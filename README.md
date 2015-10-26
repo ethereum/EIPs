@@ -6,6 +6,3 @@ We are fairly liberal with approving EIPs, and try not to be too involved in dec
 Having a EIP here does not make it a formally accepted standard until its status becomes Active. For a EIP to become Active requires the mutual consent of the community.
 Those proposing changes should consider that ultimately consent may rest with the consensus of the Ethereum users (see also: economic majority).
 
-## Prior Art
-[The Bitcoin Improvement Process](https://github.com/bitcoin/bips)
-[The Python Improvement Process](https://www.python.org/dev/peps/)
