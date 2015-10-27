@@ -8,16 +8,16 @@
 
 ==What is a EIP?==
 
-EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Bitcoin community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature.
+EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature.
 
-We intend EIPs to be the primary mechanisms for proposing new features, for collecting community input on an issue, and for documenting the design decisions that have gone into Bitcoin. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
+We intend EIPs to be the primary mechanisms for proposing new features, for collecting community input on an issue, and for documenting the design decisions that have gone into Ethereum. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
 Because the EIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
 ==EIP Types==
 
 There are three kinds of EIP:
 
-* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Bitcoin. Futher more Standard EIPs can be broken down into the following categories.
+* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Futher more Standard EIPs can be broken down into the following categories.
   * Networking
   * VM
   * Consensus
@@ -102,7 +102,6 @@ Each EIP must begin with an RFC 822 style header preamble. The headers must appe
            Withdrawn | Final | Superseded>
   Type: <Standards Track | Informational | Process>
   Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-* Post-History: <dates of postings to bitcoin mailing list>
 * Replaces: <EIP number>
 * Superseded-By: <EIP number>
 * Resolution: <url>
@@ -126,7 +125,7 @@ While a EIP is in private discussions (usually during the initial Draft phase), 
 
 The Type header specifies the type of EIP: Standards Track, Informational, or Process.
 
-The Created header records the date that the EIP was assigned a number, while Post-History is used to record the dates of when new versions of the EIP are posted to bitcoin mailing lists. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+The Created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
 EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
 
@@ -172,4 +171,4 @@ The editors don't pass judgement on EIPs. We merely do the administrative & edit
 
 ==History==
 
-This document was derived heavily from [https://github.com/bitcoin/bips Bitcoin's BIP-0001] wich in turn was derived from [https://www.python.org/dev/peps/ Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
+This document was derived heavily from [https://github.com/bitcoin/bips Bitcoin's BIP-0001] written by Todd Peters wich in turn was derived from [https://www.python.org/dev/peps/ Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
