@@ -3,24 +3,30 @@
   Title: EIP Purpose and Guidelines
   Status: Draft
   Type: Meta
-  Created: 2011-08-19
+  Author: Martin Becze <mb@ethdev.com>
+  Created: 2015-10-27
 </pre>
 
 ==What is a EIP?==
 
-EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Bitcoin community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature.
+EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature.  The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
-We intend EIPs to be the primary mechanisms for proposing new features, for collecting community input on an issue, and for documenting the design decisions that have gone into Bitcoin. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
+==EIP Rational==
 
-Because the EIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
+We intend EIPs to be the primary mechanisms for proposing new features, for collecting community input on an issue and for documenting the design decisions that have gone into Ethereum. Because the EIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
+
+For Ethereum implementers EIPs are a convenient way to track the progress of their implementation. Ideally each implementation maintainer would list the EIPs that they have implemented. This will give end users a convenient way to know the current status of a given implementation or library.  
+
+EIPs are intend to replace the venerable etherpads the described the intial PoC and strike a balance between ease of accessibility and trackablity.
+
 ==EIP Types==
 
 There are three kinds of EIP:
 
-* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Bitcoin. Futher more Standard EIPs can be broken down into the following categories.
-  * Networking
-  * VM
-  * Consensus
+* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
+** Networking
+** Consensus
+Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p reposisory].
 
 * An Informational EIP describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent a Ethereum community consensus or recommendation, so users and implementors are free to ignore Informational EIPs or follow their advice.
 * A Meta EIP describes a process surrounding Ethereum, or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
@@ -29,7 +35,7 @@ There are three kinds of EIP:
 
 The EIP repository Collaborators change the EIPs status. Please send all EIP-related email to the EIP Collaborators, which is listed under EIP Editors below. Also see EIP Editor Responsibilities & Workflow.
 
-The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. Small enhancements or patches that don't affect consensus often don't need a EIP and can be injected into the Ethereum development work flow with a patch submission to the corisponding Ethereum issue tracker. The more focused the EIP, the more successful it tends to be. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
+The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. Small enhancements or patches that don't affect consensus often don't need a EIP and can be injected into the Ethereum development workflow with a patch submission to the corresponding Ethereum issue tracker. The more focused the EIP, the more successful it tends to be. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
 
 Each EIP must have a champion -- someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea. The EIP champion (a.k.a. Author) should first attempt to ascertain whether the idea is EIP-able. Posting to the  the [https://forum.ethereum.org/categories/protocol-and-client-discussion Protocol Discussion] forum or opening an [https://github.com/ethereum/EIP/issues Issue] is the best way to go about this.
 
@@ -55,23 +61,21 @@ A EIP can also be "Rejected". Perhaps after all is said and done it was not a go
 
 EIPs can also be superseded by a different EIP, rendering the original obsolete. This is intended for Informational EIPs, where version 2 of an API can replace version 1.
 
-The possible paths of the status of BIPs are as follows:
+The possible paths of the status of EIPs are as follows:
 
-<img src=https://github.com/bitcoin/bips/blob/master/bip-0001/process.png></img>
+<img src=./eip-1/process.png></img>
 
-Some Informational and Process BIPs may also have a status of "Active" if they are never meant to be completed. E.g. EIP 1 (this EIP).
+Some Informational and Process EIPs may also have a status of "Active" if they are never meant to be completed. E.g. EIP 1 (this EIP).
 
 ==What belongs in a successful EIP?==
 
 Each EIP should have the following parts:
 
-* Preamble -- RFC 822 style headers containing meta-data about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), the names, and optionally the contact info for each author, etc.
+* Preamble -- RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), the names, and optionally the contact info for each author, etc.
 
 * Abstract -- a short (~200 word) description of the technical issue being addressed.
 
-* Copyright/public domain -- Each EIP must either be explicitly labelled as placed in the public domain (see this EIP as an example) or licensed under the Open Publication License.
-
-* Specification -- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, ethereumj, ethereum-js).
+* Specification -- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, ethereumj, ethereumjs).
 
 * Motivation -- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
@@ -82,6 +86,8 @@ Each EIP should have the following parts:
 * Backwards Compatibility -- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 * Reference Implementation -- The reference implementation must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. It is better to finish the specification and rationale first and reach consensus on it before writing code.
+
+* Test -- All EIPs non-meta should have corresponding tests. The tests should be in JSON format and if the EIP is accepted should be submited to the [https://github.com/ethereum/tests tests repository]
 
 * The final implementation must include test code and documentation appropriate for the Ethereum protocol.
 
@@ -102,7 +108,6 @@ Each EIP must begin with an RFC 822 style header preamble. The headers must appe
            Withdrawn | Final | Superseded>
   Type: <Standards Track | Informational | Process>
   Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-* Post-History: <dates of postings to bitcoin mailing list>
 * Replaces: <EIP number>
 * Superseded-By: <EIP number>
 * Resolution: <url>
@@ -120,13 +125,13 @@ if the address is not given.
 
 If there are multiple authors, each should be on a separate line following RFC 2822 continuation line conventions.
 
-Note: The Resolution header is required for Standards Track BIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the BIP is made.
+Note: The Resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While a EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the BIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
+While a EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the EIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
 
 The Type header specifies the type of EIP: Standards Track, Informational, or Process.
 
-The Created header records the date that the EIP was assigned a number, while Post-History is used to record the dates of when new versions of the EIP are posted to bitcoin mailing lists. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+The Created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
 EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
 
@@ -160,7 +165,7 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 * Assign a EIP number (almost always just the next available number)
 
-* Accept the corrisponding pull request
+* Accept the corresponding pull request
 
 * List the EIP in [[README.mediawiki]]
 
@@ -172,4 +177,4 @@ The editors don't pass judgement on EIPs. We merely do the administrative & edit
 
 ==History==
 
-This document was derived heavily from [https://github.com/bitcoin/bips Bitcoin's BIP-0001] wich in turn was derived from [https://www.python.org/dev/peps/ Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
+This document was derived heavily from [https://github.com/bitcoin/bips Bitcoin's BIP-0001] written by Todd Peters wich in turn was derived from [https://www.python.org/dev/peps/ Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
