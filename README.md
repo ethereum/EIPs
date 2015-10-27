@@ -7,9 +7,9 @@ Having a EIP here does not make it a formally accepted standard until its status
 Those proposing changes should consider that ultimately consent may rest with the consensus of the Ethereum users.
 
 # Contrubuting
-First review [EIP-1](blob/master/eip-1.mediawiki). Then clone the reposistory and add your EIP to it. Then submit a Pull Request to Ethereum's [EIP reposistroy](https://github.com/ethereum/EIP).
+First review [EIP-1](eip-1.mediawiki). Then clone the reposistory and add your EIP to it. Then submit a Pull Request to Ethereum's [EIP reposistroy](https://github.com/ethereum/EIP).
 
 # Current EIPS
 | Number        | Title         | Type  | Status |
 | ------------- |---------------| -----:| -------|
-| [1](blob/master/eip-1.mediawiki)    | EIP Purpose and Guidelines | Meta | Draft |
+| [1](eip-1.mediawiki)    | EIP Purpose and Guidelines | Meta | Draft |
