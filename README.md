@@ -1,7 +1,5 @@
 # EIP
-The Ethereum Improvement Process
-
-EIPs propose and discribe changes made to Ethereum Protocol.
+The Ethereum Improvement Process. EIPs propose and discribe changes made to Ethereum Protocol.
 
 People wishing to submit EIPs first should propose their idea or document as a PR. After discussion it will be published here. We are fairly liberal with approving EIPs and try not to be too involved in decision making on behalf of the community. Having a EIP here does not make it a formally accepted standard until its status becomes Active. For a EIP to become Active requires the mutual consent of the community. Those proposing changes should consider that ultimately consent may rest with the consensus of the Ethereum users.
 
