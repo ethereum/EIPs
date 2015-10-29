@@ -47,13 +47,13 @@ If the EIP collaborators approves, the will assign the EIP a number, label it as
 
 The EIP author may update the Draft as necessary in the git repository. Updates to drafts may also be submitted by the author as pull requests.
 
-Standards Track EIPs consist of two parts, a design document and a reference implementation. The EIP should be reviewed and accepted before a reference implementation is begun, unless a reference implementation will aid people in studying the EIP. Standards Track EIPs must include an implementation -- in the form of code, a patch, or a URL to same -- before it can be considered Final.
+Standards Track EIPs consist of three parts, a design document, implementation and finally if warrented an update to the [github.com/ethereum/yellowpaper formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track EIPs must be implemented in at least two viable Ethereum clients before it can be considered Final.
 
-EIP authors are responsible for collecting community feedback on a EIP before submitting it for review. However, wherever possible, long open-ended discussions should be avoided. Strategies to keep the discussions efficient include: having the BIP author accept private comments in the early design phases, setting up a wiki page or git repository, etc. EIP authors should use their discretion here.
+EIP authors are responsible for collecting community feedback on a EIP before submitting it for review. However, wherever possible, long open-ended discussions should be avoided. Strategies to keep the discussions efficient include: having the EIP author accept private comments in the early design phases, setting up a wiki page or git repository, etc. EIP authors should use their discretion here.
 
 For a EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-Once a EIP has been accepted, the reference implementation must be completed. When the reference implementation is complete and accepted by the community, the status will be changed to "Final".
+Once a EIP has been accepted, the implementations must be completed. When the implementation is complete in at least to viable clients and accepted by the community, the status will be changed to "Final". An update to the [github.com/ethereum/yellowpaper formal specification]should accompany the "Final" status change.
 
 A EIP can also be assigned status "Deferred". The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once a EIP is deferred, the EIP editor can re-assign it to draft status.
 
@@ -85,11 +85,7 @@ Each EIP should have the following parts:
 
 * Backwards Compatibility -- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
-* Reference Implementation -- The reference implementation must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. It is better to finish the specification and rationale first and reach consensus on it before writing code.
-
-* Test -- All EIPs non-meta should have corresponding tests. The tests should be in JSON format and if the EIP is accepted should be submited to the [https://github.com/ethereum/tests tests repository]
-
-* The final implementation must include test code and documentation appropriate for the Ethereum protocol.
+* Implementations -- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. It is better to finish the specification and rationale first and reach consensus on it before writing code.
 
 ==EIP Formats and Templates==
 
@@ -100,7 +96,7 @@ EIPs should be written in mediawiki or markdown format. Image files should be in
 Each EIP must begin with an RFC 822 style header preamble. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
 <pre>
-  BIP: <EIP number>
+  EIP: <EIP number>
   Title: <EIP title>
   Author: <list of authors' real names and optionally, email addrs>
 * Discussions-To: <email address>
