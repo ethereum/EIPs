@@ -24,9 +24,8 @@ EIPs are intend to replace the venerable etherpads the described the intial PoC 
 There are three kinds of EIP:
 
 * A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
-** Networking
-** Consensus
-Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p reposisory].
+** Consensus - Once PoS has been established it is expected that PoS protocol will have a seperate spefication.
+** Networking - Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p reposisory].
 
 * An Informational EIP describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent a Ethereum community consensus or recommendation, so users and implementors are free to ignore Informational EIPs or follow their advice.
 * A Meta EIP describes a process surrounding Ethereum, or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
@@ -47,13 +46,13 @@ If the EIP collaborators approves, the will assign the EIP a number, label it as
 
 The EIP author may update the Draft as necessary in the git repository. Updates to drafts may also be submitted by the author as pull requests.
 
-Standards Track EIPs consist of three parts, a design document, implementation and finally if warrented an update to the [github.com/ethereum/yellowpaper formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track EIPs must be implemented in at least two viable Ethereum clients before it can be considered Final.
+Standards Track EIPs consist of three parts, a design document, implementation and finally if warrented an update to the [https://github.com/ethereum/yellowpaper formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track EIPs must be implemented in at least two viable Ethereum clients before it can be considered Final.
 
 EIP authors are responsible for collecting community feedback on a EIP before submitting it for review. However, wherever possible, long open-ended discussions should be avoided. Strategies to keep the discussions efficient include: having the EIP author accept private comments in the early design phases, setting up a wiki page or git repository, etc. EIP authors should use their discretion here.
 
 For a EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-Once a EIP has been accepted, the implementations must be completed. When the implementation is complete in at least to viable clients and accepted by the community, the status will be changed to "Final". An update to the [github.com/ethereum/yellowpaper formal specification]should accompany the "Final" status change.
+Once a EIP has been accepted, the implementations must be completed. When the implementation is complete in at least to viable clients and accepted by the community, the status will be changed to "Final". An update to the [https://github.com/ethereum/yellowpaper formal specification] should accompany the "Final" status change.
 
 A EIP can also be assigned status "Deferred". The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once a EIP is deferred, the EIP editor can re-assign it to draft status.
 
