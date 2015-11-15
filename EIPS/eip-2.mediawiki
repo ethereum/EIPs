@@ -9,16 +9,16 @@
 
 ==Specification==
 
-If <code>block.number &gt;= HOMESTEAD_FORK_BLKNUM</code> (suggestion: 666000 on livenet and Morden, 0 on future testnets), do the following:
+If <code>block.number >= HOMESTEAD_FORK_BLKNUM</code> (suggestion: 666000 on livenet and Morden, 0 on future testnets), do the following:
 
-# The gas cost ''for creating contracts via a transaction'' is increased from 21000 to 53000, ie. if you send a transaction and the to address is '', the initial gas subtracted is 53000 plus the gas cost of the tx data, rather than 21000 as is currently the case. Contract creation from a contract using the <code>CREATE</code> opcode is unaffected.
-# Transactions with s-value greater than secp256k1n/2 are now considered invalid.
+# The gas cost ''for creating contracts via a transaction'' is increased from 21000 to 53000, ie. if you send a transaction and the to address is the empty string, the initial gas subtracted is 53000 plus the gas cost of the tx data, rather than 21000 as is currently the case. Contract creation from a contract using the <code>CREATE</code> opcode is unaffected.
+# Transactions with s-value greater than <code>secp256k1n/2</code> are now considered invalid.
 # If contract creation does not have enough gas to pay for the final gas fee for adding the contract code to the state, the contract creation fails (ie. goes out-of-gas) rather than leaving an empty contract.
-# Change the difficulty adjustment algorithm from the current formula: <code>block_diff = parent_diff + parent_diff // 2048 * (1 if block_timestamp - parent_timestamp &lt; 13 else -1)</code> to <code>block_diff = parent_diff + parent_diff // 2048 * max(1 - 2 * (block_timestamp - parent_timestamp) // 16, -99)</code>, where <code>//</code> is the integer division operator, ie. <code>6 // 2 = 3</code>, <code>7 // 2 = 3</code>, <code>8 // 2 = 4</code>
+# Change the difficulty adjustment algorithm from the current formula: <code>block_diff = parent_diff + parent_diff // 2048 * (1 if block_timestamp - parent_timestamp < 13 else -1)</code> to <code>block_diff = parent_diff + parent_diff // 2048 * max(1 - 2 * (block_timestamp - parent_timestamp) // 16, -99)</code>, where <code>//</code> is the integer division operator, eg. <code>6 // 2 = 3</code>, <code>7 // 2 = 3</code>, <code>8 // 2 = 4</code>
 
 ==Rationale==
 
-Currently, there is an excess incentive to create contracts via transactions, where the cost is 21000, rather than contracts, where the cost is 32000. Additionally, with the help of suicide refunds, it is currently possible to make a simple ether value transfer using only 11664 gas; the code for doing this looks as follows:
+Currently, there is an excess incentive to create contracts via transactions, where the cost is 21000, rather than contracts, where the cost is 32000. Additionally, with the help of suicide refunds, it is currently possible to make a simple ether value transfer using only 11664 gas; the code for doing this is as follows:
 
 <source lang="python">&gt; from ethereum import tester as t
 &gt; from ethereum import utils
@@ -30,7 +30,7 @@ Currently, there is an excess incentive to create contracts via transactions, wh
 1000000000000000</source>
 This is not a particularly serious problem, but is nevertheless arguably a bug.
 
-Allowing transactions with any s value with <code>0 &lt; s &lt; secp256k1n</code>, as is currently the case, opens a transaction malleability concern, as one can take any transaction, flip the s value from <code>s</code> to <code>secp256k1n - s</code>, flip the v value (<code>27 -&gt; 28</code>, <code>28 -&gt; 27</code>), and the resulting signature would still be valid. This is not a serious security flaw, especially since Ethereum uses addresses and not transaction hashes as the input to an ether value transfer or other transaction, but it nevertheless creates a UI inconvenience as an attacker can cause the transaction that gets confirmed in a block to have a different hash from the transaction that any user sends, interfering with user interfaces that use transaction hashes as tracking IDs. Preventing high s values removes this problem.
+Allowing transactions with any s value with <code>0 < s < secp256k1n</code>, as is currently the case, opens a transaction malleability concern, as one can take any transaction, flip the s value from <code>s</code> to <code>secp256k1n - s</code>, flip the v value (<code>27 -> 28</code>, <code>28 -> 27</code>), and the resulting signature would still be valid. This is not a serious security flaw, especially since Ethereum uses addresses and not transaction hashes as the input to an ether value transfer or other transaction, but it nevertheless creates a UI inconvenience as an attacker can cause the transaction that gets confirmed in a block to have a different hash from the transaction that any user sends, interfering with user interfaces that use transaction hashes as tracking IDs. Preventing high s values removes this problem.
 
 Making contract creation go out-of-gas if there is not enough gas to pay for the final gas fee has the benefits that (i) it creates a more intuitive &quot;success or fail&quot; distinction in the result of a contract creation process, rather than the current &quot;success, fail, or empty contract&quot; trichotomy, (ii) makes failures more easily detectable, as unless contract creation fully succeeds then no contract account will be created at all, and (iii) makes contract creation safer in the case where there is an endowment, as there is a guarantee that either the entire initiation process happens or the transaction fails and the endowment is refunded.
 
