@@ -15,6 +15,7 @@ If <code>block.number >= HOMESTEAD_FORK_BLKNUM</code> (suggestion: 666000 on liv
 # Transactions with s-value greater than <code>secp256k1n/2</code> are now considered invalid.
 # If contract creation does not have enough gas to pay for the final gas fee for adding the contract code to the state, the contract creation fails (ie. goes out-of-gas) rather than leaving an empty contract.
 # Change the difficulty adjustment algorithm from the current formula: <code>block_diff = parent_diff + parent_diff // 2048 * (1 if block_timestamp - parent_timestamp < 13 else -1)</code> to <code>block_diff = parent_diff + parent_diff // 2048 * max(1 - 2 * (block_timestamp - parent_timestamp) // 16, -99)</code>, where <code>//</code> is the integer division operator, eg. <code>6 // 2 = 3</code>, <code>7 // 2 = 3</code>, <code>8 // 2 = 4</code>
+# In a <code>CALLCODE</code> operation, propagate the sender and value from the parent scope to the child scope.
 
 ==Rationale==
 
@@ -38,6 +39,8 @@ The difficulty adjustment change conclusively solves a problem that the Ethereum
 
 The use of <code>(block_timestamp - parent_timestamp) // 16</code> as the main input variable rather than the time difference directly serves to maintain the coarse-grained nature of the algorithm, preventing an excessive incentive to set the timestamp difference to exactly 1 in order to create a block that has slightly higher difficulty and that will thus be guaranteed to beat out any possible forks. The cap of -99 simply serves to ensure that the difficulty does not fall extremely far if two blocks happen to be very far apart in time due to a client security bug or other black-swan issue.
 
+Propagating the sender and value from the parent scope to the child scope makes it much easier to use <code>CALLCODE</code> for a contract to store another address as a mutable source of code and ''pass through'' calls to it, as the child code would execute in essentially the same environment (except for reduced gas and increased callstack depth) as the parent.
+
 ==Implementation==
 
 This is implemented in Python here:
@@ -46,3 +49,4 @@ This is implemented in Python here:
 # https://github.com/ethereum/pyethereum/blob/develop/ethereum/processblock.py#L129
 # https://github.com/ethereum/pyethereum/blob/develop/ethereum/processblock.py#L304
 # https://github.com/ethereum/pyethereum/blob/develop/ethereum/blocks.py#L42
+# https://github.com/ethereum/pyethereum/blob/develop/ethereum/vm.py#L551
