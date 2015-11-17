@@ -17,14 +17,14 @@ We intend EIPs to be the primary mechanisms for proposing new features, for coll
 
 For Ethereum implementers EIPs are a convenient way to track the progress of their implementation. Ideally each implementation maintainer would list the EIPs that they have implemented. This will give end users a convenient way to know the current status of a given implementation or library.  
 
-EIPs are intend to replace the venerable etherpads the described the intial PoC and strike a balance between ease of accessibility and trackablity.
+EIPs are intend to replace the venerable etherpads the described the intial PoC (Proof of Concept) and strike a balance between ease of accessibility and trackablity.
 
 ==EIP Types==
 
 There are three kinds of EIP:
 
 * A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
-** Consensus - Once PoS has been established it is expected that PoS protocol will have a seperate spefication.
+** Consensus - Once PoS (Proof of Stake) has been established it is expected that the PoS protocol will have a separate specification.
 ** Networking - Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p reposisory].
 
 * An Informational EIP describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent a Ethereum community consensus or recommendation, so users and implementors are free to ignore Informational EIPs or follow their advice.
