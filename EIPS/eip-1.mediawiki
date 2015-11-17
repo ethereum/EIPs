@@ -23,9 +23,9 @@ EIPs are intend to replace the venerable etherpads the described the intial PoC 
 
 There are three kinds of EIP:
 
-* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
-** Consensus - Once PoS (Proof of Stake) has been established it is expected that the PoS protocol will have a separate specification.
-** Networking - Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p reposisory].
+* A Standard Track EIP describes any change that affects most or all Ethereum implementations, such as a change to the [https://github.com/ethereum/yellowpaper Yellow Paper], the network protocol, a change in block or transaction validity rules, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
+** Consensus - Once PoS has been established it is expected that PoS protocol will have a seperate spefication.
+** Networking - Currently Networking discussion tracks in the [https://github.com/ethereum/devp2p devp2p repository].
 
 * An Informational EIP describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent a Ethereum community consensus or recommendation, so users and implementors are free to ignore Informational EIPs or follow their advice.
 * A Meta EIP describes a process surrounding Ethereum, or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
