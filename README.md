@@ -7,6 +7,7 @@ People wishing to submit EIPs first should propose their idea an issue or docume
 First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.mediawiki). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
 
 # Current EIPS
-| Number        | Title         | Type  | Status |
-| ------------- |---------------| -----:| -------|
-| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Meta | Draft |
+| Number        | Title         | Author | Type  | Status | 
+| ------------- |---------------| ----- | -------| ------- |
+| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | Draft |
+| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Active |
