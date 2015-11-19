@@ -9,5 +9,6 @@ First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add yo
 # Current EIPS
 | Number        | Title         | Author | Type  | Status | 
 | ------------- |---------------| ----- | -------| ------- |
-| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | Draft |
-| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Active |
+| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | Active |
+| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Draft |
+| [3](EIPS/eip-3.mediawiki)    | Addition of CALLDEPTH opcode | Martin Holst Swende | Standard | Draft |
