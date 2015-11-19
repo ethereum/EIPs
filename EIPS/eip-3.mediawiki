@@ -30,6 +30,7 @@ It is possible to defend against this in two ways:
 
 
 [1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word `stack` has a different meaning within the EVM, and is not to be confused with the _call stack_.
+
 [2] https://github.com/pipermerriam/ethereum-stack-depth-lib 
 
 ==Specification==
@@ -38,7 +39,8 @@ The opcode <code>CALLDEPTH</code> should return the remaining call stack depth. 
 
 ==Rationale==
 
-The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks. 
+The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
 
 ==Implementation==
 
+Not implemented. 
