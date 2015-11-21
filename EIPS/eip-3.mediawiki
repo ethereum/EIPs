@@ -27,7 +27,7 @@ In order to have a EIP process which more closely reflects the interoperability 
 Standards EIPs are placed in one of four layers:
 
 # Consensus
-# Peer Services
+# Networking
 # API/RPC
 # Applications
 
@@ -47,13 +47,14 @@ In a soft fork, some structures that were valid under the old rules are no longe
 
 In a hard fork, structures that were invalid under the old rules become valid under the new rules.
 
-===2. Peer Services Layer===
+===2. Networking Layer===
 
-The peer services layer specifies how nodes find each other and propagate messages.
+The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les).  RLPx is excluded and tracked in the [https://github.com/ethereum/devp2p devp2p repository].
 
-Only a subset of all specified peer services are required for basic node interoperability. Nodes can support further optional extensions.
+Only a subset of subprotocols are required for basic node interoperability. Nodes can support further optional extensions.
 
-It is always possible to add new services without breaking compatibility with existing services, then gradually deprecate older services. In this manner, the entire network can be upgraded without serious risks of service disruption.
+It is always possible to add new subprotocols without breaking compatibility with existing protocols, then gradually deprecate older protocols. In this manner, the entire network can be upgraded without serious risks of service disruption.
+
 
 ===3. API/RPC Layer===
 
