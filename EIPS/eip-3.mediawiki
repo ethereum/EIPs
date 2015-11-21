@@ -1,0 +1,6 @@
+
+# Add a new opcode, <code>DELEGATE_CALL</code> at 0xf4, which is te same as <code>CALLCODE</code> except it propagates the sender and value from the parent scope to the child scope.
+
+Propagating the sender and value from the parent scope to the child scope makes it much easier for a contract to store another address as a mutable source of code and ''pass through'' calls to it, as the child code would execute in essentially the same environment (except for reduced gas and increased callstack depth) as the parent.
+
+# https://github.com/ethereum/pyethereum/blob/develop/ethereum/vm.py#L551
