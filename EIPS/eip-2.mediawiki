@@ -12,7 +12,7 @@
 If <code>block.number >= HOMESTEAD_FORK_BLKNUM</code> (suggestion: 666000 on livenet and Morden, 0 on future testnets), do the following:
 
 # The gas cost ''for creating contracts via a transaction'' is increased from 21000 to 53000, ie. if you send a transaction and the to address is the empty string, the initial gas subtracted is 53000 plus the gas cost of the tx data, rather than 21000 as is currently the case. Contract creation from a contract using the <code>CREATE</code> opcode is unaffected.
-# All eliptic-curve recover operations on a signature whose s-value is greater than <code>secp256k1n/2</code> are now considered invalid.
+# All transaction signatures whose s-value is greater than <code>secp256k1n/2</code> are now considered invalid.
 # If contract creation does not have enough gas to pay for the final gas fee for adding the contract code to the state, the contract creation fails (ie. goes out-of-gas) rather than leaving an empty contract.
 # Change the difficulty adjustment algorithm from the current formula: <code>block_diff = parent_diff + parent_diff // 2048 * (1 if block_timestamp - parent_timestamp < 13 else -1)</code> to <code>block_diff = parent_diff + parent_diff // 2048 * max(1 - (block_timestamp - parent_timestamp) // 10, -99)</code>, where <code>//</code> is the integer division operator, eg. <code>6 // 2 = 3</code>, <code>7 // 2 = 3</code>, <code>8 // 2 = 4</code>
 
