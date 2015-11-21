@@ -1,5 +1,5 @@
 <pre>
-  BIP: <EIP number>
+  EIP: <EIP number>
   Title: <EIP title>
   Author: <list of authors' real names and optionally, email addrs>
   Discussions-To: <email address>
