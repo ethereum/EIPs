@@ -2,7 +2,7 @@
   EIP: 2
   Title: Homestead Hard-fork Changes
   Author: Vitalik Buterin <v@buterin.com>
-  Status: Active
+  Status: Accepted
   Type: Hard-fork protocol change
   Created: 2015-11-15
 </pre>
