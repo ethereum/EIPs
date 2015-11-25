@@ -5,6 +5,7 @@
       Author: Christian Reitwiessner <c@ethdev.com>
       Status: Draft
       Type: Standards Track
+      Layer: Consensus (hard-fork)
       Created: 2015-11-22
 
 ### Abstract
