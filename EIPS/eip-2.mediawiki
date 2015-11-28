@@ -3,7 +3,8 @@
   Title: Homestead Hard-fork Changes
   Author: Vitalik Buterin <v@buterin.com>
   Status: Accepted
-  Type: Hard-fork protocol change
+  Type: Standard
+  Layer: Consensus (hard-fork)
   Created: 2015-11-15
 </pre>
 
