@@ -13,4 +13,4 @@ First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add yo
 | [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Consensus (hard-fork) | Accepted |
 | [3](EIPS/eip-3.mediawiki)    | Addition of CALLDEPTH opcode | Martin Holst Swende | Standard | Consensus (hard-fork) | Draft |
 | [4](EIPS/eip-4.mediawiki)    | EIP Classification | Joseph Chow | Meta | | Draft |
-| [5](EIPS/eip-5.mediawiki)    | Gas Usage for `RETURN` and `CALL*` | Christian Reitwiessner | Standard | Consensus (hard-fork) | Draft |
+| [5](EIPS/eip-5.md)    | Gas Usage for `RETURN` and `CALL*` | Christian Reitwiessner | Standard | Consensus (hard-fork) | Draft |
