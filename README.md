@@ -7,10 +7,10 @@ People wishing to submit EIPs first should propose their idea an issue or docume
 First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.mediawiki). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
 
 # Current EIPS
-| Number        | Title         | Author | Type  | Status | 
-| ------------- |---------------| ----- | -------| ------- |
-| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | Active |
-| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Accepted |
-| [3](EIPS/eip-3.mediawiki)    | Addition of CALLDEPTH opcode | Martin Holst Swende | Standard | Draft |
-| [4](EIPS/eip-4.mediawiki)    | EIP Classification | Joseph Chow | Meta | Draft |
-| [5](EIPS/eip-5.md)    | Gas Usage for `RETURN` and `CALL*` | Christian Reitwiessner | Standard | Draft |
+| Number        |Title         | Author | Type  | Layer        | Status | 
+| ------------- | ------------ | ------ | ----- | -------------| ------ |
+| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | | Active |
+| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | Consensus (hard-fork) | Accepted |
+| [3](EIPS/eip-3.mediawiki)    | Addition of CALLDEPTH opcode | Martin Holst Swende | Standard | Consensus (hard-fork) | Draft |
+| [4](EIPS/eip-4.mediawiki)    | EIP Classification | Joseph Chow | Meta | | Draft |
+| [5](EIPS/eip-5.mediawiki)    | Gas Usage for `RETURN` and `CALL*` | Christian Reitwiessner | Standard | Consensus (hard-fork) | Draft |
