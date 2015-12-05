@@ -1,7 +1,7 @@
 ### Title
 
       EIP: 6
-      Title: Renaming Suicide Variable
+      Title: Renaming SUICIDE opcode
       Author: Hudson Jameson <hudson@hudsonjameson.com>
       Status: Draft
       Type: Standards Track
