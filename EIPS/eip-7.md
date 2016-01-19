@@ -2,8 +2,8 @@
       EIP: 7
       Title: DELEGATECALL
       Author: Vitalik Buterin <v@buterin.com>
-      Status: Active
-      Type: Serenity feature
+      Status: Accepted
+      Type: Homestead feature
       Created: 2015-11-15
 
 ### Overview
