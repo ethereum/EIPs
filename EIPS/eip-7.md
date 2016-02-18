@@ -26,7 +26,7 @@ Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCOD
 - Unused gas is refunded as normal.
 
 #### Notes on Sender
-- `CALLER` behaves exactly in the callee's environment as it does in the caller's environment.
+- `CALLER` and `VALUE` behave exactly in the callee's environment as they do in the caller's environment.
 
 #### Other Notes
 - The depth limit of 1024 is still preserved as normal.
