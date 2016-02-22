@@ -49,7 +49,7 @@ Furthermore, charging gas for areas of memory that are not actually written to i
 
 This proposal tries to solve both problems: A caller can choose to provide a gigantic area of
 memory at the end of their memory area. The callee can "write" to it by returning and the
-caller is only changed for the memory area that is actually written.
+caller is only charged for the memory area that is actually written.
 
 This makes it possible to return dynamic data like strings and dynamically-sized arrays
 in a very flexible way. It is even possible to determine the size of the returned data:
