@@ -10,7 +10,7 @@
 
 ==Specification==
 
-If <code>block.number >= HOMESTEAD_FORK_BLKNUM</code> (eg. 100,000,000 (NOT YET SET IN STONE!) on livenet and Morden, 0 on future testnets), do the following:
+If <code>block.number >= HOMESTEAD_FORK_BLKNUM</code> (eg. 1.150.000 (NOT YET SET IN STONE!) on livenet and Morden, 0 on future testnets), do the following:
 
 # The gas cost ''for creating contracts via a transaction'' is increased from 21000 to 53000, ie. if you send a transaction and the to address is the empty string, the initial gas subtracted is 53000 plus the gas cost of the tx data, rather than 21000 as is currently the case. Contract creation from a contract using the <code>CREATE</code> opcode is unaffected.
 # All transaction signatures whose s-value is greater than <code>secp256k1n/2</code> are now considered invalid.
