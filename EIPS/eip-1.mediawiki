@@ -131,7 +131,8 @@ The Created header records the date that the EIP was assigned a number. Both hea
 EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
 
 EIPs may also have a Superseded-By header indicating that a EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
-Auxiliary Files
+
+==Auxiliary Files==
 
 EIPs may include auxiliary files such as diagrams. Such files must be named EIP-XXXX-Y.ext, where "XXXX" is the EIP number, "Y" is a serial number (starting at 1), and "ext" is replaced by the actual file extension (e.g. "png").
 
