@@ -16,8 +16,14 @@ Motivation
 Currently, if a user navigate to a dapp running on a website using her/his everyday browser, the dapp will have by default no access to the rpc node for security reason. The user will have to enable CORS for the website's domain in order for the dapp to work. Unfortunately if the user do so, the dapp will be able to send transaction from any unlocked account without the need for any user consent. In other word not only the user need to change its node default setting but the user is also forced to trust the dapp in order to use it. This is of course not acceptable and force existing dapps to rely on the use of workarround like:
 - if the transaction is a plain ether transfer the user is asked to enter it in a dedicated trusted wallet like "Mist"
 - For more complex case, the user is asked to enter the transaction manually via the node command line interface.
+
+
 This proposal aims to provide a safe and user friendly alternative.
 <img src="./draft-dapp-html-authorization/authorization.png">
+
+<img src="./draft-dapp-html-authorization/authorization-password.png">
+
+<img src="./draft-dapp-html-authorization/authorization-locked.png">
 
 Specification
 =============
