@@ -18,12 +18,20 @@ Currently, if a user navigate to a dapp running on a website using her/his every
 - For more complex case, the user is asked to enter the transaction manually via the node command line interface.
 
 
-This proposal aims to provide a safe and user friendly alternative.
+This proposal aims to provide a safe and user friendly alternative:
+
+Account unlocked :
+-----------------
 <img src="./draft-dapp-html-authorization/authorization.png">
 
+Account locked and no "personal" api exposed via rpc:
+-----------------
+<img src="./draft-dapp-html-authorization/authorization-locked.png">
+
+Account locked but node exposing the "personal" api via rpc :
+-----------------
 <img src="./draft-dapp-html-authorization/authorization-password.png">
 
-<img src="./draft-dapp-html-authorization/authorization-locked.png">
 
 Specification
 =============
