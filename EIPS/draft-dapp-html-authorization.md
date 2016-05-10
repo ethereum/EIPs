@@ -198,13 +198,13 @@ That's it
             <p id="infomessage">Please wait...</p>
         </div>
         
-        <div id="form" class="wrapper">
+        <form id="form" class="wrapper">
             <br/>
             <p id="message" class="message"></p>
             <p id="passwordField"><label>Password Required:</label><input id="password" type="password" /></p>
-            <button id="cancel-button" autofocus>Cancel</button>
-            <button id="confirm-button" >Confirm</button>
-        </div>
+            <button id="cancel-button" type="button" autofocus>Cancel</button>
+            <button id="confirm-button" type="button" >Confirm</button>
+        </form>
     
         <div id="modal-dialog" class="wrapper">
             <h3 id="modal-dialog-title" class="title">Title</h3>
@@ -213,6 +213,8 @@ That's it
         </div>
             
         <script>
+        var noMessageReceivedYet = true;
+        var closedByCode = false;
         var pleaseWait = document.getElementById("pleasewait");
         var form = document.getElementById("form");
         var cancelButton = document.getElementById("cancel-button");
@@ -235,7 +237,13 @@ That's it
         }else if(window.parent != window){
             source = window.parent;
         }else{
-            console.error("no opener nor parent");
+            console.log("closing");
+            window.close();
+        }
+        
+        function closeWindow(){
+            closedByCode = true;
+            window.close();
         }
         
         function showWaiting(){
@@ -271,9 +279,13 @@ That's it
                 }
             }
         }
+        
+        function hideMessage(){
+            modalDialog.style.display = "none";
+            modalDialogButton.onclick = null;
+        }
             
         function sendAsync(url,payload, callback) {
-            //var url = window.location.protocol + '//' + window.location.host; // this would force the use of the iframe url
             var request = new XMLHttpRequest();
             request.open('POST', url, true);
             request.setRequestHeader('Content-Type','application/json'); 
@@ -286,7 +298,7 @@ That's it
                         result = JSON.parse(result);
                     } catch(e) {
                         var message = !!result && !!result.error && !!result.error.message ? result.error.message : 'Invalid JSON RPC response: ' + JSON.stringify(result);
-                        error = {message:message};
+                        error = {message:message,type:"JsonParse"};
                     }
                     callback(error, result);
                 }
@@ -295,7 +307,7 @@ That's it
             try {
                 request.send(JSON.stringify(payload));
             } catch(e) {
-                callback({message:'CONNECTION ERROR: Couldn\'t connect to node '+ url +'.'});
+                callback({message:'CONNECTION ERROR: Couldn\'t connect to node '+ url +'.',type:"noConnection"});
             }
         }
         
@@ -305,8 +317,7 @@ That's it
                 size: 8,
                 scale: 6
             });
-            //icon.style="vertical-align:middle";
-            message.appendChild(icon); //
+            message.appendChild(icon);
         }
         
         function askAuthorization(transactionInfo, data, requireUnlock, sourceWindow){
@@ -331,7 +342,6 @@ That's it
             var span = document.createElement('span');
             span.style="font-size:3em;";
             span.innerHTML = "&nbsp;&nbsp;&nbsp;" + "&#x2192;" + "&nbsp;&nbsp;&nbsp;";
-            //span.innerHTML = "&#10145;";
             message.appendChild(span);
             
             addBlocky(message,transactionInfo.to);
@@ -342,21 +352,21 @@ That's it
             textSpan.innerHTML = etherValue.toFormat() + " ether <br/>  + gas cost (" + gasEtherValue.toFormat() + " ether )"
             
             if(requireUnlock){
-                passwordField.style.display = "block"; //inline ?
+                passwordField.style.display = "block"; 
             }else{
                 passwordField.style.display = "none"; 
             }
             
             cancelButton.onclick = function(){
-                sourceWindow.postMessage({id:data.id,result:null,error:{message:"Not Authorized"}},sourceWindow.location.href);
-                window.close();
+                sourceWindow.postMessage({id:data.id,result:null,error:{message:"Not Authorized"},type:"cancel"},sourceWindow.location.href);
+                closeWindow();
             }
             
-            confirmButton.onclick = function(){
+            var submitFunc = function(){
                 if(requireUnlock){
                     if(password.value == ""){
                         password.style.border = "2px solid red";
-                        return;
+                        return false;
                     }
                     password.style.border = "none";
                     var params = [transactionInfo.from,password.value,3];
@@ -365,26 +375,31 @@ That's it
                         if(error || result.error){
                             showMessage("Error unlocking account", "Please retry.", hideWaiting);
                         }else{
-                            sendAsync(data.url,data.payload,function(error,result){ //data.url to allow use of different but trusted domain
+                            sendAsync(data.url,data.payload,function(error,result){
                                 sourceWindow.postMessage({id:data.id,result:result,error:error},sourceWindow.location.href);
-                                window.close();
+                                closeWindow();
                             });
                             showWaiting();
                         }
                     });
                 }else{
-                    sendAsync(data.url,data.payload,function(error,result){ //data.url to allow use of different but trusted domain
+                    sendAsync(data.url,data.payload,function(error,result){
                         if(result && result.error){
                             processMessage(data,sourceWindow);
                         }else{
                             sourceWindow.postMessage({id:data.id,result:result,error:error},sourceWindow.location.href);
-                            window.close();
+                            closeWindow();
                         }
                     });
                     showWaiting();
                 }
                 
+                return false;
+                
             }
+            
+            form.onsubmit = submitFunc;
+            confirmButton.onclick = submitFunc;
             
         }
         
@@ -412,16 +427,26 @@ That's it
             }else{
                 firstUrl = event.origin;
             }
+            hideMessage();
+            noMessageReceivedYet = false;
             var data = event.data;
-            processMessage(data,event.source);
+            try{
+                processMessage(data,event.source);
+            }catch(e){
+                event.source.postMessage({id:data.id,result:null,error:{message:"Could not process message data"},type:"notValid"},event.source.location.href);
+                showMessage("Error","The application has sent invalid data", function(){
+                    closeWindow();
+                });
+            }
+            
         }
         
         function processMessage(data, sourceWindow){
             if(data.payload.method == "eth_sendTransaction" || data.payload.method == "eth_sign"){
                 if(inIframe){
-                    sourceWindow.postMessage({id:data.id,result:null,error:{message:"Cannot make call that require an unlokced key (" + data.payload.method + ") via iframe"}},sourceWindow.location.href);
+                    sourceWindow.postMessage({id:data.id,result:null,error:{message:"Cannot make call that require an unlocked key (" + data.payload.method + ") via iframe"},type:"notAllowed"},sourceWindow.location.href);
                 }else if(data.payload.method == "eth_sign"){
-                    sourceWindow.postMessage({id:data.id,result:null,error:{message:"cannot sign transaction (" + data.payload.method + ") via html"}},sourceWindow.location.href);
+                    sourceWindow.postMessage({id:data.id,result:null,error:{message:"cannot sign transaction (" + data.payload.method + ") via html",type:"notAllowed"}},sourceWindow.location.href);
                 }else{
                     var transactionInfo = null;
                     if(data.payload.params.length > 0){ 
@@ -450,17 +475,31 @@ That's it
                             
                         });
                     }else{
-                        sourceWindow.postMessage({id:data.id,result:null,error:{message:"Need to specify from , to,  gas and gasPrice"}},sourceWindow.location.href);
-                        window.close();
+                        sourceWindow.postMessage({id:data.id,result:null,error:{message:"Need to specify from , to,  gas and gasPrice"},type:"notValid"},sourceWindow.location.href);
+                        closeWindow();
                     }
                 }
             }else{
-                sendAsync(data.url,data.payload,function(error,result){ //data.url to allow use of different but trusted domain
+                sendAsync(data.url,data.payload,function(error,result){
                     sourceWindow.postMessage({id:data.id,result:result,error:error},sourceWindow.location.href);
                 });
             }
         }
         
+        window.onbeforeunload = function (event) {
+            if(!closedByCode){
+                source.postMessage({id:data.id,result:null,error:{message:"Not Authorized",type:"cancel"}},source.location.href);
+            }
+        };
+        
+        function checkMessageNotReceived(){
+            if(noMessageReceivedYet){
+                showMessage("Error","No transaction received. Please make sure popup are not blocked.", function(){
+                    closeWindow();
+                });
+            }
+        }
+        setTimeout(checkMessageNotReceived,1000);
         
         window.addEventListener("message", receiveMessage);
         if(source){
