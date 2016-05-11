@@ -28,19 +28,19 @@ Account unlocked :
 -----------------
 When the account is already unlocked, the user is presented with the following popup for every transaction that the dapp attempts to make :
 
-<img src="./draft-dapp-html-authorization/authorization.png">
+<img src="./eip-XXX/authorization.png">
 
 Account locked and no "personal" api exposed via rpc:
 -----------------
 When the account is locked and the node do not provide access to account unlocking via its rpc interface, the following popup will be presented. This is not ideal since this require the user to know how to unlock an account:
 
-<img src="./draft-dapp-html-authorization/authorization-locked.png">
+<img src="./eip-XXX/authorization-locked.png">
 
 Account locked but node exposing the "personal" api via rpc :
 -----------------
 A better option is to ask the user the password but this is only possible if the node allow access to the "personal" api via rpc. In such case the following dialog will be presented to the user so he/she can accept the transaction by providing the password required to unlock the account:
 
-<img src="./draft-dapp-html-authorization/authorization-password.png">
+<img src="./eip-XXX/authorization-password.png">
 
 
 Specification
