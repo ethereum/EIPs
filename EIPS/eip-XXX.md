@@ -51,7 +51,7 @@ This file will then be used by the dapp in 2 different modes (invisible iframe a
 
 The invisible iframe will be embeded in the dapp to allow the dapp to send its read-only rpc call without having to enable CORS for the dapp's website domain. This is done by sending message to the iframe (via javascript ```window.postMessage```) which in turn execute the rpc call. This works since the iframe and the node share the same domain/port. 
 
-In the iframe node, the html file's javascript code will ensure that no call requiring an unlocked key can be made. This is to prevent dapps from embedding the invisible iframe and tricking the user into clicking the confirm button.
+In the iframe mode, the html file's javascript code will ensure that no call requiring an unlocked key can be made. This is to prevent dapps from embedding the invisible iframe and tricking the user into clicking the confirm button.
 If the dapp requires an ```eth_sendTransaction``` call, the dapp will instead open a new window using the same url.
 
 In this popup window mode, the html file's javascript code will alow ```eth_sendTransaction``` (but not  ```eth_sign```, as there is no way to display to the user the meaningful content of the transaction to sign in a safe way) to be called. But instead of sending the call to the node directly, a confirmation dialog will be presented showing the sender and recipient addresses, as well as the amount being transfered along with the potential gas cost. Upon the user approving, the request will be sent and the result returned to the dapp. An error will be returned in case the user cancel the request. 
