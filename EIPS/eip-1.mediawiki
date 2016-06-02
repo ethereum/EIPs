@@ -52,7 +52,7 @@ EIP authors are responsible for collecting community feedback on a EIP before su
 
 For a EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-Once a EIP has been accepted, the implementations must be completed. When the implementation is complete in at least to viable clients and accepted by the community, the status will be changed to "Final". An update to the [https://github.com/ethereum/yellowpaper formal specification] should accompany the "Final" status change.
+Once a EIP has been accepted, the implementations must be completed. When the implementation is complete in at least two viable clients and accepted by the community, the status will be changed to "Final". An update to the [https://github.com/ethereum/yellowpaper formal specification] should accompany the "Final" status change.
 
 A EIP can also be assigned status "Deferred". The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once a EIP is deferred, the EIP editor can re-assign it to draft status.
 
