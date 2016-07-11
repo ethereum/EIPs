@@ -1,6 +1,5 @@
 ### Title
 
-      EIP: 9
       Title: Add precompiled BLAKE2b contract
       Author: Tjaden Hess <tah83@cornell.edu>
       Status: Draft
