@@ -21,10 +21,10 @@ This EIP introduces a new precompiled contract which implements the BLAKE2b cryp
 
 Adds a precompile at address `0x0000....0c` which accepts a variable length input interpreted as
 
-    [INSIZE, OUTSIZE, D_1, D_2, ..., D_INSIZE]
+    [OUTSIZE, D_1, D_2, ..., D_INSIZE]
 
 
- where `INSIZE` is the length in bytes of the input. If the length of data provided is less than `INSIZE`, remaining bytes are assumed to be zero, extra bytes are ignored. Throws if `OUTSIZE` is greater than 64. Returns the `OUTSIZE`-byte BLAKE2b digest, as defined in [RFC 7693](https://tools.ietf.org/html/rfc7693).
+ where `INSIZE` is the length in bytes of the input. Throws if `OUTSIZE` is greater than 64. Returns the `OUTSIZE`-byte BLAKE2b digest, as defined in [RFC 7693](https://tools.ietf.org/html/rfc7693).
 
 Gas costs would be equal to `GBLAKEBASE + GBLAKEWORD * floor(INSIZE / 32)`
 
