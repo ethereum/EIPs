@@ -17,3 +17,4 @@ First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add yo
 | [6](EIPS/eip-6.md)    | Renaming Suicide Variable | Hudson Jameson | Meta |  | [Draft](https://github.com/ethereum/EIPs/pull/42) |
 | [7](EIPS/eip-7.md)    | DELEGATECALL | Vitalik Buterin | Standard | homestead (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/23) |
 | [8](EIPS/eip-8.md)    | devp2p Forward Compatibility Requirements for Homestead | Felix Lange | Standard | Networking | [Accepted](https://github.com/ethereum/EIPs/pull/49) |
+| [150](https://github.com/ethereum/EIPs/issues/150)    | Gas cost changes for IO-heavy operations | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/150) |
