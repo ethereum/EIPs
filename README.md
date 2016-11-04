@@ -18,3 +18,6 @@ First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add yo
 | [7](EIPS/eip-7.md)    | DELEGATECALL | Vitalik Buterin | Standard | homestead (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/23) |
 | [8](EIPS/eip-8.md)    | devp2p Forward Compatibility Requirements for Homestead | Felix Lange | Standard | Networking | [Accepted](https://github.com/ethereum/EIPs/pull/49) |
 | [150](https://github.com/ethereum/EIPs/issues/150)    | Gas cost changes for IO-heavy operations | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/150) |
+| [155](https://github.com/ethereum/EIPs/issues/155)    | Simple replay attack protection | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/155) |
+| [160](https://github.com/ethereum/EIPs/issues/160)    | EXP cost increase | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/160) |
+| [161](https://github.com/ethereum/EIPs/issues/161)    | State trie clearing (invariant-preserving alternative) | Gavin Wood | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/161) |
