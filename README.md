@@ -21,3 +21,4 @@ First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add yo
 | [155](https://github.com/ethereum/EIPs/issues/155)    | Simple replay attack protection | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/155) |
 | [160](https://github.com/ethereum/EIPs/issues/160)    | EXP cost increase | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/160) |
 | [161](https://github.com/ethereum/EIPs/issues/161)    | State trie clearing (invariant-preserving alternative) | Gavin Wood | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/161) |
+| [170](https://github.com/ethereum/EIPs/issues/170)    | Contract code size limit | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/170) |
