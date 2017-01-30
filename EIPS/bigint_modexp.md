@@ -16,11 +16,11 @@ Example:
     0000000000000000000000000000000000000000000000000000000000000020fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
     0000000000000000000000000000000000000000000000000000000000000020fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
     
-Represents the exponent 3**(2**256 - 2**32 - 978) % (2**256 - 2**32 - 977). By Fermat's little theorem, this equals 1, so the result is:
+Represents the exponent `3**(2**256 - 2**32 - 978) % (2**256 - 2**32 - 977)`. By Fermat's little theorem, this equals 1, so the result is:
 
     0000000000000000000000000000000000000000000000000000000000000001
     
-Returned as 32 bytes because the modulus length was 32 bytes. The gas cost would be 32**2 * 32 / 20 = 1638 gas (note that this roughly equals the cost of using the EXP opcode to compute a 32-byte exponent). A 4096-bit RSA exponentiation would cost 256**2 * 256 / 20 = 838860 gas in the worst case, though RSA verification in practice usually uses an exponent of 3 or 65537, which would reduce the gas consumption to 3276 or 6553, respectively.
+Returned as 32 bytes because the modulus length was 32 bytes. The gas cost would be `32**2 * 32 / 20 = 1638` gas (note that this roughly equals the cost of using the EXP opcode to compute a 32-byte exponent). A 4096-bit RSA exponentiation would cost `256**2 * 256 / 20 = 838860` gas in the worst case, though RSA verification in practice usually uses an exponent of 3 or 65537, which would reduce the gas consumption to 3276 or 6553, respectively.
 
 ### Rationale
 
