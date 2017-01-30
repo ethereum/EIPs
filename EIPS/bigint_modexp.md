@@ -10,11 +10,14 @@ At address 0x00......05, add a precompile that expects input in the following fo
     
 Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Consumes `floor(length(MODULUS)**2 * length(EXPONENT) / GQUADDIVISOR)` gas. If there is enough gas, returns an output as a byte array with the same length as the modulus.
 
-Example:
+For example, the input data:
 
-    000000000000000000000000000000000000000000000000000000000000000103
-    0000000000000000000000000000000000000000000000000000000000000020fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
-    0000000000000000000000000000000000000000000000000000000000000020fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+    0000000000000000000000000000000000000000000000000000000000000001
+    03
+    0000000000000000000000000000000000000000000000000000000000000020
+    fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
+    0000000000000000000000000000000000000000000000000000000000000020
+    fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
     
 Represents the exponent `3**(2**256 - 2**32 - 978) % (2**256 - 2**32 - 977)`. By Fermat's little theorem, this equals 1, so the result is:
 
