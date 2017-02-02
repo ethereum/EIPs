@@ -1,19 +1,19 @@
-This is the suggested template for creating new EIPs.
+This is the suggested template for new EIPs.
 
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, use an abbreviated title in the filename, eip-draft_title_abbrev.md.
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
 
 ## Preamble
-<pre>
-  EIP: <to be assigned>
-  Title: <EIP title>
-  Author: <list of authors' names and optionally, email addresses>
-  Type: <Standard Track | Informational | Meta>
-  Category(*only required for Standard Track): <Core | Networking | Interface | ERC> 
-  Status: Draft
-  Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-  Requires (*optional): <EIP number(s)>
-  Replaces (*optional): <EIP number(s)>
-</pre>
+
+    EIP: <to be assigned>
+    Title: <EIP title>
+    Author: <list of authors' names and optionally, email addresses>
+    Type: <Standard Track | Informational | Meta>
+    Category (*only required for Standard Track): <Core | Networking | Interface | ERC> 
+    Status: Draft
+    Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+    Requires (*optional): <EIP number(s)>
+    Replaces (*optional): <EIP number(s)>
+
 
 ## Simple Summary
 "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
@@ -39,7 +39,5 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 ## Implementation
 The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
 
-
 ## Copyright
-License: Apache 2.0
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
