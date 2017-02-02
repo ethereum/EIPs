@@ -3,12 +3,12 @@
       Status: Draft
       Type: Meta
       Author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
-      Created: 2015-10-27, 2017-02-xx
+      Created: 2015-10-27, 2017-02-01
 
 What is a EIP?
 --------------
 
-EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP shousld provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
+EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
 EIP Rational
 ------------
@@ -38,7 +38,7 @@ The EIP repository Collaborators change the EIPs status. Please send all EIP-rel
 
 The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
 
-Each EIP must have a champion -- someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
+Each EIP must have a champion - someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
 
 Vetting an idea publicly before going as far as writing a EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP. 
 
@@ -69,43 +69,43 @@ What belongs in a successful EIP?
 
 Each EIP should have the following parts:
 
--   Preamble -- RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), the names, and optionally the contact info for each author, etc.
+-   Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), the names, and optionally the contact info for each author, etc.
 
 <!-- -->
 
--   Simple Summary -- “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the EIP.
+-   Simple Summary - “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the EIP.
 
 <!-- -->
 
--   Abstract -- a short (~200 word) description of the technical issue being addressed.
+-   Abstract - a short (~200 word) description of the technical issue being addressed.
 
 <!-- -->
 
--   Motivation -- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+-   Motivation - The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
 <!-- -->
 
--   Specification -- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, …).
+-   Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, …).
 
 <!-- -->
 
--   Rationale -- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
+-   Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 
 <!-- -->
 
--   Backwards Compatibility -- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+-   Backwards Compatibility - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 <!-- -->
 
--   Backwards Compatibility -- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+-   Backwards Compatibility - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 <!-- -->
 
--   Test Cases -- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+-   Test Cases - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
 
 <!-- -->
 
--   Implementations -- The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
+-   Implementations - The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
 
 EIP Formats and Templates
 -------------------------
@@ -115,13 +115,13 @@ EIPs should be written in [markdown] format. Image files should be included in a
 EIP Header Preamble
 -------------------
 
-Each EIP must begin with an RFC 822 style header preamble. The headers must appear in the following order. Headers marked with "\*" are optional and are described below. All other headers are required.
+Each EIP must begin with an RFC 822 style header preamble. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
 ` EIP: ` <EIP number> (this is determined by the EIP editor)
 
 ` Title: `<EIP title>
 
-` Author: `<list of author\'s real names and optionally, email address>
+` Author: `<list of author's real names and optionally, email address>
 
 ` * Discussions-To: ` <email address>
 
@@ -167,9 +167,9 @@ EIPs may include auxiliary files such as diagrams. Such files must be named EIP-
 Transferring EIP Ownership
 --------------------------
 
-It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we\'d like to retain the original author as a co-author of the transferred EIP, but that\'s really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around a EIP, but if that\'s not possible, you can always submit a competing EIP.
+It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that\'s really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around a EIP, but if that\'s not possible, you can always submit a competing EIP.
 
-If you are interested in assuming ownership of a EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn\'t respond to email in a timely manner, the EIP editor will make a unilateral decision (it\'s not like such decisions can\'t be reversed :).
+If you are interested in assuming ownership of a EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :).
 
 EIP Editors
 -----------
@@ -177,13 +177,21 @@ EIP Editors
 The current EIP editors are
 
 ` * Casey Detrio (@cdetrio)`
+
 ` * Fabian Vogelsteller (@frozeman)`
+
 ` * Gavin Wood (@gavofyork)`
+
 ` * Hudson Jameson (@Souptacular)`
+
 ` * Jeffrey Wilcke (@obscuren)`
+
 ` * Martin Becze (@wanderer)`
+
 ` * Nick Johnson (@arachnid)`
+
 ` * Roman Mandeleil (@romanman)`
+
 ` * Vitalik Buterin (@vbuterin)`
 
 EIP Editor Responsibilities and Workflow
@@ -215,15 +223,16 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
-The editors don\'t pass judgment on EIPs. We merely do the administrative & editorial part.
+The editors don't pass judgment on EIPs. We merely do the administrative & editorial part.
 
 History
 -------
 
-This document was derived heavily from [Bitcoin\'s BIP-0001] written by Amir Taaki which in turn was derived from [Python\'s PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
+This document was derived heavily from [Bitcoin's BIP-0001] written by Amir Taaki which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
 
 December 7, 2016: EIP 1 has been improved and will be placed as a PR.
-February XX, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
+
+February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
