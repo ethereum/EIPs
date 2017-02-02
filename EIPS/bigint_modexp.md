@@ -33,7 +33,29 @@ This input data:
     0000000000000000000000000000000000000000000000000000000000000020
     fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
     
-Would 
+Would be parsed as a base of 0, exponent of `2**256 - 2**32 - 978` and modulus of `2**256 - 2**32 - 978`, and so would return 0. Notice how if the BASE_LENGTH is 0, then it does not interpret _any_ data as the base, instead immediately interpreting the next 32 bytes as EXPONENT_LENGTH.
+
+This input data:
+
+    0000000000000000000000000000000000000000000000000000000000000000
+    0000000000000000000000000000000000000000000000000000000000000020
+    ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
+    fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd
+    
+Would parse as a base of 0, an exponent of `2**256 - 1`, but then it would see an exponent length of `2**256 - 2`, notice that there are not enough bytes in the exponent to cover that length, and so it would throw.
+
+This input data:
+
+    0000000000000000000000000000000000000000000000000000000000000001
+    03
+    0000000000000000000000000000000000000000000000000000000000000002
+    ffff
+    0000000000000000000000000000000000000000000000000000000000000020
+    ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+    00
+
+Would parse as a base of 3, an exponent of 65535, and a modulus of `2**256 - 1`, but then there is an extra zero byte left over, which would cause it to throw.
 
 ### Rationale
 
