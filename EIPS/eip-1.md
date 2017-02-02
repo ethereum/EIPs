@@ -167,7 +167,7 @@ EIPs may include auxiliary files such as diagrams. Such files must be named EIP-
 Transferring EIP Ownership
 --------------------------
 
-It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that\'s really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around a EIP, but if that\'s not possible, you can always submit a competing EIP.
+It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around a EIP, but if that's not possible, you can always submit a competing EIP.
 
 If you are interested in assuming ownership of a EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :).
 
@@ -199,11 +199,11 @@ EIP Editor Responsibilities and Workflow
 
 For each new EIP that comes in, an editor does the following:
 
--   Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don\'t seem likely to be accepted.
+-   Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to be accepted.
 -   The title should accurately describe the content.
 -   Edit the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
 
-If the EIP isn\'t ready, the editor will send it back to the author for revision, with specific instructions.
+If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
 
 Once the EIP is ready for the repository, the EIP editor will:
 
