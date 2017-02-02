@@ -176,8 +176,15 @@ EIP Editors
 
 The current EIP editors are
 
-` * Martin Becze`
-` * Hudson Jameson`
+` * Casey Detrio (@cdetrio)`
+` * Fabian Vogelsteller (@frozeman)`
+` * Gavin Wood (@gavofyork)`
+` * Hudson Jameson (@Souptacular)`
+` * Jeffrey Wilcke (@obscuren)`
+` * Martin Becze (@wanderer)`
+` * Nick Johnson (@arachnid)`
+` * Roman Mandeleil (@romanman)`
+` * Vitalik Buterin (@vbuterin)`
 
 EIP Editor Responsibilities and Workflow
 --------------------------------------
@@ -186,13 +193,13 @@ For each new EIP that comes in, an editor does the following:
 
 -   Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don\'t seem likely to be accepted.
 -   The title should accurately describe the content.
--   Edit the EIP for language (spelling, grammar, sentence structure, etc.), markup (for reST EWIPs), code style
+-   Edit the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
 
 If the EIP isn\'t ready, the editor will send it back to the author for revision, with specific instructions.
 
 Once the EIP is ready for the repository, the EIP editor will:
 
--   Assign a EIP number (almost always just the next available number)
+-   Assign a EIP number (generally the PR number or, if preferred by the author, the Issue # if ther was discussion in the Issues section of this repository about this EIP)
 
 <!-- -->
 
@@ -204,18 +211,19 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 <!-- -->
 
--   Send email back to the EIP author with next step.
+-   Send a message back to the EIP author with next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
-The editors don\'t pass judgment on EIPs. We merely do the administrative & editorial part. Except for times like this, there\'s relatively low volume.
+The editors don\'t pass judgment on EIPs. We merely do the administrative & editorial part.
 
 History
 -------
 
 This document was derived heavily from [Bitcoin\'s BIP-0001] written by Amir Taaki which in turn was derived from [Python\'s PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
 
-December 7, 2016: EIP 1 has been improved and will be placed as a PR. Hudson Jameson is now the EIP editor.
+December 7, 2016: EIP 1 has been improved and will be placed as a PR.
+February XX, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
