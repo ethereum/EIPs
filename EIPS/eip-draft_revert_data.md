@@ -41,7 +41,11 @@ This change has no effect on contracts created in the past.
 
 ## Test Cases
 
-TBA
+Valid:
+
+`[ 13 ]` -> `81 0d`
+
+`[ 42, "Invalid key"]` -> `82 18 2a 6b 496e76616c6964206b6579`
 
 ## Copyright
 
