@@ -21,7 +21,7 @@ Note that an EIP number will be assigned by an editor. When opening a pull reque
 ## Abstract
 A short (~200 word) description of the technical issue being addressed.
 
-## Motivation
+## Motivation (*optional)
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
 ## Specification
