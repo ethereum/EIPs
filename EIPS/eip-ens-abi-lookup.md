@@ -46,9 +46,9 @@ Encoding type 8 indicates that the ABI can be found elsewhere, at the specified 
 ### Resolver profile
 A new resolver interface is defined, consisting of the following method:
 
-    function abi(bytes32 node, uint256 contentType) constant returns (uint256, bytes);
+    function ABI(bytes32 node, uint256 contentType) constant returns (uint256, bytes);
 
-The interface ID of this interface is 0x83ee6bd2.
+The interface ID of this interface is 0x2203ab56.
 
 contentType is a bitfield, and is the bitwise OR of all the encoding types the caller will accept. Resolvers that implement this interface must return an ABI encoded using one of the requested formats, or `(0, "")` if they do not have an ABI for this function, or do not support any of the requested formats.
 
