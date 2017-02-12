@@ -1,0 +1,101 @@
+---
+eip: <to be assigned>
+title: Recommendation for using YAML ABI in specifications
+author: Alex Beregszaszi (@axic)
+discussions-to: <URL>
+status: Draft
+type: Informational
+created: 2017-02-11
+---
+
+## Simple Summary
+
+Recommendation for including contract ABI descriptions in EIPs and ERCs as YAML.
+
+## Motivation
+
+In the past, most suggestions included an ABI description purely as a Solidity contract and/or interface. This has several drawbacks:
+- Prefers a single language over others and could hinder the development of new languages.
+- Locks the specification to a certain version of the Solidity language.
+- Allows syntactical elements and features of the language, which may not be well representable in the ABI.
+
+This proposal aims to solve all these issues.
+
+## Specification
+
+The *Standard Contract ABI* is usually represented as a JSON object.  This works well and several tools – including compilers and clients – support it to handle data encoding.
+
+One shortcoming of the JSON description is its inability to contain comments.  To counter this, we suggest the use of YAML for providing user readable specifications.  Given YAML was designed to be compatible with JSON, several tools exists to convert between the two formats.
+
+The following example contains a single function, `transfer` with one input and one output in YAML:
+
+```yaml
+# The transfer function. Takes the recipient address
+# as an input and returns a boolean signaling the result.
+- name: transfer
+  type: function
+  payable: false
+  constant: false
+  inputs:
+  - name: recipient
+    type: address
+  - name: amount
+    type: uint256
+  outputs:
+  - name: ''
+    type: bool
+```
+
+Specifications are encouraged to include comments in the YAML ABI.
+
+For details on what fields and values are valid in the ABI, please consult the *Standard Contract ABI* specification.
+
+
+The same in JSON:
+
+```json
+[
+  {
+    "name": "transfer",
+    "type": "function",
+    "payable": false,
+    "constant": false,
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ]
+  }
+]
+```
+
+## Rationale
+
+The aim was to chose a representation which is well supported by tools and supports comments. While inventing a more concise description language seems like a good idea, it felt as an unnecessary layer of complexity.
+
+## Backwards Compatibility
+
+This has no effect on backwards compatibility.
+
+## Test Cases
+
+TBA
+
+## Implementation
+
+TBA
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
