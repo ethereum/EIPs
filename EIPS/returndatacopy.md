@@ -1,0 +1,61 @@
+## Preamble
+
+    EIP:
+    Title: New opcodes: RETURNDATASIZE and RETURNDATACOPY
+    Author: Christian Reitwiessner <chris@ethereum.org>
+    Type: Standard Track
+    Category Core
+    Status: Draft
+    Created: 2017-02-13
+    Requires:
+    Replaces: 5/8
+
+
+## Simple Summary
+
+A mechanism to allow returning arbitrary-length data inside the EVM has been requested for quite a while now. Existing proposals always had very intricate problems associated with charging gas. This proposal solves the same problem while at the same time, it has a very simple gas charging mechanism and reqires minimal changes to the call opcodes. Its workings are very similar to the way calldata is handled already: After a call, return data is kept inside a virtual buffer from which the caller can copy it (or parts thereof) into memory. At the next call, the buffer is overwritten. This mechanism is 100% backwards compatible.
+
+## Abstract
+
+Please see summary.
+
+## Motivation
+
+In some situations, it is vital for a function to be able to return data whose length cannot be anticipated before the call. In principle, this can be solved without alterations to the EVM, for example by splitting the call into two calls where the first is used to compute only the size. All of these mechanisms, though, are very expensive in at least some situations. A very useful example of such a worst-case situation is a generic forwarding contract: A contract that takes call data, potentially makes some checks and then forwards it as is to another contract. The return data should of course be transferred in a similar way to the original caller. Since the contract is generic and does not know about the contract it calls, there is no way to determine the size of the output without adapting the called contract accordingly or trying a logarithmic number of calls.
+
+Compiler implementors are advised to reserve a zero-length area for return data if the size of the return data is unknown before the call and then use `RETURNDATACOPY` in conjunction with `RETURNDATASIZE` to actually retrieve the data.
+
+Note that this proposal also makes the EIP that proposes to allow to return data in case of an intentional state reversion (EIP [206](https://github.com/ethereum/EIPs/pull/206)) much more useful. Since the size of the failure data might be larger than the regular return data (or even unknown), it is possible to retrieve the failure data after the CALL opcode has signalled a failure, even if the regular output area is not large enough to hold the data.
+
+## Specification
+
+Add two new opcodes:
+
+`RETURNDATASIZE`: `0xd`
+
+Pushes the size of the return data (or the failure return data, see EIP [206](https://github.com/ethereum/EIPs/pull/206)) of the previous call onto the stack. If there was no previous call, pushes zero.
+Gas costs: 2 (same as `CALLDATASIZE`)
+
+`RETURNDATACOPY`: `0xe`
+
+This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data of the previous call. If the return data is accessed beyond its length, it is considered to be filled with zeros. If there was no previous call, copies zeros.
+Gas costs: `3 + 3 * ceil(amount / 32)` (same as `CALLDATACOPY`)
+
+## Rationale
+
+Other solutions that would allow returning dynamic data were considered, but they all had to deduct the gas from the call opcode and thus were both complicated to implement and specify ([5/8](https://github.com/ethereum/EIPs/issues/8)). Since this proposal is very similar to the way calldata is handled, it fits nicely into the concept. Furthermore, the eWASM architecture already handles return data in exactly the same way.
+
+Note that the EVM implementation needs to keep the return data until the next call or the return from the current call. Since this resource was already paid for as part of the memory of the callee, it should not be a problem. Implementations may either choose to keep the full memory of the callee alive until the next call or copy only the return data to a special memory area.
+
+The number values of the opcodes were allocated in the same nibble block that also contains `CALLDATASIZE` and `CALLDATACOPY`.
+
+## Backwards Compatibility
+
+This proposal introduces two new opcodes and stays fully backwards compatible apart from that.
+
+## Test Cases
+
+## Implementation
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
