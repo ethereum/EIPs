@@ -1,0 +1,91 @@
+## Preamble
+<pre>
+  EIP: <to be assigned>
+  Title: Precompiled contracts for addition and scalar multiplication
+         on the elliptic curve alt_bn128
+  Author: Christian Reitwiessner<chris@ethereum.org>
+  Type: Standard Track
+  Category: Core
+  Status: Draft
+  Created: 2017-02-02
+</pre>
+
+## Simple Summary
+
+Precompiled contracts for elliptic curve operations are required in order to perform zkSNARK verification within the block gas limit.
+
+## Abstract
+
+This EIP suggests to add precompiled contracts for addition and scalar multiplication on a specific pairing-friendly elliptic curve. This can in turn be combined with https://github.com/ethereum/EIPs/pull/212 to verify zkSNARKs in Ethereum smart contracts. The general benefit of zkSNARKs for Ethereum is that it will increase the privacy for users (because of the Zero-Knowledge property) and might also be a scalability solution (because of the succinctness and efficient verifiability property).
+
+## Motivation
+
+Current smart contract executions on Ethereum are fully transparent, which makes them unsuitable for several use-cases that involve private information like the location, identity or history of past transactions. The technology of zkSNARKs could be a solution to this problem. While the Ethereum Virtual Machine can make use of zkSNARKs in theory, they are currently too expensive
+to fit the block gas limit. Because of that, this EIP proposes to specify certain parameters for some elementary primitives that enable zkSNARKs so that they can be implemented more efficiently and the gas cost be reduced.
+
+Note that fixing these parameters will in no way limit the use-cases for zkSNARKs, it will even allow for incorporating some advances in zkSNARK research without the need for a further hard fork.
+
+## Specification
+
+Add precompiled contracts for point addition (ADD)  and scalar multiplication (MUL) on the elliptic curve "alt_bn128".
+
+Address of ADD: 0x6
+Address for MUL: 0x7
+
+The curve is defined by:
+```
+Y^2 = X^3 + 3
+over the field F_p with
+p = 21888242871839275222246405745257275088696311157297823662689037894645226208583
+```
+
+### Encoding
+
+Field elements are encoded as 32 byte big-endian numbers. Curve points are encoded as two field elements `(x, y)`, where the point at infinity is encoded as `(0, 0)`.
+
+For both precompiled contracts, if the input is shorter than expected, it is padded with zeros at the end.
+
+The length of the returned data is always as specified (i.e. it is not "unpadded"). 
+
+### Exact semantics
+
+Invalid input: For both contracts, if any input point does not lie on the curve or any of the field elements (point coordinates or scalar) is equal or larger than the field modulus p, the contract fails.
+
+ADD: Input: two curve points `(x, y)`. Fail on invalid input. Otherwise, return the curve point `x + y` where `+` is point addition on the elliptic curve `alt_bn128` specified above.
+
+MUL: Input: curve point and scalar `(x, s)`. Fail on invalid input. Otherwise, return the cureve point `x * s`, where `*` is the scalar multiplication on the elliptic curve `alt_bn128` specified above.
+
+### Gas costs
+
+To be determined. 
+
+## Rationale
+
+The specific curve `alt_bn128` was chosen because it is particularly well-suited for zkSNARKs, or, more specifically their verification building block of pairing functions. Furthermore, by choosing this curve, we can use synergy effects with ZCash and re-use some of their components and artifacts.
+
+The feature of adding curve and field parameters to the inputs was considered but ultimately rejected since it complicates the specification: The gas costs are much harder to determine and it would be possible to call the contracts on something which is not an actual elliptic curve.
+
+A non-compact point encoding was chosen since it still allows to perform some operations in the smart contract itself (inclusion of the full y coordinate) and two encoded points can be compared for equality (no third projective coordinate).
+
+## Backwards Compatibility
+
+As with the introduction of any precompiled contract, contracts that already use the given addresses will change their semantics. Because of that, the addresses are taken from the "reserved range" below 256.
+
+## Test Cases
+
+To be written.
+
+## Implementation
+
+Implementation of these primitives are available here:
+
+ - [libsnark](https://github.com/scipr-lab/libsnark/blob/master/src/algebra/curves/alt_bn128/alt_bn128_g1.hpp) (C++)
+ - [bn](https://github.com/zcash/bn/blob/master/src/groups/mod.rs) (Rust)
+
+In both codebases, a specific group on the curve alt_bn128 is used and is called G1.
+
+ - [Python](https://github.com/ethereum/research/blob/master/zksnark/bn128_curve.py) - probably most self-contained and best readable.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
