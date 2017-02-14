@@ -35,7 +35,7 @@ Address: 0x8
 
 For a cyclic group `G` (written additively) of prime order q let `log_P: G -> F_q` be the discrete logarithm on this group with respect to a generator `P`, i.e. `log_P(x)` is the integer `n` such that `n * P = x`.
 
-The precompiled contract is defined as follows, where the two groups `G_1` and `G_2` and their generators `P_1` and `P_2` are defined below:
+The precompiled contract is defined as follows, where the two groups `G_1` and `G_2` and their generators `P_1` and `P_2` are defined below (they have the same order `q`):
 
 ```
 Input: (a1, b1, a2, b2, ..., ak, bk) from (G_1 x G_2)^k
@@ -43,17 +43,17 @@ Output: If the length of the input is incorrect or any of the inputs are not ele
         the respective group or are not encoded correctly, the call fails.
         Otherwise, return one if
         log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0
-        and zero else.
+        (in F_q) and zero else.
 ```
 
 ### Definition of the groups
 
-The groups `G_1` and `G_1` are cyclic groups on the elliptic curve `alt_bn128` defined by the curve equation
+The groups `G_1` and `G_2` are cyclic groups of prime order `q` on the elliptic curve `alt_bn128` defined by the curve equation
 `Y^2 = X^3 + 3`.
 
-The group `G_1` is a cyclic group of prime order on the above curve over the field `F_p` with `p = 21888242871839275222246405745257275088696311157297823662689037894645226208583` with generator `P1 = (1, 2)`.
+The group `G_1` is a cyclic group on the above curve over the field `F_p` with `p = 21888242871839275222246405745257275088696311157297823662689037894645226208583` with generator `P1 = (1, 2)`.
 
-The group `G_2` is a cyclic group of prime order in the same elliptic curve over a different field `F_p^2 = F_p[X] / (X^2 + 1)` (p is the same as above) with generator
+The group `G_2` is a cyclic group on the same elliptic curve over a different field `F_p^2 = F_p[X] / (X^2 + 1)` (p is the same as above) with generator
 ```
 P2 = (
   11559732032986387107991004021392285783925812861821192530917403151452391805634 * i +
