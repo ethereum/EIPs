@@ -47,9 +47,7 @@ The specification contains details for a single document referred to as a *"Rele
 > These documents have not been inlined into this ERC to ensure that there is a single source of truth for the specification.
 
 
-# Rationale
-
-## Use Cases
+# Use Cases
 
 This specification covers the following types of smart contract packages.
 
@@ -60,43 +58,38 @@ This specification covers the following types of smart contract packages.
 Full explanations and examples of these use cases can be found in the [`README.md`](https://github.com/ethpm/epm-spec/blob/v1.0.0/README.md#use-cases) from the `epm/epm-spec` repository.
 
 
-## Package Managers
+# Package Managers
 
 The *Release Lockfile* is intended for consumption by package management software.  Specific care was made to ensure that all of the following functionality can be implemented by package managers.
 
 
-### Deterministic builds
+## Deterministic builds
 
 Ensures that a package will always resolve to the same set of dependencies and source files.  Both source files and dependencies are content addressed to ensure that the referenced resources cannot change.
 
 
-### Bytecode verification
+## Bytecode verification
 
-Contains the appropriate information for a package manager to inspect a deployed contract and verify that it's bytecode matches the bytecode that results from compilation and linking of the package source code.
+Contains the appropriate information for a package manager to inspect a deployed contract and verify that its bytecode matches the bytecode that results from compilation and linking of the package source code.
 
 
-### Multi-chain deploys
+## Multi-chain deploys
 
 Supports deployments across multiple chains, allowing a package to define addresses on both the public mainnet and testnet.
 
 
-### Trusted packages
+## Trusted packages
 
 Allows for packages which exclude source code or other elements which would be needed for verification of the contract bytecode.  This allows for minimalistic packages to be created for special situations where the package manager will not be performing verification.
 
 
-# Implementation
+# Framework support and integration
 
-Implementations are implemented in the following frameworks.
+Support for ERC190 is either implemented or in progress for the following:
 
 * [Truffle](http://truffleframework.com/)
 * [Populus](http://populus.readthedocs.io/en/latest/)
-
-Implementations are underway for the following frameworks.
-
 * [Dapple](http://dapple.readthedocs.io/en/master/)
 * [Eris PM](https://github.com/eris-ltd/eris-cli)
-
-Implementation has not yet begun in the following frameworks but is on the roadmap.
-
 * [Embark](https://github.com/iurimatias/embark-framework)
+* [Browser Solidity](https://github.com/ethereum/browser-solidity/issues/386)
