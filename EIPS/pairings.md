@@ -5,7 +5,7 @@
          on the elliptic curve alt_bn128
   Author: Vitalik Buterin &lt;vitalik@ethereum.org&gt;, Christian Reitwiessner &lt;chris@ethereum.org&gt;
   Type: Standard Track
-  Category(*only required for Standard Track): Core
+  Category: Core
   Status: Draft
   Created: 2017-02-06
 </pre>
@@ -45,6 +45,8 @@ Output: If the length of the input is incorrect or any of the inputs are not ele
         log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0
         (in F_q) and zero else.
 ```
+
+Note that k is determined from the length of the input. k == 0 is valid and results in returning one.
 
 ### Definition of the groups
 
