@@ -1,14 +1,13 @@
 ## Preamble
-<pre>
-  EIP: <to be assigned>
-  Title: Precompiled contracts for addition and scalar multiplication
-         on the elliptic curve alt_bn128
-  Author: Christian Reitwiessner<chris@ethereum.org>
-  Type: Standard Track
-  Category: Core
-  Status: Draft
-  Created: 2017-02-02
-</pre>
+
+    EIP: <to be assigned>
+    Title: Precompiled contracts for addition and scalar multiplication
+           on the elliptic curve alt_bn128
+    Author: Christian Reitwiessner<chris@ethereum.org>
+    Type: Standard Track
+    Category: Core
+    Status: Draft
+    Created: 2017-02-02
 
 ## Simple Summary
 
