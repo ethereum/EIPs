@@ -1,14 +1,13 @@
 ## Preamble
-<pre>
-  EIP: to be assigned
-  Title: Precompiled contracts for optimal ate pairing check
-         on the elliptic curve alt_bn128
-  Author: Vitalik Buterin &lt;vitalik@ethereum.org&gt;, Christian Reitwiessner &lt;chris@ethereum.org&gt;
-  Type: Standard Track
-  Category: Core
-  Status: Draft
-  Created: 2017-02-06
-</pre>
+
+    EIP: to be assigned
+    Title: Precompiled contracts for optimal ate pairing check
+           on the elliptic curve alt_bn128
+    Author: Vitalik Buterin <vitalik@ethereum.org>, Christian Reitwiessner <chris@ethereum.org>
+    Type: Standard Track
+    Category: Core
+    Status: Draft
+    Created: 2017-02-06
 
 ## Simple Summary
 
