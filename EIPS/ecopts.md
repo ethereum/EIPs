@@ -41,7 +41,7 @@ p = 2188824287183927522224640574525727508869631115729782366268903789464522620858
 
 ### Encoding
 
-Field elements are encoded as 32 byte big-endian numbers. Curve points are encoded as two field elements `(x, y)`, where the point at infinity is encoded as `(0, 0)`.
+Field elements and scalars are encoded as 32 byte big-endian numbers. Curve points are encoded as two field elements `(x, y)`, where the point at infinity is encoded as `(0, 0)`.
 
 For both precompiled contracts, if the input is shorter than expected, it is padded with zeros at the end.
 
@@ -51,9 +51,15 @@ The length of the returned data is always as specified (i.e. it is not "unpadded
 
 Invalid input: For both contracts, if any input point does not lie on the curve or any of the field elements (point coordinates or scalar) is equal or larger than the field modulus p, the contract fails.
 
-ADD: Input: two curve points `(x, y)`. Fail on invalid input. Otherwise, return the curve point `x + y` where `+` is point addition on the elliptic curve `alt_bn128` specified above.
+#### ADD
+Input: two curve points `(x, y)`.
+Output: curve point `x + y`, where `+` is point addition on the elliptic curve `alt_bn128` specified above.
+Fails on invalid input and consumes all gas provided.
 
-MUL: Input: curve point and scalar `(x, s)`. Fail on invalid input. Otherwise, return the cureve point `x * s`, where `*` is the scalar multiplication on the elliptic curve `alt_bn128` specified above.
+#### MUL
+Input: curve point and scalar `(x, s)`.
+Output: curve point `s * x`, where `*` is the scalar multiplication on the elliptic curve `alt_bn128` specified above.
+Fails on invalid input and consumes all gas.
 
 ### Gas costs
 
