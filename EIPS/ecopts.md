@@ -23,7 +23,7 @@ This EIP suggests to add precompiled contracts for addition and scalar multiplic
 Current smart contract executions on Ethereum are fully transparent, which makes them unsuitable for several use-cases that involve private information like the location, identity or history of past transactions. The technology of zkSNARKs could be a solution to this problem. While the Ethereum Virtual Machine can make use of zkSNARKs in theory, they are currently too expensive
 to fit the block gas limit. Because of that, this EIP proposes to specify certain parameters for some elementary primitives that enable zkSNARKs so that they can be implemented more efficiently and the gas cost be reduced.
 
-Note that fixing these parameters will in no way limit the use-cases for zkSNARKs, it will even allow for incorporating some advances in zkSNARK research without the need for a further hard fork.
+Note that while fixing these parameters might look like limiting the use-cases for zkSNARKs, the primitives are so basic that they can be combined in ways that are flexible enough so that it should even be possible to allow future advances in zkSNARK research without the need for a further hard fork.
 
 ## Specification
 
@@ -43,7 +43,9 @@ p = 2188824287183927522224640574525727508869631115729782366268903789464522620858
 
 Field elements and scalars are encoded as 32 byte big-endian numbers. Curve points are encoded as two field elements `(x, y)`, where the point at infinity is encoded as `(0, 0)`.
 
-For both precompiled contracts, if the input is shorter than expected, it is padded with zeros at the end.
+Tuples of objects are encoded as their concatenation.
+
+For both precompiled contracts, if the input is shorter than expected, it is assumed to be virtually padded with zeros at the end (i.e. compatible with the semantics of the `CALLDATALOAD` opcode).
 
 The length of the returned data is always as specified (i.e. it is not "unpadded"). 
 
