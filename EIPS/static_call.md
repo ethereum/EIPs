@@ -1,13 +1,12 @@
 ## Preamble
-<pre>
-  EIP: to be assigned
-  Title: New opcode STATIC_CALL
-  Author: Vitalik Buterin &lt;vitalik@ethereum.org&gt;, Christian Reitwiessner &lt;chris@ethereum.org&gt;
-  Type: Standard Track
-  Category(*only required for Standard Track): Core
-  Status: Draft
-  Created: 2017-02-13
-</pre>
+
+    EIP: to be assigned
+    Title: New opcode STATIC_CALL
+    Author: Vitalik Buterin <vitalik@ethereum.org>, Christian Reitwiessner <chris@ethereum.org>;
+    Type: Standard Track
+    Category: Core
+    Status: Draft
+    Created: 2017-02-13
 
 ## Simple Summary
 
