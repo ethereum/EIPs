@@ -1,8 +1,6 @@
 # EIP [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 Ethereum Improvement Proposal. EIPs propose and describe changes made to Ethereum Protocol.
 
-People wishing to submit EIPs first should propose their idea as an issue and then formalize it using a PR. After discussion it will be published here. Having an EIP here does not make it a formally accepted standard until its status becomes Active. For a EIP to become Active requires the mutual consent of the community. An EIP is not finalized until it has been implemented and is in use. Those proposing changes should consider that ultimately consent may rest with the consensus of the Ethereum users.
-
 # Contributing
 First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.md). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
 
