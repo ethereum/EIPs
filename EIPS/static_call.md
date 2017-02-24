@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: to be assigned
-    Title: New opcode STATIC_CALL
+    Title: New opcode STATICCALL
     Author: Vitalik Buterin <vitalik@ethereum.org>, Christian Reitwiessner <chris@ethereum.org>;
     Type: Standard Track
     Category: Core
@@ -22,7 +22,7 @@ To increase smart contract security, this proposal adds a new opcode that can be
 
 Opcode: `0xfa`.
 
-`STATIC_CALL` functions equivalently to a `CALL`, except it takes 6 arguments not including value, and calls the child with a `STATIC` flag on. Any calls, static or otherwise, made by an execution instance with a `STATIC` flag on will also have a `STATIC` flag on. Any attempts to make state-changing operations inside an execution instance with a `STATIC` flag on will instead throw an exception. These operations include nonzero-value calls, creates, `LOG` calls, `SSTORE`, `SSTOREBYTES` and `SUICIDE`.
+`STATICCALL` functions equivalently to a `CALL`, except it takes 6 arguments not including value, and calls the child with a `STATIC` flag on. Any calls, static or otherwise, made by an execution instance with a `STATIC` flag on will also have a `STATIC` flag on. Any attempts to make state-changing operations inside an execution instance with a `STATIC` flag on will instead throw an exception. These operations include nonzero-value calls, creates, `LOG` calls, `SSTORE`, `SSTOREBYTES` and `SUICIDE`.
 
 ## Rationale
 
