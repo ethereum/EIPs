@@ -50,7 +50,7 @@ The length of the returned data is always as specified (i.e. it is not "unpadded
 
 ### Exact semantics
 
-Invalid input: For both contracts, if any input point does not lie on the curve or any of the field elements (point coordinates or scalar) is equal or larger than the field modulus p, the contract fails.
+Invalid input: For both contracts, if any input point does not lie on the curve or any of the field elements (point coordinates) is equal or larger than the field modulus p, the contract fails. The scalar can be any number between `0` and `2**256-1`.
 
 #### ADD
 Input: two curve points `(x, y)`.
@@ -80,7 +80,14 @@ As with the introduction of any precompiled contract, contracts that already use
 
 ## Test Cases
 
-To be written.
+Inputs to test:
+
+ - Curve points which would be valid if the numbers were taken mod p (should fail).
+ - Both contracts should succeed on empty input.
+ - Truncated input that results in a valid curve point.
+ - Points not on curve (but valid otherwise).
+ - Multiply point with scalar that lies between the order of the group and the field (should succeed).
+ - Multiply point with scalar that is larger than the field order (should succeed).
 
 ## Implementation
 
