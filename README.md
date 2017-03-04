@@ -25,11 +25,11 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | --------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ----------| ------------| ----------|
 | [86](https://github.com/ethereum/EIPs/pull/208)         | Abstraction of transaction origin and signature                                     | Vitalik Buterin       | Standard  | Core        | Accepted  |
 | [96](https://github.com/ethereum/EIPs/pull/210)         | Blockhash refactoring                                                               | Vitalik Buterin       | Standard  | Core        | Accepted  |
-| [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles	          | Vitalik Buterin       | Standard  | Core        | Accepted  |
+| [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles	            | Vitalik Buterin       | Standard  | Core        | Accepted  |
 | [140](https://github.com/ethereum/EIPs/pull/206)        | REVERT instruction in the Ethereum Virtual Machine                                  | Beregszaszi, Mushegian| Standard  | Core        | Accepted  |
 | [196](https://github.com/ethereum/EIPs/pull/213)        | Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128 | Reitwiessner | Standard  | Core        | Accepted  |
 | [197](https://github.com/ethereum/EIPs/pull/212)        | Precompiled contracts for optimal Ate pairing check on the elliptic curve alt_bn128 | Buterin, Reitwiessner | Standard  | Core        | Accepted  |
-
+| [198](https://github.com/ethereum/EIPs/pull/198)        | Precompiled contract for bigint modular exponentiation				                      | Vitalik Buterin       | Standard  | Core        | Accepted  |
 
 
 # Finalized EIPs (standards that have been adopted)
