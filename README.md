@@ -13,19 +13,20 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 
 
 # EIPs under consideration
-| Number                      |Title                                                                                | Author                | Type      | Layer       | Status    | 
-| --------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ----------| ------------| ----------|
-| [5](EIPS/eip-5.md)          | Gas Usage for `RETURN` and `CALL*`                                                  | Christian Reitwiessner| Standard  | Core        | Draft     |
+| Number                                                  |Title                                                                                | Author                | Type      | Layer       | Status    | 
+| ------------------------------------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ----------| ------------| ----------|
+| [5](EIPS/eip-5.md)                                      | Gas Usage for `RETURN` and `CALL*`                                                  | Christian Reitwiessner| Standard  | Core        | Draft     |
 | [211](https://github.com/ethereum/EIPs/pull/211)        | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                      | Christian Reitwiessner| Standard  | Core        | Draft     |
-
+| [214](https://github.com/ethereum/EIPs/pull/214)        | New opcode STATICCALL                                                               | Buterin, Reitwiessner | Standard  | Core        | Draft     |
+| [195](https://github.com/ethereum/EIPs/pull/195)        | New opcode PURE_CALL                                                                | Vitalik Buterin       | Standard  | Core        | Draft     |
 
 
 # Accepted EIPs (planned for adoption)
-| Number                      |Title                                                                                | Author                | Type      | Layer       | Status    | 
-| --------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ----------| ------------| ----------|
+| Number                                                  |Title                                                                                | Author                | Type      | Layer       | Status    | 
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ----------| ------------| ----------|
 | [86](https://github.com/ethereum/EIPs/pull/208)         | Abstraction of transaction origin and signature                                     | Vitalik Buterin       | Standard  | Core        | Accepted  |
 | [96](https://github.com/ethereum/EIPs/pull/210)         | Blockhash refactoring                                                               | Vitalik Buterin       | Standard  | Core        | Accepted  |
-| [98](https://github.com/ethereum/EIPs/pull/98)         | Removal of intermediate state roots from receipts                                                               | Vitalik Buterin       | Standard  | Core        | Accepted  |
+| [98](https://github.com/ethereum/EIPs/pull/98)          | Removal of intermediate state roots from receipts                                   | Vitalik Buterin       | Standard  | Core        | Accepted  |
 | [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles	            | Vitalik Buterin       | Standard  | Core        | Accepted  |
 | [140](https://github.com/ethereum/EIPs/pull/206)        | REVERT instruction in the Ethereum Virtual Machine                                  | Beregszaszi, Mushegian| Standard  | Core        | Accepted  |
 | [196](https://github.com/ethereum/EIPs/pull/213)        | Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128 | Reitwiessner | Standard  | Core        | Accepted  |
@@ -34,15 +35,14 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 
 
 # Finalized EIPs (standards that have been adopted)
-| Number                      |Title                                                        | Author          | Type      | Layer       | Status  | 
-| --------------------------  | ----------------------------------------------------------- | ----------------| ----------| ------------| --------|
-| [2](EIPS/eip-2.mediawiki)   | Homestead Hard-fork Changes                                 | Vitalik Buterin | Standard  | Core        | Final   |
-| [6](EIPS/eip-6.md)          | Renaming Suicide Opcode                                     | Hudson Jameson  | Standard  | Interface   | Final   |
-| [7](EIPS/eip-7.md)          | DELEGATECALL                                                | Vitalik Buterin | Standard  | Core        | Final   |
-| [8](EIPS/eip-8.md)          | devp2p Forward Compatibility Requirements for Homestead     | Felix Lange     | Standard  | Networking  | Final   |
+| Number                                                  |Title                                                        | Author          | Type      | Layer       | Status  | 
+| ------------------------------------------------------- | ----------------------------------------------------------- | ----------------| ----------| ------------| --------|
+| [2](EIPS/eip-2.mediawiki)                               | Homestead Hard-fork Changes                                 | Vitalik Buterin | Standard  | Core        | Final   |
+| [6](EIPS/eip-6.md)                                      | Renaming Suicide Opcode                                     | Hudson Jameson  | Standard  | Interface   | Final   |
+| [7](EIPS/eip-7.md)                                      | DELEGATECALL                                                | Vitalik Buterin | Standard  | Core        | Final   |
+| [8](EIPS/eip-8.md)                                      | devp2p Forward Compatibility Requirements for Homestead     | Felix Lange     | Standard  | Networking  | Final   |
 | [150](https://github.com/ethereum/EIPs/issues/150)      | Gas cost changes for IO-heavy operations                    | Vitalik Buterin | Standard  | Core        | Final   |
 | [155](https://github.com/ethereum/EIPs/issues/155)      | Simple replay attack protection                             | Vitalik Buterin | Standard  | Core        | Final   |
 | [160](https://github.com/ethereum/EIPs/issues/160)      | EXP cost increase                                           | Vitalik Buterin | Standard  | Core        | Final   |
 | [161](https://github.com/ethereum/EIPs/issues/161)      | State trie clearing (invariant-preserving alternative)      | Gavin Wood      | Standard  | Core        | Final   |
 | [170](https://github.com/ethereum/EIPs/issues/170)      | Contract code size limit                                    | Vitalik Buterin | Standard  | Core        | Final   |
-
