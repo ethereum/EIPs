@@ -18,7 +18,6 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [5](EIPS/eip-5.md)                                      | Gas Usage for `RETURN` and `CALL*`                                                  | Christian Reitwiessner| Standard  | Core        | Draft     |
 | [211](https://github.com/ethereum/EIPs/pull/211)        | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                      | Christian Reitwiessner| Standard  | Core        | Draft     |
 | [214](https://github.com/ethereum/EIPs/pull/214)        | New opcode STATICCALL                                                               | Buterin, Reitwiessner | Standard  | Core        | Draft     |
-| [195](https://github.com/ethereum/EIPs/pull/195)        | New opcode PURE_CALL                                                                | Vitalik Buterin       | Standard  | Core        | Draft     |
 
 
 # Accepted EIPs (planned for adoption)
