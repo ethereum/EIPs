@@ -30,10 +30,6 @@ In case there is not enough gas left to cover the cost of `REVERT` or there is a
 
 The content of the optionally provided memory section is not defined by this EIP, but is a candidate for another Informational EIP.
 
-## Rationale
-
-TBD
-
 ## Backwards Compatibility
 
 This change has no effect on contracts created in the past.
