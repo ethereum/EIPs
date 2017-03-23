@@ -40,7 +40,14 @@ This change has no effect on contracts created in the past.
 
 ## Test Cases
 
-TBA
+```
+6c726576657274656420646174616000557f726576657274206d657373616765000000000000000000000000000000000000600052600e6000fd
+```
+
+should:
+- return `726576657274206d657373616765` as `REVERT` data,
+- the storage at key `0x0` should be left as unset and
+- use 20024 gas in total.
 
 ## Copyright
 
