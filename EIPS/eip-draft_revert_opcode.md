@@ -1,6 +1,6 @@
 ## Preamble
 
-    EIP: <to be assigned>
+    EIP: 140
     Title: REVERT instruction in the Ethereum Virtual Machine
     Author: Alex Beregszaszi, Nikolai Mushegian (nikolai@nexusdev.us)
     Type: Standard Track
