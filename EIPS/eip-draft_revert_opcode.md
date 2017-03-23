@@ -22,7 +22,7 @@ Currently this is not possible. There are two practical ways to revert a transac
 
 ## Specification
 
-The `REVERT` instruction is introduced at `0xfd`. Execution is aborted and state changes are rolled back.
+The `REVERT` instruction is introduced at `0xfd`. Execution is aborted, considered as failed, and state changes are rolled back.
 
 It expects two stack items, the top item is the `memory_offset` followed by `memory_length`. Both of these can equal to zero. The cost of the `REVERT` instruction equals to that of the `RETURN` instruction.
 
