@@ -1,7 +1,7 @@
 ### Preamble
 
     EIP: <to be assigned>
-    Title: Abstraction
+    Title: Abstraction of transaction origin and signature
     Author: Vitalik Buterin
     Type: Standard Track
     Category: Core
@@ -22,8 +22,9 @@ Implements a set of changes that serve the combined purpose of "abstracting out"
 
 If `block.number >= METROPOLIS_FORK_BLKNUM`, then:
 1. If the signature of a transaction is `(CHAIN_ID, 0, 0)` (ie. `r = s = 0`, `v = CHAIN_ID`), then treat it as valid and set the sender address to `NULL_SENDER`
-2. Set the address of any contract created through a creation transaction to equal `sha3(NULL_SENDER + sha3(init code)) % 2**160`, where `+` represents concatenation, replacing the earlier address formula of `sha3(rlp.encode([sender, nonce]))`
-3. Create a new opcode at `0xfb`, `CREATE_P2SH`, which sets the creation address to `sha3(sender + sha3(init code)) % 2**160`. If a contract at that address already exists, fails and returns 0 as if the init code had run out of gas.
+2. Transactions of this form MUST have gasprice = 0, nonce = 0, value = 0, and do NOT increment the nonce of account 0.
+3. Set the address of any contract created through a creation transaction to equal `sha3(NULL_SENDER + sha3(init code)) % 2**160`, where `+` represents concatenation, replacing the earlier address formula of `sha3(rlp.encode([sender, nonce]))`
+4. Create a new opcode at `0xfb`, `CREATE_P2SH`, which sets the creation address to `sha3(sender + sha3(init code)) % 2**160`. If a contract at that address already exists, fails and returns 0 as if the init code had run out of gas.
 
 ### Rationale
 
