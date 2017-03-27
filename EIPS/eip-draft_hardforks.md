@@ -24,9 +24,10 @@ Today discussions about hard forks happen at various forums and sometimes in ad-
 A Meta EIP should be created as a draft as a pull request as soon as a hard fork is planned. This EIP should contain:
 - the desired codename of the hard fork,
 - list of all the EIPs included in the hard fork and
-- activation block number once decided.
+- activation block number once decided and
+- the **Requires** header should point to the previous hard fork meta EIP.
 
-The draft pull request shall be updated with summaries of the decisions around the hard fork. It should move in to `Accepted` state once the changes are frozen and in to the `Final` state once the hard fork has been activated.
+The draft pull request shall be updated with summaries of the decisions around the hard fork. It should move in to the `Accepted` state once the changes are frozen and in to the `Final` state once the hard fork has been activated.
 
 The Yellow Paper should be kept updated with the hard fork changes. It could either refer to the fork codename or the EIP number of the fork.
 
