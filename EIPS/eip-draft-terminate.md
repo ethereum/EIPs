@@ -16,7 +16,7 @@ We propose a new EVM opcode, 'TERMINATE', that facilitates new compute operation
 'TERMINATE' is a new opcode, tentatively assigned code 0xFC. When executed, it destroys the universe.
 
 ## Motivation
-According to the [many-worlds interpretation](https://en.wikipedia.org/wiki/Many-worlds_interpretation) of quantum physics, every quantum interaction results in the creation of two distinct universes, one for each outcome of the interaction. As a result, every combination of quantum interactions exists in a potential universe somewhere.
+According to the [many-worlds interpretation](https://en.wikipedia.org/wiki/Many-worlds_interpretation) of quantum physics, every quantum interaction results in the creation of two distinct universes, one for each outcome of the interaction. As a result, every combination of quantum interactions exists in a potential universe somewhere. 
 
 This provides a method by which we can implement algorithms with better efficiency bounds than traditional classical algorithms. For instance, O(n) general purpose sorting becomes possible by implementing the Quantum Bogosort algorithm:
 
@@ -31,6 +31,8 @@ Even more significantly, an O(1) algorithm for factoring integers becomes possib
   3. If the numbers do not divide, destroy the universe.
 
 We do not recommend running this algorithm on known primes.
+
+This approach has previously been suggested under the term 'anthropic computing' in [arXiv:quant-ph/0412187v1](https://arxiv.org/pdf/quant-ph/0412187v1.pdf).
 
 Random numbers can be provided by an offchain random oracle, making use of quantum randomness such as nuclear decay.
 
