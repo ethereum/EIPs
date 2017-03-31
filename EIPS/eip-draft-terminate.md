@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: New EVM opcodes 'RANDOM' and 'TERMINATE'
+    Title: New EVM opcode 'TERMINATE'
     Author: Nick Johnson
     Type: Standard Track
     Category (*only required for Standard Track): Core
