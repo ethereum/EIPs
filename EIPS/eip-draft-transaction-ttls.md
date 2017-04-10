@@ -22,7 +22,7 @@ This proposal addresses both of these issues by allowing nodes to place a hard l
 ## Specification
 The following names are used throughout this specification:
 
- - `valid_until_block` - The block number at which a transaction may no longer be included in the chain.
+ - `valid_until_block` - The block number after which a transaction may no longer be included in the chain.
  - `current_blocknumber` - The number of the current block.
  - `transaction_ttl` - The maximum number of blocks in the future a transaction's `valid_until_block` field may be, in order to be accepted and relayed by a given node.
  - `fork_blocknumber` - The block number at which this change becomes active.
