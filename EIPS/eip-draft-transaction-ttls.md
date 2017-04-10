@@ -35,7 +35,7 @@ Nodes MUST accept both 9-element and valid 10-element transactions in mined bloc
 
 Nodes should not relay transactions whose `valid_until_block` is in the past, as these transactions are un-mineable. Nodes should treat other nodes that relay such transactions to them as broken or malicious.
 
-Nodes are also encouraged to set a transaction TTL, and refuse to accept or relay transactions where `current_blocknumber + transaction_ttl < valid_until_block`. As an implementation guideline, we suggest a default transaction TTL of 6000 - approximately one day.
+Nodes are also encouraged to set a transaction TTL, and refuse to accept or relay transactions where `valid_until_block > current_blocknumber + transaction_ttl`. As an implementation guideline, we suggest a default transaction TTL of 6000 - approximately one day.
 
 In regards to transaction pool inclusion and relaying, nodes are further encouraged to treat 9-element transactions as having a `valid_until_block` value of `fork_blocknumber + transaction_ttl`.
 
