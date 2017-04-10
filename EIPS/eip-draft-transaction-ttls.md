@@ -27,7 +27,7 @@ The following names are used throughout this specification:
  - `transaction_ttl` - The maximum number of blocks in the future a transaction's `valid_until_block` field may be, in order to be accepted and relayed by a given node.
  - `fork_blocknumber` - The block number at which this change becomes active.
 
-Transactions are RLP-encoded lists described in the whitepaper as containing the 9 elements `(T_n, T_p, T_g, T_t, T_v, T_d, T_w, T_r, T_s)`, or `(T_n, T_p, T_g, T_t, T_v, T_i, T_w, T_r, T_s)` for contract-creation transactions. This EIP adds the field T_b as a tenth element to both tuples. T_b is defined as the latest block number at which this transaction may be included in the chain, and is hereafter referred to equivalently as `valid_until_block`.
+Transactions are RLP-encoded lists described in the whitepaper as containing the 9 elements `(T_n, T_p, T_g, T_t, T_v, T_d, T_w, T_r, T_s)`, or `(T_n, T_p, T_g, T_t, T_v, T_i, T_w, T_r, T_s)` for contract-creation transactions. This EIP adds the field `T_b` as a tenth element to both tuples. `T_b` is defined as the latest block number at which this transaction may be included in the chain, and is hereafter referred to equivalently as `valid_until_block`.
 
 Block validation rules are amended to state that a block is invalid if it contains a 10-element transaction whose T_b is less than the block's number.
 
