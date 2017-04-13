@@ -1,0 +1,76 @@
+## Preamble
+
+    EIP: <to be assigned>
+    Title: Ethereum hierarchy for deterministic wallets
+    Author: Nick Johnson <nick@ethereum.org>, Micah Zoltu
+    Type: Standard Track
+    Category : ERC
+    Status: Draft
+    Created: 2017-04-13
+    Replaces: [84](https://github.com/ethereum/EIPs/issues/84)
+
+
+## Abstract
+This EIP defines a logical hierarchy for deterministic wallets based on [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and the purpose scheme defined in [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
+
+This EIP is a particular application of BIP43.
+
+## Motivation
+At present, different Ethereum clients and wallets use different derivation paths; a summary of them can be found [here](https://github.com/ethereum/EIPs/issues/84#issuecomment-292324521). Some of these paths violate BIP44, the standard defining derivation paths starting with `m/44'/`. This creates confusion and incompatibility between wallet implementations, in some cases making funds from one wallet inaccessible on another, and in others requiring prompting users manually for a derivation path, which hinders usability.
+
+Further, BIP44 was designed with UTXO-based blockchains in mind, and is a poor fit for Ethereum, which uses an accounts abstraction instead.
+
+As an alternative, we propose a deterministic wallet hierarchy better tailored to Ethereum's unique requiremnts.
+
+## Specification
+We define the following 3 levels in BIP32 path:
+
+<pre>
+m / purpose' / subpurpose' / wallet'
+</pre>
+
+Apostrophe in the path indicates that BIP32 hardened derivation is used.
+
+Each level has a special meaning, described in the chapters below.
+
+### Purpose
+
+Purpose is a constant set to a value to be determined; the authors of this EIP are still engaged in the standards process to obtain assignment of a 'purpose' field.
+
+The purpose field indicates that the subtree of this node is used according to this specification.
+
+Hardened derivation is used at this level.
+
+### Subpurpose
+Subpurpose is set to the EIP number specifying the remainder of the BIP32 derivation path. For paths following this EIP specification, the number assigned to this EIP is used.
+
+### Wallet
+This component of the path splits the wallet into different user identities, allowing a single wallet to have multiple public identities.
+
+Accounts are numbered from index 0 in sequentially increasing manner. This number is used as child index in BIP32 derivation.
+
+Hardened derivation is used at this level.
+
+Software should prevent a creation of an account if a previous account does not have a transaction history (meaning its address has not been used before).
+
+Software needs to discover all used accounts after importing the seed from an external source.
+
+## Rationale
+The existing convention is to use the 'Ethereum' coin type, leading to paths starting with `m/44'/60'/*`. Because this still assumes a UTXO-based coin, we contend that this is a poor fit, resulting in standardisation, usability, and security compromises. As a result, we are making the above proposal to define an entirely new hierarchy for Ethereum-based chains.
+
+## Backwards Compatibility
+The introduction of another derivation path requires existing software to add support for this scheme in addition to any existing schemes. Given the already confused nature of wallet derivation paths in Ethereum, we anticipate this will cause relatively little additional disruption, and has the potential to improve matters significantly in the long run.
+
+For applications that utilise mnemonics, the authors expect to submit another EIP draft that describes a method for avoiding backwards compatibility concerns when transitioning to this new derivation path.
+
+## Test Cases
+TBD
+
+## Implementation
+None yet.
+
+## References
+[This discussion on derivation paths](https://github.com/ethereum/EIPs/issues/84)
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
