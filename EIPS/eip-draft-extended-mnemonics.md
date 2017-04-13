@@ -35,9 +35,11 @@ An extended mnemonic follows the same process, but the checksum is the logical i
 
 Extended mnemonics further assign meaning to the first bits of the entropy (`ENT`) field. The first bits encode a 'type ID' for the mnemonic, as follows:
 
- - 0b0*** **** - Type 0
- - 0b10xx xxxx - Types 1 - 64
- - 0b110x xxxx xxxx xxxx - Types 65 - 8257
+| Binary representation | Types |
+| --- | --- |
+| 0b0*** **** | 0 |
+| 0b10xx xxxx | 1 - 64 |
+| 0b110x xxxx xxxx xxxx | 65 - 8257 |
 
 Here, '*' represents a data bit, while 'x' represents a type bit. If necessary, this scheme may be extended, with the number of leading 1 bits indicating the number of leading bytes to interpret as type ID, including the current byte.
 
