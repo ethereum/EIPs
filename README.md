@@ -33,6 +33,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [6](EIPS/eip-6.md)                                      | Renaming Suicide Opcode                                     | Hudson Jameson  | Standard  | Interface   | Final   |
 | [7](EIPS/eip-7.md)                                      | DELEGATECALL                                                | Vitalik Buterin | Standard  | Core        | Final   |
 | [8](EIPS/eip-8.md)                                      | devp2p Forward Compatibility Requirements for Homestead     | Felix Lange     | Standard  | Networking  | Final   |
+[ [141](EIPS/eip-141.md)                                  | Designated invalid EVM instruction                          | Alex Beregsazszi| Standard  | Core        | Final   |
 | [150](https://github.com/ethereum/EIPs/issues/150)      | Gas cost changes for IO-heavy operations                    | Vitalik Buterin | Standard  | Core        | Final   |
 | [155](https://github.com/ethereum/EIPs/issues/155)      | Simple replay attack protection                             | Vitalik Buterin | Standard  | Core        | Final   |
 | [160](https://github.com/ethereum/EIPs/issues/160)      | EXP cost increase                                           | Vitalik Buterin | Standard  | Core        | Final   |
