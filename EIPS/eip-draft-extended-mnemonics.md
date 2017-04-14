@@ -45,7 +45,7 @@ MS = (ENT + CS) / 11
 ```
 
 |  ENT  | CS | ENT+CS |  MS  |
-+-------+----+--------+------+
+| ----- | -- | ------ | ---- |
 |  128  |  4 |   132  |  12  |
 |  160  |  5 |   165  |  15  |
 |  192  |  6 |   198  |  18  |
@@ -71,9 +71,9 @@ Extended mnemonics further assign meaning to the leftmost (most significant) bit
 | Binary representation | Types |
 | --- | --- |
 | 0b0*** **** | 0 |
-| 0b10xx **** | 1 - 5 |
-| 0b110x xxxx | 6 - 38 |
-| 0b1110 xxxx xxxx **** | 39 - 295 |
+| 0b10xx **** | 1 - 4 |
+| 0b110x xxxx | 5 - 37 |
+| 0b1110 xxxx xxxx **** | 38 - 294 |
 
 Here, '*' represents a data bit, while 'x' represents a type bit. If necessary, this scheme may be extended, with the number of leading 1 bits indicating the number of leading nybbles to interpret as type ID, including the first nybble.
 
