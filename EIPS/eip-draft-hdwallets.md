@@ -11,9 +11,9 @@
 
 
 ## Abstract
-This EIP defines a logical hierarchy for deterministic wallets based on [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and the purpose scheme defined in [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
+This EIP defines a logical hierarchy for deterministic wallets based on [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki), the purpose scheme defined in [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki) and eip-draft-ethereum-purpose.
 
-This EIP is a particular application of BIP43.
+This EIP is a particular application of eip-draft-ethereum-purpose.
 
 ## Motivation
 At present, different Ethereum clients and wallets use different derivation paths; a summary of them can be found [here](https://github.com/ethereum/EIPs/issues/84#issuecomment-292324521). Some of these paths violate BIP44, the standard defining derivation paths starting with `m/44'/`. This creates confusion and incompatibility between wallet implementations, in some cases making funds from one wallet inaccessible on another, and in others requiring prompting users manually for a derivation path, which hinders usability.
