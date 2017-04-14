@@ -91,7 +91,7 @@ Software implementations MUST check the type ID in the decoded entropy data and 
 
 Type 0 extended mnemonics act in all ways like a standard mnemonic, with the exception that when used to derive a deterministic wallet address for use with Ethereum, they MUST conform to eip-draft-hdwallets. Implementations MUST NOT derive BIP44 type HD wallets from a type 0 extended mnemonic, if that wallet is to be used with an Ethereum network.
 
-To generate a type 0 extended mnemonic, generate a data field with the most significant bit set to 0, followed by 32n - 1 bits of entropy (eg, 127, 159, 191, 223 or 255). Encode this as a mnemonic phrase as described above in "Encoding standard (BIP39) mnemonics".
+To generate a type 0 extended mnemonic, generate a data field with the most significant bit set to 0, followed by 32n - 1 bits of entropy (eg, 127, 159, 191, 223 or 255). Encode this as a mnemonic phrase as described above in "Encoding standard (BIP39) mnemonics", logically inverting the checksum bits as described in "Encoding extended mnemonics".
 
 ### Generating seeds from extended mnemonics
 
