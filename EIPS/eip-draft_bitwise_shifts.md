@@ -76,7 +76,7 @@ TBA
 ## Implementation
 
 Client support:
-TBA
+- cpp-ethereum: https://github.com/ethereum/cpp-ethereum/pull/4054
 
 Compiler support:
 - Solidity: https://github.com/ethereum/solidity/tree/asm-bitshift
