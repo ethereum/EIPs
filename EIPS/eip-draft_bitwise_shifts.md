@@ -59,29 +59,7 @@ Notes:
 - `arg1` is interpreted as unsigned number.
 - If the shift amount is greater or equal 256 the result is 0 if `arg2` is non-negative or -1 if `arg2` is negative.
 
-### `0x1e`: `ROL` (rotate left)
-
-The `ROL` instruction (rotate left) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the second popped value `arg2` circular shifted to the left by the number of bits in the first popped value `arg1`.
-
-```
-(arg1 shl arg2) or (arg1 shr (256 - arg2)
-```
-
-Notes:
-- `arg2 rol arg1` is equivalent of `arg2 rol (arg1 mod 2^256)`
-
-### `0x1f`: `ROR` (rotate right)
-
-The `ROL` instruction (rotate right) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the second popped value `arg2` circular shifted to the right by the number of bits in the first popped value `arg1`.
-
-```
-(arg1 shr arg2) or (arg1 shl (256 - arg2)
-```
-
-Notes:
-- `arg2 ror arg1` is equivalent of `arg2 ror (arg1 mod 2^256)`
-
-The cost of the shift instructions is set at `verylow` tier (3 gas), while the rotations are 12 gas each.
+The cost of the shift instructions is set at `verylow` tier (3 gas).
 
 ## Rationale
 
