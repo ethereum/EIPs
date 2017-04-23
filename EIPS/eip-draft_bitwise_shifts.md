@@ -27,10 +27,10 @@ The following instructions are introduced:
 
 ### `0x1b`: `SHL` (shift left)
 
-The `SHL` instruction (shift left) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the second popped value `arg2` shifted to the left by the number of bits in the first popped value `arg1`. The result is equal to
+The `SHL` instruction (shift left) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the first popped value `arg1` shifted to the left by the number of bits in the second popped value `arg2`. The result is equal to
 
 ```
-(arg2 * 2^arg1) mod 2^256
+(arg1 * 2^arg2) mod 2^256
 ```
 
 Notes:
@@ -38,10 +38,10 @@ Notes:
 
 ### `0x1c`: `SHR` (logical shift right)
 
-The `SHR` instruction (logical shift right) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the second popped value `arg2` shifted to the right by the number of bits in the first popped value `arg1` with zero fill. The result is equal to
+The `SHR` instruction (logical shift right) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the first popped value `arg1` shifted to the right by the number of bits in the second popped value `arg2` with zero fill. The result is equal to
 
 ```
-arg2 udiv 2^arg1
+arg1 udiv 2^arg2
 ```
 
 Notes:
@@ -49,15 +49,15 @@ Notes:
 
 ### `0x1d`: `SAR` (arithmetic shift right)
 
-The `SAR` instruction (arithmetic shift right) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the second popped value `arg2` shifted to the right by the number of bits in the first popped value `arg1` with sign extension. The result is equal to
+The `SAR` instruction (arithmetic shift right) pops 2 values from the stack, `arg1` and `arg2`, and pushes on the stack the first popped value `arg1` shifted to the right by the number of bits in the second popped value `arg2` with sign extension. The result is equal to
 
 ```
-arg2 sdiv 2^arg1
+arg1 sdiv 2^arg2
 ```
 
 Notes:
-- `arg1` is interpreted as unsigned number.
-- If the shift amount is greater or equal 256 the result is 0 if `arg2` is non-negative or -1 if `arg2` is negative.
+- `arg2` is interpreted as unsigned number.
+- If the shift amount (`arg2`) is greater or equal 256 the result is 0 if `arg1` is non-negative or -1 if `arg1` is negative.
 
 The cost of the shift instructions is set at `verylow` tier (3 gas).
 
