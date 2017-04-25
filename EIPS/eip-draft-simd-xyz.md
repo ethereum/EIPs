@@ -1,4 +1,5 @@
-```EIP: <to be assigned>
+```
+EIP: <to be assigned>
 Title: SIMD Operations for the EVM
 Author: Greg Colvin, greg@colvin.org
 Type: Standard Track
