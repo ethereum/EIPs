@@ -1,6 +1,6 @@
 ## Preamble
 
-    EIP:
+    EIP: 211
     Title: New opcodes: RETURNDATASIZE and RETURNDATACOPY
     Author: Christian Reitwiessner <chris@ethereum.org>
     Type: Standard Track
@@ -29,16 +29,21 @@ Note that this proposal also makes the EIP that proposes to allow to return data
 
 ## Specification
 
-Add two new opcodes:
+Add two new opcodes and amend the semantics of any opcode that creates a new call frame (like `CALL`, `CREATE`, `DELEGATECALL`, ...) called call-like opcodes in the following. It is assumed that the EVM (to be more specific: an EVM call frame) has a new internal buffer of variable size, called the return data buffer. This buffer is created empty for each new call frame. Upon executing any call-like opcode, the buffer is cleared (its size is set to zero). After executing a call-like opcode, the complete return data (or failure data, see EIP [206](https://github.com/ethereum/EIPs/pull/206)) of the call is stored in the return data buffer (of the caller), and its size changed accordingly. As an exception, `CREATE` is considered to return the empty buffer in the success case and the failure data in the failure case. 
+
+As an optimization, it is possible to share the return data buffer across call frames because only one will be non-empty at any time.
 
 `RETURNDATASIZE`: `0xd`
 
-Pushes the size of the return data (or the failure return data, see EIP [206](https://github.com/ethereum/EIPs/pull/206)) of the previous call onto the stack. If there was no previous call, pushes zero.
+Pushes the size of the return data buffer onto the stack.
 Gas costs: 2 (same as `CALLDATASIZE`)
 
 `RETURNDATACOPY`: `0xe`
 
-This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data of the previous call. If the return data is accessed beyond its length, it is considered to be filled with zeros. If there was no previous call, copies zeros.
+This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data buffer. If the return data buffer is accessed beyond its size, it is considered to be filled with zeros.
+
+ALTERNATIVE: If the return data is accessed beyond its size, results in failure.
+
 Gas costs: `3 + 3 * ceil(amount / 32)` (same as `CALLDATACOPY`)
 
 ## Rationale
@@ -46,6 +51,8 @@ Gas costs: `3 + 3 * ceil(amount / 32)` (same as `CALLDATACOPY`)
 Other solutions that would allow returning dynamic data were considered, but they all had to deduct the gas from the call opcode and thus were both complicated to implement and specify ([5/8](https://github.com/ethereum/EIPs/issues/8)). Since this proposal is very similar to the way calldata is handled, it fits nicely into the concept. Furthermore, the eWASM architecture already handles return data in exactly the same way.
 
 Note that the EVM implementation needs to keep the return data until the next call or the return from the current call. Since this resource was already paid for as part of the memory of the callee, it should not be a problem. Implementations may either choose to keep the full memory of the callee alive until the next call or copy only the return data to a special memory area.
+
+Keeping the memory of the callee until the next call-like opcode does not increase the peak memory usage in the following sense: Any memory allocation in the caller's frame that happens after the return from the call can be moved before the call without a change in gas costs, but will add this allocation to the peak allocation.
 
 The number values of the opcodes were allocated in the same nibble block that also contains `CALLDATASIZE` and `CALLDATACOPY`.
 
