@@ -3,7 +3,7 @@ EIP: TBD
 Title: Subroutines and Static Jumps for the EVM
 Status: Draft
 Type: Core
-Author: Greg Colvin, Paweł Bylica, Christian Reitwiessner 
+Author: Greg Colvin <greg@colvin.org>, Paweł Bylica, Christian Reitwiessner
 Created: 2016-12-10
 Edited: 2016-29-12
 ```
