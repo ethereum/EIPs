@@ -1,10 +1,11 @@
-EIP: <to be assigned>
+```EIP: <to be assigned>
 Title: SIMD Operations for the EVM
 Author: Greg Colvin, greg@colvin.org
 Type: Standard Track
 Category: Core
 Status: Draft
 Created: 2017-04-25
+```
 
 ## ABSTRACT
 
