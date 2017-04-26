@@ -23,7 +23,7 @@ Stores blockhashes in the state, reducing the protocol complexity and the need f
 
 If `block.number == METROPOLIS_FORK_BLKNUM`, then when processing the block, before processing any transactions set the code of BLOCKHASH_CONTRACT_ADDR to BLOCKHASH_CONTRACT_CODE.
 
-If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then when processing a block, before processing any transactions execute a call with the parameters:
+If `block.number >= METROPOLIS_FORK_BLKNUM`, then when processing a block, before processing any transactions execute a call with the parameters:
 
 * `SENDER`: SUPER_USER
 * `GAS`: 1000000
