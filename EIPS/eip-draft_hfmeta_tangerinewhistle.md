@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: Hardfork Meta: EIP 150 Hard Fork
+    Title: Hardfork Meta: Tangerine Whistle
     Author: Alex Beregszaszi
     Type: Standard Track
     Category: Core
@@ -15,7 +15,7 @@ This specifies the changes included in the hard fork named EIP 150 Hard Fork.
 
 ## Specification
 
-- Codename: EIP 150 Hard Fork
+- Codename: Tangerine Whistle
 - Activation:
   - Block >= 2,463,000 on Mainnet
 - Included EIPs:
