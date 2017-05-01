@@ -1,5 +1,3 @@
-This is the suggested template for new EIPs.
-
 ## Preamble
 
     EIP: <to be assigned>
