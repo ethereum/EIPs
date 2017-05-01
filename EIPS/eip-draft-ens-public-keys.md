@@ -10,7 +10,7 @@ This is the suggested template for new EIPs.
     Status: Draft
     Created: 2017-05-01
     Requires: 137
-    Discussions-To:
+    Discussions-To: https://github.com/ethereum/EIPs/issues/620
     
 ## Abstract
 This EIP defines a resolver profile for ENS that permits the lookup of SECP256k1 public keys. This is necessary in order to facilitate ENS lookup for applications such as Whisper.
