@@ -1,33 +1,27 @@
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
 ## Preamble
 
     EIP: <to be assigned> (I Suggest 20)
     Title: <EIP title>
     Author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
     Type: Informational
-    Category ERC
     Status: Draft
     Created: 2015-11-19
 
 
 ## Simple Summary
 
-Token standard interface.
+A standard interface for tokens.
 
 
 ## Abstract
 
-The following standard allows for people to implement a token standard API withing their smart contracts.
-
-This standard provides basic functionality for sending and approving tokens to be spend by a third party.
+The following standard allows for the implementation of a standard API for tokens within their smart contracts:
+it primarily provides basic functionality to transfer tokens and allow them to be approved to be spend by another on-chain third party.
 
 
 ## Motivation
 
-Following the same standard interface allows those tokens to be used in many wallets and exchanges.
+A standard interface allows any tokens on Ethereum to be re-used by other applications: from wallets to decentralized exchanges.
 
 
 ## Specification
@@ -61,7 +55,7 @@ Get the account balance of another account with address `_owner`
 function transfer(address _to, uint256 _value) returns (bool success)
 ```
 
-Send `_value` amount of tokens to address `_to`
+Transfer `_value` amount of tokens to address `_to`
 
 
 #### transferFrom
@@ -82,7 +76,7 @@ function approve(address _spender, uint256 _value) returns (bool success)
 ```
 
 Allow _spender to withdraw from your account, multiple times, up to the _value amount. If this function is called again it overwrites the current allowance with _value.
-To prevent attack vectors like described here: https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/
+To prevent attack vectors like the one described here: https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/
 make sure to set the allowance to 0 before setting it to another value for the same spender.
 
 
@@ -118,11 +112,14 @@ Triggered whenever `approve(address _spender, uint256 _value)` is called.
 
 ## Implementation
 
-Different implementations are available at
+There are already plenty of ERC20-compliant tokens deployed on the Ethereum network and is the most widely used standard.
+Different implementations have been written by various teams that have different trade-offs: from gas saving to improved security.
+
+#### Example implementations are available at
 - https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/StandardToken.sol
 - https://github.com/ConsenSys/Tokens/blob/master/Token_Contracts/contracts/StandardToken.sol
 
-Implentation adding the force 0 before calling approve again:
+#### Implementation adding the force 0 before calling approve again:
 - https://github.com/Giveth/minime/blob/master/MiniMeToken.sol
 
 ## Copyright
