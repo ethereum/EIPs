@@ -31,6 +31,33 @@ A standard interface allows any tokens on Ethereum to be re-used by other applic
 
 **NOTE**: An important point is that callers should handle `false` from `returns (bool success)`.  Callers should not assume that `false` is never returned!
 
+#### name
+
+``` js
+function name() constant returns (string name)
+```
+
+Returns the name of the token. E.g. "MyToken"
+
+
+#### symbol
+
+``` js
+function symbol() constant returns (string symbol)
+```
+
+Returns the symbol of the token. E.g. "MYT"
+
+
+#### decimals
+
+``` js
+function decimals() constant returns (uint8 decimals)
+```
+
+Returns the number of decimals the token uses. E.g. 8, which would mean to divide the token amount by 100000000 to get its user representation.
+
+
 #### totalSupply
 
 ``` js
