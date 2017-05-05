@@ -22,9 +22,9 @@ Implements a set of changes that serve the combined purpose of "abstracting out"
 
 If `block.number >= METROPOLIS_FORK_BLKNUM`, then:
 1. If the signature of a transaction is `(CHAIN_ID, 0, 0)` (ie. `r = s = 0`, `v = CHAIN_ID`), then treat it as valid and set the sender address to `NULL_SENDER`
-2. Transactions of this form MUST have gasprice = 0, nonce = 0, value = 0, and do NOT increment the nonce of account 0.
+2. Transactions of this form MUST have gasprice = 0, nonce = 0, value = 0, and do NOT increment the nonce of account NULL_SENDER.
 3. Set the address of any contract created through a creation transaction (whether of the traditional or the EIP86 variety) to equal `sha3(NULL_SENDER + sha3(init code)) % 2**160`, where `+` represents concatenation, replacing the earlier address formula of `sha3(rlp.encode([sender, nonce]))`
-4. Create a new opcode at `0xfb`, `CREATE2`, which sets the creation address to `sha3(sender + sha3(init code)) % 2**160`. If a contract at that address already exists, fails and returns 0 as if the init code had run out of gas.
+4. Create a new opcode at `0xfb`, `CREATE2`, with 4 stack arguments (value, salt, mem_start, mem_size) which sets the creation address to `sha3(sender + salt + sha3(init code)) % 2**160`, where `sender` is as a 20-. If a contract at that address already exists, fails and returns 0 as if the init code had run out of gas.
 
 ### Rationale
 
