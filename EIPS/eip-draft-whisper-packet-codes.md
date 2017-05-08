@@ -26,17 +26,15 @@ If Whisper node does not support a particular packet code, it should just ignore
 
 The Whisper sub-protocol should support the following packet codes:
 
-	Status (0x00)
+| EIP   | Name                       | Int Value |
+|-------|----------------------------|-----------|
+|       | Status                     |   0x00    |
+|       | Messages                   |   0x01    |
+|       | P2P                        |   0x02    |
+|       | P2P Request                |   0x03    |
+|       | PoW Requirement            |   0x04    |
+|       | Bloom Filter               |   0x05    |
 
-	Messages (0x01)
-
-	P2P (0x02)
-
-	P2P Request (0x03)
-
-	PoW Requirement (0x04)
-
-	Bloom Filter (0x05)
 
 ### Packet Format and Usage
 
