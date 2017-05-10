@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: draft
-    Title: Whsiper Packet Codes - Specification
+    Title: Whsiper Specification
     Author: Vlad Gluhovsky <gluk256@gmail.com>
     Type: Informational
     Status: Draft
@@ -9,12 +9,13 @@
 
 ## Abstract
 
-This draft EIP describes the packet codes and format used for Whisper messages within the ÐΞVp2p Wire Protocol.
+This draft EIP describes the format of Whisper messages within the ÐΞVp2p Wire Protocol.
 This EIP should substitute the [existing specification](https://github.com/ethereum/wiki/wiki/Whisper-Wire-Protocol).
+More detailed documentation on Whisper could be found [here](https://github.com/ethereum/go-ethereum/wiki/Whisper).
 
 ## Motivation
 
-It is necessary to specify the standard for Whipser messages in order to ensure forward compatibility of different Whisper clients, even in case they don't support particular message codes.
+It is necessary to specify the standard for Whipser messages in order to ensure forward compatibility of different Whisper clients.
 
 ## Specification
 
@@ -72,7 +73,51 @@ This packet is used by Whisper nodes for dynamic adjustment of their individual 
 
 This packet contains two objects: integer (0x05) followed by a byte array of arbitrary size.
 
-This packet is used by Whisper nodes for sharing their interest in messages with specific topics. 
+This packet is used by Whisper nodes for sharing their interest in messages with specific topics.
+
+### Whisper Envelope
+
+Envelopes are RLP-encoded structures of the following format:
+
+	[ Version, Expiry, TTL, Topic, AESNonce, Data, EnvNonce ]
+	
+`Version`: up to 4 bytes (currently one byte containing zero). Version indicates encryption method. If Version is higher than current, envelope could not be decrypted, and therefore only forwarded to the peers.
+
+`Expiry`: 4 bytes (UNIX time in seconds).
+
+`TTL`: 4 bytes (time-to-live in seconds).
+
+`Topic`: 4 bytes of arbitrary data.
+
+`AESNonce`: 12 bytes of random data (only present in case of symmetric encryption).
+
+`Data`: byte array of arbitrary size (contains encrypted message).
+
+`EnvNonce`: 8 bytes of arbitrary data (used for PoW calculation).
+
+### Contents of Data Field (Message)
+
+Data field contains encrypted message of the Envelope. Plaintext (unencrypted) payload is formed as a concatenation of a single byte for flags, additional metadata (as stipulated by the flags) and the actual payload. The message has the following structure:
+
+    flags: 1 byte
+    
+    optional padding: byte array of arbitrary size
+    
+    payload: byte array of arbitrary size
+    
+    optional signature: 65 bytes
+
+Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28. 
+
+The padding is introduced in order to align the message size, since message size alone might reveal important metainformation. The first several bytes of padding (up to four bytes) indicate the total size of padding. E.g. if padding is less than 256 bytes, then one byte is enough; if padding is less than 65536 bytes, then 2 bytes; and so on.
+
+Flags byte uses only three bits in v.5. First two bits indicate, how many bytes indicate the padding size. The third byte indicates if signature is present. Other bits must be set to zero for backwards compatibility of future versions.
+
+### Payload Encryption
+
+Asymmetric encryption uses the standard Elliptic Curve Integrated Encryption Scheme with SECP-256k1 public key.
+
+Symmetric encryption uses AES GCM algorithm with random 96-bit nonce.
 
 ## Rationale
 
@@ -86,7 +131,7 @@ Packet code 0x05 will be necessary for scalability of the network. In case of to
 
 ## Backwards Compatibility
 
-This EIP is backwards-compatible with Whisper version 5. Any client which does not impement certain codes should gracefully ignore the packets with those codes. This will insure the forward compatibility. 
+This EIP is compatible with Whisper version 5. Any client which does not implement certain packet codes should gracefully ignore the packets with those codes. This will ensure the forward compatibility. 
 
 ## Implementation
 
