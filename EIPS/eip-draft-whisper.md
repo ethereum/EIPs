@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: draft
-    Title: Whsiper Specification
+    Title: Whisper Specification
     Author: Vlad Gluhovsky <gluk256@gmail.com>
     Type: Informational
     Status: Draft
@@ -81,7 +81,7 @@ Envelopes are RLP-encoded structures of the following format:
 
 	[ Version, Expiry, TTL, Topic, AESNonce, Data, EnvNonce ]
 	
-`Version`: up to 4 bytes (currently one byte containing zero). Version indicates encryption method. If Version is higher than current, envelope could not be decrypted, and therefore only forwarded to the peers.
+`Version`: up to 4 bytes (currently one byte containing zero). Version indicates encryption method. If Version is higher than current, envelope could not be decoded, and therefore only forwarded to the peers.
 
 `Expiry`: 4 bytes (UNIX time in seconds).
 
@@ -109,7 +109,7 @@ Data field contains encrypted message of the Envelope. Plaintext (unencrypted) p
 
 Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28. 
 
-The padding is introduced in order to align the message size, since message size alone might reveal important metainformation. The first several bytes of padding (up to four bytes) indicate the total size of padding. E.g. if padding is less than 256 bytes, then one byte is enough; if padding is less than 65536 bytes, then 2 bytes; and so on.
+The padding is introduced in order to align the message size, since message size alone might reveal important metainformation. The first several bytes of padding (up to four bytes) indicate the total size of padding (including these length bytes). E.g. if padding is less than 256 bytes, then one byte is enough; if padding is less than 65536 bytes, then 2 bytes; and so on.
 
 Flags byte uses only three bits in v.5. First two bits indicate, how many bytes indicate the padding size. The third byte indicates if signature is present. Other bits must be set to zero for backwards compatibility of future versions.
 
