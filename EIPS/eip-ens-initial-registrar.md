@@ -1,8 +1,8 @@
 ```
-EIP: Draft
+EIP: 162
 Title: Initial ENS Hash Registrar
 Author: Maurelian and Nick Johnson
-Status: Draft
+Status: Final
 Type: Informational
 Created: 2016-10-25
 ```
@@ -74,7 +74,7 @@ The Initial Registrar will also prohibit registration of names 6 characters or l
 
 Names submitted to the initial registrar must be hashed using Ethereum's sha3 function. Note that the hashes submitted to the registrar are the hash of the subdomain label being registered, not the namehash as defined in EIP 137.
 
-For example, in order to register `abcdefg.eth`, one should submit `sha3('abcdefg')`, not `sha3('abcdefg', sha3('eth', 0))`.
+For example, in order to register `abcdefg.eth`, one should submit `sha3('abcdefg')`, not `sha3(sha3(0, 'eth'), 'abcdefg')`.
 
 ### Auctioning names
 
