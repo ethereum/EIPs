@@ -91,7 +91,6 @@ The auction lifecycle of a name has 5 possible states, or Modes.
 3. **Auction:** Once the auction for a name has begun, there is a 72 hour bidding period. Bidders must submit a payment of ether, along with sealed bids as a hash of `sha3(bytes32 hash, address owner, uint value, bytes32 salt)`. The bidder may obfuscate the true bid value by sending a greater amount of ether.
 4. **Reveal:** After the bidding period, a 48 hour reveal period commences. During this time, bidders must reveal the true parameters of their sealed bid. As bids are revealed, ether payments are returned according to the schedule of "refund ratios" outlined in the table below. If no bids are revealed, the name will return to the Open state.
 5. **Owned:** After the reveal period has finished, the winning bidder must submit a transaction to finalize the auction, which then calls the ENS's `setSubnodeOwner` function, recording the winning bidder's address as the owner of the hash of the name.
-<!-- 6. **Forbidden:** Names must not be 6 characters are less, but the Registrar knows only the hash of a name. Short names which are Owned can thus be reported, this will change the state to Forbidden, and a portion of the value of the name will be paid to the reporting account as a reward. -->
 
 <!-- #### Registrar Parameters
 
