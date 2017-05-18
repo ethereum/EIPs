@@ -1,6 +1,6 @@
 ## Preamble
 
-    EIP: to be assigned
+    EIP: 214
     Title: New opcode STATICCALL
     Author: Vitalik Buterin <vitalik@ethereum.org>, Christian Reitwiessner <chris@ethereum.org>;
     Type: Standard Track
@@ -14,15 +14,23 @@ To increase smart contract security, this proposal adds a new opcode that can be
 
 ## Abstract
 
+This proposal adds a new opcode that can be used to call another contract (or itself) while disallowing any modifications to the state during the call (and its subcalls, if present). Any opcode that attempts to perform such a modification (see below for details) will result in an exception instead of performing the modification.
 
 ## Motivation
 
+Currently, there is no restriction about what a called contract can do, as long as the computation can be performed with the amount of gas provided. This poses certain difficulties about smart contract engineers: After a regular call, unless you know the called contract, you cannot make any assumptions about the state of the contracts. Furthermore, because you cannot know the order of transactions before they are confirmed by miners, not even an outside observer can be sure about that in all cases.
+
+This EIP adds a way to call other contracts and restrict what they can do in the simplest way. It can be safely assumed that the state of all contracts is the same before and after a static call.
 
 ## Specification
 
+Introduce a new `STATIC` flag to the virtual machine. This flag is set to `false` initially. Its value is always copied to sub-calls or sub-creates with an exception for the new opcode below.
+
 Opcode: `0xfa`.
 
-`STATICCALL` functions equivalently to a `CALL`, except it takes 6 arguments not including value, and calls the child with a `STATIC` flag on. Any calls, static or otherwise, made by an execution instance with a `STATIC` flag on will also have a `STATIC` flag on. Any attempts to make state-changing operations inside an execution instance with a `STATIC` flag on will instead throw an exception. These operations include nonzero-value calls, creates, `LOG` calls, `SSTORE`, `SSTOREBYTES` and `SUICIDE`.
+`STATICCALL` functions equivalently to a `CALL`, except it takes 6 arguments not including value, and calls the child with the `STATIC` flag set to `true`.
+
+Any attempts to make state-changing operations inside an execution instance with `STATIC` set to `true` will instead throw an exception. These operations include `CREATE`, `CREATE2`, `LOG`, `SSTORE`, `SSTOREBYTES` and `SELFDESTRUCT`. They also include `CALL` and `DELEGATECALL` with a non-zero value. As an exception, `CALLCODE` is not considered state-changing, even with a non-zero value.
 
 ## Rationale
 
@@ -30,7 +38,7 @@ This allows contracts to make calls that are clearly non-state-changing, reassur
 
 ## Backwards Compatibility
 
-This proposal adds a new opcode but does not modify the behaviour of other opcodes and thus is backwards compatible for old contracts that do not use the new opcode.
+This proposal adds a new opcode but does not modify the behaviour of other opcodes and thus is backwards compatible for old contracts that do not use the new opcode and are not called via the new opcode.
 
 ## Test Cases
 
