@@ -33,12 +33,12 @@ Add two new opcodes and amend the semantics of any opcode that creates a new cal
 
 As an optimization, it is possible to share the return data buffer across call frames because only one will be non-empty at any time.
 
-`RETURNDATASIZE`: `0xd`
+`RETURNDATASIZE`: `0x3d`
 
 Pushes the size of the return data buffer onto the stack.
 Gas costs: 2 (same as `CALLDATASIZE`)
 
-`RETURNDATACOPY`: `0xe`
+`RETURNDATACOPY`: `0x3e`
 
 This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data buffer. If the return data buffer is accessed beyond its size, it is considered to be filled with zeros.
 
