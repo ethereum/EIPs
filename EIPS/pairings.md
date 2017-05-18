@@ -45,11 +45,13 @@ Output: If the length of the input is incorrect or any of the inputs are not ele
         (in F_q) and zero else.
 ```
 
-Note that k is determined from the length of the input. k == 0 is valid and results in returning one.
+Note that `k` is determined from the length of the input. `k == 0` is valid and results in returning one.
+
+In order to check that an input is an element of `G_1`, verifying the encoding of the coordinates and checking that they satisfy the curve equation (or is the encoding of infinity) is sufficient. For `G_2`, in addition to that, the order of the element has to be checked to be equal to the group order `q = 21888242871839275222246405745257275088548364400416034343698204186575808495617`.
 
 ### Definition of the groups
 
-The groups `G_1` and `G_2` are cyclic groups of prime order `q` on the elliptic curve `alt_bn128` defined by the curve equation
+The groups `G_1` and `G_2` are cyclic groups of prime order `q = 21888242871839275222246405745257275088548364400416034343698204186575808495617` on the elliptic curve `alt_bn128` defined by the curve equation
 `Y^2 = X^3 + 3`.
 
 The group `G_1` is a cyclic group on the above curve over the field `F_p` with `p = 21888242871839275222246405745257275088696311157297823662689037894645226208583` with generator `P1 = (1, 2)`.
@@ -79,7 +81,15 @@ The length of the returned data is always exactly 32 bytes and encoded as a 32 b
 
 ### Gas costs
 
-To be determined. 
+[Benchmarks run on cpp-ethereum](https://gist.github.com/chriseth/4168b56bfe638cae8da1945dd988600b)
+
+suggest the following gas formula:
+
+`60000 * k + 40000`
+
+if we target 20000 gas per millisecond.
+
+Awaiting benchmarks from other implementations.
 
 ## Rationale
 
