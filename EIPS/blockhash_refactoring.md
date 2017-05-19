@@ -39,7 +39,7 @@ If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then the BLOCKHASH opcode ins
 * `VALUE`: 0
 * `DATA`: 32 byte zero-byte-leftpadded integer representing the stack argument with which the opcode was called
 
-Also, the gas cost is increased from 20 to 800 to reflect the higher costs of processing the algorithm in the contract code.
+Also, for blocks where `block.number >= METROPOLIS_FORK_BLKNUM`, the gas cost is increased from 20 to 800 to reflect the higher costs of processing the algorithm in the contract code.
 
 ### BLOCKHASH_CONTRACT_CODE
 
