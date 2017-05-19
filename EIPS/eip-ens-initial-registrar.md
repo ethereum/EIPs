@@ -121,14 +121,14 @@ The following table outlines what portion of the balance held in a deed contract
 | --- | --- | --- |
 | A valid non-winning bid is revealed. | Bidder | 99.5% |
 | A bid submitted after the auction period is revealed. | Bidder | 99.5% |
-| An otherwise valid bid is revealed on an owned name. <sup>1</sup> | Bidder | %0.5 |
+| A bid is revealed after the reveal period. <sup>1</sup> | Bidder | 0.5% |
 | An expired sealed bid is cancelled. <sup>2</sup> | Canceler | 0.5% |
 | A registered hash is reported as invalid. <sup>3</sup> | Reporter | 50% |
 | A registered hash is reported as invalid. <sup>3</sup> | Owner | 50% |
 
 ##### Notes:
 
-1. This is to prevent an extortion attack on the current highest bidder, by threatening to reveal a new second highest bid. This forces all bids to be revealed.
+1. This incentivizes all bids to be revealed in time. If bids could be revealed late, an extortion attack on the current highest bidder could be made by threatening to reveal a new second highest bid.
 2. A bid which remains sealed after more than 2 weeks and 5 days may be cancelled by anyone to collect a small reward.
 2. Since names are hashed before auctioning and registration, the Initial Registrar is unable to enforce character length restrictions independently. A reward is therefore provided for reporting invalid names.
 
