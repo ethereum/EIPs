@@ -31,7 +31,7 @@ If `block.number >= METROPOLIS_FORK_BLKNUM`, then when processing a block, befor
 * `VALUE`: 0
 * `DATA`: <32 bytes corresponding to the block's prevhash>
 
-If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then the BLOCKHASH opcode instead returns the result of executing a call with the parameters:
+If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then the BLOCKHASH opcode instead returns the result of executing a call (NOT a transaction) with the parameters:
 
 * `SENDER`: <account from which the opcode was called>
 * `GAS`: 1000000
