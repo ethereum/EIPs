@@ -1,6 +1,6 @@
 ### Parameters
 
-* `GQUADDIVISOR: 20`
+* `GQUADDIVISOR: 100`
 
 ### Specification
 
@@ -8,7 +8,13 @@ At address 0x00......05, add a precompile that expects input in the following fo
 
     <length_of_BASE> <length_of_EXPONENT> <length_of_MODULUS> <BASE> <EXPONENT> <MODULUS>
     
-Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Call data is assumed to be infinitely right-padded with zero bytes, and excess data is ignored. Consumes `floor(max(length_of_MODULUS, length_of_BASE) ** 2 * max(length_of_EXPONENT, 1) / GQUADDIVISOR)` gas, and if there is enough gas, returns an output `(BASE**EXPONENT) % MODULUS` as a byte array with the same length as the modulus.
+Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Call data is assumed to be infinitely right-padded with zero bytes, and excess data is ignored. Consumes `floor(max(length_of_MODULUS, length_of_BASE) ** 2 * max(ADJUSTED_EXPONENT_LENGTH, 1) / GQUADDIVISOR)` gas, and if there is enough gas, returns an output `(BASE**EXPONENT) % MODULUS` as a byte array with the same length as the modulus.
+
+`ADJUSTED_EXPONENT_LENGTH` is defined as follows.
+
+* If `length_of_EXPONENT <= 256`, and all bits in `EXPONENT` are 0, return 0
+* If `length_of_EXPONENT <= 256`, then return the index of the highest bit in `EXPONENT` (eg. 1 -> 0, 2 -> 1, 3 -> 1, 255 -> 7, 256 -> 8)
+* If `length_of_EXPONENT > 256`, then return `8 * (length_of_EXPONENT - 32)` plus the index of the highest bit in the first 32 bytes of `EXPONENT` (eg. if `EXPONENT = \x00\x00\x01\x00.....\x00`, with one hundred bytes, then the result is 8 * (100 - 32) + 253 = 797)
 
 For example, the input data:
 
@@ -23,7 +29,7 @@ Represents the exponent `3**(2**256 - 2**32 - 978) % (2**256 - 2**32 - 977)`. By
 
     0000000000000000000000000000000000000000000000000000000000000001
     
-Returned as 32 bytes because the modulus length was 32 bytes. The gas cost would be `32**2 * 32 / 20 = 1638` gas (note that this roughly equals the cost of using the EXP opcode to compute a 32-byte exponent). A 4096-bit RSA exponentiation would cost `256**2 * 256 / 20 = 838860` gas in the worst case, though RSA verification in practice usually uses an exponent of 3 or 65537, which would reduce the gas consumption to 3276 or 6553, respectively.
+Returned as 32 bytes because the modulus length was 32 bytes. The `ADJUSTED_EXPONENT_LENGTH` would be 255, and the gas cost would be `32**2 * 255 / 100 = 2611` gas (note that this is ~five thirds of the cost of using the EXP opcode to compute a 32-byte exponent). A 4096-bit RSA exponentiation would cost `512**2 * 4095 / 100 = 10734796` gas in the worst case, though RSA verification in practice usually uses an exponent of 3 or 65537, which would reduce the gas consumption to 2621 or 41943, respectively.
 
 This input data:
 
@@ -71,5 +77,7 @@ Would also parse as a base of 3, an exponent of 65535 and a modulus of `2**255`,
 ### Rationale
 
 This allows for efficient RSA verification inside of the EVM, as well as other forms of number theory-based cryptography. Note that adding precompiles for addition and subtraction is not required, as the in-EVM algorithm is efficient enough, and multiplication can be done through this precompile via `a * b = ((a + b)**2 - (a - b)**2) / 4`.
+
+The bit-based exponent calculation is done specifically to fairly charge for the often-used exponents of 2 (for multiplication) and 3 and 65537 (for RSA verification).
 
     
