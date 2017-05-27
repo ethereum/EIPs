@@ -33,20 +33,22 @@ A new resolver interface is defined, consisting of the following method:
 The interface ID of this interface is 0x59d1d43c.
 
 The `text` data may be any arbitrary UTF-8 string. If the key is not present, the empty string
-should be returned.
+must be returned.
 
 
 ### Initial Recommended Keys
 
-Keys should always be made up of lowercase letters, numbers and the hyphen (-). Extended keys
-or non-standard services should be prefixed with `x-`.
+Keys must be made up of lowercase letters, numbers and the hyphen (-). Vendor specific
+services must be prefixed with `vnd.`.
 
 - **email** - an e-mail address
 - **url** - a URL
-- **x-twitter** - a twitter username (should it be prefixed with an @?)
-- **x-github** - a GitHub username
-
-A separate document may make more sense to track *standard* and *extended* keys.
+- **avatar** - a URL to an image used as an avatar or logo
+- **description** - A description of the name
+- **notice** - A notice regarding this name; 
+- **keywords** - A list of comma-separated keywords, ordered by most significant first; clients that interpresent this field may choose a threshold beyond which to ignore
+- **vnd.twitter** - a twitter username (should it be prefixed with an @?)
+- **vnd.github** - a GitHub username
 
 
 ## Rationale
