@@ -30,10 +30,10 @@ Here two extension functions are introduced, which act as levers with which to m
 Supply may be increased at any time and by any amount by minting new tokens and transferring them to a desired address. Again, adding ownership modifiers and restricting privileges would prove useful in most cases.
 
 ```
-function mint(uint value, address for) public returns (bool) {
+function increaseSupply(uint value, address to) public returns (bool) {
   totalSupply = safeAdd(totalSupply, value);
-  balances[for] = safeAdd(balances[for], value);
-  Transfer(0, for, value);
+  balances[for] = safeAdd(balances[to], value);
+  Transfer(0, to, value);
   return true;
 }
 ```
@@ -51,7 +51,7 @@ function safeAdd(uint a, uint b) internal returns (uint) {
 Supply may be decreased at any time by subtracting from a desired address. There is one caveat: the token balance of the provided party must be at least equal to the amount being subtracted from total supply.
 
 ```
-function burn(uint value, address from) public returns (bool) {
+function decreaseSupply(uint value, address from) public returns (bool) {
   balances[from] = safeSub(balances[from], value);
   totalSupply = safeSub(totalSupply, value);  
   Transfer(from, 0, value);
