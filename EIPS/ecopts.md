@@ -1,6 +1,6 @@
 ## Preamble
 
-    EIP: <to be assigned>
+    EIP: 213
     Title: Precompiled contracts for addition and scalar multiplication
            on the elliptic curve alt_bn128
     Author: Christian Reitwiessner<chris@ethereum.org>
@@ -44,7 +44,7 @@ Field elements and scalars are encoded as 32 byte big-endian numbers. Curve poin
 
 Tuples of objects are encoded as their concatenation.
 
-For both precompiled contracts, if the input is shorter than expected, it is assumed to be virtually padded with zeros at the end (i.e. compatible with the semantics of the `CALLDATALOAD` opcode).
+For both precompiled contracts, if the input is shorter than expected, it is assumed to be virtually padded with zeros at the end (i.e. compatible with the semantics of the `CALLDATALOAD` opcode). If the input is longer than expected, surplus bytes at the end are ignored.
 
 The length of the returned data is always as specified (i.e. it is not "unpadded"). 
 
