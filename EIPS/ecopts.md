@@ -93,12 +93,12 @@ Inputs to test:
 
 Implementation of these primitives are available here:
 
- - [libsnark](https://github.com/scipr-lab/libsnark/blob/master/src/algebra/curves/alt_bn128/alt_bn128_g1.hpp) (C++)
+ - [libff](https://github.com/scipr-lab/libff/blob/master/src/algebra/curves/alt_bn128/alt_bn128_g1.cpp) (C++)
  - [bn](https://github.com/zcash/bn/blob/master/src/groups/mod.rs) (Rust)
 
 In both codebases, a specific group on the curve alt_bn128 is used and is called G1.
 
- - [Python](https://github.com/ethereum/research/blob/master/zksnark/bn128_curve.py) - probably most self-contained and best readable.
+ - [Python](https://github.com/ethereum/research/blob/master/zksnark/py_pairing/py_pairing/bn128_curve.py) - probably most self-contained and best readable.
 
 ## Copyright
 
