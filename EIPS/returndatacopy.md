@@ -40,7 +40,7 @@ Gas costs: 2 (same as `CALLDATASIZE`)
 
 `RETURNDATACOPY`: `0x3e`
 
-This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data buffer. Furthermore, accessing the return data buffer beyond its size results in a failure, i.e. if `start + length` overflows or results in a value larger than `RETURNDATASIZE`, the current call stops in an out-of-gas condition.
+This opcode has similar semantics to `CALLDATACOPY`, but instead of copying data from the call data, it copies data from the return data buffer. Furthermore, accessing the return data buffer beyond its size results in a failure, i.e. if `start + length` overflows or results in a value larger than `RETURNDATASIZE`, the current call stops in an out-of-gas condition. In particular, reading 0 bytes from the end of the buffer will read 0 bytes; reading 0 bytes from one-byte out of the buffer causes an exception.
 
 Gas costs: `3 + 3 * ceil(amount / 32)` (same as `CALLDATACOPY`)
 
