@@ -58,8 +58,9 @@ A given level `k` of stored block hashes has the _interval_ of `B**k` blocks.
 
 The level update formula is:
 
-```
+```python
 if p % B**k == 0:
+    # FIXME: We might need to move the index by 1.
     index = (p / B**k) % B
     storage[k][index] = storage[k - 1][0]
 ```
@@ -94,16 +95,16 @@ if msg.sender == 2**160 - 2:
         # Use storage fields 512..767 to store the hashes of 256
         # blocks with block.number % 65536 == 0.
         index = (prev_block_number / 65536 - 1) % 256
-        # Move to be replaced record from level 1 to level 2.
-        ~sstore(512 + index, ~sload(256 + 0))
+        # Move to be replaced record of index 0 from level 1 to level 2.
+        ~sstore(512 + index, ~sload(256))
 
     # Level 1
     if prev_block_number % 256 == 0:
         # Use storage fields 256..511 to store the hashes of 256
         # blocks with block.number % 256 == 0.
         index = (prev_block_number / 256 - 1) % 256
-        # Move to be replaced record from level 0 to level 1.
-        ~sstore(256 + index, ~sload(0 + 0))
+        # Move to be replaced record of index 0 from level 0 to level 1.
+        ~sstore(256 + index, ~sload(0))
 
     # Level 0
     # Use storage fields 0..255 to store the hashes of the last 256
