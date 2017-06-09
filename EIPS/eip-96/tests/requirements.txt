@@ -1,0 +1,3 @@
+six
+pytest
+ethereum==1.6.1
