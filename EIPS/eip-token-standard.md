@@ -161,7 +161,7 @@ Different implementations have been written by various teams that have different
 - https://github.com/ConsenSys/Tokens/blob/master/Token_Contracts/contracts/StandardToken.sol
 
 #### Implementation of adding the force to 0 before calling "approve" again:
-- https://github.com/Giveth/minime/blob/master/MiniMeToken.sol
+- https://github.com/Giveth/minime/blob/master/contracts/MiniMeToken.sol
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
