@@ -24,13 +24,13 @@ This EIP adds a way to call other contracts and restrict what they can do in the
 
 ## Specification
 
-Introduce a new `STATIC` flag to the virtual machine. This flag is set to `false` initially. Its value is always copied to sub-calls or sub-creates with an exception for the new opcode below.
+Introduce a new `STATIC` flag to the virtual machine. This flag is set to `false` initially. Its value is always copied to sub-calls with an exception for the new opcode below.
 
 Opcode: `0xfa`.
 
 `STATICCALL` functions equivalently to a `CALL`, except it takes 6 arguments not including value, and calls the child with the `STATIC` flag set to `true` for the execution of the child. Once this call returns, the flag is reset to its value before the call.
 
-Any attempts to make state-changing operations inside an execution instance with `STATIC` set to `true` will instead throw an exception. These operations include `CREATE`, `CREATE2`, `LOG`, `SSTORE`, `SSTOREBYTES` and `SELFDESTRUCT`. They also include `CALL` and `DELEGATECALL` with a non-zero value. As an exception, `CALLCODE` is not considered state-changing, even with a non-zero value.
+Any attempts to make state-changing operations inside an execution instance with `STATIC` set to `true` will instead throw an exception. These operations include `CREATE`, `CREATE2`, `LOG1`, `LOG2`, `LOG3`, `LOG4`, `SSTORE`, and `SELFDESTRUCT`. They also include `CALL` with a non-zero value. As an exception, `CALLCODE` is not considered state-changing, even with a non-zero value.
 
 ## Rationale
 
