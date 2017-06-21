@@ -82,9 +82,10 @@ function balanceOf(address _owner) constant returns (uint256 balance)
 
 #### transfer
 
-Transfers `_value` amount of tokens to address `_to`.
-The command should `throw` if the `_from` account balance has not enough tokens to spend.
+Transfers `_value` amount of tokens to address `_to`, and should fire the `Transfer` event.
+The function should `throw` if the `_from` account balance has not enough tokens to spend.
 
+*Note* Transfers of 0 values should be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
 function transfer(address _to, uint256 _value) returns (bool success)
@@ -94,11 +95,13 @@ function transfer(address _to, uint256 _value) returns (bool success)
 
 #### transferFrom
 
-Transfers `_value` amount of tokens from address `_from` to address `_to`.
+Transfers `_value` amount of tokens from address `_from` to address `_to`, and should fire the `Transfer` event.
 
 The `transferFrom` method is used for a withdraw workflow, allowing contracts to transfer tokens on your behalf.
 This can be used for example to allow a contract to transfer tokens on your behalf and/or to charge fees in sub-currencies.
-The command should `throw` unless the `_from` account has deliberately authorized the sender of the message via some mechanism.
+The function should `throw` unless the `_from` account has deliberately authorized the sender of the message via some mechanism.
+
+*Note* Transfers of 0 values should be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
 function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
