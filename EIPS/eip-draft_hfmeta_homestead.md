@@ -22,9 +22,7 @@ This specifies the changes included in the hard fork named Homestead.
   - Block >= 0 on future testnets
 - Included EIPs:
   - EIP 2 (Homestead Hard-fork Changes)
-  - EIP 6 (Renaming Suicide Opcode)
   - EIP 7 (DELEGATECALL)
-  - EIP 8 (devp2p Forward Compatibility Requirements for Homestead)
 
 ## Copyright
 
