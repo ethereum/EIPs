@@ -6,12 +6,12 @@
     Type: Standard Track
     Category: Core
     Status: Final
-    Created: 23/04/2017
+    Created: 2017-04-23
     Requires: 150
 
 ## Abstract
 
-This specifies the changes included in the hard fork named EIP 150 Hard Fork.
+This specifies the changes included in the hard fork named Tangerine Whistle (EIP 150).
 
 ## Specification
 
@@ -19,7 +19,7 @@ This specifies the changes included in the hard fork named EIP 150 Hard Fork.
 - Activation:
   - Block >= 2,463,000 on Mainnet
 - Included EIPs:
-  - EIP 150 version 1c (Long-term gas cost changes for IO-heavy operations to mitigate transaction spam attacks)
+  - [EIP 150](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-150.md) (Gas cost changes for IO-heavy operations)
 
 ## Copyright
 
