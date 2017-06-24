@@ -4,7 +4,7 @@ Title: Mixed-case checksum address encoding
 Author: Vitalik Buterin
 Type: Standard Track
 Category: ERC
-Status: Draft
+Status: Accepted
 Created: 2016-01-14
 ```
 
@@ -13,27 +13,36 @@ Created: 2016-01-14
 Code:
 
 ``` python
+from ethereum import utils
+
 def checksum_encode(addr): # Takes a 20-byte binary address as input
     o = ''
-    v = utils.big_endian_to_int(utils.sha3(addr))
-    for i, c in enumerate(addr.encode('hex')):
+    v = utils.big_endian_to_int(utils.sha3(addr.hex()))
+    for i, c in enumerate(addr.hex()):
         if c in '0123456789':
             o += c
         else:
-            o += c.upper() if (v & (2**(255 - i))) else c.lower()
+            o += c.upper() if (v & (2**(255 - 4*i))) else c.lower()
     return '0x'+o
+
+def test(addrstr):
+    assert(addrstr == checksum_encode2(bytes.fromhex(addrstr[2:])))
+
+test('0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed')
+test('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359')
+test('0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB')
+test('0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb')
+
 ```
 
-In English, convert the address to hex, but if the ith digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the ith bit of the hash of the address (in binary form) is 1 otherwise print it in lowercase.
+In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the address is 1 otherwise print it in lowercase.
 
 Benefits:
 - Backwards compatible with many hex parsers that accept mixed case, allowing it to be easily introduced over time
 - Keeps the length at 40 characters
-- ~~The average address will have 60 check bits, and less than 1 in 1 million addresses will have less than 32 check bits; this is stronger performance than nearly all other check schemes. Note that the very tiny chance that a given address will have very few check bits is dwarfed by the chance in any scheme that a bad address will randomly pass a check~~
+- On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
 
-UPDATE: I was actually wrong in my math above. I forgot that the check bits are per-hex-character, not per-bit (facepalm). On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
+# References
 
-Examples:
-- `0xCd2a3d9f938e13Cd947eC05ABC7fe734df8DD826` (the "cow" address)
-- `0x9Ca0e998dF92c5351cEcbBb6Dba82Ac2266f7e0C`
-- `0xcB16D0E54450Cdd2368476E762B09D147972b637`
+1. EIP 55 issue and discussion https://github.com/ethereum/eips/issues/55
+2. Python example by @Recmo https://github.com/ethereum/eips/issues/55#issuecomment-261521584
