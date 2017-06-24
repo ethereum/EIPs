@@ -1,4 +1,14 @@
-EDITOR NOTE: below is a copy of the EIP 55 https://github.com/ethereum/eips/issues/55#issue-126609688 raw text fetched on 2017-06-24.
+```
+EIP: 55
+Title: Mixed-case checksum address encoding
+Author: Vitalik Buterin
+Type: Standard Track
+Category: ERC
+Status: Draft
+Created: 2016-01-14
+```
+
+# Specification
 
 Code:
 
