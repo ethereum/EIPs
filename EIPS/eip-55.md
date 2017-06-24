@@ -37,6 +37,43 @@ test('0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb')
 
 In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the address is 1 otherwise print it in lowercase.
 
+# Implementation
+
+In javascript:
+
+```js
+const createKeccakHash = require('keccak')
+
+function toChecksumAddress (address) {
+  address = address.toLowerCase().replace('0x','');
+  var hash = createKeccakHash('keccak256').update(address).digest('hex')
+  var ret = '0x'
+
+  for (var i = 0; i < address.length; i++) {
+    if (parseInt(hash[i], 16) >= 8) {
+      ret += address[i].toUpperCase()
+    } else {
+      ret += address[i]
+    }
+  }
+
+  return ret
+}
+```
+
+```
+> toChecksumAddress('0xfb6916095ca1df60bb79ce92ce3ea74c37c5d359')
+'0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'
+```
+
+Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i.e. the hex address encoded as ASCII):
+
+```
+    var hash = createKeccakHash('keccak256').update(Buffer.from(address.toLowerCase(), 'ascii')).digest()
+```
+
+# Rationale
+
 Benefits:
 - Backwards compatible with many hex parsers that accept mixed case, allowing it to be easily introduced over time
 - Keeps the length at 40 characters
@@ -46,3 +83,4 @@ Benefits:
 
 1. EIP 55 issue and discussion https://github.com/ethereum/eips/issues/55
 2. Python example by @Recmo https://github.com/ethereum/eips/issues/55#issuecomment-261521584
+3. Ethereumjs-util implementation https://github.com/ethereumjs/ethereumjs-util/blob/75f529458bc7dc84f85fd0446d0fac92d991c262/index.js#L452-L466
