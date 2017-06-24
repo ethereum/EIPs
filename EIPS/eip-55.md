@@ -79,6 +79,27 @@ Benefits:
 - Keeps the length at 40 characters
 - On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
 
+# Adoption
+
+| Wallet                   | displays checksummed addresses | rejects invalid mixed-case | rejects too short | rejects too long |
+|--------------------------|--------------------------------|----------------------------|-------------------|------------------|
+| Jaxx 1.2.17              | No                             | Yes                        | Yes               | Yes              |
+| MetaMask 3.7.8           | Yes                            | Yes                        | Yes               | Yes              |
+| Mist 0.8.10              | Yes                            | Yes                        | Yes               | Yes              |
+| MyEtherWallet v3.9.4     | Yes                            | Yes                        | Yes               | Yes              |
+| Parity 1.6.6-beta (UI)   | Yes                            | Yes                        | Yes               | Yes              |
+
+### Exchange support for mixed-case address checksums, as of 2017-05-27:
+
+| Exchange     | displays checksummed deposit addresses | rejects invalid mixed-case | rejects too short | rejects too long |
+|--------------|----------------------------------------|----------------------------|-------------------|------------------|
+| Bitfinex     | No                                     | Yes                        | Yes               | Yes              |
+| Coinbase     | Yes                                    | No                         | Yes               | Yes              |
+| GDAX         | Yes                                    | Yes                        | Yes               | Yes              |
+| Kraken       | No                                     | No                         | Yes               | Yes              |
+| Poloniex     | No                                     | No                         | Yes               | Yes              |
+| Shapeshift   | No                                     | No                         | Yes               | Yes              |
+
 # References
 
 1. EIP 55 issue and discussion https://github.com/ethereum/eips/issues/55
