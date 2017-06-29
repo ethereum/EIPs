@@ -35,7 +35,7 @@ test('0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb')
 
 ```
 
-In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the address is 1 otherwise print it in lowercase.
+In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the lowercase hexadecimal address is 1 otherwise print it in lowercase.
 
 # Implementation
 
