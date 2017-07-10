@@ -83,6 +83,7 @@ Benefits:
 
 | Wallet                   | displays checksummed addresses | rejects invalid mixed-case | rejects too short | rejects too long |
 |--------------------------|--------------------------------|----------------------------|-------------------|------------------|
+| Etherwall 2.0.1          | Yes                            | Yes                        | Yes               | Yes              |
 | Jaxx 1.2.17              | No                             | Yes                        | Yes               | Yes              |
 | MetaMask 3.7.8           | Yes                            | Yes                        | Yes               | Yes              |
 | Mist 0.8.10              | Yes                            | Yes                        | Yes               | Yes              |
