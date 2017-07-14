@@ -7,7 +7,7 @@
     Category: Core
     Status: Final
     Created: 23/04/2017
-    Requires: 2, 6, 7, 8
+    Requires: 2, 7
 
 ## Abstract
 
@@ -21,8 +21,8 @@ This specifies the changes included in the hard fork named Homestead.
   - Block >= 494,000 on Morden
   - Block >= 0 on future testnets
 - Included EIPs:
-  - EIP 2 (Homestead Hard-fork Changes)
-  - EIP 7 (DELEGATECALL)
+  - [EIP 2](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2.md) (Homestead Hard-fork Changes)
+  - [EIP 7](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8.md) (DELEGATECALL)
 
 ## Copyright
 
