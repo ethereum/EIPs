@@ -29,6 +29,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [198](https://github.com/ethereum/EIPs/pull/198)        | Precompiled contract for bigint modular exponentiation				                      | Vitalik Buterin       | Core        | Accepted  |
 | [211](https://github.com/ethereum/EIPs/pull/211)        | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                      | Christian Reitwiessner| Core        | Accepted  |
 | [214](https://github.com/ethereum/EIPs/pull/214)        | New opcode STATICCALL                                                               | Buterin, Reitwiessner | Core        | Accepted  |
+| [658](https://github.com/ethereum/EIPs/pull/658)        | Embedding transaction return data in receipts                                       | Nick Johnson          | Core        | Accepted  |
 
 
 # Finalized EIPs (standards that have been adopted)
