@@ -69,6 +69,18 @@ This packet contains two objects: integer (0x04) followed by a single floating p
 
 This packet is used by Whisper nodes for dynamic adjustment of their individual PoW requirements. Receipient of this message should no longer deliver the sender messages with PoW lower than specified in this message.
 
+PoW is defined as average number of iterations, required to find the current BestBit (the number of leading zero bits in the hash), divided by message size and TTL:
+
+	PoW = (2**BestBit) / (size * TTL)
+
+PoW calculation:
+
+	fn short_rlp(envelope) = rlp of envelope, excluding env_nonce field.
+	fn pow_hash(envelope, env_nonce) = sha3(short_rlp(envelope) ++ env_nonce)
+	fn pow(pow_hash, size, ttl) = 2**leading_zeros(pow_hash) / (size * ttl)
+
+where size is the size of the full RLP-encoded envelope.
+
 **Bloom Filter** [`0x05`, `bytes`]
 
 This packet contains two objects: integer (0x05) followed by a byte array of arbitrary size.
