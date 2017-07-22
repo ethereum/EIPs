@@ -8,13 +8,22 @@ At address 0x00......05, add a precompile that expects input in the following fo
 
     <length_of_BASE> <length_of_EXPONENT> <length_of_MODULUS> <BASE> <EXPONENT> <MODULUS>
     
-Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Call data is assumed to be infinitely right-padded with zero bytes, and excess data is ignored. Consumes `floor(max(length_of_MODULUS, length_of_BASE) ** 2 * max(ADJUSTED_EXPONENT_LENGTH, 1) / GQUADDIVISOR)` gas, and if there is enough gas, returns an output `(BASE**EXPONENT) % MODULUS` as a byte array with the same length as the modulus.
+Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Call data is assumed to be infinitely right-padded with zero bytes, and excess data is ignored. Consumes `floor(mult_complexity(max(length_of_MODULUS, length_of_BASE)) * max(ADJUSTED_EXPONENT_LENGTH, 1) / GQUADDIVISOR)` gas, and if there is enough gas, returns an output `(BASE**EXPONENT) % MODULUS` as a byte array with the same length as the modulus.
 
 `ADJUSTED_EXPONENT_LENGTH` is defined as follows.
 
 * If `length_of_EXPONENT <= 32`, and all bits in `EXPONENT` are 0, return 0
 * If `length_of_EXPONENT <= 32`, then return the index of the highest bit in `EXPONENT` (eg. 1 -> 0, 2 -> 1, 3 -> 1, 255 -> 7, 256 -> 8).
 * If `length_of_EXPONENT > 32`, then return `8 * (length_of_EXPONENT - 32)` plus the index of the highest bit in the first 32 bytes of `EXPONENT` (eg. if `EXPONENT = \x00\x00\x01\x00.....\x00`, with one hundred bytes, then the result is 8 * (100 - 32) + 253 = 797). If all of the first 32 bytes of `EXPONENT` are zero, return exactly `8 * (length_of_EXPONENT - 32)`.
+
+`mult_complexity` is a function intended to approximate the difficulty of Karatsuba multiplication (used in all major bigint libraries) and is defined as follows.
+
+```
+def mult_complexity(x):
+    if x <= 64: return x ** 2
+    elif x <= 1024: return x ** 2 // 4 + 96 * x - 3072
+    else: return x ** 2 // 16 + 480 * x - 199680
+```
 
 For example, the input data:
 
