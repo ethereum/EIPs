@@ -32,7 +32,7 @@ Add a precompiled contracts for a bilinear function on groups on the elliptic cu
 
 Address: 0x8
 
-For a cyclic group `G` (written additively) of prime order q let `log_P: G -> F_q` be the discrete logarithm on this group with respect to a generator `P`, i.e. `log_P(x)` is the integer `n` such that `n * P = x`.
+For a cyclic group `G` (written additively) of prime order q let `log_P: G -> F_q` be the discrete logarithm on this group with respect to a generator `P`, i.e. `log_P(x)` is the smallest non-negative integer `n` such that `n * P = x`.
 
 The precompiled contract is defined as follows, where the two groups `G_1` and `G_2` and their generators `P_1` and `P_2` are defined below (they have the same order `q`):
 
@@ -41,11 +41,13 @@ Input: (a1, b1, a2, b2, ..., ak, bk) from (G_1 x G_2)^k
 Output: If the length of the input is incorrect or any of the inputs are not elements of
         the respective group or are not encoded correctly, the call fails.
         Otherwise, return one if
-        log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0
+        log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 1
         (in F_q) and zero else.
 ```
 
-Note that `k` is determined from the length of the input. `k == 0` is valid and results in returning one.
+Note that `k` is determined from the length of the input. Following the section on the encoding below,
+`k` is the length of the input divided by `192`. If the input length is not a multiple of `192`,
+the call fails. Empty input is valid and results in returning zero.
 
 In order to check that an input is an element of `G_1`, verifying the encoding of the coordinates and checking that they satisfy the curve equation (or is the encoding of infinity) is sufficient. For `G_2`, in addition to that, the order of the element has to be checked to be equal to the group order `q = 21888242871839275222246405745257275088548364400416034343698204186575808495617`.
 
@@ -118,7 +120,7 @@ The precompiled contract can be implemented using elliptic curve pairing functio
 
 Now observe that
 ```
-log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0
+log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 1
 ```
 if and only if
 ```
