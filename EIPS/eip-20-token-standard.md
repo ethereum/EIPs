@@ -96,7 +96,7 @@ function balanceOf(address _owner) constant returns (uint256 balance)
 Transfers `_value` amount of tokens to address `_to`, and MUST fire the `Transfer` event.
 The function SHOULD `throw` if the `_from` account balance has not enough tokens to spend.
 
-An token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
+A token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
 
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
@@ -127,7 +127,8 @@ function transferFrom(address _from, address _to, uint256 _value) returns (bool 
 Allows `_spender` to withdraw from your account multiple times, up to the `_value` amount. If this function is called again it overwrites the current allowance with `_value`.
 
 **NOTE**: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/) and discussed [here](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729),
-make sure to force users to set the allowance to `0` before setting it to another value for the same spender.
+clients SHOULD make sure to create user interfaces in such a way that they set the allowance first to `0` before setting it to another value for the same spender.
+THOUGH The contract itself shouldn't enforce it, to allow backwards compatilibilty with contracts deployed before
 
 ``` js
 function approve(address _spender, uint256 _value) returns (bool success)
