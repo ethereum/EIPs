@@ -32,22 +32,22 @@ Add a precompiled contracts for a bilinear function on groups on the elliptic cu
 
 Address: 0x8
 
-For a cyclic group `G` (written additively) of prime order q let `log_P: G -> F_q` be the discrete logarithm on this group with respect to a generator `P`, i.e. `log_P(x)` is the smallest non-negative integer `n` such that `n * P = x`.
+For a cyclic group `G` (written additively) of prime order `q` let `log_P: G -> F_q` be the discrete logarithm on this group with respect to a generator `P`, i.e. `log_P(x)` is the smallest non-negative integer `n` such that `n * P = x`.
 
-The precompiled contract is defined as follows, where the two groups `G_1` and `G_2` and their generators `P_1` and `P_2` are defined below (they have the same order `q`):
+The precompiled contract is defined as follows, where the two groups `G_1` and `G_2` and their generators `P_1` and `P_2` are defined below. Both generators have the same prime order `q` and the actual choice of the generators does not matter, as long as they have order `q`.
 
 ```
 Input: (a1, b1, a2, b2, ..., ak, bk) from (G_1 x G_2)^k
 Output: If the length of the input is incorrect or any of the inputs are not elements of
         the respective group or are not encoded correctly, the call fails.
         Otherwise, return one if
-        log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 1
+        log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0
         (in F_q) and zero else.
 ```
 
 Note that `k` is determined from the length of the input. Following the section on the encoding below,
 `k` is the length of the input divided by `192`. If the input length is not a multiple of `192`,
-the call fails. Empty input is valid and results in returning zero.
+the call fails. Empty input is valid and results in returning one.
 
 In order to check that an input is an element of `G_1`, verifying the encoding of the coordinates and checking that they satisfy the curve equation (or is the encoding of infinity) is sufficient. For `G_2`, in addition to that, the order of the element has to be checked to be equal to the group order `q = 21888242871839275222246405745257275088548364400416034343698204186575808495617`.
 
@@ -67,6 +67,8 @@ P2 = (
   8495653923123431417604973247489272438418190587263600148770280649306958101930
 )
 ```
+
+Note that `G_2` is the only group of order `q` of that elliptic curve over the field `F_p^2`.
 
 
 ### Encoding
@@ -120,11 +122,11 @@ The precompiled contract can be implemented using elliptic curve pairing functio
 
 Now observe that
 ```
-log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 1
+log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk) = 0 (in F_q)
 ```
 if and only if
 ```
-e(P1, P2)^(log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk)) = e(P1, P2)
+e(P1, P2)^(log_P1(a1) * log_P2(b1) + ... + log_P1(ak) * log_P2(bk)) = 1 (in G_T)
 ```
 
 Furthermore, the left hand side of this equation is equal to
@@ -134,7 +136,7 @@ e(log_P1(a1) * P1, log_P2(b1) * P2) * ... * e(log_P1(ak) * P1, log_P2(bk) * P2)
 ```
 
 And thus, the precompiled contract can be implemented by verifying that
-`e(a1, b1) * ... * e(ak, bk) = e(P1, P2)`
+`e(a1, b1) * ... * e(ak, bk) = 1`
 
 Implementations are available here:
 
