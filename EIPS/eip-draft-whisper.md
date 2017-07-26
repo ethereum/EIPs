@@ -132,9 +132,11 @@ Envelopes are RLP-encoded structures of the following format:
 
 `Nonce`: 8 bytes of arbitrary data (used for PoW calculation).
 
-### Contents of Data Field (Message)
+### Contents of Data Field of the Message (Optional)
 
-This section describes optional description of Data Field to set up an example. It is only relevant if you want to decrypt the incoming message, but any other format would be perfectly valid and must be forwarded to the peers.
+This section describes optional description of Data Field to set up an example. Later it may be moved to a separate EIP.
+
+It is only relevant if you want to decrypt the incoming message, but any other format would be perfectly valid and must be forwarded to the peers.
 
 Data field contains encrypted message of the Envelope. In case of symmetric encryption, it also contains appended Salt (12 bytes). Plaintext (unencrypted) payload is formed as a concatenation of a single byte for flags, additional metadata (as stipulated by the flags) and the actual payload. The message has the following structure:
 
