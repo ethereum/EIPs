@@ -49,15 +49,14 @@ The following message codes are optional, but they are reserved for specific pur
 
 ### Packet Format and Usage
 
-**Status** [`0`, `whisper_protocol_version`] 
+**Status** [`0`]
 
-This packet contains two objects: integer (0x00) followed by integer (Whisper protocol version).
-
-Informs a peer of the Whisper version. This message should be send after the initial handshake and prior to any other messages.
+This packet contains two objects: integer (0x00). Might be followed by some arbitrary data in future versions, which should be gracefully ignored for future compatibility.
+This message should be send after the initial handshake and prior to any other messages.
 
 **Messages** [`1`, `whisper_envelopes`]
 
-This packet contains two objects: integer (0x01) followed by a list of Whisper Envelopes.
+This packet contains two objects: integer (0x01) followed by a list (possibly empty) of Whisper Envelopes.
 
 This packet is used for sending the standard Whisper envelopes.
 
@@ -94,7 +93,7 @@ The projection function is defined as a mapping from a a 4-byte slice S to a 512
 	LET D[*] = 0
 	FOREACH i IN { 0, 1, 2 } DO
 	LET n = S[i]
-	IF S[3] & (2 ** i) THEN n += 512
+	IF S[3] & (2 ** i) THEN n += 256
 	D[n] = 1
 	END FOR
 
