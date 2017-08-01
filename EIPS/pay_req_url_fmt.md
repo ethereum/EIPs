@@ -52,8 +52,9 @@ The only mandatory field `beneficiary_address` denotes the address of the accoun
 Thus, if `token_contract_address` is missing, the target address of the transaction is `beneficiary_address`, otherwise it is
 `token_contract_address`, with the appropriate transaction data, as defined in ERC #20 indicating the transfer of the given amount of tokens.
 
-If using ENS names instead of hexadecimal addresses, the resolution is up to the payer, at any time between receiving the
-URL and sending the transaction.
+If using ENS names instead of hexadecimal addresses, the resolution is up to the payer, at any time between receiving the URL and 
+sending the transaction. Hexadecimal addresses always take precedence over ENS names, i. e. even if there exists a matching ENS name 
+consisting of 40 hexadecimal digits, it should never be resolved. Instead, the hexadecimal address should be used directly.
 
 The amount is to be interpreted in the decimal definition of the token, NOT the atomic unit. In case of Ether, it needs to
 be multiplied by 10^18 to get the integer amount in Wei. For other tokens, the decimal value should be read from the
