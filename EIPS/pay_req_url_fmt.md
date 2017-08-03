@@ -7,7 +7,7 @@
     Category: ERC
     Status: Draft
     Created: 2017-08-01
-    Requires: #20, #67, #137
+    Requires: #20, #137
 
 ## Simple Summary
 A standard way of representing payment requests in Ethers and ERC #20 tokens as URLs.
