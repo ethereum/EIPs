@@ -13,7 +13,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # EIPs under consideration
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
-| [649](https://github.com/ethereum/EIPs/issues/669)      | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Afri Schoedon         | Core        | Draft     |
+| [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Draft     |
 
 
 # Accepted EIPs (planned for adoption)
