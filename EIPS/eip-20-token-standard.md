@@ -94,7 +94,7 @@ function balanceOf(address _owner) constant returns (uint256 balance)
 #### transfer
 
 Transfers `_value` amount of tokens to address `_to`, and MUST fire the `Transfer` event.
-The function SHOULD `throw` if the `_from` account balance has not enough tokens to spend.
+The function SHOULD `throw` if the `_from` account balance does not have enough tokens to spend.
 
 A token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
 
