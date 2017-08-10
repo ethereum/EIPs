@@ -56,13 +56,15 @@ Let `B` be the base -- the number of records kept on every level.
 The levels are numbered with `k`, starting from 0.
 A given level `k` of stored block hashes has the _interval_ of `B**k` blocks.
 
-The level update formula is:
+The recursive level update formula is:
 
 ```python
-if p % B**k == 0:
-    # FIXME: We might need to move the index by 1.
-    index = (p / B**k) % B
-    storage[k][index] = storage[k - 1][0]
+def update(k, p):
+    n = p - B**k          # The number of the block hash to be moved.
+    i = (n / B**k) % B    # The index of the storage slot where to move the block hash.
+    if i == 0:
+        update(k + 1, n)  # Update higher level.
+    storage[k][i] = storage[k - 1][0]  # Move the block hash from lower level.
 ```
 
 where
@@ -81,7 +83,7 @@ where
 BLOCKHASH_CONTRACT_CODE is set to:
 
 ```
-0x73fffffffffffffffffffffffffffffffffffffffe33141561006a5760014303600035610100820755610100810715156100455760003561010061010083050761010001555b6201000081071515610064576000356101006201000083050761020001555b5061013e565b4360003512151561008457600060405260206040f361013d565b61010060003543031315156100a857610100600035075460605260206060f361013c565b6101006000350715156100c55762010000600035430313156100c8565b60005b156100ea576101006101006000350507610100015460805260206080f361013b565b620100006000350715156101095763010000006000354303131561010c565b60005b1561012f57610100620100006000350507610200015460a052602060a0f361013a565b600060c052602060c0f35b5b5b5b5b
+0x73fffffffffffffffffffffffffffffffffffffffe3314156100995760014303602052610100602051076040526000604051141561008d576101006020510360605261010061010060605105076080526000608051141561008157620100006060510360a0526101006201000060a051050760c0526101005460c05161020001555b60005460805161010001555b60003560405155610171565b60003560e05260e0514313156100b557600060e05112156100b8565b60005b156101645760e051430361010052610100610100511315156100e75761010060e0510754610120526020610120f35b600061010060e0510714156101635762010100610100511315156101205761010061010060e05105076101000154610140526020610140f35b6201000060e05107151561013e576301010100610100511315610141565b60005b15610162576101006201000060e05105076102000154610160526020610160f35b5b5b6000610180526020610180f35b
 ```
 
 The Serpent source code is:
@@ -89,29 +91,34 @@ The Serpent source code is:
 ```python
 # Setting the block hash
 if msg.sender == 2**160 - 2:
-    prev_block_number = block.number - 1
-    # Level 2
-    if prev_block_number % 65536 == 0:
-        # Use storage fields 512..767 to store the hashes of 256
-        # blocks with block.number % 65536 == 0.
-        index = (prev_block_number / 65536 - 1) % 256
-        # Move to be replaced record of index 0 from level 1 to level 2.
-        ~sstore(512 + index, ~sload(256))
-
-    # Level 1
-    if prev_block_number % 256 == 0:
-        # Use storage fields 256..511 to store the hashes of 256
-        # blocks with block.number % 256 == 0.
-        index = (prev_block_number / 256 - 1) % 256
-        # Move to be replaced record of index 0 from level 0 to level 1.
-        ~sstore(256 + index, ~sload(0))
 
     # Level 0
     # Use storage fields 0..255 to store the hashes of the last 256
     # blocks.
-    index = prev_block_number % 256
+    n0 = block.number - 1
+    i0 = n0 % 256
+
+    if i0 == 0:
+        # Level 1
+        # Use storage fields 256..511 to store the hashes of 256
+        # blocks with block.number % 256 == 0.
+        n1 = n0 - 256
+        i1 = (n1 / 256) % 256
+
+        if i1 == 0:
+            # Level 2
+            # Use storage fields 512..767 to store the hashes of 256
+            # blocks with block.number % 65536 == 0.
+            n2 = n1 - 256*256
+            i2 = (n2 / (256*256)) % 256
+            # Move to be replaced record from level 1 to level 2.
+            ~sstore(512 + i2, ~sload(256))
+
+        # Move to be replaced record from level 0 to level 1.
+        ~sstore(256 + i1, ~sload(0))
+
     # Save the provided hash of the previous block.
-    ~sstore(index, ~calldataload(0))
+    ~sstore(i0, ~calldataload(0))
 
 # Getting the block hash
 else:

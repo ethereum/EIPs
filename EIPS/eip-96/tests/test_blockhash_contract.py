@@ -5,8 +5,11 @@ from ethereum import tester, utils
 from ethereum.config import default_config
 from rlp.utils import decode_hex
 
+# Compile with serpent:
+# serpent compile blockhash.se
+# The extract runtime code 73fffffffffffffffffffffffffffffffffffffff...f35b
 EIP_BLOCKHASH_CODE = decode_hex(
-    b'73fffffffffffffffffffffffffffffffffffffffe3314156100935760014303602052600062010000602051071415610051576101006001620100006020510503076040526101005460405161020001555b600061010060205107141561007d57610100600161010060205105030760405260005460405161010001555b6101006020510760405260003560405155610161565b6000356060526060514313156100af57600060605112156100b2565b60005b156101545760605143036080526101006080511315156100dd57610100606051075460a052602060a0f35b60006101006060510714156101535762010100608051131515610113576101006101006060510507610100015460c052602060c0f35b620100006060510715156101305763010101006080511315610133565b60005b1561015257610100620100006060510507610200015460e052602060e0f35b5b5b6000610100526020610100f35b'  # noqa
+    b'73fffffffffffffffffffffffffffffffffffffffe3314156100995760014303602052610100602051076040526000604051141561008d576101006020510360605261010061010060605105076080526000608051141561008157620100006060510360a0526101006201000060a051050760c0526101005460c05161020001555b60005460805161010001555b60003560405155610171565b60003560e05260e0514313156100b557600060e05112156100b8565b60005b156101645760e051430361010052610100610100511315156100e75761010060e0510754610120526020610120f35b600061010060e0510714156101635762010100610100511315156101205761010061010060e05105076101000154610140526020610140f35b6201000060e05107151561013e576301010100610100511315610141565b60005b15610162576101006201000060e05105076102000154610160526020610160f35b5b5b6000610180526020610180f35b'  # noqa
 )
 
 BLOCKHASH_ADDR = decode_hex(b'00000000000000000000000000000000000000f0')
@@ -19,12 +22,13 @@ SYSTEM_GAS_PRICE = 0
 BLOCKHASH_CODE = EIP_BLOCKHASH_CODE.replace(EIP_SYSTEM_ADDR, SYSTEM_ADDR, 1)
 NULL_HASH = b'\0' * 32
 
-BLOCKHASH_LEVEL0_COST = 399
-BLOCKHASH_LEVEL1_COST = 484
-BLOCKHASH_LEVEL2_COST = 564
-BLOCKHASH_INVALID_COST = 128
-BLOCKHASH_INVALID1_COST = 236
-BLOCKHASH_INVALID2_COST = 323
+BLOCKHASH_LEVEL0_COST = 411
+BLOCKHASH_LEVEL1_COST = 496
+BLOCKHASH_LEVEL2_COST = 576
+BLOCKHASH_INVALID_COST = 140
+BLOCKHASH_INVALID1_COST = 248
+BLOCKHASH_INVALID2_COST = 335
+BLOCKHASH_INVALID_ARG_COST = 162
 
 # Configure execution in pre-Metropolis mode.
 default_config['HOMESTEAD_FORK_BLKNUM'] = 0
@@ -77,7 +81,7 @@ def state():
     return state
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
 def fake_state():
     """Create BLOCKHASH contract state. "Mining" more than 256 blocks is not
        feasible with ethereum.tester."""
@@ -156,7 +160,7 @@ def test_overflow(state):
     out = state.profile(sender=tester.k1, to=BLOCKHASH_ADDR, value=0,
                         evmdata=arg)
     assert out['output'] == NULL_HASH
-    assert out['gas'] == 150
+    assert out['gas'] == BLOCKHASH_INVALID_ARG_COST
 
     state.block.number = n
 
@@ -168,16 +172,50 @@ def test_fake_state_setup(fake_state):
 
 
 def test_overflow2(fake_state):
-    n = fake_state.block.number
     fake_state.block.number = 255
 
     arg = '\xff' * 31
     out = fake_state.profile(sender=tester.k1, to=BLOCKHASH_ADDR, value=0,
                              evmdata=arg)
     assert out['output'] == NULL_HASH
-    assert out['gas'] == 150
+    assert out['gas'] == BLOCKHASH_INVALID_ARG_COST
 
-    fake_state.block.number = n
+
+def test_system_level1(fake_state):
+    tester.gas_price = SYSTEM_GAS_PRICE
+
+    for n in range(256 + 1, 300 * 256 + 2, 256):
+        fake_state.block.number = n
+        arg = os.urandom(32)
+        slot_to_move = fake_state.get_slot(0)
+        out = fake_state.profile(sender=SYSTEM_PRIV, to=BLOCKHASH_ADDR,
+                                 value=0, evmdata=arg)
+        assert out['gas'] > 10000  # TODO
+        assert fake_state.get_slot(0) == arg
+        block_to_move = n - 1 - 256
+        index = (block_to_move / 256) % 256
+        print n, index
+        assert fake_state.get_slot(256 + index) == slot_to_move
+
+
+def test_system_level2(fake_state):
+    tester.gas_price = SYSTEM_GAS_PRICE
+
+    for n in range(65536 + 256 + 1, 300 * 65536 + 2, 65536):
+        fake_state.block.number = n
+        arg = os.urandom(32)
+        slot_to_move0 = fake_state.get_slot(0)
+        slot_to_move1 = fake_state.get_slot(256)
+        out = fake_state.profile(sender=SYSTEM_PRIV, to=BLOCKHASH_ADDR,
+                                 value=0, evmdata=arg)
+        assert out['gas'] > 5000  # TODO
+        assert fake_state.get_slot(0) == arg
+        block_to_move = n - 1 - 65536 - 256
+        assert block_to_move % 65536 == 0
+        index = (block_to_move / 65536) % 256
+        print n, block_to_move, index
+        assert fake_state.get_slot(512 + index) == slot_to_move1
+        assert fake_state.get_slot(256) == slot_to_move0
 
 
 def test_blockhash_last256(fake_state):
