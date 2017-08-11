@@ -24,7 +24,7 @@ The need for this EIP came up in a [github issue of go-ethereum](https://github.
 
 `<varint_prefix_length><prefix><varint_message_length><message>`
 
-To specify the length of prefix and message we use [variable length integer (varint)](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) as used in Bitcoin. This means:
+To specify the length of prefix and message we use [variable length integer (varint)](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) as used in Bitcoin. This is defined as the following:
 
 | Value          | Storage length |	Format                                  |
 | -------------- | -------------- |	--------------------------------------- |
@@ -45,6 +45,13 @@ WIP
 ## Implementation
 
 WIP
+
+## Links
+
+* [Article on medium from the Metamask team regarding the problem](https://medium.com/metamask/the-new-secure-way-to-sign-data-in-your-browser-6af9dd2a1527)
+* [PR in go-ethereum to implement personal_sign](https://github.com/ethereum/go-ethereum/pull/2940)
+* [Issue in go-ethereum that is the spark of this standard](https://github.com/ethereum/go-ethereum/issues/14794)
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
