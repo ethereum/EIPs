@@ -52,31 +52,39 @@ BLOCKHASH_CONTRACT_CODE is set to:
 The Serpent source code is:
 
 ```python
-# Setting the block hash
-if msg.sender == 2**160 - 2:
-    with prev_block_number = block.number - 1:
-        # Use storage fields 0..255 to store the last 256 hashes
-        ~sstore(prev_block_number % 256, ~calldataload(0))
-        # Use storage fields 256..511 to store the hashes of the last 256
-        # blocks with block.number % 256 == 0
-        if not (prev_block_number % 256):
-            ~sstore(256 + (prev_block_number / 256) % 256, ~calldataload(0))
-        # Use storage fields 512..767 to store the hashes of the last 256
-        # blocks with block.number % 65536 == 0
-        if not (prev_block_number % 65536):
-            ~sstore(512 + (prev_block_number / 65536) % 256, ~calldataload(0))
-# Getting the block hash
-else:
-    if ~calldataload(0) >= block.number:
-        return(0)
-    elif block.number - ~calldataload(0) <= 256:
-        return(~sload(~calldataload(0) % 256))
-    elif (not (~calldataload(0) % 256) and block.number - ~calldataload(0) <= 65536):
-        return(~sload(256 + (~calldataload(0) / 256) % 256))
-    elif (not (~calldataload(0) % 65536) and block.number - ~calldataload(0) <= 16777216):
-        return(~sload(512 + (~calldataload(0) / 65536) % 256))
+with offset = 0:
+    if msg.sender == 0xfffffffffffffffffffffffffffffffffffffffe:
+        with bn = block.number - 1:
+            while 1:
+                ~sstore(offset + ~mod(bn, 256), ~calldataload(0))
+                if ~mod(bn, 256):
+                    ~stop()
+                bn = ~div(bn, 256)
+                offset += 256
+    elif ~calldataload(0) < block.number:
+        with tbn = ~calldataload(0):
+            with dist_minus_one = block.number - tbn - 1:
+                while dist_minus_one >= 256 && ~mod(tbn, 256) == 0:
+                    offset += 256
+                    tbn = ~div(tbn, 256) 
+                    dist_minus_one = ~div(dist_minus_one, 256)
+                if dist_minus_one >= 256:
+                    return(0)
+                return(~sload(offset + ~mod(tbn, 256)))
     else:
         return(0)
+```
+
+The EVM init code is:
+
+```
+0x6100e28061000e6000396100f056600073fffffffffffffffffffffffffffffffffffffffe33141561005957600143035b60011561005357600035610100820683015561010081061561004057005b6101008104905061010082019150610022565b506100e0565b4360003512156100d4576000356001814303035b61010081121515610085576000610100830614610088565b60005b156100a75761010083019250610100820491506101008104905061006d565b610100811215156100bd57600060a052602060a0f35b610100820683015460c052602060c0f350506100df565b600060e052602060e0f35b5b505b6000f3
+```
+
+The EVM bytecode for the contract is:
+
+```
+0x600073fffffffffffffffffffffffffffffffffffffffe33141561005957600143035b60011561005357600035610100820683015561010081061561004057005b6101008104905061010082019150610022565b506100e0565b4360003512156100d4576000356001814303035b61010081121515610085576000610100830614610088565b60005b156100a75761010083019250610100820491506101008104905061006d565b610100811215156100bd57600060a052602060a0f35b610100820683015460c052602060c0f350506100df565b600060e052602060e0f35b5b50
 ```
 
 ### Rationale
