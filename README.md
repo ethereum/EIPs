@@ -19,7 +19,6 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Accepted EIPs (planned for adoption)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
-| [98](https://github.com/ethereum/EIPs/pull/98)          | Removal of intermediate state roots from receipts                                   | Vitalik Buterin       | Core        | Accepted  |
 | [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles	            | Vitalik Buterin       | Core        | Accepted  |
 | [140](https://github.com/ethereum/EIPs/pull/206)        | REVERT instruction in the Ethereum Virtual Machine                                  | Beregszaszi, Mushegian| Core        | Accepted  |
 | [196](https://github.com/ethereum/EIPs/pull/213)        | Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128 | Reitwiessner | Core        | Accepted  |
