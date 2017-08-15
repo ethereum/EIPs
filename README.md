@@ -10,12 +10,6 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 * **Final** - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).
 * **Deferred** - an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.
 
-# EIPs under consideration
-| Number                                                  |Title                                                                                | Author                | Layer       | Status    |
-| ------------------------------------------------------  | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
-| [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Draft     |
-
-
 # Accepted EIPs (planned for adoption)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
@@ -29,6 +23,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [198](https://github.com/ethereum/EIPs/pull/198)        | Precompiled contract for bigint modular exponentiation				                      | Vitalik Buterin       | Core        | Accepted  |
 | [211](https://github.com/ethereum/EIPs/pull/211)        | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                      | Christian Reitwiessner| Core        | Accepted  |
 | [214](https://github.com/ethereum/EIPs/pull/214)        | New opcode STATICCALL                                                               | Buterin, Reitwiessner | Core        | Accepted  |
+| [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Draft     |
 
 
 # Finalized EIPs (standards that have been adopted)
