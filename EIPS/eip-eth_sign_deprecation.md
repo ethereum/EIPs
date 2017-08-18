@@ -90,6 +90,27 @@ fun eth_signBytes(prefix: string, value: string): string {
   return `0x{rHex}{sHex}{vHex}`
 ```
 
+### `eth_signBytes(value: string): string`
+This method **MUST** display a prominent warning to the end-user that when using this method they are at risk of loss of funds and they should only sign it if they explicitly trust the source and infrastructure.  This method is meant to be used by scripts and tools not designed for end-users.
+#### Parameter: value
+An arbitrary length byte array of data that needs to be signed.  It will be interpreted as-is and not mutated in any way before being hashed and signed.
+#### Returns
+A signature (using the private key chosen by the signing tool) of the keccak256 hash the provided bytes.  The format of the result will be a string containing a `0x` prefixed hex encoded byte array containing the signature's `r`, `s` and `recoveryParam + 27`.
+
+#### Pseudocode implementation
+```
+fun eth_signBytes(value: string): string {
+  // TODO: present user with strong warning about signing anything presented by this method
+  bytes = hexStringToBytes(value)
+  hash = keccak256(bytes)
+  signature = secp256k1.sign(privateKey, hash)
+  rHex = padAsHex(signature.r, 64)
+  sHex = padAsHex(signature.s, 64)
+  vHex = padAsHex(signature.recoveryParam + 27, 2)
+  return `0x{rHex}{sHex}{vHex}`
+```
+
+
 
 ## Rationale
 This strategy has worked well for `eth_signTransaction` and has allowed signing tools to build custom UIs around transaction signing that allow the user to validate that what they are signing is in fact what they intended to sign.  We have chosen to follow the defacto standard JSON-RPC types for passing QUANTITIES, strings, and signatures to avoid implementors having to implement new utilities for handling the input/output.
