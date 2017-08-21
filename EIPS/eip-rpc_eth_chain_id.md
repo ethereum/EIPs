@@ -26,6 +26,11 @@ the RPC.
 
 ## Specification
 
+__Related PR__:
+https://github.com/ethereum/go-ethereum/pull/15002
+
+__Example documentation__:
+
 ----
 
 ### eth_chainId
