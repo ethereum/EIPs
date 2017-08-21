@@ -2,7 +2,7 @@
 
     EIP: <to be assigned>
     Title: Create `eth_chainId` method for JSON-RPC
-    Author: Isaac Ardis: isaac.ardis@gmail.com, Wei Tang: hi@that.world
+    Author: Isaac Ardis: isaac.ardis@gmail.com, Wei Tang: hi@that.world, [@tcz001](https://github.com/tcz001)
     Type: Standard Track
     Category: Interface
     Status: Draft
@@ -25,11 +25,6 @@ makes it impossible to determine the current actual blockchain using
 the RPC.
 
 ## Specification
-
-__Related PR__:
-https://github.com/ethereum/go-ethereum/pull/15002
-
-__Example documentation__:
 
 ----
 
@@ -65,6 +60,12 @@ endpoint without knowing it unless it tries to sign a transaction or
 it fetch a transaction that is known to have signed with a chain
 ID. This has since caused trouble for application developers, such as
 MetaMask, to add multi-chain support.
+
+Please note related links:
+
+- [Parity PR](https://github.com/paritytech/parity/pull/6329)
+- [Geth Classic PR (merged)](https://github.com/ethereumproject/go-ethereum/pull/336)
+
 
 ## Backwards Compatibility
 Not relevant.
