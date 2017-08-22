@@ -62,7 +62,7 @@ This packet is used for sending the standard Whisper envelopes.
 
 **PoW Requirement** [`2`, `PoW`]
 
-This packet contains two objects: integer (0x02) followed by a single floating point value of PoW.
+This packet contains two objects: integer (0x02) followed by a single floating point (32 bits) value of PoW. Values of qNAN, sNAN, INF and -INF are not allowed. 
 
 This packet is used by Whisper nodes for dynamic adjustment of their individual PoW requirements. Receipient of this message should no longer deliver the sender messages with PoW lower than specified in this message.
 
@@ -117,10 +117,8 @@ This packet is used for sending the peer-to-peer messages, which are not suppose
 
 Envelopes are RLP-encoded structures of the following format:
 
-	[ Version, Expiry, TTL, Topic, Data, Nonce ]
+	[ Expiry, TTL, Topic, Data, Nonce ]
 	
-`Version`: 1 byte. If Version is higher than current, envelope could not be decoded, and therefore only forwarded to the peers.
-
 `Expiry`: 4 bytes (UNIX time in seconds).
 
 `TTL`: 4 bytes (time-to-live in seconds).
