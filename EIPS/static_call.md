@@ -30,7 +30,7 @@ Opcode: `0xfa`.
 
 `STATICCALL` functions equivalently to a `CALL`, except it takes only 6 arguments (the "value" argument is not included and taken to be zero), and calls the child with the `STATIC` flag set to `true` for the execution of the child. Once this call returns, the flag is reset to its value before the call.
 
-Any attempts to make state-changing operations inside an execution instance with `STATIC` set to `true` will instead throw an exception. These operations include `CREATE`, `CREATE2`, `LOG1`, `LOG2`, `LOG3`, `LOG4`, `SSTORE`, and `SELFDESTRUCT`. They also include `CALL` with a non-zero value. As an exception, `CALLCODE` is not considered state-changing, even with a non-zero value.
+Any attempts to make state-changing operations inside an execution instance with `STATIC` set to `true` will instead throw an exception. These operations include `CREATE`, `CREATE2`, `LOG0`, `LOG1`, `LOG2`, `LOG3`, `LOG4`, `SSTORE`, and `SELFDESTRUCT`. They also include `CALL` with a non-zero value. As an exception, `CALLCODE` is not considered state-changing, even with a non-zero value.
 
 ## Rationale
 
