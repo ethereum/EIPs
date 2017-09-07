@@ -24,7 +24,7 @@ This specification supersedes ERC #67, which is a URL format for representing ar
 ## Specification
 
 ### Syntax
-Payment request URLs contain "ethpay" in their schema (protocol) part and are constructed as follows:
+Payment request URLs contain "ethereum" in their schema (protocol) part and are constructed as follows:
 
     request                 = "ethereum" ":" target_address [ "/" function_name ] [ "?" parameters ]
     target_address          = ethereum_address
