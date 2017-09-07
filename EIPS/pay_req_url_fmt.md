@@ -1,16 +1,17 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: URL Format for Payment Requests
+    Title: URL Format for Transaction Requests
     Author: Daniel A. Nagy <daniel@ethereum.org>
     Type: Standard Track
     Category: ERC
     Status: Draft
+    Replaces: 67
     Created: 2017-08-01
-    Requires: #20, #137
+    Requires: 20
 
 ## Simple Summary
-A standard way of representing payment requests in Ethers and ERC #20 tokens as URLs.
+A standard way of representing various transactions, especially payment requests in Ethers and ERC #20 tokens as URLs.
 
 ## Abstract
 URLs embedded in QR-codes, hyperlinks in web-pages, emails or chat messages provide for robust cross-application signaling between very loosely coupled applications. A standardized URL format for payment requests allows for instant invocation of the user's preferred wallet application (even if it is a webapp or a swarm đapp), with the correct parameterization of the payment transaction only to be confirmed by the (authenticated) user.
@@ -18,37 +19,47 @@ URLs embedded in QR-codes, hyperlinks in web-pages, emails or chat messages prov
 ## Motivation
 The convenience of representing payment requests by standard URLs has been a major factor in the wide adoption of Bitcoin. Bringing a similarly convenient mechanism to Ethereum would speed up its acceptance as a payment platform among end-users. In particular, URLs embedded in broadcast Intents are the preferred way of launching applications on the Android operating system and work across practically all applications. Desktop web browsers have a standardized way of defining protocol handlers for URLs with specific protocol specifications. Other desktop applications typically launch the web browser upon encountering a URL. Thus, payment request URLs could be delivered through a very broad, ever growing selection of channels.
 
-Note that this is different from ERC #67, which is a URL format for representing arbitrary transactions and as such is more general and low-level. This ERC deals specifically with the important special case of payment requests.
+This specification supersedes ERC #67, which is a URL format for representing arbitrary transactions in a low-level fashion. This ERC focuses specifically on the important special case of payment requests, while allowing for other, ABI-specified transactions.
 
 ## Specification
 
 ### Syntax
 Payment request URLs contain "ethpay" in their schema (protocol) part and are constructed as follows:
 
-    request                 = "ethpay" ":" beneficiary_address [ "/" token_contract_address ] [ "?" parameters ]
-    beneficiary_address     = ethereum_address
-    token_contract_address  = ethereum_address
-    ethereum_address        = 40*40HEXDIG / ENS_NAME
+    request                 = "ethereum" ":" target_address [ "/" function_name ] [ "?" parameters ]
+    target_address          = ethereum_address
+    function_name           = STRING
+    ethereum_address        = ( "0x" 40*40HEXDIG ) / ENS_NAME
     parameters              = parameter *( "&" parameter )
     parameter               = key "=" value
+    key                     = "value" / "gas" / TYPE
+    value                   = number / ethereum_address / STRING
+    number                  = [ "-" / "+" ] *DIGIT [ "." 1*DIGIT ] [ ( "e" / "E" ) [ 1*DIGIT ]
 
-At present, the only `key` defined is `amount` and the corresponding `value` is a decimal number. Thus:
+Where `TYPE` is a standard ABI type name, as defined in [Ethereum Contract ABI specification](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI). `STRING` is a URL-encoded unicode string of arbitrary length, where delimiters and the percentage symbol (`%`) are mandatorily hex-encoded with a `%` prefix.
 
-    key                     = "amount"
-    value                   = *DIGIT [ "." 1*DIGIT ]
+Note that a `number` can be expressed in *scientific notation*, with a multiplier of a power of 10. The use of this notation is strongly encouraged when expressing monetary value in Ethers or ERC #20 tokens in atomic units (e. g. Wei, in case of Ether).
+
+If *key* in the parameter list is `value` or `gas` then *value* MUST be a `number`. Otherwise, it must correspond to the `TYPE` string used as *key*.
 
 For the syntax of ENS_NAME, please consult ERC #137 defining Ethereum Name Service.
 
 ### Semantics
-If `token_contract_address` is missing, then the payment is requested in the native token of the blockchain, which is Ether in our case. The only mandatory field `beneficiary_address` denotes the address of the account to be credited with the requested token.
 
-Thus, if `token_contract_address` is missing, the target address of the transaction is `beneficiary_address`, otherwise it is `token_contract_address`, with the appropriate transaction data, as defined in ERC #20 indicating the transfer of the given amount of tokens.
+`target_address` is mandatory and denotes either the beneficiary of native token payment (see below) or the contract address with which the user is asked to interact.
+
+If `function_name` is missing, then the URL is requesting payment in the native token of the blockchain, which is Ether in our case. The amount is specified in `value` parameter, in the atomic unit (i.e. Wei). The use of scientific notation is strongly encouraged. For example, requesting 2.014 ETH to address `0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359` would look as follows: 
+[ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18](ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18)
+
+Requesting payments in ERC #20 tokens involves a request to call the `transfer` function of the token contract with an `address` and a `uint256` typed parameter, containing the *beneficiary address* and the *amount in atomic units*, respectively. For example, 
+requesting a Unicorn to address `0x8e23ee67d1332ad560396262c48ffbb01f93d052` looks as follows: 
+[ethereum:0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7/transfer?address=0x8e23ee67d1332ad560396262c48ffbb01f93d052&uint256=1](ethereum:0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7/transfer?address=0x8e23ee67d1332ad560396262c48ffbb01f93d052&uint256=1)
 
 If using ENS names instead of hexadecimal addresses, the resolution is up to the payer, at any time between receiving the URL and sending the transaction. Hexadecimal addresses always take precedence over ENS names, i. e. even if there exists a matching ENS name consisting of 40 hexadecimal digits, it should never be resolved. Instead, the hexadecimal address should be used directly.
 
-The amount is to be interpreted in the decimal definition of the token, NOT the atomic unit. In case of Ether, it needs to be multiplied by 10^18 to get the integer amount in Wei. For other tokens, the decimal value should be read from the token contract before conversion.
+If the payer client has access to the blockchain, the interface should display the amount in the units as specified in the token contract. Otherwise, it should be displayed as expressed in the URL.
 
-Note that the indicated amount is only a suggestion and the user is free to change it. With no indicated amount, the user should be prompted to enter the amount to be paid. In case of multiple suggestions, the user should have the option of choosing one or enter their own.
+Note that the indicated amount is only a suggestion (as are all the supplied arguments) which the user is free to change. With no indicated amount, the user should be prompted to enter the amount to be paid.
 
 ## Rationale
-The proposed format is chosen to resemble `bitcoin:` URLs as closely as possible, as both users and application programmers are already familiar with that format. In particular, this motivated the omission of the unit, which is often used in Ethereum ecosystem. Handling different orders of magnitude is delegated to the application, just like in the case of `bitcoin:`. Additional parameters may be added, if popular use cases requiring them emerge in practice.
+The proposed format is chosen to resemble `bitcoin:` URLs as closely as possible, as both users and application programmers are already familiar with that format. In particular, this motivated the omission of the unit, which is often used in Ethereum ecosystem. Handling different orders of magnitude is delegated to the application, just like in the case of `bitcoin:`, but lacking access to the block chain, the application can take a hint from the exponent in the URL. Additional parameters may be added, if popular use cases requiring them emerge in practice.
