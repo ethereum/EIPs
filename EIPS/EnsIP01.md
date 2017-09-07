@@ -1,5 +1,3 @@
-This is the first of a series of ENS Improvements inspired by the ENS workshop in London, august 2017.
-
 ## Preamble
 
     EIP: <to be assigned>
