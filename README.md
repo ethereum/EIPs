@@ -10,7 +10,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 * **Final** - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).
 * **Deferred** - an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.
 
-# Accepted EIPs (planned for adoption)
+# Accepted EIPs (planned for adoption in the Byzantium Metropolis hard fork)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
 | [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles             | Vitalik Buterin       | Core        | Accepted  |
@@ -23,7 +23,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Accepted  |
 | [658](https://github.com/ethereum/EIPs/pull/658)        | Embedding transaction return data in receipts                                       | Nick Johnson          | Core        | Accepted  |
 
-# Deferred EIPs (adoption postponed)
+# Deferred EIPs (adoption postponed until the Constantinople Metropolis hard fork)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
 | [86](https://github.com/ethereum/EIPs/pull/208)         | Abstraction of transaction origin and signature                                     | Vitalik Buterin       | Core        | Deferred  |
