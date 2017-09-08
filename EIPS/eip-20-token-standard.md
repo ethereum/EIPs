@@ -37,7 +37,7 @@ A standard interface allows any tokens on Ethereum to be re-used by other applic
 
 Returns the name of the token - e.g. `"MyToken"`.
 
-OPTIONAL - This method can be used to improve useability,
+OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 
@@ -50,7 +50,7 @@ function name() constant returns (string name)
 
 Returns the symbol of the token. E.g. "HIX".
 
-OPTIONAL - This method can be used to improve useability,
+OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
@@ -63,7 +63,7 @@ function symbol() constant returns (string symbol)
 
 Returns the number of decimals the token uses - e.g. `8`, means to divide the token amount by `100000000` to get its user representation.
 
-OPTIONAL - This method can be used to improve useability,
+OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
