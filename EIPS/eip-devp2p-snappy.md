@@ -43,20 +43,32 @@ Note, the handshake message is never compressed, since it is needed to negotiate
 
 Currently a devp2p message length is limited to 24 bits, amoutning to a maximum size of 16MB. With the introduction of Snappy compression, care must be taken not to blidly decompress messages, since they may get significantly larger than 16MB.
 
-However, Snappy is capable of calculating the decompressed size of an input message without inflating it in memory. This can be used to set the message size to its final decompressed length and only execute the decompression lazily if upper layers still accept the message. This allows the `eth` protocol to enforce the current 10MB message limit without needing to decompress malicious payload.
+However, Snappy is capable of calculating the decompressed size of an input message without inflating it in memory. This can be used to discard any messages which decompress above some threshold. **The proposal is to use the same limit (16MB) as the threshold for decompressed messages.** This retains the same guarantees that the current devp2p protocol does, so there won't be surprises in application level protocols.
 
-## Rationale
-Alternative solutions to data compression that have been brought up and discarded are:
+## Alternatives (discarded)
 
- * Extend protocol `xyz` to support compressed messages
-  * **Pro**: Can be better optimized when to compress and when not to.
-  * **Con**: Mixes in transport layer encoding into application layer logic.
-  * **Con**: Makes the individual message specs more convoluted with compression details.
-  * **Con**: Requires cross client coordination on every single protocol, making the effor much harder and repeated (eth, les, shh, bzz).
- * Introduce seamless variations of protocol such as `xyz` expanded with `xyz-compressed`:
-  * **Pro**: Can be done (hacked in) without cross client coordination.
-  * **Con**: Litters the network with client specific protocol announces.
-  * **Con**: Needs to be specced in an EIP for cross interoperability anyway.
+**Alternative solutions to data compression that have been brought up and discarded are:**
+
+Extend protocol `xyz` to support compressed messages versus doing it at devp2p level:
+
+ * **Pro**: Can be better optimized when to compress and when not to.
+ * **Con**: Mixes in transport layer encoding into application layer logic.
+ * **Con**: Makes the individual message specs more convoluted with compression details.
+ * **Con**: Requires cross client coordination on every single protocol, making the effor much harder and repeated (eth, les, shh, bzz).
+
+Introduce seamless variations of protocol such as `xyz` expanded with `xyz-compressed`:
+
+ * **Pro**: Can be done (hacked in) without cross client coordination.
+ * **Con**: Litters the network with client specific protocol announces.
+ * **Con**: Needs to be specced in an EIP for cross interoperability anyway.
+
+**Other ideas that have been discussed and discarded:**
+
+Don't explicitly limit the decompressed message size, only the compressed one:
+
+ * **Pro**: Allows larger messages to traverse through devp2p.
+ * **Con**: Upper layer protocols need to check and discard large messages.
+ * **Con**: Needs lazy decompression to allow size limitations without DOS.
 
 ## Backwards Compatibility
 This proposal is fully backward compatible. Clients upgrading to the proposed devp2p protocol version `5` should still support skipping the compression step for connections that only advertise version `4` of the devp2p protocol.
