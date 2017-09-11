@@ -85,15 +85,8 @@ The length of the returned data is always exactly 32 bytes and encoded as a 32 b
 
 ### Gas costs
 
-[Benchmarks run on cpp-ethereum](https://gist.github.com/chriseth/4168b56bfe638cae8da1945dd988600b)
-
-suggest the following gas formula:
-
-`60000 * k + 40000`
-
-if we target 20000 gas per millisecond.
-
-Awaiting benchmarks from other implementations.
+The gas costs of the precompiled contract are `80 000 * k + 100 000`, where `k` is the number of
+points or, equivalently, the length of the input divided by 192.
 
 ## Rationale
 
