@@ -175,7 +175,7 @@ Different implementations have been written by various teams that have different
 
 #### Example implementations are available at
 - https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/StandardToken.sol
-- https://github.com/ConsenSys/Tokens/blob/master/Token_Contracts/contracts/StandardToken.sol
+- https://github.com/ConsenSys/Tokens/blob/master/contracts/StandardToken.sol
 
 #### Implementation of adding the force to 0 before calling "approve" again:
 - https://github.com/Giveth/minime/blob/master/contracts/MiniMeToken.sol
