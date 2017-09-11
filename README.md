@@ -36,6 +36,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [6](EIPS/eip-6.md)                                      | Renaming Suicide Opcode                                     | Hudson Jameson  | Interface   | Final   |
 | [7](EIPS/eip-7.md)                                      | DELEGATECALL                                                | Vitalik Buterin | Core        | Final   |
 | [8](EIPS/eip-8.md)                                      | devp2p Forward Compatibility Requirements for Homestead     | Felix Lange     | Networking  | Final   |
+| [20](EIPS/eip-20-token-standard.md)                     | ERC-20 Token Standard                                       | Fabian Vogelsteller, Vitalik Buterin     | ERC  | Final   |
 | [141](EIPS/eip-141.md)                                  | Designated invalid EVM instruction                          | Alex Beregszaszi| Core        | Final   |
 | [150](EIPS/eip-150.md)                                  | Gas cost changes for IO-heavy operations                    | Vitalik Buterin | Core        | Final   |
 | [155](EIPS/eip-155.md)                                  | Simple replay attack protection                             | Vitalik Buterin | Core        | Final   |
