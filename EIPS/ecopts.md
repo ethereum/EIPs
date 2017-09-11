@@ -64,7 +64,8 @@ Fails on invalid input and consumes all gas.
 
 ### Gas costs
 
-To be determined. 
+ - Gas cost for ``ECADD``: 500
+ - Gas cost for ``ECMUL``: 40000
 
 ## Rationale
 
