@@ -34,9 +34,16 @@ Payment request URLs contain "ethereum" in their schema (protocol) part and are 
     parameter               = key "=" value
     key                     = "value" / "gas" / TYPE
     value                   = number / ethereum_address / STRING
-    number                  = [ "-" / "+" ] *DIGIT [ "." 1*DIGIT ] [ ( "e" / "E" ) [ 1*DIGIT ]
+    number                  = [ "-" / "+" ] *DIGIT [ "." 1*DIGIT ] [ ( "e" / "E" ) [ 1*DIGIT ] [ "+" UNIT ]
 
-Where `TYPE` is a standard ABI type name, as defined in [Ethereum Contract ABI specification](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI). `STRING` is a URL-encoded unicode string of arbitrary length, where delimiters and the percentage symbol (`%`) are mandatorily hex-encoded with a `%` prefix.
+
+Where `TYPE` is a standard ABI type name, as defined in [Ethereum Contract ABI specification](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI). `STRING` is a URL-encoded unicode string of arbitrary length, where delimiters and the 
+percentage symbol (`%`) are mandatorily hex-encoded with a `%` prefix.
+
+`UNIT` is a URL-encoded unicode string. If `UNIT` is ETH, it always means a multiplier of 10<sup>18</sup>. If it is something 
+else AND the addressed contract has a `symbol` field exactly matching this string AND the contract has a `decimals` field, then 
+10 to that power is used as a multiplier. Otherwise, the payment request is deemed invalid. Applications that have no access to 
+the blockchain should refuse accepting requests with a non-empty `UNIT`, if it is not ETH.
 
 Note that a `number` can be expressed in *scientific notation*, with a multiplier of a power of 10. The use of this notation is strongly encouraged when expressing monetary value in Ethers or ERC #20 tokens in atomic units (e. g. Wei, in case of Ether).
 
