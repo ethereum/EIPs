@@ -42,7 +42,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() constant returns (string name)
+function name() constant returns (string)
 ```
 
 
@@ -54,7 +54,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function symbol() constant returns (string symbol)
+function symbol() constant returns (string)
 ```
 
 
@@ -67,7 +67,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function decimals() constant returns (uint8 decimals)
+function decimals() constant returns (uint8)
 ```
 
 
@@ -76,7 +76,7 @@ function decimals() constant returns (uint8 decimals)
 Returns the total token supply.
 
 ``` js
-function totalSupply() constant returns (uint256 totalSupply)
+function totalSupply() constant returns (uint256)
 ```
 
 
