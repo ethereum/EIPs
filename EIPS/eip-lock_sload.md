@@ -1,10 +1,15 @@
 ## Preamble
 
 EIP: X
+
 Title: Pessimistic locking for SLOAD
+
 Author: Egor Homakov <homakov@gmail.com>
+
 Status: Draft
+
 Type: Standards Track Core
+
 Created: 2017-09-21
 
 ## Simple Summary
@@ -12,6 +17,8 @@ Created: 2017-09-21
 To improve security-in-depth and isolation of contract storage, every SLOAD-ed record must be locked until termination of the frame.
 
 ## Abstract
+
+This is the formal proposal. Here is rather emotional rationale: https://medium.com/@homakov/make-ethereum-blockchain-again-ef73c5b86582
 
 We expose similarities between traditional databases vs contract storage and between traditional race conditions vs re-entrancy attacks. As a result we offer a rather traditional (known since 1993) approach that all financial applications are using to this date: implementation of pessimistic locks on storage records to prevent a race condition-like attacks like the one that happened with the DAO.
 
