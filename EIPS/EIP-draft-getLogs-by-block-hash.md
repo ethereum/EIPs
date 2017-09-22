@@ -3,7 +3,7 @@
 EIP: <to be assigned>
 Title: Add `blockHash` to JSON-RPC filter options.
 Author: Micah Zoltu
-Type: <Standard Track | Informational | Meta>
+Type: Standard Track
 Category: Interface
 Status: Draft
 Created: 2017-03-24
