@@ -37,7 +37,10 @@ Similarly to message sending, when receiving a devp2p v5 message from a remote n
  * Decompress the payload with Snappy and store it in the same field.
  * Update the message size to the length of the decompressed payload.
 
-Note, the handshake message is never compressed, since it is needed to negotiate the common version.
+Important caveats:
+
+ * The handshake message is **never** compressed, since it is needed to negotiate the common version.
+ * Snappy framing is **not** used, since the devp2p protocol already message oriented.
 
 ### Avoiding DOS attacks
 
@@ -75,6 +78,115 @@ This proposal is fully backward compatible. Clients upgrading to the proposed de
 
 ## Implementation
 You can find a reference implementation of this EIP in https://github.com/ethereum/go-ethereum/pull/15106.
+
+## Test vectors
+
+There is more than one valid encoding of any given input, and there is more than one good internal compression algorithm within Snappy when trading off throughput for output size. As such, different implementations might produce slight variations in the compressed form, but all should be cross compatible between each other.
+
+As an example, take hex encoded RLP of block #272621 from the Rinkeby test network: [block.rlp (~3MB)](https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.rlp).
+
+ * Encoding the raw RLP via [Go's Snappy library](https://github.com/golang/snappy) yields: [block.go.snappy (~70KB)](https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.go.snappy).
+ * Encoding the raw RLP via [Python's Snappy library](https://github.com/andrix/python-snappy) yields: [block.py.snappy (~70KB)](https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.py.snappy).
+
+You can verify that an encoded binary can be decoded into the proper plaintext using the following snippets:
+
+### Go
+
+```
+$ go get https://github.com/golang/snappy
+```
+
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/hex"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+
+	"github.com/golang/snappy"
+)
+
+func main() {
+	// Read and decode the decompressed file
+	plainhex, err := ioutil.ReadFile(os.Args[1])
+	if err != nil {
+		log.Fatalf("Failed to read decompressed file %s: %v", os.Args[1], err)
+	}
+	plain, err := hex.DecodeString(string(plainhex))
+	if err != nil {
+		log.Fatalf("Failed to decode decompressed file: %v", err)
+	}
+	// Read and decode the compressed file
+	comphex, err := ioutil.ReadFile(os.Args[2])
+	if err != nil {
+		log.Fatalf("Failed to read compressed file %s: %v", os.Args[2], err)
+	}
+	comp, err := hex.DecodeString(string(comphex))
+	if err != nil {
+		log.Fatalf("Failed to decode compressed file: %v", err)
+	}
+	// Make sure they match
+	decomp, err := snappy.Decode(nil, comp)
+	if err != nil {
+		log.Fatalf("Failed to decompress compressed file: %v", err)
+	}
+	if !bytes.Equal(plain, decomp) {
+		fmt.Println("Booo, decompressed file does not match provided plain text!")
+		return
+	}
+	fmt.Println("Yay, decompressed data matched provided plain text!")
+}
+```
+
+```
+$ go run main.go block.rlp block.go.snappy
+Yay, decompressed data matched provided plain text!
+
+$ go run main.go block.rlp block.py.snappy
+Yay, decompressed data matched provided plain text!
+```
+
+### Python
+
+```bash
+$ pip install python-snappy
+```
+
+```py
+import snappy
+import sys
+
+# Read and decode the decompressed file
+with open(sys.argv[1], 'rb') as file:
+    plainhex = file.read()
+
+plain = plainhex.decode("hex")
+
+# Read and decode the compressed file
+with open(sys.argv[2], 'rb') as file:
+    comphex = file.read()
+
+comp = comphex.decode("hex")
+
+# Make sure they match
+decomp = snappy.uncompress(comp)
+if plain != decomp:
+    print "Booo, decompressed file does not match provided plain text!"
+else:
+    print "Yay, decompressed data matched provided plain text!"
+```
+
+```
+$ python main.py block.rlp block.go.snappy
+Yay, decompressed data matched provided plain text!
+
+$ python main.py block.rlp block.py.snappy
+Yay, decompressed data matched provided plain text!
+```
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
