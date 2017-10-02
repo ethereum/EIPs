@@ -42,11 +42,13 @@ Important caveats:
  * The handshake message is **never** compressed, since it is needed to negotiate the common version.
  * Snappy framing is **not** used, since the DEVp2p protocol already message oriented.
 
+*Note: Snappy supports uncompressed binary literals (up to 4GB) too, leaving room for fine-tuned future optimisations for already compressed or encrypted data that would have no gain of compression (Snappy usually detects this case automatically).*
+
 ### Avoiding DOS attacks
 
 Currently a DEVp2p message length is limited to 24 bits, amounting to a maximum size of 16MB. With the introduction of Snappy compression, care must be taken not to blindy decompress messages, since they may get significantly larger than 16MB.
 
-However, Snappy is capable of calculating the decompressed size of an input message without inflating it in memory. This can be used to discard any messages which decompress above some threshold. **The proposal is to use the same limit (16MB) as the threshold for decompressed messages.** This retains the same guarantees that the current DEVp2p protocol does, so there won't be surprises in application level protocols.
+However, Snappy is capable of calculating the decompressed size of an input message without inflating it in memory (*[the stream starts with the uncompressed length up to a maximum of `2^32 - 1` stored as a little-endian varint](https://github.com/google/snappy/blob/master/format_description.txt#L20)*). This can be used to discard any messages which decompress above some threshold. **The proposal is to use the same limit (16MB) as the threshold for decompressed messages.** This retains the same guarantees that the current DEVp2p protocol does, so there won't be surprises in application level protocols.
 
 ## Alternatives (discarded)
 
@@ -187,6 +189,11 @@ Yay, decompressed data matched provided plain text!
 $ python main.py block.rlp block.py.snappy
 Yay, decompressed data matched provided plain text!
 ```
+
+## References
+
+ * Snappy website: https://google.github.io/snappy/
+ * Snappy specification: https://github.com/google/snappy/blob/master/format_description.txt
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
