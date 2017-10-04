@@ -21,10 +21,10 @@ the time the `CALL` returns.
 
 ### Specification
 
-The gas and memory semantics for `CALL` and `CALLCODE` (and `DELEGATE_CALL`, if adopted, see EIP-4)
+The gas and memory semantics for `CALL`, `CALLCODE` and `DELEGATECALL` (called later as `CALL*`)
 are changed in the following way (`CREATE` does not write to memory and is thus unaffected):
 
-Suppose the arguments to `CALL` / `CALLCODE` are `gas, address, value, input_start, input_size, output_start, output_size)`,
+Suppose the arguments to `CALL*` are `gas, address, value, input_start, input_size, output_start, output_size`,
 then, at the beginning of the opcode, gas for growing memory is only charged for `input_start + input_size`, but not
 for `output_start + output_size`.
 
