@@ -28,6 +28,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
 | [86](https://github.com/ethereum/EIPs/pull/208)         | Abstraction of transaction origin and signature                                     | Vitalik Buterin       | Core        | Deferred  |
 | [96](https://github.com/ethereum/EIPs/pull/210)         | Blockhash refactoring                                                               | Vitalik Buterin       | Core        | Deferred  |
+| [145](EIPS/eip-145.md)                                  | Bitwise shifting instructions in EVM                                                | Alex Beregszaszi, Paweł Bylica | Core | Deferred  |
 
 # Finalized EIPs (standards that have been adopted)
 | Number                                                  |Title                                                        | Author          | Layer       | Status  |
