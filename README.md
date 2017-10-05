@@ -37,9 +37,21 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [7](EIPS/eip-7.md)                                      | DELEGATECALL                                                | Vitalik Buterin | Core        | Final   |
 | [8](EIPS/eip-8.md)                                      | devp2p Forward Compatibility Requirements for Homestead     | Felix Lange     | Networking  | Final   |
 | [20](EIPS/eip-20-token-standard.md)                     | ERC-20 Token Standard                                       | Fabian Vogelsteller, Vitalik Buterin     | ERC  | Final   |
+| [55](EIPS/eip-55.md)                                    | ERC-55 Mixed-case checksum address encoding                 | Vitalik Buterin | Core        | Final   |
+| [137](EIPS/eip-137.md)                                  | Ethereum Domain Name Service - Specification                | Nick Johnson | ERC        | Final   |
 | [141](EIPS/eip-141.md)                                  | Designated invalid EVM instruction                          | Alex Beregszaszi| Core        | Final   |
+| [145](EIPS/eip-145.md)                                  | Bitwise shifting instructions in EVM                        | Alex Beregszaszi, Paweł Bylica | Core        | Final   |
 | [150](EIPS/eip-150.md)                                  | Gas cost changes for IO-heavy operations                    | Vitalik Buterin | Core        | Final   |
 | [155](EIPS/eip-155.md)                                  | Simple replay attack protection                             | Vitalik Buterin | Core        | Final   |
 | [160](EIPS/eip-160.md)                                  | EXP cost increase                                           | Vitalik Buterin | Core        | Final   |
-| [161](EIPS/eip-161.md)                                  | State trie clearing (invariant-preserving alternative)      | Gavin Wood      | Core        | Final   |
+| [161](EIPS/eip-161.md)                                  | State trie clearing (invariant-preserving alternative)      | Gavin Wood | Core        | Final   |
+| [162](EIPS/eip-162.md)                                  | ERC-162 ENS support for reverse resolution of Ethereum addresses | Maurelian, Nick Johnson | ERC        | Final   |
 | [170](EIPS/eip-170.md)                                  | Contract code size limit                                    | Vitalik Buterin | Core        | Final   |
+| [170](EIPS/eip-170.md)                                  | Contract code size limit                                    | Vitalik Buterin | Core        | Final   |
+| [181](EIPS/eip-181.md)                                  | ERC-181 ENS support for reverse resolution of Ethereum addresses | Nick Johnson | ERC        | Final   |
+| [190](EIPS/eip-190.md)                                  | ERC-190 Ethereum Smart Contract Packaging Standard          | Piper Merriam, Tim Coulter, Denis Erfurt (mhhf), RJ Catalano (VoR0220), Iuri Matias (iurimatias) | ERC        | Final   |
+| [606](EIPS/eip-606.md)                                  | Hardfork Meta: Homestead                                    | Alex Beregszaszi | Meta         | Final    |
+| [607](EIPS/eip-607.md)                                  | Hardfork Meta: Spurious Dragon                              | Alex Beregszaszi | Meta         | Final    |
+| [608](EIPS/eip-608.md)                                  | Hardfork Meta: Tangerine Whistle                            | Alex Beregszaszi | Meta         | Final    |
+| [609](EIPS/eip-609.md)                                  | Hardfork Meta: Byzantium                                    | Alex Beregszaszi | Meta         | Draft    |
+| [706](EIPS/eip-706.md)                                  | DEVp2p snappy compression                                   | Péter Szilágyi     | Networking  | Final   |
