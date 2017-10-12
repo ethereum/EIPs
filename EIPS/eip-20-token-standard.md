@@ -128,7 +128,7 @@ Allows `_spender` to withdraw from your account multiple times, up to the `_valu
 
 **NOTE**: To prevent attack vectors like the one [described here](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/) and discussed [here](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729),
 clients SHOULD make sure to create user interfaces in such a way that they set the allowance first to `0` before setting it to another value for the same spender.
-THOUGH The contract itself shouldn't enforce it, to allow backwards compatilibilty with contracts deployed before
+THOUGH The contract itself shouldn't enforce it, to allow backwards compatibility with contracts deployed before
 
 ``` js
 function approve(address _spender, uint256 _value) returns (bool success)
