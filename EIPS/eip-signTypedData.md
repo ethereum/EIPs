@@ -192,8 +192,16 @@ Proper test vector suite will be added in the next finalization steps.
 
 ## Implementation
 
-Not implemented Yet.
-Metamask @flyswatter expressed a will to imlement it as an experemental feature.
+It is imlemented as an experimental feature in Metamask 3.11.0+.
+It's not part of web3.js yet, so you can try using it like:
+```javascript
+const data = {
+  'type': 'string',
+  'name': 'message',
+  'value': 'Hi, Alice!',
+};
+web3.currentProvider.sendAsync({method: 'eth_signTypedData', params: [data, signerAddress], jsonrpc: '2.0', id: 1}, callback);
+```
 
 ## Copyright
 
