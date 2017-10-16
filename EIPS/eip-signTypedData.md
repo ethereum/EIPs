@@ -124,11 +124,8 @@ const signature = await web3.eth.signTypedData(signerAddress, typedData);
 import * as _ from 'lodash';
 import * as ethAbi from 'ethereumjs-abi';
 
-const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`);
-const schemaHash = ethAbi.soliditySHA3(
-    _.times(typedData.length, _.constant('string')),
-    schema,
-);
+const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`).join(',');
+const schemaHash = ethAbi.soliditySHA3(['string'], schema);
 const data = _.map(typedData, 'value');
 const types = _.map(typedData, 'type');
 const hash = ethAbi.soliditySHA3(
