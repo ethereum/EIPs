@@ -98,7 +98,7 @@ typedData = [
 <img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
 
-It's important to make the schema part of the signature (explanation can be found in “Rationale” section). The way the schema will be combined with the values to generate the hash signed by the user is shown below. First, the schema is encoded into a string using a method similar to [solidity events signatures](http://solidity.readthedocs.io/en/develop/contracts.html#low-level-interface-to-logs). It is then hashed together with the keccak256 hash of the data array.
+It's important to make the schema part of the signature (explanation can be found in “Rationale” section). The way the schema will be combined with the values to generate the hash signed by the user is shown below. First, the schema is encoded into a string using a method similar to [solidity events signatures](http://solidity.readthedocs.io/en/develop/contracts.html#low-level-interface-to-logs). Then it's hash is prepended to the data array before hashing it.
 
 ### Pseudocode examples:
 
@@ -120,30 +120,29 @@ const signature = await web3.eth.signTypedData(typedData);
 ```
 
 ```javascript
-// Signed code JS example
+// Signer code JS example
 import * as _ from 'lodash';
 import * as ethAbi from 'ethereumjs-abi';
 
+const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`);
+const schemaHash = ethAbi.soliditySHA3(
+    _.times(typedData.length, _.constant('string')),
+    schema,
+);
 const data = _.map(typedData, 'value');
 const types = _.map(typedData, 'type');
-const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`);
 const hash = ethAbi.soliditySHA3(
-  ['bytes32', 'bytes32'],
-  [
-    ethAbi.soliditySHA3(_.times(typedData.length, _.constant('string')), schema),
-    ethAbi.soliditySHA3(types, data),
-  ],
+  ['bytes32', ...types],
+  [schemaHash, ...data],
 );
 ```
 
 ```solidity
 // Solidity example
 string message = 'Hi, Alice!';
-unit value = 42;
-const hash = keccak256(
-  keccak256('string message', 'uint value'), // Probably hardcoded
-  keccak256(message, value),
-);
+uint value = 42;
+bytes32 schemaHash = keccak256('string message', 'uint value'); // Probably hardcoded
+const hash = keccak256(schemaHash, message, value);
 address recoveredSignerAddress = ecrecover(hash, v, r, s);
 ```
 
