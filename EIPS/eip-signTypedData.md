@@ -116,7 +116,7 @@ const typedData = [
     'value': 42,
   },
 ];
-const signature = await web3.eth.signTypedData(typedData);
+const signature = await web3.eth.signTypedData(signerAddress, typedData);
 ```
 
 ```javascript
