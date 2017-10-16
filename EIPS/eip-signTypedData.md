@@ -1,4 +1,4 @@
-# personal_signTypedData
+# eth_signTypedData
 
 ## Preamble
 
@@ -23,7 +23,7 @@ This EIP adds an RPC method to sign arrays of arbitrary typed data, making it ea
 
 This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor). It should not be implemented in clients where approval is already granted (e.g Geth with unlocked accounts).
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-personal_signTypedData/personal_signTypedData.png" width="500px">
+<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
 This EIP is a continuation of a discussion here: https://github.com/ethereum/EIPs/pull/683
 I offered this solution in a comment: https://github.com/ethereum/EIPs/pull/683#issuecomment-327945854
@@ -41,19 +41,19 @@ There are a whole range of higher level protocols emerging on Ethereum. State ch
 
 The current `eth_sign` implementation allows signing of arbitrary data without specifying it's type or structure. Some signers assume that the data is a UTF-8 string. Some signers show it as a hex encoded string. This leads to user confusion since it is impossible to verify the message you're signing unless it's a plaintext UTF-8 string.
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-personal_signTypedData/eth_sign.png"  width="500px">
+<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_sign.png"  width="500px">
 
 Calling `eth_sign` on Metamask displays the string to sign. If the user is signing the result of hashing a complex structure involving multiple critical pieces of information, the only way to verify what they are signing is to re-hash the same structure in an independent script and make sure the hashes match.
 
 Calling `personal_sign` on Metamask with the raw bytes of a hash (e.g not an ASCII string) shows the user this even less verifiable message that they should sign.
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-personal_signTypedData/personal_sign.png"  width="500px">
+<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/personal_sign.png"  width="500px">
 
 The main problem is that signers don't have enough metadata to display the DApp's real intent effectively. In order to do so, they need the plaintext input that the dApp wishes hashed and signed by the user.
 
 ## Specification
 
-This EIP proposes a new JSON RPC method to the `personal` namespace: `personal_signTypedData`. It accepts an array of values together with their specified type and human-readable name. The [json-schema](http://json-schema.org/) draft is defined below.
+This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`. It accepts an array of values together with their specified type and human-readable name. The [json-schema](http://json-schema.org/) draft is defined below.
 
 ### Params JSON Schema:
 ```json-schema
@@ -95,7 +95,7 @@ typedData = [
 
 ### How it can look in signer UI:
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-personal_signTypedData/personal_signTypedData.png" width="500px">
+<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
 
 It's important to make the schema part of the signature (explanation can be found in “Rationale” section). The way the schema will be combined with the values to generate the hash signed by the user is shown below. First, the schema is encoded into a string using a method similar to [solidity events signatures](http://solidity.readthedocs.io/en/develop/contracts.html#low-level-interface-to-logs). It is then hashed together with the keccak256 hash of the data array.
@@ -116,7 +116,7 @@ const typedData = [
     'value': 42,
   },
 ];
-const signature = await web3.personal.signTypedData(typedData);
+const signature = await web3.eth.signTypedData(typedData);
 ```
 
 ```javascript
@@ -166,12 +166,12 @@ This approach is even possible to implement on hardware wallets with small scree
 
 This EIP does not break backwards compatibility.
 
-`eth_sign` and `personal_sign` will not be removed for backwards compatibility reasons even though the `personal_signTypedData` is a superset of their functionality. Current off-chain protocols will however need to modify the verifying code in their smart contracts to include the schema.
+`eth_sign` and `personal_sign` will not be removed for backwards compatibility reasons even though the `eth_signTypedData` is a superset of their functionality. Current off-chain protocols will however need to modify the verifying code in their smart contracts to include the schema.
 
-Example of signing a simple string using `personal_signTypedData`
+Example of signing a simple string using `eth_signTypedData`
 
 ```javascript
-const signature = await web3.personal.signTypedData([
+const signature = await web3.eth.signTypedData([
   {
     'type': 'string',
     'name': 'message',
@@ -181,7 +181,7 @@ const signature = await web3.personal.signTypedData([
 ```
 
 
-The implementation of `personal_signTypedData`  makes some assumptions about the crypto primitives being used (tightly-packed + keccak256 + secp256k1), but the same assumptions have already been made for the [keccak256](http://solidity.readthedocs.io/en/develop/units-and-global-variables.html) function in solidity. If Ethereum becomes more crypto-agnostic in the future and allows for other types of signatures - this EIP can be adjusted.
+The implementation of `eth_signTypedData`  makes some assumptions about the crypto primitives being used (tightly-packed + keccak256 + secp256k1), but the same assumptions have already been made for the [keccak256](http://solidity.readthedocs.io/en/develop/units-and-global-variables.html) function in solidity. If Ethereum becomes more crypto-agnostic in the future and allows for other types of signatures - this EIP can be adjusted.
 
 The choice of keccak256 is motivated by the fact, that it's twice [cheaper to verify in a smart contract](https://ethereum.stackexchange.com/questions/3184/what-is-the-cheapest-hash-function-available-in-solidity/3200#3200) when compared with sha3.
 
