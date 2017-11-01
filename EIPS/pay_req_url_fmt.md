@@ -8,7 +8,7 @@
     Status: Draft
     Replaces: 67
     Created: 2017-08-01
-    Requires: 20
+    Requires: 20, 137
 
 ## Simple Summary
 A standard way of representing various transactions, especially payment requests in Ethers and ERC #20 tokens as URLs.
@@ -26,8 +26,9 @@ This specification supersedes ERC #67, which is a URL format for representing ar
 ### Syntax
 Payment request URLs contain "ethereum" in their schema (protocol) part and are constructed as follows:
 
-    request                 = "ethereum" ":" target_address [ "/" function_name ] [ "?" parameters ]
+    request                 = "ethereum" ":" target_address [ "@" chain_id ] [ "/" function_name ] [ "?" parameters ]
     target_address          = ethereum_address
+    chain_id                = 1*DIGIT
     function_name           = STRING
     ethereum_address        = ( "0x" 40*40HEXDIG ) / ENS_NAME
     parameters              = parameter *( "&" parameter )
@@ -54,6 +55,8 @@ For the syntax of ENS_NAME, please consult ERC #137 defining Ethereum Name Servi
 ### Semantics
 
 `target_address` is mandatory and denotes either the beneficiary of native token payment (see below) or the contract address with which the user is asked to interact.
+
+`chain_id` is optional and contains the decimal chain ID, such that transactions on various test- and private networks can be requested. If no `chain_id` is present, the main network (1) is assumed.
 
 If `function_name` is missing, then the URL is requesting payment in the native token of the blockchain, which is Ether in our case. The amount is specified in `value` parameter, in the atomic unit (i.e. Wei). The use of scientific notation is strongly encouraged. For example, requesting 2.014 ETH to address `0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359` would look as follows: 
 [ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18](ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18)
