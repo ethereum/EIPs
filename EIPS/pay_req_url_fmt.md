@@ -1,6 +1,6 @@
 ## Preamble
 
-    EIP: <to be assigned>
+    EIP: 861
     Title: URL Format for Transaction Requests
     Author: Daniel A. Nagy <daniel@ethereum.org>
     Type: Standard Track
