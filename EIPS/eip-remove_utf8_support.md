@@ -34,7 +34,7 @@ These problems has lead to a marked lack of support for string processing and (r
 
 The performance issues of UTF-8 is the worst part, but runtime validation is a problem as well. Most contracts are called from dedicated APIs, or web-based client UIs (such as parity), which means that validation is most likely being done at some point, but contracts can also be transacted to directly which means that no guarantees can be made unless the validation is done in contract code.
 
-The author has been working with strings in Solidity and LLL, and has written a lot of code, tests, and benchmarks related to the processing of UTF-8 and ASCII strings. An example of a library used for UTF-8 validation in Solidity can be found here: https://github.com/ethereum/solidity-examples/blob/master/docs/packages/Strings.md. Working with string processing is what motivated this EIP.
+The author has been working with strings in Solidity and LLL, and has written a lot of code, tests, and benchmarks related to the processing of UTF-8 and ASCII strings. An example of a library used for UTF-8 validation in Solidity can be found here: https://github.com/ethereum/solidity-examples/blob/master/docs/strings/Strings.md. Working with string processing is what motivated this EIP.
 
 ## Specification
 
@@ -60,7 +60,7 @@ A range of `0` means that the standard byte encoding is used, so it is the same 
 
 Validating a string is done by checking that none of its characters has a value that is outside of the range.
 
-Note that non power-of-two character-widths are bad, because they lead to inefficient use of storage (a single value could have their bytes spread out over more then one storage slot).
+Note that non power-of-two character-widths are not ideal, because they lead to inefficient use of storage (a single value could have its bytes spread out over more then one storage slot).
 
 ##### reserved
 
