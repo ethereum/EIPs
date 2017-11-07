@@ -14,14 +14,14 @@ the latest Parity hack, which I guess is in some way a DDoS.
     Created: 2017-11-07
 
 ## Simple Summary
-Disclaimer: I only kinda know what I'm talking about
+Disclaimer: I hardly know what I'm talking about
 
 An address might be allowed to redeploy the exact same contract
 to the same address as a safeguard against contracts that were accidentally killed.
 
 ## Abstract
 The parity wallet was hacked and access to funds is locked because a library function
-was designed to terminate the wallet was used to kill the library itself.
+that was designed to terminate the wallet was used to kill the library itself.
 
 ## Motivation
 Create a mechanism for affected Parity wallets to recover funds.
