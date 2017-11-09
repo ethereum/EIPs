@@ -24,15 +24,11 @@ forfeiting a proportional part of the mining reward. Similarly, if
 receive the same additional mining reward that would need to be 
 forfeited to raise it back.
 
-Each contract account gets a new balance called `lease` used for paying 
-rent that is initialized at 0 and is assumed to have been zero before 
-its introduction. For externally controlled accounts, their `lease` 
-balance is the same as their normal balance. With each new block, an 
-account is chosen in a deterministically random fashion with a 
-probability proportional to the amount of storage that they use. The 
-current value of `rent` is subtracted from their `lease` and if the 
-result is negative, the account gets removed from the state. Otherwise, 
-`lease` is updated by the result.
+With each new block, an account is chosen in a deterministically random 
+fashion with a probability proportional to the amount of storage that 
+they use. The current value of `rent` is subtracted from their balance 
+and if the result is negative, the account gets removed from the state. 
+Otherwise, account balance is updated by the result.
 
 ## Motivation
 Currently, contracts storing a large state over a long period of time 
@@ -42,9 +38,7 @@ an unreasonable waste of a scarce resource.
 
 ## Specification
 ### TODO
-Both `rent` and their own `lease` are available as readable 
-environment to contracts. Contracts can transfer part or whole of their 
-normal balance to their `lease`.
+Both `rent` is available as readable environment to contracts.
 
 ## Rationale
 The proposed rent control mechanism creates a *tragedy of commons* type 
@@ -57,11 +51,11 @@ rent in check and make it difficult for miners to raise rent beyond
 the actual cost of storing the state.
 
 ## Backwards Compatibility
-The fact that both `rent` and `lease` are initialized as zero and assumed 
-to have been zero before introducing the protocol change, the entire 
-history of the blockchain is conforming to the rules introduces in this 
-protocol change. Since miners are beneficiaries of the change, no 
-difficulty is expected with acceptance by miners.
+The fact that both `rent` is initialized as zero and assumed to have been 
+zero before introducing the protocol change, the entire history of the 
+blockchain is conforming to the rules introduces in this protocol change. 
+Since miners are beneficiaries of the change, no difficulty is expected 
+with acceptance by miners.
 
 ## Test Cases
 ### TODO
