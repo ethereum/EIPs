@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: Return values for eth_sendTransaction and eth_sendRawTransaction RPC requests
+    Title: Subscriptions and filters for transaction return data
     Author: Jack Peterson <jack@tinybike.net>
     Type: Standard Track
     Category: Interface
@@ -10,19 +10,21 @@
 
 
 ## Simple Summary
-Provide a way for external callers to access return values of functions executed during Ethereum transactions.
+Provide a way for external callers to access the return data of functions executed during Ethereum transactions.
 
 ## Abstract
-When a new transaction is submitted successfully to an Ethereum node, the node responds with the transaction's hash.  If the transaction involved the execution of a contract function that returns a value, the return value is simply discarded.  If the return value is state-dependent, which is common, there is not a straightforward way for the caller to access or compute the return value.  This EIP proposes that when a transaction is submitted, the caller may subscribe to the transaction's hash.  The Ethereum node would then push a notification to the caller when the transaction is sealed (and again if/when the transaction is affected by chain reorganizations).
+When a new transaction is submitted successfully to an Ethereum node, the node responds with the transaction's hash.  If the transaction involved the execution of a contract function that returns data, the data is discarded.  If the return data is state-dependent, which is common, there is no straightforward way for the caller to access or compute the return data.  This EIP proposes that callers should be able to subscribe to (or poll for) the return data of their transactions.  The Ethereum node then sends the return data to the caller when the transactions are sealed.
 
 ## Motivation
-External callers presently have no way of accessing return values from Ethereum, if the function was executed via `eth_sendTransaction` or `eth_sendRawTransaction` RPC request.  Access to return value is in many cases a desirable feature.  Making return values available to external callers also addresses the inconsistency between _internal_ callers, which have access to return values within the context of the transaction, and external callers, which do not.  The typical workaround is to log the return values, which is bad for several reasons: it contributes to chain bloat, it imposes additional gas costs on the caller, and it can result in many unused logs being written if the externally called function involves other (internal) function calls that log their return values.
+External callers presently have no way of accessing return data from Ethereum, if the function was executed via `eth_sendTransaction` or `eth_sendRawTransaction` RPC request.  Access to function return data is in many cases a desirable feature.  Making return data available to external callers also addresses the inconsistency between internal callers, which have access to return data within the context of the transaction, and external callers, which do not.  Presently, a common workaround is to log the return data, which is bad for several reasons: it contributes to chain bloat, imposes additional gas costs on the caller, and can result in unused logs being written if the externally called function involves other (internal) function calls that log their return data.
 
 ## Specification
-A transaction is submitted via `eth_sendTransaction` or `eth_sendRawTransaction` RPC request and has the transaction hash `"0x00000000000000000000000000000000000000000000000000000000deadbeef"`.  The sender can then subscribe to the transaction's return value by sending an `eth_subscribe` request with the transaction hash as a parameter:
+
+### Subscriptions
+A caller who wants to be notified of return data for their transactions sends an `eth_subscribe` RPC request with the parameter `"returnData"`:
 
 ```json
-{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["0x00000000000000000000000000000000000000000000000000000000deadbeef"]}
+{"jsonrpc": "2.0", "id": 1, "method": "eth_subscribe", "params": ["returnData"]}
 ```
 
 The Ethereum node responds with a subscription ID:
@@ -31,25 +33,57 @@ The Ethereum node responds with a subscription ID:
 {"jsonrpc": "2.0", "id": 1, "result": "0x00000000000000000000000000000b0b"}
 ```
 
-When the transaction is sealed (mined), the Ethereum node computes the return value (`"0x000000000000000000000000000000000000000000000000000000000000002a"`) and pushes a notification to the subscriber:
+The caller submits a transaction via `eth_sendTransaction` or `eth_sendRawTransaction` RPC request which has the transaction hash `"0x00000000000000000000000000000000000000000000000000000000deadbeef"`.  When the transaction is sealed (mined), the Ethereum node computes the return value (`"0x000000000000000000000000000000000000000000000000000000000000002a"`) and pushes a notification to the caller:
 
 ```json
 {
   "jsonrpc": "2.0",
   "method": "eth_subscription",
   "params": {
-    "result": "0x000000000000000000000000000000000000000000000000000000000000002a",
+    "result": {
+      "transactionHash": "0x00000000000000000000000000000000000000000000000000000000deadbeef",
+      "returnData": "0x000000000000000000000000000000000000000000000000000000000000002a"
+    },
     "subscription": "0x00000000000000000000000000000b0b"
   }
 }
 ```
 
-Unlike other subscriptions, the subscriber only receives notifications about a transaction's return value in two cases: first when the transaction is sealed, and again (with an extra `"removed": true` field) if the transaction is affected by a chain reorganization.
+The caller receives notifications about their transactions' return data in two cases: first when a transaction is sealed, and again (with an extra `"removed": true` field) if a transaction is affected by a chain reorganization.  As with other subscriptions, the caller can send an `eth_unsubscribe` RPC request to stop receiving push notifications:
+
+```json
+{"jsonrpc": "2.0", "id": 2, "method": "eth_unsubscribe", "params": ["0x00000000000000000000000000000b0b"]}
+```
+
+### Polling
+Push notifications require full duplex connections (i.e., websocket or IPC).  Instead of subscribing, callers using HTTP send an `eth_newFilter` request:
+
+```json
+{"jsonrpc": "2.0", "id": 1, "method": "eth_newFilter", "params": ["returnData"]}
+```
+
+The Ethereum node responds with a filter ID:
+
+```json
+{"jsonrpc": "2.0", "id": 1, "result": "0x1"}
+```
+
+When a transaction is submitted, the Ethereum node computes the return data and pushes it to a queue, which is emptied when the caller polls using `eth_getFilterChanges`:
+
+```json
+{"jsonrpc": "2.0", "id": 2, "method": "eth_getFilterChanges", "params": ["0x1"]}
+```
+
+The node responds with an array of return data, in the order they were computed:
+
+```json
+{"jsonrpc": "2.0", "id": 2, "result": ["0x000000000000000000000000000000000000000000000000000000000000002a"]}
+```
 
 ## Rationale
-[A recent EIP](https://github.com/ethereum/EIPs/pull/658) originally proposed adding return values to transaction receipts.  However, return data is not charged for (as it is not presently stored on the blockchain), so adding it to transaction receipts could result in DoS and spam opportunities. Instead, a simple Boolean `status` field was added to transaction receipts.  This was included in the Byzantium hard fork.
+[EIP 658](https://github.com/ethereum/EIPs/pull/658) originally proposed adding return data to transaction receipts.  However, return data is not charged for (as it is not stored on the blockchain), so adding it to transaction receipts could result in DoS and spam opportunities.  Instead, a simple Boolean `status` field was added to transaction receipts.  This modified version of EIP 658 was included in the Byzantium hard fork.  While the `status` field is useful, applications often need the return data as well.
 
-The primary advantage of using a push notification is that no extra data needs to be stored on the blockchain.  One ramification of this design is that after-the-fact lookups of the return value are impossible.  However, this is consistent with how return values are normally used: they are only accessible to the caller when the function returns, and are not stored for later use.
+The primary advantage of using the strategy outlined here is efficiency: no extra data needs to be stored on the blockchain, and minimal extra computational load is imposed on nodes.  Since light clients have the current state, they can compute and send return data notifications without contacting a server.  Although after-the-fact lookups of the return value would not be supported, this is consistent with the conventional use of return data, which are only accessible to the caller when the function returns, and are not stored for later use.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
