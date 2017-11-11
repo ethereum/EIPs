@@ -20,7 +20,7 @@ External callers presently have no way of accessing return data from Ethereum, i
 
 ## Specification
 
-### Subscriptions
+### Subscription
 A caller who wants to be notified of return data for their transactions sends an `eth_subscribe` RPC request with the parameter `"returnData"`:
 
 ```json
@@ -74,10 +74,17 @@ When a transaction is submitted, the Ethereum node computes the return data and 
 {"jsonrpc": "2.0", "id": 2, "method": "eth_getFilterChanges", "params": ["0x1"]}
 ```
 
-The node responds with an array of return data, in the order they were computed:
+The node responds with an array of transaction hashes and their corresponding return data, in the order they were computed:
 
 ```json
-{"jsonrpc": "2.0", "id": 2, "result": ["0x000000000000000000000000000000000000000000000000000000000000002a"]}
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": [{
+    "transactionHash": "0x00000000000000000000000000000000000000000000000000000000deadbeef",
+    "returnData": "0x000000000000000000000000000000000000000000000000000000000000002a"
+  }]
+}
 ```
 
 ## Rationale
