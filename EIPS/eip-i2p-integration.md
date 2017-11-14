@@ -32,6 +32,12 @@ Some of the anonymity concerns addressed by I2P are covered by the Whisper proto
 ## Specification
 The specific implementation details will vary across Ethereum client software.
 
+Full I2P implementations:
+Java    - [i2p](https://github.com/i2p/i2p.i2p)
+C++     - [i2pd](https://github.com/PurpleI2P/i2pd)
+C++     - [kovri - Monero's i2pd fork](https://github.com/monero-project/kovri)
+Go      - [go-i2p](https://github.com/hkparker/go-i2p)
+
 Available SAM library implementations:
 C++     - [i2psam](https://github.com/i2p/i2psam)
 C       - [libsam3](https://github.com/i2p/libsam3)
