@@ -33,22 +33,25 @@ Some of the anonymity concerns addressed by I2P are covered by the Whisper proto
 The specific implementation details will vary across Ethereum client software.
 
 Full I2P implementations:
-Java    - [i2p](https://github.com/i2p/i2p.i2p)
-C++     - [i2pd](https://github.com/PurpleI2P/i2pd)
-C++     - [kovri - Monero's i2pd fork](https://github.com/monero-project/kovri)
-Go      - [go-i2p](https://github.com/hkparker/go-i2p)
+
+- Java    - [i2p](https://github.com/i2p/i2p.i2p)
+- C++     - [i2pd](https://github.com/PurpleI2P/i2pd)
+- C++     - [kovri - Monero's i2pd fork](https://github.com/monero-project/kovri)
+- Go      - [go-i2p](https://github.com/hkparker/go-i2p)
 
 Available SAM library implementations:
-C++     - [i2psam](https://github.com/i2p/i2psam)
-C       - [libsam3](https://github.com/i2p/libsam3)
-Rust    - [i2p-rs](https://github.com/i2p/i2p-rs)
-Go      - [sam3](https://bitbucket.org/kallevedin/sam3), [goSam](https://github.com/cryptix/goSam)
-Haskell - [network-anonymous-i2p](https://hackage.haskell.org/package/network-anonymous-i2p)
+
+- C++     - [i2psam](https://github.com/i2p/i2psam)
+- C       - [libsam3](https://github.com/i2p/libsam3)
+- Rust    - [i2p-rs](https://github.com/i2p/i2p-rs)
+- Go      - [sam3](https://bitbucket.org/kallevedin/sam3), [goSam](https://github.com/cryptix/goSam)
+- Haskell - [network-anonymous-i2p](https://hackage.haskell.org/package/network-anonymous-i2p)
+
 
 Available BOB library implementations:
-Go      - [ccondom](https://bitbucket.org/kallevedin/ccondom)
-Python  - [i2py-bob](http://git.repo.i2p.xyz/w/i2py-bob.git)
-Twisted - [txi2p](https://pypi.python.org/pypi/txi2p)
+- Go      - [ccondom](https://bitbucket.org/kallevedin/ccondom)
+- Python  - [i2py-bob](http://git.repo.i2p.xyz/w/i2py-bob.git)
+- Twisted - [txi2p](https://pypi.python.org/pypi/txi2p)
 
 SAM is a much more mature protocol API, though BOB has more advanced features. First implementations may follow SAM with eye toward future implementations using BOB.
 
