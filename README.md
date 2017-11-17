@@ -46,6 +46,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [606](EIPS/eip-606.md)                                  | Hardfork Meta: Homestead                                    | Alex Beregszaszi | Meta         | Final    |
 | [607](EIPS/eip-607.md)                                  | Hardfork Meta: Spurious Dragon                              | Alex Beregszaszi | Meta         | Final    |
 | [608](EIPS/eip-608.md)                                  | Hardfork Meta: Tangerine Whistle                            | Alex Beregszaszi | Meta         | Final    |
+| [609](EIPS/eip-609.md)                                  | Hardfork Meta: Byzantium                                    | Alex Beregszaszi | Meta         | Final  |
 | [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Final  |
 | [658](https://github.com/ethereum/EIPs/pull/658)        | Embedding transaction return data in receipts                                       | Nick Johnson          | Core        | Final  |
 | [706](EIPS/eip-706.md)                                  | DEVp2p snappy compression                                   | Péter Szilágyi     | Networking  | Final   |
