@@ -13,15 +13,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Accepted EIPs (planned for adoption in the Byzantium Metropolis hard fork)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------- | --------------------  | ------------| ----------|
-| [100](https://github.com/ethereum/EIPs/issues/100)      | Change difficulty adjustment to target mean block time including uncles             | Vitalik Buterin       | Core        | Accepted  |
-| [140](https://github.com/ethereum/EIPs/pull/206)        | REVERT instruction in the Ethereum Virtual Machine                                  | Beregszaszi, Mushegian| Core        | Accepted  |
-| [196](https://github.com/ethereum/EIPs/pull/213)        | Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128 | Reitwiessner | Core        | Accepted  |
-| [197](https://github.com/ethereum/EIPs/pull/212)        | Precompiled contracts for optimal Ate pairing check on the elliptic curve alt_bn128 | Buterin, Reitwiessner | Core        | Accepted  |
-| [198](https://github.com/ethereum/EIPs/pull/198)        | Precompiled contract for bigint modular exponentiation                              | Vitalik Buterin       | Core        | Accepted  |
-| [211](https://github.com/ethereum/EIPs/pull/211)        | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                      | Christian Reitwiessner| Core        | Accepted  |
-| [214](https://github.com/ethereum/EIPs/pull/214)        | New opcode STATICCALL                                                               | Buterin, Reitwiessner | Core        | Accepted  |
 | [649](https://github.com/ethereum/EIPs/pull/669)        | Metropolis Difficulty Bomb Delay and Issuance Reduction                             | Schoedon, Buterin     | Core        | Accepted  |
-| [658](https://github.com/ethereum/EIPs/pull/658)        | Embedding transaction return data in receipts                                       | Nick Johnson          | Core        | Accepted  |
 
 # Deferred EIPs (adoption postponed until the Constantinople Metropolis hard fork)
 | Number                                                  |Title                                                                                | Author                | Layer       | Status    |
@@ -53,3 +45,4 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [607](EIPS/eip-607.md)                                  | Hardfork Meta: Spurious Dragon                              | Alex Beregszaszi | Meta         | Final    |
 | [608](EIPS/eip-608.md)                                  | Hardfork Meta: Tangerine Whistle                            | Alex Beregszaszi | Meta         | Final    |
 | [706](EIPS/eip-706.md)                                  | DEVp2p snappy compression                                   | Péter Szilágyi     | Networking  | Final   |
+| [609](EIPS/eip-609.md)                                  | Hardfork Meta: Byzantium                                    | Alex Beregszaszi | Meta         | Final  |
