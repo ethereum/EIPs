@@ -174,19 +174,13 @@ The current EIP editors are
 
 ` * Casey Detrio (@cdetrio)`
 
-` * Fabian Vogelsteller (@frozeman)`
-
-` * Gavin Wood (@gavofyork)`
-
 ` * Hudson Jameson (@Souptacular)`
-
-` * Jeffrey Wilcke (@obscuren)`
 
 ` * Martin Becze (@wanderer)`
 
 ` * Nick Johnson (@arachnid)`
 
-` * Roman Mandeleil (@romanman)`
+` * Yoichi Hirai (@pirapira)`
 
 ` * Vitalik Buterin (@vbuterin)`
 
