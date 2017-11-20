@@ -1,11 +1,11 @@
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: Embedding transaction return data in receipts
+    EIP: 658
+    Title: Embedding transaction status code in receipts
     Author: Nick Johnson <nick@ethereum.org>
     Type: Standard Track
     Category Core
-    Status: Draft
+    Status: Final
     Created: 2017-06-30
     Requires: 140
     Replaces: 98
@@ -22,7 +22,7 @@ Full nodes can provide RPCs to get a transaction return status and value by repl
 Instead, we propose to replace the intermediate state root, already obsoleted by EIP98, with the return status (1 for success, 0 for failure). This both allows callers to determine success status, and remedies the previous omission of return data from the receipt.
 
 ## Specification
-For blocks where block.number >= METROPOLIS_FORK_BLKNUM, the intermediate state root is replaced by a status code, 0 indicating failure (due to any operation that can cause the transaction or top-level call to revert) and 1 indicating success.
+For blocks where block.number >= BYZANTIUM_FORK_BLKNUM, the intermediate state root is replaced by a status code, 0 indicating failure (due to any operation that can cause the transaction or top-level call to revert) and 1 indicating success.
 
 ## Rationale
 This constitutes a minimal possible change that permits fetching the success/failure state of transactions, preserving existing capabilities with minimum disruption or additional work for Metropolis.
