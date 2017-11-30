@@ -48,7 +48,7 @@ This input data:
     fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
     fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
     
-Would be parsed as a base of 0, exponent of `2**256 - 2**32 - 978` and modulus of `2**256 - 2**32 - 978`, and so would return 0. Notice how if the length_of_BASE is 0, then it does not interpret _any_ data as the base, instead immediately interpreting the next 32 bytes as length_of_EXPONENT.
+Would be parsed as a base of 0, exponent of `2**256 - 2**32 - 978` and modulus of `2**256 - 2**32 - 977`, and so would return 0. Notice how if the length_of_BASE is 0, then it does not interpret _any_ data as the base, instead immediately interpreting the next 32 bytes as EXPONENT.
 
 This input data:
 
