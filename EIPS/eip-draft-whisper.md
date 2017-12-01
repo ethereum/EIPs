@@ -135,21 +135,17 @@ This section describes optional description of Data Field to set up an example. 
 
 It is only relevant if you want to decrypt the incoming message, but any other format would be perfectly valid and must be forwarded to the peers.
 
-Data field contains encrypted message of the Envelope. In case of symmetric encryption, it also contains appended Salt (12 bytes). Plaintext (unencrypted) payload is formed as a concatenation of a single byte for flags, additional metadata (as stipulated by the flags) and the actual payload. The message has the following structure:
+Data field contains encrypted message of the Envelope. In case of symmetric encryption, it also contains appended Salt (12 bytes). Plaintext (unencrypted) payload is RLP-encoded array of three values: payload, padding and signature (in this sequence). 
 
-    flags: 1 byte
-    
-    optional padding: byte array of arbitrary size
-    
-    payload: byte array of arbitrary size
-    
-    optional signature: 65 bytes
+	payload: byte array of arbitrary size (may be zero)
 
-Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28. 
+	padding: byte array of arbitrary size (may be zero)
 
-The padding is introduced in order to align the message size, since message size alone might reveal important metainformation. The first several bytes of padding (up to four bytes) indicate the total size of padding (including these length bytes). E.g. if padding is less than 256 bytes, then one byte is enough; if padding is less than 65536 bytes, then 2 bytes; and so on.
+	signature: either 65 or zero bytes
 
-Flags byte uses only three bits in v.6. First two bits indicate, how many bytes indicate the padding size. The third byte indicates if signature is present. Other bits must be set to zero for backwards compatibility of future versions.
+Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28.
+
+The padding field was introduced in order to align the message size, since message size alone might reveal important metainformation. Padding can be arbitrary size. However, it is recommended that the size of entire Data Field (incuding the Salt) should be factor of 256 bytes, at least in default implementations.
 
 ### Payload Encryption
 
