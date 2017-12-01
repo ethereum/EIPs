@@ -3,7 +3,7 @@
       EIP: 6
       Title: Renaming SUICIDE opcode
       Author: Hudson Jameson <hudson@hudsonjameson.com>
-      Status: Draft
+      Status: Final
       Type: Standards Track
       Layer: Applications
       Created: 2015-11-22

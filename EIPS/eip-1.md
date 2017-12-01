@@ -5,10 +5,10 @@
       Author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
       Created: 2015-10-27, 2017-02-01
 
-What is a EIP?
+What is an EIP?
 --------------
 
-EIP stands for Ethereum Improvement Proposal. A EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
+EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
 EIP Rational
 ------------
@@ -28,7 +28,7 @@ There are three types of EIP:
     -   **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP59], [EIP6]) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
     -   **ERC** - application-level standards and conventions, including contract standards such as token standards ([ERC20]), name registries ([ERC26], [ERC137]), URI schemes ([ERC67]), library/package formats ([EIP82]), and wallet formats ([EIP75], [EIP85]).
 
--   An **Informational EIP** describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementors are free to ignore Informational EIPs or follow their advice.
+-   An **Informational EIP** describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
 -   A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
 
 EIP Work Flow
@@ -40,21 +40,21 @@ The EIP process begins with a new idea for Ethereum. It is highly recommended th
 
 Each EIP must have a champion - someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
 
-Vetting an idea publicly before going as far as writing a EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP. 
+Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP. 
 
-Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. This gives the author a chance to coninuously edit the draft EIP for proper formatting and quality. This also allows for further public comment and the author of the EIP to address concerns about the proposal.
+Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. This gives the author a chance to continuously edit the draft EIP for proper formatting and quality. This also allows for further public comment and the author of the EIP to address concerns about the proposal.
 
-If the EIP collaborators approves, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP), label it as Standards Track, Informational, or Meta, give it status “Draft”, and add it to the git repository. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
+If the EIP collaborators approve, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP), label it as Standards Track, Informational, or Meta, give it status “Draft”, and add it to the git repository. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
 
 Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
 
 For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-Once a EIP has been accepted, the implementations must be completed. When the implementation is complete and accepted by the community, the status will be changed to “Final”.
+Once an EIP has been accepted, the implementations must be completed. When the implementation is complete and accepted by the community, the status will be changed to “Final”.
 
-A EIP can also be assigned status “Deferred”. The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once a EIP is deferred, the EIP editor can re-assign it to draft status.
+An EIP can also be assigned status “Deferred”. The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once an EIP is deferred, the EIP editor can re-assign it to draft status.
 
-A EIP can also be “Rejected”. Perhaps after all is said and done it was not a good idea. It is still important to have a record of this fact.
+An EIP can also be “Rejected”. Perhaps after all is said and done it was not a good idea. It is still important to have a record of this fact.
 
 EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
@@ -145,7 +145,7 @@ if the email address is not given.
 
 Note: The Resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While a EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the EIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
+While an EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the EIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
 
 The Type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
@@ -153,7 +153,7 @@ The Created header records the date that the EIP was assigned a number. Both hea
 
 EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
 
-EIPs may also have a Superseded-By header indicating that a EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
+EIPs may also have a Superseded-By header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
 
 Auxiliary Files
 ---------------
@@ -163,9 +163,9 @@ EIPs may include auxiliary files such as diagrams. Such files must be named EIP-
 Transferring EIP Ownership
 --------------------------
 
-It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around a EIP, but if that's not possible, you can always submit a competing EIP.
+It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around an EIP, but if that's not possible, you can always submit a competing EIP.
 
-If you are interested in assuming ownership of a EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :).
+If you are interested in assuming ownership of an EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :).
 
 EIP Editors
 -----------
@@ -174,19 +174,13 @@ The current EIP editors are
 
 ` * Casey Detrio (@cdetrio)`
 
-` * Fabian Vogelsteller (@frozeman)`
-
-` * Gavin Wood (@gavofyork)`
-
 ` * Hudson Jameson (@Souptacular)`
-
-` * Jeffrey Wilcke (@obscuren)`
 
 ` * Martin Becze (@wanderer)`
 
 ` * Nick Johnson (@arachnid)`
 
-` * Roman Mandeleil (@romanman)`
+` * Yoichi Hirai (@pirapira)`
 
 ` * Vitalik Buterin (@vbuterin)`
 
@@ -203,7 +197,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
--   Assign a EIP number (generally the PR number or, if preferred by the author, the Issue # if ther was discussion in the Issues section of this repository about this EIP)
+-   Assign an EIP number (generally the PR number or, if preferred by the author, the Issue # if there was discussion in the Issues section of this repository about this EIP)
 
 <!-- -->
 
@@ -237,7 +231,7 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [devp2p]: https://github.com/ethereum/wiki/wiki/%C3%90%CE%9EVp2p-Wire-Protocol
   [EIP8]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8.md
   [Light Ethereum Subprotocol]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
-  [whisper]: https://gist.github.com/gluk256/4654922ca45eb9d0846d941d7ca326f4
+  [whisper]: https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview
   [swarm]: https://github.com/ethereum/go-ethereum/pull/2959
   [API/RPC]: https://github.com/ethereum/wiki/wiki/JSON-RPC
   [EIP59]: https://github.com/ethereum/EIPs/issues/59
