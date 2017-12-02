@@ -254,3 +254,8 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [README.md]: README.md "wikilink"
   [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
   [Python's PEP-0001]: https://www.python.org/dev/peps/
+
+Copyright
+---------
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
