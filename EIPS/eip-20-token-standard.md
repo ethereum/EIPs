@@ -98,7 +98,7 @@ The function SHOULD `throw` if the `_from` account balance does not have enough 
 
 A token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
 
-*Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
+*Note* Transfers of 0 values and transfers whose source and destination addreses are the same MUST be treated as normal transfers and SHOULD fire the `Transfer` event.
 
 ``` js
 function transfer(address _to, uint256 _value) returns (bool success)
@@ -114,7 +114,7 @@ The `transferFrom` method is used for a withdraw workflow, allowing contracts to
 This can be used for example to allow a contract to transfer tokens on your behalf and/or to charge fees in sub-currencies.
 The function SHOULD `throw` unless the `_from` account has deliberately authorized the sender of the message via some mechanism.
 
-*Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
+*Note* Transfers of 0 values and transfers whose source and destination addreses are the same MUST be treated as normal transfers and SHOULD fire the `Transfer` event.
 
 ``` js
 function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
@@ -150,7 +150,7 @@ function allowance(address _owner, address _spender) constant returns (uint256 r
 
 #### Transfer
 
-MUST trigger when tokens are transferred, including zero value transfers.
+MUST trigger when tokens are transferred and SHOULD trigger on zero value transfers and transfers whose source and destination addresses are the same.
 
 ``` js
 event Transfer(address indexed _from, address indexed _to, uint256 _value)
