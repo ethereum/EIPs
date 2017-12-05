@@ -102,5 +102,8 @@ The DAO + draining transaction = throw.
 
 ## Implementations
 
-I can start working on ethereumjs-vm patch, if this EIP is approved.
+...
 
+## Copyright
+
+Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.
