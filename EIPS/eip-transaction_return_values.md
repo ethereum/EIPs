@@ -1,11 +1,11 @@
 ## Preamble
 
-    EIP: <to be assigned>
+    EIP: 758
     Title: Subscriptions and filters for transaction return data
     Author: Jack Peterson <jack@tinybike.net>
     Type: Standard Track
     Category: Interface
-    Status: Draft
+    Status: Accepted
     Created: 2017-11-09
 
 
