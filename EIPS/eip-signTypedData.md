@@ -17,11 +17,11 @@ Standard for machine-verifiable and human-readable typed data signing with Ether
 
 ## Abstract
 
-Ethereum clients provide the ability to sign UTF-8 strings with the `eth_sign` RPC call. This call however, doesn't give Signer UI's enough metadata to display the actual intent of the DApp when the data being signed is not a string. Over time, we expect value to be transferred on Ethereum using protocols that involve off-chain components (e.g state channels). These protocols are going to involve signing complex data structures with Ethereum keys, making a human-readable, machine-verifiable signing flow critical to user security.
+Ethereum clients provide the ability to sign UTF-8 strings with the `eth_sign` RPC call. This call, however, doesn't give Signer UI's enough metadata to display the actual intent of the DApp when the data being signed is not a string. Over time, we expect value to be transferred on Ethereum using protocols that involve off-chain components (e.g. state channels). These protocols are going to involve signing complex data structures with Ethereum keys, making a human-readable, machine-verifiable signing flow critical to user security.
 
 This EIP adds an RPC method to sign arrays of arbitrary typed data, making it easy for the Signer UI to display this data to the user in a human-readable form, so that the user can be 100% confident of exactly what they are signing, while keeping the resulting signatures machine-verifiable. In addition, there is no room for a malicious DApp to provide the signer with alternative data then that being presented to the user, since the signer hashes the typedData before the user signs it.
 
-This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor). It should not be implemented in clients where approval is already granted (e.g Geth with unlocked accounts).
+This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor). It should not be implemented in clients where approval is already granted (e.g. Geth with unlocked accounts).
 
 <img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
@@ -45,7 +45,7 @@ The current `eth_sign` implementation allows signing of arbitrary data without s
 
 Calling `eth_sign` on Metamask displays the string to sign. If the user is signing the result of hashing a complex structure involving multiple critical pieces of information, the only way to verify what they are signing is to re-hash the same structure in an independent script and make sure the hashes match.
 
-Calling `personal_sign` on Metamask with the raw bytes of a hash (e.g not an ASCII string) shows the user this even less verifiable message that they should sign.
+Calling `personal_sign` on Metamask with the raw bytes of a hash (e.g. not an ASCII string) shows the user this even less verifiable message that they should sign.
 
 <img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/personal_sign.png"  width="500px">
 
@@ -246,7 +246,7 @@ const signature = '0x442d2a668ea3e79b7f8084a8ddaaca82b80eba509a08e2fb0a116733053
 
 ## Implementation
 
-It is imlemented as an experimental feature in Metamask 3.11.0+.
+It is implemented as an experimental feature in Metamask 3.11.0+.
 It's not part of web3.js yet, so you can try using it like:
 ```javascript
 const data = {
