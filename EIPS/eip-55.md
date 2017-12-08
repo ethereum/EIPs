@@ -52,7 +52,7 @@ In javascript:
 const createKeccakHash = require('keccak')
 
 function toChecksumAddress (address) {
-  address = address.toLowerCase().replace('0x','');
+  address = address.toLowerCase().replace('0x', '')
   var hash = createKeccakHash('keccak256').update(address).digest('hex')
   var ret = '0x'
 
