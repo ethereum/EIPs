@@ -103,6 +103,10 @@ Each EIP should have the following parts:
 
 -   Implementations - The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
 
+<!-- -->
+
+-   Copyright Waiver - All EIPs must be in public domain. See the bottom of this EIP for an example copyright waiver.
+
 EIP Formats and Templates
 -------------------------
 
@@ -174,19 +178,13 @@ The current EIP editors are
 
 ` * Casey Detrio (@cdetrio)`
 
-` * Fabian Vogelsteller (@frozeman)`
-
-` * Gavin Wood (@gavofyork)`
-
 ` * Hudson Jameson (@Souptacular)`
-
-` * Jeffrey Wilcke (@obscuren)`
 
 ` * Martin Becze (@wanderer)`
 
 ` * Nick Johnson (@arachnid)`
 
-` * Roman Mandeleil (@romanman)`
+` * Yoichi Hirai (@pirapira)`
 
 ` * Vitalik Buterin (@vbuterin)`
 
@@ -237,7 +235,7 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [devp2p]: https://github.com/ethereum/wiki/wiki/%C3%90%CE%9EVp2p-Wire-Protocol
   [EIP8]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8.md
   [Light Ethereum Subprotocol]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
-  [whisper]: https://gist.github.com/gluk256/4654922ca45eb9d0846d941d7ca326f4
+  [whisper]: https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview
   [swarm]: https://github.com/ethereum/go-ethereum/pull/2959
   [API/RPC]: https://github.com/ethereum/wiki/wiki/JSON-RPC
   [EIP59]: https://github.com/ethereum/EIPs/issues/59
@@ -260,3 +258,8 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [README.md]: README.md "wikilink"
   [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
   [Python's PEP-0001]: https://www.python.org/dev/peps/
+
+Copyright
+---------
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
