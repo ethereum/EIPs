@@ -2,7 +2,7 @@
 
     EIP: 801
     Title: ERC-801 Canary Standard
-    Author: ligi<ligi@ligi.de>
+    Author: ligi <ligi@ligi.de>
     Type: Standard
     Category: ERC
     Status: Draft
@@ -29,89 +29,46 @@ A standard interface allows other applications to easily interface with canaries
 
 #### isAlive()
 
-Returns if the canary was feed properly to signal e.g. that no warrant was received.
+Returns if the canary was fed properly to signal e.g. that no warrant was received.
 
 ``` js
 function isAlive() constant returns (bool alive)
 ```
 
-#### timeToLive()
+#### getBlockOfDeath()
 
-The time in seconds that can elapse between feed() calls without starving the canary dead.
+Returns the block the canary died.
+Throws if the canary is alive.
 
 ``` js
-function timeToLive() constant returns (uint256 ttl)
+function getBlockOfDeath() constant returns (uint256 block)
 ```
 
-#### feed()
+#### getType()
 
-Extend the life of the canary by timeToLive() seconds.
+Returns the type of the canary:
 
-**NOTE**: this should trigger the event listed below
+* `1` = Simple (just the pure interface as defined in this ERC)
+* `2` = Single feeder (as defined in ERC-TBD)
+* `3` = Single feeder with bad food (as defined in ERC-TBD)
+* `4` = Multiple feeders (as defined in ERC-TBD)
+* `5` = Multiple mandatory feeders (as defined in ERC-TBD)
+* `6` = IOT (as defined in ERC-TBD)
 
-``` js
-function feed()
-```
-
-#### poison()
-
-Kills the canary instantly. E.g. in a urgent case when a warrant was received.
-
-``` js
-function poison()
-```
-
-#### (optional) addFeeder(address feeder)
-
-Add address that is allowed to feed (and therefore also poison) the canary.
+`1` might also be used for a special purpose contract that does not need a special type but still want to expose the functions and provide events as defined in this ERC.
 
 ``` js
-function addFeeder(address feeder)
-```
-
-#### (optional) removeFeeder(address feeder)
-
-Remove address that is allowed to feed the canary.
-
-``` js
-function removeFeeder(address feeder)
-```
-
-#### (optional) getFeederCount()
-
-Returns the count of addresses that are allowed to feed the canary.
-
-``` js
-function getFeederCount() constant returns (int count)
-```
-
-#### (optional) getFeederByIndex(unit8 index)
-
-Returns the address of the feeder at the given index.
-
-``` js
-function getFeederByIndex(unit8 index) constant returns (address feederAddress)
-```
-
-#### (optional) needsAllFeeders()
-
-When true: all feeders need to call feed() in the intervals defined by timeToLive() - analog to a multisig.
-When false: all the feeders can extend the lifespan of the canary.
-
-This does not affect poisoning - one feeder is always enough to kill the canary.
-
-``` js
-function needsAllFeeders() constant returns (bool needsAllFeeders)
+function getType() constant returns (uint8 type)
 ```
 
 ### Events
 
-#### Feed
+#### RIP
 
-MUST trigger when the canary got food.
+MUST trigger when the canary died.
 
 ``` js
-event Feed(address feeder)
+event RIP()
 ```
 
 ## Implementation
