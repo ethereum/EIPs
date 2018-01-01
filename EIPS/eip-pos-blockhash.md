@@ -12,7 +12,10 @@
 
 
 ## Simple Summary
-In PoS, each block's `blockhash` changes from being an economically staked random number to being a value determined by a particular, validator with only computational constraints (eg: not `0x0`). Thus, the assumptions of when and how to use `blockhash` will change from PoW to PoS. What was _tolerable_ or _benign_ before, is now potentially _catastrophic_.
+In PoS, each block's `blockhash` changes from being an economically staked random number to being a value determined by a particular validator with only computational constraints (eg: not `0x0`). Thus, the assumptions of when and how to use `blockhash` will change from PoW to PoS. What was _tolerable_ or _benign_ before, is now potentially _catastrophic_.
+
+In short, there is a signficant difference between `Miners can manipulate the blockhash if there is a financial gain to be made.` and `Miners can manipulate the blockhash.`
+
 
 To preserve compatibility and expectations of `blockhash` from PoW to PoS, this EIP advises replacing PoS's `blockhash` with a similarly economically staked value; or, at the very least, exposing a new value named `block.entropyhash`.
 
