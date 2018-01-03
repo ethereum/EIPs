@@ -1,6 +1,6 @@
     EIP: 1
       Title: EIP Purpose and Guidelines
-      Status: Draft
+      Status: Active
       Type: Meta
       Author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
       Created: 2015-10-27, 2017-02-01
