@@ -51,7 +51,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | Codename                              | Aliases                     | Block number   | Date (UTC) |
 |-------------------------------------- |---------------------------- |----------------|------------|
 | [Homestead](EIPS/eip-606.md)          |                             | 1,150,000      | 2016-03-14 |
-| DAO Fork                              |                             | 1,920,000      | 2016-07-20 |
+| [DAO Fork](EIPS/eip-779.md)           |                             | 1,920,000      | 2016-07-20 |
 | [Tangerine Whistle](EIPS/eip-608.md)  | Anti-DoS, EIP 150           | 2,463,000      | 2016-10-18 |
 | [Spurious Dragon](EIPS/eip-607.md)    | State-clearing, EIP 158/161 | 2,675,000      | 2016-11-22 |
 | [Byzantium](EIPS/eip-609.md)          | Metropolis: Part 1          | 4,730,000      | 2017-10-16 |
