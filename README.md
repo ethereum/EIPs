@@ -43,10 +43,15 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [198](https://github.com/ethereum/EIPs/pull/198)   | Precompiled contract for bigint modular exponentiation                                       | Vitalik Buterin                            | Core       | Final    |
 | [211](https://github.com/ethereum/EIPs/pull/211)   | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                               | Christian Reitwiessner                     | Core       | Final    |
 | [214](https://github.com/ethereum/EIPs/pull/214)   | New opcode STATICCALL                                                                        | Vitalik Buterin, Christian Reitwiessner    | Core       | Final    |
-| [606](EIPS/eip-606.md)                             | Hardfork Meta: Homestead                                                                     | Alex Beregszaszi                           | Meta       | Final    |
-| [607](EIPS/eip-607.md)                             | Hardfork Meta: Spurious Dragon                                                               | Alex Beregszaszi                           | Meta       | Final    |
-| [608](EIPS/eip-608.md)                             | Hardfork Meta: Tangerine Whistle                                                             | Alex Beregszaszi                           | Meta       | Final    |
-| [609](EIPS/eip-609.md)                             | Hardfork Meta: Byzantium                                                                     | Alex Beregszaszi                           | Meta       | Final    |
 | [649](https://github.com/ethereum/EIPs/pull/669)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                  | Afri Schoedon, Vitalik Buterin             | Core       | Final    |
 | [658](https://github.com/ethereum/EIPs/pull/658)   | Embedding transaction return data in receipts                                                | Nick Johnson                               | Core       | Final    |
 | [706](EIPS/eip-706.md)                             | DEVp2p snappy compression                                                                    | Péter Szilágyi                             | Networking | Final    |
+
+# Past Hard Forks
+| Codename                              | Aliases                     | Block number   | Date (UTC) |
+|-------------------------------------- |---------------------------- |----------------|------------|
+| [Homestead](EIPS/eip-606.md)          |                             | 1,150,000      | 2016-03-14 |
+| [DAO Fork](EIPS/eip-779.md)           |                             | 1,920,000      | 2016-07-20 |
+| [Tangerine Whistle](EIPS/eip-608.md)  | Anti-DoS, EIP 150           | 2,463,000      | 2016-10-18 |
+| [Spurious Dragon](EIPS/eip-607.md)    | State-clearing, EIP 158/161 | 2,675,000      | 2016-11-22 |
+| [Byzantium](EIPS/eip-609.md)          | Metropolis: Part 1          | 4,730,000      | 2017-10-16 |
