@@ -10,7 +10,21 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 * **Final** - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).
 * **Deferred** - an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.
 
-# Deferred EIPs (adoption postponed until the Constantinople Metropolis hard fork)
+# Non-final EIPs
+| Number                    | Title                                                   | Author                        | Layer     | Status     |
+| ------------------------- | ------------------------------------------------------- | ----------------------------- | --------- | ---------- |
+| [3](EIPS/eip-3.mediawiki) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
+| [4](EIPS/eip-4.mediawiki) |  EIP Classification                                     | Eric Lombrozo                 | Meta      | Draft      |
+| [5](EIPS/eip-5.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
+| [101](EIPS/eip-101.md)    |  Serenity Currency and Crypto Abstraction               | Vitalik Buterin               |           | Active     |
+| [158](EIPS/eip-158.md)    |  State clearing                                         | Vitalik Buterin               | Core      | Superseded |
+| [234](EIPS/eip-234.md)    |  Add `blockHash` to JSON-RPC filter options             | Micah Zoltu                   | Interface | Draft      |
+| [615](EIPS/eip-615.md)    |  Subroutines and Static Jumps for the EVM               | Greg Colvin                   | Core      | Draft      |
+| [616](EIPS/eip-EIPS/eip-616.md)    |  SIMD Operations for the EVM                            | Greg Colvin                   | Core      | Draft      |
+| [758](EIPS/eip-758.md)    |  Subscriptions and filters for transaction return data  | Jack Peterson                 | Interface | Draft      |
+| [801](EIPS/eip-801.md)    |  ERC-801 Canary Standard                                | ligi                          | Interface | Draft      |
+
+# Deferred EIPs
 | Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------ | ---------- | -------- |
 | [86](https://github.com/ethereum/EIPs/pull/208)    | Abstraction of transaction origin and signature                                              | Vitalik Buterin                            | Core       | Deferred |
@@ -25,7 +39,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [7](EIPS/eip-7.md)                                 | DELEGATECALL                                                                                 | Vitalik Buterin                            | Core       | Final    |
 | [8](EIPS/eip-8.md)                                 | devp2p Forward Compatibility Requirements for Homestead                                      | Felix Lange                                | Networking | Final    |
 | [20](EIPS/eip-20-token-standard.md)                | ERC-20 Token Standard                                                                        | Fabian Vogelsteller, Vitalik Buterin       | ERC        | Final    |
-| [55](EIPS/eip-55.md)                               | ERC-55 Mixed-case checksum address encoding                                                  | Vitalik Buterin                            | ERC       | Final    |
+| [55](EIPS/eip-55.md)                               | ERC-55 Mixed-case checksum address encoding                                                  | Vitalik Buterin                            | ERC        | Final    |
 | [100](https://github.com/ethereum/EIPs/issues/100) | Change difficulty adjustment to target mean block time including uncles                      | Vitalik Buterin                            | Core       | Final    |
 | [137](EIPS/eip-137.md)                             | Ethereum Domain Name Service - Specification                                                 | Nick Johnson                               | ERC        | Final    |
 | [140](https://github.com/ethereum/EIPs/pull/206)   | REVERT instruction in the Ethereum Virtual Machine                                           | Alex Beregszaszi, Nikolai Mushegian        | Core       | Final    |
