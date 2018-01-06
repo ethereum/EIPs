@@ -26,7 +26,7 @@ def checksum_encode(addr): # Takes a 20-byte binary address as input
     return '0x'+o
 
 def test(addrstr):
-    assert(addrstr == checksum_encode2(bytes.fromhex(addrstr[2:])))
+    assert(addrstr == checksum_encode(bytes.fromhex(addrstr[2:])))
 
 test('0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed')
 test('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359')
@@ -37,6 +37,13 @@ test('0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb')
 
 In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the lowercase hexadecimal address is 1 otherwise print it in lowercase.
 
+# Rationale
+
+Benefits:
+- Backwards compatible with many hex parsers that accept mixed case, allowing it to be easily introduced over time
+- Keeps the length at 40 characters
+- On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
+
 # Implementation
 
 In javascript:
@@ -45,7 +52,7 @@ In javascript:
 const createKeccakHash = require('keccak')
 
 function toChecksumAddress (address) {
-  address = address.toLowerCase().replace('0x','');
+  address = address.toLowerCase().replace('0x', '')
   var hash = createKeccakHash('keccak256').update(address).digest('hex')
   var ret = '0x'
 
@@ -72,12 +79,21 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
     var hash = createKeccakHash('keccak256').update(Buffer.from(address.toLowerCase(), 'ascii')).digest()
 ```
 
-# Rationale
+# Test Cases
 
-Benefits:
-- Backwards compatible with many hex parsers that accept mixed case, allowing it to be easily introduced over time
-- Keeps the length at 40 characters
-- On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
+```
+# All caps
+0x52908400098527886E0F7030069857D2E4169EE7
+0x8617E340B3D01FA5F11F306F4090FD50E238070D
+# All Lower
+0xde709f2102306220921060314715629080e2fb77
+0x27b1fdb04752bbc536007a920d24acb045561c26
+# Normal
+0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed
+0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359
+0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB
+0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb
+```
 
 # Adoption
 
