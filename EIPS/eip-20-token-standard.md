@@ -42,7 +42,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() constant returns (string)
+function name() public view returns (string)
 ```
 
 
@@ -54,7 +54,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function symbol() constant returns (string)
+function symbol() public view returns (string)
 ```
 
 
@@ -67,7 +67,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function decimals() constant returns (uint8)
+function decimals() public view returns (uint8)
 ```
 
 
@@ -76,7 +76,7 @@ function decimals() constant returns (uint8)
 Returns the total token supply.
 
 ``` js
-function totalSupply() constant returns (uint256)
+function totalSupply() public view returns (uint256)
 ```
 
 
@@ -86,7 +86,7 @@ function totalSupply() constant returns (uint256)
 Returns the account balance of another account with address `_owner`.
 
 ``` js
-function balanceOf(address _owner) constant returns (uint256 balance)
+function balanceOf(address _owner) public view returns (uint256 balance)
 ```
 
 
@@ -101,7 +101,7 @@ A token contract which creates new tokens SHOULD trigger a Transfer event with t
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
-function transfer(address _to, uint256 _value) returns (bool success)
+function transfer(address _to, uint256 _value) public returns (bool success)
 ```
 
 
@@ -117,7 +117,7 @@ The function SHOULD `throw` unless the `_from` account has deliberately authoriz
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
-function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
+function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
 ```
 
 
@@ -131,7 +131,7 @@ clients SHOULD make sure to create user interfaces in such a way that they set t
 THOUGH The contract itself shouldn't enforce it, to allow backwards compatilibilty with contracts deployed before
 
 ``` js
-function approve(address _spender, uint256 _value) returns (bool success)
+function approve(address _spender, uint256 _value) public returns (bool success)
 ```
 
 
@@ -140,7 +140,7 @@ function approve(address _spender, uint256 _value) returns (bool success)
 Returns the amount which `_spender` is still allowed to withdraw from `_owner`.
 
 ``` js
-function allowance(address _owner, address _spender) constant returns (uint256 remaining)
+function allowance(address _owner, address _spender) public view returns (uint256 remaining)
 ```
 
 
@@ -174,11 +174,11 @@ There are already plenty of ERC20-compliant tokens deployed on the Ethereum netw
 Different implementations have been written by various teams that have different trade-offs: from gas saving to improved security.
 
 #### Example implementations are available at
-- https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/StandardToken.sol
-- https://github.com/ConsenSys/Tokens/blob/master/contracts/StandardToken.sol
+- https://github.com/OpenZeppelin/zeppelin-solidity/blob/6af6efc19829a95683cc1aca3cbdf8908a8eea0d/contracts/examples/SimpleToken.sol
+- https://github.com/ConsenSys/Tokens/blob/0357814acf6b50cadb6586d1984ca964c32456cd/contracts/eip20/EIP20.sol
 
 #### Implementation of adding the force to 0 before calling "approve" again:
-- https://github.com/Giveth/minime/blob/master/contracts/MiniMeToken.sol
+- https://github.com/Giveth/minime/blob/ea04d950eea153a04c51fa510b068b9dded390cb/contracts/MiniMeToken.sol
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
