@@ -184,6 +184,20 @@ This event logs any new exchange that have taken place and have been spent immed
 ``` js
 event ExchangeAndSpent ( address _from, address _by, uint _value ,address _target ,address _to)
 ```
+
+### Diagramatic Explaination
+
+#### Exchanging Tokens
+![token-exchange-standard-visual-representation-1](https://raw.githubusercontent.com/kashishkhullar/EIPs/master/EIPS/token-exchange-standard-visual-representation-1.PNG)
+
+NOTE: After the successful exchange the contract on right owns some tokens of the contract on the left.
+
+#### Exchanging And Spending Tokens
+
+![token-exchange-standard-visual-representation-2](https://raw.githubusercontent.com/kashishkhullar/EIPs/master/EIPS/token-exchange-standard-visual-representation-2.PNG)
+
+NOTE: After the successful exchange the contract on right owns some tokens of the contract on the left.
+
 ## Rationale
 
 Such a design provides a consistent exchange standard 
@@ -198,3 +212,4 @@ This proposal is fully backward compatible. Tokens extended by this proposal sho
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
