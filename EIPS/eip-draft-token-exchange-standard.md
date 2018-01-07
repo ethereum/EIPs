@@ -56,12 +56,12 @@ function exchangeAndSpend(address _targetContract, uint _amount,address _to) pub
 ```
 
 ##### __exchangerCallback
-This function is called by the exchange service contract to our token contract to deduct calculated amount from our balance. It takes the address of the person who exchanged the tokens and amount to be deducted from exchangers account as parameters and returns boolean `success`.
+This function is called by the exchange service contract to our token contract to deduct calculated amount from our balance. It takes the address of the targert contract , the address of the person who exchanged the tokens and amount to be deducted from exchangers account as parameters and returns boolean `success`.
 
 NOTE: It is required that only the exchange service contract has the authority to call this function.
 
 ``` js
-function __exchangerCallback(address _exchanger, uint _amount) public returns(bool success)
+function __exchangerCallback(address _targetContract,address _exchanger, uint _amount) public returns(bool success)
 ```
 
 #### Events
