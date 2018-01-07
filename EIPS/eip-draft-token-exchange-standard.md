@@ -152,7 +152,7 @@ NOTE: Before any exchange it must be ensured that the token is registered.
 function registerToken(address _token) public returns(bool success)
 ```
 
-###### exchangeToken
+##### exchangeToken
 
 This function is called by the token holder who wants to exchange his token with the `_targetContract` tokens. This function queries the exchange rate, calculates the converted amount, calls `__exchangerCallback` and calls the `__targetExchangeCallback`. It takes address of the target contract and amount to exchange as parameter and returns boolean `success` and amount credited.
 
