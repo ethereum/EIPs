@@ -51,18 +51,19 @@ The following message codes are optional, but they are reserved for specific pur
 
 **Status** [`0`]
 
-This packet contains two objects: integer (0x00). Might be followed by some arbitrary data in future versions, which should be gracefully ignored for future compatibility.
-This message should be send after the initial handshake and prior to any other messages.
+This packet contains two objects: integer message code (0x00) followed by a list of values: integer version, float PoW requirement, and bloom filter, in this order. The bloom filter paramenter is optional; if it is missing or nil, the node is considered to be full node (i.e. accepts all messages). The format of PoW and bloom filter please see below (message codes 2 and 3).
+
+Status message should be send after the initial handshake and prior to any other messages.
 
 **Messages** [`1`, `whisper_envelopes`]
 
-This packet contains two objects: integer (0x01) followed by a list (possibly empty) of Whisper Envelopes.
+This packet contains two objects: integer message code (0x01) followed by a list (possibly empty) of Whisper Envelopes.
 
 This packet is used for sending the standard Whisper envelopes.
 
 **PoW Requirement** [`2`, `PoW`]
 
-This packet contains two objects: integer (0x02) followed by a single floating point (32 bits) value of PoW. Values of qNAN, sNAN, INF and -INF are not allowed. 
+This packet contains two objects: integer message code (0x02) followed by a single floating point value of PoW. This value is the IEEE 754 binary representation of 64-bit floating point number. Values of qNAN, sNAN, INF and -INF are not allowed. Negative values are also not allowed.
 
 This packet is used by Whisper nodes for dynamic adjustment of their individual PoW requirements. Receipient of this message should no longer deliver the sender messages with PoW lower than specified in this message.
 
@@ -80,7 +81,7 @@ where size is the size of the full RLP-encoded envelope.
 
 **Bloom Filter** [`3`, `bytes`]
 
-This packet contains two objects: integer (0x03) followed by a byte array of arbitrary size.
+This packet contains two objects: integer message code (0x03) followed by a byte array of arbitrary size.
 
 This packet is used by Whisper nodes for sharing their interest in messages with specific topics.
 
@@ -102,13 +103,13 @@ OPTIONAL
 
 **P2P Request** [`126`, `whisper_envelope`]
 
-This packet contains two objects: integer (0x7E) followed by a single Whisper Envelope.
+This packet contains two objects: integer message code (0x7E) followed by a single Whisper Envelope.
 
 This packet is used for sending Dapp-level peer-to-peer requests, e.g. Whisper Mail Client requesting old messages from the Whisper Mail Server.
 
 **P2P Message** [`127`, `whisper_envelope`]
 
-This packet contains two objects: integer (0x7F) followed by a single Whisper Envelope.
+This packet contains two objects: integer message code (0x7F) followed by a single Whisper Envelope.
 
 This packet is used for sending the peer-to-peer messages, which are not supposed to be forwarded any further. E.g. it might be used by the Whisper Mail Server for delivery of old (expired) messages, which is otherwise not allowed.
 
