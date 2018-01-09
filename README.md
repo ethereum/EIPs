@@ -43,7 +43,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [55](EIPS/eip-55.md)                               | ERC-55 Mixed-case checksum address encoding                                                  | Vitalik Buterin                            | ERC        | Final    |
 | [100](https://github.com/ethereum/EIPs/issues/100) | Change difficulty adjustment to target mean block time including uncles                      | Vitalik Buterin                            | Core       | Final    |
 | [137](EIPS/eip-137.md)                             | Ethereum Domain Name Service - Specification                                                 | Nick Johnson                               | ERC        | Final    |
-| [140](https://github.com/ethereum/EIPs/pull/206)   | REVERT instruction in the Ethereum Virtual Machine                                           | Alex Beregszaszi, Nikolai Mushegian        | Core       | Final    |
+| [140](https://github.com/ethereum/EIPs/pull/206)   | REVERT instruction                                                                           | Alex Beregszaszi, Nikolai Mushegian        | Core       | Final    |
 | [141](EIPS/eip-141.md)                             | Designated invalid EVM instruction                                                           | Alex Beregszaszi                           | Core       | Final    |
 | [150](EIPS/eip-150.md)                             | Gas cost changes for IO-heavy operations                                                     | Vitalik Buterin                            | Core       | Final    |
 | [155](EIPS/eip-155.md)                             | Simple replay attack protection                                                              | Vitalik Buterin                            | Core       | Final    |
@@ -59,7 +59,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [211](https://github.com/ethereum/EIPs/pull/211)   | New opcodes: RETURNDATASIZE and RETURNDATACOPY                                               | Christian Reitwiessner                     | Core       | Final    |
 | [214](https://github.com/ethereum/EIPs/pull/214)   | New opcode STATICCALL                                                                        | Vitalik Buterin, Christian Reitwiessner    | Core       | Final    |
 | [649](https://github.com/ethereum/EIPs/pull/669)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                  | Afri Schoedon, Vitalik Buterin             | Core       | Final    |
-| [658](https://github.com/ethereum/EIPs/pull/658)   | Embedding transaction return data in receipts                                                | Nick Johnson                               | Core       | Final    |
+| [658](https://github.com/ethereum/EIPs/pull/658)   | Embedding transaction status code in receipts                                                | Nick Johnson                               | Core       | Final    |
 | [706](EIPS/eip-706.md)                             | DEVp2p snappy compression                                                                    | Péter Szilágyi                             | Networking | Final    |
 
 # Past Hard Forks
