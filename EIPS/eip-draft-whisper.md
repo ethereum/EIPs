@@ -134,19 +134,23 @@ Envelopes are RLP-encoded structures of the following format:
 
 This section describes optional description of Data Field to set up an example. Later it may be moved to a separate EIP.
 
-It is only relevant if you want to decrypt the incoming message, but any other format would be perfectly valid and must be forwarded to the peers.
+It is only relevant if you want to decrypt the incoming message, but if you only want to send a message, any other format would be perfectly valid and must be forwarded to the peers.
 
-Data field contains encrypted message of the Envelope. In case of symmetric encryption, it also contains appended Salt (12 bytes). Plaintext (unencrypted) payload is RLP-encoded array of three values: payload, padding and signature (in this sequence). 
+Data field contains encrypted message of the Envelope. In case of symmetric encryption, it also contains appended Salt (a.k.a. AES Nonce, 12 bytes). Plaintext (unencrypted) payload consists of the following concatenated fields: flags, auxiliary field, payload, padding and signature (in this sequence).
 
-	payload: byte array of arbitrary size (may be zero)
+	flags: 1 byte; first two bits contain the size of auxiliary field, third bit indicates whether the signature is present.
+	
+	auxiliary field: up to 4 bytes; contains the size of payload.
 
-	padding: byte array of arbitrary size (may be zero)
+	payload: byte array of arbitrary size (may be zero).
 
-	signature: either 65 or zero bytes
+	padding: byte array of arbitrary size (may be zero).
+
+	signature: 65 bytes, if present.
 
 Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28.
 
-The padding field was introduced in order to align the message size, since message size alone might reveal important metainformation. Padding can be arbitrary size. However, it is recommended that the size of entire Data Field (incuding the Salt) should be factor of 256 bytes, at least in default implementations.
+The padding field was introduced in order to align the message size, since message size alone might reveal important metainformation. Padding can be arbitrary size. However, it is recommended that the size of Data Field (excuding the Salt) before encryption (i.e. plain text) should be factor of 256 bytes.
 
 ### Payload Encryption
 
