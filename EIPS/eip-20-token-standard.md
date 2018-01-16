@@ -30,8 +30,10 @@ A standard interface allows any tokens on Ethereum to be re-used by other applic
 ## Token
 ### Methods
 
-**NOTE**: Callers MUST handle `false` from `returns (bool success)`.  Callers MUST NOT assume that `false` is never returned!
-
+**NOTES**:
+ - The following specifications use syntax from Solidity `0.4.17` (or above)
+ - Callers MUST handle `false` from `returns (bool success)`.  Callers MUST NOT assume that `false` is never returned!
+ 
 
 #### name
 
