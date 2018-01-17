@@ -178,13 +178,16 @@ This EIP does not break backwards compatibility.
 Example of signing a simple string using `eth_signTypedData`
 
 ```javascript
-const signature = await web3.eth.signTypedData([
-  {
-    'type': 'string',
-    'name': 'message',
-    'value': 'Hi, Alice!',
-  },
-]);
+const signature = await web3.eth.signTypedData(
+  signerAddress,
+  [
+    {
+      'type': 'string',
+      'name': 'message',
+      'value': 'Hi, Alice!',
+    },
+  ],
+);
 ```
 
 
