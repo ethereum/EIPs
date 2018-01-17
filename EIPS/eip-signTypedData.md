@@ -9,7 +9,6 @@
     Category: ERC
     Status: Draft
     Created: 2017-09-13
-    Replaces: 693
 
 ## Simple Summary
 
@@ -17,21 +16,21 @@ Standard for machine-verifiable and human-readable typed data signing with Ether
 
 ## Abstract
 
-Ethereum clients provide the ability to sign UTF-8 strings with the `eth_sign` RPC call. This call, however, doesn't give Signer UI's enough metadata to display the actual intent of the DApp when the data being signed is not a string. Over time, we expect value to be transferred on Ethereum using protocols that involve off-chain components (e.g. state channels). These protocols are going to involve signing complex data structures with Ethereum keys, making a human-readable, machine-verifiable signing flow critical to user security.
+Ethereum clients provide the ability to sign UTF-8 strings with the `eth_sign` RPC call. This call, however, doesn't give Signer UI's enough metadata to display the actual intent of the DApp when the data being signed is not a string. Over time, we expect value to be transferred on Ethereum using protocols that involve off-chain components (e.g. state channels). These protocols are going to involve signing complex data structures with Ethereum keys, making a human-readable, machine-verifiable signing flow critical for user security.
 
-This EIP adds an RPC method to sign arrays of arbitrary typed data, making it easy for the Signer UI to display this data to the user in a human-readable form, so that the user can be 100% confident of exactly what they are signing, while keeping the resulting signatures machine-verifiable. In addition, there is no room for a malicious DApp to provide the signer with alternative data then that being presented to the user, since the signer hashes the typedData before the user signs it.
+This EIP adds an RPC method to sign arrays of arbitrary typed data, making it easy for the Signer UI to display this data to the user in a human-readable form, so that the user can be 100% confident of exactly what they are signing, while keeping the resulting signatures machine-verifiable. In addition, there is no room for a malicious DApp to provide the signer with alternative data then that being presented to the user, since the signer is the one hashing the typed data before the user signs it.
 
-This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor). It should not be implemented in clients where approval is already granted (e.g. Geth with unlocked accounts).
+This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor, Cypher Browser). It should not be implemented in clients where approval is already granted (e.g. Geth with unlocked accounts).
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
+<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
-This EIP is a continuation of a discussion here: https://github.com/ethereum/EIPs/pull/683
-I offered this solution in a comment: https://github.com/ethereum/EIPs/pull/683#issuecomment-327945854
-It proposes a more general solution then the one offered here: https://github.com/ethereum/EIPs/pull/693
+This EIP is a continuation of a discussion [here](https://github.com/ethereum/EIPs/pull/683).
+I offered this solution in [a comment](https://github.com/ethereum/EIPs/pull/683#issuecomment-327945854).
+It proposes a more general solution then the one offered [here](https://github.com/ethereum/EIPs/pull/693).
 
 ## Motivation
 
-There are a whole range of higher level protocols emerging on Ethereum. State channels, 0x protocol, Login protocols, etc... For scalability reasons these protocols want to sign some protocol-specific data off-chain. They then use those signed messages to trigger on-chain or other actions with important consequences.
+There is a whole range of higher level protocols emerging on Ethereum. State channels, 0x protocol, Login protocols, etc... For scalability reasons these protocols want to sign some protocol-specific data off-chain. They then use those signed messages to trigger on-chain or other actions with important consequences.
 
 * Transferring ETH
 * Transferring tokens
@@ -39,23 +38,30 @@ There are a whole range of higher level protocols emerging on Ethereum. State ch
 * etc...
 
 
-The current `eth_sign` implementation allows signing of arbitrary data without specifying it's type or structure. Some signers assume that the data is a UTF-8 string. Some signers show it as a hex encoded string. This leads to user confusion since it is impossible to verify the message you're signing unless it's a plaintext UTF-8 string.
+The current `eth_sign` implementation allows signing of arbitrary data without specifying it's type or structure. Some signers assume that the data is a UTF-8 string. Some signers show it as a hex encoded string. This leads to user confusion since it's impossible to verify the message you're signing unless it's a plaintext UTF-8 string.
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_sign.png"  width="500px">
+<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_sign.png"  width="500px">
 
 Calling `eth_sign` on Metamask displays the string to sign. If the user is signing the result of hashing a complex structure involving multiple critical pieces of information, the only way to verify what they are signing is to re-hash the same structure in an independent script and make sure the hashes match.
 
 Calling `personal_sign` on Metamask with the raw bytes of a hash (e.g. not an ASCII string) shows the user this even less verifiable message that they should sign.
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/personal_sign.png"  width="500px">
+<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/personal_sign.png"  width="500px">
 
 The main problem is that signers don't have enough metadata to display the DApp's real intent effectively. In order to do so, they need the plaintext input that the dApp wishes hashed and signed by the user.
 
 ## Specification
 
-This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`. It accepts an array of values together with their specified type and human-readable name. The [json-schema](http://json-schema.org/) draft is defined below.
+This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`.
 
-### Params JSON Schema:
+Parameters:
+0. `Address` - 20 Bytes - Address of the account that will sign the messages
+1. `TypedData` - Typed data to be signed
+
+Returns:
+0. `DATA` - signature - 65-byte data in hexadecimal string
+
+Typed data is the array of data entries with their specified type and human-readable name. Below is the [json-schema](http://json-schema.org/) definition for `TypedData` param.
 ```json-schema
 {
   items: {
@@ -76,6 +82,8 @@ This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedDa
 }
 ```
 
+There also should be a corresponding `personal_signTypedData` method which accepts the password for an account as the last argument.
+
 ### Example params:
 // For this state channel POC: https://medium.com/@matthewdif/ethereum-payment-channel-in-50-lines-of-code-a94fad2704bc
 ```javascript
@@ -95,7 +103,7 @@ typedData = [
 
 ### How it can look in signer UI:
 
-<img src="https://github.com/0xProject/EIPs/tree/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
+<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
 
 
 It's important to make the schema part of the signature (explanation can be found in “Rationale” section). The way the schema will be combined with the values to generate the hash signed by the user is shown below. First, the schema is encoded into a string using a method similar to [solidity events signatures](http://solidity.readthedocs.io/en/develop/contracts.html#low-level-interface-to-logs). Then it's hash is prepended to the data array before hashing it.
@@ -117,6 +125,8 @@ const typedData = [
   },
 ];
 const signature = await web3.eth.signTypedData(signerAddress, typedData);
+// or
+const signature = await web3.personal.signTypedData(signerAddress, typedData, '************');
 ```
 
 ```javascript
@@ -125,7 +135,8 @@ import * as _ from 'lodash';
 import * as ethAbi from 'ethereumjs-abi';
 
 const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`).join(',');
-const schemaHash = ethAbi.soliditySHA3(['string'], schema);
+// Will generate `string message,uint value` for the above example
+const schemaHash = ethAbi.soliditySHA3(['string'], [schema]);
 const data = _.map(typedData, 'value');
 const types = _.map(typedData, 'type');
 const hash = ethAbi.soliditySHA3(
@@ -138,7 +149,7 @@ const hash = ethAbi.soliditySHA3(
 // Solidity example
 string message = 'Hi, Alice!';
 uint value = 42;
-bytes32 schemaHash = keccak256('string message', 'uint value'); // Probably hardcoded
+bytes32 schemaHash = keccak256('string message,uint value'); // Probably hardcoded
 const hash = keccak256(schemaHash, message, value);
 address recoveredSignerAddress = ecrecover(hash, v, r, s);
 ```
@@ -179,7 +190,7 @@ const signature = await web3.eth.signTypedData([
 
 The implementation of `eth_signTypedData`  makes some assumptions about the crypto primitives being used (tightly-packed + keccak256 + secp256k1), but the same assumptions have already been made for the [keccak256](http://solidity.readthedocs.io/en/develop/units-and-global-variables.html) function in solidity. If Ethereum becomes more crypto-agnostic in the future and allows for other types of signatures - this EIP can be adjusted.
 
-The choice of keccak256 is motivated by the fact, that it's twice [cheaper to verify in a smart contract](https://ethereum.stackexchange.com/questions/3184/what-is-the-cheapest-hash-function-available-in-solidity/3200#3200) when compared with sha3.
+The choice of keccak256 is motivated by the fact, that it's [twice as cheap to verify in a smart contract](https://ethereum.stackexchange.com/questions/3184/what-is-the-cheapest-hash-function-available-in-solidity/3200#3200) when compared with sha3.
 
 ## Test Cases
 
