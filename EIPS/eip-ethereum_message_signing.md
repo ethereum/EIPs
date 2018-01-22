@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: Ethereum message signing
+    Title: prefixed message signing
     Author: ligi <ligi@ligi.de>
     Type: Standard Track
     Category: ERC
@@ -10,11 +10,13 @@
 
 ## Simple Summary
 
-Standard for message signing with Ethereum accounts.
+Standard for prefixed message signing with Ethereum accounts.
 
 ## Abstract
 
-Messages should not be signed in a raw form directly to prevent unintended signing e.g. of valid transactions. We use a prefix here to prevent the data we sign to be something like a valid transaction.
+Messages should not be signed in a raw form directly to prevent unintended signing of valid transactions.
+We use a prefix to prevent the data we sign to be a valid transaction. By allowing different prefixes we can also separate different use-cases. The same way that when we use a prefix we know the data we sign is not a valid transaction - the same way we know that when we sign data with prefix-x - then we do not sign data with prefix-y.
+We can also have "trust on first use" user interactions for different prefixes. So the user can be made aware when he sees a prefix for the first time - there can also be the option to add context by the user. This context can be presented on repeated usage.
 
 ## Motivation
 
