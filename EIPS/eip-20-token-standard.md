@@ -148,7 +148,7 @@ function allowance(address _owner, address _spender) constant returns (uint256 r
 
 #### Transfer
 
-MUST trigger when tokens are transferred, including zero value transfers.
+MUST trigger when tokens are transferred, including zero value transfers. A token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
 
 A token contract which creates new tokens SHOULD trigger a Transfer event with the `_from` address set to `0x0` when tokens are created.
 
