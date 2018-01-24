@@ -55,8 +55,8 @@ The main problem is that signers don't have enough metadata to display the DApp'
 This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`.
 
 Parameters:
-0. `Address` - 20 Bytes - Address of the account that will sign the messages
-1. `TypedData` - Typed data to be signed
+0. `TypedData` - Typed data to be signed
+1. `Address` - 20 Bytes - Address of the account that will sign the messages
 
 Returns:
 0. `DATA` - signature - 65-byte data in hexadecimal string
@@ -124,9 +124,9 @@ const typedData = [
     'value': 42,
   },
 ];
-const signature = await web3.eth.signTypedData(signerAddress, typedData);
+const signature = await web3.eth.signTypedData(typedData, signerAddress);
 // or
-const signature = await web3.personal.signTypedData(signerAddress, typedData, '************');
+const signature = await web3.personal.signTypedData(typedData, signerAddress, '************');
 ```
 
 ```javascript
@@ -179,7 +179,6 @@ Example of signing a simple string using `eth_signTypedData`
 
 ```javascript
 const signature = await web3.eth.signTypedData(
-  signerAddress,
   [
     {
       'type': 'string',
@@ -187,6 +186,7 @@ const signature = await web3.eth.signTypedData(
       'value': 'Hi, Alice!',
     },
   ],
+  signerAddress,
 );
 ```
 
