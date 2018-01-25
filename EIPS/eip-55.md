@@ -2,9 +2,9 @@
 EIP: 55
 Title: Mixed-case checksum address encoding
 Author: Vitalik Buterin
-Type: Standard Track
+Type: Standards Track
 Category: ERC
-Status: Accepted
+Status: Final
 Created: 2016-01-14
 ```
 
