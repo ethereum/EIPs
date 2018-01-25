@@ -3,9 +3,9 @@
     EIP: 20
     Title: ERC-20 Token Standard
     Author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-    Type: Standard
+    Type: Standards Track
     Category: ERC
-    Status: Accepted
+    Status: Final
     Created: 2015-11-19
 
 
