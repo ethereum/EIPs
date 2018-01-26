@@ -6,8 +6,11 @@
       Type: Homestead feature
       Created: 2015-11-15
 
+### Hard Fork
+[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md)
+
 ### Parameters
-- FORK_BLKNUM: 2,675,000 ([Spurious Dragon](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-607.md))
+- FORK_BLKNUM: 2,675,000 
 - CHAIN_ID: 1
 
 ### Overview
