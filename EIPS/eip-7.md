@@ -11,8 +11,8 @@
 
 ### Parameters
 - Activation:
-  - Block >= 1,150,000 on Mainnet   (CHAIN_ID = 1)
-  - Block >= 494,000 on Morden      (CHAIN_ID = 2)
+  - Block >= 1,150,000 on Mainnet
+  - Block >= 494,000 on Morden
   - Block >= 0 on future testnets
 
 ### Overview
