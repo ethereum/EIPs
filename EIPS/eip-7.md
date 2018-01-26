@@ -6,6 +6,10 @@
       Type: Homestead feature
       Created: 2015-11-15
 
+### Parameters
+- FORK_BLKNUM: 2,675,000 ([Spurious Dragon](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-607.md))
+- CHAIN_ID: 1
+
 ### Overview
 
 Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCODE`, except that it propagates the sender and value from the parent scope to the child scope, i.e. the call created has the same sender and value as the original call.
