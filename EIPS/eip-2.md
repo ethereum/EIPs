@@ -7,10 +7,21 @@ Type: Standard Track
 Category: Core
 Created: 2015-11-15
 ```
+### Meta reference
+
+[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md).
+
+### Parameters
+
+|   FORK_BLKNUM   |  CHAIN_ID  | CHAIN_NAME  |
+|-----------------|------------|-------------|
+|    1,150,000    |     1      | Main net    |
+|   494,000       |     2      | Morden      |
+|    0            |     1      | Future testnets    |
 
 # Specification
 
-If `block.number >= HOMESTEAD_FORK_BLKNUM` (e.g., 1,150,000 on livenet, 494,000 on Morden and 0 on future testnets), do the following:
+If `block.number >= HOMESTEAD_FORK_BLKNUM`, do the following:
 
 1. The gas cost *for creating contracts via a transaction* is increased from 21,000 to 53,000, i.e. if you send a transaction and the to address is the empty string, the initial gas subtracted is 53,000 plus the gas cost of the tx data, rather than 2,1000 as is currently the case. Contract creation from a contract using the `CREATE` opcode is unaffected.
 2. All transaction signatures whose s-value is greater than `secp256k1n/2` are now considered invalid. The ECDSA recover precompiled contract remains unchanged and will keep accepting high s-values—this is useful e.g. if a contract recovers old Bitcoin signatures.
