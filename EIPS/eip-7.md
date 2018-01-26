@@ -10,8 +10,10 @@
 [Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md)
 
 ### Parameters
-- FORK_BLKNUM: 2,675,000 
-- CHAIN_ID: 1
+- Activation:
+  - Block >= 1,150,000 on Mainnet   (CHAIN_ID = 1)
+  - Block >= 494,000 on Morden      (CHAIN_ID = 2)
+  - Block >= 0 on future testnets
 
 ### Overview
 
