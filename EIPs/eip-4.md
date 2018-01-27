@@ -2,7 +2,7 @@
   EIP: 4
   Layer: Process
   Title: EIP Classification
-  Author: Eric Lombrozo
+  Author: Joseph Chow
   Status: Draft
   Type: Process
   Created: 2015-11-17
@@ -10,7 +10,7 @@
 
 # Abstract
 
-This document describes a classification scheme for EIPs, adapted from BIP123.
+This document describes a classification scheme for EIPs, adapted from [BIP 123](https://github.com/bitcoin/bips/blob/master/bip-0123.mediawiki).
 
 EIPs are classified by system layers with lower numbered layers involving more intricate interoperability requirements.
 
@@ -64,4 +64,4 @@ There's room at this layer to allow for competing standards without breaking bas
 
 # 4. Applications Layer
 
-The applications layer specifies high level structures, abstractions, and conventions that allow different applications to support similar features and share data. 
+The applications layer specifies high level structures, abstractions, and conventions that allow different applications to support similar features and share data.
