@@ -6,9 +6,18 @@
       Type: Homestead feature
       Created: 2015-11-15
 
+### Hard Fork
+[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md)
+
+### Parameters
+- Activation:
+  - Block >= 1,150,000 on Mainnet
+  - Block >= 494,000 on Morden
+  - Block >= 0 on future testnets
+
 ### Overview
 
-Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCODE`, except that it propagates the sender and value from the parent scope to the child scope, ie. the call created has the same sender and value as the original call.
+Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCODE`, except that it propagates the sender and value from the parent scope to the child scope, i.e. the call created has the same sender and value as the original call.
 
 ### Specification
 
@@ -20,15 +29,15 @@ Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCOD
 - `out_offset`: the offset into memory of the output;
 - `out_size`: the size of the scratch pad for the output.
 
-#### Notes on Gas
+#### Notes on gas
 - The basic stipend is not given; `gas` is the total amount the callee receives.
 - Like `CALLCODE`, account creation never happens, so the upfront gas cost is always `schedule.callGas` + `gas`.
 - Unused gas is refunded as normal.
 
-#### Notes on Sender
+#### Notes on sender
 - `CALLER` and `VALUE` behave exactly in the callee's environment as they do in the caller's environment.
 
-#### Other Notes
+#### Other notes
 - The depth limit of 1024 is still preserved as normal.
 
 ### Rationale
