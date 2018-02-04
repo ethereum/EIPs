@@ -1,15 +1,12 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: <EIP standard deposit and withdraw functions>
-    Author: <Gabriele Rigo, gab@rigoblock.com>
-    Type: <Standard Track>
-    Category (*only required for Standard Track): <Interface> 
+    Title: EIP standard deposit and withdraw functions
+    Author: Gabriele Rigo <gab@rigoblock.com>
+    Type: Standard Track
+    Category: Interface
     Status: Draft
-    Created: <2017-09-01>
-    Requires (*optional): <EIP number(s)>
-    Replaces (*optional): <EIP number(s)>
-
+    Created: 2017-09-01
 
 ## Simple Summary
 define standard and abstracted deposit and withdraw interface functions for allowing interaction between contracts
