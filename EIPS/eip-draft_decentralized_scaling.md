@@ -1,7 +1,3 @@
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
 ## Preamble
 
     EIP: <to be assigned>
