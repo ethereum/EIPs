@@ -37,6 +37,8 @@ Benefits
 Unfortunately, traditional pooling would become obsolete, but the need for nodes is imminent. Perhaps a node reward would supply sufficient incentive to the community to run nodes.
 An intermediate deployment stage would be needed where both traditional pool mining and Steroid mining is supported until the network stabilizes on Steroid core pool.
 
+-This binds perfectly with the proposed Casper update
+
 ## Test Cases
 Tests are not yet completed at this stage. Looking for volunteers!
 
