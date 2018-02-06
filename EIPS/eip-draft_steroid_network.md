@@ -35,7 +35,7 @@ Benefits
 
 ## Backwards Compatibility
 Unfortunately, traditional pooling would become obsolete, but the need for nodes is imminent. Perhaps a node reward would supply sufficient incentive to the community to run nodes.
-An intermediate deployment stage would be needed where both traditional pool mining and Steroid mining is supported until the network stabilizes on Steroid core pool.
+An intermediate deployment stage would be needed where both traditional pool mining and Steroid mining is supported until the network stabilizes on Steroid core pool with 51% (Hostile Takeover).
 
 * This binds perfectly with the proposed Casper update
 
