@@ -21,23 +21,23 @@ Scalability to the number of transactions processed is a threshold subject to a 
 
 ## Specification
 
--Steroid network pool build-in to core
+* Steroid network pool build-in to core
 *Implies that all miners are connected directly and not to 3rd-party pools
 
 The Steroid pool gathers all the newly found blocks and applies a "Pending" status to them. It then broadcasts to the network for miners to pick-up and process. The steroid pool can control the number of pending blocks required, for the current transaction load, dynamically using the traditional diff method.
 
 Benefits
--Miners get paid based on work submitted (Fair distribution).
--Network scalability controlled by core diff algorithm.
--Number of transactions is subject to available hashrate.
--Network rewards are subject to typical supply&demand 
-*More transactions = more work necessary => More rewards
+* Miners get paid based on work submitted (Fair distribution).
+* Network scalability controlled by core diff algorithm.
+* Number of transactions is subject to available hashrate.
+* Network rewards are subject to typical supply&demand 
+* More transactions = more work necessary => More rewards
 
 ## Backwards Compatibility
 Unfortunately, traditional pooling would become obsolete, but the need for nodes is imminent. Perhaps a node reward would supply sufficient incentive to the community to run nodes.
 An intermediate deployment stage would be needed where both traditional pool mining and Steroid mining is supported until the network stabilizes on Steroid core pool.
 
--This binds perfectly with the proposed Casper update
+* This binds perfectly with the proposed Casper update
 
 ## Test Cases
 Tests are not yet completed at this stage. Looking for volunteers!
