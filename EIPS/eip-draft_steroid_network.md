@@ -10,8 +10,6 @@
     Requires (*optional): <EIP number(s)>
     Replaces (*optional): <EIP number(s)>
 
-The title should be 44 characters or less.
-
 ## Simple Summary
 The suggestion implies a build-in pool and a change in the way new blocks are handled in the following manner. New block found -> Network broadcasts new pending block to miners, miners process, change status from pending to complete & add to chain.
 
