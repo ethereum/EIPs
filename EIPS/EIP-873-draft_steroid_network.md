@@ -1,7 +1,7 @@
 ## Preamble
 
     EIP: <to be assigned>
-    Title: Steroid Network
+    Title: EIP-873: Steroid Network
     Author: Angelos Hadjiphilippou <angelos@exevior.com>
     Type: Standard Track
     Category (*only required for Standard Track): Core 
