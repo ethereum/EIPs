@@ -34,7 +34,6 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Finalized EIPs (standards that have been adopted)
 | Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
-| [1](EIPS/eip-1.md)                                 | EIP Purpose and Guidelines                                                                  | Martin Becze, Hudson Jameson               | Meta       | Final    |
 | [2](EIPS/eip-2.md)                                 | Homestead Hard-fork Changes                                                                  | Vitalik Buterin                            | Core       | Final    |
 | [6](EIPS/eip-6.md)                                 | Renaming Suicide Opcode                                                                      | Hudson Jameson                             | Interface  | Final    |
 | [7](EIPS/eip-7.md)                                 | DELEGATECALL                                                                                 | Vitalik Buterin                            | Core       | Final    |
@@ -61,6 +60,12 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [649](https://github.com/ethereum/EIPs/pull/669)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                  | Afri Schoedon, Vitalik Buterin             | Core       | Final    |
 | [658](https://github.com/ethereum/EIPs/pull/658)   | Embedding transaction status code in receipts                                                | Nick Johnson                               | Core       | Final    |
 | [706](EIPS/eip-706.md)                             | DEVp2p snappy compression                                                                    | Péter Szilágyi                             | Networking | Final    |
+
+# Active EIPs (standards that have been adopted but never meant to be completed)
+
+| Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
+| [1](EIPS/eip-1.md)                                 | EIP Purpose and Guidelines                                                                   | Martin Becze, Hudson Jameson               | Meta       | Active    |
 
 # Past Hard Forks
 | Codename                              | Aliases                     | Block number   | Date (UTC) |
