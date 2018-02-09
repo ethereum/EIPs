@@ -16,11 +16,11 @@ This EIP proposes a simple way that enables this by simply separating the transa
 
 ## Abstract
 
-Currently, ethereum transactions have the following fields: `nonce`, `gasPrice`, `gasLimit`, `value`, `to` and `data`. This EIP proposes adding a new one: `from` which, if present, indicates that `data` is an ethereum transaction containing `to`, `value`, `to` and its own `data`, but the message is signed by the account represented on `from`.
+Currently, ethereum transactions have the following fields: `nonce`, `gasPrice`, `gasLimit`, `value`, `to` and `data`. This EIP proposes creating a new class of transactions that are two encapsulated signed transactions. The outer one contains `nonce`, `gasPrice`, `gasLimit` and a new field alled `signedTransaction` that contains the inner transaction. The inner transaction is a standard ethereum transaction, except it doesn't have `gasPrice` or `gasLimit`. Both transactions have a `nonce` field.
 
-Block validators/miners should check the validity of the signature, and proceed to treat the transaction in sense as if it was being made by the `from` account **except** that in the end, the gas costs (with an added extra cost for the work of checking the validity of the signature) is *deduced from the account of the account deploying the transaction to the chain*.
+Block validators/miners should treat the inner transaction as a standard one **except** that in the end, the gas costs (with an added extra cost for the work of checking the validity of the signature) is *deduced from the account of the outer transaction, which deploying to the chain*. Both nonces must be valid and both should be incremented.
 
-In higher level languages like solidity, `from`(if present) would be the `msg.sender` as it would be compatible with current contracts, and a new special variable called `tx.sender` could be added to represent the deployer of the transaction (if the code wanted to create incentives).
+In higher level languages like solidity, `from` (if present) would be the `msg.sender` as it would be compatible with current contracts, and a new special variable called `tx.sender` could be added to represent the deployer of the transaction (if the code wanted to create incentives).
 
 
 ## Motivation
@@ -29,6 +29,16 @@ Using signed messages instead of transactions as means to interact with contract
 
 **Alternatively** this could be also done without a hard fork by adding support for these on solidity, by adding a function property that on compilation creates a second set of functions that accept signed messages.
 
+## Current Implementation examples
+
+As said, we are paving a cow path, there are multiple projects that are trying to develop this on their own solidity code, and therefore it's a good candidate for being a native feature.
+
+* [Status](https://github.com/status-im/ideas/issues/73) 
+* [Swarm City](https://github.com/swarmcity/SCLabs-gasstation-service)
+* [Aragon](https://github.com/aragonlabs/pay-protocol) (this might not be the best link to show their work in this area)
+* [Token Standard Functions for Preauthorized Actions](https://github.com/ethereum/EIPs/issues/662)
+* [Token Standard Extension 865](https://github.com/ethereum/EIPs/issues/865)
+* [Transaction Relay](https://github.com/iurimatias/TransactionRelay)
 
 ## Backwards Compatibility
 
