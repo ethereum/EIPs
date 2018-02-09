@@ -1,16 +1,17 @@
 | Variable           | Symbol       | Value         | Unit          | Source |
 | -------------------|--------------|---------------|---------------|--------|
 | Network Hashrate   |H<sub>N</sub> | 232001        | GH/s          | https://etherscan.io/chart/hashrate |
-| Power/Hashrate     |P<sub>H</sub> | 3.54          | W*s/MH        | http://www.legitreviews.com/geforce-gtx-1070-ethereum-mining-small-tweaks-great-hashrate-low-power_195451, https://www.reddit.com/r/ethereum/comments/7vewys/10000_tons_co2_per_day_and_climbing_eip_858/dtrswyz/ |
+| GPU Hashrate       |H<sub>M</sub> | 31.2          | MH/s          | http://www.legitreviews.com/geforce-gtx-1070-ethereum-mining-small-tweaks-great-hashrate-low-power_195451 |
+| GPU Power          |P<sub>M</sub> | 110.6         | W             | https://www.reddit.com/r/ethereum/comments/7vewys/10000_tons_co2_per_day_and_climbing_eip_858/dtrswyz/ |
 
 
 ## Network Power Consumption (P<sub>N</sub>)
 
 A baseline value for network power consumption can be found by multiplying the total network hashrate with a "best case" value for the power/hashrate ratio that a miner can achieve.
 
-> P<sub>N</sub> = H<sub>N</sub> x P<sub>H</sub>
+> P<sub>N</sub> = H<sub>N</sub> x P<sub>M</sub> / H<sub>M</sub>
 >
-> P<sub>N</sub> = 232001 (GH/s) x 3.54 (W*s/MH) x 1000 (MH/GH) / 10^6 (W/MW)
+> P<sub>N</sub> = 232001 (GH/s) x 110.6 (W) x 1000 (MH/GH) / ( 31.2 (MH/s) x 10^6 (W/MW) )
 >
 > P<sub>N</sub> = 821 MW
 
