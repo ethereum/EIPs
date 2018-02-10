@@ -22,7 +22,7 @@ Scalability to the number of transactions processed is a threshold subject to a 
 * Steroid network pool build-in to core
 *Implies that all miners are connected directly and not to 3rd-party pools
 
-The Steroid pool gathers all the newly found blocks and applies a "Pending" status to them. It then broadcasts to the network for miners to pick-up and process. The steroid pool can control the number of pending blocks required, for the current transaction load, dynamically using the traditional diff method.
+The Steroid pool gathers all the newly found blocks and applies a "Pending" status to them. It then broadcasts to the network for miners to pick-up and process. The Steroid pool can control the number of pending blocks required, for the current transaction load, dynamically using the traditional diff method.
 
 Benefits
 * Miners get paid based on work submitted (Fair distribution).
