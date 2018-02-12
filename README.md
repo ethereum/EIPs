@@ -14,7 +14,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | Number                    | Title                                                   | Author                        | Layer     | Status     |
 | ------------------------- | ------------------------------------------------------- | ----------------------------- | --------- | ---------- |
 | [3](EIPS/eip-3.mediawiki) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
-| [4](EIPS/eip-4.mediawiki) |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
+| [4](EIPS/eip-4.md)        |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
 | [5](EIPS/eip-5.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
 | [101](EIPS/eip-101.md)    |  Serenity Currency and Crypto Abstraction               | Vitalik Buterin               |           | Active     |
 | [158](EIPS/eip-158.md)    |  State clearing                                         | Vitalik Buterin               | Core      | Superseded |
