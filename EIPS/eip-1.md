@@ -184,8 +184,6 @@ The current EIP editors are
 
 ` * Nick Johnson (@arachnid)`
 
-` * Yoichi Hirai (@pirapira)`
-
 ` * Vitalik Buterin (@vbuterin)`
 
 ` * Nick Savers (@nicksavers)`
