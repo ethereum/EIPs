@@ -78,7 +78,8 @@ This will be extended as follows:
      *
      *  `decimals` — MUST return 0 as each token represents a single share and shares are non-divisible.
      */
-    interface ERCNNN is ERC20 {
+    interface ERC884 is ERC20 {
+
       /**
        *  By counting the number of token owners using `totalSupply`
        *  one can retrieve the complete list of token owners, one at a time.
@@ -183,7 +184,7 @@ This will be extended as follows:
 
 The SEC has additional requirements as to how a Crowdsale ought to be run, and what information must be made available to the general public. This information is however out of scope from this standard, though the standard does support the requirements.
 
-For example the SEC requires a Crowdsale's website display the amount of money raised in USD.  To support this an crowdsale contract minting these tokens must maintain a USD to ETH conversion rate (via Oracle or some other mechansism) and must record the conversion rate used at time of minting.
+For example the SEC requires a Crowdsale's website display the amount of money raised in USD.  To support this a crowdsale contract minting these tokens must maintain a USD to ETH conversion rate (via Oracle or some other mechanism) and must record the conversion rate used at time of minting.
 
 ### Use of the Identity `hash` value.
 
@@ -198,6 +199,10 @@ It is also desirable that the implementers offer a REST API endpoint along the l
 That enables 3rd party auditors to verify that a given Ethereum address is known to the implementers as a verified address.
 
 How the implementers verify a person's identity is up to them and beyond the scope of this standard.
+
+### Permissions management
+
+It is not desirable that anyone can add, remove, or update verified addresses, however the specifics of how access to those functions is controlled is outside of the scope of this standard.
 
 ## Rationale
 
