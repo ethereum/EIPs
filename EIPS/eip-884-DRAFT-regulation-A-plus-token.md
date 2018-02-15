@@ -110,7 +110,7 @@ This will be extended as follows:
       /**
        *  Update the hash for a verified address known to the contract.
        *  Upon successful update of a verified address the contract must emit
-       *  `VerifiedAddressUpdated(addr, hash, msg.sender)`.
+       *  `VerifiedAddressUpdated(addr, oldHash, hash, msg.sender)`.
        *  @param addr The verified address of the person represented by the supplied hash.
        *  @param hash A cryptographic hash of the address owner's verified information.
        *  @throw if the supplied address or hash are zero, or if the address is unknown to the contract.
