@@ -188,6 +188,9 @@ The current EIP editors are
 
 ` * Vitalik Buterin (@vbuterin)`
 
+` * Nick Savers (@nicksavers)`
+
+
 EIP Editor Responsibilities and Workflow
 --------------------------------------
 
