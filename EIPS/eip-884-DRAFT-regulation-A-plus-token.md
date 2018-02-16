@@ -89,10 +89,45 @@ This will be extended as follows:
     contract ERC884 is ERC20 {
 
       /**
+       *  This event is emitted when a verified address and associated
+       *  identity hash are added to the contract.
+       *  @param addr The address that was added.
+       *  @param hash The identity hash associated with the address.
+       *  @param sender The address that caused the address to be added.
+       */
+      event VerifiedAddressAdded(
+          address indexed addr,
+          bytes32 hash,
+          address indexed sender
+      );
+
+      /**
+       *  This event is emitted when a verified address its associated
+       *  identity hash are removed from the contract.
+       *  @param addr The address that was removed.
+       *  @param sender The address that caused the address to be removed.
+       */
+      event VerifiedAddressRemoved(address indexed addr, address indexed sender);
+
+      /**
+       *  This event is emitted when the identity hash associated with a verified address is updated.
+       *  @param addr The address whose hash was updated.
+       *  @param oldHash The identity hash that was associated with the address.
+       *  @param hash The hash now associated with the address.
+       *  @param sender The address that caused the hash to be updated.
+       */
+      event VerifiedAddressUpdated(
+          address indexed addr,
+          bytes32 oldHash,
+          bytes32 hash,
+          address indexed sender
+      );
+
+      /**
        *  By counting the number of Token owners using `totalSupply`
        *  you can retrieve the complete list of Token owners, one at a time.
-       *  It MUST throw if `index > totalSupply()`.
-       *  @param index The index of the owner. Must be > 1. Index 0 MUST return `address(0)`.
+       *  It MUST throw if `index >= totalSupply()`.
+       *  @param index The zero-based index of the owner.
        *  @return the address of the Token owner with the given index.
        */
       function ownerAt(uint256 index) public view returns (address);
@@ -111,6 +146,7 @@ This will be extended as follows:
        *  Remove a verified address, and the associated verification hash. If the address is
        *  unknown to the contract then this does nothing. If the address is successfully removed this
        *  function must emit `VerifiedAddressRemoved(addr, msg.sender)`.
+       *  It MUST throw if an attempt is made to remove a verifiedAddress that owns Tokens.
        *  @param addr The verified address to be removed.
        */
       function removeVerified(address addr) public;
@@ -153,41 +189,6 @@ This will be extended as follows:
        *  have not been verified and added to the contract.
        */
       function transferFrom(address from, address to, uint256 value) public returns (bool);
-
-      /**
-       *  This event is emitted when a verified address and associated identity hash are
-       *  added to the contract.
-       *  @param addr The address that was added.
-       *  @param hash The identity hash associated with the address.
-       *  @param sender The address that caused the address to be added.
-       */
-      event VerifiedAddressAdded(
-          address indexed addr,
-          bytes32 hash,
-          address indexed sender
-      );
-
-      /**
-       *  This event is emitted when a verified address its associated identity hash are
-       *  removed from the contract.
-       *  @param addr The address that was removed.
-       *  @param sender The address that caused the address to be removed.
-       */
-      event VerifiedAddressRemoved(address indexed addr, address indexed sender);
-
-      /**
-       *  This event is emitted when the identity hash associated with a verified address is updated.
-       *  @param addr The address whose hash was updated.
-       *  @param oldHash The identity hash that was associated with the address.
-       *  @param hash The hash now associated with the address.
-       *  @param sender The address that caused the hash to be updated.
-       */
-      event VerifiedAddressUpdated(
-          address indexed addr,
-          bytes32 oldHash,
-          bytes32 hash,
-          address indexed sender
-      );
     }
 
 ### SEC Requirements
