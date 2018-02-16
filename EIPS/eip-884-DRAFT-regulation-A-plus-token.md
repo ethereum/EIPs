@@ -230,13 +230,9 @@ Proviso 1 will not break compatibility with modern wallets or exchanges as they 
 
 Proviso 2 will cause transfers to fail if an attempt is made to transfer Tokens to a non-verified address. This is implicit in the design and implementers are encouraged to make this abundantly clear to market participants. We appreciate that this will make the standard unpalatable to some exchanges, but it is an SEC requirement that stockholders of a corporation provide verified names and addresses.
 
-## Test Cases
+## Test Cases and Reference Implementation
 
-Test cases and a reference implementations will be provided separately.
-
-## Implementation
-
-A reference implementation will be provided separately.
+Test cases and a reference implementation are available at [github.com/davesag/ERC884-reference-implementation](https://github.com/davesag/ERC884-reference-implementation).
 
 ## Copyright
 
