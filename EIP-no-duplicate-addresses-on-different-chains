@@ -1,0 +1,96 @@
+## Preamble
+
+    EIP: <to be assigned>
+    Title: No duplicate addresses on different chains
+    Author: James Ray
+    Type: Standard Track
+    Category: Core
+    Status: Draft
+    Created: 2017-02-16
+    Requires: [EIP-155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md), [EIP-161](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md)
+
+## Simple Summary
+Implement one or more options to avoid someone sending to an address that is on the main network, but it was actually meant to be sent to the same address on a different network, or vice versa.
+
+## Abstract
+A short (~200 word) description of the technical issue being addressed.
+
+## Motivation
+This EIP aims to avoid one particular case of lost funds where funds are sent to an address on one network, while the funds were actually meant to be sent to the same address, but on a different network.
+
+## Specification
+This is just an example to illustrate how it might work:
+```python
+% Vyper
+from enum import Enum
+
+def isNonExistentAccount(address _address):
+    if _address == "":
+        return true;
+
+% This is already done in EIP-161
+def isEmptyAccount(address _address):
+    if (_address.nonce == 0 && % pseudocode: nonce is not formally a member of the address type.
+                % For the main net this will be 0, but for other nets this may be different
+            _address.balance) == 0 &&
+            _address.codesize == 0):
+        % delete account
+        _address == ""
+        return "The address had an empty account but it is now deleted";
+    else:
+        return false;
+
+class chain_ID(Enum):
+    % See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids.
+    ETHEREUM_MAINNET = 1
+    EXPANSE_MAINNET = 2 % Morden (disused), Expanse mainnet
+    ROPSTEN = 3
+    RINKEBY = 4
+    ROOTSTOCK_MAINNET = 30
+    ROOTSTOCK_TESTNET = 31
+    KOVAN = 42 % Kovan
+    ETHEREUM_CLASSIC_MAINNET = 61
+    ETHEREUM_CLASSIC_TESTNET = 62
+    GETH_PRIVATE_CHAINS_DEFAULT = 1337
+           
+def isExistingAddressOnAChainID(chain_ID _chain_ID, address _address):
+    % Pseudocode
+    if not isNonExistentAccount(_chain_ID._address) || not isEmptyAccount(_chain_ID._address):
+        return = true;
+
+def isExistingAddressOnAnotherChainID(address _address)
+    for i in chain_ID:
+        if isExistingAddressOnAChainID(chain_ID[i], _address):
+            % I'm not sure if this is correct syntax, it's not clear from here: https://docs.python.org/3/library/enum.html?highlight=enum#module-enum:
+            for j in chain_ID[i+1:]:
+                if isExistingAddressOnAChainID(chain_ID[j], _address):
+                    return true;
+        else:
+            continue;
+    else:
+        return false;
+def makeATransaction(wei_value value, address: _to, chain_ID _chain_ID)
+    if isExistingAddressOnAnotherChainID(_to):
+        confirmTransaction = "The same address %d exists on at least 2 chain_IDs, are you sure that you want to send it to %d? Enter Y/N: " % (_to, _chain_ID)
+        if confirmTransaction == "N"
+            break;
+        elseif confirmTransaction == "Y":
+            % proceed with the transaction.
+        else:
+            print "You didn't enter Y/N, please try again."
+```
+
+## Rationale
+I haven't considered alternative designs, the above is just a minimum example of how it could be implemented.
+
+## Backwards Compatibility
+I don't think this introduces backwards incompatibilities.
+
+## Test Cases
+Not done.
+
+## Implementation
+The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
