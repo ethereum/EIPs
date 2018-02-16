@@ -15,7 +15,7 @@ Ref: [proposing-an-eip-for-regulation-a-Tokens](http://forum.ethereum.org/discus
 
 ## Simple Summary
 
-An `ERC20` compatible Token that conforms to [Delaware State Senate, 149th General Assembly, Senate Bill No. 69: An act to Amend Title 8 of the Delaware Code Relating to the General Corporation Law](https://legis.delaware.gov/json/BillDetail/GenerateHtmlDocument?legislationId=25730&legislationTypeId=1&docTypeId=2&legislationName=SB69), henceforth referred to as 'The Act', and also known as ['Regulation A+'](https://en.wikipedia.org/wiki/Regulation_A#Regulation_A+).
+An `ERC20` compatible Token that conforms to [Delaware State Senate, 149th General Assembly, Senate Bill No. 69: An act to Amend Title 8 of the Delaware Code Relating to the General Corporation Law](https://legis.delaware.gov/json/BillDetail/GenerateHtmlDocument?legislationId=25730&legislationTypeId=1&docTypeId=2&legislationName=SB69), henceforth referred to as 'The Act', sufficient for registration as an equity security under U.S. federal ['Regulation A+'](https://en.wikipedia.org/wiki/Regulation_A#Regulation_A+).
 
 ## Abstract
 
@@ -42,9 +42,9 @@ The recently amended 'Title 8 of the Delaware Code Relating to the General Corpo
 
 ## Motivation
 
-By using a `Regulation A+` compatible Token, a firm may be able to raise funds via IPO, conforming to Deleware Corporations Law, but bypassing the need for involvement of a traditional Stock Exchange.
+By using a `Regulation A+` compatible Token, a firm may be able to raise funds via IPO, conforming to Delaware Corporations Law, but bypassing the need for involvement of a traditional Stock Exchange.
 
-The are currently no Token standards that conform to the `Regulation A+` rules. `ERC20` Tokens do not support KYC/AML rules required by the General Corporation Law, and do not provide facilities for the exporting of lists of stockholders. While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are not completely aligned with the `Regulation A+` rules.
+The are currently no Token standards that conform to the `Regulation A+` rules. `ERC20` Tokens do not support KYC/AML rules required by the General Corporation Law, and do not provide facilities for the exporting of lists of stockholders. While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are not completely aligned with The Act or `Regulation A+` rules.
 
 ## Specification
 
@@ -183,7 +183,7 @@ This will be extended as follows:
       );
     }
 
-### Other SEC Requirements
+### SEC Requirements
 
 The SEC has additional requirements as to how a Crowdsale ought to be run and what information must be made available to the general public. This information is however out of scope from this standard, though the standard does support the requirements.
 
@@ -209,7 +209,7 @@ It is not desirable that anyone can add, remove, or update verified addresses. H
 
 ## Rationale
 
-The proposed standard offers an as minimal as possible extension over the existing ERC20 standard in order to conform to the requirements of The Act. Rather than return a `bool` for successful or unsuccessful completion of state-changing functions such as `addVerified`, `removeVerified`, and `updateVerified`, we have opted to require that implementations `throw` (preferably by using the [forthcoming `require(condition, 'fail message')` syntax](https://github.com/ethereum/solidity/issues/1686#issuecomment-328181514).)
+The proposed standard offers an as minimal as possible extension over the existing `ERC20` standard in order to conform to the requirements of The Act. Rather than return a `bool` for successful or unsuccessful completion of state-changing functions such as `addVerified`, `removeVerified`, and `updateVerified`, we have opted to require that implementations `throw` (preferably by using the [forthcoming `require(condition, 'fail message')` syntax](https://github.com/ethereum/solidity/issues/1686#issuecomment-328181514).)
 
 ## Backwards Compatibility
 
