@@ -42,9 +42,16 @@ The recently amended 'Title 8 of the Delaware Code Relating to the General Corpo
 
 ## Motivation
 
+1. Regulation A+ allows a company to register a security offering with the SEC (U.S. Federal). Such a filing allows the company to advertise the securities to all KYC verified investors.
+2. Delaware General Corporation Law requires that stock issued by a Delaware corporation be recorded in a stock ledger.
+3. These tokens are compliant with Delaware General Corporation Law, which is sufficient for registration as an equity security under U.S. federal Regulation A+.
+4. This standard could be extended beyond Regulation A+ to include equity issued by any Delaware corporation, whether private or public.
+
 By using a `Regulation A+` compatible Token, a firm may be able to raise funds via IPO, conforming to Delaware Corporations Law, but bypassing the need for involvement of a traditional Stock Exchange.
 
-The are currently no Token standards that conform to the `Regulation A+` rules. `ERC20` Tokens do not support KYC/AML rules required by the General Corporation Law, and do not provide facilities for the exporting of lists of stockholders. While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are not completely aligned with The Act or `Regulation A+` rules.
+The are currently no Token standards that conform to the `Regulation A+` rules. `ERC20` Tokens do not support KYC/AML rules required by the General Corporation Law, and do not provide facilities for the exporting of lists of stockholders.
+
+While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are not completely aligned with The Act or `Regulation A+` rules.
 
 ## Specification
 
