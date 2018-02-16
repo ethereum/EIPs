@@ -57,7 +57,7 @@ While the `ERC721` Token proposal allows for some association of metadata with a
 
 The `ERC20` Token provides the following basic features:
 
-    interface ERC20 {
+    contract ERC20 {
       function totalSupply() public view returns (uint256);
       function balanceOf(address who) public view returns (uint256);
       function transfer(address to, uint256 value) public returns (bool);
@@ -86,14 +86,14 @@ This will be extended as follows:
      *
      *  `decimals` — MUST return `0` as each Token represents a single Share and Shares are non-divisible.
      */
-    interface ERC884 is ERC20 {
+    contract ERC884 is ERC20 {
 
       /**
        *  By counting the number of Token owners using `totalSupply`
        *  you can retrieve the complete list of Token owners, one at a time.
+       *  It MUST throw if `index > totalSupply()`.
        *  @param index The index of the owner. Must be > 1. Index 0 MUST return `address(0)`.
        *  @return the address of the Token owner with the given index.
-       *  @throw if the supplied index is > `totalSupply()`.
        */
       function ownerAt(uint256 index) public view returns (address);
 
@@ -101,9 +101,9 @@ This will be extended as follows:
        *  Add a verified address, along with an associated verification hash to the contract.
        *  Upon successful addition of a verified address the contract must emit
        *  `VerifiedAddressAdded(addr, hash, msg.sender)`.
+       *  It MUST throw if the supplied address or hash are zero, or if the address has already been supplied.
        *  @param addr The address of the person represented by the supplied hash.
        *  @param hash A cryptographic hash of the address owner's verified information.
-       *  @throw if the supplied address or hash are zero, or if the address has already been supplied.
        */
       function addVerified(address addr, bytes32 hash) public;
 
@@ -121,9 +121,9 @@ This will be extended as follows:
        *  `VerifiedAddressUpdated(addr, oldHash, hash, msg.sender)`.
        *  If the hash is the same as the value already stored then
        *  no `VerifiedAddressUpdated` event is to be emitted.
+       *  It MUST throw if the supplied address or hash are zero, or if the address is unknown to the contract.
        *  @param addr The verified address of the person represented by the supplied hash.
        *  @param hash A new cryptographic hash of the address owner's updated verified information.
-       *  @throw if the supplied address or hash are zero, or if the address is unknown to the contract.
        */
       function updateVerified(address addr, bytes32 hash) public;
 
@@ -173,7 +173,7 @@ This will be extended as follows:
        *  @param addr The address that was removed.
        *  @param sender The address that caused the address to be removed.
        */
-      event VerifiedAddressRemoved(address indexed addr, address indexed sender)`.
+      event VerifiedAddressRemoved(address indexed addr, address indexed sender);
 
       /**
        *  This event is emitted when the identity hash associated with a verified address is updated.
