@@ -51,7 +51,11 @@ By using a `Regulation A+` compatible Token, a firm may be able to raise funds v
 
 The are currently no Token standards that conform to the `Regulation A+` rules. `ERC20` Tokens do not support KYC/AML rules required by the General Corporation Law, and do not provide facilities for the exporting of lists of stockholders.
 
-While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are not completely aligned with The Act or `Regulation A+` rules.
+### What about ERC721?
+
+The proposed standard could easily be used to enhance ERC721, adding features for associating tokens with assets such as share certificates.
+
+While the `ERC721` Token proposal allows for some association of metadata with an Ethereum address, its uses are _not completely aligned_ with The Act or `Regulation A+` rules, and it is not, in its current form, fully `ERC20` compatible.
 
 ## Specification
 
