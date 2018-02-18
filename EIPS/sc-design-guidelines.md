@@ -27,7 +27,7 @@ quantify and mitigate risk in software that has the potential to significantly i
 Smart Contracts are similar development items, since poor behavior of these software items can have
 a significant financial impact to users; therefore, it should be developed to a similar level of rigor.
 
-This EIP aims to adopt some of these standards, particularly DO-178 and OWASP, to create a common
+This EIP aims to adopt some of these standards, particularly DO-178, to create a common
 framework tailored specifically to Smart Contract design and development practices.
 This includes formalizing certain software engineering guidelines
 (of which "security best practices" are a major component) and tool development processes
