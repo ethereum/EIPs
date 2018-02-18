@@ -48,7 +48,8 @@ We will perform this analysis at the method level of each smart contract,
 which will provide a comphrehensive analysis of all the possible calls.
 
 Specifically, we define `Liklihood` as the access control level (ACL) of a given method,
-and `Impact` as the ability of that method to modify the underlying state of Ethereum.
+and `Impact` as the ability of that method to affect the use or ownership of valuable assets 
+held in the state of Ethereum.
 
 Once the level of risk is understood, a level of rigor needed to verify the software can be
 objectively determined, which is defined as a the Design Assurance Level (DAL).
