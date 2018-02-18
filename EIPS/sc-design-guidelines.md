@@ -1,12 +1,11 @@
 # Preamble
-```
-EIP: <to be assigned>
-Title: Smart Contract Development Guidelines
-Authors: Rex Hygate (@RexShinka), Bryant Eisenbach (@fubuloubu), Roman Pavloyski (@rpavlovs)
-Type: Informational
-Status: Draft
-Created: 2018-02-17
-```
+
+    EIP: <to be assigned>
+    Title: Smart Contract Development Guidelines
+    Authors: Rex Hygate (@RexShinka), Bryant Eisenbach (@fubuloubu), Roman Pavloyski (@rpavlovs)
+    Type: Informational
+    Status: Draft
+    Created: 2018-02-17
 
 # Simple Summary
 Develop a comprehensive set of standards and methodologies formalizing
@@ -72,11 +71,3 @@ We invite you to help contribute on the formation of this standards body through
 
 # Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
-# Special Thanks!
-This project was developed at ETH Denver!
-We'd like to thank the following people for helping us in designing this EIP
-* Manuel Aráoz (@maraoz)
-* Hudson Jameson (@Souptacular)
-* Jorge Izquierdo (@izqui)
-* Phillip Goldberg (@djphillyg)
