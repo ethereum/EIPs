@@ -186,7 +186,7 @@ Different implementations have been written by various teams that have different
 
 Historical links releated to this standard:
 
-- Orginial proposal from Vitalik Buterin: https://github.com/ethereum/wiki/wiki/Standardized_Contract_APIs/499c882f3ec123537fc2fccd57eaa29e6032fe4a
+- Original proposal from Vitalik Buterin: https://github.com/ethereum/wiki/wiki/Standardized_Contract_APIs/499c882f3ec123537fc2fccd57eaa29e6032fe4a
 - Reddit discussion: https://www.reddit.com/r/ethereum/comments/3n8fkn/lets_talk_about_the_coin_standard/
 - Original Issue #20: https://github.com/ethereum/EIPs/issues/20
 
