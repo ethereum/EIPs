@@ -10,18 +10,45 @@
     Requires: EIP-155
 
 ## Simple Summary
-Fix the inconsistency with invalid signature in ECRECOVER precompile vs ECRECOVER function as proposed [here](https://github.com/ethereum/yellowpaper/pull/305#discussion_r169570558).
+Fix the inconsistency with invalid signature in the ECRECOVER precompile vs the ECRECOVER function as proposed [here](https://github.com/ethereum/yellowpaper/pull/305#discussion_r169570558).
 
-The rest is to be completed.
+Further info is [here](https://github.com/ethereum/yellowpaper/pull/282).
 
 ## Abstract
-A short (~200 word) description of the technical issue being addressed.
+The Yellow Paper formal specification currently has a conflict between the invalid signature definition in the [ECREC precompile](https://ethereum.github.io/yellowpaper/paper.pdf#page.20) vs in the ECDSARECOVER function in [Appendix F](https://ethereum.github.io/yellowpaper/paper.pdf#appendix.F), where the latter change is more up-to-date as introduced in [EIP-155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md). This EIP proposes to update the definition of an invalid signature in the ECREC precompile to as it is in the ECDSARECOVER function in Appendix F.
 
 ## Motivation
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+Following are the two conflicting definitions of an invalid signature in the Yellow Paper:
+
+![screenshot from 2018-02-21 19-28-07](https://user-images.githubusercontent.com/16969914/36470011-6e5f5080-173d-11e8-98e8-7640bcb19552.png)
+
+![screenshot from 2018-02-21 19-29-26](https://user-images.githubusercontent.com/16969914/36470040-9105d01e-173d-11e8-8870-ebdeec146e9b.png)
+
+To reiterate in text, the definition of an invalid signature in the EC precompile is: ECDSARECOVER(h, v, r, s) = ∅, or `$\mathtt{\tiny ECDSARECOVER}(h, v, r, s) = \varnothing$`.
+
+Whereas the definition of an invalid signature in the ECDSARECOVER function (in appendix F) is as in the second screenshot above:
+
+```
+We declare that a signature is invalid unless all the following conditions are true:
+\begin{align}
+0 < \linkdest{r}{r} &< \mathtt{\tiny secp256k1n} \\
+0 < \linkdest{s}{s} &< \mathtt{\tiny secp256k1n} \div 2 + 1 \\
+\hyperlink{v}{v} &\in \{27,28,\mathtt{\tiny chain\_{\mathrm{id}}} \times 2 + 35, \mathtt{\tiny chain\_{\mathrm{id}}} \times 2 + 36\}
+\end{align}
+where:
+\begin{align}
+\mathtt{\tiny secp256k1n} &= 115792089237316195423570985008687907852837564279074904382605163141518161494337
+%\mathtt{\tiny secp256k1p} &= 2^{256} - 2^{32} - 977\\
+\end{align}
+``` 
+
+As stated above: "this EIP proposes to update the definition of an invalid signature in the ECREC precompile to as it is in the ECRECOVER function in Appendix F." 
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). 
+
+Update implementations of the EC precompile contract to as above, again, from:
+> In the case of an invalid signature (`$\mathtt{\tiny ECDSARECOVER}(h, v, r, s) = \varnothing$`), we return no output.
+to: "In the case of an invalid signature (as defined in ), we return no output.
 
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
