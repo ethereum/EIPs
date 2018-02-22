@@ -183,8 +183,10 @@ This will be extended as follows:
         /**
          *  Cancel the original address and reissue the Tokens to the replacement address.
          *  Access to this function MUST be strictly controlled.
+         *  The `original` address MUST be removed from the set of verified addresses.
          *  Throw if the `original` address supplied is not a stockholder.
-         *  Throw if the replacement address is not a verified address.
+         *  Throw if the `replacement` address is not a verified address.
+         *  Throw if the `replacement` address already holds Tokens.
          *  This function MUST emit the `VerifiedAddressSuperseded` event.
          *  @param original The address to be superseded. This address MUST NOT be reused.
          */
