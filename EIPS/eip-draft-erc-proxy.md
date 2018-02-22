@@ -25,8 +25,7 @@ of a DelegateProxy, given its simplicity, but we believe there is a lot of value
 in agreeing on an interface all proxies use that allows for a standard way to
 operate with proxies.
 
-An example implementation of a DelegateProxy can be found in aragonOS or zeppelinOS
-[//TODO links].
+An example implementation of a DelegateProxy can be found in [aragonOS](https://github.com/aragon/aragonOS/blob/dev/contracts/common/DelegateProxy.sol) or [zeppelinOS](https://github.com/zeppelinos/labs/blob/master/upgradeability_with_vtable/contracts/Proxy.sol).
 
 ## Standardized interface
 
