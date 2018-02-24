@@ -144,8 +144,8 @@ a dummy value along with every call. Instead, such a call would look more like t
 ```solidity
 function approve(address spender, uint amount) public returns (bool success) {
     if (validator.check(this, msg.sender, spender, amount) == okStatusCode) {
-        allowed[msg.sender][spender] = amount;
-        Approval(msg.sender, spender, amount);
+        allowed[msg.sender][spender] = tokens;
+        Approval(msg.sender, spender, tokens);
         return true;
     } else {
         return false;
@@ -173,7 +173,7 @@ ERC-20, EIP-721, EIP-777, future token standards, centralized and decentralized 
 and so on.
 
 ## Implementation
-[Reference implementations](https://github.com/Finhaven/ValidatedToken/)
+[Reference implementations](https://github.com/Finhaven/ValidatedToken/) (WIP)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
