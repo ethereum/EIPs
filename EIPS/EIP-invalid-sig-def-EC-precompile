@@ -1,0 +1,103 @@
+## Preamble
+
+    EIP: <to be assigned>
+    Title: Update invalid signature definition in EC precompile
+    Author: James Ray, Yoichi Hirai, and Adam Smolarek
+    Type: Standard Track
+    Category): Core
+    Status: Draft
+    Created: 2017-02-21
+    Requires: EIP-155
+
+## Simple Summary
+Fix the inconsistency with invalid signature in the ECRECOVER precompile vs the ECRECOVER function as proposed [here](https://github.com/ethereum/yellowpaper/pull/305#discussion_r169570558).
+
+Further info is [here](https://github.com/ethereum/yellowpaper/pull/282).
+
+## Abstract
+The Yellow Paper formal specification currently has a conflict between the invalid signature definition in the [ECREC precompile](https://ethereum.github.io/yellowpaper/paper.pdf#page.20) vs in the ECDSARECOVER function in [Appendix F](https://ethereum.github.io/yellowpaper/paper.pdf#appendix.F), where the latter change is more up-to-date as introduced in [EIP-155](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md). This EIP proposes to update the definition of an invalid signature in the ECREC precompile to as it is in the ECDSARECOVER function in Appendix F.
+
+## Motivation
+Following are the two conflicting definitions of an invalid signature in the Yellow Paper:
+
+![screenshot from 2018-02-21 19-28-07](https://user-images.githubusercontent.com/16969914/36470011-6e5f5080-173d-11e8-98e8-7640bcb19552.png)
+
+![screenshot from 2018-02-21 19-29-26](https://user-images.githubusercontent.com/16969914/36470040-9105d01e-173d-11e8-8870-ebdeec146e9b.png)
+
+To reiterate in text, the definition of an invalid signature in the EC precompile is: ECDSARECOVER(h, v, r, s) = ∅, or `$\mathtt{\tiny ECDSARECOVER}(h, v, r, s) = \varnothing$`.
+
+Whereas the definition of an invalid signature in the ECDSARECOVER function (in appendix F) is as in the second screenshot above:
+
+```
+We declare that a signature is invalid unless all the following conditions are true:
+\begin{align}
+0 < \linkdest{r}{r} &< \mathtt{\tiny secp256k1n} \\
+0 < \linkdest{s}{s} &< \mathtt{\tiny secp256k1n} \div 2 + 1 \\
+\hyperlink{v}{v} &\in \{27,28,\mathtt{\tiny chain\_{\mathrm{id}}} \times 2 + 35, \mathtt{\tiny chain\_{\mathrm{id}}} \times 2 + 36\}
+\end{align}
+where:
+\begin{align}
+\mathtt{\tiny secp256k1n} &= 115792089237316195423570985008687907852837564279074904382605163141518161494337
+%\mathtt{\tiny secp256k1p} &= 2^{256} - 2^{32} - 977\\
+\end{align}
+``` 
+
+As stated above: "this EIP proposes to update the definition of an invalid signature in the ECREC precompile to as it is in the ECRECOVER function in Appendix F." 
+
+## Specification
+
+Update implementations of the EC precompile contract to as above, again, from:
+> In the case of an invalid signature (`$\mathtt{\tiny ECDSARECOVER}(h, v, r, s) = \varnothing$`), we return no output.
+to: "In the case of an invalid signature (as defined \hyperlink{invalidsig}{here} in Appendix F), we return no output."; i.e. the link will direct to [here](https://github.com/ethereum/EIPs/files/1746120/Paper.pdf#invalidsig) in the built PDF.
+
+(Note that the link is a file that I built and uploaded to a comment, then appended the #invalidsig label to direct to the intended definition. This label/link change is pending in a PR https://github.com/ethereum/yellowpaper/pull/634.
+
+## Rationale
+> The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
+
+Without previously reading the code of any implementations, I had a quick look in the top 3 implementations.
+
+[The Current implementation in cppethereum is:](https://github.com/ethereum/cpp-ethereum/blob/851ed501a72cb996ddb00d77248eab1edc632220/libdevcrypto/Common.cpp#L353)
+	if (!secp256k1_ec_pubkey_parse(ctx, &rawPubkey, serializedPubKey.data(), serializedPubKey.size()))
+		return false;  // Invalid public key.
+Then from [here](https://github.com/bitcoin-core/secp256k1/blob/master/include/secp256k1.h#L295-L300) and `#include <sec256k1.h>`:
+    SECP256K1_API SECP256K1_WARN_UNUSED_RESULT int secp256k1_ec_pubkey_parse(
+        const secp256k1_context* ctx,
+        secp256k1_pubkey* pubkey,
+        const unsigned char *input,
+        size_t inputlen
+    ) SECP256K1_ARG_NONNULL(1) SECP256K1_ARG_NONNULL(2) SECP256K1_ARG_NONNULL(3);
+    
+[go-ethereum](https://github.com/bitcoin-core/secp256k1/blob/cd329dbc3eaf096ae007e807b86b6f5947621ee3/include/secp256k1.h#L295-L300):
+    // VerifySignature checks that the given public key created signature over hash.
+    // The public key should be in compressed (33 bytes) or uncompressed (65 bytes) format.
+    // The signature should have the 64 byte [R || S] format.
+    func VerifySignature(pubkey, hash, signature []byte) bool {
+        return secp256k1.VerifySignature(pubkey, hash, signature)
+    }
+Then [here](https://github.com/ethereum/go-ethereum/blob/master/crypto/secp256k1/secp256.go#L124-L134):
+    // VerifySignature checks that the given pubkey created signature over message.
+// The signature should be in [R || S] format.
+func VerifySignature(pubkey, msg, signature []byte) bool {
+	if len(msg) != 32 || len(signature) != 64 || len(pubkey) == 0 {
+		return false
+	}
+	sigdata := (*C.uchar)(unsafe.Pointer(&signature[0]))
+	msgdata := (*C.uchar)(unsafe.Pointer(&msg[0]))
+	keydata := (*C.uchar)(unsafe.Pointer(&pubkey[0]))
+	return C.secp256k1_ext_ecdsa_verify(context, sigdata, msgdata, keydata, C.size_t(len(pubkey))) != 0
+}
+
+I had a look in Parity, and while I found similar functions, couldn't find ECRECOVER in the same form as the Yellow Paper, nor the EC precompile.
+
+## Backwards Compatibility
+Changes the EC precompile function to as defined above.
+
+## Test Cases
+Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+
+## Implementation
+The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
