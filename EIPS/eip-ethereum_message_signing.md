@@ -24,12 +24,12 @@ The need for this EIP came up in a [github issue of go-ethereum](https://github.
 
 ## Specification
 
-`<varint_prefix_length><prefix><varint_message_length><message>`
+`<varint_prefix_length><prefix><message>`
 
-To specify the length of prefix and message we use [variable length integer (varint)](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) as used in Bitcoin. This is defined as the following:
+To specify the length of the prefix we use [variable length integer (varint)](https://en.bitcoin.it/wiki/Protocol_documentation#Variable_length_integer) as used in Bitcoin. This is defined as the following:
 
-| Value          | Storage length |	Format                                  |
-| -------------- | -------------- |	--------------------------------------- |
+| Value          | Storage length | Format                                  |
+| -------------- | -------------- | --------------------------------------- |
 | < 0xFD         | 1              | uint8_t                                 |
 | <= 0xFFFF      | 3              | 0xFD followed by the length as uint16_t |
 | <= 0xFFFF FFFF | 5              | 0xFE followed by the length as uint32_t |
