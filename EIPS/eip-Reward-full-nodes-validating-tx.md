@@ -1,4 +1,4 @@
-TBC
+TBC, probably after considerable discussion.
 
 ## Preamble
 
