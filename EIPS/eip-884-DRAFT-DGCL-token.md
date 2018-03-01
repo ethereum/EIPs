@@ -218,6 +218,13 @@ This will be extended as follows:
         function isVerified(address addr) public view returns (bool);
 
         /**
+         *  Checks to see if the supplied address is a stock holder.
+         *  @param addr The address to check.
+         *  @return true if the supplied address owns a token.
+         */
+        function isHolder(address addr) public view returns (bool);
+
+        /**
          *  Checks that the supplied hash is associated with the given address.
          *  @param addr The address to test.
          *  @param hash The hash to test.
@@ -262,6 +269,8 @@ This will be extended as follows:
 The SEC has additional requirements as to how a Crowdsale ought to be run and what information must be made available to the general public. This information is however out of scope from this standard, though the standard does support the requirements.
 
 For example: The SEC requires a Crowdsale's website display the amount of money raised in USD. To support this a Crowdsale contract minting these Tokens must maintain a USD to ETH conversion rate (via Oracle or some other mechanism) and must record the conversion rate used at time of minting.
+
+Also, depending on the type of raise, the SEC (or other statutory body) can apply limits to the number of shareholders allowed. To support this the standard provides the `holderCount` and `isHolder` functions which a crowdsale can invoke to check that limits have not been exceeded.
 
 ### Use of the Identity `hash` value.
 
