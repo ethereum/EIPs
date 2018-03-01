@@ -1,4 +1,4 @@
-TBC, probably after considerable discussion.
+To be completed, probably after considerable discussion.
 
 ## Preamble
 
