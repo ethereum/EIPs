@@ -4,9 +4,9 @@ TBC
 
     EIP: <to be assigned>
     Title: Reward for full nodes validating transactions
-    Author: <list of authors' names and optionally, email addresses>
-    Type: <Standard Track | Informational | Meta>
-    Category (*only required for Standard Track): <Core | Networking | Interface | ERC> 
+    Author: James Ray, Micah Zoltu
+    Type: Standard Track
+    Category: Core & ERC
     Status: Draft
     Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
     Requires (*optional): <EIP number(s)>
