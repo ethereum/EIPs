@@ -4,7 +4,7 @@ To be completed, probably after considerable discussion.
 
     EIP: <to be assigned>
     Title: Reward for full nodes and clients
-    Author: James Ray, Micah Zoltu
+    Author: James Ray and Micah Zoltu
     Type: Standard Track
     Category: Core & ERC
     Status: Draft
