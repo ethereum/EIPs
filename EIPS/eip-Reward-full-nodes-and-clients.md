@@ -9,7 +9,7 @@
     Created: 2017-03-01
 
 ## Simple Summary
-Provide rewards to full nodes validators and clients for validating and processing transactions.
+Provide a reward to full nodes for validating transactions and give a reward to clients for developing the client.
 
 <!--## Abstract-->
 <!--A short (~200 word) description of the technical issue being addressed.-->
