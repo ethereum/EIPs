@@ -1,0 +1,19 @@
+[
+    {
+        "id": "speed-mining-service", 
+        "name": "Speed Mining Service", 
+        "symbol": "SMS", 
+        "rank": "589", 
+        "price_usd": "47.1963", 
+        "price_btc": "0.0043754", 
+        "24h_volume_usd": "30290.7", 
+        "market_cap_usd": "4943354.0", 
+        "available_supply": "104740.0", 
+        "total_supply": "300000.0", 
+        "max_supply": null, 
+        "percent_change_1h": "2.87", 
+        "percent_change_24h": "-2.61", 
+        "percent_change_7d": "-17.28", 
+        "last_updated": "1519279460"
+    }
+]
