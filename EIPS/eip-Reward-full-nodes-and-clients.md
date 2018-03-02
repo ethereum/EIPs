@@ -40,7 +40,7 @@ Providing rewards to full node validators and to clients would increase the issu
 
 One point of controversy with rewarding clients and full nodes is that the work previously done by them has not been paid for until now (except of course by the Ethereum Foundation or Parity VCs funding the work), so existing clients may say that this EIP gives an advantage to new entrants. However, this doesn't hold up well, because existing clients have the first mover advantage, with much development to create useful and well-used products.
 
-<--!The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.!-->
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 <!--## Backwards Compatibility-->
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
