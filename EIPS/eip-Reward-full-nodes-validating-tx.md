@@ -8,27 +8,25 @@ To be completed, probably after considerable discussion.
     Type: Standard Track
     Category: Core & ERC
     Status: Draft
-    Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-    Requires (*optional): <EIP number(s)>
-    Replaces (*optional): <EIP number(s)>
-
-The title should be 44 characters or less.
+    Created: 2017-03-01
 
 ## Simple Summary
-"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+Provide rewards
 
 ## Abstract
 A short (~200 word) description of the technical issue being addressed.
 
 ## Motivation
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+Currently there is a lack of incentives for anyone to run a full node, while joining a mining pool is not really economical if one has to purchase a mining rig (several GPUs) now, since there is unlikely to be a return on investment by the time that Ethereum transitions to hybrid Proof-of-Work/Proof-of-Stake, then full PoS. Additionally, providing a reward for clients gives a revenue stream that is independent of state channels, which are less secure, although this insecurity can be offset by mechanisms such as insurance, bonded payments and time locks. Rationalising that investors may invest in a client because it is an enabler for the Ethereum ecosystem may not scale very well; the investment would be considered as more of a donation; and 
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). 
+when a client signs a transaction, it attaches a user agent to the signature. This could then be used to send some amount of ETH to the author of that user agent. Additionally, some ETH could be sent to the organization that develops the client (e.g. Parity, the Ethereum Foundation, etc.), when the transaction is processed (similar to mining rewards).
 
 ## Rationale
 
 Discussion at https://ethresear.ch/t/incentives-for-running-full-ethereum-nodes/1239/20.
+
+Providing rewards to full node validators and to clients would increase the issuance. In order to maintain the issuance at current levels, this EIP could also reduce the mining reward (despite being reduced previously with the Byzantium release in October 2017 from 5 ETH to 3 ETH), but that would generate more controversy and discusssion.
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 
