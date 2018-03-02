@@ -38,7 +38,7 @@ And as for the absolute amounts, this will require data analysis, but clearly a 
 
 Providing rewards to full node validators and to clients would increase the issuance. In order to maintain the issuance at current levels, this EIP could also reduce the mining reward (despite being reduced previously with the Byzantium release in October 2017 from 5 ETH to 3 ETH), but that would generate more controversy and discusssion.
 
-One point of controversy with rewarding clients and full nodes is that the work previously done by them has not been paid for until now (except of course by the Ethereum Foundation or Parity VCs funding the work), so existing clients may say that this EIP gives an advantage to new entrants. However, this doesn't hold up well, because existing clients have the first mover advantage, with much development to create useful and well-used products.
+Another potential point of controversy with rewarding clients and full nodes is that the work previously done by them has not been paid for until now (except of course by the Ethereum Foundation or Parity VCs funding the work), so existing clients may say that this EIP gives an advantage to new entrants. However, this doesn't hold up well, because existing clients have the first mover advantage, with much development to create useful and well-used products.
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
