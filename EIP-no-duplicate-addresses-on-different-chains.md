@@ -13,10 +13,13 @@
 Implement one or more options to avoid someone sending to an address that is on the main network, but it was actually meant to be sent to the same address on a different network, or vice versa.
 
 ## Abstract
-A short (~200 word) description of the technical issue being addressed.
+This EIP aims to avoid one particular case of lost funds where funds are sent to an address on one network, while the funds were actually meant to be sent to the same address, but on a different network. This case is described in detail [here](https://github.com/ethereum/EIPs/pull/867/files#diff-2c90d5bf27887dac3a3d5f6d048567d5R52] in EIP 867, and is replicated below for convenience:
+
+>*Considerable example** (concise, includes supporting evidence, no negative impact): 
+*A crowdsale run by XYZ incorrectly published the testnet address of their crowdsale contract to their public website at the start of their crowdsale on Jan 19, 2018.  501 ETH was sent by 328 users on the mainnet to the incorrect address between block 4,235,987 and 4,236,050.  See here for the testnet contract, and see here for the transactions to the same address on the mainnet.  See here for a statement made by XYZ on their website.  Because there is a contract at this address on the testnet and the corresponding nonce for the creator address has already been used on the mainnet, it is considered effectively impossible that anyone coincidentally holds the private key. We have verified that all transactions came from addresses with no associated code, so there should be no issue returning eth to the senders.*  
+
 
 ## Motivation
-This EIP aims to avoid one particular case of lost funds where funds are sent to an address on one network, while the funds were actually meant to be sent to the same address, but on a different network.
 
 ## Specification
 This is just an example to illustrate how it might work:
