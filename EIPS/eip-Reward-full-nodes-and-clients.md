@@ -1,10 +1,8 @@
-To be completed, probably after considerable discussion.
-
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: Reward for full nodes and clients
-    Author: James Ray and Micah Zoltu
+    EIP: to be assigned
+    Title: Reward full nodes and clients
+    Author: James Ray and Micah Zoltu
     Type: Standard Track
     Category: Core & ERC
     Status: Draft
