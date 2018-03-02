@@ -11,8 +11,8 @@
 ## Simple Summary
 Provide a reward to full nodes for validating transactions and give a reward to clients for developing the client.
 
-<!--## Abstract-->
-<!--A short (~200 word) description of the technical issue being addressed.-->
+## Abstract
+This EIP proposes to make a change to the protocol to provide a reward to full nodes for validating transactions and thus providing extra security for the Ethereum network, and a reward to clients for providing the software that enables Ethereum to function. Reward mechanisms that are external to being built in to the protocol are beyond the scope of this EIP. Such extra-protocol reward methods include state channel payments for extra services such as light client servers providing faster information such as receipts; state channel payments for buying state reads from full nodes; archival services (which is only applicable to future proposed versions of Ethereum with stateless clients); and tokens for the client and running full nodes. .
 
 ## Motivation
 Currently there is a lack of incentives for anyone to run a full node, while joining a mining pool is not really economical if one has to purchase a mining rig (several GPUs) now, since there is unlikely to be a return on investment by the time that Ethereum transitions to hybrid Proof-of-Work/Proof-of-Stake, then full PoS. Additionally, providing a reward for clients gives a revenue stream that is independent of state channels, which are less secure, although this insecurity can be offset by mechanisms such as insurance, bonded payments and time locks. Rationalising that investors may invest in a client because it is an enabler for the Ethereum ecosystem (and thus opening up investment opportunities) may not scale very well, and it seems that it is more sustainable to monetize the client as part of the service(s) it provides.
