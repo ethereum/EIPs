@@ -1,12 +1,12 @@
 ## Preamble
 
-EIP: <to be assigned>
-Title: Tip on transactions to fund building a global commons
-Author: James Ray, with [attribution to Rhys Lindmark](https://medium.com/@RhysLindmark/co-evolving-the-phase-shift-to-cryptocapitalism-by-founding-the-ethereum-commons-co-op-f4771e5f0c83)
-Type: Standard Track
-Category: Core
-Status: Draft
-Created: 2017-03-07
+EIP: <to be assigned>  
+Title: Tip on transactions to fund building a global commons  
+Author: James Ray, with [attribution to Rhys Lindmark](https://medium.com/@RhysLindmark/co-evolving-the-phase-shift-to-cryptocapitalism-by-founding-the-ethereum-commons-co-op-f4771e5f0c83)  
+Type: Standard Track  
+Category: Core  
+Status: Draft  
+Created: 2017-03-07  
     
 ## Simple Summary
 Have a voluntary contribution on transactions in order to fund building a global commons (e.g. infrastructure, healthcare, education, UBI, a governance platform, etc.).
