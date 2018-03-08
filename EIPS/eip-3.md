@@ -37,3 +37,7 @@ It is possible to defend against this in two ways:
 # Specification
 
 The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made. 
+
+# Rationale
+
+The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
