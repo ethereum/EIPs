@@ -33,3 +33,7 @@ It is possible to defend against this in two ways:
 [1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word ''stack'' has a different meaning within the EVM, and is not to be confused with the ''call stack''.
 
 [2] https://github.com/pipermerriam/ethereum-stack-depth-lib 
+
+# Specification
+
+The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made. 
