@@ -41,3 +41,7 @@ The opcode `CALLDEPTH` should return the remaining call stack depth. A value of 
 # Rationale
 
 The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
+
+# Implementation
+
+Not implemented. 
