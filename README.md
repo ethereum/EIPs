@@ -2,7 +2,7 @@
 Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
 
 # Contributing
-First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.md). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+First review [EIP-1](EIPS/eip-001.md). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-xxx.md). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
 
 # EIP status terms
 * **Draft** - an EIP that is open for consideration
@@ -13,9 +13,9 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Non-final EIPs
 | Number                    | Title                                                   | Author                        | Layer     | Status     |
 | ------------------------- | ------------------------------------------------------- | ----------------------------- | --------- | ---------- |
-| [3](EIPS/eip-3.md) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
-| [4](EIPS/eip-4.md)        |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
-| [5](EIPS/eip-5.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
+| [3](EIPS/eip-003.md) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
+| [4](EIPS/eip-004.md)        |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
+| [5](EIPS/eip-005.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
 | [101](EIPS/eip-101.md)    |  Serenity Currency and Crypto Abstraction               | Vitalik Buterin               |           | Active     |
 | [158](EIPS/eip-158.md)    |  State clearing                                         | Vitalik Buterin               | Core      | Superseded |
 | [165](EIPS/eip-165.md)    |  ERC-165 Standard Interface Detection                   | Christian Reitwiessner        | Interface    | Draft |
@@ -36,12 +36,12 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Finalized EIPs (standards that have been adopted)
 | Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
-| [2](EIPS/eip-2.md)                                 | Homestead Hard-fork Changes                                                                  | Vitalik Buterin                            | Core       | Final    |
-| [6](EIPS/eip-6.md)                                 | Renaming Suicide Opcode                                                                      | Hudson Jameson                             | Interface  | Final    |
-| [7](EIPS/eip-7.md)                                 | DELEGATECALL                                                                                 | Vitalik Buterin                            | Core       | Final    |
-| [8](EIPS/eip-8.md)                                 | devp2p Forward Compatibility Requirements for Homestead                                      | Felix Lange                                | Networking | Final    |
-| [20](EIPS/eip-20-token-standard.md)                | ERC-20 Token Standard                                                                        | Fabian Vogelsteller, Vitalik Buterin       | ERC        | Final    |
-| [55](EIPS/eip-55.md)                               | ERC-55 Mixed-case checksum address encoding                                                  | Vitalik Buterin                            | ERC        | Final    |
+| [2](EIPS/eip-002.md)                                 | Homestead Hard-fork Changes                                                                  | Vitalik Buterin                            | Core       | Final    |
+| [6](EIPS/eip-006.md)                                 | Renaming Suicide Opcode                                                                      | Hudson Jameson                             | Interface  | Final    |
+| [7](EIPS/eip-007.md)                                 | DELEGATECALL                                                                                 | Vitalik Buterin                            | Core       | Final    |
+| [8](EIPS/eip-008.md)                                 | devp2p Forward Compatibility Requirements for Homestead                                      | Felix Lange                                | Networking | Final    |
+| [20](EIPS/eip-020-token-standard.md)                | ERC-20 Token Standard                                                                        | Fabian Vogelsteller, Vitalik Buterin       | ERC        | Final    |
+| [55](EIPS/eip-055.md)                               | ERC-55 Mixed-case checksum address encoding                                                  | Vitalik Buterin                            | ERC        | Final    |
 | [100](https://github.com/ethereum/EIPs/issues/100) | Change difficulty adjustment to target mean block time including uncles                      | Vitalik Buterin                            | Core       | Final    |
 | [137](EIPS/eip-137.md)                             | Ethereum Domain Name Service - Specification                                                 | Nick Johnson                               | ERC        | Final    |
 | [140](https://github.com/ethereum/EIPs/pull/206)   | REVERT instruction                                                                           | Alex Beregszaszi, Nikolai Mushegian        | Core       | Final    |
@@ -67,7 +67,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 
 | Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
-| [1](EIPS/eip-1.md)                                 | EIP Purpose and Guidelines                                                                   | Martin Becze, Hudson Jameson               | Meta       | Active    |
+| [1](EIPS/eip-001.md)                                 | EIP Purpose and Guidelines                                                                   | Martin Becze, Hudson Jameson               | Meta       | Active    |
 
 # Past Hard Forks
 | Codename                              | Aliases                     | Block number   | Date (UTC) |
