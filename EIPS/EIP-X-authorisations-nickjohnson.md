@@ -39,10 +39,11 @@ As this standard uses EIP-X-metadata-nickjohnson, the authorisation flow is as f
 Commonly, providers will wish to supply a standardised interface for users to set and unset their own authorisations. They SHOULD implement the following interface:
 
 ```
-function authoriseCaller(address owner, address caller, address callee, bytes4 func, bool authorised);
+function authoriseCaller(address owner, address caller, address callee, bytes4 func);
+function revokeCaller(address owner, address caller, address callee, bytes4 func);
 ```
 
-Arguments have the same meaning as in `canCall`, with the addition of `authorised,` which specifies if the authorisation is being set or cleared. Implementing contracts MUST ensure that `msg.sender` is authorised to call `authoriseCaller` on behalf of `owner`; this MUST always be true if `owner == msg.sender`. Implementing contracts SHOULD use the standard specified here to determine if other callers may provide authorisations as well.
+Arguments have the same meaning as in `canCall`. Implementing contracts MUST ensure that `msg.sender` is authorised to call `authoriseCaller` or `revokeCaller` on behalf of `owner`; this MUST always be true if `owner == msg.sender`. Implementing contracts SHOULD use the standard specified here to determine if other callers may provide authorisations as well.
 
 Implementing contracts SHOULD treat a `func` of 0 as authorising calls to all functions on `callee`. If `authorised` is `false` and `func` is 0, contracts need only clear any blanket authorisation; individual authorisations may remain in effect.
 
