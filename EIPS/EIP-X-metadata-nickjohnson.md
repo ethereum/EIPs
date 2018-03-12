@@ -7,6 +7,7 @@
     Category: ERC
     Status: Draft
     Created: 2018-03-12
+    Dependencies: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
 
 ## Abstract
 This EIP specifies a registry for address metadata, permitting both contracts and external accounts to supply metadata about themselves to onchain and offchain callers. This permits use-cases such as generalised authorisations, providing token acceptance settings, and claims registries.
@@ -37,7 +38,7 @@ Providers have one mandatory function:
 function supportsInterface(bytes4 interfaceID) constant returns (bool)
 ```
 
-The `supportsInterface` function is documented in [EIP 165](https://github.com/ethereum/EIPs/issues/165), and returns true if the provider implements the interface specified by the provided 4 byte identifier. An interface identifier consists of the XOR of the function signature hashes of the functions provided by that interface; in the degenerate case of single-function interfaces, it is simply equal to the signature hash of that function. If a provider returns `true` for `supportsInterface()`, it must implement the functions specified in that interface.
+The `supportsInterface` function is documented in [EIP 165](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md), and returns true if the provider implements the interface specified by the provided 4 byte identifier. An interface identifier consists of the XOR of the function signature hashes of the functions provided by that interface; in the degenerate case of single-function interfaces, it is simply equal to the signature hash of that function. If a provider returns `true` for `supportsInterface()`, it must implement the functions specified in that interface.
 
 `supportsInterface` must always return true for `0x01ffc9a7`, which is the interface ID of `supportsInterface` itself.
 
