@@ -15,7 +15,7 @@ More detailed documentation on Whisper could be found [here](https://github.com/
 
 ## Motivation
 
-It is necessary to specify the standard for Whipser messages in order to ensure forward compatibility of different Whisper clients.
+It is necessary to specify the standard for Whisper messages in order to ensure forward compatibility of different Whisper clients.
 
 ## Specification
 
@@ -53,7 +53,7 @@ The following message codes are optional, but they are reserved for specific pur
 
 This packet contains two objects: integer message code (0x00) followed by a list of values: integer version, float PoW requirement, and bloom filter, in this order. The bloom filter paramenter is optional; if it is missing or nil, the node is considered to be full node (i.e. accepts all messages). The format of PoW and bloom filter please see below (message codes 2 and 3).
 
-Status message should be send after the initial handshake and prior to any other messages.
+Status message should be sent after the initial handshake and prior to any other messages.
 
 **Messages** [`1`, `whisper_envelopes`]
 
@@ -89,7 +89,7 @@ The Bloom filter is used to identify a number of topics to a peer without compro
 
 Blooms are formed by the bitwise OR operation on a number of bloomed topics. The bloom function takes the topic and projects them onto a 512-bit slice. At most, three bits are marked for each bloomed topic.
 
-The projection function is defined as a mapping from a a 4-byte slice S to a 512-bit slice D; for ease of explanation, S will dereference to bytes, whereas D will dereference to bits.
+The projection function is defined as a mapping from a 4-byte slice S to a 512-bit slice D; for ease of explanation, S will dereference to bytes, whereas D will dereference to bits.
 
 	LET D[*] = 0
 	FOREACH i IN { 0, 1, 2 } DO
@@ -132,7 +132,7 @@ Envelopes are RLP-encoded structures of the following format:
 
 ### Contents of Data Field of the Message (Optional)
 
-This section describes optional description of Data Field to set up an example. Later it may be moved to a separate EIP.
+This section outlines the optional description of Data Field to set up an example. Later it may be moved to a separate EIP.
 
 It is only relevant if you want to decrypt the incoming message, but if you only want to send a message, any other format would be perfectly valid and must be forwarded to the peers.
 
@@ -147,6 +147,8 @@ Data field contains encrypted message of the Envelope. In case of symmetric encr
 	padding: byte array of arbitrary size (may be zero).
 
 	signature: 65 bytes, if present.
+
+	salt: 12 bytes, if present (in case of symmetric encryption).
 
 Those unable to decrypt the message data are also unable to access the signature. The signature, if provided, is the ECDSA signature of the Keccak-256 hash of the unencrypted data using the secret key of the originator identity. The signature is serialised as the concatenation of the `R`, `S` and `V` parameters of the SECP-256k1 ECDSA signature, in that order. `R` and `S` are both big-endian encoded, fixed-width 256-bit unsigned. `V` is an 8-bit big-endian encoded, non-normalised and should be either 27 or 28.
 
