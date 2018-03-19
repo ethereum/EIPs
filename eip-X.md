@@ -4,17 +4,17 @@ Note that an EIP number will be assigned by an editor. When opening a pull reque
 
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: <EIP title>
-    Author: <list of authors' names and optionally, email addresses>
-    Type: <Standard Track | Informational | Meta>
-    Category (*only required for Standard Track): <Core | Networking | Interface | ERC> 
-    Status: Draft
-    Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-    Requires (*optional): <EIP number(s)>
-    Replaces (*optional): <EIP number(s)>
+<!--insert two spaces at the end of a line to have a line break.-->
 
-The title should be 44 characters or less.
+EIP: <to be assigned>  
+Title: <EIP title, which should be 44 characters or less.>  
+Author: <list of authors' names and optionally, email addresses>  
+Type: <Standard Track | Informational | Meta>  
+Category (*only required for Standard Track): <Core | Networking | Interface | ERC>  
+Status: Draft  
+Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>  
+Requires (*optional): <EIP number(s)>  
+Replaces (*optional): <EIP number(s)>  
 
 ## Simple Summary
 "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
