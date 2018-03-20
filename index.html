@@ -1,0 +1,23 @@
+---
+# You don't need to edit this file, it's empty on purpose.
+# Edit theme's home layout instead if you wanna make some changes
+# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+layout: home
+---
+
+{% assign statuses = site.pages|map:"Status"|uniq %}
+{% for status in statuses %}
+  {% if status != undefined %}
+    <h1>{{status}}</h1>
+    <table>
+      <thead>
+        <tr><th>Number</th><th>Title</th><th>Author</th><th>Layer</th></tr>
+      </thead>
+      {% for page in site.pages %}
+        {% if page.Status == status %}
+          <tr><td>{{page.EIP}}</td><td>{{page.Title}}</td><td>{{page.Author}}</td><td>{{page.Layer}}</td></tr>
+        {% endif %}
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endfor %}
