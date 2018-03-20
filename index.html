@@ -15,7 +15,7 @@ layout: home
       </thead>
       {% for page in site.pages %}
         {% if page.Status == status %}
-          <tr><td>{{page.EIP}}</td><td>{{page.Title}}</td><td>{{page.Author}}</td><td>{{page.Layer}}</td></tr>
+          <tr><td><a href="{{page.url|relative_url}}">{{page.EIP}}</a></td><td>{{page.Title}}</td><td>{{page.Author}}</td><td>{{page.Layer}}</td></tr>
         {% endif %}
       {% endfor %}
     </table>
