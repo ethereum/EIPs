@@ -1,18 +1,18 @@
-<pre>
-  EIP: 3
-  Title: Addition of CALLDEPTH opcode
-  Author: Martin Holst Swende <martin@swende.se>
-  Status: Draft
-  Type: Standards Track
-  Layer: Consensus (hard-fork)
-  Created: 2015-11-19
-</pre>
+```
+EIP: 3
+Title: Addition of CALLDEPTH opcode
+Author: Martin Holst Swende <martin@swende.se>
+Status: Draft
+Type: Standards Track
+Layer: Consensus (hard-fork)
+Created: 2015-11-19
+```
 
-==Abstract==
+# Abstract
 
-This is a proposal to add a new opcode, <code>CALLDEPTH</code>. The <code>CALLDEPTH</code> opcode would return the remaining available call stack depth. 
+This is a proposal to add a new opcode, `CALLDEPTH`. The `CALLDEPTH` opcode would return the remaining available call stack depth. 
 
-==Motivation==
+# Motivation
 
 There is a limit specifying how deep contracts can call other contracts; the call stack. The limit is currently `256`. If a contract invokes another contract (either via `CALL` or `CALLCODE`), the operation will fail if the call stack depth limit has been reached. 
 
@@ -20,28 +20,28 @@ This behaviour makes it possible to subject a contract to a "call stack attack" 
 
 Example: 
 
-# Contract `A` want's to be invoked regularly, and pays Ether to the invoker in every block.
-# When contract `A` is invoked, it calls contracts `B` and `C`, which consumes a lot of gas. After invocation, contract `A` pays Ether to the caller. 
-# Malicious user `X` ensures that the stack depth is shallow before invoking A. Both calls to `B` and `C` fail, but `X` can still collect the reward. 
+1. Contract `A` want's to be invoked regularly, and pays Ether to the invoker in every block.
+2. When contract `A` is invoked, it calls contracts `B` and `C`, which consumes a lot of gas. After invocation, contract `A` pays Ether to the caller. 
+3. Malicious user `X` ensures that the stack depth is shallow before invoking A. Both calls to `B` and `C` fail, but `X` can still collect the reward. 
 
 It is possible to defend against this in two ways:
 
-# Check return value after invocation. 
-# Check call stack depth experimentally. A library [2] by Piper Merriam exists for this purpose. This method is quite costly in gas.
+1. Check return value after invocation. 
+2. Check call stack depth experimentally. A library [2] by Piper Merriam exists for this purpose. This method is quite costly in gas.
 
 
 [1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word ''stack'' has a different meaning within the EVM, and is not to be confused with the ''call stack''.
 
 [2] https://github.com/pipermerriam/ethereum-stack-depth-lib 
 
-==Specification==
+# Specification
 
-The opcode <code>CALLDEPTH</code> should return the remaining call stack depth. A value of <code>0</code> means that the call stack is exhausted, and no further calls can be made. 
+The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made. 
 
-==Rationale==
+# Rationale
 
 The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
 
-==Implementation==
+# Implementation
 
 Not implemented. 
