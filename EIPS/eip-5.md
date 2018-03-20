@@ -1,12 +1,12 @@
-### Title
-
-      EIP: 5
-      Title: Gas Usage for `RETURN` and `CALL*`
-      Author: Christian Reitwiessner <c@ethdev.com>
-      Status: Draft
-      Type: Standards Track
-      Layer: Consensus (hard-fork)
-      Created: 2015-11-22
+---
+EIP: 5
+Title: Gas Usage for `RETURN` and `CALL*`
+Author: Christian Reitwiessner <c@ethdev.com>
+Status: Draft
+Type: Standards Track
+Layer: Consensus (hard-fork)
+Created: 2015-11-22
+---
 
 ### Abstract
 
