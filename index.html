@@ -16,7 +16,7 @@ layout: home
       </thead>
       {% for page in pages %}
         {% if page.Status == status %}
-          <tr><td><a href="{{page.url|relative_url}}">{{page.EIP}}</a></td><td>{{page.Title}}</td><td>{{page.Author}}</td><td>{{page.Layer}}</td></tr>
+          <tr><td><a href="{{page.url|relative_url}}">{{page.EIP}}</a></td><td>{{page.Title|xml_escape}}</td><td>{{page.Author|xml_escape}}</td><td>{{page.Layer|xml_escape}}</td></tr>
         {% endif %}
       {% endfor %}
     </table>
