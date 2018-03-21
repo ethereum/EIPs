@@ -5,7 +5,7 @@ layout: default
 <div class="home">
   <h1 class="page-heading">
     EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    <a href="https://github.com/ethereum/EIPs/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
+    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
   </h1>
   <table>
     <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
