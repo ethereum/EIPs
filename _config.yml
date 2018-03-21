@@ -31,6 +31,8 @@ theme: minima
 plugins:
   - jekyll-feed
 
+permalink: slug
+
 defaults:
   -
     scope:

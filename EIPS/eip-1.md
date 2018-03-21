@@ -62,7 +62,7 @@ EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
 The possible paths of the status of EIPs are as follows:
 
-<img src=./eip-1/process.png>
+![](process.png)
 
 Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
 

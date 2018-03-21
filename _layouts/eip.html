@@ -4,7 +4,6 @@ layout: default
 
 <div class="home">
   <h1 class="page-heading">EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}</h1>
-
   <table>
     <tr><th>Author</th><td>{{ page.author | xml_escape }}</td></tr>
     {% if page["discussions-to"] != undefined %}
