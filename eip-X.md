@@ -4,7 +4,7 @@ title: <EIP title>
 author: <list of authors' names and optionally, email addresses>
 discussions-to: <email address>
 status: Draft
-type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
+type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 category (*only required for Standard Track): <Core | Networking | Interface | ERC>
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires (*optional): <EIP number(s)>

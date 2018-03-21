@@ -23,6 +23,12 @@ twitter_username: ethereum
 github_username:  ethereum
 header_pages:
  - index.html
+ - core.html
+ - networking.html
+ - interface.html
+ - erc.html
+ - informational.html
+ - meta.html
 
 # Build settings
 markdown: kramdown

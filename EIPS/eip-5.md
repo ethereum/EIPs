@@ -4,7 +4,7 @@ title: Gas Usage for `RETURN` and `CALL*`
 author: Christian Reitwiessner <c@ethdev.com>
 status: Draft
 type: Standards Track
-layer: Consensus (hard-fork)
+category: Core
 created: 2015-11-22
 ---
 

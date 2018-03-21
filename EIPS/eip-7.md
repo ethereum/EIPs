@@ -3,7 +3,8 @@ eip: 7
 title: DELEGATECALL
 author: Vitalik Buterin <v@buterin.com>
 status: Final
-type: Homestead feature
+type: Standards Track
+category: Core
 created: 2015-11-15
 ---
 

@@ -1,9 +1,21 @@
 ---
-# You don't need to edit this file, it's empty on purpose.
-# Edit theme's home layout instead if you wanna make some changes
-# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-layout: home
+layout: default
+title: Home
 ---
+
+<h1 class="page-heading">EIPs <a href="https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a></h1>
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+
+<h2>Contributing</h2>
+<p>First review <a href="EIPS/eip-1">EIP-1</a>. Then clone the repository and add your EIP to it. There is a <a href="https://github.com/ethereum/EIPs/blob/master/eip-X.md">template EIP here</a>. Then submit a Pull Request to Ethereum's <a href="https://github.com/ethereum/EIPs">EIPs repository</a>.</p>
+
+<h2>EIP status terms</h2>
+<ul>
+  <li><strong>Draft</strong> - an EIP that is open for consideration.</li>
+  <li><strong>Accepted</strong> - an EIP that is planned for immediate adoption, i.e. expected to be included in the next hard fork (for Core/Consensus layer EIPs).</li>
+  <li><strong>Final</strong> - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).</li>
+  <li><strong>Deferred</strong> an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.</li>
+</ul>
 
 {% assign statuses = site.pages|map:"status"|uniq %}
 {% assign pages = site.pages|sort:"eip" %}

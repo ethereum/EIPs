@@ -129,7 +129,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
 
-` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
+` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
 ` * category `: <Core | Networking | Interface | ERC>
 

@@ -4,7 +4,7 @@ title: Addition of CALLDEPTH opcode
 author: Martin Holst Swende <martin@swende.se>
 status: Draft
 type: Standards Track
-layer: Consensus (hard-fork)
+category: Core
 created: 2015-11-19
 ---
 
