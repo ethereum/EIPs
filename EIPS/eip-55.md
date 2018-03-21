@@ -1,11 +1,11 @@
 ---
-EIP: 55
-Title: Mixed-case checksum address encoding
-Author: Vitalik Buterin
-Type: Standard Track
-Category: ERC
-Status: Accepted
-Created: 2016-01-14
+eip: 55
+title: Mixed-case checksum address encoding
+author: Vitalik Buterin
+type: Standard Track
+category: ERC
+status: Accepted
+created: 2016-01-14
 ---
 
 # Specification

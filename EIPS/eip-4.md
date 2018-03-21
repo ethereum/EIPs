@@ -1,11 +1,11 @@
 ---
-EIP: 4
-Layer: Process
-Title: EIP Classification
-Author: Joseph Chow
-Status: Draft
-Type: Process
-Created: 2015-11-17
+eip: 4
+layer: Process
+title: EIP Classification
+author: Joseph Chow
+status: Draft
+type: Process
+created: 2015-11-17
 ---
 
 # Abstract

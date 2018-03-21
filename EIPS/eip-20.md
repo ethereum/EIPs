@@ -1,11 +1,11 @@
 ---
-EIP: 20
-Title: ERC-20 Token Standard
-Author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-Type: Standard
-Category: ERC
-Status: Accepted
-Created: 2015-11-19
+eip: 20
+title: ERC-20 Token Standard
+author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
+type: Standard
+category: ERC
+status: Accepted
+created: 2015-11-19
 ---
 
 ## Simple Summary

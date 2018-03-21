@@ -1,10 +1,10 @@
 ---
-EIP: 7
-Title: DELEGATECALL
-Author: Vitalik Buterin <v@buterin.com>
-Status: Final
-Type: Homestead feature
-Created: 2015-11-15
+eip: 7
+title: DELEGATECALL
+author: Vitalik Buterin <v@buterin.com>
+status: Final
+type: Homestead feature
+created: 2015-11-15
 ---
 
 ### Hard Fork

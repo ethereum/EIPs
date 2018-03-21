@@ -1,11 +1,11 @@
 ---
-EIP: 6
-Title: Renaming SUICIDE opcode
-Author: Hudson Jameson <hudson@hudsonjameson.com>
-Status: Final
-Type: Standards Track
-Layer: Applications
-Created: 2015-11-22
+eip: 6
+title: Renaming SUICIDE opcode
+author: Hudson Jameson <hudson@hudsonjameson.com>
+status: Final
+type: Standards Track
+layer: Applications
+created: 2015-11-22
 ---
 
 ### Abstract

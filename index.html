@@ -5,8 +5,8 @@
 layout: home
 ---
 
-{% assign statuses = site.pages|map:"Status"|uniq %}
-{% assign pages = site.pages|sort:"EIP" %}
+{% assign statuses = site.pages|map:"status"|uniq %}
+{% assign pages = site.pages|sort:"eip" %}
 {% for status in statuses %}
   {% if status != undefined %}
     <h1>{{status}}</h1>
@@ -15,8 +15,8 @@ layout: home
         <tr><th>Number</th><th>Title</th><th>Author</th><th>Layer</th></tr>
       </thead>
       {% for page in pages %}
-        {% if page.Status == status %}
-          <tr><td><a href="{{page.url|relative_url}}">{{page.EIP}}</a></td><td>{{page.Title|xml_escape}}</td><td>{{page.Author|xml_escape}}</td><td>{{page.Layer|xml_escape}}</td></tr>
+        {% if page.status == status %}
+          <tr><td><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td><td>{{page.title|xml_escape}}</td><td>{{page.author|xml_escape}}</td><td>{{page.layer|xml_escape}}</td></tr>
         {% endif %}
       {% endfor %}
     </table>

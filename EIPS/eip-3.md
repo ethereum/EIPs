@@ -1,11 +1,11 @@
 ---
-EIP: 3
-Title: Addition of CALLDEPTH opcode
-Author: Martin Holst Swende <martin@swende.se>
-Status: Draft
-Type: Standards Track
-Layer: Consensus (hard-fork)
-Created: 2015-11-19
+eip: 3
+title: Addition of CALLDEPTH opcode
+author: Martin Holst Swende <martin@swende.se>
+status: Draft
+type: Standards Track
+layer: Consensus (hard-fork)
+created: 2015-11-19
 ---
 
 # Abstract
