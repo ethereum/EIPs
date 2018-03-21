@@ -22,7 +22,6 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: ethereum
 github_username:  ethereum
 header_pages:
- - index.html
  - core.html
  - networking.html
  - interface.html
