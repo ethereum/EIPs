@@ -10,7 +10,7 @@
         <tr>
           <td><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
           <td>{{page.title|xml_escape}}</td>
-          <td>{{page.author|xml_escape}}</td>
+          <td>{% include authorlist.html authors=page.author %}</td>
         </tr>
       {% endfor %}
     </table>

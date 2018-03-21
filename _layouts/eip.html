@@ -5,7 +5,7 @@ layout: default
 <div class="home">
   <h1 class="page-heading">EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}</h1>
   <table>
-    <tr><th>Author</th><td>{{ page.author | xml_escape }}</td></tr>
+    <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
     {% if page["discussions-to"] != undefined %}
       <tr><th>Discussions-To</th><td><a href="mailto:{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
     {% endif %}
@@ -19,10 +19,10 @@ layout: default
       <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
     {% endif %}
     {% if page.replaces != undefined %}
-      <tr><th>Replaces</th><td>{{% include eipnums.html eips=page.replaces %}</td></tr>
+      <tr><th>Replaces</th><td>{% include eipnums.html eips=page.replaces %}</td></tr>
     {% endif %}
     {% if page["superseded-by"] != undefined %}
-      <tr><th>Superseded by</th><td>{% include eipnums.html eips=page['superseded-by'] %}</td></tr>
+      <tr><th>Superseded by</th><td>{% include eipnums.html eips=page.superseded-by %}</td></tr>
     {% endif %}
     {% if page.resolution != undefined %}
       <tr><th>Resolution</th><td><a href="{{page.resolution | uri_escape }}">{{ page.resolution | xml_escape }}</a></td></tr>
