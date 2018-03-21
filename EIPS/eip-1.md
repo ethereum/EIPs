@@ -131,6 +131,8 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
 
+` * category `: <Core | Networking | Interface | ERC>
+
 ` created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
 
 ` * requires: `<EIP number(s)>
@@ -156,6 +158,8 @@ Note: The resolution header is required for Standards Track EIPs only. It contai
 While an EIP is in private discussions (usually during the initial Draft phase), a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
 
 The type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
+
+The category header specifies the EIP's category. This is required for standards-track EIPs only.
 
 The created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 

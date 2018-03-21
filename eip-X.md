@@ -1,18 +1,19 @@
+---
+eip: <to be assigned>
+title: <EIP title>
+author: <list of authors' names and optionally, email addresses>
+discussions-to: <email address>
+status: Draft
+type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
+category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+requires (*optional): <EIP number(s)>
+replaces (*optional): <EIP number(s)>
+---
+
 This is the suggested template for new EIPs.
 
 Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-## Preamble
-
-    EIP: <to be assigned>
-    Title: <EIP title>
-    Author: <list of authors' names and optionally, email addresses>
-    Type: <Standard Track | Informational | Meta>
-    Category (*only required for Standard Track): <Core | Networking | Interface | ERC> 
-    Status: Draft
-    Created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-    Requires (*optional): <EIP number(s)>
-    Replaces (*optional): <EIP number(s)>
 
 The title should be 44 characters or less.
 
@@ -26,7 +27,7 @@ A short (~200 word) description of the technical issue being addressed.
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). 
+The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...).
 
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
