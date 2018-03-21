@@ -1,6 +1,6 @@
 {% assign bystatus = include.eips|sort:"eip"|group_by:"status" %}
 {% for group in bystatus %}
-  {% if group.name != undefined %}
+  {% if group.name != "" %}
     <h2>{{group.name}}</h2>
     <table>
       <thead>
