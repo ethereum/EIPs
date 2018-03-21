@@ -2,55 +2,308 @@
 
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: Ethereum typed data signing
-    Author: Leonid Logvinov <logvinov.leon@gmail.com>
-    Type: Standard Track
+    EIP:      <to be assigned>
+    Title:    Ethereum typed structured data signing
+    Author:   Remco Bloemen <remco@wicked.ventures>,
+              Leonid Logvinov <logvinov.leon@gmail.com>
+    Type:     Standard Track
     Category: ERC
-    Status: Draft
-    Created: 2017-09-13
+    Status:   Draft
+    Created:  2017-09-13
+
+
 
 ## Simple Summary
 
-Standard for machine-verifiable and human-readable typed data signing with Ethereum keys.
+<!-- "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. -->
+
+Signing data is a solved problem if all we care about are bytestrings. Unfortunately in the real world we care about complex meaningful messages. Mapping these to bytestrings is an error prone process. This standard 
+
+
 
 ## Abstract
 
-Ethereum clients provide the ability to sign UTF-8 strings with the `eth_sign` RPC call. This call, however, doesn't give Signer UI's enough metadata to display the actual intent of the DApp when the data being signed is not a string. Over time, we expect value to be transferred on Ethereum using protocols that involve off-chain components (e.g. state channels). These protocols are going to involve signing complex data structures with Ethereum keys, making a human-readable, machine-verifiable signing flow critical for user security.
+<!-- A short (~200 word) description of the technical issue being addressed. -->
 
-This EIP adds an RPC method to sign arrays of arbitrary typed data, making it easy for the Signer UI to display this data to the user in a human-readable form, so that the user can be 100% confident of exactly what they are signing, while keeping the resulting signatures machine-verifiable. In addition, there is no room for a malicious DApp to provide the signer with alternative data then that being presented to the user, since the signer is the one hashing the typed data before the user signs it.
+This is a standard for hashing and signing of typed structured data (as opposed to bytestrings). A new RPC call, web3 function and Solidity features is added. A reference and optimized implementation in EVM is given.
 
-This method should only be implemented in Ethereum clients with Signer UI's that require user approval before signing (MetaMask, MEW, Parity signer, Ledger, Trezor, Cypher Browser). It should not be implemented in clients where approval is already granted (e.g. Geth with unlocked accounts).
-
-<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
-
-This EIP is a continuation of a discussion [here](https://github.com/ethereum/EIPs/pull/683).
-I offered this solution in [a comment](https://github.com/ethereum/EIPs/pull/683#issuecomment-327945854).
-It proposes a more general solution then the one offered [here](https://github.com/ethereum/EIPs/pull/693).
 
 ## Motivation
 
-There is a whole range of higher level protocols emerging on Ethereum. State channels, 0x protocol, Login protocols, etc... For scalability reasons these protocols want to sign some protocol-specific data off-chain. They then use those signed messages to trigger on-chain or other actions with important consequences.
+<!-- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. -->
 
-* Transferring ETH
-* Transferring tokens
-* Transferring ownership
-* etc...
+A signature scheme consists of hashing algorithm and a signing algorithm. The signing algorithm of choice in Ethereum is `secp256k1`. The hashing algorithm of choice is `keccak256`, this is a function from bytestrings, 𝔹⁸ⁿ, to 256-bit strings, 𝔹²⁵⁶.
 
+A good hashing algorithm should satisfy security properties such as determinism, second pre-image resistance and collision resistance. The `keccak256` function satisfies the above criteria *when applied to bytestrings*. If we want to apply it to other sets we first need to map this set to bytestrings. It is critically important that this encoding function is [deterministic][deterministic] and [injective][injective]. If it is not deterministic then the hash might differ from the moment of signing to the moment of verifying, causing the signature to incorrectly be rejected. If it is not injective then there are two different elements in our input set that hash to the same value, causing a signature to be valid for a different unrelated message.
 
-The current `eth_sign` implementation allows signing of arbitrary data without specifying it's type or structure. Some signers assume that the data is a UTF-8 string. Some signers show it as a hex encoded string. This leads to user confusion since it's impossible to verify the message you're signing unless it's a plaintext UTF-8 string.
+[deterministic]: https://en.wikipedia.org/wiki/Deterministic_algorithm
+[injective]: https://en.wikipedia.org/wiki/Injective_function
 
-<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_sign.png"  width="500px">
+### Transactions and bytestrings
 
-Calling `eth_sign` on Metamask displays the string to sign. If the user is signing the result of hashing a complex structure involving multiple critical pieces of information, the only way to verify what they are signing is to re-hash the same structure in an independent script and make sure the hashes match.
+An illustrative example of the above breakage can be found in Ethereum prior to.
+Ethereum has two kinds of messages, transactions `𝕋` and bytestrings `𝔹⁸ⁿ`. These are signed using `eth_sendTransaction` and `eth_sign` respectively. Originally the encoding function `encode : 𝕋 ∪ 𝔹⁸ⁿ → 𝔹⁸ⁿ` was as defined as follows:
 
-Calling `personal_sign` on Metamask with the raw bytes of a hash (e.g. not an ASCII string) shows the user this even less verifiable message that they should sign.
+* `encode(t : 𝕋) = RLP_encode(t)`
+* `encode(b : 𝔹⁸ⁿ) = b`
 
-<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/personal_sign.png"  width="500px">
+While individually they satisfy the required properties, together they do not. If we take `b = RLP_encode(t)` we have a collision. This is mitigated in Geth [PR 2940][geth-pr] by modifying the second leg of the encoding function:
 
-The main problem is that signers don't have enough metadata to display the DApp's real intent effectively. In order to do so, they need the plaintext input that the dApp wishes hashed and signed by the user.
+[geth-pr]: https://github.com/ethereum/go-ethereum/pull/2940
+
+* `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b)` where `len(b)` is the ascii-decimal encoding of the number of bytes in `b`.
+
+Since `RLP_encode(t : 𝕋)` never starts with `\x19`, this solves the collision between the functions. The function also does not introduce new collisions, but this is mostly due to luck, the encoding function is ambiguous. Does `"x19Ethereum Signed Messagege:\n42a…"` mean a four byte string starting with `2a` or a 42-byte string starting with `a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately, it appears this flaw does not lead to actual collisions. It would easier to prove security if `len(b)` was left out entirely. It is also important that `len(b)` does not allow zero padding as that would fail the determinism criteria.
+
+[geth-issue-14794]: https://github.com/ethereum/go-ethereum/issues/14794
+[trezor]: https://github.com/trezor/trezor-mcu/issues/163
+
+The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` expects implements to do exactly that.
+
+### Messages
+
+The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps 𝕄. This set is impossible to formalize, so we approximate it with the set of typed named structures 𝕊 and a domain separator 𝔹²⁵⁶ to obtain the set `𝔹²⁵⁶ × 𝕊`. The specification formalizes the set 𝕊 and provides a deterministic injective encoding function.
 
 ## Specification
+
+<!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...).  -->
+
+* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ encode(s)`
+* `encode(s : 𝕊) = keccak256(schemaHash(s) ‖ data(s))`
+
+The set 𝕊 consists of all instances of
+
+[abi-types]: http://solidity.readthedocs.io/en/v0.4.21/abi-spec.html#types
+
+* Value types:
+  * `bytes1` to `bytes32`
+  * `uint8` to `uint256` (but no `uint`)
+  * `int8` to `int256` (but no `int`)
+  * `bool`
+  * `address` (but not specific contract instances)
+  * Enums
+* Dynamic types:
+  * `bytes`
+  * `bytes`
+* Reference types:
+  * Arrays
+  * Structs
+
+
+
+### Domain separator
+
+The domain separator is a 256-bit nonce. It is mostly there to prevent collision of 
+
+
+
+The specification is based on
+
+* the `keccak256` hashing function,
+* the SECP-256k1 ECDSA signature algorithm as specified in the yellow paper and
+* [ABIv2 types][abiv2types].
+
+[abiv2types]: https://solidity.readthedocs.io/en/develop/abi-spec.html#types
+
+In pseudo code, the signing and verifying algorithms are as follows:
+
+**Signing**: Suppose we want to sign a complex `message`, in pseudo code we would do the following:
+
+1. Hash the type of the message. This is the same for every message of this type, an application specific constant. This function is described below.
+
+```javascript
+schemaHash = schemaHashFunction(typeof(message))
+```
+
+2. Hash the contents of the message is an unambiguous way. This function is described below.
+
+```javascript
+dataHash = dataHashFunction(message)
+```
+
+3. Combine both
+
+```javascript
+structHash = keccak256(schemaHash, dataHash)
+messageHash = keccak256(domainSeparator, messageHash)
+```
+
+4. Sign using existing elliptic curve signature standards.
+
+```javascript
+(v, r, s) = ecdsa_sign(messageHash, privateKey)
+bytes65 signature = v || r || s
+```
+
+**Verifying**:
+
+1. Compute the `messageHash` identical to the above.
+2. Verify using the existing elliptic curve signature verification, or use an ecrecover.
+
+
+The JSON RPC call `eth_signTypedData` will take a type specification and JSON encoded data that matches the type specifications.
+
+
+### Computation of `schemaHash`
+
+The `schemaHash` computation is based on the [ABIv2 function signature encoding][abiv2-sig], with the following changes
+
+[abiv2-sig]: https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding
+
+1. The full 32-byte output of `keccak256` is used instead of the first four bytes.
+2. For tuples, the type name of the corresponding struct is prefixed to the tuple.
+3. In tuples, after each type, a single space and the name of the parameter is specified.
+4. All relevant struct types are declared sequentially in alphabetical order, with the exception of the `root` type, which is declared first.
+
+The `root` of the schema is always a struct.
+
+#### Example
+
+```
+struct Person {
+    string name;
+    address wallet;
+}
+
+struct Message {
+    Person from;
+    Person to;
+    string message;
+}
+```
+
+Then `schemaHash(Message)` is as follows:
+
+```
+bytes32 schemaHash = keccak256(
+    "Message(Person from,Person to,string message)"
+    "Person(string name,address wallet)"
+  );
+```
+
+(Note that the string is split up in substrings for readability. The result is equivalent if all strings are concatenated).
+
+### Computation of `dataHash`
+
+All [elementary types][abitypes] from ABIv2 are padded to 32 bytes. Just like in ABIv2, this also includes `bytes32` and the like.
+
+[abitypes]: https://solidity.readthedocs.io/en/develop/abi-spec.html#types
+
+Arrays of fixed size are concatenated, with the encoding applied recursively.
+
+The reference implementation will enter an infinite recursion when asked to hash a cyclical data structure. It is possible to solve this by maintaining a stack of visited addresses and using a stack index when revisiting a node. This should still lead to u
+
+Similarly, a data structure that is a directed acyclic graph will be walked as if it is a tree. This can cause nodes to be hashed more than once. In the worst case this leads to an exponential growth in computation time. Memoization would solve this,
+
+
+### `eth_signTypedData` JSON RPC
+
+
+### Web3 interface
+
+
+### Optimized EVM implementation
+
+```javascript
+struct Order {
+    address from;
+    address to;
+    uint128 amount;
+    uint64 timestamp;
+    string message;
+}
+
+bytes32 constant ORDER_SCHEMA_HASH = keccak256(
+  "Order(address from,address to,uint128 amount,"
+  "uint64 timestamp,string message)");
+
+function dataHash(Order order) returns (bytes32 hash) {
+    
+    // Compute sub-hashes
+    bytes32 messageHash = keccak256(order.message);
+    
+    assembly {
+        // Back up select memory 
+        let temp1 := mload(sub(order, 32))
+        let temp2 := mload(add(order, 128))
+        
+        // Write schemaHash and sub-hashes
+        mstore(sub(order, 32), ORDER_SCHEMA_HASH)
+        mstore(add(order, 128), messageHash)
+        
+        // Compute hash
+        hash := keccak256(sub(order, 32), 192)
+        
+        // Restore memory
+        mstore(sub(order, 32), temp1)
+        mstore(add(order, 128), temp2)
+    }
+}
+```
+
+For this to work, the `Order` struct needs to be stored at an address higher than 32. Solidity currently reserves the lower addresses for internal use, so this requirement is already always satisfied.
+
+
+
+### Solidity extensions
+
+`Order.schemaHash` will return the schemaHash.
+
+`keccak256(order)` will generate code for the above optimized implementation.
+
+```
+function verifySignature(Order order, uint8 v, bytes32 r, bytes32 s) {
+    address signer = ecrecover(keccak256(order), v, r, s);
+}
+```
+
+
+
+## Rationale
+
+<!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
+
+
+### Schema hash
+
+For the schema hash several alternatives where considered and rejected for the flaws mentioned:
+
+**Alternative 1**: Use ABIv2 function signatures. `bytes4` is not enough to be collision resistant. Unlike function signatures, there is negligible runtime cost incurred by using longer hashes.
+
+**Alternative 2**: ABIv2 function signatures modified to be 256-bit. While this unambigously captures type info, it does not capture any of the semantics other than the function. This is already causing a practical collision between ERC20's and ERC721's `transfer(address,uint256)`, where in the former the `uint256` revers to an amount and the latter to a unique id.
+
+**Alternative 3**: 256-bit ABIv2 signatures extended with parameter names and type names. The `Message` example from a above would be encoded as `Message(Person(string name,address wallet) from,Person(string name,address wallet) to,string message)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). More importantly, it does not allow a schemaHash for a recursive data type (consider `struct List {uint256 value; List next;}`).
+
+This progression leads us to the current specification. There are also some ideas that have been considered, but not implemented for reason.
+
+**Idea 4**: Include a domain separator. When designing a specific message format, the message format designer generates a 256-bit random number, which is then combined with the schemaHash. This eliminates accidental collision of standards. This idea is not implemented because generating random numbers is error prone.
+
+**TODO**: I'm actually in favour of Idea 4, should we include it? Yes!
+
+**Idea 5**: Include the target contract address. Similar to the domain separator, except instead of a random number the address of the target contract is used. This assumes that only a single contract will be handling the signed messages, but in practices a signed message protocol may be used by multiple participants.
+
+**Idea 6**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It would make the schemaHash mechanism very verbose. It also prevents the documentation from being extended and amended.
+
+### Data hash
+
+**Alternative 7**: Tight packing.
+
+**Alternative 8**: ABIv2 encoding. Especially with the upcoming `abi.encode` it should be easy to use `keccak256(abi.encode(someStruct))` as the `dataHash`. The ABIv2 standard by itself fails the determinism security criteria. There are several valid ABIv2 encodings of the same data. It also does not incorporate type data, so the `schemaHash` would still be required for safety, requiring additional code. The current proposal is safer because type information is always included in the hash. Finally, the current standard allows for an efficient implementation that avoids copying of data.
+
+**Alternative 9**: Recursive data/schema hash.
+
+**TODO**: Actually, I like this. Why not?
+
+**Idea 10**: Cyclical data structures.
+
+
+### In place computation of hashes
+
+The format of the encoding is designed to coincide with the in-memory representation. This allows for an efficient zero-copy implementation of the hashing functions:
+
+It is entirely possible, and encouraged, for Solidity to make this the default behaviour when hashing a struct. The current implementation just hashes the pointer address, which is not very useful.
+
+### `eth_signTypedData` JSON RPC
 
 This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`.
 
@@ -84,29 +337,6 @@ Typed data is the array of data entries with their specified type and human-read
 
 There also should be a corresponding `personal_signTypedData` method which accepts the password for an account as the last argument.
 
-### Example params:
-// For this state channel POC: https://medium.com/@matthewdif/ethereum-payment-channel-in-50-lines-of-code-a94fad2704bc
-```javascript
-typedData = [
-    {
-      "name": "channel",
-      "type": "address",
-      "value": "0xb088a3Bc93F71b4DE97b9De773e9647645983688",
-    },
-    {
-      "name": "value",
-      "type": "uint",
-      "value": 42,
-    },
-];
-```
-
-### How it can look in signer UI:
-
-<img src="https://raw.githubusercontent.com/0xProject/EIPs/master/EIPS/eip-eth_signTypedData/eth_signTypedData.png" width="500px">
-
-
-It's important to make the schema part of the signature (explanation can be found in “Rationale” section). The way the schema will be combined with the values to generate the hash signed by the user is shown below. First, the schema is encoded into a string using a method similar to [solidity events signatures](http://solidity.readthedocs.io/en/develop/contracts.html#low-level-interface-to-logs). Then it's hash is prepended to the data array before hashing it.
 
 ### Pseudocode examples:
 
@@ -154,124 +384,85 @@ const hash = keccak256(schemaHash, message, value);
 address recoveredSignerAddress = ecrecover(hash, v, r, s);
 ```
 
-Signature will be returned in the same format as `eth_sign` (the ecSignature params concatenated together (r + s + v) and hex encoded.
+Signature will be returned in the same format as `eth_sign` (the ecSignature params concatenated together `(r + s + v)` and hex encoded.
 
-## Rationale
-
-Signing support in Ethereum clients is most useful for off-chain transactions. On-chain transactions in Ethereum have well-defined typed schemas (gas uint, gasPrice uint, etc) which allows signer UIs to show useful information about transactions to the user. We need the same for off-chain transactions.
-
-The Solidity keccak256 function accepts an array of typed arguments and motivated the current design.
-
-The main and the most important part of this change is to give Signer UIs a chance to give a user enough information to be able to verify what is being signed even when using untrusted DApps. Since the DApp does not get to provide the signer with a hard-to-read hash but must supply the exact values (in plain-text) that the user will be signing, the dangers of signing a malicious action (transaction or otherwise) are greatly reduced.
-
-The schema information must be signed together with the data, so that the verifying party can be confident, that the user was shown the data with the corresponding type and names supplied by the DApp.
-
-This approach is even possible to implement on hardware wallets with small screens (Ledger Nano S, Trezor). Users will be shown one line at a time (as currently with transactions).
 
 
 ## Backwards Compatibility
 
-This EIP does not break backwards compatibility.
-
-`eth_sign` and `personal_sign` will not be removed for backwards compatibility reasons even though the `eth_signTypedData` is a superset of their functionality. Current off-chain protocols will however need to modify the verifying code in their smart contracts to include the schema.
-
-Example of signing a simple string using `eth_signTypedData`
-
-```javascript
-const signature = await web3.eth.signTypedData(
-  [
-    {
-      'type': 'string',
-      'name': 'message',
-      'value': 'Hi, Alice!',
-    },
-  ],
-  signerAddress,
-);
-```
+<!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
 
 
-The implementation of `eth_signTypedData`  makes some assumptions about the crypto primitives being used (tightly-packed + keccak256 + secp256k1), but the same assumptions have already been made for the [keccak256](http://solidity.readthedocs.io/en/develop/units-and-global-variables.html) function in solidity. If Ethereum becomes more crypto-agnostic in the future and allows for other types of signatures - this EIP can be adjusted.
 
-The choice of keccak256 is motivated by the fact, that it's [twice as cheap to verify in a smart contract](https://ethereum.stackexchange.com/questions/3184/what-is-the-cheapest-hash-function-available-in-solidity/3200#3200) when compared with sha3.
+`keccak256(order)` is already valid syntax in Solidity and it currently.
+
+This is already valid Solidity syntax. The current behaviour is to compute the hash of the address of the Order struct. This is a breaking change, but it unlikely that the current behaviour is useful.
+
+
 
 ## Test Cases
 
-All tests use the first address generated by the mnemonic:
+<!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
+
+
+#### Examples
+
 ```
-concert load couple harbor equip island argue ramp clarify fence smart topic
-```
-Address:
-```
-0x5409ed021d9299bf6814279a6a1411a7e866a631
-```
-Private key:
-```
-f2f48ee19680706196e2e339e5da3491186e0c4c5030670656b0e0164837257d
+struct Order {
+    address from;
+    address to;
+    uint128 amount;
+    uint64 timestamp;
+    string message;
+}
+
+function dataHash(Order order) returns (bytes32) {
+    return keccak256(
+        bytes32(order.from),
+        bytes32(order.to),
+        bytes32(order.amount),
+        bytes32(order.timestamp),
+        keccak256(order.message)
+    );
+}
 ```
 
-```javascript
-const test1 = [{
-    value: 'Hi, Alice!',
-    type: 'string',
-    name: 'message',
-}];
-const schema = 'string message';
-const schemaHash = '0xdc515b3059b4b84c18705c36390462776d1225701f972f9c3be50e553609e243';
-const typedDataHash = '0xe18794748cc6d73634d578f6a83f752bee11a0c9853d76bd0111d67a9b555a2c';
-const signature = '0x1a4ca93acf066a580f097690246e6c85d1deeb249194f6d3c2791f3aecb6adf8714ca4a0f12512ddd2a4f2393ea0c3b2c856279ba4929a5a34ae6859689428061b';
+```
+struct Person {
+    string name;
+    address wallet;
+}
+
+struct Message {
+    Person from;
+    Person to;
+    string message;
+}
+
+function dataHash(Person person) returns (bytes32) {
+    return keccak256(
+        keccak256(person.name),
+        bytes32(person.wallet),
+    );
+}
+
+function dataHash(Message message) returns (bytes32) {
+    return keccak256(
+        dataHash(message.from),
+        dataHash(message.to),
+        keccak256(message.message)
+    );
+}
 ```
 
-```javascript
-const test2 = [{
-    value: 42,
-    type: 'uint',
-    name: 'value',
-}];
-const schema = 'uint value';
-const schemaHash = '0x900c03b437f206d641d2295da46ff002a6734dc3e65bf63bf34df850fc7ccfbc';
-const typedDataHash = '0x6cb1c2645d841a0a3d142d1a2bdaa27015cc77f442e17037015b0350e468a957';
-const signature = '0x87c5b6a9f3a758babcc9140a96ae07957c6c9109af65bf139266cded52da49e63df6af6f7daef588218e156bc83b95e0bfcfa8e72843cf4cf8c67c3ca11c3fd11b';
-```
 
-```javascript
-const test3 = [
-    {
-        value: 42,
-        type: 'uint',
-        name: 'value',
-    },
-    {
-        value: 'Hi, Alice!',
-        type: 'string',
-        name: 'message',
-    },
-    {
-        value: false,
-        type: 'bool',
-        name: 'removed',
-    },
-];
-const schema = 'uint value,string message,bool removed';
-const schemaHash = '0x4820e70c96098f7857d65e3f43eacb822e7e99c863e7948d544a58a4936b73e9';
-const typedDataHash = '0xdb7ef11800c80fd69e0d1ddeb08309aecc0deefc5db8e2bafe84655f5266f0eb';
-const signature = '0x442d2a668ea3e79b7f8084a8ddaaca82b80eba509a08e2fb0a116733053fea404829b3651c89415cbd6f5598282f552c28b4b43a9429147fb66e0228ba7f7c1a1b';
-```
 
 ## Implementation
 
-It is implemented as an experimental feature in Metamask 3.11.0+.
-It's not part of web3.js yet, so you can try using it like:
-```javascript
-const data = {
-  'type': 'string',
-  'name': 'message',
-  'value': 'Hi, Alice!',
-};
-web3.currentProvider.sendAsync({method: 'eth_signTypedData', params: [data, signerAddress], jsonrpc: '2.0', id: 1}, callback);
-```
+<!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
+
+
 
 ## Copyright
-
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
