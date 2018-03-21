@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+<div class="home">
+  <h1 class="page-heading">EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}</h1>
+
+  <table>
+    <tr><th>Author</th><td>{{ page.author | xml_escape }}</td></tr>
+    <tr><th>Status</th><td>{{ page.status | xml_escape }}</td></tr>
+    <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
+    <tr><th>Layer</th><td>{{ page.layer | xml_escape }}</td></tr>
+    <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
+    <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
+  </table>
+
+  {{ content }}
+
+</div>
