@@ -117,29 +117,31 @@ EIPs should be written in [markdown] format. Image files should be included in a
 EIP Header Preamble
 -------------------
 
-Each EIP must begin with an RFC 822 style header preamble. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each EIP must begin with an RFC 822 style header preamble, preceded and followed by three hyphens ('---'). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-` EIP: ` <EIP number> (this is determined by the EIP editor)
+` eip: ` <EIP number> (this is determined by the EIP editor)
 
-` Title: `<EIP title>
+` title: `<EIP title>
 
-` Author: `<list of author's real names and optionally, email address>
+` author: `<list of author's real names and optionally, email address>
 
-` * Discussions-To: ` <email address>
+` * discussions-to: ` <email address>
 
-` Status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
+` status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
 
-` Type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
+` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
 
-` Created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
+` created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
 
-` * Replaces: `<EIP number>
+` * requires: `<EIP number(s)>
 
-` * Superseded-By: `<EIP number>
+` * replaces: `<EIP number(s)>
 
-` * Resolution: `<url>
+` * superseded-by: `<EIP number(s)>
 
-The Author header lists the names, and optionally the email addresses of all the authors/owners of the EIP. The format of the Author header value must be
+` * resolution: `<url>
+
+The author header lists the names, and optionally the email addresses of all the authors/owners of the EIP. The format of the author header value must be
 
 Random J. User &lt;address@dom.ain&gt;
 
@@ -149,17 +151,19 @@ Random J. User
 
 if the email address is not given.
 
-Note: The Resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
+Note: The resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While an EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the EIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
+While an EIP is in private discussions (usually during the initial Draft phase), a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
 
-The Type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
+The type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
-The Created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+The created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
-EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
+EIPs may have a requires header, indicating the EIP numbers that this EIP depends on.
 
-EIPs may also have a Superseded-By header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
+EIPs may also have a superseded-by header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
+
+Headers that permit lists must separate elements with commas.
 
 Auxiliary Files
 ---------------

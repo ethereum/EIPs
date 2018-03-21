@@ -7,11 +7,24 @@ layout: default
 
   <table>
     <tr><th>Author</th><td>{{ page.author | xml_escape }}</td></tr>
+    {% if page["discussions-to"] != undefined %}
+      <tr><th>Discussions-To</th><td>{{ page["discussions-to"] | xml_escape }}</td></tr>
+    {% endif %}
     <tr><th>Status</th><td>{{ page.status | xml_escape }}</td></tr>
     <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
-    <tr><th>Layer</th><td>{{ page.layer | xml_escape }}</td></tr>
-    <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
     <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
+    {% if page.requires != undefined %}
+      <tr><th>Requires</th><td>{{ page.requires | xml_escape }}</td></tr>
+    {% endif %}
+    {% if page.replaces != undefined %}
+      <tr><th>Replaces</th><td>{{ page.replaces | xml_escape }}</td></tr>
+    {% endif %}
+    {% if page["superseded-by"] != undefined %}
+      <tr><th>Superseded by</th><td>{{ page["superseded-by"] | xml_escape }}</td></tr>
+    {% endif %}
+    {% if page.resolution != undefined %}
+      <tr><th>Resolution</th><td>{{ page.resolution | xml_escape }}</td></tr>
+    {% endif %}
   </table>
 
   {{ content }}
