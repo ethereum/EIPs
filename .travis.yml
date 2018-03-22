@@ -5,9 +5,6 @@ language: ruby
 # Cache Ruby bundles
 cache: bundler
 
-before_script:
-  - bundle exec github-pages versions
-
 # Assume bundler is being used, therefore
 # the `install` step will run `bundle install` by default.
 script: "bash -ex .travis-ci.sh"

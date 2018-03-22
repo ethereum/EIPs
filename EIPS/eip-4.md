@@ -4,7 +4,7 @@ layer: Process
 title: EIP Classification
 author: Joseph Chow
 status: Draft
-type: Process
+type: Meta
 created: 2015-11-17
 ---
 
