@@ -36,7 +36,7 @@ theme: minima
 plugins:
   - jekyll-feed
 
-permalink: slug
+permalink: /:slug
 
 defaults:
   -

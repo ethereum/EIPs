@@ -62,7 +62,7 @@ EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
 The possible paths of the status of EIPs are as follows:
 
-![](process.png)
+![EIP Process](eip-1/process.png)
 
 Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
 
@@ -220,10 +220,6 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 <!-- -->
 
--   List the EIP in [README.md]
-
-<!-- -->
-
 -   Send a message back to the EIP author with next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
@@ -238,6 +234,8 @@ This document was derived heavily from [Bitcoin's BIP-0001] written by Amir Taak
 December 7, 2016: EIP 1 has been improved and will be placed as a PR.
 
 February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
+
+March 21, 2018: Minor edits to accommodate new automatically-generated EIP directory on eips.ethereum.org.
 
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
@@ -266,7 +264,6 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [formal specification]: https://github.com/ethereum/yellowpaper
   [the Issues section of this repository]: https://github.com/ethereum/EIPs/issues
   [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-  [README.md]: README.md "wikilink"
   [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
   [Python's PEP-0001]: https://www.python.org/dev/peps/
 
