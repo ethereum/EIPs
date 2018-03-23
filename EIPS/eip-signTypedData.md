@@ -26,14 +26,15 @@ As such, the adage "don't roll your own crypto" applies. Instead, a peer-reviewe
 
 <!-- A short (~200 word) description of the technical issue being addressed. -->
 
-This is a standard for hashing and signing of typed structured data as opposed to bytestrings.
+This is a standard for hashing and signing of typed structured data as opposed to jsut bytestrings. It includes a
 
-* A specification of structured data similar to and compatible with Solidity structs.
-* A safe hashing algorithm for instances of those structures.
-* Safe inclusion of those instances in the set of signable messages.
-* A new RPC call `eth_signTypedData`.
-* An optimized implementation of the hashing algorithm in EVM.
-* An extension to the Solidity language.
+* theoretical framework for correctness of encoding functions,
+* specification of structured data similar to and compatible with Solidity structs,
+* safe hashing algorithm for instances of those structures,
+* safe inclusion of those instances in the set of signable messages,
+* new RPC call `eth_signTypedData`,
+* optimized implementation of the hashing algorithm in EVM, and
+* an extension to Solidity's `keccak256` builtin function.
 
 
 ## Motivation
@@ -49,8 +50,7 @@ A good hashing algorithm should satisfy security properties such as determinism,
 
 ### Transactions and bytestrings
 
-An illustrative example of the above breakage can be found in Ethereum prior to.
-Ethereum has two kinds of messages, transactions `𝕋` and bytestrings `𝔹⁸ⁿ`. These are signed using `eth_sendTransaction` and `eth_sign` respectively. Originally the encoding function `encode : 𝕋 ∪ 𝔹⁸ⁿ → 𝔹⁸ⁿ` was as defined as follows:
+An illustrative example of the above breakage can be found in Ethereum. Ethereum has two kinds of messages, transactions `𝕋` and bytestrings `𝔹⁸ⁿ`. These are signed using `eth_sendTransaction` and `eth_sign` respectively. Originally the encoding function `encode : 𝕋 ∪ 𝔹⁸ⁿ → 𝔹⁸ⁿ` was as defined as follows:
 
 * `encode(t : 𝕋) = RLP_encode(t)`
 * `encode(b : 𝔹⁸ⁿ) = b`
@@ -61,220 +61,99 @@ While individually they satisfy the required properties, together they do not. I
 
 * `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the ascii-decimal encoding of the number of bytes in `b`.
 
-Since `RLP_encode(t : 𝕋)` never starts with `\x19`, this solves the collision between the functions. The function also does not introduce new collisions, but this is mostly due to luck, the encoding function is ambiguous. Does `"x19Ethereum Signed Messagege:\n42a…"` mean a four byte string starting with `2a` or a 42-byte string starting with `a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately, it appears this flaw does not lead to actual collisions. It would easier to prove security if `len(b)` was left out entirely. It is also important that `len(b)` does not allow zero padding as that would fail the determinism criteria.
+This solves the collision between the legs since `RLP_encode(t : 𝕋)` never starts with `\x19`. There is still the risk of the new encoding function not being deterministic or injective. It is instructive to consider those in detail.
+
+As is, the definition above is not deterministic. For a 4-byte string `b` both encodings with `len(b) = "4"` and `len(b) = "004"` are valid. This can be solved by further requiring that the decimal encoding of the length has no leading zeros.
+
+The above definition is not obviously collision free. Does a bytestring starting with `"x19Ethereum Signed Message:\n42a…"` mean a 42-byte string starting with `a` or a 4-byte string starting with `2a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately this does not lead to actual collisions as the length of the encoded bytestring provides sufficient information to disambiguate the cases.
 
 [geth-issue-14794]: https://github.com/ethereum/go-ethereum/issues/14794
 [trezor]: https://github.com/trezor/trezor-mcu/issues/163
 
-The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` expects implements to do exactly that.
+Both determinism and invectiveness would be trivially true if `len(b)` was left out entirely. The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` still takes a bytestring as input and expects implementors to come up with an encoding.
 
 ### Messages
 
-The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps 𝕄. This set is impossible to formalize, so we approximate it with the set of typed named structures 𝕊 and a domain separator 𝔹²⁵⁶ to obtain the set `𝔹²⁵⁶ × 𝕊`. The specification formalizes the set 𝕊 and provides a deterministic injective encoding function.
-
+The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize  so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
 
 
 ## Specification
 
 <!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...).  -->
 
-The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing as follows:
+The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is thus `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing and signing as follows:
 
 * `encode(t : 𝕋) = RLP_encode(t)`
 * `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the *non-zero-padded* ascii-decimal encoding of the number of bytes in `b`.
-* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ hash(s)` where `d` is a domain separator and `hash(s)` is defined below.
+* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
 
 This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(t)` does not start with `\x01` or `\x19`.)
 
-### Domain separator
+### Domain separator `d`
 
-The domain separator is a 256-bit nonce. It prevents collision of otherwise identical data structures. For each distinct use-case a new nonce is generated. It is recommended to use the address of a relevant contract or a randomly generated 256-bit constant. It should be considered part of the interface specification and shared with it.
+The domain separator is a 256-bit nonce. For each distinct use-case a new nonce is generated. It is recommended to use the address of a relevant contract or a randomly generated 256-bit constant. It should be considered part of the interface specification and shared with it.
 
-### Hashing of structured data
+It is recommended to use a different domain separator on different chains (i.e. testnet and mainnet) to prevent accidental compatibility. The Ethereum signature method already includes a chain-id to prevent cross-chain signature validity.
 
-The set 𝕊 contains all instances of a struct type. A struct has a name and zero or more member variables. Member variables have a type and a name.
+### Definition of typed structured data `𝕊`
+
+To define the set of all structured data, we start with defining acceptable types. Like ABIv2 these are closely related to Solidity types. It is illustrative to adopt Solidity notation to explain the definitions. The standard is specific to the Ethereum Virtual Machine, but aims to be agnostic to higher level languages. Example:
 
 ```cpp
-struct MyStructType {
-    FirstType firstMember;
-    SecondType secondMember;
-    // ...
+struct Message {
+    address from;
+    address to;
+    string contents;
 };
 ```
 
-Names are valid Solidity identifiers. Member variables types are either atomic, dynamic or reference types.
+**Definition**: A *struct type* has valid identifier as name and contains zero or more member variables. Member variables have a member type and a name.
 
-* Atomic types:
-  * `bytes1` to `bytes32`
-  * `uint8` to `uint256`
-  * `int8` to `int256`
-  * `bool`
-  * `address`
-* Dynamic types:
-  * `bytes`
-  * `string`
-* Reference types:
-  * Arrays
-  * Structs
+**Definition**: A *member type* can be either an atomic type, a dynamic type or a reference type.
 
-Compare with [ABIv2 types][abi-types].
+**Definition**: The *atomic types* are `bytes1` to `bytes32`, `uint8` to `uint256`, `int8` to `int256`, `bool` and `address`. These correspond to their definition in Solidity. Note that there are no aliases `uint` and `int`. Note that contract addresses are always plain `address`. Fixed point numbers are not supported by the standard. Future versions of this standard may add new atomic types.
 
-[abi-types]: http://solidity.readthedocs.io/en/v0.4.21/abi-spec.html#types
+**Definition**: The *dynamic types* are `bytes` and `string`. These are like the atomic types for the purposed of type declaration, but their treatment in encoding is different.
 
-The hashing of structs `myInstance` of type `MyStructType` is defined as:
+**Definition**: The *reference types* are arrays and structs. Arrays are either fixed size or dynamic and denoted by `Type[n]`  or `Type[]` respectively. Structs are references to other structs by their name. The standard supports recursive struct types.
 
-```
-hash(myInstance : MyStructType) = keccak256(
-    keccak256(encodeSchema(MyType)) ‖
-    encode(myInstance.firstMember) ‖
-    encode(myInstance.secondMember) ‖
-    // ...
-)
-```
+**Definition**: The set of structured typed data `𝕊` contains all the instances of all the struct types.
 
+### Definition of `hashStruct`
 
+The `hashStruct` function is defined as
 
+* `hashStruct(s : 𝕊) = keccak256(typeHash ‖ encodeData(s))` where `typeHash = keccak256(encodeType(typeOf(s)))`
 
-```
-encode(MyStructType) = name ‖ "(" ‖ ",".join() ‖ ")"
-```
+**Note**: The `typeHash` is a constant for a given struct type and does not need to be runtime computed.
 
+### Definition of `encodeType`
 
-### Computation of `schemaHash`
+The type of a struct is encoded as `name ‖ "(" ‖ member₁ ‖ "," ‖ member₂ ‖ "," ‖ … ‖ memberₙ ")"` where each member is written as `type ‖ " " ‖ name`. For example, the above `Message` struct is encoded as `Message(address from,address to,string contents)`.
 
-The `schemaHash` computation is based on the [ABIv2 function signature encoding][abiv2-sig], with the following changes
+If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Person(address wallet,string name)Asset(address token,uint256 amount)`.
 
-[abiv2-sig]: https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding
+### Definition of `encodeData`
 
-1. The full 32-byte output of `keccak256` is used instead of the first four bytes.
-2. For tuples, the type name of the corresponding struct is prefixed to the tuple.
-3. In tuples, after each type, a single space and the name of the parameter is specified.
-4. All relevant struct types are declared sequentially in alphabetical order, with the exception of the `root` type, which is declared first.
+The encoding of a struct instance is `value₁ ‖ value₂ ‖ … ‖ valueₙ`, i.e. a simple concatenation of the encoding of the member values. Each encoded member value is exactly 32-byte long.
 
-The `root` of the schema is always a struct.
+The atomic values are encoded as follows: Boolean `false` and `true` are encoded as `uint256` values `0` and `1` respectively. Addresses are encoded as `uint160`. Integer values are sign-extended to 256-bit and encoded in big endian order. `bytes1` to `bytes31` are padded at the end to `bytes32`.
 
+The dynamic values `bytes` and `string` are encoded as a `keccak256` hash of their contents.
 
-### Computation of `dataHash`
+The array values are encoded as the `keccak256` hash of the concatenated `encodeData` of their contents (i.e. the encoding of `SomeType[5]` identical to that of a struct containing five members of type `SomeType`).
 
-All [elementary types][abitypes] from ABIv2 are padded to 32 bytes. Just like in ABIv2, this also includes `bytes32` and the like.
+The struct values are encoded recursively as `hashStruct(value)`. This is undefined for cyclical data.
 
-[abitypes]: https://solidity.readthedocs.io/en/develop/abi-spec.html#types
+### Extension of Solidity
 
-Arrays of fixed size are concatenated, with the encoding applied recursively.
+For a given struct type `SomeStruct` the expression `SomeStruct.typeHash` will evaluate to `keccak256(encodeType(SomeStruct))`. (Note that this is expressed as a member of the type not of an instance so there is no potential conflict.)
 
-The reference implementation will enter an infinite recursion when asked to hash a cyclical data structure. It is possible to solve this by maintaining a stack of visited addresses and using a stack index when revisiting a node. This should still lead to u
+For an instance `someInstance` of `SomeStruct` the expression `keccak256(someInstance)` will evaluate to `hashStruct(someInstance)`.
 
-Similarly, a data structure that is a directed acyclic graph will be walked as if it is a tree. This can cause nodes to be hashed more than once. In the worst case this leads to an exponential growth in computation time. Memoization would solve this,
+### Specification of the `eth_signTypedData` JSON RPC
 
-
-### `eth_signTypedData` JSON RPC
-
-
-### Web3 interface
-
-
-### Optimized EVM implementation
-
-```javascript
-struct Order {
-    address from;
-    address to;
-    uint128 amount;
-    uint64 timestamp;
-    string message;
-}
-
-bytes32 constant ORDER_SCHEMA_HASH = keccak256(
-  "Order(address from,address to,uint128 amount,"
-  "uint64 timestamp,string message)");
-
-function dataHash(Order order) returns (bytes32 hash) {
-    
-    // Compute sub-hashes
-    bytes32 messageHash = keccak256(order.message);
-    
-    assembly {
-        // Back up select memory 
-        let temp1 := mload(sub(order, 32))
-        let temp2 := mload(add(order, 128))
-        
-        // Write schemaHash and sub-hashes
-        mstore(sub(order, 32), ORDER_SCHEMA_HASH)
-        mstore(add(order, 128), messageHash)
-        
-        // Compute hash
-        hash := keccak256(sub(order, 32), 192)
-        
-        // Restore memory
-        mstore(sub(order, 32), temp1)
-        mstore(add(order, 128), temp2)
-    }
-}
-```
-
-For this to work, the `Order` struct needs to be stored at an address higher than 32. Solidity currently reserves the lower addresses for internal use, so this requirement is already always satisfied.
-
-
-
-### Solidity extensions
-
-`Order.schemaHash` will return the schemaHash.
-
-`keccak256(order)` will generate code for the above optimized implementation.
-
-```
-function verifySignature(Order order, uint8 v, bytes32 r, bytes32 s) {
-    address signer = ecrecover(keccak256(order), v, r, s);
-}
-```
-
-
-
-## Rationale
-
-<!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
-
-
-### Schema hash
-
-For the schema hash several alternatives where considered and rejected for the flaws mentioned:
-
-**Alternative 1**: Use ABIv2 function signatures. `bytes4` is not enough to be collision resistant. Unlike function signatures, there is negligible runtime cost incurred by using longer hashes.
-
-**Alternative 2**: ABIv2 function signatures modified to be 256-bit. While this unambigously captures type info, it does not capture any of the semantics other than the function. This is already causing a practical collision between ERC20's and ERC721's `transfer(address,uint256)`, where in the former the `uint256` revers to an amount and the latter to a unique id.
-
-**Alternative 3**: 256-bit ABIv2 signatures extended with parameter names and type names. The `Message` example from a above would be encoded as `Message(Person(string name,address wallet) from,Person(string name,address wallet) to,string message)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). More importantly, it does not allow a schemaHash for a recursive data type (consider `struct List {uint256 value; List next;}`).
-
-This progression leads us to the current specification. There are also some ideas that have been considered, but not implemented for reason.
-
-**Idea 4**: Include a domain separator. When designing a specific message format, the message format designer generates a 256-bit random number, which is then combined with the schemaHash. This eliminates accidental collision of standards. This idea is not implemented because generating random numbers is error prone.
-
-**TODO**: I'm actually in favour of Idea 4, should we include it? Yes!
-
-**Idea 5**: Include the target contract address. Similar to the domain separator, except instead of a random number the address of the target contract is used. This assumes that only a single contract will be handling the signed messages, but in practices a signed message protocol may be used by multiple participants.
-
-**Idea 6**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It would make the schemaHash mechanism very verbose. It also prevents the documentation from being extended and amended.
-
-### Data hash
-
-**Alternative 7**: Tight packing.
-
-**Alternative 8**: ABIv2 encoding. Especially with the upcoming `abi.encode` it should be easy to use `keccak256(abi.encode(someStruct))` as the `dataHash`. The ABIv2 standard by itself fails the determinism security criteria. There are several valid ABIv2 encodings of the same data. It also does not incorporate type data, so the `schemaHash` would still be required for safety, requiring additional code. The current proposal is safer because type information is always included in the hash. Finally, the current standard allows for an efficient implementation that avoids copying of data.
-
-**Alternative 9**: Recursive data/schema hash.
-
-**TODO**: Actually, I like this. Why not?
-
-**Idea 10**: Cyclical data structures.
-
-
-### In place computation of hashes
-
-The format of the encoding is designed to coincide with the in-memory representation. This allows for an efficient zero-copy implementation of the hashing functions:
-
-It is entirely possible, and encouraged, for Solidity to make this the default behaviour when hashing a struct. The current implementation just hashes the pointer address, which is not very useful.
-
-### `eth_signTypedData` JSON RPC
+**TODO**: Update.
 
 This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`.
 
@@ -309,7 +188,9 @@ Typed data is the array of data entries with their specified type and human-read
 There also should be a corresponding `personal_signTypedData` method which accepts the password for an account as the last argument.
 
 
-### Pseudocode examples:
+### Specification of `web3.{eth,personal}.signTypedData`
+
+**TODO**: Write.
 
 ```javascript
 // Client-side code example
@@ -346,36 +227,116 @@ const hash = ethAbi.soliditySHA3(
 );
 ```
 
-```solidity
-// Solidity example
-string message = 'Hi, Alice!';
-uint value = 42;
-bytes32 schemaHash = keccak256('string message,uint value'); // Probably hardcoded
-const hash = keccak256(schemaHash, message, value);
-address recoveredSignerAddress = ecrecover(hash, v, r, s);
+
+## Rationale
+
+<!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
+
+The `encode` function is extended with a new case for the new types. The first byte of the encoding distinguishes the cases. For the same reason it is not safe to start immediately with the domain separator or a `typeHash`. While hard, it may be possible to construct a `typeHash` that also happens to be a prefix of a valid RLP encoded transaction.
+
+The domain separator prevents collision of otherwise identical structures. It is possible that two DApps come up with an identical structure like `Transfer(address from,address to,uint256 amount)` that should not be compatible. By introducing a domain separator the DApp developers are guaranteed that there can be no signature collision.
+
+The domain separator also allows for multiple distinct signatures use-cases on the same struct instance within a given DApp. In the previous example, perhaps signatures from both `from` and `to` are required. By providing two distinct domain separators these signatures can be distinguished from each other.
+
+**Alternative 1**: Use the target contract address as domain separator. This solves the first problem, contracts coming up with identical types, but does not address second use-case. The standard does suggest implementors to use the target contract address where this is appropriate.
+
+The function `hashStruct` starts with a `typeHash` to separate types. By giving different types a different prefix the `encodeData` function only has to be injective for within a given type. It is okay for `encodeData(a)` to equal `encodeData(b)` as long as `typeOf(a)` is not `typeOf(b)`.
+
+### Rationale for `typeHash`
+
+The `typeHash` is designed to turn into a compile time constant in Solidity. For example:
+
+```javascript
+bytes32 constant MESSAGE_TYPEHASH = keccak256(
+  "Message(address from,address to,string contents)");
 ```
 
-Signature will be returned in the same format as `eth_sign` (the ecSignature params concatenated together `(r + s + v)` and hex encoded.
+For the type hash several alternatives where considered and rejected for the reasons:
 
+**Alternative 2**: Use ABIv2 function signatures. `bytes4` is not enough to be collision resistant. Unlike function signatures, there is negligible runtime cost incurred by using longer hashes.
+
+**Alternative 3**: ABIv2 function signatures modified to be 256-bit. While this captures type info, it does not capture any of the semantics other than the function. This is already causing a practical collision between ERC20's and ERC721's `transfer(address,uint256)`, where in the former the `uint256` revers to an amount and the latter to a unique id. In general ABIv2 favors compatibility where a hashing standard should prefer incompatibility.
+
+**Alternative 4**: 256-bit ABIv2 signatures extended with parameter names and struct names. The `Message` example from a above would be encoded as `Message(Person(string name,address wallet) from,Person(string name,address wallet) to,string message)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). It also does not allow a recursive struct type (consider `struct List {uint256 value; List next;}`).
+
+**Alternative 5**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It makes extending and amending documentation a breaking changes, which contradicts common assumptions. It also makes the schemaHash mechanism very verbose. 
+
+### Rationale for `encodeData`
+
+The `encodeData` is designed to allow easy implementation of `hashStruct` in Solidity:
+
+```javascript
+function hashStruct(Message memory message) pure returns (bytes32 hash) {
+    return keccak256(
+        MESSAGE_TYPEHASH,
+        bytes32(message.from),
+        bytes32(message.to),
+        keccak256(message.contents)
+    );
+}
+```
+
+it also allows for an efficient in-place implementation in EVM
+
+```javascript
+function hashStruct(Message memory message) pure returns (bytes32 hash) {
+  
+    // Compute sub-hashes
+    bytes32 typeHash = MESSAGE_TYPEHASH;
+    bytes32 contentsHash = keccak256(message.contents);
+    
+    assembly {
+        // Back up select memory 
+        let temp1 := mload(sub(order, 32))
+        let temp2 := mload(add(order, 128))
+        
+        // Write typeHash and sub-hashes
+        mstore(sub(message, 32), typeHash)
+        mstore(add(order, 64), contentsHash)
+        
+        // Compute hash
+        hash := keccak256(sub(order, 32), 128)
+        
+        // Restore memory
+        mstore(sub(order, 32), temp1)
+        mstore(add(order, 64), temp2)
+    }
+}
+```
+
+The in-place implementation makes strong but reasonable assumptions on the memory layout of structs in memory. Specifically it assume structs are not allocated below address 32, that members are stored in order, that all values are padded to 32-byte boundaries, and that dynamic and reference types are stored as a 32-byte pointers.
+
+**Alternative 6**: Tight packing. This is the default behaviour in Soldity when calling `keccak256` with multiple arguments. It minimizes the number of bytes to be hashed but requires complicated packing instructions in EVM to do so. It does not allow in-place computation.
+
+**Alternative 7**: ABIv2 encoding. Especially with the upcoming `abi.encode` it should be easy to use `abi.encode` as the `encodeData` function. The ABIv2 standard by itself fails the determinism security criteria. There are several valid ABIv2 encodings of the same data. ABIv2 does not allow in-place computation.
+
+**Alternative 8**: Leave `typeHash` out of `hashStruct` and instead combine it with the domain separator. This is more efficient, but then the semantics of the Solidity `keccak256` hash function are not injective.
+
+**Alternative 9**: Support cyclical data structures. The current standard is optimized for tree-like data structures and undefined for cyclical data structures. To support cyclical data a stack containing the path to the current node needs to be maintained and a stack offset substituted when a cycle is detected. This is prohibitively more complex to specify and implement. It also breaks composability where the hashes of the member values are used to construct the hash of the struct (the hash of the member values would dependent on the path). It is possible to extend the standard in a compatible way to define hashes of cyclical data.
+
+Similarly, a straightforward implementation is sub-optimal for directed acyclic graphs. A simple recursion through the members can visit the same node twice. Memoization can optimize this.
+
+### Rationale for Solidity extensions
+
+The struct declaration and it's type encoding are redundant. By providing an intrinsic an `SomeStruct.typeHash` intrinsic the compiler takes care of deriving the `typeHash` from the struct declaration.
+
+Deriving `hashStruct` functions from structures is also redundant and error-prone, especially if the optimized form is used. By modifying the behaviour of `keccak256(someInstance)` the compiler can derive optimal `hashStruct` functions from the struct type specifications.
 
 
 ## Backwards Compatibility
 
 <!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
 
+The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently undefined. Defining them should not affect the behaviour of existing DApps.
 
-
-`keccak256(order)` is already valid syntax in Solidity and it currently.
-
-This is already valid Solidity syntax. The current behaviour is to compute the hash of the address of the Order struct. This is a breaking change, but it unlikely that the current behaviour is useful.
-
+The Solidity expression `keccak256(someInstance)` for an instance `someInstance` of a struct type `SomeStruct` is valid syntax. It currently evaluates to the `keccak256` hash of the memory address of the instance. This behaviour should be considered dangerous, as in some scenarios it will appear to work correctly, but in others it will fail both determinism and injetiveness. DApps that depend on the current behaviour should be considered broken.
 
 
 ## Test Cases
 
 <!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
 
-### Worked example
+
 
 ```
 struct Person {
@@ -405,11 +366,6 @@ bytes32 schemaHash = keccak256(
 
 
 (Note that the string is split up in substrings for readability. The result is equivalent if all strings are concatenated).
-
-
-
-
-#### Examples
 
 ```
 struct Order {
@@ -465,6 +421,17 @@ function dataHash(Message message) returns (bytes32) {
 
 <!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
 
+To be done before this EIP can be considered accepted:
+
+* [ ] Finalize specification
+* [ ] Add test vectors
+* [ ] Review specification
+
+To be done before this EIP can be considered "Final":
+
+* [ ] Implement `eth_signTypedData` in major RPC providers.
+* [ ] Implement `web3.sign` in Web3 providers.
+* [ ] Implement `keccak256` struct hashing in Solidity.
 
 
 ## Copyright
