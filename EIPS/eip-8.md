@@ -4,7 +4,7 @@ title: devp2p Forward Compatibility Requirements for Homestead
 author: Felix Lange <felix@ethdev.com>
 status: Final
 type: Standards Track
-layer: Networking
+category: Networking
 created: 2015-12-18
 ---
 
