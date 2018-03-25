@@ -31,7 +31,7 @@ gem "wdm", "~> 0.1.0" if Gem.win_platform?
 
 gem "html-proofer", '>=3.3.1'
 
-gem "eip_validator", ">=0.2.0"
+gem "eip_validator", ">=0.3.0"
 gem "front_matter_parser"
 gem "activemodel"
  
