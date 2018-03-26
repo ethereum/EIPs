@@ -12,7 +12,7 @@ elif [[ $TASK = 'htmlproofer-external' ]]; then
   bundle exec jekyll build
   bundle exec htmlproofer $HTMLPROOFER_OPTIONS --external_only
 elif [[ $TASK = 'eip-validator' ]]; then
-  bundle exec eip_validator EIPS/*.md
+  bundle exec eip_validator $(ls EIPS/*.md | grep "eip-\d*\.md")
 fi
 
 # Validate GH Pages DNS setup
