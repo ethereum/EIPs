@@ -1,24 +1,24 @@
-### Preamble
+```
+eip: 86
+title: Abstraction of transaction origin and signature
+author: Vitalik Buterin
+type: Standards Track
+category: Core
+status: Draft
+created: 2017-02-10
+```
 
-    EIP: <to be assigned>
-    Title: Abstraction of transaction origin and signature
-    Author: Vitalik Buterin
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-02-10
-    
-### Summary
+# Summary
 
 Implements a set of changes that serve the combined purpose of "abstracting out" signature verification and nonce checking, allowing users to create "account contracts" that perform any desired signature/nonce checks instead of using the mechanism that is currently hard-coded into transaction processing.
 
-### Parameters
+# Parameters
 
 * METROPOLIS_FORK_BLKNUM: TBD
 * CHAIN_ID: same as used for EIP 155 (ie. 1 for mainnet, 3 for testnet)
 * NULL_SENDER: 2**160 - 1
 
-### Specification
+# Specification
 
 If `block.number >= METROPOLIS_FORK_BLKNUM`, then:
 1. If the signature of a transaction is `(CHAIN_ID, 0, 0)` (ie. `r = s = 0`, `v = CHAIN_ID`), then treat it as valid and set the sender address to `NULL_SENDER`
@@ -26,7 +26,7 @@ If `block.number >= METROPOLIS_FORK_BLKNUM`, then:
 3. Create a new opcode at `0xfb`, `CREATE2`, with 4 stack arguments (value, salt, mem_start, mem_size) which sets the creation address to `sha3(sender + salt + sha3(init code)) % 2**160`, where `salt` is always represented as a 32-byte value.
 4. Add to _all_ contract creation operations, including transactions and opcodes, the rule that if a contract at that address already exists and has non-empty code OR non-empty nonce, the operation fails and returns 0 as if the init code had run out of gas. If an account has empty code and nonce but nonempty balance, the creation operation may still succeed.
 
-### Rationale
+# Rationale
 
 The goal of these changes is to set the stage for abstraction of account security. Instead of having an in-protocol mechanism where ECDSA and the default nonce scheme are enshrined as the only "standard" way to secure an account, we take initial steps toward a model where in the long term all accounts are contracts, contracts can pay for gas, and users are free to define their own security model.
 
@@ -75,7 +75,7 @@ The benefits that this provides lie in the most interesting cases:
 
 (2) and (3) introduce a feature similar to bitcoin's P2SH, allowing users to send funds to addresses that provably map to only one particular piece of code. Something like this is crucial in the long term because, in a world where all accounts are contracts, we need to preserve the ability to send to an account before that account exists on-chain, as that's a basic functionality that exists in all blockchain protocols today.
 
-### Miner and transaction replaying strategy
+# Miner and transaction replaying strategy
 
 Note that miners would need to have a strategy for accepting these transactions. This strategy would need to be very discriminating, because otherwise they run the risk of accepting transactions that do not pay them any fees, and possibly even transactions that have no effect (eg. because the transaction was already included and so the nonce is no longer current).
 
@@ -92,3 +92,7 @@ One example would be to check as follows:
 If all five checks pass, relay and/or mine the transaction.
 
 A looser but still effective strategy would be to accept any code that fits the same general format as the above, consuming only a limited amount of gas to perform nonce and signature checks and having a guarantee that transaction fees will be paid to the miner. Another strategy is to, alongside other approaches, try to process any transaction that asks for less than 250,000 gas, and include it only if the miner's balance is appropriately higher after executing the transaction than before it.
+
+# Copyright
+
+Copyright and related rights waived via CC0.
