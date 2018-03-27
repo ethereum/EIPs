@@ -1,13 +1,12 @@
-## Preamble
-
-    EIP: 20
-    Title: ERC-20 Token Standard
-    Author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-    Type: Standard
-    Category: ERC
-    Status: Accepted
-    Created: 2015-11-19
-
+---
+eip: 20
+title: ERC-20 Token Standard
+author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
+type: Standards Track
+category: ERC
+status: Accepted
+created: 2015-11-19
+---
 
 ## Simple Summary
 
@@ -42,7 +41,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() constant returns (string name)
+function name() view returns (string name)
 ```
 
 
@@ -54,7 +53,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function symbol() constant returns (string symbol)
+function symbol() view returns (string symbol)
 ```
 
 
@@ -67,7 +66,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function decimals() constant returns (uint8 decimals)
+function decimals() view returns (uint8 decimals)
 ```
 
 
@@ -76,7 +75,7 @@ function decimals() constant returns (uint8 decimals)
 Returns the total token supply.
 
 ``` js
-function totalSupply() constant returns (uint256 totalSupply)
+function totalSupply() view returns (uint256 totalSupply)
 ```
 
 
@@ -86,7 +85,7 @@ function totalSupply() constant returns (uint256 totalSupply)
 Returns the account balance of another account with address `_owner`.
 
 ``` js
-function balanceOf(address _owner) constant returns (uint256 balance)
+function balanceOf(address _owner) view returns (uint256 balance)
 ```
 
 
@@ -138,7 +137,7 @@ function approve(address _spender, uint256 _value) returns (bool success)
 Returns the amount which `_spender` is still allowed to withdraw from `_owner`.
 
 ``` js
-function allowance(address _owner, address _spender) constant returns (uint256 remaining)
+function allowance(address _owner, address _spender) view returns (uint256 remaining)
 ```
 
 

@@ -1,0 +1,27 @@
+sudo: false # route your build to the container-based infrastructure for a faster build
+
+language: ruby
+
+# Cache Ruby bundles
+cache: bundler
+
+# Assume bundler is being used, therefore
+# the `install` step will run `bundle install` by default.
+script: "bash -ex .travis-ci.sh"
+
+env:
+  global:
+  - NOKOGIRI_USE_SYSTEM_LIBRARIES=true # speeds up installation of html-proofer
+
+matrix:
+  fast_finish: true
+  include:
+    - rvm: 2.2.5
+      env: TASK='htmlproofer'
+    - rvm: 2.2.5
+      env: TASK='htmlproofer-external'
+    - rvm: 2.2.5
+      env: TASK='eip-validator'
+  allow_failures:
+    - rvm: 2.2.5
+      env: TASK='htmlproofer-external'
