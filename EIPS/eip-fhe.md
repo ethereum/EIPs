@@ -1,13 +1,13 @@
 ## Preamble
-
-    EIP: <to be assigned>
-    Title: Homomorphically encrypted storage
-    Author:	silur <huohuli@protonmail.ch>
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-11-07
-
+---
+eip: <to be assigned>
+title: Homomorphically encrypted storage
+author:	silur <huohuli@protonmail.ch>
+type: Standard Track
+category: Core
+status: Draft
+created: 2017-11-07
+---
 
 ## Simple Summary
 Storages could include a layer where data is stored and handled by the same opcodes using fully homomorphic encryption, allowing to store and evaluate any boolean logic on confidental data while
