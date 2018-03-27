@@ -13,7 +13,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Non-final EIPs
 | Number                    | Title                                                   | Author                        | Layer     | Status     |
 | ------------------------- | ------------------------------------------------------- | ----------------------------- | --------- | ---------- |
-| [3](EIPS/eip-3.mediawiki) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
+| [3](EIPS/eip-3.md) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
 | [4](EIPS/eip-4.md)        |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
 | [5](EIPS/eip-5.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
 | [101](EIPS/eip-101.md)    |  Serenity Currency and Crypto Abstraction               | Vitalik Buterin               |           | Active     |
@@ -21,7 +21,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [165](EIPS/eip-165.md)    |  ERC-165 Standard Interface Detection                   | Christian Reitwiessner        | Interface    | Draft |
 | [234](EIPS/eip-234.md)    |  Add `blockHash` to JSON-RPC filter options             | Micah Zoltu                   | Interface | Draft      |
 | [615](EIPS/eip-615.md)    |  Subroutines and Static Jumps for the EVM               | Greg Colvin                   | Core   | Draft      |
-| [616](EIPS/eip-EIPS/eip-616.md)    |  SIMD Operations for the EVM                            | Greg Colvin                   | Core      | Draft      |
+| [616](EIPS/eip-616.md)    |  SIMD Operations for the EVM                            | Greg Colvin                   | Core      | Draft      |
 | [681](EIPS/eip-681.md)    |  ERC-681 URL Format for Transaction Requests  | Daniel A. Nagy                 | Interface | Draft      |
 | [758](EIPS/eip-758.md)    |  Subscriptions and filters for transaction return data  | Jack Peterson                 | Interface | Draft      |
 | [801](EIPS/eip-801.md)    |  ERC-801 Canary Standard                                | ligi                          | Interface | Draft      |
