@@ -1,12 +1,12 @@
-## Preamble
-
-    EIP: to be assigned
-    Title: Reward full nodes and clients
-    Author: James Ray and Micah Zoltu
-    Type: Standard Track
-    Category: Core & ERC
-    Status: Draft
-    Created: 2017-03-01
+---
+eip: to be assigned
+title: Reward full nodes and clients
+author: James Ray and Micah Zoltu
+type: Standard Track
+category: Core & ERC
+status: Draft
+Created: 2017-03-01
+---
 
 ## Simple Summary
 Provide a reward to full nodes for validating transactions and give a reward to clients for developing the client.
