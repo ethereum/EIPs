@@ -10,7 +10,7 @@ layout: default
   <table>
     <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
     {% if page["discussions-to"] != undefined %}
-      <tr><th>Discussions-To</th><td><a href="mailto:{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
+      <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
     {% endif %}
     <tr><th>Status</th><td>{{ page.status | xml_escape }}</td></tr>
     <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
