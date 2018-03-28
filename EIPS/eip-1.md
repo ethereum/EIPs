@@ -46,17 +46,23 @@ Vetting an idea publicly before going as far as writing an EIP is meant to save 
 
 Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request].
 
-If the EIP editors approve the EIP ([see the EIP editors workflow section below for details](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow)) and the authors are happy for it to be merged as a draft, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. (EIP authors can request for it to be merged after they have finished editing it, and editors can ask if they have finished editing it and would like it to be merged. This prevents merging an EIP when more edits are intended to be made by the author, although it can always be edited after merging.) Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
+If the EIP editors approve the EIP ([see the EIP editors workflow section below for details](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow)) and the authors are happy for it to be merged as a draft, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
 
-Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase.
+EIP authors can request for a pull request to be merged after they have finished editing it by putting '[WIP]' in the title. This prevents merging an EIP when more edits are intended to be made by the author, although it can always be edited after merging.
+
+Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase. An automated process will check all pull requests; if the request passes the format checks and contains only additions or edits to drafts owned by the submitter, it will be automatically merged. No editorial control is exercised over the content of an EIP draft.
 
 Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
 
-For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
+Standards track EIPs of type 'Core' are updated from 'Draft' to 'Accepted' status when a core devs meeting has accepted the draft and the participants have announced their intention to implement the EIP for inclusion in a future hard fork. At that point, an EIP number is assigned by the editors and the EIP is moved to the EIPS directory and renamed accordingly. Once a Core EIP has been implemented in at least three clients, and all pass a common set of test suites, the status of the EIP is updated to 'Final'. An EIP can also be assigned status “Deferred”. The EIP author or editor can assign the EIP this status when no progress is being made on the EIP.
 
-Once an EIP has been accepted, the implementations must be completed. When the implementation is complete and accepted by the community, the status will be changed to “Final”.
+Non-core EIPs remain in Draft status until at least one implementation has been completed and referenced in the Implementations section of the draft. At that point, the draft's author may request a 'final call', by submitting a pull request changing the EIP's status from 'Draft' to 'Final'.
 
-An EIP can also be assigned status “Deferred”. The EIP author or editor can assign the EIP this status when no progress is being made on the EIP. Once an EIP is deferred, the EIP editor can re-assign it to draft status.
+Final call PRs will be left open for two weeks to give community members an opportunity to comment. An editor will review the feedback on the final call; if there are no significant unaddressed technical issues, the PR will be merged and the EIP transitioned to 'Final'. If unaddressed technical issues remain, the PR will be closed, and the author invited to resubmit when the EIP is more mature.
+
+Editors may close a final-call PR without waiting for the two week period to expire if the EIP is not clear and unambiguous, has significant formatting or descriptive issues, or if the feedback already submitted by the community makes it clear the EIP is not ready to be finalised.
+
+Once an EIP is marked Final, edits are not permitted unless they correct errata; no substantive changes may be made. Anyone wishing to amend a Final EIP must submit a new EIP instead.
 
 An EIP can also be “Rejected”. Perhaps after all is said and done it was not a good idea. It is still important to have a record of this fact.
 
@@ -131,9 +137,9 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
 
-` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+` type: `<Standards Track  | Informational | Meta>
 
-` * category `: <Core | Networking | Interface | ERC>
+` * category `: <Core | Networking | Interface | ERC> (Standards Track EIPs only)
 
 ` created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
 
