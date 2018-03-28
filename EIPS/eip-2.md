@@ -1,12 +1,13 @@
-```
-EIP: 2
-Title: Homestead Hard-fork Changes
-Author: Vitalik Buterin <v@buterin.com>
-Status: Final
-Type: Standard Track
-Category: Core
-Created: 2015-11-15
-```
+---
+eip: 2
+title: Homestead Hard-fork Changes
+author: Vitalik Buterin <v@buterin.com>
+status: Final
+type: Standards Track
+category: Core
+created: 2015-11-15
+---
+
 ### Meta reference
 
 [Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md).
