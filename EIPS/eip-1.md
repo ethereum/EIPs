@@ -42,7 +42,7 @@ The EIP process begins with a new idea for Ethereum. It is highly recommended th
 
 Each EIP must have a champion—someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
 
-Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
+Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Fellowship of Ethereum Magicians], [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
 
 Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request].
 
@@ -275,6 +275,7 @@ See [the revision history for further details](https://github.com/ethereum/EIPs/
   [EIP82]: https://github.com/ethereum/EIPs/issues/82
   [EIP75]: https://github.com/ethereum/EIPs/issues/75
   [EIP85]: https://github.com/ethereum/EIPs/issues/85
+  [the Fellowship of Ethereum Magicians]: https://ethereum-magicians.org/
   [the Ethereum subreddit]: https://www.reddit.com/r/ethereum/
   [one of the Ethereum Gitter chat rooms]: https://gitter.im/ethereum/
   [pull request]: https://github.com/ethereum/EIPs/pulls
