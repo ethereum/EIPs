@@ -13,14 +13,16 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Non-final EIPs
 | Number                    | Title                                                   | Author                        | Layer     | Status     |
 | ------------------------- | ------------------------------------------------------- | ----------------------------- | --------- | ---------- |
-| [3](EIPS/eip-3.mediawiki) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
-| [4](EIPS/eip-4.mediawiki) |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
+| [3](EIPS/eip-3.md) |  Addition of CALLDEPTH opcode                           | Martin Holst Swende           | Core      | Draft      |
+| [4](EIPS/eip-4.md)        |  EIP Classification                                     | Joseph Chow                   | Meta      | Draft      |
 | [5](EIPS/eip-5.md)        |  Gas Usage for `RETURN` and `CALL*`                     | Christian Reitwiessner        | Core      | Draft      |
 | [101](EIPS/eip-101.md)    |  Serenity Currency and Crypto Abstraction               | Vitalik Buterin               |           | Active     |
 | [158](EIPS/eip-158.md)    |  State clearing                                         | Vitalik Buterin               | Core      | Superseded |
+| [165](EIPS/eip-165.md)    |  ERC-165 Standard Interface Detection                   | Christian Reitwiessner        | Interface    | Draft |
 | [234](EIPS/eip-234.md)    |  Add `blockHash` to JSON-RPC filter options             | Micah Zoltu                   | Interface | Draft      |
-| [615](EIPS/eip-615.md)    |  Subroutines and Static Jumps for the EVM               | Greg Colvin                   | Core      | Draft      |
-| [616](EIPS/eip-EIPS/eip-616.md)    |  SIMD Operations for the EVM                            | Greg Colvin                   | Core      | Draft      |
+| [615](EIPS/eip-615.md)    |  Subroutines and Static Jumps for the EVM               | Greg Colvin                   | Core   | Draft      |
+| [616](EIPS/eip-616.md)    |  SIMD Operations for the EVM                            | Greg Colvin                   | Core      | Draft      |
+| [681](EIPS/eip-681.md)    |  ERC-681 URL Format for Transaction Requests  | Daniel A. Nagy                 | Interface | Draft      |
 | [758](EIPS/eip-758.md)    |  Subscriptions and filters for transaction return data  | Jack Peterson                 | Interface | Draft      |
 | [801](EIPS/eip-801.md)    |  ERC-801 Canary Standard                                | ligi                          | Interface | Draft      |
 
@@ -34,7 +36,6 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 # Finalized EIPs (standards that have been adopted)
 | Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
-| [1](EIPS/eip-1.md)                                 | EIP Purpose and Guidelines                                                                  | Martin Becze, Hudson Jameson               | Meta       | Final    |
 | [2](EIPS/eip-2.md)                                 | Homestead Hard-fork Changes                                                                  | Vitalik Buterin                            | Core       | Final    |
 | [6](EIPS/eip-6.md)                                 | Renaming Suicide Opcode                                                                      | Hudson Jameson                             | Interface  | Final    |
 | [7](EIPS/eip-7.md)                                 | DELEGATECALL                                                                                 | Vitalik Buterin                            | Core       | Final    |
@@ -49,7 +50,7 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [155](EIPS/eip-155.md)                             | Simple replay attack protection                                                              | Vitalik Buterin                            | Core       | Final    |
 | [160](EIPS/eip-160.md)                             | EXP cost increase                                                                            | Vitalik Buterin                            | Core       | Final    |
 | [161](EIPS/eip-161.md)                             | State trie clearing (invariant-preserving alternative)                                       | Gavin Wood                                 | Core       | Final    |
-| [162](EIPS/eip-162.md)                             | ERC-162 ENS support for reverse resolution of Ethereum addresses                             | Maurelian, Nick Johnson                    | ERC        | Final    |
+| [162](EIPS/eip-162.md)                             | ERC-162 Initial ENS Hash Registrar                                                           | Maurelian, Nick Johnson                    | ERC        | Final    |
 | [170](EIPS/eip-170.md)                             | Contract code size limit                                                                     | Vitalik Buterin                            | Core       | Final    |
 | [181](EIPS/eip-181.md)                             | ERC-181 ENS support for reverse resolution of Ethereum addresses                             | Nick Johnson                               | ERC        | Final    |
 | [190](EIPS/eip-190.md)                             | ERC-190 Ethereum Smart Contract Packaging Standard                                           | Merriam, Coulter, Erfurt, Catalano, Matias | ERC        | Final    |
@@ -61,6 +62,12 @@ First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP 
 | [649](https://github.com/ethereum/EIPs/pull/669)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                  | Afri Schoedon, Vitalik Buterin             | Core       | Final    |
 | [658](https://github.com/ethereum/EIPs/pull/658)   | Embedding transaction status code in receipts                                                | Nick Johnson                               | Core       | Final    |
 | [706](EIPS/eip-706.md)                             | DEVp2p snappy compression                                                                    | Péter Szilágyi                             | Networking | Final    |
+
+# Active EIPs (standards that have been adopted but never meant to be completed)
+
+| Number                                             | Title                                                                                        | Author                                     | Layer      | Status   |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------| ---------- | -------- |
+| [1](EIPS/eip-1.md)                                 | EIP Purpose and Guidelines                                                                   | Martin Becze, Hudson Jameson               | Meta       | Active    |
 
 # Past Hard Forks
 | Codename                              | Aliases                     | Block number   | Date (UTC) |
