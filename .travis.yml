@@ -20,6 +20,8 @@ matrix:
       env: TASK='htmlproofer'
     - rvm: 2.2.5
       env: TASK='htmlproofer-external'
+    - rvm: 2.2.5
+      env: TASK='eip-validator'
   allow_failures:
     - rvm: 2.2.5
       env: TASK='htmlproofer-external'
