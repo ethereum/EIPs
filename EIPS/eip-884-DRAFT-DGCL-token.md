@@ -1,17 +1,17 @@
+---
+eip: 884
+title: 'DGCL Token'
+author: 'Dave Sag <davesag@gmail.com>'
+type: Standard Track
+category: ERC
+status: Draft
+created: 2018-02-14
+requires: ERC20
+---
+
 # Delaware General Corporations Law (DGCL) compatible stock Token
 
 Ref: [proposing-an-eip-for-DGCL-Tokens](http://forum.ethereum.org/discussion/17200/proposing-an-eip-for-regulation-a-Tokens)
-
-## Preamble
-
-    EIP: 884
-    Title: 'DGCL Token'
-    Author: 'Dave Sag <davesag@gmail.com>'
-    Type: Standard Track
-    Category: ERC
-    Status: Draft
-    Created: 2018-02-14
-    Requires: ERC20
 
 ## Simple Summary
 
