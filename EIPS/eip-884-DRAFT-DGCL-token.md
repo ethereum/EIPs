@@ -6,7 +6,6 @@ type: Standard Track
 category: ERC
 status: Draft
 created: 2018-02-14
-requires: ERC20
 ---
 
 # Delaware General Corporations Law (DGCL) compatible stock Token
