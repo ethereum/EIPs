@@ -1,14 +1,12 @@
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: Weighted Distinguishable Asset Registry
-    Author: Alex Sherbuck <Alex@igave.io>
-    Type: Standard Track
-    Category: ERC
-    Status: Draft
-    Created: 2018-02-06
-    Requires EIP 821
-
+eip: 874
+title: Weighted NFTs
+author: Alex Sherbuck <Alex@igave.io>
+type: Standard Track
+category: ERC
+status: Draft
+created: 2018-02-06
 
 ##  Summary
 Not all NFTs are created equal. Nothing exists to distinguish one NFT from another. Weight allows a DAO or other external actors to recognize some value for unique asset holdings.
@@ -68,6 +66,7 @@ Returns the address of the Weighted DAR.
 Calls the `weightOfHolder` function of the Weighted DAR.
 
 ## Implementation
+This will be updated to the most recent ERC-721 standard.
 
 [Weighted Digital Asset Registry](https://github.com/I-Gave/erc821/tree/weighted-registry/contracts) - w/ DAO voting
 
