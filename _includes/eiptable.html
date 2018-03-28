@@ -1,0 +1,28 @@
+<style type="text/css">
+  .eiptable .title {
+    width: 67%;
+  }
+
+  .eiptable .author {
+    width: 33%;
+  }
+</style>
+{% for status in site.data.statuses %}
+  {% assign eips = include.eips|where:"status",status|sort:"eip" %}
+  {% assign count = eips|size %}
+  {% if count > 0 %}
+    <h2>{{status}}</h2>
+    <table class="eiptable">
+      <thead>
+        <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+      </thead>
+      {% for page in eips %}
+        <tr>
+          <td class="eipnum"><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
+          <td class="title">{{page.title|xml_escape}}</td>
+          <td class="author">{% include authorlist.html authors=page.author %}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+{% endfor %}
