@@ -1,9 +1,11 @@
-    EIP: 1
-      Title: EIP Purpose and Guidelines
-      Status: Draft
-      Type: Meta
-      Author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
-      Created: 2015-10-27, 2017-02-01
+---
+eip: 1
+title: EIP Purpose and Guidelines
+status: Active
+type: Meta
+author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
+created: 2015-10-27, 2017-02-01
+---
 
 What is an EIP?
 --------------
@@ -40,7 +42,7 @@ The EIP process begins with a new idea for Ethereum. It is highly recommended th
 
 Each EIP must have a champion - someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
 
-Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP. 
+Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
 
 Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. This gives the author a chance to continuously edit the draft EIP for proper formatting and quality. This also allows for further public comment and the author of the EIP to address concerns about the proposal.
 
@@ -60,7 +62,7 @@ EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
 The possible paths of the status of EIPs are as follows:
 
-<img src=./eip-1/process.png>
+![EIP Process](eip-1/process.png)
 
 Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
 
@@ -103,6 +105,10 @@ Each EIP should have the following parts:
 
 -   Implementations - The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
 
+<!-- -->
+
+-   Copyright Waiver - All EIPs must be in public domain. See the bottom of this EIP for an example copyright waiver.
+
 EIP Formats and Templates
 -------------------------
 
@@ -111,29 +117,33 @@ EIPs should be written in [markdown] format. Image files should be included in a
 EIP Header Preamble
 -------------------
 
-Each EIP must begin with an RFC 822 style header preamble. The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each EIP must begin with an RFC 822 style header preamble, preceded and followed by three hyphens ('---'). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-` EIP: ` <EIP number> (this is determined by the EIP editor)
+` eip: ` <EIP number> (this is determined by the EIP editor)
 
-` Title: `<EIP title>
+` title: `<EIP title>
 
-` Author: `<list of author's real names and optionally, email address>
+` author: `<list of author's real names and optionally, email address>
 
-` * Discussions-To: ` <email address>
+` * discussions-to: ` <email address>
 
-` Status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
+` status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
 
-` Type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Process>
+` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
-` Created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
+` * category `: <Core | Networking | Interface | ERC>
 
-` * Replaces: `<EIP number>
+` created: `<date created on, in ISO 8601 (yyyy-mm-dd) format>
 
-` * Superseded-By: `<EIP number>
+` * requires: `<EIP number(s)>
 
-` * Resolution: `<url>
+` * replaces: `<EIP number(s)>
 
-The Author header lists the names, and optionally the email addresses of all the authors/owners of the EIP. The format of the Author header value must be
+` * superseded-by: `<EIP number(s)>
+
+` * resolution: `<url>
+
+The author header lists the names, and optionally the email addresses of all the authors/owners of the EIP. The format of the author header value must be
 
 Random J. User &lt;address@dom.ain&gt;
 
@@ -143,17 +153,21 @@ Random J. User
 
 if the email address is not given.
 
-Note: The Resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
+Note: The resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While an EIP is in private discussions (usually during the initial Draft phase), a Discussions-To header will indicate the mailing list or URL where the EIP is being discussed. No Discussions-To header is necessary if the EIP is being discussed privately with the author.
+While an EIP is in private discussions (usually during the initial Draft phase), a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
 
-The Type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
+The type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
-The Created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+The category header specifies the EIP's category. This is required for standards-track EIPs only.
 
-EIPs may have a Requires header, indicating the EIP numbers that this EIP depends on.
+The created header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
-EIPs may also have a Superseded-By header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
+EIPs may have a requires header, indicating the EIP numbers that this EIP depends on.
+
+EIPs may also have a superseded-by header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a Replaces header containing the number of the EIP that it rendered obsolete.
+
+Headers that permit lists must separate elements with commas.
 
 Auxiliary Files
 ---------------
@@ -174,21 +188,16 @@ The current EIP editors are
 
 ` * Casey Detrio (@cdetrio)`
 
-` * Fabian Vogelsteller (@frozeman)`
-
-` * Gavin Wood (@gavofyork)`
-
 ` * Hudson Jameson (@Souptacular)`
-
-` * Jeffrey Wilcke (@obscuren)`
 
 ` * Martin Becze (@wanderer)`
 
 ` * Nick Johnson (@arachnid)`
 
-` * Roman Mandeleil (@romanman)`
-
 ` * Vitalik Buterin (@vbuterin)`
+
+` * Nick Savers (@nicksavers)`
+
 
 EIP Editor Responsibilities and Workflow
 --------------------------------------
@@ -211,10 +220,6 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 <!-- -->
 
--   List the EIP in [README.md]
-
-<!-- -->
-
 -   Send a message back to the EIP author with next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
@@ -230,6 +235,8 @@ December 7, 2016: EIP 1 has been improved and will be placed as a PR.
 
 February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
+March 21, 2018: Minor edits to accommodate new automatically-generated EIP directory on eips.ethereum.org.
+
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
   [EIP90]: https://github.com/ethereum/EIPs/issues/90
@@ -237,7 +244,7 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [devp2p]: https://github.com/ethereum/wiki/wiki/%C3%90%CE%9EVp2p-Wire-Protocol
   [EIP8]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8.md
   [Light Ethereum Subprotocol]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
-  [whisper]: https://gist.github.com/gluk256/4654922ca45eb9d0846d941d7ca326f4
+  [whisper]: https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview
   [swarm]: https://github.com/ethereum/go-ethereum/pull/2959
   [API/RPC]: https://github.com/ethereum/wiki/wiki/JSON-RPC
   [EIP59]: https://github.com/ethereum/EIPs/issues/59
@@ -257,6 +264,10 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
   [formal specification]: https://github.com/ethereum/yellowpaper
   [the Issues section of this repository]: https://github.com/ethereum/EIPs/issues
   [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-  [README.md]: README.md "wikilink"
   [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
   [Python's PEP-0001]: https://www.python.org/dev/peps/
+
+Copyright
+---------
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
