@@ -1,14 +1,14 @@
 ## Preamble
-
-	EIP: <to be assigned>
-    Title: Token Exchange Standard
-    Author: Kashish Khullar <kkhullar7@gmail.xcom>
-    Type: Standard Track
-    Category: ERC
+---
+	eip: <to be assigned>
+    title: Token Exchange Standard
+    author: Kashish Khullar <kkhullar7@gmail.xcom>
+    type: Standard Track
+    category: ERC
     Status: Draft
-    Created: 2018-01-06
-    Requires: 20
-
+    sreated: 2018-01-06
+    requires: 20
+---
 
 ## Simple Summary
 A standard for token contracts, providing token exchange services thereby facilitating cross token payments.
