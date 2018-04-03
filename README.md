@@ -4,7 +4,15 @@ Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platfo
 A browsable version of all current and draft EIPs can be found on [the official EIP site](http://eips.ethereum.org/).
 
 # Contributing
-First review [EIP-1](EIPS/eip-1.md). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.md). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+
+ 1. Review [EIP-1](EIPS/eip-1.md).
+ 2. Fork the repository by clicking "Fork" in the top right.
+ 3. Add your EIP to your fork of the repository. There is a [template EIP here](eip-X.md).
+ 4. Submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+
+We have a bot that helps out by automatically merging PRs to draft EIPs. Your first PR for an EIP will require manual review by an editor, but once that has been merged, the bot can automerge updates to your draft.
+
+For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your Github username or your email address inside <triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
 
 # EIP status terms
 * **Draft** - an EIP that is open for consideration
