@@ -143,14 +143,13 @@ hamming weight, however care should be taken not to choose constants with too
 large of weight.
 
 The current FNV prime, 0x1000193 has a hamming weight of 6. 
-`HammingWeight(0x10001a7) = 7; 
-HammingWeight(0x10001ab) = 7;  
-HammingWeight(0x10001cf) = 8;  
-HammingWeight(0x10001e3) = 7;  
-HammingWeight(0x10001ef) = 9; // Not chosen  
-HammingWeight(0x10001f9) = 8;  
-HammingWeight(0x10001fb) = 9; // Not chosen   
-`
+`HammingWeight(0x10001a7) = 7;`  
+`HammingWeight(0x10001ab) = 7;`    
+`HammingWeight(0x10001cf) = 8;`    
+`HammingWeight(0x10001e3) = 7;`    
+`HammingWeight(0x10001ef) = 9; // Not chosen`   
+`HammingWeight(0x10001f9) = 8;`  
+`HammingWeight(0x10001fb) = 9; // Not chosen`
 
 An exhaustive analysis was done regarding the dispersion of these constants as compared to 0x01000193.
 
