@@ -142,7 +142,7 @@ through minor Mask changes, we propose choosing new constants with a larger
 hamming weight, however care should be taken not to choose constants with too
 large of weight.
 
-The current FNV prime, 0x1000193 has a hamming weight of 6. 
+The current FNV prime, 0x1000193 has a hamming weight of 6.   
 `HammingWeight(0x10001a7) = 7;`  
 `HammingWeight(0x10001ab) = 7;`    
 `HammingWeight(0x10001cf) = 8;`    
