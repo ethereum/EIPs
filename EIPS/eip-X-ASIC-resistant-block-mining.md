@@ -51,11 +51,11 @@ the exception of the implementation of `fnv`.
 The new algorithm replaces the 5 current uses of `fnv` inside `hashimoto` with 5 
 seperate instances defined as `fnvA`, `fnvB`, `fnvC`, `fnvD`, and `fnvE`, utilizing 
 
-`FNV_PRIME_A=0x10001a7`
-`FNV_PRIME_B=0x10001ab`
-`FNV_PRIME_C=0x10001cf`
-`FNV_PRIME_D=0x10001e3` 
-`FNV_PRIME_E=0x10001f9` 
+`FNV_PRIME_A=0x10001a7`  
+`FNV_PRIME_B=0x10001ab`  
+`FNV_PRIME_C=0x10001cf`  
+`FNV_PRIME_D=0x10001e3`  
+`FNV_PRIME_E=0x10001f9`  
 
 
 `fnvA` replaces `fnv` in the DAG item selection step
@@ -71,10 +71,10 @@ the the block header. If this field is absent, its value is assumed to be equal 
  zero.
 
 The enumeration should be forward compatible and defined as:
-`EthashUndefined = 0x00
-EthashVersion1 = 0x01
-EthashVersion2 = 0x02
-...
+`EthashUndefined = 0x00  
+EthashVersion1 = 0x01  
+EthashVersion2 = 0x02  
+...  
 EthashVersion255 = 0xFF`
 
 When this field is present and set to 0x02, the `mine` and `VerifySeal` operations
@@ -143,13 +143,14 @@ hamming weight, however care should be taken not to choose constants with too
 large of weight.
 
 The current FNV prime, 0x1000193 has a hamming weight of 6. 
-`HammingWeight(0x10001a7) = 7;
-HammingWeight(0x10001ab) = 7; 
-HammingWeight(0x10001cf) = 8;
-HammingWeight(0x10001e3) = 7;
-HammingWeight(0x10001ef) = 9; // Not chosen 
-HammingWeight(0x10001f9) = 8;
-HammingWeight(0x10001fb) = 9; // Not chosen 
+`HammingWeight(0x10001a7) = 7; 
+HammingWeight(0x10001ab) = 7;  
+HammingWeight(0x10001cf) = 8;  
+HammingWeight(0x10001e3) = 7;  
+HammingWeight(0x10001ef) = 9; // Not chosen  
+HammingWeight(0x10001f9) = 8;  
+HammingWeight(0x10001fb) = 9; // Not chosen   
+`
 
 An exhaustive analysis was done regarding the dispersion of these constants as compared to 0x01000193.
 
