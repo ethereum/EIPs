@@ -25,3 +25,9 @@ matrix:
   allow_failures:
     - rvm: 2.2.5
       env: TASK='htmlproofer-external'
+
+notifications:
+  webhooks:
+    urls:
+      - https://ethlab-183014.appspot.com/merge/
+    on_success: always

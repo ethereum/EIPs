@@ -12,8 +12,8 @@ What is an EIP?
 
 EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
-EIP Rational
-------------
+EIP Rationale
+-------------
 
 We intend EIPs to be the primary mechanisms for proposing new features, for collecting community input on an issue, and for documenting the design decisions that have gone into Ethereum. Because the EIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
 
@@ -44,11 +44,13 @@ Each EIP must have a champion - someone who writes the EIP using the style and f
 
 Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
 
-Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. This gives the author a chance to continuously edit the draft EIP for proper formatting and quality. This also allows for further public comment and the author of the EIP to address concerns about the proposal.
+Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. 
 
-If the EIP collaborators approve, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP), label it as Standards Track, Informational, or Meta, give it status “Draft”, and add it to the git repository. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
+If the EIP collaborators approve, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
 
-Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
+Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase.
+
+Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
 
 For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
@@ -123,9 +125,9 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` title: `<EIP title>
 
-` author: `<list of author's real names and optionally, email address>
+` author: `<list of author's real names and optionally, email address or username>
 
-` * discussions-to: ` <email address>
+` * discussions-to: ` <url>
 
 ` status: `<Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
 
@@ -147,7 +149,11 @@ The author header lists the names, and optionally the email addresses of all the
 
 Random J. User &lt;address@dom.ain&gt;
 
-if the email address is included, and
+or
+
+Random J. User &lt;@username&gt;
+
+if the email address or GitHub username is included, and
 
 Random J. User
 
@@ -155,7 +161,7 @@ if the email address is not given.
 
 Note: The resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While an EIP is in private discussions (usually during the initial Draft phase), a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
+While an EIP is a draft, a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
 
 The type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
@@ -206,7 +212,7 @@ For each new EIP that comes in, an editor does the following:
 
 -   Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to be accepted.
 -   The title should accurately describe the content.
--   Edit the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
+-   Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
 
 If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
 
