@@ -1,12 +1,12 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Token Validation
-    Author: Brooklyn Zelenka<brooklyn@finhaven.com>, Tom Carchrae<tom@finhaven.com>, Gleb Naumenko<gleb@finhaven.com>
-    Type: Standard Track
-    Category: ERC
-    Status: Draft
-    Created: 2018-02-14
+---
+eip: 902
+title: Token Validation
+author: Brooklyn Zelenka <brooklyn@finhaven.com>, Tom Carchrae <tom@finhaven.com>, Gleb Naumenko <gleb@finhaven.com>
+type: Standards Track
+category: ERC
+status: Draft
+created: 2018-02-14
+---
 
 ## Simple Summary
 A protocol for services providing token ownership and transfer validation.
@@ -163,7 +163,8 @@ It also does not include an interface for a `Validated` contract.
 A token may require one or many `Validator`s for different purposes,
 requiring different validations for different, or just a single `Validator`.
 The potential use cases are too varied to provide a single unified set of methods.
-We have provided a set of example contracts [here](some.link) that may be inherited from for common use cases.
+We have provided a set of example contracts [here](https://github.com/Finhaven/ValidatedToken/)
+that may be inherited from for common use cases.
 
 The status codes in the `uint8` returns are unspecified. Any status code scheme
 may be used, though a general status code proposal is fortcoming.
@@ -173,7 +174,7 @@ ERC-20, EIP-721, EIP-777, future token standards, centralized and decentralized 
 and so on.
 
 ## Implementation
-[Reference implementations](https://github.com/Finhaven/ValidatedToken/) (WIP)
+[Reference implementations](https://github.com/Finhaven/ValidatedToken/)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
