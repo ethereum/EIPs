@@ -49,13 +49,12 @@ sealing the block has been mined using `ethashV2`.
 the exception of the implementation of `fnv`. 
 
 The new algorithm replaces the 5 current uses of `fnv` inside `hashimoto` with 5 
-seperate instances defined as fnvA`, `fnvB`, `fnvC`, `fnvD`, and `fnvE`, utilizing 
+seperate instances defined as `fnvA`, `fnvB`, `fnvC`, `fnvD`, and `fnvE`, utilizing 
 `FNV_PRIME_A=0x10001a7
 FNV_PRIME_B=0x10001ab
 FNV_PRIME_C=0x10001cf
 FNV_PRIME_D=0x10001e3 
 FNV_PRIME_E=0x10001f9` 
-`
 
 
 `fnvA` replaces `fnv` in the DAG item selection step
