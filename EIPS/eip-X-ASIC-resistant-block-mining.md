@@ -34,7 +34,7 @@ trend towards centralization of mining power.
 This trend towards centralization has a negative effect on network security,
 putting significant control of the network in the hands of only a few entities.
 
-Furthermore, Ethereum was initial designed as an ASIC resistant algorithm and 
+Furthermore, Ethereum was initially designed as an ASIC resistant algorithm and 
 the community has voiced strong support for making a definitive stand on our position
 regarding dedicated mining hardware development to discourage future R&D investments.
 
@@ -94,8 +94,8 @@ that chooses not to implement the ASIC_Mitigation hardfork.
 
 Due to compatibility concerns with implementations that already add additional 
 parameters to GetWork, it may be desired to define a 33 Byte BlockHeader, where
-the first octet represents the EthashVersion enumeration value desired for the 
-block.
+the first octet represents the EthashVersion enumeration value required for the 
+block. If this octet is not present, it may be assumed to be zero.
   
 ## Rationale
 
@@ -105,7 +105,7 @@ existing ethash algorithm.  We hope to accomplish the following:
 1. Break existing ASIC based miners.
 2. Demonstrate a willingness to fork in the event of future ASIC miner production.
 
-Goal #1 is something that we can only do probabalistically without detailned
+Goal #1 is something that we can only do probabalistically without detailed
 knowledge of existing ASIC miner design.  Our approach should balance the
 inherent security risks involved with changing the mining algorithm with the
 risk that the change we make does not break existing ASIC miners.  This EIP
@@ -119,9 +119,9 @@ may alter the power utilization or performance profile of existing GPU hardware.
 The change of FNV constant is a minimal change that can be quickly
 implemented across the various network node and miner implementations.
 
-It is proposed that `ASIC_MITIGATION_FORK_BLKNUM` be no more than 5550000, giving
+It is proposed that `ASIC_MITIGATION_FORK_BLKNUM` be no more than 5550000 (epoch 185), giving
 around 30 days of notice to node and miner developers and a sufficient window
-for formal analysis of the changes by experts. We must weight this window against
+for formal analysis of the changes by experts. We must weigh this window against
 the risk introduced by allowing ASICs to continue to probalistically propagate
 on the network, as well as the risk of providing too much advanced warning to 
 ASIC developers. 
@@ -138,7 +138,7 @@ https://tools.ietf.org/html/draft-eastlake-fnv-14#section-2.1
 Typical ASIC synthesis tools would optimize multiplication of a constant
 in the FNV algorithm, reducing the area needed for the multiplier according
 to the hamming weight of the constant. To reduce the chance of ASIC adaptation
-through minor Mask changes, we propose choosing new constants with a larger
+through minor mask changes, we propose choosing new constants with a larger
 hamming weight, however care should be taken not to choose constants with too
 large of weight.
 
