@@ -19,24 +19,26 @@ mining algorithm.
 ## Abstract
 
 There are companies who currently have dedicated hardware based ethereum miners in
-production, and probabalistically actively mining.  This EIP aims to "Poison
-the well" by modifying the block mining algorithm in a manner that
-probabalistically *"breaks"* these miners if they are in-fact built on ASICs.
+production, and may be actively mining.  This EIP aims to "poison
+the well" by modifying the block mining algorithm in a low risk manner that
+may *"break"* these miners if they are in-fact built as traditional ASICs.
 
 
 ## Motivation
 
 ASIC based miners will have lower operational costs than GPU based miners which
 will result in GPU based mining quickly becoming unprofitable.  Given that
-production of ASIC based miners has a high barrier to entry, this will cause a
-trend towards centralization of mining power.
+production of ASIC based miners has a high barrier to entry and few market players,
+this will cause a trend towards centralization of mining power.  
 
 This trend towards centralization has a negative effect on network security,
 putting significant control of the network in the hands of only a few entities.
 
-Furthermore, Ethereum was initially designed as an ASIC resistant algorithm and 
-the community has voiced strong support for making a definitive stand on our position
-regarding dedicated mining hardware development to discourage future R&D investments.
+Ethash remains ASIC resistant, however ASIC manufacturer technology is advancing
+and ethash may require further changes in order to remain resistant to unforeseen
+design techniques. This EIP seeks explicitly to buy time during which newly developed
+ASIC technology will face a barrier while more long term mechanisms to ensure 
+continued ASIC resistance can be explored.  
 
 ## Specification
 
@@ -64,7 +66,7 @@ seperate instances defined as `fnvA`, `fnvB`, `fnvC`, `fnvD`, and `fnvE`, utiliz
 
 `fnv` as utilized in DAG-item creation should remain unchanged.
 
-## Node Changes
+## Node Changes (Optional Variant)
 
 A new field of `EthashVersion` defined as an 8 bit unsigned enumeration is added to 
 the the block header. If this field is absent, its value is assumed to be equal to
@@ -84,7 +86,7 @@ utilize the `ethashV2` algorithm. If this field is set to any value other than 0
 `VerifySeal` shall also fail verification in the event 
 `block.Number >= ASIC_MITIGATION_FORK_BLKNUM && block.EthashVersion < EthashVersion2`
 
-## Agent Changes
+## Agent Changes (Optional Variant, stand alone or combined with Node Changes)
  
 GetWork may optionally return the proposed blocks `EthashVersion` field. While a 
 miner or pool may infer the requirement for ethashV2 based on the computed 
@@ -122,7 +124,7 @@ implemented across the various network node and miner implementations.
 It is proposed that `ASIC_MITIGATION_FORK_BLKNUM` be no more than 5550000 (epoch 185), giving
 around 30 days of notice to node and miner developers and a sufficient window
 for formal analysis of the changes by experts. We must weigh this window against
-the risk introduced by allowing ASICs to continue to probalistically propagate
+the risk introduced by allowing ASICs that may exist to continue to propagate
 on the network, as well as the risk of providing too much advanced warning to 
 ASIC developers. 
 
