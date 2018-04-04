@@ -153,7 +153,7 @@ The current FNV prime, 0x1000193 has a hamming weight of 6.
 
 An exhaustive analysis was done regarding the dispersion of these constants as compared to 0x01000193.
 
-It can be empirically confirmed that no duplicates occur in the 32 bit word space with these constants. 
+It can be empirically confirmed that no more than 1 duplicates occur in the 32 bit word space with these constants. 
 
 It is worth noting that FNV is not a cryptographic hash, and it is not used as such in ethash. With 
 that said, a more invasive hash algorithm change could consider other options. One suggestion has been 
