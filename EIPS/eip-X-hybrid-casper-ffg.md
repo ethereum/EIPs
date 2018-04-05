@@ -10,7 +10,7 @@ created: 2018-04-05
 
 ## Abstract
 
-This EIP describes the specification for implementating and hard-forking the Ethereum network to support hybrid PoW/PoS Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top providing economic finality through a modified forkchoice rule. Because network security is shifted from PoW to PoS, PoW block reward will be reduced to 0.6 ETH.
+This EIP describes the specification for implementating and hard-forking the Ethereum network to support hybrid PoW/PoS Casper the Friendly Finality Gadget (FFG). In this hybrid model, existing PoW mechanics are used as the block proposal mechanism while PoS is layered on top providing economic finality through a modified forkchoice rule. Because network security is shifted from PoW to PoS, PoW block reward is reduced.
 
 This EIP does not provide safety or liveness proofs. See the [Casper FFG](https://arxiv.org/abs/1710.09437) paper for a more detailed formal discussion.
 
@@ -93,3 +93,46 @@ If `block.number >= HYBRID_CASPER_FORK_BLKNUM`, then `block_reward = NEW_BLOCK_R
 ### Validators
 
 The mechanics and responsibilities of validators are not specified in this EIP because they rely upon network transactions to the contract at `CASPER_ADDR` rather than on protocol level implementation and changes.
+
+### SIGHASHER_CODE
+
+The source code for `SIGHASHER_CODE` is located [here](https://github.com/ethereum/casper/blob/master/casper/validation_codes/verify_hash_ladder_sig.se).
+
+The EVM init code is:
+```
+0x
+```
+
+The EVM bytecode that the contract should be set to is:
+```
+0x
+```
+
+### PURITY_CHECKER_CODE
+
+The source code for `PURITY_CHECKER_CODE` is located [here](https://github.com/ethereum/research/blob/master/impurity/check_for_impurity.se).
+
+The EVM init code is:
+```
+0xj
+```
+
+The EVM bytecode that the contract should be set to is:
+```
+0x
+```
+
+### CASPER_CODE
+
+The source code for `CASPER_CODE` is located at
+[here](https://github.com/ethereum/casper/blob/master/casper/contracts/simple_casper.v.py).
+
+The EVM init code with the above specified params is:
+```
+0x
+```
+
+The EVM bytecode that the contract should be set to is:
+```
+0x
+```
