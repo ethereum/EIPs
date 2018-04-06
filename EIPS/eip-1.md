@@ -44,7 +44,7 @@ Each EIP must have a champion - someone who writes the EIP using the style and f
 
 Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Asking the Ethereum community first if an idea is original helps prevent too much time being spent on something that is guaranteed to be rejected based on prior discussions (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
 
-Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request]. 
+Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request].
 
 If the EIP collaborators approve, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
 
@@ -64,7 +64,7 @@ EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
 The possible paths of the status of EIPs are as follows:
 
-![EIP Process](eip-1/process.png)
+![EIP Process](../assets/eip-1/process.png)
 
 Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
 
@@ -114,7 +114,8 @@ Each EIP should have the following parts:
 EIP Formats and Templates
 -------------------------
 
-EIPs should be written in [markdown] format. Image files should be included in a subdirectory for that EIP.
+EIPs should be written in [markdown] format.
+Image files should be included in a subdirectory of the `assets` folder for that EIP as follow: `assets/eip-X` (for eip **X**). When linking to an image in the EIP, use relative links such as `../assets/eip-X/image.png`.
 
 EIP Header Preamble
 -------------------
