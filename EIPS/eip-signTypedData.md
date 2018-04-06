@@ -11,8 +11,6 @@
     Status:   Draft
     Created:  2017-09-13
 
-
-
 ## Simple Summary
 
 <!-- "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. -->
@@ -21,21 +19,19 @@ Signing data is a solved problem if all we care about are bytestrings. Unfortuna
 
 As such, the adage "don't roll your own crypto" applies. Instead, a peer-reviewed well-tested standard method needs to be used. This EIP aims to be that standard.
 
-
 ## Abstract
 
 <!-- A short (~200 word) description of the technical issue being addressed. -->
 
-This is a standard for hashing and signing of typed structured data as opposed to jsut bytestrings. It includes a
+This is a standard for hashing and signing of typed structured data as opposed to just bytestrings. It includes a
 
-* theoretical framework for correctness of encoding functions,
-* specification of structured data similar to and compatible with Solidity structs,
-* safe hashing algorithm for instances of those structures,
-* safe inclusion of those instances in the set of signable messages,
-* new RPC call `eth_signTypedData`,
-* optimized implementation of the hashing algorithm in EVM, and
-* an extension to Solidity's `keccak256` builtin function.
-
+*   theoretical framework for correctness of encoding functions,
+*   specification of structured data similar to and compatible with Solidity structs,
+*   safe hashing algorithm for instances of those structures,
+*   safe inclusion of those instances in the set of signable messages,
+*   new RPC call `eth_signTypedData`,
+*   optimized implementation of the hashing algorithm in EVM, and
+*   an extension to Solidity's `keccak256` builtin function.
 
 ## Motivation
 
@@ -43,7 +39,7 @@ This is a standard for hashing and signing of typed structured data as opposed t
 
 A signature scheme consists of hashing algorithm and a signing algorithm. The signing algorithm of choice in Ethereum is `secp256k1`. The hashing algorithm of choice is `keccak256`, this is a function from bytestrings, 𝔹⁸ⁿ, to 256-bit strings, 𝔹²⁵⁶.
 
-A good hashing algorithm should satisfy security properties such as determinism, second pre-image resistance and collision resistance. The `keccak256` function satisfies the above criteria *when applied to bytestrings*. If we want to apply it to other sets we first need to map this set to bytestrings. It is critically important that this encoding function is [deterministic][deterministic] and [injective][injective]. If it is not deterministic then the hash might differ from the moment of signing to the moment of verifying, causing the signature to incorrectly be rejected. If it is not injective then there are two different elements in our input set that hash to the same value, causing a signature to be valid for a different unrelated message.
+A good hashing algorithm should satisfy security properties such as determinism, second pre-image resistance and collision resistance. The `keccak256` function satisfies the above criteria _when applied to bytestrings_. If we want to apply it to other sets we first need to map this set to bytestrings. It is critically important that this encoding function is [deterministic][deterministic] and [injective][injective]. If it is not deterministic then the hash might differ from the moment of signing to the moment of verifying, causing the signature to incorrectly be rejected. If it is not injective then there are two different elements in our input set that hash to the same value, causing a signature to be valid for a different unrelated message.
 
 [deterministic]: https://en.wikipedia.org/wiki/Deterministic_algorithm
 [injective]: https://en.wikipedia.org/wiki/Injective_function
@@ -52,14 +48,14 @@ A good hashing algorithm should satisfy security properties such as determinism,
 
 An illustrative example of the above breakage can be found in Ethereum. Ethereum has two kinds of messages, transactions `𝕋` and bytestrings `𝔹⁸ⁿ`. These are signed using `eth_sendTransaction` and `eth_sign` respectively. Originally the encoding function `encode : 𝕋 ∪ 𝔹⁸ⁿ → 𝔹⁸ⁿ` was as defined as follows:
 
-* `encode(t : 𝕋) = RLP_encode(t)`
-* `encode(b : 𝔹⁸ⁿ) = b`
+*   `encode(t : 𝕋) = RLP_encode(t)`
+*   `encode(b : 𝔹⁸ⁿ) = b`
 
 While individually they satisfy the required properties, together they do not. If we take `b = RLP_encode(t)` we have a collision. This is mitigated in Geth [PR 2940][geth-pr] by modifying the second leg of the encoding function:
 
 [geth-pr]: https://github.com/ethereum/go-ethereum/pull/2940
 
-* `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the ascii-decimal encoding of the number of bytes in `b`.
+*   `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the ascii-decimal encoding of the number of bytes in `b`.
 
 This solves the collision between the legs since `RLP_encode(t : 𝕋)` never starts with `\x19`. There is still the risk of the new encoding function not being deterministic or injective. It is instructive to consider those in detail.
 
@@ -70,12 +66,11 @@ The above definition is not obviously collision free. Does a bytestring starting
 [geth-issue-14794]: https://github.com/ethereum/go-ethereum/issues/14794
 [trezor]: https://github.com/trezor/trezor-mcu/issues/163
 
-Both determinism and invectiveness would be trivially true if `len(b)` was left out entirely. The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` still takes a bytestring as input and expects implementors to come up with an encoding.
+Both determinism and injectiveness would be trivially true if `len(b)` was left out entirely. The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` still takes a bytestring as input and expects implementors to come up with an encoding.
 
 ### Messages
 
-The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize  so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
-
+The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
 
 ## Specification
 
@@ -83,9 +78,9 @@ The `eth_sign` call assumes messages to be bytestrings. In practice we are not h
 
 The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is thus `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing and signing as follows:
 
-* `encode(t : 𝕋) = RLP_encode(t)`
-* `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the *non-zero-padded* ascii-decimal encoding of the number of bytes in `b`.
-* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
+*   `encode(t : 𝕋) = RLP_encode(t)`
+*   `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the _non-zero-padded_ ascii-decimal encoding of the number of bytes in `b`.
+*   `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
 
 This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(t)` does not start with `\x01` or `\x19`.)
 
@@ -107,15 +102,15 @@ struct Message {
 };
 ```
 
-**Definition**: A *struct type* has valid identifier as name and contains zero or more member variables. Member variables have a member type and a name.
+**Definition**: A _struct type_ has valid identifier as name and contains zero or more member variables. Member variables have a member type and a name.
 
-**Definition**: A *member type* can be either an atomic type, a dynamic type or a reference type.
+**Definition**: A _member type_ can be either an atomic type, a dynamic type or a reference type.
 
-**Definition**: The *atomic types* are `bytes1` to `bytes32`, `uint8` to `uint256`, `int8` to `int256`, `bool` and `address`. These correspond to their definition in Solidity. Note that there are no aliases `uint` and `int`. Note that contract addresses are always plain `address`. Fixed point numbers are not supported by the standard. Future versions of this standard may add new atomic types.
+**Definition**: The _atomic types_ are `bytes1` to `bytes32`, `uint8` to `uint256`, `int8` to `int256`, `bool` and `address`. These correspond to their definition in Solidity. Note that there are no aliases `uint` and `int`. Note that contract addresses are always plain `address`. Fixed point numbers are not supported by the standard. Future versions of this standard may add new atomic types.
 
-**Definition**: The *dynamic types* are `bytes` and `string`. These are like the atomic types for the purposed of type declaration, but their treatment in encoding is different.
+**Definition**: The _dynamic types_ are `bytes` and `string`. These are like the atomic types for the purposed of type declaration, but their treatment in encoding is different.
 
-**Definition**: The *reference types* are arrays and structs. Arrays are either fixed size or dynamic and denoted by `Type[n]`  or `Type[]` respectively. Structs are references to other structs by their name. The standard supports recursive struct types.
+**Definition**: The _reference types_ are arrays and structs. Arrays are either fixed size or dynamic and denoted by `Type[n]` or `Type[]` respectively. Structs are references to other structs by their name. The standard supports recursive struct types.
 
 **Definition**: The set of structured typed data `𝕊` contains all the instances of all the struct types.
 
@@ -123,7 +118,7 @@ struct Message {
 
 The `hashStruct` function is defined as
 
-* `hashStruct(s : 𝕊) = keccak256(typeHash ‖ encodeData(s))` where `typeHash = keccak256(encodeType(typeOf(s)))`
+*   `hashStruct(s : 𝕊) = keccak256(typeHash ‖ encodeData(s))` where `typeHash = keccak256(encodeType(typeOf(s)))`
 
 **Note**: The `typeHash` is a constant for a given struct type and does not need to be runtime computed.
 
@@ -131,7 +126,7 @@ The `hashStruct` function is defined as
 
 The type of a struct is encoded as `name ‖ "(" ‖ member₁ ‖ "," ‖ member₂ ‖ "," ‖ … ‖ memberₙ ")"` where each member is written as `type ‖ " " ‖ name`. For example, the above `Message` struct is encoded as `Message(address from,address to,string contents)`.
 
-If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Person(address wallet,string name)Asset(address token,uint256 amount)`.
+If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)`.
 
 ### Definition of `encodeData`
 
@@ -158,13 +153,16 @@ For an instance `someInstance` of `SomeStruct` the expression `keccak256(someIns
 This EIP proposes a new JSON RPC method to the `eth` namespace: `eth_signTypedData`.
 
 Parameters:
-0. `TypedData` - Typed data to be signed
-1. `Address` - 20 Bytes - Address of the account that will sign the messages
+
+0.  `TypedData` - Typed data to be signed
+1.  `Address` - 20 Bytes - Address of the account that will sign the messages
 
 Returns:
-0. `DATA` - signature - 65-byte data in hexadecimal string
+
+0.  `DATA` - signature - 65-byte data in hexadecimal string
 
 Typed data is the array of data entries with their specified type and human-readable name. Below is the [json-schema](http://json-schema.org/) definition for `TypedData` param.
+
 ```json-schema
 {
   items: {
@@ -186,7 +184,6 @@ Typed data is the array of data entries with their specified type and human-read
 ```
 
 There also should be a corresponding `personal_signTypedData` method which accepts the password for an account as the last argument.
-
 
 ### Specification of `web3.{eth,personal}.signTypedData`
 
@@ -222,11 +219,10 @@ const schemaHash = ethAbi.soliditySHA3(['string'], [schema]);
 const data = _.map(typedData, 'value');
 const types = _.map(typedData, 'type');
 const hash = ethAbi.soliditySHA3(
-  ['bytes32', ...types],
-  [schemaHash, ...data],
+    ['bytes32', ...types],
+    [schemaHash, ...data]
 );
 ```
-
 
 ## Rationale
 
@@ -259,7 +255,7 @@ For the type hash several alternatives where considered and rejected for the rea
 
 **Alternative 4**: 256-bit ABIv2 signatures extended with parameter names and struct names. The `Message` example from a above would be encoded as `Message(Person(string name,address wallet) from,Person(string name,address wallet) to,string message)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). It also does not allow a recursive struct type (consider `struct List {uint256 value; List next;}`).
 
-**Alternative 5**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It makes extending and amending documentation a breaking changes, which contradicts common assumptions. It also makes the schemaHash mechanism very verbose. 
+**Alternative 5**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It makes extending and amending documentation a breaking changes, which contradicts common assumptions. It also makes the schemaHash mechanism very verbose.
 
 ### Rationale for `encodeData`
 
@@ -280,23 +276,23 @@ it also allows for an efficient in-place implementation in EVM
 
 ```javascript
 function hashStruct(Message memory message) pure returns (bytes32 hash) {
-  
+
     // Compute sub-hashes
     bytes32 typeHash = MESSAGE_TYPEHASH;
     bytes32 contentsHash = keccak256(message.contents);
-    
+
     assembly {
-        // Back up select memory 
+        // Back up select memory
         let temp1 := mload(sub(order, 32))
         let temp2 := mload(add(order, 128))
-        
+
         // Write typeHash and sub-hashes
         mstore(sub(message, 32), typeHash)
         mstore(add(order, 64), contentsHash)
-        
+
         // Compute hash
         hash := keccak256(sub(order, 32), 128)
-        
+
         // Restore memory
         mstore(sub(order, 32), temp1)
         mstore(add(order, 64), temp2)
@@ -322,7 +318,6 @@ The struct declaration and it's type encoding are redundant. By providing an int
 
 Deriving `hashStruct` functions from structures is also redundant and error-prone, especially if the optimized form is used. By modifying the behaviour of `keccak256(someInstance)` the compiler can derive optimal `hashStruct` functions from the struct type specifications.
 
-
 ## Backwards Compatibility
 
 <!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
@@ -331,12 +326,9 @@ The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently un
 
 The Solidity expression `keccak256(someInstance)` for an instance `someInstance` of a struct type `SomeStruct` is valid syntax. It currently evaluates to the `keccak256` hash of the memory address of the instance. This behaviour should be considered dangerous, as in some scenarios it will appear to work correctly, but in others it will fail both determinism and injetiveness. DApps that depend on the current behaviour should be considered broken.
 
-
 ## Test Cases
 
 <!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
-
-
 
 ```
 struct Person {
@@ -363,7 +355,6 @@ bytes32 schemaHash = keccak256(
     "Person(string name,address wallet)"
   );
 ```
-
 
 (Note that the string is split up in substrings for readability. The result is equivalent if all strings are concatenated).
 
@@ -415,24 +406,21 @@ function dataHash(Message message) returns (bytes32) {
 }
 ```
 
-
-
 ## Implementation
 
 <!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
 
 To be done before this EIP can be considered accepted:
 
-* [ ] Finalize specification
-* [ ] Add test vectors
-* [ ] Review specification
+*   [ ] Finalize specification
+*   [ ] Add test vectors
+*   [ ] Review specification
 
 To be done before this EIP can be considered "Final":
 
-* [ ] Implement `eth_signTypedData` in major RPC providers.
-* [ ] Implement `web3.sign` in Web3 providers.
-* [ ] Implement `keccak256` struct hashing in Solidity.
-
+*   [ ] Implement `eth_signTypedData` in major RPC providers.
+*   [ ] Implement `web3.sign` in Web3 providers.
+*   [ ] Implement `keccak256` struct hashing in Solidity.
 
 ## Copyright
 
