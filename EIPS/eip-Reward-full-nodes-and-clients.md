@@ -3,7 +3,7 @@ eip: to be assigned
 title: Reward full nodes and clients
 author: James Ray and Micah Zoltu
 type: Standard Track
-category: Core & ERC
+category: Core
 status: Draft
 type: Standards Track
 category: Core
