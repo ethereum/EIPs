@@ -2,6 +2,7 @@
 eip: <to be assigned>
 title: Reward full nodes and clients
 author: James Ray and Micah Zoltu
+discussions-to: https://gitter.im/ethereum/topics/topic/5ac8574227c509a774e7901a/eip-reward-full-nodes-and-clients
 type: Standard Track
 category: Core
 status: Draft
