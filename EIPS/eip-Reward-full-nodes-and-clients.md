@@ -6,8 +6,9 @@ discussions-to: https://gitter.im/ethereum/topics/topic/5ac8574227c509a774e7901a
 status: Draft
 type: Standards Track
 category: Core
-created: 2017-03-01
+created: 2018-03-01
 ---
+
 
 ## Simple Summary
 Provide a reward to full nodes for validating transactions and give a reward to clients for developing the client.
