@@ -139,7 +139,7 @@ If the struct type references other struct types (and these in turn reference ev
 
 The encoding of a struct instance is `value₁ ‖ value₂ ‖ … ‖ valueₙ`, i.e. a simple concatenation of the encoding of the member values. Each encoded member value is exactly 32-byte long.
 
-The atomic values are encoded as follows: Boolean `false` and `true` are encoded as `uint256` values `0` and `1` respectively. Addresses are encoded as `uint160`. Integer values are sign-extended to 256-bit and encoded in big endian order. `bytes1` to `bytes31` are padded at the end to `bytes32`.
+The atomic values are encoded as follows: Boolean `false` and `true` are encoded as `uint256` values `0` and `1` respectively. Addresses are encoded as `uint160`. Integer values are sign-extended to 256-bit and encoded in big endian order. `bytes1` to `bytes31` are arrays with a beginning (index `0`) and an end (index `length - 1`), they are zero-padded at the end to `bytes32` and encoded in beginning to end order.
 
 The dynamic values `bytes` and `string` are encoded as a `keccak256` hash of their contents.
 
