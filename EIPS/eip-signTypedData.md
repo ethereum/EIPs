@@ -147,12 +147,6 @@ The array values are encoded as the `keccak256` hash of the concatenated `encode
 
 The struct values are encoded recursively as `hashStruct(value)`. This is undefined for cyclical data.
 
-### Extension of Solidity
-
-For a given struct type `SomeStruct` the expression `SomeStruct.typeHash` will evaluate to `keccak256(encodeType(SomeStruct))`. (Note that this is expressed as a member of the type not of an instance so there is no potential conflict.)
-
-For an instance `someInstance` of `SomeStruct` the expression `keccak256(someInstance)` will evaluate to `hashStruct(someInstance)`.
-
 ### Specification of the `eth_signTypedData` JSON RPC
 
 **TODO**: Update.
@@ -317,12 +311,6 @@ The in-place implementation makes strong but reasonable assumptions on the memor
 **Alternative 9**: Support cyclical data structures. The current standard is optimized for tree-like data structures and undefined for cyclical data structures. To support cyclical data a stack containing the path to the current node needs to be maintained and a stack offset substituted when a cycle is detected. This is prohibitively more complex to specify and implement. It also breaks composability where the hashes of the member values are used to construct the hash of the struct (the hash of the member values would dependent on the path). It is possible to extend the standard in a compatible way to define hashes of cyclical data.
 
 Similarly, a straightforward implementation is sub-optimal for directed acyclic graphs. A simple recursion through the members can visit the same node twice. Memoization can optimize this.
-
-### Rationale for Solidity extensions
-
-The struct declaration and it's type encoding are redundant. By providing an intrinsic an `SomeStruct.typeHash` intrinsic the compiler takes care of deriving the `typeHash` from the struct declaration.
-
-Deriving `hashStruct` functions from structures is also redundant and error-prone, especially if the optimized form is used. By modifying the behaviour of `keccak256(someInstance)` the compiler can derive optimal `hashStruct` functions from the struct type specifications.
 
 
 ## Backwards Compatibility
