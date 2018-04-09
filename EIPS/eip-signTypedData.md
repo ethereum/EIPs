@@ -30,14 +30,14 @@ As such, the adage "don't roll your own crypto" applies. Instead, a peer-reviewe
 ## Abstract
 <!-- A short (~200 word) description of the technical issue being addressed. -->
 
-This is a standard for hashing and signing of typed structured data as opposed to jsut bytestrings. It includes a
+This is a standard for hashing and signing of typed structured data as opposed to just bytestrings. It includes a
 
 * theoretical framework for correctness of encoding functions,
 * specification of structured data similar to and compatible with Solidity structs,
 * safe hashing algorithm for instances of those structures,
 * safe inclusion of those instances in the set of signable messages,
 * new RPC call `eth_signTypedData`,
-* optimized implementation of the hashing algorithm in EVM, and
+* optimized implementation of the hashing algorithm in the EVM, and
 * an extension to Solidity's `keccak256` builtin function.
 
 
