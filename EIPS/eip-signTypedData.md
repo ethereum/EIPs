@@ -63,16 +63,16 @@ While individually they satisfy the required properties, together they do not. I
 
 This solves the collision between the legs since `RLP_encode(t : 𝕋)` never starts with `\x19`. There is still the risk of the new encoding function not being deterministic or injective. It is instructive to consider those in detail.
 
-As is, the definition above is not deterministic. For a 4-byte string `b` both encodings with `len(b) = "4"` and `len(b) = "004"` are valid. This can be solved by further requiring that the decimal encoding of the length has no leading zeros.
+As is, the definition above is not deterministic. For a 4-byte string `b` both encodings with `len(b) = "4"` and `len(b) = "004"` are valid. This can be solved by further requiring that the decimal encoding of the length has no leading zeros and `len("") = "0"`.
 
-The above definition is not obviously collision free. Does a bytestring starting with `"x19Ethereum Signed Message:\n42a…"` mean a 42-byte string starting with `a` or a 4-byte string starting with `2a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately this does not lead to actual collisions as the length of the encoded bytestring provides sufficient information to disambiguate the cases.
+The above definition is not obviously collision free. Does a bytestring starting with `"x19Ethereum Signed Message:\n42a…"` mean a 42-byte string starting with `a` or a 4-byte string starting with `2a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately this does not lead to actual collisions as the total length of the encoded bytestring provides sufficient information to disambiguate the cases.
 
 [geth-issue-14794]: https://github.com/ethereum/go-ethereum/issues/14794
 [trezor]: https://github.com/trezor/trezor-mcu/issues/163
 
-Both determinism and invectiveness would be trivially true if `len(b)` was left out entirely. The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` still takes a bytestring as input and expects implementors to come up with an encoding.
+Both determinism and injectivity would be trivially true if `len(b)` was left out entirely. The point is, it is difficult to map arbitrary sets to bytestrings without introducing security issues in the encoding function. Yet the current design of `eth_sign` still takes a bytestring as input and expects implementors to come up with an encoding.
 
-### Messages
+### Arbitrary messages
 
 The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize  so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
 
@@ -104,7 +104,7 @@ struct Message {
     address from;
     address to;
     string contents;
-};
+}
 ```
 
 **Definition**: A *struct type* has valid identifier as name and contains zero or more member variables. Member variables have a member type and a name.
@@ -131,7 +131,7 @@ The `hashStruct` function is defined as
 
 The type of a struct is encoded as `name ‖ "(" ‖ member₁ ‖ "," ‖ member₂ ‖ "," ‖ … ‖ memberₙ ")"` where each member is written as `type ‖ " " ‖ name`. For example, the above `Message` struct is encoded as `Message(address from,address to,string contents)`.
 
-If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Person(address wallet,string name)Asset(address token,uint256 amount)`.
+If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)`.
 
 ### Definition of `encodeData`
 
@@ -165,7 +165,8 @@ Returns:
 0. `DATA` - signature - 65-byte data in hexadecimal string
 
 Typed data is the array of data entries with their specified type and human-readable name. Below is the [json-schema](http://json-schema.org/) definition for `TypedData` param.
-```json-schema
+
+```javascript
 {
   items: {
     properties: {
@@ -329,7 +330,7 @@ Deriving `hashStruct` functions from structures is also redundant and error-pron
 
 The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently undefined. Defining them should not affect the behaviour of existing DApps.
 
-The Solidity expression `keccak256(someInstance)` for an instance `someInstance` of a struct type `SomeStruct` is valid syntax. It currently evaluates to the `keccak256` hash of the memory address of the instance. This behaviour should be considered dangerous, as in some scenarios it will appear to work correctly, but in others it will fail both determinism and injetiveness. DApps that depend on the current behaviour should be considered broken.
+The Solidity expression `keccak256(someInstance)` for an instance `someInstance` of a struct type `SomeStruct` is valid syntax. It currently evaluates to the `keccak256` hash of the memory address of the instance. This behaviour should be considered dangerous. In some scenarios it will appear to work correctly but in others it will fail determinism and/or injectiveness. DApps that depend on the current behaviour should be considered dangerously broken.
 
 
 ## Test Cases
