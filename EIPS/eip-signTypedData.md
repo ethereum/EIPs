@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 712
 title: Ethereum typed structured data hashing and signing
 author: Remco Bloemen <remco@wicked.ventures>,
         Leonid Logvinov <logvinov.leon@gmail.com>
