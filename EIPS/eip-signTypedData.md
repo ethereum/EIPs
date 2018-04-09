@@ -1,20 +1,25 @@
-# Structured data hashing and signing
+---
+eip: <to be assigned>
+title: Ethereum typed structured data hashing and signing
+author: Remco Bloemen <remco@wicked.ventures>,
+        Leonid Logvinov <logvinov.leon@gmail.com>
+discussions-to: remco@wicked.ventures
+status: Draft
+type: Standards Track
+category (*only required for Standard Track): Interface
+created: 2017-09-12
+requires (*optional): <EIP number(s)>
+replaces (*optional): <EIP number(s)>
+---
+<!--
+This is the suggested template for new EIPs.
 
-## Preamble
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
 
-    EIP:      <to be assigned>
-    Title:    Ethereum typed structured data hashing and signing
-    Author:   Remco Bloemen <remco@wicked.ventures>,
-              Leonid Logvinov <logvinov.leon@gmail.com>
-    Type:     Standard Track
-    Category: ERC
-    Status:   Draft
-    Created:  2017-09-13
-
-
+The title should be 44 characters or less.
+-->
 
 ## Simple Summary
-
 <!-- "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. -->
 
 Signing data is a solved problem if all we care about are bytestrings. Unfortunately in the real world we care about complex meaningful messages. Hashing structured data is non-trivial and errors result in loss of the security properties of the system.
@@ -23,7 +28,6 @@ As such, the adage "don't roll your own crypto" applies. Instead, a peer-reviewe
 
 
 ## Abstract
-
 <!-- A short (~200 word) description of the technical issue being addressed. -->
 
 This is a standard for hashing and signing of typed structured data as opposed to jsut bytestrings. It includes a
@@ -38,7 +42,6 @@ This is a standard for hashing and signing of typed structured data as opposed t
 
 
 ## Motivation
-
 <!-- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. -->
 
 A signature scheme consists of hashing algorithm and a signing algorithm. The signing algorithm of choice in Ethereum is `secp256k1`. The hashing algorithm of choice is `keccak256`, this is a function from bytestrings, 𝔹⁸ⁿ, to 256-bit strings, 𝔹²⁵⁶.
@@ -78,8 +81,7 @@ The `eth_sign` call assumes messages to be bytestrings. In practice we are not h
 
 
 ## Specification
-
-<!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...).  -->
+<!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). -->
 
 The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is thus `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing and signing as follows:
 
@@ -230,7 +232,6 @@ const hash = ethAbi.soliditySHA3(
 
 
 ## Rationale
-
 <!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
 
 The `encode` function is extended with a new case for the new types. The first byte of the encoding distinguishes the cases. For the same reason it is not safe to start immediately with the domain separator or a `typeHash`. While hard, it may be possible to construct a `typeHash` that also happens to be a prefix of a valid RLP encoded transaction.
@@ -325,7 +326,6 @@ Deriving `hashStruct` functions from structures is also redundant and error-pron
 
 
 ## Backwards Compatibility
-
 <!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
 
 The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently undefined. Defining them should not affect the behaviour of existing DApps.
@@ -334,7 +334,6 @@ The Solidity expression `keccak256(someInstance)` for an instance `someInstance`
 
 
 ## Test Cases
-
 <!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
 
 
@@ -419,7 +418,6 @@ function dataHash(Message message) returns (bytes32) {
 
 
 ## Implementation
-
 <!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
 
 To be done before this EIP can be considered accepted:
@@ -436,5 +434,4 @@ To be done before this EIP can be considered "Final":
 
 
 ## Copyright
-
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
