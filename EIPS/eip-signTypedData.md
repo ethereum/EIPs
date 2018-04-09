@@ -68,7 +68,7 @@ This solves the collision between the legs since `RLP_encode(t : 𝕋)` never st
 
 As is, the definition above is not deterministic. For a 4-byte string `b` both encodings with `len(b) = "4"` and `len(b) = "004"` are valid. This can be solved by further requiring that the decimal encoding of the length has no leading zeros and `len("") = "0"`.
 
-The above definition is not obviously collision free. Does a bytestring starting with `"x19Ethereum Signed Message:\n42a…"` mean a 42-byte string starting with `a` or a 4-byte string starting with `2a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately this does not lead to actual collisions as the total length of the encoded bytestring provides sufficient information to disambiguate the cases.
+The above definition is not obviously collision free. Does a bytestring starting with `"\x19Ethereum Signed Message:\n42a…"` mean a 42-byte string starting with `a` or a 4-byte string starting with `2a`?. This was pointed out in [Geth issue #14794][geth-issue-14794] and motivated Trezor to [not implement the standard][trezor] as-is. Fortunately this does not lead to actual collisions as the total length of the encoded bytestring provides sufficient information to disambiguate the cases.
 
 [geth-issue-14794]: https://github.com/ethereum/go-ethereum/issues/14794
 [trezor]: https://github.com/trezor/trezor-mcu/issues/163
