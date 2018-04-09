@@ -1,11 +1,13 @@
 ## Preamble
 
-    EIP: draft
-    Title: Whisper Specification
-    Author: Vlad Gluhovsky <gluk256@gmail.com>
-    Type: Informational
-    Status: Draft
-    Created: 2017-05-05
+---
+eip: 627
+title: Whisper Specification
+author: Vlad Gluhovsky <gluk256@gmail.com>
+type: Informational
+status: Draft
+created: 2017-05-05
+---
 
 ## Abstract
 
