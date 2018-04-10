@@ -1,5 +1,3 @@
-## Preamble
-
 ---
 eip: 627
 title: Whisper Specification
