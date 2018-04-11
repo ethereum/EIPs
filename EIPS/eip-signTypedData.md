@@ -87,9 +87,13 @@ The set of signable messages is extended from transactions and bytestrings `𝕋
 
 * `encode(t : 𝕋) = RLP_encode(t)`
 * `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the *non-zero-padded* ascii-decimal encoding of the number of bytes in `b`.
-* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
+* `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x19\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
 
-This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(t)` does not start with `\x01` or `\x19`.)
+This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(t)` does not start with `\x19`.)
+
+TODO: [EIP-191][eip191]
+
+[eip191]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-191.md
 
 ### Domain separator `d`
 
