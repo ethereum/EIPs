@@ -79,6 +79,10 @@ Both determinism and injectivity would be trivially true if `len(b)` was left ou
 
 The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize  so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
 
+### Note on replay attacks
+
+TODO
+
 
 ## Specification
 <!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). -->
