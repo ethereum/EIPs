@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: <EIP title>
-author: <list of authors' names and optionally, email addresses>
+author: <list of authors' names and optionally, email addresses or Github usernames e.g.: FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>>
 discussions-to: <email address>
 status: Draft
 type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
