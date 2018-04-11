@@ -415,6 +415,8 @@ function dataHash(Message message) returns (bytes32) {
 To be done before this EIP can be considered accepted:
 
 * [ ] Finalize specification
+  * [ ] Domain separators
+  * [ ] Prevent replay attacks
 * [ ] Add test vectors
 * [ ] Review specification
 
