@@ -35,9 +35,8 @@ This is a standard for hashing and signing of typed structured data as opposed t
 *   specification of structured data similar to and compatible with Solidity structs,
 *   safe hashing algorithm for instances of those structures,
 *   safe inclusion of those instances in the set of signable messages,
-*   new RPC call `eth_signTypedData`,
-*   optimized implementation of the hashing algorithm in EVM, and
-*   an extension to Solidity's `keccak256` builtin function.
+*   new RPC call `eth_signTypedData`, and
+*   an optimized implementation of the hashing algorithm in EVM.
 
 ## Motivation
 <!-- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. -->
