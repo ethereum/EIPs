@@ -10,24 +10,64 @@ created: 2018-04-13
 requires: 20
 ---
 
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
-
 ## Simple Summary
-"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+ERC20 tokens need to be able to support the same tokenURI metadata standard as ERC721 tokens
 
 ## Abstract
-A short (~200 word) description of the technical issue being addressed.
+The ERC721 standard introduced the "tokenURI" parameter for non-fungible tokens to handle metadata such as:
+
+- thumbnail image
+- title
+- description
+- properties
+
+etc.
+
+This particularly critical for crypto-collectibles and gaming assets. However, not all crypto-collectibles and gaming assets will be non-fungible. Therefore, it is critical to extend the ERC20 standard to support the same metadata standard to simplify platforms supporting both fungible and non-fungible collectibles, game assets, and more.
 
 ## Motivation
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+The ERC721 standard was created to support the creation of perfectly unique, 1-of-1, non-divisible tokens known as "non-fungible tokens".
+
+The initial motivation behind creating this standard was to support crypto-collectibles and gaming assets, initially for the "Crypto Kitties" collectibles game. The success of Crypto Kitties has caused significant investment into platforms that support displaying ERC721 assets based on the metadata contained in the "tokenURI" metadata paramater.
+
+However, not all crypto-collectibles and gaming assets need to be unique and non-fungible. Gaming assets such as weapons, crypto-artworks with non-unique "prints", and more will function more like traditional ERC20 tokens with a fungible "supply". Many platforms such as wallets, exchanges, games, etc will want to support both fungible and non-fungible assets with similar metadata. This proposal will extend the ERC20 standard to optionally include a nearly identical "tokenURI" parameter supporting the JSON metadata schema as the ERC721 standard.
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...).
 
+The **metadata extension** will be OPTIONAL for ERC-20 smart contracts. This allows your smart contract to be interrogated for its name and for details about the assets which your tokens represent.
+
+```solidity
+/// @title ERC-20 optional metadata extension
+interface TokenMetaData /* is ERC20 */ {
+
+    /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
+    ///  3986. The URI may point to a JSON file that conforms to the "Metadata JSON Schema".
+    function tokenURI() external view returns (string);
+}
+```
+
+This is the "Token Metadata JSON Schema" referenced above.
+
+```json
+{
+    "title": "Asset Metadata",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Identifies the asset to which this token represents",
+        },
+        "description": {
+            "type": "string",
+            "description": "Describes the asset to which this NFT represents",
+        },
+        "image": {
+            "type": "string",
+            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive.",
+        }
+    }
+}
+```
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 
