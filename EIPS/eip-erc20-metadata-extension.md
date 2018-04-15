@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: ERC20 Extended to Support tokenURI Metadata
+title: ERC20 Metadata Extension
 author: Tommy Nicholas (@tomasienrbc), Matt Russo (@mateofrancesco), Matt Condon (@shrugs)
 discussions-to: thelab@rareart.io
 status: Draft
