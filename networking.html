@@ -1,0 +1,7 @@
+---
+layout: page
+title: Networking
+---
+
+{% assign eips=site.pages|where:"type","Standards Track"|where:"category","Networking" %}
+{% include eiptable.html eips=eips %}
