@@ -1,24 +1,14 @@
 ## Preamble
 
-    EIP: <to be assigned>
-    Title: Ethereum decentralized base network service
-    Authors: Kirill Varlamov @ongrid <kirill@ongrid.pro>
-             Vsevolod Mikhalevsky <vm@ongrid.pro>
-    Type: Informational
-    Category: Networking
-    Status: Draft
-    Requires: EIP boot process for IPv6 adress-family (WIP)
-              EIP smart contract for IPv6 prefix assignment and delegation (TBD)
-              EIP P2P node capabilities discovery: router/probe/stub roles (TBD)
-              EIP link-state routing protocol (TBD)
-              EIP strong network-layer cryptography for all the data (TBD)
-              EIP Smart Contract for peering relations between router/probe/stub nodes (TBD)
-              EIP End-to end service measurement protocol (TBD)
-              EIP Smart Contract for service level measurement for routing reward/penalty (TBD)
-              EIP Network stack changes for endpoint operating systems (TBD)
-              EIP Reference software-based router/probe (TBD)
-              EIP Hardware router platform (TBD)
-    Created: 2017-08-08
+---
+eip: 711
+title: Ethereum decentralized base network service
+author: Kirill Varlamov @ongrid <kirill@ongrid.pro>, Vsevolod Mikhalevsky <seva@ongrid.pro>
+type: Informational
+category: Networking
+status: Draft
+created: 2017-08-08
+---
 
 ## Simple Summary
 This 'umbrella' EIP describes the arguments against using current Internet as a transport for public blockchain applications, the potential vulnerabilities and risks of the current design and proposes the new principles for fast, autonomous, censorship-resistant base network. The proposal was written by network engineers with solid operations background at largest European service providers and practicing network architects.
