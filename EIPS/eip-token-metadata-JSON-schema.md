@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
 title: Token Metadata JSON Schema
-author: Tommy Nicholas (@tomasienrbc)
-discussions-to: tommy@rareart.io
+author: Tommy Nicholas (@tomasienrbc), Matt Russo (@mateosu), John Zettler (@JohnZettler), Matt Condon (@shrugs)
+discussions-to: thelab@rareart.io
 status: Draft
 type: Standards Track
 category: ERC

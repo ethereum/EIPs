@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: ERC20 Metadata Extension
-author: Tommy Nicholas (@tomasienrbc), Matt Russo (@mateosu), Matt Condon (@shrugs)
+author: Tommy Nicholas (@tomasienrbc), Matt Russo (@mateosu), John Zettler (@JohnZettler), Matt Condon (@shrugs)
 discussions-to: thelab@rareart.io
 status: Draft
 type: Standards Track
