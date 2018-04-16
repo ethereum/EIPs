@@ -19,19 +19,22 @@ The ERC721 standard introduced the "tokenURI" parameter for non-fungible tokens 
 - title
 - description
 - properties
+- etc.
 
-etc.
+This is particularly critical for crypto-collectibles and gaming assets.
 
-This particularly critical for crypto-collectibles and gaming assets.
-
-This standard includes a reference to metadata standard named "ERC721 Metadata JSON Schema". This schema is actually equally relevant to ERC20 tokens and therefore should be its own standard, separate from the ERC721 standard.
+This standard includes a reference to a metadata standard named "ERC721 Metadata JSON Schema". This schema is actually equally relevant to ERC20 tokens and therefore should be its own standard, separate from the ERC721 standard.
 
 ## Motivation
-Metadata is critical for both ERC721 and ERC20 tokens representing things like crypto-collectibles, gaming assets, etc. Therefore, it is more logical and will be easier to maintain one Token Metadata JSON Schema rather than multiple schemas contained in their own EIPs. This should result in no code changes to the ERC721 standard or ERC20 standard and will serve only to simplify the process of maintaining and up to date JSON Schema for token metadata.
+Metadata is critical for both ERC721 and ERC20 tokens representing things like crypto-collectibles, gaming assets, etc. Not all crypto-collectibles and gaming assets will be non-fungible. It is critical for fungible ERC20 tokens to have a metadata standard similar to that of ERC721 tokens. Standardization of metadata between ERC20 and ERC721 will simplify development of dApps and infrastructure that must support both fungible and non-fungible assets.
+
+It is more logical and easier to maintain one Token Metadata JSON Schema rather than multiple schemas contained in their own EIPs.
+
+This should result in no code changes to the ERC721 standard or ERC20 standard and will serve only to simplify the process of maintaining a standard JSON Schema for token metadata.
 
 ## Specification
 
-This is the "Token Metadata JSON Schema" as it currently exists in the ERC721 standard. No changes are being recommended at this time.
+This "Token Metadata JSON Schema" mimics the structure of the ERC721 standard. Only grammatical changes are being recommended at this time.
 
 ```json
 {
