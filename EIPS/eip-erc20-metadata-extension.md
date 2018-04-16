@@ -71,7 +71,7 @@ This is the "Token Metadata JSON Schema" referenced above.
 This proposal will make adding metadata to ERC20 tokens straightforward for developers with minimal-to-no disruption to the overall ecosystem. By using the same parameter name and by consolidating the underlying Token JSON Metadata Standard, developers will confidently understand how to add and interpret token metadata between ERC20 and ERC721 tokens.
 
 ## Backwards Compatibility
-I believe this EIP is fully backwards compatible but I may be misunderstanding the definition of "backwards compatible". Help!
+This EIP is fully backwards compatible as its implementation simply extends the functionality of ERC20 tokens and is optional.
 
 ## Test Cases
 TO-DO
