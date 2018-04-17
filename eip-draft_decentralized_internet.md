@@ -1,5 +1,3 @@
-## Preamble
-
 ---
 eip: 711
 title: Ethereum decentralized base network service
