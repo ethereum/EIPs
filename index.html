@@ -1,0 +1,43 @@
+---
+layout: default
+title: Home
+---
+
+<h1 class="page-heading">EIPs <a href="https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a></h1>
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+
+<h2>Contributing</h2>
+<p>First review <a href="EIPS/eip-1">EIP-1</a>. Then clone the repository and add your EIP to it. There is a <a href="https://github.com/ethereum/EIPs/blob/master/eip-X.md">template EIP here</a>. Then submit a Pull Request to Ethereum's <a href="https://github.com/ethereum/EIPs">EIPs repository</a>.</p>
+
+<h2>EIP status terms</h2>
+<ul>
+  <li><strong>Draft</strong> - an EIP that is open for consideration.</li>
+  <li><strong>Accepted</strong> - an EIP that is planned for immediate adoption, i.e. expected to be included in the next hard fork (for Core/Consensus layer EIPs).</li>
+  <li><strong>Final</strong> - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).</li>
+  <li><strong>Deferred</strong> an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.</li>
+</ul>
+
+<h2>EIP Types</h2>
+
+<p>EIPs are separated into a number of types, and each has its own list of EIPs.</p>
+
+<h3>Standard Track ({{site.pages|where:"type","Standards Track"|size}})</h3>
+<p>Describes any change that affects most or all Ethereum implementations, such as a change to the the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.</p>
+
+<h4><a href="{{"core"|relative_url}}">Core</a> ({{site.pages|where:"type","Standards Track"|where:"category","Core"|size}})</h4>
+<p>Improvements requiring a consensus fork (e.g. <a href="EIPS/eip-5">EIP5</a>, <a href="EIPS/eip-101">EIP101</a>), as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions (for example, the miner/node strategy changes 2, 3, and 4 of <a href="EIPS/eip-86">EIP86</a>).</p>
+
+<h4><a href="{{"networking"|relative_url}}">Networking</a> ({{site.pages|where:"type","Standards Track"|where:"category","Networking"|size}})</h4>
+<p>Includes improvements around devp2p (<a href="EIPS/eip-8">EIP8</a>) and Light Ethereum Subprotocol, as well as proposed improvements to network protocol specifications of whisper and swarm.</p>
+
+<h4><a href="{{"interface"|relative_url}}">Interface</a> ({{site.pages|where:"type","Standards Track"|where:"category","Interface"|size}})</h4>
+<p>Includes improvements around client API/RPC specifications and standards, and also certain language-level standards like method names (<a href="EIPS/eip-6">EIP6</a>) and contract ABIs. The label “interface” aligns with the interfaces repo and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.</p>
+
+<h4><a href="{{"erc"|relative_url}}">ERC</a> ({{site.pages|where:"type","Standards Track"|where:"category","ERC"|size}})</h4>
+<p>Application-level standards and conventions, including contract standards such as token standards (<a href="EIPS/eip-20">ERC20</a>), name registries (<a href="EIPS/eip-137">ERC137</a>), URI schemes (<a href="EIPS/eip-681">ERC681</a>), library/package formats (<a href="EIPS/eip-190">EIP190</a>), and wallet formats (<a href="https://github.com/ethereum/EIPs/issues/85">EIP85</a>).</p>
+
+<h3><a href="{{"informational"|relative_url}}">Informational</a> ({{site.pages|where:"type","Informational"|size}})</h3>
+<p>Describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.</p>
+
+<h3><a href="{{"meta"|relative_url}}">Meta</a> ({{site.pages|where:"type","Meta"|size}})</h3>
+<p>Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.</p>
