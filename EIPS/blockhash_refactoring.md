@@ -14,16 +14,16 @@ Stores blockhashes in the state, reducing the protocol complexity and the need f
 
 ### Parameters
 
-* `METROPOLIS_FORK_BLKNUM`: TBD
+* `CONSTANTINOPLE_FORK_BLKNUM`: TBD
 * `SUPER_USER`: 2**160 - 2
 * `BLOCKHASH_CONTRACT_ADDR`: 0xf0 (ie. 240)
 * `BLOCKHASH_CONTRACT_CODE`: see below
 
 ### Specification
 
-If `block.number == METROPOLIS_FORK_BLKNUM`, then when processing the block, before processing any transactions set the code of BLOCKHASH_CONTRACT_ADDR to BLOCKHASH_CONTRACT_CODE.
+If `block.number == CONSTANTINOPLE_FORK_BLKNUM`, then when processing the block, before processing any transactions set the code of BLOCKHASH_CONTRACT_ADDR to BLOCKHASH_CONTRACT_CODE.
 
-If `block.number >= METROPOLIS_FORK_BLKNUM`, then when processing a block, before processing any transactions execute a call with the parameters:
+If `block.number >= CONSTANTINOPLE_FORK_BLKNUM`, then when processing a block, before processing any transactions execute a call with the parameters:
 
 * `SENDER`: SUPER_USER
 * `GAS`: 1000000
@@ -31,7 +31,7 @@ If `block.number >= METROPOLIS_FORK_BLKNUM`, then when processing a block, befor
 * `VALUE`: 0
 * `DATA`: <32 bytes corresponding to the block's prevhash>
 
-If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then the BLOCKHASH opcode instead returns the result of executing a call (NOT a transaction) with the parameters:
+If `block.number >= CONSTANTINOPLE_FORK_BLKNUM + 256`, then the BLOCKHASH opcode instead returns the result of executing a call (NOT a transaction) with the parameters:
 
 * `SENDER`: <account from which the opcode was called>
 * `GAS`: 1000000
@@ -39,7 +39,7 @@ If `block.number >= METROPOLIS_FORK_BLKNUM + 256`, then the BLOCKHASH opcode ins
 * `VALUE`: 0
 * `DATA`: 32 byte zero-byte-leftpadded integer representing the stack argument with which the opcode was called
 
-Also, for blocks where `block.number >= METROPOLIS_FORK_BLKNUM`, the gas cost is increased from 20 to 800 to reflect the higher costs of processing the algorithm in the contract code.
+Also, for blocks where `block.number >= CONSTANTINOPLE_FORK_BLKNUM`, the gas cost is increased from 20 to 800 to reflect the higher costs of processing the algorithm in the contract code.
 
 ### BLOCKHASH_CONTRACT_CODE
 
