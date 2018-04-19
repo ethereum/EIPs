@@ -1,13 +1,13 @@
-### Preamble
+---
+eip: 210
+title: Blockhash refactoring
+author: Vitalik Buterin (@vbuterin)
+type: Standards Track
+category: core
+status: Draft
+created: 2017-02-10
+---
 
-    EIP: <to be assigned>
-    Title: Blockhash refactoring
-    Author: Vitalik Buterin
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-02-10
-    
 ### Summary
 
 Stores blockhashes in the state, reducing the protocol complexity and the need for client implementation complexity in order to process the BLOCKHASH opcode. Also extends the range of how far back blockhash checking can go, with the side effect of creating direct links between blocks with very distant block numbers, facilitating much more efficient initial light client syncing.
