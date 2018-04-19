@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1010
 title: Uniformity Between 0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B and 0x15E55EF43efA8348dDaeAa455F16C43B64917e3c
 author: Anderson Wesley <@andywesley>
 discussions-to: https://github.com/andywesley/EIPs/issues
