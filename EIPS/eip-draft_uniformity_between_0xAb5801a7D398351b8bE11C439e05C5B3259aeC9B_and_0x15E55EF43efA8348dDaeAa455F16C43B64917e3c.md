@@ -45,7 +45,7 @@ Ethereum project and community.
 ## Specification
 
 The balance of `0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B` will be decreased
-by 100,000 ether. The balance of `0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B`
+by 100,000 ether. The balance of `0x15E55EF43efA8348dDaeAa455F16C43B64917e3c`
 will be increased by 100,000 ether. No net change in the amount of extant
 ether will occur unless at the time of implementation the former address does not
 contain sufficient ether for such a deduction.
