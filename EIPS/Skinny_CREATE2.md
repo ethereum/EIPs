@@ -9,7 +9,7 @@ Created: 2018-04-20
 
 ### Specification
 
-Adds a new opcode at 0xf5, which takes 4 stack arguments: endowment, memory_start, memory_length, salt. Behaves identically to CREATE, except using `sha3(msg.sender ++ salt ++ init_code)[12:]` instead of the usual sender-and-nonce-hash as the address the contract is created.
+Adds a new opcode at 0xf5, which takes 4 stack arguments: endowment, memory_start, memory_length, salt. Behaves identically to CREATE, except using `sha3(msg.sender ++ salt ++ init_code)[12:]` instead of the usual sender-and-nonce-hash as the address where the contract is initialized at.
 
 ### Motivation
 
