@@ -1,10 +1,10 @@
 ---
-eip: <to be assigned>
+eip: 1000
 title: Configurable On Chain Issuance
 author: Alex Van de Sande <avsa@ethereum.org>
-discussions-to: <email address>
+discussions-to: https://ethereum-magicians.org/t/eip-dynamic-block-rewards-with-governance-contract/204
 status: Draft
-type: Core
+type: Standards Track
 category: Core
 created: 2018-04-20
 ---
