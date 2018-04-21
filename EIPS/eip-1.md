@@ -36,7 +36,7 @@ There are three types of EIP:
 EIP Work Flow
 -------------
 
-The EIP repository editors change the EIPs status. Please send all EIP-related email to the EIP editors or preferably you can ping one of the Editors that is involved with your pull request (PR); they are listed under [EIP editors below](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors). Also see [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
+The EIP repository editors change the EIPs status. Please send all EIP-related email to the EIP editors or preferably (e,g, for public transparency) you can ping one of the Editors that is involved with your pull request (PR); they are listed under [EIP editors below](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors). Also see [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
 
 The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
 
@@ -146,7 +146,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * resolution: `<url>
 
-The author header lists the names, and optionally the email addresses of all the authors/owners of the EIP. The format of the author header value must be
+The author header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may prefer to only use a username, or a first name and a username. The format of the author header value must be:
 
 Random J. User &lt;address@dom.ain&gt;
 
