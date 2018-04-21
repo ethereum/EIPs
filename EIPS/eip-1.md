@@ -152,7 +152,7 @@ Random J. User &lt;address@dom.ain&gt;
 
 or
 
-Random J. User &lt;@username&gt;
+Random J. User (@username)
 
 if the email address or GitHub username is included, and
 
@@ -184,9 +184,9 @@ EIPs may include auxiliary files such as diagrams. Such files must be named EIP-
 Transferring EIP Ownership
 --------------------------
 
-It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or not responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around an EIP, but if that's not possible, you can always submit a competing EIP.
+It occasionally becomes necessary to transfer ownership of EIPs to a new champion. In general, we'd like to retain the original author as a co-author of the transferred EIP, but that's really up to the original author. A good reason to transfer ownership is because the original author no longer has the time or interest in updating it or following through with the EIP process, or has fallen off the face of the 'net (i.e. is unreachable or isn't responding to email). A bad reason to transfer ownership is because you don't agree with the direction of the EIP. We try to build consensus around an EIP, but if that's not possible, you can always submit a competing EIP.
 
-If you are interested in assuming ownership of an EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :).
+If you are interested in assuming ownership of an EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :)).
 
 EIP Editors
 -----------
@@ -227,7 +227,7 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 <!-- -->
 
--   Send a message back to the EIP author with next step.
+-   Send a message back to the EIP author with the next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
@@ -245,6 +245,8 @@ February 1, 2016: EIP 1 has added editors, made draft improvements to process, a
 March 21, 2018: Minor edits to accommodate the new automatically-generated EIP directory on [eips.ethereum.org](http://eips.ethereum.org/).
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
+
+### Bibliography
 
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
