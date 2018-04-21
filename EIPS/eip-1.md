@@ -36,7 +36,7 @@ There are three types of EIP:
 EIP Work Flow
 -------------
 
-The EIP repository Collaborators change the EIPs status. Please send all EIP-related email to the EIP Collaborators, which is listed under EIP Editors below. Also see EIP Editor Responsibilities & Workflow.
+The EIP repository editors change the EIPs status. Please send all EIP-related email to the EIP editors or preferably ping them in the pull request (PR); they are listed under [EIP editors below](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors). Also see [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
 
 The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
 
@@ -46,7 +46,7 @@ Vetting an idea publicly before going as far as writing an EIP is meant to save 
 
 Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request].
 
-If the EIP collaborators approve, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the Ethereum philosophy.
+If the EIP editors approve the EIP ([see the EIP editors workflow section below for details](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow)) and the authors are happy for it to be merged as a draft, the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
 
 Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase.
 
@@ -193,17 +193,17 @@ EIP Editors
 
 The current EIP editors are
 
+` * Nick Johnson (@arachnid)` (Nick is the lead EIP editor, merging most EIPs).
+
 ` * Casey Detrio (@cdetrio)`
 
 ` * Hudson Jameson (@Souptacular)`
 
-` * Martin Becze (@wanderer)`
-
-` * Nick Johnson (@arachnid)`
-
 ` * Vitalik Buterin (@vbuterin)`
 
 ` * Nick Savers (@nicksavers)`
+
+` * Martin Becze (@wanderer)`
 
 
 EIP Editor Responsibilities and Workflow
@@ -242,7 +242,9 @@ December 7, 2016: EIP 1 has been improved and will be placed as a PR.
 
 February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
-March 21, 2018: Minor edits to accommodate new automatically-generated EIP directory on eips.ethereum.org.
+March 21, 2018: Minor edits to accommodate the new automatically-generated EIP directory on [eips.ethereum.org](http://eips.ethereum.org/).
+
+See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
   [EIP5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
   [EIP101]: https://github.com/ethereum/EIPs/issues/28
