@@ -193,7 +193,7 @@ EIP Editors
 
 The current EIP editors are
 
-` * Nick Johnson (@arachnid)` (Nick is the lead EIP editor, merging most EIPs, so you can ping him if you need to—just write his username, `@arachnid` in a comment).
+` * Nick Johnson (@arachnid)` (Nick is the lead EIP editor, merging most EIPs, so you can ping him if you need to—just write his username prepended by @ in a comment, like so: `@arachnid` ).
 
 ` * Casey Detrio (@cdetrio)`
 
