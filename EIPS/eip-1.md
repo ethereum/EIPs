@@ -108,7 +108,7 @@ Each EIP should have the following parts:
 
 <!-- -->
 
--   Copyright Waiver - All EIPs must be in public domain. See the bottom of this EIP for an example copyright waiver.
+-   Copyright Waiver - All EIPs must be in the public domain. See the bottom of this EIP for an example copyright waiver.
 
 EIP Formats and Templates
 -------------------------
