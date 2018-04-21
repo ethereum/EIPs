@@ -126,7 +126,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` title: `<EIP title>
 
-` author: `<list of author's real names and optionally, email address or username>
+` author: `<list of author's real names and optionally, email address or username as shown below>
 
 ` * discussions-to: ` <url>
 
@@ -162,7 +162,7 @@ if the email address is not given.
 
 Note: The resolution header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
 
-While an EIP is a draft, a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. No discussions-to header is necessary if the EIP is being discussed privately with the author.
+While an EIP is a draft, a discussions-to header will indicate the mailing list or URL where the EIP is being discussed. Examples include [Ethereum topics on Gitter](https://gitter.im/ethereum/topics), an issue in a fork of this repo, [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect), and [Reddit r/ethereum](https://www.reddit.com/r/ethereum/). No discussions-to header is necessary if the EIP is being discussed privately with the author.
 
 The type header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
