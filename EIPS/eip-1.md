@@ -73,8 +73,7 @@ What belongs in a successful EIP?
 
 Each EIP should have the following parts:
 
--   Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), the names, and optionally the contact info for each author, etc.
-
+-   Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-header-preamble) for details.
 <!-- -->
 
 -   Simple Summary - “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the EIP.
@@ -126,7 +125,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` title: `<EIP title>
 
-` author: `<list of author's real names and optionally, email address or username as shown below>
+` author: `<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 
 ` * discussions-to: ` <url>
 
@@ -146,7 +145,8 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * resolution: `<url>
 
-The author header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may prefer to only use a username, or a first name and a username. The format of the author header value must be:
+#### Author header
+The author header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
 
 Random J. User &lt;address@dom.ain&gt;
 
