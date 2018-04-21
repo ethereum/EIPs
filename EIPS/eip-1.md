@@ -66,7 +66,7 @@ The possible paths of the status of EIPs are as follows:
 
 ![EIP Process](../assets/eip-1/process.png)
 
-Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
+Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed, e.g. EIP 1 (this EIP).
 
 What belongs in a successful EIP?
 ---------------------------------
@@ -88,7 +88,7 @@ Each EIP should have the following parts:
 
 <!-- -->
 
--   Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, …).
+-   Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
 
 <!-- -->
 
