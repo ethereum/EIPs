@@ -1,0 +1,26 @@
+---
+eip: <to be assigned>
+title: Add a link to the Ethereum wiki on www.ethereum.org
+author: James Ray (@jamesray1)
+discussions-to: https://ethereum-magicians.org/t/eip-add-a-link-to-the-ethereum-wiki-on-www-ethereum-org/242
+status: Draft
+type: Informational
+created: 2018-04-28
+---
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+Repeating the title: add a link to the Ethereum wiki on www.ethereum.org.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+
+> https://github.com/ethereum/wiki/wiki contains a wealth of information, that is frequently updated, from an introductory level to advanced. Thus, it would be good to link to it on the website.
+
+## Specification
+A PR is [here: https://github.com/ethereum/ethereum-org/pull/794](https://github.com/ethereum/ethereum-org/pull/794).
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
