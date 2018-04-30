@@ -35,6 +35,7 @@ This is a standard for hashing and signing of typed structured data as opposed t
 *   specification of structured data similar to and compatible with Solidity structs,
 *   safe hashing algorithm for instances of those structures,
 *   safe inclusion of those instances in the set of signable messages,
+*   an extensible mechanism for domain separation,
 *   new RPC call `eth_signTypedData`, and
 *   an optimized implementation of the hashing algorithm in EVM.
 
@@ -88,21 +89,15 @@ This standard is only about signing messages and verifying signatures. In many p
 
 The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is thus `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing and signing as follows:
 
-*   `encode(t : 𝕋) = RLP_encode(t)`
-*   `encode(b : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(b) ‖ b` where `len(b)` is the _non-zero-padded_ ascii-decimal encoding of the number of bytes in `b`.
-*   `encode((d, s) : 𝔹²⁵⁶ × 𝕊) = "\x19\x01" ‖ d ‖ hashStruct(s)` where `d` is a domain separator and `hashStruct(s)` is defined below.
+*   `encode(transaction : 𝕋) = RLP_encode(transaction)`
+*   `encode(message : 𝔹⁸ⁿ) = "\x19Ethereum Signed Message:\n" ‖ len(message) ‖ message` where `len(message)` is the _non-zero-padded_ ascii-decimal encoding of the number of bytes in `message`.
+*   `encode(domainSeparator : 𝔹²⁵⁶, message : 𝕊) = "\x19\x01" ‖ domainSeparator ‖ hashStruct(message)` where `domainSeparator` and `hashStruct(message)` are defined below.
 
-This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(t)` does not start with `\x19`.)
+This encoding is deterministic because the individual components are. The encoding is injective because the three cases always differ in first byte. (`RLP_encode(transaction)` does not start with `\x19`.)
 
-TODO: [EIP-191][eip191]
+The encoding is compliant with [EIP-191][eip191]. The 'version byte' is fixed to `0x01`, the 'version specific data' is the 32-byte domain separator `domainSeparator` and the 'data to sign' is the 32-byte `hashStruct(message)`.
 
 [eip191]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-191.md
-
-### Domain separator `d`
-
-The domain separator is a 256-bit nonce. For each distinct use-case a new nonce is generated. It is recommended to use the address of a relevant contract or a randomly generated 256-bit constant. It should be considered part of the interface specification and shared with it.
-
-It is recommended to use a different domain separator on different chains (i.e. testnet and mainnet) to prevent accidental compatibility. The Ethereum signature method already includes a chain-id to prevent cross-chain signature validity.
 
 ### Definition of typed structured data `𝕊`
 
@@ -153,6 +148,35 @@ The dynamic values `bytes` and `string` are encoded as a `keccak256` hash of the
 The array values are encoded as the `keccak256` hash of the concatenated `encodeData` of their contents (i.e. the encoding of `SomeType[5]` identical to that of a struct containing five members of type `SomeType`).
 
 The struct values are encoded recursively as `hashStruct(value)`. This is undefined for cyclical data.
+
+### Definition of `domainSeparator`
+
+The domain separator is a 256-bit number that is constant for a given domain, use-case, DApp or implementation by any other name. It serves to disambiguate otherwise identical messages between different domains. So two DApps, both accepting a `Transfer(address to)` message would not accidentally accept each others signed messages.
+
+Besides accidental compatibility, there is also a malicious scenario where an attacker creates a DApp that tricks users into signing a message that will be valid in a different domain than the user intended. By having a trusted user-agent involved in the derivation of the domain separator, this can be partially mitigated. For example, the user-agent can include the current domain name in the domain separator.
+
+Since different domains have different needs, an extensible scheme is used where the DApp specifies a `DomainSeparator` struct type and an instance `domainSeparatorInstance` which it passes to the user-agent. The user-agent can then apply different verification measures depending on the fields that are there.
+
+```
+domainSeparator = hashStruct(domainSeparatorInstance)
+```
+
+where the type of `domainSeparatorInstance` is a stuct named `DomainSeparator` with one or more of the below fields. The user-agent can reject (i.e. refuse to sign) depending on the `domainSeparatorInstance` object.
+
+* A field `bytes32 salt` will always be accepted.
+* A field `string origin` can be rejected if the supplied value does not match the current [`origin`][mdn-origin] as specified in the HTML standard.
+* A field `address contract` can be rejected if the user-agent determines the current request is not appropriate for the given contract. This allows the user-agent to implement custom anti-phising for well-known contracts.
+* Unrecognized fields can be rejected.
+* Future extensions to the standard can add new fields with new constraints.
+
+[mdn-origin]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/origin
+
+Note that a console based user-agent is allowed to accept domain separators using the `domain` field. It has no way to verify the value and needs to trust the user.
+
+DApp implementors should not add non-standard fields, they can always use the `salt` field to implement domain specific extensions.
+
+
+
 
 ### Specification of the `eth_signTypedData` JSON RPC
 
@@ -318,6 +342,13 @@ The in-place implementation makes strong but reasonable assumptions on the memor
 **Alternative 9**: Support cyclical data structures. The current standard is optimized for tree-like data structures and undefined for cyclical data structures. To support cyclical data a stack containing the path to the current node needs to be maintained and a stack offset substituted when a cycle is detected. This is prohibitively more complex to specify and implement. It also breaks composability where the hashes of the member values are used to construct the hash of the struct (the hash of the member values would dependent on the path). It is possible to extend the standard in a compatible way to define hashes of cyclical data.
 
 Similarly, a straightforward implementation is sub-optimal for directed acyclic graphs. A simple recursion through the members can visit the same node twice. Memoization can optimize this.
+
+
+## Rationale for `domainSeparator`
+
+A field `string eip719dsl` can added and be rejected if the value does not match the hash of the [EIP-719][eip719] DSL interface string.
+
+[eip719]: https://github.com/ethereum/EIPs/issues/719
 
 
 ## Backwards Compatibility
