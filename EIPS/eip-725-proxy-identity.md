@@ -1,7 +1,7 @@
 ---
 eip: 725
 title: Proxy Identity
-author: Fabian Vogelsteller (@frozeman) <fabian@ethereum.org>
+author: Fabian Vogelsteller (@frozeman)
 discussions-to: https://github.com/ethereum/EIPs/issues/725
 status: Draft
 type: Standards Track
