@@ -163,7 +163,7 @@ This SHOULD create a pending claim, which SHOULD to be approved or rejected by `
 
 Only Events:
 **Triggers if the claim is new Event and approval process exists:** [ClaimRequested](#claimrequested)
-**Triggers if the claim index existed Event:** [ClaimChanged](#claimchanged)
+**Triggers if the claim index existed Event:** [ClaimChanged](https://github.com/ethereum/EIPs/issues/735)
 
 
 #### removeClaim
