@@ -51,15 +51,31 @@ All EIPs that introduce backwards incompatibilities must include a section descr
 
 https://www.npmjs.com/package/multihashes
 
+IPFS to hex
+
 ```
 import multihash from 'multihashes'
 
-export const getContentHash = function(ipfsHash) {
+export const encode = function(ipfsHash) {
   let buf = multihash.fromB58String(ipfsHash)
   let digest = multihash.decode(buf).digest
   return '0x' + multihash.toHexString(digest)
 }
 ```
+
+hex to IPFS
+
+```
+import multihash from 'multihashes'
+
+export const decode = function(contentHash) {
+  let hex = contentHash.substring(2)
+  let buf = multihash.fromHexString(hex)
+  return multihash.toB58String(multihash.encode(buf, 'sha2-256'))
+}
+```
+
+Workable repository: https://github.com/PortalNetwork/portal-network-browser-extension
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
