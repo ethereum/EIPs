@@ -10,76 +10,76 @@ created: 2018-05-02
 ---
 
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+To specify the mapping protocol between resources stored on IPFS and ENS(Ethereum Naming Service).
 
 ## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-A short (~200 word) description of the technical issue being addressed.
+The following standard details the implementation of how to combine the IPFS cryptographic hash unique fingerprint with ENS public resolver. This standard provides a functionality to get and set IPFS online resources to ENS resolver.
+  
+We think that this implementation is not only aim to let more developers and communities to provide more use cases, but also leverage the human-readable features to gain more user adoption accessing decentralized resources. We considered the IPFS ENS resolver mapping standard a cornerstone for building future Web3.0 service.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+To build fully decentralized web service, it’s necessary to have a decentralized file sotrage system. Here comes the IPFS, for three following advantages :
+- Address large amounts of data, and has unique cryptographic hash for every records.
+- Since IPFS is also based on peer to peer network, it can be really helpful to delivers large amounts of data to users, with safer way and lower the millions of cost for the bandwidth.
+- IPFS stores files in high efficient way via tracking version history for every file, and removing the duplications across the network.
+  
+Those features makes perfect match for integrating into ENS, and these make users can easily access content through ENS, and show up in the normal browser.
+
 
 ## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+The condition now is that the IPFS file fingerprint using base58 and in the meantime, the Ethereum using hex encryption. These comes the two restrictions :
+- Different data type, one is string, the other is integer.
+- The way to process the condition requires not only we need to transfer from IPFS to Ethereum, but also need to convert it back.
+  
+To solve this requirements, we can use binary buffer briding that gap.
+When mapping the IPFS base58 string to ENS resolver, first we convert the Base58 to binary buffer, turn the buffer to hex encrypted format, and save to the contract. Once we want to get the IPFS resources address represented by the specific ENS, we can first find the mapping information stored as hex format before, extract the hex format to binary buffer, and finally turn that to IPFS Base58 address string.
+
 
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-
-Set IPFS hex into this function 
-
+To implement the specification, need two methods from ENS public resolver contract, when we want to store IPFS file fingerprint to contract, convert the Base58 string identifier to the hex format and invoke the ‘setContent’ method below :
+  
 ```
 function setContent(bytes32 node, bytes32 hash) public only_owner(node);
 ```
-
-Get IPFS hex from this function
-
+  
+Whenever user need to visit the ENS content, we call the ‘content’ method to get the IPFS hex data, transfer to the Base58 format, and return the IPFS resources to use.
+  
 ```
 function content(bytes32 node) public view returns (bytes32);
 ```
 
-
-## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-
 ## Test Cases
 
-https://www.npmjs.com/package/multihashes
-
-IPFS(Base58) to hex
-
+To implement the way to transfer from base58 to hex format and the reverse one, using the ‘multihashes’ library to deal with the problem.
+The library link : https://www.npmjs.com/package/multihashes
+To implement the method transfer from IPFS(Base58) to hex encryption format :
+  
 ```
 import multihash from 'multihashes'
 
 export const toHex = function(ipfsHash) {
-  let buf = multihash.fromB58String(ipfsHash)
-  let digest = multihash.decode(buf).digest
-  return '0x' + multihash.toHexString(digest)
+ let buf = multihash.fromB58String(ipfsHash)
+ let digest = multihash.decode(buf).digest
+ return '0x' + multihash.toHexString(digest)
 }
 ```
-
-hex to IPFS(Base58)
-
+  
+To implemnt the method transfer from hex encryption fromat to IPFS(Base58) :
+  
 ```
 import multihash from 'multihashes'
 
 export const toBase58 = function(contentHash) {
-  let hex = contentHash.substring(2)
-  let buf = multihash.fromHexString(hex)
-  return multihash.toB58String(multihash.encode(buf, 'sha2-256'))
+ let hex = contentHash.substring(2)
+ let buf = multihash.fromHexString(hex)
+ return multihash.toB58String(multihash.encode(buf, 'sha2-256'))
 }
 ```
 
-Workable repository: https://github.com/PortalNetwork/portal-network-browser-extension
-
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+The use case can be implemented as browser extension. Users can easily download the extension, and easily get decentralized resources by just typing the ENS just like we normally type the DNS to browser the website. Solve the current pain for normal people can not easily visit the total decentralized website.
+
+The workable implementation repository : [https://github.com/PortalNetwork/portal-network-browser-extension](https://github.com/PortalNetwork/portal-network-browser-extension)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
