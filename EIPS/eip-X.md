@@ -51,24 +51,24 @@ All EIPs that introduce backwards incompatibilities must include a section descr
 
 https://www.npmjs.com/package/multihashes
 
-IPFS to hex
+IPFS(Base58) to hex
 
 ```
 import multihash from 'multihashes'
 
-export const encode = function(ipfsHash) {
+export const toHex = function(ipfsHash) {
   let buf = multihash.fromB58String(ipfsHash)
   let digest = multihash.decode(buf).digest
   return '0x' + multihash.toHexString(digest)
 }
 ```
 
-hex to IPFS
+hex to IPFS(Base58)
 
 ```
 import multihash from 'multihashes'
 
-export const decode = function(contentHash) {
+export const toBase58 = function(contentHash) {
   let hex = contentHash.substring(2)
   let buf = multihash.fromHexString(hex)
   return multihash.toB58String(multihash.encode(buf, 'sha2-256'))
