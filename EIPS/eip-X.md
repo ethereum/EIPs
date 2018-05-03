@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Ethereum Name Service integration with IPFS
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: Phyrex Tsai<phyrex@portal.network> and Portal Network
 discussions-to: <email address>
 status: Draft
 type: Standards Track
@@ -31,18 +31,18 @@ The condition now is that the IPFS file fingerprint using base58 and in the mean
 - Different data type, one is string, the other is integer.
 - The way to process the condition requires not only we need to transfer from IPFS to Ethereum, but also need to convert it back.
   
-To solve this requirements, we can use binary buffer briding that gap.
+To solve this requirements, we can use binary buffer briding that gap.  
 When mapping the IPFS base58 string to ENS resolver, first we convert the Base58 to binary buffer, turn the buffer to hex encrypted format, and save to the contract. Once we want to get the IPFS resources address represented by the specific ENS, we can first find the mapping information stored as hex format before, extract the hex format to binary buffer, and finally turn that to IPFS Base58 address string.
 
 
 ## Rationale
-To implement the specification, need two methods from ENS public resolver contract, when we want to store IPFS file fingerprint to contract, convert the Base58 string identifier to the hex format and invoke the ‘setContent’ method below :
+To implement the specification, need two methods from ENS public resolver contract, when we want to store IPFS file fingerprint to contract, convert the Base58 string identifier to the hex format and invoke the `setContent` method below :
   
 ```
 function setContent(bytes32 node, bytes32 hash) public only_owner(node);
 ```
   
-Whenever user need to visit the ENS content, we call the ‘content’ method to get the IPFS hex data, transfer to the Base58 format, and return the IPFS resources to use.
+Whenever user need to visit the ENS content, we call the `content` method to get the IPFS hex data, transfer to the Base58 format, and return the IPFS resources to use.
   
 ```
 function content(bytes32 node) public view returns (bytes32);
@@ -50,8 +50,8 @@ function content(bytes32 node) public view returns (bytes32);
 
 ## Test Cases
 
-To implement the way to transfer from base58 to hex format and the reverse one, using the ‘multihashes’ library to deal with the problem.
-The library link : https://www.npmjs.com/package/multihashes
+To implement the way to transfer from base58 to hex format and the reverse one, using the ‘multihashes’ library to deal with the problem.  
+The library link : [https://www.npmjs.com/package/multihashes](https://www.npmjs.com/package/multihashes)  
 To implement the method transfer from IPFS(Base58) to hex encryption format :
   
 ```
