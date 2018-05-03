@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
 title: Ethereum Name Service integration with IPFS
-author: Phyrex Tsai<phyrex@portal.network> and Portal Network
-discussions-to: <email address>
+author: Phyrex Tsai<phyrex@portal.network> and Portal Network Team
+discussions-to: phyrex@portal.network
 status: Draft
 type: Standards Track
 category : ERC
