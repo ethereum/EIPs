@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: Ethereum Name Service integration with IPFS
+title: Formalize IPFS hash into ENS(Ethereum Name Service) resolver
 author: Phyrex Tsai<phyrex@portal.network> and Portal Network Team
 discussions-to: phyrex@portal.network
 status: Draft
