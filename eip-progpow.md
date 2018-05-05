@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned> 
 title: ProgPoW, a Programmatic Proof-of-Work
-author: Radix Pi (@RadixPi), IfDef Else (@IfDefElse)   
+author: Radix Pi <radix.pi.314@gmail.com>, Ifdef Else <ifdefelse@protonmail.com>   
 discussions-to: https://ethereum-magicians.org/t/eip-progpow-a-programmatic-proof-of-work/272
 status: Draft
 type: Standards Track
