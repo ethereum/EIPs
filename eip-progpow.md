@@ -1,16 +1,12 @@
 ---
-EIP <to be assigned> 
-Title: ProgPoW, a Programmatic Proof-of-Work
-Author: @RadixPi <radix.pi.314@gmail.com> | @IfDefElse <ifdefelse@protonmail.com>   
-Discussions-To: https://ethereum-magicians.org/t/eip-progpow-a-programmatic-proof-of-work/272
-Status: Draft
-Type: Standards
-Category: Core
-Created: 2018-05-02
-Requires: 
-Replaces:
-Superseded-by:
-Resolution:
+eip: <to be assigned> 
+title: ProgPoW, a Programmatic Proof-of-Work
+author: Radix Pi (@RadixPi), IfDef Else (@IfDefElse)   
+discussions-to: https://ethereum-magicians.org/t/eip-progpow-a-programmatic-proof-of-work/272
+status: Draft
+type: Standards Track
+category: Core
+created: 2018-05-02
 ---
 
 ## Simple Summary
