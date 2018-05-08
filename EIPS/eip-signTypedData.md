@@ -11,6 +11,7 @@ created: 2017-09-12
 requires (*optional): <EIP number(s)>
 replaces (*optional): <EIP number(s)>
 ---
+
 <!--
 This is the suggested template for new EIPs.
 
@@ -20,6 +21,7 @@ The title should be 44 characters or less.
 -->
 
 ## Simple Summary
+
 <!-- "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. -->
 
 Signing data is a solved problem if all we care about are bytestrings. Unfortunately in the real world we care about complex meaningful messages. Hashing structured data is non-trivial and errors result in loss of the security properties of the system.
@@ -27,6 +29,7 @@ Signing data is a solved problem if all we care about are bytestrings. Unfortuna
 As such, the adage "don't roll your own crypto" applies. Instead, a peer-reviewed well-tested standard method needs to be used. This EIP aims to be that standard.
 
 ## Abstract
+
 <!-- A short (~200 word) description of the technical issue being addressed. -->
 
 This is a standard for hashing and signing of typed structured data as opposed to just bytestrings. It includes a
@@ -42,7 +45,18 @@ This is a standard for hashing and signing of typed structured data as opposed t
 It does not include replay protection.
 
 ## Motivation
+
 <!-- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. -->
+
+This EIP aims to improve the usability of off-chain message signing for use on-chain. We are seeing growing adoption of off-chain message signing as it saves gas and reduces the number of transactions on the blockchain. Currently signed messages are an opaque hex string displayed to the user with little context about the items that make up the message.
+
+<img src="https://github.com/0xProject/EIPs/blob/73cfdecfddf38cf879ddcd68dc4958734635f773/EIPS/eip-eth_signTypedData/eth_sign.png?raw=true" style="padding-bottom: 20px; padding-top: 20px" width="60%" />
+
+Here we outline a scheme to encode data along with its structure which allows it to be displayed to the user for verification when signing. Below is an example of what a user could be shown when signing an EIP712 message.
+
+<img src="https://github.com/0xProject/EIPs/blob/73cfdecfddf38cf879ddcd68dc4958734635f773/EIPS/eip-eth_signTypedData/eth_signTypedData.png?raw=true" style="padding-bottom: 20px; padding-top: 20px" width="60%" />
+
+### Signatures and Hashing overview
 
 A signature scheme consists of hashing algorithm and a signing algorithm. The signing algorithm of choice in Ethereum is `secp256k1`. The hashing algorithm of choice is `keccak256`, this is a function from bytestrings, 𝔹⁸ⁿ, to 256-bit strings, 𝔹²⁵⁶.
 
@@ -83,8 +97,8 @@ The `eth_sign` call assumes messages to be bytestrings. In practice we are not h
 
 This standard is only about signing messages and verifying signatures. In many practical applications, signed messages are used to authorize an action, for example an exchange of tokens. It is _very important_ that implementers make sure the application behaves correctly when it sees the same signed message twice. For example, the repeated message should be rejected or the authorized action should be idempotent. How this is implemented is specific to the application and out of scope for this standard.
 
-
 ## Specification
+
 <!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). -->
 
 The set of signable messages is extended from transactions and bytestrings `𝕋 ∪ 𝔹⁸ⁿ` to also include structured data `𝕊`. The new set of signable messages is thus `𝕋 ∪ 𝔹⁸ⁿ ∪ 𝕊`. They are encoded to bytestrings suitable for hashing and signing as follows:
@@ -163,20 +177,17 @@ domainSeparator = hashStruct(domainSeparatorInstance)
 
 where the type of `domainSeparatorInstance` is a stuct named `DomainSeparator` with one or more of the below fields. The user-agent can reject (i.e. refuse to sign) depending on the `domainSeparatorInstance` object.
 
-* A field `bytes32 salt` will always be accepted.
-* A field `string origin` can be rejected if the supplied value does not match the current [`origin`][mdn-origin] as specified in the HTML standard.
-* A field `address contract` can be rejected if the user-agent determines the current request is not appropriate for the given contract. This allows the user-agent to implement custom anti-phising for well-known contracts.
-* Unrecognized fields can be rejected.
-* Future extensions to the standard can add new fields with new constraints.
+*   A field `bytes32 salt` will always be accepted.
+*   A field `string origin` can be rejected if the supplied value does not match the current [`origin`][mdn-origin] as specified in the HTML standard.
+*   A field `address contract` can be rejected if the user-agent determines the current request is not appropriate for the given contract. This allows the user-agent to implement custom anti-phising for well-known contracts.
+*   Unrecognized fields can be rejected.
+*   Future extensions to the standard can add new fields with new constraints.
 
 [mdn-origin]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/origin
 
 Note that a console based user-agent is allowed to accept domain separators using the `domain` field. It has no way to verify the value and needs to trust the user.
 
 DApp implementors should not add non-standard fields, they can always use the `salt` field to implement domain specific extensions.
-
-
-
 
 ### Specification of the `eth_signTypedData` JSON RPC
 
@@ -250,13 +261,11 @@ const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`).join(','
 const schemaHash = ethAbi.soliditySHA3(['string'], [schema]);
 const data = _.map(typedData, 'value');
 const types = _.map(typedData, 'type');
-const hash = ethAbi.soliditySHA3(
-    ['bytes32', ...types],
-    [schemaHash, ...data]
-);
+const hash = ethAbi.soliditySHA3(['bytes32', ...types], [schemaHash, ...data]);
 ```
 
 ## Rationale
+
 <!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
 
 The `encode` function is extended with a new case for the new types. The first byte of the encoding distinguishes the cases. For the same reason it is not safe to start immediately with the domain separator or a `typeHash`. While hard, it may be possible to construct a `typeHash` that also happens to be a prefix of a valid RLP encoded transaction.
@@ -343,15 +352,14 @@ The in-place implementation makes strong but reasonable assumptions on the memor
 
 Similarly, a straightforward implementation is sub-optimal for directed acyclic graphs. A simple recursion through the members can visit the same node twice. Memoization can optimize this.
 
-
 ## Rationale for `domainSeparator`
 
 A field `string eip719dsl` can added and be rejected if the value does not match the hash of the [EIP-719][eip719] DSL interface string.
 
 [eip719]: https://github.com/ethereum/EIPs/issues/719
 
-
 ## Backwards Compatibility
+
 <!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
 
 The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently undefined. Defining them should not affect the behaviour of existing DApps.
@@ -359,6 +367,7 @@ The RPC calls, web3 methods and `SomeStruct.typeHash` parameter are currently un
 The Solidity expression `keccak256(someInstance)` for an instance `someInstance` of a struct type `SomeStruct` is valid syntax. It currently evaluates to the `keccak256` hash of the memory address of the instance. This behaviour should be considered dangerous. In some scenarios it will appear to work correctly but in others it will fail determinism and/or injectiveness. DApps that depend on the current behaviour should be considered dangerously broken.
 
 ## Test Cases
+
 <!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
 
 ```
@@ -438,13 +447,14 @@ function dataHash(Message message) returns (bytes32) {
 ```
 
 ## Implementation
+
 <!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
 
 To be done before this EIP can be considered accepted:
 
 *   [ ] Finalize specification
-  *   [ ] Domain separators
-  *   [ ] Prevent replay attacks
+*   [ ] Domain separators
+*   [ ] Prevent replay attacks
 *   [ ] Add test vectors
 *   [ ] Review specification
 
@@ -455,4 +465,5 @@ To be done before this EIP can be considered "Final":
 *   [ ] Implement `keccak256` struct hashing in Solidity.
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
