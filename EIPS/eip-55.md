@@ -4,7 +4,7 @@ title: Mixed-case checksum address encoding
 author: Vitalik Buterin
 type: Standards Track
 category: ERC
-status: Accepted
+status: Final
 created: 2016-01-14
 ---
 
