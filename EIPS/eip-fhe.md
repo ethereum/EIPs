@@ -1,4 +1,3 @@
-## Preamble
 ---
 eip: <to be assigned>
 title: Homomorphically encrypted storage
@@ -26,7 +25,6 @@ This EIP issues this problem with enabling distribution of existing infrastructu
 ## Specification
 
 Contract storages will have a subset (or extension?) dedicated for encrypted data with a map of storage-keys on which can operate on a specified offset range.
-Contracts can read each other's storage using a known storage key so multiparty confidential storage is possible with for eg `web3.eth.get(Secret?)StorageAt(...)`.
 Bootstrapping is implemented using learning with errors which is known to be as hard as lattice shortest-vector problems (are quantum-resistant by design),
 and allow near-infinite amounts of operations on secrets.
 
@@ -40,16 +38,15 @@ being the amplitude and variance of error, the algorithm shall output:
 `||error(c)||∞ <= R||error(c)||∞  + nt*n*Aks + n*2^-(t+1)` in worst case and
 `variance(error(c)) <= R^2*variance(error(c)) + nt*n*Vks + n*2^(2*(t+1))` in average case
 
+One way to implement this without introducing an equivalent opcode for each circuit operator in EVM would be to make only 2 new opcodes `FHEE` and `FHEL` to enter and leave `FHE` context that indicates that opcodes in the section should perform their equivalents on the specified FHE circuit descriptor left on the top of stack before calling `FHEE`.
 
-Most of the design is based on the academic works of Ilaria Chillotti1, Nicolas Gama, Mariya Georgieva, and Malika Izabachene, cryptology ePrint 2017/430
+Most of the mathematical design is based on the academic works of Ilaria Chillotti1, Nicolas Gama, Mariya Georgieva, and Malika Izabachene, cryptology ePrint 2017/430
 ## Rationale
-A separate layer of storage was decided so the same opcodes in the VM can handle encrypted data with only knowledge of the context.
-This can be achieved by either a new opcode pair or by directly determining it with every VM implementation by offset calculation.
+An operation context-switching flag was decided so the same opcodes in the VM that can handle encrypted data with only knowledge of the context and the circuit descriptor.
 TLWE was choosen for it's extremely fast bootstraping and quasi-limitless homomorphic property which is a huge step in homomorphic encryption.
 ## Backwards Compatibility
-Incompatibilities with SSTORE and SLOAD will take place with contracts that are not aware of the subset/extension limits of each other.
-A solution for this can be that SSTORE and SLOAD will only enter this area of the storage with knowledge of a user-provided secret context
+VM implementations without this feature should revert on encountering `FHEE`
 ## Test Cases
-Realistic amount of key-switches (as in IRL business cases) 
+Realistic amount of key-switches (as in RL business cases) 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
