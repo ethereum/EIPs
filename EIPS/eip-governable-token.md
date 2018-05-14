@@ -31,6 +31,16 @@ To mitigate the effects of reasonably provable token or asset loss or theft and 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
+Extends erc-20 or erc-721
+Extends 792 with
+dispute() payable
+recover() payable
+disputedBalanceOf()
+
+How do you prevent grieving? For dispute you have to be party to the transaction. For recover, which you'd use if your funds got trapped then we can delay arbitration because no one has the key. For recover if the funds are stolen, you must also be able to sign with the key with which the funds were stolen from.
+
+createDispute is a no-op?
+
 Should be somewhat like a wallet, but with a mechanism to dispute a balance. Disputed balances can then be resolved by the wallets arbitration provider.
 
 Need ways to move funds into and out of the wallet.
