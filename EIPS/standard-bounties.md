@@ -1,6 +1,6 @@
 ```
 EIP: <to be assigned>
-Title: Standard Bounties
+Title: EIP-1081 Standard Bounties
 Authors: Mark Beylin <mark.beylin@consensys.net>, Kevin Owocki <kevin.owocki@consensys.net>, Ricardo Guilherme Schmidt (@3esmit)
 Discussions-to: <mark.beylin@consensys.net>
 Status: Draft
