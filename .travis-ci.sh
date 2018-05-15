@@ -16,4 +16,4 @@ elif [[ $TASK = 'eip-validator' ]]; then
 fi
 
 # Validate GH Pages DNS setup
-bundle exec github-pages health-check
+# bundle exec github-pages health-check
