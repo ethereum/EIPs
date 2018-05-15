@@ -1,12 +1,12 @@
 ```
 EIP: <to be assigned>
-Title: ERC-1070 Standard Bounties
+Title: Standard Bounties
 Authors: Mark Beylin <mark.beylin@consensys.net>, Kevin Owocki <kevin.owocki@consensys.net>, Ricardo Guilherme Schmidt (@3esmit)
 Discussions-to: <mark.beylin@consensys.net>
 Status: Draft
 Type: Standards Track
 Category: ERC
-Created: created on 2018-05-08
+Created: created on 2018-05-14
 Requires: EIP20
 ```
 ## Simple Summary
