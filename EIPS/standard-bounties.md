@@ -1,4 +1,4 @@
-```
+---
 EIP: <to be assigned>
 Title: EIP-1081 Standard Bounties
 Authors: Mark Beylin <mark.beylin@consensys.net>, Kevin Owocki <kevin.owocki@consensys.net>, Ricardo Guilherme Schmidt (@3esmit)
@@ -8,7 +8,8 @@ Type: Standards Track
 Category: ERC
 Created: created on 2018-05-14
 Requires: EIP20
-```
+---
+   
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 A standard contract and interface for issuing bounties on Ethereum, usable for any type of task, paying in any ERC20 token or in ETH.
