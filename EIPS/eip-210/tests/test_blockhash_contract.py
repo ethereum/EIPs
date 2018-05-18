@@ -71,6 +71,7 @@ def tester(base_tester):
 
     chain = base_tester.backend.chain
 
+    # Start by executing system transaction in a number of first blocks.
     for i in range(257):
         prev_block_hash = chain.get_canonical_head().hash
         vm = chain.get_vm()
@@ -187,25 +188,6 @@ def test_setup(w3, tester):
         assert get_slot(i) == NULL_HASH
 
 
-#def test_setup(state):
-#    assert state.block.get_code(BLOCKHASH_ADDR) == BLOCKHASH_CODE
-#    assert state.block.get_balance(SYSTEM_ADDR) == 0
-#    assert state.block.get_nonce(SYSTEM_ADDR) > 0
-#
-#    assert state.get_slot(0) == state.blocks[256].hash
-#    for i in range(1, 256):
-#        assert state.get_slot(i) == state.blocks[i].hash
-#
-#    assert state.get_slot(256) == state.blocks[0].hash
-#    assert state.get_slot(257) == state.blocks[256].hash
-#    for i in range(258, 256 + 256):
-#        assert state.get_slot(i) == NULL_HASH
-#
-#    assert state.get_slot(512) == state.blocks[0].hash
-#    for i in range(513, 512 + 256):
-#        assert state.get_slot(i) == NULL_HASH
-#
-#
 #def test_get_prev_block_hash(state):
 #    prev = state.block.number - 1
 #    pprint(prev)
