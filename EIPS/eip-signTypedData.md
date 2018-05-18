@@ -3,13 +3,11 @@ eip: 712
 title: Ethereum typed structured data hashing and signing
 author: Remco Bloemen <remco@wicked.ventures>,
         Leonid Logvinov <logvinov.leon@gmail.com>
-discussions-to: remco@wicked.ventures
+discussions-to: https://ethereum-magicians.org/t/eip-712-eth-signtypeddata-as-a-standard-for-machine-verifiable-and-human-readable-typed-data-signing/397
 status: Draft
 type: Standards Track
-category (*only required for Standard Track): Interface
+category: Interface
 created: 2017-09-12
-requires (*optional): <EIP number(s)>
-replaces (*optional): <EIP number(s)>
 ---
 
 <!--
