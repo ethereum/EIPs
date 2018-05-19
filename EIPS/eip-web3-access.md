@@ -44,7 +44,8 @@ IF web3 is undefined
         NOTIFY[3] dapp
         CONTINUE dapp
     IF user rejects
-        STOP dapp
+    IF non-web3 environment
+        NOOP[4]
 ```
 
 **REQUEST[1]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST”.
@@ -53,7 +54,11 @@ IF web3 is undefined
 
 **NOTIFY[3]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure or “WEB3_API_ERROR” after unsuccessful web3 exposure. In the case of an error, an optional `message` property can be included with additional information.
 
+**NOOP[4]** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
+
 ### Example implementation: `postMessage`
+
+The following example demonstrates one possible implementation of this strategy in a browser-based DOM environment. Note that web3 environments on other platforms would most likely use platform-specific native messaging protocols, not `postMessage`.
 
 ```js
 if (typeof web3 !== 'undefined') {
@@ -78,11 +83,10 @@ An [open issue](https://github.com/MetaMask/metamask-extension/issues/714) again
 
 ### Constraints
 
-* Web3 SHOULD NOT be exposed to websites by default.
-* Dapps SHOULD request web3 if it does not exist.
-* Users SHOULD be able to approve or reject web3 access.
-* Web3 SHOULD be exposed to websites after user consent.
-* Dapps MUST continue to work in environments that continue to auto-expose web3.
+* Web3 MUST NOT be exposed to websites by default.
+* Dapps MUST request web3 if it does not exist.
+* Users MUST be able to approve or reject web3 access.
+* Web3 MUST be exposed to websites after user consent.
 * Environments MAY continue auto-exposing web3 if users can disable this behavior.
 
 ### Immediate value-add
