@@ -48,13 +48,13 @@ IF web3 is undefined
         NOOP[4]
 ```
 
-**REQUEST[1]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST” and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
+**[1]REQUEST** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST” and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
 
-**INJECT[2]** This operation would be achieved by any implementation-level API that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
+**[2]INJECT** This operation would be achieved by any implementation-level API that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
 
-**NOTIFY[3]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure.
+**[3]NOTIFY** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure.
 
-**NOOP[4]** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
+**[4]NOOP** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
 
 ### Example implementation: `postMessage`
 
@@ -68,8 +68,6 @@ if (typeof web3 !== 'undefined') {
         if (!event.data || !event.data.type) { return; }
         if (event.data.type === 'WEB3_API_SUCCESS') {
             // web3 API defined, start dapp
-        } else if (event.data.type === 'WEB3_API_ERROR') {
-            // Something went wrong, stop dapp
         }
     });
     // request web3 API
