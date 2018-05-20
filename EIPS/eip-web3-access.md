@@ -52,7 +52,7 @@ IF web3 is undefined
 
 **[2]INJECT** This operation would be achieved by any implementation-level API that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
 
-**[3]NOTIFY** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure.
+**[3]NOTIFY** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS" and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
 
 **[4]NOOP** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
 
