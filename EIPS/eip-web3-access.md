@@ -48,11 +48,11 @@ IF web3 is undefined
         NOOP[4]
 ```
 
-**REQUEST[1]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST”.
+**REQUEST[1]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST” and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
 
 **INJECT[2]** This operation would be achieved by any implementation-level API that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
 
-**NOTIFY[3]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure or “WEB3_API_ERROR” after unsuccessful web3 exposure. In the case of an error, an optional `message` property can be included with additional information.
+**NOTIFY[3]** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS” after successful web3 exposure.
 
 **NOOP[4]** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
 
@@ -88,6 +88,8 @@ An [open issue](https://github.com/MetaMask/metamask-extension/issues/714) again
 * Users MUST be able to approve or reject web3 access.
 * Web3 MUST be exposed to websites after user consent.
 * Environments MAY continue auto-exposing web3 if users can disable this behavior.
+
+_Note: This proposal intentionally omits platform-specific details like messaging protocols, and instead chooses only to detail a high-level strategy that can be applied agnostically of platform or available APIs._
 
 ### Immediate value-add
 
