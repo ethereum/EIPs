@@ -1,7 +1,7 @@
 ---
 ```
 eip: <to be assigned>
-title: Reduce ECADD, ECMUL, pairing check gas costs
+title: Reduce alt_bn128 precompile gas costs
 author: Antonio Salazar Cardozo (@shadowfiend) <antonio@keep.network>
 status: Draft
 type: Standards Track
