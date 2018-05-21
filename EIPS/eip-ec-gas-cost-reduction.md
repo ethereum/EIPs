@@ -3,9 +3,11 @@
 EIP: <to be assigned>
 Title: Reduce ECADD, ECMUL, pairing check gas costs
 Author: Antonio Salazar Cardozo (@shadowfiend) <antonio@keep.network>
+Status: Draft
 Type: Standards Track
 Category: Core
 Created: 2018-05-21
+requires: 196, 197
 ```
 ---
 
