@@ -34,7 +34,7 @@ There are three types of EIP:
 The normal process is:
 
 ```
-[ A pull request ] -> [ DRAFT ] -> [ TWO WEEK REVIEW ] -> [ FINAL ]
+[ A pull request ] -> [ DRAFT ] -> [ TWO WEEK REVIEW ] -> [APPROVED] -> [ FINAL ]
 ```
 
 The [EIP editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) update the status of EIPs at the request of EIP authors. Please ping the editors by mentioning them in your pull request or send them an email. See alse [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
@@ -55,7 +55,9 @@ Standards Track EIPs consist of three parts, a design document, implementation, 
 
 For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-An EIP in draft status must have implementations to be considered for promotion to the next status. When no further changes are planned and adove rules are met, the champion will request, and the editor will approve a change to "two week review" status. This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS here [TODO LATER, ADD A LINK HERE]). After the review period, if all issues are resolved, then the editor will change to final status. Or if issues remain then it may be returned to draft.
+An EIP in draft status must have implementations to be considered for promotion to the next status. When no further changes are planned and adove rules are met, the champion will request, and the editor will approve a change to "two week review" status. This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS here [TODO LATER, ADD A LINK HERE]). After the review period, if all issues are resolved, then the editor will proceed to the next status; if issues remain then it may be returned to draft.
+
+Standards track EIPs of type "Core" that pass "two week review" will be sent to the core devs meeting for review. A successful review will lead to "Accepted" status. And when implemented in at least two clients totalling at least 50% of deployed nodes, and all pass a common set of test suites, the status of the EIP is updated to "Final". Alternatively, non-core EIPS will proceed directly from "two week review" to "final".
 
 Other exceptional outcomes for EIPS include "deferred", a temporary status for drafts which have no recent progress, and "rejected" which records an EIP that is fundamentally broken and will not be implemented. Also, "active" denotes an EIP that is in effect but which may be updated without changing its EIP number. A "final" EIP should be updated on to correct errata, although another EIP may wish to supercede it — in that case you would have an original and succesor EIP both in final status.
 
