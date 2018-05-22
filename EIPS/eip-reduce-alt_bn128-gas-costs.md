@@ -46,4 +46,5 @@ EIP-196, while the gas costs for the pairing check are updates to the cost
 listed in EIP-197.
 
 [1]- Per [EIP-196](https://github.com/ethereum/EIPs/blob/984cf5de90bbf5fbe7e49be227b0c2f9567e661e/EIPS/eip-196.md#gas-costs).
+
 [2]- Per [EIP-197](https://github.com/ethereum/EIPs/blob/df132cd37efb3986f9cd3ef4922b15a767d2c54a/EIPS/eip-197.md#specification).
