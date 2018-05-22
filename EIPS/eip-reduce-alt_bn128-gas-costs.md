@@ -39,7 +39,7 @@ Following is a table with the current gas cost and new gas cost:
 | ------------- | --------- | -----------------------------  | ------------------- |
 | `ECADD`       | `0x06`    | 500<sup>[1]</sup>              | 50                  |
 | `ECMUL`       | `0x07`    | 40 000<sup>[1]</sup>           | 2 000               |
-| Pairing check | `0x08`    | 80 000k + 100 000<sup>[2]</sup>| 5 500k + 100 000    |
+| Pairing check | `0x08`    | 80 000k + 100 000<sup>[2]</sup>| 5 500k + 80 000     |
 
 The gas costs for `ECADD` and `ECMUL` are updates to the costs listed in
 EIP-196, while the gas costs for the pairing check are updates to the cost
