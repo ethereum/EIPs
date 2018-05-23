@@ -5,7 +5,6 @@ status: Active
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>
 created: 2015-10-27, 2017-02-01
-
 ---
 
 ## What is an EIP?
@@ -60,7 +59,7 @@ EIPs can also be superseded by a different EIP, rendering the original obsolete.
 
 The possible paths of the status of EIPs are as follows:
 
-![EIP Process]()
+![EIP Process](../assets/eip-1/process.png)
 
 Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed, e.g. EIP 1 (this EIP).
 
