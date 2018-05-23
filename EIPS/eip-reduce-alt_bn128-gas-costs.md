@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Reduce alt_bn128 precompile gas costs
-author: Antonio Salazar Cardozo (@shadowfiend) <antonio@keep.network>
+author: Antonio Salazar Cardozo (@shadowfiend)
 status: Draft
 type: Standards Track
 category: Core
