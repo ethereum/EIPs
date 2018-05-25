@@ -3,7 +3,7 @@ eip: 1
 title: EIP Purpose and Guidelines
 status: Active
 type: Meta
-author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, William Entriken <github.com@phor.net>
+author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, [and others](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md).
 created: 2015-10-27, 2017-02-01
 ---
 
