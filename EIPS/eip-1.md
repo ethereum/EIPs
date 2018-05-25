@@ -93,9 +93,9 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * discussions-to:` <url>
 
-` status:` <Draft | Last Call | Approved | Final | Active | Deferred | Rejected | Superseded >
+` status:` <Draft | Last Call | Approved | Final | Active | Deferred | Rejected | Superseded>
 
-`* review-period:`Starting YYYY-MM-DD, ending YYYY-MM-DD
+`* review-period:` Starting YYYY-MM-DD, ending YYYY-MM-DD
 
 ` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
