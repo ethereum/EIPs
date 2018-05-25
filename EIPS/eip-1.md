@@ -59,7 +59,7 @@ An EIP in draft status must have implementations to be considered for promotion 
 
 Standards track EIPs of type "Core" that pass "Last Call" will be sent to the core devs meeting for review. A successful review will lead to "Accepted" status. And when implemented in at least two clients totalling at least 50% of deployed nodes, and all pass a common set of test suites, the status of the EIP is updated to "Final". Alternatively, non-core EIPS will proceed directly from "Last Call" to "Final".
 
-Other exceptional outcomes for EIPS include "deferred", a temporary status for drafts which have no recent progress, and "rejected" which records an EIP that is fundamentally broken and will not be implemented. Also, "active" denotes an EIP that is in effect but which may be updated without changing its EIP number. A "final" EIP should be updated on to correct errata, although another EIP may wish to supercede it — in that case you would have an original and succesor EIP both in final status.
+Other exceptional outcomes for EIPS include "deferred", a temporary status for drafts which have no recent progress, and "rejected" which records an EIP that is fundamentally broken and will not be implemented. Also, "active" denotes an EIP that is in effect but which may be updated without changing its EIP number. A "final" EIP should be updated on to correct errata, although another EIP may wish to "supersede" it — in that case you would have an original and succesor EIP both in final status.
 
 ## What belongs in a successful EIP?
 
@@ -93,7 +93,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * discussions-to:` <url>
 
-` status:` <Draft | Active | Accepted | Deferred | Rejected | Withdrawn | Final | Superseded>
+` status:` <Draft | Last Call | Approved | Final | Active | Deferred | Rejected | Superseded >
 
 `* review-period:`Starting YYYY-MM-DD, ending YYYY-MM-DD
 
