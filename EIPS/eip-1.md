@@ -51,7 +51,7 @@ EIP authors can request for the pull request to be merged as Draft when signific
 
 Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase.
 
-Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
+Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted as Draft before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
 
 For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
