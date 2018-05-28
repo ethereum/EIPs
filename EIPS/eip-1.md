@@ -55,7 +55,7 @@ Standards Track EIPs consist of three parts, a design document, implementation, 
 
 For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-An EIP in draft status must have implementations to be considered for promotion to the next status. When no further changes are planned and adove rules are met, the champion will request, and the editor will approve a change to "Last Call" status. This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)). After the review period, if all issues are resolved, then the editor will proceed to the next status; if issues remain then it may be returned to draft.
+An EIP in draft status must have implementations to be considered for promotion to the next status. When no further changes are planned and adove rules are met, the champion will request, and the editor will approve a change to "Last Call" status and set the review date (normally the date of the change plus 14 days). This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)). After the review period, if all issues are resolved, then the editor will proceed to the next status; if issues remain then it may be returned to draft.
 
 Standards track EIPs of type "Core" that pass "Last Call" will be sent to the core devs meeting for review. A successful review will lead to "Accepted" status. And when implemented in at least two clients totalling at least 50% of deployed nodes, and all pass a common set of test suites, the status of the EIP is updated to "Final". Alternatively, non-core EIPS will proceed directly from "Last Call" to "Final".
 
@@ -95,7 +95,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status:` <Draft | Last Call | Approved | Final | Active | Deferred | Rejected | Superseded>
 
-`* review-period:` Starting YYYY-MM-DD, ending YYYY-MM-DD
+`* review-period-end-date: YYYY-MM-DD
 
 ` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
