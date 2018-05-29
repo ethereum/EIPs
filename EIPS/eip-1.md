@@ -37,7 +37,7 @@ The normal process is:
 [ A pull request ] -> [ DRAFT ] -> [ LAST CALL ] -> [APPROVED] -> [ FINAL ]
 ```
 
-The [EIP editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) update the status of EIPs at the request of EIP authors. Please ping the editors by mentioning them in your pull request or send them an email. See alse [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
+The [EIP editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) update the status of EIPs at the request of EIP authors. Please ping the editors by mentioning them in your pull request or send them an email. See also [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
 
 The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
 
