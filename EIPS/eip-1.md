@@ -21,7 +21,7 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 
 There are three types of EIP:
 
-- A **Standard Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
+- A **Standard Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories. Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification].
   - **Core** - improvements requiring a consensus fork (e.g. [EIP5], [EIP101]), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP90], and the miner/node strategy changes 2, 3, and 4 of [EIP86]).
   - **Networking** - includes improvements around [devp2p] ([EIP8]) and [Light Ethereum Subprotocol], as well as proposed improvements to network protocol specifications of [whisper] and [swarm].
   - **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP59], [EIP6]) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
@@ -29,37 +29,44 @@ There are three types of EIP:
 - An **Informational EIP** describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
 
+It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does.
+
+An EIP must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
+
 ## EIP Work Flow
 
-The normal process is:
+Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
+
+:warning: Before you begin, vet your idea, this will save you time. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
+
+Your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea. Following is the process that a successful EIP will move along:
 
 ```
-[ A pull request ] -> [ DRAFT ] -> [ LAST CALL ] -> [APPROVED] -> [ FINAL ]
+[ WIP ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
 ```
 
-The [EIP editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) update the status of EIPs at the request of EIP authors. Please ping the editors by mentioning them in your pull request or send them an email. See also [EIP Editor Responsibilities & Workflow](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow).
+Each status change is requested by the EIP author by @-mentioning or emailing the EIP editors. The EIP editors will process these requests as per the conditions below.
 
-The EIP process begins with a new idea for Ethereum. It is highly recommended that a single EIP contain a single key proposal or new idea. The more focused the EIP, the more successful it tends to be. A change to one client doesn't require an EIP; a change that affects multiple clients, or defines a standard for multiple apps to use, does. The EIP editor reserves the right to reject EIP proposals if they appear too unfocused or too broad. If in doubt, split your EIP into several well-focused ones.
+* **Work in progress (WIP)** -- Once the champion has asked the Ethereum community whether an idea has any chance of acceptance, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
+  * :arrow_right: Draft -- If approved, EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP.
+  * :x: Draft -- Reasons for denying draft status include being too unfocused, too broad, duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
+* **Draft** -- Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next status. An EIP in draft status must have implementations to be considered for promotion to the next status.
+  * :arrow_right: Last Call -- If approved, the EIP editor will assign Last Call status and set a review end date, normally 14 days later.
+  * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed. Last Call will be denied if the implementation is not complete and accepted by the community.
+* **Last Call** -- This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
+  * :x: -- A Last Call which results in material changes or substantial unaddressed complaints will cause the EIP to revert to Draft or worse.
+  * :arrow_right: Accepted (Core EIPs only) -- After the review end date, the Ethereum Core Developers will vote on whether to accept this change. If yes, the status will upgrade to Accepted.
+  * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed complaints will become Final.
+* **Accepted (Core EIPs only)** -- This is being implemented by Ethereum Core Developers.
+  * :arrow_right: Final -- When a Standards Track Core EIP is implemented in at least three viable Ethereum clients, and it is deployed on at least 50% of deployed nodes, and the implementations pass a common set of test suites, then the status is upgraded to Final.
+* **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
-Each EIP must have a champion—someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea.
+Other exceptional statuses include:
 
-Vetting an idea publicly before going as far as writing an EIP is meant to save the potential author time. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
-
-Once the champion has asked the Ethereum community whether an idea has any chance of acceptance a draft EIP should be presented as a [pull request].
-
-EIP authors can request for the pull request to be merged as Draft. Then, if the EIP editors approve the EIP ([see the EIP editors workflow section below for details](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editor-responsibilities-and-workflow)), the EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP. Reasons for denying EIP status include duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
-
-Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next phase.
-
-Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification]. The EIP should be reviewed and accepted as Draft before an implementation is begun, unless an implementation will aid people in studying the EIP. Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final.
-
-For an EIP to be accepted it must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
-
-An EIP in draft status must have implementations to be considered for promotion to the next status. When no further changes are planned and adove rules are met, the champion will request, and the editor will approve a change to "Last Call" status and set the review date (normally the date of the change plus 14 days). This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)). After the review period, if all issues are resolved, then the editor will proceed to the next status; if issues remain then it may be returned to draft.
-
-Standards track EIPs of type "Core" that pass "Last Call" will be sent to the core devs meeting for review. A successful review will lead to "Accepted" status. And when implemented in at least two clients totalling at least 50% of deployed nodes, and all pass a common set of test suites, the status of the EIP is updated to "Final". Alternatively, non-core EIPS will proceed directly from "Last Call" to "Final".
-
-Other exceptional outcomes for EIPS include "deferred", when a core EIP is delayed for a future hard for, and "rejected" which records an EIP that is fundamentally broken and will not be implemented. Also, "active" denotes an EIP that is in effect but which may be updated without changing its EIP number. A "final" EIP should be updated on to correct errata, although another EIP may wish to "supersede" it — in that case you would have an original and succesor EIP both in final status.
+* Deferred -- This is for core EIPs that have been put off for a future hard fork.
+* Rejected -- An EIP that is fundamentally broken and will not be implemented.
+* Active -- This is similar to Final, but denotes an EIP which which may be updated without changing its EIP number.
+* Superseded -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
 
 ## What belongs in a successful EIP?
 
@@ -169,7 +176,7 @@ The current EIP editors are
 
 ` * Martin Becze (@wanderer)`
 
-## EIP Editor Responsibilities and Workflow
+## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
 
@@ -200,6 +207,8 @@ December 7, 2016: EIP 1 has been improved and will be placed as a PR.
 February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
 March 21, 2018: Minor edits to accommodate the new automatically-generated EIP directory on [eips.ethereum.org](http://eips.ethereum.org/).
+
+May 29, 2018: A last call process was added.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
