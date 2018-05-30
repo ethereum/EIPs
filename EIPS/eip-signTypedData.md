@@ -233,34 +233,46 @@ There also should be a corresponding `personal_signTypedData` method which accep
 
 ```javascript
 // Client-side code example
-const typedData = [
-  {
-    'type': 'string',
-    'name': 'message',
-    'value': 'Hi, Alice!',
-  },
-  {
-    'type': 'uint',
-    'name': 'value',
-    'value': 42,
-  },
-];
+const typedData = {
+    types: {
+        EIP712Domain: [
+            { name: 'name', type: 'string' },
+            { name: 'version', type: 'string' },
+            { name: 'httpOrigin', type: 'string' },
+            { name: 'verifyingContract', type: 'address' }
+        ],
+        Person: [
+            { name: 'name', type: 'string' },
+            { name: 'wallet', type: 'address' }
+        ],
+        Mail: [
+            { name: 'from', type: 'Person' },
+            { name: 'to', type: 'Person' },
+            { name: 'contents', type: 'string' }
+        ]
+    },
+    domain: {
+        name: 'Ether Mail',
+        version: '1',
+        httpOrigin: 'https://ether-mail.eth',
+        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC'
+    },
+    messageType: 'Mail',
+    message: {
+        from: {
+            name: 'Alice',
+            wallet: '0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa'
+        },
+        to: {
+            name: 'Bob',
+            wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB'
+        },
+        contents: 'Hello, Bob!'
+    }
+};
 const signature = await web3.eth.signTypedData(typedData, signerAddress);
 // or
 const signature = await web3.personal.signTypedData(typedData, signerAddress, '************');
-```
-
-```javascript
-// Signer code JS example
-import * as _ from 'lodash';
-import * as ethAbi from 'ethereumjs-abi';
-
-const schema = _.map(typedData, entry => `${entry.type} ${entry.name}`).join(',');
-// Will generate `string message,uint value` for the above example
-const schemaHash = ethAbi.soliditySHA3(['string'], [schema]);
-const data = _.map(typedData, 'value');
-const types = _.map(typedData, 'type');
-const hash = ethAbi.soliditySHA3(['bytes32', ...types], [schemaHash, ...data]);
 ```
 
 ## Rationale
