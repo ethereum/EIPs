@@ -47,18 +47,18 @@ Your role as the champion is to write the EIP using the style and format describ
 
 Each status change is requested by the EIP author by @-mentioning or emailing the EIP editors. The EIP editors will process these requests as per the conditions below.
 
-* **Work in progress (WIP)** -- Once the champion has asked the Ethereum community whether an idea has any chance of acceptance, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
-  * :arrow_right: Draft -- If approved, EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP.
+* **Work in progress (WIP)** -- Once the champion has asked the Ethereum community whether an idea has any chance of support, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
+  * :arrow_right: Draft -- If agreeable, EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP.
   * :x: Draft -- Reasons for denying draft status include being too unfocused, too broad, duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
 * **Draft** -- Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next status. An EIP in draft status must be implemented to be considered for promotion to the next status (ignore this requirement for core EIPs).
-  * :arrow_right: Last Call -- If approved, the EIP editor will assign Last Call status and set a review end date, normally 14 days later.
-  * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed. Last Call will be denied if the implementation is not complete and accepted by the community.
+  * :arrow_right: Last Call -- If agreeable, the EIP editor will assign Last Call status and set a review end date, normally 14 days later.
+  * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed. Last Call will be denied if the implementation is not complete and supported by the community.
 * **Last Call** -- This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
   * :x: -- A Last Call which results in material changes or substantial unaddressed complaints will cause the EIP to revert to Draft.
   * :arrow_right: Accepted (Core EIPs only) -- After the review end date, the Ethereum Core Developers will vote on whether to accept this change. If yes, the status will upgrade to Accepted.
   * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed complaints will become Final.
 * **Accepted (Core EIPs only)** -- This is being implemented by Ethereum Core Developers.
-  * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and accepted by the community, the status will be changed to “Final”.
+  * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and supported by the community, the status will be changed to “Final”.
 * **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
 Other exceptional statuses include:
@@ -80,7 +80,7 @@ Each EIP should have the following parts:
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 - Backwards Compatibility - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 - Test Cases - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
-- Implementations - The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
+- Implementations - The implementations must be completed before any EIP is given status “Final”, but it need not be completed before the EIP is merged as draft. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of “rough consensus and running code” is still useful when it comes to resolving many discussions of API details.
 - Copyright Waiver - All EIPs must be in the public domain. See the bottom of this EIP for an example copyright waiver.
 
 ## EIP Formats and Templates
@@ -100,7 +100,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * discussions-to:` <url>
 
-` status:` <Draft | Last Call | Approved | Final | Active | Deferred | Rejected | Superseded>
+` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
 `* review-period-end: YYYY-MM-DD
 
@@ -180,7 +180,7 @@ The current EIP editors are
 
 For each new EIP that comes in, an editor does the following:
 
-- Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to be accepted.
+- Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
 - The title should accurately describe the content.
 - Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
 
@@ -190,7 +190,7 @@ Once the EIP is ready for the repository, the EIP editor will:
 
 - Assign an EIP number (generally the PR number or, if preferred by the author, the Issue # if there was discussion in the Issues section of this repository about this EIP)
 
-- Accept the corresponding pull request
+- Merge the corresponding pull request
 
 - Send a message back to the EIP author with the next step.
 
