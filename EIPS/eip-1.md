@@ -54,7 +54,7 @@ Each status change is requested by the EIP author by @-mentioning or emailing th
   * :arrow_right: Last Call -- If approved, the EIP editor will assign Last Call status and set a review end date, normally 14 days later.
   * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed. Last Call will be denied if the implementation is not complete and accepted by the community.
 * **Last Call** -- This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
-  * :x: -- A Last Call which results in material changes or substantial unaddressed complaints will cause the EIP to revert to Draft or worse.
+  * :x: -- A Last Call which results in material changes or substantial unaddressed complaints will cause the EIP to revert to Draft.
   * :arrow_right: Accepted (Core EIPs only) -- After the review end date, the Ethereum Core Developers will vote on whether to accept this change. If yes, the status will upgrade to Accepted.
   * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed complaints will become Final.
 * **Accepted (Core EIPs only)** -- This is being implemented by Ethereum Core Developers.
