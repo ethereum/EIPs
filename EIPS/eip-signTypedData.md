@@ -156,13 +156,13 @@ If the struct type references other struct types (and these in turn reference ev
 
 ### Definition of `encodeData`
 
-The encoding of a struct instance is `value₁ ‖ value₂ ‖ … ‖ valueₙ`, i.e. a simple concatenation of the encoding of the member values. Each encoded member value is exactly 32-byte long.
+The encoding of a struct instance is `enc(value₁) ‖ enc(value₂) ‖ … ‖ enc(valueₙ)`, i.e. the concatenation of the encoded of the member values in the order that they apear in the type. Each encoded member value is exactly 32-byte long.
 
-The atomic values are encoded as follows: Boolean `false` and `true` are encoded as `uint256` values `0` and `1` respectively. Addresses are encoded as `uint160`. Integer values are sign-extended to 256-bit and encoded in big endian order. `bytes1` to `bytes31` are arrays with a beginning (index `0`) and an end (index `length - 1`), they are zero-padded at the end to `bytes32` and encoded in beginning to end order.
+The atomic values are encoded as follows: Boolean `false` and `true` are encoded as `uint256` values `0` and `1` respectively. Addresses are encoded as `uint160`. Integer values are sign-extended to 256-bit and encoded in big endian order. `bytes1` to `bytes31` are arrays with a beginning (index `0`) and an end (index `length - 1`), they are zero-padded at the end to `bytes32` and encoded in beginning to end order. This corresponds to their encoding in ABI v1 and v2.
 
 The dynamic values `bytes` and `string` are encoded as a `keccak256` hash of their contents.
 
-The array values are encoded as the `keccak256` hash of the concatenated `encodeData` of their contents (i.e. the encoding of `SomeType[5]` identical to that of a struct containing five members of type `SomeType`).
+The array values are encoded as the `keccak256` hash of the concatenated `encodeData` of their contents (i.e. the encoding of `SomeType[5]` is identical to that of a struct containing five members of type `SomeType`).
 
 The struct values are encoded recursively as `hashStruct(value)`. This is undefined for cyclical data.
 
