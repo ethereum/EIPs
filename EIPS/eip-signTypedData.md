@@ -89,7 +89,11 @@ Both determinism and injectiveness would be trivially true if `len(b)` was left 
 
 ### Arbitrary messages
 
-The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize so we approximate it with the set of typed named structures `𝕊` and a domain separator `𝔹²⁵⁶` to obtain the set `𝔹²⁵⁶ × 𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for `𝔹²⁵⁶ × 𝕊`.
+The `eth_sign` call assumes messages to be bytestrings. In practice we are not hashing bytestrings but the collection of all semantically different messages of all different DApps `𝕄`. Unfortunately, this set is impossible to formalize. Instead we approximate it with the set of typed named structures `𝕊`. This standard formalizes the set `𝕊` and provides a deterministic injective encoding function for it.
+
+Just encoding structs is not enough. It is likely that two different DApps use  identical structs. When this happens, a signed message intended for one DApp would also be valid for the other. The signatures are compatible. This can be intended behaviour, in which case everything is fine as long as the DApps took replay attacks into consideration. If it is not intended, there is a security problem.
+
+The way to solve this is by introducing a domain separator, a 256-bit number. This is a value unique to each domain that is 'mixed in' the signature. It makes signatures from different domains incompatible. The domain separator is designed to include bits of DApp unique information such as the name of the DApp, the intended validator contract address, the expected DApp domain name, etc. The user and user-agent can use this information to mitigate phishing attacks, where a malicious DApp tries to trick the user into signing a message for another DApp.
 
 ### Note on replay attacks
 
@@ -163,11 +167,6 @@ The struct values are encoded recursively as `hashStruct(value)`. This is undefi
 
 ### Definition of `domainSeparator`
 
-The domain separator is a 256-bit number that is constant for a given domain, use-case, DApp or implementation by any other name. It serves to disambiguate otherwise identical messages between different domains. So two DApps, both accepting a `Transfer(address to)` message would not accidentally accept each others signed messages.
-
-Besides accidental compatibility, there is also a malicious scenario where an attacker creates a DApp that tricks users into signing a message that will be valid in a different domain than the user intended. By having a trusted user-agent involved in the derivation of the domain separator, this can be partially mitigated. For example, the user-agent can include the current domain name in the domain separator.
-
-Since different domains have different needs, an extensible scheme is used where the DApp specifies a `DomainSeparator` struct type and an instance `domainSeparatorInstance` which it passes to the user-agent. The user-agent can then apply different verification measures depending on the fields that are there.
 
 ```
 domainSeparator = hashStruct(domainSeparatorInstance)
@@ -186,6 +185,9 @@ where the type of `domainSeparatorInstance` is a stuct named `DomainSeparator` w
 Note that a console based user-agent is allowed to accept domain separators using the `domain` field. It has no way to verify the value and needs to trust the user.
 
 DApp implementors should not add non-standard fields, they can always use the `salt` field to implement domain specific extensions.
+
+**TODO**: Order of fields and JSON.
+
 
 ### Specification of the `eth_signTypedData` JSON RPC
 
@@ -351,6 +353,8 @@ The in-place implementation makes strong but reasonable assumptions on the memor
 Similarly, a straightforward implementation is sub-optimal for directed acyclic graphs. A simple recursion through the members can visit the same node twice. Memoization can optimize this.
 
 ## Rationale for `domainSeparator`
+
+Since different domains have different needs, an extensible scheme is used where the DApp specifies a `DomainSeparator` struct type and an instance `domainSeparatorInstance` which it passes to the user-agent. The user-agent can then apply different verification measures depending on the fields that are there.
 
 A field `string eip719dsl` can added and be rejected if the value does not match the hash of the [EIP-719][eip719] DSL interface string.
 
