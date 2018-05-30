@@ -58,7 +58,7 @@ Each status change is requested by the EIP author by @-mentioning or emailing th
   * :arrow_right: Accepted (Core EIPs only) -- After the review end date, the Ethereum Core Developers will vote on whether to accept this change. If yes, the status will upgrade to Accepted.
   * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed complaints will become Final.
 * **Accepted (Core EIPs only)** -- This is being implemented by Ethereum Core Developers.
-  * :arrow_right: Final -- When a Standards Track Core EIP is implemented in at least three viable Ethereum clients, and it is deployed on at least 50% of deployed nodes, and the implementations pass a common set of test suites, then the status is upgraded to Final.
+  * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and accepted by the community, the status will be changed to “Final”.
 * **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
 Other exceptional statuses include:
