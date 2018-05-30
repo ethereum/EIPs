@@ -121,7 +121,7 @@ The encoding is compliant with [EIP-191][eip191]. The 'version byte' is fixed to
 To define the set of all structured data, we start with defining acceptable types. Like ABIv2 these are closely related to Solidity types. It is illustrative to adopt Solidity notation to explain the definitions. The standard is specific to the Ethereum Virtual Machine, but aims to be agnostic to higher level languages. Example:
 
 ```cpp
-struct Message {
+struct Mail {
     address from;
     address to;
     string contents;
@@ -150,7 +150,7 @@ The `hashStruct` function is defined as
 
 ### Definition of `encodeType`
 
-The type of a struct is encoded as `name ‖ "(" ‖ member₁ ‖ "," ‖ member₂ ‖ "," ‖ … ‖ memberₙ ")"` where each member is written as `type ‖ " " ‖ name`. For example, the above `Message` struct is encoded as `Message(address from,address to,string contents)`.
+The type of a struct is encoded as `name ‖ "(" ‖ member₁ ‖ "," ‖ member₂ ‖ "," ‖ … ‖ memberₙ ")"` where each member is written as `type ‖ " " ‖ name`. For example, the above `Mail` struct is encoded as `Mail(address from,address to,string contents)`.
 
 If the struct type references other struct types (and these in turn reference even more struct types), then the set of referenced struct types is collected, sorted by name and appended to the encoding. An example encoding is `Transaction(Person from,Person to,Asset tx)Asset(address token,uint256 amount)Person(address wallet,string name)`.
 
@@ -284,8 +284,8 @@ The function `hashStruct` starts with a `typeHash` to separate types. By giving 
 The `typeHash` is designed to turn into a compile time constant in Solidity. For example:
 
 ```javascript
-bytes32 constant MESSAGE_TYPEHASH = keccak256(
-  "Message(address from,address to,string contents)");
+bytes32 constant MAIL_TYPEHASH = keccak256(
+  "Mail(address from,address to,string contents)");
 ```
 
 For the type hash several alternatives where considered and rejected for the reasons:
@@ -294,7 +294,7 @@ For the type hash several alternatives where considered and rejected for the rea
 
 **Alternative 3**: ABIv2 function signatures modified to be 256-bit. While this captures type info, it does not capture any of the semantics other than the function. This is already causing a practical collision between ERC20's and ERC721's `transfer(address,uint256)`, where in the former the `uint256` revers to an amount and the latter to a unique id. In general ABIv2 favors compatibility where a hashing standard should prefer incompatibility.
 
-**Alternative 4**: 256-bit ABIv2 signatures extended with parameter names and struct names. The `Message` example from a above would be encoded as `Message(Person(string name,address wallet) from,Person(string name,address wallet) to,string message)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). It also does not allow a recursive struct type (consider `struct List {uint256 value; List next;}`).
+**Alternative 4**: 256-bit ABIv2 signatures extended with parameter names and struct names. The `Mail` example from a above would be encoded as `Mail(Person(string name,address wallet) from,Person(string name,address wallet) to,string contents)`. This is longer than the proposed solution. And indeed, the length of the string can grow exponentially in the length of the input (consider `struct A{B a;B b;}; struct B {C a;C b;}; …`). It also does not allow a recursive struct type (consider `struct List {uint256 value; List next;}`).
 
 **Alternative 5**: Include natspec documentation. This would include even more semantic information in the schemaHash and further reduces chances of collision. It makes extending and amending documentation a breaking changes, which contradicts common assumptions. It also makes the schemaHash mechanism very verbose.
 
@@ -303,12 +303,12 @@ For the type hash several alternatives where considered and rejected for the rea
 The `encodeData` is designed to allow easy implementation of `hashStruct` in Solidity:
 
 ```javascript
-function hashStruct(Message memory message) pure returns (bytes32 hash) {
+function hashStruct(Mail memory mail) pure returns (bytes32 hash) {
     return keccak256(
-        MESSAGE_TYPEHASH,
-        bytes32(message.from),
-        bytes32(message.to),
-        keccak256(message.contents)
+        MAIL_TYPEHASH,
+        bytes32(mail.from),
+        bytes32(mail.to),
+        keccak256(mail.contents)
     );
 }
 ```
@@ -316,11 +316,11 @@ function hashStruct(Message memory message) pure returns (bytes32 hash) {
 it also allows for an efficient in-place implementation in EVM
 
 ```javascript
-function hashStruct(Message memory message) pure returns (bytes32 hash) {
+function hashStruct(Mail memory mail) pure returns (bytes32 hash) {
 
     // Compute sub-hashes
-    bytes32 typeHash = MESSAGE_TYPEHASH;
-    bytes32 contentsHash = keccak256(message.contents);
+    bytes32 typeHash = MAIL_TYPEHASH;
+    bytes32 contentsHash = keccak256(mail.contents);
 
     assembly {
         // Back up select memory
@@ -328,7 +328,7 @@ function hashStruct(Message memory message) pure returns (bytes32 hash) {
         let temp2 := mload(add(order, 128))
 
         // Write typeHash and sub-hashes
-        mstore(sub(message, 32), typeHash)
+        mstore(sub(mail, 32), typeHash)
         mstore(add(order, 64), contentsHash)
 
         // Compute hash
