@@ -371,80 +371,138 @@ The Solidity expression `keccak256(someInstance)` for an instance `someInstance`
 
 <!-- Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable. -->
 
-```
-struct Person {
-    string name;
-    address wallet;
-}
+Example contract:
 
-struct Message {
-    Person from;
-    Person to;
-    string message;
-}
-```
+```cpp
+contract Example {
+    
+    struct EIP712Domain {
+        string  name;
+        string  version;
+        uint256 chainId;
+        string  httpOrigin;
+        address verifyingContract;
+    }
 
-Then `schemaHash(Message)` is as follows:
+    struct Person {
+        string name;
+        address wallet;
+    }
 
-```
-bytes32 constant PERSON_SCHEMA_HASH = keccak256(
-    "Person(string name,address wallet)"
-);
+    struct Mail {
+        Person from;
+        Person to;
+        string contents;
+    }
 
-bytes32 schemaHash = keccak256(
-    "Message(Person from,Person to,string message)"
-    "Person(string name,address wallet)"
-  );
-```
-
-(Note that the string is split up in substrings for readability. The result is equivalent if all strings are concatenated).
-
-```
-struct Order {
-    address from;
-    address to;
-    uint128 amount;
-    uint64 timestamp;
-    string message;
-}
-
-function dataHash(Order order) returns (bytes32) {
-    return keccak256(
-        bytes32(order.from),
-        bytes32(order.to),
-        bytes32(order.amount),
-        bytes32(order.timestamp),
-        keccak256(order.message)
+    bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
+        "EIP712Domain(string name,string version,uint256 chainId,string httpOrigin,address verifyingContract)"
     );
+
+    bytes32 constant PERSON_TYPEHASH = keccak256(
+        "Person(string name,address wallet)"
+    );
+
+    bytes32 constant MAIL_TYPEHASH = keccak256(
+        "Mail(Person from,Person to,string content)Person(string name,address wallet)"
+    );
+
+    bytes32 DOMAIN_SEPARATOR;
+
+    constructor () public {
+        DOMAIN_SEPARATOR = hash(EIP712Domain({
+            name: "Ether Mail",
+            version: '1',
+            chainId: 1,
+            httpOrigin: "https://ether-mail.eth",
+            verifyingContract: this
+        }));
+    }
+
+    function hash(EIP712Domain eip712Domain) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(
+            EIP712DOMAIN_TYPEHASH,
+            keccak256(bytes(eip712Domain.name)),
+            keccak256(bytes(eip712Domain.version)),
+            eip712Domain.chainId, 
+            keccak256(bytes(eip712Domain.httpOrigin)),
+            bytes32(eip712Domain.verifyingContract)
+        ));
+    }
+
+    function hash(Person person) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(
+            PERSON_TYPEHASH,
+            keccak256(bytes(person.name)),
+            bytes32(person.wallet)
+        ));
+    }
+
+    function hash(Mail mail) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(
+            MAIL_TYPEHASH,
+            hash(mail.from),
+            hash(mail.to),
+            keccak256(bytes(mail.contents))
+        ));
+    }
+
+    function verify(Mail mail, uint8 v, bytes32 r, bytes32 s) internal view returns (bool) {
+        bytes32 digest = keccak256(abi.encodePacked(
+          "\x19\x01",
+          DOMAIN_SEPARATOR,
+          hash(mail)
+        ));
+        return ecrecover(digest, v, r, s) == mail.from.wallet;
+    }
 }
 ```
 
+Tests:
+
+```js
+assert(hash(EIP712Domain({
+    name: "Ether Mail",
+    version: '1',
+    chainId: 1,
+    httpOrigin: "https://ether-mail.eth",
+    verifyingContract: 0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC
+})) == 0x0b72c8f1f2c3bf8bcca4c3cc24cd47275f9261a5b0bcf7b9bd803419b303a1a9);
 ```
-struct Person {
-    string name;
-    address wallet;
-}
 
-struct Message {
-    Person from;
-    Person to;
-    string message;
-}
+```js
+assert(hash(Mail({
+    from: Person({
+       name: "Alice",
+       wallet: 0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa
+    }),
+    to: Person({
+        name: "Bob",
+        wallet: 0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB
+    }),
+    contents: "Hello, World!"
+})) == 0xb565f8c15e1e6584fa3ce6b6abfa71c5fa7f9fc099c494dd54ea2b284beac548);
+```
 
-function dataHash(Person person) returns (bytes32) {
-    return keccak256(
-        keccak256(person.name),
-        bytes32(person.wallet),
-    );
-}
-
-function dataHash(Message message) returns (bytes32) {
-    return keccak256(
-        dataHash(message.from),
-        dataHash(message.to),
-        keccak256(message.message)
-    );
-}
+```js
+// Assumes contract is deployed on
+// 0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC
+assert(verify(
+    Mail({
+        from: Person({
+            name: "Cow",
+            wallet: 0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826
+        }),
+        to: Person({
+            name: "Bob",
+            wallet: 0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB
+        }),
+        contents: "Hello, World!"
+    }),
+    28,
+    0x7d4f1214f5050342e9bb26f33aa07e94ec48ade60ec6a831baaece5250070300,
+    0x3ee5b929266f4f08444f01064eafa4b0a91bcc6d7b0a5bf2ee1a971621c1bbd2
+));
 ```
 
 ## Implementation
@@ -453,9 +511,9 @@ function dataHash(Message message) returns (bytes32) {
 
 To be done before this EIP can be considered accepted:
 
-*   [ ] Finalize specification
-*   [ ] Domain separators
-*   [ ] Add test vectors
+*   [x] Finalize specification of structure hashing
+*   [x] Domain separators
+*   [x] Add test vectors
 *   [ ] Review specification
 
 To be done before this EIP can be considered "Final":
