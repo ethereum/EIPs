@@ -170,25 +170,23 @@ The struct values are encoded recursively as `hashStruct(value)`. This is undefi
 
 
 ```
-domainSeparator = hashStruct(domainSeparatorInstance)
+domainSeparator = hashStruct(eip712Domain)
 ```
 
-where the type of `domainSeparatorInstance` is a stuct named `DomainSeparator` with one or more of the below fields. The user-agent can reject (i.e. refuse to sign) depending on the `domainSeparatorInstance` object.
+where the type of `eip712Domain` is a struct named `EIP712Domain` with one or more of the below fields. Protocol designers only need to include the fields that make sense for their signing domain. Unused fields are left out of the struct type.
 
-*   A field `bytes32 salt` will always be accepted.
-*   A field `string origin` can be rejected if the supplied value does not match the current [`origin`][mdn-origin] as specified in the HTML standard.
-*   A field `address contract` can be rejected if the user-agent determines the current request is not appropriate for the given contract. This allows the user-agent to implement custom anti-phising for well-known contracts.
-*   Unrecognized fields can be rejected.
-*   Future extensions to the standard can add new fields with new constraints.
+*   `string name` the user readable name of signing domain, i.e. the name of the DApp or the protocol.
+*   `string version` the current major version of the signing domain. Signatures from different versions are not compatible.
+*   `uint256 chainId` the [EIP-155][eip155] chain id. The user-agent *should* refuse signing if it does not match the currently active chain.
+*   `string httpOrigin` the [http origin][mdn-origin] where the DApp is hosted. The user-agent *should* refuse signing if it does not match the current browser origin.
+*   `address verifyingContract` the address of the contract that will verify the signature. The user-agent *may* do contract specific phishing prevention.
+*   `bytes32 salt` an disambiguating salt for the protocol. This can be used as a domain separator of last resort.
+
+[eip155]: https://eips.ethereum.org/EIPS/eip-155
 
 [mdn-origin]: https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/origin
 
-Note that a console based user-agent is allowed to accept domain separators using the `domain` field. It has no way to verify the value and needs to trust the user.
-
-DApp implementors should not add non-standard fields, they can always use the `salt` field to implement domain specific extensions.
-
-**TODO**: Order of fields and JSON.
-
+Future extensions to this standard can add new fields with new user-agent behaviour constraints. User-agents are free to use the provided information to inform/warn users or refuse signing.
 
 ### Specification of the `eth_signTypedData` JSON RPC
 
