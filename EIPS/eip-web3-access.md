@@ -11,13 +11,13 @@ created: 2018-05-04
 
 ## Simple summary
 
-This proposal describes a new way for environments to expose the web3 API that requires user approval.
+This proposal describes a new way for DOM environments to expose the web3 API that requires user approval.
 
 ## Abstract
 
 MetaMask and most other tools that provide access to web3-enabled environments do so automatically and without user consent. This exposes users of such environments to fingerprinting attacks since untrusted websites can check for a `web3` object and reliably identify web3-enabled clients.
 
-This proposal outlines a new dapp initialization strategy in which websites request access to the web3 API instead of relying on its preexistence in a given environment.
+This proposal outlines a new protocol in which dapps request access to the web3 API instead of relying on its preexistence in a given DOM environment.
 
 ## Specification
 
@@ -48,13 +48,21 @@ IF web3 is undefined
         NOOP[4]
 ```
 
-**[1]REQUEST** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_REQUEST” and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
+#### `[1] REQUEST`
 
-**[2]INJECT** This operation would be achieved by any implementation-level API that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
+Dapps MUST request the web3 API by sending a message using [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) API. This message MUST be sent with a payload object containing a `type` property with a value of “WEB3_API_REQUEST” and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
 
-**[3]NOTIFY** This operation would be achieved by an implementation-level messaging API like `window.postMessage` and should pass a payload containing a `type` property with a value of “WEB3_API_SUCCESS" and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
+#### `[2] INJECT`
 
-**[4]NOOP** If a user rejects web3 access on an untrusted site, the site itself shouldn't be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
+Dapp browsers should inject the web3 API using an implementation-specific strategy that can expose the web3 API to the user’s browser context, such as HTML script tag injection.
+
+#### `[3] NOTIFY`
+
+Dapps browsers MUST notify dapps of successful web3 exposure by sending a message using [`window.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) API. This message MUST be sent with a payload object containing a `type` property with a value of “WEB3_API_SUCCESS" and an optional `id` property corresponding to an identifier of a specific wallet provider, such as "METAMASK".
+
+#### `[4] NOOP`
+
+If a user rejects web3 access on an untrusted site, the site itself MUST NOT be notified in any way; notification of a rejection would allow third-party tools to still identify that a client is web3-enabled despite not being granted web3 access.
 
 ### Example implementation: `postMessage`
 
@@ -86,8 +94,6 @@ An [open issue](https://github.com/MetaMask/metamask-extension/issues/714) again
 * Users MUST be able to approve or reject web3 access.
 * Web3 MUST be exposed to websites after user consent.
 * Environments MAY continue auto-exposing web3 if users can disable this behavior.
-
-_Note: This proposal intentionally omits platform-specific details like messaging protocols, and instead chooses only to detail a high-level strategy that can be applied agnostically of platform or available APIs._
 
 ### Immediate value-add
 
