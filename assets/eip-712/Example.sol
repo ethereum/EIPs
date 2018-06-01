@@ -6,7 +6,6 @@ contract Example {
         string  name;
         string  version;
         uint256 chainId;
-        string  httpOrigin;
         address verifyingContract;
     }
 
@@ -22,7 +21,7 @@ contract Example {
     }
 
     bytes32 constant EIP712DOMAIN_TYPEHASH = keccak256(
-        "EIP712Domain(string name,string version,uint256 chainId,string httpOrigin,address verifyingContract)"
+        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
     );
 
     bytes32 constant PERSON_TYPEHASH = keccak256(
@@ -40,7 +39,6 @@ contract Example {
             name: "Ether Mail",
             version: '1',
             chainId: 1,
-            httpOrigin: "https://ether-mail.eth",
             // verifyingContract: this
             verifyingContract: 0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC
         }));
@@ -51,8 +49,7 @@ contract Example {
             EIP712DOMAIN_TYPEHASH,
             keccak256(bytes(eip712Domain.name)),
             keccak256(bytes(eip712Domain.version)),
-            eip712Domain.chainId, 
-            keccak256(bytes(eip712Domain.httpOrigin)),
+            eip712Domain.chainId,
             bytes32(eip712Domain.verifyingContract)
         ));
     }
@@ -96,11 +93,11 @@ contract Example {
             }),
             contents: "Hello, Bob!"
         });
-        uint8 v = 27;
-        bytes32 r = 0x24040eda35064d96c51f3308b5fae290edae563327348886a366ed604e0c0480;
-        bytes32 s = 0x42bbabf2fae4b00598596a99d577dde56ff9d013e861f611cfe7b0728e1cd057;
+        uint8 v = 28;
+        bytes32 r = 0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d;
+        bytes32 s = 0x07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b91562;
         
-        assert(DOMAIN_SEPARATOR == 0x0b72c8f1f2c3bf8bcca4c3cc24cd47275f9261a5b0bcf7b9bd803419b303a1a9);
+        assert(DOMAIN_SEPARATOR == 0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f);
         assert(hash(mail) == 0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e);
         assert(verify(mail, v, r, s));
         return true;
