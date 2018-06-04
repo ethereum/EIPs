@@ -45,25 +45,25 @@ contract Example {
     }
 
     function hash(EIP712Domain eip712Domain) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(
+        return keccak256(abi.encode(
             EIP712DOMAIN_TYPEHASH,
             keccak256(bytes(eip712Domain.name)),
             keccak256(bytes(eip712Domain.version)),
             eip712Domain.chainId,
-            bytes32(eip712Domain.verifyingContract)
+            eip712Domain.verifyingContract
         ));
     }
 
     function hash(Person person) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(
+        return keccak256(abi.encode(
             PERSON_TYPEHASH,
             keccak256(bytes(person.name)),
-            bytes32(person.wallet)
+            person.wallet
         ));
     }
 
     function hash(Mail mail) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(
+        return keccak256(abi.encode(
             MAIL_TYPEHASH,
             hash(mail.from),
             hash(mail.to),
@@ -72,10 +72,11 @@ contract Example {
     }
 
     function verify(Mail mail, uint8 v, bytes32 r, bytes32 s) internal view returns (bool) {
+        // Note: we need to use `encodePacked` here instead of `encode`.
         bytes32 digest = keccak256(abi.encodePacked(
-          "\x19\x01",
-          DOMAIN_SEPARATOR,
-          hash(mail)
+            "\x19\x01",
+            DOMAIN_SEPARATOR,
+            hash(mail)
         ));
         return ecrecover(digest, v, r, s) == mail.from.wallet;
     }
