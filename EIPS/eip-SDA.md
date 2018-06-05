@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
-title: <Standardized DAPP announcements>
+title: <Standardised DAPP announcements>
 author: <"Jan Turk" (@ThunderDeliverer)>
-discussions-to: <jan.jasociety@gmail.com>
+discussions-to: <https://ethereum-magicians.org/t/eip-sda-standardised-dapp-announcements/508?u=thunderdeliverer>
 status: Draft
 type: <Standards Track>
 category (*only required for Standard Track): <ERC>
