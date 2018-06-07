@@ -22,6 +22,6 @@ elif [[ $TASK = 'eip-validator' ]]; then
     exit 1
   fi
 
-  FILES=$(ls EIPS/*.md)
+  FILES="$(ls EIPS/*.md | egrep  "^eip-[0-9]+.md$")"
   bundle exec eip_validator $FILES
 fi
