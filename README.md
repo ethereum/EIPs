@@ -22,7 +22,7 @@ When you believe your EIP is mature and ready to progress past the draft phase, 
  - **For all other EIPs**, open a PR changing the state of your EIP to 'Final'. An editor will review your draft and ask if anyone objects to its being finalised. If the editor decides there is no rough consensus - for instance, because contributors point out significant issues with the EIP - they may close the PR and request that you fix the issues in the draft before trying again.
 
 # EIP status terms
-* **Draft** - an EIP that is open for consideration
+* **Draft** - an EIP that is open for consideration.
 * **Accepted** - an EIP that is planned for immediate adoption, i.e. expected to be included in the next hard fork (for Core/Consensus layer EIPs).
 * **Final** - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).
 * **Deferred** - an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.
