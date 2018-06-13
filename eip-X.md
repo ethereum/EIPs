@@ -16,9 +16,9 @@ Non Fungible Token which can be used in PaaS instead of accounts,API-keys,and se
 ## Abstract
 This proposal extends ERC721 token to idenfing owners in any network using a web server,not only in Ethereum Network. Adding a public key to tokens and introducing an order relation enable ERC721 tokens to have practical ID abilities. 
 Achieved ID abilities are below.
-0 External server can authorize token holder or do Access Control without using Ethereum private key.
-1 owner can change account's password or registration at any moment
-2 owner can send this NFT to transfer his/her authority without security problems.
+0 External servers can authorize token holders or do Access-Control without using an Ethereum private key.
+1 Owners can change account's password or registration at any moment with one transaction.
+2 Owners can send this NFT to transfer his/her authority without security problems.
 
 ## Motivation
 Logging in cloud systems by Ethereum address can be done in principle.In addition,policy services or ACL(Access Control List) systems also can be enforced by Ethereum and its clients programs.
@@ -40,7 +40,7 @@ mapping (uint256 => bool) managersOf;
 PublicKey publicKeyOf;
 
 #### Functions
-function createToken(address _approver) public;   
+function createToken(address _approver) public returns(uint256);   
 function switchManagers(uint256 _fromTokenId, uint256 _toTokenId, uint256 _managerTokenId, bool _propriety) public;
 function switchAuthority(uint256 _fromTokenId, uint256 _toTokenId, uint8 _authorityId, bool _propriety) public;
 function refreshPublicKey(uint256 _tokenId, string _nOfPublicKey, uint256 _eOfPublicKey) public;
@@ -56,7 +56,7 @@ mapping (uint256 => bool) managersOf;
 This attribution defines order relation between tokens. Owners of a token's manager tokens can change the authority attribution of it.
 
 ####Functions
-* createToken - Only the person owned the token called 'issuer' can execute this function. After calling, \_approver owns new token. The 'issuer' be the 'manager' of the token automatically.
+* createToken - Only the person owned the token called 'issuer' can execute this function. After calling, \_approver owns new token with returned tokenID(uint 256). The 'issuer' be the 'manager' of the token automatically.
 
 * switchManagers - Only the 'manager' of the token whose id equals \_toTokenId (call 'toToken' below) can execute this function. The owner of the token whose id equals \_fromTokenId (call 'fromToken' below) change the propriety that the \_managerTokenId is included in managers of 'toToken' into \_propriety.
 
@@ -130,6 +130,7 @@ Some of the discussions should reach what the simplest MTS implementation for ma
 And these show which task tokens can be used in.
 <img src="./assets/eip-X/comparingBlockchainCloud.jpg"></img>
 (quoted from <a href="https://ieeexplore.ieee.org/document/7930226/">Comparing Blockchain and Cloud Services for Business Process Execution</a>)
+
 These discussions are also held in <a href="https://join.slack.com/t/geomarlin/shared_invite/enQtMzYyNTQ1MjEyNjYwLWRiNTY0M2NiYjFmYTYwMzMzMmRiNTMyOTE4MWZlNzg5YjJmOTdiNTI1ODJiNGI5NWY2ZTJjZWEwZTFkYzFmMzY">Slack</a> 
 
 ##Refereunce
