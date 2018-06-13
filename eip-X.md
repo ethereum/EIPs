@@ -69,25 +69,25 @@ function deleteToken(uint256 _tokenId) public;
 
 ## Rationale
 ### Attributions
-* mapping (uint8 => bool) authorityOf;
+* ```mapping (uint8 => bool) authorityOf;```
 
 
   This attribution defines what token owner is authorized to do at off chain.This will be referred in PaaS coding. This usually can not be changed by owner his self.
 
 
-* PublicKey publicKeyOf;
+* ```PublicKey publicKeyOf;```
 
 
   This attribution is used to authorize owners at off chain. Encrypting ,digital signing or emai-sending will be done with this attribution.
 
 
-* mapping (uint256 => bool) managersOf;
+* ```mapping (uint256 => bool) managersOf;```
 
 
   This attribution defines order relation between tokens. Owners of a token's manager tokens can change the authority attribution of it.
 
 ### Functions
-* ```createToken``` - Only the person owned the token called 'issuer' can execute this function. After calling, ```_approver``` owns new token with returned ```tokenID(uint 256)```. The 'issuer' be the 'manager' of the token automatically.
+* ```createToken``` -  After calling this function, ```_approver``` owns new token with returned ```tokenID(uint 256)```. 
 
 
 * ```switchManagers``` - Only the 'manager' of the token whose id equals ```_toTokenId``` (call 'toToken' below) can execute this function. The owner of the token whose id equals ```_fromTokenId``` (call 'fromToken' below) change the propriety that the ```_managerTokenId``` is included in managers of 'toToken' into ```_propriety```.
@@ -154,10 +154,10 @@ Design patterns of this standard are below.
 If a token has only one manager, there are two pattern to manage.
 
 
-1. allow a higher manager of the token change the authority(authorityOf)
+1. allow a higher manager of the token change the authority(```authorityOf```)
 
 
-2. don't allow any higher manager of the token change the authority(authorityOf)
+2. don't allow any higher manager of the token change the authority(```authorityOf```)
 
 #### (2)SeveralManagerPattern
 
@@ -165,7 +165,7 @@ If a token has only one manager, there are two pattern to manage.
 If a token can have several managers, conflicts of editing authority will occur.
 
 
-switchAuthority function can describe this pattern, and this depends on a developper's thought.
+```switchAuthority``` function can describe this pattern, and this depends on a developper's thought.
 
 
 The codes in the demo above let them conflict, and requires nothing.
@@ -179,10 +179,10 @@ The codes in the demo above let them conflict, and requires nothing.
 If all tokens are allowed to be created by one address,
 
 
-createToken function should require the address check.
+```createToken``` function should require the address check.
 
 
-If createToken function require the token Id,the constructor function should create one token initially.
+If ```createToken``` function require the token Id,the constructor function should create one token initially.
 
 
 <img src="./assets/eip-X/createTokenfunction.jpg"></img>
@@ -193,7 +193,7 @@ If createToken function require the token Id,the constructor function should cre
 If token holders can create new tokens, there can be unlimited number of tokens.
 
 
-Developpers should make rule by limitting CreateToken function to a certain extent.
+Developpers should make rule by limitting ```createToken``` function to a certain extent.
 
 ## To be Discussed
   This proposal is motivated by one belief that Ethereum itself should be introduced to real Cloud Administrator's jobs in the recent phase.
