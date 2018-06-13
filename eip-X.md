@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
 title: Manager Token Standard
-author: Leona Hioki <> Kiichi Hiruma<>
-discussions-to: leona.hioki@laurus-school.com
+author: Leona Hioki @leohio <leona.hioki@laurus-school.com> ,Kiichi Hiruma @CoRe103<hiruma.kiichi.72n@st.kyoto-u.ac.jp>
+discussions-to: leona.hioki@laurus-school.com,@leo_hio(Twitter)
 status: Draft
 type: Standards
 category :ERC
@@ -22,12 +22,12 @@ Achieved ID abilities are below.
 
 ## Motivation
 Logging in cloud systems by Ethereum address can be done in principle.In addition,policy services or ACL(Access Control List) systems also can be enforced by Ethereum and its clients programs.
-"NFT" brought about an adiquate timing to start those practices by its possibility of dealing IDs as assets, which implies sharing API-keys and serial numbers of both dapps/non dapp products. 
-In EIP context,By ERC735,Adding attribution to NTFs to claim ownership in Ethereum was proposed,which is extensible for outer networks because a cypher on chain works at off chain as well.
-By ERC1115,DAuth was proposed to login services by NTF,which was extensible to have policy system by adding order relation between tokens,and extensible for usages in PaaS by a simplification of the flow shown in the sequence diagram in this proposal.
-By ERC998,hiearchy NFT was proposed to manage NTFs as social assets which was extensible for PaaS useage by adding authorize functions.
+"NFT" brought about an appropriate timing to start those practices by its possibility of dealing IDs as assets, which implies sharing API-keys and serial numbers of both dapps/non dapp products. 
+In EIP context,By ERC735,Adding attribution to NTFs to claim an ownership in Ethereum was proposed,which is extensible for outer networks because a cypher on chain works at off chain as well.
+By ERC1115,DAuth was proposed to login services by NTF,which is extensible to have policy system by adding order relation between tokens,and extensible for usages in PaaS by a simplification of the authorization flow.
+By ERC994,the hiearchy NFT was proposed to manage NTFs as social assets which is extensible for PaaS useage by adding authorization functions.
 
-NFT for Cloud/Ethereum half&half system in minimum extension of ERC721 was needed.
+NFT for Cloud/Ethereum half&half system with the minimum extension of ERC721 was needed.
 
 ## Specification
 ####Diaglam
@@ -66,13 +66,19 @@ This attribution defines order relation between tokens. Owners of a token's mana
 
 * deleteToken - Only the token owner and issuer can execute this function. After calling, the token whose id equals \_tokenId delete.
 
+<img src="./assets/eip-X/createTokenfunction.jpg"></img>
+<img src="./assets/eip-X/refreshPublicKeyfunction.jpg"></img>
+<img src="./assets/eip-X/switchAuthorityfunction.jpg"></img>
+
 ## Backwards Compatibility(ERC721)
-This standard has no backwards compatibility.This is a NFT standard for cloud useages with minimum extension of ERC721.
+This standard has no backwards compatibility.This is a NFT standard for cloud usages with the minimum extension of ERC721.
 And this is not the extension of ERC735,ERC998,ERC1115. 
 
 ## Test Cases
 Demo is here.Please install Metamask and access with a pc.
 <a href="https://www.geomerlin.com/blog/managertoken.html">Enter Demo</a>
+The sample solidity code is on link below.
+<a href="https://github.com/geo-merlin/infraOnEthereum/blob/PLCdemo/sol/ManagerToken.sol">ManagerToken.sol</a>
 
 ## Implementation
 Examples of the implemention can be executed at the demo above.
@@ -84,28 +90,52 @@ Design patterns of this standard are below.
 2.Server check the sign by the public key,execute the function,and returns the result.
 
 ####Sending Token
-1.The current owner send token to another,and transfer the authority,with the public key unchanged.
-2.The receiver change the public key not to let the previous owner use the token.
-3.The manager set the new authority for the token.
+1.The current owner sends token to another,and transfers the authority,with the public key unchanged.
+2.The receiver changes the public key not to let the previous owner use the token.
+3.The manager sets the new authority for the token.
 
 ####Manager Relation
 (1)OneManagerPattern
 If a token has only one manager,there are two pattern to manage.
-1. allow the higher manager of the token change the authority(authorityOf)
-2. don't allow the higher manager of the token change the authority(authorityOf)
+1. allow a higher manager of the token change the authority(authorityOf)
+2. don't allow any higher manager of the token change the authority(authorityOf)
 
 (2)SeveralManagerPattern
 If a token can have several managers,conflicts of editing authority will occur.
-changeAuthority function can describe this pattern,and this depends on a developper's thought.
+switchAuthority function can describe this pattern,and this depends on a developper's thought.
 The codes in the demo above let them conflict,and requires nothing.
 <img src="./assets/eip-X/conflict.jpg"></img>
 
 (3)OneIssuerPattern
 If all tokens are allowed to be created by one address,
-CreateToken function should require the address check.
-If CreateToken function require the token Id,the constructor function should create one token initially.
+createToken function should require the address check.
+If createToken function require the token Id,the constructor function should create one token initially.
 <img src="./assets/eip-X/createToken.jpg"></img>
 
 (4)SeveralIssuerPattern
 If token holders can create new tokens,there can be unlimited number of tokens.
 Developpers should make rule by limitting CreateToken function to a certain extent.
+
+##To be Discussed
+This proposal is motivated by one belief that Ethereum itself should be introduced to real Cloud Administrator's jobs in the recent phase.
+
+Then the difference of these diagrams below leads to the questions,"what is the Ethereum's role in Clouds?" and "What is the minimum token standard to be used by Cloud Admins today?"
+<img src="./assets/eip-X/ManagerTokenBefore.jpg"></img>
+<img src="./assets/eip-X/ManagerToken.jpg"></img>
+
+As an economical aspect of Manager Token Standard(MTS),this frees product sellers from fixed pricing mistakes by effects of free markets,
+and gives them opptunities to open crowd sales instead of sign-up of API-keys or serial numbers. 
+
+Some of the discussions should reach what the simplest MTS implementation for managing and marketing system is.
+And these show which task tokens can be used in.
+<img src="./assets/eip-X/comparingBlockchainCloud.jpg"></img>
+(quoted from <a href="https://ieeexplore.ieee.org/document/7930226/">Comparing Blockchain and Cloud Services for Business Process Execution</a>)
+These discussions are also held in <a href="https://join.slack.com/t/geomarlin/shared_invite/enQtMzYyNTQ1MjEyNjYwLWRiNTY0M2NiYjFmYTYwMzMzMmRiNTMyOTE4MWZlNzg5YjJmOTdiNTI1ODJiNGI5NWY2ZTJjZWEwZTFkYzFmMzY">Slack</a> 
+
+##Refereunce
+<a href="https://github.com/ethereum/EIPs/issues/721">[1]ERC721</a>
+<a href="https://github.com/ethereum/EIPs/issues/935">[2]ERC935</a>
+<a href="https://github.com/ethereum/EIPs/issues/994">[3]ERC994</a>
+<a href="https://github.com/ethereum/EIPs/issues/1115">[4]ERC1115</a>
+<a href="https://ieeexplore.ieee.org/document/7930226/">[5]Comparing Blockchain and Cloud Services for Business Process Execution</a>
+<a href="https://azure.microsoft.com/es-es/blog/introducing-enterprise-smart-contracts/">[6]Introducing Enterprise Smart Contracts</a>
