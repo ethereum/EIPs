@@ -87,16 +87,16 @@ function deleteToken(uint256 _tokenId) public;
   This attribution defines order relation between tokens. Owners of a token's manager tokens can change the authority attribution of it.
 
 ### Functions
-* createToken - Only the person owned the token called 'issuer' can execute this function. After calling, ```_approver``` owns new token with returned ```tokenID(uint 256)```. The 'issuer' be the 'manager' of the token automatically.
+* ```createToken``` - Only the person owned the token called 'issuer' can execute this function. After calling, ```_approver``` owns new token with returned ```tokenID(uint 256)```. The 'issuer' be the 'manager' of the token automatically.
 
 
-* switchManagers - Only the 'manager' of the token whose id equals \_toTokenId (call 'toToken' below) can execute this function. The owner of the token whose id equals \_fromTokenId (call 'fromToken' below) change the propriety that the \_managerTokenId is included in managers of 'toToken' into \_propriety.
+* ```switchManagers``` - Only the 'manager' of the token whose id equals ```_toTokenId``` (call 'toToken' below) can execute this function. The owner of the token whose id equals ```_fromTokenId``` (call 'fromToken' below) change the propriety that the ```_managerTokenId``` is included in managers of 'toToken' into ```_propriety```.
 
-* switchAuthority - As switchManagers, \_fromTokenId owner change the propriety that the \_authorityId is included in authoritys of 'toToken' into \_propriety. But this function caller must own the token with the \_authorityId, in addition.
+* ```switchAuthority``` - As ```switchManagers```, ```_fromTokenId``` owner change the propriety that the ```_authorityId``` is included in authoritys of 'toToken' into ```_propriety```. But this function caller must own the token with the ```_authorityId```, in addition.
 
-* refreshPublicKey - Only the token owner can execute this function. The owner resister the value equivalent to the 'n' and 'e' of RSA cryptosystems. By using these values, the owner allow someone to encrypto confidential data and anyone can decrypto the sign by the corresponded private key in advance.
+* ```refreshPublicKey``` - Only the token owner can execute this function. The owner resister the value equivalent to the 'n' and 'e' of RSA cryptosystems. By using these values, the owner allow someone to encrypto confidential data and anyone can decrypto the sign by the corresponded private key in advance.
 
-* deleteToken - Only the token owner and issuer can execute this function. After calling, the token whose id equals \_tokenId delete.
+* ```deleteToken``` - Only the token owner and issuer can execute this function. After calling, the token whose id equals ```_tokenId``` delete.
 
 <img src="./assets/eip-X/createTokenfunction.jpg"></img>
 <img src="./assets/eip-X/refreshPublicKeyfunction.jpg"></img>
