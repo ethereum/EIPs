@@ -51,28 +51,21 @@ NFT for Cloud/Ethereum half&half system with the minimum extension of ERC721 was
 
 ### Attributions
 
-"""mapping (uint8 => bool) authorityOf;"""
-
-
-"""mapping (uint256 => bool) managersOf;"""
-
-
-"""PublicKey publicKeyOf;"""
+```
+mapping (uint8 => bool) authorityOf;
+mapping (uint256 => bool) managersOf;
+PublicKey publicKeyOf;
+```
 
 ### Functions
-"""function createToken(address _approver) public returns(uint256);"""   
 
-
-"""function switchManagers(uint256 _fromTokenId, uint256 _toTokenId, uint256 _managerTokenId, bool _propriety) public;"""
-
-
-"""function switchAuthority(uint256 _fromTokenId, uint256 _toTokenId, uint8 _authorityId, bool _propriety) public;"""
-
-
-"""function refreshPublicKey(uint256 _tokenId, string _nOfPublicKey, uint256 _eOfPublicKey) public;"""
-
-
-"""function deleteToken(uint256 _tokenId) public;"""
+```
+function createToken(address _approver) public returns(uint256);
+function switchManagers(uint256 _fromTokenId, uint256 _toTokenId, uint256 _managerTokenId, bool _propriety) public;
+function switchAuthority(uint256 _fromTokenId, uint256 _toTokenId, uint8 _authorityId, bool _propriety) public;
+function refreshPublicKey(uint256 _tokenId, string _nOfPublicKey, uint256 _eOfPublicKey) public;
+function deleteToken(uint256 _tokenId) public;
+```
 
 ## Rationale
 ### Attributions
