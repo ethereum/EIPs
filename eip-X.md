@@ -87,7 +87,7 @@ function deleteToken(uint256 _tokenId) public;
   This attribution defines order relation between tokens. Owners of a token's manager tokens can change the authority attribution of it.
 
 ### Functions
-* createToken - Only the person owned the token called 'issuer' can execute this function. After calling, \_approver owns new token with returned tokenID(uint 256). The 'issuer' be the 'manager' of the token automatically.
+* createToken - Only the person owned the token called 'issuer' can execute this function. After calling, ```_approver``` owns new token with returned ```tokenID(uint 256)```. The 'issuer' be the 'manager' of the token automatically.
 
 
 * switchManagers - Only the 'manager' of the token whose id equals \_toTokenId (call 'toToken' below) can execute this function. The owner of the token whose id equals \_fromTokenId (call 'fromToken' below) change the propriety that the \_managerTokenId is included in managers of 'toToken' into \_propriety.
