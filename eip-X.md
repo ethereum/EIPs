@@ -215,7 +215,7 @@ And these show which task tokens can be used in.
 (here is quoted from <a href="https://ieeexplore.ieee.org/document/7930226/">Comparing Blockchain and Cloud Services for Business Process Execution</a>)
 <img src="./assets/eip-X/comparingBlockchainCloud.jpg"></img>
 
-These discussions are also held in <a href="https://join.slack.com/t/geomarlin/shared_invite/enQtMzYyNTQ1MjEyNjYwLWRiNTY0M2NiYjFmYTYwMzMzMmRiNTMyOTE4MWZlNzg5YjJmOTdiNTI1ODJiNGI5NWY2ZTJjZWEwZTFkYzFmMzY">Slack</a> 
+These discussions are also held in <a href="https://join.slack.com/t/geomarlin/shared_invite/enQtMzgwODc3MDA5NTg3LTExNGE1MjY1NmZmMTgzZDc4MDQ5ODIxNGYwZDliNDY5Zjg5Y2VmNzI4Mzc1ODRjOWJiMjIxNjA2NzUwNDE0YjM">Slack</a> 
 
 ## Refereunce
 <p><a href="https://github.com/ethereum/EIPs/issues/721">[1]ERC721</a></p>
