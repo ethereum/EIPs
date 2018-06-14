@@ -6,7 +6,7 @@ discussions-to: leona.hioki@laurus-school.com,@leo_hio(Twitter)
 status: Draft
 type: Standards
 category :ERC
-created: 2018-06-15
+created: 2018-06-14
 requires (*optional): <EIP 721>
 ---
 
@@ -109,10 +109,10 @@ function deleteToken(uint256 _tokenId) public;
 And this is not the extension of ERC735,ERC998,ERC1115. 
 
 ## Test Cases
-Demo is here.Please install Metamask and access with a pc.
+DEMO is here.Please install Metamask and access with a pc.
 
 
-<a href="https://www.geomerlin.com/blog/managertoken.html">Enter Demo</a>
+<a href="https://www.geomerlin.com/blog/ManagerToken.html">Enter Demo</a>
 
 
 The sample solidity code is on the link below.
