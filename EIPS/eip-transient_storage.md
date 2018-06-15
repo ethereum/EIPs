@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Transient storage opcodes
 author: Alexey Akhunov (@AlexeyAkhunov)
-discussions-to: <email address>
+discussions-to: https://ethereum-magicians.org/t/eip-transient-storage-opcodes/553
 status: Draft
 type: Standards Track
 category Core
