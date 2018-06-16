@@ -31,6 +31,11 @@ Communication via storage (SSTORE/SLOAD) is costly. Transient storage is a dedic
 
 Language support could be added in relatively easy way. For example, in Solidity, a qualifier “transient” can be introduced (similar to the existing qualifiers “memory” and “storage”). Since addressing scheme of TSTORE and TLOAD is the same as for SSTORE and SLOAD, code generation routines that exist for storage variables, can be easily generalised to also support transient storage.
 
+Potential use cases unlocked by this EIP include:
+1. Reentrancy lock
+2. Passing error codes and messages from the execution frames up the execution stack
+3. More generic libraries that use callbacks, for example generalised sorting with functions "Less" and "Swap" defined.
+
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 Two new opcodes are added to EVM, TLOAD and TSTORE.
