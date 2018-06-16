@@ -45,10 +45,11 @@ Addressing is the same as SLOAD and SSTORE. i.e. each 32-byte address points to 
 
 Gas cost for both is 8 units of gas, regardless of values stored.
 
-The effects of transient storage are discarded at the end of transactions.
+The effects of transient storage are discarded at the end of the transaction.
 
 Transient storage is private to the contract that owns it, in the same way as "regular" storage is. Only owning contract frames may access their transient storage. And when they do, all the frames access the same transient store, in the same way as "regular" storage, but unlike "memory".
 
+Transient storage does not interact with reverts or invalid transactions, that means if a frame reverts, its effects on the transient storage remain until the end of the transaction.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
