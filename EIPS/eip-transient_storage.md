@@ -54,6 +54,8 @@ The effects of transient storage are discarded at the end of the transaction.
 
 Transient storage is private to the contract that owns it, in the same way as "regular" storage is. Only owning contract frames may access their transient storage. And when they do, all the frames access the same transient store, in the same way as "regular" storage, but unlike "memory".
 
+When transient storage is used in the context of DELEGATECALL or CALLCODE, then the owning contract of the transient storage is the contract that issued DELEGATECALL or CALLCODE instruction (the caller). When transient storage is used in the context of CALL or STATICCALL, then the owning contract of the transient storage is the contract that is the target of the CALL or STATICCALL instruction (the callee).
+
 Transient storage does not interact with reverts or invalid transactions, that means if a frame reverts, its effects on the transient storage remain until the end of the transaction.
 
 ## Rationale
