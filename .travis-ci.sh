@@ -1,5 +1,4 @@
 #!/bin/bash
-# SUSHI
 set -e # halt script on error
 
 HTMLPROOFER_OPTIONS="./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858"
