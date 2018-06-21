@@ -4,7 +4,7 @@ title: Wallet & shop standard for all tokens (erc20)
 author: Nitro888 (Jet Lim)
 status: Draft
 type: Informational
-created: 2018-06-19
+created: 2018-06-21
 requires : ERC20
 ---
 
