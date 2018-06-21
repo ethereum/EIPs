@@ -80,10 +80,16 @@ withdrawal `_value` amount of `_erc20` token to `_owner`.
 function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success)
 ```
 
-#### pay
-Pay for item with item index `_item`.
+#### paySafe
+Pay for safe shop (created by contract) item with item index `_item`.
 ``` js
-function pay(address _shop, uint256 _item) onlyOwner public payable returns (bool success)
+function paySafe(address _shop, uint256 _item) onlyOwner public payable returns (bool success)
+```
+
+#### payUnsafe
+Pay for unsafe shop (did not created by contract) item with item index `_item`.
+``` js
+function payUnsafe(address _shop, uint256 _item) onlyOwner public payable returns (bool success)
 ```
 
 #### refund
