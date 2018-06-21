@@ -62,6 +62,7 @@ event Shop(address indexed _owner, address indexed _shop, address indexed _erc20
 ```
 
 ## Wallet
+Wallet must be created by wallet center.
 ### Methods
 #### balanceOf
 Returns the account balance of Wallet.
@@ -110,6 +111,7 @@ event Refund(address indexed _shop, uint256 indexed _item, uint256 indexed _valu
 ```
 
 ## Shop
+Shop is created by wallet center or not. but Shop that created by wallet center is called safe shop.
 ### Methods
 #### balanceOf
 Returns the account balance of Shop.
