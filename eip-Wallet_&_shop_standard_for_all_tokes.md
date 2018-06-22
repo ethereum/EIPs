@@ -1,11 +1,12 @@
 ---
-eip: <to be assigned>
+eip:
 title: Wallet & shop standard for all tokens (erc20)
 author: Nitro888 (Jet Lim)
 status: Draft
 type: Informational
+category:
 created: 2018-06-21
-requires : ERC20
+requires: 20
 ---
 
 ## Simple Summary
