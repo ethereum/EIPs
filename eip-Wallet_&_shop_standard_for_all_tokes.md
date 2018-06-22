@@ -3,14 +3,16 @@ eip:
 title: Wallet & shop standard for all tokens (erc20)
 author: Nitro888 (Jet Lim)
 status: Draft
-type: Informational
-category:
+type: Standards Track
+category: ERC
 created: 2018-06-21
 requires: 20
 ---
 
 ## Simple Summary
 Make wallets and shops created from certified contracts make erc20 tokens easy to use for commerce.
+
+![wallet](https://user-images.githubusercontent.com/11692220/41762799-ee17c480-7636-11e8-9930-681be2c59b56.png)
 
 ## Abstract
 The mutual trust between the wallet and the shop created by the authenticated contract allows you to pay for and purchase items at a simple process.
