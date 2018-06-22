@@ -1,7 +1,7 @@
 ---
 eip:
 title: Wallet & shop standard for all tokens (erc20)
-author: Nitro888 (Jet Lim)
+author: Jet Lim (@Nitro888)
 status: Draft
 type: Standards Track
 category: ERC
