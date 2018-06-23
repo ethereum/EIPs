@@ -73,11 +73,6 @@ Returns the account balance of Wallet.
 ``` js
 function balanceOf(address _erc20) public constant returns (uint256 balance)
 ```
-#### transfer
-Transfers `_value` amount of `_erc20` tokens to address `_to`.
-``` js
-function transfer(address _erc20, address _to, uint256 _value) onlyOwner public returns (bool success)
-```
 
 #### withdrawal
 withdrawal `_value` amount of `_erc20` token to `_owner`.
@@ -88,7 +83,7 @@ function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bo
 #### paySafe
 Pay for safe shop (created by contract) item with item index `_item`.
 ``` js
-function paySafe(address _shop, uint256 _item) onlyOwner public payable returns (bool success)
+function paySafe(address _shop, uint256 _item) onlyOwner onlyShop(_shop) public payable returns (bool success)
 ```
 
 #### payUnsafe
@@ -123,12 +118,6 @@ Returns the account balance of Shop.
 function balanceOf(address _erc20) public constant returns (uint256 balance)
 ```
 
-#### transfer
-Transfers `_value` amount of `_erc20` tokens to address `_to`.
-``` js
-function transfer(address _erc20, address _to, uint256 _value) onlyOwner public returns (bool success)
-```
-
 #### withdrawal
 withdrawal `_value` amount of `_erc20` token to `_owner`.
 ``` js
@@ -138,13 +127,13 @@ function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bo
 #### pay
 Pay from buyer with item index `_item`.
 ``` js
-function pay(uint256 _item) public payable returns (bool success)
+function pay(uint256 _item) onlyWallet(msg.sender) public payable returns (bool success)
 ```
 
 #### refund
 refund token to `_to`.
 ``` js
-function refund(address _buyer, uint256 _item, uint256 _value) onlyOwner public payable returns (bool success)
+function refund(address _buyer, uint256 _item, uint256 _value) onlyWallet(_buyer) onlyOwner public payable returns (bool success)
 ```
 
 #### resister
@@ -319,17 +308,17 @@ contract _Base {
         return ERC20Interface(_erc20).balanceOf(this);
     }
 
-    function transfer(address _to, address _erc20, uint256 _value) onlyOwner public returns (bool success) {
-        require((_erc20==address(0)&&address(this).balance>_value)||(_erc20!=address(0)&&ERC20Interface(_erc20).balanceOf(this)>_value));
+    function transfer(address _to, address _erc20, uint256 _value) internal returns (bool success) {
+        require((_erc20==address(0)?address(this).balance:ERC20Interface(_erc20).balanceOf(this))>=_value);
         if(_erc20==address(0))
             _to.transfer(_value);
         else
-            ERC20Interface(_erc20).transfer(_to,_value);
+            ERC20Interface(_erc20).approve(_to,_value);
         return true;
     }
     
     function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success) {
-        require((_erc20==address(0)&&address(this).balance>_value)||(_erc20!=address(0)&&ERC20Interface(_erc20).balanceOf(this)>_value));
+        require((_erc20==address(0)?address(this).balance:ERC20Interface(_erc20).balanceOf(this))>=_value);
         if(_erc20==address(0))
             owner.transfer(_value);
         else
@@ -350,14 +339,14 @@ contract _Wallet is _Base {
     
     function pay(address _shop, uint256 _item) private {
         require(_Shop(_shop).canBuy(this,_item));
-        
+
         address _erc20;
         uint256 _value;
         (_erc20,_value) = _Shop(_shop).price(_item);
-
+        
+        transfer(_shop,_erc20,_value);
         _Shop(_shop).pay(_item);
         emit Pay(_shop,_item,_value);
-        transfer(_shop,_erc20,_value);
     }
     
     function paySafe(address _shop, uint256 _item) onlyOwner onlyShop(_shop) public payable returns (bool success) {
@@ -369,15 +358,17 @@ contract _Wallet is _Base {
         return true;
     }
 
-    function refund(address _erc20, uint256 _item, uint256 _value) onlyShop(msg.sender) public payable returns (bool success) {
-        require(ERC20Interface(_erc20).allowance(msg.sender,this)==_value);
-        ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
+    function refund(address _erc20, uint256 _item, uint256 _value) public payable returns (bool success) {
+        require((_erc20==address(0)?msg.value:ERC20Interface(_erc20).allowance(msg.sender,this))==_value);
+        if(_erc20!=address(0))
+            ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
         emit Refund(msg.sender,_item,_value);
         return true;
     }
-    function prize(address _erc20, uint256 _item, uint256 _value) onlyShop(msg.sender) public payable returns (bool success) {
-        require(ERC20Interface(_erc20).allowance(msg.sender,this)==_value);
-        ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
+    function prize(address _erc20, uint256 _item, uint256 _value) public payable returns (bool success) {
+        require((_erc20==address(0)?msg.value:ERC20Interface(_erc20).allowance(msg.sender,this))==_value);
+        if(_erc20!=address(0))
+            ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
         emit Prize(msg.sender,_item,_value);
         return true;
     }
@@ -402,8 +393,12 @@ contract _Shop is _Base, SafeMath{
     uint                    index;
     mapping(uint256=>item)  items;
     
-    function pay(uint256 _item) public payable returns (bool success) {
+    function pay(uint256 _item) onlyWallet(msg.sender) public payable returns (bool success) {
         require(canBuy(msg.sender, _item));
+        require((erc20==address(0)?msg.value:ERC20Interface(erc20).allowance(msg.sender,this))==items[_item].price);
+        
+        if(erc20!=address(0))
+            ERC20Interface(erc20).transferFrom(msg.sender,this,items[_item].price);
         
         if(items[_item].category==1 || items[_item].category==2 && now > safeAdd(items[_item].buyer[msg.sender], 1 weeks))
             items[_item].buyer[msg.sender]  = now;
@@ -420,11 +415,13 @@ contract _Shop is _Base, SafeMath{
     
     function refund(address _buyer, uint256 _item, uint256 _value) onlyWallet(_buyer) onlyOwner public payable returns (bool success) {
         require(isBuyer(_buyer,_item));
-        require((erc20==address(0)&&address(this).balance>_value)||(erc20!=address(0)&&ERC20Interface(erc20).balanceOf(this)>_value));
+        require((erc20==address(0)?address(this).balance:ERC20Interface(erc20).balanceOf(this))>=_value);
 
         items[_item].buyer[_buyer]  = 0;
-        
-        ERC20Interface(erc20).approve(_buyer,_value);
+        if(erc20==address(0))
+            transfer(_buyer, erc20, _value);
+        else
+            ERC20Interface(erc20).approve(_buyer,_value);
         _Wallet(_buyer).refund(erc20,_item,_value);
         emit Refund(_buyer,_item,_value);
 
@@ -455,11 +452,10 @@ contract _Shop is _Base, SafeMath{
         return (erc20,items[_item].price);
     }
     
-    function canBuy(address _who, uint256 _item) onlyWallet(_who) public constant returns (bool _canBuy) {
+    function canBuy(address _who, uint256 _item) public constant returns (bool _canBuy) {
         return  (items[_item].category>0) &&
                 !(items[_item].category==1&&items[_item].buyer[_who]>0) &&
-                (items[_item].stockCount>0) && 
-                ((erc20==address(0)&&address(_who).balance>items[_item].price)||(erc20!=address(0)&&ERC20Interface(erc20).balanceOf(_who)>items[_item].price));
+                (items[_item].stockCount>0);
     }
     
     function isBuyer(address _who, uint256 _item) public constant returns (bool _buyer) {
