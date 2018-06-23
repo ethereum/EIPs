@@ -296,16 +296,23 @@ contract SafeMath {
     }
 }
 
-
 contract _Base {
     address internal owner;
     address internal walletCenter;
-
+    
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
     }
-
+    modifier onlyWallet(address _adr) {
+        require(WalletCenter(walletCenter).isWallet(_adr));
+        _;
+    }
+    modifier onlyShop(address _adr) {
+        require(WalletCenter(walletCenter).isShop(_adr));
+        _;
+    }
+    
     function balanceOf(address _erc20) public constant returns (uint256 balance) {
         if(_erc20==address(0))
             return address(this).balance;
@@ -320,7 +327,7 @@ contract _Base {
             ERC20Interface(_erc20).transfer(_to,_value);
         return true;
     }
-
+    
     function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success) {
         require((_erc20==address(0)&&address(this).balance>_value)||(_erc20!=address(0)&&ERC20Interface(_erc20).balanceOf(this)>_value));
         if(_erc20==address(0))
@@ -329,9 +336,10 @@ contract _Base {
             ERC20Interface(_erc20).transfer(owner,_value);
         return true;
     }
-
+    
     event Pay(address indexed _who, uint256 indexed _item, uint256 indexed _value);
     event Refund(address indexed _who, uint256 indexed _item, uint256 indexed _value);
+    event Prize(address indexed _who, uint256 indexed _item, uint256 indexed _value);
 }
 
 contract _Wallet is _Base {
@@ -339,11 +347,10 @@ contract _Wallet is _Base {
         owner           = _who;
         walletCenter    = msg.sender;
     }
-
-    function pay(address _shop, uint256 _item) onlyOwner public payable returns (bool success) {
-        require(WalletCenter(walletCenter).isShop(_shop));
+    
+    function pay(address _shop, uint256 _item) private {
         require(_Shop(_shop).canBuy(this,_item));
-
+        
         address _erc20;
         uint256 _value;
         (_erc20,_value) = _Shop(_shop).price(_item);
@@ -351,13 +358,27 @@ contract _Wallet is _Base {
         _Shop(_shop).pay(_item);
         emit Pay(_shop,_item,_value);
         transfer(_shop,_erc20,_value);
-
+    }
+    
+    function paySafe(address _shop, uint256 _item) onlyOwner onlyShop(_shop) public payable returns (bool success) {
+        pay(_shop,_item);
+        return true;
+    }
+    function payUnsafe(address _shop, uint256 _item) onlyOwner public payable returns (bool success) {
+        pay(_shop,_item);
         return true;
     }
 
-    function refund(uint256 _item, uint256 _value) public payable returns (bool success) {
-        require(WalletCenter(walletCenter).isShop(msg.sender));
+    function refund(address _erc20, uint256 _item, uint256 _value) onlyShop(msg.sender) public payable returns (bool success) {
+        require(ERC20Interface(_erc20).allowance(msg.sender,this)==_value);
+        ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
         emit Refund(msg.sender,_item,_value);
+        return true;
+    }
+    function prize(address _erc20, uint256 _item, uint256 _value) onlyShop(msg.sender) public payable returns (bool success) {
+        require(ERC20Interface(_erc20).allowance(msg.sender,this)==_value);
+        ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
+        emit Prize(msg.sender,_item,_value);
         return true;
     }
 }
@@ -369,7 +390,7 @@ contract _Shop is _Base, SafeMath{
         walletCenter    = msg.sender;
         erc20           = _erc20;
     }
-
+    
     struct item {
         uint8                       category;   // 0 = disable, 1 = non Stock, non Expire, 2 = can Expire (after 1 week), 3 = stackable
         uint256                     price;
@@ -380,10 +401,10 @@ contract _Shop is _Base, SafeMath{
 
     uint                    index;
     mapping(uint256=>item)  items;
-
+    
     function pay(uint256 _item) public payable returns (bool success) {
         require(canBuy(msg.sender, _item));
-
+        
         if(items[_item].category==1 || items[_item].category==2 && now > safeAdd(items[_item].buyer[msg.sender], 1 weeks))
             items[_item].buyer[msg.sender]  = now;
         else if(items[_item].category==2 && now < safeAdd(items[_item].buyer[msg.sender], 1 weeks) )
@@ -396,20 +417,20 @@ contract _Shop is _Base, SafeMath{
         emit Pay(msg.sender,_item,items[_item].buyer[msg.sender]);
         return true;
     }
-
-    function refund(address _buyer, uint256 _item, uint256 _value) onlyOwner public payable returns (bool success) {
-        require(WalletCenter(walletCenter).isWallet(_buyer));
+    
+    function refund(address _buyer, uint256 _item, uint256 _value) onlyWallet(_buyer) onlyOwner public payable returns (bool success) {
         require(isBuyer(_buyer,_item));
         require((erc20==address(0)&&address(this).balance>_value)||(erc20!=address(0)&&ERC20Interface(erc20).balanceOf(this)>_value));
 
         items[_item].buyer[_buyer]  = 0;
-        _Wallet(_buyer).refund(_item,_value);
+        
+        ERC20Interface(erc20).approve(_buyer,_value);
+        _Wallet(_buyer).refund(erc20,_item,_value);
         emit Refund(_buyer,_item,_value);
-        transfer(_buyer,erc20,_value);
 
         return true;
     }
-
+    
     event Item(uint256 indexed _item, uint256 _price);
     function resister(uint8 _category, uint256 _price, uint256 _stock) onlyOwner public returns (uint256 _itemId) {
         require(_category>0&&_category<4);
@@ -425,23 +446,22 @@ contract _Shop is _Base, SafeMath{
         uint256 temp = items[_item].price;
         items[_item].price      = _price;
         items[_item].stockCount = safeAdd(items[_item].stockCount,_stock);
-
+        
         if(temp!=items[_item].price)
             emit Item(index,items[_item].price);
     }
-
+    
     function price(uint256 _item) public constant returns (address _erc20, uint256 _value) {
         return (erc20,items[_item].price);
     }
-
-    function canBuy(address _who, uint256 _item) public constant returns (bool _canBuy) {
-        return  (WalletCenter(walletCenter).isWallet(_who)) &&
-                (items[_item].category>0) &&
+    
+    function canBuy(address _who, uint256 _item) onlyWallet(_who) public constant returns (bool _canBuy) {
+        return  (items[_item].category>0) &&
                 !(items[_item].category==1&&items[_item].buyer[_who]>0) &&
-                (items[_item].stockCount>0) &&
+                (items[_item].stockCount>0) && 
                 ((erc20==address(0)&&address(_who).balance>items[_item].price)||(erc20!=address(0)&&ERC20Interface(erc20).balanceOf(_who)>items[_item].price));
     }
-
+    
     function isBuyer(address _who, uint256 _item) public constant returns (bool _buyer) {
         return (items[_item].category==1&&items[_item].buyer[_who]>0)||(items[_item].category==2&&safeAdd(items[_item].buyer[_who],1 weeks)>now)||(items[_item].category==3&&items[_item].buyer[_who]>0);
     }
