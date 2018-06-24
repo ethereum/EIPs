@@ -92,6 +92,12 @@ Pay for unsafe shop (did not created by contract) item with item index `_item`.
 function payUnsafe(address _shop, uint256 _item) onlyOwner public payable returns (bool success)
 ```
 
+#### payCancel
+Cancel pay and refund. (only weekly model)
+``` js
+function payCancel(address _shop, uint256 _item) onlyOwner public returns (bool success)
+```
+
 #### refund
 Refund from shop with item index `_item`.
 ``` js
@@ -293,15 +299,15 @@ contract _Base {
         require(owner == msg.sender);
         _;
     }
-    modifier onlyWallet(address _adr) {
-        require(WalletCenter(walletCenter).isWallet(_adr));
+    modifier onlyWallet(address _addr) {
+        require(WalletCenter(walletCenter).isWallet(_addr));
         _;
     }
-    modifier onlyShop(address _adr) {
-        require(WalletCenter(walletCenter).isShop(_adr));
+    modifier onlyShop(address _addr) {
+        require(WalletCenter(walletCenter).isShop(_addr));
         _;
     }
-    
+
     function balanceOf(address _erc20) public constant returns (uint256 balance) {
         if(_erc20==address(0))
             return address(this).balance;
@@ -317,14 +323,7 @@ contract _Base {
         return true;
     }
     
-    function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success) {
-        require((_erc20==address(0)?address(this).balance:ERC20Interface(_erc20).balanceOf(this))>=_value);
-        if(_erc20==address(0))
-            owner.transfer(_value);
-        else
-            ERC20Interface(_erc20).transfer(owner,_value);
-        return true;
-    }
+    function withdrawal(address _erc20, uint256 _value) public returns (bool success);
     
     event Pay(address indexed _who, uint256 indexed _item, uint256 indexed _value);
     event Refund(address indexed _who, uint256 indexed _item, uint256 indexed _value);
@@ -357,6 +356,10 @@ contract _Wallet is _Base {
         pay(_shop,_item);
         return true;
     }
+    function payCancel(address _shop, uint256 _item) onlyOwner public returns (bool success) {
+        _Shop(_shop).payCancel(_item);
+        return true;
+    }
 
     function refund(address _erc20, uint256 _item, uint256 _value) public payable returns (bool success) {
         require((_erc20==address(0)?msg.value:ERC20Interface(_erc20).allowance(msg.sender,this))==_value);
@@ -370,6 +373,15 @@ contract _Wallet is _Base {
         if(_erc20!=address(0))
             ERC20Interface(_erc20).transferFrom(msg.sender,this,_value);
         emit Prize(msg.sender,_item,_value);
+        return true;
+    }
+    
+    function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success) {
+        require((_erc20==address(0)?address(this).balance:ERC20Interface(_erc20).balanceOf(this))>=_value);
+        if(_erc20==address(0))
+            owner.transfer(_value);
+        else
+            ERC20Interface(_erc20).transfer(owner,_value);
         return true;
     }
 }
@@ -387,7 +399,7 @@ contract _Shop is _Base, SafeMath{
         uint256                     price;
         uint256                     stockCount;
 
-        mapping(address=>uint256)   buyer;
+        mapping(address=>uint256)   customer;
     }
 
     uint                    index;
@@ -400,30 +412,43 @@ contract _Shop is _Base, SafeMath{
         if(erc20!=address(0))
             ERC20Interface(erc20).transferFrom(msg.sender,this,items[_item].price);
         
-        if(items[_item].category==1 || items[_item].category==2 && now > safeAdd(items[_item].buyer[msg.sender], 1 weeks))
-            items[_item].buyer[msg.sender]  = now;
-        else if(items[_item].category==2 && now < safeAdd(items[_item].buyer[msg.sender], 1 weeks) )
-            items[_item].buyer[msg.sender]  = safeAdd(items[_item].buyer[msg.sender], 1 weeks);
+        if(items[_item].category==1 || items[_item].category==2 && now > safeAdd(items[_item].customer[msg.sender], 1 weeks))
+            items[_item].customer[msg.sender]   = now;
+        else if(items[_item].category==2 && now < safeAdd(items[_item].customer[msg.sender], 1 weeks) )
+            items[_item].customer[msg.sender]   = safeAdd(items[_item].customer[msg.sender], 1 weeks);
         else if(items[_item].category==3) {
-            items[_item].buyer[msg.sender]  = safeAdd(items[_item].buyer[msg.sender],1);
-            items[_item].stockCount         = safeSub(items[_item].stockCount,1);
+            items[_item].customer[msg.sender]   = safeAdd(items[_item].customer[msg.sender],1);
+            items[_item].stockCount             = safeSub(items[_item].stockCount,1);
         }
 
-        emit Pay(msg.sender,_item,items[_item].buyer[msg.sender]);
+        emit Pay(msg.sender,_item,items[_item].customer[msg.sender]);
         return true;
     }
     
-    function refund(address _buyer, uint256 _item, uint256 _value) onlyWallet(_buyer) onlyOwner public payable returns (bool success) {
-        require(isBuyer(_buyer,_item));
-        require((erc20==address(0)?address(this).balance:ERC20Interface(erc20).balanceOf(this))>=_value);
+    function payCancel(uint256 _item) onlyWallet(msg.sender) public returns (bool success) {
+        require (items[_item].category==2&&safeAdd(items[_item].customer[msg.sender],2 weeks)>now&&balanceOf(erc20)>=items[_item].price);
 
-        items[_item].buyer[_buyer]  = 0;
-        if(erc20==address(0))
-            transfer(_buyer, erc20, _value);
+        items[_item].customer[msg.sender]  = safeSub(items[_item].customer[msg.sender],1 weeks);
+        transfer(msg.sender, erc20, items[_item].price);
+        _Wallet(msg.sender).refund(erc20,_item,items[_item].price);
+        emit Refund(msg.sender,_item,items[_item].price);
+
+        return true;
+    }
+    function refund(address _to, uint256 _item) onlyWallet(_to) onlyOwner public payable returns (bool success) {
+        require(isBuyer(_to,_item)&&items[_item].category>0&&(items[_item].customer[_to]>0||(items[_item].category==2&&safeAdd(items[_item].customer[_to],2 weeks)>now)));
+        require((erc20==address(0)?address(this).balance:ERC20Interface(erc20).balanceOf(this))>=items[_item].price);
+
+        if(items[_item].category==1)
+            items[_item].customer[_to]  = 0;
+        else if(items[_item].category==2)
+            items[_item].customer[_to]  = safeSub(items[_item].customer[_to],1 weeks);
         else
-            ERC20Interface(erc20).approve(_buyer,_value);
-        _Wallet(_buyer).refund(erc20,_item,_value);
-        emit Refund(_buyer,_item,_value);
+            items[_item].customer[_to]  = safeSub(items[_item].customer[_to],1);
+            
+        transfer(_to, erc20, items[_item].price);
+        _Wallet(_to).refund(erc20,_item,items[_item].price);
+        emit Refund(_to,_item,items[_item].price);
 
         return true;
     }
@@ -454,12 +479,24 @@ contract _Shop is _Base, SafeMath{
     
     function canBuy(address _who, uint256 _item) public constant returns (bool _canBuy) {
         return  (items[_item].category>0) &&
-                !(items[_item].category==1&&items[_item].buyer[_who]>0) &&
+                !(items[_item].category==1&&items[_item].customer[_who]>0) &&
                 (items[_item].stockCount>0);
     }
     
     function isBuyer(address _who, uint256 _item) public constant returns (bool _buyer) {
-        return (items[_item].category==1&&items[_item].buyer[_who]>0)||(items[_item].category==2&&safeAdd(items[_item].buyer[_who],1 weeks)>now)||(items[_item].category==3&&items[_item].buyer[_who]>0);
+        return (items[_item].category==1&&items[_item].customer[_who]>0)||(items[_item].category==2&&safeAdd(items[_item].customer[_who],1 weeks)>now)||(items[_item].category==3&&items[_item].customer[_who]>0);
+    }
+    
+    uint lastWithdrawal;
+    function withdrawal(address _erc20, uint256 _value) onlyOwner public returns (bool success) {
+        require(safeAdd(lastWithdrawal,1 weeks)<=now);
+        require((_erc20==address(0)?address(this).balance:ERC20Interface(_erc20).balanceOf(this))>=_value);
+        if(_erc20==address(0))
+            owner.transfer(_value);
+        else
+            ERC20Interface(_erc20).transfer(owner,_value);
+        lastWithdrawal = now;
+        return true;
     }
 }
 
