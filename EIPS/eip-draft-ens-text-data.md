@@ -1,13 +1,12 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Storage of text records in ENS 
-    Author: Richard Moore <me@ricmoo.com>
-    Type: Standard Track
-    Category ERC
-    Status: Draft
-    Created: 2017-05-17
-
+---
+eip: <to be assigned>
+title: Storage of text records in ENS 
+author: Richard Moore <me@ricmoo.com>
+type: Standard Track
+category: ERC
+status: Draft
+created: 2017-05-17
+---
 
 ## Abstract
 This EIP defines a resolver profile for ENS that permits the lookup of arbitrary key-value
