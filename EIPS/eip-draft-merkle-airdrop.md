@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
 title: Merkle Airdrops
-author: Richard Moore <me@ricmoo.com>
-type: Standard Track
+author: Richard Moore <me@ricmoo.com>, Nick Johnson <@arachnid>
+type: Standards Track
 category: ERC
 status: Draft
 created: 2018-06-24
