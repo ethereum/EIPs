@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Storage of text records in ENS 
 author: Richard Moore <me@ricmoo.com>
-type: Standard Track
+type: Standards Track
 category: ERC
 status: Draft
 created: 2017-05-17
