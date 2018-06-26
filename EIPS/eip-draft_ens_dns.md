@@ -1,0 +1,105 @@
+eip: <to be assigned>
+title: Storage of DNS Records in ENS
+author: Jim McDonald <Jim@mcdee.net>
+status: Draft
+type: Standards Track
+category ERC
+created: 2018-06-26
+requires: #137
+
+## Abstract
+This EIP defines a resolver profile for ENS that provides features for storage and lookup of DNS records. This allows ENS to be used as a store of authoritative DNS information.
+
+## Motivation
+ENS is a perfect store for DNS records.  It provides the distributed authority of DNS without conflating ownership and serving of information.  With ENS, the owner of a domain has full control over their own DNS records.  Separately, ENS has the ability (through smart contracts) for a domain's subdomains to be irrevocably assigned to another entity.
+
+## Specification
+
+The resolver profile to support DNS on ENS builds on the standalone resolver as defined in #137.
+
+Traditionally, DNS is a zone-based system in that all of the records for a zone are kept together in the same file.  This has the benefit of simplicity and atomicity of zone updates, but when transposed to ENS can result in significant gas costs for simple changes.  As a result, the resolver provides the ability to store either zone-based or record-based DNS information for a given domain, each with their own set of functions for managing the information.
+
+The primary reason that a user might choose to use the zone-based functions is if the zone uses information that spans multiple records and requires strict ordering (for example DNSSEC with NSSEC/NSSEC3 records), so an unordered record-based storage system is not possible.  If this is not a consideration then record-based storage is generally cheaper and more flexible.
+
+A DNS zone is uniquely identified by the domain for which it contains records.  A DNS record set is uniquely identified by the domain, label and resource record type.
+
+One of zone-based or record-based functions should be chosen for a given ENS domain.  If both are used then results from a DNS resolver may be inconsistent.
+
+The DNS resolver interface consists of three functions to update DNS information and three functions to query DNS information.
+
+### setDNSRecords(bytes32 node, bytes data)
+
+This function is used when using record-based storage.
+
+`setDNSRecords()` sets, updates or clears 1 or more DNS records for a given node.
+
+The arguments for the function are as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to set the records.  Node hashes are defined in #137
+  - data: 1 or more DNS records in DNS wire format.
+
+### dnsRecord(bytes32 node, bytes32 name, uint16 resource)
+
+This function is used when using record-based storage.
+
+`dnsRecord()` obtains the DNS records for a given node, name and resource.
+
+The arguments for the function are as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to set the records.  Node hashes are defined in #137
+  - name: the `keccak256()` hash of the name of the record in DNS wire format.
+  - resource: the resource record ID.  Resource record IDs are defined in https://en.wikipedia.org/wiki/List\_of\_DNS\_record\_types
+
+The function returns all matching records in DNS wire format.  If there are no records present the function will return nothing.
+
+### hasDNSRecords(bytes32 node, bytes32 name)
+
+This function is used when using record-based storage.
+
+`hasDNSRecords()` reports if there are any records for the provided name in the domain.  This is needed by DNS resolvers when working with wildcard resources.
+
+The arguments for the function are as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to set the records.  Node hashes are defined in #137
+  - name: the `keccak256()` hash of the name of the record in DNS wire format.
+
+The function returns `true` if there are any records for the provided node and name, otherwise `false`.
+
+### setDNSZone(bytes32 node, bytes data)
+
+This function is used when using zone-based storage.
+
+`setDNSZone()` sets or updates the DNS zone file for a given domain.
+
+The arguments for the function are as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to set the zone.  Node hashes are defined in #137
+  - data: the entire zone in DNS wire format
+
+### dnsZone(bytes32 node)
+
+This function is used when using zone-based storage.
+
+`dnsZone()` obtains the DNS zone file for a given domain.
+
+The argument for the function is as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to set the zone.  Node hashes are defined in #137
+
+The function returns the entire zone in DNS wire format.  If there is no zone present the function will return nothing.
+
+### clearDNSZone(bytes32 node)
+
+This function is used when using zone-based storage.
+
+`clearDNSZone()` removes the entire zone for a given domain.
+
+The argument for the function is as follows:
+  - node: the nodehash of the fully-qualified domain in ENS for which to clear the zone.  Node hashes are defined in (ENS EIP?)
+
+## Backwards compatibility
+Not applicable.
+
+## Implementation
+The reference implementation of the DNS resolver is at https://github.com/wealdtech/wealdtech-solidity/blob/master/contracts/ens/DNSResolver.sol
+
+## Test Cases
+Test cases for the DNS resolver are at https://github.com/wealdtech/wealdtech-solidity/blob/master/test/ens/DNSResolver.js
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
