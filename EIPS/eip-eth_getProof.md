@@ -14,13 +14,13 @@ created: 2018-06-24
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-One of the great feature of Ethereum is the fact, that you can verify all data of the state. But in order to allow verification of accounts outside the client, we need a additional function delivering us the required proof. These proofs are important to secure Layer2-Technologies.
+One of the great features of Ethereum is the fact, that you can verify all data of the state. But in order to allow verification of accounts outside the client, we need a additional function delivering us the required proof. These proofs are important to secure Layer2-Technologies.
 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-Ethereum uses MerkleTrees to store the state of accounts and their storage. This allows verification of each value by simply creating a MerkleProof. But currently the eth-Module does not give you access to these proofs. This EIP suggests a additional RPC-Method, which creates MerkleProofs for Accounts and Storage-Values. 
+Ethereum uses MerkleTrees to store the state of accounts and their storage. This allows verification of each value by simply creating a MerkleProof. But currently the eth-Module in the RPC-Interface does not give you access to these proofs. This EIP suggests a additional RPC-Method, which creates MerkleProofs for Accounts and Storage-Values. 
 
 Combined with a stateRoot (from the blockheader) it enables offline verification of any account or storage-value. This allows especially IOT-Devices or even mobile apps which are not able to run a light client to verify responses from a untrusted source.
 
