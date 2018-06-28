@@ -46,7 +46,7 @@ Returns the account- and storage-values of the specified account including the m
 
 1. `DATA`, 20 Bytes - address of the storage.
 2. `ARRAY`, 32 Bytes - array of storage-keys which should be proofed and included. See [`eth_getStorageAt`](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getstorageat)  
-3. `QUANTITY|TAG` - integer block number, or the string `"latest"`, `"earliest"` or `"pending"`, see the [default block parameter](https://github.com/ethereum/wiki/wiki/JSON-RPC#the-default-block-parameter)
+3. `QUANTITY|TAG` - integer block number, or the string `"latest"` or `"earliest"`, see the [default block parameter](https://github.com/ethereum/wiki/wiki/JSON-RPC#the-default-block-parameter)
 
 ##### Returns
 
@@ -69,8 +69,8 @@ Returns the account- and storage-values of the specified account including the m
 
 ```json
 {
-  "jsonrpc": "2.0",
   "id": 1,
+  "jsonrpc": "2.0",
   "method": "eth_getProof",
   "params": [
     "0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842",
@@ -84,6 +84,7 @@ The result will look like this:
 
 ```json
 {
+  "id": 1
   "jsonrpc": "2.0",
   "result": {
     "accountProof": [
@@ -93,7 +94,6 @@ The result will look like this:
       "0xf90211a...0675b80",
       "0xf90151a0...ca08080"
     ],
-    "address": "0x7f0d15c7faae65896648c8273b6d7e43f58fa842",
     "balance": "0x0",
     "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
     "nonce": "0x0",
@@ -108,26 +108,46 @@ The result will look like this:
         "value": "0x1"
       }
     ]
-  },
-  "id": 1
+  }
 }
 ```
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
+This one Method actually returns 3 different important data:
+
+1. The 4 fields of an account-object as specified in the yellow paper `[nonce, balance, storageHash, codeHash ]`, which allows to store a hash of the account-object in order to keep track of changes.
+2. The MerkleProof for the account starting with a stateRoot from the specified block.
+3. The MerkleProof for each requested storage entry starting with a storageHash from the account.
+
+Combining these in one Method allows the client to work very efficient, since the required data are already fetched from the db.
+
+### possible Changes to be discussed:
+
+- instead of providing the blocknumber maybe the blockhash would be better, since it would allow proofs of uncles-states.
+- in order to reduce data, the account-object may only provide the `accountProof` and `storageProof`. The Fields `balance`, `nonce`, `storageHash` and `codeHash` could be taken from the last Node in the proof by deserializing it. 
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+Since this only adds a new Method there is no issues with Backwards Compatibility.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+
+These Tests cover the verification based on the result of the `eth_getProof`
+https://github.com/slockit/in3-server/blob/master/test/eth/eth_abi.ts#L277
+
+<TODO> Further test inside the client may be required.
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+We implemented this function for:
+
+- [x] [parity](https://github.com/paritytech/parity/pull/9001) (Status: pending pull request)
+- [ ] geth (Status: planned)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
