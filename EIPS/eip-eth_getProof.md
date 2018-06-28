@@ -85,7 +85,7 @@ The result will look like this:
 
 ```json
 {
-  "id": 1
+  "id": 1,
   "jsonrpc": "2.0",
   "result": {
     "accountProof": [
