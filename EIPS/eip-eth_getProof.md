@@ -27,10 +27,11 @@ Combined with a stateRoot (from the blockheader) it enables offline verification
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-In order to create a MerkleProof access to the full state is required. The current RPC-Methods allow a application to access single values (`eth_getBalance`,`eth_getTransactionCount`,`eth_getStorageAt`,`eth_getCode`), but it is impossible to read Information about the MerkleTree storing these values through the standard RPC-Interface.
+In order to create a MerkleProof access to the full state db is required. The current RPC-Methods allow a application to access single values (`eth_getBalance`,`eth_getTransactionCount`,`eth_getStorageAt`,`eth_getCode`), but it is impossible to read the data needed for a  MerkleProof through the standard RPC-Interface. (There are implementaion using leveldb and accessing the data via filesystems, but this can not be used for productive systems, since it requires the client to be stopped first - See https://github.com/zmitton/eth-proof) 
 
 Today MerkleProofs are already used internally. For example the [Light Client Protocol](https://github.com/zsfelfoldi/go-ethereum/wiki/Light-Ethereum-Subprotocol-%28LES%29#on-demand-data-retrieval) supports a function creating MerkleProof, which is used in order to verify the requested account or storage-data.
-Offering these already existing function through the RPC-Interface as well would enable Applications to store and send these proofs to devices which are not directly connected to the p2p-network and still are able to verify the data. 
+
+Offering these already existing function through the RPC-Interface as well would enable Applications to store and send these proofs to devices which are not directly connected to the p2p-network and still are able to verify the data. This could be used to verify data in mobile applications or IOT-devices, which are currently only using a remote client.
 
 
 ## Specification
