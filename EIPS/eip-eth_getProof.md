@@ -14,22 +14,22 @@ created: 2018-06-24
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-One of the great features of Ethereum is the fact, that you can verify all data of the state. But in order to allow verification of accounts outside the client, we need a additional function delivering us the required proof. These proofs are important to secure Layer2-Technologies.
+One of the great features of Ethereum is the fact, that you can verify all data of the state. But in order to allow verification of accounts outside the client, we need an additional function delivering us the required proof. These proofs are important to secure Layer2-Technologies.
 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-Ethereum uses MerkleTrees to store the state of accounts and their storage. This allows verification of each value by simply creating a MerkleProof. But currently the eth-Module in the RPC-Interface does not give you access to these proofs. This EIP suggests a additional RPC-Method, which creates MerkleProofs for Accounts and Storage-Values. 
+Ethereum uses MerkleTrees to store the state of accounts and their storage. This allows verification of each value by simply creating a MerkleProof. But currently, the eth-Module in the RPC-Interface does not give you access to these proofs. This EIP suggests an additional RPC-Method, which creates MerkleProofs for Accounts and Storage-Values. 
 
-Combined with a stateRoot (from the blockheader) it enables offline verification of any account or storage-value. This allows especially IOT-Devices or even mobile apps which are not able to run a light client to verify responses from a untrusted source.
+Combined with a stateRoot (from the blockheader) it enables offline verification of any account or storage-value. This allows especially IOT-Devices or even mobile apps which are not able to run a light client to verify responses from an untrusted source only given a trusted blockhash.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-In order to create a MerkleProof access to the full state db is required. The current RPC-Methods allow a application to access single values (`eth_getBalance`,`eth_getTransactionCount`,`eth_getStorageAt`,`eth_getCode`), but it is impossible to read the data needed for a  MerkleProof through the standard RPC-Interface. (There are implementaion using leveldb and accessing the data via filesystems, but this can not be used for productive systems, since it requires the client to be stopped first - See https://github.com/zmitton/eth-proof) 
+In order to create a MerkleProof access to the full state db is required. The current RPC-Methods allow an application to access single values (`eth_getBalance`,`eth_getTransactionCount`,`eth_getStorageAt`,`eth_getCode`), but it is impossible to read the data needed for a  MerkleProof through the standard RPC-Interface. (There are implementations using leveldb and accessing the data via filesystems, but this can not be used for production systems since it requires the client to be stopped first - See https://github.com/zmitton/eth-proof) 
 
-Today MerkleProofs are already used internally. For example the [Light Client Protocol](https://github.com/zsfelfoldi/go-ethereum/wiki/Light-Ethereum-Subprotocol-%28LES%29#on-demand-data-retrieval) supports a function creating MerkleProof, which is used in order to verify the requested account or storage-data.
+Today MerkleProofs are already used internally. For example, the [Light Client Protocol](https://github.com/zsfelfoldi/go-ethereum/wiki/Light-Ethereum-Subprotocol-%28LES%29#on-demand-data-retrieval) supports a function creating MerkleProof, which is used in order to verify the requested account or storage-data.
 
 Offering these already existing function through the RPC-Interface as well would enable Applications to store and send these proofs to devices which are not directly connected to the p2p-network and still are able to verify the data. This could be used to verify data in mobile applications or IOT-devices, which are currently only using a remote client.
 
@@ -37,15 +37,15 @@ Offering these already existing function through the RPC-Interface as well would
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-As Part of the eth-Module, a additional Method called `eth_getProof` should be defined as following:
+As Part of the eth-Module, an additional Method called `eth_getProof` should be defined as follows:
 
 #### eth_getProof
 
-Returns the account- and storage-values of the specified account including the merkle-proof.  
+Returns the account- and storage-values of the specified account including the Merkle-proof.  
 
 ##### Parameters
 
-1. `DATA`, 20 Bytes - address of the storage.
+1. `DATA`, 20 Bytes - address of the account.
 2. `ARRAY`, 32 Bytes - array of storage-keys which should be proofed and included. See [`eth_getStorageAt`](https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getstorageat)  
 3. `QUANTITY|TAG` - integer block number, or the string `"latest"` or `"earliest"`, see the [default block parameter](https://github.com/ethereum/wiki/wiki/JSON-RPC#the-default-block-parameter)
 
@@ -116,27 +116,27 @@ The result will look like this:
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-This one Method actually returns 3 different important data:
+This one Method actually returns 3 different important data points:
 
-1. The 4 fields of an account-object as specified in the yellow paper `[nonce, balance, storageHash, codeHash ]`, which allows to store a hash of the account-object in order to keep track of changes.
+1. The 4 fields of an account-object as specified in the yellow paper `[nonce, balance, storageHash, codeHash ]`, which allows storing a hash of the account-object in order to keep track of changes.
 2. The MerkleProof for the account starting with a stateRoot from the specified block.
 3. The MerkleProof for each requested storage entry starting with a storageHash from the account.
 
-Combining these in one Method allows the client to work very efficient, since the required data are already fetched from the db.
+Combining these in one Method allows the client to work very efficient since the required data are already fetched from the db.
 
 ### Proofs for non existant values
 
-In case a address or storage-value does not exist, the proof needs to provide enough data to verify this fact. This means, the client needs to follow the path from the root node and deliver until the last matching node. If the last matching node is a branch, the proof value in the node must be empty one. In case of leaf-type it must be pointing to a different relative-path in order to proof that the requested path does not exists.
+In case an address or storage-value does not exist, the proof needs to provide enough data to verify this fact. This means the client needs to follow the path from the root node and deliver until the last matching node. If the last matching node is a branch, the proof value in the node must be an empty one. In case of leaf-type, it must be pointing to a different relative-path in order to proof that the requested path does not exist.
 
 ### possible Changes to be discussed:
 
-- instead of providing the blocknumber maybe the blockhash would be better, since it would allow proofs of uncles-states.
+- instead of providing the blocknumber maybe the blockhash would be better since it would allow proofs of uncles-states.
 - in order to reduce data, the account-object may only provide the `accountProof` and `storageProof`. The Fields `balance`, `nonce`, `storageHash` and `codeHash` could be taken from the last Node in the proof by deserializing it. 
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
-Since this only adds a new Method there is no issues with Backwards Compatibility.
+Since this only adds a new Method there are no issues with Backwards Compatibility.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
