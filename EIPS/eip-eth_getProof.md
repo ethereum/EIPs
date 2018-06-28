@@ -123,6 +123,10 @@ This one Method actually returns 3 different important data:
 
 Combining these in one Method allows the client to work very efficient, since the required data are already fetched from the db.
 
+### Proofs for non existant values
+
+In case a address or storage-value does not exist, the proof needs to provide enough data to verify this fact. This means, the client needs to follow the path from the root node and deliver until the last matching node. If the last matching node is a branch, the proof value in the node must be empty one. In case of leaf-type it must be pointing to a different relative-path in order to proof that the requested path does not exists.
+
 ### possible Changes to be discussed:
 
 - instead of providing the blocknumber maybe the blockhash would be better, since it would allow proofs of uncles-states.
