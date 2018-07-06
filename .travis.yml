@@ -2,8 +2,12 @@ sudo: false # route your build to the container-based infrastructure for a faste
 
 language: ruby
 
-# Cache Ruby bundles
-cache: bundler
+cache:
+  # Cache Ruby bundles
+  - bundler
+  - directories:
+    - $TRAVIS_BUILD_DIR/tmp/.htmlproofer #https://github.com/gjtorikian/html-proofer/issues/381
+  
 
 # Assume bundler is being used, therefore
 # the `install` step will run `bundle install` by default.
@@ -31,3 +35,8 @@ notifications:
     urls:
       - https://ethlab-183014.appspot.com/merge/
     on_success: always
+
+addons:
+  apt:
+    packages:
+      "libcurl4-openssl-dev" # https://github.com/gjtorikian/html-proofer/issues/376#issuecomment-332767999
