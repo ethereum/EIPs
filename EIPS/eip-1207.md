@@ -1,6 +1,6 @@
 ---
 eip: 1207
-title: DAuth protocol: Access Delegation Standard
+title: DAuth Access Delegation Standard
 author: Xiaoyu Wang (@wxygeek), Bicong Wang (@Wangbicong)
 discussions-to: https://github.com/ethereum/EIPs/issues/1207
 status: Draft
@@ -9,7 +9,7 @@ category: ERC
 created: 2018-07-10
 ---
 
-DAuth protocol: Access Delegation Standard
+DAuth Access Delegation Standard
 =====
 
 ## Simple Summary
