@@ -4,7 +4,7 @@ title: ERC-20 Token Standard
 author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
 type: Standards Track
 category: ERC
-status: Accepted
+status: Final
 created: 2015-11-19
 ---
 
@@ -183,7 +183,7 @@ Different implementations have been written by various teams that have different
 
 ## History
 
-Historical links releated to this standard:
+Historical links related to this standard:
 
 - Original proposal from Vitalik Buterin: https://github.com/ethereum/wiki/wiki/Standardized_Contract_APIs/499c882f3ec123537fc2fccd57eaa29e6032fe4a
 - Reddit discussion: https://www.reddit.com/r/ethereum/comments/3n8fkn/lets_talk_about_the_coin_standard/
