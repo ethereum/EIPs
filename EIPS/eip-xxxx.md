@@ -20,7 +20,7 @@ The difficulty bomb operates under the assumption that miners decide what code e
 
 ## Specification
 #### Remove Difficulty with Fake Block Number
-For the purposes of `calc_difficulty`, simply remove the use of `block.number`, as used in the exponential ice age component.
+For the purposes of `calc_difficulty`, change the epsilon component to `0` rather than having it be a function of block number.
 
 ## Rationale
 With the difficulty bomb removed, when Casper is released it will be up to economic participants to decide whether they want the features that Casper enables or not.  If they do not want Casper, they are free to continue running unpatched clients and participating in the Ethereum network as it exists today.  This freedom of choice is the cornerstone of DLTs and making it hard for people to make that choice (by creating an artificial pressure) does not work towards that goal of freedom of choice.  If the development team is not confident that economic participants will want Casper, then they should re-evaluate their priorities rather than trying to force Casper onto users.
