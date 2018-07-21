@@ -33,5 +33,8 @@ This EIP is not forward compatible and introduces backwards incompatibilities in
 ## Test Cases
 Test cases shall be created once the specification is to be accepted by the developers or implemented by the clients.
 
+## Implementations
+The yellow paper implements this change in https://github.com/ethereum/yellowpaper/pull/710
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
