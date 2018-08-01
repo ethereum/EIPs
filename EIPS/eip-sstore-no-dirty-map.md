@@ -1,0 +1,109 @@
+---
+eip: <to be assigned>
+title: Net gas metering for SSTORE without dirty maps
+author: Wei Tang (@sorpaas)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2018-08-01
+---
+
+## Abstract
+
+This EIP proposes net gas metering changes for SSTORE opcde, as an
+alternative for EIP-1087. It tries to be friendlier to implementations
+that uses different opetimiazation strategies for storage change
+caches.
+
+## Motivation
+
+EIP-1087 proposes a way to adjust gas metering for SSTORE opcode,
+enabling new usages on this opcodes where it is previously too
+expensive. However, EIP-1087 requires keeping a dirty map for storage
+changes, and implictly makes the assumption that a transaction's
+storage changes are committed to the storage trie at the end of a
+transaction. This works well for some implementations, but not for
+others. Some implementations do the optimization to only commit
+storage changes at the end of a block. For them, it is possible to
+know a storage's original value and current value, but it is not
+possible to iterate over all storage changes. For EIP-1087, they will
+need to keep a separate dirty map to keep track of gas costs. This
+adds additional memory consumptions.
+
+This EIP proposes an alternative way for gas metering on SSTORE, using
+information that is more universially available to most
+implementations:
+
+* *Storage slot's original value*. This is the value of the storage if
+  a call/create reversion happens on the current VM execution
+  context. It is universially available because all clients need to
+  keep track of call/create reversion.
+* *Storage slot's current value*. 
+* Refund counter.
+
+## Specification
+
+Term *original value* is as defined in Motivation. *Current value*
+refers to the storage slot value before SSTORE happens. *New value*
+refers to the storage slot value after SSTORE happens.
+
+Replace SSTORE opcode gas cost calculation (including refunds) with
+the following logic:
+
+* If *current value* equals *new value* (this is a no-op), 200 gas is
+  deducted.
+* If *current value* does not equal *new value*
+  * If *original value* equals *current value* (this storage slot has
+    not been change by the current execution context)
+    * If *original value* is 0, 20000 gas is deducted.
+    * Otherwise, 5000 gas is deducted. If *new value* is 0, add 15000
+      gas to refund counter.
+  * If *original value* does not equal *current value* (this storage
+    slot is dirty), 200 gas is deducted.
+    * If *original value* equals *new value*
+      * If *original value* is 0, add 19800 gas to refund counter.
+      * Otherwise, add 4800 gas to refund counter.
+
+Refund counter works as before -- it is limited to half of the gas
+consumed.
+
+## Rationale
+
+This EIP mostly archives what EIP-1087 tries to do, but without the
+complexity of introducing the concept of "dirty maps". One limitation
+is that the dirtiness tracking only applies to current execution
+context -- if a sub-frame executes on the same address as the
+parent-frame, it won't benefit from the parent dirtiness gas refund.
+
+Examine examples provided in EIP-1087's Motivation:
+
+* If a contract with empty storage sets slot 0 to 1, then back to 0,
+  it will be charged `20000 + 200 - 19800 = 400` gas.
+* A contract with empty storage that increments slot 0 5 times will be
+  charged `20000 + 5 * 200 = 21000` gas.
+* A balance transfer from account A to account B followed by a
+  transfer from B to C, with all accounts having nonzero starting and
+  ending balances
+  * If the token contract has multi-send function, it will cost
+    `5000 * 3 + 200 - 4800 = 10400` gas.
+  * If this transfer from A to B to C is invoked by a third-party
+    contract, and the token contract has no multi-send function, then
+    it won't benefit from this EIP's gas reduction.
+
+## Backwards Compatibility
+
+This EIP requires a hard fork to implement. No gas cost increase is
+anticipated, and many contract will see gas reduction.
+
+## Test Cases
+
+To be added.
+
+## Implementation
+
+To be added.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
