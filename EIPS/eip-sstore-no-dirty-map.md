@@ -55,7 +55,7 @@ the following logic:
   deducted.
 * If *current value* does not equal *new value*
   * If *original value* equals *current value* (this storage slot has
-    not been change by the current execution context)
+    not been changed by the current execution context)
     * If *original value* is 0, 20000 gas is deducted.
     * Otherwise, 5000 gas is deducted. If *new value* is 0, add 15000
       gas to refund counter.
