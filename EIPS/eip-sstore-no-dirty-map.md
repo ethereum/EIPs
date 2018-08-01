@@ -11,7 +11,7 @@ created: 2018-08-01
 
 ## Abstract
 
-This EIP proposes net gas metering changes for SSTORE opcde, as an
+This EIP proposes net gas metering changes for SSTORE opcode, as an
 alternative for EIP-1087. It tries to be friendlier to implementations
 that uses different opetimiazation strategies for storage change
 caches.
