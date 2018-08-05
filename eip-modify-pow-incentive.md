@@ -1,11 +1,11 @@
 ---
-eip: <tbd>
+eip: tbd
 title: Modify Ethereum PoW Incentive Structure and Diffuse Difficulty Bomb
-author: <Brian Venturo (@atlanticcrypto)>
+author: Brian Venturo (@atlanticcrypto)
 discussions-to: TBD
 status: Draft
-type: <Standards Track>
-category: <Core>
+type: Standards Track
+category: Core
 created: <2018-08-05>
 ---
 
