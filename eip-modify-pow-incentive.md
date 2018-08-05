@@ -16,7 +16,7 @@ Network security and overall ecosystem maturity warrants the continued incentivi
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-Starting with CNSTNTNPL_FORK_BLKNUM the client will calculate the difficulty based on a fake block number suggesting the client that the difficulty bomb is adjusting around 6 million blocks later than previously specified with the Homestead fork. Furthermore, Uncle rewards will be adjusted and Nephew rewards will be removed to eliminate excess ancillary ETH issuance. The current ETH block reward of 3 ETH will remain constant.
+Starting with CNSTNTNPL_FORK_BLKNUM the client will calculate the difficulty without the additional exponential component. Furthermore, Uncle rewards will be adjusted and Nephew rewards will be removed to eliminate excess ancillary ETH issuance. The current ETH block reward of 3 ETH will remain constant.
 
 
 ## Motivation
