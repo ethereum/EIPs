@@ -99,7 +99,9 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 
-` * discussions-to:` <url>
+` * discussions-to:` \<a url pointing to the official discussion thread\>
+
+ - :x: `discussions-to` can not be a Github `Pull-Request`.
 
 ` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
@@ -117,7 +119,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * superseded-by:` <EIP number(s)>
 
-` * resolution:` <url>
+` * resolution:` \<a url pointing to the resolution of this EIP\>
 
 #### Author header
 
