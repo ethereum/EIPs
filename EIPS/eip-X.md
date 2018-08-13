@@ -12,14 +12,20 @@ replaces (*optional): <EIP number(s)>
 ---
 
 Simple Summary
+---
+
 2 factor authenication can be setup in a smart contract system with a lot of ease. 
+
 Abstract
+---
 Using RegisteredAgents to update a central smart contract with a generated 2FA code, can help provide a third party level security over smart contract's transactions. If a user wants to interact with a contract that uses 2FA, they would be required to log into a third party website via traditional authenication means, and then generate a new 2FA that is then sent to the smart contract via a registeredAgent. Then User can then transact with the smart contract but including the 2FA code within their transaction. This provides a username/password combo as a second layer over your private key. Using this system, in order for someone to steal your funds from the smart contract, they would need access to your private key, and now the login credidentals for the third party website. Preventing theft of funds, if a private key is lost/stolen. 
 
 Motivation
+---
 Motivation comes from international travel. If I have XYZ tokens but I'm travelling aboard, if my private key is stolen while travelling, there will be no updates/emails/messages that alert me that my XYZ tokens have been moved. This means, when I get back home, or check my wallet, I'll see the balance as 0. To prevent this, using 2FA as a multisig wallet between a trusted third party and yourself, without sharing the actual private keys is one solution. Now, if I am traveling and someone wanted to move my ZYX tokens, they would need to have hacked my 3rdparty2fa.com account to get access to, and also, generate, a 2FA code needed to transfer my tokens. 
 
 ## Specification
+---
 
    pragma solidity ^0.4.21;
 
@@ -72,22 +78,44 @@ Motivation comes from international travel. If I have XYZ tokens but I'm travell
     }
     
 }
-
+---
 ## Rationale
+---
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 ## Backwards Compatibility
+---
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+Not backwards compatible. 
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+---
+
+   pragma solidity ^0.4.21;
+
+   import "./manager2fa.sol";
+
+   contract Test2FA {
+    
+    
+     manager2FA instance;
+    
+    function setAddress(address _addr){
+        
+        instance = manager2FA(_addr);
+    }
+   function confirmCode(uint256 _2FAcode) returns (bool){
+       require(instance.verifyTx(msg.sender, _2FAcode));
+       return true;
+       
+   }
+    
+   }
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+---
+Coming soon
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
