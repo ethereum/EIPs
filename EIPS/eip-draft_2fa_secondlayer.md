@@ -5,20 +5,20 @@ author: Zach Burks (@VexyCats)
 discussions-to: https://ethereum-magicians.org/t/discussion-around-2fa-implementation-within-smart-contracts/924
 status: Draft
 type: Standards Track
-category (*only required for Standard Track): ERC
-created: 2018/8/1
+category: ERC
+created: 2018/08/01
 ---
 
-Simple Summary
+## Simple Summary
 
 
 2 factor authenication can be setup in a smart contract system, so that a 2FA code is required as extra data in order to execute some function.
 
-Abstract
+## Abstract
 
 Using RegisteredAgents to update a central smart contract with a generated 2FA code, can help provide a third party level security over smart contract's transactions. If a user wants to interact with a contract that uses 2FA, they would be required to log into a third party website via traditional authenication means, and then generate a new 2FA that is then sent to the smart contract via a registeredAgent. Then User can then transact with the smart contract but including the 2FA code within their transaction. This provides a username/password combo as a second layer over your private key. Using this system, in order for someone to steal your funds from the smart contract, they would need access to your private key, and now the login credidentals for the third party website. Preventing theft of funds, if a private key is lost/stolen. 
 
-Motivation
+## Motivation
 
 Motivation comes from international travel. If I have XYZ tokens but I'm travelling aboard, if my private key is stolen while travelling, there will be no updates/emails/messages that alert me that my XYZ tokens have been moved. This means, when I get back home, or check my wallet, I'll see the balance as 0. To prevent this, using 2FA as a multisig wallet between a trusted third party and yourself, without sharing the actual private keys is one solution. Now, if I am traveling and someone wanted to move my ZYX tokens, they would need to have hacked my 3rdparty2fa.com account to get access to, and also, generate, a 2FA code needed to transfer my tokens. 
 
