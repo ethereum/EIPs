@@ -14,7 +14,7 @@ replaces (*optional): <EIP number(s)>
 Simple Summary
 ---
 
-2 factor authenication can be setup in a smart contract system with a lot of ease. 
+2 factor authenication can be setup in a smart contract system, so that a 2FA code is required as extra data in order to execute some function.
 
 Abstract
 ---
@@ -115,7 +115,7 @@ Not backwards compatible.
 
 ## Implementation
 ---
-Coming soon
+Coming soon. Need feedback on whether each contract implementing the 2FA standard should be required to run their own registeredAgent, meaning every 2FA contract out there, would be its own login/3rd party registeredAgent. Or, one general Smart contract for the entire Ethereum Ecosystem, where registeredAgents are able to be added for individual contracts. The latter is a single point of failure, but allows for a 2FA smart contract to exsist on the mainnet for everyone to use. 
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
