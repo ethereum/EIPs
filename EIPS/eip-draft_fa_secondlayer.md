@@ -1,14 +1,14 @@
- ---
- eip: <to be assigned>
- title: <2-Factor Auhenication for transfering ownership>
- author: <Zach Burks (@VexyCats)>
- discussions-to: <https://ethereum-magicians.org/t/discussion-around-2fa-implementation-within-smart-contracts/924>
- status: Draft
- type: <Standards Track >
- category (*only required for Standard Track): <ERC>
- created: <2018/08/01>
- requires (*optional): <EIP number(s)>
- replaces (*optional): <EIP number(s)>
+---
+eip: <to be assigned>
+title: 2-Factor Auhenication for transfering ownership
+title: 2-Factor Authenication for transferring ownership
+author: Zach Burks (@VexyCats)
+discussions-to: https://ethereum-magicians.org/t/discussion-around-2fa-implementation-within-smart-contracts/924
+status: Draft
+type: Standards Track
+category: ERC
+created: 2018/08/01
+ 
 ---
 
 ## Simple Summary
