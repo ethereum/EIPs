@@ -4,7 +4,7 @@ title: 2-Factor Auhenication for transfering ownership
 title: 2-Factor Authenication for transferring ownership
 author: Zach Burks (@VexyCats)
 discussions-to: https://ethereum-magicians.org/t/discussion-around-2fa-implementation-within-smart-contracts/924
-status: Draft
+status: WIP
 type: Standards Track
 category: ERC
 created: 2018/08/01
