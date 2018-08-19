@@ -1,6 +1,5 @@
 ---
-eip: <to be assigned>
-title: 2-Factor Auhenication for transfering ownership
+eip: 258
 title: 2-Factor Authenication for transferring ownership
 author: Zach Burks (@VexyCats)
 discussions-to: https://ethereum-magicians.org/t/discussion-around-2fa-implementation-within-smart-contracts/924
