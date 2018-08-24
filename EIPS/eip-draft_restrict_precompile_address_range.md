@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 1352
 title: Specify restricted address range for precompiles/system contracts
-author: Alex Beregszaszi (@axic)
-discussions-to: <URL>
+author: Alex Beregszaszi (axic)
+discussions-to: https://ethereum-magicians.org/t/eip-1352-specify-restricted-address-range-for-precompiles-system-contracts/1151
 status: Draft
 type: Standards Track
 category: Core
