@@ -2,7 +2,7 @@
 eip: TBD
 title: Delay Difficulty Bomb and Reduce Block Reward to 2.7
 author: Peter Salanki (@salanki)
-discussions-to: 
+discussions-to: https://github.com/ethereum/EIPs/pull/1362
 status: Draft
 type: Standards Track
 category: Core
