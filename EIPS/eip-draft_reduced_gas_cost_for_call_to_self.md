@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Reduced gas cost for call to self
-author: Alex Beregszaszi (@axic)
+author: Alex Beregszaszi (@axic), Jacques Wagener (@jacqueswww)
 discussions-to: <TBA>
 status: Draft
 type: Standards Track
@@ -14,7 +14,23 @@ requires: 150
 Reduce the gas cost for call instructions, when the goal is to run a new instance of the currently loaded contract.
 
 ## Motivation
-TBA (there's a lot to write here)
+The current gas cost of 700 for all call types (`CALL`, `DELEGATECALL`, `CALLCODE` and `STATICCALL`) does not take into account that a call to a contract itself
+does not need to perform additional I/O operations as with an external contract call, as the current contract code has already been loaded into the VM memory.
+
+Reducing the call-to-self gas cost would greatly benefit smart contract languages, such as Solidity and Vyper, who would then be able to utilise `CALL` instead
+of `JUMP` opcodes for internal function calls.
+
+Using `JUMP` comes at a considerable cost in complexity to the implementation of a smart contract language and/or compiler. The context (including stack and memory)
+must be swapped in and out of the calling functions context.
+
+Using call-to-self provides the guarentee that when making an internal call the function can rely on a clear reset state of memory or context, benefiting both
+contract writers and contract consumers against potentially undetetected edge cases were memory could poison the context of the internal function.
+
+Because of the `JUMP` usage for internal functions a smart contract languages are also at risk of reaching the stack depth limit considerbly faster, if nested
+function calls with many in and/or outputs are required.
+
+Reducing the gas cost, and thereby incentivising of using call-to-self instead of `JUMP`s for the internal function implementation will also benefit static
+analyzers and tracers.
 
 ## Specification
 If `block.number >= FORK_BLKNUM`, then decrease the cost of `CALL`, `DELEGATECALL`, `CALLCODE` and `STATICCALL` from 700 to 40,
