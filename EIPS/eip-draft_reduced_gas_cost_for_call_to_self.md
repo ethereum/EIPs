@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 1380
 title: Reduced gas cost for call to self
 author: Alex Beregszaszi (@axic), Jacques Wagener (@jacqueswww)
-discussions-to: <TBA>
+discussions-to: https://ethereum-magicians.org/t/eip-1380-reduced-gas-cost-for-call-to-self/1242
 status: Draft
 type: Standards Track
 category: Core
