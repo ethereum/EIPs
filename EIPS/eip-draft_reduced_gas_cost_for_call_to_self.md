@@ -15,13 +15,15 @@ Reduce the gas cost for call instructions, when the goal is to run a new instanc
 
 ## Motivation
 The current gas cost of 700 for all call types (`CALL`, `DELEGATECALL`, `CALLCODE` and `STATICCALL`) does not take into account that a call to a contract itself
-does not need to perform additional I/O operations as with an external contract call, as the current contract code has already been loaded into the VM memory.
+does not need to perform additional I/O operations, because the current contract code has already been loaded into memory.
 
 Reducing the call-to-self gas cost would greatly benefit smart contract languages, such as Solidity and Vyper, who would then be able to utilise `CALL` instead
-of `JUMP` opcodes for internal function calls.
+of `JUMP` opcodes for internal function calls. While languages can already utilise `CALL` for internal function calls, they are discouraged to do so due to the
+gas costs associated with it.
 
 Using `JUMP` comes at a considerable cost in complexity to the implementation of a smart contract language and/or compiler. The context (including stack and memory)
-must be swapped in and out of the calling functions context.
+must be swapped in and out of the calling functions context. A desired feature is having *pure* functions, which do not modify the state of memory, and realising
+them through `JUMP` requires a bigger effort from the compiler as opposed to being able to use `CALL`s.
 
 Using call-to-self provides the guarentee that when making an internal call the function can rely on a clear reset state of memory or context, benefiting both
 contract writers and contract consumers against potentially undetetected edge cases were memory could poison the context of the internal function.
