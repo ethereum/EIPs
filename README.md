@@ -11,7 +11,7 @@ This repository tracks the ongoing status of EIPs. It contains:
 - [Last Calls](https://eips.ethereum.org/all) for proposals that may become final (see also [RSS feed](https://eips.ethereum.org/last-call.xml)).
 - [Accepted](https://eips.ethereum.org/all) and [Deferred](https://eips.ethereum.org/all) proposals which are awaiting implementation or deployment by Ethereum client developers.
 - [Final](https://eips.ethereum.org/all) and [Active](https://eips.ethereum.org/all) proposals that are recorded.
-- The [EIP process](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
+- The [EIP process](EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
 
 Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibilty of the implementer to decide if these proposals will be useful to you and if they represent best practice.
 
@@ -23,8 +23,8 @@ The Ethereum Improvement Proposals repository exists as a place to discuss concr
 
 We promote high-quality, peer-reviewed proposals in two categories:
 
-- [Consensus Changes](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-types) require people running an Ethereum client to update their software to implement the change. If enough people do not upgrade then an existing network will fork into two separate networks.
-- [Other Proposals](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-types) do not require a change in client software and can be used by any interested party.
+- [Consensus Changes](EIPS/eip-1.md#eip-types) require people running an Ethereum client to update their software to implement the change. If enough people do not upgrade then an existing network will fork into two separate networks.
+- [Other Proposals](EIPS/eip-1.md#eip-types) do not require a change in client software and can be used by any interested party.
 
 ## Preferred Citation Format
 
