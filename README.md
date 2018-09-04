@@ -1,5 +1,7 @@
 # Ethereum Improvement Proposals (EIPs) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
+Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
+
 **Before you initiate a pull request**, please read the process document. Ideas should be thoroughly discussed on the [Ethereum Magicians forums](https://ethereum-magicians.org) first.
 
 This repository tracks the ongoing status of EIPs. It contains:
