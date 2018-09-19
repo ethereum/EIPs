@@ -18,10 +18,11 @@ There have been suggestions for modified tokens based on erc20, but since many t
 ## Motivation
 While many projects are under development in an open source way, they are simply adding and deploy with open sources to their projects. This means that you are developing a centralized service that uses your own dApp-generated information on your own. In order to improve the block chain ecosystem, all resources created by dApp and placed in the public block chain must be reusable in another dApp. This means that you can enhance your service by exchanging the generated information with other dApp. Likewise, ERC20 Tokens require Universal Wallet standards to be easy to use for direct transactions.
 
-To improve the block chain ecosystem
-- Synergy between dApp or contracts,
-- Easy interface for ERC20.
-- Information is created but not monopolized.
+### Seeds for improvement of the blockchain ecosystem.
+- Synergy - With other dApps and resources.
+- Enhanced interface - For ERC20 tokens.
+- Easy & Decentralized - Everyone should be able to add to their services easily, without censorship.
+
 
 #### The following avatar store, badge system, and universal wallet are kind of examples about component dApp.
 ![intro](https://user-images.githubusercontent.com/11692220/45585539-ef51af00-b920-11e8-876b-ec7ee91c2cc6.png)
