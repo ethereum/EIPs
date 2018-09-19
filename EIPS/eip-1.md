@@ -65,10 +65,10 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 
 Other exceptional statuses include:
 
-* Deferred -- This is for core EIPs that have been put off for a future hard fork.
-* Rejected -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
-* Active -- This is similar to Final, but denotes an EIP which which may be updated without changing its EIP number.
-* Superseded -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
+* **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
+* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
+* **Active** -- This is similar to Final, but denotes an EIP which which may be updated without changing its EIP number.
+* **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
 
 ## What belongs in a successful EIP?
 
@@ -106,9 +106,9 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
-`* review-period-end: YYYY-MM-DD
+`* review-period-end:` YYYY-MM-DD
 
-` type: `<Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+` type:` <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
 ` * category:` <Core | Networking | Interface | ERC>
 
