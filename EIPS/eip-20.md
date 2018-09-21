@@ -41,7 +41,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() view returns (string name)
+function name() view returns (string)
 ```
 
 
@@ -53,7 +53,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function symbol() view returns (string symbol)
+function symbol() view returns (string)
 ```
 
 
@@ -66,7 +66,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function decimals() view returns (uint8 decimals)
+function decimals() view returns (uint8)
 ```
 
 
@@ -75,7 +75,7 @@ function decimals() view returns (uint8 decimals)
 Returns the total token supply.
 
 ``` js
-function totalSupply() view returns (uint256 totalSupply)
+function totalSupply() view returns (uint256)
 ```
 
 
