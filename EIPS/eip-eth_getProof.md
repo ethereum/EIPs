@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1186
 title: eth_getProof 
 author: Simon Jentzsch <simon.jentzsch@slock.it>, Christoph Jentzsch <christoph.jentzsch@slock.it>
 discussions-to: simon.jentzsch@slock.it
@@ -141,10 +141,7 @@ Since this only adds a new Method there are no issues with Backwards Compatibili
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 
-These Tests cover the verification based on the result of the `eth_getProof`
-https://github.com/slockit/in3-server/blob/master/test/eth/eth_abi.ts#L277
-
-<TODO> Further test inside the client may be required.
+<TODO>Tests still need to be implemented, but the core function creating the proof already exists inside the clients and are well tested.
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
