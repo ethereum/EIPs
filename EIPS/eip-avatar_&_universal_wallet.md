@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1438
 title: dApp Components (avatar) & Universal Wallet
 author: Jet Lim (@Nitro888)
 discussions-to:
