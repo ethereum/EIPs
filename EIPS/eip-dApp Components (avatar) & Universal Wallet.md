@@ -6,7 +6,7 @@ discussions-to: <email address>
 status: Draft
 type: Standards Track
 category: ERC
-created: 2018-09-18
+created: 2018-09-21
 ---
 
 ## Simple Summary
