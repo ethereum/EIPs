@@ -148,7 +148,7 @@ Since this only adds a new Method there are no issues with Backwards Compatibili
 
 We implemented this function for:
 
-- [x] [parity](https://github.com/paritytech/parity/pull/9001) (Status: pending pull request)
+- [x] [parity](https://github.com/paritytech/parity/pull/9001) (Status: pending pull request) - [Docker](https://hub.docker.com/r/slockit/parity-in3/tags/)
 - [ ] geth (Status: planned)
 
 ## Copyright
