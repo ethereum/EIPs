@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: dApp Components (avatar) & Universal Wallet
 author: Jet Lim (@Nitro888)
-discussions-to: <email address>
+discussions-to:
 status: Draft
 type: Standards Track
 category: ERC
