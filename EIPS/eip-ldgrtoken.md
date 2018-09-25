@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: LDGRToken
-author: Howard Marks (Howard@StartEngine.com), John Shiple (John@StartEngine.com), David Zhang (David@StartEngine.com)
+author: Howard Marks (Howard@StartEngine.com), John Shiple (@johnshiple), David Zhang (David@StartEngine.com)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
