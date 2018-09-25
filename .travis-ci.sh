@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # halt script on error
 
-HTMLPROOFER_OPTIONS="./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858"
+HTMLPROOFER_OPTIONS="./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858"
 
 if [[ $TASK = 'htmlproofer' ]]; then
   bundle exec jekyll doctor
@@ -22,6 +22,6 @@ elif [[ $TASK = 'eip-validator' ]]; then
     exit 1
   fi
 
-  FILES=$(ls EIPS/*.md)
+  FILES="$(ls EIPS/*.md | egrep "eip-[0-9]+.md")"
   bundle exec eip_validator $FILES
 fi

@@ -1,0 +1,3 @@
+# GitHub highlighting for Solidity files
+# See https://github.com/github/linguist/pull/3973#issuecomment-357507741
+*.sol linguist-language=Solidity
