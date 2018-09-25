@@ -17,42 +17,42 @@ created: 2018-09-25
 ## Abstract
 `LDGRToken` facilitates the recording of ownership and transfer of securities sold under the [new Securities Act Regulations](https://www.sec.gov/smallbusiness/exemptofferings). The issuance and trading of securities is subject to the Securities Exchange Commission (SEC) and specific U.S. state blue sky laws and regulations.
 
-`LDGRToken` manages securities ownership during issuance and trading. The Issuer is the only role that should create a `LDGRToken` and assign the RTA. The RTA is the only role that is allowed to execute `LDGRToken`’s mint, burnFrom, and transferFrom functions. No role is allowed to execute `LDGRToken`’s transfer function.
+`LDGRToken` manages securities ownership during issuance and trading. The Issuer is the only role that should create a `LDGRToken` and assign the RTA. The RTA is the only role that is allowed to execute `LDGRToken`’s `mint`, `burnFrom`, and `transferFrom` functions. No role is allowed to execute `LDGRToken`’s `transfer` function.
 
 ## Motivation
 With the advent of the [JOBS Act](https://www.sec.gov/spotlight/jobs-act.shtml) in 2012 and the launch of Regulation Crowdfunding and the amendments to Regulation A and Regulation D in 2016, Investors have the right to purchase securities issued by companies (Issuers) and to sell those securities to other Investors under the conditions specified in a purchase agreement and subject to SEC and State regulations.
 
-There are currently no token standards that conform to SEC regulations. ERC-20 tokens do not support the regulated roles of Funding Portal, Broker Dealer, RTA, and Investor and do not support the [Bank Secrecy Act/USA Patriot Act KYC and AML requirements](https://www.occ.treas.gov/topics/compliance-bsa/bsa/index-bsa.html). Other improvements (notably [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) have tried to tackle KYC and AML regulatory requirement. This approach is novel because the RTA is solely responsible for performing KYC and AML and should be solely responsible for transferFrom, mint, and burnFrom.
+There are currently no token standards that conform to SEC regulations. ERC-20 tokens do not support the regulated roles of Funding Portal, Broker Dealer, RTA, and Investor and do not support the [Bank Secrecy Act/USA Patriot Act KYC and AML requirements](https://www.occ.treas.gov/topics/compliance-bsa/bsa/index-bsa.html). Other improvements (notably [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) have tried to tackle KYC and AML regulatory requirement. This approach is novel because the RTA is solely responsible for performing KYC and AML and should be solely responsible for `transferFrom`, `mint`, and `burnFrom`.
 
 ## Specification
 `LDGRToken` extends ERC-20.
 
 ### `LDGRToken`
-`LDGRToken` requires that only the Issuer can create a token representing the security that only the RTA manages. Instantiating the `LDGRToken` requires the Owned and IssuerControlled modifiers, and only the Issuer should execute the `LDGRToken` constructor for a compliant token. `LDGRToken` extends the general Ownable modifier to describe a specific subset of owners that automate and decentralize compliance through the contract modifiers Owned and IssuerControlled and the function modifiers onlyOwner and onlyIssuerTransferAgent. The Owned contract modifier instantiates the onlyOwner modifier for functions. The IssuerControlled modifier instantiates the onlyIssuerTransferAgent modifier for functions.
+`LDGRToken` requires that only the Issuer can create a token representing the security that only the RTA manages. Instantiating the `LDGRToken` requires the `Owned` and `IssuerControlled` modifiers, and only the Issuer should execute the `LDGRToken` constructor for a compliant token. `LDGRToken` extends the general `Ownable` modifier to describe a specific subset of owners that automate and decentralize compliance through the contract modifiers `Owned` and `IssuerControlled` and the function modifiers `onlyOwner` and `onlyIssuerTransferAgent`. The `Owned` contract modifier instantiates the `onlyOwner` modifier for functions. The `IssuerControlled` modifier instantiates the `onlyIssuerTransferAgent` modifier for functions.
 
-`LDGRToken` must prevent anyone from executing the transfer, allowance, and approve functions and/or implement these functions to always fail. `LDGRToken` updates the transferFrom, mint, and burnFrom functions. transferFrom, mint, and burnFrom may only be executed by the RTA and are restricted with the onlyIssuerTransferAgent modifier. Additionally, `LDGRToken` defines the functions transferOwnership, setTransferAgent, setPhysicalAddressOfOperation, and isTransferAgent.  Only the issuer may call the transferOwnership, setTransferAgent, and setPhysicalAddressOfOperation functions. Anyone may call the isTransferAgent function.
+`LDGRToken` must prevent anyone from executing the `transfer`, `allowance`, and `approve` functions and/or implement these functions to always fail. `LDGRToken` updates the `transferFrom`, `mint`, and `burnFrom` functions. `transferFrom`, `mint`, and `burnFrom` may only be executed by the RTA and are restricted with the `onlyIssuerTransferAgent` modifier. Additionally, `LDGRToken` defines the functions `transferOwnership`, `setTransferAgent`, `setPhysicalAddressOfOperation`, and `isTransferAgent`.  Only the issuer may call the `transferOwnership`, `setTransferAgent`, and `setPhysicalAddressOfOperation` functions. Anyone may call the `isTransferAgent` function.
 
 ### Issuers and RTAs
-For compliance reasons, the `LDGRToken` constructor must specify the issuer (the owner), the RTA (transferAgent), the security’s name, and the security’s symbol.
+For compliance reasons, the `LDGRToken` constructor must specify the issuer (the `owner`), the RTA (`transferAgent`), the security’s `name`, and the security’s `symbol`.
 
 #### Issuer Owned
-`LDGRToken` must specify the owner in its constructor, apply the Owned modifier, and instantiate the onlyOwner modifier to enable specific functions to permit only the Issuer’s owner address to execute them. `LDGRToken` also defines the function transferOwnership which transfer ownership of the Issuer to new owner’s address and can only be called by the owner. transferOwnership triggers the OwnershipTransferred event.
+`LDGRToken` must specify the `owner` in its constructor, apply the `Owned` modifier, and instantiate the `onlyOwner` modifier to enable specific functions to permit only the Issuer’s `owner` address to execute them. `LDGRToken` also defines the function `transferOwnership` which transfers ownership of the Issuer to the new `owner`’s address and can only be called by the `owner`. `transferOwnership` triggers the `OwnershipTransferred` event.
 
 #### Issuer Controlled
-IssuerControlled maintains the Issuer’s ownership of their securities by owning the contract and enables the Issuer to set and update the RTA for the Issuer’s securities. `LDGRToken`‘s constructor must have an IssuerControlled modifier with the issuer specified in its `LDGRToken` constructor. IssuerControlled instantiates the onlyIssuerTransferAgent modifier for `LDGRToken` to enable specific functions (setPhysicalAddressOfOperation and setTransferAgent) to permit only the Issuer to execute these functions.
+`IssuerControlled` maintains the Issuer’s ownership of their securities by owning the contract and enables the Issuer to set and update the RTA for the Issuer’s securities. `LDGRToken`‘s constructor must have an `IssuerControlled` modifier with the issuer specified in its `LDGRToken` constructor. `IssuerControlled` instantiates the `onlyIssuerTransferAgent` modifier for `LDGRToken` to enable specific functions (`setPhysicalAddressOfOperation` and `setTransferAgent`) to permit only the Issuer to execute these functions.
 
 #### Register Transfer Agent Controlled
-`LDGRToken` defines the setTransferAgent function (to change the RTA) and setPhysicalAddressOfOperation function (to change the Issuer’s address) and must restrict execution to the Issuer’s owner with the onlyOwner modifier. setTransferAgent must emit the TransferAgentUpdated event. setPhysicalAddressOfOperation must emit the PhysicalAddressOfOperationUpdated event.
+`LDGRToken` defines the `setTransferAgent` function (to change the RTA) and `setPhysicalAddressOfOperation` function (to change the Issuer’s address) and must restrict execution to the Issuer’s owner with the `onlyOwner` modifier. `setTransferAgent` must emit the `TransferAgentUpdated` event. `setPhysicalAddressOfOperation` must emit the `PhysicalAddressOfOperationUpdated` event.
 
-`LDGRToken` must specify the transferAgent in its constructor and instantiate the onlyIssuerTransferAgent modifier to enable specific functions (transferFrom, mint, and burnFrom) to permit only the Issuer’s transferAgent address to execute them. `LDGRToken` also defines the public function isTransferAgent to lookup and identify the Issuer’s RTA.
+`LDGRToken` must specify the `transferAgent` in its constructor and instantiate the `onlyIssuerTransferAgent` modifier to enable specific functions (`transferFrom`, `mint`, and `burnFrom`) to permit only the Issuer’s `transferAgent` address to execute them. `LDGRToken` also defines the public function `isTransferAgent` to lookup and identify the Issuer’s RTA.
 
 #### Securities
-`LDGRToken` updates the transferFrom, mint, and burnFrom functions by applying the onlyIssuerTransferAgent to enable the issuance, re-issuance, and trading of securities.
+`LDGRToken` updates the `transferFrom`, `mint`, and `burnFrom` functions by applying the `onlyIssuerTransferAgent` to enable the issuance, re-issuance, and trading of securities.
 
 ### ERC-20 Extension
 ERC-20 tokens provide the following functionality:
 
-contract ERC20 {
+`contract ERC20 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
@@ -61,7 +61,7 @@ contract ERC20 {
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Transfer(address indexed from, address indexed to, uint256 value);
-}
+}`
 
 ERC-20 is extended as follows:
 
@@ -275,7 +275,7 @@ Contract LDGRToken is Owned, IssuerControlled {
 }`
 
 ### Securities Exchange Commission Requirements
-The SEC has very strict requirements as to the specific roles that are allowed to perform specific actions. Specifically, only the RTA may mint and transferFrom securities.
+The SEC has very strict requirements as to the specific roles that are allowed to perform specific actions. Specifically, only the RTA may `mint` and `transferFrom` securities.
 
 Implementers must maintain off-chain services and databases that record and track the Investor’s name, physical address, Ethereum address, and security ownership amount. The implementers and the SEC must be able to access the Investor’s private information on an as needed basis. Issuers and the RTA must be able to produce a current list of all Investors, including the names, addresses, and security ownership levels for every security at any given moment. Issuers and the RTA must be able to re-issue securities to Investors for a variety of regulated reasons.
 
@@ -287,15 +287,15 @@ Special care and attention must be taken to ensure that the personally identifia
 ### Issuers who lost access to their address or private keys
 There is no recourse if the Issuer loses access to their address to an existing instance of their securities. Special care and efforts must be made by the Issuer to secure and safely store their address and associated private key. The Issuer can reassign ownership to another Issuer but not in the case where the Issuer loses their private key.
 
-If the Issuer loses access, the Issuer’s securities must be rebuilt using off-chain services. The Issuer must create (and secure)  a new address. The RTA can read the existing Issuer securities, and the RTA can mint Investor securities accordingly under a new `LDGRToken` smart contract..
+If the Issuer loses access, the Issuer’s securities must be rebuilt using off-chain services. The Issuer must create (and secure) a new address. The RTA can read the existing Issuer securities, and the RTA can `mint` Investor securities accordingly under a new `LDGRToken` smart contract.
 
 ### Registered Transfer Agents who lost access to their address or private keys
-If the RTA loses access, the RTA can create a new Ethereum address, and the Issuer can execute the setTransferAgent function to reassign the RTA.
+If the RTA loses access, the RTA can create a new Ethereum address, and the Issuer can execute the `setTransferAgent` function to reassign the RTA.
 
 ### Handling Investors (security owners) who lost access to their addresses or private keys
 Investors may “lose” their credentials for a number of reasons: they simply “lost” their credentials, they were hacked or the victim of fraud, they committed securities-related fraud, or a life event (like death) occurred. Because the RTA manages the Issuer’s securities, the RTA may authorize ownership related changes of securities (as long as they are properly notarized and verified).
 
-If an Investor (or, say, the Investor’s heir) loses their credentials, the Investor must go through a notarized process to notify the RTA of the situation and supply a new Investor address. From there, the RTA can mint the “lost” securities to the new Investor address and burnFrom the old Investor address (because the RTA knows all Investors’ addresses).
+If an Investor (or, say, the Investor’s heir) loses their credentials, the Investor must go through a notarized process to notify the RTA of the situation and supply a new Investor address. From there, the RTA can `mint` the “lost” securities to the new Investor address and `burnFrom` the old Investor address (because the RTA knows all Investors’ addresses).
 
 ## Rationale
 The are currently no token standards that conform to SEC regulations. The closest token is [ERC-884 (Delaware General Corporations Law (DGCL) compatible share token)](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-884.md) which states that SEC requirements are out of scope. [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) does not go far enough to address SEC requirements around re-issuing securities to Investors.
