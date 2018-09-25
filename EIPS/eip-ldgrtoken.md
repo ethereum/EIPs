@@ -12,7 +12,7 @@ created: 2018-09-25
 # LDGRToken - A compatible security token for issuing and trading SEC-compliant securities
 
 ## Simple Summary
-`LDGRToken` is an ERC-20 compatible token that complies with the [new Securities Act Regulations: Regulation Crowdfunding, Regulation D, and Regulation A](https://www.sec.gov/smallbusiness/exemptofferings).
+`LDGRToken` is an `ERC-20` compatible token that complies with the [new Securities Act Regulations: Regulation Crowdfunding, Regulation D, and Regulation A](https://www.sec.gov/smallbusiness/exemptofferings).
 
 ## Abstract
 `LDGRToken` facilitates the recording of ownership and transfer of securities sold under the [new Securities Act Regulations](https://www.sec.gov/smallbusiness/exemptofferings). The issuance and trading of securities is subject to the Securities Exchange Commission (SEC) and specific U.S. state blue sky laws and regulations.
@@ -25,7 +25,7 @@ With the advent of the [JOBS Act](https://www.sec.gov/spotlight/jobs-act.shtml) 
 There are currently no token standards that conform to SEC regulations. ERC-20 tokens do not support the regulated roles of Funding Portal, Broker Dealer, RTA, and Investor and do not support the [Bank Secrecy Act/USA Patriot Act KYC and AML requirements](https://www.occ.treas.gov/topics/compliance-bsa/bsa/index-bsa.html). Other improvements (notably [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) have tried to tackle KYC and AML regulatory requirement. This approach is novel because the RTA is solely responsible for performing KYC and AML and should be solely responsible for `transferFrom`, `mint`, and `burnFrom`.
 
 ## Specification
-`LDGRToken` extends ERC-20.
+`LDGRToken` extends `ERC-20`.
 
 ### `LDGRToken`
 `LDGRToken` requires that only the Issuer can create a token representing the security that only the RTA manages. Instantiating the `LDGRToken` requires the `Owned` and `IssuerControlled` modifiers, and only the Issuer should execute the `LDGRToken` constructor for a compliant token. `LDGRToken` extends the general `Ownable` modifier to describe a specific subset of owners that automate and decentralize compliance through the contract modifiers `Owned` and `IssuerControlled` and the function modifiers `onlyOwner` and `onlyIssuerTransferAgent`. The `Owned` contract modifier instantiates the `onlyOwner` modifier for functions. The `IssuerControlled` modifier instantiates the `onlyIssuerTransferAgent` modifier for functions.
@@ -50,7 +50,7 @@ For compliance reasons, the `LDGRToken` constructor must specify the issuer (the
 `LDGRToken` updates the `transferFrom`, `mint`, and `burnFrom` functions by applying the `onlyIssuerTransferAgent` to enable the issuance, re-issuance, and trading of securities.
 
 ### ERC-20 Extension
-ERC-20 tokens provide the following functionality:
+`ERC-20` tokens provide the following functionality:
 
 ```
 contract ERC20 {
@@ -65,7 +65,7 @@ contract ERC20 {
 }
 ```
 
-ERC-20 is extended as follows:
+`ERC-20` is extended as follows:
 
 ```
 /**
