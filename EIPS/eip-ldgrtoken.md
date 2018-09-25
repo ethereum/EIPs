@@ -67,7 +67,8 @@ contract ERC20 {
 
 ERC-20 is extended as follows:
 
-```/**
+```
+/**
  * LDGRToken is an ERC-20 compatible token that complies with the new Securities Act
  * Regulations.
  *
@@ -274,7 +275,8 @@ Contract LDGRToken is Owned, IssuerControlled {
      */
     function burnFrom(address _who, uint256 _value) public onlyIssuerTransferAgent returns
         (bool);
-}```
+}
+```
 
 ### Securities Exchange Commission Requirements
 The SEC has very strict requirements as to the specific roles that are allowed to perform specific actions. Specifically, only the RTA may `mint` and `transferFrom` securities.
