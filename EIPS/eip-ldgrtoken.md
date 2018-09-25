@@ -4,7 +4,7 @@ title: LDGRToken
 author: Howard Marks (Howard@StartEngine.com), John Shiple (John@StartEngine.com), David Zhang (David@StartEngine.com)
 discussions-to: <URL>
 status: Draft
-type: Standards Track  | Informational | Meta>
+type: Standards Track
 category: ERC
 created: 2018-09-25
 ---
