@@ -12,12 +12,12 @@ created: 2018-09-25
 # LDGRToken - A compatible security token for issuing and trading SEC-compliant securities
 
 ## Simple Summary
-LDGRToken is an ERC-20 compatible token that complies with the [new Securities Act Regulations: Regulation Crowdfunding, Regulation D, and Regulation A](https://www.sec.gov/smallbusiness/exemptofferings).
+`LDGRToken` is an ERC-20 compatible token that complies with the [new Securities Act Regulations: Regulation Crowdfunding, Regulation D, and Regulation A](https://www.sec.gov/smallbusiness/exemptofferings).
 
 ## Abstract
-LDGRToken facilitates the recording of ownership and transfer of securities sold under the [new Securities Act Regulations](https://www.sec.gov/smallbusiness/exemptofferings). The issuance and trading of securities is subject to the Securities Exchange Commission (SEC) and specific U.S. state blue sky laws and regulations.
+`LDGRToken` facilitates the recording of ownership and transfer of securities sold under the [new Securities Act Regulations](https://www.sec.gov/smallbusiness/exemptofferings). The issuance and trading of securities is subject to the Securities Exchange Commission (SEC) and specific U.S. state blue sky laws and regulations.
 
-LDGRToken manages securities ownership during issuance and trading. The Issuer is the only role that should create a LDGRToken and assign the RTA. The RTA is the only role that is allowed to execute LDGRToken’s mint, burnFrom, and transferFrom functions. No role is allowed to execute LDGRToken’s transfer function.
+`LDGRToken` manages securities ownership during issuance and trading. The Issuer is the only role that should create a `LDGRToken` and assign the RTA. The RTA is the only role that is allowed to execute `LDGRToken`’s mint, burnFrom, and transferFrom functions. No role is allowed to execute `LDGRToken`’s transfer function.
 
 ## Motivation
 With the advent of the [JOBS Act](https://www.sec.gov/spotlight/jobs-act.shtml) in 2012 and the launch of Regulation Crowdfunding and the amendments to Regulation A and Regulation D in 2016, Investors have the right to purchase securities issued by companies (Issuers) and to sell those securities to other Investors under the conditions specified in a purchase agreement and subject to SEC and State regulations.
@@ -25,29 +25,29 @@ With the advent of the [JOBS Act](https://www.sec.gov/spotlight/jobs-act.shtml) 
 There are currently no token standards that conform to SEC regulations. ERC-20 tokens do not support the regulated roles of Funding Portal, Broker Dealer, RTA, and Investor and do not support the [Bank Secrecy Act/USA Patriot Act KYC and AML requirements](https://www.occ.treas.gov/topics/compliance-bsa/bsa/index-bsa.html). Other improvements (notably [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) have tried to tackle KYC and AML regulatory requirement. This approach is novel because the RTA is solely responsible for performing KYC and AML and should be solely responsible for transferFrom, mint, and burnFrom.
 
 ## Specification
-LDGRToken extends ERC-20.
+`LDGRToken` extends ERC-20.
 
-### LDGRToken
-LDGRToken requires that only the Issuer can create a token representing the security that only the RTA manages. Instantiating the LDGRToken requires the Owned and IssuerControlled modifiers, and only the Issuer should execute the LDGRToken constructor for a compliant token. LDGRToken extends the general Ownable modifier to describe a specific subset of owners that automate and decentralize compliance through the contract modifiers Owned and IssuerControlled and the function modifiers onlyOwner and onlyIssuerTransferAgent. The Owned contract modifier instantiates the onlyOwner modifier for functions. The IssuerControlled modifier instantiates the onlyIssuerTransferAgent modifier for functions.
+### `LDGRToken`
+`LDGRToken` requires that only the Issuer can create a token representing the security that only the RTA manages. Instantiating the `LDGRToken` requires the Owned and IssuerControlled modifiers, and only the Issuer should execute the `LDGRToken` constructor for a compliant token. `LDGRToken` extends the general Ownable modifier to describe a specific subset of owners that automate and decentralize compliance through the contract modifiers Owned and IssuerControlled and the function modifiers onlyOwner and onlyIssuerTransferAgent. The Owned contract modifier instantiates the onlyOwner modifier for functions. The IssuerControlled modifier instantiates the onlyIssuerTransferAgent modifier for functions.
 
-LDGRToken must prevent anyone from executing the transfer, allowance, and approve functions and/or implement these functions to always fail. LDGRToken updates the transferFrom, mint, and burnFrom functions. transferFrom, mint, and burnFrom may only be executed by the RTA and are restricted with the onlyIssuerTransferAgent modifier. Additionally, LDGRToken defines the functions transferOwnership, setTransferAgent, setPhysicalAddressOfOperation, and isTransferAgent.  Only the issuer may call the transferOwnership, setTransferAgent, and setPhysicalAddressOfOperation functions. Anyone may call the isTransferAgent function.
+`LDGRToken` must prevent anyone from executing the transfer, allowance, and approve functions and/or implement these functions to always fail. `LDGRToken` updates the transferFrom, mint, and burnFrom functions. transferFrom, mint, and burnFrom may only be executed by the RTA and are restricted with the onlyIssuerTransferAgent modifier. Additionally, `LDGRToken` defines the functions transferOwnership, setTransferAgent, setPhysicalAddressOfOperation, and isTransferAgent.  Only the issuer may call the transferOwnership, setTransferAgent, and setPhysicalAddressOfOperation functions. Anyone may call the isTransferAgent function.
 
 ### Issuers and RTAs
-For compliance reasons, the LDGRToken constructor must specify the issuer (the owner), the RTA (transferAgent), the security’s name, and the security’s symbol.
+For compliance reasons, the `LDGRToken` constructor must specify the issuer (the owner), the RTA (transferAgent), the security’s name, and the security’s symbol.
 
 #### Issuer Owned
-LDGRToken must specify the owner in its constructor, apply the Owned modifier, and instantiate the onlyOwner modifier to enable specific functions to permit only the Issuer’s owner address to execute them. LDGRToken also defines the function transferOwnership which transfer ownership of the Issuer to new owner’s address and can only be called by the owner. transferOwnership triggers the OwnershipTransferred event.
+`LDGRToken` must specify the owner in its constructor, apply the Owned modifier, and instantiate the onlyOwner modifier to enable specific functions to permit only the Issuer’s owner address to execute them. `LDGRToken` also defines the function transferOwnership which transfer ownership of the Issuer to new owner’s address and can only be called by the owner. transferOwnership triggers the OwnershipTransferred event.
 
 #### Issuer Controlled
-IssuerControlled maintains the Issuer’s ownership of their securities by owning the contract and enables the Issuer to set and update the RTA for the Issuer’s securities. LDGRToken‘s constructor must have an IssuerControlled modifier with the issuer specified in its LDGRToken constructor. IssuerControlled instantiates the onlyIssuerTransferAgent modifier for LDGRToken to enable specific functions (setPhysicalAddressOfOperation and setTransferAgent) to permit only the Issuer to execute these functions.
+IssuerControlled maintains the Issuer’s ownership of their securities by owning the contract and enables the Issuer to set and update the RTA for the Issuer’s securities. `LDGRToken`‘s constructor must have an IssuerControlled modifier with the issuer specified in its `LDGRToken` constructor. IssuerControlled instantiates the onlyIssuerTransferAgent modifier for `LDGRToken` to enable specific functions (setPhysicalAddressOfOperation and setTransferAgent) to permit only the Issuer to execute these functions.
 
 #### Register Transfer Agent Controlled
-LDGRToken defines the setTransferAgent function (to change the RTA) and setPhysicalAddressOfOperation function (to change the Issuer’s address) and must restrict execution to the Issuer’s owner with the onlyOwner modifier. setTransferAgent must emit the TransferAgentUpdated event. setPhysicalAddressOfOperation must emit the PhysicalAddressOfOperationUpdated event.
+`LDGRToken` defines the setTransferAgent function (to change the RTA) and setPhysicalAddressOfOperation function (to change the Issuer’s address) and must restrict execution to the Issuer’s owner with the onlyOwner modifier. setTransferAgent must emit the TransferAgentUpdated event. setPhysicalAddressOfOperation must emit the PhysicalAddressOfOperationUpdated event.
 
-LDGRToken must specify the transferAgent in its constructor and instantiate the onlyIssuerTransferAgent modifier to enable specific functions (transferFrom, mint, and burnFrom) to permit only the Issuer’s transferAgent address to execute them. LDGRToken also defines the public function isTransferAgent to lookup and identify the Issuer’s RTA.
+`LDGRToken` must specify the transferAgent in its constructor and instantiate the onlyIssuerTransferAgent modifier to enable specific functions (transferFrom, mint, and burnFrom) to permit only the Issuer’s transferAgent address to execute them. `LDGRToken` also defines the public function isTransferAgent to lookup and identify the Issuer’s RTA.
 
 #### Securities
-LDGRToken updates the transferFrom, mint, and burnFrom functions by applying the onlyIssuerTransferAgent to enable the issuance, re-issuance, and trading of securities.
+`LDGRToken` updates the transferFrom, mint, and burnFrom functions by applying the onlyIssuerTransferAgent to enable the issuance, re-issuance, and trading of securities.
 
 ### ERC-20 Extension
 ERC-20 tokens provide the following functionality:
@@ -66,70 +66,70 @@ contract ERC20 {
 ERC-20 is extended as follows:
 
 /**
- * LDGRToken is an ERC-20 compatible token that complies with the new Securities Act
+ * `LDGRToken` is an ERC-20 compatible token that complies with the new Securities Act
  * Regulations.
  *
- * Implementations of the LDGRToken standard must define the following optional ERC-20
+ * Implementations of the `LDGRToken` standard must define the following optional ERC-20
  *     fields:
  * 
- * ‘name’ - The name of the security
- * ‘symbol’ - The symbol of the security
+ * name - The name of the security
+ * symbol - The symbol of the security
  * 
- * Implementations of the LDGRToken standard must specify the following constructor
+ * Implementations of the `LDGRToken` standard must specify the following constructor
  *   arguments:
  * 
- * ‘_owner’ - the address of the owner
- * ‘_transferAgent’ - the address of the transfer agent
- * ‘_name’ - the name of the security
- * ‘_symbol’ - the symbol of the security
+ * _owner - the address of the owner
+ * _transferAgent - the address of the transfer agent
+ * _name - the name of the security
+ * _symbol - the symbol of the security
  *  
- *  Implementations of the LDGRToken standard must implement the following contract
+ *  Implementations of the `LDGRToken` standard must implement the following contract
  *      modifiers:
  * 
- * ‘Owned’ - Only the address of the security’s issuer is permitted to execute the
+ * Owned - Only the address of the security’s issuer is permitted to execute the
  *     token’s constructor. This modifier also sets up the onlyOwner function modifier.
- * ‘IssuerControlled’ - This modifier sets up the onlyIssuerTransferAgent function modifier.
+ * IssuerControlled - This modifier sets up the onlyIssuerTransferAgent function modifier.
  * 
- * Implementations of the LDGRToken standard must implement the following function
+ * Implementations of the `LDGRToken` standard must implement the following function
  *      modifiers:
  * 
- * ‘onlyOwner’ - Only the address of the security’s issuer is permitted to execute the
+ * onlyOwner - Only the address of the security’s issuer is permitted to execute the
  *     functions transferOwnership, setTransferAgent, and setPhysicalAddressOfOperation.
- * ‘onlyIssuerTransferAgent’ - Only the address of the issuer’s Registered Transfer
+ * onlyIssuerTransferAgent - Only the address of the issuer’s Registered Transfer
  *     Agent is permitted to execute the functions transferFrom, mint, and burnFrom.
  * 
- * Implementations of the LDGRToken standard must implement the following required ERC-20
+ * Implementations of the `LDGRToken` standard must implement the following required ERC-20
  *     event to always fail:
  * 
- * ‘Approval’ - Should never be called as the functions that emit this event must be
+ * Approval - Should never be called as the functions that emit this event must be
  *     implemented to always fail. 
  * 
- * Implementations of the LDGRToken standard must implement the following required
+ * Implementations of the `LDGRToken` standard must implement the following required
  *     ERC-20 functions to always fail:
  * 
- * ‘transfer’ - Not a legal, regulated call for transferring securities because
+ * transfer - Not a legal, regulated call for transferring securities because
  *     the token holder initiates the token transfer. The function must be implemented to
  *     always fail.
- * ‘allowance’ - Not a legal, regulated call for transferring securities because
+ * allowance - Not a legal, regulated call for transferring securities because
  *     the token holder may not allow third parties to initiate token transfers. The
  *     function must be implemented to always fail.
- * ‘approve’ - Not a legal, regulated call for transferring securities because
+ * approve - Not a legal, regulated call for transferring securities because
  *     the token holder may not allow third parties to initiate token transfers. The
  *     function must be implemented to always fail.
  * 
- * Implementations of the LDGRToken standard must implement the following optional
+ * Implementations of the `LDGRToken` standard must implement the following optional
  *     ERC-20 function:
- * ‘decimals’ - Must return ‘0’ because securities are indivisible entities.
+ * decimals - Must return ‘0’ because securities are indivisible entities.
  * 
- * Implementations of the LDGRToken standard must implement the following functions:
+ * Implementations of the `LDGRToken` standard must implement the following functions:
  * 
- * ‘mint’ - Only the address of the issuer’s Registered Transfer Agent may create new
+ * mint - Only the address of the issuer’s Registered Transfer Agent may create new
  *     securities.
- * ‘burnFrom’ - Only the address of the issuer’s Registered Transfer Agent may burn or 
+ * burnFrom - Only the address of the issuer’s Registered Transfer Agent may burn or 
  *     destroy securities.
  */
 
-Contract LDGRToken is Owned, IssuerControlled {
+Contract `LDGRToken` is Owned, IssuerControlled {
 
   /**
    * The constructor must implement a modifier (Owned) that creates the onlyOwner modifier
@@ -145,23 +145,23 @@ Contract LDGRToken is Owned, IssuerControlled {
     /**
      * Specify that only the owner (issuer) may execute a function.
      *
-     * ‘onlyOwner’ requires the msg.sender to be the owner’s address.
+     * onlyOwner requires the msg.sender to be the owner’s address.
      */
     modifier onlyOwner();
 
     /**
      * Specify that only the issuer’s transferAgent may execute a function.
      *
-     * ‘onlyIssuerTransferAgent’ requires the msg.sender to be the transferAgent’s address.
+     * onlyIssuerTransferAgent requires the msg.sender to be the transferAgent’s address.
      */
     modifier onlyIssuerTransferAgent();
 
     /**
      * Transfer ownership of a security from one issuer to another issuer.
      *
-     * ‘transferOwnership’ must implement the onlyOwner modifier to only allow the
+     * transferOwnership must implement the onlyOwner modifier to only allow the
      *     address of the issuer’s owner to transfer ownership.
-     * ‘transferOwnership’ requires the _newOwner address to be the address of the new
+     * transferOwnership requires the _newOwner address to be the address of the new
      *     issuer.
      */
     function transferOwnership(address _newOwner) public onlyOwner;
@@ -174,25 +174,25 @@ Contract LDGRToken is Owned, IssuerControlled {
     /**
      * Sets the transfer agent for the security.
      *
-     * ‘setTransferAgent’ must implement the onlyOwner modifier to only allow the
+     * setTransferAgent must implement the onlyOwner modifier to only allow the
      *     address of the issuer’s specify the security’s transfer agent.
-     * ‘setTransferAgent’ requires the _newTransferAgent address to be the address of the
+     * setTransferAgent requires the _newTransferAgent address to be the address of the
      *     new transfer agent.
      */
     function setTransferAgent(address _newTransferAgent) public onlyOwner;
 
     /**
-     * Triggered after ‘setTransferAgent’ is executed.
+     * Triggered after setTransferAgent is executed.
      */
-event TransferAgentUpdated(address indexed previousTransferAgent, address indexed
-    newTransferAgent);
+    event TransferAgentUpdated(address indexed previousTransferAgent, address indexed
+        newTransferAgent);
 
     /**
      * Sets the issuers physical address of operation.
      *
-     * ‘setPhysicalAddressOfOperation’ must implement the onlyOwner modifier to only allow
+     * setPhysicalAddressOfOperation must implement the onlyOwner modifier to only allow
      *     the address of the issuer’s owner to transfer ownership.
-     * ‘setPhysicalAddressOfOperation’ requires the _newPhysicalAddressOfOperation address
+     * setPhysicalAddressOfOperation requires the _newPhysicalAddressOfOperation address
      *     to be the new address of the issuer.
      */
     function setPhysicalAddressOfOperation(string _newPhysicalAddressOfOperation) public
@@ -207,40 +207,40 @@ event TransferAgentUpdated(address indexed previousTransferAgent, address indexe
     /**
      * Look up the security’s transfer agent.
      *
-     * ‘isTransferAgent’ is a public function.
-     * ‘isTransferAgent’ requires the _lookup address to determine if that address
+     * isTransferAgent is a public function.
+     * isTransferAgent requires the _lookup address to determine if that address
      *   is the security’s transfer agent.
      */
     function isTransferAgent(address _lookup) public view returns (bool);
 
     /**
-     * ‘transfer’ is not a legal, regulated call and must be implemented to always fail.
+     * transfer is not a legal, regulated call and must be implemented to always fail.
      */
     transfer(address to, uint tokens) public returns (bool success);
 
     /**
-     * ‘Approval’ does not have to be implemented. This event should never be triggered as
+     * Approval does not have to be implemented. This event should never be triggered as
      * the functions that emit this even are not legal, regulated calls.
      */
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
     /**
-     * ‘allowance’ is not a legal, regulated call and must be implemented to always fail.
+     * allowance is not a legal, regulated call and must be implemented to always fail.
      */
     allowance(address tokenOwner, address spender) public constant returns (uint remaining);
 
     /**
-     * ‘approve’ is not a legal, regulated call and must be implemented to always fail.
+     * approve is not a legal, regulated call and must be implemented to always fail.
      */
     approve(address spender, uint tokens) public returns (bool success);
 
     /**
      * Transfer securities.
      *
-     * ‘transferFrom’ must implement the onlyIssuerTransferAgent modifier to only allow the
-     *     address of the issuer’s Registered Transfer Agent to transfer LDGRTokens.
-     * ‘transferFrom’ requires the _from address to have _value tokens.
-     * ‘transferFrom’ requires that the _to address must not be 0 because securities must
+     * transferFrom must implement the onlyIssuerTransferAgent modifier to only allow the
+     *     address of the issuer’s Registered Transfer Agent to transfer `LDGRToken`s.
+     * transferFrom requires the _from address to have _value tokens.
+     * transferFrom requires that the _to address must not be 0 because securities must
      *     not destroyed in this manner.
      */
     function transferFrom(address _from, address _to, uint256 _value) public
@@ -249,13 +249,13 @@ event TransferAgentUpdated(address indexed previousTransferAgent, address indexe
     /**
      * Create new securities.
      *
-     * ‘mint’ must implement the onlyIssuerTransferAgent modifier to only allow the address
-     *     of the issuer’s Registered Transfer Agent to mint LDGRTokens.
-     * ‘mint’ requires that the _to address must not be 0 because securities must
+     * mint must implement the onlyIssuerTransferAgent modifier to only allow the address
+     *     of the issuer’s Registered Transfer Agent to mint `LDGRToken`s.
+     * mint requires that the _to address must not be 0 because securities must
      *     not destroyed in this manner.
-     * ‘mint’ must add _value tokens to the _to address and increase the totalSupply by
+     * mint must add _value tokens to the _to address and increase the totalSupply by
      *     _value.
-     * ‘mint’ must emit the Transfer event.
+     * mint must emit the Transfer event.
      */
     function mint(address _to, uint256 _value) public onlyIssuerTransferAgent returns
         (bool);
@@ -263,12 +263,12 @@ event TransferAgentUpdated(address indexed previousTransferAgent, address indexe
     /**
      * Burn or destroy securities.
      *
-     * ‘burnFrom’ must implement the onlyIssuerTransferAgent modifier to only allow the
-     *     address of the issuer’s Registered Transfer Agent to burn LDGRTokens.
-     * ‘burnFrom’ requires the _from address to have _value tokens.
-     * ‘burnFrom’ must subtract _value tokens from the _from address and decrease the
+     * burnFrom must implement the onlyIssuerTransferAgent modifier to only allow the
+     *     address of the issuer’s Registered Transfer Agent to burn `LDGRToken`s.
+     * burnFrom requires the _from address to have _value tokens.
+     * burnFrom must subtract _value tokens from the _from address and decrease the
      *     totalSupply by _value.
-     * ‘burnFrom’ must emit the Transfer event.
+     * burnFrom must emit the Transfer event.
      */
     function burnFrom(address _who, uint256 _value) public onlyIssuerTransferAgent returns
         (bool);
@@ -287,7 +287,7 @@ Special care and attention must be taken to ensure that the personally identifia
 ### Issuers who lost access to their address or private keys
 There is no recourse if the Issuer loses access to their address to an existing instance of their securities. Special care and efforts must be made by the Issuer to secure and safely store their address and associated private key. The Issuer can reassign ownership to another Issuer but not in the case where the Issuer loses their private key.
 
-If the Issuer loses access, the Issuer’s securities must be rebuilt using off-chain services. The Issuer must create (and secure)  a new address. The RTA can read the existing Issuer securities, and the RTA can mint Investor securities accordingly under a new LDGRToken smart contract..
+If the Issuer loses access, the Issuer’s securities must be rebuilt using off-chain services. The Issuer must create (and secure)  a new address. The RTA can read the existing Issuer securities, and the RTA can mint Investor securities accordingly under a new `LDGRToken` smart contract..
 
 ### Registered Transfer Agents who lost access to their address or private keys
 If the RTA loses access, the RTA can create a new Ethereum address, and the Issuer can execute the setTransferAgent function to reassign the RTA.
@@ -301,17 +301,17 @@ If an Investor (or, say, the Investor’s heir) loses their credentials, the Inv
 The are currently no token standards that conform to SEC regulations. The closest token is [ERC-884 (Delaware General Corporations Law (DGCL) compatible share token)](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-884.md) which states that SEC requirements are out of scope. [EIP-1404 (Simple Restricted Token Standard)](https://github.com/ethereum/EIPs/issues/1404) does not go far enough to address SEC requirements around re-issuing securities to Investors.
 
 ## Backwards Compatibility
-LDGRToken maintains compatibility with ERC-20 tokens with the following stipulations:
-function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
-Must be implemented to always fail because allowance is not a legal, regulated call for a security.
-function transfer(address to, uint tokens) public returns (bool success);
-As the token holder initiates the transfer, must be implemented to always fail because transfer is not a legal, regulated call for a security.
-function approve(address spender, uint tokens) public returns (bool success);
-Must be implemented to always fail because approve is not a legal, regulated call for a security
-function transferFrom(address from, address to, uint tokens) public returns (bool success);
-Must be implemented so that only the Issuer’s RTA can perform this action
-event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-Does not have to be implemented. Approval should never be called as the functions that emit this event must be implemented to always fail
+`LDGRToken` maintains compatibility with ERC-20 tokens with the following stipulations:
+* function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+  * Must be implemented to always fail because allowance is not a legal, regulated call for a security.
+* function transfer(address to, uint tokens) public returns (bool success);
+  * As the token holder initiates the transfer, must be implemented to always fail because transfer is not a legal, regulated call for a security.
+* function approve(address spender, uint tokens) public returns (bool success);
+  * Must be implemented to always fail because approve is not a legal, regulated call for a security
+* function transferFrom(address from, address to, uint tokens) public returns (bool success);
+  * Must be implemented so that only the Issuer’s RTA can perform this action
+* event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+  * Does not have to be implemented. Approval should never be called as the functions that emit this event must be implemented to always fail
 
 ## Test Cases
 Test cases are available at [https://github.com/StartEngine/ldgr_smart_contracts/tree/master/test](https://github.com/StartEngine/ldgr_smart_contracts/tree/master/test).
