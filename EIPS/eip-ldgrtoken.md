@@ -65,17 +65,17 @@ contract ERC20 {
 
 ERC-20 is extended as follows:
 
-/**
- * `LDGRToken` is an ERC-20 compatible token that complies with the new Securities Act
+`/**
+ * LDGRToken is an ERC-20 compatible token that complies with the new Securities Act
  * Regulations.
  *
- * Implementations of the `LDGRToken` standard must define the following optional ERC-20
+ * Implementations of the LDGRToken standard must define the following optional ERC-20
  *     fields:
  * 
  * name - The name of the security
  * symbol - The symbol of the security
  * 
- * Implementations of the `LDGRToken` standard must specify the following constructor
+ * Implementations of the LDGRToken standard must specify the following constructor
  *   arguments:
  * 
  * _owner - the address of the owner
@@ -83,14 +83,14 @@ ERC-20 is extended as follows:
  * _name - the name of the security
  * _symbol - the symbol of the security
  *  
- *  Implementations of the `LDGRToken` standard must implement the following contract
+ *  Implementations of the LDGRToken standard must implement the following contract
  *      modifiers:
  * 
  * Owned - Only the address of the security’s issuer is permitted to execute the
  *     token’s constructor. This modifier also sets up the onlyOwner function modifier.
  * IssuerControlled - This modifier sets up the onlyIssuerTransferAgent function modifier.
  * 
- * Implementations of the `LDGRToken` standard must implement the following function
+ * Implementations of the LDGRToken standard must implement the following function
  *      modifiers:
  * 
  * onlyOwner - Only the address of the security’s issuer is permitted to execute the
@@ -98,13 +98,13 @@ ERC-20 is extended as follows:
  * onlyIssuerTransferAgent - Only the address of the issuer’s Registered Transfer
  *     Agent is permitted to execute the functions transferFrom, mint, and burnFrom.
  * 
- * Implementations of the `LDGRToken` standard must implement the following required ERC-20
+ * Implementations of the LDGRToken standard must implement the following required ERC-20
  *     event to always fail:
  * 
  * Approval - Should never be called as the functions that emit this event must be
  *     implemented to always fail. 
  * 
- * Implementations of the `LDGRToken` standard must implement the following required
+ * Implementations of the LDGRToken standard must implement the following required
  *     ERC-20 functions to always fail:
  * 
  * transfer - Not a legal, regulated call for transferring securities because
@@ -117,19 +117,19 @@ ERC-20 is extended as follows:
  *     the token holder may not allow third parties to initiate token transfers. The
  *     function must be implemented to always fail.
  * 
- * Implementations of the `LDGRToken` standard must implement the following optional
+ * Implementations of the LDGRToken standard must implement the following optional
  *     ERC-20 function:
- * decimals - Must return ‘0’ because securities are indivisible entities.
+ * decimals - Must return '0' because securities are indivisible entities.
  * 
- * Implementations of the `LDGRToken` standard must implement the following functions:
+ * Implementations of the LDGRToken standard must implement the following functions:
  * 
- * mint - Only the address of the issuer’s Registered Transfer Agent may create new
+ * mint - Only the address of the issuer's Registered Transfer Agent may create new
  *     securities.
  * burnFrom - Only the address of the issuer’s Registered Transfer Agent may burn or 
  *     destroy securities.
  */
 
-Contract `LDGRToken` is Owned, IssuerControlled {
+Contract LDGRToken is Owned, IssuerControlled {
 
   /**
    * The constructor must implement a modifier (Owned) that creates the onlyOwner modifier
@@ -272,7 +272,7 @@ Contract `LDGRToken` is Owned, IssuerControlled {
      */
     function burnFrom(address _who, uint256 _value) public onlyIssuerTransferAgent returns
         (bool);
-}
+}`
 
 ### Securities Exchange Commission Requirements
 The SEC has very strict requirements as to the specific roles that are allowed to perform specific actions. Specifically, only the RTA may mint and transferFrom securities.
@@ -302,15 +302,15 @@ The are currently no token standards that conform to SEC regulations. The closes
 
 ## Backwards Compatibility
 `LDGRToken` maintains compatibility with ERC-20 tokens with the following stipulations:
-* function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+* `function allowance(address tokenOwner, address spender) public constant returns (uint remaining);`
   * Must be implemented to always fail because allowance is not a legal, regulated call for a security.
-* function transfer(address to, uint tokens) public returns (bool success);
+* `function transfer(address to, uint tokens) public returns (bool success);`
   * As the token holder initiates the transfer, must be implemented to always fail because transfer is not a legal, regulated call for a security.
-* function approve(address spender, uint tokens) public returns (bool success);
+* `function approve(address spender, uint tokens) public returns (bool success);`
   * Must be implemented to always fail because approve is not a legal, regulated call for a security
-* function transferFrom(address from, address to, uint tokens) public returns (bool success);
+* `function transferFrom(address from, address to, uint tokens) public returns (bool success);`
   * Must be implemented so that only the Issuer’s RTA can perform this action
-* event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+* `event Approval(address indexed tokenOwner, address indexed spender, uint tokens);`
   * Does not have to be implemented. Approval should never be called as the functions that emit this event must be implemented to always fail
 
 ## Test Cases
