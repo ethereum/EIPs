@@ -29,6 +29,9 @@ header_pages:
  - erc.html
  - informational.html
  - meta.html
+twitter:
+  card: summary
+  username: ethereum
 
 # Build settings
 markdown: kramdown
