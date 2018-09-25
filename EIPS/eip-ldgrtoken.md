@@ -52,7 +52,7 @@ For compliance reasons, the `LDGRToken` constructor must specify the issuer (the
 ### ERC-20 Extension
 ERC-20 tokens provide the following functionality:
 
-`contract ERC20 {
+```contract ERC20 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
@@ -61,11 +61,11 @@ ERC-20 tokens provide the following functionality:
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Transfer(address indexed from, address indexed to, uint256 value);
-}`
+}```
 
 ERC-20 is extended as follows:
 
-`/**
+```/**
  * LDGRToken is an ERC-20 compatible token that complies with the new Securities Act
  * Regulations.
  *
@@ -272,7 +272,7 @@ Contract LDGRToken is Owned, IssuerControlled {
      */
     function burnFrom(address _who, uint256 _value) public onlyIssuerTransferAgent returns
         (bool);
-}`
+}```
 
 ### Securities Exchange Commission Requirements
 The SEC has very strict requirements as to the specific roles that are allowed to perform specific actions. Specifically, only the RTA may `mint` and `transferFrom` securities.
