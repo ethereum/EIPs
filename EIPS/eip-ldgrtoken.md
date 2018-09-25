@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: LDGRToken
 author: Howard Marks (Howard@StartEngine.com), John Shiple (@johnshiple), David Zhang (David@StartEngine.com)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/erc-proposal-ldgrtoken-a-compatible-security-token-for-issuing-and-trading-sec-compliant-securities/1468
 status: Draft
 type: Standards Track
 category: ERC
