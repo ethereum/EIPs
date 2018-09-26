@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: A Standard for Tokenized Debt
 author: Aaron Diamond-Reivich <aarondia@wharton.upenn.edu> (@aarondr77), Gabriel Barros (@gbarros), Griffin Anderson <griffin.anderson@consensys.net> (@andergri)
-discussions-to: <URL>
+discussions-to: https://github.com/aarondr77/DebtStandard/issues
 status: Draft
 type: Standards
 category ERC
