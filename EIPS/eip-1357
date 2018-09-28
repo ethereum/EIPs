@@ -1,0 +1,106 @@
+```
+eip: tbd
+title: JSON Standard for storing address Metadata
+authors: 
+    Alexander Mangel <alexander.mangel@protonmail.com>, 
+    Pedro Gomes <pedrouid@protonmail.com>
+type: Standards Track
+category: ERC
+status: WIP
+created: 2018-09-17
+discussions-to: 
+```
+
+## JSON schema for storing address Metadata
+
+## Summary
+
+A standard JSON specification for metadata associated to Ethereum addresses. 
+
+## Abstract
+
+Ethereum addresses have related information (metadata) useful to users and developers. This metadata is captured by third parties and not accessible through an on-chain mechanism.
+
+The Registry makes address metadata available to applications and users through a registry contract that maps the addres to a JSON file stored on IPFS. 
+
+A working prototype is available at:  https://theregistry.online.
+
+
+## Specification
+
+Inspired by:
+https://github.com/ethereum-lists/mETHadata
+https://github.com/MetaMask/eth-contract-metadata
+https://etherscamdb.info/api
+
+
+```
+{
+    version: 1,           // int        - Spec version
+    address: "",          // string     - Ethereum address
+    submission: {         // Submission related details
+        comments: "",         // string     - Comments on submission
+        ipfs: [],             // string[]   - Related IPFS hashes for documents
+    },
+    metadata: {
+        name: "",         // string     - official name
+        url: "",          // string     - official url
+        logo: "",         // string     - Ipfs hash to base64 encoded image
+        description: "",  // string     - description
+        ens: "",          // string     - ENS Address
+        contact: {
+            peepeth: "@handle",
+            email: "john@doh.com",
+            support: "help@doh.com"
+            press: "press@doh.com"
+        },
+    },
+    contract: {
+        name: "",             // string - Constructor name
+        abi: "",              // string - Ipfs hash to abi (as json)
+        source: "",           // string - Ipfs hash to source (as plaintext)
+        compiler: "",         // string - 0.4.24+commit.e67f0147
+        language: "",         // string - Solidity
+        optimizer: -1,        // int    - 200
+        swarm: "",            // string - Swarm address
+        constructor: ""      // string - Constructor arguments     
+    },
+    standards: {              // Standard Specific Metadata
+        20:{                  // Standard Specific Metadata
+            version: 1,       // SSMD versioning
+            ticker:"",        // Preferred ticker symbol
+            decimals:18       // Token decimals
+           }
+        },
+        721:{
+            version: 1,
+            
+        }
+    },
+    reputation: {
+        status: "",           // Safe, Warning, Blocked, Offline
+        tags: ["scam",        // Scamming, Phishing, Hacker ?? category or tags?
+               "ponzi", 
+               "binance"],    
+        description: "",      // Further details
+        addresses: []         // Related addresses
+        related: [],          // Related JSON IPFS hashes
+    },
+}
+```
+
+## Standard Specific Metadata
+
+The specification has approach standard-specific Metadata to supplement the needs/desire for data that is not inherently available from the contract but arises during usage/implementation.
+
+
+## Rationale
+Increase the availability of metadata for dApps and wallets by storing an IPFS key-value pair on chain. 
+
+Looking for input on:
+-    reputation
+-    interface/standards specific metadata
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
