@@ -1,5 +1,5 @@
 ---
-eip: 1453
+eip: to be named
 title: A Standard for Tokenized Debt
 author: Aaron Diamond-Reivich <aarondia@wharton.upenn.edu>, Gabriel Barros <gbbabarros@gmail.com>, Griffin Anderson <andergri1@gmail.com>
 discussions-to: https://github.com/aarondr77/DebtStandard/issues
