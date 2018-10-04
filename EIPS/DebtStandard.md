@@ -2,7 +2,6 @@
 eip: to be named
 title: A Standard for Tokenized Debt
 author: Aaron Diamond-Reivich <aarondia@wharton.upenn.edu>, Gabriel Barros <gbbabarros@gmail.com>, Griffin Anderson <andergri1@gmail.com>
-discussions-to: https://github.com/aarondr77/DebtStandard/issues
 status: WIP
 type: Standards Track
 category: ERC
@@ -14,9 +13,9 @@ requires: 721
 The Ethereum community needs a standard for representing debt on the blockchain because most business transactions utilize the tracking of liabilities in order to facilitate interactions that cannot settle using an atomic swap of two assets. The lack of a standard created siloed pools of debt that are not interoperable. The adoption of this standard will allow for the creation of valuable applications and protocols to help users manage user's debt.
 
 ## Abstract
-From complex transactions like mortgages, to simple transactions like purchasing coffee from Starbucks, there is a period of time when one party has yet to fulfill his/her side of the agreement; that party is in debt. The creation of debt is a method to ensure accountability for these incomplete business transactions.
+From complex transactions like mortgages to simple transactions like purchasing coffee from Starbucks, there is a period of time when one party has yet to fulfill his/her side of the agreement; that party is in debt. The creation of debt is a method to ensure accountability for these incomplete business transactions.
 
-The Ethereum developer community has adopted the ERC20 and ERC721 token standards as a means of representing assets on the ethereum blockchain. These common standards allow exchanges, wallets, and protocols to facilitate the transfer and custody of these assets. The common interface to enable transfer of ownership of these digital assets is powerful. However, the inclusion of a few optional pieces of data have proven useful as well, namely, token name, symbol, and number of decimals. Incorporating this extra information into the standard makes the aforementioned tools even more powerful.
+The Ethereum developer community has adopted the ERC20 and ERC721 token standards as a means of representing assets on the Ethereum blockchain. These common standards allow exchanges, wallets, and protocols to facilitate the transfer and custody of these assets. The common interface to enable the transfer of ownership of these digital assets is powerful. However, the inclusion of a few optional pieces of data has proven useful as well, namely, token name, symbol, and the number of decimals. Incorporating this extra information into the standard makes the aforementioned tools even more powerful.
 
 Although tokens have traditionally been used to represent assets, this is of course not their only use case. Similar to how additional standards have been built on top of the ERC20 token standard, we are proposing an additional standard on top of the ERC721 token standard. Our Debt Standard defines a common interface that is to be implemented by all ERC721 token smart contracts created to represent debt.
 
@@ -34,12 +33,12 @@ The existing ERC 721 token standard is inadequate for representing debt on the b
 ##### fulfill
 
 This function should retrieve information about the debt
-and try to fullfil the transfer of value. It can be Ether or ERC223 already deposited
+and try to fulfil the transfer of value. It can be Ether or ERC223 already deposited
 at this contract. It could be Ether being sent with the call, where msg.value must match
 the amount owed. Or it could be an ERC20 or ERC721 which will try transferFrom methods, meaning
 debtor must have allowed the contract prior to this call.
 
-* @param debtID - is an unique identifier of a debt inside this contract space
+* @param debtID - is a unique identifier of a debt inside this contract space
 
 ```
 function fullfill(uint256 debtID) public payable;
@@ -59,11 +58,10 @@ function withdraw(uint debt) public;
 ##### status
 
 This function should return the status of a debt
-based on its time parameters. All created debts are necessarily done by debtor, as such
-all are Approved by default. If activation date as passed, it's Materialized. Following,
-if due date for fullfiment has passed, it's Defaulted.
+based on its time parameters. If the activation date has passed, it's Materialized.
+If due date for fulfillment has passed, it's Defaulted.
 
-* @param debtID - is an unique identifier of a debt inside this contract space
+* @param debtID - is a unique identifier of a debt inside this contract space
 
 ```
 function status(uint256 debtID) public view returns (DebtStatus _status);
@@ -81,7 +79,7 @@ function info(uint256 debtID) public view returns
 
 ##### calculateFulillment
 
-This function should calculate all specific terms inhenrent to the debt and
+This function should calculate all specific terms inherent to the debt and
 return the exact amount one must pay in order to fulfill.
 
 * @param debtID - is an unique identifier of a debt inside this contract space
@@ -92,7 +90,7 @@ function calculateFulfillment(uint256 debtID, uint256 fulfillmentTime) public vi
 ```
 
 ##### changeDebtor
-This function change the debtor of a debt to msg.sender
+This function changes the debtor of a debt to msg.sender
 It should be used by exchange solutions where their original debtor is
 not responsible to pay out the debt anymore.
 
@@ -120,7 +118,7 @@ This function changes the owner of the debt contract to @param newOwner.
 It can only be called by the current owner. All future created debt for the
 debt contract should default to @param newOwner as the receiver of the payment
 
-* @param debtID - is an unique identifier of a debt inside this contract space
+* @param debtID - is a unique identifier of a debt inside this contract space
 * @param newOwner - the address to make the receiver of all new debt
 
 ```
@@ -153,7 +151,7 @@ Fulfilled - The debtor fulfilled his terms of the agreement
 enum DebtStatus { Approved, Materialized, Defaulted, Fulfilled }
 ```
 
-The above interface should be implemented by all tokens that represent debt of any sort. Additionally, for collateralized debt and interest bearing debt, we propose the following supplemental interfaces.
+The above interface should be implemented by all tokens that represent debt of any sort. Additionally, for collateralized debt and interest-bearing debt, we propose the following supplemental interfaces.
 
 ### Secured Debt
 The Secured Standard is used in addition to the debt standard to represent collateralized debt.
@@ -175,14 +173,14 @@ event CollateralClaimed(uint indexed reference);
 #### Functions
 ##### depositCollateral
 
-This function should enables the deposit of collateral goods for this debt
+This function should enable the deposit of collateral goods for this debt
 
 ```
 function depositCollateral() public payable;
 ```
 ##### withdrawCollateral
 
-This function should allow for return of ownership of collateral
+This function should allow for the return of ownership of collateral
 once all debt attached to it is fulfilled
 
 ```
@@ -197,12 +195,12 @@ function claimCollateral() public;
 ```
 ### Interest
 
-The Interest Standard is used in addition to the debt standard to represent interest bearing debt.
+The Interest Standard is used in addition to the debt standard to represent interest-bearing debt.
 #### Functions
 
 ##### amountTowardsPrincipal
 
-This function should return the amount of payments that have been made that has counted against the principal of the debt.
+This function should return the number of payments that have been made that has counted against the principal of the debt.
 
 ```
 function amountTowardsPrincipal() public returns (uint principal);
@@ -210,19 +208,19 @@ function amountTowardsPrincipal() public returns (uint principal);
 
 ##### totalInterestPaid
 
-This function should return the amount of payments that have been made that has gone towards the interest of the debt.
+This function should return the number of payments that have been made that has gone towards the interest of the debt.
 ```
 function totalInterestPaid() public returns (uint interest);
 ```
 
 ## Rationale
-Each unique debt token is assigned to a unique debt. When that debt is repayed by the borrower, the owner of the token burns his/her debt token in order to receive the payment. This burned token is now an imutable receipt of the fulfilled debt.
+Each unique debt token is assigned to a unique debt. When that debt is repaid by the borrower, the owner of the token burns his/her debt token in order to receive the payment. This burned token is now an immutable receipt of the fulfilled debt.
 
-Representing the right to claim the payment for a debt as an EIP 721 NFT immiedietly allows the owner of the token to sell the debt through existing protocols like 0x.
+Representing the right to claim the payment for a debt as an EIP 721 NFT immediately allows the owner of the token to sell the debt through existing protocols like 0x.
 
-The debt standard smart contract can be implemented to accomodate a wide range of business processes. We have tested it out with subscriptions, mortgages, and loans. Because the standard does not dictate the creation of the debt, the developper has the freedom to use this standard across a multitude of different use cases.
+The debt standard smart contract can be implemented to accomodate a wide range of business processes. We have tested it out with subscriptions, mortgages, and loans. Because the standard does not dictate the creation of the debt, the developer has the freedom to use this standard across a multitude of different use cases.
 ## Backwards Compatibility
-Backwards Compatible with EIP 721
+Backward Compatible with EIP 721
 
 ## Test Cases
 WIP
