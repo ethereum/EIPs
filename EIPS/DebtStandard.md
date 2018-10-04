@@ -6,7 +6,6 @@ status: WIP
 type: Standards Track
 category: ERC
 created: 2018-10-03
-requires: 721
 ---
 
 ## Simple Summary
