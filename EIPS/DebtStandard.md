@@ -4,7 +4,7 @@ title: A Standard for Tokenized Debt
 author: Aaron Diamond-Reivich <aarondia@wharton.upenn.edu>, Gabriel Barros <gbbabarros@gmail.com>, Griffin Anderson <andergri1@gmail.com>
 discussions-to: https://github.com/aarondr77/DebtStandard/issues
 status: WIP
-type: Standards
+type: Standards Track
 category: ERC
 created: 2018-10-03
 requires: 721
