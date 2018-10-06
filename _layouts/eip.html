@@ -1,0 +1,37 @@
+---
+layout: default
+---
+
+<div class="home">
+  <h1 class="page-heading">
+    EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
+  </h1>
+  <table>
+    <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
+    {% if page["discussions-to"] != undefined %}
+      <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
+    {% endif %}
+    <tr><th>Status</th><td>{{ page.status | xml_escape }}</td></tr>
+    <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
+    {% if page.category != undefined %}
+      <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
+    {% endif %}
+    <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
+    {% if page.requires != undefined %}
+      <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
+    {% endif %}
+    {% if page.replaces != undefined %}
+      <tr><th>Replaces</th><td>{% include eipnums.html eips=page.replaces %}</td></tr>
+    {% endif %}
+    {% if page["superseded-by"] != undefined %}
+      <tr><th>Superseded by</th><td>{% include eipnums.html eips=page.superseded-by %}</td></tr>
+    {% endif %}
+    {% if page.resolution != undefined %}
+      <tr><th>Resolution</th><td><a href="{{page.resolution | uri_escape }}">{{ page.resolution | xml_escape }}</a></td></tr>
+    {% endif %}
+  </table>
+
+  {{ content }}
+
+</div>
