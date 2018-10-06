@@ -71,9 +71,9 @@ Specific types of values passed to and returned from Ethereum RPC methods requir
 - A `Data` value MUST be "0x"-prefixed.
 - A `Data` value MUST be expressed using two hex digits per byte.
 
-##### Adding new RPC methods
+##### Proposing changes
 
-As proposals for new RPC methods reach "draft" status, such as [`eth_signTypedData`](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md), this proposal will be updated to include them. By keeping the method list in this proposal up-to-date, it can serve as the canonical Ethereum RPC specification that developers can rely on.
+New Ethereum RPC methods and changes to existing methods MUST be proposed via the traditional EIP process. This allows for community consensus around new method implementations and proposed method modifications. RPC method proposals MUST reach "draft" status before being added to this proposal and the official Ethereum RPC specification defined herein.
 
 ### Methods
 
