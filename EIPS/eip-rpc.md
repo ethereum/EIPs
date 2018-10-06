@@ -43,7 +43,7 @@ If an Ethereum RPC method encounters an error, the `error` member included on th
 
 Example error response:
 
-```js
+```sh
 {
     "id": 1337
     "jsonrpc": "2.0",
@@ -94,16 +94,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "web3_clientVersion",
     "params": [],
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -132,16 +132,16 @@ Hashes data using the Keccak-256 algorithm
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "web3_sha3",
     "params": ["0x68656c6c6f20776f726c64"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -177,16 +177,16 @@ Common chain IDs:
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337
     "jsonrpc": "2.0",
     "method": "net_version",
     "params": [],
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -213,16 +213,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "net_listening",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -248,16 +248,16 @@ _(none)_
 {[`Quantity`](#quantity)} - number of connected peers
 
 #### Example
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "net_peerCount",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -283,16 +283,16 @@ _(none)_
 {`string`} - current Ethereum protocol version
 
 #### Example
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_protocolVersion",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -323,16 +323,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_syncing",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -363,16 +363,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_coinbase",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -399,16 +399,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_mining",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -435,16 +435,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_hashrate",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -471,16 +471,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_gasPrice",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -507,16 +507,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_accounts",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -543,16 +543,16 @@ _(none)_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_blockNumber",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -582,16 +582,16 @@ Returns the balance of an address in wei
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getBalance",
     "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -622,16 +622,16 @@ Returns the value from a storage position at an address
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getStorageAt",
     "params": ["0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x0", "latest"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -661,16 +661,16 @@ Returns the number of transactions sent from an address
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getTransactionCount",
     "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -699,16 +699,16 @@ Returns the number of transactions in a block specified by block hash
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getBlockTransactionCountByHash",
     "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -737,16 +737,16 @@ Returns the number of transactions in a block specified by block number
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getBlockTransactionCountByNumber",
     "params": ["0xe8"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -775,16 +775,16 @@ Returns the number of uncles in a block specified by block hash
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getUncleCountByBlockHash",
     "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -813,16 +813,16 @@ Returns the number of uncles in a block specified by block number
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getUncleCountByBlockNumber",
     "params": ["0xe8"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -852,16 +852,16 @@ Returns the contract code stored at a given address
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getCode",
     "params": ["0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b", "0x2"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -891,16 +891,16 @@ Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereu
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_sign",
     "params": ["0x9b2055d370f73ec7d8a03e965129118dc8f5bf83", "0xdeadbeaf"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -932,9 +932,9 @@ Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereu
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
 	"id": 1337
 	"jsonrpc": "2.0",
 	"method": "eth_signTypedData",
@@ -990,9 +990,9 @@ Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereu
 			"contents": "Hello, Bob!"
 		}
 	}]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1021,9 +1021,9 @@ Creates, signs, and sends a new transaction to the network
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_sendTransaction",
@@ -1035,9 +1035,9 @@ Creates, signs, and sends a new transaction to the network
         "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
         "value": "0x9184e72a"
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1066,16 +1066,16 @@ Sends and already-signed transaction to the network
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_sendRawTransaction",
     "params": ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1105,9 +1105,9 @@ Executes a new message call immediately without submitting a transaction to the 
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_call",
@@ -1119,9 +1119,9 @@ Executes a new message call immediately without submitting a transaction to the 
         "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
         "value": "0x9184e72a"
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1153,9 +1153,9 @@ Estimates the gas necessary to complete a transaction without submitting it to t
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_estimateGas",
@@ -1167,9 +1167,9 @@ Estimates the gas necessary to complete a transaction without submitting it to t
         "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
         "value": "0x9184e72a"
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1219,16 +1219,16 @@ Returns information about a block specified by hash
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getBlockByHash",
     "params":["0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331", true]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1297,16 +1297,16 @@ Returns information about a block specified by number
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getBlockByNumber",
     "params":["0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331", true]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1369,16 +1369,16 @@ Returns information about a transaction specified by hash
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByHash",
     "params": ["0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1438,16 +1438,16 @@ Returns information about a transaction specified by block hash and transaction 
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByBlockHashAndIndex",
     "params":["0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331", "0x0"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1507,16 +1507,16 @@ Returns information about a transaction specified by block number and transactio
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByBlockNumberAndIndex",
     "params":["0x29c", "0x0"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1575,16 +1575,16 @@ Returns the receipt of a transaction specified by hash
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getTransactionReceipt",
     "params": ["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1644,16 +1644,16 @@ Returns information about an uncle specified by block hash and uncle index posit
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getUncleByBlockHashAndIndex",
     "params": ["0xc6ef2fc5426d6ad6fd9e2a26abeab0aa2411b7ab17f30a99d3cb96aed1d1055b", "0x0"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1713,16 +1713,16 @@ Returns information about an uncle specified by block number and uncle index pos
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getUncleByBlockNumberAndIndex",
     "params": ["0x29c", "0x0"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1769,18 +1769,18 @@ Creates a filter to listen for specific state changes that can then be used with
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337
     "jsonrpc": "2.0",
     "method": "eth_newFilter",
     "params": [{
         "topics": ["0x0000000000000000000000000000000000000000000000000000000012341234"]
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1807,16 +1807,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337
     "jsonrpc": "2.0",
     "method": "eth_newBlockFilter",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1843,16 +1843,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337
     "jsonrpc": "2.0",
     "method": "eth_newPendingTransactionFilter",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1883,16 +1883,16 @@ Destroys a filter based on filter ID
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_uninstallFilter",
     "params": ["0xb"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -1933,16 +1933,16 @@ Returns a list of all logs based on filter ID since the last log retrieval
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getFilterChanges",
     "params": ["0x16"]
-}
+}' <url>
 
-// Response object
+# Response
 {
    "id": 1337,
    "jsonrpc": "2.0",
@@ -1992,16 +1992,16 @@ Returns a list of all logs based on filter ID
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getFilterLogs",
     "params": ["0x16"]
-}
+}' <url>
 
-// Response object
+# Response
 {
    "id": 1337,
    "jsonrpc": "2.0",
@@ -2053,18 +2053,18 @@ Returns a list of all logs based on a filter object
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getLogs",
     "params": [{
         "topics":["0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b"]
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
    "id": 1337,
    "jsonrpc": "2.0",
@@ -2104,16 +2104,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_getWork",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2148,9 +2148,9 @@ Submit a proof-of-work solution
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_submitWork",
@@ -2159,9 +2159,9 @@ Submit a proof-of-work solution
         "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         "0xD1GE5700000000000000000000000000D1GE5700000000000000000000000000"
     ]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2191,9 +2191,9 @@ Submit a mining hashrate
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "eth_submitHashrate",
@@ -2201,9 +2201,9 @@ Submit a mining hashrate
         "0x0000000000000000000000000000000000000000000000000000000000500000",
         "0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c"
     ]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2230,16 +2230,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_version",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2268,9 +2268,9 @@ Sends a whisper message
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_post",
@@ -2282,9 +2282,9 @@ Sends a whisper message
         "priority": "0x64",
         "ttl": "0x64",
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2311,16 +2311,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_newIdentity",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2349,18 +2349,18 @@ Checks if this client has private keys for a given identity
  
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_hasIdentity",
     "params": [
         "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"
     ]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2387,16 +2387,16 @@ _none_
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_newGroup",
     "params": []
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2425,18 +2425,18 @@ Adds a whisper identity to the current group
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_addToGroup",
     "params": [
         "0x04f96a5e25610293e42a73....."
     ]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2470,9 +2470,9 @@ Creates a filter to listen for specific whisper messages that can then be used w
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_newFilter",
@@ -2480,9 +2480,9 @@ Creates a filter to listen for specific whisper messages that can then be used w
         "topics": ["0x12341234bf4b564f"],
         "to": "0x2341234bf4b2341234bf4b564f..."
     }]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2513,17 +2513,16 @@ Destroys a whisper filter based on filter ID
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_uninstallFilter",
     "params": ["0x7"]
-}
+}' <url>
 
-
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
@@ -2562,16 +2561,16 @@ Returns a list of all whisper messages based on filter ID since the last message
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_getFilterChanges",
     "params": ["0x16"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc":"2.0",
@@ -2620,16 +2619,16 @@ Returns a list of all messages based on filter ID
 
 #### Example
 
-```js
-// Request object
-{
+```sh
+# Request
+curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "method": "shh_getMessages",
     "params": ["0x16"]
-}
+}' <url>
 
-// Response object
+# Response
 {
     "id": 1337,
     "jsonrpc":"2.0",
