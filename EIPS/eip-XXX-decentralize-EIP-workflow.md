@@ -1,9 +1,15 @@
 eip: <to be assigned>
+  
 title: Decentralize EIP workflow
+
 author: Ethernian <dima@ethernian.com>
+
 discussions-to: https://ethereum-magicians.org/t/decentralizing-eip-workflow/1525
+
 status: Draft
+
 type: Meta
+
 created: 2018-10-03
 
 ## Abstract
@@ -47,30 +53,31 @@ Currently proposed solutions for the overstrained EIP review process are not suf
 1. ... more _Editors_ will process more EIPs for _CoreDevs_, but it will not help other communities in their work.
 
 ## Basic Principles and Assumptions
-* [u]_Communities are chat/forum based_:[/u]
+* **_Communities are chat/forum based_:**
 The Ethereum community is naturally organized around chats and forums identified by URL. Those online communities may be focused on different aspects and be mentally quite disconnected from each other.
 
-* [u]_Communities are focused on different knowledge domains:_[/u]
+* **_Communities are focused on different knowledge domains:_**
 Communication in ethereum community is naturally organized around various knowledge domains.
 There are _CoreDevs_, WalletDevs, Miners, Whales and so on. 
 Communities should review EIPs in aspects they are focused on.
 
-*  [u]_Tags should be meant as local to community_[/u] 
+*  **_Tags should be meant as local to community_**
 Any formalized terms (like statuses or tags) are defined and understood inside the community. They are just labels in some knowledge domain and may be quite unknown or misinterpreted outside of community. It means all terms should be meant as related to some community. Sharing terms between communities is possible, but needs additional efforts.
 
-* [u]_Editor role becomes local to community_[/u]
+* _Editor role becomes local to community_
+
 The same person can be _Editor_ in many communities if trusted by them. Current _Editors_ will become  trusted by _CoreDevs_ and _Ethereum Users_ communities. Most probably they will work for other communities like _WalletDevs_ too.
 
-* [u]_An advanced ethereum user is usually a member of many communities_:[/u]
+* **_An advanced ethereum user is usually a member of many communities_:**
 Example: A member of _CoreDev_ community is naturally a member of Ethereum Users community too. This he has knows  terms and rules of both communities.
  
-* [u]_Communities may be organized differently_:[/u]
+* **_Communities may be organized differently_:**
 A global EIP review process should be agnostic about the way how the particular community is organized. It can be centralized or anarchistic - it should not matter.
 
-* [u]_Anyone and any community can make review, but nobody has to take it into account_:[/u]
+* **_Anyone and any community can make review, but nobody has to take it into account_:**
 Example: Anyone can express _his_ opinion setting a tag on particular EIP, but _CoreDevs_ are free to see and to follow only tags of their trusted _Editors_. 
 
-* [u]_Anyone and any community are free to build its own and unenforced opinion about EIPs_:[/u]
+* **_Anyone and any community are free to build its own and unenforced opinion about EIPs_:**
 _CoreDevs_ do not have a special place in EIP process any more, nor they have to follow EIP statuses set by others. _CoreDevs_ is now one of many ethereum communities (even very honored and reputable one).
 Nevertheless Communities should make their trusted _Editors_ public in order to make their opinion public and official.
 
@@ -78,37 +85,37 @@ Nevertheless Communities should make their trusted _Editors_ public in order to 
 
 In order to achieve or goals we propose to improve the current EIP workflow as follows:
 
-* [u]_Splitting EIP target audience:_[/u]
+* **_Splitting EIP target audience:_**
 Currently, all EIPs are targeting the whole community. This creates huge overhead and is not necessary. EIPs should target an interested and responsible groups inside the ethereum community. Anyone outside target groups is primarily interested on the EIP status only.
 
-* [u]_Ethereum Users community:_[/u]
+* **_Ethereum Users community:_**
 Ethereum Users community is a default one for all ethereum users. It defines few status tags unambiguously understood by anyone. There could be like "OK", "NOT_OK", "IN_PROGRESS", "N/A". These few tags should be adopted by any other ethereum community in inter-community communication. 
 EIPs changing global consensus should target Ethereum Users community to reflect their global impact.
 
-*  [u]_Externally defined Tags can be reused by community_[/u]
+*  **_Externally defined Tags can be reused by community_**
 Like common tags from Ethereum Users Community, it is possible to re-use tags from other community.
 
-*  [u]_Community can ask an external _Editor_ to mark all new EIPs related to it:_[/u]
+*  **_Community can ask an external _Editor_ to mark all new EIPs related to it:_**
 _Example:_ A _WalletDev_ community asks an external _Editor_ to mark any new EIPs that may be important for wallet development by using a tag "wallet". The _Editor_ is free to accept or reject request.
 
-*  [u]_An Editor can ask a Community for review a particular aspect of EIP:_[/u]
+*  **_An Editor can ask a Community for review a particular aspect of EIP:_**
 _Example:_ An _Editor_ might be interested to initiate a discussion inside of Community of Miners about reducing a BlockReward, making his own decision depended on it.
 
 ## Community Examples
 Here are some ideas for communities and their tags:
-* [u]_Ethereum Users_[/u]
+* **_Ethereum Users_**
   Tags: 
         process: "OK", "NOT_OK", "IN_WORK", "N/A",
         state: "CLASH"
-* [u]_Developers_[/u]
+* **_Developers_**
    Tags: DesignPattern, Standard
-  * [u]_CoreDevs_[/u]
+  * **_CoreDevs_**
       Tags: HF (needs hard fork).
-  * [u]_WalletDev_[/u]
+  * **_WalletDev_**
   Tags: interface
-  * [u]_Browser_[/u]
+  * **_Browser_**
    Tags: browser, ENS, user_permissions
-* [u]_Miners_[/u]
+* **_Miners_**
 Tags: ASIC, BlockReward
-* [u]_Whales_[/u]
+* **_Whales_**
 Tags: Inflation
