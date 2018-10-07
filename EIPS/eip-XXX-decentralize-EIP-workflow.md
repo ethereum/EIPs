@@ -32,7 +32,7 @@ Things have changed.
 
 EIPs are not only about changes in ethereum protocol any more. Only few of EIPs require community consensus. Many of EIPs do not appeal to _CoreDev_ and do not need to be reviewed by whole community before being implemented. Most of new EIPs are targeting some specific ethereum sub-community and not the whole ethereum community or only _CoreDev's_.  
 
-Now EIP is in effect [u] an unique identifier and a vehicle to collect enough community attention[/u] for review. This core change in the meaning of an EIP is cause for a change in the classification process.
+**Now EIP is in effect an unique identifier and a vehicle to collect enough community attention for review. This core change in the meaning of an EIP is cause for a change in the classification process.**
 
 Current EIP reviewing process has some problems:
 
