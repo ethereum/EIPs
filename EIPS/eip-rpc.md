@@ -21,13 +21,17 @@ Nodes created by the current generation of Ethereum clients expose inconsistent 
 
 ### Concepts
 
+#### RFC-2119
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC-2119](https://www.ietf.org/rfc/rfc2119.txt).
+
 #### JSON-RPC
 
-Communication with Ethereum nodes is accomplished using [JSON-RPC](https://www.jsonrpc.org/specification), a stateless, lightweight [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call) protocol that uses [JSON](http://www.json.org/) as its data format. Ethereum RPC methods MUST be called using [JSON-RPC request objects](https://www.jsonrpc.org/specification#request_object) and MUST respond with [JSON-RPC response objects](https://www.jsonrpc.org/specification#response_object).
+Communication with Ethereum nodes is accomplished using [JSON-RPC](https://www.jsonrpc.org/specification), a stateless, lightweight [remote procedure call](https://en.wikipedia.org/wiki/Remote_procedure_call) protocol that uses [JSON](http://www.json.org/) as its data format. Ethereum RPC methods **MUST** be called using [JSON-RPC request objects](https://www.jsonrpc.org/specification#request_object) and **MUST** respond with [JSON-RPC response objects](https://www.jsonrpc.org/specification#response_object).
 
 #### Error codes
 
-If an Ethereum RPC method encounters an error, the `error` member included on the response object MUST be an object containing a `code` member and descriptive `message` member. The following list contains all possible error codes and associated messages:
+If an Ethereum RPC method encounters an error, the `error` member included on the response object **MUST** be an object containing a `code` member and descriptive `message` member. The following list contains all possible error codes and associated messages:
 
 |Code|Message|Meaning|Category|
 |-|-|-|-|
@@ -61,20 +65,41 @@ Specific types of values passed to and returned from Ethereum RPC methods requir
 
 ##### `Quantity`
 
-- A `Quantity` value MUST be hex-encoded.
-- A `Quantity` value MUST be "0x"-prefixed.
-- A `Quantity` value MUST be expressed using compact notation.
-- A `Quantity` value MUST express zero as "0x0".
+- A `Quantity` value **MUST** be hex-encoded.
+- A `Quantity` value **MUST** be "0x"-prefixed.
+- A `Quantity` value **MUST** be expressed using the fewest possible hex digits per byte.
+- A `Quantity` value **MUST** express zero as "0x0".
+
+Examples `Quantity` values:
+
+|Value|Valid|Reason|
+|-|-|-|
+|0x41|`true`||
+|0x400|`true`||
+|0x|`false`|zero must be "0x0"|
+|0x0400|`false`|leading zeroes not allowed|
+|ff|`false`|values must be prefixed|
+
 
 ##### `Data`
 
-- A `Data` value MUST be hex-encoded.
-- A `Data` value MUST be "0x"-prefixed.
-- A `Data` value MUST be expressed using two hex digits per byte.
+- A `Data` value **MUST** be hex-encoded.
+- A `Data` value **MUST** be "0x"-prefixed.
+- A `Data` value **MUST** be expressed using two hex digits per byte.
+
+Examples `Data` values:
+
+|Value|Valid|Reason|
+|-|-|-|
+|0x41|`true`||
+|0x004200|`true`||
+|0x|`true`||
+|0xf0f0f|`false`|bytes require two hex digits|
+|004200|`false`|values must be prefixed|
 
 ##### Proposing changes
 
-New Ethereum RPC methods and changes to existing methods MUST be proposed via the traditional EIP process. This allows for community consensus around new method implementations and proposed method modifications. RPC method proposals MUST reach "draft" status before being added to this proposal and the official Ethereum RPC specification defined herein.
+New Ethereum RPC methods and changes to existing methods **MUST** be proposed via the traditional EIP process. This allows for community consensus around new method implementations and proposed method modifications. RPC method proposals **MUST** reach "draft" status before being added to this proposal and the official Ethereum RPC specification defined herein.
 
 ### Methods
 
@@ -2209,441 +2234,6 @@ curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_version</strong></code></summary>
-
-#### Description
-
-Returns the current whisper protocol version
-
-#### Parameters
-
-_none_
-
-#### Returns
-
-{`string`} - whisper protocol version
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_version",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "2"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_post</strong></code></summary>
-
-#### Description
-
-Sends a whisper message
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{`object`}|@property {[`Data`](#data)} `[from]` - sender identity<br/>@property {[`Data`](#data)} `[to]` - recipient identity<br/>@property {[`Data[]`](#data)} `topics` - list of topics to identify messages<br/>@property {[`Data`](#data)} `payload` - message payload<br/>@property {[`Quantity`](#quantity)} `priority` - message priority<br/>@property {[`Quantity`](#quantity)} `ttl` - time to live in seconds|
-
-#### Returns
-
-{`boolean`} - `true` if the message is sent successfully, `false` otherwise
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_post",
-    "params": [{
-        "from": "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1",
-        "to": "0x3e245533f97284d442460f2998cd41858798ddf04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a0d4d661997d3940272b717b1",
-        "topics": ["0x776869737065722d636861742d636c69656e74", "0x4d5a695276454c39425154466b61693532"],
-        "payload": "0x7b2274797065223a226d6",
-        "priority": "0x64",
-        "ttl": "0x64",
-    }]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_newIdentity</strong></code></summary>
-
-#### Description
-
-Creates a new whisper identity on this client
-
-#### Parameters
-
-_none_
-
-#### Returns
-
-{[`Data`](#data)} - address of the newly-created identity
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_newIdentity",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xc931d93e97ab07fe42d923478ba2465f283f440fd6cabea4dd7a2c807108f651b7135d1d6ca9007d5b68aa497e4619ac10aa3b27726e1863c1fd9b570d99bbaf"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_hasIdentity</strong></code></summary>
-
-#### Description
-
-Checks if this client has private keys for a given identity
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|identity address to check|
-
-#### Returns
-
-{`boolean`} - `true` if the client holds the private key for that identity, otherwise `false`
- 
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_hasIdentity",
-    "params": [
-        "0x04f96a5e25610293e42a73908e93ccc8c4d4dc0edcfa9fa872f50cb214e08ebf61a03e245533f97284d442460f2998cd41858798ddfd4d661997d3940272b717b1"
-    ]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_newGroup</strong></code></summary>
-
-#### Description
-
-Creates a new whisper group on this client
-
-#### Parameters
-
-_none_
-
-#### Returns
-
-{[`Data`](#data)} - address of the newly-created group
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_newGroup",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xc65f283f440fd6cabea4dd7a2c807108f651b7135d1d6ca90931d93e97ab07fe42d923478ba2407d5b68aa497e4619ac10aa3b27726e1863c1fd9b570d99bbaf"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_addToGroup</strong></code></summary>
-
-#### Description
-
-Adds a whisper identity to the current group
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|identity address to add|
-
-#### Returns
-
-{`boolean`} - `true` if the identity is successfully added to the group, otherwise `false`
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_addToGroup",
-    "params": [
-        "0x04f96a5e25610293e42a73....."
-    ]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_newFilter</strong></code></summary>
-
-#### Description
-
-Creates a filter to listen for specific whisper messages that can then be used with `shh_getFilterChanges`
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{`object`}|@property {[`Data`](#data)} `[to]` - identity of the receiver<br/>@property {[`Data[]`](#data)} `topics` - list of topics that incoming messages should match</code>|
-
-**Note:** The following combinations can be used for topics:
-- `[A, B] = A && B`
-- `[A, [B, C]] = A && (B || C)`
-- `[null, A, B] = ANYTHING && A && B` (`null` works as a wildcard)
-
-#### Returns
-
-{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `shh_getFilterChanges`
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_newFilter",
-    "params": [{
-        "topics": ["0x12341234bf4b564f"],
-        "to": "0x2341234bf4b2341234bf4b564f..."
-    }]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x7"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_uninstallFilter</strong></code></summary>
-
-#### Description
-
-Destroys a whisper filter based on filter ID
-
-**Note:** This should only be called if a filter and its notifications are no longer needed. This will also be called automatically on a filter if its notifications are not retrieved using `shh_getFilterChanges` for a period of time.
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter to destroy|
-
-#### Returns
-
-{`boolean`} - `true` if the filter is found and successfully destroyed or `false` if it is not
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_uninstallFilter",
-    "params": ["0x7"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_getFilterChanges</strong></code></summary>
-
-#### Description
-
-Returns a list of all whisper messages based on filter ID since the last message retrieval
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter|
-
-#### Returns
-
-{`Array<Message>`} - array of message objects with the following members:
-
-- {[`Data[]`](#data)} `topics` - list of topics contained in the message
-- {[`Data`](#data)} `from` - message sender
-- {[`Data`](#data)} `hash` - message hash
-- {[`Data`](#data)} `payload` - message payload
-- {[`Data`](#data)} `to` - message recipient
-- {[`Quantity`](#quantity)} `expiry` - time in seconds when this message expires
-- {[`Quantity`](#quantity)} `sent` - unix timestamp when message was sent
-- {[`Quantity`](#quantity)} `ttl` - message time to live in seconds
-- {[`Quantity`](#quantity)} `workProved` - work required by this message
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_getFilterChanges",
-    "params": ["0x16"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc":"2.0",
-    "result": [{
-        "expiry": "0x54caa50a",
-        "from": "0x3ec052fc33..",
-        "hash": "0x33eb2da77bf3527e28f8bf493650b1879b08c4f2a362beae4ba2f71bafcd91f9",
-        "payload": "0x7b2274797065223a226d657373616765222c2263686...",
-        "sent": "0x54ca9ea2",
-        "to": "0x87gdf76g8d7fgdfg...",
-        "topics": ["0x6578616d"],
-        "ttl": "0x64",
-        "workProved": "0x0"
-    }]
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>shh_getMessages</strong></code></summary>
-
-#### Description
-
-Returns a list of all messages based on filter ID
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter|
-
-#### Returns
-
-{`Array<Message>`} - array of message objects with the following structure:
-
-- {[`Data[]`](#data)} `topics` - list of topics contained in the message
-- {[`Data`](#data)} `from` - message sender
-- {[`Data`](#data)} `hash` - message hash
-- {[`Data`](#data)} `payload` - message payload
-- {[`Data`](#data)} `to` - message recipient
-- {[`Quantity`](#quantity)} `expiry` - time in seconds when this message expires
-- {[`Quantity`](#quantity)} `sent` - unix timestamp when message was sent
-- {[`Quantity`](#quantity)} `ttl` - message time to live in seconds
-- {[`Quantity`](#quantity)} `workProved` - work required by this message
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "shh_getMessages",
-    "params": ["0x16"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc":"2.0",
-    "result": [{
-        "expiry": "0x54caa50a",
-        "from": "0x3ec052fc33..",
-        "hash": "0x33eb2da77bf3527e28f8bf493650b1879b08c4f2a362beae4ba2f71bafcd91f9",
-        "payload": "0x7b2274797065223a226d657373616765222c2263686...",
-        "sent": "0x54ca9ea2",
-        "to": "0x87gdf76g8d7fgdfg...",
-        "topics": ["0x6578616d"],
-        "ttl": "0x64",
-        "workProved": "0x0"
-    }]
 }
 ```
 ---
