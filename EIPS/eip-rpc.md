@@ -103,7 +103,7 @@ New Ethereum RPC methods and changes to existing methods **MUST** be proposed vi
 
 ### Methods
 
-<details>
+<details open>
 <summary><code><strong>web3_clientVersion</strong></code></summary>
 
 #### Description
