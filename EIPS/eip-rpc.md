@@ -178,51 +178,6 @@ curl -X POST --data '{
 </details>
 
 <details>
-<summary><code><strong>net_version</strong></code></summary>
-
-#### Description
-
-Returns the chain ID associated with the current network
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{`string`} - chain ID associated with the current network
-
-Common chain IDs:
-
-- `"1"` -  Ethereum mainnet
-- `"3"` - Ropsten testnet
-- `"4"` - Rinkeby testnet
-- `"42"` - Kovan testnet
-
-**Note:** See EIP-155 for a [complete list](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids) of possible chain IDs.
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337
-    "jsonrpc": "2.0",
-    "method": "net_version",
-    "params": [],
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "3"
-}
-```
----
-</details>
-
-<details>
 <summary><code><strong>net_listening</strong></code></summary>
 
 #### Description
@@ -294,11 +249,11 @@ curl -X POST --data '{
 </details>
 
 <details>
-<summary><code><strong>eth_protocolVersion</strong></code></summary>
+<summary><code><strong>net_version</strong></code></summary>
 
 #### Description
 
-Returns the current Ethereum protocol version
+Returns the chain ID associated with the current network
 
 #### Parameters
 
@@ -306,211 +261,33 @@ _(none)_
 
 #### Returns
 
-{`string`} - current Ethereum protocol version
+{`string`} - chain ID associated with the current network
 
-#### Example
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_protocolVersion",
-    "params": []
-}' <url>
+Common chain IDs:
 
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "54"
-}
-```
----
-</details>
+- `"1"` -  Ethereum mainnet
+- `"3"` - Ropsten testnet
+- `"4"` - Rinkeby testnet
+- `"42"` - Kovan testnet
 
-<details>
-<summary><code><strong>eth_syncing</strong></code></summary>
-
-#### Description
-
-Returns information about the status of this client's network synchronization
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{`boolean|object`} - `false` if this client is not syncing with the network, otherwise an object with the following members:
-
-- {[`Quantity`](#quantity)} `currentBlock` - number of the most-recent block synced
-- {[`Quantity`](#quantity)} `highestBlock` - number of latest block on the network
-- {[`Quantity`](#quantity)} `startingBlock` - block number at which syncing started
+**Note:** See EIP-155 for a [complete list](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#list-of-chain-ids) of possible chain IDs.
 
 #### Example
 
 ```sh
 # Request
 curl -X POST --data '{
-    "id": 1337,
+    "id": 1337
     "jsonrpc": "2.0",
-    "method": "eth_syncing",
-    "params": []
+    "method": "net_version",
+    "params": [],
 }' <url>
 
 # Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
-    "result": {
-        "currentBlock": '0x386',
-        "highestBlock": '0x454',
-        "startingBlock": '0x384'
-    }
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_coinbase</strong></code></summary>
-
-#### Description
-
-Returns the coinbase address for this client
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{[`Data`](#data)} - coinbase address
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_coinbase",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xc94770007dda54cF92009BFF0dE90c06F603a09f"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_mining</strong></code></summary>
-
-#### Description
-
-Determines if this client is mining new blocks
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{`boolean`} - `true` if this client is mining or `false` if it is not mining
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_mining",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_hashrate</strong></code></summary>
-
-#### Description
-
-Returns the number of hashes-per-second this node is mining at
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of hashes-per-second
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_hashrate",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x38a"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_gasPrice</strong></code></summary>
-
-#### Description
-
-Returns the current price of gas expressed in wei
-
-#### Parameters
-
-_(none)_
-
-#### Returns
-
-{[`Quantity`](#quantity)} - current gas price in wei
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_gasPrice",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x09184e72a000"
+    "result": "3"
 }
 ```
 ---
@@ -589,529 +366,6 @@ curl -X POST --data '{
 </details>
 
 <details>
-<summary><code><strong>eth_getBalance</strong></code></summary>
-
-#### Description
-
-Returns the balance of an address in wei
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address to query for balance|
-|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - balance of the provided account in wei
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getBalance",
-    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x0234c8a3397aab58"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getStorageAt</strong></code></summary>
-
-#### Description
-
-Returns the value from a storage position at an address
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address of stored data|
-|2|{[`Quantity`](#quantity)}|index into stored data|
-|3|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Data`](#data)} - value stored at the given address and data index
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getStorageAt",
-    "params": ["0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x0", "latest"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x00000000000000000000000000000000000000000000000000000000000004d2"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getTransactionCount</strong></code></summary>
-
-#### Description
-
-Returns the number of transactions sent from an address
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address to query for sent transactions|
-|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of transactions sent from the specified address
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getTransactionCount",
-    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x1"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getBlockTransactionCountByHash</strong></code></summary>
-
-#### Description
-
-Returns the number of transactions in a block specified by block hash
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|hash of a block|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of transactions in the specified block
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockTransactionCountByHash",
-    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xc"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getBlockTransactionCountByNumber</strong></code></summary>
-
-#### Description
-
-Returns the number of transactions in a block specified by block number
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of transactions in the specified block
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getBlockTransactionCountByNumber",
-    "params": ["0xe8"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xa"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getUncleCountByBlockHash</strong></code></summary>
-
-#### Description
-
-Returns the number of uncles in a block specified by block hash
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|hash of a block|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of uncles in the specified block
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getUncleCountByBlockHash",
-    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xc"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getUncleCountByBlockNumber</strong></code></summary>
-
-#### Description
-
-Returns the number of uncles in a block specified by block number
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Quantity`](#quantity)} - number of uncles in the specified block
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getUncleCountByBlockNumber",
-    "params": ["0xe8"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x1"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getCode</strong></code></summary>
-
-#### Description
-
-Returns the contract code stored at a given address
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address to query for code|
-|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
-
-#### Returns
-
-{[`Data`](#data)} - code from the specified address
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getCode",
-    "params": ["0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b", "0x2"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_sign</strong></code></summary>
-
-#### Description
-
-Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))`
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address to use for signing|
-|2|{[`Data`](#data)}|data to sign|
-
-#### Returns
-
-{[`Data`](#data)} - signature hash of the provided data
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_sign",
-    "params": ["0x9b2055d370f73ec7d8a03e965129118dc8f5bf83", "0xdeadbeaf"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_signTypedData</strong></code></summary>
-
-#### Description
-
-Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))`
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|address to use for signing|
-|2|{[`Data`](#data)}|message to sign containing type information, a domain separator, and data|
-
-**Note:** Client developers should refer to EIP-712 for complete semantics around [encoding and signing data](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md#specification). Dapp developers should refer to EIP-712 for the expected structure of [RPC method input parameters](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md#parameters).
-
-#### Returns
-
-{[`Data`](#data)} - signature hash of the provided message
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-	"id": 1337
-	"jsonrpc": "2.0",
-	"method": "eth_signTypedData",
-	"params": ["0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826", {
-		"types": {
-			"EIP712Domain": [{
-				"name": "name",
-				"type": "string"
-			}, {
-				"name": "version",
-				"type": "string"
-			}, {
-				"name": "chainId",
-				"type": "uint256"
-			}, {
-				"name": "verifyingContract",
-				"type": "address"
-			}],
-			"Person": [{
-				"name": "name",
-				"type": "string"
-			}, {
-				"name": "wallet",
-				"type": "address"
-			}],
-			"Mail": [{
-				"name": "from",
-				"type": "Person"
-			}, {
-				"name": "to",
-				"type": "Person"
-			}, {
-				"name": "contents",
-				"type": "string"
-			}]
-		},
-		"primaryType": "Mail",
-		"domain": {
-			"name": "Ether Mail",
-			"version": "1",
-			"chainId": 1,
-			"verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
-		},
-		"message": {
-			"from": {
-				"name": "Cow",
-				"wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
-			},
-			"to": {
-				"name": "Bob",
-				"wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
-			},
-			"contents": "Hello, Bob!"
-		}
-	}]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_sendTransaction</strong></code></summary>
-
-#### Description
-
-Creates, signs, and sends a new transaction to the network
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{`object`}|@property {[`Data`](#data)} `from` - transaction sender<br/>@property {[`Data`](#data)} `[to]` - transaction recipient<br/>@property {[`Quantity`](#quantity)} `[gas="0x15f90"]` - gas provided for transaction execution<br/>@property {[`Quantity`](#quantity)} `[gasPrice]` - price in wei of each gas used<br/>@property {[`Quantity`](#quantity)} `[value]` - value in wei sent with this transaction<br/>@property {[`Data`](#data)} `[data]` - contract code or a hashed method call with encoded args<br/>@property {[`Quantity`](#quantity)} `[nonce]` - unique number identifying this transaction|
-
-#### Returns
-
-{[`Data`](#data)} - transaction hash, or the zero hash if the transaction is not yet available
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_sendTransaction",
-    "params": [{
-        "data": "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675",
-        "from": "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
-        "gas": "0x76c0",
-        "gasPrice": "0x9184e72a000",
-        "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
-        "value": "0x9184e72a"
-    }]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_sendRawTransaction</strong></code></summary>
-
-#### Description
-
-Sends and already-signed transaction to the network
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|signed transaction data|
-
-#### Returns
-
-{[`Data`](#data)} - transaction hash, or the zero hash if the transaction is not yet available
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_sendRawTransaction",
-    "params": ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
-}
-```
----
-</details>
-
-<details>
 <summary><code><strong>eth_call</strong></code></summary>
 
 #### Description
@@ -1152,6 +406,42 @@ curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "result": "0x"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_coinbase</strong></code></summary>
+
+#### Description
+
+Returns the coinbase address for this client
+
+#### Parameters
+
+_(none)_
+
+#### Returns
+
+{[`Data`](#data)} - coinbase address
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_coinbase",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xc94770007dda54cF92009BFF0dE90c06F603a09f"
 }
 ```
 ---
@@ -1200,6 +490,81 @@ curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "result": "0x5208"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_gasPrice</strong></code></summary>
+
+#### Description
+
+Returns the current price of gas expressed in wei
+
+#### Parameters
+
+_(none)_
+
+#### Returns
+
+{[`Quantity`](#quantity)} - current gas price in wei
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_gasPrice",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x09184e72a000"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getBalance</strong></code></summary>
+
+#### Description
+
+Returns the balance of an address in wei
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to query for balance|
+|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Quantity`](#quantity)} - balance of the provided account in wei
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getBalance",
+    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x0234c8a3397aab58"
 }
 ```
 ---
@@ -1362,36 +727,21 @@ curl -X POST --data '{
 </details>
 
 <details>
-<summary><code><strong>eth_getTransactionByHash</strong></code></summary>
+<summary><code><strong>eth_getBlockTransactionCountByHash</strong></code></summary>
 
 #### Description
 
-Returns information about a transaction specified by hash
+Returns the number of transactions in a block specified by block hash
 
 #### Parameters
 
 |#|Type|Description|
 |-|-|-|
-|1|{[`Data`](#data)}|hash of a transaction|
+|1|{[`Data`](#data)}|hash of a block|
 
 #### Returns
 
-{`null|object`} - `null` if no transaction is found, otherwise a transaction object with the following members:
-
-- {[`Data`](#data)} `r` - ECDSA signature r
-- {[`Data`](#data)} `s` - ECDSA signature s
-- {[`Data`](#data)} `blockHash` - hash of block containing this transaction or `null` if pending
-- {[`Data`](#data)} `from` - transaction sender
-- {[`Data`](#data)} `hash` - hash of this transaction
-- {[`Data`](#data)} `input` - contract code or a hashed method call
-- {[`Data`](#data)} `to` - transaction recipient or `null` if deploying a contract
-- {[`Quantity`](#quantity)} `v` - ECDSA recovery ID
-- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this transaction or `null` if pending
-- {[`Quantity`](#quantity)} `gas` - gas provided for transaction execution
-- {[`Quantity`](#quantity)} `gasPrice` - price in wei of each gas used
-- {[`Quantity`](#quantity)} `nonce` - unique number identifying this transaction
-- {[`Quantity`](#quantity)} `transactionIndex` - index of this transaction in the block or `null` if pending
-- {[`Quantity`](#quantity)} `value` - value in wei sent with this transaction
+{[`Quantity`](#quantity)} - number of transactions in the specified block
 
 #### Example
 
@@ -1400,30 +750,313 @@ Returns information about a transaction specified by hash
 curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
-    "method": "eth_getTransactionByHash",
-    "params": ["0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"]
+    "method": "eth_getBlockTransactionCountByHash",
+    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
 }' <url>
 
 # Response
 {
     "id": 1337,
     "jsonrpc": "2.0",
-    "result": {
-        "blockHash": "0x1d59ff54b1eb26b013ce3cb5fc9dab3705b415a67127a003c3e61eb445bb8df2",
-        "blockNumber": "0x5daf3b",
-        "from": "0xa7d9ddbe1f17865597fbd27ec712455208b6b76d",
-        "gas": "0xc350",
-        "gasPrice": "0x4a817c800",
-        "hash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
-        "input": "0x68656c6c6f21",
-        "nonce": "0x15",
-        "r": "0x1b5e176d927f8e9ab405058b2d2457392da3e20f328b16ddabcebc33eaac5fea",
-        "s": "0x4ba69724e8f69de52f0125ad8b3c5c2cef33019bac3249e2c0a2192766d1721c",
-        "to": "0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb",
-        "transactionIndex": "0x41",
-        "v": "0x25",
-        "value": "0xf3dbb76162000"
-    }
+    "result": "0xc"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getBlockTransactionCountByNumber</strong></code></summary>
+
+#### Description
+
+Returns the number of transactions in a block specified by block number
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Quantity`](#quantity)} - number of transactions in the specified block
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getBlockTransactionCountByNumber",
+    "params": ["0xe8"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xa"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getCode</strong></code></summary>
+
+#### Description
+
+Returns the contract code stored at a given address
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to query for code|
+|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Data`](#data)} - code from the specified address
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getCode",
+    "params": ["0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b", "0x2"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x600160008035811a818181146012578301005b601b6001356025565b8060005260206000f25b600060078202905091905056"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getFilterChanges</strong></code></summary>
+
+#### Description
+
+Returns a list of all logs based on filter ID since the last log retrieval
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Quantity`](#quantity)}|ID of the filter|
+
+#### Returns
+
+{`Array<Log>`} - array of log objects with the following members:
+
+- {[`Data`](#data)} `address` - address from which this log originated
+- {[`Data`](#data)} `blockHash` - hash of block containing this log or `null` if pending
+- {[`Data`](#data)} `data` - contains the non-indexed arguments of the log
+- {[`Data`](#data)} `transactionHash` - hash of the transaction that created this log or `null` if pending
+- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this log or `null` if pending
+- {[`Quantity`](#quantity)} `logIndex` - index of this log within its block or `null` if pending
+- {[`Quantity`](#quantity)} `transactionIndex` - index of the transaction that created this log or `null` if pending
+- {[`Data[]`](#data)} `topics` - list of order-dependent topics
+- {`boolean`} `removed` - `true` if this filter has been destroyed and is invalid
+
+**Note:** The return value of `eth_getFilterChanges` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getFilterChanges",
+    "params": ["0x16"]
+}' <url>
+
+# Response
+{
+   "id": 1337,
+   "jsonrpc": "2.0",
+    "result": [{
+        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockNumber":"0x1b4",
+        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
+        "logIndex": "0x1",
+        "topics": [],
+        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
+        "transactionIndex": "0x0"
+   }]
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getFilterLogs</strong></code></summary>
+
+#### Description
+
+Returns a list of all logs based on filter ID
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Quantity`](#quantity)}|ID of the filter|
+
+#### Returns
+
+{`Array<Log>`} - array of log objects with the following members:
+
+- {[`Data`](#data)} address - address from which this log originated
+- {[`Data`](#data)} blockHash - hash of block containing this log or `null` if pending
+- {[`Data`](#data)} data - contains the non-indexed arguments of the log
+- {[`Data`](#data)} transactionHash - hash of the transaction that created this log or `null` if pending
+- {[`Quantity`](#quantity)} blockNumber - number of block containing this log or `null` if pending
+- {[`Quantity`](#quantity)} logIndex - index of this log within its block or `null` if pending
+- {[`Quantity`](#quantity)} transactionIndex - index of the transaction that created this log or `null` if pending
+- {`Array<Data>`} topics - list of order-dependent topics
+- {`boolean`} removed - `true` if this filter has been destroyed and is invalid
+
+**Note:** The return value of `eth_getFilterLogs` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getFilterLogs",
+    "params": ["0x16"]
+}' <url>
+
+# Response
+{
+   "id": 1337,
+   "jsonrpc": "2.0",
+    "result": [{
+        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockNumber":"0x1b4",
+        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
+        "logIndex": "0x1",
+        "topics": [],
+        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
+        "transactionIndex": "0x0"
+   }]
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getLogs</strong></code></summary>
+
+#### Description
+
+Returns a list of all logs based on a filter object
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{`object`}|@property {[`Quantity`](#quantity)\|`string`} `[fromBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Quantity`](#quantity)\|`string`} `[toBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Data`](#data)\|[`Data[]`](#data)} `[address]` - contract address or a list of addresses from which logs should originate<br/>@property {[`Data[]`](#data)} `[topics]` - list of order-dependent topics<br/>@property {[`Data`](#data)} `[blockhash]` - restrict logs to a block by hash|
+
+**Note:** If `blockhash` is passed, neither `fromBlock` nor `toBlock` are allowed or respected.
+
+#### Returns
+
+{`Array<Log>`} - array of log objects with the following members:
+
+- {[`Data`](#data)} `address` - address from which this log originated
+- {[`Data`](#data)} `blockHash` - hash of block containing this log or `null` if pending
+- {[`Data`](#data)} `data` - contains the non-indexed arguments of the log
+- {[`Data`](#data)} `transactionHash` - hash of the transaction that created this log or `null` if pending
+- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this log or `null` if pending
+- {[`Quantity`](#quantity)} `logIndex` - index of this log within its block or `null` if pending
+- {[`Quantity`](#quantity)} `transactionIndex` - index of the transaction that created this log or `null` if pending
+- {[`Data`](#data)} `topics` - list of order-dependent topics
+- {`boolean`} `removed` - `true` if this filter has been destroyed and is invalid
+
+**Note:** The return value of `eth_getLogs` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getLogs",
+    "params": [{
+        "topics":["0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b"]
+    }]
+}' <url>
+
+# Response
+{
+   "id": 1337,
+   "jsonrpc": "2.0",
+    "result": [{
+        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
+        "blockNumber":"0x1b4",
+        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
+        "logIndex": "0x1",
+        "topics": [],
+        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
+        "transactionIndex": "0x0"
+   }]
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getStorageAt</strong></code></summary>
+
+#### Description
+
+Returns the value from a storage position at an address
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address of stored data|
+|2|{[`Quantity`](#quantity)}|index into stored data|
+|3|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Data`](#data)} - value stored at the given address and data index
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getStorageAt",
+    "params": ["0x295a70b2de5e3953354a6a8344e616ed314d7251", "0x0", "latest"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x00000000000000000000000000000000000000000000000000000000000004d2"
 }
 ```
 ---
@@ -1562,6 +1195,113 @@ curl -X POST --data '{
         "v": "0x25",
         "value": "0xf3dbb76162000"
     }
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getTransactionByHash</strong></code></summary>
+
+#### Description
+
+Returns information about a transaction specified by hash
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|hash of a transaction|
+
+#### Returns
+
+{`null|object`} - `null` if no transaction is found, otherwise a transaction object with the following members:
+
+- {[`Data`](#data)} `r` - ECDSA signature r
+- {[`Data`](#data)} `s` - ECDSA signature s
+- {[`Data`](#data)} `blockHash` - hash of block containing this transaction or `null` if pending
+- {[`Data`](#data)} `from` - transaction sender
+- {[`Data`](#data)} `hash` - hash of this transaction
+- {[`Data`](#data)} `input` - contract code or a hashed method call
+- {[`Data`](#data)} `to` - transaction recipient or `null` if deploying a contract
+- {[`Quantity`](#quantity)} `v` - ECDSA recovery ID
+- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this transaction or `null` if pending
+- {[`Quantity`](#quantity)} `gas` - gas provided for transaction execution
+- {[`Quantity`](#quantity)} `gasPrice` - price in wei of each gas used
+- {[`Quantity`](#quantity)} `nonce` - unique number identifying this transaction
+- {[`Quantity`](#quantity)} `transactionIndex` - index of this transaction in the block or `null` if pending
+- {[`Quantity`](#quantity)} `value` - value in wei sent with this transaction
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getTransactionByHash",
+    "params": ["0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": {
+        "blockHash": "0x1d59ff54b1eb26b013ce3cb5fc9dab3705b415a67127a003c3e61eb445bb8df2",
+        "blockNumber": "0x5daf3b",
+        "from": "0xa7d9ddbe1f17865597fbd27ec712455208b6b76d",
+        "gas": "0xc350",
+        "gasPrice": "0x4a817c800",
+        "hash": "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+        "input": "0x68656c6c6f21",
+        "nonce": "0x15",
+        "r": "0x1b5e176d927f8e9ab405058b2d2457392da3e20f328b16ddabcebc33eaac5fea",
+        "s": "0x4ba69724e8f69de52f0125ad8b3c5c2cef33019bac3249e2c0a2192766d1721c",
+        "to": "0xf02c1c8e6114b1dbe8937a39260b5b0a374432bb",
+        "transactionIndex": "0x41",
+        "v": "0x25",
+        "value": "0xf3dbb76162000"
+    }
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getTransactionCount</strong></code></summary>
+
+#### Description
+
+Returns the number of transactions sent from an address
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to query for sent transactions|
+|2|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Quantity`](#quantity)} - number of transactions sent from the specified address
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getTransactionCount",
+    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f", "latest"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x1"
 }
 ```
 ---
@@ -1770,40 +1510,69 @@ curl -X POST --data '{
 </details>
 
 <details>
-<summary><code><strong>eth_newFilter</strong></code></summary>
+<summary><code><strong>eth_getUncleCountByBlockHash</strong></code></summary>
 
 #### Description
 
-Creates a filter to listen for specific state changes that can then be used with `eth_getFilterChanges`
+Returns the number of uncles in a block specified by block hash
 
 #### Parameters
 
 |#|Type|Description|
 |-|-|-|
-|1|{`object`}|@property {[`Quantity`](#quantity)\|`string`} `[fromBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Quantity`](#quantity)\|`string`} `[toBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Data`](#data)\|[`Data[]`](#data)} `[address]` - contract address or a list of addresses from which logs should originate<br/>@property {[`Data[]`](#data)} `[topics]` - list of order-dependent topics|
-
-**Note:** Topics are order-dependent. A transaction with a log with topics `[A, B]` will be matched by the following topic filters:
-- `[]` - "anything"
-- `[A]` - "A in first position (and anything after)"
-- `[null, B]` - "anything in first position AND B in second position (and anything after)"
-- `[A, B]` - "A in first position AND B in second position (and anything after)"
-- `[[A, B], [A, B]]` - "(A OR B) in first position AND (A OR B) in second position (and anything after)"
+|1|{[`Data`](#data)}|hash of a block|
 
 #### Returns
 
-{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
+{[`Quantity`](#quantity)} - number of uncles in the specified block
 
 #### Example
 
 ```sh
 # Request
 curl -X POST --data '{
-    "id": 1337
+    "id": 1337,
     "jsonrpc": "2.0",
-    "method": "eth_newFilter",
-    "params": [{
-        "topics": ["0x0000000000000000000000000000000000000000000000000000000012341234"]
-    }]
+    "method": "eth_getUncleCountByBlockHash",
+    "params": ["0xc94770007dda54cF92009BFF0dE90c06F603a09f"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xc"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_getUncleCountByBlockNumber</strong></code></summary>
+
+#### Description
+
+Returns the number of uncles in a block specified by block number
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Quantity`](#quantity)\|`string`}|block number, or one of `"latest"`, `"earliest"` or `"pending"`|
+
+#### Returns
+
+{[`Quantity`](#quantity)} - number of uncles in the specified block
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_getUncleCountByBlockNumber",
+    "params": ["0xe8"]
 }' <url>
 
 # Response
@@ -1811,299 +1580,6 @@ curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
     "result": "0x1"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_newBlockFilter</strong></code></summary>
-
-#### Description
-
-Creates a filter to listen for new blocks that can be used with `eth_getFilterChanges`
-
-#### Parameters
-
-_none_
-
-#### Returns
-
-{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337
-    "jsonrpc": "2.0",
-    "method": "eth_newBlockFilter",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x1"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_newPendingTransactionFilter</strong></code></summary>
-
-#### Description
-
-Creates a filter to listen for new pending transactions that can be used with `eth_getFilterChanges`
-
-#### Parameters
-
-_none_
-
-#### Returns
-
-{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337
-    "jsonrpc": "2.0",
-    "method": "eth_newPendingTransactionFilter",
-    "params": []
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": "0x1"
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_uninstallFilter</strong></code></summary>
-
-#### Description
-
-Destroys a filter based on filter ID
-
-**Note:** This should only be called if a filter and its notifications are no longer needed. This will also be called automatically on a filter if its notifications are not retrieved using `eth_getFilterChanges` for a period of time.
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter to destroy|
-
-#### Returns
-
-{`boolean`} - `true` if the filter is found and successfully destroyed or `false` if it is not
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_uninstallFilter",
-    "params": ["0xb"]
-}' <url>
-
-# Response
-{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "result": true
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getFilterChanges</strong></code></summary>
-
-#### Description
-
-Returns a list of all logs based on filter ID since the last log retrieval
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter|
-
-#### Returns
-
-{`Array<Log>`} - array of log objects with the following members:
-
-- {[`Data`](#data)} `address` - address from which this log originated
-- {[`Data`](#data)} `blockHash` - hash of block containing this log or `null` if pending
-- {[`Data`](#data)} `data` - contains the non-indexed arguments of the log
-- {[`Data`](#data)} `transactionHash` - hash of the transaction that created this log or `null` if pending
-- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this log or `null` if pending
-- {[`Quantity`](#quantity)} `logIndex` - index of this log within its block or `null` if pending
-- {[`Quantity`](#quantity)} `transactionIndex` - index of the transaction that created this log or `null` if pending
-- {[`Data[]`](#data)} `topics` - list of order-dependent topics
-- {`boolean`} `removed` - `true` if this filter has been destroyed and is invalid
-
-**Note:** The return value of `eth_getFilterChanges` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getFilterChanges",
-    "params": ["0x16"]
-}' <url>
-
-# Response
-{
-   "id": 1337,
-   "jsonrpc": "2.0",
-    "result": [{
-        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockNumber":"0x1b4",
-        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
-        "logIndex": "0x1",
-        "topics": [],
-        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
-        "transactionIndex": "0x0"
-   }]
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getFilterLogs</strong></code></summary>
-
-#### Description
-
-Returns a list of all logs based on filter ID
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{[`Quantity`](#quantity)}|ID of the filter|
-
-#### Returns
-
-{`Array<Log>`} - array of log objects with the following members:
-
-- {[`Data`](#data)} address - address from which this log originated
-- {[`Data`](#data)} blockHash - hash of block containing this log or `null` if pending
-- {[`Data`](#data)} data - contains the non-indexed arguments of the log
-- {[`Data`](#data)} transactionHash - hash of the transaction that created this log or `null` if pending
-- {[`Quantity`](#quantity)} blockNumber - number of block containing this log or `null` if pending
-- {[`Quantity`](#quantity)} logIndex - index of this log within its block or `null` if pending
-- {[`Quantity`](#quantity)} transactionIndex - index of the transaction that created this log or `null` if pending
-- {`Array<Data>`} topics - list of order-dependent topics
-- {`boolean`} removed - `true` if this filter has been destroyed and is invalid
-
-**Note:** The return value of `eth_getFilterLogs` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getFilterLogs",
-    "params": ["0x16"]
-}' <url>
-
-# Response
-{
-   "id": 1337,
-   "jsonrpc": "2.0",
-    "result": [{
-        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockNumber":"0x1b4",
-        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
-        "logIndex": "0x1",
-        "topics": [],
-        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
-        "transactionIndex": "0x0"
-   }]
-}
-```
----
-</details>
-
-<details>
-<summary><code><strong>eth_getLogs</strong></code></summary>
-
-#### Description
-
-Returns a list of all logs based on a filter object
-
-#### Parameters
-
-|#|Type|Description|
-|-|-|-|
-|1|{`object`}|@property {[`Quantity`](#quantity)\|`string`} `[fromBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Quantity`](#quantity)\|`string`} `[toBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Data`](#data)\|[`Data[]`](#data)} `[address]` - contract address or a list of addresses from which logs should originate<br/>@property {[`Data[]`](#data)} `[topics]` - list of order-dependent topics<br/>@property {[`Data`](#data)} `[blockhash]` - restrict logs to a block by hash|
-
-**Note:** If `blockhash` is passed, neither `fromBlock` nor `toBlock` are allowed or respected.
-
-#### Returns
-
-{`Array<Log>`} - array of log objects with the following members:
-
-- {[`Data`](#data)} `address` - address from which this log originated
-- {[`Data`](#data)} `blockHash` - hash of block containing this log or `null` if pending
-- {[`Data`](#data)} `data` - contains the non-indexed arguments of the log
-- {[`Data`](#data)} `transactionHash` - hash of the transaction that created this log or `null` if pending
-- {[`Quantity`](#quantity)} `blockNumber` - number of block containing this log or `null` if pending
-- {[`Quantity`](#quantity)} `logIndex` - index of this log within its block or `null` if pending
-- {[`Quantity`](#quantity)} `transactionIndex` - index of the transaction that created this log or `null` if pending
-- {[`Data`](#data)} `topics` - list of order-dependent topics
-- {`boolean`} `removed` - `true` if this filter has been destroyed and is invalid
-
-**Note:** The return value of `eth_getLogs` when retrieving logs from `eth_newBlockFilter` and `eth_newPendingTransactionFilter` filters will be an array of hashes, not an array of Log objects.
-
-#### Example
-
-```sh
-# Request
-curl -X POST --data '{
-    "id": 1337,
-    "jsonrpc": "2.0",
-    "method": "eth_getLogs",
-    "params": [{
-        "topics":["0x000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b"]
-    }]
-}' <url>
-
-# Response
-{
-   "id": 1337,
-   "jsonrpc": "2.0",
-    "result": [{
-        "address": "0x16c5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockHash": "0x8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcfdf829c5a142f1fccd7d",
-        "blockNumber":"0x1b4",
-        "data":"0x0000000000000000000000000000000000000000000000000000000000000000",
-        "logIndex": "0x1",
-        "topics": [],
-        "transactionHash":  "0xdf829c5a142f1fccd7d8216c5785ac562ff41e2dcfdf5785ac562ff41e2dcf",
-        "transactionIndex": "0x0"
-   }]
 }
 ```
 ---
@@ -2154,6 +1630,533 @@ curl -X POST --data '{
 </details>
 
 <details>
+<summary><code><strong>eth_hashrate</strong></code></summary>
+
+#### Description
+
+Returns the number of hashes-per-second this node is mining at
+
+#### Parameters
+
+_(none)_
+
+#### Returns
+
+{[`Quantity`](#quantity)} - number of hashes-per-second
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_hashrate",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x38a"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_mining</strong></code></summary>
+
+#### Description
+
+Determines if this client is mining new blocks
+
+#### Parameters
+
+_(none)_
+
+#### Returns
+
+{`boolean`} - `true` if this client is mining or `false` if it is not mining
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_mining",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": true
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_newBlockFilter</strong></code></summary>
+
+#### Description
+
+Creates a filter to listen for new blocks that can be used with `eth_getFilterChanges`
+
+#### Parameters
+
+_none_
+
+#### Returns
+
+{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337
+    "jsonrpc": "2.0",
+    "method": "eth_newBlockFilter",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x1"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_newFilter</strong></code></summary>
+
+#### Description
+
+Creates a filter to listen for specific state changes that can then be used with `eth_getFilterChanges`
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{`object`}|@property {[`Quantity`](#quantity)\|`string`} `[fromBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Quantity`](#quantity)\|`string`} `[toBlock]` - block number, or one of `"latest"`, `"earliest"` or `"pending"`<br/>@property {[`Data`](#data)\|[`Data[]`](#data)} `[address]` - contract address or a list of addresses from which logs should originate<br/>@property {[`Data[]`](#data)} `[topics]` - list of order-dependent topics|
+
+**Note:** Topics are order-dependent. A transaction with a log with topics `[A, B]` will be matched by the following topic filters:
+- `[]` - "anything"
+- `[A]` - "A in first position (and anything after)"
+- `[null, B]` - "anything in first position AND B in second position (and anything after)"
+- `[A, B]` - "A in first position AND B in second position (and anything after)"
+- `[[A, B], [A, B]]` - "(A OR B) in first position AND (A OR B) in second position (and anything after)"
+
+#### Returns
+
+{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337
+    "jsonrpc": "2.0",
+    "method": "eth_newFilter",
+    "params": [{
+        "topics": ["0x0000000000000000000000000000000000000000000000000000000012341234"]
+    }]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x1"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_newPendingTransactionFilter</strong></code></summary>
+
+#### Description
+
+Creates a filter to listen for new pending transactions that can be used with `eth_getFilterChanges`
+
+#### Parameters
+
+_none_
+
+#### Returns
+
+{[`Quantity`](#quantity)} - ID of the newly-created filter that can be used with `eth_getFilterChanges`
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337
+    "jsonrpc": "2.0",
+    "method": "eth_newPendingTransactionFilter",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x1"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_protocolVersion</strong></code></summary>
+
+#### Description
+
+Returns the current Ethereum protocol version
+
+#### Parameters
+
+_(none)_
+
+#### Returns
+
+{`string`} - current Ethereum protocol version
+
+#### Example
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_protocolVersion",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "54"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_sendRawTransaction</strong></code></summary>
+
+#### Description
+
+Sends and already-signed transaction to the network
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|signed transaction data|
+
+#### Returns
+
+{[`Data`](#data)} - transaction hash, or the zero hash if the transaction is not yet available
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_sendRawTransaction",
+    "params": ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_sendTransaction</strong></code></summary>
+
+#### Description
+
+Creates, signs, and sends a new transaction to the network
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{`object`}|@property {[`Data`](#data)} `from` - transaction sender<br/>@property {[`Data`](#data)} `[to]` - transaction recipient<br/>@property {[`Quantity`](#quantity)} `[gas="0x15f90"]` - gas provided for transaction execution<br/>@property {[`Quantity`](#quantity)} `[gasPrice]` - price in wei of each gas used<br/>@property {[`Quantity`](#quantity)} `[value]` - value in wei sent with this transaction<br/>@property {[`Data`](#data)} `[data]` - contract code or a hashed method call with encoded args<br/>@property {[`Quantity`](#quantity)} `[nonce]` - unique number identifying this transaction|
+
+#### Returns
+
+{[`Data`](#data)} - transaction hash, or the zero hash if the transaction is not yet available
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_sendTransaction",
+    "params": [{
+        "data": "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675",
+        "from": "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
+        "gas": "0x76c0",
+        "gasPrice": "0x9184e72a000",
+        "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
+        "value": "0x9184e72a"
+    }]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_sign</strong></code></summary>
+
+#### Description
+
+Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))`
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to use for signing|
+|2|{[`Data`](#data)}|data to sign|
+
+#### Returns
+
+{[`Data`](#data)} - signature hash of the provided data
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_sign",
+    "params": ["0x9b2055d370f73ec7d8a03e965129118dc8f5bf83", "0xdeadbeaf"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_signTransaction</strong></code></summary>
+
+#### Description
+
+Signs a transaction that can be submitted to the network at a later time using with `eth_sendRawTransaction`
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{`object`}|@property {[`Data`](#data)} `from` - transaction sender<br/>@property {[`Data`](#data)} `[to]` - transaction recipient<br/>@property {[`Quantity`](#quantity)} `[gas="0x15f90"]` - gas provided for transaction execution<br/>@property {[`Quantity`](#quantity)} `[gasPrice]` - price in wei of each gas used<br/>@property {[`Quantity`](#quantity)} `[value]` - value in wei sent with this transaction<br/>@property {[`Data`](#data)} `[data]` - contract code or a hashed method call with encoded args<br/>@property {[`Quantity`](#quantity)} `[nonce]` - unique number identifying this transaction|
+
+#### Returns
+
+{[`Data`](#data)} - signature hash of the transaction object
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_signTransaction",
+    "params": [{
+        "data": "0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675",
+        "from": "0xb60e8dd61c5d32be8058bb8eb970870f07233155",
+        "gas": "0x76c0",
+        "gasPrice": "0x9184e72a000",
+        "to": "0xd46e8dd67c5d32be8058bb8eb970870f07244567",
+        "value": "0x9184e72a"
+    }]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_signTypedData</strong></code></summary>
+
+#### Description
+
+Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))`
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to use for signing|
+|2|{[`Data`](#data)}|message to sign containing type information, a domain separator, and data|
+
+**Note:** Client developers should refer to EIP-712 for complete semantics around [encoding and signing data](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md#specification). Dapp developers should refer to EIP-712 for the expected structure of [RPC method input parameters](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md#parameters).
+
+#### Returns
+
+{[`Data`](#data)} - signature hash of the provided message
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+	"id": 1337
+	"jsonrpc": "2.0",
+	"method": "eth_signTypedData",
+	"params": ["0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826", {
+		"types": {
+			"EIP712Domain": [{
+				"name": "name",
+				"type": "string"
+			}, {
+				"name": "version",
+				"type": "string"
+			}, {
+				"name": "chainId",
+				"type": "uint256"
+			}, {
+				"name": "verifyingContract",
+				"type": "address"
+			}],
+			"Person": [{
+				"name": "name",
+				"type": "string"
+			}, {
+				"name": "wallet",
+				"type": "address"
+			}],
+			"Mail": [{
+				"name": "from",
+				"type": "Person"
+			}, {
+				"name": "to",
+				"type": "Person"
+			}, {
+				"name": "contents",
+				"type": "string"
+			}]
+		},
+		"primaryType": "Mail",
+		"domain": {
+			"name": "Ether Mail",
+			"version": "1",
+			"chainId": 1,
+			"verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+		},
+		"message": {
+			"from": {
+				"name": "Cow",
+				"wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+			},
+			"to": {
+				"name": "Bob",
+				"wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+			},
+			"contents": "Hello, Bob!"
+		}
+	}]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b915621c"
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_submitHashrate</strong></code></summary>
+
+#### Description
+
+Submit a mining hashrate
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|hash rate|
+|2|{[`Data`](#data)}|random ID identifying this node|
+
+#### Returns
+
+{`boolean`} - `true` if submitting went through successfully, `false` otherwise
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_submitHashrate",
+    "params": [
+        "0x0000000000000000000000000000000000000000000000000000000000500000",
+        "0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c"
+    ]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": true
+}
+```
+---
+</details>
+
+<details>
 <summary><code><strong>eth_submitWork</strong></code></summary>
 
 #### Description
@@ -2197,23 +2200,25 @@ curl -X POST --data '{
 ---
 </details>
 
+
 <details>
-<summary><code><strong>eth_submitHashrate</strong></code></summary>
+<summary><code><strong>eth_syncing</strong></code></summary>
 
 #### Description
 
-Submit a mining hashrate
+Returns information about the status of this client's network synchronization
 
 #### Parameters
 
-|#|Type|Description|
-|-|-|-|
-|1|{[`Data`](#data)}|hash rate|
-|2|{[`Data`](#data)}|random ID identifying this node|
+_(none)_
 
 #### Returns
 
-{`boolean`} - `true` if submitting went through succesfully, `false` otherwise
+{`boolean|object`} - `false` if this client is not syncing with the network, otherwise an object with the following members:
+
+- {[`Quantity`](#quantity)} `currentBlock` - number of the most-recent block synced
+- {[`Quantity`](#quantity)} `highestBlock` - number of latest block on the network
+- {[`Quantity`](#quantity)} `startingBlock` - block number at which syncing started
 
 #### Example
 
@@ -2222,11 +2227,52 @@ Submit a mining hashrate
 curl -X POST --data '{
     "id": 1337,
     "jsonrpc": "2.0",
-    "method": "eth_submitHashrate",
-    "params": [
-        "0x0000000000000000000000000000000000000000000000000000000000500000",
-        "0x59daa26581d0acd1fce254fb7e85952f4c09d0915afd33d3886cd914bc7d283c"
-    ]
+    "method": "eth_syncing",
+    "params": []
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": {
+        "currentBlock": '0x386',
+        "highestBlock": '0x454',
+        "startingBlock": '0x384'
+    }
+}
+```
+---
+</details>
+
+<details>
+<summary><code><strong>eth_uninstallFilter</strong></code></summary>
+
+#### Description
+
+Destroys a filter based on filter ID
+
+**Note:** This should only be called if a filter and its notifications are no longer needed. This will also be called automatically on a filter if its notifications are not retrieved using `eth_getFilterChanges` for a period of time.
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Quantity`](#quantity)}|ID of the filter to destroy|
+
+#### Returns
+
+{`boolean`} - `true` if the filter is found and successfully destroyed or `false` if it is not
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_uninstallFilter",
+    "params": ["0xb"]
 }' <url>
 
 # Response
