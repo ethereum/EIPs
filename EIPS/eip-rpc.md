@@ -11,7 +11,7 @@ created: 2018-10-02
 
 ## Simple Summary
 
-This proposal defines a standard set of remote procedure call methods that an Ethereum node must implement.
+This proposal defines a standard set of remote procedure call methods that an Ethereum node should implement.
 
 ## Abstract
 
