@@ -74,11 +74,13 @@ Examples `Quantity` values:
 
 |Value|Valid|Reason|
 |-|-|-|
-|0x41|`true`||
-|0x400|`true`||
-|0x|`false`|zero must be "0x0"|
-|0x0400|`false`|leading zeroes not allowed|
-|ff|`false`|values must be prefixed|
+|0x|`invalid`|empty not a valid quantity|
+|0x0|`valid`|interpreted as a quantity of zero|
+|0x00|`invalid`|leading zeroes not allowed|
+|0x41|`valid`|interpreted as a quantity of 65|
+|0x400|`valid`|interpreted as a quantity of 1024|
+|0x0400|`invalid`|leading zeroes not allowed|
+|ff|`invalid`|values must be prefixed|
 
 
 ##### `Data`
@@ -91,9 +93,11 @@ Examples `Data` values:
 
 |Value|Valid|Reason|
 |-|-|-|
-|0x41|`true`||
-|0x004200|`true`||
-|0x|`true`||
+|0x|`valid`|interpreted as empty data|
+|0x0|`invalid`|each byte must be represented using two hex digits|
+|0x00|`valid`|interpreted as a single zero byte|
+|0x41|`true`|interpreted as a data value of 65|
+|0x004200|`true`|interpreted as a data value of 16896|
 |0xf0f0f|`false`|bytes require two hex digits|
 |004200|`false`|values must be prefixed|
 
