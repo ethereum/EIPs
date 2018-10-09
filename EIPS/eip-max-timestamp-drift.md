@@ -8,19 +8,15 @@ type: Standards Track: Core
 created: 2018-10-09
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
-
-## Abstract
 
 Include an explicit definition of the acceptable timestamp drift in the protocol specification.
 
+## Abstract
+
+On the basis that both Geth and Parity implement the same timestamp validation requirements, this should be written into the reference specification.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
 There is a lack of clarity about how accurate timestamps in the block header must be. The yellow paper describes the timestamp as 
 
@@ -45,11 +41,14 @@ Both [Geth](https://github.com/ethereum/go-ethereum/blob/4e474c74dc2ac1d26b339c3
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-Would this apply?
+
+It may be necessary to relax this requirement for blocks which were mined early in the main chain's history, if they would be considered invalid.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-_Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable._
+
+These would be important to have.
+
 
 
 
