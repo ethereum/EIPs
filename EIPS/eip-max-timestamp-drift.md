@@ -28,6 +28,8 @@ There is a lack of clarity about how accurate timestamps in the block header mus
 
 This causes [confusion](https://ethereum.stackexchange.com/questions/5924/how-do-ethereum-mining-nodes-maintain-a-time-consistent-with-the-network/5926#5926) about the safe use of the `TIMESTAMP` opcode (solidity's `block.timestamp` or `now`) in smart contract development.
 
+Differing interpretations of 'reasonable' may create a risk of consenus failures.
+
 
 ## Specification
 
