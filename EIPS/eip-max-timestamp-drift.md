@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Define a maximum block timestamp drift
 author: @Maurelian
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/define-a-maximum-block-timestamp-drift/1556
 status: Draft
 type: Standards Track: Core
 created: 2018-10-09
