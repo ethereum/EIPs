@@ -22,17 +22,18 @@ Include an explicit definition of the acceptable timestamp drift in the protocol
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-There is a lack of clarity about how accurate timestamps in the block header must be. The yellow paper describes the timestamp as "A scalar value equal to the reasonable
-output of Unix’s time() at this block’s inception" 
+There is a lack of clarity about how accurate timestamps in the block header must be. The yellow paper describes the timestamp as 
+
+> A scalar value equal to the reasonable output of Unix’s time() at this block’s inception
 
 This causes [confusion](https://ethereum.stackexchange.com/questions/5924/how-do-ethereum-mining-nodes-maintain-a-time-consistent-with-the-network/5926#5926) about the safe use of the `TIMESTAMP` opcode (solidity's `block.timestamp` or `now`) in smart contract development.
 
 
 ## Specification
 
-The yellow paper should define a timestamp as: "A scalar value equal to the
-output of Unix’s time() at this block’s inception. For the purpose of block validation, it must be greater than the previous block's timestamp, and no more than 15 seconds greater than system time".
+The yellow paper should define a timestamp as: 
 
+> A scalar value equal to the output of Unix’s time() at this block’s inception. For the purpose of block validation, it must be greater than the previous block's timestamp, and no more than 15 seconds greater than system time.
 
 
 ## Rationale
