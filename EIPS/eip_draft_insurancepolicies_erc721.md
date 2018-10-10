@@ -17,10 +17,10 @@ A standard interface for insurance policies, based on ERC 721.
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 The following standard allows for the implementation of a standard API for insurance policies within smart contracts. 
-Insurance policies are financial assets which are unique in some aspects, as they are connected to a specific risk, or have other unique properties like premium, period, carrier, underwriter etc.
+Insurance policies are financial assets which are unique in some aspects, as they are connected to a customer, a specific risk, or have other unique properties like premium, period, carrier, underwriter etc.
 Nevertheless, there are many potential applications where insurance policies can be traded, transferred or otherwise treated as an asset.
 The ERC 721 standard already provides the standard and technical means to handle policies as a specific class of non fungible tokens.
-In this proposal, we define a minimum metadata structure with properties which are common to the greatest possible class of policies.
+insurance In this proposal, we define a minimum metadata structure with properties which are common to the greatest possible class of policies.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
