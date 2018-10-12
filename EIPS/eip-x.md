@@ -6,7 +6,7 @@ discussions-to: https://github.com/ethereum/EIPs/issues/TBD
 status: Draft
 type: Standards Track
 category: ERC
-created: 2018-10-08
+created: 2018-10-12
 ---
 
 ## Simple Summary
