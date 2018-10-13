@@ -1,6 +1,6 @@
 ---
 eip:
-title: Human Cost Accounting Standard
+title: Human Cost Accounting Standard (Like Gas but for humans)
 author: Iamnot (@cohabo)
 discussions-to: https://github.com/freeworkculture/kazini/issues/11
 status: Draft
