@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip:
 title: Human Cost Accounting Standard
 author: Iamnot (@cohabo)
 discussions-to: https://github.com/freeworkculture/kazini/issues/11
@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2018-10-12
-requires: ERC-20, ERC-721
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
