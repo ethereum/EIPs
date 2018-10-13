@@ -32,7 +32,7 @@ The proliferation of on-chain identity solutions can be traced back to the fact 
 
  `Identities` can remove an `Associated Address` by producing a signed message indicating intent to disassociate itself from the `Identity`. Signatures are stored in the `Registry` to prevent replay attacks.
 
-- `Provider`: An Ethereum address (typically but not by definition a smart contract) authorized to add and remove `Associated Addresses`, `Providers`, and `Resolvers` from the `Identities` of users who have authorized the `Provider` to act on their behalf. `Providers` exist to facilitate end users adoption, and make it easy to manage identities.
+- `Provider`: An Ethereum address (typically but not by definition a smart contract) authorized to add and remove `Associated Addresses`, `Providers`, and `Resolvers` from the `Identities` of users who have authorized the `Provider` to act on their behalf. `Providers` exist to facilitate end user adoption, and make it easy to manage identities.
 
 - `Resolver`: A smart contract containing arbitrary information pertaining to users' `Identities`. A resolver may implement an identity standard, such as ERC 725, or may consist of a smart contract leveraging or declaring any identifying information about `Identities`. These could be simple attestation structures or more sophisticated financial dApps, social media dApps, etc.
 
@@ -101,7 +101,7 @@ We find that at a protocol layer, identity should contain no claim or attestatio
 The main criticism of an identity layer comes from restrictiveness; we aim to limit requirements to be modular and future-proof without providing any special functionality for any component within the core registry. It simply allows users the option to interact on the blockchain using an arbitrarily robust identity rather than just an address.
 
 ## Implementation
-[**The reference implementation for the ERC may be found in this public repository.**](https://github.com/hydrogen-dev/identity-erc)
+[**\*\*The reference implementation for the ERC may be found in this public repository.\*\***](https://github.com/hydrogen-dev/identity-erc)
 
 #### identityExists
 
