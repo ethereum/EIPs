@@ -1,13 +1,13 @@
 ---
 eip: <to be assigned>
-title: <Human Capital Accounting Standard>
-author: <Iamnot (@cohabo)>
-discussions-to: <https://github.com/freeworkculture/kazini/issues/11>
+title: Human Cost Accounting Standard
+author: Iamnot (@cohabo)
+discussions-to: https://github.com/freeworkculture/kazini/issues/11
 status: Draft
-type: <Standards Track>
-category: <ERC>
-created: <2018-10-13>
-requires: <ERC-20, ERC-721>
+type: Standards Track
+category: ERC
+created: 2018-10-12
+requires: ERC-20, ERC-721
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -36,10 +36,6 @@ ERC-1155 Crypto Item standard allows a smart contract interface where one can re
 This standard is inspired by the belief–desire–intention (BDI) model of human practical reasoning developed by Michael Bratman as a way of explaining future-directed intention. A BDI agent is a particular type of bounded rational software agent, imbued with particular mental attitudes, viz: Beliefs, Desires and Intentions (BDI). The model identifies commitment as the distinguishing factor between desire and intention, and a noteworthy property that leads to (1) temporal persistence in plans and in the sense of explicit reference to time, (2) further plans being made on the basis of those to which it is already committed, (3) hierarchical nature of plans, since the overarching plan remains in effect while subsidiary plans are being executed.
 
 The BDI software model is an attempt to solve a problem of plans and planning choice and the execution thereof. The complement of which tenders a sufficient metric for indicating means-end coherence and ascribing cost baselines to such outcomes.
-
-
-
-
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
