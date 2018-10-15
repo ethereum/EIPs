@@ -175,11 +175,8 @@ There are already plenty of ERC20-compliant tokens deployed on the Ethereum netw
 Different implementations have been written by various teams that have different trade-offs: from gas saving to improved security.
 
 #### Example implementations are available at
-- https://github.com/OpenZeppelin/openzeppelin-solidity/blob/9b3710465583284b8c4c5d2245749246bb2e0094/contracts/token/ERC20/ERC20.sol
-- https://github.com/ConsenSys/Tokens/blob/812791dfbf3c9a9f5e8370e26cda0009bde43f03/contracts/eip20/EIP20.sol
-
-#### Implementation of adding the force to 0 before calling "approve" again:
-- https://github.com/Giveth/minime/blob/ea04d950eea153a04c51fa510b068b9dded390cb/contracts/MiniMeToken.sol
+- [OpenZeppelin implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/9b3710465583284b8c4c5d2245749246bb2e0094/contracts/token/ERC20/ERC20.sol)
+- [ConsenSys implementation](https://github.com/ConsenSys/Tokens/blob/fdf687c69d998266a95f15216b1955a4965a0a6d/contracts/eip20/EIP20.sol)
 
 
 ## History
