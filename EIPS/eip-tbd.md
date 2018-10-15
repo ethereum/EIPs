@@ -48,8 +48,8 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 | eth_getCode | IMPLEMENTED |  `account(address: "0x...") { code }` |
 | eth_getLogs |  TODO | |
 | eth_getStorageAt | IMPLEMENTED |  `account(address: "0x...") { storage(slot: "0x...") }` |
-| eth_getTransactionByBlockHashAndIndex |  `block(hash: "0x...") { transactionAt(index: x) { ... } }` | |
-| eth_getTransactionByBlockNumberAndIndex |  `block(number: n) { transactionAt(index: x) { ... } }` | |
+| eth_getTransactionByBlockHashAndIndex | IMPLEMENTED | `block(hash: "0x...") { transactionAt(index: x) { ... } }` |
+| eth_getTransactionByBlockNumberAndIndex | IMPLEMENTED | `block(number: n) { transactionAt(index: x) { ... } }` |
 | eth_getTransactionByHash | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
 | eth_getTransactionCount | IMPLEMENTED |  `account(address: "0x...") { transactionCount }` |
 | eth_getTransactionReceipt | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
