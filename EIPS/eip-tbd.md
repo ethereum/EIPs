@@ -33,6 +33,7 @@ This EIP specifies only operations concerned with read-only access to public dat
 This API is not backwards compatible with the JSON-RPC API. It is recommended that nodes wishing to implement this API expose it on a separate port or URL path, deprecating the JSON-RPC API for eventual removal.
 
 The following table maps existing RPC calls under the `eth_` namespace to their GraphQL equivalents:
+
 | RPC | Status | Description |
 | --- | ------ | ----------- |
 | eth_protocolVersion | TODO | |
