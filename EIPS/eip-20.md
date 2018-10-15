@@ -176,9 +176,6 @@ Different implementations have been written by various teams that have different
 - [OpenZeppelin implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/9b3710465583284b8c4c5d2245749246bb2e0094/contracts/token/ERC20/ERC20.sol)
 - [ConsenSys implementation](https://github.com/ConsenSys/Tokens/blob/fdf687c69d998266a95f15216b1955a4965a0a6d/contracts/eip20/EIP20.sol)
 
-#### Implementation of adding the force to 0 before calling "approve" again:
-- https://github.com/Giveth/minime/blob/master/contracts/MiniMeToken.sol
-
 
 
 ## History
