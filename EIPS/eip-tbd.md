@@ -34,7 +34,7 @@ This API is not backwards compatible with the JSON-RPC API. It is recommended th
 
 The following table maps existing RPC calls under the `eth_` namespace to their GraphQL equivalents:
 | RPC | Status | Description |
-|-----|--------|-------------|
+| --- | ------ | ----------- |
 | eth_protocolVersion | TODO | |
 | eth_syncing | TODO | |
 | eth_coinbase | NOT IMPLEMENTED | Mining functionality to be defined separately. |
