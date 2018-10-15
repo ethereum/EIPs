@@ -36,35 +36,30 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 
 | RPC | Status | Description |
 | --- | ------ | ----------- |
-| eth_protocolVersion | TODO | |
-| eth_syncing | TODO | |
-| eth_coinbase | NOT IMPLEMENTED | Mining functionality to be defined separately. |
-| eth_mining | NOT IMPLEMENTED | Mining functionality to be defined separately. |
-| eth_hashRate | NOT IMPLEMENTED | Mining functionality to be defined separately. |
-| eth_gasPrice | TODO | |
-| eth_accounts | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
 | eth_blockNumber | IMPLEMENTED |  `block { number }` |
-| eth_getBalance | IMPLEMENTED |  `account(address: "0x...") { balance }` |
-| eth_getStorageAt | IMPLEMENTED |  `account(address: "0x...") { storage(slot: "0x...") }` |
-| eth_getTransactionCount | IMPLEMENTED |  `account(address: "0x...") { nonce }` |
-| eth_getBlockTransactionCountByHash | IMPLEMENTED |  `block(hash: "0x...") { transactionCount }` |
-| eth_getBlockTransactionCountByNumber | IMPLEMENTED |  `block(number: x) { transactionCounnt }` |
-| eth_getUncleCountByBlockHash | IMPLEMENTED |  `block(hash: "0x...") { ommerCount }` |
-| eth_getUncleCountByBlockNumber | IMPLEMENTED |  `block(number: x) { ommerCount }` |
-| eth_getCode | IMPLEMENTED |  `account(address: "0x...") { code }` |
-| eth_sign | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
-| eth_sendTransaction | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
-| eth_sendRawTransaction |  TODO | |
 | eth_call |  TODO | |
 | eth_estimateGas |  TODO | |
+| eth_gasPrice | TODO | |
+| eth_getBalance | IMPLEMENTED |  `account(address: "0x...") { balance }` |
 | eth_getBlockByHash | IMPLEMENTED |  `block(hash: "0x...") { ... }` |
 | eth_getBlockByNumber | IMPLEMENTED |  `block(number: 123) { ... }` |
-| eth_getTransactionByHash | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
+| eth_getBlockTransactionCountByHash | IMPLEMENTED |  `block(hash: "0x...") { transactionCount }` |
+| eth_getBlockTransactionCountByNumber | IMPLEMENTED |  `block(number: x) { transactionCounnt }` |
+| eth_getCode | IMPLEMENTED |  `account(address: "0x...") { code }` |
+| eth_getLogs |  TODO | |
+| eth_getStorageAt | IMPLEMENTED |  `account(address: "0x...") { storage(slot: "0x...") }` |
 | eth_getTransactionByBlockHashAndIndex |  TODO | |
 | eth_getTransactionByBlockNumberAndIndex |  TODO | |
-| eth_getTransactionReceipt | IMPLEMENTED |  `transaction(hash: "0x...") { receipt { ... } }` |
+| eth_getTransactionByHash | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
+| eth_getTransactionCount | IMPLEMENTED |  `account(address: "0x...") { transactionCount }` |
+| eth_getTransactionReceipt | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
 | eth_getUncleByBlockHashAndIndex | IMPLEMENTED |  `block(hash: "0x...") { ommers { ... } }` |
 | eth_getUncleByBlockNumberAndIndex | IMPLEMENTED |  `block(number: "0x...") { ommers { ... } }` |
+| eth_getUncleCountByBlockHash | IMPLEMENTED |  `block(hash: "0x...") { ommerCount }` |
+| eth_getUncleCountByBlockNumber | IMPLEMENTED |  `block(number: x) { ommerCount }` |
+| eth_protocolVersion | TODO | |
+| eth_sendRawTransaction |  TODO | |
+| eth_syncing | TODO | |
 | eth_getCompilers | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
 | eth_compileLLL | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
 | eth_compileSolidity | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
@@ -75,10 +70,15 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 | eth_uninstallFilter | NOT IMPLEMENTED | Filter functionality may be specified in a future EIP. |
 | eth_getFilterChanges | NOT IMPLEMENTED | Filter functionality may be specified in a future EIP. |
 | eth_getFilterLogs | NOT IMPLEMENTED | Filter functionality may be specified in a future EIP. |
-| eth_getLogs |  TODO | |
+| eth_accounts | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
+| eth_sign | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
+| eth_sendTransaction | NOT IMPLEMENTED | Accounts functionality is not part of the core node API. |
+| eth_coinbase | NOT IMPLEMENTED | Mining functionality to be defined separately. |
 | eth_getWork | NOT IMPLEMENTED | Mining functionality to be defined separately. |
-| eth_submitWork | NOT IMPLEMENTED | Mining functionality to be defined separately. |
+| eth_hashRate | NOT IMPLEMENTED | Mining functionality to be defined separately. |
+| eth_mining | NOT IMPLEMENTED | Mining functionality to be defined separately. |
 | eth_submitHashrate | NOT IMPLEMENTED | Mining functionality to be defined separately. |
+| eth_submitWork | NOT IMPLEMENTED | Mining functionality to be defined separately. |
 
 Some node APIs are expected to be defined in related EIPs, or to be deprecated with the JSON-RPC API and eventually removed:
 
