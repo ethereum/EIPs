@@ -57,9 +57,9 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 | eth_getUncleByBlockNumberAndIndex | IMPLEMENTED |  `{ block(number: n) { ommerAt(index: x) { ... } } }` |
 | eth_getUncleCountByBlockHash | IMPLEMENTED |  `{ block(hash: "0x...") { ommerCount } }` |
 | eth_getUncleCountByBlockNumber | IMPLEMENTED |  `{ block(number: x) { ommerCount } }` |
-| eth_protocolVersion | TODO | |
+| eth_protocolVersion | IMPLEMENTED | `{ protocolVersion }` |
 | eth_sendRawTransaction | IMPLEMENTED | `mutation { sendRawTransaction(data: data) }` |
-| eth_syncing | TODO | |
+| eth_syncing | IMPLEMENTED | `{ syncing { ... } }` |
 | eth_getCompilers | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
 | eth_compileLLL | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
 | eth_compileSolidity | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
