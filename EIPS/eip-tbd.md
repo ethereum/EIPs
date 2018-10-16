@@ -36,29 +36,29 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 
 | RPC | Status | Description |
 | --- | ------ | ----------- |
-| eth_blockNumber | IMPLEMENTED |  `block { number }` |
+| eth_blockNumber | IMPLEMENTED |  `{ block { number } }` |
 | eth_call |  TODO | |
 | eth_estimateGas |  TODO | |
 | eth_gasPrice | TODO | |
-| eth_getBalance | IMPLEMENTED |  `account(address: "0x...") { balance }` |
-| eth_getBlockByHash | IMPLEMENTED |  `block(hash: "0x...") { ... }` |
-| eth_getBlockByNumber | IMPLEMENTED |  `block(number: 123) { ... }` |
-| eth_getBlockTransactionCountByHash | IMPLEMENTED |  `block(hash: "0x...") { transactionCount }` |
-| eth_getBlockTransactionCountByNumber | IMPLEMENTED |  `block(number: x) { transactionCounnt }` |
-| eth_getCode | IMPLEMENTED |  `account(address: "0x...") { code }` |
+| eth_getBalance | IMPLEMENTED |  `{ account(address: "0x...") { balance } }` |
+| eth_getBlockByHash | IMPLEMENTED |  `{ block(hash: "0x...") { ... } }` |
+| eth_getBlockByNumber | IMPLEMENTED |  `{ block(number: 123) { ... } }` |
+| eth_getBlockTransactionCountByHash | IMPLEMENTED |  `{ block(hash: "0x...") { transactionCount } }` |
+| eth_getBlockTransactionCountByNumber | IMPLEMENTED |  `{ block(number: x) { transactionCounnt } }` |
+| eth_getCode | IMPLEMENTED |  `{ account(address: "0x...") { code } }` |
 | eth_getLogs |  TODO | |
-| eth_getStorageAt | IMPLEMENTED |  `account(address: "0x...") { storage(slot: "0x...") }` |
-| eth_getTransactionByBlockHashAndIndex | IMPLEMENTED | `block(hash: "0x...") { transactionAt(index: x) { ... } }` |
-| eth_getTransactionByBlockNumberAndIndex | IMPLEMENTED | `block(number: n) { transactionAt(index: x) { ... } }` |
-| eth_getTransactionByHash | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
-| eth_getTransactionCount | IMPLEMENTED |  `account(address: "0x...") { transactionCount }` |
-| eth_getTransactionReceipt | IMPLEMENTED |  `transaction(hash: "0x...") { ... }` |
-| eth_getUncleByBlockHashAndIndex | IMPLEMENTED |  `block(hash: "0x...") { ommerAt(index: x) { ... } }` |
-| eth_getUncleByBlockNumberAndIndex | IMPLEMENTED |  `block(number: n) { ommerAt(index: x) { ... } }` |
-| eth_getUncleCountByBlockHash | IMPLEMENTED |  `block(hash: "0x...") { ommerCount }` |
-| eth_getUncleCountByBlockNumber | IMPLEMENTED |  `block(number: x) { ommerCount }` |
+| eth_getStorageAt | IMPLEMENTED |  `{ account(address: "0x...") { storage(slot: "0x...") } }` |
+| eth_getTransactionByBlockHashAndIndex | IMPLEMENTED | `{ block(hash: "0x...") { transactionAt(index: x) { ... } } }` |
+| eth_getTransactionByBlockNumberAndIndex | IMPLEMENTED | `{ block(number: n) { transactionAt(index: x) { ... } } }` |
+| eth_getTransactionByHash | IMPLEMENTED |  `{ transaction(hash: "0x...") { ... } }` |
+| eth_getTransactionCount | IMPLEMENTED |  `{ account(address: "0x...") { transactionCount } }` |
+| eth_getTransactionReceipt | IMPLEMENTED |  `{ transaction(hash: "0x...") { ... } }` |
+| eth_getUncleByBlockHashAndIndex | IMPLEMENTED |  `{ block(hash: "0x...") { ommerAt(index: x) { ... } } }` |
+| eth_getUncleByBlockNumberAndIndex | IMPLEMENTED |  `{ block(number: n) { ommerAt(index: x) { ... } } }` |
+| eth_getUncleCountByBlockHash | IMPLEMENTED |  `{ block(hash: "0x...") { ommerCount } }` |
+| eth_getUncleCountByBlockNumber | IMPLEMENTED |  `{ block(number: x) { ommerCount } }` |
 | eth_protocolVersion | TODO | |
-| eth_sendRawTransaction |  TODO | |
+| eth_sendRawTransaction | IMPLEMENTED | `mutation { sendRawTransaction(data: data) }` |
 | eth_syncing | TODO | |
 | eth_getCompilers | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
 | eth_compileLLL | NOT IMPLEMENTED | Compiler functionality is deprecated in JSON-RPC. |
