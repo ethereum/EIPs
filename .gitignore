@@ -1,3 +1,5 @@
 _site
 .sass-cache
 .jekyll-metadata
+/.idea
+.pytest_cache
