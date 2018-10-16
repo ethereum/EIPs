@@ -39,7 +39,7 @@ The following table maps existing RPC calls under the `eth_` namespace to their 
 | eth_blockNumber | IMPLEMENTED |  `{ block { number } }` |
 | eth_call | IMPLEMENTED | `{ call(data: { to: "0x...", data: "0x..." }) { data status gasUsed } }` |
 | eth_estimateGas | IMPLEMENTED | `{ estimateGas(data: { to: "0x...", data: "0x..." }) }` |
-| eth_gasPrice | TODO | |
+| eth_gasPrice | IMPLEMENTED | `{ gasPrice }` |
 | eth_getBalance | IMPLEMENTED |  `{ account(address: "0x...") { balance } }` |
 | eth_getBlockByHash | IMPLEMENTED |  `{ block(hash: "0x...") { ... } }` |
 | eth_getBlockByNumber | IMPLEMENTED |  `{ block(number: 123) { ... } }` |
