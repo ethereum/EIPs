@@ -18,7 +18,7 @@ Browse all current and draft EIPs on [the official EIP site](http://eips.ethereu
 
 ## Project Goal
 
-The Ethereum Improvement Proposals repository exists as a place to discuss concrete proposals with potential users of the proposal and the Ethereum community at large.
+The Ethereum Improvement Proposals repository exists as a place to share concrete proposals with potential users of the proposal and the Ethereum community at large.
 
 We promote high-quality, peer-reviewed proposals in two categories:
 
