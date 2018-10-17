@@ -5,7 +5,8 @@ status: Active
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
         https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md
-created: 2015-10-27, 2017-02-01
+created: 2015-10-27
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17
 ---
 
 ## What is an EIP?
@@ -230,13 +231,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 This document was derived heavily from [Bitcoin's BIP-0001] written by Amir Taaki which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
 
-December 7, 2016: EIP 1 has been improved and will be placed as a PR.
+December 7, 2015: EIP 1 has been improved and will be placed as a PR.
 
 February 1, 2016: EIP 1 has added editors, made draft improvements to process, and has merged with Master stream.
 
 March 21, 2018: Minor edits to accommodate the new automatically-generated EIP directory on [eips.ethereum.org](http://eips.ethereum.org/).
 
 May 29, 2018: A last call process was added.
+
+Oct 17, 2018: The `updated` header was introduced.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
