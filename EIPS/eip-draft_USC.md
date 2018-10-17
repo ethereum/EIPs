@@ -1,8 +1,8 @@
 ---
-eip: 1898
+eip: <to be assigned, prefer 1898>
 title: ERC-54 Upgradable Smart Contract
 author: Kaidong Wu <wukd94@pku.edu.cn>, Chuqiao Ren <cr025@bucknell.edu>, Ruthia He <rujiahe@gmail.com>, Yun Ma <mayun@pku.edu.cn>
-discussions-to: https://github.com/ethereum/EIPs/issues/1898
+discussions-to: https://github.com/ethereum/EIPs/issues/1503
 status: Draft
 type: Standards Track
 category: ERC
@@ -335,7 +335,7 @@ Thank you to those who helped on review and revise the proposal:
 - [@lsankar4033](https://github.com/lsankar4033) from MIT
 - more
 
-** We have been very inclusive in this process and invite anyone with questions or contributions into our discussion. However, this standard is written only to support the identified use cases which are listed herein.
+We have been very inclusive in this process and invite anyone with questions or contributions into our discussion. However, this standard is written only to support the identified use cases which are listed herein.
 
 ## Implementations
 1. [Renaissance](https://www.renaissance.app) - a protocol that connect creators and fans financially
