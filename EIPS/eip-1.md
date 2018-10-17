@@ -102,8 +102,6 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * discussions-to:` \<a url pointing to the official discussion thread\>
 
- - :x: `discussions-to` can not be a Github `Pull-Request`.
-
 ` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
 `* review-period-end:` YYYY-MM-DD
@@ -146,7 +144,11 @@ The `resolution` header is required for Standards Track EIPs only. It contains a
 
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, examples for places to discuss your EIP include [Ethereum topics on Gitter](https://gitter.im/ethereum/topics), an issue in this repo or in a fork of this repo, [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect), and [Reddit r/ethereum](https://www.reddit.com/r/ethereum/). No `discussions-to` header is necessary if the EIP is being discussed privately with the author.
+While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, examples for places to discuss your EIP include [Ethereum topics on Gitter](https://gitter.im/ethereum/topics), an issue in this repo or in a fork of this repo, [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect), and [Reddit r/ethereum](https://www.reddit.com/r/ethereum/).
+
+No `discussions-to` header is necessary if the EIP is being discussed privately with the author.
+
+As a single exception, `discussions-to` cannot point to GitHub pull requests.
 
 #### `type` header
 
