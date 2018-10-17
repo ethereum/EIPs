@@ -126,15 +126,15 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 The author header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
 
-Random J. User &lt;address@dom.ain&gt;
+> Random J. User &lt;address@dom.ain&gt;
 
 or
 
-Random J. User (@username)
+> Random J. User (@username)
 
 if the email address or GitHub username is included, and
 
-Random J. User
+> Random J. User
 
 if the email address is not given.
 
