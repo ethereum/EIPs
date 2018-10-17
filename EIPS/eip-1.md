@@ -112,6 +112,8 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` created:` <date created on>
 
+` * updated:` <comma separated list of dates>
+
 ` * requires:` <EIP number(s)>
 
 ` * replaces:` <EIP number(s)>
@@ -163,6 +165,10 @@ The `category` header specifies the EIP's category. This is required for standar
 #### `created` header
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
+
+#### `updated` header
+
+The `updated` header records the date(s) when the EIP was updated with "substantional" changes. This header is only valid for EIPs of Draft and Active status.
 
 #### `requires` header
 
