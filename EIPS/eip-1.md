@@ -104,13 +104,13 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
-`* review-period-end:` YYYY-MM-DD
+`* review-period-end:` <date review period ends>
 
 ` type:` <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
 ` * category:` <Core | Networking | Interface | ERC>
 
-` created:` <date created on, in ISO 8601 (yyyy-mm-dd) format>
+` created:` <date created on>
 
 ` * requires:` <EIP number(s)>
 
@@ -121,6 +121,8 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 ` * resolution:` \<a url pointing to the resolution of this EIP\>
 
 Headers that permit lists must separate elements with commas.
+
+Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
 
 #### `author` header
 
