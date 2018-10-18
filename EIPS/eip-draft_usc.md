@@ -335,6 +335,8 @@ Thank you to those who helped on review and revise the proposal:
 - [@lsankar4033](https://github.com/lsankar4033) from MIT
 - more
 
+The proposal is initiated and developed by the team Renaissnace and the Research Group of Blockchain System @ Center for Operating System at Peking University.
+
 We have been very inclusive in this process and invite anyone with questions or contributions into our discussion. However, this standard is written only to support the identified use cases which are listed herein.
 
 ## Implementations
