@@ -1,8 +1,8 @@
 ---
 eip: 1152
 title: Manager Token Standard
-author: Leona Hioki <leona.hioki@laurus-school.com> ,Kiichi Hiruma (@CoRe103)
-discussions-to: leona.hioki@laurus-school.com,@leo_hio(Twitter)
+author: Leona Hioki <leona.hioki@laurus-school.com> ,Kiichi Hiruma <@mokemokehardcore>
+discussions-to: <https://research.cryptoeconomicslab.com/t/topic/213>
 status: Draft
 type: Standards
 category :ERC
