@@ -1,236 +1,54 @@
 ---
-eip: 1152
-title: Manager Token Standard
-author: Leona Hioki <leona.hioki@laurus-school.com> ,Kiichi Hiruma <@mokemokehardcore>
-discussions-to: <https://research.cryptoeconomicslab.com/t/topic/213>
+eip: <to be assigned>
+title: <EIP title>
+author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+discussions-to: <URL>
 status: Draft
-type: Standards
-category :ERC
-created: 2018-06-14
-requires (*optional): <EIP 721>
+type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+requires (*optional): <EIP number(s)>
+replaces (*optional): <EIP number(s)>
 ---
 
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+This is the suggested template for new EIPs.
+
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
+
+The title should be 44 characters or less.
+
 ## Simple Summary
-  Non Fungible Token which can be used in PaaS instead of accounts, API-keys,and serial numbers.
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
 
 ## Abstract
-  This proposal extends ERC721 Token Standard to identify owners in any network using a web server, not only in Ethereum Network. Adding a public key to tokens and introducing an order relation enable ERC721 tokens to have practical ID abilities. 
-
-
-The achieved ID abilities are below.
-
-
-*  External servers can authorize token holders or do Access-Control without using an Ethereum private key.
-
-
-*  Owners can change account's password or registration at any moment with one transaction.
-
-
-*  Owners can send this NFT to transfer his/her authority without security problems.
+<!--A short (~200 word) description of the technical issue being addressed.-->
+A short (~200 word) description of the technical issue being addressed.
 
 ## Motivation
-  Logging in cloud systems by Ethereum address can be done in principle. In addition, policy services or ACL(Access Control List) systems also can be enforced by Ethereum and its clients programs.
-
-
-"NFT" brought about an appropriate timing to start those practices by its possibility of dealing IDs as assets, which implies sharing API-keys and serial numbers of both dapps/non dapp products. 
-
-
-In EIP context,
-
-* By ERC735, Adding attribution to NTFs to claim an ownership in Ethereum was proposed, which is extensible for outer networks because a cypher on chain works at off chain as well.
-
-* By ERC1115, DAuth was proposed to login services by NTF, which is extensible to have policy system by adding order relation between tokens, and extensible for usages in PaaS by a simplification of the authorization flow.
-
-
-* By ERC994, the hiearchy NFT was proposed to manage NTFs as social assets which is extensible for PaaS useage by adding authorization functions.
-
-
-NFT for Cloud/Ethereum half&half system with the minimum extension of ERC721 was needed.
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
 ## Specification
-
-### Attributions
-
-```
-mapping (uint8 => bool) authorityOf;
-mapping (uint256 => bool) managersOf;
-PublicKey publicKeyOf;
-```
-
-### Functions
-
-```
-function createToken(address _approver) public returns(uint256);
-function switchManagers(uint256 _fromTokenId, uint256 _toTokenId, uint256 _managerTokenId, bool _propriety) public;
-function switchAuthority(uint256 _fromTokenId, uint256 _toTokenId, uint8 _authorityId, bool _propriety) public;
-function refreshPublicKey(uint256 _tokenId, string _nOfPublicKey, uint256 _eOfPublicKey) public;
-function deleteToken(uint256 _tokenId) public;
-```
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
 
 ## Rationale
-### Attributions
-* ```mapping (uint8 => bool) authorityOf;```
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-
-  This attribution defines what token owner is authorized to do at off chain.This will be referred in PaaS coding. This usually can not be changed by owner his self.
-
-
-* ```PublicKey publicKeyOf;```
-
-
-  This attribution is used to authorize owners at off chain. Encrypting ,digital signing or emai-sending will be done with this attribution.
-
-
-* ```mapping (uint256 => bool) managersOf;```
-
-
-  This attribution defines order relation between tokens. Owners of a token's manager tokens can change the authority attribution of it.
-
-### Functions
-* ```createToken``` -  After calling this function, ```_approver``` owns new token with returned ```tokenID(uint 256)```. 
-
-
-* ```switchManagers``` - Only the 'manager' of the token whose id equals ```_toTokenId``` (call 'toToken' below) can execute this function. The owner of the token whose id equals ```_fromTokenId``` (call 'fromToken' below) change the propriety that the ```_managerTokenId``` is included in managers of 'toToken' into ```_propriety```.
-
-* ```switchAuthority``` - As ```switchManagers```, ```_fromTokenId``` owner change the propriety that the ```_authorityId``` is included in authoritys of 'toToken' into ```_propriety```. But this function caller must own the token with the ```_authorityId```, in addition.
-
-* ```refreshPublicKey``` - Only the token owner can execute this function. The owner resister the value equivalent to the 'n' and 'e' of RSA cryptosystems. By using these values, the owner allow someone to encrypto confidential data and anyone can decrypto the sign by the corresponded private key in advance.
-
-* ```deleteToken``` - Only the token owner and issuer can execute this function. After calling, the token whose id equals ```_tokenId``` delete.
-
-<img src="./assets/eip-1152/createTokenfunction.jpg"></img>
-<img src="./assets/eip-1152/refreshPublicKeyfunction.jpg"></img>
-<img src="./assets/eip-1152/switchAuthorityfunction.jpg"></img>
-
-## Backwards Compatibility(ERC721)
-  This standard has no backwards compatibility.This is a NFT standard for cloud usages with the minimum extension of ERC721.
-
-
-And this is not the extension of ERC735,ERC998,ERC1115. 
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 ## Test Cases
-DEMO is here.Please install Metamask and access with a pc.
-
-
-<a href="https://www.geomerlin.com/blog/ManagerToken.html">Enter Demo</a>
-
-
-The sample solidity code is on the link below.
-
-
-<a href="https://github.com/geo-merlin/infraOnEthereum/blob/PLCdemo/sol/ManagerToken.sol">ManagerToken.sol</a>
+<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
 
 ## Implementation
-### Diaglam
-<img src="./assets/eip-1152/ManagerTokenSequenceDiaglam.jpg"></img>
-
-Examples of the implemention can be executed at the demo above.
-
-
-Design patterns of this standard are below.
-
-### Cloud Usage
-<img src="./assets/eip-1152/ManagerToken.jpg"></img>
-
-
-1.Requesting a server to execute a function which is authorized with the 'authority' attribution of the token, and the sign by the private key
-
-
-2.Server check the sign by the public key, execute the function, and returns the result.
-
-### Sending Token
-1.The current owner sends token to another,and transfers the authority, with the public key unchanged.
-
-
-2.The receiver changes the public key not to let the previous owner use the token.
-
-
-3.The manager sets the new authority for the token.
-
-### Manager Relation
-#### (1)OneManagerPattern
-
-
-If a token has only one manager, there are two pattern to manage.
-
-
-1. allow a higher manager of the token change the authority(```authorityOf```)
-
-
-2. don't allow any higher manager of the token change the authority(```authorityOf```)
-
-#### (2)SeveralManagerPattern
-
-
-If a token can have several managers, conflicts of editing authority will occur.
-
-
-```switchAuthority``` function can describe this pattern, and this depends on a developper's thought.
-
-
-The codes in the demo above let them conflict, and requires nothing.
-
-
-<img src="./assets/eip-1152/confliction.jpg"></img>
-
-#### (3)OneIssuerPattern
-
-
-If all tokens are allowed to be created by one address,
-
-
-```createToken``` function should require the address check.
-
-
-If ```createToken``` function require the token Id,the constructor function should create one token initially.
-
-
-<img src="./assets/eip-1152/createTokenfunction.jpg"></img>
-
-#### (4)SeveralIssuerPattern
-
-
-If token holders can create new tokens, there can be unlimited number of tokens.
-
-
-Developpers should make rule by limitting ```createToken``` function to a certain extent.
-
-## To be Discussed
-  This proposal is motivated by one belief that Ethereum itself should be introduced to real Cloud Administrator's jobs in the recent phase.
-
-
-Then the difference of these diagrams below leads to the questions, "what is the Ethereum's role in Clouds?" and "What is the minimum token standard to be used by Cloud Admins today?"
-<img src="./assets/eip-1152/BeforeAccounSystem.jpg"></img>
-<img src="./assets/eip-1152/ManagerToken.jpg"></img>
-
-As an economical aspect of Manager Token Standard(MTS), this frees product sellers from fixed pricing mistakes by effects of free markets, and gives them opptunities to open crowd sales instead of sign-up of API-keys or serial numbers. 
-
-
-Some of the discussions should reach what the simplest MTS implementation for managing and marketing system is.
-
-
-And these show which task tokens can be used in.
-
-
-(here is quoted from <a href="https://ieeexplore.ieee.org/document/7930226/">Comparing Blockchain and Cloud Services for Business Process Execution</a>)
-<img src="./assets/eip-1152/comparingBlockchainCloud.jpg"></img>
-
-These discussions are also held in <a href="https://join.slack.com/t/geomarlin/shared_invite/enQtMzgwODc3MDA5NTg3LTExNGE1MjY1NmZmMTgzZDc4MDQ5ODIxNGYwZDliNDY5Zjg5Y2VmNzI4Mzc1ODRjOWJiMjIxNjA2NzUwNDE0YjM">Slack</a> 
-
-## Refereunce
-<p><a href="https://github.com/ethereum/EIPs/issues/721">[1]ERC721</a></p>
-
-
-<p><a href="https://github.com/ethereum/EIPs/issues/935">[2]ERC935</a></p>
-
-
-<p><a href="https://github.com/ethereum/EIPs/issues/994">[3]ERC994</a></p>
-
-
-<p><a href="https://github.com/ethereum/EIPs/issues/1115">[4]ERC1115</a></p>
-
-
-<p><a href="https://ieeexplore.ieee.org/document/7930226/">[5]Comparing Blockchain and Cloud Services for Business Process Execution</a></p>
-
-
-<p><a href="https://azure.microsoft.com/es-es/blog/introducing-enterprise-smart-contracts/">[6]Introducing Enterprise Smart Contracts</a></p>
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
