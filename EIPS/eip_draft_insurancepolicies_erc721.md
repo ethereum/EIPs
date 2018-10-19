@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Insurance Policies as ERC721 Tokens
-author: Christoph Mussenbrock (@christoph2806)
+author: Christoph Mussenbrock <@christoph2806>
 discussions-to: 
 status: Draft
 type: Standards Track
