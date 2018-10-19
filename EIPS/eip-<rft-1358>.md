@@ -1,0 +1,279 @@
+---
+eip: <to be assigned by EIP Editor>
+title: Refungible-ERC721 Asset with Fungible ERC20
+author: [Tallyx Inc](tallyx.com)
+discussions-to: https://github.com/ethereum/EIPs/issues/xxxx
+status: Draft
+type: Standards Track
+category: ERC
+created: 2018-10-19
+requires: 721, 20
+---
+
+<!--
+This is the suggested template for new EIPs.
+
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
+
+The title should be 44 characters or less.
+-->
+
+## Simple Summary
+
+<!-- "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. -->
+
+A standard interface for ReFungible Token definition, ERC721 Non-Fungible Asset token backed by ERC-20 Fungible tokens representing the transferable ownership of the Asset.
+
+
+## Abstract
+
+<!-- A short (~200 word) description of the technical issue being addressed. -->
+
+This is a standard for ReFungible Token definition, with the ERC721 representing Non-Fungible Tokenized Assets such as the the assets in Global Trade(Payment Obligation, Invoice, Draft, Buyer Payment, Payment Finance, etc.), Insurance, Investment banking etc., backed by ERC-20 Fungible tokens representing the transferable ownership of the Asset. The ownership can be fully owned by one owner or split across multiple owners and the ownership can be transferred fully or partially to other owners. The transferred ownership could be further transferred fully or split across multiple tiers. The ERC20 token registry manages the ownership distribution and tracks the deep tier ownership transfer. The Asset(such as Buyer Payment or Payment Finance) has a time limit on the validity/maturity period, and a maturity event managed by a smart contract.
+
+Existing standards such as ERC721 and ERC998 does not address the ownership management requirements.
+
+
+
+## Motivation
+
+<!-- The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. -->
+
+The article on [ReFungible Token](https://medium.com/@billyrennekamp/re-fungible-token-rft-297003592769) is the concept this standard is based on, positioning for Global Trade and also extended it for  Marketplace needs etc.
+
+This EIP aims to provide a ReFungible token standard that allows multi-owner ownership of an Asset. The design permits the freedom of functional extending, for example using this standard as a storage for e-commerce items, auction or marketplace. Even storing of derivatives can be built on the top of this standard, removing the government approvals for such actions, you can store all accounting on the side-chain encapsulating private data and transfer to public chain only fact of the presence of one or another asset. 
+
+The requirement was to have a representation of a non-fungible asset with limited lifetime/maturity and the ownership split across multiple owners with the ability to transfer ownership fully or partially. The ERC998 provides a composability option but it does not suit this requirement.
+
+Support for the brandable token by Corporates and Banks with custom searchable attributes, marketplace management for listing and processing tokens and visualization will be part of the standard. This will be built for B2B, B2C or Corporate Wallet integration and provide Smart Contract capability to initiate settlement upon Maturity for all the split ownership. The secure marketplace support with restricted scoping and visibility will be addressed. 
+
+The [Tallyx Whitepapers](https://github.com/tallyxinc/top-rft/tree/master/whitepapers) provide additional information. 
+
+A summary diagram of the standard.
+![](../assets/eip-<rft-1358>/toki.png)
+
+
+## Specification
+
+<!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumj, ethereumjs, ...). -->
+
+This standard outlines a smart contract interface which represents a set of Non-Fungible Assets and Fungible and for each in a separate contracts fungibility through the ERC20. Existing standards such as ERC721 cannot provide enough features and functionality for this. The Refungible standard allows to create an ERC20 Fungible Token with predefined token supply, that is the value of the associated Non-Fungible token.
+
+The entry point to the pipeline is creating the Non-Fungible Token, whose value is represented by Fungible tokens with ERC-20, starts from the ‘createFT’ function. Under the hood ‘createFT’ creates a Fungible token with specified owner and supply and then establish Non-Fungible one, both tokens are linked between each other. By granting binding between NFT and FT we gain an opportunity to create a set of NFT’s, with different owners, the balance of Fungible Token for each holder in relative to NFT determines the measure of his ownership to the Non-Fungible asset. 
+
+Fungible token requires to have name, symbol, decimals, total supply, the address of ReFungible base contract, the address of the owner and Token ID of NFT. The fungible token has ERC20 compatible interface, that means we could create a mapping from the public to private net smart contract, keep private data encapsulated from public access on the side-chain, having confirmation that such smart contract exists and its value and transfer operation could be monitored on main Ethereum blockchain. Fungible tokens could be distributed over some addresses during one action with the use of ‘batchTransfer’ function, allowing the token owner to share his stake in a more elegant way. Inside Fungible Token there is a registry of token holders when you first receive tokens to your balance, you became token holder and as such gain ownership in proportion, on the stake of NFT. 
+
+**NFT Token Standard**
+
+	balanceOf(address _owner)
+
+		Returns NFT Token balance of selected address(_owner), which means, 
+		how many NFT tokens owner of address has on his balance.
+		_owner - address
+	
+	ownerOf(uint256 _tokenId)
+	
+		Returns owner address of selected NFT token (_tokenId).
+		_tokenId - unique identifier of NFT
+	
+	approve(address _to, uint256 _tokenId)
+	
+		Approves to transfer selected NFT (_tokenId) by specific address (_to).
+		_to - receiver address of transfer approve for selected NFT
+		_tokenId - unique identifier of NFT
+	
+	getApproved(uint256 _tokenId)
+	
+		Returns address of approved for transfer address for selected NFT(_tokenId). 
+		_tokenId - unique idenfier of NFT
+	
+	setApprovalForAll(address _to,bool _approved)
+	
+		Approve/Disapprove(depends on _approved value) transfering of all caller's NFTs by 
+		specific address (_to).
+		_to - receiver of approvals for all NFT's owned by caller address
+	
+	isApprovedForAll(address _owner, address _operator)
+	
+		Checks if all NFT's of certain address(_owner) is approved to transfer by another address(_operator)
+		_owner - address of NFT's owner
+		_operator - receipient address of transfer rights
+	
+	transferFrom(address _from, address _to, uint256 _tokenId)
+	
+		Transfer selected NFT (_tokenId) from owner (_from) to new owner(_to)
+		_from - address of NFT's owner 
+		_to - address of NFT receiver
+		_tokenId - unique identifier of NFT
+	
+	safeTransferFrom(address _from, address _to, uint256 _tokenId)
+	
+		Safe implementation of transferFrom function, which additionally checks that NFT receiver 
+		address is NFT compatible by calling method of Receipient contract address 
+		and supplying sender address, previous owner of NFT, NFT id.
+	
+	tokenOfOwnerByIndex(address _owner, uint256 _index)
+	
+		Returns NFT id owned by the supplied address and index in the owner's NFT array.
+		Index could be from 0 to n, where n is owner's balance of NFT's
+		_owner - address of NFT's owner
+		_index - index inside array of owner's NFT
+	
+	totalSupply()
+	
+		Returns total amount of NFT's presented in this NFT contract
+	
+	tokenByIndex(uint256 _index)
+	
+		Returns NFT id from all NFT's array by using its index.
+		_index - index inside array of all NFT
+	
+	tokenURI(uint256 _tokenId)
+	
+		Get Uniform Resource Identifier of selected NFT 
+		_tokenId - unique identifier of NFT
+		
+	
+		
+**FT Token Standard**
+
+	function balanceOf(address _address)
+	
+		Returns fungible token balance of specific address
+	
+	totalSupply()
+	
+		Returns all supply of tokens that was initially created
+	
+	transfer(address _to, uint256 _amount)
+	
+		Transfer specified amount of tokens from token holder to receipient, 
+		could throw in case function caller has not enough tokens
+		owner - holder of FT
+		_to - new holder of FT
+		_amount - amount of FT to be transfered
+	
+	approve(address _operator,uint256 _amount)
+	
+		Allow _operator to withdraw from your account, multiple times, up to the _amount. 
+		If this function is called again it overwrites the current allowance with _value.
+	
+	transferFrom(address _from,address _to,uint256 _amount)
+	
+		Transfer specified amount of tokens from token holder to receipient, 
+		function caller address is approved address  
+		_from - holder of FT's to transfer from
+		_to - new holder of FT's to transfer to
+		_amount - amount of FT's to be transfered
+	
+	increaseAllowance(address _operator,uint256 _addedAmount)
+	
+		Increase amount of tokens allowed to be transfered for approved address from 
+		balance of owner
+		owner - caller address
+		_operator - approved address
+		_addedAmount - amount to be added to approved address allowance balance
+	
+	decreaseAllowance(address _operator,uint256 _substractedAmount)
+	
+		Decrease amount of tokens allowed to be transfered for approved address 
+		from balance of owner
+		owner - caller address
+		_operator - approved address
+		_substractedAmount - amount to be substracted from approved address allowance balance
+	
+	allowance(address _owner,address _operator)
+	
+		Returns amount of tokens allowed to be transfered for approved address from 
+		balance of owner
+		_owner - holder of FT's
+		_operator - approved address
+	
+	batchTransfer(address[] _receivers,uint256[] _values)
+	
+		Transfer specified token amounts from token holder to receipients
+		_receivers - array of FT's receivers addresses
+		_values - array of FT's amount
+	
+	batchTransferFrom(address _from,address[] _receivers,uint256[] _values)
+	
+		Transfer specified token amounts from token holder to receipients
+		_from - holder of NFT's
+		_receivers - array of FT's receivers addresses
+		_values - array of FT's amount
+	
+	holdersCount()
+	
+		Returns count of token holders
+	
+	holderByIndex(uint256 _index)
+	
+		Returns address of token holder by index inside array of token holders
+		_index - index inside array of token holders
+	
+	holders(uint256 _from, uint256 _to)
+	
+		Returns token holders addresses and their balances in some range
+		_from - start index inside array of token holders
+		_to - end index inside array of token holders
+	
+	getNFT()
+	
+		Returns address of NFT contract and NFT id that was generated for FT
+
+
+**Management Functions (functions applicable for NFT and FT Token Standards)**
+
+	burn(address _owner, uint256 _tokenId)
+	
+		Burn NFT and delete FT data
+		_owner - owner address of NFT to burn
+		_tokenId - unique identifier of NFT
+	
+	mint(string _name,string _symbol,uint256 _decimals,address _tokenOwner,
+	uint256 _fungibleTokenSupply)
+	
+		Mint NFT token and create FT accordingly
+	
+	createFT(string _name,string _symbol,uint256 _decimals,address _tokenOwner,
+	uint256 _fungibleTokenSupply,uint256 _tokenId)
+	
+		Creates FT with specified parameters
+	
+	nftValue(uint256 _tokenId)
+	
+		Returns value of selected NFT
+		_tokenId - unique identifier of NFT
+	
+	ftHolderBalance(uint256 _tokenId,address _holder)
+	
+		Returns FT token balance of specified NFT
+		_tokenId - unique identifier of NFT
+		_holder - holder address
+	
+	ftHoldersBalances(uint256 _tokenId)
+	
+		Returns all FT token holders and their balances of specified NFT
+		_tokenId - unique identifier of NFT
+	
+	ftHoldersCount(uint256 _tokenId)
+	
+		Returns FT token holders count of specified NFT
+		_tokenId - unique identifier of NFT
+	
+	ftAddress(uint256 _tokenId)
+	
+		Returns FT smart contract address of specified NFT
+		_tokenId - unique identifier of NFT
+
+
+## Implementation
+
+<!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
+
+The initial implementation of the standard is available in [RFT Implementation](https://github.com/tallyxinc/top-rft).
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
