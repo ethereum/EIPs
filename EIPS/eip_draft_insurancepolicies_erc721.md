@@ -1,13 +1,13 @@
 ---
 eip: <to be assigned>
 title: Insurance Policies as ERC721 Tokens
-author: Christoph Mussenbrock <@christoph2806>
+author: <@christoph2806>
 discussions-to: https://github.com/ethereum/EIPs/issues/1523
 status: Draft
 type: Standards Track
 category: ERC
 created: 2018-10-10
-requires: 165,721
+requires: 721
 ---
 
 ## Simple Summary
