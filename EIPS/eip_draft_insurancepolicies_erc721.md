@@ -12,7 +12,7 @@ requires: 721
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-A standard interface for insurance policies, based on ERC 721.
+A standard interface for insurance policies, based on ERC 721. 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
