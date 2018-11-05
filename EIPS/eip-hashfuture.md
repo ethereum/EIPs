@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: HashFuture Dividable Asset Token Contract
-author: Contract <jzw@hashfuture.pro>
+author: Contract <contract@hashfuture.top>
 discussions-to: <URL>
 status: Draft
 type: Standards Track
