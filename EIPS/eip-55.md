@@ -1,12 +1,12 @@
-```
-EIP: 55
-Title: Mixed-case checksum address encoding
-Author: Vitalik Buterin
-Type: Standard Track
-Category: ERC
-Status: Accepted
-Created: 2016-01-14
-```
+---
+eip: 55
+title: Mixed-case checksum address encoding
+author: Vitalik Buterin
+type: Standards Track
+category: ERC
+status: Final
+created: 2016-01-14
+---
 
 # Specification
 
@@ -105,6 +105,8 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 | Mist 0.8.10              | Yes                            | Yes                        | Yes               | Yes              |
 | MyEtherWallet v3.9.4     | Yes                            | Yes                        | Yes               | Yes              |
 | Parity 1.6.6-beta (UI)   | Yes                            | Yes                        | Yes               | Yes              |
+| Jaxx Liberty 2.0.0       | Yes                            | Yes                        | Yes               | Yes              |
+| Coinomi 1.10             | Yes                            | Yes                        | Yes               | Yes              |
 
 ### Exchange support for mixed-case address checksums, as of 2017-05-27:
 
@@ -123,3 +125,4 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 2. Python example by @Recmo https://github.com/ethereum/eips/issues/55#issuecomment-261521584
 3. Python implementation in [`ethereum-utils`](https://github.com/pipermerriam/ethereum-utils#to_checksum_addressvalue---text)
 4. Ethereumjs-util implementation https://github.com/ethereumjs/ethereumjs-util/blob/75f529458bc7dc84f85fd0446d0fac92d991c262/index.js#L452-L466
+5. Swift implementation in [`EthereumKit`](https://github.com/yuzushioh/EthereumKit/blob/master/EthereumKit/Helper/EIP55.swift)
