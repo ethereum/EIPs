@@ -180,6 +180,8 @@ The current EIP editors are
 
 ` * Martin Becze (@wanderer)`
 
+` * James Sangalli (@James-Sangalli)`
+
 ## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
