@@ -4,8 +4,8 @@ title: EthereumStratum/2.0.0
 author: Andrea Lanfranchi [@AndreaLanfranchi](https://github.com/AndreaLanfranchi) <andrea.lanfranchi@gmail.com>, Pawel Bylica [@chfast](https://github.com/chfast) <pawel@ethereum.org>, Marius Van Der Wijden [@MariusVanDerWijden](https://github.com/MariusVanDerWijden)
 discussions-to: https://github.com/AndreaLanfranchi/EthereumStratum-2.0.0/issues
 status: Draft
-type: Standards Track/Networking
-category: 
+type: Standards Track
+category: Networking
 created: 2018-11-09
 ---
 # EthereumStratum/2.0.0 - Implementation proposal guide lines
