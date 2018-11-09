@@ -1,8 +1,8 @@
 ---
-eip: 
+eip: to be assigned
 title: EthereumStratum/2.0.0
-author: Andrea Lanfranchi (@AndreaLanfranchi)[https://github.com/AndreaLanfranchi] <andrea.lanfranchi@gmail.com>, Pawel Bylica [@chfast](https://github.com/chfast) <pawel@ethereum.org>, Marius Van Der Wijden [@MariusVanDerWijden](https://github.com/MariusVanDerWijden)
-discussions-to: 
+author: Andrea Lanfranchi [@AndreaLanfranchi](https://github.com/AndreaLanfranchi) <andrea.lanfranchi@gmail.com>, Pawel Bylica [@chfast](https://github.com/chfast) <pawel@ethereum.org>, Marius Van Der Wijden [@MariusVanDerWijden](https://github.com/MariusVanDerWijden)
+discussions-to: https://github.com/AndreaLanfranchi/EthereumStratum-2.0.0/issues
 status: Draft
 type: Standards Track/Networking
 category: 
