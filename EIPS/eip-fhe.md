@@ -39,7 +39,10 @@ being the amplitude and variance of error, the algorithm shall output:
 `variance(error(c)) <= R^2*variance(error(c)) + nt*n*Vks + n*2^(2*(t+1))` in average case
 
 One way to implement this without introducing an equivalent opcode for each circuit operator in EVM would be to make only 2 new opcodes `FHEE` and `FHEL` to enter and leave `FHE` context that indicates that opcodes in the section should perform their equivalents on the specified FHE circuit descriptor left on the top of stack before calling `FHEE`.
+The hardest obstalce in implementation would be to make a second, bootstrap-capable (boolean-algebraic) version of every opcode.
+For eg this would need a full-adder circuit implemented behind ADD for this construction only supports binary operations on the encrypted data. There exists some new, algebraic methods but those live with slightly weaker security assumptions and still unusably slow.
 
+An library of this exact RLWE scheme is at https://tfhe.github.io/tfhe/gate-bootstrapping-api.html that can be used for the EVM changes.
 Most of the mathematical design is based on the academic works of Ilaria Chillotti1, Nicolas Gama, Mariya Georgieva, and Malika Izabachene, cryptology ePrint 2017/430
 ## Rationale
 An operation context-switching flag was decided so the same opcodes in the VM that can handle encrypted data with only knowledge of the context and the circuit descriptor.
