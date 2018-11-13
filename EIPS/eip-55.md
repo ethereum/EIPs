@@ -107,6 +107,7 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 | Parity 1.6.6-beta (UI)   | Yes                            | Yes                        | Yes               | Yes              |
 | Jaxx Liberty 2.0.0       | Yes                            | Yes                        | Yes               | Yes              |
 | Coinomi 1.10             | Yes                            | Yes                        | Yes               | Yes              |
+| Trust Wallet             | Yes                            | Yes                        | Yes               | Yes              |
 
 ### Exchange support for mixed-case address checksums, as of 2017-05-27:
 
