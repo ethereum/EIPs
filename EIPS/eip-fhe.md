@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 760
 title: Homomorphically encrypted storage
 author:	silur <huohuli@protonmail.ch>
 type: Standard Track
