@@ -6,7 +6,7 @@ discussions-to: https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derive
 status: Draft
 type: Standards Track
 category: ERC
-created: 2018-10-27
+created: 2018-11-13
 ---
 
 ## Simple Summary
