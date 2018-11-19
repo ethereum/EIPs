@@ -1,5 +1,5 @@
 ---
-eip: X
+eip: 1592
 title: Address and ERC20-compliant transfer rules
 author: Cyril Lapinte <cyril.lapinte@mtpelerin.com>, Laurent Aapro <laurent.aapro@mtpelerin.com>
 type: Standards Track
