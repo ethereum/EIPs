@@ -2,7 +2,7 @@
 eip:  <to be assigned>
 title: Gas stations network
 author: Yoav Weiss <yoav@tabookey.com>
-discussions-to: <URL>
+discussions-to: https://github.com/yoav-tabookey/EIPs/issues/1
 status: Draft
 type: Standards Track
 category: ERC
