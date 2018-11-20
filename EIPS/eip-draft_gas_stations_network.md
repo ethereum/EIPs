@@ -273,6 +273,9 @@ Removal of stale relays is trustless. RelayHub verifies whether the removed rela
 ##### Attack: Attacker attempts to replay a relayed transaction.
 Transactions include a nonce. RelayHub maintains a nonce (counter) for each sender. Transactions with bad nonces get reverted by RelayHub. Each transaction can only be relayed once.
 
+##### Attack: User does not execute the raw transaction received from the Relayer, therefore blocking the execution of all further transactions signed by this relayer
+?? 
+
 ## Backwards Compatibility
 
 The gas stations network is implemented as smart contracts and external entities, and does not require any network changes.
