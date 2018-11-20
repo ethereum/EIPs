@@ -1,0 +1,37 @@
+---
+eip: <to be assigned>
+title: block reward for smart efficient miners.
+author: Jet Lim (@Nitro888)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category Core
+created: 2018-11-20
+requires: EIP-1234
+---
+
+## Simple Summary
+Suggests improvements to the compensation system from the block compensation and processing transactions, giving more compensation to the gas-efficient miners.
+
+## Abstract
+Base reward is given to miner by dividing block reward into base reward and efficiency reward. Efficiency reward is proposed in connection with the block gas limit.
+Therefore, by changing the 2ETH proposed by EIP1234 to 1+1, 1 is the base reward, and 1 is the method of reward the use of gas limit of the block for efficiency compensation.
+
+## Motivation
+Often a miner creates an empty block without any transactions, or a block without consuming the block gas limit entirely.
+This is one of the reasons for slowing the processing speed of the block chain, and to prevent this action, the processing speed of the smart contact should be increased by encouraging miners to include transactions with maximum efficiency when creating blocks.
+
+## Specification
+If you have effectively used all 8 million gas to create the block and included the transaction, you will receive a treatment reward of about 0.08eth. This is a small number to induce miners to use gas efficiently to maximise transactions.
+Therefore, we propose "1 + 1 * Block Gas Efficiency Compensation" as a modified compensation method.
+
+## Rationale
+
+## Backwards Compatibility
+
+## Test Cases
+
+## Implementation
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
