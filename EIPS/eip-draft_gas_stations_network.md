@@ -84,6 +84,8 @@ Glossary of terms used in the processes below:
 * `Sender` - an external address with a valid keypair but no ETH to pay for gas.
 * `Relay` - a node holding ETH in an external address, listed in RelayHub and relaying transactions from Senders to RelayHub for a fee.
 
+![Sequence Diagram](http://bit.ly/2zgv1Ij)
+
 The process of registering/refreshing a `Relay`:
 
 * Relay starts listening as a web app (or on some other communication channel).
@@ -105,8 +107,6 @@ The process of registering/refreshing a `Relay`:
 * `Relay` goes to sleep and waits signing requests.
 
 The process of sending a relayed transaction:
-
-![Sequence Diagram](http://bit.ly/2zhRTar)
 
 * `Sender` selects a live `Relay` from RelayHub's list by looking at `RelayAdded` events from `RelayHub`, and sorting based on its own criteria. Selection may be based on a mix of:
     * Relay published transaction fees.
