@@ -1,5 +1,5 @@
 ---
-eip: 1601
+eip: eip-1601
 title: block reward for smart efficient miners.
 author: Jet Lim (@Nitro888)
 discussions-to: https://github.com/ethereum/EIPs/issues/1602
