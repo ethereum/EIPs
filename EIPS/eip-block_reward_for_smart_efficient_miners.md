@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: block reward for smart efficient miners.
 author: Jet Lim (@Nitro888)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/issues/1602
 status: Draft
 type: Standards Track
 category Core
