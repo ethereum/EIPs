@@ -115,6 +115,7 @@ The process of sending a relayed transaction:
     * Optionally, reputation/blacklist/whitelist held by the sender app itself, or its backend, on per-app basis (not part of the gas stations network).
 * Sender prepares the transaction with its address, the recipient address, its current nonce from `RelayHub.nonces`, Relay's address, Relay's transaction fee, and gas price, and signs it.
 * Sender verifies that `RelayHub.balances[recipient]` holds enough ETH to pay Relay's fee.
+* Sender verifies that `Relay.balance` has enough eth to send the transaction
 * Sender sends the signed transaction to Relay's web interface.
 * `Relay` wraps the transaction with a transaction to `RelayHub`, with zero ETH value.
 * `Relay` signs the wrapper transaction with its key in order to pay for gas.
