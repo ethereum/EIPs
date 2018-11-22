@@ -113,7 +113,7 @@ The process of sending a relayed transaction:
     * Relay stake size and lock-up time.
     * Recent relay transactions (visible through `TransactionRelayed` events from `RelayHub`).
     * Optionally, reputation/blacklist/whitelist held by the sender app itself, or its backend, on per-app basis (not part of the gas stations network).
-* Sender prepares the transaction with its address, the recipient address, its current nonce from `RelayHub.nonces`, Relay's transaction fee, and gas price, and signs it.
+* Sender prepares the transaction with its address, the recipient address, its current nonce from `RelayHub.nonces`, Relay's address, Relay's transaction fee, and gas price, and signs it.
 * Sender verifies that `RelayHub.balances[recipient]` holds enough ETH to pay Relay's fee.
 * Sender sends the signed transaction to Relay's web interface.
 * `Relay` wraps the transaction with a transaction to `RelayHub`, with zero ETH value.
@@ -122,6 +122,7 @@ The process of sending a relayed transaction:
     * The transaction's recipient contract will accept this transaction when submitted, by calling `RelayHub.can_relay()`, a view function, 
       which checks the recipient's `may_relay`, also a view function, stating whether it's willing to accept the charges).
     * The transaction nonce matches `RelayHub.nonces[sender]`.
+    * The relay address in the transaction matches Relay's address.
     * The transaction's recipient has enough ETH deposited in `RelayHub` to pay the transaction fee.
     * Relay has enough ETH to pay for the gas required by the transaction.
 * If any of Relay's checks fail, it returns an error to sender, and doesn't proceed.
@@ -145,6 +146,7 @@ The process of sending a relayed transaction:
     * Records `gasLeft()` as initial_gas for later payment.
     * Verifies the transaction is sent from a registered relay.
     * Verifies that the signature of the internal transaction matches its stated origin (sender's key).
+    * Verifies that the relay address written in the transaction matches msg.sender.
     * Verifies that the transaction's `nonce` matches the stated origin's nonce in `RelayHub.nonces`.
     * Checks `Relay.balance` and emits `NeedsFunding(Relay)` to alert the owner if it runs low.
     * Calls recipient's `may_relay` function, asking whether it's going to accept the transaction. If not, `RelayHub` reverts. 
