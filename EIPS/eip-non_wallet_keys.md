@@ -13,7 +13,7 @@ created: 2018-11-13
 This EIP describes a derivation path structure for [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) wallets to be used for non-wallet keypairs.
 
 ## Abstract
-BIP32 defines a way to generate hierarchical trees of keys which can be derived from a common master key. BIP32 and [BIP44](https://https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) defines the usage of these keys as wallets. In this EIP we describe the usage of such keys outside the scope of the blockchain defining a logical tree for key usage which can cohesist (and thus share the same master) with existing BIP44 compatible wallets.
+BIP32 defines a way to generate hierarchical trees of keys which can be derived from a common master key. BIP32 and [BIP44](https://https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) defines the usage of these keys as wallets. In this EIP we describe the usage of such keys outside the scope of the blockchain defining a logical tree for key usage which can coexist (and thus share the same master) with existing BIP44 compatible wallets.
 
 ## Motivation
 Applications interacting with the blockchain often make use of additional, non-blockchain technologies to perform the task they are designed for. For privacy and security sensitive mechanisms, sets of keys are needed. Reusing keys used for wallets can prove to be insecure, while keeping completely independent keys make backup and migration of the full set of credentials more complex. Defining a separate (from BIP44 compliant wallets) derivation branch allows combining the security of independent keys with the convenience of having a single piece of information which needs to be backup or migrated.
