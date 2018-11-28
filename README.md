@@ -3,6 +3,23 @@ Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platfo
 
 A browsable version of all current and draft EIPs can be found on [the official EIP site](http://eips.ethereum.org/).
 
+# Standards and Specifications
+
+Aside from improving and upgrading the Ethereum platform, the goal of the EIP process is to document the standards and specifications that define it. Following these specifications, an implementation team should be able to build interoperable components that connect to the Ethereum main net, various test nets, and other layers of the Ethereum network.
+
+The list of Ethereum components is as follows. Each component may have a different process for maintenance and updates, but will create or update EIPs to reflect breaking changes and current canonical versions.
+
+* Formal Specification for Ethereum / EVM https://github.com/ethereum/yellowpaper, complimented by the Jello Paper https://jellopaper.org/
+* DevP2P https://github.com/ethereum/devp2p/
+* API/JSON-RPC https://github.com/ethereum/wiki/wiki/JSON-RPC <!-- Suggesting https://github.com/spadebuilders/ethereum-json-rpc-spec -->
+* Contract ABIs https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
+* Interfaces repo https://github.com/ethereum/interfaces
+* Light Ethereum Subprotocol https://github.com/ethereum/wiki/wiki/Light-client-protocol
+* Whisper https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview
+* Swarm https://github.com/ethereum/go-ethereum/pull/2959
+
+<!-- TEST NET DEFINITIONS? -->
+
 # Contributing
 
  1. Review [EIP-1](EIPS/eip-1.md).
