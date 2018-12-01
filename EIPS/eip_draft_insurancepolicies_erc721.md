@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1512
 title: Insurance Policies as ERC721 Tokens
 author: <@christoph2806>
 discussions-to: https://github.com/ethereum/EIPs/issues/1523
