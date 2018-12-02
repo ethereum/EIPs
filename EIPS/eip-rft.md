@@ -1,0 +1,199 @@
+---
+eip: <to be assigned>
+title: Re-Fungible Token Standard (RFT)
+author: Billy Rennekamp (@okwme), Dan Long (dan@artblx.com), Kiryl Yermakou (kiryl@artblx.com), Nate van der Ende (nate@artblx.com)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2018-11-18
+requires: EIP-20, EIP-165, EIP-721
+---
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+This improvement proposal outlines an extension to the ERC-20 Token Standard and utilization of ERC-165 Standard Interface Detection. The purpose is to enable the ability to distinguish when an ERC-20 token represents shared ownership of an ERC-721 non-fungible token (NFT) and by extension any potentially underlying asset therein. This is made possible by a re-fungible token (RFT) contract assuming ownership of a non-fungible token.
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+The intention of this proposal, the Re-Fungible Token Standard, is to extend the ERC-20 Token Standard and utilize ERC-165 Standard Interface Detection in order to represent the shared ownership of an ERC-721 Non-Fungible Token. The ERC-20 Token Standard was modified as little as possible in order to allow this new class of token to operate in all of the ways and locations which are familiar to assets that follow the original ERC-20 specification. While there are many possible variations of this specification that would enable many different capabilities and scenarios for shared ownership, this proposal is focused on the minimal commonalities to enable as much flexibility as possible for various further extensions. This proposal makes it possible to verify, from the contract level or from an external query, whether a fungible token represents a form of shared ownership of a non-fungible token. The inclusion of ERC-165 makes it possible to verify, from the contract level or from an external query, whether a non-fungible token is owned by ERC-20 token representing shared ownership.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+Shared ownership occurs across many industries and for many reasons. As more assets are registered, regulated and/or represented by the ERC-721 Non-Fungible Token Standard there will be more instances where the need for shared ownership of these assets will arise. For example, ArtBlx LLC. is working towards facilitating a protocol for fractionalizing physical, digital and conceptual artworks. The fungible tokens created from this process will have a value attached to the non-fungible tokens which they represent. This will be useful for price discovery of the underlying asset, liquidity for shared owners and as a new class of asset which can be used as collateral for loans or other financial instruments like stable coins. Providing an interface to this special class of fungible tokens is necessary to allow third parties to recognize them as a special class of fungible token and to recognize when a non-fungible token has been fractionalized. This might be useful in the case of a wallet who would want to utilize the metadata of the underlying NFT to show additional info next to an RFT, or on an exchange who might want to make that sort of info similarly available, or an NFT marketplace who may want to direct customers to a relevant exchange who wish to purchase shares in a NFT which is owned by an RFT. Anywhere an ERC-20 is applicable it would be useful for a user to know whether that token represents a shared NFT, and what attributes that NFT may have.
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+At a minimum, third parties need two things: 1) to be able to distinguish re-fungible tokens from other token standards and 2) to determine which non-fungible token is fractionally owned. These two scenarios can be encountered from the perspective of initial contact with the non-fungible token or from the perspective of initial contact with the re-fungible token.
+
+#### Inital Contact with the Re-Fungible Token
+
+In order for a third party to confirm which non-fungible token is owned by the re-fungible token there needs to be a pointer from the RFT contract to the NFT contract and the relevant token id. This is possible with two public getters named `parentToken()` and `parentTokenId()`. The first getter returns a variable of type `address` and designates the contract address of the Non-Fungible Token contract. The second getter returns a variable of type `uint256` and designates the token ID of the Non-Fungible Token. With these getters, the identity of the Non-Fungible Token can be determined. Below is an example of the Re-Fungible Token Standard interface that includes these getter functions:
+
+```solidity
+pragma solidity ^0.4.20;
+
+/// @dev Note: the ERC-165 identifier for this interface is 0x5755c3f2.
+interface RFT /* is ERC20, ERC165 */ {
+
+  function parentToken() external view returns(address _parentToken);
+  function parentTokenId() external view returns(uint256 _parentTokenId);
+
+}
+```
+
+The validity of this claim can be confirmed from another contract (on-chain) or from interacting with an RPC endpoint (off-chain). Below is an example of the on-chain scenario:
+
+```solidity
+pragma solidity ^0.4.20;
+
+import './RFT.sol';
+import './ERC721.sol';
+
+contract ConfirmRFT {
+
+  function confirmRFT(address _RFT) external view returns(bool) {
+    address _NFT = RFT(_RFT).parentToken(); // returns address of NFT contract
+    uint256 _tokenId = RFT(_RFT).parentTokenId(); // returns id of ID of NFT
+
+    return
+      NFT(_NFT).supportsInterface(0x80ac58cd) && // confirm it is ERC-721
+      NFT(_NFT).ownerOf(_tokenId) == _RFT; // confirm the owner of the NFT is the RFT contract address
+  }
+
+}
+```
+
+Below is an off-chain example using an instance of web3.js in javascript:
+```javascript
+async function confirmRFT(web3) {
+
+  const ERC721ABI = [...] // abi for ERC721
+  const RFTABI = [...] // abi for RFT
+  const RFTAddress = '0x0123456789abcdef0123456789abcdef' // address for the deployed RFT
+
+  const RFTContract = new web3.eth.Contract(RFTABI, RFTAddress) // deployed RFT contract instance
+  const ERC721Address = await RFTcontract.methods.parentToken().call() // returns address of NFT contract
+  const ERC721TokenId = await RFTcontract.methods.parentTokenId().call() // returns id of ID of NFT
+
+  const ERC721Contract = new web3.eth.Contract(ERC721ABI, ERC721Address) // deployed ERC721 (as reported by RFT)
+  const isERC721 = await ERC721Contract.methods.supportsInterface('0x80ac58cd').call() // confirm it is ERC-721
+  const ownerOfAddress = await ERC721Contract.methods.ownerOf(ERC721TokenId).call() // get the owner of the NFT
+
+  return ERC721Response.toLowerCase() === RFTAddress.toLowerCase() // confirm the owner of the NFT is the RFT contract
+}
+```
+
+#### Inital Contact with the Non-Fungible Token
+
+When checking the owner of a specific non-fungible token it's important to be able to determine whether owner is in fact a re-fungible token contract. This is possible by utilizing ERC-165 Standard Interface Detection. In order to comply with that standard a contract must include the following getter function which returns `true` when passed the `bytes4` parameter `0x01ffc9a7`:
+```
+function supportsInterface(bytes4 interfaceID) external view returns (bool);
+```
+After establishing support for this interface it becomes useful in determining whether the contract adheres to the Re-Fungible Token Standard. To do so the `supportsInterface(bytes4 interfaceID)` getter function must return `true` when passed the `bytes4` parameter `0x5755c3f2` which is the result of `bytes4(keccak256('parentToken()')) ^ bytes4(keccak256('parentTokenId()'))` or `parentToken.selector ^ parentTokenId.selector`. This could be achieved with the following code:
+```solidity
+pragma solidity ^0.4.20;
+
+import "./ERC20.sol";
+
+/// @dev Note: the ERC-165 identifier for this interface is 0x5755c3f2.
+interface RFT is ERC20 /*, ERC165 */ {
+
+  function supportsInterface(bytes4 interfaceID) external view returns(bool) {
+    return
+      interfaceID == this.supportsInterface.selector || // ERC165
+      interfaceID == this.parentToken.selector || // parentToken()
+      interfaceID == this.parentTokenId.selector || // parentTokenId()
+      interfaceID == this.parentToken.selector ^ this.parentTokenId.selector; // RFT
+  }
+
+  function parentToken() external view returns(address _parentToken);
+  function parentTokenId() external view returns(uint256 _parentTokenId);
+
+}
+```
+The flow of actually checking the status of a non-fungible token owner as a re-fungible token contract can be done from another contract (on-chain) as well as with an RPC endpoint (off-chain). Below is an example of the on-chain scenario:
+```solidity
+pragma solidity ^0.4.20;
+
+import './RFT.sol';
+import './ERC721.sol';
+
+contract ConfirmRFT {
+
+  function confirmRFT(address _NFT, uint256 _tokenId) external view returns(bool) {
+    address _RFT = ERC721(_NFT).ownerOf(_tokenId); // get the owner of the NFT
+
+    return
+      RFT(_RFT).supportsInterface(0x01ffc9a7) && // confirm it supports ERC-165
+      RFT(_RFT).supportsInterface(0x5755c3f2) // confirm it is RFT
+  }
+
+}
+```
+Below is an off-chain example using web3.js in javascript:
+```javascript
+async function confirmRFT(web3) {
+
+  const ERC721ABI = [...] // abi for ERC721
+  const RFTABI = [...] // abi for RFT
+  const ERC721Address = '0x0123456789abcdef0123456789abcdef' // address for the deployed NFT
+  const ERC721TokenId = '7' // token Id of the NFT
+
+  const ERC721Contract = new web3.eth.Contract(ERC721ABI, ERC721Address) // deployed ERC721
+  const RFTAddress = await ERC721Contract.methods.ownerOf(ERC721TokenId).call() // owner address of the NFT
+
+
+  const RFTContract = new web3.eth.Contract(RFTABI, RFTAddress) // deployed RFT contract instance
+  const isERC165 = await RFTContract.methods.supportsInterface('0x01ffc9a7').call() // confirm it is ERC-165
+  return isERC165 && await RFTContract.methods.supportsInterface('0x5755c3f2').call() // confirm it is RFT
+
+}
+```
+## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+Most of the decisions made around the design of this standard were done in the hopes of keeping it as flexible as possible for as many use cases as possible. This includes making the standard 100% backwards compatible with ERC-20 Token Standard and able to interact with any previously deployed or future ERC-721 non-fungible token. This allows for each project to determine their own system for minting, burning and governing their re-fungible tokens depending on their specific use case.
+
+There are a number of other ERCs which have similarities to this proposal however they are often overly opinionated and restict many valid variations which could arise in different scenarios. Many of them break ERC-20 or ERC-721 in the process, or are at their core solving a different problem. We believe a token standard should cover only the required commonality between an otherwise diverse set of scenarios in order for them to behave as expected where necessary but allow them to achieve their individual goals elsewhere. Below are a list of the proposals considered due to some similarities as well as why they may not fulfill the requirements of this standard. 
+
+* [ERC-864: Divisible non-fungible tokens](https://github.com/ethereum/EIPs/issues/864)
+  * Proposes a replacement for ERC-20, not ERC-20 compatible
+  * Not a complete proposal
+* [ERC-1155: Multi Token Standard](https://github.com/ethereum/EIPs/issues/1155)
+  * Combines ERC-20 and ERC-721 into a single contract
+  * Not ERC-20 backwards compatible
+* [EIP-1178: Multi-class Token Standard](https://github.com/ethereum/EIPs/pull/1178)
+  * Solves a different problem (multiple classes of ERC-20 in one contract)
+* [ERC-1410: Partially Fungible Token Standard](https://github.com/ethereum/EIPs/issues/1410)
+  * Solves a different problem (multiple classes of ERC-20 in one contract)
+* [ERC-1528: Refungible ERC721 Asset with Fungible ERC20](https://github.com/ethereum/EIPs/issues/1528)
+  * Combines ERC-20 and ERC-721 into a single contract
+  * Not ERC-721 backwards compatibile
+  * Limits the types of assets which can become re-fungible
+* [ERC-1553: Asset Token Standard](https://github.com/ethereum/EIPs/issues/1553)
+  * Standard for defining real world assets and ownership via ERC-20
+  * Only for real world assets
+  * Primarily concerned with a different objective (correlating real world and on chain assets)
+
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+The Re-Fungible Token Standard is 100% backwards compatible with ERC-20 Token Standard. It is a small extension to the original specification and meant to be further extended for more specific use cases. Keeping the standard compatible with ERC-20 is important to allow for this token to benefit from the ecosystem that has grown around supporting the ubiquitous ERC-20 Token Standard.
+
+The Re-Fungible Token Standard is intended to interact with the ERC-721 Non-Fungible Token Standard. It is kept purposefully agnostic to extensions beyond the standard in order to allow specific projects to design their own token relationships such as governance over, rights to or permissions on each non-fungible token relative to the respective re-fungible token owners.
+
+## Implementation
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+```solidity
+pragma solidity ^0.4.20;
+
+/// @dev Note: the ERC-165 identifier for this interface is 0x5755c3f2.
+interface RFT /* is ERC20, ERC165 */ {
+
+  function parentToken() external view returns(address _parentToken);
+  function parentTokenId() external view returns(uint256 _parentTokenId);
+
+}
+```
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
