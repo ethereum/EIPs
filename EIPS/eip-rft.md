@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Re-Fungible Token Standard (RFT)
 author: Billy Rennekamp (@okwme), Dan Long (dan@artblx.com), Kiryl Yermakou (kiryl@artblx.com), Nate van der Ende (nate@artblx.com)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/pull/1633
 status: Draft
 type: Standards Track
 category: ERC
