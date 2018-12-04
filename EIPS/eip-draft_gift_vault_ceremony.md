@@ -1,6 +1,6 @@
-# Ethereum GiftVault -- a safe unboxing ceremony for time-locked multisig smart contracts holding gifts
+# ERC1638: Ethereum GiftVault -- a safe unboxing ceremony for time-locked multisig smart contracts holding gifts
 
-eip: <to be assigned>
+eip: ERC1638
 title: Ethereum GiftVault Standard
 author: @ontofractal <ontofractal@protonmail.com>
 discussions-to: <URL>
@@ -193,7 +193,7 @@ A gifter must NOT be able to override and transfer assets using their gifter key
 
 # Threat vectors and mitigation
 
-![](../assets/gift_vault_recovery_flowchart.png)
+![](../assets/eip-1638/gift_vault_recovery_flowchart.png)
 
 | Threat vector  | Mitigation |
 | ------------- | ------------- |
