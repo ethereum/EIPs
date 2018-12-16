@@ -24,9 +24,9 @@ This Token standard is designed to allow Tokens to interact with service-based s
 
 Originally designed to be a crowdfunding tool, Tokens now have a painful period of transition to being a Utility Token, to provide their service to the Token holders. Many projects and companies lack sufficient Smart Contract functionalities in their Tokens, which makes it difficult to support the fundamentals of their business venture and to apply it to real-world services and products.
 
-The following interface designs are based on the fundamental features and aspects of a **Robust Tokenisation** that businesses need. This including removing the difficulties of secure bindings among smart contracts and on-chains and off-chains integration. We, FundersToken based on our experience, understanding of the Token Standards that are available in the market, FundersToken have made several improvements on the Token Standards aiming to build a Native Token Environment, a friendly environment for Tokens.
+The following interface designs are based on the fundamental features and aspects of a **Robust Tokenisation** that businesses need. This including removing the difficulties of secure bindings among smart contracts and on-chains and off-chains integration. We, FST Network based on our experience, understanding of the Token Standards that are available in the market, FST Network have made several improvements on the Token Standards aiming to build a Native Token Environment, a friendly environment for Tokens.
 
-FundersToken have also developed a **Token transfer relay**, which simulates blockchains in the form of smart contracts for the Tokens, and releases end-users from the need and limitation of only using Ether as transaction fee (gas fee) when making a Token transfer.
+FST Network have also developed a **Token transfer relay**, which simulates blockchains in the form of smart contracts for the Tokens, and releases end-users from the need and limitation of only using Ether as transaction fee (gas fee) when making a Token transfer.
 
 ## Motivation
 
@@ -878,7 +878,7 @@ This Token Standard is fully compatible with ERC-20.
 We have tested the Token via the scripts off-chain, and several testing smart contracts on-chain.
 
 Service-Friendly Token source code:  
-https://github.com/funderstoken/Service-Friendly-Token-Standard/blob/develop/MinServiceFriendlyToken.sol
+https://github.com/fstnetwork/Service-Friendly-Token-Standard/blob/develop/MinServiceFriendlyToken.sol
 
 The test cases will be open-sourced soon.
 
@@ -886,7 +886,7 @@ The test cases will be open-sourced soon.
 
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-The Token that FundersToken (https://fstk.io) has issued, is one example of the Service-Friendly Token mentioned above, and it is integrated with the modules that FundersToken provide via our Decentralised Tokenisation Platform to form a robust service-based smart contracts.
+The Token that FST Network (https://fst.network) has issued, is one example of the Service-Friendly Token mentioned above, and it is integrated with the modules that FST Network provide via our Decentralised Tokenisation Platform to form a robust service-based smart contracts.
 
 Mainnet address (Funder Smart Token, FST):  
 https://etherscan.io/address/0x51c028bc9503874d74965638a4632a266d31f61f#code
