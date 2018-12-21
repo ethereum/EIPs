@@ -2,10 +2,10 @@
 eip: <to be assigned>
 title: Account-bound EVM memory
 author: Andreas Olofsson (@androlo)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/account-bound-evm-memory/2270
 status: Draft
 type: Standard Track
-category Core
+category: Core
 created: 2018-12-21
 replaces: 1153
 ---
