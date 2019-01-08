@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Temporal Replay Protection
 author: Martin Holst Swende (@holiman)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/temporal-replay-protection/2355
 status: Draft
 type: Standards Track
 category Core
