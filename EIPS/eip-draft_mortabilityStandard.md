@@ -5,7 +5,7 @@ author: Felix Franz (@Felix-Franz)
 discussions-to: https://github.com/ethereum/EIPs/issues/1690
 status: Draft
 type: Standards Track
-category ERC
+category: ERC
 created: 2019-01-11
 requires: 173
 ---
