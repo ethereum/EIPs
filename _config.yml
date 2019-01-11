@@ -19,8 +19,13 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "http://eips.ethereum.org"
+
 twitter_username: ethereum
-github_username:  ethereum
+github_username:  ethereum # not used, hardcoded in includes/social.html
+rss:
+  all: feed.xml # A feed for all of the EIPs, displayed in includes/social.html
+
+
 header_pages:
  - all.html
  - core.html
@@ -29,6 +34,7 @@ header_pages:
  - erc.html
  - informational.html
  - meta.html
+ 
 twitter:
   card: summary
   username: ethereum
