@@ -1,0 +1,22 @@
+<p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in {{ eip.status }} status. It is authored by {{ eip.author }} and was originally created {{ eip.created | date: '%Y-%m-%d' }}. It is in the {{ eip.category }} category of type {{ eip.type }}.</p>
+        
+{% if eip.discussions-to %}
+  <p>The author has requested that discussions happen at the following URL: {{ eip.discussions-to }}</p>
+{% else %}
+  <p>Please visit the [ethereum/EIPs issue queue to comment](https://github.com/ethereum/EIPs/issues/).</p>
+{% endif %}
+        
+{% if eip.requires[0] %}
+  <p>EIP #{{ eip.eip }} requires:</p>
+  <ul>
+  {% for required in eip.requires %}
+    <li><a href="{{ site.url }}/EIPS/eip-{{ required }}">EIP-{{ required }}</a></li>
+  {% endfor %}
+  </ul>
+{% endif %}
+        
+{% if eip.status == "Last Call" %}
+  <p>The proposed Last Call Review Period{% if eip.review-period-end %} end is: {{ eip.review-period-end | date: '%Y-%m-%d' }}{% else %} is not yet set.{% endif %}. <strong>Please review and note any changes that should block acceptance.</strong></p>
+{% endif %}
+{{ eip.content }}
+<hr />
