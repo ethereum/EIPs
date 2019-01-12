@@ -1,5 +1,6 @@
 ---
 layout: null
+permalink: /feed.xml
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -8,9 +9,10 @@ layout: null
     <description>The EIPs listed here are created and merged through the ethereum/EIPs Github repo.</description>
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/feed.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>{{ site.time }}</lastBuildDate>
+    <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
+    {% comment %}_eiplist_ contains all pages in the site, some of which aren't EIPs. We are also only displaying Draft EIPs, as they are the ones that will be in flux.{% endcomment %}
     {% assign eiplist = site.pages | sort: 'eip' | reverse %}
-      {% for eip in eiplist %}
+    {% for eip in eiplist %}
       {% if eip.status == "Draft" %}
       {% capture description %}
         {% include eipfeedcontent.html %}
@@ -19,7 +21,7 @@ layout: null
         <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
         <pubDate>{{ eip.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
-        <category>{{ eip.category }}</category>
+        {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
         <link>{{ site.url }}/{{ eip.url }}</link>
         <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
       </item>
