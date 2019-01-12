@@ -10,20 +10,20 @@ permalink: /feed.xml
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/feed.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
-    {% comment %}_eiplist_ contains all pages in the site, some of which aren't EIPs. We are also only displaying Draft EIPs, as they are the ones that will be in flux.{% endcomment %}
+    {% comment %}_eiplist_ contains all pages in the site, some of which aren't EIPs -- so we check that a status is set. {% endcomment %}
     {% assign eiplist = site.pages | sort: 'eip' | reverse %}
     {% for eip in eiplist %}
-      {% if eip.status == "Draft" %}
+      {% if eip.status %}
       {% capture description %}
         {% include eipfeedcontent.html %}
       {% endcapture %}
       <item>
         <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
-        <pubDate>{{ eip.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+        <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
-        <link>{{ site.url }}/{{ eip.url }}</link>
-        <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
+        <link>{{ site.url }}{{ eip.url }}</link>
+        <guid isPermaLink="true">{{ site.url }}{{ eip.url }}</guid>
       </item>
       {% endif %}
     {% endfor %}
