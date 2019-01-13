@@ -17,7 +17,7 @@ permalink: /last-call.xml
         {% include eipfeedcontent.html %}
       {% endcapture %}
       <item>
-        <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }} (Last Call)</title>
+        <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
         <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}

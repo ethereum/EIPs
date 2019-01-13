@@ -17,8 +17,9 @@ permalink: /feed.xml
       {% capture description %}
         {% include eipfeedcontent.html %}
       {% endcapture %}
+      {% assign eiptitle = eip.title %}{% if eip.status == "Last Call" %}{% assign eiptitle = eiptitle | append: " (Last Call)" %}{% endif %}
       <item>
-        <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }}</title>
+        <title>EIP-{{ eip.eip }}: {{ eiptitle | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
         <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
