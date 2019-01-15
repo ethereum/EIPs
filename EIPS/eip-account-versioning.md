@@ -1,5 +1,5 @@
 ---
-eip: x
+eip: 1072
 title: Generalized Account Versioning Scheme
 author: Wei Tang (@sorpaas)
 discussions-to: To be added
