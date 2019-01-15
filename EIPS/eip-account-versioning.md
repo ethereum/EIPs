@@ -2,7 +2,7 @@
 eip: 1702
 title: Generalized Account Versioning Scheme
 author: Wei Tang (@sorpaas)
-discussions-to: To be added
+discussions-to: https://github.com/sorpaas/EIPs/issues/2
 status: Draft
 type: Standards Track
 category: Core
