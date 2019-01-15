@@ -24,7 +24,7 @@ permalink: /feed.xml
         <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
         <link>{{ site.url }}{{ eip.url }}</link>
-        <guid isPermaLink="true">{{ site.url }}{{ eip.url }}</guid>
+        <guid>{{ site.url }}{{ eip.url }}{{ eip.status | xml_escape }}</guid>
       </item>
       {% endif %}
     {% endfor %}
