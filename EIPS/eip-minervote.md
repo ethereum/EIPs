@@ -1,5 +1,5 @@
 ---
-eip: xxx
+eip: 1715
 title: Generalized Version Bits Voting for Consensus Soft and Hard Forks
 author: Wei Tang (@sorpaas)
 discussions-to: https://github.com/sorpaas/EIPs/issues/5
