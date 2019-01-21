@@ -2,6 +2,9 @@ sudo: false # route your build to the container-based infrastructure for a faste
 
 language: ruby
 
+before_install:
+  - gem install bundler -v '< 2'
+     
 cache:
   # Cache Ruby bundles
   - bundler
