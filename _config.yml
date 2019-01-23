@@ -13,11 +13,11 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Ethereum Improvement Proposals
+title: 以太坊改进提案
 description: >-
-  Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
-  platform, including core protocol specifications, client APIs, and contract
-  standards.
+  以太坊改进提案(EIPs)描述了以太坊平台的相关标准，
+  这些标准包括了核心协议规范、客户端APIs和合约标
+  准等。
 url: "http://eips.ethereum.org"
 twitter_username: ethereum
 github_username:  ethereum
