@@ -56,7 +56,7 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
   * :arrow_right: Review -- If agreeable, the EIP editor will assign Review status and alert relevant stakeholders to solicit their comments prior to Last Call. The EIP editor shall record tentative dates and participation links for discussions by these groups. Ideally, reviews should be scheduled to occur within a month.
   * :x: Review -- A request to move to Review status will be denied if material changes are still expected to be made to the draft. This is to avoid unnecessary reviews by key stakeholders.
 * **Review** -- When the draft is considered mature, no further changes are allowed to the proposal and all relevant stakeholder groups added during the Draft period are contacted and solicited for feedback. An Editor or member of a stakeholder group can request additional stakeholder groups be added. Any stakeholder groups can choose to remove themselves from review if they deem their opinions to be unecessary by reporting a decision of "no comment". The minutes of the discussion, and the consensus recommendations of the group shall be summarized if a response is provided.
-  * :arrow_right: Last Call -- If there are no technical issues raised with the proposal by the suggested stakeholder groups, the EIP editor will assign Last Call status and set a review end date (`review-period-end`), normally 14 days later.
+  * :arrow_right: Last Call -- If there are no technical issues raised with the proposal by the suggested stakeholder groups, the EIP editor will assign Last Call status and set a public review end date (`last-call-period-end`), normally 14 days later.
   * :x: Draft -- A Review which results in material changes or substantial unaddressed technical complaints will cause the EIP to revert to Draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed.
 * **Last Call** -- This EIP will listed prominently on the http://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
   * :x: -- A Last Call which results in material changes or substantial unaddressed technical complaints will cause the EIP to revert to Draft.
@@ -107,7 +107,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` status:` <Draft | Review | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
 
-`* review-period-end:` <date review period ends>
+`* last-call-period-end:` <date last call period ends>
 
 ` type:` <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
 
