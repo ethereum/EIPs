@@ -127,3 +127,4 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 3. Python implementation in [`ethereum-utils`](https://github.com/pipermerriam/ethereum-utils#to_checksum_addressvalue---text)
 4. Ethereumjs-util implementation https://github.com/ethereumjs/ethereumjs-util/blob/75f529458bc7dc84f85fd0446d0fac92d991c262/index.js#L452-L466
 5. Swift implementation in [`EthereumKit`](https://github.com/yuzushioh/EthereumKit/blob/master/EthereumKit/Helper/EIP55.swift)
+6. Kotlin implementation in [`KEthereum`](https://github.com/walleth/kethereum/tree/master/erc55)
