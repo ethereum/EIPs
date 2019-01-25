@@ -16,8 +16,8 @@
 title: 以太坊改进提案
 description: >-
   以太坊改进提案(EIPs)描述了以太坊平台的相关标准，
-  这些标准包括了核心协议规范、客户端APIs和合约标
-  准等。
+  这些标准包括了核心协议规范、客户端APIs和合约标准
+  等。
 url: "http://eips.ethereum.org"
 twitter_username: ethereum
 github_username:  ethereum
@@ -55,3 +55,6 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - eip-X.md
+
+plugins:
+  - jemoji
