@@ -26,7 +26,7 @@ EIP是以太坊改进提案(Ethereum Improvement Proposal)的缩写。一个EIP�
   - **核心(core)** - 需要一次分叉来实现的改进 (比如 [EIP5], [EIP101])，同时包括一些跟[“core dev” discussions](https://github.com/ethereum/pm)"讨论相关但不涉及共识层面的修改 (例如, 在<a href="EIPS/eip-86">EIP86</a>第2、3和第4条中关于矿工/节点 策略的修改)。
   - **网络(Networking)** - 包括了关于[devp2p] ([EIP8])和[Light Ethereum Subprotocol] (以太坊轻节点子协议)的改进，以及关于[whisper]和[swarm]的网络协议规范的改进。
   - **接口(interface)** - 包括了关于客户端[API/RPC]的规范和标准的改进，以及关于特定语言级别的标准比如方法名 ([EIP59], [EIP6])和[contract ABIs]的改进。[interfaces repo] (接口仓库)和相关讨论中的"接口"标签应该在EIP被提交到EIPs仓库之前被打上。
-  - **ERC** - 应用级别的标准和约定，包括合约标准比如代币标准([ERC20])、命名注册([ERC26], [ERC137])、URI方案 ([ERC67])、库/包的格式 ([EIP82])和钱包格式([EIP75], [EIP85])。
+  - **以太坊征求意见稿(ERC,Ethereum Request for Comments)** - 应用级别的标准和约定，包括合约标准比如代币标准([ERC20])、命名注册([ERC26], [ERC137])、URI方案 ([ERC67])、库/包的格式 ([EIP82])和钱包格式([EIP75], [EIP85])。
 - **信息(Informational)EIP** 关于以太坊设计问题的描述，或者提供给以太坊社区的通用指南或信息，但不会包含新的特性。信息类EIPs不一定是以太坊社区的共识或者推荐，因此用户和开发人员可以自由选择是否遵循这些信息类EIPs。
 - **元(Meta)EIP** 描述关于以太坊的一个相关过程(process)或者提议某个程序的修改(或事件)的提案。过程(Process)EIPs和Standards Track EIPs类似，不同的是适用于非以太坊协议相关部分。它们可能提议一项非提交到以太坊代码库的实现，且通常需要达成社区共识；与信息EIPs不同，它们的级别高于推荐, 因此用户一般不能忽略它们。例子包括：规程、指南、对决议流程的修改以及对以太坊开发工具和环境的修改。所有的元EIPs也都是Process EIPs。
 
