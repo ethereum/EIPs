@@ -1,16 +1,16 @@
 # EIPs [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
+以太坊改进提案(Ethereum Improvement Proposals, EIPs)描述了以太坊平台的相关标准，包括核心协议规范、客户端APIs和合约的相关标准。
 
-A browsable version of all current and draft EIPs can be found on [the official EIP site](http://eips.ethereum.org/).
+现有的所有EIPs和草案的一个浏览器版本可以查看这里[EIP官方地址](http://eips.ethereum.org/)，中文版本的可以查看[EIP中文版地址](https://posa88.github.io/EIPs-Chinese/)。
 
-# Contributing
+# 如何贡献
 
- 1. Review [EIP-1](EIPS/eip-1.md).
- 2. Fork the repository by clicking "Fork" in the top right.
- 3. Add your EIP to your fork of the repository. There is a [template EIP here](eip-X.md).
- 4. Submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+ 1. 阅读[EIP-1](EIPS/eip-1.md)。
+ 2. 通过点击右上角的"Fork"按钮Fork本代码仓库。
+ 3. 向你的分支添加你的EIP。这里有一个[EIP模板](eip-X.md)。
+ 4. 向以太坊代码仓库提交一个Pull Request[EIPs代码仓库](https://github.com/ethereum/EIPs)，中文翻译则向中文代码仓库[中文翻译版EIPs仓库](https://github.com/posa88/EIPs-Chinese)提交。
 
-Your first PR should be a first draft of the final EIP. It must meet the formatting criteria enforced by the build (largely, correct metadata in the header). An editor will manually review the first PR for a new EIP and assign it a number before merging it. Make sure you include a `discussions-to` header with the URL to a discussion forum or open GitHub issue where people can discuss the EIP as a whole.
+你的第一个PR应当是EIP定稿的一个草稿。 It must meet the formatting criteria enforced by the build (largely, correct metadata in the header). An editor will manually review the first PR for a new EIP and assign it a number before merging it. Make sure you include a `discussions-to` header with the URL to a discussion forum or open GitHub issue where people can discuss the EIP as a whole.
 
 If your EIP requires images, the image files should be included in a subdirectory of the `assets` folder for that EIP as follow: `assets/eip-X` (for eip **X**). When linking to an image in the EIP, use relative links such as `../assets/eip-X/image.png`.
 
