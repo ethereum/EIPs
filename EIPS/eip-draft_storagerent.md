@@ -135,17 +135,19 @@ def charge_rent(prestate, poststate, addr, currentblock):
 
 ### New EVM Opcodes
 
-#### `PAYRENT <balance> <addr>`
+#### `PAYRENT <amount> <addr>`
 
 At any time, the `rent balance` of an account may be topped up by the `PAYRENT` opcode.
 `PAYRENT` deducts the given amount of `ether` from the account executing the opcode and adds
 it to the `rent balance` of the address specified as beneficiary.
 
+Any participant can pay the rent for any other participant. 
+
 Gas cost: TBD
 
 #### `RENTBALANCE <addr>`
 
-The `rent balance` of an account may be queried through the `RBALANCE` opcode. It pushes the
+The `rent balance` of an account may be queried through the `RENTBALANCE` opcode. It pushes the
 `rentbalance` field of the given address to the stack.
 
 Gas cost: like `EXTCODEHASH`.
