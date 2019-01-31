@@ -12,6 +12,8 @@ created: 2019-01-08
 ## Simple Summary
 
 This EIP proposes adding a 'temporal' replay protection to transactions, in the form of a `valid-until` timestamp. 
+This EIP is very similar to https://github.com/ethereum/EIPs/pull/599 by Nick Johnson and Konrad Feldmeier, the main difference
+being that this EIP is based on clock-time / walltime instead of block numbers. 
 
 
 ## Motivation
@@ -40,6 +42,8 @@ At block `Y`,
 
 ## Rationale
 
+### Rationale for this EIP
+
 For the dust-account clearing usecase, 
 - This change is much less invasive in the consensus engine. 
   - No need to maintain a consensus-field of 'highest-known-nonce' or cap the number of transactions from a sender in a block. 
@@ -48,6 +52,16 @@ For the dust-account clearing usecase,
     - such as inability to create contracts at certain addresses.
     - more difficult to integrate with offline signers, since more elaborate nonce-schemes requires state access to determine. 
     - More intricate schemes like `highest-nonce` are a lot more difficult, since highest-known-nonce will be a consensus-struct that is incremented and possibly reverted during transaction execution, requireing one more journalled field.  
+
+
+### Rationale for walltime
+ 
+Why use walltime instead of block numbers, as proposed in https://github.com/ethereum/EIPs/pull/599 ? 
+
+- The UTC time is generally available in most settings, even on a computer which is offline. This means that even a setup where blockchain information is unavailable, the party signing a transaction can generate a transaction with the desired properties. 
+- The correlation between time and block number is not fixed; even though a 14s blocktime is 'desired', this varies due to both network hashrate and difficulty bomb progression. 
+- The block number is even more unreliable as a timestamp for testnets and private networks.
+- UTC time is more user-friendly, a user can more easily decide on reasonable end-date for a transaction, rather than a suitalbe number of valid blocks.
 
 
 ## Backwards Compatibility
@@ -62,6 +76,15 @@ todo
 ## Implementation
 
 None yet
+
+## Security considerations
+
+The most notable security impact is that pre-signed transactions stored on paper backups, will become invalid as of block `Y`. There are a couple of cases where this might be used
+   - Pregenerated onetime 'bootstrap' transactions, e.g. to onboard a user into Ethereum. Instead of giving a user a giftcard with actual ether on it, someone may instead give the person a one-time pregenerated transaction that will only send those ether to the card once the 
+user actively wants to start using it.
+   - If a user has an offline paper-wallet, he may have pregenerated transactions to send value to e.g. an exchange. This is sometimes done to be able to send ether to an exchange without having to go through all the hoops of bringing the paper wallet back to 'life'. 
+
+Secondary security impacts are that the addition of a timestamp would make the transactions a little bit larger. 
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
