@@ -7,10 +7,10 @@ title: Home
   <a href="https://gitter.im/ethereum/EIPs?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
   <a href="/last-call.xml"><img src="https://img.shields.io/badge/rss-Last Calls-red.svg" alt="RSS"></a>
 </h1>
-<p>以太坊改进建议(Ethereum Improvement Proposals, EIPs)描述了以太坊平台的相关标准， 包括核心协议规范、客户端APIs和合约的相关标准。</p>
+<p>以太坊改进建议(Ethereum Improvement Proposals, EIPs)描述了以太坊平台的相关标准，包括核心协议规范、客户端APIs和合约的相关标准。</p>
 
 <h2>如何贡献</h2>
-<p>先阅读 <a href="EIPS/eip-1">EIP-1</a>，然后clone本代码仓库并向其中添加EIP。这里是一个<a href="https://github.com/ethereum/EIPs/blob/master/eip-X.md">EIP模板</a>。然后提交Pull Request给以太坊的<a href="https://github.com/ethereum/EIPs">EIPs仓库</a>。</p>
+<p>先阅读<a href="EIPS/eip-1">EIP-1</a>，然后clone本代码仓库并向其中添加EIP。这里是一个<a href="https://github.com/ethereum/EIPs/blob/master/eip-X.md">EIP模板</a>。然后提交Pull Request给以太坊的<a href="https://github.com/ethereum/EIPs">EIPs仓库</a>。</p>
 
 <h2>EIP状态</h2>
 <ul>
@@ -24,7 +24,7 @@ title: Home
 
 <p>EIPs被分为几类，每一类都有一个单独的列表。</p>
 
-<h3>标准路径（Standards Track）EIPs ({{site.pages|where:"type","Standards Track"|size}})</h3>
+<h3>标准路径(Standards Track)EIPs({{site.pages|where:"type","Standards Track"|size}})</h3>
 <p>描述会影响以太坊大部分甚至全部实现的修改，比如对网络协议的修改、区块或交易有效性规则的修改、应用程序标准/约定的提案，或对以太坊网络中的应用的互联互通有影响的任何修改或增项。这些标准路径EIPs可以归类到以下的几个子类别。</p>
 
 <h4><a href="{{"core"|relative_url}}">核心</a> ({{site.pages|where:"type","Standards Track"|where:"category","Core"|size}})</h4>
@@ -34,13 +34,13 @@ title: Home
 <p>包括了关于devp2p的改进(<a href="EIPS/eip-8">EIP8</a>)和 Light Ethereum Subprotocol(以太坊轻节点子协议)，以及关于whisper和swarm的网络协议规范的改进。</p>
 
 <h4><a href="{{"interface"|relative_url}}">接口</a> ({{site.pages|where:"type","Standards Track"|where:"category","Interface"|size}})</h4>
-<p>包括了关于客户端API/RPC的规范和标准的改进，以及关于特定语言级别的标准比如方法名 (<a href="EIPS/eip-6">EIP6</a>) 和合约ABIs的改进。 接口仓库和讨论的"接口"标签应该在EIP被提交到EIPs仓库之前被打上。</p>
+<p>包括了关于客户端API/RPC的规范和标准的改进，以及关于特定语言级别的标准比如方法名(<a href="EIPS/eip-6">EIP6</a>)和合约ABIs的改进。接口仓库和讨论的"接口"标签应该在EIP被提交到EIPs仓库之前被打上。</p>
 
 <h4><a href="{{"erc"|relative_url}}">以太坊征求意见稿(ERC,Ethereum Request for Comments)</a> ({{site.pages|where:"type","Standards Track"|where:"category","ERC"|size}})</h4>
-<p>应用级别的标准和约定，包括合约标准比如代币标准(<a href="EIPS/eip-20">ERC20</a>)、命名注册 (<a href="EIPS/eip-137">ERC137</a>)、URI方案 (<a href="EIPS/eip-681">ERC681</a>)、库/包的格式(<a href="EIPS/eip-190">EIP190</a>) 和 钱包格式 (<a href="https://github.com/ethereum/EIPs/issues/85">EIP85</a>)。</p>
+<p>应用级别的标准和约定，包括合约标准比如代币标准(<a href="EIPS/eip-20">ERC20</a>)、命名注册(<a href="EIPS/eip-137">ERC137</a>)、URI方案 (<a href="EIPS/eip-681">ERC681</a>)、库/包的格式(<a href="EIPS/eip-190">EIP190</a>) 和 钱包格式 (<a href="https://github.com/ethereum/EIPs/issues/85">EIP85</a>)。</p>
 
 <h3><a href="{{"informational"|relative_url}}">信息类(informational)</a> ({{site.pages|where:"type","Informational"|size}})</h3>
 <p>关于以太坊设计问题的描述，或者提供给以太坊社区的通用指南或信息，但不会包含新的特性。信息类EIPs不一定是以太坊社区的共识或者推荐，因此用户和开发人员可以自由选择是否遵循这些信息类EIPs。</p>
 
 <h3><a href="{{"meta"|relative_url}}">元(Meta)</a> ({{site.pages|where:"type","Meta"|size}})</h3>
-<p>描述关于以太坊的一个相关过程(process)或者提议某个程序的修改(或事件)的提案。过程(Process)EIPs和Standards Track EIPs类似，不同的是适用于非以太坊协议相关部分。它们可能提议一项非提交到以太坊代码库的实现，且通常需要达成社区共识；与信息EIPs不同，它们的级别高于推荐, 因此用户一般不能忽略它们。例子包括：规程、指南、对决议流程的修改以及对以太坊开发工具和环境的修改。所有的元EIPs也都是Process EIPs。</p>
+<p>描述关于以太坊的一个相关过程(Process)或者提议某个程序的修改(或事件)的提案。过程(Process)EIPs和Standards Track EIPs类似，不同的是适用于非以太坊协议相关部分。它们可能提议一项非提交到以太坊代码库的实现，且通常需要达成社区共识；与信息EIPs不同，它们的级别高于推荐, 因此用户一般不能忽略它们。例子包括：规程、指南、对决议流程的修改以及对以太坊开发工具和环境的修改。所有的元EIPs也都是Process EIPs。</p>
