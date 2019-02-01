@@ -23,7 +23,7 @@ EIP是以太坊改进提案(Ethereum Improvement Proposal)的缩写。一个EIP�
 总的来说有三种EIP:
 
 - **标准路径(Standard Track)EIP** 描述会影响以太坊大部分甚至全部实现的修改，比如对网络协议的修改、区块或交易有效性规则的修改、应用程序标准/约定的提案，或对以太坊网络中的应用的互联互通有影响的任何修改或增项。这些标准路径EIPs可以归类到以下的几个类别。标准路径EIPs包含了三个部分：设计文档，实现和对[formal specification] (正式的规范说明书)的更新。
-  - **核心(core)** - 需要一次分叉来实现的改进 (比如 [EIP5], [EIP101])，同时包括一些跟[“core dev” discussions](https://github.com/ethereum/pm)"讨论相关但不涉及共识层面的修改 (例如, 在<a href="EIPS/eip-86">EIP86</a>第2、3和第4条中关于矿工/节点 策略的修改)。
+  - **核心(core)** - 需要一次分叉来实现的改进 (比如 [EIP5], [EIP101])，同时包括一些跟[“core dev”讨论](https://github.com/ethereum/pm)"相关但不涉及共识层面的修改 (例如, 在<a href="EIPS/eip-86">EIP86</a>第2、3和第4条中关于矿工/节点 策略的修改)。
   - **网络(Networking)** - 包括了关于[devp2p] ([EIP8])和[Light Ethereum Subprotocol] (以太坊轻节点子协议)的改进，以及关于[whisper]和[swarm]的网络协议规范的改进。
   - **接口(interface)** - 包括了关于客户端[API/RPC]的规范和标准的改进，以及关于特定语言级别的标准比如方法名 ([EIP59], [EIP6])和[contract ABIs]的改进。[interfaces repo] (接口仓库)和相关讨论中的"接口"标签应该在EIP被提交到EIPs仓库之前被打上。
   - **以太坊征求意见稿(ERC,Ethereum Request for Comments)** - 应用级别的标准和约定，包括合约标准比如代币标准([ERC20])、命名注册([ERC26], [ERC137])、URI方案 ([ERC67])、库/包的格式 ([EIP82])和钱包格式([EIP75], [EIP85])。
@@ -36,7 +36,7 @@ EIP必须满足一些最小准则。它们必须能简明且完整地描述提�
 
 ## EIP工作流程
 
-流程中的参与方包括你、*EIP作者*、[*EIP编辑*](#eip-editors)，以及[*以太坊核心开发者*](https://github.com/ethereum/pm).
+流程中的参与方包括你、*EIP作者*、[*EIP编辑*](#eip-editors)，以及[*以太坊核心开发者*](https://github.com/ethereum/pm)。
 
 :warning: 在你开始前，请审查你的想法，这将节省你的时间。询问以太坊社区以了解该想法是否是第一次被提出，以免你的提案因为过去的一些研究被拒绝而浪费时间(在网上搜索有时候不一定能搞定)。同时这也能够帮助确认你的想法是否能被整个社区认可，而不是作者自己。一个在作者看来不错的主意不代表它在大多数人和大多数以太坊涉及的领域也很好。衡量你的EIP是否被认可的合适公共论坛有[the Ethereum subreddit]、[the Issues section of this repository]和[one of the Ethereum Gitter chat rooms]。特别说明的是，[the Issues section of this repository] 是一个非常好的和社区讨论你的EIP以及开始创建关于你的EIP的正式描述的地方。
 
