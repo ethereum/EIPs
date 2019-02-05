@@ -1,0 +1,166 @@
+---
+eip: <to be assigned>
+title: Smart Contract Interface for Licences
+author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+discussions-to: <URL>
+status: Draft
+type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+requires (*optional): <EIP number(s)>
+replaces (*optional): <EIP number(s)>
+---
+
+# Abstract
+
+This Etherium Improvement Proposal (EIP) proposes an Ethereum standard for the issuance of licences, permits and grants (Licences). 
+
+A Licence is a limited and temporary authority, granted to a natural (e.g. you) or legal person (e.g. a corporation), to do something that would otherwise be unlawful pursuant to a legal framework. A public Licence is granted by the government, directly (e.g. by the NSW Department of Primary Industries) or indirectly (e.g. by an agent operating under the government’s authority), and derives its authority from legislation, though this is often practically achieved via delegated legislation such as regulations. This can be contrasted to a private licence – for example, the licence you grant to a visitor who comes onto your property.
+
+A Licence has the following properties:
+
+* granted personally to the licencee (Licencee), though it may be transferrable to another person or company;
+
+* conferring a temporary right to the Licencee to own, use or do something that would otherwise be prohibited, without conferring any property interest in the underlying thing. For example, you may be granted a licence to visit a national park without acquiring any ownership in or over the park itself;
+
+* allowing the government authority responsible for the Licence to amend, revoke, renew, suspend or deny the issuance of the Licence, or to impose conditions or penalties for non-compliance; and
+
+* usually issued only after the payment of a fee or the meeting of some criteria.
+
+Additionally, a Licence may be granted in respect of certain information. For example, a Licence may be issued in respect of a vehicle registration number and attaching to that specific registered vehicle.
+
+## Motivation
+
+Governments are responsible for the issuance and management of Licences. However, maintaining and sharing this data can be complicated and inefficient. The granting of Licences usually requires the filing of paper-based application forms, manual oversight of applicable legislation and data entry into registries, as well as the issuance of paper based Licences. If individuals wish to sight information on Licence registries, they often need to be present at the government office and complete further paper-based enquiry forms in order to access that data (if available publicly).
+
+This EIP seeks to define a standard that will allow for the granting and/or management of Licences via Etherium smart contracts. The motivation is, in essence, to address the inefficiencies inherent in current licencing systems.
+
+## Licences
+
+This EIP will define the smart contract interface for Licences.
+
+## Rationale
+
+The use of smart contracts to apply for, renew, suspend and revoke Licences will free up much needed government resources and allow for the more efficient management of Licences. The EIP also seeks to improve the end user experience of the Licence system. In an era of open government, there is also an increased expectation that individuals will be able to easily access Licence registries, and that the process will be transparent and fair.
+
+By creating an EIP, we hope to increase the use of Ethereum based and issued Licences, which will address these issues.
+
+The Ethereum blockchain is adaptable to various Licences and government authorities. It will also be easily translatable into other languages and can be used by other governmental authorities across the world. Moreover, a blockchain will more effectively protect the privacy of Licence-holders’ data, particularly at a time of an ever-increasing volume of government data breaches.
+
+The EIP has been developed following the review of a number of licensing regulations at the national and state level in Australia. The review allowed the identification of the common licence requirements and criteria for incorporation into the EIP. We have included these in the proposed standard but seek feedback on whether these criteria are sufficient and universal.
+
+## Test Case
+
+A real world example of a Licence is a permit required to camp in a national park in Australia (e.g. Kakadu national park in the Northern Territory of Australia) under the Environment Protection and Biodiversity Conservation Regulations 2000 (Cth) (EPBC Act) and the Environment Protection and Biodiversity Conservation Regulations 2000 (the Regulations). Pursuant to the EPBC Act and the Regulations, the Director of National Parks oversees a camping permit system, which is intended to help regulate certain activities in National Parks. Permits allowing access to National Parks can be issued to legal or natural persons if the applicant has met certain conditions.
+
+The current digital portal and application form to camp at Kakadu National Park (the Application) can be accessed at: http://www.environment.gov.au/system/files/resources/b3481ed3-164b-4e72-a9f8-91fc987d90e7/files/kakadu-camping-permit-form-19jan2015-pdf.pdf
+
+The user must provide the following details when making an Application:
+
+* The full name and contact details of each person to whom the permit is to be issued;
+
+* If the applicant is a company or other incorporated body:
+
+o the name, business address and postal address of the company or incorporated body;
+
+o if the applicant is a company—
+
+* the full name of each of the directors of the company;
+
+* the full name and contact details of the person completing the application form;
+
+* the ACN or ABN of the company or other incorporated body (if applicable);
+
+* Details of the proposed camping purpose (e.g. private camping, school group, etc.);
+
+* A start date and duration for the camping (up to the maximum duration allowed by law);
+
+* Number of campers (up to the maximum allowed by law);
+
+* All other required information not essential to the issuance of the Licence (e.g. any particular medical needs of the campers); and
+
+* Fees payable depending on the site, duration and number of campers.
+
+The Regulations also set out a number of conditions that must be met by licensees when the permit has been issued. The Regulations allow the Director of National Parks to cancel, renew or transfer the licence. The above workflow could be better performed by way of a smart contract.
+
+The key criteria required as part of this process form part of the proposed Ethereum standard. We have checked this approach by also considering the issuance of a Commercial Fishing Licence under Part 8 “Licensing and other commercial fisheries management” of the Fisheries Management (General) Regulation 2010 (NSW) (Fisheries Regulations) made pursuant to the Fisheries Management Act 1994 (NSW) (Fisheries Act).
+
+## Implementation
+
+The issuance and ownership of a Licence can be digitally represented on the Ethereum blockchain.
+
+Smart contracts can be used to embed regulatory requirements with respect to the relevant Licence in the blockchain. The Licence would be available electronically in the form of a token. This might be practically represented by a QR code, for example, displaying the current Licence information. The digital representation of the Licence would be stored in a digital wallet, typically an application on a smartphone or tablet computer. The proposed standard allows issuing authorities or regulators to amend, revoke or deny Licences from time to time, with the result of their determinations reflected in the Licence token in near real-time. Licence holders will therefore be notified almost instantly of any amendments, revocations or issues involving their Licence.
+
+## Interface 
+
+### Solidity Example
+```
+interface EIP-x {
+	string public name;
+	uint256 public totalSupply;
+	
+	function grantAuthority(address who);
+	function revokeAuthority(address who);
+	function hasAuthority(address who) pure public returns (bool);
+	
+	function issue(address who, uint256 from, uint256 to) public;
+	function revoke(address who) public;
+	
+	function hasValid(address who) public view returns (boolean);
+	function purchase(uint256 from, uint256 to) public payable;
+}
+
+contract Permit is EIP-x {
+
+	string public name = "Fraser Island Camping Area";
+	uint256 public totalSupply;
+
+	address private _owner;
+	mapping(address => address) private _authorities;
+	mapping(addrress => Permit) private _holders;
+	
+	struct Permit {
+		address issuer;
+		uint256 start;
+		uint256 end;
+	}
+	
+	constructor() public {
+		_owner = msg.sender;
+	}
+	
+	function grantAuthority(address who) public onlyOwner() {
+		_authorities[who] = who;
+	}
+	
+	function revokeAuthority(address who) public onlyOwner() {
+		delete _authorities[who];
+	}
+	
+	function hasAuthority(address who) pure public returns (bool) {
+		return _authorities[msg.sender] != address(0);
+	}
+	
+	function issue(address who, uint256 from, uint256 to) public onlyAuthority() {
+		
+	}
+	
+	function revoke(address who) public onlyAuthority() {
+		delete _holders[who];
+	}
+	
+	function hasValid(address who) public view returns (boolean) {
+		return _holders[who] != address(0);
+	}
+
+	function purchase(uint256 from, uint256 to) public payable;
+	
+	modifier onlyOwner() {
+		require(msg.sender == _owner, "Only owner can perform this function");
+	}
+	
+	modifier onlyAuthority() {
+		require(hasAuthority(msg.sender), "Only an authority can perform this function");
+	}
+}
+```
