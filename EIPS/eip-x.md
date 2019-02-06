@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Smart Contract Interface for Licences
-author: Lucas Cullen @BitcoinBrisbane, Kai Yeung (@CivicKai), Katrina Donaghy, katrina@civicledger.com
+author: Lucas Cullen @BitcoinBrisbane, Kai Yeung @CivicKai, Katrina Donaghy, katrina@civicledger.com
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -90,7 +90,7 @@ Smart contracts can be used to embed regulatory requirements with respect to the
 
 ### Solidity Example
 ```
-interface EIP-x {
+interface EIPx {
 	string public name;
 	uint256 public totalSupply;
 	
@@ -105,14 +105,16 @@ interface EIP-x {
 	function purchase(uint256 from, uint256 to) public payable;
 }
 
-contract Permit is EIP-x {
+pragma solidity ^0.5.3;
+
+contract EIP is EIPx {
 
 	string public name = "Fraser Island Camping Area";
 	uint256 public totalSupply;
 
 	address private _owner;
-	mapping(address => address) private _authorities;
-	mapping(addrress => Permit) private _holders;
+	mapping(address => bool) private _authorities;
+	mapping(address => Permit) private _holders;
 	
 	struct Permit {
 		address issuer;
@@ -125,37 +127,43 @@ contract Permit is EIP-x {
 	}
 	
 	function grantAuthority(address who) public onlyOwner() {
-		_authorities[who] = who;
+		_authorities[who] = true;
 	}
 	
 	function revokeAuthority(address who) public onlyOwner() {
 		delete _authorities[who];
 	}
 	
-	function hasAuthority(address who) pure public returns (bool) {
-		return _authorities[msg.sender] != address(0);
+	function hasAuthority(address who) public view returns (bool) {
+		return _authorities[who] == true;
 	}
 	
-	function issue(address who, uint256 from, uint256 to) public onlyAuthority() {
-		
+	function issue(address who, uint256 start, uint256 end) public onlyAuthority() {
+		_holders[who] = Permit(_owner, start, end);
+		totalSupply += 1;
 	}
 	
 	function revoke(address who) public onlyAuthority() {
 		delete _holders[who];
 	}
 	
-	function hasValid(address who) public view returns (boolean) {
-		return _holders[who] != address(0);
+	function hasValid(address who) public view returns (bool) {
+	    return _holders[who].start > now && _holders[who].end < now;
 	}
 
-	function purchase(uint256 from, uint256 to) public payable;
+	function purchase(uint256 from, uint256 to) public payable {
+	    require(msg.value == 1 ether, "Incorrect fee");
+	    issue(msg.sender, from, to);
+	}
 	
 	modifier onlyOwner() {
 		require(msg.sender == _owner, "Only owner can perform this function");
+		_;
 	}
 	
 	modifier onlyAuthority() {
-		require(hasAuthority(msg.sender), "Only an authority can perform this function");
+		require(hasAuthority(msg.sender) == true, "Only an authority can perform this function");
+        _;
 	}
 }
 ```
