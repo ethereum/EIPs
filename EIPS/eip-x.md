@@ -5,7 +5,7 @@ author: Lucas Cullen @BitcoinBrisbane, <a list of the author's or authors' name(
 discussions-to: <URL>
 status: Draft
 type: Interface
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+category ERC
 created: 2019-02-06
 ---
 
