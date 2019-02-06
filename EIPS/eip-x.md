@@ -4,7 +4,7 @@ title: Smart Contract Interface for Licences
 author: Lucas Cullen @BitcoinBrisbane, Kai Yeung @CivicKai, Katrina Donaghy, katrina@civicledger.com
 status: Draft
 type: Standards Track
-category ERC
+category: ERC
 created: 2019-02-06
 ---
 
