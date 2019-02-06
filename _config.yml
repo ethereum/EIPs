@@ -60,3 +60,6 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - eip-X.md
+  - ISSUE_TEMPLATE.md
+  - ISSUE_TEMPLATE.md
+  - README.md
