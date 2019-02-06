@@ -13,18 +13,15 @@ replaces (*optional): <EIP number(s)>
 
 # Abstract
 
-This Etherium Improvement Proposal (EIP) proposes an Ethereum standard for the issuance of licences, permits and grants (Licences). 
+This Ethereum Improvement Proposal (EIP) proposes an Ethereum standard for the issuance of licences, permits and grants (Licences). 
 
 A Licence is a limited and temporary authority, granted to a natural (e.g. you) or legal person (e.g. a corporation), to do something that would otherwise be unlawful pursuant to a legal framework. A public Licence is granted by the government, directly (e.g. by the NSW Department of Primary Industries) or indirectly (e.g. by an agent operating under the government’s authority), and derives its authority from legislation, though this is often practically achieved via delegated legislation such as regulations. This can be contrasted to a private licence – for example, the licence you grant to a visitor who comes onto your property.
 
 A Licence has the following properties:
 
 * granted personally to the licencee (Licencee), though it may be transferrable to another person or company;
-
 * conferring a temporary right to the Licencee to own, use or do something that would otherwise be prohibited, without conferring any property interest in the underlying thing. For example, you may be granted a licence to visit a national park without acquiring any ownership in or over the park itself;
-
 * allowing the government authority responsible for the Licence to amend, revoke, renew, suspend or deny the issuance of the Licence, or to impose conditions or penalties for non-compliance; and
-
 * usually issued only after the payment of a fee or the meeting of some criteria.
 
 Additionally, a Licence may be granted in respect of certain information. For example, a Licence may be issued in respect of a vehicle registration number and attaching to that specific registered vehicle.
