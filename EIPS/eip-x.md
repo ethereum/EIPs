@@ -2,7 +2,6 @@
 eip: <to be assigned>
 title: Smart Contract Interface for Licences
 author: Lucas Cullen @BitcoinBrisbane, Kai Yeung @CivicKai, Katrina Donaghy, katrina@civicledger.com
-discussions-to: <URL>
 status: Draft
 type: Standards Track
 category ERC
@@ -109,7 +108,7 @@ pragma solidity ^0.5.3;
 
 contract EIP is EIPx {
 
-	string public name = "Fraser Island Camping Area";
+	string public name = "Kakadu National Park Camping Permit";
 	uint256 public totalSupply;
 
 	address private _owner;
