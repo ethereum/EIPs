@@ -6,7 +6,7 @@ permalink: /feed.xml
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ethereum EIPs - Ethereum Improvement Proposals</title>
-    <description>The EIPs listed here are created and merged through the ethereum/EIPs Github repo.</description>
+    <description>The EIPs listed here are created and merged through the ethereum/EIPs GitHub repo.</description>
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/feed.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
@@ -17,14 +17,13 @@ permalink: /feed.xml
       {% capture description %}
         {% include eipfeedcontent.html %}
       {% endcapture %}
-      {% assign eiptitle = eip.title %}{% if eip.status == "Last Call" %}{% assign eiptitle = eiptitle | append: " (Last Call)" %}{% endif %}
       <item>
-        <title>EIP-{{ eip.eip }}: {{ eiptitle | xml_escape }}</title>
+        <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }} {% if eip.status != "Final" %}({{ eip.status }}){% endif %}</title>
         <description>{{ description | xml_escape }}</description>
         <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
         <link>{{ site.url }}{{ eip.url }}</link>
-        <guid>{{ site.url }}{{ eip.url }}{{ eip.status | xml_escape }}</guid>
+        <guid isPermaLink="false">EIP-{{ eip.eip }}@{{ eip.status | slugify }}{% if eip.status == "Last Call" %}@review-period-end-{{ eip.review-period-end | default: "UNDEFINED-DATE" }}{% endif %}</guid>
       </item>
       {% endif %}
     {% endfor %}
