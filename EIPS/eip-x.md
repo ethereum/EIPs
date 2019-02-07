@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Smart Contract Interface for Licences
-author: Lucas Cullen @BitcoinBrisbane, Kai Yeung @CivicKai, Katrina Donaghy, katrina@civicledger.com
+author: Lucas Cullen @BitcoinBrisbane, Kai Yeung @CivicKai, Anna Crowley annaelizabethcrowley@gmail.com, Caroline Marshall caroline.marshall888@gmail.com, Katrina Donaghy, katrina@civicledger.com
 status: Draft
 type: Standards Track
 category: ERC
