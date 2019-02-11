@@ -10,25 +10,25 @@
  3. 向你的分支添加你的EIP。这里有一个[EIP模板](eip-X.md)。
  4. 向以太坊代码仓库提交一个Pull Request[EIPs代码仓库](https://github.com/ethereum/EIPs)，中文翻译则向中文代码仓库[中文翻译版EIPs仓库](https://github.com/posa88/EIPs-Chinese)提交。
 
-你的第一个PR应当是EIP定稿的一个草稿。 It must meet the formatting criteria enforced by the build (largely, correct metadata in the header). An editor will manually review the first PR for a new EIP and assign it a number before merging it. Make sure you include a `discussions-to` header with the URL to a discussion forum or open GitHub issue where people can discuss the EIP as a whole.
+你的第一个PR应当是EIP定稿的一个草稿。它必须满足构建所需的格式要求(主要是正确地填写header中的元数据)。编辑会手动地审查新EIP的第一个PR并在合并它之前赋予一个编号。请尽量加入一个指向用户讨论你的EIP的论坛或者Github issue的URL地址的`discussions-to`消息头。
 
-If your EIP requires images, the image files should be included in a subdirectory of the `assets` folder for that EIP as follow: `assets/eip-X` (for eip **X**). When linking to an image in the EIP, use relative links such as `../assets/eip-X/image.png`.
+如果你EIP包含图片，则这些图片之类的资源文件放在`assets`目录中的单独子目录中，并命名为: `assets/eip-X` (for eip **X**)的格式。当在EIP链接图片(文件)的时候，使用相对链接地址比如： `../assets/eip-X/image.png`。
 
-Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your Github username or your email address inside <triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
+一旦你的第一个PR被合并，我们会用一个机器人自动合并你的PRs到EIPs草案中，前提是你是该草案的所有者。请确保你的EIP的'author'消息头中包含了你的Github用户名或者你的邮箱(邮箱用<尖括号>括起来)。如果用的是你的邮箱，则该邮箱必须是公开展示在[你的github profile](https://github.com/settings/profile)上的那一个。
 
-When you believe your EIP is mature and ready to progress past the draft phase, you should do one of two things:
+当你认为你的EIP已经足够成熟并可以通过草稿的最后征求意见阶段了的时候，你应该按下面两步中的一步来推进:
 
- - **For a Standards Track EIP of type Core**, ask to have your issue added to [the agenda of an upcoming All Core Devs meeting](https://github.com/ethereum/pm/issues), where it can be discussed for inclusion in a future hard fork. If implementers agree to include it, the EIP editors will update the state of your EIP to 'Accepted'.
- - **For all other EIPs**, open a PR changing the state of your EIP to 'Final'. An editor will review your draft and ask if anyone objects to its being finalised. If the editor decides there is no rough consensus - for instance, because contributors point out significant issues with the EIP - they may close the PR and request that you fix the issues in the draft before trying again.
+ - **对一个标准路径EIP中的核心EIP**，则申请将你的issue加入到[核心开发会议议程表](https://github.com/ethereum/pm/issues)中，在那里讨论是否将你的EIP中的内容加入到未来的一个分叉中。如果开发实施者们同意将其加入，EIP编辑们则会将EIP的状态变更为'Accepted'。
+ - **对其它EIPs**，提交一个将EIP状态修改EIP状态为'Final'的PR。会有编辑审查你的草稿并询问是否有人不同意你的EIP进入定稿(Final)状态。如果编辑看到达成初步共识，比如，有贡献者指出了该EIP的重大问题，则编辑们可能会关闭PR并要求你在再次提交PR之前先处理该问题。
 
-# EIP Status Terms
-* **Draft** - an EIP that is undergoing rapid iteration and changes
-* **Last Call** - an EIP that is done with its initial iteration and ready for review by a wide audience
-* **Accepted** - a core EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author
-* **Final (non-Core)** - an EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author.
-* **Final (Core)** - an EIP that the Core Devs have decide to implement and release in a future hard fork or has already been released in a hard fork
-* **Deferred** - an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.
+# EIP状态术语
+* **草案(Draft)** - 一个正在快速迭代和修改的EIP草稿
+* **最后征求意见(Last Call)** - EIP已经完成了初始迭代并且准备好给社区审查
+* **接受(Accepted)** - 一个核心EIP进入Last Call状态最少已经经过了2周，并且被要求的技术修改已经被作者进行了处理后进入Accepted状态
+* **定稿(Final,non-Core)** - 非核心EIP进入Last Call状态最少已经经过了2周，并且被要求的技术修改已经被作者进行了处理后进入Final状态
+* **定稿(Final,Core)** - 核心EIP被核心开发者们决定实现并会在未来的硬分叉中发布，或者已经在过去的硬分叉中发布了
+* **延期(Deferred)** - 一个不会考虑马上采用的EIP，但可能在未来考虑在硬分叉中采用
 
-# Preferred Citation Format
+# 首选引用格式
 
-The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for ERC-165 is https://eips.ethereum.org/EIPS/eip-165.
+查看达到Draft状态的EIP的权威地址是https://eips.ethereum.org/ 域名下，中文版的则在https://posa88.github.io/EIPs-Chinese/ 。比如ERC-165的权威地址是https://eips.ethereum.org/EIPS/eip-165 ，中文版则在https://posa88.github.io/EIPs-Chinese/EIPS/eip-1 。
