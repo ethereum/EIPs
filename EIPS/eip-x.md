@@ -12,7 +12,7 @@ created: 2019-02-06
 
 This Ethereum Improvement Proposal (EIP) proposes an Ethereum standard for the issuance of licences, permits and grants (Licences). 
 
-A Licence is a limited and temporary authority, granted to a natural (e.g. you) or legal person (e.g. a corporation), to do something that would otherwise be unlawful pursuant to a legal framework. A public Licence is granted by the government, directly (e.g. by the NSW Department of Primary Industries) or indirectly (e.g. by an agent operating under the government’s authority), and derives its authority from legislation, though this is often practically achieved via delegated legislation such as regulations. This can be contrasted to a private licence – for example, the licence you grant to a visitor who comes onto your property.
+A Licence is a limited and temporary authority, granted to a natural (e.g. you) or legal person (e.g. a corporation), to do something that would otherwise be unlawful pursuant to a legal framework. A public Licence is granted by the government, directly (e.g. by the New South Wales Department of Primary Industries, Australia) or indirectly (e.g. by an agent operating under the government’s authority), and derives its authority from legislation, though this is often practically achieved via delegated legislation such as regulations. This can be contrasted to a private licence – for example, the licence you grant to a visitor who comes onto your property.
 
 A Licence has the following properties:
 
@@ -27,7 +27,7 @@ Additionally, a Licence may be granted in respect of certain information. For ex
 
 Governments are responsible for the issuance and management of Licences. However, maintaining and sharing this data can be complicated and inefficient. The granting of Licences usually requires the filing of paper-based application forms, manual oversight of applicable legislation and data entry into registries, as well as the issuance of paper based Licences. If individuals wish to sight information on Licence registries, they often need to be present at the government office and complete further paper-based enquiry forms in order to access that data (if available publicly).
 
-This EIP seeks to define a standard that will allow for the granting and/or management of Licences via Etherium smart contracts. The motivation is, in essence, to address the inefficiencies inherent in current licencing systems.
+This EIP seeks to define a standard that will allow for the granting and/or management of Licences via Ethereum smart contracts. The motivation is, in essence, to address the inefficiencies inherent in current licencing systems.
 
 ## Licences
 
