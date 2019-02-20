@@ -177,7 +177,7 @@ depending on user choice, user will be prompted for signing confirmations or not
 ### Global HD methods:
 none
 
-### Ethereum methods:
+### Ethereum accounts methods:
 hdSubPath
 with uint under 0x80000000, 31 bits
 should follow bip32
@@ -187,12 +187,18 @@ can be writen in hex or int
 * appKey_eth_getPublicKey(hdSubPath) returns 64 bytes
 0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
 
-* appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes
-hdSubPath should not be hardened
-
 * appKey_eth_getAddress(hdSubPath) returns 20 bytes
-hdSubPath: "index_i / index_(i+1) '", can use hardening
-e.g. 0x 9d f7 73 28 a2 51 5c 6d 52 9b ae 90 ed f3 d5 01 ea aa 26 8e 
+hdSubPath: string
+"index_i / index_(i+1) '", can use hardening
+e.g. 0x9df77328a2515c6d529bae90edf3d501eaaa268e 
+
+* appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes
+hdSubPath: string should not be hardened
+
+* appKey_eth_getAddressForPublicKey(publicKey) returns 20 bytes
+publicKey 64 bytes
+
+### Ethereum signing methods:
 
 * appKey_eth_signTransaction(fromAddress, tx)
 tx is ethereum-js tx object
@@ -219,14 +225,13 @@ Store in MetaMask localdb, specific store for plugin
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-### Isolated paths but customisables
+### Isolated paths but customisable
 
 ### persona isolation for privacy
 
 ### hardening for privacy
 hardening has benefits for security and privacy if parent extended public key is known, public keys of child of hardened indexes can not be computed.
-hardened indexes in case some extended public key leaks at some level, protects the sub trees (of course this has no impact if private keys leak)
-
+hardened indexes in case some extended public key leaks at some previous level of the tree, protects the sub trees (of course this has no impact if private keys leak)
 
 ### API not exposing private keys
 
