@@ -118,10 +118,10 @@ where
 EIP#, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
 
 [persona path]  allows to have personas that are not known by apps while having this independant of accounts, thus blockchains keys.
-hardened indexes
+hardened
 [domain uid path]
 Since each derivation step only has 31 bits we will decompose the domain uid into several indexes
-
+hardened
 
 
 #### domain's uid hash decomposition to get an Hd path 
@@ -186,8 +186,9 @@ can be writen in hex or int
 
 * appKey_eth_getPublicKey(hdSubPath) returns 64 bytes
 0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
+
 * appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes
-parentPublicKey should not be hardened
+hdSubPath should not be hardened
 
 * appKey_eth_getAddress(hdSubPath) returns 20 bytes
 hdSubPath: "index_i / index_(i+1) '", can use hardening
@@ -223,7 +224,9 @@ Store in MetaMask localdb, specific store for plugin
 ### persona isolation for privacy
 
 ### hardening for privacy
-hardening has benefits for security and privacy if parent is leaked
+hardening has benefits for security and privacy if parent extended public key is known, public keys of child of hardened indexes can not be computed.
+hardened indexes in case some extended public key leaks at some level, protects the sub trees (of course this has no impact if private keys leak)
+
 
 ### API not exposing private keys
 
