@@ -124,11 +124,6 @@ Since each derivation step only has 31 bits we will decompose the domain uid int
 
 
 
-#### domain source
-
-
-
-
 #### domain's uid hash decomposition to get an Hd path 
 
 Since each derivation step only has 31 bits we will decompose the domain's hash as several path indexes, first as hex bytes then parsed as integers
@@ -151,9 +146,6 @@ or alternatively equal length
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
 ```
 where `x0` to `x7` are 20 bits.
-
-
-
 
 
 if we use an ENS namehash 32 bytes, 256 bits
@@ -226,32 +218,31 @@ Store in MetaMask localdb, specific store for plugin
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-### Isolated paths ut customisables
-### persona isolation
+### Isolated paths but customisables
+
+### persona isolation for privacy
+
+### hardening for privacy
+hardening has benefits for security and privacy if parent is leaked
+
 ### API not exposing private keys
 
-### HD derivation path Using ENS as domain 
-#### HD Path: Alternative derivation spec than bip32?
+### Alternatives about HD derivation path 
+HD Path: Alternative derivation spec than bip32?
 HD still but not with hardening?
-hardening has benefits
-## HD Paths:
-### Proposal 1 (use their own paths):
-
-[Standard beginning of Hd Path] / [Domain Specific Hd Path] / [App controlled HD subPath] / [Account index]
-
-
-Standard beginning:
-m/44/60 is eth
-but we won't be using bip44 here since not a crypto
+We won't be using bip44 here since not a crypto
 and we don't want app keys to be ETH specific
 
-### Proposal 2 (make them subsets of ETH main accounts)
+Proposal 2 (make them subsets of ETH main accounts)
 [Hd Path of an Eth main Account] / [Domain Specific Hd subPath] / [App controlled HD subPath] / [Account index]
 
 pros:
 allows to use isolated app paths for the same app using the same mnemonic.
+
 can have several accounts fully separated to use the same domain without the domain knowing I'm the same individual. All this with the same mnemonic, I would just use 2 different mainAccounts.
+
 One question though is how do you handle apps/plugin that would like to interact with several "main accounts", accounts outside of their control? Not sure if this use case really exists tho and we could have.
+
 Also how does this applies to the plugins if metamask doesn't have a "selected account anymore"? Logging into plugins in the same way as in websites, EIP1102?
 
 cons: 
@@ -259,14 +250,11 @@ makes this a subset of an ethereum account or should be eventually generalised t
 adds complexity to restore, one should remember which account is which
 same benefits of privacy could be implemented by add an user provided field in the HD path, after domain and before app subpath
 
-### Hardening
+==> personas seem better
 
-we harden all but the 
-
-### domain's authentification
-##### domain's UID: Alternative spec, eth author address and including a signed message
+### Alternatives about domain's authentification
+domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
 0x9df77328a2515c6d529bae90edf3d501eaaa268e
-
 
 
 ## Backwards Compatibility
