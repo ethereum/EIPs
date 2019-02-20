@@ -17,7 +17,7 @@ replaces (*optional): <EIP number(s)>
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-Among other cryptographic applications, Scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations and may also require her to watch some state and be ready to take some cryptographic action (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacle to the development of a complete web3.0 experience both in terms of UX, security and privacy.
+Among other cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations and may also require her to watch some state and be ready to take some cryptographic action (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacle to the development of a complete web3.0 experience both in terms of UX, security and privacy.
 This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given app (domain). We propose to call them `app keys`. These accounts allow to isolate the accounts used for each app, thus increasing privacy. They also allow to give more control to the applications developpers over accounts management and signing delegation. These app keys have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally one can use these to sign transactions without broadcasting them.
 This new accounts type should allow to significantly improve UX and to allow for new designs for apps of the crypto permissionned web.
 
@@ -30,51 +30,44 @@ We propose this EIP as an ERC such that our community can aggree on a standard t
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-Allows to give more power and flexibility to the crypto apps developers. This should allow to improve a lot the UX of crypto dapps and allow to create new designs that were not possible before leveraging on the ability to create and handle many accounts, to presign messages and broadcast them later.
+Wallets have aggreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC85 (https://github.com/ethereum/EIPs/issues/85)
+Web3 (browser) wallets have implemented in a roughly similar way the rpc eth api.
+EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
+But several limitations remain to allow for a proper UX of the crypto permissioned web.
 
-Can allow to easily implement several of the features that where requested to MetaMask but that where incompatible with the level of security we were requesting for main accounts:
+Most current wallets don't allow for
 
-offline signing without broadcasting of txes
-be able to sign without prompting the user
-be able to use throwable keys to improve anonymity
-be able to use different keys / accounts for each apps
-While being fully restorable using the user's mnemonic or hardware wallet and the HD Path determined uniquely by the app's ens name.
+* offline transaction signing without broadcasting of txes while still being able to perform other transaction signing
+* being able to sign without prompting the user
+* be able to use throwable keys to improve anonymity
+* being able to automatically and effortlessly use different keys / accounts for each apps 
+* All this while being fully restorable using the user's mnemonic or hardware wallet and the HD Path determined uniquely by the app's ens name.
 
+We try to solve this by introducing a new account's type, app keys made to be used along side the existing main accounts.
+
+These new app keys should allow to give more power and flexibility to the crypto apps developers. This should allow to improve a lot the UX of crypto dapps and allow to create new designs that were not possible before leveraging on the ability to create and handle many accounts, to presign messages and broadcast them later. These features were not compatible with the level of security we were requesting for main accounts that hold most of an user's funds.
 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-### HD path
-requires BIP 32 and BIP 39
-derives from BIP44 and EIP
-BIP 44 for eth: https://github.com/ethereum/EIPs/issues/84 and https://github.com/ethereum/EIPs/issues/85
-not stricly BIP44 because of cointype should be a number between 0 and 2^31.
+### Domains
 
-eth:
-m/44'/60'/a'/0/n
+A domain is an app that would like to request access to app keys, crypto app, eth but not only.
 
-Favored spec, bip32
+#### Domain's UID
+ens domain
+namehash node
 
-m/EIP#'/[persona path]'/[domain uid path]'/[domain custom subpath]
+Favored spec, ENS name hash and resolving url through ens
 
-where EIP, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
+bytes32 e.g. 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
 
-[persona path]  allows to have personas that are not known by apps while having this independant of accounts, thus blockchains keys.
-hardened indexes
-[domain uid path]
-Since each derivation step only has 31 bits we will decompose the domain uid into several indexes
-
-### Domain's UID and authentication
-
-#### domain source
-
-##### domain's UID: Favored spec, ENS name hash and resolving url through ens
-0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
 
 ENS Specs
 http://docs.ens.domains/en/latest/implementers.html#namehash
 
+```
 domain - the complete, human-readable form of a name; eg, ‘vitalik.wallet.eth’.
 label - a single component of a domain; eg, ‘vitalik’, ‘wallet’, or ‘eth’. A label may not contain a period (‘.’).
 label hash - the output of the keccak-256 function applied to a label; eg, keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0.
@@ -91,6 +84,48 @@ keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47
 
 Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
+```
+See alternative specs in rationale below.
+
+#### Domain's authentication
+
+Load window or script through ens resolution
+
+using for instance this resolver.
+
+we either point the name to a string or use metadatafields if it points to an address
+
+we also add a authorEthAddress metadatafield that can be used to authenticate message from the app's dev
+
+
+### Personas
+
+We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
+
+
+### HD path
+requires BIP 32 and BIP 39
+derives from BIP44 and EIP
+BIP 44 for eth: https://github.com/ethereum/EIPs/issues/84 and https://github.com/ethereum/EIPs/issues/85
+not stricly BIP44 because of cointype should be a number between 0 and 2^31.
+
+eth:
+m/44'/60'/a'/0/n
+
+m/[EIP#]'/[persona path]'/[domain uid path]'/[domain custom subpath]
+
+where 
+EIP#, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
+
+[persona path]  allows to have personas that are not known by apps while having this independant of accounts, thus blockchains keys.
+hardened indexes
+[domain uid path]
+Since each derivation step only has 31 bits we will decompose the domain uid into several indexes
+
+
+
+#### domain source
+
 
 
 
@@ -198,7 +233,7 @@ Store in MetaMask localdb, specific store for plugin
 ### HD derivation path Using ENS as domain 
 #### HD Path: Alternative derivation spec than bip32?
 HD still but not with hardening?
-hardening has benefits ?
+hardening has benefits
 ## HD Paths:
 ### Proposal 1 (use their own paths):
 
