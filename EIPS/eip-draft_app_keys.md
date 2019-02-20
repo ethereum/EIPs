@@ -102,6 +102,10 @@ we also add a authorEthAddress metadatafield that can be used to authenticate me
 
 We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
 
+We use a string following BIP32 format (can be hardened) to define personas
+
+e.g. `0'` or `0'/1/2'/0`
+
 
 ### HD path
 requires BIP 32 and BIP 39
@@ -183,8 +187,11 @@ app custom path params: (entirely customisable by app under BIP32 standard) app_
 
 ### App keys exposure:
 wallet.appkeys.enable()
+
 uses the persona selected by the user (not shared with app)
+
 uses the domain ens hash that was resolved to load window
+
 depending on user choice, user will be prompted for signing confirmations or not for those app keys
 
 ### Global HD methods:
@@ -192,9 +199,13 @@ none
 
 ### Ethereum accounts methods:
 hdSubPath
+
 with uint under 0x80000000, 31 bits
+
 should follow bip32
+
 can be hardened
+
 can be writen in hex or int
 
 * appKey_eth_getPublicKey(hdSubPath) returns 64 bytes
@@ -273,9 +284,12 @@ same benefits of privacy could be implemented by add an user provided field in t
 
 ==> personas seem better
 
-### Alternatives about domain's authentification
+### Alternatives about domain's identification and authentification
 domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
 0x9df77328a2515c6d529bae90edf3d501eaaa268e
+
+However, using ens hashing scheme doesn't restrict us to use ens format for name strings.
+For authentication we use ENS resolution, but once first resolution is done we could use some metadata param address for ethereum less authentication.
 
 
 ## Backwards Compatibility
@@ -300,9 +314,14 @@ token contract:
 https://github.com/ethereum/EIPs/issues/85
 
 ## Acknowledgements
-Liam
-ricmoo
-jeff coleman
+MetaMask team
+
+Liam Horne
+
+Richard Moore
+
+Jeff Coleman
+
 for discussions about the domain's hd path
 
 ## Copyright
