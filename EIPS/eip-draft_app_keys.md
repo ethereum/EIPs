@@ -110,9 +110,10 @@ BIP 44 for eth: https://github.com/ethereum/EIPs/issues/84 and https://github.co
 not stricly BIP44 because of cointype should be a number between 0 and 2^31.
 
 eth:
-m/44'/60'/a'/0/n
+`m/44'/60'/a'/0/n`
+where a is a set of account number and n is the account index
 
-m/[EIP#]'/[persona path]'/[domain uid path]'/[domain custom subpath]
+`m/ [EIP#]' / [persona path]' / [domain uid path]' / [domain custom subpath]`
 
 where 
 EIP#, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
@@ -140,6 +141,7 @@ where `x0` to `x7` are 30 bits and `x8` 16 bits
 equal length would be 16 * 16 bits
 
 or 16 * 2 bytes, cleanest:
+
 4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
 
 
@@ -168,6 +170,14 @@ where `x0` to `x7` are 20 bits.
 does not seem to really matter which we pick between the 2 decomposition approaches,
 Maybe favor the one that leads to less indexes, less computations
 alternative has the benefit of being much cleaner, especially for the 256 bits decompositions
+
+### Example HD paths for app keys:
+EIP#: 12345
+personaPath: 0
+uid: 4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
+app custom path params: (entirely customisable by app under BIP32 standard) app_version set_of_accounts_index, change_index, account_index
+
+`m/0'/12345'/4f5b'/8127'/89fc'/606b'/e1b3'/b169'/08db'/13fc'/7a9a'/df7c'/a726'/41f8'/4d75'/b470'/69d3'/d7f0'/app_version'/a'/0/n`
 
 ## API:
 
