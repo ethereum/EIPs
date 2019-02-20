@@ -128,7 +128,23 @@ hardened
 
 Since each derivation step only has 31 bits we will decompose the domain's hash as several path indexes, first as hex bytes then parsed as integers
 
-if we use an eth address of 20 bytes, 160 bits
+if we use an `ENS namehash` 32 bytes, 256 bits
+
+0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
+
+```
+x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
+```
+where `x0` to `x7` are 30 bits and `x8` 16 bits
+
+equal length would be 16 * 16 bits
+
+or 16 * 2 bytes, cleanest:
+4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
+
+
+
+The same reasoning, if we use an `eth address` of 20 bytes, 160 bits
 
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5
@@ -148,22 +164,9 @@ x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
 where `x0` to `x7` are 20 bits.
 
 
-if we use an ENS namehash 32 bytes, 256 bits
-
-0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
-
-```
-x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
-```
-where `x0` to `x7` are 30 bits and `x8` 16 bits
-
-equal length would be 16 * 16 bits
-
-or 16 * 2 bytes, cleanest:
-4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
 
 does not seem to really matter which we pick between the 2 decomposition approaches,
-Maybe favor the one that leads to less indexes
+Maybe favor the one that leads to less indexes, less computations
 alternative has the benefit of being much cleaner, especially for the 256 bits decompositions
 
 ## API:
