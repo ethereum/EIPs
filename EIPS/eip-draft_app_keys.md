@@ -3,13 +3,13 @@ eip: <to be assigned>
 title: ERC - App Keys: domain specific accounts
 author: 
 Vincent Eli @Bunjin vincent.eli@gmail.com
-Dan Finley @DanFinley
+Dan Finlay @DanFinlay
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
 created: 2019-02-20
-requires (*optional): <EIP number(s)>
+requires (*optional): BIP32
 replaces (*optional): <EIP number(s)>
 ---
 
@@ -30,7 +30,7 @@ We propose this EIP as an ERC such that our community can aggree on a standard t
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-Wallets have aggreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC84 (https://github.com/ethereum/EIPs/issues/84)
+Wallets have agreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC84 (https://github.com/ethereum/EIPs/issues/84)
 Web3 (browser) wallets have implemented in a roughly similar way the rpc eth api.
 EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
 But several limitations remain to allow for a proper UX of the crypto permissioned web.
@@ -278,18 +278,16 @@ For apps that registered their user using main accounts eth addresses, they need
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 
-## Examples:
-token contract:
-https://github.com/ethereum/EIPs/issues/85
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 WIP
 Link to hdkeyring methods
 
-## Copyright
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
+## Examples:
+token contract:
+https://github.com/ethereum/EIPs/issues/85
 
 ## Acknowledgements
 Liam
@@ -297,6 +295,8 @@ ricmoo
 jeff coleman
 for discussions about the domain's hd path
 
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 ## Sources:
 
