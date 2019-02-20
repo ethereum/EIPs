@@ -30,12 +30,12 @@ We propose this EIP as an ERC such that our community can aggree on a standard t
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-Wallets have aggreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC85 (https://github.com/ethereum/EIPs/issues/85)
+Wallets have aggreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC84 (https://github.com/ethereum/EIPs/issues/84)
 Web3 (browser) wallets have implemented in a roughly similar way the rpc eth api.
 EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
 But several limitations remain to allow for a proper UX of the crypto permissioned web.
 
-Most current wallets don't allow for
+Most current wallets don't allow for:
 
 * offline transaction signing without broadcasting of txes while still being able to perform other transaction signing
 * being able to sign without prompting the user
