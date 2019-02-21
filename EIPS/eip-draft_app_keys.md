@@ -61,17 +61,19 @@ An app is a website (or other) that would like to request from a wallet to acces
 
 We need a way to uniquely identify each App.
 
-In our favored spec, each app is uniquely defined and authentified by its name, an ens domain string (e.g. foo.bar.eth).
-Note that this favored spec does not restrict the apps' names to be following the .eth standard. There are a few restrictions however on the characters used and normalisation, following the [ENS Specs](http://docs.ens.domains/en/latest/implementers.html#namehash), reproduced below for convinience and reference.
-In addition there must be a maximum size to the domain string that we need to determine such that the mapping from strings to nodes remains injective.
-NamePrep Algorithm:
-https://tools.ietf.org/html/rfc3491
+In our favored spec, each app is uniquely defined and authentified by its name, a domain string. For apps to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the apps' names to be following the .eth standard but they would need to be authentified differently (see below). 
 
-From ENS specs
+There are a few restrictions however on the characters used and normalisation, each name should be passed through the [NamePrep Algorithm](https://tools.ietf.org/html/rfc3491)
+
+In addition there must be a maximum size to the domain string that we need to determine such that the mapping from strings to nodes remains injective, to avoid collision.
+
+We recommand this standard to be following the [ENS Specs](http://docs.ens.domains/en/latest/implementers.html#namehash), reproduced below for convinience and reference.
 ```
 Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
+
+No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
 
 
 The ENS can also allow to register and resolve metadata for the app such as url, parameters, 
@@ -84,8 +86,6 @@ This gives an unique identifier (UID) of 32 bytes.
 e.g. for foo.bar.eth
 app's uid 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 ```
-
-
 
 
 
