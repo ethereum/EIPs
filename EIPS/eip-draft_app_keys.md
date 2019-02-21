@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: ERC - App Keys: domain specific accounts
+title: App Keys: app specific accounts
 author: 
 Vincent Eli @Bunjin
 Dan Finlay @DanFinlay
@@ -18,13 +18,16 @@ replaces (*optional): <EIP number(s)>
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
 Among other cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations and may also require her to watch some state and be ready to take some cryptographic action (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacle to the development of a complete web3.0 experience both in terms of UX, security and privacy.
+
 This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given app (domain). We propose to call them `app keys`. These accounts allow to isolate the accounts used for each app, thus increasing privacy. They also allow to give more control to the applications developpers over accounts management and signing delegation. These app keys have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally one can use these to sign transactions without broadcasting them.
+
 This new accounts type should allow to significantly improve UX and to allow for new designs for apps of the crypto permissionned web.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 In a wallet, an user often holds most of her funds in her main accounts. These accounts require a significant level of security and should not be delegated in any way, this significantly impacts the design of crypto apps if a user has to manually confirm every transaction. Also often an user uses the same accounts accross apps, which is a privacy and potentially also a security issue.
 We introduce here a new account type, app keys that allow for signing delegation and accounts isolation accross domains for privacy and security.
+
 We specify how to uniquely define each domain, authenticate a request to use a given domain's app keys, how to derive the accounts along an HDpath restricted for the domain and we finally define an API to derive and use these app keys.
 We propose this EIP as an ERC such that our community can aggree on a standard that would allow for cross wallet and cross app compatibility while fitting most needs.
 
@@ -32,6 +35,7 @@ We propose this EIP as an ERC such that our community can aggree on a standard t
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 Wallets have agreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC84 (https://github.com/ethereum/EIPs/issues/84)
 Web3 (browser) wallets have implemented in a roughly similar way the rpc eth api.
+
 EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
 But several limitations remain to allow for a proper UX of the crypto permissioned web.
 
@@ -54,6 +58,7 @@ These new app keys should allow to give more power and flexibility to the crypto
 ### Apps
 
 An app is a website (or other) that would like to request access to app keys, crypto app, eth but not only.
+
 We map uniquely apps to their domains (ens domain but can be other).
 
 #### Domain's UID
