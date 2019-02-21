@@ -10,7 +10,7 @@ type: Standards Track
 category: ERC
 created: 2019-02-20
 requires (*optional): BIP32, EIP137, EIP165, 
-replaces (*optional): <EIP number(s)>
+replaces (*optional): EIP 1581
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -329,6 +329,17 @@ domain's UID: Alternative spec, eth author address and including a signed messag
 
 However, using ens hashing scheme doesn't restrict us to use ens format for name strings.
 For authentication we use ENS resolution, but once first resolution is done we could use some metadata param address for ethereum less authentication.
+
+Replaces this EIP 1581: Non-wallet usage of keys derived from BIP-32 trees 
+https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
+https://eips.ethereum.org/EIPS/eip-1581
+
+Benefit of our approach:
+More englobing (personas among other)
+Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
+
+One possibility would be to keep only the first xxx bytes of the node
+
 
 
 ### Allowing app keys to derive any subpath and index, even if preivous ones by enumeration are empty
