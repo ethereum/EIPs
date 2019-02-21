@@ -133,21 +133,25 @@ hardened
 
 Since each derivation step only has 31 bits we will decompose the domain's hash as several path indexes, first as hex bytes then parsed as integers
 
-if we use an `ENS namehash` 32 bytes, 256 bits
+If for the domain uid we use an `ENS namehash` of 32 bytes, 256 bits
 
-foo.bar.eth
-gives a namehash of:
-0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
+e.g. `foo.bar.eth` gives namehash
+`0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3`
 
+We can decompose it in several ways, here are 2 ways:
+
+-approach that favors having the least indexes
 
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
 ```
 where `x0` to `x7` are 30 bits and `x8` 16 bits
 
-equal length would be 16 * 16 bits
-
-or 16 * 2 bytes, cleanest and favorite spec:
+-approach that favors an homogenous decomposition:
+equal length would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favorite spec:
+```
+x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8 || x9 || x10 || x11 || x12 || x13 || x14 || x15
+```
 
 ```
 foo.bar.eth
