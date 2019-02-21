@@ -34,23 +34,20 @@ This ERC aims at finding a standard that will fit the needs of wallets and appli
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-Wallets have agreed on a derivation path for eth accounts using BIP32, BIP44, SLIP44, ERC84 (https://github.com/ethereum/EIPs/issues/84)
-Web3 (browser) wallets have implemented in a roughly similar way the rpc eth api.
+Wallets developers have agreed on an HD derivation path for ethereum accounts using BIP32, BIP44, SLIP44, [ERC84](https://github.com/ethereum/EIPs/issues/84). Web3 wallets have implemented in a roughly similar way the rpc eth api. EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
 
-EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
-But several limitations remain to allow for a proper UX of the crypto permissioned web.
+However several limitations remain in order to allow for a proper designs and UX for crypto permissioned apps.
 
-Most current wallets don't allow for:
-
-* offline transaction signing without broadcasting of txes while still being able to perform other transaction signing
-* being able to sign without prompting the user
-* be able to use throwable keys to improve anonymity
-* being able to automatically and effortlessly use different keys / accounts for each apps 
+Most of UI based current wallets don't allow to:
+* being able to automatically and effortlessly use different keys / accounts for each apps,
+* being able to sign some app's action without prompting the user with the same level of security as sending funds from their main accounts,
+* being able to use throwable keys to improve anonymity,
+* effortlessly signing transactions for an app without broadcasting these while still being able to perform other transaction signing as usual from their main accounts,
 * All this while being fully restorable using the user's mnemonic or hardware wallet and the HD Path determined uniquely by the app's ens name.
 
-We try to solve this by introducing a new account's type, app keys made to be used along side the existing main accounts.
+We try to overcome these limitations by introducing a new account's type, app keys, made to be used along side the existing main accounts.
 
-These new app keys should allow to give more power and flexibility to the crypto apps developers. This should allow to improve a lot the UX of crypto dapps and allow to create new designs that were not possible before leveraging on the ability to create and handle many accounts, to presign messages and broadcast them later. These features were not compatible with the level of security we were requesting for main accounts that hold most of an user's funds.
+These new app keys can permit to give more power and flexibility to the crypto apps developers. This can allow to improve a lot the UX of crypto dapps and to create new designs that were not possible before leveraging the ability to create and handle many accounts, to presign messages and broadcast them later. These features were not compatible with the level of security we were requesting for main accounts that hold most of an user's funds.
 
 
 ## Specification
@@ -58,21 +55,39 @@ These new app keys should allow to give more power and flexibility to the crypto
 
 ### Apps
 
-An app is a website (or other) that would like to request access to app keys, crypto app, eth but not only.
+An app is a website (or other) that would like to request from a wallet to access app keys. It can be any form of cryptography/identity relying application, ethereum but not only.
 
-We map uniquely apps to their domains (ens domain but can be other).
+#### Apps' Unique Identifiers
 
-#### Domain's UID
-ens domain
-namehash node
+We need a way to uniquely identify each App.
 
-Favored spec, ENS name hash and resolving url through ens
+In our favored spec, each app is uniquely defined and authentified by its name, an ens domain string (e.g. foo.bar.eth).
+Note that this favored spec does not restrict the apps' names to be following the .eth standard. There are a few restrictions however on the characters used and normalisation, following the [ENS Specs](http://docs.ens.domains/en/latest/implementers.html#namehash), reproduced below for convinience and reference.
+In addition there must be a maximum size to the domain string that we need to determine such that the mapping from strings to nodes remains injective.
+NamePrep Algorithm:
+https://tools.ietf.org/html/rfc3491
 
-bytes32 e.g. 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
+From ENS specs
+```
+Normalising and validating names
+Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
+```
 
 
-ENS Specs
-http://docs.ens.domains/en/latest/implementers.html#namehash
+The ENS can also allow to register and resolve metadata for the app such as url, parameters, 
+
+Ens defines an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
+
+This gives an unique identifier (UID) of 32 bytes.
+
+```
+e.g. for foo.bar.eth
+app's uid 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
+```
+
+
+
+
 
 ```
 domain - the complete, human-readable form of a name; eg, ‘vitalik.wallet.eth’.
@@ -89,19 +104,19 @@ namehash([label, …]) = keccak256(namehash(…), keccak256(label))
 
 keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
 
-Normalising and validating names
-Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
-We thus propose to use the node of each app's domain as a unique identifier for each app.
 
-See alternative specs in rationale below.
+We thus propose to use the node of each app's domain as a unique identifier for each app but one can think of other UIDs, see the alternative specs mentionned in the `Rationale` section below.
 
-#### Domain's authentication
+#### App's authentication
 
-Load window or script through ens resolution
+In the case of the favored apps' UID specs using ENS, we can authenticate the app through ens resolution.
 
-using for instance this resolver profile defined in EIP 634 that permits the lookup of arbitrary key-value text data.
-https://eips.ethereum.org/EIPS/eip-634
+If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the keys `url` to point to a website. 
+
+One can think of other authentification methods and use them alongside the url-resolution method through ENS. We mention other methods in the `Rationale`
+
+
 
 ```
 A new resolver interface is defined, consisting of the following method:
@@ -324,23 +339,33 @@ same benefits of privacy could be implemented by add an user provided field in t
 
 ==> personas seem better
 
-### Alternatives about domain's identification and authentification
+### Alternatives for App identification 
+
+Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first xxx bytes of the node and slice them similarly. This may increase the change of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
+
 domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
 0x9df77328a2515c6d529bae90edf3d501eaaa268e
 
-However, using ens hashing scheme doesn't restrict us to use ens format for name strings.
-For authentication we use ENS resolution, but once first resolution is done we could use some metadata param address for ethereum less authentication.
-
-Replaces this EIP 1581: Non-wallet usage of keys derived from BIP-32 trees 
+Replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
-https://eips.ethereum.org/EIPS/eip-1581
-
 Benefit of our approach:
 More englobing (personas among other)
 Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
 
-One possibility would be to keep only the first xxx bytes of the node
+### Alternatives for App authentification
 
+For authentication we use ENS resolution, and browsing to a given url resolved
+With ENS resolution and authentification homoglyph attack is not a problem since it will not leak kees from one domain to another.
+
+Caveats 
+* First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata param address for ethereum less authentication of the app (eg. app server signs a challenge message with the author address resolved in the ENS metadata)
+* ENS resolution can change without the user knowing and then a different app/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
+
+Other metadata resolution through ENS that can be used alongside:
+* author address: already mentionned above
+* contract address: For app keys that would be designed to interact with a given ethereum contract (for instance app keys for a given token, if one desires to do so), other metadata fields could be used such as contract addresses.
+
+Alternative specs could
 
 
 ### Allowing app keys to derive any subpath and index, even if preivous ones by enumeration are empty
@@ -390,14 +415,10 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 ### HD and mnemonics
 #### BIPS:
-BIP 32 specs, Hierarchical Deterministic Wallets: 
-https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
-BIP 39 specs, Mnemonic code for generating deterministic keys: 
-https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
-BIP44: Multi-Account Hierarchy for Deterministic Wallets
-https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
-SLIP44: Registered coin types for BIP-0044
-https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+[BIP 32 specs, Hierarchical Deterministic Wallets:](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
+[BIP 39 specs, Mnemonic code for generating deterministic keys:](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
+[BIP44: Multi-Account Hierarchy for Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit)
+[SLIP44: Registered coin types for BIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
 
 
 #### Derivation path for eth:
@@ -419,6 +440,9 @@ https://github.com/ethereum/EIPs/blob/master/EIPS/eip-634.md
 ENS docs about namehash:
 http://docs.ens.domains/en/latest/implementers.html#namehash
 
+### Previous proposals related to app keys
+[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
 
 # Notes:
 BIP 39 tool: https://iancoleman.io/bip39/#english
