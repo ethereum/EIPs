@@ -17,19 +17,20 @@ replaces (*optional): EIP 1581
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-Among other cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations and may also require her to watch some state and be ready to take some cryptographic action (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacle to the development of a complete web3.0 experience both in terms of UX, security and privacy.
+Among others cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations. It may also require her to watch some state and be ready to sign data automatically (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacles to the development of a complete web3.0 experience both in terms of UX, security and privacy.
 
-This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given app (domain). We propose to call them `app keys`. These accounts allow to isolate the accounts used for each app, thus increasing privacy. They also allow to give more control to the applications developpers over accounts management and signing delegation. These app keys have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally one can use these to sign transactions without broadcasting them.
+This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given app. We propose to call them `app keys`. These accounts allow to isolate the accounts used for each app, thus increasing privacy. They also allow to give more control to the applications developpers over accounts management and signing delegation. For these app keys, wallets can have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally wallet can also implement a different behavior such as allowing to sign transactions without broadcasting them.
 
-This new accounts type should allow to significantly improve UX and to allow for new designs for apps of the crypto permissionned web.
+This new accounts type can allow to significantly improve UX and permit new designs for apps of the crypto permissionned web.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 In a wallet, an user often holds most of her funds in her main accounts. These accounts require a significant level of security and should not be delegated in any way, this significantly impacts the design of crypto apps if a user has to manually confirm every transaction. Also often an user uses the same accounts accross apps, which is a privacy and potentially also a security issue.
-We introduce here a new account type, app keys that allow for signing delegation and accounts isolation accross domains for privacy and security.
 
-We specify how to uniquely define each domain, authenticate a request to use a given domain's app keys, how to derive the accounts along an HDpath restricted for the domain and we finally define an API to derive and use these app keys.
-We propose this EIP as an ERC such that our community can aggree on a standard that would allow for cross wallet and cross app compatibility while fitting most needs.
+We introduce here a new account type, app keys, which permits signing delegation and accounts isolation accross apps for privacy and security.
+
+In this EIP, we provide a proposal how to uniquely identify and authenticate each app, how to derive the accounts along an HDpath restricted for the domain and we finally define an API for apps to derive and use these app keys.
+This ERC aims at finding a standard that will fit the needs of wallets and application developers while also allowing app keys to be used across wallets and yield the same accounts for the user for each app.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
