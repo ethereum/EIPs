@@ -129,10 +129,14 @@ e.g. `0'` or `0'/1/2'/0`
 ### HD path
 requires BIP 32 and BIP 39
 derives from BIP44 and EIP
-BIP 44 for eth: https://github.com/ethereum/EIPs/issues/84 and https://github.com/ethereum/EIPs/issues/85
+BIP 44 for eth: 
+https://github.com/ethereum/EIPs/issues/84
+https://github.com/ethereum/EIPs/issues/85
+https://github.com/ethereum/EIPs/pull/600
+https://github.com/ethereum/EIPs/pull/601
 not stricly BIP44 because of cointype should be a number between 0 and 2^31.
 
-eth:
+most frequently used eth derivation path
 `m/44'/60'/a'/0/n`
 where a is a set of account number and n is the account index
 
@@ -327,6 +331,14 @@ However, using ens hashing scheme doesn't restrict us to use ens format for name
 For authentication we use ENS resolution, but once first resolution is done we could use some metadata param address for ethereum less authentication.
 
 
+### Allowing app keys to derive any subpath and index, even if preivous ones by enumeration are empty
+
+problem apps won't be able to restore by enumeration
+but if they do that to derive accounts maybe it's on purpose and they may backup this data somewhere
+Also maybe wallets wants to include an address gap limit for the derivation by enumeration when importing
+https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
+
+
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 No incompatibity since these are separate accounts
@@ -362,13 +374,28 @@ for discussions about the domain's hd path
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
-## Sources:
+## References:
 
 ### HD and mnemonics
-BIP 32 specs, Hierarchical Deterministic Wallets: https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
-BIP 39 specs, Mnemonic code for generating deterministic keys: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
-BIP 39 tool: https://iancoleman.io/bip39/#english
-BIP 44 for eth: https://github.com/ethereum/EIPs/issues/85, https://github.com/ethereum/EIPs/issues/84
+#### BIPS:
+BIP 32 specs, Hierarchical Deterministic Wallets: 
+https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
+BIP 39 specs, Mnemonic code for generating deterministic keys: 
+https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
+BIP44: Multi-Account Hierarchy for Deterministic Wallets
+https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
+SLIP44: Registered coin types for BIP-0044
+https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+
+
+#### Derivation path for eth:
+https://github.com/ethereum/EIPs/issues/84
+https://github.com/ethereum/EIPs/issues/85
+https://github.com/ethereum/EIPs/pull/600
+Ethereum hierarchy for deterministic wallets - 
+https://github.com/ethereum/EIPs/pull/601
+
+
 
 ### ENS:
 EIP137:  Ethereum Domain Name Service - specification
@@ -382,6 +409,7 @@ http://docs.ens.domains/en/latest/implementers.html#namehash
 
 
 # Notes:
+BIP 39 tool: https://iancoleman.io/bip39/#english
 - In Hd Paths, Merge app controlled subset and account index ?
 
 
