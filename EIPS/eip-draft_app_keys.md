@@ -73,9 +73,6 @@ Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
 
-No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
-
-
 The ENS can also allow to register and resolve metadata for the app such as url, parameters, 
 
 Ens defines an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
@@ -345,14 +342,20 @@ same benefits of privacy could be implemented by add an user provided field in t
 
 Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first xxx bytes of the node and slice them similarly. This may increase the change of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
 
+Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved differently because ENS does not allow other TLDs.
+```
+No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
+```
+
 domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
 0x9df77328a2515c6d529bae90edf3d501eaaa268e
 
 Replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
 Benefit of our approach:
-More englobing (personas among other)
 Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
+Englobing (personas among other)
+
 
 ### Alternatives for App authentification
 
