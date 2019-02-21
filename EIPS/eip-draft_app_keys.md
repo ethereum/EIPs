@@ -57,6 +57,28 @@ These new app keys can permit to give more power and flexibility to the crypto a
 
 An app is a website (or other) that would like to request from a wallet to access app keys. It can be any form of cryptography/identity relying application, ethereum but not only.
 
+Once connected to a wallet, an application can request to access a set of accounts derived exclusively for that application using the hierarchical deterministic (HD) paths.
+
+### HD path
+
+requires BIP 32 and BIP 39
+derives from BIP44 and EIP
+
+We propose to use the following HD path for each app keys:
+
+
+`m/ [EIP#]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
+
+
+Where:
+
+`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. [At this point, I'm not sure if there is a list of alternative standards to BIP44 codes]
+`persona path` allows to use applications with different and isolated personas (or in other words accounts) that are tracable by the application. They will still be fully restorable from the same mnemonic.
+`application uniquely assigned path` isolate each application along unique branches of the tree through these unique subPath combination.
+`app's custom subPath` give freedom to application to use this BIP32 compliant subPath to manage accounts and other needed parameters.
+
+Note that we suggest that each of these indexes, except those belonging to the app's custom subpath, must be hardened to fully isolate the public keys across personas and applications.
+
 #### Apps' Unique Identifiers
 
 We need a way to uniquely identify each App.
@@ -73,9 +95,9 @@ Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
 
-The ENS can also allow to register and resolve metadata for the app such as url, parameters, 
 
-Ens defines an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
+
+The ENS uses an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
 
 This gives an unique identifier (UID) of 32 bytes.
 
@@ -84,7 +106,7 @@ e.g. for foo.bar.eth
 app's uid 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 ```
 
-
+For referenceHere are the specs of ENS:
 
 ```
 domain - the complete, human-readable form of a name; eg, ‘vitalik.wallet.eth’.
@@ -103,15 +125,15 @@ keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47
 
 ```
 
-We thus propose to use the node of each app's domain as a unique identifier for each app but one can think of other UIDs, see the alternative specs mentionned in the `Rationale` section below.
+We thus propose to use the node of each app's domain as a unique identifier for each app but one can think of other UIDs, we include some alternative specs in the `Rationale` section below.
 
 #### App's authentication
 
-In the case of the favored apps' UID specs using ENS, we can authenticate the app through ens resolution.
+In the case of our favored specification for apps' UIDs using ENS, we can authenticate the app through ens resolution.
+The ENS can also allow to register and resolve metadata for the app such as `url`, and other parameters.
 
-If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the keys `url` to point to a website. 
+If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the key `url` to point to a website. 
 
-One can think of other authentification methods and use them alongside the url-resolution method through ENS. We mention other methods in the `Rationale`
 
 
 
@@ -124,10 +146,9 @@ The interface ID of this interface is 0x59d1d43c.
 The text data may be any arbitrary UTF-8 string. If the key is not present, the empty string must be returned.
 ```
 
+One can think of other authentification methods and even use some of them alongside the url-resolution method through ENS. We mention other methods in the `Rationale` section.
 
-we either point the name to a string or use metadatafields if it points to an address
-
-we also add a authorEthAddress metadatafield that can be used to authenticate message from the app's dev
+We suggest for instance to also add an `authorEthAddress` text  metadata field that can be used to authenticate message from the app, with for instance a sign challenge.
 
 
 ### Personas
@@ -139,42 +160,18 @@ We use a string following BIP32 format (can be hardened) to define personas
 e.g. `0'` or `0'/1/2'/0`
 
 
-### HD path
-requires BIP 32 and BIP 39
-derives from BIP44 and EIP
-BIP 44 for eth: 
-https://github.com/ethereum/EIPs/issues/84
-https://github.com/ethereum/EIPs/issues/85
-https://github.com/ethereum/EIPs/pull/600
-https://github.com/ethereum/EIPs/pull/601
-not stricly BIP44 because of cointype should be a number between 0 and 2^31.
-
-most frequently used eth derivation path
-`m/44'/60'/a'/0/n`
-where a is a set of account number and n is the account index
-
-`m/ [EIP#]' / [persona path]' / [app's domain uid path]' / [app's custom subpath]`
-
-where 
-EIP#, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
-
-[persona path]  allows to have personas that are not known by apps while having this independant of accounts, thus blockchains keys.
-hardened
-[domain uid path]
-Since each derivation step only has 31 bits we will decompose the domain uid into several indexes
-hardened
 
 
 #### domain's uid hash decomposition to get an Hd path 
 
-Since each derivation step only has 31 bits we will decompose the domain's hash as several path indexes, first as hex bytes then parsed as integers
+Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers
 
 If for the domain uid we use an `ENS namehash` of 32 bytes, 256 bits
 
 e.g. `foo.bar.eth` gives namehash
 `0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3`
 
-We can decompose it in several ways, here are 2 ways:
+We can decompose it in several ways, here are 2 potential ways:
 
 -approach that favors having the least indexes
 
@@ -184,11 +181,10 @@ x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
 where `x0` to `x7` are 30 bits and `x8` 16 bits
 
 -approach that favors an homogenous decomposition:
-equal length would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favorite spec:
+equal length would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favored spec:
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8 || x9 || x10 || x11 || x12 || x13 || x14 || x15
 ```
-
 ```
 foo.bar.eth
 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
@@ -196,25 +192,6 @@ foo.bar.eth
 6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'
 24627'/25677'/26427'/18355'/48800'/20089'/48096'/28024'/52854'/47294'/12216'/28751'/39978'/33021'/5020'/33235'
 ```
-
-The same reasoning, if we use an `eth address` of 20 bytes, 160 bits
-
-```
-x = x0 || x1 || x2 || x3 || x4 || x5
-```
-where `x0` to `x4` are 30 bits and `x5` is 10 bits. 
-
-which gives the derivation sub path:
-
-```
-x0'/x1'/x2'/x3'/x4'/x5'
-```
-
-or alternatively equal length
-```
-x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
-```
-where `x0` to `x7` are 20 bits.
 
 
 
@@ -316,6 +293,18 @@ However the app can use non hardened indexes in their custom path part to be abl
 ### Alternatives about HD derivation path 
 HD Path: Alternative derivation spec than bip32?
 HD still but not with hardening?
+
+BIP 44 for eth: 
+https://github.com/ethereum/EIPs/issues/84
+https://github.com/ethereum/EIPs/issues/85
+https://github.com/ethereum/EIPs/pull/600
+https://github.com/ethereum/EIPs/pull/601
+not stricly BIP44 because of cointype should be a number between 0 and 2^31.
+
+most frequently used eth derivation path
+`m/44'/60'/a'/0/n`
+where a is a set of account number and n is the account index
+
 We won't be using bip44 here since not a crypto
 and we don't want app keys to be ETH specific
 
@@ -340,15 +329,14 @@ same benefits of privacy could be implemented by add an user provided field in t
 
 ### Alternatives for App identification 
 
-Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first xxx bytes of the node and slice them similarly. This may increase the change of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
+#### Shortening the ENS node
+Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the change of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
 
+#### Names not restricted to ens domains?
 Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved differently because ENS does not allow other TLDs.
 ```
 No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
 ```
-
-domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
-0x9df77328a2515c6d529bae90edf3d501eaaa268e
 
 Replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
@@ -356,6 +344,27 @@ Benefit of our approach:
 Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
 Englobing (personas among other)
 
+domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
+0x9df77328a2515c6d529bae90edf3d501eaaa268e
+
+The same reasoning, if we use an `eth address` of 20 bytes, 160 bits
+
+```
+x = x0 || x1 || x2 || x3 || x4 || x5
+```
+where `x0` to `x4` are 30 bits and `x5` is 10 bits. 
+
+which gives the derivation sub path:
+
+```
+x0'/x1'/x2'/x3'/x4'/x5'
+```
+
+or alternatively equal length
+```
+x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
+```
+where `x0` to `x7` are 20 bits.
 
 ### Alternatives for App authentification
 
