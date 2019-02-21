@@ -200,19 +200,14 @@ Can be extended to several child indexes in order to include the required data s
 
 ### Example HD paths for app keys:
 
----
+```
 Dummy data:
-
 EIP#: 12345
-
 personaPath: 0
-
 application's name: foo.bar.eth
-
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
-
 app custom path params: app_version set_of_accounts_index, change_index, account_index
----
+```
 
 `m/0'/12345'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
 
