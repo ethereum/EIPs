@@ -86,7 +86,7 @@ We use a string following BIP32 format (can be hardened) to define personas
 with hex under 0x80000000, 31 bits
 e.g. `0'` or `0'/1/2'/0`
 
-#### Apps' Unique Identifiers
+### Apps' Unique Identifiers
 
 We need a way to uniquely identify each App.
 
@@ -132,7 +132,7 @@ keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47
 
 We thus propose to use the node of each app's domain as a unique identifier for each app but one can think of other UIDs, we include some alternative specs in the [Rationale](#Rationale) section below.
 
-#### App's authentication
+### App's authentication
 
 In the case of our favored specification for apps' UIDs using ENS, we can authenticate the app through ens resolution.
 The ENS can also allow to register and resolve metadata for the app such as `url`, and other parameters.
@@ -152,7 +152,7 @@ One can think of other authentification methods and even use some of them alongs
 
 We suggest for instance to also add an `authorEthAddress` text  metadata field that can be used to authenticate message from the app, with for instance a sign challenge.
 
-#### Application UID decomposition to get a BIP32 HD path 
+### Application UID decomposition to get a BIP32 HD path 
 
 Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers
 
