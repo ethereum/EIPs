@@ -312,6 +312,8 @@ Store in MetaMask localdb, specific store for plugin
 hardening has benefits for security and privacy if parent extended public key is known, public keys of child of hardened indexes can not be computed.
 hardened indexes in case some extended public key leaks at some previous level of the tree, protects the sub trees (of course this has no impact if private keys leak)
 
+However the app can use non hardened indexes in their custom path part to be able to benefit from guessing child public keys from parent one (for instance for counterfactual state channel interaction accross 2 peers that would like to use new keys every time they counterfactually instantiate a new sub app).
+
 ### API not exposing private keys
 
 ### Alternatives about HD derivation path 
