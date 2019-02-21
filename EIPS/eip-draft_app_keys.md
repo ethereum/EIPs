@@ -77,6 +77,15 @@ Where:
 
 Note that we suggest that each of these indexes, except those belonging to the app's custom subpath, must be hardened to fully isolate the public keys across personas and applications.
 
+
+### Personas
+
+We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
+
+We use a string following BIP32 format (can be hardened) to define personas
+with hex under 0x80000000, 31 bits
+e.g. `0'` or `0'/1/2'/0`
+
 #### Apps' Unique Identifiers
 
 We need a way to uniquely identify each App.
@@ -92,8 +101,6 @@ We recommand this standard to be following the [ENS Specs](http://docs.ens.domai
 Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
-
-
 
 The ENS uses an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
 
@@ -132,9 +139,6 @@ The ENS can also allow to register and resolve metadata for the app such as `url
 
 If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the key `url` to point to a website. 
 
-
-
-
 ```
 A new resolver interface is defined, consisting of the following method:
 
@@ -148,19 +152,7 @@ One can think of other authentification methods and even use some of them alongs
 
 We suggest for instance to also add an `authorEthAddress` text  metadata field that can be used to authenticate message from the app, with for instance a sign challenge.
 
-
-### Personas
-
-We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
-
-We use a string following BIP32 format (can be hardened) to define personas
-
-e.g. `0'` or `0'/1/2'/0`
-
-
-
-
-#### domain's uid hash decomposition to get an Hd path 
+#### Application UID decomposition to get a BIP32 HD path 
 
 Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers
 
@@ -191,32 +183,38 @@ foo.bar.eth
 24627'/25677'/26427'/18355'/48800'/20089'/48096'/28024'/52854'/47294'/12216'/28751'/39978'/33021'/5020'/33235'
 ```
 
-
-
 does not seem to really matter which we pick between the 2 decomposition approaches,
 Maybe favor the one that leads to less indexes, less computations
 alternative has the benefit of being much cleaner, especially for the 256 bits decompositions
 
-### App custom sub path
+### Application custom sub path
 
-hdSubPath
+Must follow bip32, with hex under 0x80000000, 31 bits
 
-with uint under 0x80000000, 31 bits
+Can be hardened depending on each application's need
 
-should follow bip32
+Can be writen in hex or int
 
-can be hardened
-
-can be writen in hex or int
+Can be extended to several child indexes in order to include the required data such as `version` for instance.
 
 
 ### Example HD paths for app keys:
-EIP#: 12345
-personaPath: 0
-uid: 4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
-app custom path params: (entirely customisable by app under BIP32 standard) app_version set_of_accounts_index, change_index, account_index
 
-`m/0'/12345'/4f5b'/8127'/89fc'/606b'/e1b3'/b169'/08db'/13fc'/7a9a'/df7c'/a726'/41f8'/4d75'/b470'/69d3'/d7f0'/app_version'/a'/0/n`
+---
+Dummy data:
+
+EIP#: 12345
+
+personaPath: 0
+
+application's name: foo.bar.eth
+
+uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
+
+app custom path params: app_version set_of_accounts_index, change_index, account_index
+---
+
+`m/0'/12345'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
 
 ## API:
 
