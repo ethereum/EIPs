@@ -68,8 +68,11 @@ Using the BIP 32 and BIP 39 standards, we propose to use the following HD path f
 Where:
 
 `EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. [At this point, I'm not sure if there is a list of alternative standards to BIP44 codes]
+
 `persona path` allows to use applications with different and isolated personas (or in other words accounts) that are tracable by the application. They will still be fully restorable from the same mnemonic.
+
 `application uniquely assigned path` isolate each application along unique branches of the tree through these unique subPath combination.
+
 `app's custom subPath` give freedom to application to use this BIP32 compliant subPath to manage accounts and other needed parameters.
 
 Note that we suggest that each of these indexes, except those belonging to the app's custom subpath, must be hardened to fully isolate the public keys across personas and applications.
