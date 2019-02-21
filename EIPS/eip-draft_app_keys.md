@@ -51,9 +51,10 @@ These new app keys should allow to give more power and flexibility to the crypto
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-### Domains
+### Apps
 
-A domain is an app that would like to request access to app keys, crypto app, eth but not only.
+An app is a website (or other) that would like to request access to app keys, crypto app, eth but not only.
+We map uniquely apps to their domains (ens domain but can be other).
 
 #### Domain's UID
 ens domain
@@ -117,7 +118,7 @@ eth:
 `m/44'/60'/a'/0/n`
 where a is a set of account number and n is the account index
 
-`m/ [EIP#]' / [persona path]' / [domain uid path]' / [domain custom subpath]`
+`m/ [EIP#]' / [persona path]' / [app's domain uid path]' / [app's custom subpath]`
 
 where 
 EIP#, we use a different path than 44 since it's not bip44, not sure if there is a list of alternative standards
@@ -186,6 +187,19 @@ does not seem to really matter which we pick between the 2 decomposition approac
 Maybe favor the one that leads to less indexes, less computations
 alternative has the benefit of being much cleaner, especially for the 256 bits decompositions
 
+### App custom sub path
+
+hdSubPath
+
+with uint under 0x80000000, 31 bits
+
+should follow bip32
+
+can be hardened
+
+can be writen in hex or int
+
+
 ### Example HD paths for app keys:
 EIP#: 12345
 personaPath: 0
@@ -209,15 +223,6 @@ depending on user choice, user will be prompted for signing confirmations or not
 none
 
 ### Ethereum accounts methods:
-hdSubPath
-
-with uint under 0x80000000, 31 bits
-
-should follow bip32
-
-can be hardened
-
-can be writen in hex or int
 
 * appKey_eth_getPublicKey(hdSubPath) returns 64 bytes
 0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
