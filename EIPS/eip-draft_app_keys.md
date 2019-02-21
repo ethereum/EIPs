@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: ERC - App Keys: domain specific accounts
 author: 
-Vincent Eli @Bunjin vincent.eli@gmail.com
+Vincent Eli @Bunjin
 Dan Finlay @DanFinlay
 discussions-to: <URL>
 status: Draft
@@ -135,7 +135,10 @@ Since each derivation step only has 31 bits we will decompose the domain's hash 
 
 if we use an `ENS namehash` 32 bytes, 256 bits
 
-0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0
+foo.bar.eth
+gives a namehash of:
+0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
+
 
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
@@ -144,11 +147,15 @@ where `x0` to `x7` are 30 bits and `x8` 16 bits
 
 equal length would be 16 * 16 bits
 
-or 16 * 2 bytes, cleanest:
+or 16 * 2 bytes, cleanest and favorite spec:
 
-4f5b 8127 89fc 606b e1b3 b169 08db 13fc 7a9a df7c a726 41f8 4d75 b470 69d3 d7f0
-
-
+```
+foo.bar.eth
+0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
+6033 644d 673b 47b3 bea0 4e79 bbe0 6d78 ce76 b8be 2fb8 704f 9c2a 80fd 139c 81d3
+6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'
+24627'/25677'/26427'/18355'/48800'/20089'/48096'/28024'/52854'/47294'/12216'/28751'/39978'/33021'/5020'/33235'
+```
 
 The same reasoning, if we use an `eth address` of 20 bytes, 160 bits
 
