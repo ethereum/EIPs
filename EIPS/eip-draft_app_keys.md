@@ -61,14 +61,9 @@ Once connected to a wallet, an application can request to access a set of accoun
 
 ### HD path
 
-requires BIP 32 and BIP 39
-derives from BIP44 and EIP
-
-We propose to use the following HD path for each app keys:
-
+Using the BIP 32 and BIP 39 standards, we propose to use the following HD path for each app keys:
 
 `m/ [EIP#]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
-
 
 Where:
 
