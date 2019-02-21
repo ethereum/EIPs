@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: GraphQL interface to Ethereum node data
 author: Nick Johnson (@arachnid)
-discussions-to: <email address>
+discussions-to: https://ethereum-magicians.org/t/graphql-interface-to-ethereum-node-data/2710
 status: Draft
 type: Standards Track
 category: Interface
