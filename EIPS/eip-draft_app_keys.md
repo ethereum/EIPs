@@ -203,28 +203,29 @@ Can be extended to several child indexes in order to include the required data s
 ```
 Dummy data:
 EIP#: 12345
-personaPath: 0
+personaPath: 0'
 application's name: foo.bar.eth
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 app custom path params: app_version set_of_accounts_index, change_index, account_index
 ```
 
-`m/0'/12345'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
+`m/12345'/0'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
 
 ## API:
 
 ### App keys exposure:
 
-* `wallet.appkey.enable()`
+* `wallet.appkey.enable(options)`
 
-uses the persona selected by the user (not known nor shared with app)
+[TBD] where `options` is a javascript object containing the permissions requested for these app keys:
+* delegate account creation and signing to application for these keys
+* access and use the local storage under these keys
 
-uses the domain ens namehash (node) that was resolved to load window (not  by app)
+Uses the persona selected by the user (not known nor controllable by application).
 
-depending on user choice, user will be prompted for signing confirmations or not for those app keys
+Uses the domain ens namehash (node) that was resolved to load window (not provided by application itself)
 
-### Global HD methods:
-none
+Depending on user choice, the user will be prompted for signing confirmations or not for those app keys
 
 ### Ethereum accounts methods:
 
@@ -259,7 +260,6 @@ Request Encryption
 
 * `decrypt() [TBD]`
 Request Decryption
-#### cross domain communication / signing
 #### storage
 * `persistInDb(key, data)  [TBD] `:
 Store in MetaMask localdb, specific store for plugin
