@@ -9,7 +9,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2019-02-20
-requires (*optional): BIP32
+requires (*optional): BIP32, EIP137, EIP165, 
 replaces (*optional): <EIP number(s)>
 ---
 
@@ -86,13 +86,26 @@ keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47
 Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
+We thus propose to use the node of each app's domain as a unique identifier for each app.
+
 See alternative specs in rationale below.
 
 #### Domain's authentication
 
 Load window or script through ens resolution
 
-using for instance this resolver.
+using for instance this resolver profile defined in EIP 634 that permits the lookup of arbitrary key-value text data.
+https://eips.ethereum.org/EIPS/eip-634
+
+```
+A new resolver interface is defined, consisting of the following method:
+
+function text(bytes32 node, string key) constant returns (string text);
+The interface ID of this interface is 0x59d1d43c.
+
+The text data may be any arbitrary UTF-8 string. If the key is not present, the empty string must be returned.
+```
+
 
 we either point the name to a string or use metadatafields if it points to an address
 
@@ -211,11 +224,12 @@ app custom path params: (entirely customisable by app under BIP32 standard) app_
 ## API:
 
 ### App keys exposure:
-wallet.appkeys.enable()
 
-uses the persona selected by the user (not shared with app)
+* `wallet.appkey.enable()`
 
-uses the domain ens hash that was resolved to load window
+uses the persona selected by the user (not known nor shared with app)
+
+uses the domain ens namehash (node) that was resolved to load window (not  by app)
 
 depending on user choice, user will be prompted for signing confirmations or not for those app keys
 
@@ -224,43 +238,43 @@ none
 
 ### Ethereum accounts methods:
 
-* appKey_eth_getPublicKey(hdSubPath) returns 64 bytes
+* `appKey_eth_getPublicKey(hdSubPath) returns 64 bytes`
 0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
 
-* appKey_eth_getAddress(hdSubPath) returns 20 bytes
+* `appKey_eth_getAddress(hdSubPath) returns 20 bytes`
 hdSubPath: string
 "index_i / index_(i+1) '", can use hardening
 e.g. 0x9df77328a2515c6d529bae90edf3d501eaaa268e 
 
-* appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes
+* `appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes`
 hdSubPath: string should not be hardened
 
-* appKey_eth_getAddressForPublicKey(publicKey) returns 20 bytes
+* `appKey_eth_getAddressForPublicKey(publicKey) returns 20 bytes`
 publicKey 64 bytes
 
 ### Ethereum signing methods:
 
-* appKey_eth_signTransaction(fromAddress, tx)
+* `appKey_eth_signTransaction(fromAddress, tx)`
 tx is ethereum-js tx object
 
-* appKey_eth_sign(fromAddress, message)
-* appKey_eth_personalSign(fromAddress, message)
-* appKey_eth_signTypedMessage(fromAddress, message)
+* `appKey_eth_sign(fromAddress, message)`
+* `appKey_eth_personalSign(fromAddress, message)`
+* `appKey_eth_signTypedMessage(fromAddress, message)`
 
 ### Other potential methods:
 #### other cryptocurrencies
 #### other crypto
-* **encrypt(uint index, data) return bytes**
+* `encrypt() [TBD]`
 Request Encryption
 
-* **decrypt(uint index, bytes) return data**
+* `decrypt() [TBD]`
 Request Decryption
 #### cross domain communication / signing
 #### storage
-* **persistInDb(key, data)**:
+* `persistInDb(key, data)  [TBD] `:
 Store in MetaMask localdb, specific store for plugin
 
-* **readInDb(key) returns data**:
+* `readInDb(key) returns data [TBD] `:
 
 
 ## Rationale
@@ -352,6 +366,13 @@ BIP 39 tool: https://iancoleman.io/bip39/#english
 BIP 44 for eth: https://github.com/ethereum/EIPs/issues/85, https://github.com/ethereum/EIPs/issues/84
 
 ### ENS:
+EIP137:  Ethereum Domain Name Service - specification
+https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md
+EIP165: Standard Interface Detection
+https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
+EIP634: Storage of text record in ENS
+https://github.com/ethereum/EIPs/blob/master/EIPS/eip-634.md
+ENS docs about namehash:
 http://docs.ens.domains/en/latest/implementers.html#namehash
 
 
