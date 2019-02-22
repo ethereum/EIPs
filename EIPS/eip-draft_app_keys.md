@@ -63,7 +63,7 @@ Once connected to a wallet, an application can request to access a set of accoun
 
 Using the BIP 32 and BIP 39 standards, we propose to use the following HD path for each app keys:
 
-`m/ [EIP#]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
+`m / [EIP#]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
 
 Where:
 
@@ -197,14 +197,14 @@ It does not seem to really matter which method we pick between these 2 decomposi
 
 ### Application customisable  HD sub path
 
-Must follow bip32, with hex under 0x80000000, 31 bits
+Finally, the last part of the hd path is under the application's control. This will allow applications developers to use the HD path structure that best fits their needs. Developers can for instance, among any combination of other parameters they like, choose to include a `version` field if they would like to use different signing accounts when updating to a new version. They can then also manage the user accounts in the way they would like, for instance including or not an index for `sets of accounts` (called `accounts` in BIP44), an index for `change` and an index for `account` (called `address_index` in BIP44).
+We consider that a given child on the HD tree should be called an `account` and not an `address` since it is composed of a private key, a public key and an address.
 
-Can be hardened depending on each application's need
+Similarly to the persona path, this sub path must follow bip32, with hex under 0x80000000, 31 bits.
+It can be hardened depending on each application's needs and can be writen as hex or unsigned integers.
+It can include a large number of indexes.
 
-Can be writen in hex or int
-
-Can be extended to several child indexes in order to include the required data such as `version` for instance.
-
+Q[Should we set a limit on the persona and application customsable hd path number of indexes?]
 
 ### Example HD paths for app keys:
 
@@ -214,7 +214,7 @@ EIP#: 12345
 personaPath: 0'
 application's name: foo.bar.eth
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
-app custom path params: app_version set_of_accounts_index, change_index, account_index
+app custom path params: app_version,yy set_of_accounts_index, change_index, account_index
 ```
 
 `m/12345'/0'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
@@ -223,7 +223,10 @@ app custom path params: app_version set_of_accounts_index, change_index, account
 
 ### App keys exposure:
 
+
+
 * `wallet.appkey.enable(options)`
+This method allows to install app keys (getting user permission to use and allow him to select the persona she would like to use).
 
 [TBD] where `options` is a javascript object containing the permissions requested for these app keys:
 * delegate account creation and signing to application for these keys
@@ -261,25 +264,34 @@ tx is ethereum-js tx object
 * `appKey_eth_signTypedMessage(fromAddress, message)`
 
 ### Other potential methods:
-#### other cryptocurrencies
-#### other crypto
-* `encrypt() [TBD]`
-Request Encryption
 
-* `decrypt() [TBD]`
-Request Decryption
-#### storage
-* `persistInDb(key, data)  [TBD] `:
-Store in MetaMask localdb, specific store for plugin
+#### Other cryptocurrencies
+We defined for now Ethereum accounts and signing methods. However, one could do the same for other cryptocurrencies deriving accounts along their standards. This may open to some very interesting cross-blockchains application designs.
 
-* `readInDb(key) returns data [TBD] `:
+#### Other cryptographic methods
+Similarly, using entropy provided by the HD Path, one could think of other cryptographic methods such as encryption.
+
+#### Storage
+The HD path for each application can also be used as a key to isolate databases for user's persistent data. We could introduce methods that allow to read and write in a database specific to the application.
+
+[Benefit of this compared to using classical browser local storage?]
 
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 ### Isolated paths but customisable
+Persona strict isolation and not known nor computable by the applications
+Application uid deterministic and common knowledge
 
 
+
+### API not exposing private keys
+
+Applications can derive accounts and request signing from them but they will not get access to the private keys of these accounts. So when the user closes her wallet entirely, the application can not continue signing for the user.
+This is of course for control reason.  
+If there is a strong demand, we could add a method that exposes the private keys for the application accounts but it would be an optional to request upon app keys initial setup.
+
+We indeed think that writing applications that don't need to manipulate the user private keys is a better pattern. For instance, if one needs the user to sign data while being offline, one should for instance rather implement a delegation method to an external application's controlled account rather than storing the user private key on a server that stays online.
 
 ### Persona isolation for privacy
 Instead of personas, alternative proposal (make them subsets of ETH main accounts)
@@ -308,7 +320,7 @@ hardened indexes in case some extended public key leaks at some previous level o
 
 However the app can use non hardened indexes in their custom path part to be able to benefit from guessing child public keys from parent one (for instance for counterfactual state channel interaction accross 2 peers that would like to use new keys every time they counterfactually instantiate a new sub app).
 
-### API not exposing private keys
+
 
 ### Alternatives about HD derivation path 
 HD Path: Alternative derivation spec than bip32?
