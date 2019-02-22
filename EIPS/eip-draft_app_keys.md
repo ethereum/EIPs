@@ -350,6 +350,9 @@ If we agree on not using BIP44 but following BIP32 and BIP43, we need to settle 
 
 current pseudo list of used BIP43 purpose codes:
 
+
+| code | Reference                                                                | Title |
+|------|--------------------------------------------------------------------------|-------|
 | 44 | [BIP-0044](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) | Multi-Account Hierarchy for Deterministic Wallets      |
 | 45 | [BIP-0045](https://github.com/bitcoin/bips/blob/master/bip-0045.mediawiki) | Structure for Deterministic P2SH Multisignature Wallets|
 
