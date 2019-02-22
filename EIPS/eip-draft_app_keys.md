@@ -2,8 +2,8 @@
 eip: <to be assigned>
 title: App Keys: app specific accounts
 author: 
-Vincent Eli [@Bunjin](https://github.com/Bunjin)
-Dan Finlay [@DanFinlay](https://github.com/DanFinlay)
+Vincent Eli [Bunjin](https://github.com/Bunjin)
+Dan Finlay [DanFinlay](https://github.com/DanFinlay)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -67,7 +67,7 @@ Using the BIP 32 and BIP 39 standards, we propose to use the following HD path f
 
 Where:
 
-`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. [At this point, I'm not sure if there is a list of alternative standards to BIP44 codes]
+`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. At this point, I'm not sure if there is a list of alternative standards to BIP44 codes, following the purpose code spec of [BIP43(https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
 
 `persona path` allows to use applications with different and isolated personas (or in other words accounts) that are tracable by the application. They will still be fully restorable from the same mnemonic.
 
@@ -329,6 +329,7 @@ Should we allow names that are not .eth domains?  We may want to be able to hand
 No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
 ```
 
+#### Not using a centraly maintened index of application uids
 Replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
 Benefit of our approach:
@@ -405,6 +406,8 @@ https://github.com/ethereum/EIPs/issues/85
 ## Acknowledgements
 MetaMask team
 
+Christian Lundkvist
+
 Liam Horne
 
 Richard Moore
@@ -424,6 +427,8 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 [BIP 39 specs, Mnemonic code for generating deterministic keys:](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
 
+[BIP43: Purpose Field for Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
+
 [BIP44: Multi-Account Hierarchy for Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit)
 
 [SLIP44: Registered coin types for BIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
@@ -434,10 +439,15 @@ https://github.com/ethereum/EIPs/issues/84
 
 https://github.com/ethereum/EIPs/issues/85
 
-https://github.com/ethereum/EIPs/pull/600
 
-Ethereum hierarchy for deterministic wallets - 
-https://github.com/ethereum/EIPs/pull/601
+Draft EIP600 Ethereum purpose allocation for Deterministic Wallets:
+https://github.com/ethereum/EIPs/blob/d5e99145d962b0b6b4c66daaabb598b870d9d0ad/eip-600.md
+
+
+
+
+Draft EIP601 Ethereum hierarchy for deterministic wallets:
+https://github.com/ethereum/EIPs/blob/d8476ef1c861eb578bb6e9057ff52a71f3cd10e4/EIPS/eip-601.md
 
 
 
