@@ -279,7 +279,9 @@ Q [Benefit of this compared to using classical browser local storage?]
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 ### Isolated paths but customisable
 The proposed specifications permit to have isolation between personas and between applications. Each persona / application combination will yield a unique subtree that can be explored by the application using the structure it would like to use.
+
 Personas are known only by the user and its wallet, application' UID based path is computable by everyone from the application's name. And then the application decides and communicates the final levels of the path.
+
 Only the wallet and the user will know the full tree and where we are in the tree (depth, parents). Applications will have knowledge only of the subtree, starting after the persona.
 
 
@@ -292,9 +294,17 @@ If there is a strong demand, we could add a method that exposes the private keys
 We indeed think that writing applications that don't need to manipulate the user private keys is a better pattern. For instance, if one needs the user to sign data while being offline, one should for instance rather implement a delegation method to an external application's controlled account rather than storing the user private key on a server that stays online.
 
 ### Persona isolation for privacy
+
 Persona strict isolation and not known nor computable by the applications
+
+
 Instead of personas, alternative proposal (make them subsets of ETH main accounts)
-[Hd Path of an Eth main Account] / [Domain Specific Hd subPath] / [App controlled HD subPath] / [Account index]
+
+most frequently used eth derivation path
+`m/44'/60'/a'/0/n`
+where a is a set of account number and n is the account index
+
+`[Hd Path of an Eth main Account] / [Application UID based path] / [App controlled HD subPath]`
 
 pros:
 allows to use isolated app paths for the same app using the same mnemonic.
@@ -314,27 +324,29 @@ same benefits of privacy could be implemented by add an user provided field in t
 
 
 ### Hardening for privacy
+
 hardening has benefits for security and privacy if parent extended public key is known, public keys of child of hardened indexes can not be computed.
+
 hardened indexes in case some extended public key leaks at some previous level of the tree, protects the sub trees (of course this has no impact if private keys leak)
 
 However the app can use non hardened indexes in their custom path part to be able to benefit from guessing child public keys from parent one (for instance for counterfactual state channel interaction accross 2 peers that would like to use new keys every time they counterfactually instantiate a new sub app).
 
 
 
-### Alternatives for the HD derivation path 
+### Alternatives for the HD derivation path purpose field
+
 HD Path: Alternative derivation spec than bip32?
+
 HD still but not with hardening?
 
 BIP 44 for eth: 
 https://github.com/ethereum/EIPs/issues/84
+
 https://github.com/ethereum/EIPs/issues/85
 https://github.com/ethereum/EIPs/pull/600
 https://github.com/ethereum/EIPs/pull/601
 not stricly BIP44 because of cointype should be a number between 0 and 2^31.
 
-most frequently used eth derivation path
-`m/44'/60'/a'/0/n`
-where a is a set of account number and n is the account index
 
 We won't be using bip44 here since not a crypto
 and we don't want app keys to be ETH specific
