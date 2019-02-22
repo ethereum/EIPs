@@ -334,14 +334,15 @@ However the app can use non hardened indexes in their custom path part to be abl
 
 
 ### Alternatives for the HD derivation path
-[BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
-Our proposed specification follows BIP32 and BIP43:
+
+Our proposed specification follows [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki):
+
 `m / purpose' / *`
 
 It is of course not be BIP44 compliant which uses the following tree level structure:
 `m / purpose' / coin_type' / account' / change / address_index`
 
-One could think of alternatives specification deviating from BIP43 or even BIP32. Or on the contrary, one could try to become BIP44 compliant, although we do not really see the benefit of that for app keys and it would impose serious limitations on how to identify the applications using potentially the `coin_type` field.
+One could think of alternative specifications deviating from BIP43 or even BIP32. Or on the contrary, one could try to become BIP44 compliant, although we do not really see the benefit of that for app keys and it would impose serious limitations on how to identify the applications using potentially the `coin_type` field.
 
 
 ### Alternatives for the HD derivation path purpose field
