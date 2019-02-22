@@ -82,15 +82,16 @@ Note that we suggest that each of these indexes, except those belonging to the a
 
 We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
 
-We use a string following BIP32 format (can be hardened) to define personas
-with hex under 0x80000000, 31 bits
-e.g. `0'` or `0'/1/2'/0`
+We use a string following BIP32 format (can be hardened) to define personas.
+The indexes should be hex under 0x80000000, 31 bits.
+
+E.g. `0'` or `0'/1/2'/0`
 
 ### Applications' Unique Identifiers
 
-We need a way to uniquely identify each App.
+We need a way to uniquely identify each application.
 
-In our favored spec, each app is uniquely defined and authentified by its name, a domain string. For apps to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the apps' names to be following the .eth standard but they would need to be authentified differently (see below). 
+In our favored spec, each application is uniquely defined and authentified by its name, a domain string. For applications to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the applications' names to be following the .eth standard but they would need to be authentified differently (see below).
 
 There are a few restrictions however on the characters used and normalisation, each name should be passed through the [NamePrep Algorithm](https://tools.ietf.org/html/rfc3491)
 
@@ -135,8 +136,8 @@ We thus propose to use the node of each app's domain as a unique identifier for 
 
 ### Applications' authentication
 
-In the case of our favored specification for apps' UIDs using ENS, we can authenticate the app through ens resolution.
-The ENS can also allow to register and resolve metadata for the app such as `url`, and other parameters.
+In the case of our favored specification for applications' UIDs using ENS, we can authenticate the application through ENS resolution.
+The ENS can also allow to register and resolve metadata for the application such as `url`, and other parameters.
 
 If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the key `url` to point to a website. 
 
@@ -151,31 +152,32 @@ The text data may be any arbitrary UTF-8 string. If the key is not present, the 
 
 One can think of other authentification methods and even use some of them alongside the url-resolution method through ENS. We mention other methods in the [Rationale](#Rationale) section.
 
-We suggest for instance to also add an `authorEthAddress` text  metadata field that can be used to authenticate message from the app, with for instance a sign challenge.
+We suggest for instance to also add an `authorEthAddress` text metadata field that can be used to authenticate messages from the application, with for instance a sign challenge.
 
 ### Applications UID decomposition to get a BIP32 HD path 
 
 Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers.
 
-Let's focus first on the case where for the applications's uid we use an `ENS namehash node` of 32 bytes, 256 bits.
+Let's focus first on the case where for the applications's uid we use an `ENS namehash node` of 32 bytes, 256 bits (removing the leading `0x`).
 
 e.g. `foo.bar.eth` which gives the following namehash node: `0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3`
 
 We can decompose it in several ways, here are 2 potential ways:
 
-* approach that favors having the least indexes
+* The first approach favors an homogenous decomposition:
 
-```
-x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
-```
-where `x0` to `x7` are 30 bits and `x8` 16 bits
+Equal lenght indexes would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favored spec:
 
-* approach that favors an homogenous decomposition:
-equal length would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favored spec:
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8 || x9 || x10 || x11 || x12 || x13 || x14 || x15
+
+where || is concatenation
 ```
+
+
 ```
+E.g. 
+
 foo.bar.eth
 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 6033 644d 673b 47b3 bea0 4e79 bbe0 6d78 ce76 b8be 2fb8 704f 9c2a 80fd 139c 81d3
@@ -183,10 +185,17 @@ foo.bar.eth
 24627'/25677'/26427'/18355'/48800'/20089'/48096'/28024'/52854'/47294'/12216'/28751'/39978'/33021'/5020'/33235'
 ```
 
-It does not seem to really matter which method we pick between these 2 decomposition approaches, there is a trade-off between computational efficiency (having less depth) and having an homegenous decomposition. We tend to favor the second approach with an homogenous decomposition.
+* An alternative approach could favor having the least indexes:
+
+```
+x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
+```
+where `x0` to `x7` are 30 bits and `x8` 16 bits
+
+It does not seem to really matter which method we pick between these 2 decomposition approaches, there is a trade-off between computational efficiency (having less depth) and having an homegenous decomposition. We tend to favor the approach with an homogenous decomposition.
 
 
-### Application custom sub path
+### Application customisable  HD sub path
 
 Must follow bip32, with hex under 0x80000000, 31 bits
 
