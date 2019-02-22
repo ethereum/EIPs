@@ -330,11 +330,10 @@ No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten
 ```
 
 #### Not using a centraly maintened index of application uids
-Replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
-https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
-Benefit of our approach:
-Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
-Englobing (personas among other)
+This EIP potentially replaces [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4)
+
+We think our approach has several benefits, the most important being that it does not require a centrally maintained registry. In our approach every application has already a potential uid assigned to it. Also our EIP is more englobing (personas among other).
 
 #### Alternative application identification specification
 domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
