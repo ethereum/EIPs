@@ -53,13 +53,13 @@ These new app keys can permit to give more power and flexibility to the crypto a
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-### Apps
+### Applications
 
 An app is a website (or other) that would like to request from a wallet to access app keys. It can be any form of cryptography/identity relying application, ethereum but not only.
 
 Once connected to a wallet, an application can request to access a set of accounts derived exclusively for that application using the hierarchical deterministic (HD) paths.
 
-### HD path
+### Applications' HD path
 
 Using the BIP 32 and BIP 39 standards, we propose to use the following HD path for each app keys:
 
@@ -86,7 +86,7 @@ We use a string following BIP32 format (can be hardened) to define personas
 with hex under 0x80000000, 31 bits
 e.g. `0'` or `0'/1/2'/0`
 
-### Apps' Unique Identifiers
+### Applications' Unique Identifiers
 
 We need a way to uniquely identify each App.
 
@@ -96,7 +96,8 @@ There are a few restrictions however on the characters used and normalisation, e
 
 In addition there must be a maximum size to the domain string that we need to determine such that the mapping from strings to nodes remains injective, to avoid collision.
 
-We recommand this standard to be following the [ENS Specs](http://docs.ens.domains/en/latest/implementers.html#namehash), reproduced below for convinience and reference.
+We recommend this standard to be following the [ENS Specs](http://docs.ens.domains/en/latest/implementers.html#namehash), reproduced below for convinience and reference.
+
 ```
 Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
@@ -132,7 +133,7 @@ keccak256(‘eth’) = 0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47
 
 We thus propose to use the node of each app's domain as a unique identifier for each app but one can think of other UIDs, we include some alternative specs in the [Rationale](#Rationale) section below.
 
-### App's authentication
+### Applications' authentication
 
 In the case of our favored specification for apps' UIDs using ENS, we can authenticate the app through ens resolution.
 The ENS can also allow to register and resolve metadata for the app such as `url`, and other parameters.
@@ -152,14 +153,13 @@ One can think of other authentification methods and even use some of them alongs
 
 We suggest for instance to also add an `authorEthAddress` text  metadata field that can be used to authenticate message from the app, with for instance a sign challenge.
 
-### Application UID decomposition to get a BIP32 HD path 
+### Applications UID decomposition to get a BIP32 HD path 
 
-Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers
+Since each child index in an HD path only has 31 bits we will decompose the domain's hash as several child indexes, first as hex bytes then parsed as integers.
 
-If for the domain uid we use an `ENS namehash` of 32 bytes, 256 bits
+Let's focus first on the case where for the applications's uid we use an `ENS namehash node` of 32 bytes, 256 bits.
 
-e.g. `foo.bar.eth` gives namehash
-`0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3`
+e.g. `foo.bar.eth` which gives the following namehash node: `0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3`
 
 We can decompose it in several ways, here are 2 potential ways:
 
@@ -270,7 +270,9 @@ Store in MetaMask localdb, specific store for plugin
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 ### Isolated paths but customisable
 
-### persona isolation for privacy
+
+
+### Persona isolation for privacy
 Instead of personas, alternative proposal (make them subsets of ETH main accounts)
 [Hd Path of an Eth main Account] / [Domain Specific Hd subPath] / [App controlled HD subPath] / [Account index]
 
@@ -291,7 +293,7 @@ same benefits of privacy could be implemented by add an user provided field in t
 ==> personas seem better
 
 
-### hardening for privacy
+### Hardening for privacy
 hardening has benefits for security and privacy if parent extended public key is known, public keys of child of hardened indexes can not be computed.
 hardened indexes in case some extended public key leaks at some previous level of the tree, protects the sub trees (of course this has no impact if private keys leak)
 
@@ -402,6 +404,12 @@ Link to hdkeyring methods
 ## Examples:
 token contract:
 https://github.com/ethereum/EIPs/issues/85
+
+default account for dapps
+https://ethereum-magicians.org/t/default-accounts-for-dapps/904
+
+non wallet/crypto accounts
+[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 
 ## Acknowledgements
 MetaMask team
