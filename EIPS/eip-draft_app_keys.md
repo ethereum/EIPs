@@ -306,7 +306,7 @@ The persona path is set by the user-wallet interaction and known only by them. T
 
 Instead of personas, an alternative proposal would be to make the `application UID based path` a subset of a user's ethereum main accounts)
 
-Most wallets use the following derivation path for Ether accounts:
+Most wallets use the following derivation path for ethereum accounts:
 `m/44'/60'/a'/0/n`
 where a is a set of account number and n is the account index
 
@@ -315,14 +315,14 @@ We could use:
 
 This way, we could use accounts as personas. 
 
-However it does not necessarily make sense to anchor an application to a single main account. Some applications may like to interact with several "main accounts" or allow the user to change the main account they are using to deposit while keeping the same signing `app keys` accounts. 
+However it does not necessarily make sense to anchor an application to a single main account. Some applications may like to interact with several "main accounts" or allow the user to change the main account they are using to deposit while keeping the same signing `app keys` accounts. Some applications may even like to use non ethereum accounts.
 
 Also this alternative specification HD path would not be BIP44 compliant but would be using this purpose field.
-makes this a subset of an ethereum account or should be eventually generalised to non ETH main accounts?
 
 Also it may add complexity to restore a wallet and the used accounts, one should remember which account is associated with which application and application can not suggest you which account to use because they are not aware of this part of the path.
 If we don't harden the level indexes after the main account index, we could however enumerate all app keys of an user given a list a applications. We would first enumerate over the main accounts (assuming the wallet uses an [account gap limit](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit)), then over the Applications list and then over the `Application controlled HD subPath` if it allows to do so and has an account gap limit.
-For persona this may not be possible, unless we impose some structure on the personas such as using a basic index.
+
+For the persona specification this may not be possible, unless we impose some structure on the personas such as using a basic index.
 
 ### Hardened and non-hardened indexes: privacy and functionality
 
@@ -410,34 +410,34 @@ x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
 where `x0` to `x7` are 20 bits.
 
 
+Another alternative could be to use the plain website url and get rid of ens altogether but it would require another way to authenticate applications. See for instance [SLIP-0013](https://github.com/satoshilabs/slips/blob/master/slip-0013.md) for such a proposal.
+
 ### Alternatives for application's authentification
 
-For authentication we use ENS resolution, and browsing to a given url resolved
-With ENS resolution and authentification homoglyph attack is not a problem since it will not leak kees from one domain to another.
+For authentication we use ENS resolution, and browsing to a given url resolved. A few comments on this:
 
-Caveats 
-* First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata param address for ethereum less authentication of the application (eg. application server signs a challenge message with the author address resolved in the ENS metadata)
-* ENS resolution can change without the user knowing and then a different application/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
+* First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata paramater such as `author address` for a blockchain less authentication of the application (e.g. application server signs a challenge message with the author address resolved in the ENS metadata).
+
+* The url the name resolves to through ENS can change without the user knowing and then a different application/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
+
+* Homoglyph attacks are not a bigger problem for `app keys` than it is for ENS since it will not grant access to `app keys` from the real domain (they would be derived along a different path). However homoglyph applications may lure the user to send funds from her main account to an `app key` of a malicious homoglyphic domain.
 
 Other metadata resolution through ENS that can be used alongside:
-* author address: already mentionned above
-* contract address: For app keys that would be designed to interact with a given ethereum contract (for instance app keys for a given token, if one desires to do so), other metadata fields could be used such as contract addresses.
+* `author address`: already mentionned above
+* `contract address`: For app keys that would be designed to interact with a given ethereum contract (for instance app keys for a given token, if one desires to do so), other metadata fields could be used such as contract addresses.
+* [TBD]
 
-Alternative specs could
+In relation to the SLIP-0013 proposal mentionned above, one could think of alternative specifications that would use some certificate for authentification similar to https.
 
+### An Account gap limit standard for application controlled hd sub-path?
 
-### Allowing app keys to derive any subpath and index, even if preivous ones by enumeration are empty
-
-problem: applications won't be able to restore by enumeration
-but if they do that to derive accounts maybe it's on purpose and they may backup this data somewhere
-Also maybe wallets wants to include an address gap limit for the derivation by enumeration when importing
-https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
-
+If applications don't enumerate through their hd sub-path structure, we won't be able to restore `app keys` accounts by enumeration. However it has benefits to give total freedom to applications over the way they create accounts and use their sub-path. Also, it may be safe to assume that the part of the restoring procedure will be carried by the application itself and not by the wallets. The application will need a way to remember what accounts were derived for each user.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-No incompatibity since these are separate accounts
-For applications that registered their user using main accounts eth addresses, they need to have a migration pattern to app keys accounts if desirable.
+From a wallet point of view, there does not seem to be incompatibities since these are separate accounts from those that were used previously by wallets and they are supposed to be used along-side in synergy.
+
+However, for applications that associated in some way their users to their main accounts ethereum addresses may want to reflect on if and how they would like to leverage the power offered by `app keys` to migrate to them and increase their user's privacy, security and potentially also user-flow.
 
 
 
