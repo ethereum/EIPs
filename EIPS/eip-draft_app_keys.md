@@ -452,15 +452,22 @@ Provide some examples of accounts derived from a given mnemonic, persona, applic
 [WIP]
 [See here for an early implementation of the HD methods](https://github.com/MetaMask/KeyringController/blob/plugin-system/index.js)
 
-## Examples:
-token contract:
+## Example use cases:
+
+* token contract:
 https://github.com/ethereum/EIPs/issues/85
 
-default account for dapps
+* default account for dapps
 https://ethereum-magicians.org/t/default-accounts-for-dapps/904
 
-non wallet/crypto accounts
+* non wallet/crypto accounts
 [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+
+* state channel application
+
+* privacy solution
+
+* ...
 
 ## Acknowledgements
 MetaMask team
