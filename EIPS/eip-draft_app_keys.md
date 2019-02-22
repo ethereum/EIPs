@@ -36,9 +36,9 @@ This ERC aims at finding a standard that will fit the needs of wallets and appli
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 Wallets developers have agreed on an HD derivation path for ethereum accounts using BIP32, BIP44, SLIP44, [ERC84](https://github.com/ethereum/EIPs/issues/84). Web3 wallets have implemented in a roughly similar way the rpc eth api. EIP 1102 introduced privacy through non automatic opt-in of a wallet account into an app increasing privacy.
 
-However several limitations remain in order to allow for a proper designs and UX for crypto permissioned apps.
+However several limitations remain in order to allow for proper design and UX for crypto permissioned apps.
 
-Most of UI based current wallets don't allow to:
+Most of GUI based current wallets don't allow to:
 * being able to automatically and effortlessly use different keys / accounts for each apps,
 * being able to sign some app's action without prompting the user with the same level of security as sending funds from their main accounts,
 * being able to use throwable keys to improve anonymity,
