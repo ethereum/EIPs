@@ -2,8 +2,8 @@
 eip: <to be assigned>
 title: App Keys: app specific accounts
 author: 
-Vincent Eli @Bunjin
-Dan Finlay @DanFinlay
+Vincent Eli [@Bunjin](https://github.com/Bunjin)
+Dan Finlay [@DanFinlay](https://github.com/DanFinlay)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -111,7 +111,7 @@ e.g. for foo.bar.eth
 app's uid 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 ```
 
-For referenceHere are the specs of ENS:
+For reference, here are the specs of ENS:
 
 ```
 domain - the complete, human-readable form of a name; eg, ‘vitalik.wallet.eth’.
@@ -163,14 +163,14 @@ e.g. `foo.bar.eth` gives namehash
 
 We can decompose it in several ways, here are 2 potential ways:
 
--approach that favors having the least indexes
+* approach that favors having the least indexes
 
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8
 ```
 where `x0` to `x7` are 30 bits and `x8` 16 bits
 
--approach that favors an homogenous decomposition:
+* approach that favors an homogenous decomposition:
 equal length would be 16 * 16 bits or in other words 16 * 2 bytes, cleanest and favored spec:
 ```
 x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7 || x8 || x9 || x10 || x11 || x12 || x13 || x14 || x15
@@ -183,9 +183,8 @@ foo.bar.eth
 24627'/25677'/26427'/18355'/48800'/20089'/48096'/28024'/52854'/47294'/12216'/28751'/39978'/33021'/5020'/33235'
 ```
 
-does not seem to really matter which we pick between the 2 decomposition approaches,
-Maybe favor the one that leads to less indexes, less computations
-alternative has the benefit of being much cleaner, especially for the 256 bits decompositions
+It does not seem to really matter which method we pick between these 2 decomposition approaches, there is a trade-off between computational efficiency (having less depth) and having an homegenous decomposition. We tend to favor the second approach with an homogenous decomposition.
+
 
 ### Application custom sub path
 
@@ -322,7 +321,7 @@ and we don't want app keys to be ETH specific
 ### Alternatives for App identification 
 
 #### Shortening the ENS node
-Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the change of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
+Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
 
 #### Names not restricted to ens domains?
 Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved differently because ENS does not allow other TLDs.
@@ -385,7 +384,7 @@ https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 No incompatibity since these are separate accounts
-For apps that registered their user using main accounts eth addresses, they need to have a migration pattern to app keys accounts when desirable
+For apps that registered their user using main accounts eth addresses, they need to have a migration pattern to app keys accounts if desirable.
 
 
 
@@ -422,15 +421,21 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 ### HD and mnemonics
 #### BIPS:
 [BIP 32 specs, Hierarchical Deterministic Wallets:](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
+
 [BIP 39 specs, Mnemonic code for generating deterministic keys:](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
+
 [BIP44: Multi-Account Hierarchy for Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit)
+
 [SLIP44: Registered coin types for BIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md)
 
 
 #### Derivation path for eth:
 https://github.com/ethereum/EIPs/issues/84
+
 https://github.com/ethereum/EIPs/issues/85
+
 https://github.com/ethereum/EIPs/pull/600
+
 Ethereum hierarchy for deterministic wallets - 
 https://github.com/ethereum/EIPs/pull/601
 
@@ -439,15 +444,19 @@ https://github.com/ethereum/EIPs/pull/601
 ### ENS:
 EIP137:  Ethereum Domain Name Service - specification
 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md
+
 EIP165: Standard Interface Detection
 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md
+
 EIP634: Storage of text record in ENS
 https://github.com/ethereum/EIPs/blob/master/EIPS/eip-634.md
+
 ENS docs about namehash:
 http://docs.ens.domains/en/latest/implementers.html#namehash
 
 ### Previous proposals related to app keys
 [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+
 https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4
 
 # Notes:
