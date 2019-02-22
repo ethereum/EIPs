@@ -85,7 +85,7 @@ We allow the user to use different personas in combination to her mnemonic to po
 We use a string following BIP32 format (can be hardened) to define personas.
 The indexes should be hex under 0x80000000, 31 bits.
 
-E.g. `0'` or `0'/1/2'/0`
+E.g. `0'` or `0'/1/2'/0` or `1d7b'/a41c'`
 
 ### Applications' Unique Identifiers
 
@@ -204,20 +204,20 @@ Similarly to the persona path, this sub path must follow bip32, with hex under 0
 It can be hardened depending on each application's needs and can be writen as hex or unsigned integers.
 It can include a large number of indexes.
 
-Q[Should we set a limit on the persona and application customsable hd path number of indexes?]
+Q [Should we set a limit on the persona and application customsable hd path number of indexes?]
 
 ### Example HD paths for app keys:
 
 ```
 Dummy data:
 EIP#: 12345
-personaPath: 0'
+personaPath: 0'/712'
 application's name: foo.bar.eth
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
 app custom path params: app_version,yy set_of_accounts_index, change_index, account_index
 ```
 
-`m/12345'/0'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
+`m/12345'/0'/712'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0/0`
 
 ## API:
 
@@ -274,15 +274,15 @@ Similarly, using entropy provided by the HD Path, one could think of other crypt
 #### Storage
 The HD path for each application can also be used as a key to isolate databases for user's persistent data. We could introduce methods that allow to read and write in a database specific to the application.
 
-[Benefit of this compared to using classical browser local storage?]
+Q [Benefit of this compared to using classical browser local storage?]
 
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 ### Isolated paths but customisable
-Persona strict isolation and not known nor computable by the applications
-Application uid deterministic and common knowledge
-
+The proposed specifications permit to have isolation between personas and between applications. Each persona / application combination will yield a unique subtree that can be explored by the application using the structure it would like to use.
+Personas are known only by the user and its wallet, application' UID based path is computable by everyone from the application's name. And then the application decides and communicates the final levels of the path.
+Only the wallet and the user will know the full tree and where we are in the tree (depth, parents). Applications will have knowledge only of the subtree, starting after the persona.
 
 
 ### API not exposing private keys
@@ -294,6 +294,7 @@ If there is a strong demand, we could add a method that exposes the private keys
 We indeed think that writing applications that don't need to manipulate the user private keys is a better pattern. For instance, if one needs the user to sign data while being offline, one should for instance rather implement a delegation method to an external application's controlled account rather than storing the user private key on a server that stays online.
 
 ### Persona isolation for privacy
+Persona strict isolation and not known nor computable by the applications
 Instead of personas, alternative proposal (make them subsets of ETH main accounts)
 [Hd Path of an Eth main Account] / [Domain Specific Hd subPath] / [App controlled HD subPath] / [Account index]
 
@@ -322,7 +323,7 @@ However the app can use non hardened indexes in their custom path part to be abl
 
 
 
-### Alternatives about HD derivation path 
+### Alternatives for the HD derivation path 
 HD Path: Alternative derivation spec than bip32?
 HD still but not with hardening?
 
@@ -341,7 +342,7 @@ We won't be using bip44 here since not a crypto
 and we don't want app keys to be ETH specific
 
 
-### Alternatives for App identification 
+### Alternatives for application's identification 
 
 #### Shortening the ENS node
 Current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
@@ -381,7 +382,7 @@ x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
 ```
 where `x0` to `x7` are 20 bits.
 
-### Alternatives for Application authentification
+### Alternatives for application's authentification
 
 For authentication we use ENS resolution, and browsing to a given url resolved
 With ENS resolution and authentification homoglyph attack is not a problem since it will not leak kees from one domain to another.
