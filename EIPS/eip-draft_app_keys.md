@@ -223,8 +223,6 @@ app custom path params: app_version,yy set_of_accounts_index, change_index, acco
 
 ### App keys exposure:
 
-
-
 * `wallet.appkey.enable(options)`
 This method allows to install app keys (getting user permission to use and allow him to select the persona she would like to use).
 
@@ -287,8 +285,8 @@ Only the wallet and the user will know the full tree and where we are in the tre
 
 ### API not exposing private keys
 
-Applications can derive accounts and request signing from them but they will not get access to the private keys of these accounts. So when the user closes her wallet entirely, the application can not continue signing for the user.
-This is of course for control reason.  
+Applications can derive accounts and request signing from them but they will not get access to the private keys of these accounts. So when the user closes her wallet entirely, the application can not continue signing for the user. This is of course in order to keep an user's ultimate control over its accounts.
+
 If there is a strong demand, we could add a method that exposes the private keys for the application accounts but it would be an optional to request upon app keys initial setup.
 
 We indeed think that writing applications that don't need to manipulate the user private keys is a better pattern. For instance, if one needs the user to sign data while being offline, one should for instance rather implement a delegation method to an external application's controlled account rather than storing the user private key on a server that stays online.
