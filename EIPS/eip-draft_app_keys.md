@@ -67,7 +67,7 @@ Using the BIP 32 and BIP 39 standards, we propose to use the following HD path f
 
 Where:
 
-`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. At this point, I'm not sure if there is a list of alternative standards to BIP44 codes, following the purpose code spec of [BIP43(https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)
+`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. At this point, I'm not sure if there is a list of BIP43 codes of standards following the `purpose` field specification of [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
 
 `persona path` allows to use applications with different and isolated personas (or in other words accounts) that are tracable by the application. They will still be fully restorable from the same mnemonic.
 
@@ -333,23 +333,33 @@ However the app can use non hardened indexes in their custom path part to be abl
 
 
 
+### Alternatives for the HD derivation path
+[BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
+Our proposed specification follows BIP32 and BIP43:
+`m / purpose' / *`
+
+It is of course not be BIP44 compliant which uses the following tree level structure:
+`m / purpose' / coin_type' / account' / change / address_index`
+
+One could think of alternatives specification deviating from BIP43 or even BIP32. Or on the contrary, one could try to become BIP44 compliant, although we do not really see the benefit of that for app keys and it would impose serious limitations on how to identify the applications using potentially the `coin_type` field.
+
+
 ### Alternatives for the HD derivation path purpose field
 
-HD Path: Alternative derivation spec than bip32?
+If we agree on not using BIP44 but following BIP32 and BIP43, we need to settle on a purpose field. We proposed to used the number that will be assigned to this EIP and we should research
 
-HD still but not with hardening?
+current pseudo list of used BIP43 purpose codes:
+| 44 | [BIP-0044](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) | Multi-Account Hierarchy for Deterministic Wallets|
+| 45 | [BIP-0045](https://github.com/bitcoin/bips/blob/master/bip-0045.mediawiki) | Structure for Deterministic P2SH Multisignature Wallets|
 
-BIP 44 for eth: 
-https://github.com/ethereum/EIPs/issues/84
+| 48: [SLIP-0048](https://github.com/satoshilabs/slips/issues/49): Deterministic Key Hierarchy for Graphene-based Networks
+| 49: [BIP-0049](https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki):  Derivation scheme for P2WPKH-nested-in-P2SH based accounts
+| 80: [BIP-0080](https://github.com/bitcoin/bips/blob/master/bip-0080.mediawiki): Hierarchy for Non-Colored Voting Pool Deterministic Multisig Wallets
+| 84: [BIP-0084](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki): Derivation scheme for P2WPKH based accounts
+| 535348: [Ledger app ssh](https://github.com/LedgerHQ/ledger-app-ssh-agent/blob/master/getPublicKey.py#L49)
+| 80475047: [GPG/SSH Ledger](https://github.com/LedgerHQ/ledger-app-openpgp-card/blob/master/doc/developper/gpgcard3.0-addon.rst#deterministic-key-derivation)
 
-https://github.com/ethereum/EIPs/issues/85
-https://github.com/ethereum/EIPs/pull/600
-https://github.com/ethereum/EIPs/pull/601
-not stricly BIP44 because of cointype should be a number between 0 and 2^31.
 
-
-We won't be using bip44 here since not a crypto
-and we don't want app keys to be ETH specific
 
 
 ### Alternatives for application's identification 
