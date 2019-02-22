@@ -336,6 +336,7 @@ Benefit of our approach:
 Does not require a centrally maintained registry. In our approach every app has already a domain assigned to it.
 Englobing (personas among other)
 
+#### Alternative application identification specification
 domain's UID: Alternative spec, eth author address and including a signed message challenge for author for authentication
 0x9df77328a2515c6d529bae90edf3d501eaaa268e
 
@@ -358,14 +359,14 @@ x = x0 || x1 || x2 || x3 || x4 || x5 || x6 || x7
 ```
 where `x0` to `x7` are 20 bits.
 
-### Alternatives for App authentification
+### Alternatives for Application authentification
 
 For authentication we use ENS resolution, and browsing to a given url resolved
 With ENS resolution and authentification homoglyph attack is not a problem since it will not leak kees from one domain to another.
 
 Caveats 
-* First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata param address for ethereum less authentication of the app (eg. app server signs a challenge message with the author address resolved in the ENS metadata)
-* ENS resolution can change without the user knowing and then a different app/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
+* First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata param address for ethereum less authentication of the application (eg. application server signs a challenge message with the author address resolved in the ENS metadata)
+* ENS resolution can change without the user knowing and then a different application/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
 
 Other metadata resolution through ENS that can be used alongside:
 * author address: already mentionned above
@@ -376,7 +377,7 @@ Alternative specs could
 
 ### Allowing app keys to derive any subpath and index, even if preivous ones by enumeration are empty
 
-problem apps won't be able to restore by enumeration
+problem: applications won't be able to restore by enumeration
 but if they do that to derive accounts maybe it's on purpose and they may backup this data somewhere
 Also maybe wallets wants to include an address gap limit for the derivation by enumeration when importing
 https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
@@ -385,7 +386,7 @@ https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#Address_gap_limit
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 No incompatibity since these are separate accounts
-For apps that registered their user using main accounts eth addresses, they need to have a migration pattern to app keys accounts if desirable.
+For applications that registered their user using main accounts eth addresses, they need to have a migration pattern to app keys accounts if desirable.
 
 
 
@@ -471,10 +472,6 @@ https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-tr
 
 # Notes:
 BIP 39 tool: https://iancoleman.io/bip39/#english
-- In Hd Paths, Merge app controlled subset and account index ?
-
-
-- XPubKeys, how do we introduce them? How do we isolate them such that we don't leak a single XPubKey for the whole mnemonic, which would be a big privacy concern and would also remove the benefit of proposal 2 for hd path isolation per main account.
 
 
 json rpc method middleware
