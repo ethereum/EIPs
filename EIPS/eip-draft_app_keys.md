@@ -349,7 +349,8 @@ One could think of alternatives specification deviating from BIP43 or even BIP32
 If we agree on not using BIP44 but following BIP32 and BIP43, we need to settle on a purpose field. We proposed to used the number that will be assigned to this EIP and we should research
 
 current pseudo list of used BIP43 purpose codes:
-| 44 | [BIP-0044](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) | Multi-Account Hierarchy for Deterministic Wallets|
+
+| 44 | [BIP-0044](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) | Multi-Account Hierarchy for Deterministic Wallets      |
 | 45 | [BIP-0045](https://github.com/bitcoin/bips/blob/master/bip-0045.mediawiki) | Structure for Deterministic P2SH Multisignature Wallets|
 
 | 48: [SLIP-0048](https://github.com/satoshilabs/slips/issues/49): Deterministic Key Hierarchy for Graphene-based Networks
