@@ -523,11 +523,11 @@ https://github.com/ethereum/EIPs/blob/d8476ef1c861eb578bb6e9057ff52a71f3cd10e4/E
 
 
 ### ENS:
-[EIP137:  Ethereum Domain Name Service - specification](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md)
+[EIP137:  Ethereum Domain Name Service - specification](https://eips.ethereum.org/EIPS/eip-137)
 
-[EIP165: Standard Interface Detection](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-165.md)
+[EIP165: Standard Interface Detection](https://eips.ethereum.org/EIPS/eip-165)
 
-[EIP634: Storage of text record in ENS](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-634.md)
+[EIP634: Storage of text record in ENS](https://eips.ethereum.org/EIPS/eip-634)
 
 [ENS docs about namehash:](http://docs.ens.domains/en/latest/implementers.html#namehash)
 
