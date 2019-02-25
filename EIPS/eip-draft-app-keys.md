@@ -369,7 +369,7 @@ We did not find a list of BIP43 purpose code so here is what we could gather:
 | 84 | [BIP-0084](https://github.com/bitcoin/bips/blob/master/bip-0084.mediawiki) | Derivation scheme for P2WPKH based accounts |
 | 535348 | [Ledger app ssh](https://github.com/LedgerHQ/ledger-app-ssh-agent/blob/master/getPublicKey.py#L49) | |
 | 80475047| [GPG/SSH Ledger](https://github.com/LedgerHQ/ledger-app-openpgp-card/blob/master/doc/developper/gpgcard3.0-addon.rst#deterministic-key-derivation)| |
-| # | [EIP #](#)| App Keys: application specific wallet accounts  |
+| ??? | EIP Number| App Keys: application specific wallet accounts  | 
 
 
 ### Alternatives for application's identification 
