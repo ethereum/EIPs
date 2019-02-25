@@ -17,11 +17,11 @@ replaces (*optional): EIP 1581
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-Among others cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations. It may also require her to watch some state and be ready to sign data automatically (e.g. sign a state or contest a withdraw in a state channel). The way wallets currently implement accounts poses several obstacles to the development of a complete web3.0 experience both in terms of UX, security and privacy.
+Among others cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations. It may also require her to watch some state and be ready to sign data automatically (e.g. sign a state or contest a withdraw). The way wallets currently implement accounts poses several obstacles to the development of a complete web3.0 experience both in terms of UX, security and privacy.
 
-This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given app. We propose to call them `app keys`. They allow to isolate the accounts used for each application, thus increasing privacy. They also allow to give more control to the applications developpers over account management and signing delegation. For these app keys, wallets can have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally wallet can also implement a different behavior such as allowing to sign transactions without broadcasting them.
+This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given application. We propose to call them `app keys`. They allow to isolate the accounts used for each application, thus increasing privacy. They also allow to give more control to the applications developpers over account management and signing delegation. For these app keys, wallets can have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally wallets can also implement a different behavior such as allowing to sign transactions without broadcasting them.
 
-This new accounts type can allow to significantly improve UX and permit new designs for apps of the crypto permissionned web.
+This new accounts type can allow to significantly improve UX and permit new designs for applications of the crypto permissionned web.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
@@ -244,19 +244,25 @@ Depending on user choice, the user will be prompted for signing confirmations or
 
 ### Ethereum accounts methods:
 
-* `appKey_eth_getPublicKey(hdSubPath) returns 64 bytes`
-0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
+* `appKey_eth_getPublicKey(hdSubPath) returns publicKey 64 bytes`:
 
-* `appKey_eth_getAddress(hdSubPath) returns 20 bytes`
-hdSubPath: string
-"index_i / index_(i+1) '", can use hardening
-e.g. 0x9df77328a2515c6d529bae90edf3d501eaaa268e 
+`hdSubPath` string with BIP32 format, "index_i / index_(i+1) '", can use hardening
 
-* `appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns 64 bytes`
-hdSubPath: string should not be hardened
+`publicKey` returns e.g. 0x80b994e25fb98f69518b1a03e59ddf4494a1a86cc66019131a732ff4a85108fbb86491e2bc423b2cdf6f1f0f4468ec73db0535a1528ca192d975116899289a4b
 
-* `appKey_eth_getAddressForPublicKey(publicKey) returns 20 bytes`
-publicKey 64 bytes
+* `appKey_eth_getAddress(hdSubPath) returns address 20 bytes`:
+
+`hdSubPath`: string with BIP32 format, "index_i / index_(i+1) '", can use hardening
+
+`address` e.g. 0x9df77328a2515c6d529bae90edf3d501eaaa268e 
+
+* `appKey_eth_derivePublicKeyFromParent(parentPublicKey, hdSubPath) returns publicKey 64 bytes`
+
+`hdSubPath`: string with BIP32 format, "index_i / index_(i+1) '", should not use hardening here.
+
+* `appKey_eth_getAddressForPublicKey(publicKey) returns address 20 bytes`
+
+`publicKey` 64 bytes
 
 ### Ethereum signing methods:
 
@@ -467,7 +473,7 @@ https://ethereum-magicians.org/t/default-accounts-for-dapps/904
 
 * privacy solution
 
-* ...
+* non custodian cross cryptocurrency exchange...
 
 ## Acknowledgements
 MetaMask team
