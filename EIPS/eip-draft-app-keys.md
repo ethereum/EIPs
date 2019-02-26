@@ -2,9 +2,9 @@
 eip: <to be assigned>
 title: App Keys: application specific wallet accounts
 author: 
-Vincent Eli [Bunjin](https://github.com/Bunjin)
-Dan Finlay [DanFinlay](https://github.com/DanFinlay)
-discussions-to: <URL>
+Vincent Eli (@Bunjin)
+Dan Finlay (@DanFinlay)
+discussions-to: https://ethereum-magicians.org/t/eip-erc-app-keys-application-specific-wallet-accounts/2742
 status: Draft
 type: Standards Track
 category: ERC
@@ -475,15 +475,7 @@ https://ethereum-magicians.org/t/default-accounts-for-dapps/904
 * non custodian cross cryptocurrency exchange...
 
 ## Acknowledgements
-MetaMask team
-
-Christian Lundkvist
-
-Liam Horne
-
-Richard Moore
-
-Jeff Coleman
+MetaMask team, Christian Lundkvist, Counterfactual team, Liam Horne, Richard Moore, Jeff Coleman.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
