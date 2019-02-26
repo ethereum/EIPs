@@ -4,7 +4,7 @@ title: App Keys: application specific wallet accounts
 author: 
 Vincent Eli (@Bunjin)
 Dan Finlay (@DanFinlay)
-discussions-to: https://ethereum-magicians.org/t/eip-erc-app-keys-application-specific-wallet-accounts/2742
+discussions-to:[Fellowship of Ethereum Magicians](https://ethereum-magicians.org/t/eip-erc-app-keys-application-specific-wallet-accounts/2742)
 status: Draft
 type: Standards Track
 category: ERC
