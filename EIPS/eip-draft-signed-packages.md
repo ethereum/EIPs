@@ -8,7 +8,7 @@ type: ERC
 category (*only required for Standard Track): <Core | Networking | Interface | ERC>
 created: 2019-02-27
 requires (*optional): TBD
-replaces (*optional): -
+replaces (*optional):
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -33,7 +33,7 @@ Ideally, such verifications can be done in a privacy preserving and decentralize
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 `Code Signing` is widely adopted e.g. in the Java Ecosystem. [JAR](https://docs.oracle.com/javase/tutorial/deployment/jar/signing.html) and [Android APK](https://developer.android.com/studio/publish/app-signing) files already have signature standards and are digitally signed to establish additional security mechanisms and prevent e.g. man-in-the-middle attacks.
 Decentralization in software ecosystems means that the code for a build is fetched from many different servers, repositories or sources which requires complex trust models.
-In Web app (and Dapp) development these important security features are missing from almost all distributed packages, registries and package managers (see for example [Node Package Manager (NPM)](www.npmjs.com/)).
+In Web app (and Dapp) development these important security features are missing from almost all distributed packages, registries and package managers (see for example [Node Package Manager (NPM)](http://www.npmjs.com/)).
 
  It would be an option to just propose and "enforce" the adoption of existing signing mechanisms and PKI for the security critical applications we are building (e.g. wallets, clients, signers) and to establish trustworthy, (centrally) organized, and vetted package registries for audited packages. 
  However, the potentially better alternative is to propose and leverage the signing capabilities of Ethereum key pairs and tools from the Ethereum ecosystem and their financial capabilities which has significant advantages over traditional code signing:
