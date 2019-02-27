@@ -383,13 +383,6 @@ We did not find a list of BIP43 purpose code so here is what we could gather:
 
 ### Application's identification 
 
-#### On using a centraly maintened index of application uids
-
-[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
-also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4) proposes a scheme that relies on a list of indexes where application should register (similar to SLIP0044 list for instance).
-
-We think our approach while also being more englobing benefits from not requiring a centrally maintained registry. In our approach every application has already a potential unique identifier assigned to it.
-
 #### Favoring a deterministic scheme for application uids
 
 Quoting Vitalik in his post [Meta: we should value privacy more](https://ethereum-magicians.org/t/meta-we-should-value-privacy-more/2475), we indeed favor a deterministic scheme for applications specific accounts generation:
@@ -397,8 +390,15 @@ Quoting Vitalik in his post [Meta: we should value privacy more](https://ethereu
 ```
 It would be nice to keep wallet software stateless, so users can easily export and import their keys between wallets; this implies using some deterministic scheme like privkey_for_dapp = hash(master_key + dapp_id). But then what is the dapp_id? How would that work for multi-contract dapps?
 ```
-
 And we proposed to use the ENS domain hash, or node, as the dapp_id and to use a BIP32 structure instead to derive the private keys.
+
+#### Alternative: using a centraly maintened index of application uids
+
+[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4) proposes a scheme that relies on a list of indexes where application should register (similar to SLIP0044 list for instance).
+
+We think our approach while also being more englobing benefits from not requiring a centrally maintained registry. In our approach every application has already a potential unique identifier assigned to it.
+
 
 #### Shortening the ENS node
 
