@@ -77,7 +77,7 @@ Note that we suggest that each of these indexes, except those belonging to the a
 
 ### Personas
 
-We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interact with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
+We allow the user to use different personas in combination to her mnemonic to potentially fully isolate her interaction with a given app accross personas. One can use this for instance to create a personal and business profile for a given's domain both backup up from the same mnemonic, using 2 different personnas indexes. The app or domain, will not be aware that it is the same person and mnemonic behind both.
 
 We use a string following BIP32 format (can be hardened) to define personas.
 The indexes should be hex under 0x80000000, 31 bits.
