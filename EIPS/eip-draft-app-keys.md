@@ -478,6 +478,9 @@ Provide some examples of accounts derived from a given mnemonic, persona, applic
 
 ## Example use cases:
 
+* signing transactions without broadcasting them:
+https://github.com/MetaMask/metamask-extension/issues/3475
+
 * token contract:
 https://github.com/ethereum/EIPs/issues/85
 
