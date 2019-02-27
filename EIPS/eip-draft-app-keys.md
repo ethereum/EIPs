@@ -88,7 +88,7 @@ E.g. `0'` or `0'/1/2'/0` or `1d7b'/a41c'`
 
 We need a way to uniquely identify each application.
 
-In our favored spec, each application is uniquely defined and authentified by its name, a domain string. For applications to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the applications' names to be following the .eth standard but they would need to be authentified differently (see below).
+In our favored spec, each application is uniquely defined and authenticated by its name, a domain string. For applications to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the applications' names to be following the .eth standard but they would need to be authenticated differently (see below).
 
 There are a few restrictions however on the characters used and normalisation, each name should be passed through the [NamePrep Algorithm](https://tools.ietf.org/html/rfc3491)
 
@@ -147,7 +147,7 @@ The interface ID of this interface is 0x59d1d43c.
 The text data may be any arbitrary UTF-8 string. If the key is not present, the empty string must be returned.
 ```
 
-One can think of other authentification methods and even use some of them alongside the url-resolution method through ENS. We mention other methods in the [Rationale](#Rationale) section.
+One can think of other authentication methods and even use some of them alongside the url-resolution method through ENS. We mention other methods in the [Rationale](#Rationale) section.
 
 We suggest for instance to also add an `authorEthAddress` text metadata field that can be used to authenticate messages from the application, with for instance a sign challenge.
 
@@ -221,7 +221,7 @@ app custom path params: app_version,yy set_of_accounts_index, account_index
 
 ## API:
 
-We propose to introduce new RPC methods but they should be restricted and wrapped such that some parameters (e.g. domain name) are imposed by the wallet on the caller depending on the caller's authentification.
+We propose to introduce new RPC methods but they should be restricted and wrapped such that some parameters (e.g. domain name) are imposed by the wallet on the caller depending on the caller's authentication.
 
 ### App keys exposure:
 
@@ -406,7 +406,7 @@ Our current approach uses identification through an ENS name converted to a hash
 
 #### Names not restricted to ENS domains?
 
-Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved differently because ENS does not allow other TLDs.
+Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved and authenticated differently because ENS does not allow other TLDs. We can probably design an authentication scheme based on DNS certificates.
 
 ```
 No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
@@ -436,7 +436,7 @@ where `x0` to `x7` are 20 bits.
 
 Another alternative could be to use the plain website url and get rid of ens altogether but it would require another way to authenticate applications. See for instance [SLIP-0013](https://github.com/satoshilabs/slips/blob/master/slip-0013.md) for such a proposal.
 
-### Application's authentification
+### Application's authentication
 
 For authentication we use ENS resolution, and browsing to a given url resolved. A few comments on this:
 
@@ -451,7 +451,7 @@ Other metadata resolution through ENS that can be used alongside:
 * `contract address`: For app keys that would be designed to interact with a given ethereum contract (for instance app keys for a given token, if one desires to do so), other metadata fields could be used such as contract addresses.
 * [TBD]
 
-In relation to the SLIP-0013 proposal mentionned above, one could think of alternative specifications that would use some certificate for authentification similar to https.
+In relation to the SLIP-0013 proposal mentionned above, one could think of alternative specifications that would use some certificate for authentication similar to https.
 
 ### An Account gap limit standard for application controlled hd sub-path?
 
