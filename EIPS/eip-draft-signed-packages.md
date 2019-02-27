@@ -4,10 +4,10 @@ title: Ethereum Signed Packages
 author: Philipp Langhans (@PhilippLgh) <philipp@ethereum.org>
 discussions-to: https://github.com/PhilippLgh/ethereum-signed-packages/issues
 status: Draft
-type: ERC
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+type: Standards Track (Core, Networking, Interface, ERC)
+category (*only required for Standard Track): ERC
 created: 2019-02-27
-requires (*optional): TBD
+requires (*optional):
 replaces (*optional):
 ---
 
