@@ -1,16 +1,14 @@
 ---
 eip: <to be assigned>
 title: App Keys: application specific wallet accounts
-author: 
-Vincent Eli (@Bunjin)
-Dan Finlay (@DanFinlay)
-discussions-to:[Fellowship of Ethereum Magicians](https://ethereum-magicians.org/t/eip-erc-app-keys-application-specific-wallet-accounts/2742)
+author: Vincent Eli (@Bunjin), Dan Finlay (@DanFinlay)
+discussions-to: https://ethereum-magicians.org/t/eip-erc-app-keys-application-specific-wallet-accounts/2742
 status: Draft
 type: Standards Track
 category: ERC
 created: 2019-02-20
-requires (*optional): BIP32, BIP43, EIP137, EIP165, 
-replaces (*optional): EIP 1581
+requires: BIP32, BIP43, EIP137, EIP165 
+replaces: EIP 1581
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
