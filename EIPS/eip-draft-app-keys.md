@@ -230,15 +230,11 @@ This method allows to install app keys (getting user permission to use and allow
 
 may be merged with EIP1102 enable?
 
-[TBD] where `options` is a javascript object containing the permissions requested for these app keys:
-* delegate account creation and signing to application for these keys
-* access and use the local storage under these keys
+[TBD] where `options` is a javascript object containing the permissions requested for these app keys.
 
 Uses the persona selected by the user (not known nor controllable by application).
 
 Uses the domain ens namehash (node) that was resolved to load window (not provided by application itself)
-
-Depending on user choice, the user will be prompted for signing confirmations or not for those app keys
 
 ### Ethereum accounts methods:
 
