@@ -67,7 +67,7 @@ Other exceptional statuses include:
 
 * **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
-* **Active** -- This is similar to Final, but denotes an EIP which which may be updated without changing its EIP number.
+* **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
 * **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
 
 ## What belongs in a successful EIP?
