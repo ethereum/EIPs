@@ -62,11 +62,11 @@ Once connected to a wallet, an application can request to access a set of accoun
 
 Using the BIP 32 and BIP 39 standards, we propose to use the following HD path for each app keys:
 
-`m / [EIP#]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
+`m / [EIP Number]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
 
 Where:
 
-`EIP#` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. At this point, I'm not sure if there is a list of BIP43 codes of standards following the `purpose` field specification of [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
+`EIP Number` is the EIP number that will be assigned to this EIP and we harden it. We use a different path than 44' since it's not bip44 compliant. At this point, I'm not sure if there is a list of BIP43 codes of standards following the `purpose` field specification of [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki).
 
 `persona path` allows to use applications with different and isolated personas (or in other words accounts) that are tracable by the application. They will still be fully restorable from the same mnemonic.
 
@@ -197,7 +197,7 @@ The derivation sub-path would be:
 It does not seem to really matter which method we pick between these 2 decomposition approaches, there is a trade-off between computational efficiency (having less depth) and having an homegenous decomposition. We tend to favor the approach with an homogenous decomposition.
 
 
-### Application customisable  HD sub path
+### Application customisable HD sub path
 
 Finally, the last part of the hd path is under the application's control. This will allow applications developers to use the HD path structure that best fits their needs. Developers can for instance, among any combination of other parameters they like, choose to include a `version` field if they would like to use different signing accounts when updating to a new version. They can then also manage the user accounts in the way they would like, for instance including or not an index for `sets of accounts` (called `accounts` in BIP44), an index for `change` and an index for `account` (called `address_index` in BIP44).
 We consider that a given child on the HD tree should be called an `account` and not an `address` since it is composed of a private key, a public key and an address.
@@ -212,7 +212,7 @@ Q [Should we set a limit on the persona and application customsable hd path numb
 
 ```
 Dummy data:
-EIP#: 12345
+EIP Number: 12345
 personaPath: 0'/712'
 application's name: foo.bar.eth
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
@@ -223,7 +223,8 @@ app custom path params: app_version,yy set_of_accounts_index, account_index
 
 ## API:
 
-RPC methods 
+We propose to introduce new RPC methods but they should be restricted and wrapped such that some parameters (e.g. domain name) are imposed by the wallet on the caller depending on the caller's authentification.
+
 ### App keys exposure:
 
 * `wallet.appkey.enable(options)`
@@ -274,17 +275,27 @@ tx is ethereum-js tx object
 
 ### Other potential methods:
 
-#### Other cryptocurrencies
+#### Other cryptocurrencies:
 We defined for now Ethereum accounts and signing methods. However, one could do the same for other cryptocurrencies deriving accounts along their standards. This may open to some very interesting cross-blockchains application designs.
 
-#### Other cryptographic methods
-Similarly, using entropy provided by the HD Path, one could think of other cryptographic methods such as encryption.
+#### Other cryptographic methods:
+Similarly, using entropy provided by the HD Path, one could think of other cryptographic methods such as encryption and also other curve types.
 
-#### Storage
+
+#### Storage:
 The HD path for each application can also be used as a key to isolate databases for user's persistent data. We could introduce methods that allow to read and write in a database specific to the application.
 
 Q [Benefit of this compared to using classical browser local storage?]
 
+### API permissions and confirmations from users:
+
+#### Initial permission request and full access afterwards:
+
+Each wallet has freedom in the way they implement their permission system along with this EIP and this API. We tend to favor a design where the applications would request once and for all full access to the applications keys (for their domain) and that the user has to confirm this once. From then on, any account derivation or signing for those applications keys will not prompt a confirmation request on the wallet side.
+However applications themselves are free to reproduce some confirmation at their own level if they would like the users to double check the transactions or signatures they are making at the application level. This will be of course dependent on trusting the application code.
+
+#### Paranoia mode:
+However, we would like to give users the option to monitor at any point applications keys and how applications user them. We therefore encourage wallets to introduce a `paranoia mode` that users can activate (for instance in the wallet advanced settings) to force confirmations request for all the applications keys actions.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -372,26 +383,36 @@ We did not find a list of BIP43 purpose code so here is what we could gather:
 | ??? | EIP Number| App Keys: application specific wallet accounts  | 
 
 
-### Alternatives for application's identification 
+### Application's identification 
+
+#### On using a centraly maintened index of application uids
+
+[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
+also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4) proposes a scheme that relies on a list of indexes where application should register (similar to SLIP0044 list for instance).
+
+We think our approach while also being more englobing benefits from not requiring a centrally maintained registry. In our approach every application has already a potential unique identifier assigned to it.
+
+#### Favoring a deterministic scheme for application uids
+
+Quoting Vitalik in his post [Meta: we should value privacy more](https://ethereum-magicians.org/t/meta-we-should-value-privacy-more/2475), we indeed favor a deterministic scheme for applications specific accounts generation:
+
+```
+It would be nice to keep wallet software stateless, so users can easily export and import their keys between wallets; this implies using some deterministic scheme like privkey_for_dapp = hash(master_key + dapp_id). But then what is the dapp_id? How would that work for multi-contract dapps?
+```
+
+And we proposed to use the ENS domain hash, or node, as the dapp_id and to use a BIP32 structure instead to derive the private keys.
 
 #### Shortening the ENS node
 
-Our current approach uses identification through an ENS name converted to a hash node and sliced fully but one could keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to bytes32.
+Our current approach uses identification through an ENS name converted to a hash node and sliced fully but one could potentially keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to hashes.
 
-#### Names not restricted to ens domains?
+#### Names not restricted to ENS domains?
 
 Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved differently because ENS does not allow other TLDs.
 
 ```
 No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
 ```
-
-#### Using a centraly maintened index of application uids
-
-[EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
-also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4) proposes a scheme that relies on a list of indexes where application should register (similar to SLIP0044 list for instance).
-
-We think our approach while also being more englobing benefits from not requiring a centrally maintained registry. In our approach every application has already a potential unique identifier assigned to it.
 
 #### Alternative application identification specification
 
@@ -417,7 +438,7 @@ where `x0` to `x7` are 20 bits.
 
 Another alternative could be to use the plain website url and get rid of ens altogether but it would require another way to authenticate applications. See for instance [SLIP-0013](https://github.com/satoshilabs/slips/blob/master/slip-0013.md) for such a proposal.
 
-### Alternatives for application's authentification
+### Application's authentification
 
 For authentication we use ENS resolution, and browsing to a given url resolved. A few comments on this:
 
@@ -475,7 +496,7 @@ https://ethereum-magicians.org/t/default-accounts-for-dapps/904
 * non custodian cross cryptocurrency exchange...
 
 ## Acknowledgements
-MetaMask team, Christian Lundkvist, Counterfactual team, Liam Horne, Richard Moore, Jeff Coleman.
+MetaMask team, Christian Lundkvist, Counterfactual team, Liam Horne, Erik Bryn, Richard Moore, Jeff Coleman.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
@@ -522,7 +543,9 @@ https://github.com/ethereum/EIPs/blob/d8476ef1c861eb578bb6e9057ff52a71f3cd10e4/E
 
 [ENS docs about namehash:](http://docs.ens.domains/en/latest/implementers.html#namehash)
 
-### Previous proposals related to app keys
+### Previous proposals and discussions related to app keys
+[Meta: we should value privacy more](https://ethereum-magicians.org/t/meta-we-should-value-privacy-more/2475)
+
 [EIP 1581: Non-wallet usage of keys derived from BIP-32 trees](https://eips.ethereum.org/EIPS/eip-1581)
 
 [EIP 1581: discussion](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-derived-from-bip-32-trees/1817/4)
