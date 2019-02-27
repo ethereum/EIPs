@@ -10,7 +10,7 @@ created: 2015-11-15
 
 ### 元信息引用
 
-[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md).
+[Homestead](https://github.com/posa88/EIPs-Chinese/blob/master/EIPS/eip-606.md).
 
 ### 参数
 
