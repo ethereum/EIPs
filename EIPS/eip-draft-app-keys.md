@@ -214,7 +214,7 @@ EIP Number: 12345
 personaPath: 0'/712'
 application's name: foo.bar.eth
 uid: 0x6033644d673b47b3bea04e79bbe06d78ce76b8be2fb8704f9c2a80fd139c81d3
-app custom path params: app_version,yy set_of_accounts_index, account_index
+app custom path params: app_version, set_of_accounts_index, account_index
 ```
 
 `m/12345'/0'/712'/6033'/644d'/673b'/47b3'/bea0'/4e79'/bbe0'/6d78'/ce76'/b8be'/2fb8'/704f'/9c2a'/80fd'/139c'/81d3'/0'/0'/0`
