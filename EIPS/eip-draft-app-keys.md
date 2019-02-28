@@ -228,7 +228,7 @@ We propose to introduce new RPC methods but they should be restricted and wrappe
 * `wallet.appkey.enable(options)`
 This method allows to enable app keys (getting user permission to use and allow him to select the persona she would like to use).
 
-[TBD] Could return the root account public key from the path without the application's subPath. Hence from this one could derive all non hardened childs public keys of the app's keys.
+[TBD] Could return the account public key from the HD path before `the app's custom subPath`. Hence from this app's root account, one could derive all non hardened childs public keys of the app's keys.
 [TBD] where `options` is a javascript object containing the permissions requested for these app keys.
 Options could also include a challenge to be signed by the app's root account (would serve as authentication of the users from the app's perspective)
 
