@@ -17,7 +17,7 @@ replaces: EIP 1581
 
 Among others cryptographic applications, scalability and privacy solutions for ethereum blockchain require that an user performs a significant amount of signing operations. It may also require her to watch some state and be ready to sign data automatically (e.g. sign a state or contest a withdraw). The way wallets currently implement accounts poses several obstacles to the development of a complete web3.0 experience both in terms of UX, security and privacy.
 
-This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given application. We propose to call them `app keys`. They allow to isolate the accounts used for each application, thus increasing privacy. They also allow to give more control to the applications developpers over account management and signing delegation. For these app keys, wallets can have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally wallets can also implement a different behavior such as allowing to sign transactions without broadcasting them.
+This proposal describes a standard and api for a new type of wallet accounts that are derived specifically for a each given application. We propose to call them `app keys`. They allow to isolate the accounts used for each application, thus potentially increasing privacy. They also allow to give more control to the applications developpers over account management and signing delegation. For these app keys, wallets can have a more permissive level of security (e.g. not requesting user's confirmation) while keeping main accounts secure. Finally wallets can also implement a different behavior such as allowing to sign transactions without broadcasting them.
 
 This new accounts type can allow to significantly improve UX and permit new designs for applications of the crypto permissionned web.
 
@@ -58,7 +58,7 @@ Once connected to a wallet, an application can request to access a set of accoun
 
 ### Applications' HD path
 
-Using the BIP 32 and BIP 39 standards, we propose to use the following HD path for each app keys:
+Using the BIP 32 and BIP 43 standards, we propose to use the following HD path for each app keys:
 
 `m / [EIP Number]' / [persona path]' / [application uniquely assigned path]' / [app's custom subpath]`
 
@@ -226,11 +226,11 @@ We propose to introduce new RPC methods but they should be restricted and wrappe
 ### App keys exposure:
 
 * `wallet.appkey.enable(options)`
-This method allows to install app keys (getting user permission to use and allow him to select the persona she would like to use).
+This method allows to enable app keys (getting user permission to use and allow him to select the persona she would like to use).
 
-may be merged with EIP1102 enable?
-
+[TBD] Could return the root account public key from the path without the application's subPath. Hence from this one could derive all non hardened childs public keys of the app's keys.
 [TBD] where `options` is a javascript object containing the permissions requested for these app keys.
+Options could also include a challenge to be signed by the app's root account (would serve as authentication of the users from the app's perspective)
 
 Uses the persona selected by the user (not known nor controllable by application).
 
@@ -266,6 +266,7 @@ tx is ethereum-js tx object
 * `appKey_eth_sign(fromAddress, message)`
 * `appKey_eth_personalSign(fromAddress, message)`
 * `appKey_eth_signTypedMessage(fromAddress, message)`
+EIP712
 
 ### Other potential methods:
 
