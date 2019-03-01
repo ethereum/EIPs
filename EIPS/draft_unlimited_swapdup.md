@@ -1,13 +1,12 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Unlimited SWAP and DUP instructions
-    Author: Alex Beregszaszi
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-07-03
-
+---
+eip: <to be assigned>
+title: Unlimited SWAP and DUP instructions
+author: Alex Beregszaszi (@axic)
+type: Standards Track
+category: Core
+status: Draft
+created: 2017-07-03
+---
 
 ## Abstract
 
