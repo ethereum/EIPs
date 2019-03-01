@@ -1,12 +1,12 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Rename opcodes for clarity
-    Author: Alex Beregszaszi
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-07-28
+---
+eip: <to be assigned>
+title: Rename opcodes for clarity
+author: Alex Beregszaszi (@axic)
+type: Standards Track
+category: Core
+status: Draft
+created: 2017-07-28
+---
 
 ## Abstract
 
