@@ -1,6 +1,6 @@
 ---
 eip: 8
-title: devp2p Forward Compatibility Requirements for Homestead
+title: 家园中devp2p的向前兼容性要求
 author: Felix Lange <felix@ethdev.com>
 status: Final
 type: Standards Track
@@ -8,88 +8,75 @@ category: Networking
 created: 2015-12-18
 ---
 
-### Abstract
+### 摘要
 
-This EIP introduces new forward-compatibility requirements for implementations of the
-devp2p Wire Protocol, the RLPx Discovery Protocol and the RLPx TCP Transport Protocol.
-Clients which implement EIP-8 behave according to Postel's Law:
+这个EIP介绍了实现devp2p总线协议、RLPx发现协议以及RLPx TCP传输协议新的向前兼容性要求。
+实现了EIP-8的客户端行为遵从伯斯塔尔法则:
 
-> Be conservative in what you do, be liberal in what you accept from others.
+> 对待自己的发送行为时要保守，对待接收的内容时要开放。
 
-### Specification
+### 规范
 
-Implementations of **the devp2p Wire Protocol** should ignore the version number of hello
-packets. When sending the hello packet, the version element should be set to the highest
-devp2p version supported. Implementations should also ignore any additional list elements
-at the end of the hello packet.
+实现**devp2p总线协议**应当忽略hello数据包中的版本号。
+当发送hello数据包时，版本号应该设置为devp2p所支持的最高版本。实现还应该忽略hello数据包尾部的任何额外列表元素。
 
-Similarly, implementations of **the RLPx Discovery Protocol** should not validate the
-version number of the ping packet, ignore any additional list elements in any packet, and
-ignore any data after the first RLP value in any packet. Discovery packets with unknown
-packet type should be discarded silently. The maximum size of any discovery packet is
-still 1280 bytes.
+类似的，实现**RLPx发现协议**应当忽略ping数据包中的版本号，忽略任何数据包中的额外列表元素，
+并忽略任何数据包中第一个RLP值后面的任何数据。没有数据包类型的发现协议数据包应当被默默丢弃。
+发现协议数据包的最大尺寸仍然是1280字节。
 
-Finally, implementations of **the RLPx TCP Transport protocol** should accept a new
-encoding for the encrypted key establishment handshake packets. If an EIP-8 style RLPx
-`auth-packet` is received, the corresponding `ack-packet` should be sent using the rules
-below.
+最后**RLPx TCP传输协议**应当接受一个加密密钥建立握手数据包的新编码。如果一个EIP-8风格的RLPx
+`auth-packet`被接收，则对应的`ack-packet`应该用下面的规则来发送。
 
-Decoding the RLP data in `auth-body` and `ack-body` should ignore mismatches of `auth-vsn`
-and `ack-vsn`, any additional list elements and any trailing data after the list. During
-the transitioning period (i.e. until the old format has been retired), implementations
-should pad `auth-body` with at least 100 bytes of junk data. Adding a random amount in
-range [100, 300] is recommended to vary the size of the packet.
+解码`auth-body`和`ack-body`中的RLP数据应当忽略不匹配的`auth-vsn`和`ack-vsn`、任何额外的列表元素以及列表后的任何尾部数据。
+在过渡期间(即 直到旧格式退役)，实现应该在`auth-body`中填充至少100字节的垃圾数据。
+建议添加在[100,300]范围内的随机数量，以变化数据包的大小。
 
 ```text
 auth-vsn         = 4
-auth-size        = size of enc-auth-body, encoded as a big-endian 16-bit integer
+auth-size        = enc-auth-body的大小，使用大端字节顺序(big-endian)16位整数编码
 auth-body        = rlp.list(sig, initiator-pubk, initiator-nonce, auth-vsn)
 enc-auth-body    = ecies.encrypt(recipient-pubk, auth-body, auth-size)
 auth-packet      = auth-size || enc-auth-body
 
 ack-vsn          = 4
-ack-size         = size of enc-ack-body, encoded as a big-endian 16-bit integer
+ack-size         = enc-ack-body的大小，使用大端字节顺序(big-endian)16位整数编码
 ack-body         = rlp.list(recipient-ephemeral-pubk, recipient-nonce, ack-vsn)
 enc-ack-body     = ecies.encrypt(initiator-pubk, ack-body, ack-size)
 ack-packet       = ack-size || enc-ack-body
 
-where
+其中
 
 X || Y
-    denotes concatenation of X and Y.
+    表示X和Y的级联。
 X[:N]
-    denotes an N-byte prefix of X.
+    表示X的n字节前缀。
 rlp.list(X, Y, Z, ...)
-    denotes recursive encoding of [X, Y, Z, ...] as an RLP list.
+    表示[X, Y, Z，…]的递归编码作为RLP列表。
 sha3(MESSAGE)
-    is the Keccak256 hash function as used by Ethereum.
+    是以太坊使用的Keccak256哈希函数
 ecies.encrypt(PUBKEY, MESSAGE, AUTHDATA)
-    is the asymmetric authenticated encryption function as used by RLPx.
-    AUTHDATA is authenticated data which is not part of the resulting ciphertext,
-    but written to HMAC-256 before generating the message tag.
+    是RLPx使用的非对称身份验证加密函数
+    AUTHDATA是经过身份验证的数据，它不是生成的密文的一部分，
+    但是在生成消息标记之前写入HMAC-256。
 ```
 
-### Motivation
+### 目的
 
-Changes to the devp2p protocols are hard to deploy because clients running an older
-version will refuse communication if the version number or structure of the hello
-(discovery ping, RLPx handshake) packet does not match local expectations.
+对devp2p协议的更改很难部署，因为运行较旧的客户端如果发现
+hello(发现协议ping，RLPx握手)数据包版本号或结构的版本与本地期望不符将拒绝通信。
 
-Introducing forward-compatibility requirements as part of the Homestead consensus upgrade
-will ensure that all client software in use on the Ethereum network can cope with future
-network protocol upgrades (as long as backwards-compatibility is maintained).
+引入向前兼容性要求作为Homestead共识升级的一部分将确保以太坊网络上使用的所有
+客户端软件都能应对未来网络协议升级(只要保持向后兼容性)。
 
-### Rationale
+### 基本原理
 
-The proposed changes address forward compatibility by applying Postel's Law (also known as
-the Robustness Principle) throughout the protocol stack. The merit and applicability of
-this approach has been studied repeatedly since its original application in RFC 761. For a
-recent perspective, see
+通过在整个协议栈中应用Postel定律(也称为鲁棒性原则)，所提出的更改解决了向前兼容性问题。
+自该方法在RFC 761中的首次应用以来，人们对其优点和适用性进行了多次研究。关于最近的观点，请参见:
 ["The Robustness Principle Reconsidered" (Eric Allman, 2011)](http://queue.acm.org/detail.cfm?id=1999945).
 
-#### Changes to the devp2p Wire Protocol
+#### 对devp2p总线协议的修改
 
-All clients currently contain statements such as the following:
+所有的客户端当前都包含以下语句:
 
 ```python
 # pydevp2p/p2p_protocol.py
@@ -99,53 +86,39 @@ if data['version'] != proto.version:
     return proto.send_disconnect(reason=reasons.incompatibel_p2p_version)
 ```
 
-These checks make it impossible to change the version or structure of the hello packet.
-Dropping them enables switching to a newer protocol version: Clients implementing a newer
-version simply send a packet with higher version and possibly additional list elements.
+这些检查使得更改hello数据包的版本或结构变得不可能。
+删除它们可以切换到一个新的协议版本:实现一个新版本的客户端只需发送一个具有更高版本并可能包含其他列表元素的数据包。
 
-* If such a packet is received by a node with lower version, it will blindly assume that
-  the remote end is backwards-compatible and respond with the old handshake.
-* If the packet is received by a node with equal version, new features of the protocol can
-  be used.
-* If the packet is received by a node with higher version, it can enable
-  backwards-compatibility logic or drop the connection.
+* 如果一个版本较低的节点接收到这样的数据包，它将默认假设远程端是向后兼容的，并使用旧的握手方式进行响应
+* 如果该数据包被具有相同版本的节点接收，则可以使用协议的新特性。
+* 如果包被具有更高版本的节点接收，它可以启用向后兼容逻辑或删除连接。
 
-#### Changes to the RLPx Discovery Protocol
+#### 对RLPx发现协议的修改
 
-The relaxation of discovery packet decoding rules largely codifies current practice. Most
-existing implementations do not care about the number of list elements (an exception being
-go-ethereum) and do not reject nodes with mismatching version. This behaviour is not
-guaranteed by the spec, though.
+发现包解码规则的放宽在很大程度上规范了当前的实践。大多数现有的实现不关心列表元素
+的数量(go-ethereum是一个例外)，也不拒绝版本不匹配的节点。然而，规范并不保证这种行为。
 
-If adopted, the change makes it possible to deploy protocol changes in a similar manner to
-the devp2p hello change: simply bump the version and send additional information. Older
-clients will ignore the additional elements and can continue to operate even when the
-majority of the network has moved on to a newer protocol.
+如果采用此更改，则可以以类似于devp2p hello更改的方式部署协议更改:只需修改版本并发
+送其他信息。老客户端将忽略其他元素，即使大部分网络已经转移到新协议上，也可以继续操作。
 
-#### Changes to the RLPx TCP Handshake
+#### 对RLPx TCP握手协议的修改
 
-Discussions of the RLPx v5 changes (chunked packets, change to key derivation) have
-faltered in part because the v4 handshake encoding provides only one in-band way to add a
-version number: shortening the random portion of the nonce. Even if the RLPx v5 handshake
-proposal were accepted, future upgrades are hard because the handshake packet is a fixed
-size ECIES ciphertext with known layout.
+关于RLPx v5版本的更改(分组包更改为密钥派生)的讨论已经进展缓慢，部分原因是v4握手编码
+只提供了一种带内方式来添加版本号:缩短nonce的随机部分。即使RLPx v5握手提议被接受，
+未来的升级也是困难的，因为握手数据包是一个具有已知的布局的固定大小的ECIES密文。
 
-I propose the following changes to the handshake packets:
+我建议对握手数据包进行以下更改:
 
-* Adding the length of the ciphertext as a plaintext header.
-* Encoding the body of the handshake as RLP.
-* Adding a version number to both packets in place of the token flag (unused).
-* Removing the hash of the ephemeral public key (it is redundant).
+* 将密文的长度作为明文标题添加。
+* 将握手的body编码为RLP。
+* 在两个数据包中添加一个版本号来代替token标志(未使用)。
+* 删除临时公钥的哈希(它是冗余的)。
 
-These changes make it possible to upgrade the RLPx TCP transport protocol in the same
-manner as described for the other protocols, i.e. by adding list elements and bumping the
-version. Since this is the first change to the RLPx handshake packet, we can seize the
-opportunity to remove all currently unused fields.
+这些更改使RLPx TCP传输协议能够以与其他协议相同的方式进行升级，即添加列表元素并修改版本。
+由于这是对RLPx握手数据包的第一次更改，因此我们可以抓住机会删除所有当前未使用的字段。
 
-Additional data is permitted (and in fact required) after the RLP list because the
-handshake packet needs to grow in order to be distinguishable from the old format.
-Clients can employ logic such as the following pseudocode to handle both formats
-simultaneously.
+在RLP列表之后允许(实际上是必需的)附加数据，因为握手数据包需要增长以便与旧格式区分开来。
+客户端可以使用如下伪代码这样的逻辑来同时处理两种格式。
 
 ```go
 packet = read(307, connection)
@@ -161,54 +134,47 @@ if decrypt(packet) {
 }
 ```
 
-The plain text size prefix is perhaps the most controversial aspect of this document. It
-has been argued that the prefix aids adversaries that seek to filter and identify RLPx
-connections on the network level.
+纯文本的大小前缀可能是本文最具争议的方面。
+有人认为前缀可能会被那些试图过滤和识别网络级RLPx连接的对手利用。
 
-This is largely a question of how much effort the adversary is willing to expense. If the
-recommendation to randomise the lengths is followed, pure pattern-based packet
-recognition is unlikely to succeed.
+这在很大程度上是一个对手愿意付出多大努力的问题。
+如果遵循随机长度的建议，纯基于模式的数据包识别不太可能成功。
 
-* For typical firewall operators, blocking all connections whose first two bytes form an
-  integer in range [300,600] is probably too invasive. Port-based blocking would be
-  a more effective measure to filter most RLPx traffic.
-* For an attacker who can afford to correlate many criteria, the size prefix would ease
-  recognition because it adds to the indicator set. However, such an attacker could also
-  be expected to read or participate in RLPx Discovery traffic, which would be sufficient
-  to enable blocking of RLPx TCP connections whatever their format is.
+* 对于典型的防火墙操作人员来说，阻塞所有前两个字节形成一个范围为[300,600]的整数的
+连接可能太激进了。基于端口的阻塞将是过滤大多数RLPx流量的更有效措施。
+* 对于一个有能力关联很多标准的攻击者,大小前缀将缓解识别,因为它增加了指示符集。
+然而,这样的攻击者也可能去读取或参与RLPx发现流量,这足以阻塞RLPx TCP连接，不管它们是什么格式。
 
-### Backwards Compatibility
+### 向后兼容
 
-This EIP is backwards-compatible, all valid version 4 packets are still accepted.
+这个EIP是向后兼容的，所有的有效版本4种数据包都能接收。
 
-### Implementation
+### 实现
 
 [go-ethereum](https://github.com/ethereum/go-ethereum/pull/2091)
 [libweb3core](https://github.com/ethereum/libweb3core/pull/46)
 [pydevp2p](https://github.com/ethereum/pydevp2p/pull/32)
 
-### Test Vectors
+### 测试向量
 
-#### devp2p Base Protocol
+#### devp2p基础协议
 
-devp2p hello packet advertising version 22 and containing a few additional list elements:
-
+devp2p hello数据包广播版本22并包含一些额外的列表元素。
 ```text
 f87137916b6e6574682f76302e39312f706c616e39cdc5836574683dc6846d6f726b1682270fb840
 fda1cff674c90c9a197539fe3dfb53086ace64f83ed7c6eabec741f7f381cc803e52ab2cd55d5569
 bce4347107a310dfd5f88a010cd2ffd1005ca406f1842877c883666f6f836261720304
 ```
 
-#### RLPx Discovery Protocol
+#### RLPx发现协议
 
-Implementations should accept the following encoded discovery packets as valid.
-The packets are signed using the secp256k1 node key
+实现应该视以下经过编码的发现协议数据包为有效。数据包使用secp256k1节点key进行签名
 
 ```text
 b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291
 ```
 
-ping packet with version 4, additional list elements:
+带额外列表元素的版本4 ping数据包:
 
 ```text
 e9614ccfd9fc3e74360018522d30e1419a143407ffcce748de3e22116b7e8dc92ff74788c0b6663a
@@ -217,7 +183,7 @@ aa3d67d641936511c8f8d6ad8698b820a7cf9e1be7155e9a241f556658c55428ec0563514365799a
 000000000000000000018208ae820d058443b9a3550102
 ```
 
-ping packet with version 555, additional list elements and additional random data:
+带额外列表元素和额外随机数据的版本555 ping数据包:
 
 ```text
 577be4349c4dd26768081f58de4c6f375a7a22f3f7adda654d1428637412c3d7fe917cadc56d4e5e
@@ -230,7 +196,7 @@ d74069a50b902a82c9903ed37cc993c50001f83e82022bd79020010db83c4d001500000000abcdef
 6d922dc3
 ```
 
-pong packet with additional list elements and additional random data:
+带额外列表元素和额外随机数据的pong数据包:
 
 ```text
 09b2428d83348d27cdf7064ad9024f526cebc19e4958f0fdad87c15eb598dd61d08423e0bf66b206
@@ -241,7 +207,7 @@ a355c6010203c2040506a0c969a58f6f9095004c0177a6b47f451530cab38966a25cca5cb58f0555
 42124e
 ```
 
-findnode packet with additional list elements and additional random data:
+带额外列表元素和额外随机数据的findnode数据包:
 
 ```text
 c7c44041b9f7c7e41934417ebac9a8e1a4c6298f74553f2fcfdcae6ed6fe53163eb3d2b52e39fe91
@@ -252,7 +218,7 @@ c7c44041b9f7c7e41934417ebac9a8e1a4c6298f74553f2fcfdcae6ed6fe53163eb3d2b52e39fe91
 dd7fc0c04ad9ebf3919644c91cb247affc82b69bd2ca235c71eab8e49737c937a2c396
 ```
 
-neighbours packet with additional list elements and additional random data:
+带额外列表元素和额外随机数据的neighbours数据包:
 
 ```text
 c679fc8fe0b8b12f06577f2e802d34f6fa257e6137a995f6f4cbfc9ee50ed3710faf6e66f932c4c8
@@ -269,10 +235,10 @@ d96126051913f44582e8c199ad7c6d6819e9a56483f637feaac9448aacf8599020010db885a308d3
 8443b9a355010203b525a138aa34383fec3d2719a0
 ```
 
-#### RLPx Handshake
+#### RLPx握手
 
-In these test vectors, node A initiates a connection with node B.
-The values contained in all packets are given below:
+在这些测试向量中，节点A发起与节点b的连接。
+所有数据包中包含的值如下所示:
 
 ```text
 Static Key A:    49a7b37aa6f6645917e7b807e9d1c00d4fa71f18343b0d4122a4d2df64dd6fee
@@ -283,7 +249,7 @@ Nonce A:         7e968bba13b6c50e2c4cd7f241cc0d64d1ac25c7f5952df231ac6a2bda8ee5d
 Nonce B:         559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd
 ```
 
-(Auth₁)  RLPx v4 format (sent from A to B):
+(Auth₁)  RLPx v4 格式 (从A发送给B):
 ```text
 048ca79ad18e4b0659fab4853fe5bc58eb83992980f4c9cc147d2aa31532efd29a3d3dc6a3d89eaf
 913150cfc777ce0ce4af2758bf4810235f6e6ceccfee1acc6b22c005e9e3a49d6448610a58e98744
@@ -295,7 +261,7 @@ c444f14be226458940d6061c296350937ffd5e3acaceeaaefd3c6f74be8e23e0f45163cc7ebd7622
 a4592ee77e2bd94d0be3691f3b406f9bba9b591fc63facc016bfa8
 ```
 
-(Auth₂) EIP-8 format with version 4 and no additional list elements (sent from A to B):
+(Auth₂) 版本4且没有额外列表元素的EIP-8格式(从A发送给B):
 ```text
 01b304ab7578555167be8154d5cc456f567d5ba302662433674222360f08d5f1534499d3678b513b
 0fca474f3a514b18e75683032eb63fccb16c156dc6eb2c0b1593f0d84ac74f6e475f1b8d56116b84
@@ -310,7 +276,7 @@ c001edaeb5f8a06d2b26fb6cb93c52a9fca51853b68193916982358fe1e5369e249875bb8d0d0ec3
 3bf7678318e2d5b5340c9e488eefea198576344afbdf66db5f51204a6961a63ce072c8926c
 ```
 
-(Auth₃) EIP-8 format with version 56 and 3 additional list elements (sent from A to B):
+(Auth₃) 版本56且带3个额外列表元素的EIP-8格式(从A发送给B):
 ```text
 01b8044c6c312173685d1edd268aa95e1d495474c6959bcdd10067ba4c9013df9e40ff45f5bfd6f7
 2471f93a91b493f8e00abc4b80f682973de715d77ba3a005a242eb859f9a211d93a347fa64b597bf
@@ -326,7 +292,7 @@ f0fce91676fd64c7773bac6a003f481fddd0bae0a1f31aa27504e2a533af4cef3b623f4791b2cca6
 d490
 ```
 
-(Ack₁) RLPx v4 format (sent from B to A):
+(Ack₁) RLPx v4格式 (从B发送给A):
 ```text
 049f8abcfa9c0dc65b982e98af921bc0ba6e4243169348a236abe9df5f93aa69d99cadddaa387662
 b0ff2c08e9006d5a11a278b1b3331e5aaabf0a32f01281b6f4ede0e09a2d5f585b26513cb794d963
@@ -336,7 +302,7 @@ dca6505b7196532e5f85b259a20c45e1979491683fee108e9660edbf38f3add489ae73e3dda2c71b
 d1497113d5c755e942d1
 ```
 
-(Ack₂) EIP-8 format with version 4 and no additional list elements (sent from B to A):
+(Ack₂) 版本4且没有任何额外列表元素的EIP-8格式(从B发送给A):
 ```text
 01ea0451958701280a56482929d3b0757da8f7fbe5286784beead59d95089c217c9b917788989470
 b0e330cc6e4fb383c0340ed85fab836ec9fb8a49672712aeabbdfd1e837c1ff4cace34311cd7f4de
@@ -353,7 +319,7 @@ e754d021bfca14dc989753d61c413d261934e1a9c67ee060a25eefb54e81a4d14baff922180c395d
 5833c2464c805246155289f4
 ```
 
-(Ack₃) EIP-8 format with version 57 and 3 additional list elements (sent from B to A):
+(Ack₃) 版本57且带3个额外列表元素的EIP-8格式:
 ```text
 01f004076e58aae772bb101ab1a8e64e01ee96e64857ce82b1113817c6cdd52c09d26f7b90981cd7
 ae835aeac72e1573b8a0225dd56d157a010846d888dac7464baf53f2ad4e3d584531fa203658fab0
@@ -370,14 +336,14 @@ c8c2c5098dbdd28fca547b3f58c01a424ac05f869f49c6a34672ea2cbbc558428aa1fe48bbfd6115
 35b9593b48b9d3ca4c13d245d5f04169b0b1
 ```
 
-Node B derives the connection secrets for (Auth₂, Ack₂) as follows:
+节点B派生(Auth₂, Ack₂)的连接secrets如下:
 
 ```text
 aes-secret = 80e8632c05fed6fc2a13b0f8d31a3cf645366239170ea067065aba8e28bac487
 mac-secret = 2ea74ec5dae199227dff1af715362700e989d889d7a493cb0639691efb8e5f98
 ```
 
-Running B's `ingress-mac` keccak state on the string "foo" yields the hash
+在字符串"foo"上允许B的`ingress-mac` keccak state会产生以下哈希
 
 ```text
 ingress-mac("foo") = 0c7ec6340062cc46f5e9f1e3cf86f8c8c403c5a0964f5df0ebd34a75ddc86db5
