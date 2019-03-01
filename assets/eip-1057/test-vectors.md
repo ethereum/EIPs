@@ -14,7 +14,7 @@ Many of these vectors are dervived from [chfast/ethash](https://github.com/chfas
 
 For `z`=`362436069`, `w`=`521288629`, `jsr`=`123456789`, and `jcong`=`380116160` the result of each iterative call to `kiss99` is as follows:
 
-| _iteration_ |     _result_ |
+| _iteration_ |     _result_ |kernel
 | ----------: | -----------: |
 |         `1` |  `769445856` |
 |         `2` |  `742012328` |
