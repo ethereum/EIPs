@@ -356,6 +356,13 @@ However the app can use non hardened indexes in their custom path part to be abl
 
 ### Privacy and the funding trail:
 
+If all an application needs to do with its keys is to sign messages and it does not require funding, then this EIP allows for privacy through the use of distinct keys for each application with a simple deterministic standard compatible across wallets.
+
+However if these application keys require funding, there can be trail and the use of app keys would not fully solve the privacy problem there.
+
+Mixers or anonymous ways of funding an ethereum address (ring signatures) along with this proposal would guarantee privacy.
+
+Even if privacy is not solved fully without this anonymous funding method, we still need a way to easily create and restore different accounts/addresses for each application
 
 
 ### Alternatives for the HD derivation path
