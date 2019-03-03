@@ -354,17 +354,6 @@ For instance if we don't harden the application path, in case a persona public k
 
 However the app can use non hardened indexes in their custom path part to be able to benefit from guessing child public keys from parent one (for instance for counterfactual state channel interaction accross 2 peers that would like to use new keys every time they counterfactually instantiate a new sub app).
 
-### Privacy and the funding trail:
-
-If all an application needs to do with its keys is to sign messages and it does not require funding, then this EIP allows for privacy through the use of distinct keys for each application with a simple deterministic standard compatible across wallets.
-
-However if these application keys require funding, there can be trail and the use of app keys would not fully solve the privacy problem there.
-
-Mixers or anonymous ways of funding an ethereum address (ring signatures) along with this proposal would guarantee privacy.
-
-Even if privacy is not solved fully without this anonymous funding method, we still need a way to easily create and restore different accounts/addresses for each application
-
-
 ### Alternatives for the HD derivation path
 
 Our proposed specification follows [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) and [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki):
@@ -416,7 +405,7 @@ also discussed [here](https://ethereum-magicians.org/t/non-wallet-usage-of-keys-
 We think our approach while also being more englobing benefits from not requiring a centrally maintained registry. In our approach every application has already a potential unique identifier assigned to it.
 
 
-#### Shortening the ENS node
+#### Shortening the Hash node
 
 Our current approach uses identification through an ENS name converted to a hash node and sliced fully but one could potentially keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to hashes.
 
@@ -446,8 +435,9 @@ Another alternative could be to use the plain website url and get rid of ens alt
 
 ### Application's authentication
 
-For authentication we use ENS resolution, and browsing to a given url resolved. A few comments on this:
+For authentication we use DNS and ENS resolution, and browsing to a given url resolved. A few comments on this:
 
+A few comments in case of ENS resolution:
 * First connection requires the wallet to connect to ethereum mainnet, but once first resolution is done we could use some metadata paramater such as `author address` for a blockchain less authentication of the application (e.g. application server signs a challenge message with the author address resolved in the ENS metadata).
 
 * The url the name resolves to through ENS can change without the user knowing and then a different application/website may be granted access to his app keys. But this means the ENS name owner address was copromised. This would be similar to using a signing challenge authentified by a known public key. If this known public key is compromised we have a similar problem.
@@ -464,6 +454,17 @@ In relation to the SLIP-0013 proposal mentionned above, one could think of alter
 ### An Account gap limit standard for application controlled hd sub-path?
 
 If applications don't enumerate through their hd sub-path structure, we won't be able to restore `app keys` accounts by enumeration. However it has benefits to give total freedom to applications over the way they create accounts and use their sub-path. Also, it may be safe to assume that the part of the restoring procedure will be carried by the application itself and not by the wallets. The application will need a way to remember what accounts were derived for each user.
+
+
+### Privacy and the funding trail:
+
+If all an application needs to do with its keys is to sign messages and it does not require funding, then this EIP allows for privacy through the use of distinct keys for each application with a simple deterministic standard compatible across wallets.
+
+However if these application keys require funding, there can be trail and the use of app keys would not fully solve the privacy problem there.
+
+Mixers or anonymous ways of funding an ethereum address (ring signatures) along with this proposal would guarantee privacy.
+
+Even if privacy is not solved fully without this anonymous funding method, we still need a way to easily create and restore different accounts/addresses for each application
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
