@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Ethereum Verifiable Claims
 author: Pelle Braendgaard <@pelle>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/erc-1812-ethereum-verifiable-claims/2814
 status: Draft
 type: Standards Track
 category: ERC
@@ -14,7 +14,7 @@ requires: 712
 
 ## Simple Summary
 
-Reuseable Verifiable Claims using [EIP 712 Signed Typed Data](https://github.com/ethereum/EIPs/issues/712).
+Reusable Verifiable Claims using [EIP 712 Signed Typed Data](https://github.com/ethereum/EIPs/issues/712).
 
 ## Abstract
 A new method for Off-Chain Verifiable Claims built on [EIP 712](https://github.com/ethereum/EIPs/issues/712). These Claims can be issued by any user with a EIP 712 compatible web3 provider. Claims can be stored off chain and verified on-chain by Solidity Smart Contracts, State Channel Implementations or off-chain libraries.
