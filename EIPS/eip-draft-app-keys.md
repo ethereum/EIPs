@@ -229,6 +229,8 @@ app custom path params: app_version, set_of_accounts_index, account_index
 
 We propose to introduce new RPC methods but they should be restricted and wrapped such that some parameters (e.g. domain name) are imposed by the wallet on the caller depending on the caller's authentication.
 
+[TBD] Specify scope of RPC methods (some params should be forced to the authenticated domain value) and how to integrate them into web3 api.
+
 ### App keys exposure:
 
 * `wallet.appkey.enable(options)`
