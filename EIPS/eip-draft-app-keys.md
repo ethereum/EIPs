@@ -86,9 +86,11 @@ E.g. `0'` or `0'/1/2'/0` or `1d7b'/a41c'`
 
 ### Applications' Unique Identifiers
 
-We need a way to uniquely identify each application.
+#### Applications Names
 
-In our favored spec, each application is uniquely defined and authenticated by its name, a domain string. For applications to be resolved through the Ethereum Name Service (ENS), they need to be a using a .eth domain name (e.g. foo.bar.eth). Note that the proposed spec does not restrict the applications' names to be following the .eth standard but they would need to be authenticated differently (see below).
+We need a way to uniquely identify each application. We will use a naming and a hashing scheme.
+
+In our favored spec, each application is uniquely defined and authenticated by its name, a domain string. It can be a Domain Name Service DNS name or and Ethereum Name Service ENS name. 
 
 There are a few restrictions however on the characters used and normalisation, each name should be passed through the [NamePrep Algorithm](https://tools.ietf.org/html/rfc3491)
 
@@ -101,7 +103,9 @@ Normalising and validating names
 Before a name can be converted to a node hash using Namehash, the name must first be normalised and checked for validity - for instance, converting fOO.eth into foo.eth, and prohibiting names containing forbidden characters such as underscores. It is crucial that all applications follow the same set of rules for normalisation and validation, as otherwise two users entering the same name on different systems may resolve the same human-readable name into two different ENS names.
 ```
 
-The ENS uses an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function
+#### Hashing and Applications UIDs
+
+The ENS uses an hashing scheme to associate a domain to a unique hash, `node`, through the `namehash` function. We will use this hashing scheme both for ENS and for DNS names.
 
 This gives an unique identifier (UID) of 32 bytes.
 
@@ -133,7 +137,9 @@ We thus propose to use the node of each app's domain as a unique identifier for 
 
 ### Applications' authentication
 
-In the case of our favored specification for applications' UIDs using ENS, we can authenticate the application through ENS resolution.
+If the application is using a DNS name then we simply authenticate the application by using the url of the loaded browser webpage.
+
+For applications using ENS, we can authenticate the application through ENS resolution.
 The ENS can also allow to register and resolve metadata for the application such as `url`, and other parameters.
 
 If we use for instance this resolver profile defined in [EIP 634](https://eips.ethereum.org/EIPS/eip-634) which permits the lookup of arbitrary key-value text data, we can for instance use the key `url` to point to a website. 
@@ -229,8 +235,11 @@ We propose to introduce new RPC methods but they should be restricted and wrappe
 This method allows to enable app keys (getting user permission to use and allow him to select the persona she would like to use).
 
 [TBD] Could return the account public key from the HD path before `the app's custom subPath`. Hence from this app's root account, one could derive all non hardened childs public keys of the app's keys.
+
 [TBD] where `options` is a javascript object containing the permissions requested for these app keys.
-Options could also include a challenge to be signed by the app's root account (would serve as authentication of the users from the app's perspective)
+Options could also include a challenge to be signed by the app's root account (would serve as authentication of the users from the app's perspective). The signature should then be also returned.
+
+Options should also include a parameter for the application to indicate which name should be used to compute the domain's HD path. That's required for applications that are loaded through ENS. They could be authenticated either through ENS or through DNS. These applications may like to use the DNS name even when they are resolved through ENS. (e.g. an application that just upgraded to ENS may like to continue using DNS paths to be retro-compatible for its former users).
 
 Uses the persona selected by the user (not known nor controllable by application).
 
@@ -345,6 +354,9 @@ For instance if we don't harden the application path, in case a persona public k
 
 However the app can use non hardened indexes in their custom path part to be able to benefit from guessing child public keys from parent one (for instance for counterfactual state channel interaction accross 2 peers that would like to use new keys every time they counterfactually instantiate a new sub app).
 
+### Privacy and the funding trail:
+
+
 
 ### Alternatives for the HD derivation path
 
@@ -358,7 +370,7 @@ It is of course not be BIP44 compliant which uses the following tree level struc
 One could think of alternative specifications deviating from BIP43 or even BIP32. Or on the contrary, one could try to become BIP44 compliant, although we do not really see the benefit of that for app keys and it would impose serious limitations on how to identify the applications using potentially the `coin_type` field.
 
 
-### Alternatives for the HD derivation path purpose field
+### HD derivation path purpose field
 
 If we agree on not using BIP44 but following BIP32 and BIP43, we need to settle on a purpose field. We proposed to used the number that will be assigned to this EIP and we should research
 
@@ -400,14 +412,6 @@ We think our approach while also being more englobing benefits from not requirin
 #### Shortening the ENS node
 
 Our current approach uses identification through an ENS name converted to a hash node and sliced fully but one could potentially keep only the first 16 bytes of the node for instance and slice them similarly. This may increase the chance of app collision but we probably can reduce the lenght while retaining an injective mapping from strings to hashes.
-
-#### Names not restricted to ENS domains?
-
-Should we allow names that are not .eth domains?  We may want to be able to handle DNS names for instance without using an ENS proxy (ie. a .eth domain point to a DNS url). They would have to be resolved and authenticated differently because ENS does not allow other TLDs. We can probably design an authentication scheme based on DNS certificates.
-
-```
-No, TLDs are restricted to only .eth (on mainnet), or .eth and .test (on Ropsten), plus any special purpose TLDs such as those required to permit reverse lookups. There are no immediate plans to invite proposals for additional TLDs. In large part this is to reduce the risk of a namespace collision with the IANA DNS namespace.
-```
 
 #### Alternative application identification specification
 
