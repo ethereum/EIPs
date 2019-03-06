@@ -1,0 +1,117 @@
+---
+eip: To be assigned
+title: Precompile for Elliptic Curve Linear Combinations
+discussions-to: https://ethereum-magicians.org/t/ewasm-precompile-for-general-elliptic-curve-math/2581
+status: Draft
+type: Core
+replaces: EIP-196 (in some cases)
+author: Remco Bloemen <Recmo@0x.org>
+created: 2019-03-06
+---
+
+# Precompile for Elliptic Curve Linear Combinations
+
+**Problem.** Currently the EVM only supports `secp261k1` natively and `bn254` through two pre-compiles specified in [EIP-196][eip196]. There are many more elliptic curve that have useful application for integration with existing systems or newly developed curves for zero-knownledge proofs.
+
+## Proposal
+
+Given integers $m, α$ and $β$, scalars $s_i$, and curve points $A_i$ construct the elliptic curve
+
+$$
+y^2 = x^3 + α ⋅ x + β \mod m
+$$
+
+and compute the following
+
+$$
+C = s_0 ⋅ A_0 + s_1 ⋅ A_1 + \cdots + s_n ⋅ A_n
+$$
+
+aka *linear combination*, *inner product*, *multi-multiplication* or even *multi-exponentiation*.
+
+```
+(Cx, Cy) := ecmul(m, α, β,  s0, Ax0, As0, s1, Ax1, As1, ...)
+```
+
+## Gas cost
+
+```
+BASE_GAS = ...
+ADD_GAS  = ...
+MUL_GAS  = ...
+```
+
+The total gas cost is `BASE_GAS` plus `ADD_GAS` for each $s_i$ that is $1$ and `MUL_GAS` for each $s_i > 1$ ($s_0 = 0$ is free).
+
+## Encoding of points
+
+Encode as $(x, y')$ where $s$ is the indicates the wheter $y$ or $-y$ is to be taken. It follows SEC 1 v 1.9 2.3.4, except uncompressed points (`y' = 0x04`) are not supported.
+
+|  $y'$  | $(x, y)$ |
+|--------|-----|
+| `0x00` | Point at infinity |
+| `0x02` | Solution with $y$ even |
+| `0x03` | Solution with $y$ odd |
+
+Conversion from affine coordinates to compressed coordinates is trivial: `y' = 0x02 | (y & 0x01)`.
+
+## Special cases
+
+**Coordinate recovery.** Set $s_0 = 1$. The output will be the recovered coordinates of $A_0$.
+
+**On-curve checking.** Do coordinate recovery and compare $y$ coordinate.
+
+**Addition.** Set $s_0 = s_1 = 1$, the output will be $A_0 + A_1$.
+
+**Doubling.** Set $s_0 = 2$. The output will be $2 ⋅ A_0$. (Note: under current gas model this may be more costly than self-addition!)
+
+**Scalar multiplication.** Set only $s_0$ and $A_0$.
+
+**Modular square root.** Set $α = s_0 = A = 0$ the output will have $\mathtt{Cy}^2 = β \mod m$.
+
+## Rationale
+
+**Generic Field and Curve.** Many important optimizations are independent of the field and curve used. Some missed specific optimizations are:
+
+* Reductions specific to the binary structure of the field prime.
+* Precomputation of Montgomery factors.
+* Precomputation of multiples of certain popular points like the generator.
+* Special point addition/doubling [formulas][formulas] for $α = -3$, $α = -1$, $α = 0$, $β = 0$.
+
+
+[formulas]: http://www.hyperelliptic.org/EFD/g1p/auto-shortw.html
+
+TODO: The special cases for $α$ and $β$ might be worth implementing and offered a gas discount.
+
+**Compressed Coordinates.** Compressed coordinates allow contract to work with only $x$ coordinates and sign bytes. It also prevents errors around points not being on-curve. Conversion to compressed coordinates is trivial.
+
+**Linear Combination.** We could instead have a simple multiply $C = r ⋅ A$. In this case we would need a separate pre-compile for addition. In addtion, a linear combination allows for optimizations that like Shamir's trick that are not available in a single scalar multiplication. ECDSA requires $s_0 ⋅ A_0 + s_1 ⋅ A_1$ and would benfit from this.
+
+The BN254 (aka alt_bn8) multiplication operation introduced by the [EIP-196][eip196] precompile only handles a single scalar multiplication. The missed performance is such that for two or more points it is cheaper to use EVM, as pratically demonstrated by [Weierstrudel][ws].
+
+[eip196]: https://eips.ethereum.org/EIPS/eip-196
+[ws]: https://medium.com/aztec-protocol/huffing-for-crypto-with-weierstrudel-9c9568c06901
+
+**Variable Time Math.** When called during a transaction, there is no assumption of privacy and no mittigations for side-channel attacks are necessary.
+
+**Prime Fields.** This EIP is for fields of large characteristic. It does not cover Binary fields and other fields of non-prime characteristic.
+
+**256-bit modulus.** This EIP is for field moduli less than $2^{256}$. This covers many of the popular curves while still having all parameters fit in a single EVM word.
+
+TODO: Consider a double-word version. 512 bits would cover all known curves except E-521. In particular it will cover the NIST P-384 curve used by the Estonian e-Identity and the BLS12-381 curve used by [ZCash Sappling][sappling].
+
+[sappling]: https://z.cash/blog/new-snark-curve/
+
+**Short Weierstrass Curves.** This EIP is for fields specified in short Weierstrass form. While any curve can be converted to short Weierstrass form through a [substitution of variables][cov], this misses out on the performance advantages of those specific forms.
+
+[cov]: https://safecurves.cr.yp.to/equation.html
+
+## Edge cases
+
+* Non-prime moduli or too small modulus
+* Field elements larger than modulus
+* Curve has singular points ($4 α^3 + 27 β^2 = 0$)
+* Invalid sign bytes
+* x coordinate not on curve
+* Returning the point at infinity
+* (Please add if you spot more)
