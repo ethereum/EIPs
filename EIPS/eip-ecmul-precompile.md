@@ -140,6 +140,12 @@ TODO: Consider a double-word version. 512 bits would cover all known curves exce
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
+There will be a reference implementation in Rust based on the existing libraries (in particular those by ZCash and The Matter Inc.).
+
+The reference implementation will be production grade and compile to a native library with a C api and a webassembly version. Node developers are encouraged to use the reference implementation.
+
+The webassembly version will specifically be suitable for use as a eWasm based precompile.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
