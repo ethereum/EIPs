@@ -4,16 +4,30 @@ title: Precompile for Elliptic Curve Linear Combinations
 discussions-to: https://ethereum-magicians.org/t/ewasm-precompile-for-general-elliptic-curve-math/2581
 status: Draft
 type: Core
-replaces: EIP-196 (in some cases)
+replaces: EIP-196 (in some cases), EIP 665, EIP 1108 (partially)
 author: Remco Bloemen <Recmo@0x.org>
 created: 2019-03-06
 ---
 
 # Precompile for Elliptic Curve Linear Combinations
 
-**Problem.** Currently the EVM only supports `secp261k1` natively and `bn254` through two pre-compiles specified in [EIP-196][eip196]. There are many more elliptic curve that have useful application for integration with existing systems or newly developed curves for zero-knownledge proofs.
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-## Proposal
+Currently the EVM only supports `secp261k1` in a limited way through `ecrecover` and `bn254` through three pre-compiles. There are draft proposals to add more curves. There are many more elliptic curve that have useful application for integration with existing systems or newly developed curves for zero-knownledge proofs.
+
+This EIP adds a precompile that allows whole classes of curves to be used.
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+
+A precompile that takes a curve and computes a linear combination of curve points.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 Given integers $m, α$ and $β$, scalars $s_i$, and curve points $A_i$ construct the elliptic curve
 
@@ -33,7 +47,7 @@ aka *linear combination*, *inner product*, *multi-multiplication* or even *multi
 (Cx, Cy) := ecmul(m, α, β,  s0, Ax0, As0, s1, Ax1, As1, ...)
 ```
 
-## Gas cost
+### Gas cost
 
 ```
 BASE_GAS = ...
@@ -43,7 +57,7 @@ MUL_GAS  = ...
 
 The total gas cost is `BASE_GAS` plus `ADD_GAS` for each $s_i$ that is $1$ and `MUL_GAS` for each $s_i > 1$ ($s_0 = 0$ is free).
 
-## Encoding of points
+### Encoding of points
 
 Encode as $(x, y')$ where $s$ is the indicates the wheter $y$ or $-y$ is to be taken. It follows SEC 1 v 1.9 2.3.4, except uncompressed points (`y' = 0x04`) are not supported.
 
@@ -55,7 +69,7 @@ Encode as $(x, y')$ where $s$ is the indicates the wheter $y$ or $-y$ is to be t
 
 Conversion from affine coordinates to compressed coordinates is trivial: `y' = 0x02 | (y & 0x01)`.
 
-## Special cases
+### Special cases
 
 **Coordinate recovery.** Set $s_0 = 1$. The output will be the recovered coordinates of $A_0$.
 
@@ -69,7 +83,18 @@ Conversion from affine coordinates to compressed coordinates is trivial: `y' = 0
 
 **Modular square root.** Set $α = s_0 = A = 0$ the output will have $\mathtt{Cy}^2 = β \mod m$.
 
+### Edge cases
+
+* Non-prime moduli or too small modulus
+* Field elements larger than modulus
+* Curve has singular points ($4 α^3 + 27 β^2 = 0$)
+* Invalid sign bytes
+* x coordinate not on curve
+* Returning the point at infinity
+* (Please add if you spot more)
+
 ## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 **Generic Field and Curve.** Many important optimizations are independent of the field and curve used. Some missed specific optimizations are:
 
@@ -106,12 +131,15 @@ TODO: Consider a double-word version. 512 bits would cover all known curves exce
 
 [cov]: https://safecurves.cr.yp.to/equation.html
 
-## Edge cases
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
-* Non-prime moduli or too small modulus
-* Field elements larger than modulus
-* Curve has singular points ($4 α^3 + 27 β^2 = 0$)
-* Invalid sign bytes
-* x coordinate not on curve
-* Returning the point at infinity
-* (Please add if you spot more)
+## Test Cases
+<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+
+## Implementation
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
