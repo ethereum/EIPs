@@ -4,7 +4,7 @@ title: Precompile for Elliptic Curve Linear Combinations
 discussions-to: https://ethereum-magicians.org/t/ewasm-precompile-for-general-elliptic-curve-math/2581
 status: Draft
 type: Core
-replaces: EIP-196 (in some cases), EIP 665, EIP 1108 (partially)
+replaces: EIP-196 (in some cases), EIP 665, EIP 1108 (partially), https://github.com/ethereum/EIPs/issues/603
 author: Remco Bloemen <Recmo@0x.org>
 created: 2019-03-06
 ---
