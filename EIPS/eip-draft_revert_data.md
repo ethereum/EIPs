@@ -1,13 +1,14 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Data structure for the REVERT instruction
-    Author: Alex Beregszaszi
-    Type: Standard Track
-    Category: ERC
-    Status: Draft
-    Created: 2017-02-06
-    Requires: (`REVERT` EIP)
+---
+eip: 207
+title: Data structure for the REVERT instruction
+author: Alex Beregszaszi (@axic)
+discussions-to: 
+type: Standards Track
+category: ERC
+status: Draft
+created: 2017-02-06
+requires: 140
+---
 
 ## Simple Summary
 
