@@ -1,13 +1,13 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Rent Collection for Blockchain Data
-    Author: Daniel A. Nagy <daniel@ethereum.org>, Zsolt Felfoldi <zsolt@ethereum.org>
-    Type: Standard Track
-    Category: Core
-    Status: Draft
-    Created: 2017-11-01
-
+---
+eip: 755
+title: Rent Collection for Blockchain Data
+author: Daniel A. Nagy <daniel@ethereum.org>, Zsolt Felfoldi <zsolt@ethereum.org>
+discussions-to: 
+status: Draft
+type: Standards Track
+category: Core
+created: 2017-11-01
+---
 
 ## Simple Summary
 Introducing a way to collect rent from accounts that is proportional 
