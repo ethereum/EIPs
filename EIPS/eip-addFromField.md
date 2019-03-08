@@ -1,12 +1,13 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Separating transaction signer from transaction deployer
-    Author: Alex Van de Sande
-    Type: ERC
-    Status: Draft
-    Created: 2018-02-09
-
+---
+eip: 877
+title: Separating transaction signer from transaction deployer
+author: Alex Van de Sande (@alexvandesande)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2018-02-09
+---
 
 ## Simple Summary
 
