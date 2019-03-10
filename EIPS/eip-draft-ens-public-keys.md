@@ -1,15 +1,15 @@
-## Preamble
+---
+eip: <to be assigned>
+title: Storage of SECP256k1 public keys in ENS
+author: Nick Johnson <nick@ethereum.org>
+discussions-to: https://github.com/ethereum/EIPs/issues/620
+status: Draft
+type: Standards Track
+category: ERC
+created: 2017-05-01
+Requires: 137
+---
 
-    EIP: <to be assigned>
-    Title: Storage of SECP256k1 public keys in ENS
-    Author: Nick Johnson <nick@ethereum.org>
-    Type: Standard Track
-    Category ERC
-    Status: Draft
-    Created: 2017-05-01
-    Requires: 137
-    Discussions-To: https://github.com/ethereum/EIPs/issues/620
-    
 ## Abstract
 This EIP defines a resolver profile for ENS that permits the lookup of SECP256k1 public keys. This is necessary in order to facilitate ENS lookup for applications such as Whisper.
 
