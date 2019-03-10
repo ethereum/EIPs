@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1682
 title: Storage Rent
 author: Felix J Lange (@fjl), Martin Holst Swende (@holiman)
 discussions-to: <URL>
