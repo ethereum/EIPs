@@ -1,14 +1,14 @@
-## Preamble
-
-    EIP: <to be assigned>
-    Title: Extended mnemonic codes
-    Author: Nick Johnson <nick@ethereum.org>, Micah Zoltu
-    Type: Standard Track
-    Category: ERC
-    Status: Draft
-    Created: 2017-04-13
-    Requires: eip-draft-hdwallets
-
+---
+eip: <to be assigned>
+title: Extended mnemonic codes
+author: Nick Johnson <nick@ethereum.org>, Micah Zoltu (@MicahZoltu)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2017-04-13
+requires: eip-draft-hdwallets
+---
 
 ## Abstract
 
