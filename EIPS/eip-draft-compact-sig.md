@@ -15,9 +15,9 @@ This proposal describes a compact representation of an Ethereum Signature.
 ## Abstract
 
 The secp256k1 curve permits the computation of the public key of signed
-digest when coupled with the signature, which is used implicitly to
+digest when coupled with a signature, which is used implicitly to
 establish the origin of an EOA-based transaction as well as on-chain in
-EVM contracts for example, in meta-transactions.
+EVM contracts for example, in meta-transactions and multi-sig contracts.
 
 Currently signatures require 65 bytes to represent, which when aligned
 to 256-bit words, requires 96 bytes (with 31 zero bytes injected). With
