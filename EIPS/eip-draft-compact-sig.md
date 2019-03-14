@@ -139,7 +139,7 @@ let contract = new Contract(address, abi, wallet);
     console.log("  Gas Used:", receipt.gasUsed.toString());
 
     console.log("Compact:");
-    tx = await contract.recoverCompact(hash, sig.r, sig.s);
+    tx = await contract.recoverCompact(hash, sig.r, sig._vs);
     console.log("  Hash:    ", tx.hash);
     console.log("  Data:    ", tx.data);
     console.log("  Length:  ", utils.hexDataLength(tx.data));
