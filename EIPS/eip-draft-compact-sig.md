@@ -1,0 +1,178 @@
+---
+eip: 1
+title: EIP Compact Signature Representation
+status: Draft
+type: Informational
+author: Richard Moore <me@ricmoo.com>
+created: 2019-03-14
+---
+
+## Simply Summary
+
+This proposal describes a compact representation of an Ethereum Signature.
+
+
+## Abstract
+
+The secp256k1 curve permits the computation of the public key of signed
+digest when coupled with the signature, which is used implicitly to
+establish the origin of an EOA-based transaction as well as on-chain in
+EVM contracts for example, in meta-transactions.
+
+Currently signatures require 65 bytes to represent, which when aligned
+to 256-bit words, requires 96 bytes (with 31 zero bytes injected). With
+compact signatures, this can be reduced to 64 bytes, which remains 64
+bytes when word-aligned.
+
+
+## Motivation
+
+The motivations for a compact representation are to simplify handling
+transactions in client code, reduce gas costs and reduce transaction sizes.
+
+
+## Specification
+
+A secp256k1 signature is made up of 3 parameters, `r`, `s` and `v`. The `r`
+represents the `x` component on the curve (from which the `y` can be
+computed), and the `s` represents the challenge solution for signing by a
+private key. Due to the symmetric nature of an elliptic curve, a `v` is
+required, which indicates which of the 2 possible solutions was intended,
+by indicating its parity (odd-ness), 
+
+Two key observation are required to create a compact representation.
+
+First, the `v` parameter is always either 0 or 1 (canonically the values used
+have been 27 and 28, as these values didn't collide with other binary prefixes
+used in Bitcoin.)
+
+Second, the top bit of the `s` parameters is **always** 0, due to the use of
+canonical signatures which flip the solution parity to prevent negative values.
+
+So, we can use the top bit in the `s` parameter to store `v`.
+
+```python
+def to_compact(r, s, v):
+    return {
+        "r": r,
+        "vs": ((v - 27) << 255) | s
+    }
+
+def to_canonical(r, vs):
+    return {
+        "r": r,
+        "s": vs & ((1 << 255) - 1),
+        "v": (27 + (vs >> 255))
+    }
+```
+
+See:
+  - https://twitter.com/nicksdjohnson/status/1030830279487709185
+  - https://github.com/HarryR/solcrypto/blob/01a3c5d91053f3b8bffde328146d5f18015ebfed/contracts/ECDSA.sol#L6
+
+
+## Rationale
+
+How is rationale different than motivation?
+
+
+## Backwards Compatibility
+
+The Compact Representation does not collide with canonical signature as
+it usess 2 parameters (r, vs) while canonical signatures involve 3
+separate parameters (r, s, v).
+
+
+## Test Cases
+
+**Solidity**
+
+```
+// See: https://ropsten.etherscan.io/address/0xce826fbc499e3723df5668ea90a4bc51aeca13b8
+
+pragma solidity 0.5.6;
+
+contract TestCompact {
+    address _lastAddr;
+    
+    function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public returns (address) {
+         _lastAddr = ecrecover(hash, v, r, s);
+    }
+
+    function recoverCompact(bytes32 hash, bytes32 r, bytes32 vs) public returns (address) {
+        bytes32 s = vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+        uint8 v = 27 + uint8(uint256(vs) >> 255);
+        _lastAddr = ecrecover(hash, v, r, s);
+    }
+    
+    function lastAddr() public view returns (address) {
+        return _lastAddr;
+    }
+
+}
+```
+
+**JavaScript**
+
+```
+let address = "0xcE826fbC499e3723DF5668Ea90a4BC51AeCa13b8";
+let abi = [
+  'function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public returns (address)',
+  'function recoverCompact(bytes32 hash, bytes32 r, bytes32 vs) public returns (address)',
+  'function lastAddr() public view returns (address)'
+];
+let wallet = Wallet.fromMnemonic("relief cousin sorry cabin burst frog slush flavor pitch tragic hip disagree").connect(provider);
+
+let hash = "0x6ac9e083f46825a57816e023ae641ee45ac9b82cc2c370c10ec1ef4c835fa182";
+let sig = wallet.signingKey.signDigest(hash)
+
+let contract = new Contract(address, abi, wallet);
+(async function() {
+    let tx, receipt;
+
+    console.log("Canonical:");
+    tx = await contract.recover(hash, sig.v, sig.r, sig.s);
+    console.log("  Hash:    ", tx.hash);
+    console.log("  Data:    ", tx.data);
+    console.log("  Length:  ", utils.hexDataLength(tx.data));  
+    receipt = await tx.wait();
+    console.log("  Gas Used:", receipt.gasUsed.toString());
+
+    console.log("Compact:");
+    tx = await contract.recoverCompact(hash, sig.r, sig.s);
+    console.log("  Hash:    ", tx.hash);
+    console.log("  Data:    ", tx.data);
+    console.log("  Length:  ", utils.hexDataLength(tx.data));
+    receipt = await tx.wait();
+    console.log("  Gas Used:", receipt.gasUsed.toString());
+})();
+```
+
+
+**Result**
+
+```
+/home/ricmoo> ethers --network ropsten run test.js 
+Canonical:
+  Hash:     0x3280985011d2f25e76141681e865216e796cf065880eb9dd1f8221f3243028d2
+  Data:     0xc2bf17b06ac9e083f46825a57816e023ae641ee45ac9b82cc2c370c10ec1ef4c835fa182000000000000000000000000000000000000000000000000000000000000001be95b1a8633ee7ff851f68cf4303030b1e2596d686cafd9803cef74919a9139291c492d05696da754cf342bec961d00d9f7dfac3ab90b1e9352177c7b9bfa2a5d
+  Length:   132
+  Gas Used: 37541
+Compact:
+  Hash:     0x513bd8bd8710a84903235ca60591fc60f2f3db524d14cc1b6874edc628512176
+  Data:     0x1230abb66ac9e083f46825a57816e023ae641ee45ac9b82cc2c370c10ec1ef4c835fa182e95b1a8633ee7ff851f68cf4303030b1e2596d686cafd9803cef74919a9139291c492d05696da754cf342bec961d00d9f7dfac3ab90b1e9352177c7b9bfa2a5d
+  Length:   100
+  Gas Used: 37329
+```
+
+
+## Implementations
+
+The ethers.js library will support this in v5; currently in the signature._vs
+property, but should be considered an internal property that may change at
+discretion of the community.
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
