@@ -81,6 +81,10 @@ Why this 5M20 model:
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+* > Once a predetermined number of coins have entered
+circulation, the incentive can transition entirely to transaction fees and be completely inflation
+free. [6. Intentive. Bitcoin White Paper](https://bitcoin.org/bitcoin.pdf)
+* [ECIP-2017](https://github.com/ethereumproject/ECIPs/blob/master/ECIPs/ECIP-1017.md)
 
 
 ## Implementation
