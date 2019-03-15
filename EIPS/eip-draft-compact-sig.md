@@ -3,7 +3,7 @@ eip: 1
 title: EIP Compact Signature Representation
 status: Draft
 type: Informational
-author: Richard Moore <me@ricmoo.com>
+author: Richard Moore <me@ricmoo.com>, Nick Johnson <nick@ethereum.org>
 created: 2019-03-14
 ---
 
@@ -67,13 +67,15 @@ def to_canonical(r, vs):
 ```
 
 See:
-  - https://twitter.com/nicksdjohnson/status/1030830279487709185
-  - https://github.com/HarryR/solcrypto/blob/01a3c5d91053f3b8bffde328146d5f18015ebfed/contracts/ECDSA.sol#L6
+  - [Original Tweet from Nick](https://twitter.com/nicksdjohnson/status/1030830279487709185)
+  - [Original Solidity Inspiration](https://github.com/HarryR/solcrypto/blob/01a3c5d91053f3b8bffde328146d5f18015ebfed/contracts/ECDSA.sol#L6)
 
 
 ## Rationale
 
-How is rationale different than motivation?
+The compact representation propsed is simple to both compose and decompose
+in clients and in Solidity, so that it can be easily (and intuitively) supported,
+while reducing transaction sizes and gas costs.
 
 
 ## Backwards Compatibility
