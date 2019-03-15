@@ -67,7 +67,7 @@ def to_canonical(r, vs):
 ```
 
 See:
-  - [Original Tweet from Nick](https://twitter.com/nicksdjohnson/status/1030830279487709185)
+  - [Original Tweet from Nick and conversation](https://twitter.com/nicksdjohnson/status/1030830279487709185)
   - [Original Solidity Inspiration](https://github.com/HarryR/solcrypto/blob/01a3c5d91053f3b8bffde328146d5f18015ebfed/contracts/ECDSA.sol#L6)
 
 
