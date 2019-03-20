@@ -458,3 +458,6 @@ Block 100,000,000:
 - `header` - `49e15ba4bf501ce8fe88765403bd0f848e19cff5c50ba5c0d6210ddb16250ec3`
 - `mix_hash` - `ac452084d6f4e6eacf4282ad58dbd4ce7ef2653fb5e6b5c877f56928c907432a`
 - `final_hash` - `b879f84923e71b812ef5a42ece0b5b9366c31cab218f40afe65f8a2cae448a6f`
+
+### 0.9.3
+[Machine-readable data](../assets/eip-1057/test-vectors-0.9.3.json)
