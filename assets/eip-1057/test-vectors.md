@@ -336,6 +336,9 @@ loop 1 are as follows.
 
 ## progPowHash
 
+### 0.9.2
+[Machine-readable data](../assets/eip-1057/test-vectors-0.9.2.json)
+
 Block 30000:
 
 - `prog_seed` - 600
