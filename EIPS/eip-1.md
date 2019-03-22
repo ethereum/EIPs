@@ -58,11 +58,11 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
   * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed.
 * **Last Call** -- This EIP will listed prominently on the https://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
   * :x: -- A Last Call which results in material changes or substantial unaddressed technical complaints will cause the EIP to revert to Draft.
-  * :arrow_right: Accepted (Core EIPs only) -- A successful Last Call without material changes or unaddressed technical complaints will become Accepted.
+  * :arrow_right: Accepted (Core EIPs only) -- This EIP is in the hands of the Ethereum client developers. 
   * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed technical complaints will become Final.
 * **Accepted (Core EIPs only)** -- This EIP is in the hands of the Ethereum client developers.  Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
   * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and adopted by the community, the status will be changed to “Final”.
-* **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
+* **Final (Not core EIPs)** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
 Other exceptional statuses include:
 
