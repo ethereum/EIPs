@@ -1,11 +1,11 @@
 ---
-eip: <to be assigned>
+eip: 1872
 title: Ethereum Network Upgrade Windows
 author: Danno Ferrin (@shemnon)
 discussions-to: https://ethereum-magicians.org/t/eip-ethereum-network-upgrade-windows/
 status: Draft
 type: Meta
-created: 2018-03-25 <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: 2018-03-25 
 ---
 
 ## Simple Summary
