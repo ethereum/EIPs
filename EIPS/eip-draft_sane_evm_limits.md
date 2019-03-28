@@ -23,36 +23,50 @@ and can reduce the effort needed to create consensus critical test cases by elim
 
 If `block.number >= {FORK_BLOCK}`, the following value ranges are introduced:
 
-- *gas* - 64 bit signed number
-- *block gas limit* - 64 bit signed number
-- *block number* - 64 bit unsigned number
-- *account address* - 160 bit value
-- *timestamp* - 64 bit unsigned number
+- *gas* - 64-bit signed number
+- *block gas limit* - 64-bit signed number
+- *block number* - 64-bit unsigned number
+- *account address* - 160-bit value
+- *timestamp* - 64-bit unsigned number
+- *buffer sizes* - 32-bit unsigned number
+
+### Protocol changes
+
+### EVM changes
+
+List of affected EVM opcodes:
+- address
+- balance
+- origin
+- caller
+- callvalue
+- calldatasize
+- codesize
+- gasprice
+- extcodesize
+- returndatasize
+- coinbase
+- timestamp
+- number
+- gaslimit
+- msize
+- gas
+- create
+- create2
 
 As a result the behaviour of the following EVM opcodes are altered as stated:
 
-1) `GAS` (`0xf3`) - can only return
+1) `GAS` (`0xf3`) - can only return a 64-bit value
 
-2) `NUMBER` (`0xf3`)
+2) `NUMBER` (`0xf3`) - can only return a 64-bit value
 
-3) `TIMESTAMP`
+3) `TIMESTAMP` - can only return a 64-bit value
 
-4) `BLOCKGAS`
+4) `BLOCKGAS` - can only return a 64-bit value
 
 5) `CALL` / `CALLGAS` / `DELEGATECALL` / `STATICCALL`
 
-If `block.number >= BYZANTIUM_FORK_BLKNUM`, add two new opcodes and amend the semantics of any opcode that creates a new call frame (like `CALL`, `CREATE`, `DELEGATECALL`, ...) called call-like opcodes in the following. It is assumed that the EVM (to be more specific: an EVM call frame) has a new internal buffer of variable size, called the return data buffer. This buffer is created empty for each new call frame. Upon executing any call-like opcode, the buffer is cleared (its size is set to zero). After executing a call-like opcode, the complete return data (or failure data, see [EIP-140](./eip-140.md)) of the call is stored in the return data buffer (of the caller), and its size changed accordingly. As an exception, `CREATE` and `CREATE2` are considered to return the empty buffer in the success case and the failure data in the failure case. If the call-like opcode is executed but does not really instantiate a call frame (for example due to insufficient funds for a value transfer or if the called contract does not exist), the return data buffer is empty.
-
-
-In EVM the
-
-    evmc_uint256be tx_gas_price;     /**< The transaction gas price. */
-    evmc_address tx_origin;          /**< The transaction origin account. */
-    evmc_address block_coinbase;     /**< The miner of the block. */
-    int64_t block_number;            /**< The block number. */
-    int64_t block_timestamp;         /**< The block timestamp. */
-    int64_t block_gas_limit;         /**< The block gas limit. */
-    evmc_uint256be block_difficulty; /**< The block difficulty. */
+TBD.
 
 ## Rationale
 
