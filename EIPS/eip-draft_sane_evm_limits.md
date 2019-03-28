@@ -12,23 +12,26 @@ created: 2018-08-01
 ## Abstract
 
 Introduce an explicit value range for certain protocol and EVM parameters (such as gas limits, block number, block timestamp, size field when returning/copying data within EVM).
-Some of these already have an implicit value range due to various reasons.
+Some of these already have an implicit value range due to various (practical) reasons.
 
 ## Motivation
 
 Having such an explicit value range can help in creating compatible client implementations, in certain cases it can also offer minor speed improvements,
-and can reduce the effort needed to create consensus critical test cases.
+and can reduce the effort needed to create consensus critical test cases by eliminating
 
 ## Specification
 
 If `block.number >= {FORK_BLOCK}`, the following value ranges are introduced:
 
 - *gas* - 64 bit signed number
-- *block number* - 
+- *block gas limit* - 64 bit signed number
+- *block number* - 64 bit unsigned number
+- *account address* - 160 bit value
+- *timestamp* - 64 bit unsigned number
 
 As a result the behaviour of the following EVM opcodes are altered as stated:
 
-1) `GAS` (`0xf3`)
+1) `GAS` (`0xf3`) - can only return
 
 2) `NUMBER` (`0xf3`)
 
@@ -62,7 +65,7 @@ These limits have been:
 - allowed by certain test cases in the [Ethereum testing suite]
 - and implicitly also allowed by certain assumptions, such as due to gas limits some of these values cannot grow past a certain limit
 
-Most of the limits proposed in this document have been previously explored and tested in [EVM].
+Most of the limits proposed in this document have been previously explored and tested in [EVMC].
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
