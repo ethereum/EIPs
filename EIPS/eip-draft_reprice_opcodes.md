@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Opcode repricing 
 author: Martin Holst Swende (@holiman)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/opcode-repricing/3024
 status: Draft
 type: Core
 created: 2019-03-28
