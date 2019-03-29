@@ -1,7 +1,8 @@
 ---
 eip: <to be assigned>
-title: Opcode repricing 
+title: Opcode repricing for trie-size-dependent opcodes 
 author: Martin Holst Swende (@holiman)
+category: Core
 discussions-to: https://ethereum-magicians.org/t/opcode-repricing/3024
 status: Draft
 type: Core
@@ -53,14 +54,14 @@ At block `N`,
 
 Here are two charts, taken from a full sync using geth. The execution time was measured for every opcode, and aggregated for 10K blocks. These bar charts show the top 25 'heavy' opcodes in the ranges 5M to 6M and 6M to 7M:
 
-![bars1](images/run3.total-bars-5.png) 
-![bars2](images/run3.total-bars-6.png) 
+![bars1](../assets/eip-1884/run3.total-bars-5.png) 
+![bars2](../assets/eip-1884/run3.total-bars-6.png) 
 
 Note: It can also be seen that the `SLOAD` moves towards the top position. The `GASPRICE` opcode has position one which I believe can be optimized away within the client -- which is not the case with `SLOAD`/`BALANCE`.
 
 Here is another chart, showing a full sync with geth. It represents the blocks `0` to `5.7M`, and highlights what the block processing time is spent on.
 
-![geth](images/geth_processing.png)
+![geth](../assets/eip-1884/geth_processing.png)
 
 It can be seen that `storage_reads` and `account_reads` are the two most significant factors contributing to the block processing time. 
 
@@ -70,7 +71,7 @@ It can be seen that `storage_reads` and `account_reads` are the two most signifi
 The following graph shows a go-ethereum full sync, where each data point represents
  10K blocks. During those 10K blocks, the execution time for the opcode was aggregated.
 
-![graph](images/SLOAD-run3.png)
+![graph](../assets/eip-1884/SLOAD-run3.png)
 
 It can be seen that the repricing at [EIP-150][eip-150] caused a steep drop, from around `67` to `23`. 
 Around block `5M`, it started reaching pre-[EIP-150][eip-150] levels, and at block `7M` 
@@ -84,7 +85,7 @@ state clearing efforts are implemented before that happens.
 
 `BALANCE` (a.k.a `EXTBALANCE`) is an operation which fetches data from the state trie. It was repriced at [EIP-150][eip-150] from `20` to `400`.
 
-![graph](images/BALANCE-run3.png)
+![graph](../assets/eip-1884/BALANCE-run3.png)
 
 It is comparable to `EXTCODESIZE` and `EXTCODEHASH`, which are priced at `700` already. 
 
