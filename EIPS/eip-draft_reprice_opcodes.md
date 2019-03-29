@@ -15,18 +15,18 @@ This EIP proposes repricing certain opcodes, to obtain a good balance between ga
 
 ## Abstract
 
-The growth of the Ethereum state has caused certain opcodes to be more resorce-intensive at this point than 
-they previously were. This EIP proposes to raise the `gasCost` for those opcodes. 
+The growth of the Ethereum state has caused certain opcodes to be more resource-intensive at this point than 
+they were previously. This EIP proposes to raise the `gasCost` for those opcodes.
 
 ## Motivation
 
 An imbalance between the price of an operation and the resource consumption (CPU time, memory etc)
 has several drawbacks:
 
-- It could be used for attacks, by filling blocks with underpriced operations which causes excessive block processing time
-- Underpriced opcodes causes a skewed block gas limit, where somtimes blocks finish quickly but other blocks with similar gas finish slowly. 
+- It could be used for attacks, by filling blocks with underpriced operations which causes excessive block processing time.
+- Underpriced opcodes cause a skewed block gas limit, where sometimes blocks finish quickly but other blocks with similar gas use finish slowly.
 
-If operations are well balanced, we can maximise the block gaslimit and have a more stable processing time. 
+If operations are well-balanced, we can maximise the block gaslimit and have a more stable processing time.
 
 ## Specification
 
@@ -35,7 +35,7 @@ If operations are well balanced, we can maximise the block gaslimit and have a m
 At block `N`, 
 
 - The `SLOAD` operation changes from `200` to `800` gas,
-- The `BALANCE` operation changes from `400` to `700` gas,
+- The `BALANCE` operation changes from `400` to `700` gas.
 
 
 ### Version B
@@ -46,7 +46,7 @@ At block `N`,
 - The `BALANCE` operation changes from `400` to `700` gas,
 - A new opcode, `SELFBALANCE` is introduced at `0x46`. 
   - `SELFBALANCE` pops `0` arguments off the stack, 
-  - `SELFBALANCE` pushes the `balance` of the current address to the stack
+  - `SELFBALANCE` pushes the `balance` of the current address to the stack,
   - `SELFBALANCE` is priced as `GasFastStep`, at `5` gas. 
 
 ## Rationale
@@ -66,14 +66,14 @@ It can be seen that `storage_reads` and `account_reads` are the two most signifi
 
 ### `SLOAD`
 
-`SLOAD` was repriced at EIP 150, from `50` to `200`. 
+`SLOAD` was repriced at [EIP-150][eip-150], from `50` to `200`. 
 The following graph shows a go-ethereum full sync, where each data point represents
  10K blocks. During those 10K blocks, the execution time for the opcode was aggregated.
 
 ![graph](images/SLOAD-run3.png)
 
-It can be seen that the repricing at EIP 150 caused a steep drop, from around `67` to `23`. 
-Around block `5M`, it started reaching pre-eip150 levels, and at block `7M` 
+It can be seen that the repricing at [EIP-150][eip-150] caused a steep drop, from around `67` to `23`. 
+Around block `5M`, it started reaching pre-[EIP-150][eip-150] levels, and at block `7M` 
 it was averaging on around `150` - more than double pre-eip-150 levels. 
 
 Increasing the cost of `SLOAD` by `4` would bring it back down to around `40`. 
@@ -82,7 +82,7 @@ state clearing efforts are implemented before that happens.
 
 ### `BALANCE` 
 
-`BALANCE` (a.k.a `EXTBALANCE`) is an operation which fetches data from the state trie. It was repriced at Eip 150 from `20` to `400`. 
+`BALANCE` (a.k.a `EXTBALANCE`) is an operation which fetches data from the state trie. It was repriced at [EIP-150][eip-150] from `20` to `400`.
 
 ![graph](images/BALANCE-run3.png)
 
@@ -95,9 +95,9 @@ In hindsight, it might have been a better choice to have two
 opcodes: `EXTBALANCE(address)` and `SELFBALANCE`, and have two different prices. 
 
 * Specification (A) does not extend the current opcode set, thus the safest alternative is to set the price at the worst-case basis.
-* Specification B extends the current opcode set. 
+* Specification (B) extends the current opcode set.
   * Unfortunately, the opcode span `0x3X` is already full, hence the suggestion to place `SELFBALANCE` in the `0x4X` range.  
-  * As for why it is priced at `5` (`GasFastStep`) instead of `2` (`GasQuickStep`), like other similar operations: The reason is that the EVM execution engine still needs a lookup into the (cached) trie, and `balance`, unlike `gasPrice` or `timeStamp`, is not constant during the execution, so it has a bit more inherent overhead. 
+  * As for why it is priced at `5` (`GasFastStep`) instead of `2` (`GasQuickStep`), like other similar operations: the EVM execution engine still needs a lookup into the (cached) trie, and `balance`, unlike `gasPrice` or `timeStamp`, is not constant during the execution, so it has a bit more inherent overhead. 
 
 
 
@@ -105,20 +105,20 @@ opcodes: `EXTBALANCE(address)` and `SELFBALANCE`, and have two different prices.
 
 The changes require a hardfork. The changes have the following consequences:
 
-- Certain calls will become more expensive. 
-- Contracts that assume a certain fixed gas cost for calls (or internal sections) may cease to function. 
+- Certain calls will become more expensive.
+- Contracts that assume a certain fixed gas cost for calls (or internal sections) may cease to function.
   - However, these operations have already been repriced earlier, so there is a historical precedent that 'the gascost for these operations may change', which should have prevented such fixed-gas-cost assumptions from being implemented.
 
-I expect that certain patterns will be less used, for example the use of multiple modifiers which `SLOAD`s the same opcode will be merged into one. It may also lead to less `log` operations containing `SLOAD`:ed values that are not strictly necessary. 
+I expect that certain patterns will be less used, for example the use of multiple modifiers which `SLOAD`s the same opcode will be merged into one. It may also lead to less `log` operations containing `SLOAD`ed values that are not strictly necessary.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 
-No testcases are implemented as of yet. 
+No test cases are implemented as of yet.
 
 ## Implementation
 
-Both these opcodes have been repriced before, and the client internals for managing reprices are already in place. 
+Both these opcodes have been repriced before, and the client internals for managing reprices are already in place.
 
 ### Specification B
 
@@ -136,8 +136,10 @@ func opSelfBalance(pc *uint64, interpreter *EVMInterpreter, contract *Contract, 
 ## Security considerations
 
 - See backwards compatibility section. 
-- There are no special edgecases regarding `SELFBALANCE`, if we define it as `BALANCE` with `address` instead of popping an address from the stack -- since `BALANCE` is already well defined. 
-- It should be investigated if solidity contains any hardcoded expectations on the gas cost of these operations. 
+- There are no special edgecases regarding `SELFBALANCE`, if we define it as `BALANCE` with `address` instead of popping an address from the stack -- since `BALANCE` is already well-defined.
+- It should be investigated if solidity contains any hardcoded expectations on the gas cost of these operations.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+[eip-150]: https://eips.ethereum.org/EIPS/eip-150
