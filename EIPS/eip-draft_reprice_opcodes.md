@@ -70,7 +70,7 @@ It can be seen that `storage_reads` and `account_reads` are the two most signifi
 The following graph shows a go-ethereum full sync, where each data point represents
  10K blocks. During those 10K blocks, the execution time for the opcode was aggregated.
 
-![graph](images/SLOAD_run3.png)
+![graph](images/SLOAD-run3.png)
 
 It can be seen that the repricing at EIP 150 caused a steep drop, from around `67` to `23`. 
 Around block `5M`, it started reaching pre-eip150 levels, and at block `7M` 
@@ -84,7 +84,7 @@ state clearing efforts are implemented before that happens.
 
 `BALANCE` (a.k.a `EXTBALANCE`) is an operation which fetches data from the state trie. It was repriced at Eip 150 from `20` to `400`. 
 
-![graph](images/BALANCE_run3.png)
+![graph](images/BALANCE-run3.png)
 
 It is comparable to `EXTCODESIZE` and `EXTCODEHASH`, which are priced at `700` already. 
 
