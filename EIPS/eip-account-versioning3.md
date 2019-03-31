@@ -1,0 +1,70 @@
+---
+eip: <to be assigned>
+title: Contract-based Account Versioning
+author: Wei Tang (@sorpaas)
+discussions-to: https://github.com/sorpaas/EIPs/issues/4
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-01-17
+---
+
+## Simple Summary
+
+Provide an alternative proposal compared with EIP-1702 / ECIP-1040 /
+EIP-1707, with the following advantages:
+
+* We don't need to modify existing account state format.
+* We don't need to modify how precompiled contracts are invoked.
+* The version bytes cannot be forged.
+
+The basic idea is that we use a contract address' storage to store an
+account's version bytes. Note that it is also possible to extend this
+scheme to store other information about an account.
+
+## Specification
+
+Define `VERSION_CONTRACT_ADDR` at location `0x0000..00f1`.
+
+After `FORK_BLOCK`, set nonce of `VERSION_CONTRACT_ADDR` to `1`.
+
+Define two new opcodes `VCREATE` and `VCREATE2` at `0xf6` and `0xf7`
+respectively.
+
+`VCREATE` takes 4 stack arguments (version, value, input offset, input
+size), and `VCREATE2` takes 5 stack arguments (version, endowment,
+memory_start, memory_length, salt). Note that except the stack item
+`version`, other arguments are the same as `CREATE` and `CREATE2`.
+
+The two new opcodes behave identically to `CREATE` and `CREATE2`,
+except that:
+
+* Gas cost is `CREATE` or `CREATE2`'s gas cost plus `20000`.
+* Before writing the contract code resulted from `VCREATE` and
+  `VCREATE2`, check the following conditions. If any following
+  conditions does not meet or operation fails, return out-of-gas.
+  * The `version` provided is supported version bytes. 
+  * Invoke additional checks (if any) required by the specific version
+    bytes.
+  * If the above two checks are successful
+    * Let `address` be the to-be-deployed contract address.
+    * Set storage of `VERSION_CONTRACT_ADDR` where key is `address`
+      (prefixed with 0 so that it's 256 bits), and value is `version`.
+      
+When invoking a contract, either by a transaction or a variant of
+call:
+
+* Check whether the storage of `VERSION_CONTRACT_ADDR` has non-zero
+  value with key `address` (prefixed with 0 so that it's 256 bits).
+  * If so, invoke the VM version defined by value.
+  * Otherwise, invoke the default (legacy) VM version.
+  
+When self-destruct a contract:
+
+* Set storage value of `VERSION_CONTRACT_ADDR` where key is `address`
+  (prefixed with 0 so that it's 256 bits) to zero.
+
+## Copyright
+
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
