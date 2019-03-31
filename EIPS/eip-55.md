@@ -102,7 +102,6 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 | Etherwall 2.0.1          | Yes                            | Yes                        | Yes               | Yes              |
 | Jaxx 1.2.17              | No                             | Yes                        | Yes               | Yes              |
 | MetaMask 3.7.8           | Yes                            | Yes                        | Yes               | Yes              |
-| Mist 0.8.10              | Yes                            | Yes                        | Yes               | Yes              |
 | MyEtherWallet v3.9.4     | Yes                            | Yes                        | Yes               | Yes              |
 | Parity 1.6.6-beta (UI)   | Yes                            | Yes                        | Yes               | Yes              |
 | Jaxx Liberty 2.0.0       | Yes                            | Yes                        | Yes               | Yes              |
