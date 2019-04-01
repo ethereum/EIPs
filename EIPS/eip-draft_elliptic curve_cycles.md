@@ -115,14 +115,14 @@ The curves points P(X, Y) over F_p are represented in their compressed form C(X,
     C = X | s
 ```
 
-where s represents Y as follow:
+where `s` represents `Y` as follow:
 
 ```.
-    |  `s'`  | `Y` |
-    |--------|-----|
-    | `0x00` | Point at infinity |
-    | `0x02` | Solution with `y` even |
-    | `0x03` | Solution with `y` odd |
+    |  `s'`  | `Y`                      |
+    |--------|--------------------------|
+    | `0x00` | Point at infinity        |
+    | `0x02` | Solution with `y` even   |
+    | `0x03` | Solution with `y` odd    |
 ```
 
 Compression operation from affine coordinate is trivial:
