@@ -9,18 +9,14 @@ category: Core
 created: 2018-31-03
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-
 # Support for an Elliptic Curve Cycles
 
 ## Simple Summary
 
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 The EVM currently supports elliptic curves operations for curve *alt-bn128* thanks to precompiles `ecadd` and `ecmul` and `ecpairing`. The classes MNT4 and 6 contains cycles of curves and this enable doing operation on one curve inside a SNARK on the other (end reversely). This EIP suggests adding support for those curves.
 
 ## Abstract
 
-<!--A short (~200 word) description of the technical issue being addressed.-->
 Adds supports for the following operations through precompiles:
 
 * `ecadd` on MNT4
@@ -28,7 +24,7 @@ Adds supports for the following operations through precompiles:
 * `ecpairing` on MNT4
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+
 Elliptic curve is the basic block of recursive SNARKSs (ie: verifying a SNARK inside a SNARK) and this addresses the issue of scalable zero-knowledge. More generally this addresses partly the scalability issue as SNARKs verification are constant time in the size of the circuit being verified.
 
 More concretely, today if the EVM has to deal with 1000s of SNARK verification it would take around 1.5 Billion gas and would be impractical for Ethereum. Recursive snarks for instance make it possible to aggregate multiple proofs into a single one that can be verified like any other SNARKs. It massively reduces the cost of verification then.
@@ -36,8 +32,6 @@ More concretely, today if the EVM has to deal with 1000s of SNARK verification i
 However, this is impossible using *alt-bn128* and in my knowledge, the only family of pairing-friendly curves known to produce cycles are MNT4 and MNT6. A complete characterization of the cycles existing between thoses two families is proposed [here](https://arxiv.org/pdf/1803.02067.pdf)
 
 ## Specification
-
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 ### The curve
 
