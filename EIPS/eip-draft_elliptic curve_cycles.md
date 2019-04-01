@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Support for an Elliptic Curve Cycles
-author: Alexandre Belling (@AlexandreBelling) (alexandrebelling8@gmail.com)
+author: Alexandre Belling <alexandrebelling8@gmail.com>
 discussions-to: https://ethresear.ch/t/reducing-the-verification-cost-of-a-snark-through-hierarchical-aggregation/5128/7
 status: Draft
 type: Standard Track
