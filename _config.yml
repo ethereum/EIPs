@@ -35,7 +35,7 @@ twitter:
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-minimal
+theme: minima
 
 permalink: /:slug
 
