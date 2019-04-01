@@ -138,8 +138,6 @@ In the EVM? the compressed form allows us to represents curve points with 2 uint
 * Several acceptable representations for the point at infinity
 
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-### The curve
 
 The only usable cycle in my knowledge are introduced in this [paper](https://eprint.iacr.org/2014/595.pdf).
 
@@ -154,12 +152,13 @@ Assuming we find a convenient cycle, we don't need to implement support for all 
 Proper benchmarks will be done in order to make this choice and to price the operations in gas.
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
