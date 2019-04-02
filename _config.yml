@@ -49,7 +49,7 @@ defaults:
     scope:
       path: "HEIPS"
     values:
-      layout: "eip"
+      layout: "heip"
 
 exclude:
   - Gemfile
