@@ -20,8 +20,9 @@ description: >-
   standards.
 url: "http://eips.ethereum.org"
 twitter_username: ethereum
-github_username:  ethereum
+github_username:  PlainNetwork
 header_pages:
+ - heip.html
  - all.html
  - core.html
  - networking.html

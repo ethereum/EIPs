@@ -1,0 +1,7 @@
+---
+layout: page
+title: Handy EIPs
+---
+
+{% assign eips=site.pages|where_exp: "item", "item.scope == 'HEIPS'" %}
+{% include eiptable.html eips=eips %}
