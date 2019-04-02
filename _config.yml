@@ -45,11 +45,13 @@ defaults:
       path: "EIPS"
     values:
       layout: "eip"
+      dir: "EIPS"
   -
     scope:
       path: "HEIPS"
     values:
       layout: "heip"
+      dir: "HEIPS"
 
 exclude:
   - Gemfile
