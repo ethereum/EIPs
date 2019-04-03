@@ -4,6 +4,7 @@ title: Add `blockHash` to JSON-RPC methods which accept a default block paramete
 author: Charles Cooper (@charles-cooper)
 type: Standards Track
 category: Interface
+requires: 234
 status: Draft
 created: 2019-04-01
 ---
