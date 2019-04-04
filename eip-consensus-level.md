@@ -23,16 +23,16 @@ This EIP adds a new field to the EIP template called 'Consensus', in which EIP a
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-As the Ethereum community moves from simply discussing technical EIPs to a wider unvierse of EIPS, there will inevitably be debate as to whether EIPs are good for Ethereum.
+As the Ethereum community moves from simply discussing technical EIPs to a wider universe of EIPS, there will inevitably be debate as to whether specific EIPs are good for Ethereum.
 
-The community is not very good at measuring consensus for EIPs that have achieved other than 100% consensus.  This EIP aims to correct that by putting the onus on EIP authors to measure consensus across as broad a swath of the community as possible, and to enter that information into the EIP.
+The community is currently not very good at measuring consensus for EIPs that have achieved other than 100% consensus.  This EIP aims to correct that by putting the onus on EIP authors to measure consensus across as broad a swath of the community as possible, and to enter that information into the EIP.
 
 As the old saying goes "If you can measure it you can manage it".  We believe that beginning to measure this signal will be an important step forward in Ethereum community's ability to self assemble.
 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-All new EIPs should now fill out the 'Consensus' field of the EIP template.  
+All new EIPs should now fill out the 'Consensus' field of the EIP template.  In said field, the EIP author should claim whether they have a majority, supermajority, or 99% consensus across different constituencies.  Authors are required to link to objective data which supports their claims.
 
 
 ## Rationale
