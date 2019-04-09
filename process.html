@@ -1,0 +1,40 @@
+---
+layout: default
+title: EIPs Process
+---
+
+<h1 class="page-heading">EIPs Process</h1>
+
+<p>While the technical requirements for EIPs are well explained in <a href="EIPS/eip-1">EIP-1</a>, the EIPs process also includes a fair bit of coordination. This page aims to describe this more ad-hoc, "rough-consensus"-driven part of the EIPs process and assumes familiarity with the contents of <a href="EIPS/eip-1">EIP-1</a>.</p>
+
+<h2>EIP definition</h2>
+
+<p>In <a href="EIPS/eip-1">EIP-1</a>, an EIP is defined as "a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment". One way to think of EIPs is as a standardization process within Ethereum. What is being standardied will inform which type or track an EIP belongs to.</p>
+
+<h2>Shepherding an EIP</h2>
+
+<p>Once you have written an EIP, it is your role to sheperd it through from a Draft to its final stage. The stages your EIP will go through depends on whether it is a Core EIP or not.</p>
+
+<h3>Core EIPs</h3>
+
+<p>Once the EIP has been merged as a Draft, Core EIPs need to be implemented by at least 3 clients to be considered Accepted. This implies that for a Core EIP to be succesful, you will need to either provide the technical implementation for clients, or convince clients to implement your EIP.</p>
+
+<p>The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an <a href="https://github.com/ethereum/pm/issues">AllCoreDevs agenda Github Issue.</a></p>
+
+<p>The AllCoreDevs call serve as a way for client implementers to (1) discuss the technical merits of an EIP, (2) gauge whether other client implementers will be implementing an EIP and (3) coordinate EIP implementation for network upgrades.</p>
+
+<p>The outcome of these calls is generally a "rough consensus" around what EIPs should or shouldn't be included, as well as what EIPs may be too contentious to make a decision about. The "rough consensus" often rests on the assumption that EIPs are not contentious enough to cause a network split and that they are technically sound. For a description of how consensus is reached within the broader Ethereum community, see the "Community Consensus" section below.</p>
+
+<p>Once an EIP has been implemented in a network upgrade, it becomes Final.</p>
+
+<h3>Non-Core EIPs</h3>
+
+<p>Once the EIP has been merged as a draft, it must be implemented to move to Last Call. If no objections to or issues with the EIP are brought up while it is in last call, it will then be considered Final.</p>
+
+<h2>Community Consensus</h2>
+
+<p>Some EIPs may be technically sound but contentious for other reasons within the Ethereum community. For these EIPs, the biggest challenge is to build community consensus.</p>
+
+<p>The EIPs process and AllCoreDevs call were not designed to address non-technical issues, but, due to the lack of formal ways to address these, often end up entangled in these issues. This puts the burden on client implementers to try and gauge community sentiment across several platforms, which hinders the technical coordination function of EIPs and AllCoreDevs calls.</p>
+
+<p>While there are no formal mechanisms today to build community consensus around an EIP, it is worth highlighting that each EIP should have an <a href="https://ethereum-magicians.org/">Ethereum Magicians</a> discussion thread. If you are sheperding an EIP, one way you can make the process of building community consensus easier is by making sure that the Ethereum Magicians thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.</p>
