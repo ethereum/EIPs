@@ -2,7 +2,7 @@
 EIP: <to be assigned>
 Title: Formal process of selection of EIPs for hardforks (Meta EIP#) 
 Author: Pooja Ranjan (@poojaranjan)
-Discussions-to: <URL>
+Discussions-to: https://github.com/ethereum/EIPs/pull/1852
 Status: WIP
 Type: Meta 
 Created: 2019-04-09
