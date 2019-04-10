@@ -29,7 +29,7 @@ However, the lack of a common interface for obtaining the logic address for a pr
 
 A classic example of this is a block explorer. Here, the end user wants to interact with the underlying logic contract and not the proxy itself. Having a common way to retrieve the logic contract address from a proxy would allow a block explorer, among other things, to show the ABI of the logic contract and not that of the proxy (see [this proxy](https://etherscan.io/token/0x00fdae9174357424a78afaad98da36fd66dd9e03#readContract) for an example).
 
-Another example are logic contracts that explicitly act upon the fact that they are being proxied. This allows them to potentially trigger a code update as part of their logic, as is the case of [EIP1822](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1822.md). A common storage slot allows these use cases independently of the specific proxy implementation being used.
+Another example are logic contracts that explicitly act upon the fact that they are being proxied. This allows them to potentially trigger a code update as part of their logic, as is the case of [EIP1822](https://eips.ethereum.org/EIPS/eip-1822). A common storage slot allows these use cases independently of the specific proxy implementation being used.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -58,7 +58,7 @@ Holds the address that is allowed to upgrade the logic contract address for this
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-This EIP standardises the **storage slot** for the logic contract address, instead of a public method on the proxy contract as [EIP897](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-897.md) does. The rationale for this is that proxies should never expose functions to end users that could potentially clash with those of the logic contract. 
+This EIP standardises the **storage slot** for the logic contract address, instead of a public method on the proxy contract as [EIP897](https://eips.ethereum.org/EIPS/eip-897) does. The rationale for this is that proxies should never expose functions to end users that could potentially clash with those of the logic contract. 
 
 Note that a clash may occur even among functions with different names, since that the ABI relies on just four bytes for the function selector. This can lead to unexpected errors, or even exploits, where a call to a proxied contract returns a different value than expected, since the proxy intercepts the call and answers with a value of its own. 
 
@@ -68,7 +68,7 @@ From [_Malicious backdoors in Ethereum proxies_](https://medium.com/nomic-labs-b
 > 
 > Because the function selectors use a fixed amount of bytes, there will always be the possibility of a clash. This isn’t an issue for day to day development, given that the Solidity compiler will detect a selector clash within a contract, but this becomes exploitable when selectors are used for cross-contract interaction. Clashes can be abused to create a seemingly well-behaved contract that’s actually concealing a backdoor.
 
-The fact that proxy public functions are potentially exploitable makes it necessary to standardise the logic contract address in a different way. This approach is also used as part of [EIP1822](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1822.md), which could become a specialization of this EIP.
+The fact that proxy public functions are potentially exploitable makes it necessary to standardise the logic contract address in a different way. This approach is also used as part of [EIP1822](https://eips.ethereum.org/EIPS/eip-1822), which could become a specialization of this EIP.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
