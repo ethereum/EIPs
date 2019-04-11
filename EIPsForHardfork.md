@@ -1,24 +1,27 @@
 ---
-EIP: <to be assigned>
-Title: Formal process of selection of EIPs for hardforks (Meta EIP#) 
-Author: Pooja Ranjan (@poojaranjan)
-Discussions-to: https://github.com/ethereum/EIPs/pull/1852
-Status: WIP
-Type: Meta 
-Created: 2019-04-09
-Requires : EIP 233
+eip: <to be assigned>
+title: Formal process of selection of EIPs for hardforks (Meta EIP#) 
+author: Pooja Ranjan (@poojaranjan)
+discussions-to: https://ethereum-magicians.org/t/proposal-of-a-formal-process-of-selection-of-eips-for-hardforks-meta-eip/3115
+status: Draft
+type: Meta 
+created: 2019-04-09
+requires : 233
 ---
 
 
 ## Abstract
 
-To describe the formal process of selection of EIPs for upcoming hardforks (Meta EIP#)
+To describe a formal process of selection of EIPs for upcoming hardfork (Meta EIP#).
 
 
 ## Motivation
     
-It may be the time to move from ad-hoc hardfork to fixed-schedule to release protocol upgrades. This EIP provides a general outline process to propose, discuss and track progress of EIPs for MetaEIP for upcoming hard fork. It suggests to make decision on a hard deadline and proposes to take all other proposals accepted after that should go into a subsequent hardfork for a smooth upgrade.
+Recently, discussion to streamline the process of protocol upgrades is happening at various forum. In order to move from ad-hoc to fixed-schedule to release protocol upgrades, a process of EIP selection is proposed. 
 
+## Description
+
+This meta EIP provides a general outline process to propose, discuss and track progress of EIPs for upcoming hardfork (Meta EIP#). It recommends to make decision on a hard deadline and suggests to take all other proposals received after the deadline into a subsequent hardfork for a smooth upgrade.
 
 ## Specification
 
