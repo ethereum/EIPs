@@ -1,54 +1,110 @@
+```  
 ---
 eip: <to be assigned>
-title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: <Ethereum Token Action Protocol>
+author: <Paul Bolhar <paul.bolhar@gmail.com>>
 discussions-to: <URL>
 status: Draft
-type: <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <EIP number(s)>
-replaces (*optional): <EIP number(s)>
+type: <ERC>
+category (*only required for Standard Track): <Interface | ERC>
+created: <2019-04-13>
+requires (*optional): <EIP20>
+replaces (*optional): <>
 ---
+```
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-This is the suggested template for new EIPs.
+# Simple Summary
+Health alternative for crypto ecosystem. Transition from utility tokens to action tokens.
+# Abstract
+Not ready
+# Motivation
+Almost anything ethereum tokens is utility and you as investor do not have any rights on company profits,
+it is profitable for business, but not profitable for us.
+But if we could be possible to change it now, in cryptocurrency technologies age.
+I see no reason for us to make the crowdsalers pay us a legitimate income.
+# Specification
 
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
+##### Consensus
 
-The title should be 44 characters or less.
+1) At the first stage, we determine the owner of the token, and only the true owner, can create a contract wrapper TAP.
+For this purpose, the contract is ConfrimOwnership.
 
-## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+2) Second, the owner receives all shares in the amount of totalsupply from EPC 20 token.
 
-## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-A short (~200 word) description of the technical issue being addressed.
+3) Third, the distribution of shares occurs at the will of the creator.
 
-## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+4) Fourth, the restriction on the transfer of rights, requires that the recipient on the account have more or equivalent balance in relation to the ERC20 balance. Those. the recipient must have an equivalent balance in order to prove that he, at least at the moment of receipt, is the real holder of the asset.
 
-## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+5) The fifth. The recalculation of the David takes place at a predetermined time limit, and when the legal balance is changed, the recalculation and accrual of the Devian occurs, under the conditions specified in the contract.
 
-## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+6) The sixth. The outputs are output through the withdraw pattern, the withdraw function.
 
-## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+##### TAP interface
 
-## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+    /**
+     * @dev Return current rightholders balance, this balance show your real action balance
+     * @param rightholder <address>
+     */
+    function rightsOf(address rightholder) external view returns (uint256);
 
-## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+    /**
+     * @dev Transfer rights. Use when need to sell your active.
+     * @param to 
+     * @param amount 
+     */
+    function transferOfRights(address to, uint256 amount) external returns(bool);
 
-## Copyright
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+    /**
+     * @dev Allow another balance spend the current balance.
+     * @param to 
+     * @param amount 
+     */
+    function rightToTransfer(address from, address to, uint256 amount) external returns(bool);
+
+    /**
+     * @dev Using for transfer tokens with rights. 
+     *      Economical function make double send if you need. 
+     *      Do not use for transfer to exchanges.
+     * @param to 
+     * @param amount 
+     */
+    function transferWithRights(address to, uint256 amount) external returns(bool);
+
+    /**
+     * @dev Call to get your devidents. You need execute func.withdrawalRequest() before.
+     */
+    function getDividends() external returns (bool);
+
+    /**
+     * @dev Emits when rights transfer to new rightholder.
+     * @param rightholder tx sender
+     * @param newRightholder tx spender
+     * @param amount tx value
+     */
+    event RightsTransfer(address indexed rightholder, address indexed newRightholder, uint256 indexed amount);
+
+    /**
+     * @dev Emits when rights transfer to new rightholder.
+     * @param rightholder tx sender
+     * @param newRightholder tx allowed address
+     * @param amount tx value
+     */
+    event RightsApproval(address indexed rightholder, address indexed newRightholder, uint amount);
+
+    /**
+     * @dev Emits when calculating dividends and crediting to balance.
+     * @param rightholder 
+     * @param amount
+     */
+    event AccrualDividends(address indexed rightholder, uint amount);
+
+# Rationale
+Not ready
+# Backwards Compatibility
+Not ready
+# Test Cases
+Could be found here <https://github.com/pironmind/TokenActionProtocol/tree/master/test>
+# Implementation
+Could be found here <https://github.com/pironmind/TokenActionProtocol/tree/master/contracts>
+# Copyright
+Copyright by pironmind - link <https://github.com/pironmind> | paul.bolhar@gmail.com
