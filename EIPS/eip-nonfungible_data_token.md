@@ -99,21 +99,21 @@ contract DataToken is IDataToken, ERC721 {
 
   mapping(uint256 => bytes32) data;
 
-	/**
-	 * @dev Reads the data of a specified token.
-	 * @param _tokenId The token to read the data off.
-	 * @return A bytes32 representing the current data stored in the token.
-	 */
+  /**
+   * @dev Reads the data of a specified token.
+   * @param _tokenId The token to read the data off.
+   * @return A bytes32 representing the current data stored in the token.
+   */
   function readData(uint256 _tokenId) public view returns (bytes32) {
     require(_exists(_tokenId));
     return data[_tokenId];
   }
 
-	/**
-	 * @dev Updates the data of a specified token.
-	 * @param _tokenId The token to write data to.
-	 * @param _newData The data to be written to the token.
-	 */
+  /**
+   * @dev Updates the data of a specified token.
+   * @param _tokenId The token to write data to.
+   * @param _newData The data to be written to the token.
+   */
   function writeData(uint256 _tokenId, bytes32 _newData) public {
     require(msg.sender == ownerOf(_tokenId));
     emit DataUpdated(_tokenId, data[_tokenId], _newData);
