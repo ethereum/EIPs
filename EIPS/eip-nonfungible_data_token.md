@@ -59,7 +59,7 @@ The proposal for this ERC stems from the [distributed breeding proposal](https:/
 
 Simple happy test:
 
-```
+``` solidity
 const DataToken = artifacts.require('./DataToken.sol');
 
 contract('DataToken', (accounts) => {
@@ -89,7 +89,7 @@ contract('DataToken', (accounts) => {
 
 An example implementation of the interface in solidity would look like this:
 
-```
+``` solidity
 pragma solidity ^0.5.2;
 
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
