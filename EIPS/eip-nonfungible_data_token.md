@@ -17,7 +17,7 @@ Some NFT use-cases require to have dynamic data associated with a non-fungible t
 - intellectual property tokens that encode rights holders
 - tokens that store data to transport them across chains
 
-The existing meta-data standard does not suffice as data can only be set at minting time and not modified later.
+The existing metadata standard does not suffice as data can only be set at minting time and not modified later.
 
 ## Abstract
 
@@ -49,11 +49,11 @@ contract IDataToken {
 
 The suggested data field in the NFT is used either for storing data directly, like a counter or address. If more data is required the implementer should fall back to authenticated data structures, like merkle- or patricia-trees.
 
-The proposal for this ERC stems from the [distributed breeding proposal](https://ethresear.ch/t/a-distributed-breeding-function/5264) to allow better integration of NFTs accross sidechains. [ost.com](https://ost.com/), [Skale](https://skalelabs.com/), [POA](https://poa.network/), and [LeapDAO](https://leapdao.org/) have been part of the discussion.
+The proposal for this ERC stems from the [distributed breeding proposal](https://ethresear.ch/t/a-distributed-breeding-function/5264) to allow better integration of NFTs across side-chains. [ost.com](https://ost.com/), [Skale](https://skalelabs.com/), [POA](https://poa.network/), and [LeapDAO](https://leapdao.org/) have been part of the discussion.
 
 ## Backwards Compatibility
 
-🤷‍♂️ No related proposals are known to the author, hence no backwards compatability to consider.
+🤷‍♂️ No related proposals are known to the author, hence no backwards compatibility to consider.
 
 ## Test Cases
 
