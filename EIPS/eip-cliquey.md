@@ -7,12 +7,16 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2019-04-19
-replaces: EIP-225
+requires: EIP-225
 ---
+
+## Simple Summary
+
+This document proposes a new proof-of-authority consensus engine that could be used by Ethereum test and developer networks in future.
 
 ## Abstract
 
-_Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus protocol, think _"Clique_v2"_. It comes with some usability and stability optimizations gained from creating the _Görli_ cross-client proof-of-authority network.
+_Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus protocol, previously discussed as _"Clique_v2"_. It comes with some usability and stability optimizations gained from creating the _Görli_ and _Kotti_ cross-client proof-of-authority networks that were implemented in Geth, Parity Ethereum, Pantheon, Nethermind, and various other clients.
 
 ## Motivation
 
