@@ -23,19 +23,22 @@ and can reduce the effort needed to create consensus critical test cases by elim
 
 If `block.number >= {FORK_BLOCK}`, the following value ranges are introduced:
 
-- *gas* - 64-bit signed number
-- *block gas limit* - 64-bit signed number
-- *block number* - 64-bit unsigned number
-- *account address* - 160-bit value
-- *timestamp* - 64-bit unsigned number
-- *buffer sizes* - 32-bit unsigned number
+- *gas* - a number between 0 and 9223372036854775807 (2**63 - 1)
+- *transaction gas limit* - a number between 0 and 9223372036854775807 (2**63 - 1)
+- *block gas limit* - a number between 0 and 9223372036854775807 (2**63 - 1)
+- *block number* - a number between 0 and 9223372036854775807 (2**63 - 1)
+- *account address* - a number between 0 and 1461501637330902918203684832716283019655932542975 (2**160 - 1)
+- *timestamp* - a number between 0 and 9223372036854775807 (2**63 - 1)
+- *buffer sizes* - a number between 0 and 4294967295 (2**31 - 1)
 
 ### Protocol changes
+
+1. A transaction with out-of-range gas limit is invalid.
 
 ### EVM changes
 
 List of affected EVM opcodes:
-- address
+- ADDRESS: pushes to the stack the address of current account mod 2**160
 - balance
 - origin
 - caller
@@ -47,7 +50,7 @@ List of affected EVM opcodes:
 - returndatasize
 - coinbase
 - timestamp
-- number
+- NUMBER: pushes to the stack the current block number mod 2**63
 - gaslimit
 - msize
 - gas
@@ -56,7 +59,7 @@ List of affected EVM opcodes:
 
 As a result the behaviour of the following EVM opcodes are altered as stated:
 
-1) `GAS` (`0xf3`) - can only return a 64-bit value
+1) `GAS` (`0xf3`) - pushes a 63-bit value (mod 2**63)
 
 2) `NUMBER` (`0xf3`) - can only return a 64-bit value
 
