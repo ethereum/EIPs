@@ -1,17 +1,18 @@
 ---
-eip: 225
-title: Clique proof-of-authority consensus protocol
-author: Péter Szilágyi <peterke@gmail.com>
-discussions-to: https://github.com/ethereum/EIPs/issues/225
+eip: 0000
+title: Cliquey proof-of-authority consensus protocol
+author: Aidan Hyman (@ChainSafe)
+discussions-to: https://github.com/goerli/eips-poa
 status: Draft
 type: Standards Track
 category: Core
-created: 2017-03-06
+created: 2019-04-19
+replaces: EIP-225
 ---
 
 ## Abstract
 
-Clique is a proof-of-authority consensus protocol. It shadows the design of Ethereum mainnet, so it can be added to any client with minimal effort.
+_Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus protocol, think _"Clique_v2"_. It comes with some usability and stability optimizations gained from creating the _Görli_ cross-client proof-of-authority network.
 
 ## Motivation
 
