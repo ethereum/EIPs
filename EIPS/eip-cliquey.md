@@ -52,7 +52,7 @@ We also define the following per-block constants:
  * **`BLOCK_NUMBER`**: The block height in the chain, where the height of the genesis is block `0`.
  * **`SIGNER_COUNT`**: The number of authorized signers valid at a particular instance in the chain.
  * **`SIGNER_INDEX`**: The index of the block signer in the sorted list of currently authorized signers.
- * **`SIGNER_LIMIT`**: The number of consecutive blocks out of which a signer may only sign one. It must be `floor(SIGNER_COUNT / 3) + 1` to enforce at least `> 33%` consensus on a proof-of-authority chain.
+ * **`SIGNER_LIMIT`**: The number of signers required to govern the list of authorities. It must be `floor(SIGNER_COUNT / 2) + 1` to enforce majority consensus on a proof-of-authority chain.
 
 We repurpose the `ethash` header fields as follows:
 
@@ -83,9 +83,9 @@ We repurpose the `ethash` header fields as follows:
 
 For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
 
-* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out-of-turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This strategy prevents in-turn validators from being prevented from publishing their block and potential network problems.
+* Each singer is **allowed to sign any number of consecutive blocks**. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out-of-turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This strategy prevents in-turn validators from being hindered from publishing their block and potential network halting.
 
- * If a signer is allowed to sign a block, i.e., is on the authorized list and didn't sign recently:
+ * If a signer is allowed to sign a block, i.e., is on the authorized list:
    * Calculate the Gaussian random signing time of the next block: `parent_timestamp + BLOCK_PERIOD + r`, where `r` is a uniform random value in `rand(-BLOCK_PERIOD/4, BLOCK_PERIOD/4)`.
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
    * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(0, SIGNER_COUNT * 500ms)`.
@@ -103,16 +103,16 @@ The following changes were introduced over Clique EIP-225 and should be discusse
 * Cliquey introduces a **`MIN_WAIT`** period for out-of-turn blocks to be published which is not present for Clique. This addresses the issue of out-of-turn blocks often getting pushed into the network too fast causing a lot of short reorganizations and in rare cases the network to come to an halt. By holding back out-of-turn blocks, this allows in-turn validators to seal blocks even under non-optimal networking conditions, such as high network latency or validators with unsynchronized clocks.
 * To further strengthen the role of in-turn blocks, an authority should continue to publish in-turn blocks even if an out-of-turn block was already received on the network. This prevents in-turn validators to be hindered from publishing their block and potential network problems, such as reorganizations or the network getting stuck.
 * Additionally, the **`DIFF_INTURN`** was increased from `2` to `3` to avoid situations where two different chain heads have the same total difficulty. This prevents the network from getting stuck by making in-turn blocks significantly more _heavy_ than out-of-turn blocks.
-* The **`SIGNER_LIMIT`** was reduced from simple majority to simple minority governance, effectively allowing the network to be self-governed and progressed by having only a minimum of `> 33%` of authorities online and available.
+* The **`SIGNER_LIMIT`** was removed from block sealing logic and is only required for voting. This allows the network to continue sealing blocks even if all but one validators are offline. The voting governance is not affected and still requires signer majority.
 * The block period should be less strict and slightly randomized to mimic mainnet conditions. Therefore, it is slightly randomized in the uniform range of `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`. With this, the average block time will still hover around **`BLOCK_PERIOD`**.
 * The block time-stamp no longer requires to be greater than the parent block time plus the **`BLOCK_PERIOD`**. We propose a simple sanity check on the time-stamp to be greater than the parent time stamp to be sufficient here.
 
-Finally, without changing any consenus logic, we propose the ability to specify an initial list of validators at genesis configuration. without tampering with the `extraData`.
+Finally, without changing any consensus logic, we propose the ability to specify an initial list of validators at genesis configuration. without tampering with the `extraData`.
 
 ## Test Cases
 
 ```go
-// block represents a single block signed by a parcitular account, where
+// block represents a single block signed by a particular account, where
 // the account may or may not have cast a Clique vote.
 type block struct {
   signer     string   // Account that signed this particular block
