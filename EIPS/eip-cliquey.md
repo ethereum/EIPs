@@ -80,7 +80,7 @@ For a detailed specification of the block authorization logic, please refer to E
 * Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This prevents in-turn validators to be prevented from publishing their block and potential network problems.
 
  * If a signer is allowed to sign a block (is on the authorized list and didn't sign recently).
-   * Calculate the optimal signing time of the next block (parent + **`BLOCK_PERIOD`**).
+   * Calculate the Gaussian random signing time of the next block (parent + **`BLOCK_PERIOD + r`**, where `r` is an uniform random value in `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`).
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
    * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(SIGNER_COUNT * 500ms)`.
 
