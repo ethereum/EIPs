@@ -79,6 +79,23 @@ We repurpose the `ethash` header fields as follows:
    * It **must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
    * It **must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
 
+### Validator List
+
+The initial validator list can be specified in the config at genesis, i.e., by appending it to the clique config in Geth:
+
+```json
+"clique":{
+  "period": 15,
+  "epoch": 30000,
+  "validators": [
+    "0x7d577a597b2742b498cb5cf0c26cdcd726d39e6e",
+    "0x82a978b3f5962a5b0957d9ee9eef472ee55b42f1"
+  ]
+}
+```
+
+By using this list, for convenience, the `extraData` field of the genesis only has to contain the 32 bytes of **`EXTRA_VANITY`**. The client automatically converts and appends the list of signers to the block `0` extra-data as specified in EIP-225 at checkpoint blocks (appending `N*20` bytes).
+
 ### Sealing
 
 For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
