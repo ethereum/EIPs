@@ -16,21 +16,21 @@ This document proposes a new proof-of-authority consensus engine that could be u
 
 ## Abstract
 
-_Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus protocol, previously discussed as _"Clique_v2"_. It comes with some usability and stability optimizations gained from creating the _Görli_ and _Kotti_ cross-client proof-of-authority networks that were implemented in Geth, Parity Ethereum, Pantheon, Nethermind, and various other clients.
+**Cliquey** is the second iteration of the _Clique_ proof-of-authority consensus protocol, previously discussed as _"Clique v2"_. It comes with some usability and stability optimizations gained from creating the _Görli_ and _Kotti Classic_ cross-client proof-of-authority networks that were implemented in Geth, Parity Ethereum, Pantheon, Nethermind, and various other clients.
 
 ## Motivation
 
-The _Kotti_ and _Görli_ testnets running different implementations of the Clique engine got stuck multiple times due to minor issues discovered. These issues were partially addressed on the mono-client _Rinkeby_ by improving the Geth code.
+The _Kotti Classic_ and _Görli_ testnets running different implementations of the _Clique_ engine got stuck multiple times due to minor issues discovered. These issues were partially addressed on the mono-client _Rinkeby_ network by optimizing the Geth code.
 
-However, optimizations across multiple clients should be adequately specified and discussed. This working document is a result of a couple of months testing and running cross-client Clique networks, especially with the feedback gathered by several Pantheon, Nethermind, and Parity Ethereum engineers on different channels.
+However, optimizations across multiple clients should be adequately specified and discussed. This working document is a result of a couple of months testing and running cross-client _Clique_ networks, especially with the feedback gathered by several Pantheon, Nethermind, Parity Ethereum, and Geth engineers on different channels.
 
 The overall goal is to simplify the setup and configuration of proof-of-authority networks and avoid the testnets to get stuck while maintaining and mimicking mainnet conditions.
 
-For a general motivation on proof-of-authority testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on.
+_For a general motivation on proof-of-authority testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on._
 
 ## Specification
 
-This section specifies the Cliquey proof-of-authority engine.
+This section specifies the **Cliquey** proof-of-authority engine.
 
 ### Constants
 
@@ -83,18 +83,31 @@ We repurpose the `ethash` header fields as follows:
 
 For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
 
-* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This strategy prevents in-turn validators from being prevented from publishing their block and potential network problems.
+* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out-of-turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This strategy prevents in-turn validators from being prevented from publishing their block and potential network problems.
 
- * If a signer is allowed to sign a block (is on the authorized list and didn't sign recently).
-   * Calculate the Gaussian random signing time of the next block (parent + **`BLOCK_PERIOD + r`**, where `r` is a uniform random value in `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`).
+ * If a signer is allowed to sign a block, i.e., is on the authorized list and didn't sign recently:
+   * Calculate the Gaussian random signing time of the next block: `parent_timestamp + BLOCK_PERIOD + r`, where `r` is a uniform random value in `rand(-BLOCK_PERIOD/4, BLOCK_PERIOD/4)`.
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
-   * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(SIGNER_COUNT * 500ms)`.
+   * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(0, SIGNER_COUNT * 500ms)`.
 
 This strategy will always ensure that an in-turn signer has a **substantial advantage** to sign and propagate versus the out-of-turn signers.
 
 ### Voting
 
 The voting logic is unchanged and can be adapted straight from EIP-225.
+
+## Rationale
+
+The following changes were introduced over Clique EIP-225 and should be discussed briefly.
+
+* Cliquey introduces a **`MIN_WAIT`** period for out-of-turn blocks to be published which is not present for Clique. This addresses the issue of out-of-turn blocks often getting pushed into the network too fast causing a lot of short reorganizations and in rare cases the network to come to an halt. By holding back out-of-turn blocks, this allows in-turn validators to seal blocks even under non-optimal networking conditions, such as high network latency or validators with unsynchronized clocks.
+* To further strengthen the role of in-turn blocks, an authority should continue to publish in-turn blocks even if an out-of-turn block was already received on the network. This prevents in-turn validators to be hindered from publishing their block and potential network problems, such as reorganizations or the network getting stuck.
+* Additionally, the **`DIFF_INTURN`** was increased from `2` to `3` to avoid situations where two different chain heads have the same total difficulty. This prevents the network from getting stuck by making in-turn blocks significantly more _heavy_ than out-of-turn blocks.
+* The **`SIGNER_LIMIT`** was reduced from simple majority to simple minority governance, effectively allowing the network to be self-governed and progressed by having only a minimum of `> 33%` of authorities online and available.
+* The block period should be less strict and slightly randomized to mimic mainnet conditions. Therefore, it is slightly randomized in the uniform range of `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`. With this, the average block time will still hover around **`BLOCK_PERIOD`**.
+* The block time-stamp no longer requires to be greater than the parent block time plus the **`BLOCK_PERIOD`**. We propose a simple sanity check on the time-stamp to be greater than the parent time stamp to be sufficient here.
+
+Finally, without changing any consenus logic, we propose the ability to specify an initial list of validators at genesis configuration. without tampering with the `extraData`.
 
 ## Test Cases
 
