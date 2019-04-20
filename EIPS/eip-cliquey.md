@@ -45,31 +45,31 @@ We define the following constants:
 We also define the following per-block constants:
 
  * **`BLOCK_NUMBER`**: The block height in the chain, where the height of the genesis is block `0`.
- * **`SIGNER_COUNT`**: Number of authorized signers valid at a particular instance in the chain.
- * **`SIGNER_INDEX`**: Index of the block signer in the sorted list of current authorized signers.
- * **`SIGNER_LIMIT`**: Number of consecutive blocks out of which a signer may only sign one. It must be `floor(SIGNER_COUNT / 3) + 1` to enforce at least `> 33%` consensus on a proof-of-authority chain.
+ * **`SIGNER_COUNT`**: The number of authorized signers valid at a particular instance in the chain.
+ * **`SIGNER_INDEX`**: The index of the block signer in the sorted list of current authorized signers.
+ * **`SIGNER_LIMIT`**: The number of consecutive blocks out of which a signer may only sign one. It must be `floor(SIGNER_COUNT / 3) + 1` to enforce at least `> 33%` consensus on a proof-of-authority chain.
 
 We repurpose the `ethash` header fields as follows:
 
- * **`beneficiary`**: Address to propose modifying the list of authorized signers with.
+ * **`beneficiary`**: The address to propose modifying the list of authorized signers with.
    * Should be filled with zeroes normally, modified only while voting.
-   * Arbitrary values are permitted nonetheless (even meaningless ones such as voting out non signers) to avoid extra complexity in implementations around voting mechanics.
-   * **Must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
+   * Arbitrary values are permitted nonetheless (even meaningless ones such as voting out non-signers) to avoid extra complexity in implementations around voting mechanics.
+   * It **must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
    * Transaction execution **must** use the actual block signer (see `extraData`) for the `COINBASE` opcode.
- * **`nonce`**: Signer proposal regarding the account defined by the `beneficiary` field.
-   * Should be **`NONCE_DROP`** to propose deauthorizing `beneficiary` as a existing signer.
-   * Should be **`NONCE_AUTH`** to propose authorizing `beneficiary` as a new signer.
-   * **Must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
-   * **Must** not take up any other value apart from the two above (for now).
+ * **`nonce`**: The signer proposal regarding the account defined by the `beneficiary` field.
+   * It should be **`NONCE_DROP`** to propose deauthorizing `beneficiary` as a existing signer.
+   * It should be **`NONCE_AUTH`** to propose authorizing `beneficiary` as a new signer.
+   * It **must** be filled with zeroes on checkpoint (i.e., on epoch transition) blocks.
+   * It **must** not take up any other value apart from the two above.
  * **`extraData`**: Combined field for signer vanity, checkpointing and signer signatures.
-   * First **`EXTRA_VANITY`** bytes (fixed) may contain arbitrary signer vanity data.
-   * Last **`EXTRA_SEAL`** bytes (fixed) is the signer's signature sealing the header.
-   * Checkpoint blocks **must** contain a list of signers (`N*20 bytes`) in between, **omitted** otherwise.
+   * The first **`EXTRA_VANITY`** fixed bytes may contain arbitrary signer vanity data.
+   * The last **`EXTRA_SEAL`** fixed bytes are the signer's signature sealing the header.
+   * Checkpoint blocks **must** contain a list of signers (`N*20` bytes) in between, **omitted** otherwise.
    * The list of signers in checkpoint block extra-data sections **must** be sorted in ascending order.
  * **`mixHash`**: Reserved for fork protection logic, similar to the extra-data during the DAO.
-   * **Must** be filled with zeroes during normal operation.
- * **`ommersHash`**: **Must** be **`UNCLE_HASH`** as uncles are meaningless outside of PoW.
- * **`timestamp`**: **Must** be at least the parent timestamp + **`BLOCK_PERIOD`**.
+   * It **must** be filled with zeroes during normal operation.
+ * **`ommersHash`**: It **must** be **`UNCLE_HASH`** as uncles are meaningless outside of proof-of-work.
+ * **`timestamp`**: It **must** be greater than the parent timestamp.
  * **`difficulty`**: Contains the standalone score of the block to derive the quality of a chain.
    * **Must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
    * **Must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
