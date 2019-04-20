@@ -30,7 +30,7 @@ _For a general motivation on proof-of-authority testnets, please refer to the ex
 
 ## Specification
 
-This section specifies the **Cliquey** proof-of-authority engine.
+This section specifies the **Cliquey** proof-of-authority engine. To quickly understand the differences from _Clique_, please refer to the _Rationale_ further below.
 
 ### Constants
 
@@ -69,7 +69,7 @@ We repurpose the `ethash` header fields as follows:
  * **`extraData`**: Combined field for signer vanity, checkpointing and signer signatures.
    * The first **`EXTRA_VANITY`** fixed bytes may contain arbitrary signer vanity data.
    * The last **`EXTRA_SEAL`** fixed bytes are the signer's signature sealing the header.
-   * Checkpoint blocks **must** contain a list of signers (`N*20` bytes) in between, **omitted** otherwise.
+   * Checkpoint blocks **must** contain a list of signers (`SIGNER_COUNT*20` bytes) in between, **omitted** otherwise.
    * The list of signers in checkpoint block extra-data sections **must** be sorted in ascending order.
  * **`mixHash`**: Reserved for fork protection logic, similar to the extra-data during the DAO.
    * It **must** be filled with zeroes during regular operation.
@@ -81,7 +81,7 @@ We repurpose the `ethash` header fields as follows:
 
 ### Validator List
 
-The initial validator list can be specified in the config at genesis, i.e., by appending it to the clique config in Geth:
+The _initial_ validator list can be specified in the config at genesis, i.e., by appending it to the Clique config in Geth:
 
 ```json
 "clique":{
@@ -94,7 +94,7 @@ The initial validator list can be specified in the config at genesis, i.e., by a
 }
 ```
 
-By using this list, for convenience, the `extraData` field of the genesis only has to contain the 32 bytes of **`EXTRA_VANITY`**. The client automatically converts and appends the list of signers to the block `0` extra-data as specified in EIP-225 at checkpoint blocks (appending `N*20` bytes).
+By using this list, for convenience, the `extraData` field of the genesis only has to contain the 32 bytes of **`EXTRA_VANITY`**. The client automatically converts and appends the list of signers to the block `0` extra-data as specified in EIP-225 at checkpoint blocks (appending `SIGNER_COUNT*20` bytes).
 
 ### Sealing
 
