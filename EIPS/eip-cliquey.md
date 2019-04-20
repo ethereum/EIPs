@@ -70,17 +70,13 @@ We repurpose the `ethash` header fields as follows:
    * It **must** be filled with zeroes during normal operation.
  * **`ommersHash`**: It **must** be **`UNCLE_HASH`** as uncles are meaningless outside of proof-of-work.
  * **`timestamp`**: It **must** be greater than the parent timestamp.
- * **`difficulty`**: Contains the standalone score of the block to derive the quality of a chain.
-   * **Must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
-   * **Must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
+ * **`difficulty`**: It contains the standalone score of the block to derive the quality of a chain.
+   * It **must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
+   * It **must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
 
-### Authorizing a block
+For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
 
-To authorize a block for the network, the signer needs to sign the block's hash containing **everything except the signature itself**. The means that the hash contains every field of the header (`nonce` and `mixDigest` included), and also the  `extraData` with the exception of the 65 byte signature suffix. The fields are hashed in the order of their definition in the yellow paper.
-
-This hash is signed using the standard `secp256k1` curve, and the resulting 65 byte signature (`R`, `S`, `V`, where `V` is `0` or `1`) is embedded into the `extraData` as the trailing 65 byte suffix.
-
-To ensure malicious signers (loss of signing key) cannot wreck havoc in the network, each singer is allowed to sign **maximum one** out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**).
+* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This prevents in-turn validators to be prevented from publishing their block and potential network problems.
 
 #### Authorization strategies
 
