@@ -41,6 +41,7 @@ We define the following constants:
  * **`UNCLE_HASH`**: Always `Keccak256(RLP([]))` as uncles are meaningless outside of proof-of-work.
  * **`DIFF_NOTURN`**: Block score (difficulty) for blocks containing out-of-turn signatures. It should be set to `1` since it just needs to be an arbitrary baseline constant.
  * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures. It should be `3` to show a preference over out-of-turn signatures.
+ * **`MIN_WAIT`**: The minimum time to wait for an out-of-turn block to be published. It is suggested to set it to `BLOCK_PERIOD / 2`.
 
 We also define the following per-block constants:
 
@@ -78,14 +79,10 @@ For a detailed specification of the block authorization logic, please refer to E
 
 * Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This prevents in-turn validators to be prevented from publishing their block and potential network problems.
 
-#### Authorization strategies
-
-As long as signers conform to the above specs, they can authorize and distribute blocks as they see fit. The following suggested strategy will however reduce network traffic and small forks, so it's a suggested feature:
-
  * If a signer is allowed to sign a block (is on the authorized list and didn't sign recently).
    * Calculate the optimal signing time of the next block (parent + **`BLOCK_PERIOD`**).
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
-   * If the signer is out-of-turn, delay signing by `rand(SIGNER_COUNT * 500ms)`.
+   * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(SIGNER_COUNT * 500ms)`.
 
 This small strategy will ensure that the in-turn signer (who's block weighs more) has a slight advantage to sign and propagate versus the out-of-turn signers. Also the scheme allows a bit of scale with the increase of the number of signers.
 
