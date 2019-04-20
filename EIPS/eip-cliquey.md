@@ -12,7 +12,7 @@ requires: EIP-225
 
 ## Simple Summary
 
-This document proposes a new proof-of-authority consensus engine that could be used by Ethereum test and developer networks in future.
+This document proposes a new proof-of-authority consensus engine that could be used by Ethereum testing and development networks in future.
 
 ## Abstract
 
@@ -20,76 +20,13 @@ _Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus p
 
 ## Motivation
 
-Ethereum's first official testnet was Morden. It ran from July 2015 to about November 2016, when due to the accumulated junk and some testnet consensus issues between Geth and Parity, it was finally laid to rest in favor of a testnet reboot.
+The _Kotti_ and _Görli_ testnets running different implementations of the Clique engine got stuck multiple times due to minor issues discovered. These issues were partially addressed on the mono-client _Rinkeby_ by improving the Geth code.
 
-Ropsten was thus born, clearing out all the junk and starting with a clean slate. This ran well until the end of February 2017, when malicious actors decided to abuse the low PoW and gradually inflate the block gas limits to 9 billion (from the normal 4.7 million), at which point sending in gigantic transactions crippling the entire network. Even before that, attackers attempted multiple extremely long reorgs, causing network splits between different clients, and even different versions.
+However, optimizations across multiple clients should be properly specified and discussed. This working document is a result of a couple of months testing and running cross-client Clique networks, especially with the feedback gathered by several Pantheon, Nethermind, and Parity Ethereum engineers on different channels.
 
-The root cause of these attacks is that a PoW network is only as secure as the computing capacity placed behind it. Restarting a new testnet from zero wouldn't solve anything, since the attacker can mount the same attack over and over again. The Parity team decided to go with an emergency solution of rolling back a significant number of blocks, and enacting a soft-fork rule that disallows gas limits above a certain threshold.
+The overall goal is to simplify the setup and configuration of proof-of-authority networks and avoid the testnets to get stuck while maintaining and mimicking mainnet conditions.
 
-While this solution may work in the short term:
-
-* It's not elegant: Ethereum supposed to have dynamic block limits
-* It's not portable: other clients need to implement new fork logic themselves
-* It's not compatible with sync modes: fast and light clients are both out of luck
-* It's just prolonging the attacks: junk can still be steadily pushed in ad infinitum
-
-Parity's solution although not perfect, is nonetheless workable. I'd like to propose a longer term alternative solution, which is more involved, yet should be simple enough to allow rolling out in a reasonable amount of time.
-
-### Standardized proof-of-authority
-
-As reasoned above, proof-of-work cannot work securely in a network with no value. Ethereum has its long term goal of proof-of-stake based on Casper, but that is heavy research so we cannot rely on that any time soon to fix today's problems. One solution however is easy enough to implement, yet effective enough to fix the testnet properly, namely a proof-of-authority scheme.
-
-The main design goals of the PoA protocol described here is that it should be very simple to implement and embed into any existing Ethereum client, while at the same time allow using existing sync technologies (fast, light, warp) without needing client developers to add custom logic to critical software.
-
-## Design constraints
-
-There are two approaches to syncing a blockchain in general:
-
- * The classical approach is to take the genesis block and crunch through all the transactions one by one. This is tried and proven, but in Ethereum complexity networks quickly turns out to be very costly computationally.
- * The other is to only download the chain of block headers and verify their validity, after which point an arbitrary recent state may be downloaded from the network and checked against recent headers.
-
-A PoA scheme is based on the idea that blocks may only be minted by trusted signers. As such, every block (or header) that a client sees can be matched against the list of trusted signers. The challenge here is how to maintain a list of authorized signers that can change in time? The obvious answer (store it in an Ethereum contract) is also the wrong answer: fast, light and warp sync don't have access to the state during syncing.
-
-**The protocol of maintaining the list of authorized signers must be fully contained in the block headers.**
-
-The next obvious idea would be to change the structure of the block headers so it drops the notions of PoW, and introduces new fields to cater for voting mechanisms. This is also the wrong answer: changing such a core data structure in multiple implementations would be a nightmare development, maintenance and security wise.
-
-**The protocol of maintaining the list of authorized signers must fit fully into the current data models.**
-
-So, according to the above, we can't use the EVM for voting, rather have to resort to headers. And we can't change header fields, rather have to resort to the currently available ones. Not much wiggle room.
-
-### Repurposing header fields for signing and voting
-
-The most obvious field that currently is used solely as *fun metadata* is the 32 byte **extra-data** section in block headers. Miners usually place their client and version in there, but some fill it with alternative "messages". The protocol would extend this field ~~to~~ with 65 bytes with the purpose of a secp256k1 miner signature. This would allow anyone obtaining a block to verify it against a list of authorized signers. It also makes the **miner** section in block headers obsolete (since the address can be derived from the signature).
-
-*Note, changing the length of a header field is a non invasive operation as all code (such as RLP encoding, hashing) is agnostic to that, so clients wouldn't need custom logic.*
-
-The above is enough to validate a chain, but how can we update a dynamic list of signers. The answer is that we can repurpose the newly obsoleted **miner** field and the PoA obsoleted **nonce** field to create a voting protocol:
-
- * During regular blocks, both of these fields would be set to zero.
- * If a signer wishes to enact a change to the list of authorized signers, it will:
-   * Set the **miner** to the signer it wishes to vote about
-   * Set the **nonce** to `0` or `0xff...f` to vote in favor of adding or kicking out
-
-Any clients syncing the chain can "tally" up the votes during block processing, and maintain a dynamically changing list of authorized signers by popular vote.
-
-To avoid having an infinite window to tally up votes in, and also to allow periodically flushing stale proposals, we can reuse the concept of an epoch from ethash, where every epoch transition flushes all pending votes. Furthermore, these epoch transitions can also act as stateless checkpoints containing the list of current authorized signers within the header extra-data. This permits clients to sync up based only on a checkpoint hash without having to replay all the voting that was done on the chain up to that point. It also allows the genesis header to fully define the chain, containing the list of initial signers.
-
-### Attack vector: Malicious signer
-
-It may happen that a malicious user gets added to the list of signers, or that a signer key/machine is compromised. In such a scenario the protocol needs to be able to defend itself against reorganizations and spamming. The proposed solution is that given a list of N authorized signers, any signer may only mint 1 block out of every K. This ensures that damage is limited, and the remainder of the miners can vote out the malicious user.
-
-### Attack vector: Censoring signer
-
-Another interesting attack vector is if a signer (or group of signers) attempts to censor out blocks that vote on removing them from the authorization list. To work around this, we restrict the allowed minting frequency of signers to 1 out of N/2. This ensures that malicious signers need to control at least 51% of signing accounts, at which case it's game over anyway.
-
-### Attack vector: Spamming signer
-
-A final small attack vector is that of malicious signers injecting new vote proposals inside every block they mint. Since nodes need to tally up all votes to create the actual list of authorized signers, they need to track all votes through time. Without placing a limit on the vote window, this could grow slowly, yet unbounded. The solution is to place a ~~moving~~ window of W blocks after which votes are considered stale. ~~A sane window might be 1-2 epochs.~~ We'll call this an epoch.
-
-### Attack vector: Concurrent blocks
-
-If the number of authorized signers are N, and we allow each signer to mint 1 block out of K, then at any point in time N-K+1 miners are allowed to mint. To avoid these racing for blocks, every signer would add a small random "offset" to the time it releases a new block. This ensures that small forks are rare, but occasionally still happen (as on the main net). If a signer is caught abusing it's authority and causing chaos, it can be voted out.
+For a general motivation on Proof-of-Authorty testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on.
 
 ## Specification
 
