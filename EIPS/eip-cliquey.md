@@ -32,21 +32,15 @@ For a general motivation on Proof-of-Authorty testnets, please refer to the exha
 
 We define the following constants:
 
- * **`EPOCH_LENGTH`**: Number of blocks after which to checkpoint and reset the pending votes.
-   * Suggested `30000` for the testnet to remain analogous to the mainnet `ethash` epoch.
- * **`BLOCK_PERIOD`**: Minimum difference between two consecutive block's timestamps.
-   * Suggested `15s` for the testnet to remain analogous to the mainnet `ethash` target.
- * **`EXTRA_VANITY`**: Fixed number of extra-data prefix bytes reserved for signer *vanity*.
-   * Suggested `32 bytes` to retain the current extra-data allowance and/or use.
- * **`EXTRA_SEAL`**: Fixed number of extra-data suffix bytes reserved for signer seal.
-   * `65 bytes` fixed as signatures are based on the standard `secp256k1` curve.
+ * **`EPOCH_LENGTH`**: The number of blocks after which to checkpoint and reset the pending votes. It is suggested to remain analogous to the mainnet `ethash` proof-of-work epoch (`30_000`).
+ * **`BLOCK_PERIOD`**: The minimum difference between two consecutive block's timestamps. It is suggested to remain analogous to the mainnet `ethash` proof-of-work blocktime target (`15` seconds).
+ * **`EXTRA_VANITY`**: The fixed number of extra-data prefix bytes reserved for signer _vanity_. It is suggested to retain the current extra-data allowance and/or use (`32` bytes).
+ * **`EXTRA_SEAL`**: The fixed number of extra-data suffix bytes reserved for signer seal: `65 bytes` fixed as signatures are based on the standard `secp256k1` curve.
  * **`NONCE_AUTH`**: Magic nonce number `0xffffffffffffffff` to vote on adding a new signer.
  * **`NONCE_DROP`**: Magic nonce number `0x0000000000000000` to vote on removing a signer.
- * **`UNCLE_HASH`**: Always `Keccak256(RLP([]))` as uncles are meaningless outside of PoW.
- * **`DIFF_NOTURN`**: Block score (difficulty) for blocks containing out-of-turn signatures.
-   * Suggested `1` since it just needs to be an arbitrary baseline constant.
- * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures.
-   * Suggested `2` to show a slight preference over out-of-turn signatures.
+ * **`UNCLE_HASH`**: Always `Keccak256(RLP([]))` as uncles are meaningless outside of proof-of-work.
+ * **`DIFF_NOTURN`**: Block score (difficulty) for blocks containing out-of-turn signatures. It should be set to `1` since it just needs to be an arbitrary baseline constant.
+ * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures. It should be `3` to show a preference over out-of-turn signatures.
 
 We also define the following per-block constants:
 
