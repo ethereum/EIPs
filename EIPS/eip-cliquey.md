@@ -12,7 +12,7 @@ requires: EIP-225
 
 ## Simple Summary
 
-This document proposes a new proof-of-authority consensus engine that could be used by Ethereum testing and development networks in future.
+This document proposes a new proof-of-authority consensus engine that could be used by Ethereum testing and development networks in the future.
 
 ## Abstract
 
@@ -22,36 +22,36 @@ _Cliquey_ is the second iteration of the _Clique_ proof-of-authority consensus p
 
 The _Kotti_ and _Görli_ testnets running different implementations of the Clique engine got stuck multiple times due to minor issues discovered. These issues were partially addressed on the mono-client _Rinkeby_ by improving the Geth code.
 
-However, optimizations across multiple clients should be properly specified and discussed. This working document is a result of a couple of months testing and running cross-client Clique networks, especially with the feedback gathered by several Pantheon, Nethermind, and Parity Ethereum engineers on different channels.
+However, optimizations across multiple clients should be adequately specified and discussed. This working document is a result of a couple of months testing and running cross-client Clique networks, especially with the feedback gathered by several Pantheon, Nethermind, and Parity Ethereum engineers on different channels.
 
 The overall goal is to simplify the setup and configuration of proof-of-authority networks and avoid the testnets to get stuck while maintaining and mimicking mainnet conditions.
 
-For a general motivation on Proof-of-Authorty testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on.
+For a general motivation on proof-of-authority testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on.
 
 ## Specification
 
-This specifies the Cliquey proof-of-authority engine.
+This section specifies the Cliquey proof-of-authority engine.
 
 ### Constants
 
 We define the following constants:
 
  * **`EPOCH_LENGTH`**: The number of blocks after which to checkpoint and reset the pending votes. It is suggested to remain analogous to the mainnet `ethash` proof-of-work epoch (`30_000`).
- * **`BLOCK_PERIOD`**: The minimum difference between two consecutive block's timestamps. It is suggested to remain analogous to the mainnet `ethash` proof-of-work blocktime target (`15` seconds).
- * **`EXTRA_VANITY`**: The fixed number of extra-data prefix bytes reserved for signer _vanity_. It is suggested to retain the current extra-data allowance and/or use (`32` bytes).
+ * **`BLOCK_PERIOD`**: The minimum difference between two consecutive block's timestamps. It is suggested to remain analogous to the mainnet `ethash` proof-of-work block time target (`15` seconds).
+ * **`EXTRA_VANITY`**: The fixed number of extra-data prefix bytes reserved for signer _vanity_. It is suggested to retain the current extra-data allowance and use (`32` bytes).
  * **`EXTRA_SEAL`**: The fixed number of extra-data suffix bytes reserved for signer seal: `65 bytes` fixed as signatures are based on the standard `secp256k1` curve.
  * **`NONCE_AUTH`**: Magic nonce number `0xffffffffffffffff` to vote on adding a new signer.
  * **`NONCE_DROP`**: Magic nonce number `0x0000000000000000` to vote on removing a signer.
  * **`UNCLE_HASH`**: Always `Keccak256(RLP([]))` as uncles are meaningless outside of proof-of-work.
  * **`DIFF_NOTURN`**: Block score (difficulty) for blocks containing out-of-turn signatures. It should be set to `1` since it just needs to be an arbitrary baseline constant.
- * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures. It should be `3` to show a preference over out-of-turn signatures.
+ * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures. It should be `3` to show preference over out-of-turn signatures.
  * **`MIN_WAIT`**: The minimum time to wait for an out-of-turn block to be published. It is suggested to set it to `BLOCK_PERIOD / 2`.
 
 We also define the following per-block constants:
 
  * **`BLOCK_NUMBER`**: The block height in the chain, where the height of the genesis is block `0`.
  * **`SIGNER_COUNT`**: The number of authorized signers valid at a particular instance in the chain.
- * **`SIGNER_INDEX`**: The index of the block signer in the sorted list of current authorized signers.
+ * **`SIGNER_INDEX`**: The index of the block signer in the sorted list of currently authorized signers.
  * **`SIGNER_LIMIT`**: The number of consecutive blocks out of which a signer may only sign one. It must be `floor(SIGNER_COUNT / 3) + 1` to enforce at least `> 33%` consensus on a proof-of-authority chain.
 
 We repurpose the `ethash` header fields as follows:
@@ -59,10 +59,10 @@ We repurpose the `ethash` header fields as follows:
  * **`beneficiary`**: The address to propose modifying the list of authorized signers with.
    * Should be filled with zeroes normally, modified only while voting.
    * Arbitrary values are permitted nonetheless (even meaningless ones such as voting out non-signers) to avoid extra complexity in implementations around voting mechanics.
-   * It **must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
+   * It **must** be filled with zeroes on checkpoint (i.e., epoch transition) blocks.
    * Transaction execution **must** use the actual block signer (see `extraData`) for the `COINBASE` opcode.
  * **`nonce`**: The signer proposal regarding the account defined by the `beneficiary` field.
-   * It should be **`NONCE_DROP`** to propose deauthorizing `beneficiary` as a existing signer.
+   * It should be **`NONCE_DROP`** to propose deauthorizing `beneficiary` as an existing signer.
    * It should be **`NONCE_AUTH`** to propose authorizing `beneficiary` as a new signer.
    * It **must** be filled with zeroes on checkpoint (i.e., on epoch transition) blocks.
    * It **must** not take up any other value apart from the two above.
@@ -72,7 +72,7 @@ We repurpose the `ethash` header fields as follows:
    * Checkpoint blocks **must** contain a list of signers (`N*20` bytes) in between, **omitted** otherwise.
    * The list of signers in checkpoint block extra-data sections **must** be sorted in ascending order.
  * **`mixHash`**: Reserved for fork protection logic, similar to the extra-data during the DAO.
-   * It **must** be filled with zeroes during normal operation.
+   * It **must** be filled with zeroes during regular operation.
  * **`ommersHash`**: It **must** be **`UNCLE_HASH`** as uncles are meaningless outside of proof-of-work.
  * **`timestamp`**: It **must** be greater than the parent timestamp.
  * **`difficulty`**: It contains the standalone score of the block to derive the quality of a chain.
@@ -83,14 +83,14 @@ We repurpose the `ethash` header fields as follows:
 
 For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
 
-* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This prevents in-turn validators to be prevented from publishing their block and potential network problems.
+* Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This strategy prevents in-turn validators from being prevented from publishing their block and potential network problems.
 
  * If a signer is allowed to sign a block (is on the authorized list and didn't sign recently).
-   * Calculate the Gaussian random signing time of the next block (parent + **`BLOCK_PERIOD + r`**, where `r` is an uniform random value in `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`).
+   * Calculate the Gaussian random signing time of the next block (parent + **`BLOCK_PERIOD + r`**, where `r` is a uniform random value in `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`).
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
    * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(SIGNER_COUNT * 500ms)`.
 
-This strategy will always ensure that an in-turn signer has a **strong advantage** to sign and propagate versus the out-of-turn signers.
+This strategy will always ensure that an in-turn signer has a **substantial advantage** to sign and propagate versus the out-of-turn signers.
 
 ### Voting
 
