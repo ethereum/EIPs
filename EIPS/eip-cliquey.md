@@ -1,7 +1,7 @@
 ---
 eip: 0000
 title: Cliquey proof-of-authority consensus protocol
-author: Aidan Hyman (@ChainSafe)
+author: Aidan Hyman (@ChainSafeSystems), Talha Cross (@soc1c)
 discussions-to: https://github.com/goerli/eips-poa
 status: Draft
 type: Standards Track
@@ -24,7 +24,7 @@ The _Kotti Classic_ and _Görli_ testnets running different implementations of t
 
 However, optimizations across multiple clients should be adequately specified and discussed. This working document is a result of a couple of months testing and running cross-client _Clique_ networks, especially with the feedback gathered by several Pantheon, Nethermind, Parity Ethereum, and Geth engineers on different channels.
 
-The overall goal is to simplify the setup and configuration of proof-of-authority networks and avoid the testnets to get stuck while maintaining and mimicking mainnet conditions.
+The overall goal is to simplify the setup and configuration of proof-of-authority networks, esnure testnets avoid getting stuck and mimicking mainnet conditions.
 
 _For a general motivation on proof-of-authority testnets, please refer to the exhaustive introduction in EIP-225 which this proposal is based on._
 
@@ -94,7 +94,7 @@ The _initial_ validator list can be specified in the config at genesis, i.e., by
 }
 ```
 
-By using this list, for convenience, the `extraData` field of the genesis only has to contain the 32 bytes of **`EXTRA_VANITY`**. The client automatically converts and appends the list of signers to the block `0` extra-data as specified in EIP-225 at checkpoint blocks (appending `SIGNER_COUNT*20` bytes).
+By using this list, for convenience, the `extraData` field of the genesis block only has to contain the 32 bytes of **`EXTRA_VANITY`**. The client automatically converts and appends the list of signers to the block `0` extra-data as specified in EIP-225 at checkpoint blocks (appending `SIGNER_COUNT*20` bytes).
 
 ### Sealing
 
@@ -117,14 +117,14 @@ The voting logic is unchanged and can be adapted straight from EIP-225.
 
 The following changes were introduced over Clique EIP-225 and should be discussed briefly.
 
-* Cliquey introduces a **`MIN_WAIT`** period for out-of-turn blocks to be published which is not present for Clique. This addresses the issue of out-of-turn blocks often getting pushed into the network too fast causing a lot of short reorganizations and in rare cases the network to come to an halt. By holding back out-of-turn blocks, this allows in-turn validators to seal blocks even under non-optimal networking conditions, such as high network latency or validators with unsynchronized clocks.
-* To further strengthen the role of in-turn blocks, an authority should continue to publish in-turn blocks even if an out-of-turn block was already received on the network. This prevents in-turn validators to be hindered from publishing their block and potential network problems, such as reorganizations or the network getting stuck.
+* Cliquey introduces a **`MIN_WAIT`** period for out-of-turn block to be published which is not present for Clique. This addresses the issue of out-of-turn blocks often getting pushed into the network too fast causing a lot of short reorganizations and in some rare cases causing the network to come to a halt. By holding back out-of-turn blocks, Cliquey allows in-turn validators to seal blocks even under non-optimal network conditions, such as high network latency or validators with unsynchronized clocks.
+* To further strengthen the role of in-turn blocks, an authority should continue to publish in-turn blocks even if an out-of-turn block was already received on the network. This prevents in-turn validators being hindered from publishing their block and potential network problems, such as reorganizations or the network getting stuck.
 * Additionally, the **`DIFF_INTURN`** was increased from `2` to `3` to avoid situations where two different chain heads have the same total difficulty. This prevents the network from getting stuck by making in-turn blocks significantly more _heavy_ than out-of-turn blocks.
-* The **`SIGNER_LIMIT`** was removed from block sealing logic and is only required for voting. This allows the network to continue sealing blocks even if all but one validators are offline. The voting governance is not affected and still requires signer majority.
+* The **`SIGNER_LIMIT`** was removed from block sealing logic and is only required for voting. This allows the network to continue sealing blocks even if all but one of the validators are offline. The voting governance is not affected and still requires signer majority.
 * The block period should be less strict and slightly randomized to mimic mainnet conditions. Therefore, it is slightly randomized in the uniform range of `[-BLOCK_PERIOD/4, BLOCK_PERIOD/4]`. With this, the average block time will still hover around **`BLOCK_PERIOD`**.
 * The block time-stamp no longer requires to be greater than the parent block time plus the **`BLOCK_PERIOD`**. We propose a simple sanity check on the time-stamp to be greater than the parent time stamp to be sufficient here.
 
-Finally, without changing any consensus logic, we propose the ability to specify an initial list of validators at genesis configuration. without tampering with the `extraData`.
+Finally, without changing any consensus logic, we propose the ability to specify an initial list of validators at genesis configuration without tampering with the `extraData`.
 
 ## Test Cases
 
