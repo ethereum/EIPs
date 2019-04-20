@@ -30,6 +30,10 @@ For a general motivation on Proof-of-Authorty testnets, please refer to the exha
 
 ## Specification
 
+This specifies the Cliquey proof-of-authority engine.
+
+### Constants
+
 We define the following constants:
 
  * **`EPOCH_LENGTH`**: The number of blocks after which to checkpoint and reset the pending votes. It is suggested to remain analogous to the mainnet `ethash` proof-of-work epoch (`30_000`).
@@ -75,6 +79,8 @@ We repurpose the `ethash` header fields as follows:
    * It **must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
    * It **must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
 
+### Sealing
+
 For a detailed specification of the block authorization logic, please refer to EIP-225 by honoring the constants defined above. However, the following changes should be highlighted:
 
 * Each singer is allowed to sign maximum one out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**). In case an out-of-turn block is received, an **in-turn signer should continue to publish their block** to ensure the chain always prefers in-turn blocks in any case. This prevents in-turn validators to be prevented from publishing their block and potential network problems.
@@ -84,37 +90,11 @@ For a detailed specification of the block authorization logic, please refer to E
    * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
    * If the signer is out-of-turn, delay signing by `MIN_WAIT + rand(SIGNER_COUNT * 500ms)`.
 
-This small strategy will ensure that the in-turn signer (who's block weighs more) has a slight advantage to sign and propagate versus the out-of-turn signers. Also the scheme allows a bit of scale with the increase of the number of signers.
+This strategy will always ensure that an in-turn signer has a **strong advantage** to sign and propagate versus the out-of-turn signers.
 
-### Voting on signers
+### Voting
 
-Every epoch transition (genesis block included) acts as a stateless checkpoint, from which capable clients should be able to sync without requiring any previous state. This means epoch headers **must not** contain votes, all non settled votes are discarded, and tallying starts from scratch.
-
-For all non-epoch transition blocks:
-
- * Signers may cast one vote per own block to propose a change to the authorization list.
- * Only the latest proposal per target beneficiary is kept from a single signer.
- * Votes are tallied live as the chain progresses (concurrent proposals allowed).
- * Proposals reaching majority consensus **`SIGNER_LIMIT`** come into effect immediately.
- * Invalid proposals are **not** to be penalized for client implementation simplicity.
-
-**A proposal coming into effect entails discarding all pending votes for that proposal (both for and against) and starting with a clean slate.**
-
-#### Cascading votes
-
-A complex corner case may arise during signer deauthorization. When a previously authorized signer is dropped, the number of signers required to approve a proposal might decrease by one. This might cause one or more pending proposals to reach majority consensus, the execution of which might further cascade into new proposals passing.
-
-Handling this scenario is non obvious when multiple conflicting proposals pass simultaneously (e.g. add a new signer vs. drop an existing one), where the evaluation order might drastically change the outcome of the final authorization list. Since signers may invert their own votes in every block they mint, it's not so obvious which proposal would be "first".
-
-To avoid the pitfalls cascading executions would entail, the Clique proposal explicitly forbids cascading effects. In other words: **Only the `beneficiary` of the current header/vote may be added to/dropped from the authorization list. If that causes other proposals to reach consensus, those will be executed when their respective beneficiaries are "touched" again (given that majority consensus still holds at that point).**
-
-#### Voting strategies
-
-Since the blockchain can have small reorgs, a naive voting mechanism of "cast-and-forget" may not be optimal, since a block containing a singleton vote may not end up on the final chain.
-
-A simplistic but working strategy is to allow users to configure "proposals" on the signers (e.g. "add 0x...", "drop 0x..."). The signing code can then pick a random proposal for every block it signs and inject it. This ensures that multiple concurrent proposals as well as reorgs get eventually noted on the chain.
-
-This list may be expired after a certain number of blocks / epochs, but it's important to realize that "seeing" a proposal pass doesn't mean it won't get reorged, so it should not be immediately dropped when the proposal passes.
+The voting logic is unchanged and can be adapted straight from EIP-225.
 
 ## Test Cases
 
@@ -398,6 +378,7 @@ tests := []struct {
 
 ## Implementation
 
-A reference implementation is part of [go-ethereum](https://github.com/ethereum/go-ethereum/tree/master/consensus/clique) and has been functioning as the consensus engine behind the [Rinkeby](https://www.rinkeby.io) testnet since April, 2017.
+A proof-of-concept implementation is being worked on at #ETHCapeTown.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
