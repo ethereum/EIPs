@@ -1,6 +1,6 @@
 ---
 eip: TBD
-title: EC arithmetics and pairings with runtime definisions
+title: EC arithmetics and pairings with runtime definitions
 author: Alex Vlasov (@shamatar)
 discussions-to: TBD
 type: Standards Track
@@ -32,8 +32,8 @@ This EIP proposes the following actions to bring cryptographic functionality des
 
 - Proposal to implement base elliptic curve arithmetics is covered by EIP1829 and will allow to implement various privacy-presenving protocols with a reasonable gas costs per operation.
 - Pairings:
-    - Extend set of curve that are available to allow Ethereum users to choose there security parameters and required functionality.
-    - Due to large variety of curves implementation of this EIP should cover as broad area as possible to allow Ethereum users to experiment with there choices and constructions without waiting for new forks.
+    - Extend set of curve that are available to allow Ethereum users to choose their security parameters and required functionality.
+    - Due to large variety of curves implementation of this EIP should cover as broad area as possible to allow Ethereum users to experiment with their choices and constructions without waiting for new forks.
 - Gas costs - this EIP is designed to also specify parameters and approach to gas cost evaluation before-hand. This is a strict requirement for any precompile to allow Ethereum nodes to efficiently reject transactions and operations as early as possible.
 
 ## Specification
