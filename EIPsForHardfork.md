@@ -33,7 +33,7 @@ A Meta EIP should be created and merged following the process mentioned in [EIP 
 
 * If you're an author, and still vetting the idea, please follow guidelines mentioned in [EIP - 1](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-work-flow) to formalise your idea into an EIP.
 
-* Once EIP is created, create a new issue at [EIPs repository](https://github.com/ethereum/EIPs/issues) referring "*EIP# to be considered for next upgrade (Meta EIP#)*" , before the deadline for acceptance of proposals.
+* Once EIP is created, create a new issue at [ECH repository](https://github.com/ethereum-cat-herders/PM/issues) referring "*EIP# to be considered for next upgrade (Meta EIP#)*" , before the deadline for acceptance of proposals.
 
 * It will be then picked up by the [HF coordinators](https://github.com/ethereum-cat-herders/PM/tree/master/Hard%20Fork%20Planning%20and%20Coordination) (Ethereum Cat Herders) and added as Proposed EIP under EIP tracker eg for [Istanbul](https://github.com/ethereum-cat-herders/PM/blob/master/Hard%20Fork%20Planning%20and%20Coordination/IstanbulHFEIPs.md).
 
