@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 1967
 title: Standard Proxy Storage Slots
 author: Santiago Palladino (@spalladino)
-discussions-to: https://ethereum-magicians.org/t/eip-nnnn-standard-proxy-storage-slots/3185
+discussions-to: https://ethereum-magicians.org/t/eip-1967-standard-proxy-storage-slots/3185
 status: Draft
 type: Standards Track (Core, Networking, Interface, ERC)
 category: ERC
