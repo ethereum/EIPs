@@ -45,17 +45,17 @@ A pull system is required to keep the application completely decentralized and t
  ``` 
  t1 roundMask = (20/10)
  t2 roundMask = (20/10) + (20/11) 
- t3 roundMask = (20/10) + (20/11)  + (20/11)
- t4 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)
- t5 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)+ (20/10)
- t6 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)+ (20/10) + (20/10)
+ t3 roundMask = (20/10) + (20/11) + (20/11)
+ t4 roundMask = (20/10) + (20/11) + (20/11) + (20/11)
+ t5 roundMask = (20/10) + (20/11) + (20/11) + (20/11)+ (20/10)
+ t6 roundMask = (20/10) + (20/11) + (20/11) + (20/11)+ (20/10) + (20/10)
  ``` 
 
  Total tokens released in 6 transactions = 60 tokens 
 
  As the participant joins at t2 and leaves before t5, the participant deserves the rewards between t2 and t4. When the participant joins at t2, the 'participantMask = (20/10)', when the participant leaves before t5, the cummulative deserved reward tokens are :
 
- rewards for msg.sender: `[t4 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)] - [participantMask = (20/10)] = (20/11)  + (20/11) + (20/11)`
+ rewards for msg.sender: `[t4 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)] - [participantMask = (20/10)] = [rewards = (20/11)  + (20/11) + (20/11)]`
 
  When the same participant joins the ecosystem at a later point (t27 or t35), a new 'participantMask' is given that is used to calculate the new deserved reward tokens when the participant exits. This process continues dynamically for each participant. 
 
