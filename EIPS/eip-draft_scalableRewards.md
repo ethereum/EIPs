@@ -3,9 +3,9 @@ eip: <to be assigned>
 title: Scalable Rewards 
 author: Lee Raj (@lerajk), Qin Jian - Blues
 discussions-to: lee@yesbit.ca
-status: Draft
 type: Standards Track
 category: ERC
+status: Draft
 created: 2019-04-01
 ---
 
