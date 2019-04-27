@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 1973 
 title: Scalable Rewards 
 author: Lee Raj (@lerajk), Qin Jian (@qinjian)
 type: Standards Track
