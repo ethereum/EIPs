@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Scalable Rewards 
-author: Lee Raj (@lerajk), Qin Jian - Blues
+author: Lee Raj (@lerajk), Qin Jian - Blues <blues.qin@gmail.com>
 discussions-to: lee@yesbit.ca
 type: Standards Track
 category: ERC
@@ -9,11 +9,11 @@ status: Draft
 created: 2019-04-01
 ---
 
- ## Simple Summary
+## Simple Summary
 
- A mintable token rewards interface that mints 'n' tokens per block which are distributed equally among the 'm' participants in the DAPP's ecosystem. 
+ A mintable token rewards interface that mints 'n' tokens per block which are distributed equally among the 'm' participants in the DAPP's ecosystem.
 
- ## Abstract
+## Abstract
 
  The mintable token rewards interface allows DApps to build a token economy where token rewards are distributed equally among the active participants. The tokens are minted based on per block basis that are configurable (E.g. 10.2356 tokens per block, 0.1 token per block, 1350 tokens per block) and the mint function can be initiated by any active participant. The token rewards distributed to each participant is dependent on the number of participants in the network. At the beginning, when the network has low volume, the tokens rewards per participant is high but as the network scales the token rewards decreases dynamically.
  
@@ -55,7 +55,7 @@ A pull system is required to keep the application completely decentralized and t
 
  As the participant joins at t2 and leaves before t5, the participant deserves the rewards between t2 and t4. When the participant joins at t2, the 'participantMask = (20/10)', when the participant leaves before t5, the cummulative deserved reward tokens are :
 
- rewards for msg.sender: `[t4 roundMask = (20/10) + (20/11)  + (20/11) + (20/11)] - [participantMask = (20/10)] = [rewards = (20/11)  + (20/11) + (20/11)]`
+ rewards for msg.sender: `[t4 roundMask = (20/10) + (20/11)+ (20/11) + (20/11)] - [participantMask = (20/10)] = [rewards = (20/11)+ (20/11) + (20/11)]`
 
  When the same participant joins the ecosystem at a later point (t27 or t35), a new 'participantMask' is given that is used to calculate the new deserved reward tokens when the participant exits. This process continues dynamically for each participant. 
 
@@ -79,150 +79,150 @@ import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
 
 contract Rewards is ERC20Mintable, ERC20Detailed {
 
-    using SafeMath for uint256;
+using SafeMath for uint256;
 
-    uint256 public roundMask;
-    uint256 public lastMintedBlockNumber;
-    uint256 public totalParticipants = 0; 
-    uint256 public tokensPerBlock; 
-    uint256 public blockFreezeInterval; 
-    address public tokencontractAddress = address(this);
-    mapping(address => uint256) public participantMask; 
+uint256 public roundMask;
+uint256 public lastMintedBlockNumber;
+uint256 public totalParticipants = 0;
+uint256 public tokensPerBlock; 
+uint256 public blockFreezeInterval; 
+address public tokencontractAddress = address(this);
+mapping(address => uint256) public participantMask; 
 
-  /**
-   * @dev constructor, initilizes variables.
-   * @param _tokensPerBlock The amount of token that will be released per block, entered in wei format (E.g. 1000000000000000000)
-   * @param _blockFreezeInterval The amount of blocks that need to pass (E.g. 1, 10, 100) before more tokens are brought into the ecosystem.
-   */
-   constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval) public ERC20Detailed("Simple Token", "SIM", 18)  { 
-        lastMintedBlockNumber = block.number;
-        tokensPerBlock = _tokensPerBlock;
-        blockFreezeInterval = _blockFreezeInterval;    
-    }
+/**
+ * @dev constructor, initilizes variables.
+ * @param _tokensPerBlock The amount of token that will be released per block, entered in wei format (E.g. 1000000000000000000)
+ * @param _blockFreezeInterval The amount of blocks that need to pass (E.g. 1, 10, 100) before more tokens are brought into the ecosystem.
+ */
+ constructor(uint256 _tokensPerBlock, uint256 _blockFreezeInterval) public ERC20Detailed("Simple Token", "SIM", 18){ 
+lastMintedBlockNumber = block.number;
+tokensPerBlock = _tokensPerBlock;
+blockFreezeInterval = _blockFreezeInterval;
+}
 
-  /**
-   * @dev Modifier to check if msg.sender is whitelisted as a minter. 
-   */
-    modifier isAuthorized() {
-        require(isMinter(msg.sender));
-        _;
-    }    
+/**
+ * @dev Modifier to check if msg.sender is whitelisted as a minter. 
+ */
+modifier isAuthorized() {
+require(isMinter(msg.sender));
+_;
+}
 
-  /**
-   * @dev Function to add participants in the network. 
-   * @param _minter The address that will be able to mint tokens.
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function addMinters(address _minter) external returns (bool) {
-        _addMinter(_minter);
-        totalParticipants = totalParticipants.add(1);
-        updateParticipantMask(_minter);
-        return true;
-    }
-
-
-  /**
-   * @dev Function to remove participants in the network. 
-   * @param _minter The address that will be unable to mint tokens.
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function removeMinters(address _minter) external returns (bool) {
-        totalParticipants = totalParticipants.sub(1);
-        _removeMinter(_minter); 
-        return true;
-    }
+/**
+ * @dev Function to add participants in the network. 
+ * @param _minter The address that will be able to mint tokens.
+ * @return A boolean that indicates if the operation was successful.
+ */
+function addMinters(address _minter) external returns (bool) {
+_addMinter(_minter);
+totalParticipants = totalParticipants.add(1);
+updateParticipantMask(_minter);
+return true;
+}
 
 
-  /**
-   * @dev Function to introduce new tokens in the network. 
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function trigger() external isAuthorized returns (bool) {
-        bool res = readyToMint();
-        if(res == false) {
-            return false;
-        } else {
-            mintTokens();
-            return true;
-        }
-    }
+/**
+ * @dev Function to remove participants in the network. 
+ * @param _minter The address that will be unable to mint tokens.
+ * @return A boolean that indicates if the operation was successful.
+ */
+function removeMinters(address _minter) external returns (bool) {
+totalParticipants = totalParticipants.sub(1);
+_removeMinter(_minter); 
+return true;
+}
 
-  /**
-   * @dev Function to withdraw rewarded tokens by a participant. 
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function withdraw() external isAuthorized returns (bool) {
-        uint256 amount = calculateRewards();
-        require(amount >0);
-        ERC20(tokencontractAddress).transfer(msg.sender, amount);
-    }
 
-  /**
-   * @dev Function to check if new tokens are ready to be minted. 
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function readyToMint() public view returns (bool) {
-        uint256 currentBlockNumber = block.number;
-        uint256 lastBlockNumber = lastMintedBlockNumber;
-        if(currentBlockNumber > lastBlockNumber + blockFreezeInterval) { 
-            return true;
-        } else {
-            return false;
-        }
-    }
+/**
+ * @dev Function to introduce new tokens in the network. 
+ * @return A boolean that indicates if the operation was successful.
+ */
+function trigger() external isAuthorized returns (bool) {
+bool res = readyToMint();
+if(res == false) {
+return false;
+} else {
+mintTokens();
+return true;
+}
+}
 
-  /**
-   * @dev Function to calculate current rewards for a participant. 
-   * @return A uint that returns the calculated rewards amount.
-   */
-    function calculateRewards() private returns (uint256) {
-        uint256 playerMask = participantMask[msg.sender];
-        uint256 rewards = roundMask.sub(playerMask);
-        updateParticipantMask(msg.sender);
-        return rewards;
-    }
+/**
+ * @dev Function to withdraw rewarded tokens by a participant. 
+ * @return A boolean that indicates if the operation was successful.
+ */
+function withdraw() external isAuthorized returns (bool) {
+uint256 amount = calculateRewards();
+require(amount >0);
+ERC20(tokencontractAddress).transfer(msg.sender, amount);
+}
 
-  /**
-   * @dev Function to mint new tokens into the economy. 
-   * @return A boolean that indicates if the operation was successful.
-   */
-    function mintTokens() private returns (bool) {
-        uint256 currentBlockNumber = block.number;
-        uint256 tokenReleaseAmount = (currentBlockNumber.sub(lastMintedBlockNumber)).mul(tokensPerBlock);
-        lastMintedBlockNumber = currentBlockNumber;
-        mint(tokencontractAddress, tokenReleaseAmount);
-        calculateTPP(tokenReleaseAmount);
-        return true;
-    }
-  
- /**
-  * @dev Function to calculate TPP (token amount per participant).
-  * @return A boolean that indicates if the operation was successful.
-  */
-    function calculateTPP(uint256 tokens) private returns (bool) {    
-        uint256 tpp = tokens.div(totalParticipants);
-        updateRoundMask(tpp);    
-        return true;
-    }
+/**
+ * @dev Function to check if new tokens are ready to be minted. 
+ * @return A boolean that indicates if the operation was successful.
+ */
+function readyToMint() public view returns (bool) {
+uint256 currentBlockNumber = block.number;
+uint256 lastBlockNumber = lastMintedBlockNumber;
+if(currentBlockNumber > lastBlockNumber + blockFreezeInterval) { 
+return true;
+} else {
+return false;
+}
+}
+
+/**
+ * @dev Function to calculate current rewards for a participant. 
+ * @return A uint that returns the calculated rewards amount.
+ */
+function calculateRewards() private returns (uint256) {
+uint256 playerMask = participantMask[msg.sender];
+uint256 rewards = roundMask.sub(playerMask);
+updateParticipantMask(msg.sender);
+return rewards;
+}
+
+/**
+ * @dev Function to mint new tokens into the economy. 
+ * @return A boolean that indicates if the operation was successful.
+ */
+function mintTokens() private returns (bool) {
+uint256 currentBlockNumber = block.number;
+uint256 tokenReleaseAmount = (currentBlockNumber.sub(lastMintedBlockNumber)).mul(tokensPerBlock);
+lastMintedBlockNumber = currentBlockNumber;
+mint(tokencontractAddress, tokenReleaseAmount);
+calculateTPP(tokenReleaseAmount);
+return true;
+}
 
  /**
-  * @dev Function to update round mask. 
-  * @return A boolean that indicates if the operation was successful.
-  */
-    function updateRoundMask(uint256 tpp) private returns (bool) {
-        roundMask = roundMask.add(tpp);  
-        return true;  
-    }
+* @dev Function to calculate TPP (token amount per participant).
+* @return A boolean that indicates if the operation was successful.
+*/
+function calculateTPP(uint256 tokens) private returns (bool) {
+uint256 tpp = tokens.div(totalParticipants);
+updateRoundMask(tpp);
+return true;
+}
 
  /**
-  * @dev Function to update participant mask (store the previous round mask)
-  * @return A boolean that indicates if the operation was successful.
-  */
-    function updateParticipantMask(address participant) private returns (bool) {
-        uint256 previousRoundMask = roundMask;
-        participantMask[participant] = previousRoundMask;
-        return true;
-    }
+* @dev Function to update round mask. 
+* @return A boolean that indicates if the operation was successful.
+*/
+function updateRoundMask(uint256 tpp) private returns (bool) {
+roundMask = roundMask.add(tpp);
+return true;
+}
+
+ /**
+* @dev Function to update participant mask (store the previous round mask)
+* @return A boolean that indicates if the operation was successful.
+*/
+function updateParticipantMask(address participant) private returns (bool) {
+uint256 previousRoundMask = roundMask;
+participantMask[participant] = previousRoundMask;
+return true;
+}
 
 }
 ``` 
@@ -241,11 +241,11 @@ WIP, will be added.
 
 ## Implementation
 
-WIP, a proper implementation will be added later.  A sample example is below: 
+WIP, a proper implementation will be added later.A sample example is below: 
 
 `etherscan rewards contract` : https://ropsten.etherscan.io/address/0x8b0abfc541ab7558857816a67e186221adf887bc#tokentxns
 
-`Step 1` : deploy Rewards contract with the following parameters  _tokensPerBlock = 1e18, _blockFreezeInterval = 1
+`Step 1` : deploy Rewards contract with the following parameters_tokensPerBlock = 1e18, _blockFreezeInterval = 1
 
 `Step 2` : add Alice(0x123) and Bob(0x456) as minters, addMinters(address _minter) 
 
