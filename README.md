@@ -22,6 +22,7 @@ When you believe your EIP is mature and ready to progress past the draft phase, 
  - **For all other EIPs**, open a PR changing the state of your EIP to 'Final'. An editor will review your draft and ask if anyone objects to its being finalised. If the editor decides there is no rough consensus - for instance, because contributors point out significant issues with the EIP - they may close the PR and request that you fix the issues in the draft before trying again.
 
 # EIP Status Terms
+
 * **Draft** - an EIP that is undergoing rapid iteration and changes.
 * **Last Call** - an EIP that is done with its initial iteration and ready for review by a wide audience.
 * **Accepted** - a core EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author. The process for Core Devs to decide whether to encode an EIP into their clients as part of a hard fork is not part of the EIP process. If such a decision is made, the EIP wil move to final.
@@ -32,3 +33,17 @@ When you believe your EIP is mature and ready to progress past the draft phase, 
 # Preferred Citation Format
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for ERC-165 is https://eips.ethereum.org/EIPS/eip-165.
+
+# Validation
+
+EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
+
+It is possible to run the EIP validator locally:
+```
+gem install eip_validator
+eip_validator <INPUT_FILES>
+```
+
+# Automerger
+
+The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can Github approve the change to have it auto-merged by the [eip-automerger](https://github.com/eip-automerger/automerger) bot.
