@@ -24,35 +24,40 @@ by eliminating unrealistic edge cases.
 
 ## Specification
 
-If `block.number >= {FORK_BLOCK}`, the following value ranges are introduced:
+If `block.number >= {FORK_BLOCK}`, the following value ranges are introduced.
+They restrict the results (i.e. values pushed to the stack) of the opcodes listed below.
 
-- *gas* - a number between 0 and 9223372036854775807 (2**63 - 1)
-- *gas limit* - a number between 0 and 9223372036854775807 (2**63 - 1)
-- *block gas limit* - a number between 0 and 9223372036854775807 (2**63 - 1)
-- *block number* - a number between 0 and 9223372036854775807 (2**63 - 1)
-- *account address* - a number between 0 and 1461501637330902918203684832716283019655932542975 (2**160 - 1)
-- *timestamp* - a number between 0 and 9223372036854775807 (2**63 - 1)
-- *buffer sizes* - a number between 0 and 4294967295 (2**31 - 1)
-
-### EVM changes
-
-As a result the behaviour of the following EVM opcodes are altered as stated:
-
-1) `ADDRESS` (`0x30`) - pushes a 160-bit (mod 2**160) value to the stack
-1) `ORIGIN` (`0x32`) - pushes a 160-bit (mod 2**160) value to the stack
-1) `CALLER` (`0x33`) - pushes a 160-bit (mod 2**160) value to the stack
-1) `CALLDATASIZE` (`0x36`) - pushes a 32-bit (mod 2**32) value to the stack
-1) `CODESIZE` (`0x38`) - pushes a 32-bit (mod 2**32) value to the stack
-1) `EXTCODESIZE` (`0x3b`) - pushes a 32-bit (mod 2**32) value to the stack
-1) `RETURNDATASIZE` (`0x3d`) - pushes a 32-bit (mod 2**32) value to the stack
-1) `COINBASE` (`0x41`) - pushes a 160-bit (mod 2**160) value to the stack
-1) `TIMESTAMP` (`0x42`) - pushes a 63-bit (mod 2**63) value to the stack
-1) `NUMBER` (`0x43`) - pushes a 63-bit (mod 2**63) value to the stack
-1) `GASLIMIT` (`0x45`) - pushes a 63-bit (mod 2**63) value to the stack
-1) `MSIZE` (`0x59`) - pushes a 32-bit (mod 2**32) value to the stack
-1) `GAS` (`0x5a`) - pushes a 63-bit (mod 2**63) value to the stack
-1) `CREATE` (`0xf0`) - pushes a 160-bit (mod 2**160) value to the stack
-1) `CREATE2` (`0xf5`) - pushes a 160-bit (mod 2**160) value to the stack
+1. *gas*, *gas limit*, *block gas limit*
+   is a range between `0` and `9223372036854775807` (`2**63 - 1`).
+   It affects following the opcodes:
+   - `GASLIMIT` (`0x45`),
+   - `GAS` (`0x5a`).
+   
+2. *block number*, *timestamp*
+   is a range between `0` and `9223372036854775807` (`2**63 - 1`).
+   It affects the following opcodes:
+   - `TIMESTAMP` (`0x42`),
+   - `NUMBER` (`0x43`).
+   
+3. *account address*
+   is a range between `0` and `1461501637330902918203684832716283019655932542975` (`2**160 - 1`).
+   It affects the following opcodes:
+   - `ADDRESS` (`0x30`),
+   - `ORIGIN` (`0x32`),
+   - `CALLER` (`0x33`),
+   - `COINBASE` (`0x41`),
+   - `CREATE` (`0xf0`),
+   - `CREATE2` (`0xf5`). 
+   
+4. *buffer size*
+   is a range between `0` and `4294967295` (`2**32 - 1`).
+   It affects the following opcodes:
+   - `CALLDATASIZE` (`0x36`),
+   - `CODESIZE` (`0x38`),
+   - `EXTCODESIZE` (`0x3b`),
+   - `RETURNDATASIZE` (`0x3d`),
+   - `MSIZE` (`0x59`).
+   
 
 ## Rationale
 
@@ -87,6 +92,7 @@ TBA
 
 1. The size of addresses are specified in Yellow Paper, 
 e.g. COINBASE is specified as returning H_c which has 20 bytes.
+2. Do the gas limit applies for the gas param in CALL?
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
