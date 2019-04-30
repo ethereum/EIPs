@@ -64,6 +64,11 @@ These limits have been:
 
 Most of the limits proposed in this document have been previously explored and tested in [EVMC].
 
+Using the `2**63 - 1` constant to limit some of the ranges:
+- allows using singed 64-bit integer type to represent it, 
+  what helps programming languages not having unsigned types,
+- makes arithmetic simpler (e.g. checking out-of-gas conditions is simple as `gas_counter < 0`).
+
 
 ## Backwards Compatibility
 
