@@ -27,8 +27,8 @@ header_pages:
  - networking.html
  - interface.html
  - erc.html
- - informational.html
  - meta.html
+ - informational.html
 twitter:
   card: summary
   username: ethereum
