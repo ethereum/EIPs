@@ -205,6 +205,10 @@ The current EIP editors are
 
 ` * Martin Becze (@wanderer)`
 
+` * Greg Colvin (@gcolvin)`
+
+` * Alex Beregszaszi (@axic)`
+
 ## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
