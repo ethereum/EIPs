@@ -37,11 +37,31 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 ## EIP Work Flow
 
+### Shepherding an EIP
+
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-:warning: Before you begin, vet your idea, this will save you time. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
+It will be your role as the champion to socialize your EIP and build community consensus around it. Before you begin writting a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research. It is recommended to open a discussion thread on [the Ethereum Magicians forum], but you can also use [one of the Ethereum Gitter chat rooms], [the Ethereum subreddit] or [the Issues section of this repository]. 
 
-Your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea. Following is the process that a successful EIP will move along:
+In addition to making sure your idea is original, you should try and gauge whether the community interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the community interest required for a technically complex Core EIP will have to be much higher than for a simple ERC. 
+
+### Core EIPs
+
+For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP. 
+
+The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda Github Issue].  
+
+The AllCoreDevs call serve as a way for client implementers to do three things. First, to discuss the technical merits of EIPs. Second, to gauge what other clients will be implementing. Third, to coordinate EIP implementation for network upgrades.
+
+These calls generally result in a "rough consensus" around what EIPs should be implemented. This "rough consensus" rests on the assumptions that EIPs are not contentious enough to cause a network split and that they are technically sound.
+
+:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum] thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
+
+*In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.* 
+
+### EIP Process 
+
+Following is the process that a successful EIP will move along:
 
 ```
 [ WIP ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
@@ -273,6 +293,8 @@ See [the revision history for further details](https://github.com/ethereum/EIPs/
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
+[the Ethereum Magicians forum]: https://ethereum-magicians.org/
+[AllCoreDevs agenda Github Issue]: https://github.com/ethereum/pm/issues
 
 ## Copyright
 
