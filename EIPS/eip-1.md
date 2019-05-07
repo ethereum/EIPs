@@ -41,7 +41,7 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-It will be your role as the champion to socialize your EIP and build community consensus around it. Before you begin writting a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research. It is recommended to open a discussion thread on [the Ethereum Magicians forum], but you can also use [one of the Ethereum Gitter chat rooms], [the Ethereum subreddit] or [the Issues section of this repository]. 
+It will be your role as the champion to socialize your EIP and build community consensus around it. Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research. It is recommended to open a discussion thread on [the Ethereum Magicians forum], but you can also use [one of the Ethereum Gitter chat rooms], [the Ethereum subreddit] or [the Issues section of this repository]. 
 
 In addition to making sure your idea is original, you should try and gauge whether the community interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the community interest required for a technically complex Core EIP will have to be much higher than for a simple ERC. 
 
