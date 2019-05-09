@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2019-04-30
-requires: 20
+requires: 1996
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -15,7 +15,7 @@ requires: 20
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-> "In banking and finance, clearing denotes all activities from the time a commitment is made for a transaction until it is settled." [[1]][Wikipedia] 
+> "In banking and finance, clearing denotes all activities from the time a commitment is made for a transaction until it is settled." [[1]][Clearing-Wikipedia] 
 
 ## Actors
 
@@ -32,19 +32,19 @@ The account which orders a clearable transfer. This can be the account owner its
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-The clearing process turns the promise of transfer into the actual movement of money from one account to another. A clearing agent decides if the transfer can be executed or not. The amount which should be transferred is not deducted on the balance of the 
+The clearing process turns the promise of a transfer into the actual movement of money from one account to another. A clearing agent decides if the transfer can be executed or not. The amount which should be transferred is not deducted from the balance of the payer, but neither is it available for another transfer and therefore ensures, that the execution of the transfer will be successful when it is executed.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+
+A regulated token needs to comply with all the legal requirements, especially [KYC][KYC-Wikipedia] and [AML][AML-Wikipedia]. Some of these checks may not be able to be done on-chain and therefore a transfer may not be completed in one step. Currently there is no EIP to make such off-chain checks possible. This proposal allows a user to order a transfer, which can be checked by a clearing agent off-chain. Depending on the result of it, the clearing agent will either execute or cancel the transfer. To provide more information why a transfer is cancelled, the clearing agent can add a reason why it is not executed.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 ```solidity
-interface ClearableToken /* is ERC-20 */ {
+interface ClearableToken /* is ERC-1996 */ {
     enum ClearableTransferStatusCode { Nonexistent, Ordered, InProcess, Executed, Rejected, Cancelled }
-
 
     function orderTransfer(string calldata operationId, address to, uint256 value) external returns (bool);
     function orderTransferFrom(string calldata operationId, address from, address to, uint256 value) external returns (bool);
@@ -54,17 +54,17 @@ interface ClearableToken /* is ERC-20 */ {
     function rejectClearableTransfer(address orderer, string calldata operationId, string calldata reason) external returns (bool);
     function retrieveClearableTransferData(address orderer, string calldata operationId) external view returns (address from, address to, uint256 value, ClearableTransferStatusCode status);
 
-    function authorizeClearableTransferOrderer(address orderer) external returns (bool);
-    function revokeClearableTransferOrderer(address orderer) external returns (bool);
-    function isClearableTransferOrdererFor(address orderer, address from) external view returns (bool);
+    function authorizeClearableTransferOperator(address operator) external returns (bool);
+    function revokeClearableTransferOperator(address operator) external returns (bool);
+    function isClearableTransferOperatorFor(address operator, address from) external view returns (bool);
 
     event ClearableTransferOrdered(address indexed orderer, string operationId, address indexed from, address indexed to, uint256 value);
     event ClearableTransferInProcess(address indexed orderer, string operationId);
     event ClearableTransferExecuted(address indexed orderer, string operationId);
     event ClearableTransferRejected(address indexed orderer, string operationId, string reason);
     event ClearableTransferCancelled(address indexed orderer, string operationId);
-    event AuthorizedClearableTransferOrderer(address indexed orderer, address indexed account);
-    event RevokedClearableTransferOrderer(address indexed orderer, address indexed account);
+    event AuthorizedClearableTransferOperator(address indexed operator, address indexed account);
+    event RevokedClearableTransferOperator(address indexed operator, address indexed account);
 }
 ```
 
@@ -72,7 +72,7 @@ interface ClearableToken /* is ERC-20 */ {
 
 #### orderTransfer
 
-Orders a clearable transfer on behalf of the msg.sender in favor of the payee. A clearing agent is responsible to either execute or reject the transfer.
+Orders a clearable transfer on behalf of the msg.sender in favor of `to`. A clearing agent is responsible to either execute or reject the transfer.
 
 | Parameter | Description |
 | ---------|-------------|
@@ -82,17 +82,18 @@ Orders a clearable transfer on behalf of the msg.sender in favor of the payee. A
 
 #### orderTransferFrom
 
-Orders a clearable transfer on behalf of the payer in favor of the payee. A clearing agent is responsible to either execute or reject the transfer.
+Orders a clearable transfer on behalf of the payer in favor of the `to`. A clearing agent is responsible to either execute or reject the transfer.
 
 | Parameter | Description |
 | ---------|-------------|
 | operationId | The unique ID per orderer to identify the clearable transfer |
+| from | The address of the payer, from whom the tokens are to be taken if executed |
 | to | The address of the payee, to whom the tokens are to be paid if executed |
 | value | The amount to be transferred. Must be less or equal than the balance of the payer. |
 
 #### cancelTransfer
 
-Cancels the order of a clearable transfer. Only the orderer can cancel their own orders. It must not be successful as soon as it is in status `InProcess`.
+Cancels the order of a clearable transfer. Only the orderer can cancel their own orders. It must not be successful as soon as the transfer is in status `InProcess`.
 
 | Parameter | Description |
 | ---------|-------------|
@@ -100,7 +101,7 @@ Cancels the order of a clearable transfer. Only the orderer can cancel their own
 
 #### processClearableTransfer
 
-Sets a clearable transfer to status `InProcess`. Only a clearing agent can successfully execute this action.
+Sets a clearable transfer to status `InProcess`. Only a clearing agent can successfully execute this action. This status is optional, but without it the orderer can cancel the transfer at any time.
 
 | Parameter | Description |
 | ---------|-------------|
@@ -135,30 +136,39 @@ Retrieves all the information available for a particular clearable transfer.
 | orderer | The address which ordered the clearable transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 
-#### authorizeClearableTransferOrderer
+#### authorizeClearableTransferOperator
 
-Approves an orderer to order transfers on behalf of msg.sender.
+Approves an operator to order transfers on behalf of msg.sender.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be approved as orderer of transfers |
+| operator | The address to be approved as operator of clearable transfers |
 
-#### revokeClearableTransferOrderer
+#### revokeClearableTransferOperator
 
 Revokes the approval to order transfers on behalf of msg.sender.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be revokes as orderer of transfers |
+| operator | The address to be revoked as operator of clearable transfers |
 
-#### isClearableTransferOrdererFor
+#### isClearableTransferOperatorFor
 
-Returns if an orderer is approved to order transfers on behalf of `from`.
+Returns if an operator is approved to order transfers on behalf of `from`.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| operator | The address to be an operator of clearable transfers |
 | from | The address on which the holds would be created |
+
+#### transfer
+
+It is up to the implementer of the EIP if the `transfer` function of ERC-20 should always revert or is allowed under certain circumstances.
+
+#### transferFrom
+
+It is up to the implementer of the EIP if the `transferFrom` function of ERC-20 should always revert or is allowed under certain circumstances.
+
 
 ### Events
 
@@ -168,7 +178,7 @@ Must be emitted when a clearable transfer is ordered.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| orderer | The address of the orderer of the transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 | from | The address of the payer, from whom the tokens are to be taken if executed |
 | to | The address of the payee, to whom the tokens are to be paid if executed |
@@ -180,7 +190,7 @@ Must be emitted when a clearable transfer is put in status `ÌnProcess`.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| orderer | The address of the orderer of the transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 
 #### ClearableTransferExecuted
@@ -189,54 +199,59 @@ Must be emitted when a clearable transfer is executed.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| orderer | The address of the orderer of the transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 
 #### ClearableTransferRejected
 
-Must be emitted when a clearable transfer is executed.
+Must be emitted when a clearable transfer is rejected.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| orderer | The address of the orderer of the transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 | reason | A reason given by the clearing agent why the transfer has been rejected |
 
 #### ClearableTransferCancelled
 
-Must be emitted when a clearable transfer is cancelled.
+Must be emitted when a clearable transfer is cancelled by its orderer.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| orderer | The address of the orderer of the transfer |
 | operationId | The unique ID per orderer to identify the clearable transfer |
 
-#### AuthorizedClearableTransferOrderer
+#### AuthorizedClearableTransferOperator
 
 Emitted when an operator has been approved to order transfers on behalf of another account.
 
 | Parameter | Description |
 | ---------|-------------|
-| orderer | The address to be an orderer of transfers |
+| operator | The address which has been approved as operator of clearable transfers |
 | account | Address on which behalf transfers will potentially be ordered |
 
-#### RevokedClearableTransferOrderer
+#### RevokedClearableTransferOperator
 
-Emitted when an orderer has been revoked from ordering transfers on behalf of another account.
+Emitted when an operator has been revoked from ordering transfers on behalf of another account.
 
 | Parameter | Description |
 | ---------|-------------|
-| operator | The address to be a operator of holds |
+| operator | The address which has been revoked as operator of clearable transfers |
 | account | Address on which behalf transfers could potentially be ordered |
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
+This EIP uses [EIP-1996][EIP-1996] to hold the money after a transfer is ordered. A clearing agent, whos implementation is not part of this proposal, acts as a predefined notary to decide if the transfer complies with the rules of the token or not.
+
+The operation id is unique per orderer to avoid collisions of it between different orderers.
+
+While not requiring it, the naming of the functions `authorizeClearableTransferOperator`, `revokeClearableTransferOperator` and `isClearableTransferOperatorFor` follows the naming convention of [ERC-777](https://eips.ethereum.org/EIPS/eip-777).
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
-This EIP is fully backwards compatible as its implementation extends the functionality of ERC-20.
+This EIP is fully backwards compatible as its implementation extends the functionality of ERC-1996.
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
@@ -248,4 +263,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 [1] https://en.wikipedia.org/wiki/Clearing_(finance)
 
-[Wikipedia]: https://en.wikipedia.org/wiki/Clearing_(finance)
+[Clearing-Wikipedia]: https://en.wikipedia.org/wiki/Clearing_(finance)
+[KYC-Wikipedia]: https://en.wikipedia.org/wiki/Know_your_customer
+[AML-Wikipedia]: https://en.wikipedia.org/wiki/Money_laundering#Anti-money_laundering
+[EIP-1996]: https://github.com/ethereum/EIPs/pull/1996
