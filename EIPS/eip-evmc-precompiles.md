@@ -1,0 +1,108 @@
+---
+eip: XXXX DO NOT MERGE
+title: EVMC modules for implementations of precompiled contracts
+author: Paweł Bylica (@chfast)
+discussions-to: HERE
+status: Draft
+type: Informational
+created: 2019-05-09
+---
+
+## Abstract
+
+[EVMC] specifies generic API for Ethereum execution engines.
+This EIP specifies a way of providing implementations of Ethereum precompiled contracts
+as a degenerated EVM implementations using [EVMC VM API].
+
+
+## Specification
+
+The EVMC module with implementations of precompiled contracts SHOULD:
+
+1. Advertise the [`EVMC_CAPABILITY_PRECOMPILES`] capability 
+   in the [`get_capabilities()`] method.
+2. Implement the [`execute()`] method in the following way:
+   1. Check if the call destination address ([`evmc_message::destination`])
+      is within the range of precompiled contracts defined by [EIP-1352].
+      If not, abort execution with the [`EVMC_REJECTED`] status code.
+   2. Check if the call destination address ([`evmc_message::destination`])
+      targets existing precompiled contract.
+      Consider the EVM revision ([`evmc_revision`]) requested by 
+      the `rev` parameter of [`execute()`].
+      If yes, execute as follows:
+      1. Inspect the input data ([`evmc_message::input_data`], [`evmc_message::input_size`])
+         and calculate the _gas cost_ of the execution.
+      2. Compute the amount of _gas left_ after execution by
+         subtracting the _gas cost_ from the call gas limit ([`evmc_message::gas`]).
+      3. If _gas left_ is negative,
+         abort execution with the [`EVMC_OUT_OF_GAS`] status code.
+      4. Otherwise,
+         execute the code of the precompiled contract,
+         return the [`EVMC_SUCCESS`] status code, the output and _gas left_
+         ([`evmc_result::output_data`], [`evmc_result::output_size`], [`evmc_result::gas_left`]).
+   3. Otherwise, emulate execution of empty code by returning
+      the [`EVMC_SUCCESS`] status code
+      and _gas left_ equal the call gas limit ([`evmc_message::gas`]).
+
+
+## Rationale
+
+TODO
+
+
+## Test Cases
+
+EVMC provides the [evmc-vmtester] tool for checking compatibility with EVMC specification.
+
+
+## Implementations
+
+- [Example of Precompiles VM implementation][example_precompiles_vm.cpp]
+- ewasm/precompiles
+- Aleth code for precompiles
+- Parity code for precompiles
+- Other EVMC VMs?
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+
+## References
+
+- [EVMC – Ethereum Client-VM Connector API][EVMC]
+- [EVMC documentation]
+- [EVMC VM Implementation Guide][EVMC VM API]
+- [EIP 1352: Specify restricted address range for precompiles/system contracts][EIP-1352]
+
+
+## TODO
+
+- What if message::kind is CREATE?
+- What if message contains code?
+- Add code snippets from the example?
+- Links to EVMC repo are not pinned to particular commit. Probably should be pinned to v6.3.0 later on.
+
+
+[EIP-1352]: https://eips.ethereum.org/EIPS/eip-1352
+[EVMC]: https://github.com/ethereum/evmc
+[EVMC documentation]: https://ethereum.github.io/evmc/
+[EVMC VM API]: https://ethereum.github.io/evmc/vmguide.html
+[evmc-vmtester]: https://ethereum.github.io/evmc/vmtester.html
+[example_precompiles_vm.cpp]: https://github.com/ethereum/evmc/blob/master/examples/example_precompiles_vm/example_precompiles_vm.cpp
+
+[`EVMC_CAPABILITY_PRECOMPILES`]: https://ethereum.github.io/evmc/group__EVMC.html#gga44f9ecb88cf6422a0072936494fd6ac7a43ea2aa7b099a2d67bc53c118ff3683d
+[`EVMC_REJECTED`]: https://ethereum.github.io/evmc/group__EVMC.html#gga4c0be97f333c050ff45321fcaa34d920a2f3e0d8777f8d974ead27ae2a6eb2005
+[`EVMC_OUT_OF_GAS`]: https://ethereum.github.io/evmc/group__EVMC.html#gga4c0be97f333c050ff45321fcaa34d920abfc47f75656c996c0b29c0553c00fc18
+[`EVMC_SUCCESS`]: https://ethereum.github.io/evmc/group__EVMC.html#gga4c0be97f333c050ff45321fcaa34d920a4bc3069fec2bab2a55355a72b7db68b7
+[`execute()`]: https://ethereum.github.io/evmc/structevmc__instance.html#a0823ebff21f9b0395b157e8c6b14a207
+[`get_capabilities()`]: https://ethereum.github.io/evmc/structevmc__instance.html#ae63b9ca898aa41cbd1e2fe86ca8f4e1c
+[`evmc_message::destination`]: https://ethereum.github.io/evmc/structevmc__message.html#a88ecfaa03a85a31c6da36fa043b98cea
+[`evmc_message::input_data`]: https://ethereum.github.io/evmc/structevmc__message.html#a1adee3454b105eb29cd659ee0cf65c77
+[`evmc_message::input_size`]: https://ethereum.github.io/evmc/structevmc__message.html#a2cf1deebd0dbbb20f25ecdfa299f4b5d
+[`evmc_message::gas`]: https://ethereum.github.io/evmc/structevmc__message.html#ae8deff46588584fa27890e74c82db5e7
+[`evmc_result::gas_left`]: https://ethereum.github.io/evmc/structevmc__result.html#af8478c93dbcc3cb2876037c5a5afd4c0
+[`evmc_result::output_data`]: https://ethereum.github.io/evmc/structevmc__result.html#a61978e85f9d795a7b9695b9cbf1748d6
+[`evmc_result::output_size`]: https://ethereum.github.io/evmc/structevmc__result.html#a93bb7419aff492cdef754421c6d74e26
+[`evmc_revision`]: https://ethereum.github.io/evmc/group__EVMC.html#gae5759b1590071966ccf6a505b52a0ef7
