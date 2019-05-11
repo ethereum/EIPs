@@ -7,6 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2019-05-10
+requires: 140
 ---
 
 ## Simple Summary
@@ -42,7 +43,9 @@ In the future if it is sufficiently extended and a need arises to have a state, 
 
 ### Chain identifier
 
-Initially, a feature to read the current chain identifier is introduced: `getCurrentChainId()` returns the current chain identifier as a `uint64` encoded value. This has been proposed as [EIP-1344].
+Initially, a feature to read the current chain identifier is introduced: `getCurrentChainId()` returns the current chain identifier as a `uint64` encoded value.
+It should be a non-payable function, which means sending any value would revert the transaction as described in [EIP-140].
+This has been proposed as [EIP-1344].
 
 The contract ABI JSON is the following:
 ```json
@@ -82,5 +85,6 @@ This will be translated into sending the bytes `5cf0e8a4` to the ESO and returni
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
 
 [Contract ABI Encoding]: https://solidity.readthedocs.io/en/latest/abi-spec.html
+[EIP-140]: https://eips.ethereum.org/EIPS/eip-140
 [EIP-210]: https://eips.ethereum.org/EIPS/eip-210
 [EIP-1344]: https://eips.ethereum.org/EIPS/eip-1344
