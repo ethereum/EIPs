@@ -29,7 +29,9 @@ A standard interface allows any tokens on Ethereum to be re-used by other applic
 ## Token
 ### Methods
 
-**NOTE**: Callers MUST handle `false` from `returns (bool success)`.  Callers MUST NOT assume that `false` is never returned!
+**NOTES**:
+ - The following specifications use syntax from Solidity `0.4.17` (or above)
+ - Callers MUST handle `false` from `returns (bool success)`.  Callers MUST NOT assume that `false` is never returned!
 
 
 #### name
@@ -41,7 +43,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() view returns (string name)
+function name() public view returns (string)
 ```
 
 
@@ -53,7 +55,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function symbol() view returns (string symbol)
+function symbol() public view returns (string)
 ```
 
 
@@ -66,7 +68,7 @@ OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
 
 ``` js
-function decimals() view returns (uint8 decimals)
+function decimals() public view returns (uint8)
 ```
 
 
@@ -75,7 +77,7 @@ function decimals() view returns (uint8 decimals)
 Returns the total token supply.
 
 ``` js
-function totalSupply() view returns (uint256 totalSupply)
+function totalSupply() public view returns (uint256)
 ```
 
 
@@ -85,7 +87,7 @@ function totalSupply() view returns (uint256 totalSupply)
 Returns the account balance of another account with address `_owner`.
 
 ``` js
-function balanceOf(address _owner) view returns (uint256 balance)
+function balanceOf(address _owner) public view returns (uint256 balance)
 ```
 
 
@@ -93,12 +95,12 @@ function balanceOf(address _owner) view returns (uint256 balance)
 #### transfer
 
 Transfers `_value` amount of tokens to address `_to`, and MUST fire the `Transfer` event.
-The function SHOULD `throw` if the `_from` account balance does not have enough tokens to spend.
+The function SHOULD `throw` if the message caller's account balance does not have enough tokens to spend.
 
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
-function transfer(address _to, uint256 _value) returns (bool success)
+function transfer(address _to, uint256 _value) public returns (bool success)
 ```
 
 
@@ -114,7 +116,7 @@ The function SHOULD `throw` unless the `_from` account has deliberately authoriz
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
 ``` js
-function transferFrom(address _from, address _to, uint256 _value) returns (bool success)
+function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
 ```
 
 
@@ -128,7 +130,7 @@ clients SHOULD make sure to create user interfaces in such a way that they set t
 THOUGH The contract itself shouldn't enforce it, to allow backwards compatibility with contracts deployed before
 
 ``` js
-function approve(address _spender, uint256 _value) returns (bool success)
+function approve(address _spender, uint256 _value) public returns (bool success)
 ```
 
 
@@ -137,7 +139,7 @@ function approve(address _spender, uint256 _value) returns (bool success)
 Returns the amount which `_spender` is still allowed to withdraw from `_owner`.
 
 ``` js
-function allowance(address _owner, address _spender) view returns (uint256 remaining)
+function allowance(address _owner, address _spender) public view returns (uint256 remaining)
 ```
 
 
@@ -173,12 +175,8 @@ There are already plenty of ERC20-compliant tokens deployed on the Ethereum netw
 Different implementations have been written by various teams that have different trade-offs: from gas saving to improved security.
 
 #### Example implementations are available at
-- https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/StandardToken.sol
-- https://github.com/ConsenSys/Tokens/blob/master/contracts/eip20/EIP20.sol
-
-#### Implementation of adding the force to 0 before calling "approve" again:
-- https://github.com/Giveth/minime/blob/master/contracts/MiniMeToken.sol
-
+- [OpenZeppelin implementation](https://github.com/OpenZeppelin/openzeppelin-solidity/blob/9b3710465583284b8c4c5d2245749246bb2e0094/contracts/token/ERC20/ERC20.sol)
+- [ConsenSys implementation](https://github.com/ConsenSys/Tokens/blob/fdf687c69d998266a95f15216b1955a4965a0a6d/contracts/eip20/EIP20.sol)
 
 
 ## History

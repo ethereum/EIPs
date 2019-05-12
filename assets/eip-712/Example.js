@@ -76,7 +76,7 @@ function encodeType(primaryType) {
 }
 
 function typeHash(primaryType) {
-    return ethUtil.sha3(encodeType(primaryType));
+    return ethUtil.keccak256(encodeType(primaryType));
 }
 
 function encodeData(primaryType, data) {
@@ -92,11 +92,11 @@ function encodeData(primaryType, data) {
         let value = data[field.name];
         if (field.type == 'string' || field.type == 'bytes') {
             encTypes.push('bytes32');
-            value = ethUtil.sha3(value);
+            value = ethUtil.keccak256(value);
             encValues.push(value);
         } else if (types[field.type] !== undefined) {
             encTypes.push('bytes32');
-            value = ethUtil.sha3(encodeData(field.type, value));
+            value = ethUtil.keccak256(encodeData(field.type, value));
             encValues.push(value);
         } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
             throw 'TODO: Arrays currently unimplemented in encodeData';
@@ -110,11 +110,11 @@ function encodeData(primaryType, data) {
 }
 
 function structHash(primaryType, data) {
-    return ethUtil.sha3(encodeData(primaryType, data));
+    return ethUtil.keccak256(encodeData(primaryType, data));
 }
 
 function signHash() {
-    return ethUtil.sha3(
+    return ethUtil.keccak256(
         Buffer.concat([
             Buffer.from('1901', 'hex'),
             structHash('EIP712Domain', typedData.domain),
@@ -123,7 +123,7 @@ function signHash() {
     );
 }
 
-const privateKey = ethUtil.sha3('cow');
+const privateKey = ethUtil.keccak256('cow');
 const address = ethUtil.privateToAddress(privateKey);
 const sig = ethUtil.ecsign(signHash(), privateKey);
 
