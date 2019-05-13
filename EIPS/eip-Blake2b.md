@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: EIP 131
 title: Blake2b Ethereum Implementation
 author: James Hancock <@madeoftin> , Tjaden Hess <@tjade273> 
 discussions-to: https://ethereum-magicians.org/t/blake2b-f-precompile/3157/6
