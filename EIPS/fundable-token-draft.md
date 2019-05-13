@@ -18,7 +18,7 @@ An extension to the ERC-20 standard token that allows Token wallet owners to req
 #### Token Wallet Owners
 The person or company who owns the wallet, and will order a token fund request into the wallet.
 
-#### Token contract operator
+#### Token contract owner / agent 
 The entity, company responsible/owner of the token contract, and token issuing/minting. This actor is in charge of trying to fullfill all fund request(s), reading the fund instruction(s), and corelate the private payment details.
 
 #### Orderer
@@ -28,16 +28,17 @@ An actor who is enable to initiate funding orders on behalf ot a token wallet ow
 ## Abstract
 Token wallet owners (or approved addresses) can order tokenization requests through  blockchain. This is done by calling the ```orderFund``` or ```orderFundFrom``` methods, which initiate the workflow for the token contract operator to either honor or reject the fund request. In this case, fund instructions are provided when submitting the request, which are used by the operator to determine the source of the funds to be debited in order to do fund the token wallet (through minting).
 
-In general, it is not advisable to place explicit routing instructions for debiting funds on a verbatim basis on the blockchain, and it is advised to use a private communication alternatives. such as private channels, encrypted storage or similar,  to do so (external to the blockchain ledger). Another (less desirable) possibility is to place these instructions on the instructions field on encrypted form.
+In general, it is not advisable to place explicit routing instructions for debiting funds on a verbatim basis on the blockchain, and it is advised to use a private communication alternatives, such as private channels, encrypted storage or similar,  to do so (external to the blockchain ledger). Another (less desirable) possibility is to place these instructions on the instructions field in encrypted form.
 
 
 ## Motivation
 Nowadays most of the token issuing/funding request, based on any fiat based payment method  need a previous centralized transaction, to be able to get the desired tokens issued on requester's wallet.
-In the aim of trying step by step to bring all the needed steps into decentralization, exposing all the needed steps of token lifecycle and payment transactions, a funding request can allow wallet owner to initiate the funding request via  blockchain.
+In the aim of trying to bring all the needed steps into decentralization, exposing all the needed steps of token lifecycle and payment transactions, a funding request can allow wallet owner to initiate the funding request via  blockchain.
 Key benefits:
 
-* Funding and payment traceability is enhanced bringing the initation into the ledger. All payment statuses can be stored on chain.
-* Almost all money/token lifecycle is covered via an decentralized approach, complemented with private communications which is common used in the ecosystem.
+* Funding and payment traceability is enhanced bringing the initation into the ledger. All payment stat
+s can be stored on chain.
+* Almost all money/token lifecycle is covered via a decentralized approach, complemented with private communications which is common use in the ecosystem.
 
 
 ## Specification
@@ -61,7 +62,7 @@ interface IFundable /* is ERC-20 */ {
     function executeFund(address orderer, string calldata operationId) external returns (bool);
     function rejectFund(address orderer, string calldata operationId, string calldata reason) external returns (bool);
 
-    function isApprovedToOrderFund(address walletToFund, address orderer) external view returns (bool);
+    function isFundOperatorFor(address walletToFund, address orderer) external view returns (bool);
     function retrieveFundData(address orderer, string calldata operationId) external view returns (address walletToFund,       uint256 value, string memory instructions, FundStatusCode status);
 
     event FundOrdered(address indexed orderer, string indexed operationId, address indexed , uint256 value,         string instructions);
@@ -69,8 +70,8 @@ interface IFundable /* is ERC-20 */ {
     event FundExecuted(address indexed orderer, string indexed operationId);
     event FundRejected(address indexed orderer, string indexed operationId, string reason);
     event FundCancelled(address indexed orderer, string indexed operationId);
-    event ApprovalToOrderFund(address indexed walletToFund, address indexed orderer);
-    event RevokeApprovalToOrderFund(address indexed walletToFund, address indexed orderer);
+    event FundOperatorAuthorized(address indexed walletToFund, address indexed orderer);
+    event FundOperatorRevoked(address indexed walletToFund, address indexed orderer);
 }
 
 ```
@@ -85,9 +86,9 @@ Wallet owner, allows a given address to be fund orderer.
 | ---------|-------------|
 | orderer | The address of the orderer.
 
-#### revokeApprovalToOrderFund
+#### revokeFundOperator
 
-Wallet owner, Revokes a given address to be fund orderer.
+Wallet owner, revokes a given address to be fund orderer.
 
 | Parameter | Description |
 | ---------|-------------|
@@ -100,7 +101,7 @@ Creates a fund request, that will be processed by the token operator.All fund re
 
 | Parameter | Description |
 | ---------|-------------|
-| operationId | The unique ID per token holder to identify the request |
+| operationId | The unique ID per token orderer to identify the request |
 | value | The amount to be funded. |
 | instruction | A string including the payment instruction. |
 
@@ -110,7 +111,7 @@ Creates a fund request, on behalf of a wallet owner, that will be processed by t
 
 | Parameter | Description |
 | ---------|-------------|
-| operationId |he unique ID per token holder to identify the request |
+| operationId |The unique ID per token orderer to identify the request |
 | walletToFund | The wallet to be funded on behalf.
 | value | The amount to be funded. |
 | instruction | A string including the payment instruction. |
@@ -122,8 +123,8 @@ Cancels a funding request.
 | Parameter | Description |
 | ---------|-------------|
 | orderer | The address of the orderer, to correlate the right data.
-| operationId | The unique ID per token holder to identify the request that is going to be cancelled. This can only be done by token holder, or the fund initiator. |
-| reason | The unique ID per token holder to identify the request that is going to be cancelled. This can only be done by token holder, or the fund initiator. |
+| operationId | The unique ID per token orderer to identify the request that is going to be cancelled. This can only be done by token holder, or the fund initiator. |
+
 
 
 #### processFund
@@ -154,7 +155,7 @@ Rejects a given operation with a reason.
 | operationId | The unique ID per orderer to identify the request that has been executed.
 | reason | The specific reason that explains why the fund request was rejected. EIP 1066 codes can be used |
 
-#### isApprovedToOrderFund
+#### isFundOperatorFor
 
 Checks that given player is allowed to order fund requests, for a given wallet.
 
@@ -171,7 +172,7 @@ Retrieves all the fund request data. Only operator, tokenHolder, and orderer can
 | Parameter | Description |
 | ---------|-------------|
 | orderer | The address of the orderer, to correlate the right data.
-| operationId | The unique ID per token holder to identify the fund order.
+| operationId | The unique ID per token orderer to identify the fund order.
 
 
 ## Events
@@ -180,14 +181,14 @@ Retrieves all the fund request data. Only operator, tokenHolder, and orderer can
 
 Emitted when an token wallet owner orders a funding request.
 
-| operationId | The unique ID per token holder to identify the request |
+| operationId | The unique ID per token orderer to identify the request |
 | walletToFund | The wallet that the player is allowed to start funding requests |
 | value | The amount to be funded. |
 | instruction | A string including the payment instruction. |
 
 #### FundInProcess
 
-Emitted when an operator accepts a funding request, and the operation is in process.
+Emitted when an operator starts a funding request after validating the instruction, and the operation is marked as in process.
 
 | Parameter | Description |
 | ---------|-------------|
@@ -212,7 +213,7 @@ Emitted when an operator has rejected a funding request.
 | Parameter | Description |
 | ---------|-------------|
 | orderer | The address of the fund request orderer. |
-| operationId | The unique ID per fund issuer to identify the fund. Operation ids are unique per requester/orderer. |
+| operationId | The unique ID per fund orderer to identify the fund. Operation ids are unique per requester/orderer. |
 | reason | The specific reason that explains why the fund request was rejected. EIP 1066 codes can be used |
 
 
@@ -223,10 +224,10 @@ Emitted when a token holder, orderer,  has cancelled a funding request. This can
 | Parameter | Description |
 | ---------|-------------|
 | orderer | The address of the fund request orderer. |
-| operationId | The unique ID per fund issuer to identify the fund. Operation ids are unique per requester/orderer. |
+| operationId | The unique ID per fund orderer to identify the fund. Operation ids are unique per requester/orderer. |
 
 
-#### ApprovalToOrderFund
+#### FundOperatorAuthorized
 
 Emitted when a given player, operator, company or a given persona, has been approved to start fund request for a given token holder.
 
@@ -235,7 +236,7 @@ Emitted when a given player, operator, company or a given persona, has been appr
 | walletToFund | The wallet that the player is allowed to start funding requests |
 | orderer |The address that allows the the player to start requests. |
 
-#### RevokeApprovalToOrderFund
+#### FundOperatorRevoked
 
 Emitted when a given player has been revoked initiate funding requests.
 
