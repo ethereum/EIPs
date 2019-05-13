@@ -1,0 +1,302 @@
+---
+eip: <to be assigned>
+title: Payoutable Token
+author: Fernando Paris <fer@io.builders>
+status: Draft
+type: Standards Track
+category:  ERC
+created: 2019-05-10
+requires: 20
+
+---
+
+## Simple Summary
+An extension to the ERC-20 standard token that allows Token wallet owners to request payut from their wallet, by calling the smart contract and attaching a payout instruction string.
+
+## Actors
+
+#### Token Wallet Owners
+The person or company who owns the wallet, and will order payout.
+
+#### Token contract operator
+The entity, company responsible/owner of the token contract, and token issuing/minting. This actor is in charge of trying to fullfill all payout request(s), reading the payout instruction(s), and corelate the payout details.
+
+#### Orderer
+An actor who is enable to initiate payout orders on behalf ot a token wallet owner.
+
+
+## Abstract
+Token wallet owners (or approved addresses) can order payout requests through  blockchain. This is done by calling the ```orderPayoutFrom``` or ```orderPayoutFrom``` methods, which initiate the workflow for the token contract operator to either honor or reject the payout request. In this case, payout instructions are provided when submitting the request, which are used by the operator to determine the destination of the funds.
+
+In general, it is not advisable to place explicit routing instructions for the payouts on a verbatim basis on the blockchain, and it is advised to use a private communication alternatives. such as private channels, encrypted storage or similar,  to do so (external to the blockchain ledger). Another (less desirable) possibility is to place these instructions on the instructions field on encrypted form.
+
+
+## Motivation
+Nowadays most of the token payout requests,  a previous centralized transaction, to be able to define the payout destination to be able to execute the payout (burn transaction).
+In the aim of trying step by step to bring all the needed steps into decentralization, exposing all the needed steps of token lifecycle and payment transactions, a payout request can allow wallet owner to initiate the payout order via blockchain.
+Key benefits:
+
+* Payout, burning  traceability is enhanced bringing the initation into the ledger. All payment, payout statuses can be stored on chain.
+* Almost all money/token lifecycle is covered via an decentralized approach, complemented with private communications which is common used in the ecosystem.
+
+
+
+In this case, the following movement of tokens are done as the process progresses:
+
+* Upon launch of the payout request, the appropriate amount of funds are placed on a hold with no notary (i.e. it is an internal hold that cannot be released), and the payout is placed into a ```Ordered``` state
+* The operator then can put the payout request ```InProcess```, which prevents the _orderer_ of the payout from being able to cancel the payout request
+* After checking the payout is actually possible the operator then executes the hold, which moves the funds to a suspense wallet and places the payout into the ```FundsInSuspense``` state
+* The operator then moves the funds offchain (usually from the omnibus account)  to the appropriate destination account, then burning the tokens from the suspense wallet and rendering the payout into the ```Executed``` state
+* Either before or after placing the request ```InProcess```, the operator can also reject the payout, which returns the funds to the payer and eliminates the hold. The resulting end state of the payout is ```Rejected```
+* When the payout is ```Ordered``` and before the operator places it into the ```InProcess``` state, the orderer of the payout can also cancel it, which frees up the hold and puts the payout into the final ```Cancelled``` state
+
+
+## Specification
+
+```solidity
+interface IPayoutable /* is ERC-20 */ {
+    enum PayoutStatusCode {
+        Nonexistent,
+        Ordered,
+        InProcess,
+        FundsInSuspense,
+        Executed,
+        Rejected,
+        Cancelled
+    }
+    function approveToOrderPayout(address orderer) external returns (bool);
+    function revokeApprovalToOrderPayout(address orderer) external returns (bool);
+    function orderPayout(string calldata operationId, uint256 value, string calldata instructions) external returns (bool);
+    function orderPayoutFrom(string calldata operationId, address walletToBePaidOut, uint256 value, string calldata instructions) external returns (bool);
+    function cancelPayout(string calldata operationId) external returns (bool);
+    function processPayout(address orderer, string calldata operationId) external returns (bool);
+    function putFundsInSuspenseInPayout(address orderer, string calldata operationId) external returns (bool);
+    function executePayout(address orderer, string calldata operationId) external returns (bool);
+    function rejectPayout(address orderer, string calldata operationId, string calldata reason) external returns (bool);
+
+    function isApprovedToOrderPayout(address walletToDebit, address orderer) external view returns (bool);
+    function retrievePayoutData(address orderer, string calldata operationId) external view returns (address walletToDebit, uint256 value, string memory instructions, PayoutStatusCode status);
+
+    event PayoutOrdered(address indexed orderer, string indexed operationId, address indexed walletToDebit, uint256 value, string instructions);
+    event PayoutInProcess(address indexed orderer, string indexed operationId);
+    event PayoutFundsInSuspense(address indexed orderer, string indexed operationId);
+    event PayoutExecuted(address indexed orderer, string indexed operationId);
+    event PayoutRejected(address indexed orderer, string indexed operationId, string reason);
+    event PayoutCancelled(address indexed orderer, string indexed operationId);
+    event ApprovalToOrderPayout(address indexed walletToBePaidOut, address indexed orderer);
+    event RevokeApprovalToOrderPayout(address indexed walletToBePaidOut, address indexed orderer);
+}
+
+```
+
+### Functions
+
+#### approveToOrderPayout
+
+Wallet owner, allows a given address to be payout orderer.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer.
+
+#### revokeApprovalToOrderPayout
+
+Wallet owner, Revokes a given address to be payout orderer.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer.
+
+#### orderPayout
+
+Creates a payout request, that will be processed by the token operator.All payout requests,orders, will be linked to the orderer, associating operationId to orderer, to avoid global collision between operationIds. On operationId cannot be repeated for a given orderer, but there can be two equal operation id's for distinct orderers.
+
+
+| Parameter | Description |
+| ---------|-------------|
+| operationId | The unique ID per token holder to identify the request |
+| value | The amount to be paid out. |
+| instruction | A string including the payment instruction. |
+
+#### orderPayoutFrom
+
+Creates a payout request, on behalf of a wallet owner, that will be processed by the token operator. All payout requests,orders, will be linked to the orderer, associating operationId to orderer, to avoid global collision between operationIds. On operationId cannot be repeated for a given orderer, but there can be two equal operation id's for distinct orderers.
+
+| Parameter | Description |
+| ---------|-------------|
+| operationId |he unique ID per token holder to identify the request |
+| walletToBePaidOut | The wallet to be paid out on behalf.
+| value | The amount to be paid out. |
+| instruction | A string including the payment instruction. |
+
+#### cancelPayout
+
+Cancels a payout request.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per token holder to identify the request that is going to be cancelled. This can only be done by token holder, or the payout initiator/orderer. |
+| reason | The unique ID per token holder to identify the request that is going to be cancelled. This can only be done by token holder, or the payout initiator/orderer. |
+
+
+#### processPayout
+
+Marks a payout request as on process. After the status is on process, order cannot be cancelled.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per orderer to identify the request is in process.
+
+#### putFundsInSuspenseInPayout
+
+Put a given payout in suspense. Can only be done it is in process.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per orderer to identify the request is in process.
+
+#### executePayout
+
+Burn the amount of tokens and marks a payout request as executed.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per orderer to identify the request that has been executed.
+
+#### rejectPayout
+
+Rejects a given operation with a reason.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per orderer to identify the request that has been executed.
+| reason | The specific reason that explains why the payout request was rejected. EIP 1066 codes can be used |
+
+#### isApprovedToOrderPayout
+
+Checks that given player is allowed to order payout  requests, for a given wallet.
+
+| Parameter | Description |
+| ---------|-------------|
+| walletToBePaidOut | The wallet to be paid out, and checked for approval permission.
+| orderer | The address of the orderer, to be checked for approval permission.
+
+
+#### retrievePayoutData
+
+Retrieves all the payout request data. Only operator, tokenHolder, and orderer can get the given operation data.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the orderer, to correlate the right data.
+| operationId | The unique ID per token holder to identify the payout order.
+
+
+## Events
+
+
+#### Payout Ordered
+
+Emitted when an token wallet owner orders a payout request.
+
+| operationId | The unique ID per token holder to identify the request |
+| walletToBePaidOut | The wallet that is requested to be paid out |
+| value | The amount to be funded. |
+| instruction | A string including the payment instruction. |
+
+#### PayoutFundsInSuspense
+
+Emitted when an operator puts fund in suspense.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the payout request orderer. |
+| operationId | The unique ID per payout orderer to identify the payout. Operation ids are unique per requester/orderer. |
+
+#### PayoutInProcess
+
+Emitted when an operator accepts a payout request, and the operation is in process.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the payout request orderer. |
+| operationId | The unique ID per payout orderer to identify the payout. Operation ids are unique per requester/orderer. |
+
+
+#### PayoutExecuted
+
+Emitted when an operator has executed a payout request.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the payout request orderer. |
+| operationId | The unique ID per payout orderer to identify the payout. Operation ids are unique per requester/orderer. |
+
+
+#### PayoutRejected
+
+Emitted when an operator has rejected a payout request.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the payout request orderer. |
+| operationId | The unique ID per payout orderer to identify the payout. Operation ids are unique per requester/orderer. |
+| reason | The specific reason that explains why the payout request was rejected. EIP 1066 codes can be used |
+
+
+#### PayoutCancelled
+
+Emitted when a token holder, orderer,  has cancelled a payout request. This can only be done if the operator hasn't put the payout order in process.
+
+| Parameter | Description |
+| ---------|-------------|
+| orderer | The address of the payout request orderer. |
+| operationId | The unique ID per payout issuer to identify the payout. Operation ids are unique per requester/orderer. |
+
+
+#### ApprovalToOrderPayout
+
+Emitted when a given player, operator, company or a given persona, has been approved to start payout request for a given token holder.
+
+| Parameter | Description |
+| ---------|-------------|
+| walletToBePaidOut | The wallet that the player is allowed to start payout requests |
+| orderer |The address that allows the the player to start requests. |
+
+#### RevokeApprovalToOrderPayout
+
+Emitted when a given player has been revoked initiate payout requests.
+
+| Parameter | Description |
+| ---------|-------------|
+| walletToBePaidOut | The wallet that the player is allowed to start payout requests |
+| orderer |The address that allows the the player to start requests. |
+
+
+
+
+## Rationale
+This standards provides a functionality to allow token holders to start payout requests in a decentralized way.
+
+It's important to hightlight that the token operator, need to process all payout request, updating the payout status based on the linked payment that will be done.
+
+Payout instruction format is  open. ISO payment standard like is a good start point,
+
+
+
+## Backwards Compatibility
+This EIP is fully backwards compatible as its implementation extends the functionality of ERC-20.
+
+## Implementation
+The GitHub repository [IoBuilders/payoutable-token](https://github.com/IoBuilders/payotable-token) contains the work in progress implementation.
+
+## Contributors
+This proposal has been collaboratively implemented  by adhara.io and io.builders.
+
+Copyright
+Copyright and related rights waived via CC0.
