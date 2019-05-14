@@ -1,11 +1,19 @@
-### Title
+---
+eip: 131
+title: Blake2b Ethereum Implementation
+author: James Hancock (@madeoftin) , Tjaden Hess (@tjade273) , Jay Graber
+discussions-to: https://ethereum-magicians.org/t/blake2b-f-precompile/3157/6
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-13-05
+requires: 
+replaces:
+---
 
-      Title: Add precompiled BLAKE2b contract
-      Author: Tjaden Hess & Jay Graber
-      Status: Draft
-      Type: Standard Track
-      Layer: Consensus (hard-fork)
-      Created 2016-06-30
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+Special Projects wishes greater Ethereum interopability with Zcash, IPFS, and Handshake. Coincidentally, all of these projects use the Blake2 hash function. So, this is a request to add the Blake2b F precompile 11 to the Istanbul hardfork. The first special project here will probably be creating a wrapped ZEC (WZEC) within Ethereum as well as wrapped Ether within Zcash. After that, some yet-to-be-determined bridge architecture will allow Ethereum to benefit from Zcash’s shielded transactions.
 
 ## Abstract
 
@@ -70,6 +78,10 @@ Other languages:
 [Javascript implementation](https://github.com/dcposch/blakejs)
 [Java implementation](https://github.com/alphazero/Blake2b)
 [Python implementatoin](https://github.com/buggywhip/blake2_py)
+
+## Further Notes
+
+James Hancock's role in this EIP is not as an author in the technical sense, but is acting as coordinator and point of contact for development of this EIP. Please reach out to him if you are an interested Developer. Special thanks to Tjaden Hess (@tjade273) who is the original author of [EIP 131](https://github.com/ethereum/EIPs/pull/131/)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
