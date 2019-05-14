@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2027
 title: State Rent C - Net contract size accounting
 author: Alexey Akhunov (@AlexeyAkhunov)
 discussions-to: to be added when the number is known
