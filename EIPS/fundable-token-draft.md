@@ -53,8 +53,8 @@ interface IFundable /* is ERC-20 */ {
         Rejected,
         Cancelled
     }
-    function approveToOrderFund(address orderer) external returns (bool);
-    function revokeApprovalToOrderFund(address orderer) external returns (bool) ;
+    function authorizeFundOperator(address orderer) external returns (bool);
+    function revokeFundOperator(address orderer) external returns (bool) ;
     function orderFund(string calldata operationId, uint256 value, string calldata instructions) external returns (bool);
     function orderFundFrom(string calldata operationId, address walletToFund, uint256 value, string calldata instructions) external returns (bool);
     function cancelFund(address orderer, string calldata operationId) external returns (bool);
@@ -78,9 +78,9 @@ interface IFundable /* is ERC-20 */ {
 
 ### Functions
 
-#### approveToOrderFund
+#### authorizeFundOperator
 
-Wallet owner, allows a given address to be fund orderer.
+Wallet owner, authorizes a given address to be fund orderer.
 
 | Parameter | Description |
 | ---------|-------------|
