@@ -2,7 +2,7 @@
 eip: 2027
 title: State Rent C - Net contract size accounting
 author: Alexey Akhunov (@AlexeyAkhunov)
-discussions-to: to be added when the number is known
+discussions-to: https://ethereum-magicians.org/t/eip-2027-net-contract-size-accounting-change-c-from-state-rent-v3-proposal/3275
 status: Draft
 type: Standards Track
 category Core
