@@ -264,7 +264,7 @@ This EIP is fully backwards compatible as its implementation extends the functio
 The GitHub repository [IoBuilders/fundable-token](https://github.com/IoBuilders/fundable-token) contains the work in progress implementation.
 
 ## Contributors
-This proposal has been collaboratively implemented  by adhara.io and io.builders.
+This proposal has been collaboratively implemented by [adhara.io](https://adhara.io/) and [io.builders](https://io.builders/).
 
 Copyright
 Copyright and related rights waived via CC0.
