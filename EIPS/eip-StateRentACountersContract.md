@@ -1,11 +1,11 @@
 ---
-eip: <to be assigned>
+eip: 2029
 title: State Rent A - State counters contract
 author: Alexey Akhunov (@AlexeyAkhunov)
-discussions-to: to be added when the number is known
+discussions-to: https://ethereum-magicians.org/t/eip-2029-state-counters-contract-change-a-from-state-rent-v3-proposal/3279
 status: Draft
 type: Standards Track
-category Core
+category: Core
 created: 2019-05-15
 ---
 
