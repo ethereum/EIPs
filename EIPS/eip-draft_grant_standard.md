@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: ERC888 Grant Standard
+title: Grant Standard
 author: Arnaud Brousseau (@ArnaudBrousseau), James Fickel (@JFickel)
 discussions-to: <URL>
 status: Draft
@@ -9,15 +9,15 @@ category: ERC
 created: 2019-04-30
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 This document outlines a standard interface to propose, vote on, and distribute grants.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-TODO
+Decisions:
+
+
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
@@ -29,8 +29,42 @@ TODO:
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-TODO: that's the meat of it really
+Contract interface for grant management (`Grant`)
+* `grantee`: an address receiving funds when they're unlocked
+* `grant_manager`: array of ethereum addresses
+* `fund`: a payable interface to receive money. The funds sent there are locked until they're unlocked by a grant manager
+* `amount`: cost of a grant, in tokens
+* `currency`: (can be null) if null, amount is in wei, otherwise this should be set to an ERC20-compliant contract address
+* `payout`: called from `tally` if proposal `votes` satisfy rules of `type`
+* `votes`: (data) array of (`address`, `vote_value`)
+* `type`: one of:
+    * `MAJORITY_THRESHOLD` (X% of votes necessary to unlock funds with a minimum of Y tokens)
+    * `VOTE_THRESHOLD` (X tokens to unlock the funds)
+    * `FUND_THRESHOLD` (unlocks fund as soon as threshold is reached) -- TODO: think about it
+    * `OPAQUE` (custom rules)
+* `vote_values`: array of acceptable vote values. Example:
+    * [true, false] if type is `OPAQUE` or `MAJORITY_THRESHOLD`
+    * null if `type` is `FUND_THRESHOLD` or `VOTE_THRESHOLD`
+* `expiration`: block number after which the funds are unlockable
+* `vote`:
+   * if run after `expiration`, throws error
+   * if run before `expiration`, adds caller address to `votes`
+* `tally` (takes in votes, returns a boolean, can optionally trigger payout):
+   * for `MAJORITY_THRESHOLD`:
+       * if run before `expiration`, returns true or false based on `type`'s rules, but does not trigger `payout`
+       * if run after `expiration`
+           * tallies up the votes and/or checks money according to `type`'s rules
+           * calls `payout`
+  * for `VOTE_THRESHOLD`:
+       * tallies up the votes
+       * calls `payout` if threshold is reached
+  * for `FUND_THRESHOLD`:
+       * tallies up the funds
+       * calls `payout` if threshold is reached
+  * for `OPAQUE`:
+       * shrugs. Run the function.
 
+TODO:
 * Interface definition with Solidity
 * Reasoning on what to leave out of the standard vs what to bake in (what do we want to be immutable?)
 
