@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2019-05-10
-requires: 1996, 2018, 2019, 2021, 1066
+requires: 1996, 2009, 2018, 2019, 2021, 1066
 ---
 
 ## Simple Summary
