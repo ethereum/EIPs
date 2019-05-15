@@ -9,20 +9,16 @@ category: ERC
 created: 2019-04-30
 ---
 
-## Simple Summary
+## Abstract
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 This document outlines a standard interface to propose, vote on, and distribute grants.
 
-## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-Decisions:
-
-
-
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-TODO:
 
+In short, the motivation is social scalability. We believe that a grant standard is necessary to coordinate grant efforts across the Ethereum community. Having a specified interface will more easily enable wallets, DAOs and blockchain UI providers more generally to integrate with a broader grants ecosystem.
+
+TODO:
 * what kinds of solutions are out there already?
 * why do we need a standard? (e.g. what's the problem with the current status quo?)
 * how does having a standard for grants makes the situation better?
@@ -30,29 +26,33 @@ TODO:
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 Contract interface for grant management (`Grant`)
-* `grantee`: an address receiving funds when they're unlocked
-* `grant_manager`: array of ethereum addresses
-* `fund`: a payable interface to receive money. The funds sent there are locked until they're unlocked by a grant manager
-* `amount`: cost of a grant, in tokens
+* `grantee(s)`: an address receiving funds when they're unlocked or array of addresses receiving unlocked funds in order of priority
+* `amount(s)`: grant size or array of grant sizes corresponding to elements in grantee array
+* `grant_manager` (optional): an address that manages the distribution of funds (i.e. can unlock portions of the grant after milestones have been achieved)
+* `fund`: a payable interface to receive money. Funds sent there are retained until they're released by a vote threshold (see below), fund threshold, grant manager or some combination thereof
+* `withdraw`: a withdrawal interface for grantors to withdraw funds at any time prior to a fund threshold being hit
 * `currency`: (can be null) if null, amount is in wei, otherwise this should be set to an ERC20-compliant contract address
 * `payout`: called from `tally` if proposal `votes` satisfy rules of `type`
 * `votes`: (data) array of (`address`, `vote_value`)
 * `type`: one of:
-    * `MAJORITY_THRESHOLD` (X% of votes necessary to unlock funds with a minimum of Y tokens)
-    * `VOTE_THRESHOLD` (X tokens to unlock the funds)
-    * `FUND_THRESHOLD` (unlocks fund as soon as threshold is reached) -- TODO: think about it
+    * `MAJORITY_THRESHOLD` (X% of votes necessary to unlock funds with a `minimum_token_threshold`)
+    * `VOTE_THRESHOLD` (unlocks funds after X tokens signal in favor)
+    * `FUND_THRESHOLD` (unlocks funds as soon as fund threshold is reached)
+    * `VOTE_AND_FUND_THRESHOLD` (unlocks funds when vote threshold AND fund threshold is reached)
     * `OPAQUE` (custom rules)
 * `vote_values`: array of acceptable vote values. Example:
     * [true, false] if type is `OPAQUE` or `MAJORITY_THRESHOLD`
     * null if `type` is `FUND_THRESHOLD` or `VOTE_THRESHOLD`
-* `expiration`: block number after which the funds are unlockable
+* `current_token_signal`: returns number of tokens signaling for grant
+* `expiration`: block number after which votes and funds cannot be sent
+* `withdraw_all`: a withdrawal interface that can be triggered after expiration and returns all funds to grantors
 * `vote`:
    * if run after `expiration`, throws error
    * if run before `expiration`, adds caller address to `votes`
 * `tally` (takes in votes, returns a boolean, can optionally trigger payout):
    * for `MAJORITY_THRESHOLD`:
-       * if run before `expiration`, returns true or false based on `type`'s rules, but does not trigger `payout`
-       * if run after `expiration`
+       * if run when `minimum_token_threshold` > `current_token_signal`, returns true or false based on `type`'s rules, but does not trigger `payout`
+       * if run when `minimum_token_threshold` < `current_token_signal`
            * tallies up the votes and/or checks money according to `type`'s rules
            * calls `payout`
   * for `VOTE_THRESHOLD`:
