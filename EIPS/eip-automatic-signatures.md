@@ -1,0 +1,56 @@
+---
+eip: automatic-signatures
+title: Automatic Signature Request (`wallet_autoSign`)
+author: Ronan Sandford (@wighawag)
+discussions-to: https://ethereum-magicians.org/t/automatic-authentication-signature/2429
+status: Draft
+type: Standards Track
+category: ERC
+created: 2019-05-15
+requires: 1102
+---
+
+## Simple Summary
+It is common for applications with a backend component to need to authentify wallet owner with their private key. Wallet currently provide application a way to fetch the address of the users but application can't be sure they are the one owning the private key.
+with `wallet_autoSign` application can request to sign specific payloads to ensure the user has indeed access to the privateKey behind the ethereum address. This can also be used to communicate authentically with a backend without session tracking.
+
+## Abstract
+Application can request the wallet to sign specific payload on behalf of the users without prior's user confirmation.
+
+## Motivation
+Currently, applications with a backend component that requires to authenticate ethereum address, requests users to sign a message. In some case, these messages (for a better appearance maybe) are static, vulnerable to replay attack. 
+Such user interaction is less than ideal and technically unecessary. If we can restrict the type of payload such automatic signature can sign, the request can go through, behind the scene, without involving the user. There is no risk for the user as the payload is prepended with a unique string.
+
+## Specification
+The JSON RPC method `wallet_autoSign`  require 2 parameters :
+
+### Required Parameters
+- account (string): the ethereum address expected to sign the payload
+- payload (string): any string the application want to authenticate
+
+The wallet needs to prepend "Automatic Signature" to the payload before signing to prevent the application from requesting signature for other purpose. 
+
+### Example
+A JSON-RPC request to authenticate via a specific challenge :
+```json
+{
+  "id":1,
+  "jsonrpc": "2.0",
+  "method": "wallet_autoSign",
+  "params": ["0x50545c559a4110c2a1216976b3667b3208a71c0e", ": any string"]
+}
+```
+
+This would actually sign the string "Automatic Signature: any string" with "0x50545c559a4110c2a1216976b3667b3208a71c0e"'s private key.
+
+This assume #1102's ```eth_requestAccounts``` was approved by the user first to preserve privacy
+
+## Open questions
+
+- Is it secure to let applications sign at will (even if the message is prepended by  "Automatic Signature") ?
+- Or should we do such signing using a non-hardened derived key ?
+- If so could #1102's eth_requestAccounts be used to provide the parameter to derive from (could be one based on the origin of the document) ?
+- Should we rate-limit the requests ?
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
