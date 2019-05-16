@@ -9,26 +9,27 @@ category: ERC
 created: 2019-04-30
 ---
 
-## Abstract
+## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 This document outlines a standard interface to propose, vote on, and distribute grants.
+
+## Abstract
+This standard specifies a way for Ethereum users to propose, vote on and manage the distribution of grants. It allows for multiple grant recipients to be listed and receive rewards through one smart contract. The author of the contract may specify certain conditions such as requiring atomic grants (i.e. raise all or none), a voting threshold with Ether or other tokens, and a list of grant managers that can release funds over time.
+
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-In short, the motivation is social scalability. We believe that a grant standard is necessary to coordinate grant efforts across the Ethereum community. Having a specified interface will more easily enable wallets, DAOs and blockchain UI providers more generally to integrate with a broader grants ecosystem.
+In short, the motivation is greater social scalability for grants. We believe that a grant standard is necessary to coordinate grant efforts across the Ethereum community. A specified interface will enable wallets, DAOs and other blockchain UI providers to integrate with a broader grants ecosystem.
 
-TODO:
-* what kinds of solutions are out there already?
-* why do we need a standard? (e.g. what's the problem with the current status quo?)
-* how does having a standard for grants makes the situation better?
+The current process for grants in the Ethereum ecosystem is for organizations like the Ethereum Foundation or MolochDAO to internally debate and fund grants. This creates friction for the broader Ethereum community to participate in such efforts. Open grant proposals would allow for anyone in the Ethereum community to participate in the funding of necessary infrastructure through voting or awarding funds.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 Contract interface for grant management (`Grant`)
-* `grantee(s)`: an address receiving funds when they're unlocked or array of addresses receiving unlocked funds in order of priority
-* `amount(s)`: grant size or array of grant sizes corresponding to elements in grantee array
-* `grant_manager` (optional): an address that manages the distribution of funds (i.e. can unlock portions of the grant after milestones have been achieved)
+* `grantee(s)`: array of addresses receiving unlocked funds in order of priority
+* `amount(s)`: array of grant sizes that map to elements in grantee array
+* `grant_manager(s)` (optional): array of addresses that manages the distribution of funds (i.e. can unlock portions of the grant after milestones have been achieved)
 * `fund`: a payable interface to receive money. Funds sent there are retained until they're released by a vote threshold (see below), fund threshold, grant manager or some combination thereof
 * `withdraw`: a withdrawal interface for grantors to withdraw funds at any time prior to a fund threshold being hit
 * `currency`: (can be null) if null, amount is in wei, otherwise this should be set to an ERC20-compliant contract address
@@ -38,6 +39,7 @@ Contract interface for grant management (`Grant`)
     * `MAJORITY_THRESHOLD` (X% of votes necessary to unlock funds with a `minimum_token_threshold`)
     * `VOTE_THRESHOLD` (unlocks funds after X tokens signal in favor)
     * `FUND_THRESHOLD` (unlocks funds as soon as fund threshold is reached)
+      * `overflow` (optional): null by default. if set to true, allows funding over threshold
     * `VOTE_AND_FUND_THRESHOLD` (unlocks funds when vote threshold AND fund threshold is reached)
     * `OPAQUE` (custom rules)
 * `vote_values`: array of acceptable vote values. Example:
