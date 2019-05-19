@@ -14,9 +14,11 @@ title: Home
 
 <h2>EIP status terms</h2>
 <ul>
-  <li><strong>Draft</strong> - an EIP that is open for consideration.</li>
-  <li><strong>Accepted</strong> - an EIP that is planned for immediate adoption, i.e. expected to be included in the next hard fork (for Core/Consensus layer EIPs).</li>
-  <li><strong>Final</strong> - an EIP that has been adopted in a previous hard fork (for Core/Consensus layer EIPs).</li>
+  <li><strong>Draft</strong> - an EIP that is open for consideration and is undergoing rapid iteration and changes.</li>
+  <li><strong>Last Call</strong> - an EIP that is done with its initial iteration and ready for review by a wide audience.</li>
+  <li><strong>Accepted</strong> - a core EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author. The process for Core Devs to decide whether to encode an EIP into their clients as part of a hard fork is not part of the EIP process. If such a decision is made, the EIP will move to final. </li>
+  <li><strong>Final (non-Core)</strong> - an EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author.</li>
+  <li><strong>Final (Core)</strong> - an EIP that the Core Devs have decided to implement and release in a future hard fork or has already been released in a hard fork.</li>
   <li><strong>Deferred</strong> an EIP that is not being considered for immediate adoption. May be reconsidered in the future for a subsequent hard fork.</li>
 </ul>
 
@@ -39,8 +41,8 @@ title: Home
 <h4><a href="{{"erc"|relative_url}}">ERC</a> ({{site.pages|where:"type","Standards Track"|where:"category","ERC"|size}})</h4>
 <p>Application-level standards and conventions, including contract standards such as token standards (<a href="EIPS/eip-20">ERC20</a>), name registries (<a href="EIPS/eip-137">ERC137</a>), URI schemes (<a href="EIPS/eip-681">ERC681</a>), library/package formats (<a href="EIPS/eip-190">EIP190</a>), and wallet formats (<a href="https://github.com/ethereum/EIPs/issues/85">EIP85</a>).</p>
 
-<h3><a href="{{"informational"|relative_url}}">Informational</a> ({{site.pages|where:"type","Informational"|size}})</h3>
-<p>Describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.</p>
-
 <h3><a href="{{"meta"|relative_url}}">Meta</a> ({{site.pages|where:"type","Meta"|size}})</h3>
 <p>Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.</p>
+
+<h3><a href="{{"informational"|relative_url}}">Informational</a> ({{site.pages|where:"type","Informational"|size}})</h3>
+<p>Describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.</p>
