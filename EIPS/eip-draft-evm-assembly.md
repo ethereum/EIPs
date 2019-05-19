@@ -1,0 +1,56 @@
+---
+eip: <to be assigned>
+title: Assembly Format for EVM (AFE)
+author: Alex Beregszaszi (@axic)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Interface
+created: 2019-05-15
+---
+
+## Simple Summary
+
+Define an assembly language for EVM to be shared across various tools and languages within the ecosystem.
+
+## Abstract
+
+TBA
+
+## Motivation
+
+TBA
+
+## Specification
+
+TBA
+
+## Rationale
+
+Different existing assembly languages were considered and reviewed.
+
+TBA
+
+## Backwards Compatibility
+
+TBA
+
+## Test Cases
+
+TBA
+
+## Implementation
+
+TBA
+
+## References
+
+- [Solidity inline assembly](https://solidity.readthedocs.io/en/v0.5.9/assembly.html)
+- [Geth assembly](https://github.com/ethereum/go-ethereum/tree/master/core/asm)
+- [EVMASM](https://gist.github.com/axic/17ddbbce4738ccf4040d30cbb5de484e)
+- [evmdis](https://github.com/Arachnid/evmdis)
+- [pyevmasm](https://pypi.org/project/pyevmasm/)
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
