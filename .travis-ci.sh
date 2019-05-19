@@ -17,5 +17,5 @@ elif [[ $TASK = 'htmlproofer-external' ]]; then
 elif [[ $TASK = 'eip-validator' ]]; then
   eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 elif [[ $TASK = 'codespell' ]]; then
-  codespell -q4 -I .codespell-whitelist eip-X.md EIPS/
+  codespell -q4 -I .codespell-whitelist -S ".git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css"
 fi
