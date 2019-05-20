@@ -1,6 +1,5 @@
 ---
 eip: 4
-layer: Process
 title: EIP Classification
 author: Joseph Chow
 status: Draft
