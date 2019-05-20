@@ -7,8 +7,6 @@ status: Draft
 type: Standards Track (Core, Networking, Interface, ERC)
 category (*only required for Standard Track): ERC
 created: 2019-02-27
-requires (*optional):
-replaces (*optional):
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
