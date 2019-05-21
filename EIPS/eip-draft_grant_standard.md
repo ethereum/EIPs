@@ -22,7 +22,7 @@ This standard specifies a way for Ethereum users to propose, vote on and manage 
 
 In short, the motivation is greater social scalability for grants. We believe that a grant standard is necessary to coordinate grant efforts across the Ethereum community. A specified interface will enable wallets, DAOs and other blockchain UI providers to integrate with a broader grants ecosystem.
 
-The current process for grants in the Ethereum ecosystem is for organizations like the Ethereum Foundation or MolochDAO to internally debate and fund grants. This creates friction for the broader Ethereum community to participate in such efforts. Open grant proposals would allow for anyone in the Ethereum community to participate in the funding of necessary infrastructure through voting or awarding funds.
+The current process for grants in the Ethereum ecosystem is for membership organizations like the Ethereum Foundation or MolochDAO (https://github.com/MolochVentures/moloch) to internally weigh and process grants. In the Ethereum Foundation's case, grants lack transparency by not leaving an audit trail of funds sent and the results of votes. In MolochDAO's case, there is transparency and an audit trail, but only members can propose and vote on grants, which limits the scalability of grants efforts. This standard would enable the broader Ethereum community to transparently participate in grants and voluntary governance through voting and awarding funds.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -39,7 +39,7 @@ Contract interface for grant management (`Grant`)
     * `MAJORITY_THRESHOLD` (X% of votes necessary to unlock funds with a `minimum_token_threshold`)
     * `VOTE_THRESHOLD` (unlocks funds after X tokens signal in favor)
     * `FUND_THRESHOLD` (unlocks funds as soon as fund threshold is reached)
-      * `overflow` (optional): null by default. if set to true, allows funding over threshold
+      * `allow_overflow` (optional): false by default. if set to true, allows funding over threshold
     * `VOTE_AND_FUND_THRESHOLD` (unlocks funds when vote threshold AND fund threshold is reached)
     * `OPAQUE` (custom rules)
 * `vote_values`: array of acceptable vote values. Example:
