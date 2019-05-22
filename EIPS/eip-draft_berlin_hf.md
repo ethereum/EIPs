@@ -1,0 +1,43 @@
+---
+eip: <eip>
+title: "Hardfork Meta: Berlin"
+author: Alex Beregszaszi (@axic)
+discussions-to: <url>
+type: Meta
+status: Draft
+created: 2019-05-20
+requires: 1679
+---
+
+## Abstract
+
+This meta-EIP specifies the changes included in the Ethereum hardfork named Berlin.
+
+## Specification
+
+- Codename: Berlin
+- Activation: TBD
+
+### Included EIPs
+
+- TBD
+
+### Accepted EIPs
+
+- TBD
+
+### Proposed EIPs
+
+- TBD
+
+## Timeline
+
+* 2019-09-20 (Fri) hard deadline to accept proposals for "Berlin"
+
+## References
+
+- TBD
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
