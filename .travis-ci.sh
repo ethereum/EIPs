@@ -24,4 +24,6 @@ elif [[ $TASK = 'eip-validator' ]]; then
 
   FILES="$(ls EIPS/*.md | egrep "eip-[0-9]+.md")"
   bundle exec eip_validator $FILES
+elif [[ $TASK = 'codespell' ]]; then
+  codespell -q4 -I .codespell-whitelist eip-X.md EIPS/
 fi
