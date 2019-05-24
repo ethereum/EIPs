@@ -67,7 +67,7 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 
 Other exceptional statuses include:
 
-* **Deferred** -- This is for core EIPs that have been put off for a future hard fork, or for EIPs that were Accepted for a hard fork but a decision was made to put off for a future hard fork instead. They can be moved back into an "Accepted" by Ethereum client developers at a later date as long as they were previously in the Accepted status and no technical changes are required.
+* **Deferred** -- This is for core EIPs that have been put off for a future hard fork, or for EIPs that were Accepted for a hard fork but a decision was made to put off for a future hard fork instead. They can be moved back into an "Accepted" status by Ethereum client developers at a later date as long as they were previously in the Accepted status and no technical changes are required.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
 * **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
 * **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
