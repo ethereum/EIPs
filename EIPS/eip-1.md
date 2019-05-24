@@ -62,11 +62,12 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
   * :arrow_right: Final (Not core EIPs) -- A successful Last Call without material changes or unaddressed technical complaints will become Final.
 * **Accepted (Core EIPs only)** -- This EIP is in the hands of the Ethereum client developers.  Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
   * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and adopted by the community, the status will be changed to “Final”.
+  * :x: Deferred -- If during the implementation phase a decision is made to forgo an Accepted EIP until a future fork, the status will be changed to "Deferred" to reflect this.
 * **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
 Other exceptional statuses include:
 
-* **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
+* **Deferred** -- This is for core EIPs that have been put off for a future hard fork, or for EIPs that were Accepted for a hard fork but a decision was made to put off for a future hard fork instead. They can be moved back into an "Accepted" by Ethereum client developers at a later date as long as they were previously in the Accepted status and no technical changes are required.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
 * **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
 * **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
