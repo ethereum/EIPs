@@ -1,0 +1,84 @@
+---
+eip: requireGas
+title: Opcode to require a minimal gas value while ensuring a useful eth_estimateGas
+author: Ronan Sandford (@wighawag)
+type: Standards Track
+category: Core
+status: Draft
+created: 2019-05-24
+---
+
+## Simple Summary
+
+Add an opcode to require a specific amount of gas (similar to ```require(gasleft()>X)``` in solidity) that allow ```eth_estimateGas``` to return a value that will represent enough gas to make the transaction succeed, even though the actual gas used will be less.
+
+## Abstract
+
+Currently when using ```require(gasleft()>X)```, a call to ```eth_estimateGas``` will return a value that while representing the correct amount of gas used by the transaction when sent with more than enough gas, might be returning an amount that in itself is not sufficient to make the tx to succeed. This is because when checking for `gasleft()` the actual gas used afterward might be less than the requirement.
+
+This proposal add a new opcode that perform the same check as ```require(gasleft()>X)``` but ensure that ```eth_estimateGas``` return the minimum amount of gas required for the call to succeed (the use case for ```eth_estimateGas```)
+
+### Specification
+Let specify `minimalGas` as a new variable that the EVM need to keep track for the purpose of `eth_estimateGas`. At the start of a tx, it is set to zero.
+
+At the end of an `eth_estimateGas` call, the gas spent is compared to `minimalGas`. The bigger value of the two is returned as "estimate". It does not have any other role in the context of a transaction call, its only purpose is to fix the current behavior of `eth_estimateGas` that do not consider code like `require(gasleft()>X)` when asked to return the gas required to perform a tx.
+
+Adds a new opcode ```REQUIRE_GAS``` at `<TBD>`, which uses 1 stack argument : a 32 bytes value that represent the gas required for the contract code to proceed. It will check if the gas left at that point is greater or equal to that value.
+
+If not it will revert the call. 
+
+If there is enough gas, the gas amount specified will be added to the gas spent up to that point. If that amount is bigger than `minimalGas` it replaces it. In other words:
+```
+minimalGas = max(minimalGas, X + <gas spent so far including the gas used for the opcode>)
+```
+where X is the value passed to `REQUIRE_GAS`
+
+As mentioned the result of an `eth_estimateGas` is now 
+```
+max(<gas used>, minimalGas)
+```
+
+The operation costs `G_base` + `G_verylow` to execute.
+
+### Rationale
+
+`eth_estimateGas` is currently returning the gas used, and not the gas required for the operation to succeed. While in most case, these two values are equals, there are cases where this is not the case.
+
+In those cases, applications can't relies on `eth_estimateGas` to give them a useful value. They can't even know what increase in gas they need for the transaction to succeed unless they perform a binary search by executing `eth_estimateGas` multiple time.
+
+These cases happen as soon as a smart contract is using code like
+```
+require(gasleft() > X)
+```
+where X is greater than the gas actually used after that check.
+
+This is a common pattern for meta-transaction where it is not possible for the smart contract to know whether that value X is an over estimation of the gas actually required.
+
+With the introduction of [EIP-1706](https://eips.ethereum.org/EIPS/eip-1706) such problem will also arise for contract that simply use `SSTORE`, even existing contract, unless a similar mechanism (using `minimalGas` tracking) is used to ensure `eth_estimateGas` continue to work as expected (see comment [here](https://github.com/alex-forshtat-tbk/EIPs/issues/1#issuecomment-495427734))
+
+This mechanism will also be useful for [EIP-1930](https://eips.ethereum.org/EIPS/eip-1930) that also implicitly check for `gasleft()`
+
+### Alternative Solutions
+
+Make `eth_estimateGas` to execute the call multiple time until it finds the minimum gas required for the call to succeed. This require ```log2(N)``` calls to the smart contract code where N is the difference between the initial gas given (usually the block gas limit) and the gas value returned by that first call.
+
+`eth_estimateGas` is already an expensive call to make for user interface and such solution would require up to 20 calls to find the minimal safe value.
+
+
+## Backwards Compatibility
+
+Backwards compatible for smart contract as it introduce a new opcode.
+
+`eth_estimateGas` will continue to work as intended : allow wallet to compute the amount of gas to send for the transaction to succeed.
+
+## Test Cases
+
+TBD
+
+## Implementation
+
+TBD
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
