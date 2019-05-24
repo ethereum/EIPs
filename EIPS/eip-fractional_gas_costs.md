@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2045
 title: Fractional gas costs for EVM opcodes
 author: Casey Detrio (@cdetrio)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-2045-fractional-gas-costs/3311
 status: Draft
 type: Standards Track
 category Core
@@ -17,7 +17,7 @@ The transaction capacity of an Ethereum block is determined by the gas cost of t
 
 Another way to boost the transaction capacity of a block is to reduce the gas cost of transactions. Reducing the gas costs of computational opcodes while keeping the cost of storage opcodes the same, is effectively equivalent to raising the block gas limit and simultaneously increasing the cost of storage opcodes. However, reducing the cost of computational opcodes might avoid the adverse side effects of an increase in cost of storage opcodes (again, more research is needed on this topic).
 
-Currently, computational opcode costs are already too close to the minimum unit of 1 gas to achieve the large degree of cost reductions that recent benchmarks indicate would be needed to tune opcode gas costs to the performance of optimized EVM implementations. [TODO: REF/LINK TO EVM BENCHMARKS]. A smaller minimum unit called a "particle", which is a fraction of 1 gas, enables large cost reductions.
+Currently, computational opcode costs are already too close to the minimum unit of 1 gas to achieve the large degree of cost reductions that recent benchmarks<sup>[1](#evmbenchmarks)</sup> indicate would be needed to tune opcode gas costs to the performance of optimized EVM implementations. A smaller minimum unit called a "particle"<sup>[2](#particle)</sup>, which is a fraction of 1 gas, would enable large cost reductions.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -98,7 +98,7 @@ The above pseudocode is written for clarity. A more performant implementation mi
 Many computational opcodes will undergo a cost reduction, with new costs suggested by benchmark analyses. For example, the cost of DUP and SWAP are reduced from 3 gas to 3000 particles. The cost of `ADD` and `SUB` are reduced from 3 gas to 6000 particles. The cost of `MUL` is reduced from 5 gas to 5000 particles.
 
 ## Rationale
-Adoption of fractional gas costs should only be an implementation detail inside the EVM, and not alter the current user experience around transaction gas limits and block gas limits. The concept of `particles` need not be exposed to Ethereum users nor most contract authors, but only to EVM implementers and contract authors concerned with optimized gas usage. Furthermore, only the EVM logic for charging gas per opcode executed should be affected by this change. All other contexts dealing with gas and gas limits, such as block headers and transaction formats, should be unaffected.
+Adoption of fractional gas costs should only be an implementation detail inside the EVM, and not alter the current user experience around transaction gas limits and block gas limits. The concept of `particles` need not be exposed to Ethereum users nor most contract authors, but only to EVM implementers and contract developers concerned with optimized gas usage. Furthermore, only the EVM logic for charging gas per opcode executed should be affected by this change. All other contexts dealing with gas and gas limits, such as block headers and transaction formats, should be unaffected.
 
 ## Backwards Compatibility
 This change is not backwards compatible and requires a hard fork to be activated.
@@ -108,6 +108,12 @@ TODO
 
 ## Implementation
 TODO
+
+## References
+<a name="evmbenchmarks">1</a>. https://github.com/ewasm/benchmarking
+
+<a name="particle">2</a>. The term "particle" was inspired by a proposal for [Ewasm gas costs](https://github.com/ewasm/design/blob/e77d8e3de42784f40a803a23f58ef06881142d9f/determining_wasm_gas_costs.md).
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
