@@ -1,0 +1,475 @@
+---
+eip: 225
+title: Clique proof-of-authority consensus protocol
+author: Péter Szilágyi <peterke@gmail.com>
+discussions-to: https://github.com/ethereum/EIPs/issues/225
+status: Draft
+type: Standards Track
+category: Core
+created: 2017-03-06
+---
+
+## Abstract
+
+Clique is a proof-of-authority consensus protocol. It shadows the design of Ethereum mainnet, so it can be added to any client with minimal effort.
+
+## Motivation
+
+Ethereum's first official testnet was Morden. It ran from July 2015 to about November 2016, when due to the accumulated junk and some testnet consensus issues between Geth and Parity, it was finally laid to rest in favor of a testnet reboot.
+
+Ropsten was thus born, clearing out all the junk and starting with a clean slate. This ran well until the end of February 2017, when malicious actors decided to abuse the low PoW and gradually inflate the block gas limits to 9 billion (from the normal 4.7 million), at which point sending in gigantic transactions crippling the entire network. Even before that, attackers attempted multiple extremely long reorgs, causing network splits between different clients, and even different versions.
+
+The root cause of these attacks is that a PoW network is only as secure as the computing capacity placed behind it. Restarting a new testnet from zero wouldn't solve anything, since the attacker can mount the same attack over and over again. The Parity team decided to go with an emergency solution of rolling back a significant number of blocks, and enacting a soft-fork rule that disallows gas limits above a certain threshold.
+
+While this solution may work in the short term:
+
+* It's not elegant: Ethereum supposed to have dynamic block limits
+* It's not portable: other clients need to implement new fork logic themselves
+* It's not compatible with sync modes: fast and light clients are both out of luck
+* It's just prolonging the attacks: junk can still be steadily pushed in ad infinitum
+
+Parity's solution although not perfect, is nonetheless workable. I'd like to propose a longer term alternative solution, which is more involved, yet should be simple enough to allow rolling out in a reasonable amount of time.
+
+### Standardized proof-of-authority
+
+As reasoned above, proof-of-work cannot work securely in a network with no value. Ethereum has its long term goal of proof-of-stake based on Casper, but that is heavy research so we cannot rely on that any time soon to fix today's problems. One solution however is easy enough to implement, yet effective enough to fix the testnet properly, namely a proof-of-authority scheme.
+
+The main design goals of the PoA protocol described here is that it should be very simple to implement and embed into any existing Ethereum client, while at the same time allow using existing sync technologies (fast, light, warp) without needing client developers to add custom logic to critical software.
+
+## Design constraints
+
+There are two approaches to syncing a blockchain in general:
+
+ * The classical approach is to take the genesis block and crunch through all the transactions one by one. This is tried and proven, but in Ethereum complexity networks quickly turns out to be very costly computationally.
+ * The other is to only download the chain of block headers and verify their validity, after which point an arbitrary recent state may be downloaded from the network and checked against recent headers.
+
+A PoA scheme is based on the idea that blocks may only be minted by trusted signers. As such, every block (or header) that a client sees can be matched against the list of trusted signers. The challenge here is how to maintain a list of authorized signers that can change in time? The obvious answer (store it in an Ethereum contract) is also the wrong answer: fast, light and warp sync don't have access to the state during syncing.
+
+**The protocol of maintaining the list of authorized signers must be fully contained in the block headers.**
+
+The next obvious idea would be to change the structure of the block headers so it drops the notions of PoW, and introduces new fields to cater for voting mechanisms. This is also the wrong answer: changing such a core data structure in multiple implementations would be a nightmare development, maintenance and security wise.
+
+**The protocol of maintaining the list of authorized signers must fit fully into the current data models.**
+
+So, according to the above, we can't use the EVM for voting, rather have to resort to headers. And we can't change header fields, rather have to resort to the currently available ones. Not much wiggle room.
+
+### Repurposing header fields for signing and voting
+
+The most obvious field that currently is used solely as *fun metadata* is the 32 byte **extra-data** section in block headers. Miners usually place their client and version in there, but some fill it with alternative "messages". The protocol would extend this field ~~to~~ with 65 bytes with the purpose of a secp256k1 miner signature. This would allow anyone obtaining a block to verify it against a list of authorized signers. It also makes the **miner** section in block headers obsolete (since the address can be derived from the signature).
+
+*Note, changing the length of a header field is a non invasive operation as all code (such as RLP encoding, hashing) is agnostic to that, so clients wouldn't need custom logic.*
+
+The above is enough to validate a chain, but how can we update a dynamic list of signers. The answer is that we can repurpose the newly obsoleted **miner** field and the PoA obsoleted **nonce** field to create a voting protocol:
+
+ * During regular blocks, both of these fields would be set to zero.
+ * If a signer wishes to enact a change to the list of authorized signers, it will:
+   * Set the **miner** to the signer it wishes to vote about
+   * Set the **nonce** to `0` or `0xff...f` to vote in favor of adding or kicking out
+
+Any clients syncing the chain can "tally" up the votes during block processing, and maintain a dynamically changing list of authorized signers by popular vote.
+
+To avoid having an infinite window to tally up votes in, and also to allow periodically flushing stale proposals, we can reuse the concept of an epoch from ethash, where every epoch transition flushes all pending votes. Furthermore, these epoch transitions can also act as stateless checkpoints containing the list of current authorized signers within the header extra-data. This permits clients to sync up based only on a checkpoint hash without having to replay all the voting that was done on the chain up to that point. It also allows the genesis header to fully define the chain, containing the list of initial signers.
+
+### Attack vector: Malicious signer
+
+It may happen that a malicious user gets added to the list of signers, or that a signer key/machine is compromised. In such a scenario the protocol needs to be able to defend itself against reorganizations and spamming. The proposed solution is that given a list of N authorized signers, any signer may only mint 1 block out of every K. This ensures that damage is limited, and the remainder of the miners can vote out the malicious user.
+
+### Attack vector: Censoring signer
+
+Another interesting attack vector is if a signer (or group of signers) attempts to censor out blocks that vote on removing them from the authorization list. To work around this, we restrict the allowed minting frequency of signers to 1 out of N/2. This ensures that malicious signers need to control at least 51% of signing accounts, at which case it's game over anyway.
+
+### Attack vector: Spamming signer
+
+A final small attack vector is that of malicious signers injecting new vote proposals inside every block they mint. Since nodes need to tally up all votes to create the actual list of authorized signers, they need to track all votes through time. Without placing a limit on the vote window, this could grow slowly, yet unbounded. The solution is to place a ~~moving~~ window of W blocks after which votes are considered stale. ~~A sane window might be 1-2 epochs.~~ We'll call this an epoch.
+
+### Attack vector: Concurrent blocks
+
+If the number of authorized signers are N, and we allow each signer to mint 1 block out of K, then at any point in time N-K+1 miners are allowed to mint. To avoid these racing for blocks, every signer would add a small random "offset" to the time it releases a new block. This ensures that small forks are rare, but occasionally still happen (as on the main net). If a signer is caught abusing it's authority and causing chaos, it can be voted out.
+
+## Specification
+
+We define the following constants:
+
+ * **`EPOCH_LENGTH`**: Number of blocks after which to checkpoint and reset the pending votes.
+   * Suggested `30000` for the testnet to remain analogous to the mainnet `ethash` epoch.
+ * **`BLOCK_PERIOD`**: Minimum difference between two consecutive block's timestamps.
+   * Suggested `15s` for the testnet to remain analogous to the mainnet `ethash` target.
+ * **`EXTRA_VANITY`**: Fixed number of extra-data prefix bytes reserved for signer *vanity*.
+   * Suggested `32 bytes` to retain the current extra-data allowance and/or use.
+ * **`EXTRA_SEAL`**: Fixed number of extra-data suffix bytes reserved for signer seal.
+   * `65 bytes` fixed as signatures are based on the standard `secp256k1` curve.
+ * **`NONCE_AUTH`**: Magic nonce number `0xffffffffffffffff` to vote on adding a new signer.
+ * **`NONCE_DROP`**: Magic nonce number `0x0000000000000000` to vote on removing a signer.
+ * **`UNCLE_HASH`**: Always `Keccak256(RLP([]))` as uncles are meaningless outside of PoW.
+ * **`DIFF_NOTURN`**: Block score (difficulty) for blocks containing out-of-turn signatures.
+   * Suggested `1` since it just needs to be an arbitrary baseline constant.
+ * **`DIFF_INTURN`**: Block score (difficulty) for blocks containing in-turn signatures.
+   * Suggested `2` to show a slight preference over out-of-turn signatures.
+
+We also define the following per-block constants:
+
+ * **`BLOCK_NUMBER`**: Block height in the chain, where the height of the genesis is block `0`.
+ * **`SIGNER_COUNT`**: Number of authorized signers valid at a particular instance in the chain.
+ * **`SIGNER_INDEX`**: Index of the block signer in the sorted list of current authorized signers.
+ * **`SIGNER_LIMIT`**: Number of consecutive blocks out of which a signer may only sign one.
+   * Must be `floor(SIGNER_COUNT / 2) + 1` to enforce majority consensus on a chain.
+
+We repurpose the `ethash` header fields as follows:
+
+ * **`beneficiary`**: Address to propose modifying the list of authorized signers with.
+   * Should be filled with zeroes normally, modified only while voting.
+   * Arbitrary values are permitted nonetheless (even meaningless ones such as voting out non signers) to avoid extra complexity in implementations around voting mechanics.
+   * **Must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
+   * Transaction execution **must** use the actual block signer (see `extraData`) for the `COINBASE` opcode.
+ * **`nonce`**: Signer proposal regarding the account defined by the `beneficiary` field.
+   * Should be **`NONCE_DROP`** to propose deauthorizing `beneficiary` as a existing signer.
+   * Should be **`NONCE_AUTH`** to propose authorizing `beneficiary` as a new signer.
+   * **Must** be filled with zeroes on checkpoint (i.e. epoch transition) blocks.
+   * **Must** not take up any other value apart from the two above (for now).
+ * **`extraData`**: Combined field for signer vanity, checkpointing and signer signatures.
+   * First **`EXTRA_VANITY`** bytes (fixed) may contain arbitrary signer vanity data.
+   * Last **`EXTRA_SEAL`** bytes (fixed) is the signer's signature sealing the header.
+   * Checkpoint blocks **must** contain a list of signers (`N*20 bytes`) in between, **omitted** otherwise.
+   * The list of signers in checkpoint block extra-data sections **must** be sorted in ascending order.
+ * **`mixHash`**: Reserved for fork protection logic, similar to the extra-data during the DAO.
+   * **Must** be filled with zeroes during normal operation.
+ * **`ommersHash`**: **Must** be **`UNCLE_HASH`** as uncles are meaningless outside of PoW.
+ * **`timestamp`**: **Must** be at least the parent timestamp + **`BLOCK_PERIOD`**.
+ * **`difficulty`**: Contains the standalone score of the block to derive the quality of a chain.
+   * **Must** be **`DIFF_NOTURN`** if `BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX`
+   * **Must** be **`DIFF_INTURN`** if `BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX`
+
+### Authorizing a block
+
+To authorize a block for the network, the signer needs to sign the block's hash containing **everything except the signature itself**. The means that the hash contains every field of the header (`nonce` and `mixDigest` included), and also the  `extraData` with the exception of the 65 byte signature suffix. The fields are hashed in the order of their definition in the yellow paper.
+
+This hash is signed using the standard `secp256k1` curve, and the resulting 65 byte signature (`R`, `S`, `V`, where `V` is `0` or `1`) is embedded into the `extraData` as the trailing 65 byte suffix.
+
+To ensure malicious signers (loss of signing key) cannot wreck havoc in the network, each singer is allowed to sign **maximum one** out of **`SIGNER_LIMIT`** consecutive blocks. The order is not fixed, but in-turn signing weighs more (**`DIFF_INTURN`**) than out of turn one (**`DIFF_NOTURN`**).
+
+#### Authorization strategies
+
+As long as signers conform to the above specs, they can authorize and distribute blocks as they see fit. The following suggested strategy will however reduce network traffic and small forks, so it's a suggested feature:
+
+ * If a signer is allowed to sign a block (is on the authorized list and didn't sign recently).
+   * Calculate the optimal signing time of the next block (parent + **`BLOCK_PERIOD`**).
+   * If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.
+   * If the signer is out-of-turn, delay signing by `rand(SIGNER_COUNT * 500ms)`.
+
+This small strategy will ensure that the in-turn signer (who's block weighs more) has a slight advantage to sign and propagate versus the out-of-turn signers. Also the scheme allows a bit of scale with the increase of the number of signers.
+
+### Voting on signers
+
+Every epoch transition (genesis block included) acts as a stateless checkpoint, from which capable clients should be able to sync without requiring any previous state. This means epoch headers **must not** contain votes, all non settled votes are discarded, and tallying starts from scratch.
+
+For all non-epoch transition blocks:
+
+ * Signers may cast one vote per own block to propose a change to the authorization list.
+ * Only the latest proposal per target beneficiary is kept from a single signer.
+ * Votes are tallied live as the chain progresses (concurrent proposals allowed).
+ * Proposals reaching majority consensus **`SIGNER_LIMIT`** come into effect immediately.
+ * Invalid proposals are **not** to be penalized for client implementation simplicity.
+
+**A proposal coming into effect entails discarding all pending votes for that proposal (both for and against) and starting with a clean slate.**
+
+#### Cascading votes
+
+A complex corner case may arise during signer deauthorization. When a previously authorized signer is dropped, the number of signers required to approve a proposal might decrease by one. This might cause one or more pending proposals to reach majority consensus, the execution of which might further cascade into new proposals passing.
+
+Handling this scenario is non obvious when multiple conflicting proposals pass simultaneously (e.g. add a new signer vs. drop an existing one), where the evaluation order might drastically change the outcome of the final authorization list. Since signers may invert their own votes in every block they mint, it's not so obvious which proposal would be "first".
+
+To avoid the pitfalls cascading executions would entail, the Clique proposal explicitly forbids cascading effects. In other words: **Only the `beneficiary` of the current header/vote may be added to/dropped from the authorization list. If that causes other proposals to reach consensus, those will be executed when their respective beneficiaries are "touched" again (given that majority consensus still holds at that point).**
+
+#### Voting strategies
+
+Since the blockchain can have small reorgs, a naive voting mechanism of "cast-and-forget" may not be optimal, since a block containing a singleton vote may not end up on the final chain.
+
+A simplistic but working strategy is to allow users to configure "proposals" on the signers (e.g. "add 0x...", "drop 0x..."). The signing code can then pick a random proposal for every block it signs and inject it. This ensures that multiple concurrent proposals as well as reorgs get eventually noted on the chain.
+
+This list may be expired after a certain number of blocks / epochs, but it's important to realize that "seeing" a proposal pass doesn't mean it won't get reorged, so it should not be immediately dropped when the proposal passes.
+
+## Test Cases
+
+```go
+// block represents a single block signed by a parcitular account, where
+// the account may or may not have cast a Clique vote.
+type block struct {
+  signer     string   // Account that signed this particular block
+  voted      string   // Optional value if the signer voted on adding/removing someone
+  auth       bool     // Whether the vote was to authorize (or deauthorize)
+  checkpoint []string // List of authorized signers if this is an epoch block
+}
+
+// Define the various voting scenarios to test
+tests := []struct {
+  epoch   uint64   // Number of blocks in an epoch (unset = 30000)
+  signers []string // Initial list of authorized signers in the genesis
+  blocks  []block  // Chain of signed blocks, potentially influencing auths
+  results []string // Final list of authorized signers after all blocks
+  failure error    // Failure if some block is invalid according to the rules
+}{
+  {
+    // Single signer, no votes cast
+    signers: []string{"A"},
+    blocks:  []block{{signer: "A"}},
+    results: []string{"A"},
+  }, {
+    // Single signer, voting to add two others (only accept first, second needs 2 votes)
+    signers: []string{"A"},
+    blocks:  []block{
+      {signer: "A", voted: "B", auth: true},
+      {signer: "B"},
+      {signer: "A", voted: "C", auth: true},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Two signers, voting to add three others (only accept first two, third needs 3 votes already)
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: true},
+      {signer: "B", voted: "C", auth: true},
+      {signer: "A", voted: "D", auth: true},
+      {signer: "B", voted: "D", auth: true},
+      {signer: "C"},
+      {signer: "A", voted: "E", auth: true},
+      {signer: "B", voted: "E", auth: true},
+    },
+    results: []string{"A", "B", "C", "D"},
+  }, {
+    // Single signer, dropping itself (weird, but one less cornercase by explicitly allowing this)
+    signers: []string{"A"},
+    blocks:  []block{
+      {signer: "A", voted: "A", auth: false},
+    },
+    results: []string{},
+  }, {
+    // Two signers, actually needing mutual consent to drop either of them (not fulfilled)
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "B", auth: false},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Two signers, actually needing mutual consent to drop either of them (fulfilled)
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "B", auth: false},
+      {signer: "B", voted: "B", auth: false},
+    },
+    results: []string{"A"},
+  }, {
+    // Three signers, two of them deciding to drop the third
+    signers: []string{"A", "B", "C"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B", voted: "C", auth: false},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Four signers, consensus of two not being enough to drop anyone
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B", voted: "C", auth: false},
+    },
+    results: []string{"A", "B", "C", "D"},
+  }, {
+    // Four signers, consensus of three already being enough to drop someone
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "D", auth: false},
+      {signer: "B", voted: "D", auth: false},
+      {signer: "C", voted: "D", auth: false},
+    },
+    results: []string{"A", "B", "C"},
+  }, {
+    // Authorizations are counted once per signer per target
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: true},
+      {signer: "B"},
+      {signer: "A", voted: "C", auth: true},
+      {signer: "B"},
+      {signer: "A", voted: "C", auth: true},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Authorizing multiple accounts concurrently is permitted
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: true},
+      {signer: "B"},
+      {signer: "A", voted: "D", auth: true},
+      {signer: "B"},
+      {signer: "A"},
+      {signer: "B", voted: "D", auth: true},
+      {signer: "A"},
+      {signer: "B", voted: "C", auth: true},
+    },
+    results: []string{"A", "B", "C", "D"},
+  }, {
+    // Deauthorizations are counted once per signer per target
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "B", auth: false},
+      {signer: "B"},
+      {signer: "A", voted: "B", auth: false},
+      {signer: "B"},
+      {signer: "A", voted: "B", auth: false},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Deauthorizing multiple accounts concurrently is permitted
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B"},
+      {signer: "C"},
+      {signer: "A", voted: "D", auth: false},
+      {signer: "B"},
+      {signer: "C"},
+      {signer: "A"},
+      {signer: "B", voted: "D", auth: false},
+      {signer: "C", voted: "D", auth: false},
+      {signer: "A"},
+      {signer: "B", voted: "C", auth: false},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Votes from deauthorized signers are discarded immediately (deauth votes)
+    signers: []string{"A", "B", "C"},
+    blocks:  []block{
+      {signer: "C", voted: "B", auth: false},
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B", voted: "C", auth: false},
+      {signer: "A", voted: "B", auth: false},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Votes from deauthorized signers are discarded immediately (auth votes)
+    signers: []string{"A", "B", "C"},
+    blocks:  []block{
+      {signer: "C", voted: "D", auth: true},
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B", voted: "C", auth: false},
+      {signer: "A", voted: "D", auth: true},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Cascading changes are not allowed, only the account being voted on may change
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B"},
+      {signer: "C"},
+      {signer: "A", voted: "D", auth: false},
+      {signer: "B", voted: "C", auth: false},
+      {signer: "C"},
+      {signer: "A"},
+      {signer: "B", voted: "D", auth: false},
+      {signer: "C", voted: "D", auth: false},
+    },
+    results: []string{"A", "B", "C"},
+  }, {
+    // Changes reaching consensus out of bounds (via a deauth) execute on touch
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B"},
+      {signer: "C"},
+      {signer: "A", voted: "D", auth: false},
+      {signer: "B", voted: "C", auth: false},
+      {signer: "C"},
+      {signer: "A"},
+      {signer: "B", voted: "D", auth: false},
+      {signer: "C", voted: "D", auth: false},
+      {signer: "A"},
+      {signer: "C", voted: "C", auth: true},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // Changes reaching consensus out of bounds (via a deauth) may go out of consensus on first touch
+    signers: []string{"A", "B", "C", "D"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: false},
+      {signer: "B"},
+      {signer: "C"},
+      {signer: "A", voted: "D", auth: false},
+      {signer: "B", voted: "C", auth: false},
+      {signer: "C"},
+      {signer: "A"},
+      {signer: "B", voted: "D", auth: false},
+      {signer: "C", voted: "D", auth: false},
+      {signer: "A"},
+      {signer: "B", voted: "C", auth: true},
+    },
+    results: []string{"A", "B", "C"},
+  }, {
+    // Ensure that pending votes don't survive authorization status changes. This
+    // corner case can only appear if a signer is quickly added, removed and then
+    // readded (or the inverse), while one of the original voters dropped. If a
+    // past vote is left cached in the system somewhere, this will interfere with
+    // the final signer outcome.
+    signers: []string{"A", "B", "C", "D", "E"},
+    blocks:  []block{
+      {signer: "A", voted: "F", auth: true}, // Authorize F, 3 votes needed
+      {signer: "B", voted: "F", auth: true},
+      {signer: "C", voted: "F", auth: true},
+      {signer: "D", voted: "F", auth: false}, // Deauthorize F, 4 votes needed (leave A's previous vote "unchanged")
+      {signer: "E", voted: "F", auth: false},
+      {signer: "B", voted: "F", auth: false},
+      {signer: "C", voted: "F", auth: false},
+      {signer: "D", voted: "F", auth: true}, // Almost authorize F, 2/3 votes needed
+      {signer: "E", voted: "F", auth: true},
+      {signer: "B", voted: "A", auth: false}, // Deauthorize A, 3 votes needed
+      {signer: "C", voted: "A", auth: false},
+      {signer: "D", voted: "A", auth: false},
+      {signer: "B", voted: "F", auth: true}, // Finish authorizing F, 3/3 votes needed
+    },
+    results: []string{"B", "C", "D", "E", "F"},
+  }, {
+    // Epoch transitions reset all votes to allow chain checkpointing
+    epoch:   3,
+    signers: []string{"A", "B"},
+    blocks:  []block{
+      {signer: "A", voted: "C", auth: true},
+      {signer: "B"},
+      {signer: "A", checkpoint: []string{"A", "B"}},
+      {signer: "B", voted: "C", auth: true},
+    },
+    results: []string{"A", "B"},
+  }, {
+    // An unauthorized signer should not be able to sign blocks
+    signers: []string{"A"},
+    blocks:  []block{
+      {signer: "B"},
+    },
+    failure: errUnauthorizedSigner,
+  }, {
+    // An authorized signer that signed recenty should not be able to sign again
+    signers: []string{"A", "B"},
+  blocks []block{
+      {signer: "A"},
+      {signer: "A"},
+    },
+    failure: errRecentlySigned,
+  }, {
+    // Recent signatures should not reset on checkpoint blocks imported in a batch
+    epoch:   3,
+    signers: []string{"A", "B", "C"},
+    blocks:  []block{
+      {signer: "A"},
+      {signer: "B"},
+      {signer: "A", checkpoint: []string{"A", "B", "C"}},
+      {signer: "A"},
+    },
+    failure: errRecentlySigned,
+  },,
+}
+```
+
+## Implementation
+
+A reference implementation is part of [go-ethereum](https://github.com/ethereum/go-ethereum/tree/master/consensus/clique) and has been functioning as the consensus engine behind the [Rinkeby](https://www.rinkeby.io) testnet since April, 2017.
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

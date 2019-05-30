@@ -1,8 +1,7 @@
 ---
 eip: 4
-layer: Process
 title: EIP Classification
-author: Joseph Chow
+author: Joseph Chow (@ethers)
 status: Draft
 type: Meta
 created: 2015-11-17
