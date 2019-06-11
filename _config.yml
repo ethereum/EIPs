@@ -13,25 +13,25 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Ethereum Improvement Proposals
+title: Synthetix Improvement Proposals
 description: >-
-  Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
+  Synthetix Improvement Proposals (SIPs) describe standards for the Synthetix
   platform, including core protocol specifications, client APIs, and contract
   standards.
-url: "http://eips.ethereum.org"
-twitter_username: ethereum
-github_username:  ethereum
+url: "http://sips.synthetix.io"
+twitter_username: synthetix
+github_username:  synthetix
 header_pages:
  - all.html
  - core.html
  - networking.html
  - interface.html
- - erc.html
+ - src.html
  - meta.html
  - informational.html
 twitter:
   card: summary
-  username: ethereum
+  username: synthetix_io
 
 # Build settings
 markdown: kramdown
@@ -42,9 +42,9 @@ permalink: /:slug
 defaults:
   -
     scope:
-      path: "EIPS"
+      path: "SIPS"
     values:
-      layout: "eip"
+      layout: "sip"
 
 exclude:
   - Gemfile

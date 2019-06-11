@@ -1,0 +1,7 @@
+---
+layout: page
+title: ERC
+---
+
+{% assign sips=site.pages|where:"type","Standards Track"|where:"category","ERC" %}
+{% include siptable.html sips=sips %}
