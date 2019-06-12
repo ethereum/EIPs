@@ -26,7 +26,7 @@ An SIP or SCCP must meet certain minimum criteria. It must be a clear and comple
 
 ## SIP Work Flow
 
-Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), and the [*Synthetix Engineering Team*](https://github.com/synthetixio/*).
+Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), and the [*Synthetix Engineering Team*].
 
 :warning: Before you begin, vet your idea, this will save you time. Ask the Synthetix community first if an idea is original to avoid wasting time on something that will be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will have the intend effect. The appropriate public forum to gauge interest around your SIP or SCCP is [the Synthetix Discord].
 
@@ -170,10 +170,11 @@ See [the revision history for further details](https://github.com/synthetixio/**
 ### Bibliography
 
 [the Synthetix Discord]: https://discord.gg/a2E6uxk
-[pull request]: https://github.com/synthexio/SIPs/pulls
+[pull request]: https://github.com/Synthetixio/SIPs/pulls
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
+[*Synthetix Engineering Team*]: (https://github.com/orgs/Synthetixio/people)
 
 ## Copyright
 
