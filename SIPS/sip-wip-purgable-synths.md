@@ -3,7 +3,7 @@ sip: <to be assigned>
 title: Purgeable Synths
 author: Clinton Ennis (@hav_noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: DRAFT
+status: WIP
 created: 2019-06-12
 ---
 
