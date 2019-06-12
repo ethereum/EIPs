@@ -32,7 +32,7 @@ When you believe your EIP is mature and ready to progress past the draft phase, 
 
 # Preferred Citation Format
 
-The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for ERC-165 is https://eips.ethereum.org/EIPS/eip-165.
+The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
 
 # Validation
 
