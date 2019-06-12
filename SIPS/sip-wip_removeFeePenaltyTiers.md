@@ -26,7 +26,7 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 
 ### Solidity
 
-```    /**
+``` /**
      * @notice The penalty a particular address would incur if its fees were withdrawn right now
      * @param account The address you want to query the penalty for
      */
@@ -60,7 +60,7 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 
     And reverting the transaction if the currentPenalty is larger than 0 (Minters will have to fix their C-ratio to be above the penalty threshold to claim fees)
 
-    ```function _claimFees(address claimingAddress, bytes4 currencyKey)
+    ``` function _claimFees(address claimingAddress, bytes4 currencyKey)
         internal
         returns (bool)
     {
@@ -95,13 +95,15 @@ Reducing the complexity of the fee claims process and lowering the required gas 
         }
 
         return true;
-    }```
+    }
+    ```
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-Implementing a penalty threshold that allows for the Collateralisation ratio to fluctuate between a certain percentage below the target issuance Ratio allows minters to claim their fees.
 
+Implementing a penalty threshold allows for the Collateralisation ratio to fluctuate between a certain percentage below the target issuance Ratio without the transaction reverting.
 
+If the collateralisation ratio for the minter does fall below the threshold, then it can be fixed by burning sUSD debt before attempting to claim fees again. 
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
