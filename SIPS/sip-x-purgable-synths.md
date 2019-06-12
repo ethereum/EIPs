@@ -1,7 +1,7 @@
 ---
 sip: <to be assigned>
-title: Purgable Synths
-author: Clinton Ennnis (@hav_noms)
+title: Purgeable Synths
+author: Clinton Ennis (@hav_noms)
 discussions-to: https://discord.gg/CDTvjHY
 status: DRAFT
 created: 2019-06-12
@@ -13,7 +13,7 @@ created: 2019-06-12
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-This SIP proposes to introduce a "Purgable Synth" in order to exchange the remaining balances of unpopular or frozen Inverse Synths to their holders in sUSD and remove the deprecated Synth from the system which in turn saves gas or reconfigure the frozen Inverse Synth.
+This SIP proposes to introduce a "Purgeable Synth" in order to exchange the remaining balances of unpopular or frozen Inverse Synths to their holders in sUSD and remove the deprecated Synth from the system which in turn saves gas or reconfigure the frozen Inverse Synth.
 
 ## Abstract
 
@@ -26,7 +26,7 @@ Since rolling out the 15 Fx Synths 6 have shown to have zero to dust balances. T
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
 
 The more Synths in the Synthetix system the more Mint and Burn functions cost in gas as Synthetix needs to do cross contract calls to query each Synth for its totalSupply.
-The ability to remove unused Synths would save unnesscesary gas spend and allow the reconfigurinng of Inverse Synths with a much faster turnaround as the Inverse Synths are blocked until all holders exchange out of them. e.g. iBTC -> sUSD.
+The ability to remove unused Synths would save unnecessary gas spend and allow the reconfiguring of Inverse Synths with a much faster turnaround as the Inverse Synths are blocked until all holders exchange out of them. e.g. iBTC -> sUSD.
 
 ## Specification
 
@@ -34,13 +34,13 @@ The ability to remove unused Synths would save unnesscesary gas spend and allow 
 
 ### Solidity
 
-By utilizing the Synthetix's upggradable contract mechanism we propose a new PurgableSynth contract which subclasses the existing Synth contract which only the deprecated and Inverse Synths will be upgraded to.
+By utilizing the Synthetix's upgradable contract mechanism we propose a new PurgeableSynth contract which subclasses the existing Synth contract which only the deprecated and Inverse Synths would be upgraded to PurgeableSynth and have purge called by the foundation owner.
 
 ```
 contract PurgeableSynth is Synth {}
 ```
 
-An owneronly function allowing the foundation to pass in all holders of that Synth which it will internnally look up their balance and exchanging for them into sUSD sent to their wallet.
+An owneronly function allowing the foundation to pass in all holders of that Synth which it will internally look up their balance and exchanging for them into sUSD sent to their wallet.
 
 No deprecated Synth holder will lose their value.
 
@@ -75,22 +75,30 @@ No deprecated Synth holder will lose their value.
     }
 ```
 
-This proposal specifies a hard cap value of any synth to be Purgable at a value less then or equal to \$10,000 USD. This may be found to be too little for the inverse Synths of holders are not exiting or too much for some Fx / Crypto Synths.
+This proposal specifies a hard cap value of any synth to be Purgeable at a value less than or equal to \$10,000 USD. This may be found to be too little for the inverse Synths of holders are not exiting or too much for some Fx / Crypto Synths.
 
 ```
 // The maximum allowed amount of tokenSupply in equivalent sUSD value for this synth to permit purging
     uint public maxSupplyToPurgeInUSD = 10000 * SafeDecimalMath.unit(); // 10,000
 ```
 
+A Synth must have a totalSupply of zero to be able to pass this requirement to be removed.
+
+```
+require(synths[currencyKey].totalSupply() == 0, "Synth supply exists");
+```
+
+The last step to remove a Synth from the Synthetix system is to have the foundation owner call [removeSynth()](https://github.com/Synthetixio/synthetix/blob/master/contracts/Synthetix.sol#L212).
+
 ## Rationale
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-All Synths sit behind their own Proxy contract so they are upgradeable. Subclassing Synth allows the flexibility to upgrade a Synth to a PurgableSynth and not deploy all Synths as PurgableSynth byb default. It is only required for low cap and frozen Synths. i.e. It is forseen sUSD will never be upgraded to a PurgableSynth.
+All Synths sit behind their own Proxy contract so they are upgradeable. Subclassing Synth allows the flexibility to upgrade a Synth to a PurgeableSynth and not deploy all Synths as PurgeableSynth by default. It is only required for low cap and frozen Synths. i.e. It is foreseen sUSD will never be upgraded to a PurgeableSynth.
 
-By passing in the list of addresses only the PurgableSynth looks up the balance itself protecting the user from loss of funds from incorrect amount input.
+By passing in the list of addresses only the PurgeableSynth looks up the balance itself protecting the user from loss of funds from incorrect amount input.
 
-A Synth cannnot be removed from the Synthetix system until its totalSupply == 0. So the foundation will send the correct list of addresses of holders to purge all balances and allow the Deprecated Synth to be removed from the system.
+A Synth cannot be removed from the Synthetix system until its totalSupply == 0. So the foundation will send the correct list of addresses of holders to purge all balances and allow the Deprecated Synth to be removed from the system.
 
 ## Test Cases
 
