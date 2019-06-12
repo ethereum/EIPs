@@ -23,11 +23,85 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-TBC
+
+### Solidity
+
+```    /**
+     * @notice The penalty a particular address would incur if its fees were withdrawn right now
+     * @param account The address you want to query the penalty for
+     */
+    function currentPenalty(address account)
+        public
+        view
+        returns (uint)
+    {
+        // Penalty is calculated from ratio % above the target ratio (issuanceRatio).
+        //  0  <  10%:   0% reduction in fees
+        // 10% > above:  100% reduction in fees
+        uint ratio = synthetix.collateralisationRatio(account);
+        uint targetRatio = synthetix.synthetixState().issuanceRatio();
+
+        // no penalty if collateral ratio below target ratio
+        if (ratio < targetRatio) {
+            return 0;
+        }
+
+        // Calculate the threshold for collateral ratio before penalty applies
+        uint ratio_threshold = targetRatio.multiplyDecimal(SafeDecimalMath.unit().add(PENALTY_THRESHOLD));
+
+        // Collateral ratio above threshold attracts max penalty
+        if (ratio > ratio_threshold) {
+            return ONE_HUNDRED_PERCENT;
+        }
+
+        return 0;
+    }
+```
+
+    And reverting the transaction if the currentPenalty is larger than 0 (Minters will have to fix their C-ratio to be above the penalty threshold to claim fees)
+
+    ```function _claimFees(address claimingAddress, bytes4 currencyKey)
+        internal
+        returns (bool)
+    {
+        require(currentPenalty(claimingAddress) == 0, "C-Ratio below penalty threshold");
+
+        uint availableFees;
+        uint availableRewards;
+        (availableFees, availableRewards) = feesAvailable(claimingAddress, "XDR");
+
+        require(availableFees > 0 || availableRewards > 0, "No fees or rewards available for period, or fees already claimed");
+
+        _setLastFeeWithdrawal(claimingAddress, recentFeePeriods[1].feePeriodId);
+
+        if (availableFees > 0) {
+            // Record the fee payment in our recentFeePeriods
+            uint feesPaid = _recordFeePayment(availableFees);
+
+            // Send them their fees
+            _payFees(claimingAddress, feesPaid, currencyKey);
+
+            emitFeesClaimed(claimingAddress, feesPaid);
+        }
+
+        if (availableRewards > 0) {
+            // Record the reward payment in our recentFeePeriods
+            uint rewardPaid = _recordRewardPayment(availableRewards);
+
+            // Send them their rewards
+            _payRewards(claimingAddress, rewardPaid);
+
+            emitRewardsClaimed(claimingAddress, rewardPaid);
+        }
+
+        return true;
+    }```
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-TBC
+Implementing a penalty threshold that allows for the Collateralisation ratio to fluctuate between a certain percentage below the target issuance Ratio allows minters to claim their fees.
+
+
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
