@@ -26,7 +26,7 @@ An SIP or SCCP must meet certain minimum criteria. It must be a clear and comple
 
 ## SIP Work Flow
 
-Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), and the [*Synthetix Engineering Team*].
+Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), and the [Synthetix Engineering Team].
 
 :warning: Before you begin, vet your idea, this will save you time. Ask the Synthetix community first if an idea is original to avoid wasting time on something that will be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will have the intend effect. The appropriate public forum to gauge interest around your SIP or SCCP is [the Synthetix Discord].
 
@@ -48,7 +48,7 @@ Each status change is requested by the SIP author and reviewed by the SIP editor
 
 Each SIP or SCCP should have the following parts:
 
-- Preamble - RFC 822 style headers containing metadata about the SIP, including the SIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](https://github.com - insert URL - eip-1.md#eip-header-preamble) for details.
+- Preamble - RFC 822 style headers containing metadata about the SIP, including the SIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details.
 - Simple Summary - “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the SIP.
 - Abstract - a short (~200 word) description of the technical issue being addressed.
 - Motivation (*optional) - The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.
@@ -174,7 +174,7 @@ See [the revision history for further details](https://github.com/synthetixio/**
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
-[*Synthetix Engineering Team*]: (https://github.com/orgs/Synthetixio/people)
+[Synthetix Engineering Team]: https://github.com/orgs/Synthetixio/people
 
 ## Copyright
 
