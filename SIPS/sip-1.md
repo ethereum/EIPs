@@ -169,7 +169,7 @@ See [the revision history for further details](https://github.com/synthetixio/**
 
 ### Bibliography
 
-[pull request]: https://discord.gg/a2E6uxk
+[the Synthetix Discord]: https://discord.gg/a2E6uxk
 [pull request]: https://github.com/synthexio/SIPs/pulls
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
