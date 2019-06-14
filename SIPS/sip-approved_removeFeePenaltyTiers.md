@@ -3,7 +3,7 @@ sip: <to be assigned>
 title: SIP Remove Fee Penalty Tiers
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
-status: WIP
+status: APPROVED
 created: 2019-06-10
 ---
 
