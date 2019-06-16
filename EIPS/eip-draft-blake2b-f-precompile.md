@@ -60,12 +60,16 @@ Implementation of only the core F compression function allows substantial flexib
 There is very little risk of breaking backwards-compatibility with this EIP, the sole issue being if someone were to build a contract relying on the address at `0x0d` being empty. The likelihood of this is low, and should specific instances arise, the address could be chosen to be any arbitrary value with negligible risk of collision.
 
 ## Test Cases
+
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+
+Test cases are in progress, and can be followed along in our [Golang Blake2 library fork](https://github.com/keep-network/blake2-f) as well as our fork of [go-ethereum](https://github.com/keep-network/go-ethereum).
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+Implementations are in progress, and can be followed along in our [Golang Blake2 library fork](https://github.com/keep-network/blake2-f) as well as our fork of [go-ethereum](https://github.com/keep-network/go-ethereum).
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
