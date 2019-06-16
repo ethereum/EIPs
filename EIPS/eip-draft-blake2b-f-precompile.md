@@ -19,7 +19,7 @@ This EIP will enable the Blake2b hash function to run cheaply on the EVM, allowi
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-This EIP introduces a new precompiled contract which implements the compression function F used in the BLAKE2b cryptographic hashing algorithm, for the purpose of allowing interoperability between the Zcash blockchain and the EVM, and introducing more flexible cryptographic hash primitives to the EVM.
+This EIP introduces a new precompiled contract which implements the compression function `F` used in the BLAKE2b cryptographic hashing algorithm, for the purpose of allowing interoperability between the EVM and Zcash, as well as introducing more flexible cryptographic hash primitives to the EVM.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
@@ -33,7 +33,7 @@ Interoperability with Zcash could enable contracts like trustless atomic swaps b
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-Adds a precompile at address `0x0000....0d` which accepts [ABI encoded](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) arguments corresponding to the function signature
+Adds a precompile at address `0x0d` which accepts [ABI encoded](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) arguments corresponding to the function signature
 
 ```
 F(bytes32[2] h, bytes32[4] m, uint t , bool f, uint rounds) returns (bytes32[2] h_new);
@@ -54,11 +54,10 @@ In contrast, the big-endian 32 byte semantics of the EVM are not conducive to ef
 
 Implementation of only the core F compression function allows substantial flexibility and extensibility while keeping changes at the protocol level to a minimum. This will allow functions like tree hashing, incremental hashing, and keyed, salted, and personalized hashing as well as variable length digests, none of which are currently available on the EVM.
 
-There is very little risk of breaking backwards-compatibility with this EIP, the sole issue being if someone were to build a contract relying on the address at `0x000....0000d` being empty. Te likelihood of this is low, and should specific instances arise, the address could be chosen to be any arbitrary value, with negligible risk of collision.
-
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+There is very little risk of breaking backwards-compatibility with this EIP, the sole issue being if someone were to build a contract relying on the address at `0x0d` being empty. The likelihood of this is low, and should specific instances arise, the address could be chosen to be any arbitrary value with negligible risk of collision.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
