@@ -1,12 +1,13 @@
 ---
 eip: <to be assigned>
-Title: Add Blake2 compression function `F` precompile
-Author: Tjaden Hess <tah83@cornell.edu>, Matt Luongo (@mhluongo)
+title: Add Blake2 compression function `F` precompile
+author: Tjaden Hess <tah83@cornell.edu>, Matt Luongo (@mhluongo)
 discussions-to: https://ethereum-magicians.org/t/blake2b-f-precompile/3157
-Status: Draft
+status: Draft
 type: Standards Track
-category Core
-Created 2016-10-04
+category: Core
+created 2016-10-04
+requires: 2046
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
