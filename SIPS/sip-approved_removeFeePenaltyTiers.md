@@ -27,13 +27,13 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 ### Solidity
 
 ``` /**
-     * @notice The penalty a particular address would incur if its fees were withdrawn right now
-     * @param account The address you want to query the penalty for
+     * @notice Check if a particular address is able to claim fees right now
+     * @param account The address you want to query for
      */
-    function currentPenalty(address account)
+    function feesClaimable(address account)
         public
         view
-        returns (uint)
+        returns (bool)
     {
         // Penalty is calculated from ratio % above the target ratio (issuanceRatio).
         //  0  <  10%:   0% reduction in fees
@@ -43,7 +43,7 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 
         // no penalty if collateral ratio below target ratio
         if (ratio < targetRatio) {
-            return 0;
+            return true;
         }
 
         // Calculate the threshold for collateral ratio before penalty applies
@@ -51,10 +51,10 @@ Reducing the complexity of the fee claims process and lowering the required gas 
 
         // Collateral ratio above threshold attracts max penalty
         if (ratio > ratio_threshold) {
-            return ONE_HUNDRED_PERCENT;
+            return false;
         }
 
-        return 0;
+        return true;
     }
 ```
 
@@ -64,7 +64,7 @@ And reverting the transaction if the currentPenalty is larger than 0 (Minters wi
         internal
         returns (bool)
     {
-        require(currentPenalty(claimingAddress) == 0, "C-Ratio below penalty threshold");
+        require(feesClaimable(claimingAddress), "C-Ratio below penalty threshold");
 
         uint availableFees;
         uint availableRewards;
