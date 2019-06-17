@@ -12,7 +12,7 @@ updated: N/A
 
 SCCP stands for Synthetix Configuration Change Proposal. SCCP's are documents to make a case for modifying one of the system configuration variables. The intent is to provide a clear and detailed history behind each configuration change and the rationale behind it at the time it was implemented. The author of the document is responsible for building consensus within the community and documenting dissenting opinions.
 
-## SIP & SCCP Rationale
+## SCCP Rationale
 
 We intend SCCPs to be the primary mechanisms for proposing configuration changes to Synthetix. Because they are maintained as text files in a versioned repository, their revision history is the historical record of the configuration change proposal.
 
@@ -47,7 +47,7 @@ Each status change is requested by the SCCP author and reviewed by the SIP edito
 Each SCCP should have the following parts:
 
 - Preamble - RFC 822 style headers containing metadata about the SCCP, including the SCCP number, a short descriptive title (limited to a maximum of 44 characters), and the author details.
-- Simple Summary - “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the SIP.
+- Simple Summary - “If you can’t explain it simply, you don’t understand it well enough.” Provide a simplified and layman-accessible explanation of the SCCP.
 - Abstract - a short (~200 word) description of the variable change proposed.
 - Motivation (*optional) - The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.
 - Copyright Waiver - All SCCPs must be in the public domain. See the bottom of this SCCP for an example copyright waiver.
