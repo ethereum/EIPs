@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: SIP-2
 title: SIP Remove Fee Penalty Tiers
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
