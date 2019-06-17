@@ -3,7 +3,7 @@ sip: 1
 title: SIP Purpose and Guidelines
 status: Proposed
 author: Kain Warwick <@kaiynne>
-        https://github.com/synthetixio/^^
+        https://github.com/synthetixio/SIPs
 created: 2019-06-10
 updated: N/A
 ---
