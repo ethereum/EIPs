@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: 3
 title: Purgeable Synths
 author: Clinton Ennis (@hav_noms)
 discussions-to: https://discord.gg/CDTvjHY
