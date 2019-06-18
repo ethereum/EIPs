@@ -75,7 +75,12 @@ No deprecated Synth holder will lose their value.
     }
 ```
 
-This proposal specifies a hard cap value of any synth to be Purgeable at a value less than or equal to \$10,000 USD. This may be found to be too little for the inverse Synths of holders are not exiting or too much for some Fx / Crypto Synths.
+### Maximum Supply to Purge 
+For Inverse Synths any amount is purgable if the Inverse Synth is frozen doing the check.
+```
+|| exchangeRates.rateIsFrozen(currencyKey)
+```
+This proposal specifies a hard cap value of any upgraded FX, synth to be purgeable at a value less than or equal to \$10,000 USD. This may be found to be too much for some Fx / Crypto Synths or perhaps should be atleast configrable. RFC below.
 
 ```
 // The maximum allowed amount of tokenSupply in equivalent sUSD value for this synth to permit purging
