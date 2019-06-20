@@ -34,13 +34,79 @@ Interoperability with Zcash could enable contracts like trustless atomic swaps b
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-Adds a precompile at address `0x0d` which accepts [ABI encoded](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI) arguments corresponding to the function signature
+We propose adding a precompiled contract at address `0x09` wrapping the [BLAkE2b `F` compression function](https://tools.ietf.org/html/rfc7693#section-3.2). Rather than the ABI-encoded call structure proposed in [#152](https://github.com/ethereum/EIPs/issues/152), this design better matches other precompiles and works well with a standard `staticcall`.
+
+The precompile requires 6 inputs, corresponding to the inputs specified in the [BLAKE2b RFC](https://tools.ietf.org/html/rfc7693#section-3.2)
+
+- `h` - the state vector
+- `m` - the message block vector
+- `t_0, t_1` - offset counters
+- `f` - the final block indicator flag
+- `rounds` - the number of rounds
+
+Loosely packing the data in equal 32-byte slots means an easier job for app developers, and also appears to be compatible with how other precompiles accept input data.
 
 ```
-F(bytes32[2] h, bytes32[4] m, uint t , bool f, uint rounds) returns (bytes32[2] h_new);
+[ bytes32[0] | bytes32[1] ][ bytes32[2] | bytes32[3] | bytes32[4] | bytes32[5] ]
+[      64 bytes for h     ][                    128 bytes for m                ]
+
+[             bytes32[6]             ][             bytes32[7]             ]
+[ 24 bytes padding | 8 bytes for t_0 ][ 24 bytes padding | 8 bytes for t_1 ]
+
+[             bytes32[8]          ][              bytes32[9]              ]
+[ 31 bytes padding | 1 byte for f ][ 28 bytes padding | 4 bytes for rounds]
 ```
 
-where `h`, `m`, `t` and `f` are the current state, the new message, the byte counter and a finalization flag, as defined in [RFC 7693](https://tools.ietf.org/html/rfc7693), and `rounds` is the number of rounds of mixing to perform (BLAKE2b uses 12, BLAKE2s uses 10). `h_new` is the updated state of the hash.
+The precompile can be wrapped easily in Solidity to provide a more development-friendly interface to `F`.
+
+```solidity
+    function F(bytes32[2] memory h, bytes32[4] memory m, uint64[2] memory t, bool f, uint32 rounds) public view returns (bytes32[2] memory) {
+      bytes32[2] memory output;
+
+      bytes32 _t0 = bytes32(uint256(t[0]));
+      bytes32 _t1 = bytes32(uint256(t[1]));
+
+      bytes32 _f;
+      if (f) {
+        _f = hex"0000000000000000000000000000000000000000000000000000000000000001";
+      }
+
+      bytes32 _rounds = bytes32(uint256(rounds));
+
+      bytes32[10] memory args = [ h[0], h[1], m[0], m[1], m[2], m[3], _t0, _t1, _f, _rounds ];
+
+      assembly {
+            if iszero(staticcall(not(0), 0x09, args, 0x140, output, 0x40)) {
+                revert(0, 0)
+            }
+        }
+        return output;
+    }
+
+    function callF() public view returns (bytes32[2] memory) {
+      bytes32[2] memory h;
+      h[0] = hex"6a09e627f3bcc909bb67ae8484caa73b3c6ef372fe94b82ba54ff53a5f1d36f1";
+      h[1] = hex"510e527fade682d19b05688c2b3e6c1f1f83d9abfb41bd6b5be0cd19137e2179";
+
+      bytes32[4] memory m;
+      m[0] = hex"278400340e6b05c5752592c52c4f121292eafc51cc01a997b4aed13409298fad";
+      m[1] = hex"0d99ccc8f76453d9b3661e5c4d325d7751147db17489046d1682d50eefa4a1da";
+      m[2] = hex"0000000000000000000000000000000000000000000000000000000000000000";
+      m[3] = hex"0000000000000000000000000000000000000000000000000000000000000000";
+
+      uint64[2] memory t;
+      t[0] = 18446744073709551552;
+      t[1] = 18446744073709551615;
+
+      bool f = true;
+
+      uint32 rounds = 12;
+
+      return F(h, m, t, f, rounds);
+    }
+```
+
+### Gas costs and benchmarks
 
 Each operation will cost `GFROUND * rounds`.
 
