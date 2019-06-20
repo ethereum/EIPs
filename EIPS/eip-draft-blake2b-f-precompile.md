@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Add Blake2 compression function `F` precompile
-author: Tjaden Hess <tah83@cornell.edu>, Matt Luongo (@mhluongo)
+author: Tjaden Hess <tah83@cornell.edu>, Matt Luongo (@mhluongo), Piotr Dyraga (@pdyraga)
 discussions-to: https://ethereum-magicians.org/t/blake2b-f-precompile/3157
 status: Draft
 type: Standards Track
