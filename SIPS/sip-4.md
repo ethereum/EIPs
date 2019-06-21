@@ -1,5 +1,5 @@
 ---
-sip: TBA
+sip: 4
 title: Change Fee Claim Window
 status: Approved
 author: Kain Warwick <@kaiynne>, Clinton Ennis <@hav-noms>
