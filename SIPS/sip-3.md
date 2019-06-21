@@ -1,9 +1,10 @@
 ---
 sip: 3
 title: Purgeable Synths
+status: Approved
 author: Clinton Ennis (@hav_noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Approved
+
 created: 2019-06-12
 ---
 
