@@ -1,9 +1,10 @@
 ---
 sip: 2
 title: Remove Fee Penalty Tiers
+status: Approved
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
-status: APPROVED
+
 created: 2019-06-10
 ---
 
