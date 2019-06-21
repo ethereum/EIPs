@@ -20,21 +20,16 @@ The current fee claim window is not configurable, but the community has indicate
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
 There are currently several SCCPs proposed to increase the incentives in the system to ensure the sUSD peg is maintained. These configuration changes are likely to have minimal effect and significant lag between implementation and user action given the current six week claim window. The reason for this is that a user is not sufficiently motivated to adjust their c ratio when they can wait for either the SNX price to rise in a later fee period or wait until their fees are about to expire before adjusting their ratio.
 
-## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature.-->
-TBC
-
-## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-TBC
-
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-Test cases for an implementation are mandatory for SIPs but can be included with the implementation.
+https://github.com/Synthetixio/synthetix/blob/develop/test/FeePool.js#L503
+https://github.com/Synthetixio/synthetix/blob/develop/test/RewardsIntegrationTests.js
+
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+https://github.com/Synthetixio/synthetix/blob/develop/contracts/FeePool.sol#L100
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
