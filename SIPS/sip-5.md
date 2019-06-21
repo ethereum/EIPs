@@ -1,5 +1,5 @@
 ---
-sip: SIP-5
+sip: 5
 title: New Crypto Synths June '19
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 status: Approved
