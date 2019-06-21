@@ -1,8 +1,8 @@
 ---
-sip: <to be assigned>
-title: New Synths June '19
+sip: SIP-5
+title: New Crypto Synths June '19
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
-status: Proposed
+status: Approved
 created: 2019-06-18
 ---
 
