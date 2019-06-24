@@ -1,0 +1,74 @@
+---
+eip: <to be assigned>
+title: Account Versioning Extension for CREATE and CREATE2
+author: Wei Tang (@sorpaas)
+discussions-to: https://github.com/sorpaas/EIPs/issues/2
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-06-24
+requires: 1702
+---
+
+## Simple Summary
+
+Specification for an extension of EIP-1702 to allow an EVM contract to
+create multiple versions.
+
+## Abstract
+
+This EIP defines an extension to the base layer of account versioning
+(EIP-1702) to allow an EVM contract to create sub-contracts of
+multiple versions. Although this is not necessary at this moment, it
+will be a nice-to-have add-on.
+
+## Motivation
+
+The base account versioning layer only allows contracts of the same
+version to be deployed through `CREATE` and `CREATE2`. In this
+section, we provide an extension to allow different versions of
+contracts to be deployed via them, by providing two new opcodes,
+`VCREATE` and `VCREATE2`.
+
+## Specification
+
+Define two new opcodes `VCREATE` and `VCREATE2` at `0xf6` and `0xf7`
+respectively. `VCREATE` takes 4 stack arguments (version, value, input
+offset, input size), and `VCREATE2` takes 5 stack arguments (version,
+endowment, memory_start, memory_length, salt). Note that except the
+stack item `version`, other arguments are the same as `CREATE` and
+`CREATE2`.
+
+The two new opcodes behave identically to `CREATE` and `CREATE2`,
+except that it deploys contracts with version specified by stack item
+`version`.
+
+The network at all times maintains a constant list within the client
+of all deployable versions (which can be different from supported
+versions). Upon `VCREATE` and `VCREATE2`, if the specified `version`
+is not on the list of deployable versions, return out-of-gas.
+
+## Rationale
+
+By providing two additional opcodes `VCREATE` and `VCREATE2`, contract
+developers can deploy new contracts that take advantage of them to
+create new sub-contracts of multiple versions. This may be useful for
+situations like upgradable contracts (while it currently still can be
+done via proxy contacts using only base layer account versioning).
+
+## Backwards Compatibility
+
+This EIP introduces two new opcodes for EVM runtime. Based on current
+assumed invariants, it should not have any noticable backward
+compatibility issues.
+
+## Test Cases
+
+Not yet provided.
+
+## Implementation
+
+Not yet implemented.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
