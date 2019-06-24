@@ -1,0 +1,68 @@
+---
+eip: <to be assigned>
+title: Account Versioning Extension for Contract Creation Transaction
+author: Wei Tang (@sorpaas)
+discussions-to: https://github.com/sorpaas/EIPs/issues/2
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-06-24
+requires: 1702
+---
+
+## Simple Summary
+
+Specification for an extension of EIP-1702 to allow contract creation
+transaction to create multiple versions.
+
+## Abstract
+
+This EIP defines an extension to the base layer of account versioning
+(EIP-1702) to allow multiple account versions to be used in contract
+creation transaction. Although this is not necessary at this moment,
+it will once we have multiple independent VMs (such as eWasm).
+
+## Motivation
+
+The base account versioning layer only allows contract of the
+newest version to be deployed via contract creation transaction. This
+is a reasonable assumption for current Ethereum network, because most
+of new features added to EVM are additions, and developers almost
+never want to deploy contracts that are not of the newest version. In
+this section, we provide an extension to allow multiple versions of
+contracts to be deployed via contract creation transaction.
+
+## Specification
+
+Add an additional field `version` (256-bit integer) in contract
+creation transaction. So it becomes `nonce`, `gasprice`, `startgas`,
+`to`, `value`, `data`, `v`, `r`, `s`, `version`. When signing or
+recovering, sign ten items, with `v`, `r`, `s` as defined by EIP-155.
+
+The transaction would be executed with the *code's version* in
+`version` supplied, and deploys contract of `version`. If `version` is
+not supported or *validation* does not pass, return out-of-gas.
+
+## Rationale
+
+By providing the additional field `version`, a contract creation
+transaction can specify which version it wants to deploy. In case of
+two independent VMs such as EVM and eWASM, we can allow two
+`LATEST_VERSION`s to be specified -- one for EVM and another for
+eWASM. Both of them then can deploy new contracts via transactions.
+
+## Backwards Compatibility
+
+This EIP only changes transaction formats and does not change any VM
+execution logic, thus it has no backwards compatibility issue.
+
+## Test Cases
+
+Not yet provided.
+
+## Implementation
+
+Not yet implemented.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
