@@ -39,8 +39,8 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-#### Suggestions for Authors
-*The following are not requirements, but are suggestions from the EIP Editors*
+### Suggestions for Authors
+*The following are not requirements but are suggestions from the EIP Editors*
 
 :warning: Before you begin, vet your idea, this will save you time. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
 
