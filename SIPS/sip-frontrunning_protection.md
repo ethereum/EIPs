@@ -2,7 +2,7 @@
 sip: <to be assigned>
 title: Frontrunning protection
 status: WIP
-author: Jackson Chan (@jacko125) Kain Warwick (@kaiynne)
+author: Jackson Chan (@jacko125), Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/kPPKsPb
 created: 2019-06-27
 ---
@@ -13,7 +13,7 @@ Frontrunning bots have been exploiting the oracle service to read the next updat
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-The current oracle is currently vulnerable to frontrunning, there are serveral measure in place to ensure that profitability from this is a low as possible, but more sophisticated bots have been written recently that have much higher probability of profiting. In order to protect the system we have implemented a mechanism where if the oracle detects it is being front run it will frontrun the frotrunner with a tx to change the transaction fee rate to 99%. This is a credible threat to bots attempting to frontrun the system to ensure that even if they are profitable for a period there is a high likelihood that they lose everything if the oracle detects this activity. There is the potential for collateral damage if a genuine trader exectutes a trade in the same block, but we are implementing protections against this so that a user can specify a fee rate above which the tx will be rejected. We eexpect to have this implemented soon.
+The current oracle is currently vulnerable to frontrunning, there are serveral measures in place to ensure that profitability from this is a low as possible, but more sophisticated bots have been written recently that have much higher probability of profiting. In order to protect the system we have implemented a mechanism where if the oracle detects it is being front run it will frontrun the frotrunner with a tx to change the exchange fee rate to 99%. This is a credible threat to bots attempting to frontrun the system to ensure that even if they are profitable for a period there is a high likelihood that they lose everything if the oracle detects this activity. There is the potential for collateral damage if a genuine trader exectutes a trade in the same block, but we are implementing protections against this so that a user can specify a fee rate above which the tx will be rejected. We eexpect to have this implemented soon.
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
@@ -21,11 +21,11 @@ In order for the system to remain viable traders must not be able to frontrun th
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-The oracle code is currently closed source, so we will not be publishing the exact spec of the mechanism. But above certain thresholds if a bot executes a tx at a higher gwei than the oracle in the same block the oracle will esclate to push an even higher gwei transaction to raise the transaction fee to 99%.
+The oracle code is currently closed source, so we will not be publishing the exact spec of the mechanism. But above certain thresholds if a bot executes a tx at a higher gwei than the oracle in the same block the oracle will esclate to push an even higher gwei transaction to raise the exchange fee to 99% then restore the exchange fee rate back to its original setting.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-We have implemented several soft mechanism to reduce the profitibaility of frontrunning over the last few months, and we plan to introduce more, but without a credible threat to profitibility it is still the optimal stratgey for bot developers to attempt to attack the system. If the only penalty is reduce profits. If there is a risk of total loss of funds redistributed to SNX stakes via the fee pool this changes the strategic outlook for a potential bot developer significantly.
+We have implemented several soft mechanism to reduce the profitibaility of frontrunning over the last few months, and we plan to introduce more, but without a credible threat to profitibility it is still the optimal stratgey for bot developers to attempt to attack the system. If the only penalty is reduce profits. If there is a risk of total loss of funds redistributed to SNX stakers via the fee pool this changes the strategic outlook for a potential bot developer significantly.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
