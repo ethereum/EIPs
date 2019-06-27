@@ -6,7 +6,7 @@ type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
         https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19
 ---
 
 ## What is an EIP?
@@ -74,6 +74,7 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 Other exceptional statuses include:
 
 * **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
+* **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
 * **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
 * **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
@@ -110,7 +111,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * discussions-to:` \<a url pointing to the official discussion thread\>
 
-` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
+` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Deferred | Rejected | Superseded>
 
 `* review-period-end:` <date review period ends>
 
@@ -251,6 +252,8 @@ March 21, 2018: Minor edits to accommodate the new automatically-generated EIP d
 May 29, 2018: A last call process was added.
 
 Oct 17, 2018: The `updated` header was introduced.
+
+May 19, 2019: The **Abandoned** status was introduced.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
