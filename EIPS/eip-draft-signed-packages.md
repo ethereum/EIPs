@@ -1,11 +1,11 @@
 ---
-eip: <to be assigned>
+eip: 1781
 title: Ethereum Signed Packages
 author: Philipp Langhans (@PhilippLgh) <philipp@ethereum.org>
 discussions-to: https://github.com/PhilippLgh/ethereum-signed-packages/issues
 status: Draft
-type: Standards Track (Core, Networking, Interface, ERC)
-category (*only required for Standard Track): ERC
+type: Standards Track
+category: ERC
 created: 2019-02-27
 ---
 
@@ -54,17 +54,17 @@ Discussion on the magicians forum: [Package and Dependency Managers](https://eth
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-A specification draft and reference implementation can be found at:
+The latest specification draft and reference implementation can be found at:
 
 **Specification Draft**
 [https://github.com/PhilippLgh/ethereum-signed-packages/](https://github.com/PhilippLgh/ethereum-signed-packages/blob/master/spec/README.md).
 
-The core idea is to calculate the digests for the files contained within an archive file and then sign these digests with a certificate (x509 currently not supported) or Ethereum key pair.
+Ethereum Signed Packages contain a special `_META_` subdirectory with all the necessary metadata for signature verification. Inside this directory there is a special `_checksums.json` file which contains a JSON structure representing the hashes or digests of the package contents (not including `_META_` files). The chosen hash algorithm is flexible (sha256, sha512, md5 are valid e.g.) and needs to be identifiable by the key of the nested hash structure inside the JSON to specify how to reproduce the file digests. The object can contain multiple hash representations as sub-structures. If it does contain different outputs of multiple hash functions all hashes need to be validated by a verifier for the package to be considered valid. 
 
-To represent these signatures, we are using JSON Web Signatures (JWS) as defined per [RFC7515](https://tools.ietf.org/html/rfc7515) and [RFC7519](https://tools.ietf.org/html/rfc7519).
+Moreover, the `_META_` directory contains one or more JSON file for each signature with naming scheme `_sig_*eth address of signer*.json`. The signatures within those files are represented as JSON Web Signature (JWS) according to [RFC7515](https://tools.ietf.org/html/rfc7515) and [RFC7519](https://tools.ietf.org/html/rfc7519). The payload of the JWS are the hashes of the package contents as described by `_checksums.json`. However, certain signatures can also cover only portions of the package contents. To account for missing "Ethereum" schemes in the JWS spec we use `ES256K` and `ETH` (Ethereum Signed Message format) as algorithm parameters. A focus is to have JWS that are human-readable for easier inspection. There is no need to use the compressed (JWS Compact Serialization), url-safe JWS formats. Therefore, all JWS use JWS JSON Serialization with the `b64` extension.
 
-The certificate in this case is just represented by a human-readable JSON structure binding a public secp256k1 key or Ethereum address to a dedicated key usage, valid time stamp, validity period and identity. The spec for this is out of scope and should probably be discussed in a separate EIP (TBD).
-
+Signatures are backed by certificates. A certificate in this case is just represented by a human-readable JSON structure binding a public secp256k1 key or Ethereum address to a dedicated key usage, valid time stamp, validity period and identity. The spec for this is out of scope and should probably be discussed in a separate EIP (TBD).
+A package is **valid** if the checksums of the contents can be reproduced using the described hash algorithms and the signature used to sign the digests can be verified. However, a package is only *trusted* if the package is **valid** and a certificate successfully binds the signer's public key to a trusted identity which can be just a trusted Ethereum address that is passed as argument.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -79,13 +79,13 @@ Ideally, this issue is solved by having better key metadata and dedicated wallet
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Ethereum Signed Packages will be piloted on a bigger scale in Ethereum's [new client manager software](https://github.com/ethereum/mist-shell):
+Ethereum Signed Packages will be piloted on a bigger scale in Ethereum's [new client manager software](https://github.com/ethereum/grid):
 
 [https://github.com/ethereum/mist-shell/blob/master/ETH_CERTS.md](https://github.com/ethereum/mist-shell/blob/master/ETH_CERTS.md)
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-A reference implementation and signer CLI ttool can be found at:
+A reference implementation and signer CLI tool can be found at:
 
 **Signer CLI Tool (WIP)**
 [https://github.com/PhilippLgh/ethereum-signed-packages](https://github.com/PhilippLgh/ethereum-signed-packages)
