@@ -12,7 +12,7 @@ created: 2019-07-01
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-Standarized names for common metrics Ethereum clients to use with Prometheus. 
+Standardized names for common metrics Ethereum clients to use with Prometheus. 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
