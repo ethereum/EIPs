@@ -221,11 +221,16 @@ The current EIP editors are
 
 For each new EIP that comes in, an editor does the following:
 
-- Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
+- Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense (they can be implemented), even if they don't seem likely to get to final status.
 - The title should accurately describe the content.
 - Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
 
 If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
+
+If the editor cannot or is unwilling to provide further feedback on the EIP, he must appoint another editor to replace him (ping the other editor in the EIP's PR).
+If an editor cannot reach an agreement with the EIP proponent regarding the DRAFT status of an EIP, another editor must be pinged for providing clear technical and editorial feedback.
+
+The editors have an obligation to review each EIP proposal, providing editorial or technical feedback necessary for either merging the EIP draft or closing the EIP pull request. Feedback, in the form of PR review comments on the EIP's PR, are required. The maximum amount of time that is allowed to pass between the time of making an EIP pull request and a first editor's review is 30 days. If this period is exceeded, the editor composition must be revised - e.g. new editors must be appointed, to remove the bottleneck.
 
 Once the EIP is ready for the repository, the EIP editor will:
 
