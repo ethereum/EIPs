@@ -217,6 +217,132 @@ The current EIP editors are
 
 ` * Alex Beregszaszi (@axic)`
 
+## EIP Editor Criteria
+
+Editors, when appointed, must choose the [EIP categories](#eip-types) that they have expertise in. In addition to these categories, two new editor categories are added:
+- `Syntax` - for editors with expertise in correcting language syntax in proposals and natural language semantics.
+- `Editor Review` - editors in this category can be assigned to review new editor applications, requests for an editor's removal, requests for changing an editor's categories, or any other request that brings changes to the editors' composition.
+
+Editors can choose one or more categories, as long as they fit the requirements for each category. This means they can be assigned to any EIP from that category and become responsible for the review process of that EIP. Editors are free to provide feedback (PR reviews, comments) to EIPs in any other categories, but they cannot become `assigned` editors for EIPs outside their chosen categories.
+
+An editor cannot review his/her own EIP proposal.
+
+### General Criteria
+
+This applies for any editor and any category unless specified otherwise.
+
+1. An editor must have been an author for at least one `Final` EIP in each category they choose, except for `Syntax` and `Editor Review`. If there are no current editors and no suitable editor applications for a category, this rule can be restricted to: must have been an author for at least one `Final` EIP in any category.
+2. It is recommended that an editor is not part of a competing blockchain project, as a core team member. This can be used to deny editor applications and it is up to the voting editors and community to enforce it or not.
+
+### Category-specific Criteria
+
+#### Standard Track EIP - Core
+
+An editor must prove knowledge of Ethereum's EVM and consensus mechanisms specification and implementation (in at least one programming language), proved by having a solid and on-going contribution to at least one of:
+- a widely-used Ethereum client (specifications and/or implementation)
+- a widely-used security tool: formal verification, static analysis, EVM reverse engineering and (dis)assemblers, etc.
+
+If such a contribution stops, the editor cannot be an `assigned` editor for this category anymore.
+
+#### Standard Track EIP - Networking
+
+An editor must provide knowledge of peer-to-peer networking, proved by having a solid and on-going contribution to at least one widely-used peer-to-peer network library, in any programming language. Knowledge of p2p libraries that are currently used in Ethereum (whisper, Swarm) is preferred, but not mandatory.
+
+#### Standard Track EIP - Interface
+
+An editor must provide knowledge of the interfaces used in Ethereum. At least one of the following knowledge requirements must be true:
+
+1. Client API/RPC specifications and standards that are currently used in Ethereum. Knowledge of additional RPC standards is preferred. This is proven by having a solid and ongoing contribution to at least one of:
+- maintaining specifications for an RPC protocol
+- implementing Ethereum RPC protocols in a widely-used tool (e.g. Ethereum clients)
+
+2. ABI specification and implementation. This is proven by having a solid and ongoing contribution to ABI-related parts of widely-used Ethereum tools - e.g. [Solidity](https://github.com/ethereum/solidity) compiler.
+
+3. EVM-C interface. This is proven by having a solid and ongoing contribution to [EVMC](https://github.com/ethereum/evmc).
+
+#### Standard Track EIP - ERC
+
+An editor must provide proof of knowledge of already finalized ERC standards by:
+- having participated in discussions or authoring of `Final` ERC standards (more than three).
+- contributing to existing implementations of `Final` ERC standards (more than three).
+
+All of the above are required.
+
+#### Meta EIP
+
+An editor must provide proof of knowledge of the current Ethereum processes by:
+- having participated in discussions or authoring `Final` Meta EIPs
+- contributing to the implementation of such processes or supervising the implementation.
+
+#### Informational EIP
+
+An editor must provide proof of knowledge by:
+- having participated in discussions or authoring `Final` Informational EIPs
+
+As these EIPs are optional, any editor who fits the requirements from the Standard Track and Meta EIP categories can apply for this category.
+
+#### EIP Syntax Editor
+
+An editor must demonstrate knowledge of natural language syntax and semantics (currently, for English), by either:
+- having university or higher credentials in the study of the current EIP language
+- having editorial experience or being a technical writer for technical journals or well-known publications
+
+The `Syntax` editor cannot be an `assigned` editor for an EIP. However, he/she will review EIP proposals or changes to existing EIPs, when requested.
+
+#### Editor Review
+
+An editor who chooses this category must already belong to at least one of the following categories:
+- any Standard Track EIP category
+- Meta EIP
+
+## EIP Editor Appointing
+
+### Applying to Become Editor
+
+Process for editor applications:
+
+1. Applicant must create a PR to add him/herself as an editor, modifying EIP-1.
+
+| Full Name      | Github Handle | Categories  | Application URL (PR)                       |
+| :------------- |:--------------| :---------- | :----------------------------------------- |
+| John Doeth     | @handle       | Core, ERC   | https://github.com/ethereum/EIPs/pull/xxxx |
+
+2. The PR description must contain:
+- links to the author's work, in order to verify that requirements are satisfied for each category
+- link to a discussion URL (an issue on this repository or a forum, such as https://ethereum-magicians.org), where the community can provide feedback or ask questions
+
+### Application Review and Voting Process
+
+If the application does not meet requirements, the `assigned` editor must list the missing requirements and the PR will be closed. The application can be reopened when the author considers the requirements are met.
+
+All existing editors can vote by commenting on the PR with `yes` or `no`.
+To encourage community engagement, anyone who has a GitHub account can vote on the PR's description by using "reactions":
+- `+1` for `yes`
+- `-1` for `no`
+
+The voting period is 14 days. After the 14 days, the application `yes` score (the author is accepted as editor) is calculated in the following way:
+- current editors have a 70% weight
+- community vote has a 30% weight
+
+`yesPerc = 70% * editorYesPerc + 30% * communityYesPerc`, where:
+- `editorYesPerc = yesVotes / totalVotes`, percentage of `yes` votes from the total number of editors (if the editor composition changes during the voting period, we take the minimum number of editors existing at any given moment, during voting)
+- `communityYesPerc = yesVotes / totalVotes`, percentage of `+1` votes from the total number of `+1` and `-1` community votes
+
+### Application Finalization
+
+The final application outcome will be `yes` if:
+- the application meets the EIP Editor Criteria (ensured by the `assigned` editor)
+- `yesPerc > 60%` - stable score for at least 2 hours.
+
+The voting outcome will be added in the application PR to modify EIP-1. The `assigned` editor will verify the final scores:
+
+| Full Name      | Github Handle | Categories  | Application URL (PR)                       | Vote% Editors | Vote% Community | Vote% Score |
+| :------------- | :------------ | :---------- | :----------------------------------------- | :------------ | :-------------- | :---------- |
+| John Doeth     | @handle       | Core, ERC   | https://github.com/ethereum/EIPs/pull/xxxx | x%            | y%              | z%          |
+
+
+For proof of vote, the application PR can be locked.
+
 ## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
