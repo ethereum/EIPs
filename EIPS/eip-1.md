@@ -227,10 +227,15 @@ For each new EIP that comes in, an editor does the following:
 
 If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
 
-If the editor cannot or is unwilling to provide further feedback on the EIP, he must appoint another editor to replace him (ping the other editor in the EIP's PR).
-If an editor cannot reach an agreement with the EIP proponent regarding the DRAFT status of an EIP, another editor must be pinged for providing clear technical and editorial feedback.
+Each EIP proposal must have an `assigned` editor, which ensures that the process steps are respected, the EIP changes are reviewed in due time and that the EIP status is clear for the author. However, any other editor can review the EIP.
 
-The editors have an obligation to review each EIP proposal, providing editorial or technical feedback necessary for either merging the EIP draft or closing the EIP pull request. Feedback, in the form of PR review comments on the EIP's PR, are required. The maximum amount of time that is allowed to pass between the time of making an EIP pull request and a first editor's review is 30 days. If this period is exceeded, the editor composition must be revised - e.g. new editors must be appointed, to remove the bottleneck.
+If the `assigned` editor cannot provide further feedback on the EIP, he must appoint another editor to replace him (ping the other editor in the EIP's PR).
+
+If an editor cannot reach an agreement with the EIP author regarding the DRAFT status of an EIP, another editor must be pinged for providing clear technical and editorial feedback.
+
+The editors have an obligation to review each EIP proposal, providing editorial or technical feedback necessary for either merging the EIP draft or closing the PR. Feedback, in the form of PR review comments on the EIP's PR, are required.
+
+The maximum amount of time that should pass between the author's request for review and an actual editor's review, is 30 days. This includes the first request for review, after the author publishes the EIP Draft and all subsequent requests for review, which are preceded by changes to the proposal. If this period is exceeded, another editor must provide feedback. If there are no free or willing editors, measures must be taken in order to appoint new editors.
 
 Once the EIP is ready for the repository, the EIP editor will:
 
