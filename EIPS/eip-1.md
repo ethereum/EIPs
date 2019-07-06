@@ -221,7 +221,7 @@ The current EIP editors are
 
 Editors, when appointed, must choose the [EIP categories](#eip-types) that they have expertise in. In addition to these categories, two new editor categories are added:
 - `Syntax` - for editors with expertise in correcting language syntax in proposals and natural language semantics.
-- `Editor Review` - editors in this category can be assigned to review new editor applications, requests for an editor's removal, requests for changing an editor's categories, or any other request that brings changes to the editors' composition.
+- `Editor Manager` - editors in this category can be assigned to review new editor applications, requests for an editor's removal, requests for changing an editor's categories, or any other request that brings changes to the editors' composition.
 
 Editors can choose one or more categories, as long as they fit the requirements for each category. This means they can be assigned to any EIP from that category and become responsible for the review process of that EIP. Editors are free to provide feedback (PR reviews, comments) to EIPs in any other categories, but they cannot become `assigned` editors for EIPs outside their chosen categories.
 
@@ -231,8 +231,8 @@ An editor cannot review his/her own EIP proposal.
 
 This applies for any editor and any category unless specified otherwise.
 
-1. An editor must have been an author for at least one `Final` EIP in each category they choose, except for `Syntax` and `Editor Review`. If there are no current editors and no suitable editor applications for a category, this rule can be restricted to: must have been an author for at least one `Final` EIP in any category.
-2. It is recommended that an editor is not part of a competing blockchain project, as a core team member. This can be used to deny editor applications and it is up to the voting editors and community to enforce it or not.
+1. An editor must have been an author for at least one `Final` EIP in each category they choose, except for `Syntax` and `Editor Manager`. If there are 1) no current editors and 2) no suitable editor applications for a category, this rule can be relaxed to: must have been an author for at least one `Final` EIP in any category.
+2. It is recommended that an editor does not have a conflict of interest (is part of a competing blockchain project as a core team member, etc.). However, voting editors and community are free to apply this recommendation or not. Collaboration should be kept open to everyone, as long as their intent benefits Ethereum.
 
 ### Category-specific Criteria
 
@@ -289,7 +289,7 @@ An editor must demonstrate knowledge of natural language syntax and semantics (c
 
 The `Syntax` editor cannot be an `assigned` editor for an EIP. However, he/she will review EIP proposals or changes to existing EIPs, when requested.
 
-#### Editor Review
+#### Editor Manager
 
 An editor who chooses this category must already belong to at least one of the following categories:
 - any Standard Track EIP category
@@ -341,7 +341,7 @@ The voting outcome will be added in the application PR to modify EIP-1. The `ass
 | John Doeth     | @handle       | Core, ERC   | https://github.com/ethereum/EIPs/pull/xxxx | x%            | y%              | z%          |
 
 
-For proof of vote, the application PR can be locked.
+For proof of vote, the application PR must be locked (Github's "Lock conversation").
 
 ## EIP Editor Responsibilities
 
