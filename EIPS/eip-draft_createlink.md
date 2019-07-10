@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: CREATELINK opcode
 author: William Morriss (@wjmelements)
-discussions-to: [Github PR](https://github.com/ethereum/EIPs/pulls)
+discussions-to: [Github PR](https://github.com/ethereum/EIPs/pull/2185)
 status: Draft
 type: Standards Track
 category Core
