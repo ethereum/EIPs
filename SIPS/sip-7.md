@@ -10,14 +10,14 @@ created: 2019-07-09
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
-SIP-6 was effective in removing several front-running bots, but these bots have rapidly adapted to the mechanism implemented in SIP-6. SIP-6 was always intented to be a short term deterrent. This SIP intends to be a longer term solution to front-running. It enables the oracle service to perform three functions:
+SIP-6 was effective in removing several front-running bots, but these bots have rapidly adapted to the mechanism implemented in SIP-6. SIP-6 was always intended to be a short term deterrent. This SIP intends to be a longer term solution to front-running. It enables the oracle service to perform three functions:
 1. Pause exchanges
 2. Prevent trades while an oracle update is in progress
 3. Removes the destination param in an exchange so that exchanges only go to the messageSender
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-There is an attack vector that allows front-running the oracle by observing exchange rate update transactions after they are broadcast, then attempting to trade into a currency that will shift in favour of the trade. This front-running attack is extremely effective if well constructed and provides almost risk free profits. This SIP will likely render this method ineffective, as it will halt trading when the oracle detects a change in price. Once the trading halt is in place the oracle will push a price update and reenable trading. This means that a trade broadcast right as an oracle update occurs will likely be rejected and have to be resubmitted, which impacts usability but we are plannning UI updates to prevent this from impacting users on Synthetix.Exchange.
+There is an attack vector that allows front-running the oracle by observing exchange rate update transactions after they are broadcast, then attempting to trade into a currency that will shift in favour of the trade. This front-running attack is extremely effective if well constructed and provides almost risk free profits. This SIP will likely render this method ineffective, as it will halt trading when the oracle detects a change in price. Once the trading halt is in place the oracle will push a price update and reenable trading. This means that a trade broadcast right as an oracle update occurs will likely be rejected and have to be resubmitted, which impacts usability but we are planning UI updates to prevent this from impacting users on Synthetix.Exchange.
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
