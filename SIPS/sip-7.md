@@ -19,6 +19,8 @@ SIP-6 was effective in removing several front-running bots, but these bots have 
 <!--A short (~200 word) description of the technical issue being addressed.-->
 There is an attack vector that allows front-running the oracle by observing exchange rate update transactions after they are broadcast, then attempting to trade into a currency that will shift in favour of the trade. This front-running attack is extremely effective if well constructed and provides almost risk free profits. This SIP will likely render this method ineffective, as it will halt trading when the oracle detects a change in price. Once the trading halt is in place the oracle will push a price update and reenable trading. This means that a trade broadcast right as an oracle update occurs will likely be rejected and have to be resubmitted, which impacts usability but we are planning UI updates to prevent this from impacting users on Synthetix.Exchange.
 
+Any trades / exchanges during the lock period will revert and no balances be affected. The balance of the gas paid for the transaction will be returned the wallet, about 90+ %. 
+
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
 The motivation for this change is the same as for SIP-6, it is critical that users of the exchange do not have the ability to exploit the latency of the blockchain to make profit at the expense of SNX holders. While we welcome trading bots using valid strategies we believe the network must be able to prevent and punish users attempting to exploit this latency.
