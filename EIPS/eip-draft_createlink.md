@@ -49,7 +49,7 @@ No constructor code is called.
 Few profilerated contracts require initialization, but for the ones that do, they could provide an initialization method that can only be called by the factory, and call it immediately after `CREATELINK`.
 
 There are several alternatives to reverting when the target account has no code.
-In comparison to `INVALID`, `REVERT` does not consume the additional gas, and would not allow a caller to inspect the error.
+In comparison to `INVALID`, `REVERT` does not waste the additional gas, and would allow a caller to inspect the error.
 Another alternative would be to not revert at all, and instead push onto the stack an invalid address: some number greater than or equal to `(1 << 160)`.
 However, because the intent of `CREATELINK` will never be to check whether an account has code (`EXTCODEHASH` is the cheapest way to do that), nor to create an empty account, those cases are exceptional.
 Most wallets estimate gas before issuing transactions; standardized revert data can help developers to diagnose the issue.
