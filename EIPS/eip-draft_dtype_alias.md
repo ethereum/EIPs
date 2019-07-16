@@ -1,0 +1,86 @@
+---
+eip: <to be assigned>
+title: dType Alias Extension - Decentralized Type System
+author: Loredana Cirstea (@loredanacirstea), Christian Tzurcanu (@ctzurcanu)
+discussions-to: https://github.com/ethereum/EIPs/issues/2192
+status: Draft
+type: Standards Track
+category: ERC
+created: 2019-07-16
+requires: 1900, 2157
+---
+
+## Simple Summary
+
+The dType Alias is a system for providing human-readable resource identifiers to on-chain content, supporting any type of data.
+
+## Abstract
+
+The dType Alias is a system for providing human-readable resource identifiers to on-chain content. A resource identifier is based on the type of data (identifier provided by dType, EIP-1900) and the data content (identifier provided by dType Storage Contracts, EIP-2157). It is a universal way of addressing content, supporting any type of data.
+
+
+## Motivation
+
+There are standards that currently address the need for attaching human-readable identifiers to Ethereum accounts, such as [EIP-137](http://eips.ethereum.org/EIPS/eip-137). However, they do not address the content of smart contracts, which can contain heterogeneous data that belongs to various accounts. Having uniquely identified resources opens the way to creating both human and machine-readable protocols on top of Ethereum. It also provides a basis for protocols based on functional programming.
+
+Imagine a dType `Profile` type, with related storage data about user profiles. One could access such a profile using an alias for the data content: `Alice@Profile`. For a `PaymentChannel` type, Alice can refer to her channel with Bob with `AliceBob.PaymentChannel`.
+This alias system can be used off-chain, to replace the old DNS system with a deterministic and machine-readable way of displaying content, based on the dType type's metadata.
+
+## Specification
+
+We define an `Alias` registry contract, that keeps track of the human-readable identifiers for data content.
+
+```
+interface Alias {
+
+    event AliasSet(bytes32 dtypeIdentifier, string name, string separator, bytes32 indexed identifier);
+
+    function setAlias(bytes32 dtypeIdentifier, string memory name, string memory separator, bytes32 identifier, bytes memory signature) public;
+
+    function getAliased(string memory name, string memory separator) view public returns (bytes32 identifier);
+}
+```
+
+- `dtypeIdentifier`: Type identifier from the dType registry, needed to ensure uniqueness of `name` for a dType type. `dtypeIdentifier` is checked to see if it exists in the dType registry. The dType registry also links the type's data storage contract, where the existence and ownership of the `identifier` is checked.
+- `name`: user-defined human-readable name for the resource referenced by `identifier`
+- `separator`: Character acting as a separator between the name and the rest of the alias. Allowed values:
+  - `.`: general domain separation, e.g. `Subdomain.Domain`
+  - `@`: identifying actor-related data, such as user profiles, e.g. `Alice@SocialNetwork`
+  - `#`: identifying concepts, e.g. `TopicX#PostY`
+  - `/`: general resource path definition, e.g. `Resource/ResourceSource`
+- `identifier`: Resource identifier from a smart contract linked with dType
+- `signature`: Alias owner signature on `dtypeIdentifier`, `identifier`, `name`, `separator`, `nonce`, `aliasAddress`, `chainId`.
+  - `nonce`: monotonically increasing counter, used to prevent replay attacks
+  - `aliasAddress`: Ethereum address of `Alias` contract
+  - `chainId`: chain on which the `Alias` contract is deployed
+
+Content addressability can be done:
+- using the `bytes32` identifiers directly, e.g. `0x0b5e76559822448f6243a6f76ac7864eba89c810084471bdee2a63429c92d2e7@0x9dbb9abe0c47484c5707699b3ceea23b1c2cca2ac72681256ab42ae01bd347da`
+- using the human identifiers, e.g. `Alice@SocialNetwork`
+
+Both of the above examples will resolve to the same content.
+
+
+## Rationale
+
+Current attempts to solve content addressability, such as [EIP-137](http://eips.ethereum.org/EIPS/eip-137), only target Ethereum accounts. These are based on inherited concepts from HTTP and DNS, which are not machine friendly.
+
+With EIP-1900 and EIP-2157, general content addressability can be achieved. dType provides type information and a reference to the smart contract where the type instances are stored.
+
+Multiple aliases can be assigned to a single resource. Either by using a different `name` or by using a different `separator`. Each `separator` can have a specific standard for displaying and processing data.
+
+## Backwards Compatibility
+
+Will be added.
+
+## Test Cases
+
+Will be added.
+
+## Implementation
+
+An in-work implementation can be found at https://github.com/pipeos-one/dType/blob/master/contracts/contracts/Alias.sol.
+This proposal will be updated with an appropriate implementation when consensus is reached on the specifications.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
