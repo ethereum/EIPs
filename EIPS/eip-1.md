@@ -6,7 +6,7 @@ type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
         https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-07-17
 ---
 
 ## What is an EIP?
@@ -77,7 +77,7 @@ Following is the process that a successful non-Core EIP will move along:
 Following is the process that a successful Core EIP will move along:
 
 ```
-[ IDEA ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
+[ IDEA ] -> [ DRAFT ] -> [ LAST CALL ] -> [ READY ] -> [ FINAL ]
 ```
 
 Each status change is requested by the EIP author and reviewed by the EIP editors. Use a pull request to update the status. Please include a link to where people should continue discussing your EIP. The EIP editors will process these requests as per the conditions below.
@@ -90,9 +90,9 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
   * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed.
 * **Last Call** -- This EIP will listed prominently on the https://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
   * :x: -- A Last Call which results in material changes or substantial unaddressed technical complaints will cause the EIP to revert to Draft.
-  * :arrow_right: Accepted (Core EIPs only) -- A successful Last Call without material changes or unaddressed technical complaints will become Accepted.
+  * :arrow_right: Ready (Core EIPs only) -- A successful Last Call without material changes or unaddressed technical complaints will become Ready.
   * :arrow_right: Final (Non-Core EIPs) -- A successful Last Call without material changes or unaddressed technical complaints will become Final.
-* **Accepted (Core EIPs only)** -- This status signals that material changes are unlikely and Ethereum client developers should consider this EIP for inclusion. Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
+* **Ready (Core EIPs only)** -- This status signals that material changes are unlikely and Ethereum client developers should consider this EIP for inclusion. Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
   * :arrow_right: Draft -- The Core Devs can decide to move this EIP back to the Draft status at their discretion. E.g. a major, but correctable, flaw was found in the EIP.
   * :arrow_right: Rejected -- The Core Devs can decide to mark this EIP as Rejected at their discretion. E.g. a major, but uncorrectable, flaw was found in the EIP.
   * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and adopted by the community, the status will be changed to “Final”.
@@ -137,7 +137,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * discussions-to:` *a url pointing to the official discussion thread*
 
-` status:` *Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded*
+` status:` *Draft | Last Call | Ready | Final | Active | Abandoned | Rejected | Superseded*
 
 `* review-period-end:` *date review period ends*
 
@@ -280,6 +280,8 @@ May 29, 2018: A last call process was added.
 Oct 17, 2018: The `updated` header was introduced.
 
 May 19, 2019: The **Abandoned** status was introduced.
+
+Jul 17, 2019: The **Accepted** status was renamed to **Ready**.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
