@@ -93,7 +93,6 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 
 Other exceptional statuses include:
 
-* **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
 * **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
 * **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
@@ -131,7 +130,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * discussions-to:` \<a url pointing to the official discussion thread\>
 
-` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Deferred | Rejected | Superseded>
+` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded>
 
 `* review-period-end:` <date review period ends>
 
