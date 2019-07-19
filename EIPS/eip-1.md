@@ -134,9 +134,9 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `* review-period-end:` <date review period ends>
 
-` type:` <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+` type:` <Standards Track | Informational | Meta>
 
-` * category:` <Core | Networking | Interface | ERC>
+` * category:` <Core | Networking | Interface | ERC> (Standards Track EIPs only)
 
 ` created:` <date created on>
 
