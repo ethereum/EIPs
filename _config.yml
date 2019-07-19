@@ -37,7 +37,7 @@ twitter:
 markdown: kramdown
 theme: minima
 kramdown:
-  parse_block_html: true
+  parse_block_html: false
   # This is the default, but be explicit as some EIPs depend on it
   auto_ids: true
   # This is to ensure more determistic behaviour
