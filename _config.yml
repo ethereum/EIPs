@@ -38,6 +38,10 @@ markdown: kramdown
 theme: minima
 kramdown:
   parse_block_html: true
+  # This is the default, but be explicit as some EIPs depend on it
+  auto_ids: true
+  # This is to ensure more determistic behaviour
+  auto_id_stripping: true
 
 permalink: /:slug
 
