@@ -2,7 +2,7 @@
 
 Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
 
-**Before you initiate a pull request**, please read the process document. Ideas should be thoroughly discussed prior to opening a pull request, such as on the [Ethereum Magicians forums](https://ethereum-magicians.org) or in a GitHub issue in this repository.
+**Before you initiate a pull request**, please read the process document.
 
 This repository tracks the ongoing status of EIPs. It contains:
 
