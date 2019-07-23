@@ -116,7 +116,7 @@ Each EIP should have the following parts:
 ## EIP Formats and Templates
 
 EIPs should be written in [markdown] format.
-Image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-X` (for eip **X**). When linking to an image in the EIP, use relative links such as `../assets/eip-X/image.png`.
+Image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
 
 ## EIP Header Preamble
 

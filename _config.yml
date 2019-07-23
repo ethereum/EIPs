@@ -54,4 +54,4 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - eip-X.md
+  - eip-template.md
