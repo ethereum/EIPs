@@ -123,33 +123,33 @@ Image files should be included in a subdirectory of the `assets` folder for that
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-` eip:` <EIP number> (this is determined by the EIP editor)
+` eip:` *EIP number* (this is determined by the EIP editor)
 
-` title:` <EIP title>
+` title:` *EIP title*
 
-` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
+` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
-` * discussions-to:` \<a url pointing to the official discussion thread\>
+` * discussions-to:` *a url pointing to the official discussion thread*
 
-` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded>
+` status:` *Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded*
 
-`* review-period-end:` <date review period ends>
+`* review-period-end:` *date review period ends*
 
-` type:` <Standards Track | Informational | Meta>
+` type:` *Standards Track | Informational | Meta*
 
-` * category:` <Core | Networking | Interface | ERC> (Standards Track EIPs only)
+` * category:` *Core | Networking | Interface | ERC* (Standards Track EIPs only)
 
-` created:` <date created on>
+` created:` *date created on*
 
-` * updated:` <comma separated list of dates>
+` * updated:` *comma separated list of dates*
 
-` * requires:` <EIP number(s)>
+` * requires:` *EIP number(s)*
 
-` * replaces:` <EIP number(s)>
+` * replaces:` *EIP number(s)*
 
-` * superseded-by:` <EIP number(s)>
+` * superseded-by:` *EIP number(s)*
 
-` * resolution:` \<a url pointing to the resolution of this EIP\>
+` * resolution:` *a url pointing to the resolution of this EIP*
 
 Headers that permit lists must separate elements with commas.
 
