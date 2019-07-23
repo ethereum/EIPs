@@ -94,9 +94,10 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 Other exceptional statuses include:
 
 * **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
-* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
-* **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
-* **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
+  * :arrow_right: Draft -- Authors or new champions wishing to pursue this EIP can ask for changing it to Draft status.
+* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented. An EIP cannot move on from this state.
+* **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number. An EIP cannot move on from this state.
+* **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP. An EIP cannot move on from this state.
 
 ## What belongs in a successful EIP?
 
