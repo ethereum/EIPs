@@ -6,7 +6,7 @@ type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
         https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19
 ---
 
 ## What is an EIP?
@@ -35,13 +35,40 @@ It is highly recommended that a single EIP contain a single key proposal or new 
 
 An EIP must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
+### Special requirements for Core EIPs
+
+If a **Core** EIP mentions or proposes changes to the EVM (Ethereum Virtual Machine), it should refer to the instructions by their mnemonics and define the opcodes of those mnemonics at least once. A preferred way is the following:
+```
+REVERT (0xfe)
+```
+
 ## EIP Work Flow
+
+### Shepherding an EIP
 
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-:warning: Before you begin, vet your idea, this will save you time. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will work for most people in most areas where Ethereum is used. Examples of appropriate public forums to gauge interest around your EIP include [the Ethereum subreddit], [the Issues section of this repository], and [one of the Ethereum Gitter chat rooms]. In particular, [the Issues section of this repository] is an excellent place to discuss your proposal with the community and start creating more formalized language around your EIP.
+Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be be rejected based on prior research. It is thus recommended to open a discussion thread on [the Ethereum Magicians forum] to do this, but you can also use [one of the Ethereum Gitter chat rooms], [the Ethereum subreddit] or [the Issues section of this repository]. 
 
-Your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea. Following is the process that a successful EIP will move along:
+In addition to making sure your idea is original, it will be your role as the author to make your idea clear to reviewers and interested parties, as well as inviting editors, developers and community to give feedback on the aforementioned channels. You should try and gauge whether the interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the work required for implementing a Core EIP will be much greater than for an ERC and the EIP will need sufficient interest from the Ethereum client teams. Negative community feedback will be taken into consideration and may prevent your EIP from moving past the Draft stage.
+
+### Core EIPs
+
+For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP. 
+
+The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda Github Issue].  
+
+The AllCoreDevs call serve as a way for client implementers to do three things. First, to discuss the technical merits of EIPs. Second, to gauge what other clients will be implementing. Third, to coordinate EIP implementation for network upgrades.
+
+These calls generally result in a "rough consensus" around what EIPs should be implemented. This "rough consensus" rests on the assumptions that EIPs are not contentious enough to cause a network split and that they are technically sound.
+
+:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum] thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
+
+*In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.* 
+
+### EIP Process 
+
+Following is the process that a successful EIP will move along:
 
 ```
 [ WIP ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
@@ -66,7 +93,7 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 
 Other exceptional statuses include:
 
-* **Deferred** -- This is for core EIPs that have been put off for a future hard fork.
+* **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
 * **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
 * **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
 * **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
@@ -89,11 +116,11 @@ Each EIP should have the following parts:
 ## EIP Formats and Templates
 
 EIPs should be written in [markdown] format.
-Image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-X` (for eip **X**). When linking to an image in the EIP, use relative links such as `../assets/eip-X/image.png`.
+Image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
 
 ## EIP Header Preamble
 
-Each EIP must begin with an RFC 822 style header preamble, preceded and followed by three hyphens (`---`). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
 ` eip:` <EIP number> (this is determined by the EIP editor)
 
@@ -103,7 +130,7 @@ Each EIP must begin with an RFC 822 style header preamble, preceded and followed
 
 ` * discussions-to:` \<a url pointing to the official discussion thread\>
 
-` status:` <Draft | Last Call | Accepted | Final | Active | Deferred | Rejected | Superseded>
+` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded>
 
 `* review-period-end:` <date review period ends>
 
@@ -245,6 +272,8 @@ May 29, 2018: A last call process was added.
 
 Oct 17, 2018: The `updated` header was introduced.
 
+May 19, 2019: The **Abandoned** status was introduced.
+
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
 ### Bibliography
@@ -277,6 +306,8 @@ See [the revision history for further details](https://github.com/ethereum/EIPs/
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
+[the Ethereum Magicians forum]: https://ethereum-magicians.org/
+[AllCoreDevs agenda Github Issue]: https://github.com/ethereum/pm/issues
 
 ## Copyright
 
