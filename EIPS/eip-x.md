@@ -1,0 +1,126 @@
+---
+eip: <to be assigned>
+title: Methods to Merge Ethereum Blockchains Together
+author: Wei Tang (@sorpaas)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-08-02
+requires: 155, 1702
+---
+
+This EIP defines methods that can be adopted to merge two
+Ethereum-like blockchains together (for example, Ethereum and Ethereum
+Classic).
+
+Note that this EIP is purely an exploration of technical
+possibilities, and it does not mean the author endorse merging
+Ethereum and Ethereum Classic, or any other two blockchains together.
+
+## Simple Summary
+
+We define methods to merge multiple blockchains together, in a fully
+backward compatible way.
+
+## Abstract
+
+This defines how Ethereum merging can happen, with backward
+compatibility in mind. This is done by utilizing account versioning
+together with transaction replay protection. We also define three
+additional opcodes to allow merged chains to work accross states.
+
+## Motivation
+
+There are many reasons why we may want to merge multiple Ethereum
+(eth1.x) blockchains together. For example, there may have been chain
+splits of a blockchain, where later the community issues are resolved,
+and we want to avoid a permanent split due to a temporary issue. It
+may also be two completely distinct blockchains that want to merge in
+order to share proof of work, or to improve inter-chain communication.
+
+## Specification
+
+The merge process happens at fork block, where we have a **merger**
+chain and a **mergee** chain. At fork height, a miner should mine both
+a merger chain's block, and a mergee chain's block. For those two
+blocks:
+
+* Both of them should have no transactions.
+* Merger chain's fork height block and mergee chain's fork height
+  block should have its state root processed as normal.
+* Merger chain's fork height block should set its extra data field to
+  mergee chain's fork height block's state root. The same for mergee
+  chain's fork height block.
+* After mergee chain's fork height block, its proof of work should be
+  abandoned. That is, updated miners should not continue to mine
+  mergee chain any more.
+  
+### State Root
+  
+For the block after merger chain's fork height block, the state root
+meaning is changed to be hash of concating merger chain's original
+state root, and mergee chain's original state root.
+
+### Block Rewards
+
+Use merger chain's original block rewards. And mine coinbase always to
+the merger chain's side of the state.
+
+### Transactions and Account Versioning
+
+After merge, transactions with both chain ids are considered valid on
+the merger chain. We define two account versions, one with merger
+chain's original EVM config, and one with mergee chain's original EVM
+config. Accessing accounts originally from either chain should use
+EIP-1702's account versioning rules. We define how accounts are
+referred on the merged blockchain below:
+
+* For end user interface, prefix `0x01` for accounts on the merger
+  chain, and prefix `0x02` for accounts on the mergee chain.
+* The transaction format is unchanged with addresses using original
+  format. We distingish whether a transaction operates on merger chain
+  or mergee chain by its chain id. None replay protected transactions
+  must be disabled prior to merging.
+* All original opcodes `CALL*`, `CREATE*` are unchanged, where it only
+  accesses accounts on the same originating chain.
+  
+### Cross the Merger and Mergee Chain Boundary
+
+Define factor `P // Q`, which determines how coins are exchanged on
+merger chain and mergee chain. Define three new opcodes `MCALL`,
+`MCREATE` and `MCREATE2`. They function the same as `CREATE`, `CALL`
+and `CREATE2` with the same gas cost, except that it calls accounts on
+the other side of the state. Values `V` to be exchanged are computed as
+`V * P // Q` from merger side of state to mergee side of state, and
+`V * Q // P` from mergee side of state to merger side of state.
+
+## Rationale
+
+This EIP accomplishes the chain merge by concating two blockchain's
+state root. In clients, this can be represented as a simple depth one
+binary merkle tree where root's left is the merger state, and root's
+right is the mergee state. We use account versioning and transaction
+replay protection to make it backward compatible for full nodes,
+without changing any internal address representation or transaction
+representation. We then define additional opcodes to make two sides
+communicatable.
+
+## Backwards Compatibility
+
+This EIP is fully backward compatible for EVM and account states. It
+is not backward compatible for light client state proof verification,
+because an additional binary merkle tree is added.
+
+## Test Cases
+
+To be added.
+
+## Implementation
+
+To be added.
+
+## Copyright
+
+This work is licensed under a [Creative Commons Attribution-ShareAlike
+4.0 International](https://creativecommons.org/licenses/by-sa/4.0/).
