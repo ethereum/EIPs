@@ -16,7 +16,7 @@ Ease of access to synethtix.exchange is critical to the success of the platform,
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-We are three weeks into the sETH pool staking trial and already there is almost 3k ETH of liuqidity in the Uniswap pool. In addition to the depth of the pool the peg has been restored providin even more confidence to new and existing users. By formalising thise mechanism at the protocol level liquidity providers should have even more incentive to participate as they will now have confidence that this pool will be incentivised longer term so the effort of establishing liquidiity will be worth it.
+We are three weeks into the sETH pool staking trial and already there is almost 3k ETH of liuqidity in the Uniswap pool. In addition to the depth of the pool the peg has been restored providing even more confidence to both new and existing users. By formalising this mechanism at the protocol level, liquidity providers should have even more incentives to participate as they will now have confidence that this pool will be incentivised longer term so the effort of establishing liquidiity will be worth it.
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
