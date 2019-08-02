@@ -11,8 +11,7 @@ requires: 155, 1702
 ---
 
 This EIP defines methods that can be adopted to merge two
-Ethereum-like blockchains together (for example, Ethereum and Ethereum
-Classic).
+Ethereum-like blockchains together.
 
 Note that this EIP is purely an exploration of technical
 possibilities, and it does not mean the author endorse merging
