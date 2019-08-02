@@ -31,6 +31,7 @@ The distribution rules are as follows:
 2. You must be in the pool the entire week, no withdrawals are allowed. 
 3. Only the opening LP token balance counts, you can add more liquidity but it will only be counted in following week.
 4. The snapshot will occur two hours after each fee period closes @ ~6pm AEST.
+5. There is a minimum of 1 ETH required per provider. 
 
 The distribution will be managed by a smart contract, where the inflationary supply is minted each week, LP token holders will then need to claim their tokens after the close of each fee period.
 
