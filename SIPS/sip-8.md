@@ -12,11 +12,11 @@ created: 2019-08-02
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
-Ease of access to synethtix.exchange is critical to the success of the platform, this means new users must be able to convert ETH and other cryptocurrencies to Synths to begin trading on the exchange. Uniswap is the perfect on-ramp for synthetix.exchange as it is permisionless and open, but it requires liquidity providers to deposit both ETH and tokens. Providing liquidity on Uniswap is not risk free, so in order to encourage a deep liqidity pool and provide confidence in the on-ramp and off-ramp to the synthetix.exchange we have been incentivising LP's through SNX staking rewards. This SIP intends to formalise this mechanism at the protocol level. We are four weeks into the sETH pool staking trial and there is almost 3k ETH of liquidity in the Uniswap pool. In addition to the depth of the pool the peg has been restored providing confidence to both new and existing users of sX. By formalising this mechanism at the protocol level, liquidity providers should have even more incentive to participate as they can not be confident this incentive will exist long term so the effort of establishing liquidiity will be worth it.
+Ease of access to synethtix.exchange is critical to the success of the platform, so this means new users must be able to convert ETH and other cryptocurrencies to Synths to begin trading on the exchange. Uniswap is the perfect on-ramp and off-ramp for synthetix.exchange as it is permisionless and open, but it requires liquidity providers (LPs) to deposit both ETH and tokens. Providing liquidity on Uniswap is not risk free, so in order to encourage a deep liqidity pool and provide confidence in the on-ramp and off-ramp to the synthetix.exchange we have been incentivising LP's through SNX staking rewards. This SIP intends to formalise this mechanism at the protocol level. We are four weeks into the sETH pool staking trial and there is almost 3k ETH of liquidity in the Uniswap pool. In addition to the depth of the pool the peg has been restored, providing confidence to both new and existing users of sX. By formalising this mechanism at the protocol level, liquidity providers should have even more incentive to participate as they can be confident that this incentive will exist long term so the effort of establishing liquidiity will be worthwhile.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-This SIP formalises at the protocol level diverting SNX inflation to a pool to incentivise liquidity providers of sETH/ETH in Uniswap.
+This SIP formalises at the protocol level to divert a portion of SNX inflation into a pool to incentivise liquidity providers of the sETH/ETH pair in Uniswap.
 
 
 ## Motivation
@@ -35,8 +35,8 @@ The distribution rules are as follows:
 1. SNX tokens will be distributed by the percentage of liquidity tokens at the end of each period.
 2. You must be in the pool the entire week, no withdrawals are allowed. 
 3. Only the opening LP token balance counts, you can add more liquidity but it will only be counted in following week.
-4. The snapshot will occur two hours after each fee period closes @ ~6pm AEST.
-5. There is a minimum of 1 ETH required per provider. 
+4. The snapshot will occur two hours after each fee period which closes @ Wednesday ~6pm AEST.
+5. There is a minimum of 1 liquidity token required per provider. 
 
 The distribution will be managed by an m/n multisig contract with signers selected from LP providers. 
 
@@ -56,11 +56,11 @@ The source of truth for distribution will be the open source script released by 
 
 ^Phase three requires some modifications to the fee pool contracts hence the delay and discussion required before implementing this change.
 
-^There is still a kill-switch built into this mechnism whereby if the signers go rogue the foundation (and eventually the community via decentralised proxies) can halt distribution of the inflationary rewards to this contract and deploy a new multisig with different signers.
+^There is still a kill-switch built into this mechnism whereby if the signers go rogue. The foundation (and eventually the community via decentralised proxies) can halt distribution of the inflationary rewards to this contract and deploy a new multisig with different signers.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-By implementing this distrubution mechanism using a multisig we prepare for the next phase of the project where the foundation can no longer modify distribution and other aspects of the system and begin to test aspects of decentralised goveranance.
+By implementing this distrubution mechanism using a multisig, we prepare for the next phase of the project where the foundation can no longer modify distribution and other aspects of the system and begin to test aspects of decentralised goveranance.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
