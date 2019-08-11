@@ -120,3 +120,7 @@ Python implementation:
 
   old: http://vitalik.ca/files/old.py
   new: http://vitalik.ca/files/new.py
+
+### Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

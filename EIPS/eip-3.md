@@ -45,3 +45,7 @@ The actual call stack depth, as well as the call stack depth limit, are present 
 # Implementation
 
 Not implemented.
+
+# Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
