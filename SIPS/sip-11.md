@@ -1,9 +1,9 @@
 ---
-sip: <to be assigned>
+sip: SIP-11
 title: Allow fee period to be closed by any address 
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/CDTvjHY
-status: WIP
+status: Proposed
 created: 2019-07-10
 ---
 
