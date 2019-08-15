@@ -1,4 +1,4 @@
-{% assign eips=include.eips|split:"," %}
-{% for eipnum in eips %}
-  <a href="{{eipnum|strip|prepend:"eip-" }}">{{eipnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
+{% assign sips=include.sips|split:"," %}
+{% for sipnum in sips %}
+  <a href="{{sipnum|strip|prepend:"sip-" }}">{{sipnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
 {% endfor %}

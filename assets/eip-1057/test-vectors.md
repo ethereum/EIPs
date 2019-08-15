@@ -1,4 +1,4 @@
-# Test Vectors for EIP-1057 - ProgPow
+# Test Vectors for sip-1057 - ProgPow
 
 Many of these vectors are derived from [chfast/ethash](https://github.com/chfast/ethash)
 
@@ -337,7 +337,7 @@ loop 1 are as follows.
 ## progPowHash
 
 ### 0.9.2
-[Machine-readable data](https://github.com/ethereum/EIPs/blob/ad4e73f239d53d72a21cfd8fdc89dc81eb9d2688/assets/eip-1057/test-vectors-0.9.3.json)
+[Machine-readable data](https://github.com/ethereum/sips/blob/ad4e73f239d53d72a21cfd8fdc89dc81eb9d2688/assets/sip-1057/test-vectors-0.9.3.json)
 
 Block 30000:
 
@@ -460,4 +460,4 @@ Block 100,000,000:
 - `final_hash` - `b879f84923e71b812ef5a42ece0b5b9366c31cab218f40afe65f8a2cae448a6f`
 
 ### 0.9.3
-[Machine-readable data](https://github.com/ethereum/EIPs/blob/ad4e73f239d53d72a21cfd8fdc89dc81eb9d2688/assets/eip-1057/test-vectors-0.9.3.json)
+[Machine-readable data](https://github.com/ethereum/sips/blob/ad4e73f239d53d72a21cfd8fdc89dc81eb9d2688/assets/sip-1057/test-vectors-0.9.3.json)

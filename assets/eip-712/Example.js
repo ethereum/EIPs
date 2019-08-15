@@ -4,7 +4,7 @@ const chai = require('chai');
 
 const typedData = {
     types: {
-        EIP712Domain: [
+        sip712Domain: [
             { name: 'name', type: 'string' },
             { name: 'version', type: 'string' },
             { name: 'chainId', type: 'uint256' },
@@ -117,7 +117,7 @@ function signHash() {
     return ethUtil.keccak256(
         Buffer.concat([
             Buffer.from('1901', 'hex'),
-            structHash('EIP712Domain', typedData.domain),
+            structHash('sip712Domain', typedData.domain),
             structHash(typedData.primaryType, typedData.message),
         ]),
     );
@@ -138,7 +138,7 @@ expect(ethUtil.bufferToHex(encodeData(typedData.primaryType, typedData.message))
 expect(ethUtil.bufferToHex(structHash(typedData.primaryType, typedData.message))).to.equal(
     '0xc52c0ee5d84264471806290a3f2c4cecfc5490626bf912d01f240d7a274b371e',
 );
-expect(ethUtil.bufferToHex(structHash('EIP712Domain', typedData.domain))).to.equal(
+expect(ethUtil.bufferToHex(structHash('sip712Domain', typedData.domain))).to.equal(
     '0xf2cee375fa42b42143804025fc449deafd50cc031ca257e0b194a650a912090f',
 );
 expect(ethUtil.bufferToHex(signHash())).to.equal('0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2');

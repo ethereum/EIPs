@@ -54,4 +54,5 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - eip-X.md
+  - sccp-x.md
+  - sip-X.md
