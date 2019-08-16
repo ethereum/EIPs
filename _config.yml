@@ -22,13 +22,8 @@ url: "http://sips.synthetix.io"
 twitter_username: synthetix
 github_username:  synthetix
 header_pages:
- - all.html
- - core.html
- - networking.html
- - interface.html
- - src.html
- - meta.html
- - informational.html
+ - all-sip.html
+ - all-sccp.html
 twitter:
   card: summary
   username: synthetix_io
@@ -45,6 +40,11 @@ defaults:
       path: "SIPS"
     values:
       layout: "sip"
+  -
+    scope:
+      path: "SCCP"
+    values:
+      layout: "sccp"
 
 exclude:
   - Gemfile

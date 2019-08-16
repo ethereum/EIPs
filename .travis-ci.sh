@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # halt script on error
 
-HTMLPROOFER_OPTIONS="./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858"
+HTMLPROOFER_OPTIONS="./_site --internal-domains=sips.synthetix.io --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/SIPS/sip-1,/SCCP/sccp-1"
 
 if [[ $TASK = 'htmlproofer' ]]; then
   bundle exec jekyll doctor
@@ -14,16 +14,16 @@ elif [[ $TASK = 'htmlproofer-external' ]]; then
   bundle exec jekyll doctor
   bundle exec jekyll build
   bundle exec htmlproofer $HTMLPROOFER_OPTIONS --external_only
-elif [[ $TASK = 'eip-validator' ]]; then
-  BAD_FILES="$(ls EIPS | egrep -v "eip-[0-9]+.md|eip-20-token-standard.md")" || true
+elif [[ $TASK = 'sip-validator' ]]; then
+  BAD_FILES="$(ls SIPS | egrep -v "sip-[0-9]+.md")" || true
   if [[ ! -z $BAD_FILES ]]; then
     echo "Files found with invalid names:"
     echo $BAD_FILES
     exit 1
   fi
 
-  FILES="$(ls EIPS/*.md | egrep "eip-[0-9]+.md")"
-  bundle exec eip_validator $FILES
+  FILES="$(ls SIPS/*.md | egrep "sip-[0-9]+.md")"
+  bundle exec sip_validator $FILES
 elif [[ $TASK = 'codespell' ]]; then
-  codespell -q4 -I .codespell-whitelist eip-X.md EIPS/
+  codespell -q4 -I .codespell-whitelist sip-X.md SIPS/
 fi

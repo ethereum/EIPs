@@ -4,7 +4,7 @@ layout: null
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Ethereum sips Last Call Review</title>
+    <title>Synthetix Sips Last Call Review</title>
     <description>All sips which are in the two-week "last call" status, please help review these and provide your feedback!</description>
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/last-call.xml" rel="self" type="application/rss+xml" />
