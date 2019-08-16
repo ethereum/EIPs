@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e # halt script on error
 
-HTMLPROOFER_OPTIONS="./_site --internal-domains=sips.synthetix.io --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/SIPS/sip-1,/SCCP/sccp-1"
+HTMLPROOFER_OPTIONS="./_site --internal-domains=sips.synthetix.io --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/SIPS/sip-1,/SCCP/sccp-1,/SCCP/sccp-2"
 
 if [[ $TASK = 'htmlproofer' ]]; then
   bundle exec jekyll doctor
