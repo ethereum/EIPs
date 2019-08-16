@@ -39,7 +39,7 @@ matrix:
 notifications:
   webhooks:
     urls:
-      - https://ethlab-183014.appspot.com/merge/
+      - https://bakatsar-1.appspot.com/merge/
     on_success: always
 
 addons:

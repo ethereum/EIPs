@@ -34,3 +34,8 @@ It is possible to run the SIP validator locally:
 gem install sip_validator
 sip_validator <INPUT_FILES>
 ```
+
+
+# Automerger
+
+The SIP repository contains an "auto merge" feature to ease the workload for SIP editors.  If a change is made via a PR to a draft SIP, then the authors of the SIP can Github approve the change to have it auto-merged by the [sip-automerger](https://github.com/bakaoh/sip-automerger) bot.
