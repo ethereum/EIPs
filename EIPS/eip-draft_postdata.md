@@ -23,7 +23,7 @@ For [trust-minimized side chains with fraud proofs](https://ethresear.ch/t/minim
 ## Specification
 We propose a consensus modification, beginning at `FORK_BLKNUM`:
 
-An additional, optional field for transactions, `postdata` is added. Serialized transactions now have the format:
+An additional optional field, `postdata`, is added to transactions. Serialized transactions now have the format:
 ```
 "from": bytes20,
 "to": bytes20,
@@ -36,11 +36,11 @@ An additional, optional field for transactions, `postdata` is added. Serialized 
 ```
 with witnesses signing over the [RLP encoding](https://github.com/ethereum/wiki/wiki/RLP) of the above. `postdata` is data that is posted on-chain, for later historical retrieval by layer-2 systems.
 
-`postdata` is an ELP-encoded twople `(version: uint64, data: bytes)`.
+`postdata` is an RLP-encoded twople `(version: uint64, data: bytes)`.
 1. `version` is `0`.
-1. `data` is an RLP-encoded list of binary data. This EIP does not interpret this data, though future EIPs may introduce different interpretation schemes for different values of `version`.
+1. `data` is an RLP-encoded list of binary data. This EIP does not interpret the data in any way, simply considering it as a binary blob, though future EIPs may introduce different interpretation schemes for different values of `version`.
 
-The gas cost of the posted data is `1 gas per byte`. This cost is deducted from the `startGas`; if the transaction has `<= 0` gas, it immediately reverts with an out of gas exception.
+The gas cost of the posted data is `1 gas per byte`. This cost is deducted from the `startGas`; if the remaining gas is non-positive the transaction immediately reverts with an out of gas exception.
 
 ## Rationale
 The changes proposed are as minimal and non-disruptive to the existing EVM and transaction format as possible while also supporting possible [future extensions](https://ethresear.ch/t/multi-threaded-data-availability-on-eth-1/5899) through a version code.
