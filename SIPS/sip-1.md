@@ -165,7 +165,7 @@ The SIP document was derived heavily from the EIP Ethereum Improvement Proposal 
 June 10, 2019: SIP 1 has been drafted and submitted as a PR.
 
 
-See [the revision history for further details](https://github.com/synthetixio/**), which is also available by clicking on the History button in the top right of the SIP.
+See [the revision history for further details](https://github.com/Synthetixio/), which is also available by clicking on the History button in the top right of the SIP.
 
 ### Bibliography
 

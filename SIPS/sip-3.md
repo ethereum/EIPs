@@ -2,7 +2,7 @@
 sip: 3
 title: Purgeable Synths
 status: Implemented
-author: Clinton Ennis (@hav_noms)
+author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 
 created: 2019-06-12

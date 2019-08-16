@@ -163,7 +163,7 @@ See [the revision history for further details](https://github.com/synthetixio/**
 ### Bibliography
 
 [the Synthetix Discord]: https://discord.gg/a2E6uxk
-[pull request]: https://github.com/Synthetixio/SIPs/SCCP/pulls
+[pull request]: https://github.com/Synthetixio/SIPs/pulls
 [markdown]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/

@@ -1,4 +1,8 @@
 {% assign sccp=include.sccp|split:"," %}
 {% for sccpnum in sccp %}
-  <a href="{{sccpnum|strip|prepend:"sccp-" }}">{{sccpnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
+  {% if sccpnum contains 'SIP' %}
+  <a href="../SIPS/{{sccpnum|strip|downcase}}">{{sccpnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
+  {% else %}
+  <a href="{{sccpnum|strip|downcase}}">{{sccpnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
+  {% endif %}
 {% endfor %}
