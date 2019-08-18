@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2242
 title: Transaction Postdata
 author: John Adler (@adlerjohn)
-discussions-to: https://ethereum-magicians.org/t/<TODO>
+discussions-to: https://ethereum-magicians.org/t/eip-2242-transaction-postdata/3557
 status: Draft
 type: Standards Track
 category: Core
