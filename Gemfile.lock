@@ -240,7 +240,7 @@ GEM
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
       faraday (~> 0.8, < 1.0)
-    sip_validator (0.1.0)
+    sip_validator (0.1.1)
       activemodel
       front_matter_parser (~> 0.1.1)
     terminal-table (1.8.0)
@@ -262,7 +262,7 @@ DEPENDENCIES
   jekyll (~> 3.6.2)
   jekyll-feed (~> 0.6)
   minima (~> 2.0)
-  sip_validator (>= 0.1.0)
+  sip_validator (>= 0.1.1)
   tzinfo-data
 
 BUNDLED WITH

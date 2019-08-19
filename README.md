@@ -23,6 +23,7 @@ When you believe your SIP is mature and ready to progress past the WIP phase, yo
 * **Proposed** - a SIP that is ready to be reviewed in a governance call.
 * **Approved** - a SIP that has been accepted for implementation by the Synthetix community.
 * **Implemented** - a SIP that has been released to mainnet.
+* **Rejected** - a SIP that has been rejected.
 
 
 # Validation
