@@ -1,7 +1,7 @@
 ---
 sip: 4
 title: Change Fee Claim Window
-status: Approved
+status: Implemented
 author: Kain Warwick <@kaiynne>, Clinton Ennis <@hav-noms>
 discussions-to: https://discord.gg/aApjG26
 created: 2019-06-17
