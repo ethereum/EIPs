@@ -2,7 +2,7 @@
 sip: 8
 title: sETH Uniswap Pool Staking Incentives
 status: Proposed
-author: Kain Warwick @kaiynne
+author: Kain Warwick <@kaiynne>
 discussions-to: https://discord.gg/2MmKtHb
 
 created: 2019-08-02
