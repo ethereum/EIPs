@@ -2,7 +2,7 @@
 sip: 9
 title: Change Fee Claim Window To One Period
 status: Rejected
-author: Kain Warwick <@kaiynne>, Clinton Ennis <@hav-noms>, Jackson Chan (@jacko125)
+author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/TK5Vt4h
 created: 2019-07-16
 ---
