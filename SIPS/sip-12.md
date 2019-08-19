@@ -2,7 +2,7 @@
 sip: 12
 title: Max gas price for exchange transactions
 status: Proposed
-author: Bojan Kiculovic <@kicul88>
+author: Bojan Kiculovic (@kicul88)
 discussions-to: https://discordapp.com/invite/kPPKsPb
 created: 2019-06-24
 ---
