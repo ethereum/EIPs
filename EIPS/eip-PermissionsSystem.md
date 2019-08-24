@@ -120,6 +120,7 @@ provider.send({
   ]
 })
 ```
+That type of API will also be up for discussion on [The MetaMask repository](https://github.com/MetaMask/metamask-extension/issues/6994).
 
 This would allow the wallet to limit the user's options to valid ones, and allows dapps to ensure selected accounts are compatible with their service, while preserving the user's privacy regarding how they are storing their keys.
 
