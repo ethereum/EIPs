@@ -23,9 +23,9 @@ Web3 JavaScript wallet browsers may implement `wallet_getPermissions` and `walle
 ## Motivation
 Web3 Wallets are built around the responsibility of mediating the interactions between untrusted applications and a user's keys on their computer, getting appropriate consent from the user.
 
-Today web3 browsers like MetaMask always prompt on a per-action basis, but this maximizes security at the cost of user friction. An alternative model of security is to allow applications to request a series of permissions from a user at a time.
+Today web3 browsers like MetaMask always prompt on a per-action basis. This provides security at the cost of substantial user friction. We believe that a single permissions request can achieve the same level of security with vastly improved UX.
 
-This pattern of permissions requests is common around the web, from login with Facebook, Twitter, Github, and even Apple, making it a very familiar pattern.
+The pattern of permissions requests is common around the web, from login with Facebook, Twitter, Github, and even Apple, making it a very familiar pattern.
 
 ![facebook permissions](https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Fi.stack.imgur.com%2FG7dRV.png&f=1)
 
@@ -65,7 +65,7 @@ const response = await provider.send({
 })
 ```
 
-If this request was rejected, it would throw an error with a `code` value equal to `4001`, per [EIP 1193 errors](https://eips.ethereum.org/EIPS/eip-1193), which the MetaMask team has canonized in a module [json-rpc-errors](https://github.com/metamask/eth-json-rpc-errors).
+If this request was rejected, it would throw an error with a `code` value equal to `4001`, per [EIP 1193 errors](https://eips.ethereum.org/EIPS/eip-1193), which the MetaMask team has canonized in a module [eth-json-rpc-errors](https://github.com/metamask/eth-json-rpc-errors).
 
 If the request is accepted by the user, then subsequent requests to `eth_accounts` will succeed, and return an accounts array as usual.
 
@@ -128,7 +128,7 @@ This would allow the wallet to limit the user's options to valid ones, and allow
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 We have [a branch of MetaMask available now](https://github.com/MetaMask/metamask-extension/tree/LoginPerSite) which adds these methods via an [rpc-engine](https://github.com/MetaMask/json-rpc-engine) middleware called [json-rpc-capabilities-middleware](https://github.com/MetaMask/json-rpc-capabilities-middleware) (or often `RpcCap` internally, for short).
 
-The latest build of this branch of MetaMask can be downloaded from [the draft pull request](https://github.com/MetaMask/metamask-extension/pull/7004) (look for the latest post by `@MetaMaskBot`). A guide to adding a custom build of MetaMask to Chrome can be found [here].
+The latest build of this branch of MetaMask can be downloaded from [the draft pull request](https://github.com/MetaMask/metamask-extension/pull/7004) (look for the latest post by `@MetaMaskBot`). A guide to adding a custom build of MetaMask to Chrome can be found [here](https://github.com/MetaMask/metamask-extension/blob/develop/docs/add-to-chrome.md).
 
 This branch of MetaMask can be used with [this sample site](https://metamask.github.io/permissions-adventure/) ([source](https://github.com/metamask/permissions-adventure)), which uses a couple sample permissions for demonstration purposes:
 
