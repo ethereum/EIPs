@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Gas Price Range
 author: Tom Schmidt (@tomhschmidt)
-discussions-to: will create EIP Issue when number assigned
+discussions-to: https://ethereum-magicians.org/t/eip-x-gas-price-range/3585/2
 status: Draft
 type: Standards Track
 category (*only required for Standard Track): Interface
