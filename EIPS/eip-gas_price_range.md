@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2250
 title: Gas Price Range
 author: Tom Schmidt (@tomhschmidt)
 discussions-to: https://ethereum-magicians.org/t/eip-x-gas-price-range/3585/2
