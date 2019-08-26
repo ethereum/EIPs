@@ -2,7 +2,7 @@
 eip: TBD
 title: Wallet Permissions System
 author: Dan Finlay (@danfinlay), Erik Marks (@rekmarks)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/web3-login-permissions/3583
 status: Work in progress (WIP)
 type: Standard Track
 category: Interface
