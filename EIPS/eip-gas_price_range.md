@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Gas Price Range
 author: Tom Schmidt (@tomhschmidt)
-discussions-to: <URL>
+discussions-to: will create EIP Issue when number assigned
 status: Draft
 type: Standards Track
 category (*only required for Standard Track): Interface
