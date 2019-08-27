@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2253
 title: wallet_getAddressBook JSON-RPC Method
-author: FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>,
-discussions-to: <URL>
+author: Loredana Cirstea (@loredanacirstea)
+discussions-to: https://ethereum-magicians.org/t/eip-2253-add-wallet-getaddressbook-json-rpc-method/3592
 status: Draft
 type: Standards Track
 category: ERC
@@ -12,7 +12,7 @@ requires (*optional): 1474
 
 ## Simple Summary
 
-We propose a new JSON-RPC call for retrieving a selection of items from a wallet's address book, with the user's permission.
+This is a proposal for a new JSON-RPC call for retrieving a selection of items from a wallet's address book, with the user's permission.
 
 ## Abstract
 
@@ -22,7 +22,7 @@ There is no standardized way for a dApp to request address book information from
 
 Address books for wallets are becoming a standard feature, greatly improving usability, while maintaining user ownership on this data.
 
-There is no standardized way for a dApp to leverage this information, with the user's permission. We propose a JSON-RPC method that dApps can use to retrieve strictly the information that they need, in order to process the request.
+There is no standardized way for a dApp to leverage this information, with the user's permission. dApps can use the `wallet_getAddressBook` JSON-RPC method to retrieve strictly the information that they need, in order to process the request.
 
 The current proposal will avoid duplication of effort - dApps will not need to ask the user to create another address book with them. And it also protects the user's privacy, while increasing usability.
 
