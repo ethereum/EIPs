@@ -10,6 +10,7 @@ created: 2019-08-22
 requires: 1474
 ---
 
+![Sample prompt screenshot](../assets/eip-2255/permissions.png)
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 
 ## Simple Summary
