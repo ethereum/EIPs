@@ -16,7 +16,7 @@ Crypto Synths have seen the most adoption since the launch of sBTC in early 2019
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-These synths will be implemented using the same spec as sBTC and iBTC, the specific thresholds for each iSynth will be listed in the implementaion section prior to deployment based on the latest prices.
+These synths will be implemented using the same spec as sBTC and iBTC, the specific thresholds for each iSynth will be listed in the implementation section prior to deployment based on the latest prices.
 We'll also be adding PurgeableSynth subclass to the Inverse Synths so the foundation can purge the balances to the holders when the Sysnth becomes frozen once it hits its upper or lower limit.
 
 ## Rationale

@@ -56,11 +56,11 @@ The source of truth for distribution will be the open source script released by 
 
 ^Phase three requires some modifications to the fee pool contracts hence the delay and discussion required before implementing this change.
 
-^There is still a kill-switch built into this mechnism whereby if the signers go rogue. The foundation (and eventually the community via decentralised proxies) can halt distribution of the inflationary rewards to this contract and deploy a new multisig with different signers.
+^There is still a kill-switch built into this mechanism whereby if the signers go rogue. The foundation (and eventually the community via decentralised proxies) can halt distribution of the inflationary rewards to this contract and deploy a new multisig with different signers.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-By implementing this distrubution mechanism using a multisig, we prepare for the next phase of the project where the foundation can no longer modify distribution and other aspects of the system and begin to test aspects of decentralised goveranance.
+By implementing this distribution mechanism using a multisig, we prepare for the next phase of the project where the foundation can no longer modify distribution and other aspects of the system and begin to test aspects of decentralised goveranance.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->

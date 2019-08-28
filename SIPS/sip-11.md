@@ -1,5 +1,5 @@
 ---
-sip: SIP-11
+sip: 11
 title: Allow fee period to be closed by any address 
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/CDTvjHY

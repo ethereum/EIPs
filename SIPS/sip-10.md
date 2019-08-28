@@ -43,7 +43,7 @@ function _removealldelegatepowers
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-There should be addtional functions to safeguard against potential rouge delegates after approval hence:
+There should be additional functions to safeguard against potential rogue delegates after approval hence:
 1) Delegates will only be able to burn sUSD if the owner is in penalty and only up to the point where the penalty will be removed
 2) Delegates will not able to burn any sUSD to unlock the owner SNX tokens 
 

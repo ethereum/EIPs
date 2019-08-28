@@ -1,24 +1,24 @@
 <style type="text/css">
-  .eiptable .title {
+  .siptable .title {
     width: 67%;
   }
 
-  .eiptable .author {
+  .siptable .author {
     width: 33%;
   }
 </style>
 {% for status in site.data.statuses %}
-  {% assign eips = include.eips|where:"status",status|sort:"eip" %}
-  {% assign count = eips|size %}
+  {% assign sips = include.sips|where:"status",status|sort:"sip" %}
+  {% assign count = sips|size %}
   {% if count > 0 %}
     <h2>{{status}}</h2>
-    <table class="eiptable">
+    <table class="siptable">
       <thead>
-        <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+        <tr><th class="sipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
       </thead>
-      {% for page in eips %}
+      {% for page in sips %}
         <tr>
-          <td class="eipnum"><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
+          <td class="sipnum"><a href="{{page.url|relative_url}}">{{page.sip|xml_escape}}</a></td>
           <td class="title">{{page.title|xml_escape}}</td>
           <td class="author">{% include authorlist.html authors=page.author %}</td>
         </tr>
