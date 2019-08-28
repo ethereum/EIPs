@@ -18,7 +18,7 @@ description: >-
   Synthetix Improvement Proposals (SIPs) describe standards for the Synthetix
   platform, including core protocol specifications, client APIs, and contract
   standards.
-url: "http://sips.synthetix.io"
+url: "https://sips.synthetix.io"
 repository: Synthetixio/SIPs
 twitter_username: synthetix
 github_username:  synthetix
