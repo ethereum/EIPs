@@ -19,6 +19,7 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "http://sips.synthetix.io"
+repository: Synthetixio/SIPs
 twitter_username: synthetix
 github_username:  synthetix
 header_pages:
