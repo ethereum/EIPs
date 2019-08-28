@@ -82,6 +82,7 @@ Would return a value something like this:
 ```
 [
   {
+    invoker: 'ens://your-site.eth',
     parentCapability: 'eth_accounts',
     caveats: [
       {
@@ -93,7 +94,11 @@ Would return a value something like this:
 ]
 ```
 
-The term `parentCapability` comes from the [ocap-ld spec](https://w3c-ccg.github.io/ocap-ld/), which these permissions objects are based on.
+Where `invoker` is a unique domain string used to identify the source of the current dapp. To start, this may include only `https` prefixes, but `ens`, `swarm`, `ipfs`, and others may all be valid sources in the future.
+
+The term `parentCapability` comes from the [ocap-ld spec](https://w3c-ccg.github.io/ocap-ld/), which these permissions objects are based on, and refers to the method that is being permitted.
+
+The `caveats` array represents the specific restrictions applied to the permitted method.
 
 You can see above how internally the user-selected account is transformed into a [`caveat`](https://github.com/MetaMask/json-rpc-capabilities-middleware/blob/master/src/%40types/ocap-ld.d.ts#L28-L33), which is a restriction on the response values, in this case ensuring the page can only be notified of approved accounts. This also means this permissions system is forward-extensible to support logging into a page with multiple accounts.
 
@@ -143,7 +148,7 @@ It is notable that this branch is the first version of MetaMask that allows you 
 
 You can get more detailed API and type information [on the RpcCap repository's readme](https://github.com/MetaMask/json-rpc-capabilities-middleware#rpc-methods).
 
-New hypothetical and proposed permissions can be easily added to [the `restrictedMethods` hash in the MetaMask permissions controller](https://github.com/MetaMask/metamask-extension/blob/774d931cb9f16a8f2df8c6deee1dd553b40d5ad5/app/scripts/controllers/permissions.js#L187).
+New hypothetical and proposed permissions can be easily added to [the `restrictedMethods` hash in the MetaMask permissions controller](https://github.com/MetaMask/metamask-extension/blob/774d931cb9f16a8f2df8c6deee1dd553b40d5ad5/app/scripts/controllers/permissions.js#L187) or proposed for discussion on the [MetaMask/wallet-permissions-spec](https://github.com/MetaMask/wallet-permissions-spec) repository.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
