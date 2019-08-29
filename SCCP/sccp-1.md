@@ -1,11 +1,10 @@
 ---
 sccp: 1
 title: SCCP Purpose and Guidelines
-status: Proposed
+status: Implemented
 author: Kain Warwick <@kaiynne>
 discussions-to: https://discord.gg/aApjG26
 created: 2019-06-17
-updated: N/A
 ---
 
 ## What is an SCCP?
