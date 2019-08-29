@@ -1,0 +1,159 @@
+---
+eip: <to be assigned>
+title: wallet_getOwnedTokens JSON-RPC Method
+author: Loredana Cirstea (@loredanacirstea)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2019-08-29
+requires: 55,1474
+---
+
+## Simple Summary
+
+This is a proposal for a new JSON-RPC call for retrieving from a wallet a selection of owned tokens by an Ethereum address, with the user's permission.
+
+## Abstract
+
+There is no standardized way for a dApp to request a list of owned tokens from a user. Now, each dApp needs to keep a list of all the popular or existing tokens and check the user's balance against the blockchain, for each of these tokens. This leads to duplicated effort across dApps. It also leads to the user being presented with token options that the user does not care about, from various, unwanted airdrops.
+
+## Motivation
+
+There are financial dApps that require a list of owned tokens from a user, for various purposes - calculating taxes, selecting customized payment options, etc. Each of these dApps are now forced to keep a list of popular tokens (smart contract addresses, ABIs) and retrieve the user's data from the blockchain, for each token. This leads to effort duplication and nonoptimal UX where the user is presented with either more or less token options than the user would like - various airdrops, incomplete list of tokens kept by the dApp.
+
+This list of owned token can be retrieved from the wallet used by the user. The wallet can allow the user to manage only the tokens that the user is interested in. Therefore, a new JSON-RPC method is proposed: `wallet_getOwnedTokens`.
+
+## Specification
+
+New JSON-RPC method: `wallet_getOwnedTokens`.
+
+**Arguments:**
+- number of owned tokens to return; optional
+
+**Result:**
+- array with token records:
+  - `address` - type `address`, Ethereum checksummed address
+  - `interface` - type `string`, token interface ERC identifier; e.g. `ERC20`; optional - [EIP-1820](https://eips.ethereum.org/EIPS/eip-1820) could be used
+  - `name` - type `string`, token name; optional if the token does not implement it
+  - `symbol` - type `string`, token symbol; optional if the token does not implement it
+  - `icon`- type `base64`, token icon; optional
+  - `balance` - type `uint256`, the number of tokens that the user owns, in the smallest token denomination
+
+### Examples
+
+**1) A request to return all of the user's owned tokens:**
+```
+{
+  "id":1,
+  "jsonrpc": "2.0",
+  "method": "wallet_getOwnedTokens",
+  "params": []
+}
+```
+Result:
+
+```
+{
+  "id":1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x0000000000000000000000000000000000000001",
+      "interface": "ERC20",
+      "name": "TokenA",
+      "symbol": "TKA",
+      "icon": "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      "balance": 1000000000000
+    },
+    {
+      "address": "0x0000000000000000000000000000000000000002",
+      "interface": "ERC20",
+      "name": "TokenB",
+      "symbol": "TKB",
+      "icon": "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      "balance": 2000000000000
+    },
+    {
+      "address": "0x0000000000000000000000000000000000000003",
+      "interface": "ERC721",
+      "name": "TokenC",
+      "symbol": "TKC",
+      "icon": "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      "balance": 2000000000000
+    },
+  ]
+}
+```
+
+**2) A request to return one owned token:**
+```
+{
+  "id":1,
+  "jsonrpc": "2.0",
+  "method": "wallet_getOwnedTokens",
+  "params": [1]
+}
+```
+Result:
+
+```
+{
+  "id":1,
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "address": "0x0000000000000000000000000000000000000001",
+      "interface": "ERC20",
+      "name": "TokenA",
+      "symbol": "TKA",
+      "icon": "data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==",
+      "balance": 1000000000000
+    }
+  ]
+}
+```
+
+### UI Best Practices
+
+The wallet should display a UI to the user, showing the request.
+The user can:
+- accept the request, in which case the dApp receives all the requested tokens
+- reject the request
+- amend the request by lowering the number of owned tokens returned to the dApp
+
+
+If all owned tokens are requested, the total number of owned tokens will be shown to the user. The user can also choose to select the tokens that will be returned to the dApp, amending the request.
+
+If a selection is requested, the user will select from the list of owned tokens.
+
+As an optimization, wallets can keep a list of frequently used tokens by the user, and show that list first, with the option of expanding that list with owned tokens that the user uses less frequently.
+
+## Rationale
+
+In order to avoid duplication of effort for dApps that require keeping a list of all or popular tokens and to provide optimal UX, the `wallet_getOwnedTokens` JSON-RPC method is proposed.
+
+The `name`, `symbol`, `icon` response fields enable better UX, compatible with the wallet used, making it easier for the user to understand the dApp's UI.
+
+The `address`, `interface` response fields provide enough information about the token, enabling dApps to provide additional token-specific functionality.
+
+The `balance` response field is an optimization, allowing dApps to show the user's balance without querying the blockchain. Usually, this information is already public.
+
+
+## Backwards Compatibility
+
+Not relevant, as this is a new method.
+
+
+## Test Cases
+
+To be done.
+
+
+## Implementation
+
+To be done.
+
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
