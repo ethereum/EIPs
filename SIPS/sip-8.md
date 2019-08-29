@@ -70,5 +70,7 @@ Test cases for an implementation are mandatory for SIPs but can be included with
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 We are proposing to use the Gnosis multisig for signing of these transactions. This multisig will be the owner of the "airdropper" contract that is currently manually distributing this incentive.
 
+As part of this implementation we have also enabled the abilility to manually send tokens into escrow, this functionality will support escrowing future OTC token sales from the foundation treasury.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
