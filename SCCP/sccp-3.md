@@ -1,9 +1,9 @@
 ---
 sccp: 3
 title: Raise exchange fee to 50 basis points for two weeks
-author: Kain Warwick @kaiynne
+author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/kPPKsPb
-status: Approved
+status: Implemented
 created: 2019-06-26
 ---
 
