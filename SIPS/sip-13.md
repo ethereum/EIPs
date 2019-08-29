@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: 13
 title: Account Merging
 status: WIP
 author: Kain Warwick @kaiynne
