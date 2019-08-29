@@ -20,8 +20,8 @@ description: >-
   standards.
 url: "https://sips.synthetix.io"
 repository: Synthetixio/SIPs
-twitter_username: synthetix
-github_username:  synthetix
+twitter_username: synthetix_io
+github_username:  synthetixio
 header_pages:
  - all-sip.html
  - all-sccp.html
