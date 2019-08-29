@@ -1,7 +1,7 @@
 ---
 sip: 1
 title: SIP Purpose and Guidelines
-status: Proposed
+status: Implemented
 author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/aApjG26
 created: 2019-06-10
