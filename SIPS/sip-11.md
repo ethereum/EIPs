@@ -3,7 +3,7 @@ sip: 11
 title: Allow fee period to be closed by any address 
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Implemented
 created: 2019-07-10
 ---
 
