@@ -1,5 +1,5 @@
 ---
-sip: WIP
+sip: 15
 title: Direct Redemption of SNX collateral
 status: WIP
 author: Jackson Chan (@jacko125)
