@@ -2,7 +2,7 @@
 sip: 13
 title: Account Merging
 status: WIP
-author: Kain Warwick @kaiynne
+author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/CDTvjHY
 
 created: 2019-08-14
