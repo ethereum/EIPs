@@ -3,14 +3,14 @@ sip: 10
 title: Upgrade Delegate Powers
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Approved
 created: 2019-07-16
 ---
 
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
-This SIP proposes to add the ability for Delegates to mint and burn on their owners behalf. 
+This SIP proposes to add the ability for Delegates to mint, burn & exchange on their owners behalf. 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
@@ -18,27 +18,34 @@ What are Delegates and what are their current powers? Delegates are trusted wall
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
-We expect c-ratio and reduction of rewards period to change from time to time based on governance calls so by upgrading the powers of delegates, owners can make use of their delegates to help them react to c-ratio and rewards period changes more easily. Using delegates provides higher security as well because now you can keep your hardware wallet in cold storage without needing to connect it online anymore. Also we expect delegates to help solve a major pain point for ledger wallet owners with their constant browser support issues. More importantly delegates currently can only claim rewards on behalf, however if the owner wallet is in penalty, the delegate will not be able to help fix the penalty and claim for maximum rewards. The upgrade in powers is much needed to complete the potential of what delegates can help their owners to achieve for rewards.   
+We expect c-ratio and reduction of rewards period to change from time to time based on governance calls so by upgrading the powers of delegates, owners can make use of their delegates to help them react to c-ratio and rewards period changes more easily. Using delegates provides higher security as well because now you can keep your hardware wallet in cold storage without needing to connect it online anymore. Also we expect delegates to help solve a major pain point for ledger wallet owners with their constant browser support issues. More importantly delegates currently can only claim rewards on behalf, however if the owner wallet is in penalty, the delegate will not be able to help fix the penalty and claim for maximum rewards. The upgrade in powers is much needed to complete the potential of what delegates can help their owners to achieve for rewards. 
+Delegating synthetix.exchange() is to be able to exchange via a mobile DApp browser and for Triggered Orders. (see https://github.com/Synthetixio/synthetix/issues/195)
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 New call functions expected to be added in which allows owner to approve each function individually or all 3 functions of claim, mint and burn with a single contract call
 
-function _mintonbehalf
+function mintOnBehalf
 
-function _burnonbehlaf
+function burnOnBehalf
 
-function _approvemintonbehalf
+function exchangeOnBehalf
 
-function _approveburnonbehlaf
+function approveMintOnBehalf
 
-function _removemintonbehalf
+function approveBurnOnBehalf
 
-function _removeburnonbehlaf
+function approveExchangeOnBehalf
 
-function _approvealldelegatepowers
+function removeMintOnBehalf
 
-function _removealldelegatepowers
+function removeBurnOnBehalf
+
+function removeExchangeOnBehalf
+
+function approveAllDelegatePowers (add delegate entries for all of the above including claimFeesOnBehalf)
+
+function removeAllDelegatePowers
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -47,7 +54,7 @@ There should be additional functions to safeguard against potential rogue delega
 1) Delegates will only be able to burn sUSD if the owner is in penalty and only up to the point where the penalty will be removed
 2) Delegates will not able to burn any sUSD to unlock the owner SNX tokens 
 
-Technical consultation has been asked from Clinton & Jackson (SNX core team) and initial feedback is that this is feasible 
+Technical consultation has been asked from Clinton (hav-noms) & Jackson(jacko125) (SNX core team) and initial feedback is that this is feasible 
 
 Strategic backers for this SIP are SNX Discord Guardians - gmgh & Arthur 
 
