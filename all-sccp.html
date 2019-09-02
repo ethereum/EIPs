@@ -1,0 +1,7 @@
+---
+layout: page
+title: SCCP
+---
+
+{% assign sccp=site.pages|where_exp:"page","page.sccp > 0" %}
+{% include sccptable.html sccp=sccp %}

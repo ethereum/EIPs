@@ -1,7 +1,7 @@
 ---
 sip: 2
 title: Remove Fee Penalty Tiers
-status: Approved
+status: Implemented
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 
@@ -16,7 +16,7 @@ This SIP proposes to remove the current fee penalty tiers and instead to block f
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-The fee tiers were implemented to encourage SNX holders to return thier wallets to the target C ratio, in practice at the current yield no user is willingly incurring any level of fee penalty, so the penalities past 25% are unneccesary. Removing the tiers and blocking fee claims if the ratio falls below a configurable threshold will be simpler and more user friendly as a fee claim will now revert if the ratio changes while the transaction is confirming. This has happened on several occasions already and is neccesitating users paying higher gas fees to ensure fast confirmation times to avoid the risk of a penalty.
+The fee tiers were implemented to encourage SNX holders to return their wallets to the target C ratio, in practice at the current yield no user is willingly incurring any level of fee penalty, so the penalties past 25% are unnecessary. Removing the tiers and blocking fee claims if the ratio falls below a configurable threshold will be simpler and more user friendly as a fee claim will now revert if the ratio changes while the transaction is confirming. This has happened on several occasions already and is neccesitating users paying higher gas fees to ensure fast confirmation times to avoid the risk of a penalty.
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->

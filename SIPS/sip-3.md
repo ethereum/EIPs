@@ -1,8 +1,8 @@
 ---
 sip: 3
 title: Purgeable Synths
-status: Approved
-author: Clinton Ennis (@hav_noms)
+status: Implemented
+author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 
 created: 2019-06-12
@@ -81,7 +81,7 @@ For Inverse Synths any amount is purgable if the Inverse Synth is frozen doing t
 ```
 || exchangeRates.rateIsFrozen(currencyKey)
 ```
-This proposal specifies a hard cap value of any upgraded FX, synth to be purgeable at a value less than or equal to \$10,000 USD. This may be found to be too much for some Fx / Crypto Synths or perhaps should be atleast configrable. RFC below.
+This proposal specifies a hard cap value of any upgraded FX, synth to be purgeable at a value less than or equal to \$10,000 USD. This may be found to be too much for some Fx / Crypto Synths or perhaps should be at least configrable. RFC below.
 
 ```
 // The maximum allowed amount of tokenSupply in equivalent sUSD value for this synth to permit purging

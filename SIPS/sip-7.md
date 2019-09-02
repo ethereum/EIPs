@@ -1,7 +1,7 @@
 ---
 sip: 7
 title: Oracle Trading Locks
-status: Proposed
+status: Implemented
 author: Jackson Chan (@jacko125), Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/FHPnPk
 
@@ -17,7 +17,7 @@ SIP-6 was effective in removing several front-running bots, but these bots have 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
-There is an attack vector that allows front-running the oracle by observing exchange rate update transactions after they are broadcast, then attempting to trade into a currency that will shift in favour of the trade. This front-running attack is extremely effective if well constructed and provides almost risk free profits. This SIP will likely render this method ineffective, as it will halt trading when the oracle detects a change in price. Once the trading halt is in place the oracle will push a price update and reenable trading. This means that a trade broadcast right as an oracle update occurs will likely be rejected and have to be resubmitted, which impacts usability but we are planning UI updates to prevent this from impacting users on Synthetix.Exchange.
+There is an attack vector that allows front-running the oracle by observing exchange rate update transactions after they are broadcast, then attempting to trade into a currency that will shift in favour of the trade. This front-running attack is extremely effective if well constructed and provides almost risk free profits. This SIP will likely render this method ineffective, as it will halt trading when the oracle detects a change in price. Once the trading halt is in place the oracle will push a price update and re-enable trading. This means that a trade broadcast right as an oracle update occurs will likely be rejected and have to be resubmitted, which impacts usability but we are planning UI updates to prevent this from impacting users on Synthetix.Exchange.
 
 Any trades / exchanges during the lock period will revert and no balances be affected. The balance of the gas paid for the transaction will be returned the wallet, about 90+ %. 
 
@@ -35,11 +35,11 @@ While SIP-6 was a slashing condition to punish front-running, this SIP address t
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-N/A
+https://github.com/Synthetixio/synthetix/blob/master/test/ExchangeRates.js#L1027
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-N/A
+https://github.com/Synthetixio/synthetix/blob/master/contracts/ExchangeRates.sol#L308
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

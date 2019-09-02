@@ -1,7 +1,7 @@
 ---
 sip: 6
 title: Frontrunning protection
-status: Proposed
+status: Implemented
 author: Jackson Chan (@jacko125), Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/kPPKsPb
 created: 2019-06-27

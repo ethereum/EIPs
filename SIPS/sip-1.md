@@ -1,8 +1,8 @@
 ---
 sip: 1
 title: SIP Purpose and Guidelines
-status: Proposed
-author: Kain Warwick <@kaiynne>
+status: Implemented
+author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/aApjG26
 created: 2019-06-10
 updated: N/A
@@ -165,7 +165,7 @@ The SIP document was derived heavily from the EIP Ethereum Improvement Proposal 
 June 10, 2019: SIP 1 has been drafted and submitted as a PR.
 
 
-See [the revision history for further details](https://github.com/synthetixio/**), which is also available by clicking on the History button in the top right of the SIP.
+See [the revision history for further details](https://github.com/Synthetixio/), which is also available by clicking on the History button in the top right of the SIP.
 
 ### Bibliography
 

@@ -1,24 +1,24 @@
 <style type="text/css">
-  .siptable .title {
+  .sccptable .title {
     width: 67%;
   }
 
-  .siptable .author {
+  .sccptable .author {
     width: 33%;
   }
 </style>
 {% for status in site.data.statuses %}
-  {% assign sips = include.sips|where:"status",status|sort:"sip" %}
-  {% assign count = sips|size %}
+  {% assign sccp = include.sccp|where:"status",status|sort:"sccp" %}
+  {% assign count = sccp|size %}
   {% if count > 0 %}
     <h2>{{status}}</h2>
-    <table class="siptable">
+    <table class="sccptable">
       <thead>
-        <tr><th class="sipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+        <tr><th class="sccpnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
       </thead>
-      {% for page in sips %}
+      {% for page in sccp %}
         <tr>
-          <td class="sipnum"><a href="{{page.url|relative_url}}">{{page.sip|xml_escape}}</a></td>
+          <td class="sccpnum"><a href="{{page.url|relative_url}}">{{page.sccp|xml_escape}}</a></td>
           <td class="title">{{page.title|xml_escape}}</td>
           <td class="author">{% include authorlist.html authors=page.author %}</td>
         </tr>
