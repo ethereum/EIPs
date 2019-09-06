@@ -96,7 +96,7 @@ Would return a value something like this:
 
 Where `invoker` is a unique domain string used to identify the source of the current dapp. To start, this may include only `https` prefixes, but `ens`, `swarm`, `ipfs`, and others may all be valid sources in the future.
 
-The term `parentCapability` comes from the [ocap-ld spec](https://w3c-ccg.github.io/ocap-ld/), which these permissions objects are based on, and refers to the method that is being permitted.
+The term `parentCapability` comes from the [zcap-ld spec](https://w3c-ccg.github.io/zcap-ld/), which these permissions objects are based on, and refers to the method that is being permitted.
 
 The `caveats` array represents the specific restrictions applied to the permitted method.
 
