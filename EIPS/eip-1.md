@@ -71,13 +71,13 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 Following is the process that a successful EIP will move along:
 
 ```
-[ WIP ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
+[ IDEA ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
 ```
 
 Each status change is requested by the EIP author and reviewed by the EIP editors. Use a pull request to update the status. Please include a link to where people should continue discussing your EIP. The EIP editors will process these requests as per the conditions below.
 
 * **Active** -- Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
-* **Work in progress (WIP)** -- Once the champion has asked the Ethereum community whether an idea has any chance of support, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
+* **Idea** -- Once the champion has asked the Ethereum community whether an idea has any chance of support, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
   * :arrow_right: Draft -- If agreeable, EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP.
   * :x: Draft -- Reasons for denying draft status include being too unfocused, too broad, duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
 * **Draft** -- Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next status. An EIP in draft status must be implemented to be considered for promotion to the next status (ignore this requirement for core EIPs).
@@ -94,9 +94,10 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
 Other exceptional statuses include:
 
 * **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
-* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented.
-* **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number.
-* **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP.
+  * :arrow_right: Draft -- Authors or new champions wishing to pursue this EIP can ask for changing it to Draft status.
+* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented. An EIP cannot move on from this state.
+* **Active** -- This is similar to Final, but denotes an EIP which may be updated without changing its EIP number. An EIP cannot move on from this state.
+* **Superseded** -- An EIP which was previously final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP. An EIP cannot move on from this state.
 
 ## What belongs in a successful EIP?
 
@@ -122,33 +123,33 @@ Image files should be included in a subdirectory of the `assets` folder for that
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
 
-` eip:` <EIP number> (this is determined by the EIP editor)
+` eip:` *EIP number* (this is determined by the EIP editor)
 
-` title:` <EIP title>
+` title:` *EIP title*
 
-` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
+` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
-` * discussions-to:` \<a url pointing to the official discussion thread\>
+` * discussions-to:` *a url pointing to the official discussion thread*
 
-` status:` <Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded>
+` status:` *Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded*
 
-`* review-period-end:` <date review period ends>
+`* review-period-end:` *date review period ends*
 
-` type:` <Standards Track (Core, Networking, Interface, ERC)  | Informational | Meta>
+` type:` *Standards Track | Informational | Meta*
 
-` * category:` <Core | Networking | Interface | ERC>
+` * category:` *Core | Networking | Interface | ERC* (Standards Track EIPs only)
 
-` created:` <date created on>
+` created:` *date created on*
 
-` * updated:` <comma separated list of dates>
+` * updated:` *comma separated list of dates*
 
-` * requires:` <EIP number(s)>
+` * requires:` *EIP number(s)*
 
-` * replaces:` <EIP number(s)>
+` * replaces:` *EIP number(s)*
 
-` * superseded-by:` <EIP number(s)>
+` * superseded-by:` *EIP number(s)*
 
-` * resolution:` \<a url pointing to the resolution of this EIP\>
+` * resolution:` *a url pointing to the resolution of this EIP*
 
 Headers that permit lists must separate elements with commas.
 
