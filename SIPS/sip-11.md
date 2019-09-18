@@ -36,7 +36,10 @@ Not required at this stage
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-Not required at this stage
+FeePool.closeCurrentFeePeriod() is now open for anyone to publicly call. For the latest FeePool Contract see here https://developer.synthetix.io/api/docs/deployed-contracts.html.
+
+The FeePool Authority Service is still hosted and will run every 10 minutes to check if FeePool.recentFeePeriods[0].startTime <= (now - feePeriodDuration). If so it will call FeePool.closeCurrentFeePeriod(). However if this service is down for what ever reason any SNX holder may call this to reveal the claimable rewards for everyone. 
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
