@@ -61,3 +61,6 @@ exclude:
   - vendor/gems/
   - vendor/ruby/
   - eip-template.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+  - README.md
