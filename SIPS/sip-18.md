@@ -3,7 +3,7 @@ sip: 18
 title: Recover orphaned $2.9k sUSD from SNX fee address
 author: Nocturnalsheet (@nocturnalsheet), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Approved
 created: 2019-09-02
 ---
 
