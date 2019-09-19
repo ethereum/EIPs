@@ -1,7 +1,7 @@
 ---
 sip: 13
 title: Account Merging
-status: WIP
+status: Proposed
 author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/CDTvjHY
 
