@@ -2,7 +2,7 @@
 sip: 12
 title: Max gas price for exchange transactions
 status: Proposed
-author: Bojan Kiculovic (@kicul88), Justin J Moses (@justinjmoses)
+author: Bojan Kiculovic (@kicul88), Justin J Moses (@justinjmoses), Kain Warwick (@kaiynne)
 discussions-to: https://discordapp.com/invite/kPPKsPb
 created: 2019-06-24
 ---
@@ -50,7 +50,24 @@ The proposal for Dynamic gas pricing is as follows:
 
 ## Rationale
 
-Implementing a maximum gas price on exchange transactions and setting it just below the gas price of oracle update transactions would prevent front running and minimize disruption to legitimate exchanges (who don't need their exchange to be mined immediately and can wait a few blocks).
+Implementing a maximum gas price on exchange transactions and setting it just below the gas price of oracle update transactions will prevent front running and minimize disruption to legitimate exchanges (for normal users who don't need their exchange to be mined immediately and can wait a few blocks).
+
+The example below illustrates how this mechanism will function:
+1. An oracle updates the current "Fast" and "Fastest" gas price to 20 gwei and 25 gwei respectively
+2. The Synthetix contract reads this and updates the max gas price for exchanges to a weighted AVG (configurable via SCCP) between Fast and Fastest
+3. The synthetix.exchange dApp reads the current max gas price of 23.5 gwei and sets this as the max gas price
+4. The exchange rates oracle updates its gas price to 125% (configurable via SCCP) of Fastest, 31.25 gwei
+5. A frontrunning bot detects a spot market deviation of >.3% (assuming a fee of 30bps)
+6. The Oracle detects the same price deviation
+7. Both txs are broadcast simultaneously, the exchange at 23.5 and the rate update at 31.25
+8. The rate update confirms first ensuring that the frontrunning bot always gets he current live rate from the spot market
+
+It is important to note that this mechanism relies on two components:
+1. An oracle with accurate and timely estimates for gas prices in the network (this is non-trivial)
+2. A real-time exchange rates oracle that can respond quickly to price deviations
+
+It is possible, and even probable that this mechanism could still be frontrun, although with far less frequency than the current mechanims, if the gas price estimates are inaccurate and/or delayed and a sufficiently sophisticated frontrunning bot can reliably predict the likelihood of a spot rate change greater than 30bps faster than the oracle.
+
 
 ## Test Cases
 
