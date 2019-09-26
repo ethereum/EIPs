@@ -44,7 +44,7 @@ As can be seen lately, congestion is the new norm in Ethereum, so the Dynamic op
 
 The proposal for Dynamic gas pricing is as follows:
 
-- To use a gas price oracle that gives us `fatest` (as soon as possible) gas price on-chain, which will update whenever the APIs providing these rates deviate more than some small percentage.
+- To use a gas price oracle that gives us `fast` (roughly < 2 min to confirm) gas price on-chain, which will update whenever the APIs providing these rates deviate more than some small percentage.
 - To update `Synthetix.sol`, removing the lock from exchanges and adding prevention of using more gas than the gas price oracle allows above;
 - To update our centralized oracle to always use substantially more than the gas price oracle. Further, to monitor pending oracle updates and the gas price on-chain, ensuring the former is always greater than the latter.
 
@@ -53,21 +53,19 @@ The proposal for Dynamic gas pricing is as follows:
 Implementing a maximum gas price on exchange transactions and setting it just below the gas price of oracle update transactions will prevent front running and minimize disruption to legitimate exchanges (for normal users who don't need their exchange to be mined immediately and can wait a few blocks).
 
 The example below illustrates how this mechanism will function:
-1. An oracle updates the current "Fast" and "Fastest" gas price to 20 gwei and 25 gwei respectively
-2. The Synthetix contract reads this and updates the max gas price for exchanges to a weighted AVG (configurable via SCCP) between Fast and Fastest
-3. The synthetix.exchange dApp reads the current max gas price of 23.5 gwei and sets this as the max gas price
-4. The exchange rates oracle updates its gas price to 125% (configurable via SCCP) of Fastest, 31.25 gwei
-5. A frontrunning bot detects a spot market deviation of >.3% (assuming a fee of 30bps)
-6. The Oracle detects the same price deviation
-7. Both txs are broadcast simultaneously, the exchange at 23.5 and the rate update at 31.25
-8. The rate update confirms first ensuring that the frontrunning bot always gets he current live rate from the spot market
+
+1. An oracle updates the current `fast` gas price to `20` gwei on-chain.
+2. A frontrunning bot detects a spot market deviation of `>.3%` (assuming a fee of 30bps). It issues an exchange at the highest GWEI allowed by the `Synthetix` contract, which is `20` from above.
+3. The SNX Oracle reads both `fast` on-chain (`20`) and `fastest` off-chain (`30` say). It updates its gas price to `125%` (configurable via SCCP) of `fastest`. Which is `37.5` gwei
+4. Both txs are broadcast simultaneously, the exchange bot at `20` and the SNX Oracle rate update at `37.5` gwei
+5. The rate update confirms first ensuring that the frontrunning bot always gets the current live rate from the spot market
 
 It is important to note that this mechanism relies on two components:
+
 1. An oracle with accurate and timely estimates for gas prices in the network (this is non-trivial)
 2. A real-time exchange rates oracle that can respond quickly to price deviations
 
 It is possible, and even probable that this mechanism could still be frontrun, although with far less frequency than the current mechanims, if the gas price estimates are inaccurate and/or delayed and a sufficiently sophisticated frontrunning bot can reliably predict the likelihood of a spot rate change greater than 30bps faster than the oracle.
-
 
 ## Test Cases
 
