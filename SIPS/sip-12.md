@@ -56,8 +56,8 @@ The example below illustrates how this mechanism will function:
 
 1. An oracle updates the current `fast` gas price to `20` gwei on-chain.
 2. A frontrunning bot detects a spot market deviation of `>.3%` (assuming a fee of 30bps). It issues an exchange at the highest GWEI allowed by the `Synthetix` contract, which is `20` from above.
-3. The SNX Oracle reads both `fast` on-chain (`20`) and `fastest` off-chain (`30` say). It updates its gas price to `125%` (configurable via SCCP) of `fastest`. Which is `37.5` gwei
-4. Both txs are broadcast simultaneously, the exchange bot at `20` and the SNX Oracle rate update at `37.5` gwei
+3. The SNX Oracle reads both `fast` on-chain (`20`) and `fast` off-chain via gas station APIs (let's say it has since dropped to `15`). It updates its gas price to `125%` (configurable via SCCP) of `Math.max(fast on-chain, fast off-chain)`. Which is `25` gwei
+4. Both txs are broadcast simultaneously, the exchange bot at `20` and the SNX Oracle rate update at `25` gwei
 5. The rate update confirms first ensuring that the frontrunning bot always gets the current live rate from the spot market
 
 It is important to note that this mechanism relies on two components:
