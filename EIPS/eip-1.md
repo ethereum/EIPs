@@ -142,7 +142,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` status:` *Draft | Review | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded*
 
-`* last-call-period-end:` *date review period ends*
+`* last-call-period-end:` *date last call period ends*
 
 ` type:` *Standards Track | Informational | Meta*
 
