@@ -16,7 +16,7 @@ This repository tracks the ongoing status of EIPs. It contains:
 
 Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibilty of the implementer to decide if these proposals will be useful to you and if they represent best practice.
 
-Browse all current and draft EIPs on [the official EIP site](http://eips.ethereum.org/).
+Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).
 
 ## Project Goal
 
