@@ -23,16 +23,16 @@ A new accessor function for resolvers is specified:
 
 ```
 
-function addr(bytes32 node, uint chainId) external view returns(bytes memory);
+function addr(bytes32 node, uint coinType) external view returns(bytes memory);
 ```
 
-The EIP168 interface ID for this function is 0xf1cb7e06.
+The EIP165 interface ID for this function is 0xf1cb7e06.
 
-When called on a resolver, this function must return the cryptocurrency address for the specified namehash and coin ID. A zero-length string must be returned if the specified coin ID does not exist on the specified node.
+When called on a resolver, this function must return the cryptocurrency address for the specified namehash and coin type. A zero-length string must be returned if the specified coin ID does not exist on the specified node.
 
 `coinType` is the cryptocurrency coin type index from [SLIP44](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
 
-`addr` is the cryptocurency address in binary format. For example, the Bitcoin address `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa` is base58-decoded and stored as the 25 bytes `0x0062e907b15cbf27d5425399ebf6f0fb50ebb88f18c29b7d93`, while the Ethereum address `0x314159265dd8dbb310642f98f50c066173c1259b` is hex-decoded and stored as the 20 bytes `0x314159265dd8dbb310642f98f50c066173c1259b`. In general, the native binary representation of the address should be used.
+The return value is the cryptocurency address in binary format. For example, the Bitcoin address `1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa` is base58-decoded and stored as the 25 bytes `0x0062e907b15cbf27d5425399ebf6f0fb50ebb88f18c29b7d93`, while the Ethereum address `0x314159265dd8dbb310642f98f50c066173c1259b` is hex-decoded and stored as the 20 bytes `0x314159265dd8dbb310642f98f50c066173c1259b`. In general, the native binary representation of the address should be used.
 
 
 A new event for resolvers is defined:
@@ -51,7 +51,7 @@ The following function provides the recommended interface for changing the addre
 function setAddr(bytes32 node, uint coinType, bytes calldata addr);
 ```
 
-`setAddr` adds or replaces the address for the given node and coin type.
+`setAddr` adds or replaces the address for the given node and coin type.  The parameters for this function are as per those described in `addr()` above.
 
 This function emits an `AddressChanged` event with the new address; see also the backwards compatibility section below for resolvers that also support `addr(bytes32)`.
 
