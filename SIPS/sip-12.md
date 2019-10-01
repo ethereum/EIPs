@@ -45,8 +45,8 @@ As can be seen lately, congestion is the new norm in Ethereum, so the Dynamic op
 The proposal for Dynamic gas pricing is as follows:
 
 - To use a gas price oracle that gives us `fast` (roughly < 2 min to confirm) gas price on-chain, which will update whenever the APIs providing these rates deviate more than some small percentage.
-- To update `Synthetix.sol`, removing the lock from exchanges and adding prevention of using more gas than the gas price oracle allows above;
-- To update our centralized oracle to always use substantially more than the gas price oracle. Further, to monitor pending oracle updates and the gas price on-chain, ensuring the former is always greater than the latter.
+- To update `Synthetix.sol`, adding prevention of using more gas than the gas price oracle allows above;
+- To update our centralized oracle to always use substantially more than the gas price oracle. Further, to monitor pending oracle updates and the gas price on-chain, ensuring the former is always greater than the latter. Finally, to no longer invoke the price update lock before each update.
 
 ## Rationale
 
@@ -58,7 +58,7 @@ The example below illustrates how this mechanism will function:
 2. A frontrunning bot detects a spot market deviation of `>.3%` (assuming a fee of 30bps). It issues an exchange at the highest GWEI allowed by the `Synthetix` contract, which is `20` from above.
 3. The SNX Oracle reads both `fast` on-chain (`20`) and `fast` off-chain via gas station APIs (let's say it has since dropped to `15`). It updates its gas price to `125%` (configurable via SCCP) of `Math.max(fast on-chain, fast off-chain)`. Which is `25` gwei
 4. Both txs are broadcast simultaneously, the exchange bot at `20` and the SNX Oracle rate update at `25` gwei
-5. The rate update confirms first ensuring that the frontrunning bot always gets the current live rate from the spot market
+5. The rate update confirms first ensuring that the frontrunning bot trades after the price update, ensuring it gets the current live rate from the spot market
 
 It is important to note that this mechanism relies on two components:
 
