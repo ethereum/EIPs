@@ -2,7 +2,7 @@
 sip: 13
 title: Account Merging
 status: Approved
-authors: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
+author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 
 created: 2019-08-14
