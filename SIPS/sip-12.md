@@ -44,9 +44,11 @@ As can be seen lately, congestion is the new norm in Ethereum, so the Dynamic op
 
 The proposal for Dynamic gas pricing is as follows:
 
-- To update our centralized oracle to track both `standard` and `fast` (roughly < 5 and < 2 min respectively to confirm) gas prices and calculate a gas limit from these. When this number deviates from some small percentage to the limit on-chain, it must update it.
+- To initially update our centralized oracle to track both `standard` and `fast` (roughly < 5 and < 2 min respectively to confirm) gas prices and calculate a gas limit from these. When this number deviates from some small percentage to the limit on-chain, it must update it;
 - To update `Synthetix.sol`, adding prevention of using more gas than the gas price oracle allows above;
 - To update our centralized oracle to always use substantially more than the gas price oracle. Moreover, the oracle is to no longer invoke the price update lock before each update.
+
+> Initially the plan is to use the centralized SNX Oracle to update the gas limit on-chain, but there are plans in the works to move to a decentralized oracle in the near future.
 
 ## Rationale
 
@@ -54,7 +56,7 @@ Implementing a maximum gas price on exchange transactions and setting it just be
 
 The example below illustrates how this mechanism will function:
 
-1. An oracle (initially the SNX Oracle, but with plans to soon move to a decentralized oracle) reads and averages the current `standard` and `fast` gas prices using public APIs as `10`, `20` gwei respectively and sets the max limit to halway (adjustable) between `standard` and `fast` - i.e. at `15`.;
+1. An oracle (initially the SNX Oracle, moving to a decentralized oracle in the near term) reads and averages the current `standard` and `fast` gas prices using public APIs as `10`, `20` gwei respectively and sets the max limit to halway (adjustable) between `standard` and `fast` - i.e. at `15`.;
 2. A frontrunning bot detects a spot market deviation of `>.3%` (assuming a fee of 30bps). It issues an exchange at the highest GWEI allowed by the `Synthetix` contract, which is `15` from above;
 3. The SNX Oracle reads `fastest` and `fast` (which let's say have dropped to `12` and `10` say). It updates its gas price to `125%` (adjustable) of `Math.max(fastest, currentGasLimit)`. Which is `18.75` gwei;
 4. Both txs are broadcast simultaneously, the exchange bot at `15` and the SNX Oracle rate update at `18.75` gwei;
