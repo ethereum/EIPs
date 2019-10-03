@@ -69,8 +69,6 @@ It is important to note that this mechanism relies on two components:
 
 It is possible, and even probable that this mechanism could still be frontrun, although with far less frequency than the current mechanims, if the gas price estimates are inaccurate and/or delayed and a sufficiently sophisticated frontrunning bot can reliably predict the likelihood of a spot rate change greater than 30bps faster than the oracle.
 
-> Note: An initial implementation uses the SNX Oracle to find and set the on-chain limit. This still requires the oracle waiting on
-
 ## Test Cases
 
 Test cases for an implementation are mandatory for SIPs but can be included with the implementation.
