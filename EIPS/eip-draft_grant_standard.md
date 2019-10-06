@@ -78,7 +78,7 @@ function fundingExpiration() public view returns(uint256)
 ```
 
 #### contractExpiration
-Returns the data after which payouts must be complete or anyone can trigger refunds.
+Returns the date after which payouts must be complete or anyone can trigger refunds.
 ```
 function contractExpiration() public view returns(uint256)
 ```
@@ -254,7 +254,7 @@ event LogRefundApproval(uint256 amount, uint256 totalRefunded);
 The interface separates `signaling` from `voting`. Signals have no impact on the functions of the grant contract, however, are useful for offchain decision making. Signal and voting standards / conventions may be paired with the grant standard to satisfy this need.
 
 
-* Carbon Vote: https://github.com/EthFans/carbonvote: 
+* Carbon Vote: https://github.com/EthFans/carbonvote
   * Simple contract to signal, tally offline
   * modified version used in Grant Standard reference implementation
 
@@ -272,9 +272,9 @@ The interface separates `signaling` from `voting`. Signals have no impact on the
 The standard further delegates `voting` on payouts/refunds to the `manager` which can be an EOA or Contract (e.g. Multisig contract as `manager` or a DAO contract such as Moloch acting as `manager`). See discussion with [@NickSzabo4](https://twitter.com/NickSzabo4/) and [@ameensol](https://twitter.com/ameensol)
 
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">On-chain pools bring additional trust-minimization properties to cash distributions above doing a bunch of simple 1-to-1 payments. For example prevents payor from discriminating between payees: once sufficient funds are in the pool everybody gets their cash flow.</p>&mdash; Nick Szabo 🔑 (@NickSzabo4) <a href="https://twitter.com/NickSzabo4/status/1173281662718726145?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">On-chain pools bring additional trust-minimization properties to cash distributions above doing a bunch of simple 1-to-1 payments. For example prevents payor from discriminating between payees: once sufficient funds are in the pool everybody gets their cash flow.</p>&mdash; Nick Szabo 🔑 (@NickSzabo4) <a href="https://twitter.com/NickSzabo4/status/1173281662718726145?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote> 
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">You&#39;re right, I should have been more general. The grants *standard* defines the minimum set of functions for pooling resources. Our reference implementation chose &quot;grantees can be cut off&quot;. But you could write the function your way and prevent additional categories of abuse. <a href="https://t.co/eNk6YmRPLH">pic.twitter.com/eNk6YmRPLH</a></p>&mdash; Ameen Soleimani 👹 (@ameensol) <a href="https://twitter.com/ameensol/status/1173317866801770496?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">You&#39;re right, I should have been more general. The grants *standard* defines the minimum set of functions for pooling resources. Our reference implementation chose &quot;grantees can be cut off&quot;. But you could write the function your way and prevent additional categories of abuse. <a href="https://t.co/eNk6YmRPLH">pic.twitter.com/eNk6YmRPLH</a></p>&mdash; Ameen Soleimani 👹 (@ameensol) <a href="https://twitter.com/ameensol/status/1173317866801770496?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote>
 
 
 #### Why do we think the current interface is the best?
@@ -292,6 +292,7 @@ Multiple grants are not handled within the standard and are instead managed usin
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
+N/A
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
