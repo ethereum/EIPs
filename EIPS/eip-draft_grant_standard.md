@@ -168,11 +168,11 @@ function fund(uint256 value) public returns (bool);
 ```
 
 #### approvePayout
-OPTIONAL: If managed by a `manager` this method approves payment to a grantee.
+OPTIONAL: If managed by a `manager` this method approves payment to a grantee. If using push payouts, will also send payment.
 
 OPTIONAL ARG: Pay to a single `Grantee` when `grantee` address specified otherwise spit payout among `Grantee`s.
 ```
-function approvePayout(uint256 value, address grantee) public;
+function approvePayout(uint256 value, address grantee) public returns (bool);
 ```
 
 #### withdrawPayout
