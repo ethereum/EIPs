@@ -1,8 +1,8 @@
 ---
 sip: 17
 title: Bytes4 to Bytes32 currencyKeys
-status: Approved
-author: Jackson Chan (@wacko-jacko), Clinton Ennis (@hav-noms)
+status: Implemented
+author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 created: 2019-08-29
 ---

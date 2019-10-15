@@ -1,8 +1,8 @@
 ---
 sip: 16
 title: Improved Upgrades - Utilise Proxies internally
-status: Approved
-author: Clinton Ennis (@hav-noms), Jackson Chan (@wacko-jacko)
+status: Implemented
+author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 created: 2019-08-25
 ---
@@ -26,10 +26,28 @@ Synthetix Proxy and FeePool Proxy.
 
 This would reduce the amount of time the system is offline. Making upgrades a lot faster, cheaper (gas) and minimize the impact on users with reduced downtime.
 
+UPDATE: Since this requires redeploying all the Synths. We propose to also add redeploying all of the Synth Proxies with all the new [ProxyERC20.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/ProxyERC20.sol) to be able to support DEX integrations with all Synths. Currently only SNX and sETH have been updated to support the new [ProxyERC20.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/ProxyERC20.sol) for uniswap and Kyber integration. 
+
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
+### Old Implmentation:
+Points directly to the underlying contract and needs to be set on each Synth each release. This is a growing number of calls as we add new synths. Currently 23 and more to come.
+
+```javascript
+bool isSynthetix = msg.sender == address(synthetix);
+bool isFeePool = msg.sender == address(feePool);
+```
+
+### New Implmentation:
+Utilizes the Proxy which should only be set once and rarley changed. This will however cost more gas for looking up the address.
+
+```javascript
+bool isSynthetix = msg.sender == address(Proxy(synthetixProxy).target());
+bool isFeePool = msg.sender == address(Proxy(feePoolProxy).target());
+```
+      
 ## Rationale
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -38,13 +56,15 @@ This would reduce the amount of time the system is offline. Making upgrades a lo
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
-Not required at this stage
+https://github.com/Synthetixio/synthetix/blob/master/test/Synth.js
+https://github.com/Synthetixio/synthetix/blob/master/test/ProxyERC20.js
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-Not required at this stage
+https://github.com/Synthetixio/synthetix/blob/master/contracts/Synth.sol
+https://github.com/Synthetixio/synthetix/blob/master/contracts/ProxyERC20.sol
 
 ## Copyright
 

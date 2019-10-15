@@ -3,7 +3,7 @@ sip: 18
 title: Recover orphaned $2.9k sUSD from SNX fee address
 author: Nocturnalsheet (@nocturnalsheet), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Approved
+status: Implemented
 created: 2019-09-02
 ---
 
@@ -41,6 +41,12 @@ Implement a FeePool.recoverTransferFees() public function.
 - It will burn the balance of sUSD at the 0xfeefee address 
 - then issue the effective value of XDRs at the 0xfeefee address. Essentially the reverse of the _payFees() function.
 - Call the feePaid(XDR, sUSDBalance) function to record the fees to distribute.
+
+UPDATE: Here is the MAINNET transaction recovering lost sUSD fees to XDRs for claiming. 
+https://etherscan.io/tx/0x54394af66ae7810f2114da8a02749d71b659a4409c7a98814644d1b04372edcb
+
+The function FeePool.recoverTransferFees() can now be depricated from the codebase.
+
 
 
 
