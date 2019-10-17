@@ -269,7 +269,7 @@ The interface separates `signaling` from `voting`. Signals have no impact on the
 
 * DAICO / Interactive Coin Offering: https://ethresear.ch/t/explanation-of-daicos/465, https://medium.com/truebit/an-intro-to-truebits-interactive-coin-offering-e6d1dae36090, https://medium.com/daox/how-daox-works-part-1-a1d2a456cbe7
 
-The standard further delegates `voting` on payouts/refunds to the `manager` which can be an EOA or Contract (e.g. Multisig contract as `manager` or a DAO contract such as Moloch acting as `manager`). See discussion with [@NickSzabo4](https://twitter.com/NickSzabo4/) and [@ameensol](https://twitter.com/ameensol)
+The standard further delegates `voting` on payouts/refunds to the `manager` which can be an EOA or Contract (e.g. Multisig contract as `manager` or a DAO (Distributed Autonomous Organization) contract such as Moloch acting as `manager`). See discussion with [@NickSzabo4](https://twitter.com/NickSzabo4/) and [@ameensol](https://twitter.com/ameensol)
 
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">On-chain pools bring additional trust-minimization properties to cash distributions above doing a bunch of simple 1-to-1 payments. For example prevents payor from discriminating between payees: once sufficient funds are in the pool everybody gets their cash flow.</p>&mdash; Nick Szabo 🔑 (@NickSzabo4) <a href="https://twitter.com/NickSzabo4/status/1173281662718726145?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote> 
