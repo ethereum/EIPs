@@ -28,7 +28,7 @@ The current process for grants in the Ethereum ecosystem is for membership organ
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 
-NOTE: We use the term `GRAINS` to refer to the smallest denomination of an ERC20 `currency` similar to how `WEI` is used to denote the smallest denomination of Ether.
+NOTE: We use the term `ATOMIC_UNITS` to refer to the smallest denomination of an ERC20 `currency` similar to how `WEI` is used to denote the smallest denomination of Ether.
 
 
 
@@ -38,7 +38,7 @@ NOTE: We use the term `GRAINS` to refer to the smallest denomination of an ERC20
 ```
 struct Grantee {
     uint256 targetFunding;   // Funding amount targeted for Grantee.
-    uint256 totalPayed;      // Cumulative funding received by Grantee.
+    uint256 totalPaid;       // Cumulative funding received by Grantee.
     uint256 payoutApproved;  // Pending payout approved by Manager.
 }
 ```
@@ -54,7 +54,7 @@ struct Donor {
 ### Getter Methods
 
 #### manager
-Returns the multisig, EOA, or other address responsible for managing the grant. 
+Returns the multisig, EOA (External Owned Account), or other address responsible for managing the grant. 
 ```
 function manager() public view returns(address)
 ```
@@ -71,14 +71,14 @@ Returns the grant funding threshold required to begin releasing funds.
 function targetFunding() public view returns(uint256)
 ```
 
-#### fundingExpiration
-Returns the date after which funding must be complete.
+#### fundingDeadline
+Returns the date after which funding must be complete as seconds since unix epoch.
 ```
-function fundingExpiration() public view returns(uint256)
+function fundingDeadline() public view returns(uint256)
 ```
 
 #### contractExpiration
-Returns the date after which payouts must be complete or anyone can trigger refunds.
+Returns the date after which payouts must be complete or anyone can trigger refunds, as seconds since unix epoch.
 ```
 function contractExpiration() public view returns(uint256)
 ```
@@ -102,7 +102,7 @@ function donors(address) public view returns(Donor)
 ```
 
 #### getAvailableBalance
-Get available grant balance.
+Get available grant balance. The grant balance is the total funding to date `minus` total paid to grantee `minus` total refunded `minus` pending payments or refunds.  
 ```
 function getAvailableBalance() public view returns(uint256);
 ```
@@ -113,10 +113,10 @@ Cumulative funding donated by donors.
 function totalFunding() public view returns(uint256);
 ```
 
-#### totalPayed
-Cumulative funding payed to grantees.
+#### totalPaid
+Cumulative funding paid to grantees.
 ```
-function totalPayed() public view returns(uint256);
+function totalPaid() public view returns(uint256);
 ```
 
 #### totalRefunded
@@ -152,7 +152,7 @@ constructor(
     address _manager,
     address _currency,
     uint256 _targetFunding,
-    uint256 _fundingExpiration,
+    uint256 _fundingDeadline,
     uint256 _contractExpiration
 )
 ```
@@ -160,7 +160,7 @@ constructor(
 ### State Modifying Methods
 
 #### fund
-Fund a grant proposal. `value` in WEI or GRAINS to fund.
+Fund a grant proposal. `value` in WEI or ATOMIC_UNITS to fund.
 
 NOTE: This method is not `payable`. When funding with Ether, use fallback function to dispatch the `fund` method. 
 ```
@@ -228,13 +228,13 @@ event LogRefund(address indexed donor, uint256 value);
 ```
 
 #### LogPayment
-Grant paying `grantee`. Logs address of `grantee` along with the value payed.
+Grant paying `grantee`. Logs address of `grantee` along with the value paid.
 ```
 event LogPayment(address indexed grantee, uint256 value);
 ```
 
 #### LogPaymentApproval
-OPTIONAL: If using pull payments, manager approving a payment. Logs address of `grantee` along with the value to be payed.
+OPTIONAL: If using pull payments, manager approving a payment. Logs address of `grantee` along with the value to be Paid.
 ```
 event LogPaymentApproval(address indexed grantee, uint256 value);
 ```
