@@ -134,7 +134,7 @@ function totalRefunded() public view returns(uint256);
 
 
 #### canFund
-Funding status check. true if can fund grant.
+Funding status check. Returns `true` if grant can receive funds.
 ```
 function canFund() public view returns(bool);
 ```
