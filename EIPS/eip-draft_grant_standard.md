@@ -114,7 +114,7 @@ function totalFunding() public view returns(uint256);
 ```
 
 #### totalPayed
-Cumulative funding payed to grantees.
+Cumulative funding paid to grantees.
 ```
 function totalPayed() public view returns(uint256);
 ```
