@@ -120,7 +120,7 @@ function totalPayed() public view returns(uint256);
 ```
 
 #### totalRefunded
-OPTIONAL: If refunds permitted, cumulative funding refunded to donors.
+OPTIONAL: If refunds are permitted, this returns the cumulative funding refunded to donors.
 ```
 function totalRefunded() public view returns(uint256);
 ```
