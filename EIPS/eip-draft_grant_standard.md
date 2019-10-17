@@ -54,7 +54,7 @@ struct Donor {
 ### Getter Methods
 
 #### manager
-Returns the multisig, EOA, or other address responsible for managing the grant. 
+Returns the multisig, EOA (External Owned Account), or other address responsible for managing the grant. 
 ```
 function manager() public view returns(address)
 ```
