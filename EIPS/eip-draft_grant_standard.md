@@ -113,11 +113,7 @@ Cumulative funding donated by donors.
 function totalFunding() public view returns(uint256);
 ```
 
-<<<<<<< HEAD
 #### totalPaid
-=======
-#### totalPayed
->>>>>>> 32e12192e9d263f07f918b48f4085b9455ddc203
 Cumulative funding paid to grantees.
 ```
 function totalPaid() public view returns(uint256);
@@ -200,7 +196,7 @@ function withdrawRefund(address donor) public returns(bool);
 ```
 
 #### cancelGrant
-Cancel grant and enable refunds.
+Cancel grant and enable refunds. Grant may be cancelled by the grant's `manager` at any time. The grant may also be cancelled by any address the funding goal is not met before `fundingDeadline` or funds are not completely dispersed before `contractExpiration`.
 ```
 function cancelGrant() public;
 ```
