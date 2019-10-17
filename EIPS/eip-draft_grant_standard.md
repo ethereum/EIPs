@@ -126,7 +126,7 @@ function totalRefunded() public view returns(uint256);
 ```
 
 #### pendingPayments
-OPTIONAL: If pull payments used, payments approved to grantees but not yet withdrawn.
+OPTIONAL: If pull payments used (i.e. if grant manager approves payment but requires grantee to withdraw payment), payments approved to grantees but not yet withdrawn.
 ```
 function totalRefunded() public view returns(uint256);
 ```
