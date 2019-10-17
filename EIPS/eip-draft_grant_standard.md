@@ -182,7 +182,7 @@ function withdrawPayout(uint256 value, address grantee) public returns (bool);
 ```
 
 #### approveRefund
-OPTIONAL: If refunds permitted, approve refunding a portion of the contract's available balance.
+OPTIONAL: If refunds are permitted, approve refunding a portion of the contract's available balance.
 
 OPTIONAL ARG: If `grantee` address specified, reduce `Grantee`'s  `targetFunding`.
 ```
