@@ -113,14 +113,18 @@ Cumulative funding donated by donors.
 function totalFunding() public view returns(uint256);
 ```
 
+<<<<<<< HEAD
 #### totalPaid
+=======
+#### totalPayed
+>>>>>>> 32e12192e9d263f07f918b48f4085b9455ddc203
 Cumulative funding paid to grantees.
 ```
 function totalPaid() public view returns(uint256);
 ```
 
 #### totalRefunded
-OPTIONAL: If refunds permitted, cumulative funding refunded to donors.
+OPTIONAL: If refunds are permitted, this returns the cumulative funding refunded to donors.
 ```
 function totalRefunded() public view returns(uint256);
 ```
@@ -134,7 +138,7 @@ function totalRefunded() public view returns(uint256);
 
 
 #### canFund
-Funding status check. true if can fund grant.
+Funding status check. Returns `true` if grant can receive funds.
 ```
 function canFund() public view returns(bool);
 ```
@@ -182,7 +186,7 @@ function withdrawPayout(uint256 value, address grantee) public returns (bool);
 ```
 
 #### approveRefund
-OPTIONAL: If refunds permitted, approve refunding a portion of the contract's available balance.
+OPTIONAL: If refunds are permitted, approve refunding a portion of the contract's available balance.
 
 OPTIONAL ARG: If `grantee` address specified, reduce `Grantee`'s  `targetFunding`.
 ```
