@@ -17,7 +17,7 @@ from ethereum import utils
 
 def checksum_encode(addr): # Takes a 20-byte binary address as input
     o = ''
-    v = utils.big_endian_to_int(utils.sha3(addr.hex()))
+    v = utils.big_endian_to_int(utils.keccak256(addr.hex()))
     for i, c in enumerate(addr.hex()):
         if c in '0123456789':
             o += c
