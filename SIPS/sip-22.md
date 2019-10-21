@@ -3,17 +3,12 @@ sip: 22
 title: Add sDEFI Synth
 status: Proposed
 author: Garth Travers (@garthtravers)
-discussions-to: <Discord Channel>
+discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
 created: 2019-10-18
 ---
 
 <!--You can leave these HTML comments in your merged SIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new SIPs. Note that an SIP number will be assigned by an editor. When opening a pull request to submit your SIP, please use an abbreviated title in the filename, `sip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-This is the template for SIPs.
-
-Note that an SIP number will be assigned by an editor. When opening a pull request to submit your SIP, please use an abbreviated title in the filename, `sip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
