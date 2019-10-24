@@ -3,7 +3,7 @@ sip: 21
 title: Double exchange fee rate on swing trades
 author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Approved
 created: 2019-10-17
 ---
 
