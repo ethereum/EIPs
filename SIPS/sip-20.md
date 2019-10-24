@@ -3,7 +3,7 @@ sip: 20
 title: Gas Optimisations
 author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Approved
 created: 2019-10-15
 ---
 
