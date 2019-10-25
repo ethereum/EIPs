@@ -2,7 +2,7 @@
 sip: to be assigned
 title: Inflation Smoothing
 status: Proposed
-author: Deltatiger, FrameworkVance
+author: Deltatigernz, FrameworkVance
 discussions-to: governance
 
 created: 2019-09-24
