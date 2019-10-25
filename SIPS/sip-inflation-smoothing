@@ -10,7 +10,7 @@ created: <2019-09-24>
 
 ## Simple Summary
 
-This SIP gradually decreases SNX inflation by 1.5% per week starting on November 8th, 2019. In accordance with this SIP, on June 22nd, 2022 inflation will 
+This SIP gradually decreases SNX inflation by 1.4% per week starting on November 15th, 2019. In accordance with this SIP, on June 22nd, 2022 inflation will 
 cease being determined by this schedule and moved to a fixed volume inflation model (100K SNX per week), which is being a written up in a separate SIP.
 
 ## Abstract
