@@ -3,7 +3,7 @@ sip: 19
 title: Depricate Transfer Fee logic
 author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
-status: Approved
+status: Implemented
 created: 2019-09-23
 ---
 
@@ -17,7 +17,7 @@ Remove all Synth token transfer fee logic from the Synthetix smart contracts.
 
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-Transfer fees on Synth transfers was removed in February 2019 by setting the transferFeeRate to 0. See https://blog.synthetix.io/q1-release-sbtc-and-more/
+Transfer fees on Synth transfers was removed in February 2019 by setting the transferFeeRate to 0. [See the announcement here] (https://blog.synthetix.io/q1-release-sbtc-and-more/)
 
 This proposal is to remove all transfer fee code from the system to get back code size needed for new logic. It's safe to say transfer fees can be deprecated and the code removed.
 
@@ -43,13 +43,13 @@ All tests updated to generate fees from exchanges and remove all tests generatin
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
-https://github.com/Synthetixio/synthetix/pull/248/files
+[https://github.com/Synthetixio/synthetix/pull/248/files]
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-https://github.com/Synthetixio/synthetix/commit/05c42daefb282a49f791e7e626e10cf1f8352f36
+[https://github.com/Synthetixio/synthetix/commit/05c42daefb282a49f791e7e626e10cf1f8352f36]
 
 ## Copyright
 

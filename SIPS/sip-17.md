@@ -1,7 +1,7 @@
 ---
 sip: 17
 title: Bytes4 to Bytes32 currencyKeys
-status: Approved
+status: Implemented
 author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 created: 2019-08-29
@@ -55,11 +55,6 @@ Change all instances of Bytes4 to Bytes32 in Synth.sol, Synthetix.sol, ExchangeR
         preferredCurrency[account] = currencyKey;
     }
 ```
-
-
-## Rationale
-
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 ## Test Cases
 
