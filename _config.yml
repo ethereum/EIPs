@@ -21,6 +21,12 @@ description: >-
 url: "https://eips.ethereum.org"
 twitter_username: ethereum
 github_username:  ethereum
+youtube_username: channel/UCNOfzGXD_C9YMYmnefmPH0g
+
+twitter:
+  card: summary
+  username: ethereum
+
 header_pages:
  - all.html
  - core.html
@@ -29,9 +35,6 @@ header_pages:
  - erc.html
  - meta.html
  - informational.html
-twitter:
-  card: summary
-  username: ethereum
 
 # Build settings
 highlighter: rouge
