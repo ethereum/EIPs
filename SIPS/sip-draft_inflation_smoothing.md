@@ -10,7 +10,7 @@ created: 2019-09-24
 
 ## Simple Summary 
 
-This SIP gradually decreases SNX inflation by 1.4% per week starting on November 15th, 2019 - week 34 of the current inflation schedule. There is a separate SIP that proposes a fixed rate of inflation of 100K per week starting on week 222 of the inflation schedule, the week where the smoothed inflation schedule would first go below 100K per week. 
+This SIP gradually decreases SNX inflation by 1.4% per week starting on November 15th, 2019 - week 34 of the current inflation schedule. There is a separate SIP that proposes a fixed rate of inflation of 100K per week starting on week 222 of the inflation schedule. This is the week when the smoothed inflation schedule would first go below 100K SNX per week and when the original inflation schedule would be issuing 90.1K per week.  
 
 This SIP is the formal spec successor of deltatiger's [Draft SIP Proposal #36](https://github.com/Synthetixio/SIPs/issues/36). The formalization of specifics (week starting, % decrease per week) reflects the consensus reached during the October 24, 2019 governance call. 
 
