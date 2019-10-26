@@ -2,7 +2,7 @@
 sip: <to be assigned>
 title: Terminal SNX Inflation
 status: WIP
-author: Vance Spencer (@FrameworkVance), Michael Anderson (@meanderson), Deltatiger (@deltatigernz)
+author: Vance Spencer (@FrameworkVance), Deltatiger (@deltatigernz)
 discussions-to: governance
 
 created: 2019-10-25
@@ -17,12 +17,14 @@ requires: Inflation Smoothing (SIP# TBD)
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 This proposal will add a perpetual weekly reward of 100,000 SNX starting on June 21, 2023, the 222nd week on the SNX inflation schedule. 
 
+This proposal will be voted on after SIP # TBD (Inflation Smoothing) but is written with both scenarios (Smoothing and Original) so people can review them simultaneously.
+
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 - Terminal inflation is an important mechanism to keep the SNX protocol stable in perpetuity
-- With inflation smoothing as described in SIP # TBD, inflation drops below 100K SNX per week on June 21, 2023 
-- Starting on June 21, 2023, 100,000 SNX perpetual weekly inflation represents a compelling investment opportunity for stakers that will keep the protocol stable over the long term
+- With the original inflation schedule, weekly inflation drops from 90.1K to 0 on March 13, 2024
+- With inflation smoothing as described in SIP # TBD, weekly inflation drops below 100K on June 21, 2023 
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
@@ -34,6 +36,13 @@ Perpetual weekly inflation serves as a mechanism to keep the protocol stable for
 Adjust [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/SupplySchedule.sol) to account for the following changes:
 - Starting on June 21, 2023, the weekly issuance of SNX tokens will adjust to 100,000.
 - This model will stay in place until it is stopped or adjusted.
+
+With Inflation Smoothing and 100K Terminal Inflation:
+![image](https://media.discordapp.net/attachments/637348888713625626/637736129013088295/Screen_Shot_2019-10-26_at_12.20.50_PM.png)
+
+With Original Schedule and 100K Terminal Inflation
+![image](https://media.discordapp.net/attachments/637348888713625626/637735914516512788/Screen_Shot_2019-10-26_at_12.24.34_PM.png)
+
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
