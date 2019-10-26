@@ -1,9 +1,46 @@
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  {%- seo -%}
-  <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  {% if page.layout == "eip" %}
+    <title>EIP {{ page.eip }}: {{ page.title }}</title>
+    <meta property="og:title" content="EIP {{ page.eip }}: {{ page.title }}" />
+    <meta
+      name="description"
+      content="Details on Ethereum Improvement Proposal {{page.eip}} (EIP {{page.eip}}): {{page.title}}"
+    />
+    <meta
+      property="og:description"
+      content="Details on Ethereum Improvement Proposal {{page.eip}} (EIP {{page.eip}}): {{page.title}}"
+    />
+    <meta name="twitter:description" content="Details on Ethereum Improvement Proposal {{page.eip}} (EIP {{page.eip}}): {{page.title}}" />
+  {% else %}
+  <title>{{ page.title }} | Ethereum Improvement Proposals</title>
+    <meta
+      property="og:title"
+      content="{{ page.title }} | Ethereum Improvement Proposals"
+    />
+    <meta name="description" content="Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards." />
+    <meta property="og:description" content="Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards." />
+    <meta name="twitter:description" content="Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards." />
+  {% endif %}
+  <meta name="generator" content="Jekyll v3.8.5" />
+  <meta property="og:locale" content="en_US" />
+  <link rel="canonical" href="https://eips.ethereum.org{{page.url}}" />
+  <meta property="og:url" content="https://eips.ethereum.org{{page.url}}" />
+  <meta property="og:site_name" content="Ethereum Improvement Proposals" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@ethereum" />
+  <script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org/",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
   {%- feed_meta -%}
   {%- if jekyll.environment == 'production' -%}
     {%- include matomo.html -%}
