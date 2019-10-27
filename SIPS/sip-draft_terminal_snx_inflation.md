@@ -2,7 +2,7 @@
 sip: <to be assigned>
 title: Terminal SNX Inflation
 status: WIP
-author: Vance Spencer (@FrameworkVance), Deltatiger (@deltatigernz)
+author: Vance Spencer (@FrameworkVance), Deltatiger (@deltatigernz), Michael Anderson (@meanderson)
 discussions-to: governance
 
 created: 2019-10-25
