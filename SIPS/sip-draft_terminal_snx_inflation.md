@@ -17,7 +17,7 @@ requires: Inflation Smoothing (SIP# TBD)
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 This proposal will add a perpetual weekly reward of 100,000 SNX starting on June 21, 2023, the 222nd week on the SNX inflation schedule. 
 
-This proposal will be voted on after SIP # TBD (Inflation Smoothing) but is written with both scenarios (Smoothing and Original) so people can review them simultaneously.
+This SIP is the formal spec successor of deltatiger's [Draft SIP Proposal #36](https://github.com/Synthetixio/SIPs/issues/36), specifically pertaining to terminal inflation. 
 
 
 ## Abstract
@@ -42,6 +42,8 @@ With Inflation Smoothing and 100K Terminal Inflation:
 
 With Original Schedule and 100K Terminal Inflation
 ![image](https://media.discordapp.net/attachments/637348888713625626/637735914516512788/Screen_Shot_2019-10-26_at_12.24.34_PM.png)
+
+[Model](https://docs.google.com/spreadsheets/d/1rVXFnZSMvHEv5XpA5Q23x-cXEo7w-2T80wlAfT-YbuI/edit#gid=1640166717)
 
 
 ## Rationale
