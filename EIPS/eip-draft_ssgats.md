@@ -6,7 +6,7 @@ discussions-to: <URL>
 status: Draft
 type: Informational
 category: N/A
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: 2019-10-28
 requires: None
 replaces: None
 ---
