@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: BEGINDATA opcode
 author: Martin Lundfall martin.lundfall@protonmail.com
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/new-opcode-begindata/3727
 status: Draft
 type: Standards Track
 category Core
