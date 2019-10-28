@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Stupid Simple Gas Abstracted Transaction (SSGAT) Encoding Standard
 author: Aakil Fernandes (@aakilfernandes) <aakilfernandes@gmail.com>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-draft-stupid-simple-gas-abstracted-transaction-ssgat-encoding-standard/3729
 status: Draft
 type: Informational
 category: N/A
