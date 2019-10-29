@@ -62,7 +62,7 @@ An SSGAT contains parameters
 
 All parameters are fixed length, with the exception of `transaction_a_data`. This allows us to push `transaction_a_data` to the end and use a simple concatenation for encoding.
 
->> ToDo: Specify parameter lengths and endianness
+> ToDo: Specify parameter lengths and endianness
 
 ````
 ssgat = concat([
@@ -116,11 +116,11 @@ SSGATs are not designed for the Ethereum Wire Protocol. SSGATs can be decoded an
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
->> ToDo: Include test cases of SSGAT encoding
+> ToDo: Include test cases of SSGAT encoding
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
->> ToDo: Include SSGAT implementation
+> ToDo: Include SSGAT implementation
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
