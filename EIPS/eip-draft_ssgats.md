@@ -71,6 +71,7 @@ ssgat = concat([
   transaction_a_from,
   transaction_a_to,
   transaction_a_value,
+  transaction_a_v,
   transaction_a_r,
   transaction_a_s,
   transaction_b_startgas,
