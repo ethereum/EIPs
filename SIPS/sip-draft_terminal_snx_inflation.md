@@ -1,12 +1,12 @@
 ---
-sip: <to be assigned>
+sip: 24
 title: Terminal SNX Inflation
 status: WIP
 author: Vance Spencer (@FrameworkVance), Deltatiger (@deltatigernz), Michael Anderson (@meanderson)
-discussions-to: governance
+discussions-to: https://github.com/Synthetixio/SIPs/issues/36
 
 created: 2019-10-25
-requires: Inflation Smoothing (SIP# TBD)
+requires: Inflation Smoothing (SIP-23)
 
 ---
 
