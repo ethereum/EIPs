@@ -1,6 +1,6 @@
 ---
 sip: 19
-title: Depricate Transfer Fee logic
+title: Deprecate Transfer Fee logic
 author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 status: Implemented
