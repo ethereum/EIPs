@@ -6,6 +6,7 @@ author: Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/2MmKtHb
 
 created: 2019-08-02
+Updated: 2019-10-29
 ---
 
 <!--You can leave these HTML comments in your merged SIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new SIPs. Note that an SIP number will be assigned by an editor. When opening a pull request to submit your SIP, please use an abbreviated title in the filename, `sip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -25,11 +26,9 @@ The trial has been successful but in order for this mechanism to work long term 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-The implementation of this SIP will be phased in:
+Based on the last few months of data and the current success of the sETH pool, the implementation of this SIP will be:
 
-Phase One: trial period funded by the foundation, the trial period has now been extended to five weeks finishing on 2019-08-21
-Phase Two: 5% inflation diverted to pool with all rewards unlocked (eight weeks 2019-08-21 to 2019-10-16)
-Phase Three (pending community approval): 5% additional inflation locked for 1 year as per the existing inflationary rewards mechanism (2019-10-16 ongoing)
+5% of inflation diverted to a pool with all rewards unlocked
 
 The distribution rules are as follows:
 1. SNX tokens will be distributed by the percentage of liquidity tokens at the end of each period.
@@ -37,6 +36,7 @@ The distribution rules are as follows:
 3. Only the opening LP token balance counts, you can add more liquidity but it will only be counted in following week.
 4. The snapshot will occur two hours after each fee period which closes @ Wednesday ~6pm AEST.
 5. There is a minimum of 1 liquidity token required per provider. 
+6. LP tokens may not be moved
 
 The distribution will be managed by an m/n multisig contract with signers selected from LP providers. 
 
@@ -53,8 +53,6 @@ The source of truth for distribution will be the open source script released by 
 9. Failure to vote on a correct tx will result in removal and replacement of a signer(s)
 
 *h/t @nocturnalsheet for the core signing process above.*
-
-^Phase three requires some modifications to the fee pool contracts hence the delay and discussion required before implementing this change.
 
 ^There is still a kill-switch built into this mechanism whereby if the signers go rogue. The foundation (and eventually the community via decentralised proxies) can halt distribution of the inflationary rewards to this contract and deploy a new multisig with different signers.
 
