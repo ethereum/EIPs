@@ -90,11 +90,10 @@ The miner who receives an SSGAT **should** decode the SSGAT into `transaction_a`
 1. `transaction_b_nonce = transaction_a_nonce + 1`
 2. `transaction_a_gasPrice` and `transaction_b_gasPrice` are 0
 3. `transaction_b_value` is 0
-4. `transaction_b` is a made using a solidity `transferFrom(address from, address to, uint256 amount)` where:
-  1. `address from` is `transaction_a_from`
-  2. `address to` is `erc20_handoffAddress`
+4. `transaction_b` is a made using a solidity `transfer(address to, uint256 amount)` where:
+  1. `address to` is `erc20_handoffAddress`
     1. `erc20_handoffAddress` *should* be the address of a deployed contract which allows the current miner to drain all ERC20 balances
-  3. `amount` is `erc20_amount`
+  2. `amount` is `erc20_amount`
 
 The miner **should** also generate `transaction_c` which pulls payment from `erc20_handoff`
 
@@ -108,7 +107,7 @@ The miner **should** include `transaction_a`, `transaction_b`, and `transaction_
 Since payments are made using ERC20 tokens, and the value of ERC20 tokens are in constant flux, there is no way for nodes to objectively prioritize SSGATs. Rather, a subjective judgement must be made based on the value of tokens to the miner. While an on-chain exchange *could* provide a means to objectively prioritize SSGATs, that strategy would necessitate guardrails around transaction volume and ignores that miners have subjective valuations for ERC20 tokens. For these reasons, we ignore DEVP2P compatibility concerns.
 
 ### `transaction_b` Assumptions
-`transaction_b` contains strict assumptions about *how* a user pays the miner, specifically that a simple ERC20 `transferFrom(address,address,uint256)` is used. This is because it is necessary for `transaction_b` to be statically analyzed.
+`transaction_b` contains strict assumptions about *how* a user pays the miner, specifically that a simple ERC20 `transfer(address,uint256)` is used. This is because it is necessary for `transaction_b` to be statically analyzed.
 
 For traditional transactions, users incur a penalty in terms of a wasted transaction fee when they fail to include sufficient transaction fees. With `transaction_b`, that is no longer the case. The payment is made in an ERC20 transfer, which will fail if not enough gas is included.
 
