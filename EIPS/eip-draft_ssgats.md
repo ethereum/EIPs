@@ -78,7 +78,7 @@ ssgat = concat([
   transaction_b_r,
   transaction_b_s,
   erc20_address,
-  erc20_handoff,
+  erc20_handoffAddress,
   erc20_amount,
   transaction_a_data
 ])
@@ -91,17 +91,18 @@ The miner who receives an SSGAT **should** decode the SSGAT into `transaction_a`
 3. `transaction_b_value` is 0
 4. `transaction_b` is a made using a solidity `transferFrom(address from, address to, uint256 amount)` where:
   1. `address from` is `transaction_a_from`
-  2. `address to` is `erc20_handoff`
-    1. `erc20_handoff` *should* be a contract deployed on the network which allows the current miner to drain all ERC20 balances
+  2. `address to` is `erc20_handoffAddress`
+    1. `erc20_handoffAddress` *should* be the address of a deployed contract which allows the current miner to drain all ERC20 balances
   3. `amount` is `erc20_amount`
 
-The miner **should*** also generate `transaction_c` which pulls payment from `erc20_handoff`
+The miner **should** also generate `transaction_c` which pulls payment from `erc20_handoff`
 
-The miner should include `transaction_a`, `transaction_b`, and `transaction_c` in direct sequence
+The miner **should** include `transaction_a`, `transaction_b`, and `transaction_c` in direct sequence
 
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
 ### Lack of Ethereum Wire Protocol Compatibility
 Since payments are made using ERC20 tokens, and the value of ERC20 tokens are in constant flux, there is no way for nodes to objectively prioritize SSGATs. Rather, a subjective judgement must be made based on the value of tokens to the miner. While an on-chain exchange *could* provide a means to objectively prioritize SSGATs, that strategy would necessitate guardrails around transaction volume and ignores that miners have subjective valuations for ERC20 tokens. For these reasons, we ignore DEVP2P compatibility concerns.
 
