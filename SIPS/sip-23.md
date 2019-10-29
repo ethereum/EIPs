@@ -1,9 +1,9 @@
 ---
-sip: to be assigned
+sip: 23
 title: Inflation Smoothing
 status: Proposed
 author: Deltatiger (@deltatigernz), Vance Spencer(@frameworkvance)
-discussions-to: governance
+discussions-to: https://github.com/Synthetixio/SIPs/issues/36
 
 created: 2019-09-24
 ---
