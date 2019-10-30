@@ -1,7 +1,7 @@
 ---
 sip: 25
 title: Decouple Gas Limiter from Oracle
-status: Proposed
+status: Approved
 author: Justin J. Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
