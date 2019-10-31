@@ -1,19 +1,19 @@
 ---
 sip: 15
-title: Direct Redemption of SNX collateral
+title: Liquidation. Direct Redemption of SNX collateral with synths
 status: WIP
 author: Jackson Chan (@jacko125)
 discussions-to:
 created: 2019-08-20
 ---
 
-Direct Redemption of SNX collateral with Synths
+Liquidation. Direct Redemption of SNX collateral with synths
 
 ## Simple Summary
 
-This SIP proposes to introduce direct redemption mechanism for synthetix collateral. Holders of Synths would be able to redeem their Synths against synthetix collateral that are staked, if the minter is below the liquidation ratio, at a fair discounted value.
+This SIP proposes to introduce direct redemption mechanism for synthetix collateral. Holders of Synths would be able to redeem their Synths against synthetix collateral that are staked, if the staker is below the liquidation ratio, at a fair discounted value.
 
-Direct redemption gives holders and issuers of Synthetic synths these benefits:
+Direct redemption (liquidation) gives SNX holders and issuers of Synthetic synths these benefits:
 
 1. Allows holders of Synths to burn synth debt on behalf of minter and redeem underlying collateral.
 2. Provides instrinsic value to synth debt for anyone who holds synths as backing it with synthetix collateral that can be redeemed at fair value.
