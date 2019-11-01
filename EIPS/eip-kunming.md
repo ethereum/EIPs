@@ -19,7 +19,7 @@ chance of breaking existing contracts.
 This document proposes the following blocks at which to implement the
 changes specified in "Specification" section.
 
-- Undecided on Ethereum Classic PoW-mainnet.
+- Undecided on Ethereum PoW-mainnet.
 
 ### Specification
 
