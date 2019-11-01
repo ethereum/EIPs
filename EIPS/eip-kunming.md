@@ -1,0 +1,84 @@
+---
+eip: TBA
+title: "Hardfork Meta: Kunming"
+author: Wei Tang (@sorpaas)
+discussions-to: TBA
+type: Meta
+status: Draft
+created: 2019-11-01
+---
+
+### Simple Summary
+
+This protocol upgrade provides a backward compatibility foundation to
+enable future protocol upgrades to be applied with significantly lower
+chance of breaking existing contracts.
+
+### Abstract
+
+This document proposes the following blocks at which to implement the
+changes specified in "Specification" section.
+
+- Undecided on Ethereum Classic PoW-mainnet.
+
+### Specification
+
+At hard fork block, enable [EIP-1702](https://eips.ethereum.org/EIPS/eip-1702):
+
+* Define the previous EVM version as version `0`.
+* Define a new version `1`, with the following EVM modifications
+  applied on it.
+  * **[39-UNGAS](https://specs.that.world/39-ungas/)**: Remove all
+    observable behavior of gas cost in EVM and change out-of-gas
+    exception to trap the whole transaction.
+  * **[40-UNUSED](https://specs.that.world/40-unused/)**: Disable
+    deployment of unused opcodes.
+  
+### Discussion
+
+#### Feature Upgrades
+
+Once the hard fork is enabled, future feature upgrades can be applied
+directly on version `1`, without the need to define additional new
+versions. This simplifies client maintainence, which was one of the
+main resistence to apply EIP-1702 in Istanbul.
+
+Any gas cost changes can be applied without worry about backward
+compatibility issues, because gas cost is now an unobservable behavior
+in EVM. Any addition of opcodes can be applied without worry about
+backward compatibility issues, because deployment of unused opcode is
+disabled. This nearly covers all EVM upgrade paths we need to care
+about.
+
+#### Ecosystem
+
+It is possible to deploy a helper contract to allow version `0`
+contracts continue to be created. This allows unmodified Solidity code
+to be deployed, just like what we have now.
+
+However, for version `1`, because we made several changes related to
+gas cost, which impacts the semantics of certain opcodes such as
+`CALL*` and `CREATE*`, Solidity compiler must be modified to support
+version `1`.
+
+Existing common practices might need to change as well. Some practices
+relies on the observable behavior of gas cost. Relying on gas cost is
+usually considered to be a bad practice because gas cost can and will
+change.
+
+On the other hand, version `1` enables some new practices that wasn't
+possible before. For example, a contract can now refuse to be invoked
+by any other contracts.
+
+#### Emergency Hard Fork
+
+Our current gas cost scheme might contain DoS attack vectors. If those
+attack vectors must be fixed by changing existing gas cost schemes,
+then it must change gas costs specified in version `0`. In those
+emergency hard fork scenarios, we will inevitably break backward
+compatibility.
+
+## License
+
+This work is licensed under [Apache License, Version
+2.0](http://www.apache.org/licenses/).
