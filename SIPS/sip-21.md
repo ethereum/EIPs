@@ -36,7 +36,10 @@ There is already a leveraged benefit on the inverse Synths and currently being a
 
 The normal exchange fee rate is 30 bips. It is currently 50 bips which would make the swing trade 100 bips. When it is restored to 30 bips it would then only be 60 bips on a swing trade.
 
-This is only a temporary stop-gap until the full implementation of sip-12 is rolled out which should reduce the lag opportunity on price updates then I propose to remove this doubled exchange fee on going short <> long.
+This is only a temporary stop-gap until either 
+- the full implementation of sip-12 is rolled out which should reduce the lag opportunity on price updates 
+- or the implementation of the chainlink + exchange order queue 
+then I propose to remove this doubled exchange fee on going short <> long. 
 
 ## Test Cases
 
