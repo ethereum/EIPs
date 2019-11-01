@@ -68,12 +68,15 @@ Whe deploying a contract if a contract starts with `0`, has a length 4 or later,
 that is not recognized by the EVM the contract deployment transaction fails and consumes all
 allocated gas.
 
+For this EIP, only header version '1' (contracts starting with the byte stream 0x00 0x00 0x00 0x01)
+is defined. Future EIPs may expand on the valid set of headers.
+
 For purposes of PC calculations the first byte after the version header is `0`. There is no
 mechanism within the EVM to retrieve the header values.
 
 ### `BEGINDATA`
 
-As described in EIP-2327 a new opcode `BEGINDATA` (0xGG) is added that indicates the remainder of
+As described in EIP-2327 a new opcode `BEGINDATA` (0xb6) is added that indicates the remainder of
 the contract should not be considered executable code.
 
 ### Invalid Opcode Validation
@@ -133,6 +136,10 @@ executable.
 Except for the validation rules and versioning header all other semantics of the EVM are the same.
 Gas schedules and opcode tables would be the same between versions and headers.
 
+Existing compilers (such as solidity) can provide support for headers by prepending their output
+stream with 0x00, 0x00, 0x00, 0x01 and appending in 0xb6 prior to any non-code data added as part of
+the contract.
+
 ## Forwards Compatibility
 
 This spec provides forward compatibility in at least two ways.
@@ -168,6 +175,9 @@ Incomplete whiteboard list
   - contract with header, begin data, and invalid opcodes in the middle
   - contract with header, and static jump to bad place
   - contract with header, and 1985 violations (one contract per violation)
+  - contract with unrecognized header
+  - contract with a static jump into code in BEGINDATA
+  - contract with a static jump outside of all data
   - header, and contract code too large
   - header, contract code, begin data, data, and the whole thing is too large
 
