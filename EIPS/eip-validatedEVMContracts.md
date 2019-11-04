@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2348
 title: Validated EVM Contracts
 author: Danno Ferrin (@shemnon)
-discussions-to: <TBD>
+discussions-to: https://ethereum-magicians.org/t/eip-2348-validated-evm-contracts/3756
 status: Draft
 type: Standards Track
 category: Core
