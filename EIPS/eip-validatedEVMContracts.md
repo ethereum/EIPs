@@ -1,14 +1,14 @@
 ---
 eip: <to be assigned>
 title: Validated EVM Contracts
-author: Danno Ferrin (@shemnon), <TBD>
+author: Danno Ferrin (@shemnon)
 discussions-to: <TBD>
 status: Draft
 type: Standards Track
 category: Core
-created: 2019-11-01 <TBD>
-requires: 1702, 2327, <more TBD>
-replaces: 1707 (unpublished), 1714 (unpublished), 615 (in part)
+created: 2019-11-01
+requires: 1702, 2327
+replaces: 615 (in part), 1707 (unpublished, abandoned), 1712 (unpublished)
 ---
 
 ## Simple Summary
@@ -30,7 +30,7 @@ to provide validations that allow clients to optimize their EVM execution.
 First there is the issue of an evolvable EVM. With the current state of EVM contracts literally any
 sequence of bytes can be deployed to the blockchain. Some tools take advantage of this situation and
 add meta-data to the end of their contract deployment. The real impact is that this precludes the
-addition of new multi-byte instructions (such as the PUSHn series) because the new instructions
+addition of new multi-byte instructions (such as the `PUSHn` series) because the new instructions
 could hide a previously valid `JUMPDEST` when evaluated as a new opcode set. So invalid contracts
 will not be deployable.
 
@@ -48,9 +48,10 @@ assumptions about the contract being compiled.
 
 ## Specification
 
-There are four interlocking portions, in addition to EIP-1702 (Generalized Account Versioning
-Scheme) and EIP-2327 (`BEGINDATA` opcode). They are a versioning header (similar to what was in
-EIP-1707), invalid opcode validation, static jump analysis, and same evm limits validation.
+There are three interlocking portions specified in this EIP, in addition to two other portions from
+active EIPs: [EIP-1702] (Generalized Account Versioning Scheme) and [EIP-2327] (`BEGINDATA` opcode).
+They are a versioning header (similar to what was in [EIP-1707]), invalid opcode validation (similar
+to [EIP-1712]), and static jump analysis.
 
 ### EVM Account Versioning
 
@@ -68,16 +69,16 @@ Whe deploying a contract if a contract starts with `0`, has a length 4 or later,
 that is not recognized by the EVM the contract deployment transaction fails and consumes all
 allocated gas.
 
-For this EIP, only header version '1' (contracts starting with the byte stream 0x00 0x00 0x00 0x01)
-is defined. Future EIPs may expand on the valid set of headers.
+For this EIP, only header version `1` (contracts starting with the byte stream `0x00` `0x00` `0x00`
+`0x01`) is defined. Future EIPs may expand on the valid set of headers.
 
-For purposes of PC calculations the first byte after the version header is `0`. There is no
-mechanism within the EVM to retrieve the header values.
+For purposes of Program Counter calculations the first byte after the version header is location
+`0`. There is no mechanism within the EVM to retrieve the header values.
 
 ### `BEGINDATA`
 
-As described in EIP-2327 a new opcode `BEGINDATA` (0xb6) is added that indicates the remainder of
-the contract should not be considered executable code.
+As described in [EIP-2327] a new opcode `BEGINDATA` (`0xb6`) is added that indicates the remainder
+of the contract should not be considered executable code.
 
 ### Invalid Opcode Validation
 
@@ -91,8 +92,14 @@ opcode validation consists of the following process:
   - If the code byte is the `BEGINDATA` operation (`0xb6`) stop iterating.
   - Otherwise, throw out-of-gas.
 
-As of the writing of this spec all of the multibyte operations are the `PUSHn` series of operations
-from `0x60` to `0x7f`. Future forks may add more multi-byte operations.
+As of the Istanbul upgrade all of the multi-byte operations are the `PUSHn` series of operations
+from `0x60` to `0x7f`. Future upgrades may add more multi-byte operations.
+
+As of the Istanbul upgrade the invalid opcodes are `0x0c` to `0x0f`, `0x1e`, `0x1f`, `0x21` to
+`0x2f`, `0x46` to `0x4f`, `0x5c` to `0x5f`, `0xa5` to `0xaf`, `0xb3` to `0xef`, `0xf6` to `0xf9`,
+`0xfb`, `0xfc`, and `0xfe`. Future upgrades will remove items from this list. Note that `0xb6` is
+referenced in this spec as the `BEGINDATA` marker, but is not part of any deployed upgrade. Also
+note that `0xfe` would remain as a reserved 'invalid instruction' that will still be permitted.
 
 ### Static Jump Validations
 
@@ -100,20 +107,16 @@ For every jump operation preceded by a `PUSHn` instruction the value of the data
 stack by the `PUSHn` operation must point to a valid `JUMPDEST` operation. Clients may combine this
 check with invalid opcode validation.
 
-As of the writing of this spec the jump operations are `JUMP` (0x56) and `JUMPI` (0x57). Future
-forks may add more jump operations.
-
-### ?Sane Limits checks? (1985)?
-
-> TODO research if any EIP1985 checks make sense.
+As of the Istanbul upgrade the jump operations are `JUMP` (`0x56`) and `JUMPI` (`0x57`). Future
+upgrades may add more jump operations.
 
 ## Rationale
 
 The first major feature is the invalid opcode removal. In the case where a contract has an invalid
-opcode that later becomes a multibyte opcode followed by a `JUMPDEST` marker that contract would
-become invalid after a hard fork because the destination marker would become part of the new
-multibyte instruction <TODO - link to FEM post>. If no invalid opcodes can be created then the
-possibility of the `JUMPDEST` being absorbed is eliminated.
+opcode that later becomes a multi-byte opcode followed by a `JUMPDEST` marker that contract would
+become invalid after an upgrade because the destination marker would become part of the new
+multi-byte instruction, as described in the [EIP-663 discussion]. If no invalid opcodes can be
+created then the possibility of the `JUMPDEST` being absorbed is eliminated.
 
 One complication is that current versions of solidity append the swarm hash of the source code of
 the contract in some instances to the end of the generated EVM bytecode. That is what motivated the
@@ -130,32 +133,37 @@ encountered.
 
 Almost all existing contract deployments will be able to be deployed with no client changes. The one
 exception is contract deployments that start with a zero byte. This should have no impact on
-existing contract execution because any contract with a zero byte in the first position is not
-executable.
+existing contract execution because any contract with a zero byte in the first position would
+immediately halt because `0x00` maps to the `STOP` instruction, the utility and value of those
+contracts is minimal at best. If this is not desirable a different header signaling byte (such as
+`0xEF`) can be used.
 
 Except for the validation rules and versioning header all other semantics of the EVM are the same.
 Gas schedules and opcode tables would be the same between versions and headers.
 
 Existing compilers (such as solidity) can provide support for headers by prepending their output
-stream with 0x00, 0x00, 0x00, 0x01 and appending in 0xb6 prior to any non-code data added as part of
-the contract.
+stream with `0x00`, `0x00`, `0x00`, `0x01` and appending in `0xb6` prior to any non-code data added
+as part of the contract.
 
 ## Forwards Compatibility
 
 This spec provides forward compatibility in at least two ways.
 
-First, the content of multi byte and jump dest validated opcodes can be increased in future forks.
-Contracts that would be valid under new rules would be rejected under old rules, and all older
-contracts would still be valid under the new rules. Any newly deployed opcodes would be disabled
-unless the code is appropriately validated.
+First, the content of multi byte and jump dest validated opcodes can be increased in future
+upgrades. Contracts that would be valid under new rules would be rejected under old rules, and all
+older contracts would still be valid under the new rules. Any newly deployed opcodes would be
+disabled unless the code is appropriately validated.
 
-Second, the versioning header can be extended to allow for stricter validations in future hard forks
+Second, the versioning header can be extended to allow for stricter validations in future upgrades
 while keeping the EVM evaluation semantics the same. Such possible stricter validations could
 include prohibiting dynamic jumps.
 
 ## Test Cases
 
 Incomplete whiteboard list
+
+Each test would need to be written 3 times, once for normal contract deployment, once for `CREATE`,
+and once again for `CREATE2`.
 
 - Positive
   - no header and invalid opcodes
@@ -176,15 +184,23 @@ Incomplete whiteboard list
   - contract with header, and static jump to bad place
   - contract with header, and 1985 violations (one contract per violation)
   - contract with unrecognized header
-  - contract with a static jump into code in BEGINDATA
+  - contract with a static jump into code in `BEGINDATA`
   - contract with a static jump outside of all data
   - header, and contract code too large
   - header, contract code, begin data, data, and the whole thing is too large
+  - One test for each invalid opcode. Plain, with header, and with header and `BEGINDATA`
 
 ## Implementation
 
-not done yet
+No implementation yet.
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+[eip-615]: https://eips.ethereum.org/EIPS/eip-615
+[eip-1702]: https://eips.ethereum.org/EIPS/eip-1702
+[eip-1707]: https://github.com/ethereum/EIPs/pull/1707
+[eip-1712]: https://github.com/ethereum/EIPs/pull/1712
+[eip-2327]: https://github.com/ethereum/EIPs/pull/2327
+[eip-663 discussion]: https://ethereum-magicians.org/t/eip-663-unlimited-swap-and-dup-instructions/3346/11?u=shemnon
