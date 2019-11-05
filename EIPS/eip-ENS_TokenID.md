@@ -1,0 +1,115 @@
+---
+eip: <to be assigned>
+title: ENS support for ERC 721 TokenID
+author: Oisín Kyne (@OisinKyne) <oisin@kyne.eu>
+discussions-to: https://github.com/ethereum/EIPs/issues/X
+status: Draft
+type: Meta
+created: 2019-10-30
+requires (*optional): EIP137
+---
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+
+## Simple Summary
+
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+
+TL;DR: This EIP makes ERC721 Non-Fungible Tokens addressable by the Ethereum Name Service by adding a new resolver profile, `uint256 tokenID()`.
+
+For fungible tokens, like ERC20, resolving an ENS name to a token contract address alone makes sense, because each token is indistinguishable from another. For non-fungible tokens, pointing to the contract address alone is not enough, as different tokens might have different values, rights, rewards etc. This EIP proposes a new ENS resolver for ERC721's tokenID field. This allows the Ethereum Name Service to address _a single non-fungible token_ within an ERC721 token contract of many unique tokens.
+
+## Abstract
+
+<!--A short (~200 word) description of the technical issue being addressed.-->
+
+One deployed ERC721 contract can have more than one non fungible tokens. Tokens are addressed by an unsigned 256bit integer, tokenID. This EIP proposes and extra value, `tokenID`, that can be included in an ENS resolver contract, to allow for ENS names to resolve to a specific non fungible token within a given ERC721 contract.
+
+This makes it possible to have ENS domains like `bugcat.cryptokitties.eth` and `dragon.cryptokitties.eth` resolve to both the CryptoKitties contract address and the tokenID of the non-fungible kitty within it. This addition would make NFTs addressable with the Ethereum Name Service.
+
+## Motivation
+
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+
+Non Fungible Tokens are meant to be globally unique, it makes sense to be able to name them. Giving NFTs names makes them more real to the non Ethereum enthusiast that doesn't understand what a contract address it. A domain name is already widely understood to be a finite resource, and as such, would help convey the scarcity that is a non-Fungible token to new users.
+
+This change might also to an extent, decentralise the access to non-fungibles on Ethereum. Currently, the mapping for a human readable name to an NFT is kept off chain, typically on the platform of the NFT issuer. However, if the community moved towards naming NFTs on chain, using ENS, this would allow any client that supports ENS resolution to resolve a name to an NFT, rather than just the issuer.
+
+## Specification
+
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+
+The additional ENS Resolver Profile specified by this EIP would add two new functions to a deployed resolver contract:
+
+```
+    function tokenID(bytes32 node) public view returns(uint256);
+    function setTokenID(bytes32 node, uint256 token);
+```
+
+Those evaluating this resolver can identify whether the resolver supports this EIP by using the ERC165 standard `supportsInterface(bytes4)`.
+
+    The interface identifier for this interface is `0x4b23de55`.
+
+## Rationale
+
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
+The design of this smart contract is a modified replica of the [existing contenthash resolver profile](https://github.com/ensdomains/resolvers/blob/master/contracts/profiles/ContentHashResolver.sol).
+
+## Backwards Compatibility
+
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+
+No backwards compatibility issues arise. Users wanting to address NFTs will have to deploy new ENS resolvers themselves, or use the provided one above.
+
+## Implementation
+
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
+I propose the following code as a sample implementation of this proposed `tokenId` resolver:
+
+```solidity
+pragma solidity ^0.5.8;
+
+import "../ResolverBase.sol";
+
+contract TokenIDResolver is ResolverBase {
+    bytes4 constant private TOKENID_INTERFACE_ID = 0x4b23de55;
+
+    event TokenIDChanged(bytes32 indexed node, uint256 tokenID);
+
+    mapping(bytes32=>uint256) _tokenIDs;
+
+    /**
+     * Returns the tokenID associated with an ENS node.
+     * @param node The ENS node to query.
+     * @return The associated tokenID.
+     */
+    function tokenID(bytes32 node) public view returns(uint256) {
+        return _tokenIDs[node];
+    }
+
+    /**
+     * Sets the tokenID associated with an ENS node.
+     * May only be called by those authorised for this node in the ENS registry.
+     * @param node The node to update.
+     * @param token The tokenID to set
+     */
+    function setTokenID(bytes32 node, uint256 token) public authorised(node) {
+        emit TokenIDChanged(node, token);
+        _tokenIDs[node] = token;
+    }
+
+    function supportsInterface(bytes4 interfaceID) public pure returns(bool) {
+        return interfaceID == TOKENID_INTERFACE_ID || super.supportsInterface(interfaceID);
+    }
+}
+```
+
+A fork of the [ens/resolvers](https://github.com/ensdomains/resolvers) repo with the change is available, [here](https://github.com/OisinKyne/resolvers/blob/master/contracts/profiles/TokenIDResolver.sol)
+
+A version of the contract is deployed on the Rinkeby testnet, here: [0xEA8E43D980C8c9980Cc3fA8f9666E8993cAe498f](https://rinkeby.etherscan.io/address/0xea8e43d980c8c9980cc3fa8f9666e8993cae498f)
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
