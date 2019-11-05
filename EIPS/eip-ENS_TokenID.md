@@ -15,7 +15,7 @@ requires (*optional): EIP137
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-TL;DR: This EIP makes ERC721 Non-Fungible Tokens addressable by the Ethereum Name Service by adding a new resolver profile, `uint256 tokenID()`.
+_TL;DR_: This EIP makes ERC721 Non-Fungible Tokens addressable by the Ethereum Name Service by adding a new resolver profile, `uint256 tokenID()`.
 
 For fungible tokens, like ERC20, resolving an ENS name to a token contract address alone makes sense, because each token is indistinguishable from another. For non-fungible tokens, pointing to the contract address alone is not enough, as different tokens might have different values, rights, rewards etc. This EIP proposes a new ENS resolver for ERC721's tokenID field. This allows the Ethereum Name Service to address _a single non-fungible token_ within an ERC721 token contract of many unique tokens.
 
@@ -46,9 +46,9 @@ The additional ENS Resolver Profile specified by this EIP would add two new func
     function setTokenID(bytes32 node, uint256 token);
 ```
 
-Those evaluating this resolver can identify whether the resolver supports this EIP by using the ERC165 standard `supportsInterface(bytes4)`.
+You can evaluate whether a given ENS resolver supports this EIP by using the ERC165 standard `supportsInterface(bytes4)`.
 
-    The interface identifier for this interface is `0x4b23de55`.
+The interface identifier for this interface is `0x4b23de55`.
 
 ## Rationale
 
