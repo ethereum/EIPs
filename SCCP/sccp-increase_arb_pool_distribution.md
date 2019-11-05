@@ -1,9 +1,9 @@
 ---
-sccp: <to be assigned>
+sccp: 5
 title: Increase Arb Pool Distribution to 5%
 author: Kain Warwick (@kaiynne)
-discussions-to: <Discord Channel>
-status: WIP
+discussions-to: https://discordapp.com/invite/aApjG26
+status: Proposed
 created: 2019-11-05
 ---
 
