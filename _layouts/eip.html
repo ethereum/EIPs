@@ -22,6 +22,9 @@ layout: default
       <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
     {% endif %}
     <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
+    {% if page.updated != undefined %}
+    <tr><th>Updated</th><td>{{ page.updated | xml_escape }}</td></tr>
+    {% endif %}
     {% if page.requires != undefined %}
       <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
     {% endif %}
