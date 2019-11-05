@@ -35,7 +35,7 @@ Due to the way Ethereum handles nonces, all transactions from a single account h
 In `Synthetix.sol`:
 
 - Add a new public `address` property on `Synthetix` called `gasLimitOracle`
-- Add a new `onlyOwner` setter function to mutate the `gasLimitController` called `setGasLimitOracle`
+- Add a new `onlyOwner` setter function to mutate the `setGasLimitOracle` called `setGasLimitOracle`
 - Modify `setGasPriceLimit()`, removing the `onlyOracle` modifier and adding a `require(msg.sender == gasLimitOracle)`
 
 ## Rationale
