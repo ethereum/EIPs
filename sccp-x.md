@@ -5,10 +5,10 @@ author: <a list of the author's or authors' name(s) and/or username(s), or name(
 discussions-to: <Discord Channel>
 status: WIP
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <SIP number(s)>
+requires (*optional): <SIP/SCCP number(s)>
 ---
 
-<!--You can leave these HTML comments in your merged SIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new SCCPs. Note that an SCCP number will be assigned by an editor. When opening a pull request to submit your SCCP, please use an abbreviated title in the filename, `sccp-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+<!--You can leave these HTML comments in your merged SCCP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new SCCPs. Note that an SCCP number will be assigned by an editor. When opening a pull request to submit your SCCP, please use an abbreviated title in the filename, `sccp-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 This is the template for SCCPs.
 
 Note that an SCCP number will be assigned by an editor. When opening a pull request to submit your SCCP, please use an abbreviated title in the filename, `sccp-draft_title_abbrev.md`.
