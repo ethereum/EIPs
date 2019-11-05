@@ -13,7 +13,7 @@ Reduce Ratio Fee Claim Buffer
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-An aspect of the system that allows users to remain undercollateralised indefinitely is the c-ratio buffer. This was initially required to avoid users being slashed by rapid price drops in SNX when the original mechanism reduced fees by 25%+ if a user claimed while undercollateralised. Given that now a user will only have a tx fail, the need for this buffer to be so large has been removed. By changing the buffer to 1% we should see relatively few failed claims due to SNX price shifts, while raising the global c-ratio by 10% during times of SNX price decline.
+An aspect of the system that allows users to remain undercollateralised indefinitely is the c-ratio buffer. This was initially required to avoid users being slashed by rapid price drops in SNX when the original mechanism reduced fees by 25%+ if a user claimed while undercollateralised. Given that now a user will only have a tx fail, the need for this buffer to be so large has been removed. By changing the buffer to 2% we should see relatively few failed claims due to SNX price shifts, while raising the global c-ratio by 10% during times of SNX price decline.
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
