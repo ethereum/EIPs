@@ -1,4 +1,4 @@
-  ---
+---
 sip: 26
 title: Max Gas on token fallback
 status: Approved
