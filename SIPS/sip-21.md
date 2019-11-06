@@ -11,7 +11,7 @@ created: 2019-10-17
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Double the exchange fee rate on any swing trade. That is any move to or from an "s" Synth to an "i" Synth. e.g. sTRX <> iTRX
+Double the exchange fee rate on any swing trade. That is any move to or from an `s` Synth to an `i` Synth. e.g. `sTRX` <> `iBTC` or `iETH` <> `sBNB`. The one Synth excluded from this is `sUSD` - moving in or out of `sUSD` will _not_ double the fee.
 
 ## Abstract
 
@@ -31,15 +31,17 @@ There is already a leveraged benefit on the inverse Synths and currently being a
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-- In Synthetix.exchange() detect a swing trade, that is any exchange to or from any synth beginning with s or i.
-- Double the ExchangeRates.exchangeFeeRate()
+- In `Synthetix.exchange()` detect a swing trade, that is any exchange to or from any synth beginning with s or i.
+- Double the `ExchangeRates.exchangeFeeRate()`
 
 The normal exchange fee rate is 30 bips. It is currently 50 bips which would make the swing trade 100 bips. When it is restored to 30 bips it would then only be 60 bips on a swing trade.
 
-This is only a temporary stop-gap until either 
-- the full implementation of sip-12 is rolled out which should reduce the lag opportunity on price updates 
-- or the implementation of the chainlink + exchange order queue 
-then I propose to remove this doubled exchange fee on going short <> long. 
+This is only a temporary stop-gap until either:
+
+- the full implementation of [sip-12](./sip-12.md) is rolled out which should reduce the lag opportunity on price updates
+- or the implementation of the chainlink + exchange order queue ([proposed in this issue](https://github.com/Synthetixio/synthetix/issues/298))
+
+Once one of the above is implemented, then I propose to remove this exchange fee doubling mechanism.
 
 ## Test Cases
 
@@ -49,7 +51,7 @@ then I propose to remove this doubled exchange fee on going short <> long.
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-https://github.com/Synthetixio/synthetix/commit/05c42daefb282a49f791e7e626e10cf1f8352f36
+https://github.com/Synthetixio/synthetix/commit/4022200fbe82ff25f6113993dc3bc84c442240c1
 
 ## Copyright
 
