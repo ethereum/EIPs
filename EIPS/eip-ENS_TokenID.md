@@ -17,15 +17,15 @@ requires (*optional): EIP137
 
 _TL;DR_: This EIP makes ERC721 Non-Fungible Tokens addressable by the Ethereum Name Service by adding a new resolver profile, `uint256 tokenID()`.
 
-_Slightly longer TL;DR_: For fungible tokens, like ERC20, resolving an ENS name to a token contract address alone makes sense, because each token in the contract is indistinguishable from another. For non-fungible tokens, pointing to the contract address alone is not enough, as tokens within the contract are meant to be unique and distinguishable. Non Fungibles might have different valuations, might grant the holder different rights or rewards etc.
+_Slightly longer TL;DR_: It makes sense to resolve an ENS name to a contact address for fungible tokens such as ERC20, as each token in the contract is indistinguishable from another. However, for non-fungible tokens, pointing to the contract address alone is not enough, as tokens within the contract are meant to be unique and distinguishable. Non-fungibles might have different valuations, might grant the holder different rights or rewards etc.
 
-This EIP proposes a new ENS resolver for ERC721's tokenID field. This allows the Ethereum Name Service to address _a single non-fungible token_ within an ERC721 token contract of many tokens.
+This EIP proposes a new ENS resolver for ERC721's tokenID field. This allows the Ethereum Name Service to address a single non-fungible token within an ERC721 token contract of many tokens.
 
 ## Abstract
 
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-One deployed ERC721 contract can have more than one non fungible tokens. Tokens are addressed by an unsigned 256bit integer, tokenID. This EIP proposes and extra getter and setter, `tokenID()` and `setTokenID()`, that can be included in an ENS resolver contract, to allow for ENS names to resolve to a specific non fungible token within a given ERC721 contract.
+A single deployed ERC721 contract can contain multiple non-fungible tokens. Tokens are addressed by an unsigned 256bit integer, tokenID. This EIP proposes an extra getter and setter, `tokenID()` and `setTokenID()`, that can be included in an ENS resolver contract, to allow for ENS names to resolve to a specific non fungible token within a given ERC721 contract.
 
 This makes it possible to have ENS domains like `bugcat.cryptokitties.eth` and `dragon.cryptokitties.eth` resolve to both the CryptoKitties contract address and the tokenID of the non-fungible kitty within it.
 
@@ -33,9 +33,9 @@ This makes it possible to have ENS domains like `bugcat.cryptokitties.eth` and `
 
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-Non Fungible Tokens are meant to be globally unique, it makes sense to be able to name them. Giving NFTs names makes them more real to the non Ethereum enthusiast that doesn't understand what a contract address or tokenID is. A domain name in the existing web 2.0 world is already widely understood to be a finite resource, and as such, would help convey the scarcity that is a non-Fungible token to new users.
+Non-fungible Tokens are meant to be globally unique, it makes sense to be able to name them. Giving NFTs names makes them more real to the non Ethereum enthusiast that doesn't understand what a contract address or tokenID is. A domain name in the existing web 2.0 world is already widely understood to be a finite resource, and as such, would help convey the scarcity that is a non-Fungible token to new users.
 
-This change might also to an extent, decentralise the access to non-fungibles on Ethereum. Currently, the mapping for a human readable name to an NFT is kept off chain, typically on the platform of the NFT issuer. However, if the community moved towards naming NFTs on chain, using ENS, this would allow any client that supports ENS resolution to resolve a name to an NFT, rather than just the issuer with the off-chain mapping of names to tokens.
+This change might also to an extent, decentralise access to non-fungibles on Ethereum. Currently, the mapping for a human readable name to an NFT is kept off chain, typically on the platform of the NFT issuer. However, if the community moved towards naming NFTs on chain, using ENS, this would allow any client that supports ENS resolution to resolve a name to an NFT, rather than just the issuer with the off-chain mapping of names to tokens.
 
 ## Specification
 
