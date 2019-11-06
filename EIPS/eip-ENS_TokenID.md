@@ -112,7 +112,7 @@ A fork of the [ens/resolvers](https://github.com/ensdomains/resolvers) repo with
 
 The ENS public resolver contract, with this new added profile, has been deployed and verified on etherscan on the following chains:
 
-- Rinkeby testnet: [0x5792E9C312F764E58E213C7c5621C1CD8D63b925](https://rinkeby.etherscan.io/address/0x5792e9c312f764e58e213c7c5621c1cd8d63b925)
+- Rinkeby Testnet: [0x5792E9C312F764E58E213C7c5621C1CD8D63b925](https://rinkeby.etherscan.io/address/0x5792e9c312f764e58e213c7c5621c1cd8d63b925)
 - Ropsten Testnet: [0xfDaBbe9d850a6D8a0821236c39853F6d0b276484](https://ropsten.etherscan.io/address/0xfdabbe9d850a6d8a0821236c39853f6d0b276484)
 - Mainnet: [0x888aB947Cb7135DC25D4936E9a49b4e2bcDEa467](https://etherscan.io/address/0x888ab947cb7135dc25d4936e9a49b4e2bcdea467)
 
