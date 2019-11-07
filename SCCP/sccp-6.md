@@ -3,7 +3,7 @@ sccp: 6
 title: Reduce Claim Buffer
 author: Kain Warwick (@kaiynne)
 discussions-to: https://github.com/Synthetixio/synthetix/issues/296
-status: Proposed
+status: Approved
 created: 2019-11-05
 ---
 
