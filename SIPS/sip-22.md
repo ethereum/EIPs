@@ -1,7 +1,7 @@
 ---
 sip: 22
 title: Add sDEFI Synth
-status: Approved
+status: Proposed
 author: Garth Travers (@garthtravers)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
