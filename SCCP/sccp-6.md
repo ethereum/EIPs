@@ -27,7 +27,7 @@ Users will now need to be above 742.5742574257% to be able to call claimFees.
 
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
-The buffer was implemented as a protection mechanism for slashing of fees, as fee slashing is no longer implemented there is no need for this buffer. We will keep a small 2% buffer to ensure that small price fluctuations do not lead to high fee claim failure rates.
+The buffer was implemented as a protection mechanism for slashing of fees, as fee slashing is no longer implemented there is no need for this buffer. We will keep a small 1% buffer to ensure that small price fluctuations do not lead to high fee claim failure rates.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
