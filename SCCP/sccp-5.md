@@ -3,7 +3,7 @@ sccp: 5
 title: Increase Arb Pool Distribution to 5%
 author: Kain Warwick (@kaiynne)
 discussions-to: https://discordapp.com/invite/aApjG26
-status: Proposed
+status: Approved
 created: 2019-11-05
 ---
 
