@@ -1,7 +1,7 @@
 ---
 sip: 26
 title: Max Gas on token fallback
-status: Approved
+status: Implemented
 author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/3uJ5rAy
 
@@ -44,21 +44,12 @@ In `TokenFallbackCaller.sol`:
 uint gasLimit = gasleft() < MAX_GAS_SUB_CALL ? gasleft() : MAX_GAS_SUB_CALL;
 recipient.call.gas(gasLimit)(abi.encodeWithSignature("tokenFallback(address,uint256,bytes)", sender, amount, data));
 
-## Rationale
-
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-
-
-## Test Cases
-
-<!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-
-
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-
+https://github.com/Synthetixio/synthetix/blob/v2.12.2/contracts/ExternStateToken.sol#L134
+https://github.com/Synthetixio/synthetix/blob/v2.12.2/contracts/TokenFallbackCaller.sol#L52
 
 ## Copyright
 
