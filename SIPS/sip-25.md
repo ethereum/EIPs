@@ -1,7 +1,7 @@
 ---
 sip: 25
 title: Decouple Gas Limiter from Oracle
-status: Approved
+status: Implemented
 author: Justin J. Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
@@ -47,12 +47,12 @@ I propose modifying `Synthetix.sol` rather than moving the limiter into `Exchang
 ## Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-
-Test cases will be included with the implementation.
+https://github.com/Synthetixio/synthetix/blob/v2.12.2/test/Synthetix.js#L2611
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+https://github.com/Synthetixio/synthetix/blob/v2.12.2/contracts/Synthetix.sol#L158
 
 > The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
 
