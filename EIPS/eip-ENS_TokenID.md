@@ -17,7 +17,7 @@ requires (*optional): EIP137
 
 _TL;DR_: This EIP makes ERC721 Non-Fungible Tokens addressable by the Ethereum Name Service by adding a new resolver profile, `uint256 tokenID()`.
 
-_Slightly longer TL;DR_: It makes sense to resolve an ENS name to a contact address for fungible tokens such as ERC20, as each token in the contract is indistinguishable from another. However, for non-fungible tokens, pointing to the contract address alone is not enough, as tokens within the contract are meant to be unique and distinguishable. Non-fungibles might have different valuations, might grant the holder different rights or rewards etc.
+_Slightly longer TL;DR_: It makes sense to resolve an ENS name to a contract address for fungible tokens such as ERC20, as each token in the contract is indistinguishable from another. However, for non-fungible tokens, pointing to the contract address alone is not enough, as tokens within the contract are meant to be unique and distinguishable. Non-fungibles might have different valuations, might grant the holder different rights or rewards etc.
 
 This EIP proposes a new ENS resolver for ERC721's tokenID field. This allows the Ethereum Name Service to address a single non-fungible token within an ERC721 token contract of many tokens.
 
