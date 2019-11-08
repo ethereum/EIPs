@@ -116,6 +116,13 @@ The ENS public resolver contract, with this new added profile, has been deployed
 - Ropsten Testnet: [0xfDaBbe9d850a6D8a0821236c39853F6d0b276484](https://ropsten.etherscan.io/address/0xfdabbe9d850a6d8a0821236c39853f6d0b276484)
 - Mainnet: [0x888aB947Cb7135DC25D4936E9a49b4e2bcDEa467](https://etherscan.io/address/0x888ab947cb7135dc25d4936e9a49b4e2bcdea467)
 
+To test this, I have set [this](https://etherscan.io/address/0x888ab947cb7135dc25d4936e9a49b4e2bcdea467) new resolver contract on mainnet to resolve [`devcon5.oisin.eth`](https://etherscan.io/enslookup?q=devcon5.oisin.eth) to my Devcon Ticket Non-Fugible.
+
+The address it resolves to is:
+[0x22cc8b3666e926bcbf58cb726143b2b044c80a0c](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c), which is the [contract address](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c) of all 91 tokens issued.
+And the `tokenID()` function should return:
+[10798952828109286844408842969080375883371044426718767566816061252817119618319](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c?a=10798952828109286844408842969080375883371044426718767566816061252817119618319), which is _my_ Non Fungible within that contract, hopefully illustrating this EIPs usefulness. :)
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
