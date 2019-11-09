@@ -11,10 +11,10 @@ created: 2019-04-30
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-This document outlines a standard interface to propose, vote on, and distribute grants.
+This document outlines a standard interface to propose, fund, and distribute grants.
 
 ## Abstract
-This standard specifies a way for Ethereum users to propose, vote on, and manage the distribution of grants. It allows for multiple grant recipients to be listed and receive rewards through one smart contract. The author of the contract may specify certain conditions such as requiring atomic grants (i.e. raise all or none), a voting threshold with Ether or other tokens, and grant manager(s) that can release funds over time.
+This standard specifies a way for Ethereum users to propose, fund, and manage the distribution of grants. It allows for multiple grant recipients to be listed and receive rewards through one smart contract. The author of the contract may specify certain conditions such as requiring atomic grants (i.e. raise all or none), funding expirations, and grant manager(s) that can release funds over time.
 
 
 ## Motivation
@@ -54,7 +54,7 @@ struct Donor {
 ### Getter Methods
 
 #### manager
-Returns the multisig, EOA (External Owned Account), or other address responsible for managing the grant. 
+Returns the multisig, EOA (Externally Owned Account), or other address responsible for managing the grant.
 ```
 function manager() public view returns(address)
 ```
@@ -143,7 +143,7 @@ function canFund() public view returns(bool);
 
 #### constructor
 
-Grants are initialized on creation using the constructor. 
+Grants are initialized on creation using the constructor.
 
 ```{sol}
 constructor(
@@ -162,7 +162,7 @@ constructor(
 #### fund
 Fund a grant proposal. `value` in WEI or ATOMIC_UNITS to fund.
 
-NOTE: This method is not `payable`. When funding with Ether, use fallback function to dispatch the `fund` method. 
+NOTE: This method is not `payable`. When funding with Ether, use fallback function to dispatch the `fund` method.
 ```
 function fund(uint256 value) public returns (bool);
 ```
@@ -272,7 +272,7 @@ The interface separates `signaling` from `voting`. Signals have no impact on the
 The standard further delegates `voting` on payouts/refunds to the `manager` which can be an EOA or Contract (e.g. Multisig contract as `manager` or a DAO (Distributed Autonomous Organization) contract such as Moloch acting as `manager`). See discussion with [@NickSzabo4](https://twitter.com/NickSzabo4/) and [@ameensol](https://twitter.com/ameensol)
 
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">On-chain pools bring additional trust-minimization properties to cash distributions above doing a bunch of simple 1-to-1 payments. For example prevents payor from discriminating between payees: once sufficient funds are in the pool everybody gets their cash flow.</p>&mdash; Nick Szabo 🔑 (@NickSzabo4) <a href="https://twitter.com/NickSzabo4/status/1173281662718726145?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote> 
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">On-chain pools bring additional trust-minimization properties to cash distributions above doing a bunch of simple 1-to-1 payments. For example prevents payor from discriminating between payees: once sufficient funds are in the pool everybody gets their cash flow.</p>&mdash; Nick Szabo 🔑 (@NickSzabo4) <a href="https://twitter.com/NickSzabo4/status/1173281662718726145?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote>
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">You&#39;re right, I should have been more general. The grants *standard* defines the minimum set of functions for pooling resources. Our reference implementation chose &quot;grantees can be cut off&quot;. But you could write the function your way and prevent additional categories of abuse. <a href="https://t.co/eNk6YmRPLH">pic.twitter.com/eNk6YmRPLH</a></p>&mdash; Ameen Soleimani 👹 (@ameensol) <a href="https://twitter.com/ameensol/status/1173317866801770496?ref_src=twsrc%5Etfw">September 15, 2019</a></blockquote>
 
@@ -285,7 +285,7 @@ The current interface supports managed and unmanaged grants (unmanaged being a c
 
 The interface focused on requesting funds, funding, releasing / refunding funds. All other responsibilities are left out of the standard.
 
-Multiple grants are not handled within the standard and are instead managed using a factory contract. See the [reference implementation](https://github.com/NoahMarconi/grant-contracts/) for an example. 
+Multiple grants are not handled within the standard and are instead managed using a factory contract. See the [reference implementation](https://github.com/NoahMarconi/grant-contracts/) for an example.
 
 
 
