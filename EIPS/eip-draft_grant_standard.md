@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Grant Standard
 author: Arnaud Brousseau (@ArnaudBrousseau), James Fickel (@JFickel), Noah Marconi (@NoahMarconi), Ameen Soleimani (@ameensol)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/issues/2367
 status: Draft
 type: Standards Track
 category: ERC
