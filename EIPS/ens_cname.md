@@ -67,11 +67,11 @@ getAddr(name):
     queried  = []
     resolver = ens.resolver(cname)
     while !resolver.supportsInterface(ADDR):
-        if resolver.supportsInterface(CNAME):
-            cname = resolver.cname(cname)
-            if queried.has(cname): throw(“no loops”)
-            queried.push(cname)
-            resolver = ens.resolver(cname)
+        if resolver.supportsInterface(CNAME): throw(“no addr”)
+        cname = resolver.cname(cname)
+        if queried.has(cname): throw(“no loops”)
+        queried.push(cname)
+        resolver = ens.resolver(cname)
     return resolver.addr(cname)
 ```
 
