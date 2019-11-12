@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: ENS support for canonical names
 author: Ilan Olkies (@ilanolkies)
-discussions-to: <to be assigned>
+discussions-to: https://discuss.ens.domains/t/new-standard-proposal-ens-cname-support/1236
 status: Draft
 type: Standards Track
 category: ERC
