@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2375
 title: ENS support for canonical names
 author: Ilan Olkies (@ilanolkies)
 discussions-to: https://discuss.ens.domains/t/new-standard-proposal-ens-cname-support/1236
