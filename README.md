@@ -17,7 +17,7 @@ Your first PR should be a first draft of the final EIP. It must meet the formatt
 
 If your EIP requires images, the image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
 
-Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your Github username or your email address inside <triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
+Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your GitHub username or your email address inside <triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
 
 When you believe your EIP is mature and ready to progress past the draft phase, you should do one of two things:
 
@@ -48,7 +48,7 @@ eip_validator <INPUT_FILES>
 
 # Automerger
 
-The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can Github approve the change to have it auto-merged by the [eip-automerger](https://github.com/eip-automerger/automerger) bot.
+The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can GitHub approve the change to have it auto-merged by the [eip-automerger](https://github.com/eip-automerger/automerger) bot.
 
 # Local development
 
@@ -86,4 +86,4 @@ $ bundle exec jekyll serve
 
 2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
-More information on Jekyll and Github pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+More information on Jekyll and GitHub pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
