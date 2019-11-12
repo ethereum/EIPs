@@ -121,7 +121,13 @@ To test this, I have set [this](https://etherscan.io/address/0x888ab947cb7135dc2
 The address it resolves to is:
 [0x22cc8b3666e926bcbf58cb726143b2b044c80a0c](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c), which is the [contract address](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c) of all 91 tokens issued.
 And the `tokenID()` function should return:
-[10798952828109286844408842969080375883371044426718767566816061252817119618319](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c?a=10798952828109286844408842969080375883371044426718767566816061252817119618319), which is _my_ Non Fungible within that contract, hopefully illustrating this EIPs usefulness. :)
+[10798952828109286844408842969080375883371044426718767566816061252817119618319](https://etherscan.io/token/0x22cc8b3666e926bcbf58cb726143b2b044c80a0c?a=10798952828109286844408842969080375883371044426718767566816061252817119618319) when you supply it with a node of `0x0532eb949a568331eccfc0b70427e8aa96bcbfcc747607711bd04275323a1b49` (which is the namehash of `devcon5.oisin.eth`), which is _my_ Non Fungible within that contract, hopefully illustrating this EIPs usefulness. :)
+
+## Further Questions
+
+### Can I use this EIP for my other token standard that uses a uint256 to address tokens?
+
+Yes, I have no problem using this resolver for any token contract that addresses individual tokens with a `uint256` number. However, I would ask that you formalise the adoption of this resolver for your token contract in an EIP and reference this EIP in it.
 
 ## Copyright
 
