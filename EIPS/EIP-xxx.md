@@ -31,8 +31,8 @@ The requirements for **Eligible for Inclusion** is that the AllCoreDevs, represe
 
  - Are positive towards the EIP,
  - Would accept (well written) PRs to include the EIP into the codebase.
-    -So that it could be toggled on for testing…
-    -…but not with an actual block number for activation
+    - So that it could be toggled on for testing…
+    - …but not with an actual block number for activation
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
@@ -54,14 +54,15 @@ Development of clear specifications and pull requests to existing Ethereum Clien
 
 ## Rationale
 
- **EIP Number**
- **Title**
- **Pipeline Status**
-  - Show the current status in the context of the EIP centric model. The list is sorted by furthest along in the process.
- **Date of Initial Decision**
-  - Date of the initial decision for Eligibility for Inclusion
- **REF**
-  - Link to the decision on the AllCoreDevs Notes
+**EIP Number**
+
+**Title**
+
+**Pipeline Status** : Show the current status in the context of the EIP centric model. The list is sorted by furthest along in the process.
+
+**Date of Initial Decision** : Date of the initial decision for Eligibility for Inclusion
+
+**REF** : Link to the decision on the AllCoreDevs Notes
 
 
 ## References
