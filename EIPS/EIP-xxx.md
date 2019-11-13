@@ -27,7 +27,7 @@ The pipeline for Core EIPs, per the EIP-Centric upgrade model, is as follows.
 
 This EIP documents all EIPs marked as **Eligible For Inclusion** by the All Core Devs. Typically to reach this stage, an EIP must be discussed in brief on an AllCoreDevs Call and motioned by rough consenses to be moved to this stage. Any additions to this list are required to provide a link to the meeting notes when this discussion and decision took place.
 
-The requirments for **Eligible for Inclusion** is that the AllCoreDevs, representing the major clients and ecosystem stakeholders etc:
+The requirements for **Eligible for Inclusion** is that the AllCoreDevs, representing the major clients and ecosystem stakeholders etc:
 
  - Are positive towards the EIP,
  - Would accept (well written) PRs to include the EIP into the codebase.
@@ -37,11 +37,11 @@ The requirments for **Eligible for Inclusion** is that the AllCoreDevs, represen
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-Development of clear specifications and pull requests to existing Ethereum Clients is a large investment of time and resources. The state of *Eligible for Inclusion* is a signal from the Ethereum Core Developers to an EIP Author validiating the idea behind an EIP and  confirms investing their time further pursing it is worthwile.
+Development of clear specifications and pull requests to existing Ethereum Clients is a large investment of time and resources. The state of *Eligible for Inclusion* is a signal from the Ethereum Core Developers to an EIP Author validiating the idea behind an EIP and  confirms investing their time further pursing it is worthwhile.
 
 ## Specification
 
-| EIP      | Title                              | Pipeline Status | Date of Inital Decision | REF |
+| EIP      | Title                              | Pipeline Status | Date of Initial Decision | REF |
 | -------- | ----------------------------------------------------- | -------- | ---------- | ---- | 
 | EIP-663  | Unlimited SWAP and DUP instructions                   | ELIGIBLE | 2019-11-01 | [🔗](https://github.com/ethereum/pm/blob/master/All%20Core%20Devs%20Meetings/Meeting%2074.md) |
 | EIP-1380 | Reduced gas cost for call to self                     | ELIGIBLE | 2019-11-01 | [🔗](https://github.com/ethereum/pm/blob/master/All%20Core%20Devs%20Meetings/Meeting%2074.md) |
@@ -58,7 +58,7 @@ Development of clear specifications and pull requests to existing Ethereum Clien
  **Title**
  **Pipeline Status**
   - Show the current status in the context of the EIP centric model. The list is sorted by furthest along in the process.
- **Date of Inital Decision**
+ **Date of Initial Decision**
   - Date of the initial decision for Eligibility for Inclusion
  **REF**
   - Link to the decision on the AllCoreDevs Notes
@@ -66,7 +66,7 @@ Development of clear specifications and pull requests to existing Ethereum Clien
 
 ## References
 
- - Inital EIP Centric Forking Model Proposal bu @holiman - https://notes.ethereum.org/@holiman/S1ELAYY7S?type=view
+ - EIP Centric Forking Model Proposal by @holiman - https://notes.ethereum.org/@holiman/S1ELAYY7S?type=view
 
 
 
