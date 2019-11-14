@@ -1,7 +1,7 @@
 ---
-eip: 1254
+eip: xxxx
 title: Pull Oracle Interface
-author: Alliance of Decentralized Oracles
+author: Alliance of Decentralized Oracles (l.loya.b@gmail.com)
 discussions-to: https://github.com/ethereum/EIPs/issues/
 status: DRAFT
 type: Standards Track
@@ -11,7 +11,7 @@ created: 2019-11-06
 
 ## Simple Summary
 
-A standard interface for pull oracles.
+A standard interface for pull oracles for pricing/numeric data.
 
 ## Abstract
 
@@ -67,10 +67,10 @@ The pull-based interface specs:
 
 ```solidity
 interface Oracle {
-function resultIntFor(bytes32 id) external view returns (uint timestamp, int outcome);
-function resultUintFor(bytes32 id) external view returns (uint timestamp,uint outcome);
-function resultUintArrayFor(bytes32 id) external view returns (uint timestamp, uint[] outcome);
-function resultBytesFor(bytes32 id) external view returns (uint timestamp, bytes32 outcome);
+function resultIntFor(bytes32 id) external view returns (uint timestamp, int outcome, int status);
+function resultUintFor(bytes32 id) external view returns (uint timestamp,uint outcome, uint status);
+function resultUintArrayFor(bytes32 id) external view returns (uint timestamp, uint[] outcome, uint[] status);
+function resultBytesFor(bytes32 id) external view returns (uint timestamp, bytes32 outcome, uint status);
 }
 ```
 
