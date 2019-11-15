@@ -58,6 +58,10 @@ The interface identifier for this interface is `0x4b23de55`.
 
 The design of this smart contract is a modified replica of the [existing contenthash resolver profile](https://github.com/ensdomains/resolvers/blob/master/contracts/profiles/ContentHashResolver.sol).
 
+The decision to use Contract Address and tokenID as a pair to uniquely identify ERC721 NFTs is lifted directly from the [EIP721 Rationale](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md#rationale) quoted here:
+
+    Every NFT is identified by a unique uint256 ID inside the ERC-721 smart contract. This identifying number SHALL NOT change for the life of the contract. The pair (contract address, uint256 tokenId) will then be a globally unique and fully-qualified identifier for a specific asset on an Ethereum chain.
+
 ## Backwards Compatibility
 
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
