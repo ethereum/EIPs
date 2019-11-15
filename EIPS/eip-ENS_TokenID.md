@@ -129,6 +129,14 @@ And the `tokenID()` function should return:
 
 Yes, I have no problem using this resolver for any token contract that addresses individual tokens with a `uint256` number. However, I would ask that you formalise the adoption of this resolver for your token contract in an EIP and reference this EIP in it.
 
+### How do you know when to check if an ENS name supports this EIP?
+
+To make sure everything is as expected, it would be good to check that:
+
+- The resolver contract for a given ENS name supports this EIP's interface (`0x4b23de55`)
+- The contract address pointed at by the resolver of an ENS name implements ERC721 (Interface ID of: `0x80ac58cd`)
+- One specific edge case to be aware of. In the ERC721 spec, a `tokenID` of 0 is a valid identifier of a token. If an ENS name uses this new resolver contract, but doesn't set a `tokenID` value, this field will default to 0, which implicitly is a valid `tokenID`. If an ERC721 contract owner wants to address their contract with an ENS name, but does not want to address any specific token within it, they should use a resolver contract without this EIP included, to avoid the case where an ENS resolver infers that this name is to point to `tokenID` 0 within the contract, which may or may not exist. The alternative for this edge case would be to make this EIP require that `tokenID` be non-zero to be valid, but this would make specific tokens with `tokenID` of 0 not addressable by this EIP, which would not be ideal, considering they are compliant tokens in the 721 spec.
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
