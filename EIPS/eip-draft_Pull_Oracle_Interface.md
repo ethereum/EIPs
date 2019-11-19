@@ -11,7 +11,7 @@ created: 2019-11-06
 
 ## Simple Summary
 
-A standard interface for pull oracles for pricing/numeric data.
+A standard interface for numeric pull oracles.
 
 ## Abstract
 
@@ -25,7 +25,7 @@ The Ethereum ecosystem currently has many different oracle implementations avail
 
 
 ## Background
-EIP 1154, for standardizing an oracle interface, was not widely adopted and abandoned as too early. However, this new proposal is a cooperation between current oracle systems and direct users of these. The specification below reflects this collaboration and addresses the main reason why 1154 was not successful.
+EIP 1154, for standardizing an oracle interface, was not widely adopted and abandoned as too early and specificaly too broad/general to provide any efficiency gains. This new proposal is a cooperation between current oracle systems and direct users of these. The specification below reflects this collaboration and addresses the main reason why 1154 was not successful.
 
 Link:  https://eips.ethereum.org/EIPS/eip-1154
 
@@ -67,10 +67,10 @@ The pull-based interface specs:
 
 ```solidity
 interface Oracle {
-function resultIntFor(bytes32 id) external view returns (uint timestamp, int outcome, int status);
-function resultUintFor(bytes32 id) external view returns (uint timestamp,uint outcome, uint status);
-function resultUintArrayFor(bytes32 id) external view returns (uint timestamp, uint[] outcome, uint[] status);
-function resultBytesFor(bytes32 id) external view returns (uint timestamp, bytes32 outcome, uint status);
+function resultFor(bytes32 id) external view returns (uint timestamp, int outcome, int status);
+function resultFor(bytes32 id) external view returns (uint timestamp,uint outcome, uint status);
+function resultFor(bytes32 id) external view returns (uint timestamp, uint[] outcome, uint[] status);
+function resultFor(bytes32 id) external view returns (uint timestamp, bytes32 outcome, uint status);
 }
 ```
 
@@ -88,9 +88,6 @@ function whatIsBytes32ID (bytes32 _id) public returns(string _description);
 function whatIsStringID (string _description) public returns(bytes32 _id);
 }
 ```
-
-Consumers MUST coordinate with oracles to determine how to encode/decode results to and from `bytes`. For example, `abi.encode` and `abi.decode` may be used to implement a codec for results in Solidity. `receiveResult` SHOULD revert if the consumer receives an unexpected result format from the oracle.
-
 
 ## Rationale
 Currently deployed contracts require oracles and individual companies to build specific adapters for each implementation. Future builds by both oracle adapters and new companies can create a world where oracles are interchangeable.  Diversity in oracle technology paired with oracle implementations being interchangeable can drastically increase security of oracle consumers since attacks on oracles can be minimized by projects utilizing multiple oracles in their design (averages, medians, etc.). 
