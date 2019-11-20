@@ -12,7 +12,7 @@ created: 2019-11-20
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
-Add new long and inverse Synths for three new cryptocurrencies: LINK, XRP, and LTC. 
+Add new long and inverse Synths for three new cryptocurrencies: Chainlink (LINK), Ripple (XRP), and Litecoin (LTC). 
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
