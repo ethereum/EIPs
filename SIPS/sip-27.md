@@ -1,7 +1,7 @@
 ---
 sip: 27
 title: Add new crypto Synths
-status: Approved
+status: Implemented
 author: Garth Travers (@garthtravers)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
