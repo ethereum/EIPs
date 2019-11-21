@@ -1,8 +1,8 @@
 ---
 sip: 28
-title: Implement audit remediations
-status: Proposed
-author: Garth Travers (@garthtravers)
+title: Audit Remediations
+status: Implemented 
+author: Garth Travers (@garthtravers), Clinton Ennis (@hav-noms)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
 created: 2019-11-21
@@ -14,7 +14,7 @@ created: 2019-11-21
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-This SIP proposes implementing the remediations outlined by our most recent round of auditing from Iosiro and Lightbit. 
+This SIP proposes implementing the remediations outlined by our most recent round of auditing from [iosiro](https://www.iosiro.com/) and Lightbit. 
 
 ## Motivation
 
@@ -26,25 +26,20 @@ The auditors made several suggestions. The only critical risk was addressing the
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-All the proposed low risk and informational updates will be implemented. We are also currently working on a variety of strategies to counter any frontrunning bots. 
+All the proposed low risk and informational updates will be implemented or addressed appropriately. We are also currently working on a variety of strategies to counter any frontrunning bots. 
 
 ## Rationale
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-Auditors are engaged to identify issues within the system, so implementing their findings ensures Synthetix can remain robust. 
+Auditors are engaged to identify issues and vulnerabilities within the Synthetix smart contracts, so implementing their findings ensures Synthetix can remain robust. 
 
-## Test Cases
-
-<!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-
-TBC
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-These remediations will be added in the upcoming Arcturus release.
+These remediations will be added in the upcoming Arcturus release and the final Audit report will be released shortly there after by iosiro.
 
 ## Copyright
 
