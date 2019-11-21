@@ -1,8 +1,8 @@
 ---
-eip: tbd
+eip: 2386
 title: Walletstore
 author: Jim McDonald (Jim@mcdee.net)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/eip-2386-walletstore/3792
 status: Draft
 type: Standards Track
 category: ERC
