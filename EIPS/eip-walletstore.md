@@ -142,7 +142,7 @@ The walletstore follows a similar format to that of the keystore described in [E
 
 ## Rationale
 
-A standard for walletstores, similar to that for keystores, provides a higher level of compatability between wallets and allows for simpler wallet and key interchange between them.
+A standard for walletstores, similar to that for keystores, provides a higher level of compatibility between wallets and allows for simpler wallet and key interchange between them.
 
 ## Test Cases
 
