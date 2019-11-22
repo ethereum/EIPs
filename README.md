@@ -41,7 +41,7 @@ The canonical URL for a EIP that has achieved draft status at any point is at ht
 EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
 
 It is possible to run the EIP validator locally:
-```
+```sh
 gem install eip_validator
 eip_validator <INPUT_FILES>
 ```
@@ -58,7 +58,7 @@ The EIP repository contains an "auto merge" feature to ease the workload for EIP
 
 2. Check whether you have Ruby 2.1.0 or higher installed:
 
-```
+```sh
 $ ruby --version
 ```
 
@@ -66,13 +66,13 @@ $ ruby --version
 
 4. Install Bundler:
 
-```
+```sh
 $ gem install bundler
 ```
 
 5. Install dependencies:
 
-```
+```sh
 $ bundle install
 ```
 
@@ -80,7 +80,7 @@ $ bundle install
 
 1. Bundle assets and start the server:
 
-```
+```sh
 $ bundle exec jekyll serve
 ```
 
