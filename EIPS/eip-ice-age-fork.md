@@ -1,8 +1,8 @@
 ---
-eip: tbd
+eip: 2387
 title: "Hardfork Meta: Mountain Glacier"
 author: James Hancock (@madeoftin)
-discussions-to: tbd
+discussions-to: https://github.com/ethereum/EIPs/pull/2387
 type: Meta
 status: Draft
 created: 2019/11/22
