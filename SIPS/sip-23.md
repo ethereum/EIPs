@@ -10,7 +10,7 @@ created: 2019-09-24
 
 ## Simple Summary 
 
-This SIP gradually decreases SNX inflation by 1.4% per week starting on November 15th, 2019 - week 34 of the current inflation schedule. There is a separate [SIP](https://github.com/FrameworkVance/SIPs/blob/master/SIPS/sip-draft_terminal_snx_inflation.md) that proposes a fixed rate of inflation of 100K per week starting on week 222 of the inflation schedule. This is the week when the smoothed inflation schedule would first go below 100K SNX per week and when the original inflation schedule would be issuing 90.1K per week.  
+This SIP gradually decreases SNX inflation by 1.4% per week starting on AEST December 12th, 2019 - week 38 of the current inflation schedule. There is a separate [SIP-24](https://sips.synthetix.io/sips/sip-24) that proposes a fixed rate of inflation of 100K per week starting on week 222 of the inflation schedule. This is the week when the smoothed inflation schedule would first go below 100K SNX per week and when the original inflation schedule would be issuing 90.1K per week.  
 
 If the inflation smoothing and fixed terminal inflation SIPs both get approved, inflation would look like the below graph. 
 
