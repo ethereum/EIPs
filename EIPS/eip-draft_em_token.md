@@ -7,11 +7,10 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2019-05-10
-requires: 1996, 2009, 2018, 2019, 2021, 1066
+requires: 20, 1066, 1996, 2009, 2018, 2019, 2021
 ---
 
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
 The EM Token aims to enable the issuance of regulated electronic money on blockchain networks, and its practical usage in real financial applications. 
 
@@ -21,12 +20,10 @@ The EM Token aims to enable the issuance of regulated electronic money on blockc
 An account which has been approved by an account to perform an action on the behalf of another account.
 
 ## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
 
 Financial institutions work today with electronic systems which hold account balances in databases on core banking systems. In order for an institution to be allowed to maintain records of client balances segregated and available for clients, such institution must be regulated under a known legal framework and must possess a license to do so. Maintaining a license under regulatory supervision entails ensuring compliance (i.e. performing KYC on all clients and ensuring good AML practices before allowing transactions) and demonstrating technical and operational solvency through periodic audits, so clients depositing funds with the institution can rest assured that their money is safe.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
 There are only a number of potential regulatory license frameworks that allow institutions to issue and hold money balances for customers (be it retail corporate or institutional types). The most important and practical ones are three:
 * **Electronic money entities**: these are legally regulated vehicles that are mostly used today for cash and payments services, instead of more complex financial services. For example prepaid cards or online payment systems such as PayPal run on such schemes. In most jurisdictions, electronic money balances are required to be 100% backed by assets, which often entails holding cash on an omnibus account at a bank with 100% of the funds issued to clients in the electronic money ledger   
@@ -39,9 +36,9 @@ Regulations for all these types of electronic money are local, i.e. only valid f
 
 Beyond cash, financial instruments such as equities or bonds are also registered in electronic systems in most cases, although all these systems and the bank accounting systems are only connected through rudimentary messaging means, which leads to the need for reconciliations and manual management in many cases. Cash systems to provide settlement of transactions in the capital markets are not well connected to the transactional systems, and often entail delays and settlement risk.
 
-The EM Token builds on Ethereum standards currently in use such as ERC20, but it extends them to provide few key additional pieces of functionality, needed in the regulated financial world:
+The EM Token builds on Ethereum standards currently in use such as [ERC-20], but it extends them to provide few key additional pieces of functionality, needed in the regulated financial world:
 * **Compliance**: EM Tokens implement a set of methods to check in advance whether user-initiated transactions can be done from a compliance point of view. Implementations must `require` that these methods return a positive answer before executing the transaction
-* **Clearing**: In addition to the standard ERC20 `transfer` method, EM Token provides a way to submit transfers that need to be cleared by the token issuing authority offchain. These transfers are then executed in two steps: 
+* **Clearing**: In addition to the standard [ERC-20] `transfer` method, EM Token provides a way to submit transfers that need to be cleared by the token issuing authority offchain. These transfers are then executed in two steps: 
     1. transfers are ordered
     1. after clearing them, transfers are executed or rejected by the operator of the token contract
 * **Holds**: token balances can be put on hold, which will make the held amount unavailable for further use until the hold is resolved (i.e. either executed or released). Holds have a payer, a payee, and a notary who is in charge of resolving the hold. Holds also implement expiration periods, after which anyone can release the hold Holds are similar to escrows in that are firm and lead to final settlement. Holds can also be used to implement collateralization
@@ -51,7 +48,6 @@ The EM Token builds on Ethereum standards currently in use such as ERC20, but it
 The EM Token is thus different from other tokens commonly referred to as "stable coins" in that it is designed to be issued, burnt and made available to users in a compliant manner (i.e. with full KYC and AML compliance) through a licensed vehicle (an electronic money entity, a bank, or a central bank), and in that it provides the additional functionality described above so it can be used by other smart contracts implementing more complex financial applications such as interbank payments, supply chain finance instruments, or the creation of EM-Token denominated bonds and equities with automatic delivery-vs-payment
 
 ## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 ```solidity
 interface EMToken /* is ERC-1996, ERC-2018, ERC-2019, ERC-2021 */ {
@@ -209,19 +205,16 @@ Checks if the `authorizePayoutOperator` function is allowed to be executed with 
 | from | The address from which the tokens are to be taken if executed |
 
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 This EIP unifies [ERC-1996][ERC-1996], [ERC-2018][ERC-2018], [ERC-2019][ERC-2019] and [ERC-2021][ERC-2021] and adds the checks for the compliance on top of it. By this way the separate EIPs are otherwise independent from each other and the EM Token offers a solution for all necessary functionality of regulated electronic money. 
 
 While not requiring it, the naming of the check functions was adopted from [ERC-1462][ERC-1462].
 
 ## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
-This EIP is fully backwards compatible as its implementation extends the functionality of [ERC-1996][ERC-1996], [ERC-2018][ERC-2018], [ERC-2019][ERC-2019],  [ERC-2021][ERC-2021] and [ERC-1066][ERC-1066].
+This EIP is fully backwards compatible as its implementation extends the functionality of [ERC-1996][ERC-1996], [ERC-2018][ERC-2018], [ERC-2019][ERC-2019], [ERC-2021][ERC-2021] and [ERC-1066][ERC-1066].
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
 The GitHub repository [IoBuilders/em-token](https://github.com/IoBuilders/em-token) contains the work in progress implementation.
 
@@ -233,7 +226,7 @@ Copyright and related rights waived via [CC0](https://creativecommons.org/public
 
 [ERC-1066]: http://eips.ethereum.org/EIPS/eip-1066
 [ERC-1462]: http://eips.ethereum.org/EIPS/eip-1462
-[ERC-1996]: https://github.com/ethereum/EIPs/pull/1996/files
-[ERC-2018]: https://github.com/ethereum/EIPs/pull/2018/files
-[ERC-2019]: https://github.com/ethereum/EIPs/pull/2019/files
-[ERC-2021]: https://github.com/ethereum/EIPs/pull/2021/files
+[ERC-1996]: http://eips.ethereum.org/EIPS/eip-1996
+[ERC-2018]: http://eips.ethereum.org/EIPS/eip-2018
+[ERC-2019]: http://eips.ethereum.org/EIPS/eip-2019
+[ERC-2021]: http://eips.ethereum.org/EIPS/eip-2021
