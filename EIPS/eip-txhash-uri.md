@@ -1,0 +1,86 @@
+---
+eip: <to be assigned>
+title: Transaction Hash URI
+author:  Ricardo Guilherme Schmidt (3esmit.stateofus.eth), Eric Dvorsak (yenda.stateofus.eth)
+discussions-to: https://github.com/status-im/team-core/issues/5
+status: Draft
+type:  ERC
+created: 2019-11-05
+requires: [ERC 831](https://eips.ethereum.org/EIPS/eip-831)
+---
+
+## Simple Summary
+
+A standarized URI for transaction hash with complete information about transaction.
+
+A standard way of representing a submitted transaction.
+
+## Abstract
+
+A transaction hash is not very meaningful on its own, because it looks just like any other hash. This standard includes all needed information for displaying a transaction, such as the chainId, method signature and events signatures.  
+
+URLs embedded in QR-codes, hyperlinks in web-pages, emails or chat messages provide for robust cross-application signaling between very loosely coupled applications. A standardized URL format for transactions allows for instant invocation of the user's preferred wallet application (even if it is a webapp or a swarm đapp), with the additional information
+
+## Motivation
+
+Interoperability for web3: wallets, browsers and messengers.
+
+## Specification
+
+### Syntax
+
+Payment request URLs contain "ethereum" in their schema (protocol) part and are constructed as follows:
+
+    request                 = erc831_part transaction_hash [ "@" chain_id ] [ "?" parameters ]
+    erc831_part             = "ethereum:tx-" 
+    transaction_hash        = "0x" 64*64HEXDIG 
+    chain_id                = 1*DIGIT
+    parameters              = parameter *( "&" parameter )
+    parameter               = key "=" value
+    key                     = "method" / "events"
+    value                   = function_signature / event_list
+    function_signature      = function_name "(" TYPE *( "," TYPE) ")"
+    function_name           = STRING
+    event_list              = event_signature *( ";" event_signature )
+    event_signature         = event_name "(" event_type *( "," event_type) ")"
+    event_name              = STRING
+    event_type              = ["!"] TYPE
+
+
+Where `TYPE` is a standard ABI type name, as defined in [Ethereum Contract ABI specification](https://solidity.readthedocs.io/en/develop/abi-spec.html). `STRING` is a URL-encoded unicode string of arbitrary length.
+
+The exclamation symbol (`!`), in event_type, is used to identify indexed event parameters. 
+
+### Semantics
+
+`transaction_hash` is mandatory.
+
+`chain_id` is optional and contains the decimal chain ID, such that transactions on various test- and private networks can be requested. If no `chain_id` is present, the $ETH/mainnet (`1`) is considered.
+
+if `method` or `events` are not present, this could either mean that it was a "simple" ETH transfer, or that the URI is not specifing any details. 
+When they are present, when loading the transaction it should also be checked if they are valid, and this should be done to prevent bad use of the feature. The check is done, for methods, by comparing the first 4 bytes of calldata with the first 4 bytes of the keccak256 hash of `method`.  
+
+#### Examples
+
+Simple ETH transfer: 
+`ethereum:tx-0x1143b5e38fe3cf585fb026fb9b5ce35c85a691786397dc8a23a07a62796d8172@1`
+
+[Complex contract transaction](https://etherscan.io/tx/0x4465e7cce3c784f264301bfe26fc17609855305213ec74c716c7561154b76fec#eventlog): 
+`ethereum:tx-0x4465e7cce3c784f264301bfe26fc17609855305213ec74c716c7561154b76fec@1?method="issueAndActivateBounty(address,uint256,string,uint256,address,bool,address,uint256)"&events="Transfer(!address,!address,uint256);BountyIssued(uint256);ContributionAdded(uint256,!address,uint256);BountyActivated(uint256,address)"`
+
+## Rationale
+
+In order to decode transaction parameters and events, the ABI is required. Not all clients have the ABI of all contracts, and usually the transaction signer is the one who knows the ABI and is also the same actor creating this links, so the transaction hash can optionally be shared with all the information required to fully decode the transaction data and it's events.
+
+## Compatibility and Versioning
+
+Future upgrades that are partially or fully incompatible with this proposal must use a prefix other than `tx-` that is separated by a dash (-) character from whatever follows it, as specified by ERC #831.
+
+## References
+
+https://eips.ethereum.org/EIPS/eip-831
+https://eips.ethereum.org/EIPS/eip-681
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
