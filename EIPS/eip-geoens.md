@@ -1,0 +1,166 @@
+---
+eip: <to be assigned>
+title: Geo-ENS
+author: James Choncholas <jchoncholas@gmail.com>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2019-11-15
+requires ( * optional): EIP137, EIP165, EIP1062, EIP1185
+---
+<!--replaces ( * optional): <EIP number(s)> -->
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+GeoDNS, but for ENS! Allows for location specific responses to ENS queries from resolver contracts.
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+This EIP specifies an ENS resolver interface for geographically specific address resolution.
+This permits associating a human-readable name with an address associated with a specific geographic location.
+Geographic resolution can extended beyond ENS address resolvers (EIP137) to DNS resolvers (EIP1185), ABI resolvers (EIP1062), and any more to be created.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+There are many use cases for traditional GeoDNS systems, like Amazon's Route53, in the centralized web.
+These use cases include proximity-based load balancing and serving content specific to the geographic location of the query.
+Unfortunately the ENS specification does not provide a mechanism for geo-specific resolution.
+ENS can respond to queries with IP addresses (as described in EIP1185) however there is no way to respond to geo-specific queries.
+This EIP proposes a standard to give the ENS system geo-proximal awareness to serve a similar purpose as GeoDNS.
+
+Mimicking GeoDNS is not the only purpose of this EIP.
+This interface specification extends the utility of GeoENS beyond plain GeoDNS.
+For example, GeoENS is useful to locate digital resources (like smart contracts) that represent physical objects in the real world.
+More examples include:
+ - Using ENS to do geo-specific IP queries as described in EIP1185.
+ - Smart contract managing access to a physical object associated with a specific location.
+ - ENS + IPFS web hosting (as described in EIP1162) with content translated to the native language of the query source.
+ - Tokenizing objects with a physical location.
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+This EIP proposes a new interface to ENS resolvers such that geo-spacial information can be recorded and retrieved from the blockchain.
+The interface changes are described below for "address resolvers" described in EIP137 however the idea applies to any record described in EIP1185 and EIP1062, namely DNS Resolvers, Text Resolvers, ABI Resolvers, etc.
+
+### function geoAddr(bytes32 node, uint64 geohash, uint64 precisionMask) returns (address[] memory ret)
+Query the resolver contract for a specific node and location described by a location.
+The `geohash` is masked by the `precisionMask` to describe a physical region much like a square on a map.
+All resources (contract addresses, IP addresses, ABIs, TEXT records, etc.) matching the node and within the region are returned.
+
+### function setGeoAddr(bytes32 node, uint64 geohash, address addr)
+Sets a resource (contract address, IP, ABI, TEXT, etc.) by node and geohash.
+Geohashes must be unique per node.
+Write default initialized resource value, like `address(0)`, to remove a resource from the resolver.
+
+### geohash
+Geohashes is typically encoded in base 32 characters, as described https://en.m.wikipedia.org/wiki/Geohash#Algorithm_and_example.
+While these could be represented using a string, it is more efficient to represent a geohash as a 64 bit unsigned integer.
+This reduces gas usage during transactions.
+More information regarding efficiency can be found in the implementation section.
+
+<!-- hilbert geohash -->
+
+There are different ways to search geographic data using geohashes.
+First, a single query using a geohash of reduced precision will search a box shaped geographic region.
+Searching in a circular shaped region is slightly more complex as it requires multiple queries.
+Algorithms to do so, like https://github.com/ashwin711/proximityhash, can be left to the reader to explore.
+
+## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+Because of the decentralized nature of ENS, geo-specific resolution is different than traditional GeoDNS.
+GeoDNS works as follows. DNS queries are identified by their source IP address.
+This IP is looked up in a database like GeoIP2 from MaxMind which maps the IP address to a location.
+This method of locating the source of a query is error prone and unreliable.
+If the GeoIP database is out of date, queried locations can be vastly different than their true location.
+GeoENS does not rely on a database because the user includes a location in their query.
+
+An additional shortcoming of traditional DNS is the fact that there is no way to return a list of servers in a certain proximity.
+This is paramount for uses cases that require discovering the resource with the lowest latency.
+GeoENS allows a list of resources, like IP addresses, to be gathered within a specific location.
+Then a client to determine themselves which resource has the lowest latency.
+
+Another benefit of GeoENS is that queries can be made for any location.
+Traditional DNS will only return the resource assigned to a query's provenance.
+GeoENS does not correlate a query's source with a location, allowing the entire globe to be queried from one location.
+
+Lastly, publicly facing GeoDNS services do not give fine granularity control over geographic regions for GeoDNS queries.
+Cloud based DNS services like Amazon's Route 53 only allow specifying geographic regions at the granularity of a State in the United States.
+This course granularity could be due to the unreliability of the underlying databases mapping IP to location.
+GeoENS on the other hand gives 64 bits of geohash resolution which is sub-meter accuracy.
+
+
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+This EIP does not introduce issues with backwards compatibility.
+
+## Test Cases
+<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+See https://github.com/james-choncholas/geoens/tree/master/test
+
+## Implementation
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
+This single owner address resolver, written in Solidity, implements the specifications outlined above.
+The same idea presented here can be applied to public resolvers as specified in EIP137.
+Note that geohashes are passed and stored using 64 bit unsigned integers.
+Using integers instead of strings for geohashes is more performant, especially in the `geomap` mapping.
+For comparison purposes, see https://github.com/james-choncholas/geoens/tree/master/contracts/StringOwnedGeoENSResolver.sol for the inefficient string implementation.
+
+
+```solidity
+pragma solidity >=0.4.21 <0.6.0;
+
+contract OwnedGeoENSResolver {
+    // Other code
+
+    bytes4 constant ERC165ID = 0x01ffc9a7;
+    bytes4 constant ERCTBDID = 0xc5505b25;
+    uint constant MAX_ADDR_RETURNS = 64;
+    mapping(uint64=>address) geomap;
+    address public owner = msg.sender;
+
+    event AddrChanged(bytes32 indexed node, uint64 geohash, address addr);
+
+    modifier isOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function geoAddr(bytes32 node, uint64 geohash, uint64 precisionMask) external view returns (address[] memory ret) {
+        bytes32(node); // single node georesolver ignores node
+
+        ret = new address[](MAX_ADDR_RETURNS);
+        uint ret_i = 0;
+
+        for(uint64 i=(geohash & precisionMask); i<= geohash + ~precisionMask; i++) {
+            if (geomap[i] != address(0)) {
+                ret[ret_i] = geomap[i];
+                ret_i ++;
+            }
+            if (ret_i > MAX_ADDR_RETURNS) break;
+        }
+
+        return ret;
+    }
+
+    function setGeoAddr(bytes32 node, uint64 geohash, address addr) external isOwner() {
+        // single node georesolver ignores node
+        geomap[geohash] = addr;
+        emit AddrChanged(node, geohash, addr);
+    }
+
+    function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
+        return interfaceID ==  ERC165ID || interfaceID == ERCTBDID;
+    }
+
+    function() external payable {
+        revert();
+    }
+}
+```
+
+# Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
