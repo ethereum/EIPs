@@ -85,7 +85,7 @@ The proposed changes address forward compatibility by applying Postel's Law (als
 the Robustness Principle) throughout the protocol stack. The merit and applicability of
 this approach has been studied repeatedly since its original application in RFC 761. For a
 recent perspective, see
-["The Robustness Principle Reconsidered" (Eric Allman, 2011)](http://queue.acm.org/detail.cfm?id=1999945).
+["The Robustness Principle Reconsidered" (Eric Allman, 2011)](https://queue.acm.org/detail.cfm?id=1999945).
 
 #### Changes to the devp2p Wire Protocol
 

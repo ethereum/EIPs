@@ -1,9 +1,9 @@
 
-ATTENTION! If you would like to submit an EIP and it has already been written as a draft (see the [template](https://github.com/ethereum/EIPs/blob/master/eip-X.md) for an example), please submit it as a [Pull Request](https://github.com/ethereum/EIPs/pulls).
+ATTENTION! If you would like to submit an EIP and it has already been written as a draft (see the [template](https://github.com/ethereum/EIPs/blob/master/eip-template.md) for an example), please submit it as a [Pull Request](https://github.com/ethereum/EIPs/pulls).
 
 If you are considering a proposal but would like to get some feedback on the idea before submitting a draft, then continue opening an Issue as a thread for discussion.  Note that the more clearly and completely you state your idea the higher the quality of the feedback you are likely to receive.
 
-Keep in mind the following guidelines from [EIP-1](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md):
+Keep in mind the following guidelines from [EIP-1](https://eips.ethereum.org/EIPS/eip-1):
 
 > Each EIP must have a champion - someone who writes the EIP using the style and format described below, shepherds the discussions in the appropriate forums, and attempts to build community consensus around the idea. The EIP champion (a.k.a. Author) should first attempt to ascertain whether the idea is EIP-able. Posting to the the Protocol Discussion forum or opening an Issue is the best way to go about this.
 
