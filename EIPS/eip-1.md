@@ -56,7 +56,7 @@ In addition to making sure your idea is original, it will be your role as the au
 
 For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP. 
 
-The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda Github Issue].  
+The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue].  
 
 The AllCoreDevs call serve as a way for client implementers to do three things. First, to discuss the technical merits of EIPs. Second, to gauge what other clients will be implementing. Third, to coordinate EIP implementation for network upgrades.
 
@@ -249,7 +249,7 @@ For each new EIP that comes in, an editor does the following:
 
 - Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
 - The title should accurately describe the content.
-- Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (Github flavored Markdown), code style
+- Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
 
 If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
 
@@ -314,7 +314,7 @@ See [the revision history for further details](https://github.com/ethereum/EIPs/
 [Bitcoin's BIP-0001]: https://github.com/bitcoin/bips
 [Python's PEP-0001]: https://www.python.org/dev/peps/
 [the Ethereum Magicians forum]: https://ethereum-magicians.org/
-[AllCoreDevs agenda Github Issue]: https://github.com/ethereum/pm/issues
+[AllCoreDevs agenda GitHub Issue]: https://github.com/ethereum/pm/issues
 
 ## Copyright
 
