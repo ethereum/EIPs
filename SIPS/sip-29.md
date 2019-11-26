@@ -1,6 +1,6 @@
 ---
 sip: 29
-title: Issue and burn only sUSD
+title: Issue, burn and claim only in sUSD
 status: Proposed
 author: Justin J Moses (@justinjmoses)
 discussions-to: (https://discord.gg/3uJ5rAy)
