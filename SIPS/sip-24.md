@@ -34,7 +34,7 @@ Perpetual weekly inflation serves as a mechanism to keep the protocol stable for
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 Adjust [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/SupplySchedule.sol) to account for the following changes:
-- Starting on June 21, 2023, the weekly issuance of SNX tokens will adjust to 2.5% on an annualized basis.
+- Starting on September 7, 2023, the weekly issuance of SNX tokens will adjust to 2.5% on an annualized basis.
 - This [model](https://docs.google.com/spreadsheets/d/1rVXFnZSMvHEv5XpA5Q23x-cXEo7w-2T80wlAfT-YbuI/edit#gid=1640166717) will stay in place until it is stopped or adjusted.
 
 With Inflation Smoothing and 2.5% annual Terminal Inflation:
