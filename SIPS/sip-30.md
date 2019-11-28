@@ -30,6 +30,8 @@ The UX for [Mintr](https://mintr.synthetix.io) drove the implementation of ERC22
 There is a lot of Dex activity happening now with SNX on [uniswap](https://uniswap.info/token/0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f), [Kyber](https://tracker.kyber.network/#/tokens/0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f), sUSD [uniswap](https://uniswap.info/token/0x57ab1ec28d129707052df4df418d58a2d46d5f51), [Kyber](https://tracker.kyber.network/#/tokens/0x57ab1ec28d129707052df4df418d58a2d46d5f51) and sETH [uniswap](https://uniswap.info/token/0x5e74c9036fb86bd7ecdcb084a0673efc32ea31cb).
 The ERC223 implementation is causing a significant cumulative gas loss trading these tokens. We aim to reduce the total gas lost / consumed trading Synthetix tokens.
 
+This will also enable better (cheaper) composability as teams integrate Synths to build Defi products. 
+
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
