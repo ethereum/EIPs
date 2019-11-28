@@ -56,7 +56,7 @@ This onchain self service model is precicsly the use case for smart contracts an
 - [python script](http://18.222.88.2:5000/pool-rewards/8926035/8967962)
 - [gnosis multi-sig](https://wallet.gnosis.pm/#/wallet/0x53265D3D34c9ECB5685Be3176430366b4e392010) & the 5 signers signing. 
 - [Synthetix AirDropper](https://etherscan.io/address/0xa8bbb0155e7ea36d7dacb3c59d45c4fcd4a6d73e#code) contract.
-- Mintrs Multi-sig page (https://mintr.synthetix.io/multisig)
+- Mintrs Multi-sig page https://mintr.synthetix.io/multisig
 
 
 The greatest disadvantage to LP's is that they are current automatically sent their SNX. This model will require each LP to withdraw their SNX.
