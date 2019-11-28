@@ -14,7 +14,7 @@ created: 2019-11-26
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Deprecate [ERC223](https://github.com/ethereum/EIPs/issues/223) from SNX and all Synths.
+Deprecate [ERC223](https://github.com/ethereum/EIPs/issues/223) from SNX and all Synths to save gas on dex exchanges and no transaction errors.
 
 ## Motivation
 
@@ -22,27 +22,36 @@ Deprecate [ERC223](https://github.com/ethereum/EIPs/issues/223) from SNX and all
 
 The UX for [Mintr](https://mintr.synthetix.io) drove the implementation of ERC223 to reduce the number of transactions a user(minter) had to execute to Deposit their sUSD into the Depot FIFO queue to be sold for ETH from 2 to 1 by only eliminating the ERC20 approve transaction prior to calling a ERC20 transferFrom. While this has been a nice UX for mintr users with the [Depot](https://contracts.synthetix.io/Depot)
 
-The benefits of ERC223 transfer have not outweighted the cons on contract to contract calls;
+The benefits of ERC223 transfer have not outweighted the cons on contract to contract transfers;
 
-- Bloated gas estimations
-- Causing gas loss
-- Perceived errors in SNX and Synth Transfers 'Although one or more Error Occurred [Reverted] Contract Execution Completed'
+- Bloated gas estimations [Issue 243](https://github.com/Synthetixio/synthetix/issues/243)
+- Causing gas loss [Issue 243](https://github.com/Synthetixio/synthetix/issues/243)
+- Perceived errors in SNX and Synth Transfers 'Although one or more Error Occurred [Reverted] Contract Execution Completed' [etherscan](https://etherscan.io/address/0xe9cf7887b93150d4f2da7dfc6d502b216438f244)
 
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
+- Removing all ERC223 is a simple code change to ExternStateToken.sol which is inherited by Synthetix.sol and Synth.sol/
+- It will require all Synths & SNX to be redeployed but no proxy addresses will change keeping all existing token addresses
+- The current [Depot](https://contracts.synthetix.io/Depot) will no longer be able to accept sUSD deposits effectivly putting it to its end of life
+- A new Depot will be required which will go back to using the original ERC20 approve, transferFrom workflow. This could be an opportunity to makes some additional improvements to the Depot such as making it upgradable. Putting it behind a proxy and giving it an external state contract so its logic can be upgraded.
+
 ## Rationale
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-- Removing ERC223 will no longer show the transfer errors in contract to contract transfers.
-- This will also save 200K gas per contract to contract transfer.
-- Reclaim bytcode space for SNX contract deployment
+- Removing ERC223 will no longer show the transfer errors in contract to contract transfers. [etherscan](https://etherscan.io/address/0xe9cf7887b93150d4f2da7dfc6d502b216438f244)
+- This will also save 200K gas per contract to contract transfer. [github code reference](https://github.com/Synthetixio/synthetix/blob/master/contracts/TokenFallbackCaller.sol#L52)
+- Reclaim bytecode space for SNX contract deployment
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
+- The current Depot will no longer be able to accept sUSD deposits but withdrawals and buying sUSD with ETH will still work as expected. It could stay until it is drained of sUSD supply.
+- A new Depot version will need to be deployed to allow sUSD deposits. The Dapps will need to switch over to using this Depot for sUSD purchases with ETH when the FiFo queue is drained.
+- Mintr will need to be updated to include an approve transaction for the Depot to call transferFrom to take the mintrs sUSD from their wallet to itself and create a deposit entry.
 
 ## Copyright
 
