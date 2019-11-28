@@ -56,7 +56,7 @@ This onchain self service model is precicsly the use case for smart contracts an
 - [python script](http://18.222.88.2:5000/pool-rewards/8926035/8967962)
 - [gnosis multi-sig](https://wallet.gnosis.pm/#/wallet/0x53265D3D34c9ECB5685Be3176430366b4e392010) & the 5 signers signing. 
 - [Synthetix AirDropper](https://etherscan.io/address/0xa8bbb0155e7ea36d7dacb3c59d45c4fcd4a6d73e#code) contract.
-- Mintrs Multi-sig page https://mintr.synthetix.io/multisig
+- Mintrs Multi-sig page <https://mintr.synthetix.io/multisig>
 
 
 The greatest disadvantage to LP's is that they are current automatically sent their SNX. This model will require each LP to withdraw their SNX.
@@ -65,13 +65,13 @@ The greatest disadvantage to LP's is that they are current automatically sent th
 ## Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-https://github.com/k06a/Unipool/blob/master/test/Unipool.js
+<https://github.com/k06a/Unipool/blob/master/test/Unipool.js>
 
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The proposed implementation https://github.com/k06a/Unipool
+The proposed implementation <https://github.com/k06a/Unipool>
 
 
 ## Copyright
