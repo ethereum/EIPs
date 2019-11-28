@@ -65,13 +65,14 @@ The greatest disadvantage to LP's is that they are current automatically sent th
 ## Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-(https://github.com/k06a/Unipool/blob/master/test/Unipool.js)
+https://github.com/k06a/Unipool/blob/master/test/Unipool.js
 
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The proposed implementation (https://github.com/k06a/Unipool)
+The proposed implementation https://github.com/k06a/Unipool
+
 
 ## Copyright
 
