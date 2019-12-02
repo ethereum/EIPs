@@ -1,8 +1,8 @@
 ---
 sip: 32
 title: Chainlink Oracles Phase 1 - Forex & Commodities
-status: Proposal
-author: Justin J Moses (@justinjmoses)
+status: Proposed
+author: Justin J Moses <@justinjmoses>
 discussions-to: https://discord.gg/3uJ5rAy
 
 created: 2019-12-02
