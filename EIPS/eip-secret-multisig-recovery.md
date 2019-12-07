@@ -1,12 +1,12 @@
 ---
-eip: <to be assigned>
+eip: 2429
 title: Secret Multisig Recovery
 author: Ricardo Guilherme Schmidt (ricardo3@status.im)
 discussions-to: https://ethereum-magicians.org/t/social-recovery-using-address-book-merkle-proofs/3790/12
 status: Draft
 type: Standards Track
 category: ERC
-created: 2019-11-29
+created: 2019-12-07
 requires: 137, 191, 831, 1271
 ---
 
