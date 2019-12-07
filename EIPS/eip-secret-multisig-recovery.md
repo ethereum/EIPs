@@ -1,0 +1,193 @@
+---
+eip: <to be assigned>
+title: Secret Multisig Recovery
+author: Ricardo Guilherme Schmidt (ricardo3@status.im)
+discussions-to: https://ethereum-magicians.org/t/social-recovery-using-address-book-merkle-proofs/3790/12
+status: Draft
+type: Standards Track
+category: ERC
+created: 2019-11-29
+requires: 137, 191, 831, 1271
+---
+
+
+## Simple Summary
+
+Allows user to select a list of trusted parties which can authorize calls protected by a secret only user knows. 
+Allows an controller to set a private list of addresses that can authorize calls protected by a secret.
+
+## Abstract
+
+One big problem for cryptocurrencies in general is the management of seed phrases and the consequences of it's loss.
+Social Recovery is being seen as an option for decentralized recovery of account contracts. The use of social brings the human factor which usually is the main point of vulnerability on safe systems. 
+The main risks in Social Recovery are:
+- Recovery collusions: If some users know they are part of a certain recovery, they might percive interest in executing an attack recovery. 
+- Targeted attacks: An external agent might learn about the owners of recovery and target the weakest points up to the threshold needed to execute attack recovery. 
+- General exposure attack: An attacker which manage to infect a large userbase env dependency and get access to several identities could also side effect on unaffected users through recovery. 
+- Impersonification on recovery: An targeted attack could learn about a user and impersonificate the to their social peers to execute an attack recovery. This becomes more concerning as AI research was capable of "deep fakes" of other persons voice and facial movements.
+
+Although, there is no perfect solution to solve all these problems, the goal is "trust minimizing" the contract for it's controller, and enabling interoperability for different wallets users might be using.  
+
+This standard proposes a way of defining a list of addresses stored in a merkle tree, but also removing any possibility of front running of those actors by mixing the reveal with signed messages tied to secret reveal and a partial reveal of user secret. 
+
+This addresses, along with a threshold and user personal secret would compose a secret-set, which could be exposed without directly putting user at risk, as it would still require for human verification of thershold amount from address list. 
+The secret set could be saved, for example, in web2 cloud-storage without highly compromising security, this is useful for some users that don't trust themselves, but also don't want to trust something in particular. 
+
+The user data secret is optionally saved with the data, this grately reduces security in case of exposure of the secret-set, but also reduces possible difficulties in recovery, as when not present, the user must remember how the secret was defined.
+
+The user secret is never revealed in chain, instead it's hashed with a nonce, which increments at every recovery. The recovery setup takes a `hash of a hash` of this hashed secret nonce, the double hashing is used for  matemathically proof that who is requesting a recovery knows the secret, but without revealing the secret.
+
+## Motivation
+
+Legacy Web UX, Security and Interoperability 
+
+## Specificationss
+
+A user can configure a recovery by providing a secret, a list of addresses and a threshold. The secret should be semi-private information, such as a "randomly ordered personal information + secret answer", or user biometric data, or even a password.
+This information will be processed to create the secret-set for recovery, which is shared from wallet to user along with other needed information, usually via QRCode, in EIP-831 standard: 
+
+    recovery                = erc831_part account_contract [ "@" chain_id ] "/" recovery_contract "/" threshold [ "/" secret_hash ] "/" address_list 
+    erc831_part             = "ethereum:recovery-" 
+    account_contract        = ADDRESS
+    chain_id                = 1*DIGIT
+    recovery_contract       = ADDRESS
+    threshold               = 2*DIGIT
+    secret_hash             = "0x" 64*HEXDIG
+    address_list            = ethereum_address *( ";" ethereum_address )
+    ethereum_address        = ADDRESS / ENS_NAME
+    ADDRESS                 = "0x" 40*HEXDIG
+
+`account_contract` the account contract being recovered. Any account contract can be used, as the recovery contract can execute to any interface or address (like a regular multisig).
+`chain_id` defines the ethereum chain for all addresses, if not present pre-defaults to 1 (Mainnet). 
+`recovery_contract` the contract which executes the recovery logic. Must support the ABI specified in this document.
+`threshold` the amount of signatures needed
+`secret_hash` the hash of a `User_Secret_Data`, in case not present, user should be prompted to enter secret used. 
+`address_list` should preferably be another account contracts that signaled they are available for recovery requests, but any address could assist in recovery. 
+
+### User secret data 
+
+`User_Secret_Data` is any format. Is never exposed, its never saved. Should be based on biometrics because users are very unlikely to loose their biometrics. Biometrics are usually unsafe for generating a seed phrase because they are not really secret, any high resolution camera can in fact read most of biometrics, and this information is also usually known by governaments. 
+
+`secret_hash` is `keccak256(userSecretData)`. Is never exposed, could be exported with secret-set. 
+`seedpub_hash` is `keccak256(secret_hash, recovery_contract.nonce())`. Is exposed only at execution.
+`proofpub_hash` is `keccak256(seedpub_hash)`. Is exposed at recovery authorization request, is used to proof user knows `seedpub_hash` by revealing the seed of `public_hash`.   
+`public_hash` is `keccak256(proofpub_hash)`. Is public since configuration.
+
+### Address List
+
+The addresses are hashed in a standard merkle tree, but each leaf must be hashed against the used `proofpub_hash`. 
+
+`merkle_leaf` is `keccak256(proofpub_hash, ethereum_address)`
+
+ENS is supported. If a ENS name is used, it is important that recovery contract is configured with the ENS name, not with the resolved address, and the lookup must be performed by the recovery contact by using a dedicated field in the approve function, which when resolved must match the signers address. 
+
+Addresses in the list can be account contracts, and if they are account contracts, they can call directly the approve function, or provide an ERC1271 signature. 
+In case are externally owned acconts, the ecrecover logic applies, but they could also directly call the approve function.
+
+### Secret Call
+
+There is no enforced ABI for the recovered contract, the `call_destination` and `call_data` are pre-approved by the `address_list`, however this parameters are secret and tied to `seedpub_hash`, with values revealed at execution.
+
+`secretCall` is `keccak256(recovery_address, seedpub_hash, call_destination, call_data)`;
+
+### Reconfiguration
+
+A reconfiguration should be possible, however there is a delay period used to prevent a takeover from recovery.
+
+### Solidity Interface
+
+```solidity
+
+    event SetupRequested(uint256 activation);
+    event Activated();
+    event Approved(bytes32 indexed secretHash, address approver);
+    event Execution(bool success);
+
+    /**
+     * @notice Configure recovery parameters `emits Activated()` if there was no previous setup, or `emits SetupRequested(now()+setupDelay)` when reconfiguring.
+     * @param _publicHash Double hash of seedPubHash
+     * @param _setupDelay Delay for changes being active
+     * @param _secretThresholdHash Secret Amount of approvals required
+     * @param _addressListMerkleRoot Merkle root of secret address list
+     */
+    function setup(
+        bytes32 _publicHash,
+        uint256 _setupDelay,
+        bytes32 _secretThresholdHash,
+        bytes32 _addressListMerkleRoot
+    )
+        external;
+
+    /**
+     * @notice Cancels a pending setup to change the recovery parameters. `emits PendingSetup(0)` when successful.
+     */
+    function cancelSetup()
+        external;
+
+    /**
+     * @notice Activate a pending setup of recovery parameters. `emits Activated()` when successful.
+     */
+    function activate()
+        external;
+
+    /**
+     * @notice Approves a recovery.
+     * This method is important for when the address is an contract (such as Identity).
+     * @param _proofPubHash seed of `publicHash`
+     * @param _secretCall Hash of the recovery call
+     * @param _proof Merkle proof of friendsMerkleRoot with msg.sender
+     * @param _ensName if present, the _proof is checked against _ensName. 
+     */
+    function approve(bytes32 _proofPubHash, bytes32 _secretCall, bytes32[] calldata _proof, bytes calldata _ensName)
+        external;
+
+    /**
+     * @notice Approve a recovery using an ethereum signed message
+     * @param _signer address of _signature processor. if _signer is a contract, must be ERC1271.
+     * @param _proofPubHash seed of `publicHash`
+     * @param _secretCall Hash of the recovery call
+     * @param _proof Merkle proof of friendsMerkleRoot with msg.sender
+     * @param _signature ERC191 signature
+     * @param _ensName if present, the _proof is checked against _ensName. 
+     */
+    function approvePreSigned(address _signer, bytes32 _proofPubHash, bytes32 _secretCall, bytes32[] calldata _proof, bytes calldata _signature, bytes calldata _ensName)
+        external;
+
+    /**
+     * @notice executes an approved transaction revaling userDataHash hash and friends addresses
+     * @param _seedPubHash Single hash of User Secret
+     * @param _dest Address will be called
+     * @param _data Data to be sent
+     * @param _friendList friends addresses that approved
+     */
+    function execute(
+        bytes32 _seedPubHash,
+        address _dest,
+        bytes calldata _data,
+        address[] calldata _friendList
+    ) external;
+
+    function nonce() external view returns(uint256);
+```
+
+## Rationale
+
+`User_Secret_Data`is never exposed, right after input its hashed once with keccak256 to become the `secret_hash`. This was done to standerize the `secret_hash` format. 
+`User_Secret_Data` it's not used as single authentication, but it's used to: 
+- control the execution flow: only secret holder can specify the recovery call parameters that address_list can authorize
+- a challenge to avoid social engenieering attacks: the secret can be partially revealed, so a user would only be notified of a recovery if the other party presented this proof.
+
+`merkle_leaf` uses the `proofpub_hash` to allow the reuse of same `address_list` without losing any security. `public_hash` was not used because it might reveal information on a reused `address_list`. 
+
+The account contract being recovered should not allow the remove of recovery, and if the account contract is upgradable through DELEGATECALL, then the accepted addresses must be selected by user from a limited list curated by other organization (as the contract developer). This is important to prevent take-overs of accounts in case of a compromised account management key. 
+
+## Test Cases
+
+TBD
+
+## Implementation
+
+TBD
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
