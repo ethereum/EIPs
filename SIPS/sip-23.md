@@ -28,7 +28,7 @@ After 6 months of gathering data on current inflation rates and assessing the co
 
 ## Specification
 
-Starting on GMT Wednesday, 11 December 2019 00:00:00, SNX inflation decreases by 1.25% per week per this [model.](https://docs.google.com/spreadsheets/d/1rVXFnZSMvHEv5XpA5Q23x-cXEo7w-2T80wlAfT-YbuI/edit#gid=1640166717)
+Starting on GMT Wednesday, 11 December 2019 00:00:00, SNX inflation decreases by 1.25% per week per this [final model](https://docs.google.com/spreadsheets/d/1a5r9aFP5bh6wGG4-HIW2MWPf4yMthZvesZOurnG-v_8/edit#gid=0), which is based on the [origional model](https://docs.google.com/spreadsheets/d/1rVXFnZSMvHEv5XpA5Q23x-cXEo7w-2T80wlAfT-YbuI/edit#gid=1445735519) proposed in the draft SIP.
 
 If the inflation smoothing and fixed terminal inflation SIPs both get approved, inflation would look like the below graph. 
 ![](https://user-images.githubusercontent.com/55753617/69513159-b38a8000-0efb-11ea-894e-2a89064a0998.png)
