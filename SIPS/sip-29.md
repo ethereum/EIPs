@@ -1,7 +1,7 @@
 ---
 sip: 29
 title: Issue, burn and claim only in sUSD
-status: Approved
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: (https://discord.gg/3uJ5rAy)
 
