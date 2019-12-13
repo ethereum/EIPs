@@ -15,7 +15,7 @@ requires: Inflation Smoothing (SIP-23)
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-This proposal will add a perpetual 2.5% annual inflation of SNX starting on August 30, 2023, the 234th week on the SNX inflation schedule.
+This proposal will add a perpetual 2.5% APR annual inflation of SNX starting on September 6, 2023, the 235th week on the SNX inflation schedule.
 
 This SIP is the formal spec successor of deltatiger's [Draft SIP Proposal #36](https://github.com/Synthetixio/SIPs/issues/36), specifically pertaining to terminal inflation.
 
@@ -76,6 +76,12 @@ Standard test cases for Solidity contract compling and deploying onto Ethereum t
 - Update and deploy changes to proxy contracts that reference SupplySchedule.sol on Ethereum testnets
 - Update and deploy [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/SupplySchedule.sol) to Ethereum mainnet
 - Update and deploy changes to Ethereum mainnet proxy contracts that reference SupplySchedule.sol
+
+### Compounding weekly effects on terminal inflation rate of 2.5% APR 
+
+As weekly supply is compounded weekly using a compound formula with a terminal rate of 2.5% APR, the effective rate of inflation compounded weekly over a year is 2.53% APY. 
+
+![equation](https://www.sciweavers.org/tex2img.php?eq=%281%20%2B%20%5Cfrac%7B0.025%7D%7B52%7D%29%20%5E%7B52%7D%20%3D%201.0253089608&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 
 ## Copyright
 
