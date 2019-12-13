@@ -1,7 +1,7 @@
 ---
 sip: 30
 title: Deprecate ERC223 from SNX and all Synths.
-status: Proposed
+status: Approved
 author: Clinton Ennis (@hav-noms)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
