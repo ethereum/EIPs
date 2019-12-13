@@ -1,7 +1,7 @@
 ---
 sip: 23
 title: Inflation Smoothing
-status: Approved
+status: Implemented
 author: Deltatiger (@deltatigernz), Vance Spencer(@frameworkvance)
 discussions-to: https://github.com/Synthetixio/SIPs/issues/36
 
