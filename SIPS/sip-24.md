@@ -2,7 +2,7 @@
 
 sip: 24
 title: Terminal SNX Inflation
-status: Approved
+status: Implemented
 author: Vance Spencer (@FrameworkVance), Deltatiger (@deltatigernz), Michael Anderson (@meanderson)
 discussions-to: https://github.com/Synthetixio/SIPs/issues/36
 
