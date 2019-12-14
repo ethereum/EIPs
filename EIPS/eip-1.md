@@ -71,7 +71,7 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 Following is the process that a successful non-Core EIP will move along:
 
 ```
-[ WIP ] -> [ DRAFT ] -> [ REVIEW ] -> [ LAST CALL ] -> [ FINAL ]
+[ IDEA ] -> [ DRAFT ] -> [ REVIEW ] -> [ LAST CALL ] -> [ FINAL ]
 ```
 
 Following is the process that a successful Core EIP will move along:
