@@ -4,7 +4,7 @@ layout: null
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Ethereum EIPs Last Call Review</title>
+    <title>Ethereum EIPs - Last Call Review</title>
     <description>All EIPs which are in the two-week "last call" status, please help review these and provide your feedback!</description>
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/last-call.xml" rel="self" type="application/rss+xml" />
@@ -25,7 +25,7 @@ layout: null
       <item>
         <title>{{ eip.title | xml_escape }}</title>
         <description>{{ description | xml_escape }}</description>
-        <pubDate>{{ eip.date | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+        <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
         <link>{{ site.url }}/{{ eip.url }}</link>
         <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
       </item>
