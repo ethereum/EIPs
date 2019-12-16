@@ -79,9 +79,9 @@ Standard test cases for Solidity contract compling and deploying onto Ethereum t
 
 ### Compounding weekly effects on terminal inflation rate of 2.5% APR 
 
-As weekly supply is compounded weekly using a compound formula with a terminal rate of 2.5% APR, the effective rate of inflation compounded weekly over a year is 2.53% APY. 
+As weekly supply is compounded weekly using a compound formula with a terminal rate of 2.5% APR, the effective rate of inflation compounded weekly over a year is 2.53% APY.
 
-![equation](https://www.sciweavers.org/tex2img.php?eq=%281%20%2B%20%5Cfrac%7B0.025%7D%7B52%7D%29%20%5E%7B52%7D%20%3D%201.0253089608&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+![equation](https://github.com/Synthetixio/SIPs/blob/master/SIPS/assets/sip24.png)
 
 ## Copyright
 
