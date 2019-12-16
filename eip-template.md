@@ -4,8 +4,8 @@ title: <EIP title>
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
 discussions-to: <URL>
 status: Draft
-type: <Standards Track | Meta | Informational>
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
+type: <Standards Track, Meta, or Informational>
+category (*only required for Standards Track): <Core, Networking, Interface, or ERC>
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires (*optional): <EIP number(s)>
 replaces (*optional): <EIP number(s)>
@@ -36,7 +36,7 @@ The technical specification should describe the syntax and semantics of any new 
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
