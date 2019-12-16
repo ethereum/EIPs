@@ -9,7 +9,7 @@ permalink: /last-call.xml
     <description>All EIPs which are in the two-week "last call" status, please help review these and provide your feedback!</description>
     <link>{{ site.url }}</link>
     <atom:link href="{{ site.url }}/last-call.xml" rel="self" type="application/rss+xml" />
-    <lastBuildDate>{{ site.time | date: "%a, %d %b %Y %H:%M:%S %z" }}</lastBuildDate>
+    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     {% assign eiplist = site.pages | sort: 'eip' | reverse %}
     {% for eip in eiplist %}
       {% if eip.status == "Last Call" %}
@@ -19,7 +19,7 @@ permalink: /last-call.xml
       <item>
         <title>EIP-{{ eip.eip }}: {{ eip.title | xml_escape }} (REVIEW PERIOD ENDS {{ eip.review-period-end | default: "!UNDEFINED DATE!" }})</title>
         <description>{{ description | xml_escape }}</description>
-        <pubDate>{{ eip.created | date: "%a, %d %b %Y %H:%M:%S %z" }}</pubDate>
+        <pubDate>{{ eip.created | date_to_rfc822 }}</pubDate>
         {% if eip.category %}<category>{{ eip.category }}</category>{% endif %}
         <link>{{ site.url }}{{ eip.url }}</link>
         <guid isPermaLink="false">EIP-{{ eip.eip }}@{{ eip.status | slugify }}@review-period-end-{{ eip.review-period-end | default: "UNDEFINED-DATE" }}</guid>
