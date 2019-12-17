@@ -3,7 +3,7 @@ sccp: 8
 title: Increase exchange fee back to 50 basis points 
 author: garthtravers
 discussions-to: https://discordapp.com/invite/AEdUHzt
-status: Proposed
+status: Implemented
 created: 2019-12/02
 ---
 
