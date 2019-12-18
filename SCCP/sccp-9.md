@@ -17,5 +17,8 @@ iXTZ and iBNB allow traders to effectively take a short position on Tezos and Bi
 ## Motivation
 iXTZ and iBNB are two of our existing Synths, and our usual practice when an Inverse Synth gets frozen is to re-enable it in the next release. 
 
+## Implementation
+The iXTZ entry price is $1.57 and the limits will be $0.785 and $2.355. The iBNB entry price is $12.57 and the limits will be $6.29 and $18.86. 
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
