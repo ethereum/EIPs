@@ -1,0 +1,48 @@
+---
+eip: <eip>
+title: Deprecate the CALLCODE opcode
+author: Alex Beregszaszi (@axic)
+discussions-to: <url>
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-12-20
+---
+
+## Abstract
+
+Deprecate `CALLCODE` in a *somewhat* backwards compatible way, by making it always return failure.
+
+## Motivation
+
+`CALLCODE` was part of the Frontier release of Ethereum. In the first few weeks/months it became clear
+that it cannot accomplish its intended design goal. This was rectified with introducing `DELEGATECALL`
+([EIP-7](https://eips.ethereum.org/EIPS/eip-7)) in the Homestead update (early 2016).
+
+`CALLCODE` became never utilized, but it still puts a burden on EVM implementations.
+
+## Specification
+
+If `block.number >= FORK_BLOCK`, the `CALLCODE` (`0xf2`) instruction always returns `0`, which signals failure.
+
+## Rationale
+
+It would be possible just to remove the opcode and exceptionally abort if it is encountered.
+However, by returning failure, the contract has a chance to act on it and potentially recover.
+
+## Backwards Compatibility
+
+This is a breaking change and has a potential to break contracts. The author expects no contracts of any value
+should be affected.
+
+## Test Cases
+
+TBA
+
+## Implementation
+
+TBA
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
