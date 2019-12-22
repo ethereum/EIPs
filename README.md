@@ -36,6 +36,14 @@ When you believe your EIP is mature and ready to progress past the draft phase, 
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
 
+Example format for use with a US patent application ([707.05(e) Data Used in Citing References [R-08.2017]](https://www.uspto.gov/web/offices/pac/mpep/s707.html)):
+
+* ENTRIKEN, William; SHIRLEY, Dieter; EVANS, Jacob; SACHS, Natassia. ERC-721 Non-Fungible Token Standard. Ethereum Improvement Proposals. January 2018 [retrieved on 2019-12-21]. Retrieved from the Internet: &lt;URL: https://eips.ethereum.org/EIPS/eip-721&gt;.
+
+Example with IEEE citation format ([IEEE Documentation Style](https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf)):
+
+* W. Radomski, A. Cooke, P. Castonguay, J. Therien, E. Binet, R. Sandford, "ERC-1155 Multi Token Standard," in Ethereum Improvement Proposals.\[online document\], 2018. Available: Ethereum Improvement Proposals, https://eips.ethereum.org/EIPS/eip-1155 [Accessed: December 21, 2019].
+
 # Validation
 
 EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
