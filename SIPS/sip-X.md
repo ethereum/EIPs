@@ -2,8 +2,8 @@
 sip: <to be assigned>
 title: Disable sMKR and iMKR
 status: WIP
-author: @Spreek
-discussions-to: https://discord.gg/x88nPs
+author: Spreek (@Spreek)
+discussions-to: (https://discord.gg/x88nPs)
 created: 2019-12-25
 ---
 
@@ -25,7 +25,7 @@ The utility of a synthetic version of an ERC20 token available at nearly every D
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-TBD
+Disable sMKR and iMKR, allowing current holders to exist at the fixed oracle price, but no further buys to be made. 
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
