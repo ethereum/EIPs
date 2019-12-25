@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: 34
 title: Disable sMKR and iMKR
 status: WIP
 author: Spreek (@Spreek)
