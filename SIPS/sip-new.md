@@ -3,10 +3,8 @@ sip: <to be assigned>
 title: Disable sMKR and iMKR
 status: WIP
 author: @Spreek
-discussions-to: Discord channel
-
+discussions-to: https://discord.gg/x88nPs
 created: 2019-12-25
-requires (*optional): <SIP number(s)>
 ---
 
 ## Simple Summary
