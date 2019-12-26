@@ -1,7 +1,7 @@
 ---
 sip: 34
 title: Disable sMKR and iMKR
-status: WIP
+status: Porposed
 author: Spreek (@Spreek)
 discussions-to: (https://discord.gg/x88nPs)
 created: 2019-12-25
@@ -39,7 +39,7 @@ TBD
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-TBD
+In order to implement this quickly given the priority of the issue, we are proposing to temporarily freeze the oracle price feed at the current price until a longer term solution can be found and the community reaches consensus on the future status ok sMKR and iMKR.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
