@@ -1,7 +1,7 @@
 ---
 sip: 34
 title: Disable sMKR and iMKR
-status: Porposed
+status: Proposed
 author: Spreek (@Spreek)
 discussions-to: (https://discord.gg/x88nPs)
 created: 2019-12-25
