@@ -1,0 +1,55 @@
+---
+eip: <eip>
+title: Deprecate the GAS opcode
+author: Alex Beregszaszi (@axic)
+discussions-to: <url>
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-12-20
+---
+
+## Abstract
+
+Deprecate `GAS` in a *somewhat* backwards compatible way, by making it always return all bits set.
+
+## Motivation
+
+The `GAS` opcode has been traditionally used to determine the remaining gas and was utilised by contracts to calculate
+how much gas to pass to during a call. This requirement was changed with [Tangerine Whistle](https://eips.ethereum.org/EIPS/eip-608),
+which introduced the "63/64th rule", no longer requiring exact calculation of gas to be passed via calls.
+
+The network has undergone several gas cost changes during the years, but existing contract, including those using
+hard coded calculations, could not be updated.
+
+TBD
+
+## Specification
+
+If `block.number >= FORK_BLOCK`, the `GAS` (`0x5a`) instruction always returns `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`.
+
+## Rationale
+
+It would be possible just to remove the opcode and exceptionally abort if it is encountered.
+That would however cause a lot of to fail.
+
+## Backwards Compatibility
+
+This is a breaking change and has a potential to break contracts. The author expects no contracts of any value
+should be affected.
+
+## Test Cases
+
+TBA
+
+## Implementation
+
+TBA
+
+## References
+
+This was first proposed on the "Stateless Ethereum" discussion and was motivated by the [UNGAS discussion](https://ethereum.corepaper.org/compatibility/forward/#remove-gas-observables-and-better-error-handling).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
