@@ -1,7 +1,7 @@
 ---
 sip: 34
 title: Disable sMKR and iMKR
-status: Proposed
+status: Implemented
 author: Spreek (@Spreek)
 discussions-to: (https://discord.gg/x88nPs)
 created: 2019-12-25
@@ -19,13 +19,13 @@ The sMKR and iMKR synths are under attack by price feed manipulators. See [this 
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
 The synthetix system relies on an efficient, liquid market to form its price feed. It cannot support being a larger market than the underlying (at least without substantial changes to the protocol). An oracle change by itself therefore cannot mitigate this attack, nor can any of the front running protections. The problem is that it is profitable to forcibly move the market while holding synths. I see few other recourses other than removing a synth that is exposed to such a risk.
 
-The attackers are currently trading large volumes (24 million daily volume at time of writing) and making large profits at the expense of minters. Some estimates in the discord server put the rate of growth in their account at about $7000 per hour. 
+The attackers are currently trading large volumes (24 million daily volume at time of writing) and making large profits at the expense of minters. Some estimates in the discord server put the rate of growth in their account at about $7000 per hour.
 
 The utility of a synthetic version of an ERC20 token available at nearly every DEX is also quite questionable and it has had limited interest besides among people exploiting its lack of liquidity. So there seems to be little downside in disabling it for the time being, as it is not a big driver of non-toxic volume or interest in the SNX exchange.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-Disable sMKR and iMKR, allowing current holders to exit at the fixed oracle price, but no further buys to be made. 
+Disable sMKR and iMKR, allowing current holders to exit at the fixed oracle price, but no further buys to be made.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -40,6 +40,8 @@ TBD
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 In order to implement this quickly given the priority of the issue, we are proposing to temporarily freeze the oracle price feed at the current price until a longer term solution can be found and the community reaches consensus on the future status ok sMKR and iMKR.
+
+`sMKR` frozen at `443.3180`, `iMKR` frozen at `656.6820` in https://etherscan.io/tx/0x0069d23e7461c8c474fb388845428d480be8f087f5b934ad7d11a3b1a9b5e7d6.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
