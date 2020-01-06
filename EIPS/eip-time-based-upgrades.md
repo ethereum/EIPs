@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Time Based Upgrade Transitions
 author: Danno Ferrin (@shemnon)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/time-based-upgrade-transitions/3902
 status: Draft
 type: Standards Track
 category: Core
@@ -134,6 +134,11 @@ Similarly up to two previous Transition Eligible Blocks will need to be examined
 For Beam Sync (Trinity) block execution begins prior to the complete history of block headers and
 downloading of world state finishes. In this case the two previous Transition Eligible Block headers
 will need to be downloaded and examined prior to the execution of the first block.
+
+For all of Fast, Warp, and Beam sync the historically noted transition block can be recorded in the
+genesis file as an aid to determining where the relevant transitions should occur, but the time
+transitions should still be verified. Hence it would not be advisable to simply switch to the
+historical node values for a time based transition.
 
 ## Test Cases
 
