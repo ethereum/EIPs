@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2456
 title: Time Based Upgrade Transitions
 author: Danno Ferrin (@shemnon)
 discussions-to: https://ethereum-magicians.org/t/time-based-upgrade-transitions/3902
