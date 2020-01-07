@@ -17,8 +17,8 @@ A process to specify network upgrades relative to a point in time instead of a f
 
 Instead of assigning network upgrade transitions to occur on `TRANSITION_BLOCK` ahead of time a
 `TRANSITION_TIME` is chosen. On the second "round" block after the `TRANSITION_TIME` occurs the
-transition to the network upgrade will occur. Meta-EIPs will first list the TIME and later be
-updated to the historical BLOCK when the upgrade transitioned.
+transition to the network upgrade will occur. Meta-EIPs will list the TIME and later be updated to
+also include the historical BLOCK when the upgrade transitioned.
 
 ## Motivation
 
@@ -38,12 +38,16 @@ benefit node operators and developers monitoring the upgrade.
 
 A 'Transition Eligible Block' is defined as a block where the number of blocks preceding the block
 is evenly divisible by the `TRANSITION_INCREMENT`, i.e.
-`(block.number % TRANSITION_INCREMENT) == 0`.
+`(block.number % TRANSITION_INCREMENT) == 0`. For Mainnet the `TRANSITION_INCREMENT` will be 1000.
+For testnets a `TRANSITION_INCREMENT` of 1024 is recommended.
 
-An upgrade will activate at a Transition Eligible Block if
+A specific `TRANSITION_TIME` will be chosen for the network upgrade to activate.
 
-- The timestamp of the block is on or after the `TRANSITION_TIME`
-- The previous Transition Eligible Block was on or after the `TRANSITION_TIME`
+An upgrade will activate at a Transition Eligible Block if all of the following are true:
+
+- The upgrade has not activated already.
+- The timestamp of the block is on or after the `TRANSITION_TIME`.
+- The previous Transition Eligible Block was on or after the `TRANSITION_TIME`.
 
 Once activated the upgrade remains activated for all future blocks.
 
@@ -52,12 +56,9 @@ activate. Note that most network upgrades are defined as "previous upgrade + new
 effect may be that only the most recent network upgrade would appear to activate.
 
 After the upgrade transition completes the Hard Fork Coordinator will update the Meta-EIP to note
-what the transition block was, in addition to preserving the transition time. Clients may
-incorporate this block into their genesis files as an aid to synchronization. This transition block
-number is only advisory and the time base transition rules have precedence.
-
-For Mainnet the `TRANSITION_INCREMENT` will be 1000. For testnets a `TRANSITION_INCREMENT` of 1024
-is recommended.
+what the transition block was. Clients may incorporate this block into their genesis files as an aid
+to synchronization. This transition block number is only advisory and the time base transition rules
+have precedence.
 
 ## Rationale
 
