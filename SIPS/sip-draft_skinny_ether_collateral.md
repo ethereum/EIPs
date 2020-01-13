@@ -23,7 +23,7 @@ At the end of the three month period any outstanding loans must be paid back, if
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
-The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders.
+The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders. See this GH Issue for more context on the motivation and trade-offs https://github.com/Synthetixio/synthetix/issues/232.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
