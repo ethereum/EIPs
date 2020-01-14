@@ -2,7 +2,8 @@
 sip: 35
 title: Skinny Ether Collateral
 status: WIP
-author: Kain Warwick (@kaiynne), Clinton Ennis (@havnoms)
+author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
+discussions-to: https://discord.gg/CDTvjHY
 
 created: 2020-01-13
 ---
@@ -23,11 +24,51 @@ At the end of the three month period any outstanding loans must be paid back, if
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
-The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders. See this GH Issue for more context on the motivation and trade-offs https://github.com/Synthetixio/synthetix/issues/232.
+The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders. See this GH Issue for more context on the motivation and trade-offs [https://github.com/Synthetixio/synthetix/issues/232].
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-The technical specification should describe the syntax and semantics of any new feature.
+
+### EtherCollateral contract 
+ - Requires permision on sETH to mint directly. (upgrade to sETH required)
+ - Ownable
+ - Configuration
+   - interestRate: If updated, all outstanding loans will pay this iterest rate in  on closure of the loan. Default 5%
+   - issueLimit: Maximum amount of sETH that can be issued by the EtherCollateral contract. Default 5000
+   - issuanceRatio: Collaterization ratio. Default 150%
+   - issueFeeRate: Minting for creating the loan. Default 50 bips. 
+   - openLoanClosing: Boolean to allow anyone to close the loans with sETH. 
+   
+   
+ - function `CreateLoan() payable` 
+  - Require sETH to mint does not exceed cap 
+  - Issue sETH to c-ratio
+  - Charge minting fee in sETH (or ETH?)
+  - Store Loan
+   - account address
+   - creation timestamp
+   - sETH amount issued
+  
+ - function `CloseLoan()` 
+  - Require sETH loan balance in wallet
+  - Burn all sETH
+  - Calculate and deduct interest in ETH
+  - Send remainder ETH back to loan creator address
+   - Fee Distribution
+     - Purchase sUSD with ETH from Depot
+     - Call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders.  
+
+### sETH contract 
+ - modifier to allow EtherCollateral to issue sETH
+ - (Potential) Subclass type for allowing EtherCollateral contracts to mint this synth
+ - configuration (or contract resolver) for the EtherCollateral address
+ 
+ ### Synthetix contract 
+  - sip-33 Deprecate XDR synth from Synthetix [https://sips.synthetix.io/sips/sip-33]
+  - debtBalanceOf calculation `totalIssuedSynths() - EtherCollateral.totalIssuedSynths()`
+
+ ### FeePool contract 
+  - `FeePool.donateFees(feeAmount)` public function to record fees to distribute for the open fee period.  
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
