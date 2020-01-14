@@ -44,12 +44,9 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
 - Require sETH to mint does not exceed cap 
  - Issue sETH to c-ratio
  - Charge minting fee in sETH (or ETH?)
- - Store Loan
-  - account address
-  - creation timestamp
-  - sETH amount issued
+ - Store Loan: account address, creation timestamp, sETH amount issued
   
-######`CloseLoan()` function
+###### `CloseLoan()` function
  - Require sETH loan balance in wallet
  - Burn all sETH
  - Calculate and deduct interest in ETH
