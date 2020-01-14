@@ -1,7 +1,7 @@
 ---
 sip: 35
 title: Skinny Ether Collateral
-status: Proposed
+status: WIP
 author: Kain Warwick (@kaiynne), Clinton Ennis (@havnoms)
 
 created: 2020-01-13
