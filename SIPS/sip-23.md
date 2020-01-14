@@ -52,12 +52,28 @@ An abrupt inflation halvening could lead to:
 
 Standard test cases for Solidity contract compiling and deploying onto Ethereum testnets before updating the contract on mainnet.
 
+[SupplySchedule] https://github.com/Synthetixio/synthetix/blob/v2.16.4/test/contracts/SupplySchedule.js
+
+[Synthetix] https://github.com/Synthetixio/synthetix/blob/v2.16.4/test/contracts/Synthetix.js#L2326
+
+[RewardsIntegrationTests] https://github.com/Synthetixio/synthetix/blob/v2.16.4/test/contracts/RewardsIntegrationTests.js
+
 ## Implementation
 
-- Update and deploy [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/SupplySchedule.sol) to Ropsten, Rinkby, and Kovan
+- Update and deploy [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/v2.16.4/contracts/SupplySchedule.sol) to Ropsten, Rinkby, and Kovan
 - Update and deploy changes to proxy contracts that reference SupplySchedule.sol on Ethereum testnets
-- Update and deploy [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/master/contracts/SupplySchedule.sol) to Ethereum mainnet
+- Update and deploy [SupplySchedule.sol](https://github.com/Synthetixio/synthetix/blob/v2.16.4/contracts/SupplySchedule.sol) to Ethereum mainnet
 - Update and deploy changes to Ethereum mainnet proxy contracts that reference SupplySchedule.sol
+
+### Removing time slippage on lastMintEvent and minting day buffer
+
+- `lastMintEvent` is recorded when synthetix.mint() is executed each week (7 days) and to ensure that slippage is removed, the `lastMintEvent` is set from `INFLATION_START_DATE` + `number of weeks of inflation` + `MINT_BUFFER`. 
+
+- Relying on the blocktime `now` when synthetix.mint() is called resulted in the inflation supply not be mintable again until after another 7 days had passed, i.e. if mint was called 1 day late on Friday, instead of a Thursday this slippage would compound. By setting `lastMintEvent` to the start of the week that was last minted ensures that the next inflation mint would be available earlier.
+
+- `MINT_BUFFER` of 1 DAYS was added to ensure that inflationary supply is minted a day after feePeriod closes. 
+
+[SupplySchedule] https://github.com/Synthetixio/synthetix/blob/v2.16.4/contracts/SupplySchedule.sol#L220
 
 ## Copyright
 
