@@ -38,21 +38,22 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
    - issuanceRatio: Collaterization ratio. Default 150%
    - issueFeeRate: Minting for creating the loan. Default 50 bips. 
    - openLoanClosing: Boolean to allow anyone to close the loans with sETH. 
+   
 #### functions
-  - `CreateLoan() payable` function
-   - Require sETH to mint does not exceed cap 
-   - Issue sETH to c-ratio
-   - Charge minting fee in sETH (or ETH?)
-   - Store Loan
-    - account address
-    - creation timestamp
-    - sETH amount issued
-  - `CloseLoan()` function
-   - Require sETH loan balance in wallet
-   - Burn all sETH
-   - Calculate and deduct interest in ETH
-   - Send remainder ETH back to loan creator address
-   - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
+- `CreateLoan() payable` function
+- Require sETH to mint does not exceed cap 
+ - Issue sETH to c-ratio
+ - Charge minting fee in sETH (or ETH?)
+ - Store Loan
+  - account address
+  - creation timestamp
+  - sETH amount issued
+- `CloseLoan()` function
+ - Require sETH loan balance in wallet
+ - Burn all sETH
+ - Calculate and deduct interest in ETH
+ - Send remainder ETH back to loan creator address
+ - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
 
 ### sETH contract 
  - modifier to allow EtherCollateral to issue sETH
