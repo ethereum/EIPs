@@ -24,7 +24,7 @@ At the end of the three month period any outstanding loans must be paid back, if
 
 ## Motivation
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
-The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders. See this GH Issue for more context on the motivation and trade-offs [https://github.com/Synthetixio/synthetix/issues/232].
+The addition of Ether collateral to the Synthetix Protocol will allow ETH holders to easily enter and exit Synthetix Exchange. Rather than having to trade Ether for Synths a trader can put up Ether as collateral to borrow Synths and trade on sX, unwinding the loan once they wish to exit the system. This reduces the risk of slippage entering and exiting the Synthetix ecosystem and will greatly expand the potential pool of traders. See this GH Issue for more context on the motivation and trade-offs [issue-232](https://github.com/Synthetixio/synthetix/issues/232).
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
@@ -38,9 +38,9 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
    - issuanceRatio: Collaterization ratio. Default 150%
    - issueFeeRate: Minting for creating the loan. Default 50 bips. 
    - openLoanClosing: Boolean to allow anyone to close the loans with sETH. 
-   
-#### functions
-- `CreateLoan() payable` function
+
+#### Functions
+##### `CreateLoan() payable` function
 - Require sETH to mint does not exceed cap 
  - Issue sETH to c-ratio
  - Charge minting fee in sETH (or ETH?)
@@ -48,7 +48,8 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
   - account address
   - creation timestamp
   - sETH amount issued
-- `CloseLoan()` function
+  
+######`CloseLoan()` function
  - Require sETH loan balance in wallet
  - Burn all sETH
  - Calculate and deduct interest in ETH
@@ -61,7 +62,7 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
  - configuration (or contract resolver) for the EtherCollateral address
  
 ### Synthetix contract 
-  - sip-33 Deprecate XDR synth from Synthetix [https://sips.synthetix.io/sips/sip-33]
+  - [sip-33](https://sips.synthetix.io/sips/sip-33) Deprecate XDR synth from Synthetix 
   - debtBalanceOf calculation `totalIssuedSynths() - EtherCollateral.totalIssuedSynths()`
 
 ### FeePool contract 
