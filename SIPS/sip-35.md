@@ -18,7 +18,9 @@ The original mechanism for Ether collateral would have allowed stakers to augmen
 <!--A short (~200 word) description of the technical issue being addressed.-->
 To mint Synths (sUSD) a user locks SNX and is assigned a percentage of the global debt pool, Ether collateral will allow Ether to be locked to mint sETH. This sETH debt will be excluded from the global debt pool, so for an SNX staker the global debt pool will be calculated as Total Issued Synths - Total ETH backed sETH. This means SNX minters take on the risk of debt fluctuations from ETH backed sETH, this risk is offset by the fact that fees are only paid to SNX minters and not to ETH minters. 
 
-There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a simple interest rate of 5% APR. The collateral requirement for each position is 150%. There is also a supply cap of 5000 sETH and a fixed three month term after which a more advanced version will be launched with variable interest rates based on utilisation rates. The next version will also incorporate other features as required based on the data gathered in the first three month period.
+There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a simple interest rate of 5% APR. The interest charged on the loan will be paid to SNX Minters when the loan is repaid. 
+
+The collateral requirement for each position is 150%. There is also a supply cap of 5000 sETH and a fixed three month term after which a more advanced version will be launched with variable interest rates based on utilisation rates. The next version will also incorporate other features as required based on the data gathered in the first three month period.
 
 At the end of the three month period any outstanding loans must be paid back, if after a one week grace period a loan is outstanding anyone will be able to send sETH to close the position claiming the outstanding ETH.
 
@@ -37,11 +39,12 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
    - issueLimit: Maximum amount of sETH that can be issued by the EtherCollateral contract. Default 5000
    - issuanceRatio: Collaterization ratio. Default 150%
    - issueFeeRate: Minting for creating the loan. Default 50 bips. 
-   - openLoanClosing: Boolean to allow anyone to close the loans with sETH. 
+   - openLoanClosing: Boolean to allow anyone to close the loans with sETH.
 
 #### Functions
 ##### `CreateLoan() payable` function
-- Require sETH to mint does not exceed cap 
+- Require sETH to mint does not exceed cap
+- Require openLoanClosing to be false
  - Issue sETH to c-ratio
  - Charge minting fee in sETH (or ETH?)
  - Store Loan: account address, creation timestamp, sETH amount issued
@@ -50,8 +53,10 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
  - Require sETH loan balance in wallet
  - Burn all sETH
  - Calculate and deduct interest in ETH
- - Send remainder ETH back to loan creator address
  - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
+ - The interest is calculated continuously accounting for the high variability of sETH loans. 
+ - Using [continuous compounding](https://www.investopedia.com/terms/c/continuouscompounding.asp), the ETH interest on 100 sETH loan over a year would be `100 × 2.7183 ^ (5.0% × 1) - 100 = 5.127 ETH`
+ - Send remainder ETH back to loan creator address
 
 ### sETH contract 
  - modifier to allow EtherCollateral to issue sETH
