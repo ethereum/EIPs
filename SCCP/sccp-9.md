@@ -3,7 +3,7 @@ sccp: 9
 title: Redeploy iXTZ and iBNB
 author: garthtravers
 discussions-to: https://discordapp.com/invite/AEdUHzt
-status: Proposed
+status: Implemented
 created: 2019-12/17
 ---
 
