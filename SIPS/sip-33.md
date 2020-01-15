@@ -1,7 +1,7 @@
 ---
 sip: 33
 title: Deprecate XDR synth from Synthetix.
-status: WIP
+status: Proposed
 author: Nocturnalsheet (@nocturnalsheet), Clinton Ennis (@hav-noms)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
@@ -22,7 +22,7 @@ Deprecate XDR synth from Synthetix to simplify representation and calculation of
 
 XDR has been used in Synthetix since the beginning as an unit of account, however most people are still not able to understand the purpose and calcuation of XDR and most importantly how the price of XDR is being derived.
 
-With the implementation of [SIP-29 - Issue, burn and claim only in sUSD] (https://sips.synthetix.io/sips/sip-29), XDR is not required to be the unit of account anymore and sUSD can replace the role of XDR as the base unit of account.
+With the implementation of [SIP-29 - Issue, burn and claim only in sUSD](https://sips.synthetix.io/sips/sip-29), XDR is not required to be the unit of account anymore and sUSD can replace the role of XDR as the base unit of account.
 
 - This will help new users in Synthetix ecosystem to easily understand how fees are collected and distributed
 - Easier onchain checking and verification of current amount of fees claimable sitting inside fee pool
