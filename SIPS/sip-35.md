@@ -1,8 +1,8 @@
 ---
 sip: 35
 title: Skinny Ether Collateral
-status: WIP
-author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
+status: Proposed
+author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 
 created: 2020-01-13
@@ -18,7 +18,7 @@ The original mechanism for Ether collateral would have allowed stakers to augmen
 <!--A short (~200 word) description of the technical issue being addressed.-->
 To mint Synths (sUSD) a user locks SNX and is assigned a percentage of the global debt pool, Ether collateral will allow Ether to be locked to mint sETH. This sETH debt will be excluded from the global debt pool, so for an SNX staker the global debt pool will be calculated as Total Issued Synths - Total ETH backed sETH. This means SNX minters take on the risk of debt fluctuations from ETH backed sETH, this risk is offset by the fact that fees are only paid to SNX minters and not to ETH minters. 
 
-There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a simple interest rate of 5% APR. The interest charged on the loan will be paid to SNX Minters when the loan is repaid. 
+There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a compounding interest rate of 5% APR. The interest charged on the loan will be paid to SNX Minters when the loan is repaid. 
 
 The collateral requirement for each position is 150%. There is also a supply cap of 5000 sETH and a fixed three month term after which a more advanced version will be launched with variable interest rates based on utilisation rates. The next version will also incorporate other features as required based on the data gathered in the first three month period.
 
@@ -33,7 +33,7 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
 
 ### EtherCollateral contract 
  - Requires permision on sETH to mint directly. (upgrade to sETH required)
- - Ownable
+ - Ownable, Pausable
  - Configuration
    - interestRate: If updated, all outstanding loans will pay this iterest rate in  on closure of the loan. Default 5%
    - issueLimit: Maximum amount of sETH that can be issued by the EtherCollateral contract. Default 5000
@@ -46,16 +46,15 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
 - Require sETH to mint does not exceed cap
 - Require openLoanClosing to be false
  - Issue sETH to c-ratio
- - Charge minting fee in sETH (or ETH?)
  - Store Loan: account address, creation timestamp, sETH amount issued
   
 ###### `CloseLoan()` function
  - Require sETH loan balance in wallet
  - Burn all sETH
- - Calculate and deduct interest in ETH
- - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
- - The interest is calculated continuously accounting for the high variability of sETH loans. 
- - Using [continuous compounding](https://www.investopedia.com/terms/c/continuouscompounding.asp), the ETH interest on 100 sETH loan over a year would be `100 × 2.7183 ^ (5.0% × 1) - 100 = 5.127 ETH`
+ - Calculate and deduct interest(5%) and minting fee(50 bips) in ETH
+  - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
+  - The interest is calculated continuously accounting for the high variability of sETH loans. 
+  - Using [continuous compounding](https://www.investopedia.com/terms/c/continuouscompounding.asp), the ETH interest on 100 sETH loan over a year would be `100 × 2.7183 ^ (5.0% × 1) - 100 = 5.127 ETH`
  - Send remainder ETH back to loan creator address
 
 ### sETH contract 
@@ -72,7 +71,7 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-There are several assumptions to the Ether Collateral proposal that require empirical observations of actual market participant behaviour in order to validate. The most important of these is the sensitivity to interest rates of borrowers, additionally demand for ETH denominated loans is somewhat untested. In order to gather data about these assumptions we propose a simple model with a fixed interest rate and Supply cap. Both the interest rate and supply cap will be configurable and can be modified by an SCCP. If demand significantly exceeds expectations then the cap or interest rate or both can be modified. If demand is lower than anticipated interest rates can be lowered to ascertain actual market demand. If demand is low even at low/zero interest rates it may be that a modification to the loan denomination is required. 
+There are several assumptions to the Ether Collateral proposal that require empirical observations of actual market participant behaviour in order to validate. The most important of these is the sensitivity to interest rates of borrowers, additionally demand for ETH denominated loans is somewhat untested. In order to gather data about these assumptions we propose a simple model with a fixed interest rate and supply cap. Both the interest rate and supply cap will be configurable and can be modified by an SCCP. If demand significantly exceeds expectations then the cap or interest rate or both can be modified. If demand is lower than anticipated interest rates can be lowered to ascertain actual market demand. If demand is low even at low/zero interest rates it may be that a modification to the loan denomination is required. 
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
