@@ -1,7 +1,7 @@
 ---
 sip: 31
 title: sETH LP rewards contract
-status: WIP
+status: Proposed
 author: Clinton Ennis (@hav-noms), Anton Bukov (@k06a) 
 discussions-to: https://discord.gg/3uJ5rAy
 
