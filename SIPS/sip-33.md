@@ -1,7 +1,7 @@
 ---
 sip: 33
 title: Deprecate XDR synth from Synthetix.
-status: Proposed
+status: Approved
 author: Nocturnalsheet (@nocturnalsheet), Clinton Ennis (@hav-noms)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
