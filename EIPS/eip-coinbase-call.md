@@ -12,15 +12,23 @@ created: 2020-01-19
 
 ## Simple Summary
 
-Allow contracts to be called by validator/miner (`block.coinbase`) without a transaction.
+Allow contracts to be called directly by `block.coinbase` (block validator), without a transaction.
 
 ## Abstract
 
-Validators/miners can choose become Gas Relayers to pick up fees from meta transactions, they do so by signing a transaction wrapping the meta transaction. However this brings an overhead of a signed transaction by validator that does nothing. This proposal makes possible to remove this unused ecrecover.
+_In proof-of-work blockchains, validators are known as miners._
+
+The validator might want to execute functions directly, without having to sign a transaction. Some examples might be presenting a proof in a contract for an change which also benefits the validator. 
+
+A notable example would be when a validator want to act as an [EIP-1077] Gas Relayer, to pick up fees from meta transactions. 
+Without this change, they can do so by signing from any address a `gasPrice = 0` transaction with the gas relayed call. 
+However this brings an overhead of a signed transaction by validator that does nothing, as `msg.sender` is never used, and there is no gas cost to EVM charge. 
+
+This proposal makes possible to remove this unused ecrecover.
 
 ## Motivation
 
-In order to reduce the overall overhead of gas abstraction.
+In order to reduce the overhead of calls that don't use `msg.sender` and are being called by validator with `tx.gasPrice = 0`. 
 
 ## Specification
 
@@ -28,7 +36,7 @@ The calls to be executed by `block.coinbase` would be included first at block, a
 
 Would be valid to execute any calls without a transaction by the block coinbase, except when the validator call tries to read `msg.sender`, which would throw an invalid jump.
 
-Calls included by the validator would have `tx.origin = block.coinbase` and `gas.price = 0` for the rest of call stack, the rest follows a normal transactions.
+Calls included by the validator would have `tx.origin = block.coinbase` and `gas.price = 0` for the rest of call stack, the rest follows as normal calls.
 
 ## Rationale
 
@@ -36,7 +44,7 @@ TBD
 
 ## Backwards Compatibility
 
-TBD
+`tx.origin = block.coinbase` could cause some issues on bad designed contracts, such as using `tx.origin` to validate a signature, an analysis on how contracts use tx.origin might be useful to decide if this is a good choice.
 
 ## Test Cases
 
