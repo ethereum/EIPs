@@ -31,7 +31,7 @@ Rather than using Chainlink updates for our inverse Synths, we will simply calcu
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-In order to have both the centralized oracle and decentralized oracles work in tandem, we will abstract away the logic in the `ExchangeRates` contract. Fortunately, the current architecture is such that this change is a fairly minimal impact to the Synthetix system.
+_To be added_
 
 ## Test Cases
 
