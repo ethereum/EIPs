@@ -1,5 +1,5 @@
 ---
-sip: to be assigned
+sip: 36
 title: Chainlink Oracles Phase 2 - Crpytocurrencies, indexes 
 status: WIP
 author: Garth Travers (@garthtravers), Justin J Moses (@justinjmoses)
