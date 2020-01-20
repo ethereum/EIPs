@@ -30,7 +30,7 @@ This onchain solution fixes all the issues and can be automated and self serve r
 
 - Current solution uses an off-chain [python script](http://18.222.88.2:5000/pool-rewards/8926035/8967962) to determine sETH Liquidity providers between two blocks which are manually entered.
 - We must download a CSV and manually verify the addresses and their LP amounts.
-- There are so many LPs now that it takes 2 multi-sig multi-send transactions to send out the LP SNX rewards.
+- There are so many LPs now that it takes 4 multi-sig multi-send transactions to send out the LP SNX rewards.
 - The co-ordination amongst the 5 multi-sigs signers and overhead each manually verifying is inefficient given this could all be offloaded to a trusted smart contract to calculate on-chain in a trust-less manner. 
 - The [gnosis multi-sig](https://wallet.gnosis.pm/#/wallet/0x53265D3D34c9ECB5685Be3176430366b4e392010) freezes and is very slow to react since the payloads of the transactions are so big.
 - LP providers have noted is that if they withdraw / rebalance any amount of their liquidity from the pool during the week then all their rewards will be forfeited. The python script checks that no withdrawals / transfer of LP tokens have been made from the pool to prevent people from gaming the rewards.
@@ -51,7 +51,7 @@ Workflow
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-This onchain self service model is precicsly the use case for smart contracts and should replace the offchain rewards process eradicating the need for the;
+This onchain self service model is precicely the use case for smart contracts and should replace the offchain rewards process eradicating the need for the;
 
 - [python script](http://18.222.88.2:5000/pool-rewards/8926035/8967962)
 - [gnosis multi-sig](https://wallet.gnosis.pm/#/wallet/0x53265D3D34c9ECB5685Be3176430366b4e392010) & the 5 signers signing. 
