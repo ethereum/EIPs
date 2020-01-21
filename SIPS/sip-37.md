@@ -1,6 +1,6 @@
 ---
 sip: 37
-title: Fee Reclamation and Rebate
+title: Fee Reclamations and Rebates
 status: WIP
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
