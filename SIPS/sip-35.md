@@ -40,6 +40,7 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
    - issuanceRatio: Collaterization ratio. Default 150%
    - issueFeeRate: Minting for creating the loan. Default 50 bips. 
    - openLoanClosing: Boolean to allow anyone to close the loans with sETH.
+   - minLoanSize: Minimum amount of ETH to create loan preventing griefing and gas consumption. Min 1ETH = 0.6666666667 sETH 
 
 #### Functions
 ##### `CreateLoan() payable` function
