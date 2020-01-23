@@ -9,7 +9,7 @@ created: 2020-01/23
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-I propose reducing the minter reward to 30 SNX per minting of reward supply. When supply schedule was released initially the minter reward was set to incentivise people to call synthetix.mint() and cover the cost of gas incurred. At the time the reward value was about $20USD however with the increase of SNX's value this has now ballooned into over ~$280USD at current value.
+I propose reducing the minter reward to 30 SNX per minting of reward supply from the current 200 SNX per week. When supply schedule was released initially the minter reward was set to incentivise people to call synthetix.mint() and cover the cost of gas incurred. At the time the reward value was about $20USD however with the increase of SNX's value this has now ballooned into over ~$280USD at current value.
 
 Furthermore we've observed that synthetix.mint() is now called sufficiently on time by automated bots and traded into ETH immediately for the reward.   
 
