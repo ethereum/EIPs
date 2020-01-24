@@ -68,7 +68,11 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
   - debtBalanceOf calculation `totalIssuedSynths() - EtherCollateral.totalIssuedSynths()`
 
 ### FeePool contract 
-  - `FeePool.donateFees(feeAmount)` public function to record fees to distribute for the open fee period.  
+  - `FeePool.recordFeePaid(amount)` external function to record fees to distribute for the open fee period.
+  - Synths to notify amount of fees in sUSD transferred into the FEE_ADDRESS (`0xfeEFEEfeefEeFeefEEFEEfEeFeefEEFeeFEEFEeF`) 
+
+### Synth contract
+ - `Synths.transfer(to, value)` allows EtherCollateral contract to transfer synths directly to the `FEE_ADDRESS` and convert the amount into sUSD and which is stored in feePool as fees to distribute to SNX stakers.    
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
