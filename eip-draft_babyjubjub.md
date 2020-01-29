@@ -2,7 +2,7 @@
 eip:      2494
 title:    Baby Jubjub Elliptic Curve
 authors:  Barry WhiteHat (@barryWhiteHat), Marta Bellés (@bellesmarta), Jordi Baylina (@jbaylina)
-discussions-to: https://ethresear.ch/t/discussions-to-thread-for-eip-2494-baby-jubjub-elliptic-curve/6845
+discussions-to: https://ethereum-magicians.org/t/eip-2494-baby-jubjub-elliptic-curve/3968
 status:   Draft
 type:     Standards Track 
 category: ERC
