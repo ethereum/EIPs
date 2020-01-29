@@ -1,8 +1,8 @@
 ---
-sip: <to be assigned>
+sip: 38
 title: Charge Fees During Purge
 status: WIP
-author: Justin J Moses (@justinjmoses)>
+author: Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
 created: 2020-01-29
