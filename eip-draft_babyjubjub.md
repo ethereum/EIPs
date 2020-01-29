@@ -4,7 +4,7 @@ Title:    Baby Jubjub Elliptic Curve
 Authors:  Barry WhiteHat (@barryWhiteHat),
           Marta Bellés (@bellesmarta),
           Jordi Baylina (@jbaylina)
-Discussions-To: 
+Discussions-To: https://github.com/ethereum/EIPs/issues/2493
 Status:   Draft
 Type:     Standards Track 
 Category: ERC
