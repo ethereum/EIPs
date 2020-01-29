@@ -1,6 +1,6 @@
 ---
 sip: <to be assigned>
-title: Charge Fees for Purging
+title: Charge Fees During Purge
 status: WIP
 author: Justin J Moses (@justinjmoses)>
 discussions-to: <Discord Channel>
