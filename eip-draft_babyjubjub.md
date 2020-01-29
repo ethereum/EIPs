@@ -1,14 +1,12 @@
 ---
-EIP:      <to be assigned>
-Title:    Baby Jubjub Elliptic Curve
-Authors:  Barry WhiteHat (@barryWhiteHat),
-          Marta Bellés (@bellesmarta),
-          Jordi Baylina (@jbaylina)
-Discussions-To: https://github.com/ethereum/EIPs/issues/2493
-Status:   Draft
-Type:     Standards Track 
-Category: ERC
-Created:  2020-01-29
+eip:      2494
+title:    Baby Jubjub Elliptic Curve
+authors:  Barry WhiteHat (@barryWhiteHat), Marta Bellés (@bellesmarta), Jordi Baylina (@jbaylina)
+discussions-to: https://github.com/ethereum/EIPs/pull/2494
+status:   Draft
+type:     Standards Track 
+category: ERC
+created:  2020-01-29
 ---
 
 # Simple Summary
