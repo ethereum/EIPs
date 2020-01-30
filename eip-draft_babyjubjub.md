@@ -357,6 +357,7 @@ Arithmetic of Baby Jubjub and some cryptographic primitives using the curve have
 - Circuit (circom): https://github.com/iden3/circomlib/blob/master/circuits/babyjub.circom
 - Rust: https://github.com/arnaucube/babyjubjub-rs
 - Solidity: https://github.com/yondonfu/sol-baby-jubjub
+- Go: https://github.com/iden3/go-iden3-crypto/tree/master/babyjub
 
 # Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
