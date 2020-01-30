@@ -13,7 +13,7 @@ Proposal to create a DAO to choose how to disburse funding for community grants.
 
 ## Abstract
 
-We'll set up a contract with 5 signers to vet grant proposals to contribute to the Synthetix community. This will represent phase one of the Synthetix transition to decentralised governance. 
+We'll set up a contract with 5 signers to vet grant proposals to contribute to the Synthetix community. This will represent the first, transitional phase of Synthetix's shift to decentralised governance. 
 
 ## Motivation
 
@@ -21,7 +21,7 @@ Community grants are currently disbursed by the Foundation. However, moving this
 
 ## Specification
 
-Of the 5 signers, 3 will be community members and 2 will be team members. For a grant to pass and receive funding, it will require 4 approvals. 
+There will be 5 signers, and for a grant to pass and receive funding it will require 4 approvals. 
 If the community reaches negative consensus around a signer's performance, they can vote to replace that signer. 
 
 ## Rationale
