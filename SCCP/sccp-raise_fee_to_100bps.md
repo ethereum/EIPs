@@ -17,7 +17,7 @@ Raise the exchange transaction fee to 100 basis points (1%).
 
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
-To reduce the incidence of front-running until Fee Reclamation is implemented. Once Fee reclamation is live we will need to reduce fees to teh standard 30bps to test the efficacy of the change in preventing front-running.
+To reduce the incidence of front-running until Fee Reclamation is implemented. Once Fee reclamation is live we will need to reduce fees to the standard 30bps to test the efficacy of the change in preventing front-running.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
