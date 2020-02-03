@@ -28,7 +28,7 @@ Solution #1 may discourage frontrunners but will also harm good-faith stakers/he
 
 Solution #2 is overly aggressive, sets a dangerous precedent, is somewhat arbitrary and could be deployed arbitrarily in the future. It would discourage frontrunners but at a high cost from a PR perspective and future governance perspective.
 
-Solution #3 seems kind of weak, but achieves the goal of removing the surface space for these attacks. It's a potential PR problem, but to preempt that narrative, this SCCP suggests that all disabled synths should be explicitly scheduled to be re-eanbled in the same release as Fee Reclamation. More deliberate conversations should be had then about whether certain of these assets (especially XTX) should be listed at all.
+Solution #3 seems kind of weak, but achieves the goal of removing the surface space for these attacks. It's a potential PR problem, but to preempt that narrative, this SCCP suggests that all disabled synths should be explicitly scheduled to be re-enabled in the same release as Fee Reclamation. More deliberate conversations should be had then about whether certain of these assets (especially XTX) should be listed at all.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
