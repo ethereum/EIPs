@@ -13,6 +13,26 @@ updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19,
 
 EIP stands for Ethereum Improvement Proposal. An EIP is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP should provide a concise technical specification of the feature and a rationale for the feature. The EIP author is responsible for building consensus within the community and documenting dissenting opinions.
 
+## Table of Contents
+
+- EIP Submissions
+   - [EIP Design Rational](#eip-rationale)
+   - [EIP Types](#eip-types)
+   - [EIP Work Flow](#eip-work-flow) 
+ - EIP Format and Style Guide
+   - [Requirements](#what-belongs-in-a-successful-eip)
+   - Format
+     - [Template](#eip-formats-and-templates)
+     - [Header](#eip-header-preamble)
+   - [Auxiliary Files](#auxiliary-files)
+ - EIP Best Practices
+   - [Transfering Ownership](#transferring-eip-ownership)
+ - [EIP Editors](#eip-editors)
+ - [Hardfork Meta](#hardfork-meta)
+   - [Ethereum Hardforks](#ethereum-hardforks) 
+   - [EIP Centric Model](#eip-centric-model)
+ - [History](History)
+
 ## EIP Rationale
 
 We intend EIPs to be the primary mechanisms for proposing new features, for collecting community technical input on an issue, and for documenting the design decisions that have gone into Ethereum. Because the EIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
@@ -265,6 +285,12 @@ Once the EIP is ready for the repository, the EIP editor will:
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
 The editors don't pass judgment on EIPs. We merely do the administrative & editorial part.
+
+## Hardfork Meta
+
+### Ethereum Hardforks
+
+### EIP Centric Model
 
 ## History
 
