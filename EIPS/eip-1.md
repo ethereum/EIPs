@@ -326,9 +326,9 @@ The Meta EIP representing the hard fork should move in to the Accepted state onc
  - [Homestead](https://eips.ethereum.org/EIPS/eip-606) *block 1_150_000*
  - [Spurious Dragon](https://eips.ethereum.org/EIPS/eip-607) *block 2_675_000*
  - [Byzantium](https://eips.ethereum.org/EIPS/eip-609) *block 4_370_000*
- - [Constantinople](https://eips.ethereum.org/EIPS/eip-1013) *block 7_280_000
- - [Istanbul](https://eips.ethereum.org/EIPS/eip-1679) *block 9_069_000
- - [Muir Glacier](https://eips.ethereum.org/EIPS/eip-2387) *block 9_200_000
+ - [Constantinople](https://eips.ethereum.org/EIPS/eip-1013) *block 7_280_000*
+ - [Istanbul](https://eips.ethereum.org/EIPS/eip-1679) *block 9_069_000*
+ - [Muir Glacier](https://eips.ethereum.org/EIPS/eip-2387) *block 9_200_000*
 
 ### EIP Centric Model
 
