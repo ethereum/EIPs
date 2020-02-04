@@ -3,7 +3,7 @@ sccp: 12
 title: Temporarily Deactivate Exploited Assets
 author: Michael J. Cohen (@mjayceee)
 discussions-to: TBC
-status: Proposed
+status: Implemented
 created: 2020-02-03
 ---
 
