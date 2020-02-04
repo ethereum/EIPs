@@ -31,7 +31,7 @@ EIP stands for Ethereum Improvement Proposal. An EIP is a design document provid
  - [Hardfork Meta](#hardfork-meta)
    - [Ethereum Hardforks](#ethereum-hardforks) 
    - [EIP Centric Model](#eip-centric-model)
- - [History](History)
+ - [History](#history)
 
 ## EIP Rationale
 
