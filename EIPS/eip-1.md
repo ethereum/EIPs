@@ -288,9 +288,76 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Hardfork Meta
 
+Any changes to clients that effect consensus of the Ethereum Network results in a hardfork (See the `CORE` category of EIPs). There is then a "fork" in the blockchain where one chain follows the updated ruleset. A contentious fork is when a network split occurs because two communities form to continue supporting both the old and the new client codebases simultaneously. A split is not the typical case, as historically most upgrades have been adopted by the network wholly.
+
+Non-contentious forks, or a Network Upgrades, are part of the standard upgrade process. Core EIPs follow the EIP flow defined previously in EIP-1, are implemented into the client code with a block activation number, and released as a software upgrade to the clients. Node operators upgrade their clients, and at the specified block height, the network upgrade is deployed.
+
+The following is the specification and definition of the Hard Fork process for Ethereum, governed by the AllCoreDevs Community Calls.
+
+#### Specification
+A Meta EIP should be created and merged as a Draft in preparation for the hardfork.
+
+This EIP should contain:
+ - the desired codename of the hard fork,
+ - activation block number once decided
+ - a timeline section
+ - an EIPs to include section
+ - the Requires header should point to the previous hard fork meta EIP.
+
+The draft shall be updated with summaries of the decisions around the hard fork.
+
+##### Timeline
+Once a timeline with key dates is agreed upon for other crucial dates. The basic outline of a hardfork timeline should include:
+
+- Projected date for testnet network upgrade
+- Projected date for mainnet upgrade (the activation block number / projected date for this block)
+
+#### EIP Inclusion Process
+Anyone that wishes to propose a Core EIP for the hard fork should make a PR against the Meta EIP representing the hard fork. For an EIP to be considered it must follow the EIP centric model defined later in this document and must be published in at least `DRAFT` status. It enters the Proposed EIPs section, along with at least one person who is the champion for that EIP.
+
+EIPs can move along this process by participating in discussions on the “All Core Devs Meetings”:
+- If accepted for a hard fork, the EIP should be moved to the Accepted EIPs section.
+- Once the EIPs in the Accepted EIPs section have successfully launched on a testnet roll out, they are moved to the Included EIPs section.
+
+The Meta EIP representing the hard fork should move in to the Accepted state once the changes are frozen (i.e. all referenced EIPs are in the Accepted state) and in to the Final state once the hard fork has been activated.
+
 ### Ethereum Hardforks
+ - Genesis Block *block 1*
+ - [Homestead](https://eips.ethereum.org/EIPS/eip-606) *block 1_150_000*
+ - [Spurious Dragon](https://eips.ethereum.org/EIPS/eip-607) *block 2_675_000*
+ - [Byzantium](https://eips.ethereum.org/EIPS/eip-609) *block 4_370_000*
+ - [Constantinople](https://eips.ethereum.org/EIPS/eip-1013) *block 7_280_000
+ - [Istanbul](https://eips.ethereum.org/EIPS/eip-1679) *block 9_069_000
+ - [Muir Glacier](https://eips.ethereum.org/EIPS/eip-2387) *block 9_200_000
 
 ### EIP Centric Model
+
+The EIP centric forking model defines the approval process for any EIP to be included in a hardfork or network upgrade. 
+
+The pipeline for Core EIPs is as follows.
+
+`[ DRAFT ] -> [ ELLIGLE FOR INCLUSION ] -> [ IMPLEMENTATION ] -> [ TESTING ] -> [ ACCEPTED ] -> [ DEPLOYED ]`
+
+Note that this process is included within the EIP Flow, and so `LAST_CALL` is still observed as part of the higher-order process of EIP finalization.
+
+#### Eligible for Inclusion
+
+The first stage, **EFI** (**Eligible for Inclusion**), is where the Core Developers vet the concept of an EIP and give a “green light” sufficient for EIP authors to move forward with development.
+
+[EIP 2378](https://eips.ethereum.org/EIPS/eip-2378) is a meta-registry documenting all EIPs marked as **Eligible For Inclusion** by the All Core Devs. Typically to reach this stage, an EIP must be discussed in brief on an AllCoreDevs Call and motioned by rough consenses and added to the registry. Any additions are required to provide a link to the meeting notes when this discussion and decision took place.
+
+The requirements for **Eligible for Inclusion** is that the AllCoreDevs, representing the major clients and ecosystem stakeholders etc:
+
+ - Are positive towards the EIP,
+ - Would accept (well written) PRs to include the EIP into the codebase.
+  - So that it could be toggled on for testing…
+  - …but not with an actual block number for activation
+
+*Motivation*
+Development of clear specifications and pull requests to existing Ethereum Clients is a large investment of time and resources. The state of **Eligible for Inclusion** is a signal from the Ethereum Core Developers to an EIP Author validiating the idea behind an EIP and confirms investing their time further development is worthwhile.
+
+References
+- Original EIP Centric Forking Model Proposal by @holiman - https://notes.ethereum.org/@holiman/S1ELAYY7S?type=view
 
 ## History
 
