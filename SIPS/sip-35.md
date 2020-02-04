@@ -18,7 +18,7 @@ The original mechanism for Ether collateral would have allowed stakers to augmen
 <!--A short (~200 word) description of the technical issue being addressed.-->
 To mint Synths (sUSD) a user locks SNX and is assigned a percentage of the global debt pool, Ether collateral will allow Ether to be locked to mint sETH. This sETH debt will be excluded from the global debt pool, so for an SNX staker the global debt pool will be calculated as Total Issued Synths - Total ETH backed sETH. This means SNX minters take on the risk of debt fluctuations from ETH backed sETH, this risk is offset by the fact that fees are only paid to SNX minters and not to ETH minters. 
 
-There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a compounding interest rate of 5% APR. The interest charged on the loan will be paid to SNX Minters when the loan is repaid. 
+There are two fees associated with opening an ETH backed sETH position, a minting fee of 50bps and a interest rate of 5% APR. The interest charged on the loan will be paid to SNX Minters when the loan is repaid. 
 
 The collateral requirement for each position is 150%. There is also a supply cap of 5000 sETH and a fixed three month term after which a more advanced version will be launched with variable interest rates based on utilisation rates. The next version will also incorporate other features as required based on the data gathered in the first three month period.
 
@@ -54,8 +54,8 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
  - Burn all sETH
  - Calculate and deduct interest(5%) and minting fee(50 bips) in ETH
   - Fee Distribution. Purchase sUSD with ETH from Depot then call `FeePool.donateFees(feeAmount)` to record fees to distribute to SNX holders. 
-  - The interest is calculated continuously accounting for the high variability of sETH loans. 
-  - Using [continuous compounding](https://www.investopedia.com/terms/c/continuouscompounding.asp), the ETH interest on 100 sETH loan over a year would be `100 × 2.7183 ^ (5.0% × 1) - 100 = 5.127 ETH`
+  - The interest is calculated based on a simple interest over the 3 months period per second. 
+  - Using this formula, the ETH interest on 100 sETH loan over a year would be `100 × (5.0% / 31536000) * time in seconds) - 100 = ~0.5 ETH`
  - Send remainder ETH back to loan creator address
 
 ### sETH contract 
