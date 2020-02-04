@@ -36,11 +36,23 @@ By creating a short waiting period after exchanges in which exchanges or transfe
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-When a user exchanges `src` synth for `dest` synth, the waiting period of _N_ minutes begins. Any `transfer` of `dest` synth will fail during this window, as will an `exchange` from `dest` synth to any other synth, or a burn of `sUSD` if it was the `dest` synth. If another exchange into the same `dest` synth is performed before _N_ minutes expires, the waiting period restarts with _N_ minutes remaining.
+When a user exchanges `src` synth for `dest` synth, the waiting period of _N_ minutes begins. Any `transfer` of `dest` synth will fail during this window, as will an `exchange` from `dest` synth to any other synth, or a burn of `sUSD` if it was the `dest` synth of any pending exchange. If another exchange into the same `dest` synth is performed before _N_ minutes expires, the waiting period restarts with _N_ minutes remaining.
 
 Once _N_ minutes has expired, the following `exchange` from the `dest` synth to any other, or a burn of `sUSD`, will invoke `settle` - calculating the difference between the exchanged prices and those at the end of the waiting perid. If the user made profit, it is taken to be front-run profit, and the profit is burned from the user's holding of the `dest` synth. If the user made a loss, this loss is issued to them from the `dest` synth. The `exchange` then continues as normal.
 
-In the case of a user trying to `transfer` the `dest` synth after the waiting period has expired - this will always fail. The user has to first invoke `settle` before a synth can be transferred.
+In the case of a user trying to `transfer` some `amount` of the `dest` synth after the waiting period has expired, this will always fail if the `amount` + `totalOwing` is more than the user's `balanceOf`. The user has to first invoke `settle` before a synth can be transferred. Otherwise, the `transfer` will continue as normal.
+
+The calculation of `owing` or `owed` is as follows:
+
+`Amount * (1 - feeRate) * (srcRate/destRate - newSrcRate/newDestRate)`
+
+If the result is negative, the amount is `owed` as a rebate, otherwise its `owing` as a
+
+Examples (with `feeRate` at `0.003`):
+
+- 100 sUSD into sETH at a ETHUSD rate of 100:1 (1/100) which raises to 105:1 (1/105), the `owing` would be: `100 * 0.997 * (1/100 - 1/105) = 0.04747619048 sETH`.
+
+- 100 sETH into sBTC at a BTCUSD rate of 10,000:1 and ETHUSD rate of 100:1 which raises to 105:1, the user would be rebated an `owed` amount of: `100 * 0.997 * (100/10000 - 105/10000) = 0.04985 sBTC`
 
 ## Rationale
 
@@ -50,7 +62,7 @@ The goal is to reclaim any fees owing whilst not impacting usability and composa
 
 Once the period is over, we invoke `settle` within `exchange` or `burn` of the `dest` synth to limit complexity for the user.
 
-Whilst we can also invoke `settle` within `transfer` of the `dest` synth, there are concerns that this will break `ERC20` assumptions. When `transfer(amount)` is invoked, there are assumptions in the Ethereum ecosystem that `amount` will be received by the recipient. For instance, when Synthetix was Havven, there were issues integrating `sUSD` into DEXes as the previous `sUSD` transfer fees meant that these DEXes had to consider these in their accounting systems, which was often too complex for them. That being said, this
+Whilst we can also invoke `settle` within `transfer` of the `dest` synth, there are concerns that this will break `ERC20` assumptions. When `transfer(amount)` is invoked, there are assumptions in the Ethereum ecosystem that `amount` will be received by the recipient. For instance, when Synthetix was Havven, there were issues integrating `sUSD` into DEXes as the previous `sUSD` transfer fees meant that these DEXes had to consider these in their accounting systems, which was often too complex for them. That being said, this proposal includes the addition of a `transferAndSettle` function for users who want that functionality in a single transaction.
 
 ## Test Cases
 
@@ -126,98 +138,112 @@ Given the following preconditions:
 
   Then
 
-  - ✅ the transfer succeeds because the profit made from the oracle update is less than the fee she already paid
+  - ❌ the transfer fails because she owes `100 * 0.997 * (1/100 - 1/100.25) = 0.002486284289 sETH` she must settle first
 
   ***
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and 1 minute later the price of ETHUSD goes up to 103:1
-  - ⏳ and 2 more minutes later she attempts to transfer any of this sETH
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and 2 minutes later the price of ETHUSD goes up to 100.25:1
+- ⏳ and another minute later she attempts to transfer 0.90 sETH
 
-  Then
+Then
 
-  - ❌ the transfer fails because she profited 3% - 0.3% = 2.7%. She must invoke `settle` before being able to transfer the sETH
+- ✅ the transfer succeeds because even though she owes `0.002486284289` `sETH`, she still has `0.997 - 002486284289 = 0.9945137157` sETH that is transferable
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and a minute later the price of ETHUSD goes up to 103:1
-  - ⏳ and 2 more minutes later she invokes `settle` for sETH
-  - and immediately transfers this sETH to another wallet
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and 1 minute later the price of ETHUSD goes up to 103:1
+- ⏳ and 2 more minutes later she attempts to transfer any of this sETH
 
-  Then
+Then
 
-  - ✅ the transfer succeeds as the prior `settle` invocation burned 2.7% of her sETH holdings (0.027), and transfer detected no fees remaining.
+- ❌ the transfer fails because she made `100 * 0.997 * (1/100 - 1/103) = 0.02903883495` sETH. She must either invoke `settle` separately before being able to transfer the sETH or invoke `transferAndSettle` to combine the actions.
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and a minute later the price of ETHUSD goes up to 103:1
-  - ⏳ and 2 more minutes later she attempts to exchange 1 sETH for sBTC
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and a minute later the price of ETHUSD goes up to 103:1
+- ⏳ and 2 more minutes later she invokes `settle` for sETH
+- and immediately transfers this sETH to another wallet
 
-  Then
+Then
 
-  - ✅ the exchange succeeds, burning 2.7% of her exchange amount (0.027 sETH), and converting the rest into sBTC (minus the exchange fee).
+- ✅ the transfer succeeds as the prior `settle` invocation burned `100 * 0.997 * (1/100-1/103) = 0.02903883495 sETH`, and transfer detected no fees remaining.
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and a minute later the price of ETHUSD goes down to 95:1
-  - ⏳ and 2 more minutes later she attempts to exchange 1 sETH for sBTC
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and a minute later the price of ETHUSD goes up to 103:1
+- ⏳ and 2 more minutes later she attempts to exchange 1 sETH for sBTC
 
-  Then
+Then
 
-  - ✅ the exchange succeeds, issuing her ~5.247% of her exchange amount (0.05247 sETH), and converting the entire amount into sBTC (minus the exchange fee).
+- ✅ the exchange succeeds, burning `0.02903883495 sETH` and converting the rest into sBTC (minus the exchange fee).
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and no oracle update for ETHUSD occurs after 3 minutes
-  - ⏳ once 3 minutes from exchange have elapsed she attempts to exchange
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and a minute later the price of ETHUSD goes down to 95:1
+- ⏳ and 2 more minutes later she attempts to exchange 1 sETH for sBTC
 
-  Then
+Then
 
-  - ✅ the exchange succeeds and no rebate or reclamation is required
+- ✅ the exchange succeeds, issuing her `100 * 0.997 * (1/100 - 1/95) = 0.05247368421 sETH`, and converting the entire amount (`0.967961165 sETH`) into sBTC (minus the exchange fee).
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and no oracle update for ETHUSD occurs after 3 minutes
-  - ⏳ once 3 minutes from exchange have elapsed she exchanges 1 sETH for sUSD (paying a further 30bps fee)
-  - ⏳ and a minute later the price of ETHUSD goes down to 90:1
-  - ⏳ she burns `50` sUSD
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and no oracle update for ETHUSD occurs after 3 minutes
+- ⏳ once 3 minutes from exchange have elapsed she attempts to exchange
 
-  Then
+Then
 
-  - ❌ the burn fails as the waiting period for sUSD is still ongoing
+- ✅ the exchange succeeds and no rebate or reclamation is required
 
-  ***
+---
 
-  When
+When
 
-  - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
-  - ⏳ and no oracle update for ETHUSD occurs after 3 minutes
-  - ⏳ once 3 minutes from exchange have elapsed she exchanges 1 sETH for sUSD (paying a further 30bps fee)
-  - ⏳ and a minute later the price of ETHUSD goes down to 90:1
-  - ⏳ and two minutes later 3 minutes have elapsed since her last exchange
-  - ⏳ she burns `50` sUSD
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and no oracle update for ETHUSD occurs after 3 minutes
+- ⏳ once 3 minutes from exchange have elapsed she exchanges 1 sETH for sUSD (paying a further 30bps fee)
+- ⏳ and a minute later the price of ETHUSD goes down to 90:1
+- ⏳ she burns `50` sUSD
 
-  Then
+Then
 
-  - ✅ `9.94009` sUSD is reclaimed from the user (`99.4009 - 89.46081`, which is the amount received in sUSD (`100 * 1/100 * 0.997 * 100 * 0.997`) minus the amount they should have received at the updated rate (`100 * 1/100 * 0.997 * 90 * 0.997`))
-  - and `50` sUSD is burned.
+- ❌ the burn fails as the waiting period for sUSD is still ongoing
+
+---
+
+When
+
+- she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
+- ⏳ and no oracle update for ETHUSD occurs after 3 minutes
+- ⏳ once 3 minutes from exchange have elapsed she exchanges all of her 0.997 sETH for sUSD (paying a further 30bps fee)
+- ⏳ and a minute later the price of ETHUSD goes down to 90:1
+- ⏳ and two minutes later 3 minutes have elapsed since her last exchange
+- ⏳ she burns `50` sUSD
+
+Then
+
+- She has `0.997 * 0.997 * 100/1 = 99.4009` sUSD in her account when the `burn` starts
+- `9.94009` sUSD is reclaimed from the user (`0.997 * 0.997 * (100/1 - 90/1)`
+- and `50` sUSD is burned.
+- ✅ She is left with `99.4009 - 9.94009 - 50 = 39.46081 sUSD`
 
 ## Implementation
 
@@ -238,19 +264,19 @@ Given the following preconditions:
   - _Are we currently within a waiting period for any exchange into `synth`?_
 
     - Yes: ❌ Fail the transaction
-    - No: Sum the `owing` and `owed` amounts on all unsettled `synth` exchanges as `tally`
-      - _Is the tally > 0_
-        - Yes: ✅ Reclaim the `tally` of `synth` from the user by burning it
-      - _Is the total < 0_
-        - Yes: ✅ Rebate the absolute value `tally` of `synth` to the user by issuing it
+    - No: Sum the `owing` and `owed` amounts on all unsettled `synth` exchanges as `totalOwing` and `totalOwed`
+      - _Is the totalOwing > 0_
+        - Yes: ✅ Reclaim the `totalOwing` of `synth` from the user by burning it
+      - _Is the totalOwed < 0_
+        - Yes: ✅ Rebate the absolute value `totalOwed` of `synth` to the user by issuing it
       - Finally, remove all `synth` exchanges for the user
 
 - `Synth.transfer()` invoked from synth `src` by `user` for `amount`
 
   - _Are we currently within a waiting period for any exchange into `src`?_
     - Yes: ❌ Fail the transaction
-    - No: Sum the `owing` and `owed` amounts on all unsettled `synth` exchanges as `total`
-      - _Is the total == 0_
+    - No: Sum the `owing` amounts on all unsettled `synth` exchanges as `totalOwing`
+      - _Is the user's balance >= amount + totalOwing_
         - Yes: ✅ Proceed with transfer as usual
         - No: ❌ Fail the transaction
 
