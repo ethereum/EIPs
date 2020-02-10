@@ -309,7 +309,7 @@ The draft shall be updated with summaries of the decisions around the hard fork.
 ##### Timeline
 Once a timeline with key dates is agreed upon for other crucial dates. The basic outline of a hardfork timeline should include:
 
-- Projected date for testnet network upgrade
+- Projected date for testnet network upgrades
 - Projected date for mainnet upgrade (the activation block number / projected date for this block)
 
 #### EIP Inclusion Process
@@ -336,15 +336,15 @@ The EIP centric forking model defines the approval process for any EIP to be inc
 
 The pipeline for Core EIPs is as follows.
 
-`[ DRAFT ] -> [ ELLIGLE FOR INCLUSION ] -> [ IMPLEMENTATION ] -> [ TESTING ] -> [ ACCEPTED ] -> [ DEPLOYED ]`
+`[ DRAFT ] -> [ ELLIGLE FOR INCLUSION ] -> [ IMPLEMENTATION ] -> [ TESTING ] -> [ ACCEPTED ] -> [ LAST_CALL ] -> [ DEPLOYED ]`
 
 Note that this process is included within the EIP Flow, and so `LAST_CALL` is still observed as part of the higher-order process of EIP finalization.
 
 #### Eligible for Inclusion
 
-The first stage, **EFI** (**Eligible for Inclusion**), is where the Core Developers vet the concept of an EIP and give a “green light” sufficient for EIP authors to move forward with development.
+The first stage, **Eligible for Inclusion** (**EFI**), signals that Core Developers are favorable towards the concept of an EIP, and give the EIP authors a "green light" to move forward with development, meaning that if the EIP implementation does not uncover technical issues or community objections, it could be included in a future upgrade.
 
-[EIP 2378](https://eips.ethereum.org/EIPS/eip-2378) is a meta-registry documenting all EIPs marked as **Eligible For Inclusion** by the All Core Devs. Typically to reach this stage, an EIP must be discussed in brief on an AllCoreDevs Call and motioned by rough consenses and added to the registry. Any additions are required to provide a link to the meeting notes when this discussion and decision took place.
+[EIP 2378](https://eips.ethereum.org/EIPS/eip-2378) is a registry documenting all EIPs marked as **Eligible For Inclusion** by the core developers. Typically, to reach this stage, an EIP must be discussed in brief on an AllCoreDevs call, motioned by rough consensus and added to the registry. Any additions are required to provide a link to the meeting notes when this discussion and decision took place.
 
 The requirements for **Eligible for Inclusion** is that the AllCoreDevs, representing the major clients and ecosystem stakeholders etc:
 
