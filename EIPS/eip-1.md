@@ -28,8 +28,8 @@ EIP stands for Ethereum Improvement Proposal. An EIP is a design document provid
  - EIP Best Practices
    - [Transfering Ownership](#transferring-eip-ownership)
  - [EIP Editors](#eip-editors)
- - [Hardfork Meta](#hardfork-meta)
-   - [Ethereum Hardforks](#ethereum-hardforks) 
+ - [Network Upgrade Meta](#network-upgrade-meta)
+   - [Ethereum Network Upgrades](#ethereum-network-upgrades) 
    - [EIP Centric Model](#eip-centric-model)
  - [History](#history)
 
@@ -286,7 +286,7 @@ Many EIPs are written and maintained by developers with write access to the Ethe
 
 The editors don't pass judgment on EIPs. We merely do the administrative & editorial part.
 
-## Hardfork Meta
+## Network Upgrade Meta
 
 Any changes to clients that effect consensus of the Ethereum Network results in a hardfork (See the `CORE` category of EIPs). There is then a "fork" in the blockchain where one chain follows the updated ruleset. A contentious fork is when a network split occurs because two communities form to continue supporting both the old and the new client codebases simultaneously. A split is not the typical case, as historically most upgrades have been adopted by the network wholly.
 
@@ -321,7 +321,7 @@ EIPs can move along this process by participating in discussions on the “All C
 
 The Meta EIP representing the hard fork should move in to the Accepted state once the changes are frozen (i.e. all referenced EIPs are in the Accepted state) and in to the Final state once the hard fork has been activated.
 
-### Ethereum Hardforks
+### Ethereum Network Upgrades
  - Genesis Block *block 1*
  - [Homestead](https://eips.ethereum.org/EIPS/eip-606) *block 1_150_000*
  - [Spurious Dragon](https://eips.ethereum.org/EIPS/eip-607) *block 2_675_000*
