@@ -158,7 +158,7 @@ When
 
 - she exchanges 100 sUSD into 1 sETH (paying a 30bps fee)
 - ⏳ and 1 minute later the price of ETHUSD goes up to 103:1
-- ⏳ and 2 more minutes later she attempts to transfer any of this sETH
+- ⏳ and 2 more minutes later she attempts to transfer all of her sETH
 
 Then
 
