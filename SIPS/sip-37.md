@@ -26,11 +26,11 @@ In order to prevent front-running the standard latency of Ethereum block process
 
 <!--The motivation is critical for SIPs that want to change Synthetix. It should clearly explain why the existing protocol specification is inadequate to address the problem that the SIP solves. SIP submissions without sufficient motivation may be rejected outright.-->
 
-In effect, users who `exchange` in Synthetix are actually converting debt from one form to another at the current market price on-chain. If a user trades to take advantage of latency between prices detectable in the off-chain market (the SPOT rate) and the on-chain one, then they make profit at the expense of the entire SNX stakers (as each staker hold a debt position - a percentage of the entire debt pool).
+In effect, users who `exchange` in Synthetix are actually converting debt from one form to another at the current market price on-chain. If a user trades to take advantage of latency between prices detectable in the off-chain market (the SPOT rate) and the on-chain one, then they make profit at the expense of the entire SNX stakers (as each staker holds a debt position - a percentage of the entire debt pool).
 
 [SIP-12](./sip-12.md) was implemented as a mechanism to slow down any front-running, adding latency to their exchanges. However, while it prevents true front-running (anyone watching the Ethereum mempool for oracle updates and front-running the actual market prices being committed on-chain), it doesn't help much with oracle latency when the network congestion is low. Consider that oracles can't constantly push prices, at the very least they need to wait for any previous prices to be committed on-chain, and it would be incredibly expensive (and arguably a waste of resources) to try to get an oracle update in each and every block. If Ethereum network congestion is low (and thus gas prices are low), user exchanges can still get in quite quickly and the max gas limit doesn't help much. On top of that, the max gas limit can inhibit legitimate users who accidentally hit it when it adjusts down during regular adjustments.
 
-By creating a short waiting period after exchanges in which exchanges or transfers out of that target synth are restricted, we can then settle the account automatically
+By creating a short waiting period after exchanges in which exchanges or transfers out of that target synth are restricted, we can then settle the account automatically.
 
 ## Specification
 
@@ -235,7 +235,7 @@ When
 - ⏳ and no oracle update for ETHUSD occurs after 3 minutes
 - ⏳ once 3 minutes from exchange have elapsed she exchanges all of her 0.997 sETH for sUSD (paying a further 30bps fee)
 - ⏳ and a minute later the price of ETHUSD goes down to 90:1
-- ⏳ and two minutes later 3 minutes have elapsed since her last exchange
+- ⏳ and two minutes later 3 minutes have elapsed since her last sUSD exchange
 - ⏳ she burns `50` sUSD
 
 Then
@@ -259,7 +259,7 @@ Then
       - Proceed with the `exchange` as per usual
       - Persist this exchange in the user queue for `dest` synth
 
-- `Synthetix.settle(synth)` invoked with synth `synth` by `user`
+- `Synthetix.settle(synth)` invoked with `synth` by `user`
 
   - _Are we currently within a waiting period for any exchange into `synth`?_
 
