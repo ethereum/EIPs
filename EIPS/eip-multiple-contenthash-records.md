@@ -33,6 +33,8 @@ Setting and getting functions MUST have the same public interface as specified i
 
 * For getting a `contenthash` record, the `contenthash` MUST provide additional `proto` parameter and use it to get the `contenthash` for requested type. When `proto` is not provided, it MUST return the default record.
 
+* Resolver that supports multiple `contenthash` records MUST return `true` for `supportsInterface` with interface ID `0x6de03e07`.
+
 Applications that are using ENS `contenthash` records SHOULD handle them in a specific way:
 
 * If the application only supports one hosting system (like directly handling ENS from IPFS/Swarm gateways), it SHOULD request `contenthash` with a specific type. The contract MUST then return it and application SHOULD correctly handle it.
