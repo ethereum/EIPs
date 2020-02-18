@@ -6,7 +6,7 @@ discussions-to: https://github.com/ethereum/EIPs/issues/2393
 status: Draft
 type: Standards Track
 category: ERC
-created: 2020-02-14
+created: 2020-02-18
 requires: 1577
 ---
 
