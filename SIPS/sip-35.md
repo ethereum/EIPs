@@ -1,7 +1,7 @@
 ---
 sip: 35
 title: Skinny Ether Collateral
-status: Proposed
+status: Approved
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 
@@ -35,7 +35,7 @@ The addition of Ether collateral to the Synthetix Protocol will allow ETH holder
  - Requires permision on sETH to mint directly. (upgrade to sETH required)
  - Ownable, Pausable
  - Configuration
-   - interestRate: If updated, all outstanding loans will pay this iterest rate in  on closure of the loan. Default 5%
+   - interestRate: If updated, all outstanding loans will pay this interest rate in  on closure of the loan. Default 5%
    - issueLimit: Maximum amount of sETH that can be issued by the EtherCollateral contract. Default 5000
    - issuanceRatio: Collaterization ratio. Default 150%
    - issueFeeRate: Minting for creating the loan. Default 50 bips. 
