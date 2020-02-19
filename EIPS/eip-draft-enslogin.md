@@ -61,11 +61,11 @@ This workflow is to be implemented by an SDK that Dapp could easily import. The 
 
 * **Provider instantiation:**
 	* [JAVASCRIPT/ETHEREUM] The file containing the wallet-provider's code should inject a function `global.provider: (config) => Promise<web3provider>` that returns a promise to a standardized provider object. For EVM blockchains, the object should follow [EIP 1193](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1193.md).
-	* Other blockchain types/langages should be details in the future.
+	* Other blockchain types/langages should be detailed in the future.
 
 
 * **Configuration object:** In addition to the username (ENS domain), the Dapp should have the ability to pass a configuration object that could be used by the wallet-provider instantiating function. This configuration should include:
-	* A body (common to all provider) that specify details about the targeted chain (network name / node, address of the ens entrypoint ...).
+	* A body (common to all provider) that specify details about the targeted chain (network name / node, address of the ens entrypoint ...). If any of these are missing, a fallback can be used (mainnet as a default network, boostrapping an in-browser IPFS node, ...).
 	* Wallet provider-specific fields (**optional**, starting with one underscore `_`) can be added to pass additional, wallet-provider specific, parameters / debugging flags.
 	* SDK specific fields (**optional**, starting with two underscores `__`) can be used to pass additional arguments.
 
