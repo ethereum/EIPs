@@ -7,7 +7,7 @@ status: Implemented
 created: 2020-02-03
 ---
 
-## Please note (20/02/2020)
+## Update (20/02/2020)
 As part of the Achernar release, we are reactivating these assets. 
 
 ## Simple Summary
