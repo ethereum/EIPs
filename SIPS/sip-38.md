@@ -1,7 +1,7 @@
 ---
 sip: 38
 title: Charge Fees During Purge
-status: WIP
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
