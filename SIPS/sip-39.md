@@ -1,7 +1,7 @@
 ---
 sip: 39
 title: Set up GrantsDAO
-status: WIP
+status: Implemented
 author: Garth Travers (@garthtravers)
 discussions-to: https://discordapp.com/invite/AEdUHzt
 created: 2020-01-30
