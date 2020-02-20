@@ -1,6 +1,6 @@
 ---
 sccp: 13
-title: Lower fee claim buffer to 500%
+title: Temporarily lower fee claim buffer to 500%
 author: Garth Travers (@garthtravers)
 discussions-to: Discord
 status: Implemented
