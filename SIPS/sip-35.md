@@ -1,7 +1,7 @@
 ---
 sip: 35
 title: Skinny Ether Collateral
-status: Approved
+status: Implemented
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/CDTvjHY
 
@@ -85,6 +85,14 @@ Test cases for an implementation are mandatory for SIPs but can be included with
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
+## Configurable
+<!--Add variables that are configurable via SCCP-->
+1. Supply cap - 1500 ETH
+2. Interest rate - 5%
+3. Minting fee - 30bps
+4. Max loan limit - 50 per wallet
+5. Min loan size - 1 ETH
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
