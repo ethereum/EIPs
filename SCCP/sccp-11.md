@@ -3,7 +3,7 @@ sccp: 11
 title: Raise Trading Fee to 100bps
 author: Kain Warwick (@kaiynne)
 discussions-to: TBC
-status: Proposed
+status: Implemented
 created: 2020-02-03
 ---
 
