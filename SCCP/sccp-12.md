@@ -7,6 +7,9 @@ status: Implemented
 created: 2020-02-03
 ---
 
+## Please note (20/02/2020)
+As part of the Achernar release, we are reactivating these assets. 
+
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 The vast majority of frontrunning activity is concentrated in three synth asset pairs: 
