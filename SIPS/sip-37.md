@@ -1,7 +1,7 @@
 ---
 sip: 37
 title: Fee Reclamations and Rebates
-status: WIP
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
