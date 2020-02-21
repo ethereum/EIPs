@@ -27,8 +27,8 @@ If `block.number >= X` we introduce *seven* separate precompiles to perform the 
 - G1MUL - to perform point multiplication on a curve defined over prime field
 - G1MULTIEXP - to perform multiexponentiation on a curve defined over prime field
 - G2ADD - to perform point addition on a curve twist defined over quadratic extension of the base field
-- G1MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
-- G1MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
+- G2MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
+- G2MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
 - PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
 
 Multiexponentiation operation is included to efficiently aggregate public keys or individual signer's signatures during BLS signature verification.
