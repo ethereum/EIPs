@@ -168,6 +168,7 @@ Pairing call expects `290*k` bytes as an inputs that is interpreted as byte conc
 Output is a single byte `0x01` if pairing result is equal to multiplicative identity in a pairing target field and `0x00` otherwise.
 
 Error cases:
+- Invalid encoding of any boolean variable must result in error
 - Any of G1 or G2 points being not on the curve must result in error
 - Any of G1 or G2 points for which subgroup check is requested in not actually in a subgroup
 - Field elements encoding rules apply (obviously)
