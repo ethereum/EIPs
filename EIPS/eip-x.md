@@ -6,7 +6,7 @@ discussions-to: <URL>
 status: Draft
 type: Standards Track
 category (*only required for Standard Track): Core
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: 2020-02-21
 requires (*optional): EIP1109
 replaces (*optional): -
 ---
@@ -83,6 +83,8 @@ Base field element (Fp) is encoded as `48` bytes by performing BigEndian encodin
 
 For elements of the quadratic extension field (Fp2) encoding is byte concatenation of individual encoding of the coefficients totaling in `96` bytes for a total encoding. For an Fp2 element in a form `el = c0 + c1 * v` where `v` is formal quadratic non-residue corresponding byte encoding will be `encode(c0) || encode(c1)` where `||` means byte concatenation.
 
+If encodings to not follow this spec anywhere during parsing in the precompile the precompile *must* return an error.
+
 ##### Encoding of points:
 
 Points in either G1 (in base field) or in G2 (in extension field) are encoded as byte concatenation of encodings of the `x` and `y` affine coordinates. Total encoding length for G1 point is thus `96` bytes and for G2 point is `192` bytes.
@@ -101,7 +103,75 @@ Scalar for multiplication operation is encoded as `32` bytes by performing BigEn
 
 #### ABI for operations
 
-TBD
+##### ABI for G1 addition
+
+G1 addition call expects `192` bytes as an input that is interpreted as byte concatenation of two G1 points (`96` bytes each). Output is an encoding of addition operation result.
+
+Error cases:
+- Either of points being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for G1 multiplication
+
+G1 multiplication call expects `128` bytes as an input that is interpreted as byte concatenation of encoding of G1 point (`96` bytes) and encoding of a scalar value (`32` bytes). Output is an encoding of multiplication operation result.
+
+Error cases:
+- Point being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for G1 multiexponentiation
+
+G1 multiplication call expects `128*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G1 point (`96` bytes) and encoding of a scalar value (`32` bytes). Output is an encoding of multiexponentiation operation result.
+
+Error cases:
+- Any of G1 points being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for G2 addition
+
+G2 addition call expects `384` bytes as an input that is interpreted as byte concatenation of two G2 points (`192` bytes each). Output is an encoding of addition operation result.
+
+Error cases:
+- Either of points being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for G2 multiplication
+
+G2 multiplication call expects `224` bytes as an input that is interpreted as byte concatenation of encoding of G2 point (`192` bytes) and encoding of a scalar value (`32` bytes). Output is an encoding of multiplication operation result.
+
+Error cases:
+- Point being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for G2 multiexponentiation
+
+G2 multiplication call expects `224*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G2 point (`192` bytes) and encoding of a scalar value (`32` bytes). Output is an encoding of multiexponentiation operation result.
+
+Error cases:
+- Any of G2 points being not on the curve must result in error
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
+
+##### ABI for pairing
+
+Pairing call expects `290*k` bytes as an inputs that is interpreted as byte concatenation of `k` slices. Each slice has the following structure:
+- single byte to encode if the following G1 point needs a subgroup check
+- `96` bytes of G1 point encoding
+- single byte to encode if the following G2 point needs a subgroup check
+- `192` bytes of G2 point encoding
+
+Output is a single byte `0x01` if pairing result is equal to multiplicative identity in a pairing target field and `0x00` otherwise.
+
+Error cases:
+- Any of G1 or G2 points being not on the curve must result in error
+- Any of G1 or G2 points for which subgroup check is requested in not actually in a subgroup
+- Field elements encoding rules apply (obviously)
+- Input has invalid length
 
 #### Gas schedule
 
@@ -125,14 +195,23 @@ Assuming a constant `30 MGas/second` following prices are suggested.
 
 ##### G1/G2 Multiexponentiation
 
-TBD
+Multiexponentiations are expected to be performed by the Peppinger algorithm (we can also say that is **must** be performed by Peppinger algorithm to have a speedup that results in a discount over naive implementation by multiplying each pair separately and adding the results). For this case there was a table prepared for discount in case of `k <= 128` points in the multiexponentiation with a discount cup `max_discount` for `k > 128`.
+
+To avoid non-integer arithmetic call cost is calculated as `k * multiplication_cost * discount / multiplier` where `multiplier = 1000`, `k` is a number of (scalar, point) pairs for the call, `multiplication_cost` is a corresponding single multiplication call cost for G1/G2.
+
+Discounts table as a vector of pairs `[k, discount]`:
+
+```
+[[1, 1200], [2, 888], [3, 764], [4, 641], [5, 594], [6, 547], [7, 500], [8, 453], [9, 438], [10, 423], [11, 408], [12, 394], [13, 379], [14, 364], [15, 349], [16, 334], [17, 330], [18, 326], [19, 322], [20, 318], [21, 314], [22, 310], [23, 306], [24, 302], [25, 298], [26, 294], [27, 289], [28, 285], [29, 281], [30, 277], [31, 273], [32, 269], [33, 268], [34, 266], [35, 265], [36, 263], [37, 262], [38, 260], [39, 259], [40, 257], [41, 256], [42, 254], [43, 253], [44, 251], [45, 250], [46, 248], [47, 247], [48, 245], [49, 244], [50, 242], [51, 241], [52, 239], [53, 238], [54, 236], [55, 235], [56, 233], [57, 232], [58, 231], [59, 229], [60, 228], [61, 226], [62, 225], [63, 223], [64, 222], [65, 221], [66, 220], [67, 219], [68, 219], [69, 218], [70, 217], [71, 216], [72, 216], [73, 215], [74, 214], [75, 213], [76, 213], [77, 212], [78, 211], [79, 211], [80, 210], [81, 209], [82, 208], [83, 208], [84, 207], [85, 206], [86, 205], [87, 205], [88, 204], [89, 203], [90, 202], [91, 202], [92, 201], [93, 200], [94, 199], [95, 199], [96, 198], [97, 197], [98, 196], [99, 196], [100, 195], [101, 194], [102, 193], [103, 193], [104, 192], [105, 191], [106, 191], [107, 190], [108, 189], [109, 188], [110, 188], [111, 187], [112, 186], [113, 185], [114, 185], [115, 184], [116, 183], [117, 182], [118, 182], [119, 181], [120, 180], [121, 179], [122, 179], [123, 178], [124, 177], [125, 176], [126, 176], [127, 175], [128, 174]]
+```
+
+`max_discount = 174`
 
 ##### Pairing operaiton
 
 Base cost of the pairing operation is `23000*k + 80000` where `k` is a number of pairs.
 
-Each point for which subgroup check is performed adds the corresponding G1/G2 multiplication cost to it.
-
+Each point (either G1 or G2) for which subgroup check is requested and performed adds the corresponding G1/G2 multiplication cost to it.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -142,12 +221,11 @@ Motivation section covers a total motivation to have operations over BLS12-381 c
 
 Explicit separate multiexponentiation operation that allows one to save execution time (so gas) by both the algorithm used (namely Peppinger algorithm) and (usually forgotten) by the fact that `CALL` operation in Ethereum is expensive (at the time of writing), so one would have to pay non-negigible overhead if e.g. for multiexponentiation of `100` points would have to call the multipication precompile `100` times and addition for `99` times (roughly `138600` would be saved).
 
-
 #### Explicit subgroup checks
 
 Subgroup checks are made optional both due to the fact that they can be performed explicitly by the caller (by multiplication operation) and due to the fact that subgroup checks in G2 that are expensive are not required in most of the cases cause G2 points are usually "hardcoded" and not supplied by the untrusted third party.
 
-Concretely, G2 subgroup check is around `50000` gas.
+Concretely, G2 subgroup check is around `55000` gas.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
@@ -155,7 +233,21 @@ There are no backward compatibility questions.
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test vectors for all operations.
+
+Due to the large test parameters space we first provide properties that various operations must satisfy. We use additive notation for point operations, capital letters (`P`, `Q`) for points, small letters (`a`, `b`) for scalars. Generator for G1 is labeled as `G`, generator for G2 is labeled as `H`, otherwise we assume random point on a curve in a correct subgroup. `0` means either scalar zero or point of infinity. `1` means either scalar one or multiplicative identity. `group_order` is a main subgroup order. `e(P, Q)` means pairing operation where `P` is in G1, `Q` is in G2. 
+
+Requeired properties for basic ops (add/multiply):
+
+- Commutativity: `P + Q = Q + P`
+- Additive negation: `P + (-P) = 0`
+- Doubling `P + P = 2*P`
+- Subgroup check: `group_order * P = 0`
+
+Required properties for pairing operation:
+- Degeneracy `e(P, 0*Q) = e(0*P, Q) = 1`
+- Bilinearity `e(a*P, b*Q) = e(a*b*P, Q) = e(P, a*b*Q)`
+
+Test vector for all operations.
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
@@ -166,6 +258,8 @@ There is a various choice of existing implementations:
 ## Security Considerations
 <!--All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.-->
 Strictly following the spec will eliminate security implications or consensus implications in a contrast to the previous BN254 precompile.
+
+Important topic is a "constant time" property for performed operations. We explicitly state that this precompile **IS NOT REQUIRED** to perform all the operations using constant time algorithms.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
