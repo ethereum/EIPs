@@ -21,7 +21,7 @@ This precompile adds operation on BLS12-381 curve as a precompile in a set neces
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-If `block.number >= X` we introduce *seven* separate precompiles to perform the following operations (addresses to be determined):
+If `block.number >= X` we introduce *eight* separate precompiles to perform the following operations (addresses to be determined):
 
 - G1ADD - to perform point addition on a curve defined over prime field
 - G1MUL - to perform point multiplication on a curve defined over prime field
@@ -30,6 +30,7 @@ If `block.number >= X` we introduce *seven* separate precompiles to perform the 
 - G1MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
 - G1MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
 - PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
+- DECOMPRESS - performs a point decompression
 
 Multiexponentiation operation is included to efficiently aggregate public keys or individual signer's signatures during BLS signature verification.
 
@@ -73,6 +74,8 @@ Pairing parameters:
 x is negative = true
 ```
 
+One should note that base field modulus is equal to `3 mod 4` that allows an efficient square root extraction.
+
 #### Fine points and encoding of base elements
 
 ##### Field elements encoding:
@@ -85,9 +88,22 @@ For elements of the quadratic extension field (Fp2) encoding is byte concatenati
 
 If encodings to not follow this spec anywhere during parsing in the precompile the precompile *must* return an error.
 
-##### Encoding of points:
+##### Encoding of uncompressed points:
 
 Points in either G1 (in base field) or in G2 (in extension field) are encoded as byte concatenation of encodings of the `x` and `y` affine coordinates. Total encoding length for G1 point is thus `96` bytes and for G2 point is `192` bytes.
+
+##### Encoding of compressed points:
+
+Points in compressed form only take `48` bytes. Base field modulus is `381` bit, so three most significant bits are available to use for extra encoding.
+
+The most-significant three bits of a G1 or G2 encoding **must** be masked away before the coordinate(s) are interpreted. These bits are used to unambiguously represent the underlying element:
+
+<!-- - The most significant bit, when set, indicates that the point is in compressed form. Otherwise, the point was in uncompressed form and should result in an error when decompression precompile is called.
+- The second-most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding should be set to zero (as in our convention for encoding of point of infinity).
+- The third-most significant bit is set if (and only if) this point is in compressed form (what we expect) *and* it is not the point at infinity *and* its y-coordinate is the **lexicographically largest** of the two associated with the encoded x-coordinate. -->
+
+- The most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding should be set to zero (as in our convention for encoding of point of infinity).
+- The second-most significant bit is set if it is not the point at infinity *and* its y-coordinate is the **lexicographically largest** of the two associated with the encoded x-coordinate.
 
 ##### Point of infinity encoding:
 
@@ -174,6 +190,13 @@ Error cases:
 - Field elements encoding rules apply (obviously)
 - Input has invalid length
 
+##### ABI for point decompression
+
+Decompression call expects either `48` or `96` bytes an an input that is interpreted as a compressed G1 point or compressed G2 point respencively. Output of this call is either `96` or `192` bytes and is a point in uncompressed form following respective encoding rules.
+
+Error cases:
+- Square root does not exist, that means supplied point's `x` coordinate is not on the curve
+
 #### Gas schedule
 
 Assuming a constant `30 MGas/second` following prices are suggested.
@@ -213,6 +236,10 @@ Discounts table as a vector of pairs `[k, discount]`:
 Base cost of the pairing operation is `23000*k + 80000` where `k` is a number of pairs.
 
 Each point (either G1 or G2) for which subgroup check is requested and performed adds the corresponding G1/G2 multiplication cost to it.
+
+##### Decompression operation
+
+TBD
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
