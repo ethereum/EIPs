@@ -30,7 +30,7 @@ If `block.number >= X` we introduce *eight* separate precompiles to perform the 
 - G1MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
 - G1MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
 - PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
-- DECOMPRESS - performs a point decompression
+- DECOMPRESS - to perform a point decompression
 
 Multiexponentiation operation is included to efficiently aggregate public keys or individual signer's signatures during BLS signature verification.
 
@@ -44,7 +44,7 @@ Motivation of this precompile is to add a cryptographic primitive that allows to
 
 Curve parameters:
 
-BLS12 curve is fully defined by the following set of parameters:
+BLS12 curve is fully defined by the following set of parameters (coefficient `A=0` for all BLS12 curves):
 
 ```
 Base field modulus = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
@@ -54,8 +54,8 @@ Extension tower
 Fp2 construction:
 Fp quadratic non-residue = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaaa
 Fp6/Fp12 construction:
-Fp2 quandratic non-residue c0 = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
-Fp2 quandratic non-residue c1 = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+Fp2 cubic non-residue c0 = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+Fp2 cubic non-residue c1 = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
 Twist parameters:
 Twist type: M
 B coefficient for twist c0 = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004
@@ -84,7 +84,7 @@ To encode points involved in the operation one has to encode elements of the bas
 
 Base field element (Fp) is encoded as `48` bytes by performing BigEndian encoding of the corresponding (unsigned) integer. Corresponding integer **must** be less than field modulus.
 
-For elements of the quadratic extension field (Fp2) encoding is byte concatenation of individual encoding of the coefficients totaling in `96` bytes for a total encoding. For an Fp2 element in a form `el = c0 + c1 * v` where `v` is formal quadratic non-residue corresponding byte encoding will be `encode(c0) || encode(c1)` where `||` means byte concatenation.
+For elements of the quadratic extension field (Fp2) encoding is byte concatenation of individual encoding of the coefficients totaling in `96` bytes for a total encoding. For an Fp2 element in a form `el = c0 + c1 * v` where `v` is formal quadratic non-residue and `c0` and `c1` are Fp elements the corresponding byte encoding will be `encode(c0) || encode(c1)` where `||` means byte concatenation.
 
 If encodings to not follow this spec anywhere during parsing in the precompile the precompile *must* return an error.
 
@@ -94,16 +94,20 @@ Points in either G1 (in base field) or in G2 (in extension field) are encoded as
 
 ##### Encoding of compressed points:
 
-Points in compressed form only take `48` bytes. Base field modulus is `381` bit, so three most significant bits are available to use for extra encoding.
+Points in compressed form only take half the number of bytes compared to the uncompressed form. Base field modulus is `381` bit long, so three most significant bits are available to use for extra encoding.
 
-The most-significant three bits of a G1 or G2 encoding **must** be masked away before the coordinate(s) are interpreted. These bits are used to unambiguously represent the underlying element:
+The most-significant three bits of a G1 or most-significant three bits of each `48` byte chunk of G2 encoding **must** be masked away before the coordinate(s) are interpreted. These bits are used to unambiguously represent the underlying element.
 
-<!-- - The most significant bit, when set, indicates that the point is in compressed form. Otherwise, the point was in uncompressed form and should result in an error when decompression precompile is called.
-- The second-most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding should be set to zero (as in our convention for encoding of point of infinity).
-- The third-most significant bit is set if (and only if) this point is in compressed form (what we expect) *and* it is not the point at infinity *and* its y-coordinate is the **lexicographically largest** of the two associated with the encoded x-coordinate. -->
+For compressed G1 point format is the following:
+  - The most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding **must be* to zero (as in our convention for encoding of point of infinity).
+  - The second-most significant bit is set if it is *not* the point at infinity *and* this bit is equal to the of recovered y-coordinate's least significant bit. (There are two candidates for y-coordinate when square root is extracted during reconstruction from x-coordinate and these candidates always have different parity).
 
-- The most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding should be set to zero (as in our convention for encoding of point of infinity).
-- The second-most significant bit is set if it is not the point at infinity *and* its y-coordinate is the **lexicographically largest** of the two associated with the encoded x-coordinate.
+For compressed G2 point format is the following:
+- For the first `48` bytes (encoding of `c0` coefficient):
+  - The most significant bit indicates that the point is at infinity. If this bit is set, the remaining bits of the group element's encoding should be set to zero (as in our convention for encoding of point of infinity).
+  - The second-most significant bit is set if it is *not* the point at infinity *and* is equal to the of y-coordinate's `c1` coefficient's least significant bit if `c1 != 0`. (There are two candidates for y-coordinate when square root is extracted during reconstruction from x-coordinate).
+- For the next `48` bytes (encoding of `c1` coefficient):
+  - Three most significant bits **must be** zero.
 
 ##### Point of infinity encoding:
 
@@ -111,7 +115,7 @@ Also refered as "zero point". For BLS12 curves point with coordinates `(0, 0)` (
 
 ##### Boolean encoding for subgroup checks:
 
-For subgroup checks it's required to encode a whether it's required to run a subgroup check for the G1/G2 point. For this we encode a boolean as a *single byte* `0x00` for `false` and `0x01` for `true`.
+For subgroup checks it's required to encode whether it's required to run a subgroup check for the G1/G2 point or not. For this we encode a boolean as a *single byte* `0x00` for `false` and `0x01` for `true`.
 
 ##### Encoding of scalars for multiplication operation:
 
@@ -196,6 +200,7 @@ Decompression call expects either `48` or `96` bytes an an input that is interpr
 
 Error cases:
 - Square root does not exist, that means supplied point's `x` coordinate is not on the curve
+- Input has invalid length
 
 #### Gas schedule
 
@@ -239,7 +244,8 @@ Each point (either G1 or G2) for which subgroup check is requested and performed
 
 ##### Decompression operation
 
-TBD
+G1 point decompression is `1000` gas.
+G2 point decompression is `10000` gas
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
