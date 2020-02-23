@@ -31,11 +31,15 @@ Setting and getting functions MUST have the same public interface as specified i
 
 * For setting a `contenthash` record, the `setContenthash` MUST provide additional `proto` parameter and use it to save the `contenthash`. When `proto` is not provided, it MUST save the record as default record.
 
-  ```solidity function setContenthash(bytes32 node, bytes calldata proto, bytes calldata hash) external authorised(node);```
+  ```solidity
+  function setContenthash(bytes32 node, bytes calldata proto, bytes calldata hash) external authorised(node);
+  ```
 
 * For getting a `contenthash` record, the `contenthash` MUST provide additional `proto` parameter and use it to get the `contenthash` for requested type. When `proto` is not provided, it MUST return the default record.
 
-  ```solidity function contenthash(bytes32 node, bytes calldata proto) external view returns (bytes memory);```
+  ```solidity
+  function contenthash(bytes32 node, bytes calldata proto) external view returns (bytes memory);
+  ```
 
 * Resolver that supports multiple `contenthash` records MUST return `true` for `supportsInterface` with interface ID `0x6de03e07`.
 
