@@ -21,7 +21,7 @@ This precompile adds operation on BLS12-381 curve as a precompile in a set neces
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-If `block.number >= X` we introduce *eight* separate precompiles to perform the following operations (addresses to be determined):
+If `block.number >= X` we introduce *eight* separate precompiles to perform the following operations (addresses to be determined) with one of them being optional an up to discussion (BLS12-381 curve allows efficient square root extraction, so point decompression makes *some* sense):
 
 - G1ADD - to perform point addition on a curve defined over prime field
 - G1MUL - to perform point multiplication on a curve defined over prime field
@@ -30,7 +30,7 @@ If `block.number >= X` we introduce *eight* separate precompiles to perform the 
 - G1MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
 - G1MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
 - PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
-- DECOMPRESS - to perform a point decompression
+- DECOMPRESS (optional) - to perform a point decompression
 
 Multiexponentiation operation is included to efficiently aggregate public keys or individual signer's signatures during BLS signature verification.
 
@@ -74,7 +74,7 @@ Pairing parameters:
 x is negative = true
 ```
 
-One should note that base field modulus is equal to `3 mod 4` that allows an efficient square root extraction.
+One should note that base field modulus is equal to `3 mod 4` that allows an efficient square root extraction, although as described below gas cost of decompression is larger than gas cost of supplying decompressed point data in `calldata`.
 
 #### Fine points and encoding of base elements
 
@@ -276,12 +276,15 @@ Requeired properties for basic ops (add/multiply):
 - Additive negation: `P + (-P) = 0`
 - Doubling `P + P = 2*P`
 - Subgroup check: `group_order * P = 0`
+- Trivial multiplication check: `1 * P = P`
+- Multiplication by zero: `0 * P = 0`
+- Multiplication by the unnormalized scalar `(scalar + group_order) * P = scalar * P`
 
 Required properties for pairing operation:
-- Degeneracy `e(P, 0*Q) = e(0*P, Q) = 1`
-- Bilinearity `e(a*P, b*Q) = e(a*b*P, Q) = e(P, a*b*Q)`
+- Degeneracy `e(P, 0*Q) = e(0*P, Q) = 1` 
+- Bilinearity `e(a*P, b*Q) = e(a*b*P, Q) = e(P, a*b*Q)` (internal test, not visible through ABI)
 
-Test vector for all operations.
+Test vector for all operations are expanded in this [gist](https://gist.github.com/shamatar/f82106e4b3a957761c439eb6024e5300) until it's final.
 
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
