@@ -5,10 +5,9 @@ author: Alex Vlasov (@shamatar)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
-category (*only required for Standard Track): Core
+category: Core
 created: 2020-02-21
-requires (*optional): EIP1109/EIP2046 (optional)
-replaces (*optional): -
+requires : EIP1109/EIP2046 (optional)
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -21,7 +20,7 @@ This precompile adds operation on BLS12-381 curve as a precompile in a set neces
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-If `block.number >= X` we introduce *eight* separate precompiles to perform the following operations (addresses to be determined) with one of them being optional an up to discussion (BLS12-381 curve allows efficient square root extraction, so point decompression makes *some* sense):
+If `block.number >= X` we introduce *eight* separate precompiles to perform the following operations (addresses to be determined) with one of them being optional and up to discussion (BLS12-381 curve allows efficient square root extraction, so point decompression makes *some* sense):
 
 - G1ADD - to perform point addition on a curve defined over prime field
 - G1MUL - to perform point multiplication on a curve defined over prime field
