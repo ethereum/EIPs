@@ -1,0 +1,90 @@
+---
+eip: <to be assigned>
+title: Position Statement Against the Activation of ProgPoW
+author: Justin Leroux (@MidnightOnMars)
+discussions-to: <added to ETHMagicians once EIP number is assigned>
+status: Draft
+type: Informational
+created: 2020-02-25
+---
+
+## Simple Summary
+This is a position paper signaling stakeholder dissent against the activation of EIP-1057 (ProgPoW).
+
+## Abstract
+This EIP is a signal to the community and core developers that a broad coalition of Ethereum stakeholders and experts are strongly against activation of Ethereum Improvement Proposal 1057: ProgPoW, a Programmatic Proof-of-Work.
+
+Anyone who would like to add their name to this EIP to is encouraged to do so by signaling with known public accounts.
+
+## Motivation / Specification / Rationale
+Because Ethereum is a global platform with a large and diverse group of stakeholders, it is critical that major changes to the protocol have a clear purpose and broad support. EIP-1057 clearly lacks that support, yet activation is still being considered.
+
+EIP-1057 proposes to replace eth1’s proof-of-work algorithm, Ethhash, with ProgPoW. The stated purpose of this change is to disadvantage users of specialized mining equipment in the hope of avoiding a contentious fork due to ASICs blocking the transition to eth2. In reality, EIP-1057 has precipitated a community-dividing debate since its introduction in May 2018. A stated goal of ProgPoW is to avoid contentious forks while transitioning to proof-of-stake, yet it is at odds with its own aims if activation increases the likelihood of that undesired outcome.
+
+Later this year, Ethereum will begin to transition away from proof-of-work consensus towards proof-of-stake via the eth2 beacon chain launch. Changing the eth1 hashing algorithm at this point in Ethereum’s evolution sows community division and introduces technical risk at a time when efforts and attention should be focused elsewhere.
+
+Some stakeholders have suggested that ProgPoW offers no clear benefit to Ethereum’s transition to PoS and may centralize hashpower. There is no evidence that it will serve its intended purpose of better aligning miner incentives to disincentivize adversarial miner tactics. More important than these claims is the reality that EIP-1057 has failed to achieve consensus in the Ethereum community after two years of debate which has consumed a significant amount of developer attention and community bandwidth. Forcing through this contentious change would only widen current rifts, negatively impacting Ethereum and its community for years to come, all without any clear reason for doing so.
+
+Therefore, we, the signatories of this EIP, do not support the inclusion of ProgPoW into any hard fork in the current circumstances.
+
+## Signatories
+Hayden Adams, Uniswap
+Andrew (cyber_hokie), EthereumDC
+Ryan Sean Adams
+Antiprosynthesis
+Sam Bacha, FreightTrust.com
+Eva Beylin, The Graph
+Anthony Bertolino
+BlockchainUnchained, r/ETHFinance Moderator
+Eric Conner, Gnosis / ETHHub
+Mariano Conti
+Tim Coulter, CEO Truffle Suite
+Luis Cuende, Aragon
+Mark D'Agostino, GridPlus
+Damian "foobazzler" Durruty
+Figo Finozeros
+Alex Fisher, Michigan Ethereum Meetup Founder
+Brendan Forster
+Stefan George, CTO Gnosis
+Harry Glynn, ZKEducation
+Pedro Gomes, WalletConnect
+George Hallam
+David Hoffman
+Aftab "DCInvestor" Hossain, MolochDAO
+Andrew Keys, Co-Founder DARMA Capital
+Marius Kjærstad
+Martin Köppelmann, CEO Gnosis
+Justin Leroux, GridPlus
+Scott Lewis, DeFi Pulse
+Matteo Leibowitz
+Igor Lilic, ConsenSys
+Matthew "HuntingIsland" Light, Manu DeFi
+Matt Luongo, Thesis Co-Founder
+Brian McMichael, MakerDAO
+Jeremiah Nichol, r/ETHFinance Moderator
+Spencer Noon
+Cem Özer, Protocol Engineer
+JacobP (@jacoped), Ethereum Italia
+LeonP (@LeonPedreti), Ethereum Italia
+Andrew Redden, Groundhog
+Anthony Sassano, Set / ETHHub
+Chaz Schmidt, Defi Pulse
+Ameen Soleimani, Spankchain / MolochDAO
+Santi Siri, Democracy Earth
+Kain Warwick, Synthetix
+Patricio Worthhalter, POAP
+
+## Backwards Compatibility
+Not applicable.
+
+## Test Cases
+Not applicable.
+
+## Implementation
+Not applicable.
+
+## Security Considerations
+Not applicable.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
