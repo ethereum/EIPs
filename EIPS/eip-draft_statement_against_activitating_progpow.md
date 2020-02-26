@@ -39,7 +39,7 @@ BlockchainUnchained, r/ETHFinance Moderator
 Eric Conner, Gnosis / ETHHub  
 Mariano Conti  
 Tim Coulter, CEO Truffle Suite  
-Luis Cuende, Aragon Co-Founder 
+Luis Cuende, Aragon Co-Founder  
 Mark D'Agostino, GridPlus  
 Damian "foobazzler" Durruty  
 Figo Finozeros  
