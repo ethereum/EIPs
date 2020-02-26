@@ -68,7 +68,7 @@ JacobP (@jacoped), Ethereum Italia
 LeonP (@LeonPedreti), Ethereum Italia  
 Andrew Redden, Groundhog  
 Anthony Sassano, Set / ETHHub  
-Chaz Schmidt, Defi Pulse  
+Chaz Schmidt, DeFi Pulse  
 Ameen Soleimani, Spankchain / MolochDAO  
 Santi Siri, Democracy Earth  
 Kain Warwick, Synthetix  
