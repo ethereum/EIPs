@@ -1,13 +1,13 @@
 ---
 eip: <to be assigned>
 title: BLS12-381
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: Alex Vlasov (@shamatar)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category (*only required for Standard Track): Core
 created: 2020-02-21
-requires (*optional): EIP1109
+requires (*optional): EIP1109/EIP2046 (optional)
 replaces (*optional): -
 ---
 
@@ -27,8 +27,8 @@ If `block.number >= X` we introduce *eight* separate precompiles to perform the 
 - G1MUL - to perform point multiplication on a curve defined over prime field
 - G1MULTIEXP - to perform multiexponentiation on a curve defined over prime field
 - G2ADD - to perform point addition on a curve twist defined over quadratic extension of the base field
-- G1MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
-- G1MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
+- G2MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
+- G2MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
 - PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
 - DECOMPRESS (optional) - to perform a point decompression
 
