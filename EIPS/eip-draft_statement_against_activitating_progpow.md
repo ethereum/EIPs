@@ -28,51 +28,51 @@ Some stakeholders have suggested that ProgPoW offers no clear benefit to Ethereu
 Therefore, we, the signatories of this EIP, do not support the inclusion of ProgPoW into any hard fork in the current circumstances.
 
 ## Signatories
-Hayden Adams, Uniswap
-Andrew (cyber_hokie), EthereumDC
-Ryan Sean Adams
-Antiprosynthesis
-Sam Bacha, FreightTrust.com
-Eva Beylin, The Graph
-Anthony Bertolino
-BlockchainUnchained, r/ETHFinance Moderator
-Eric Conner, Gnosis / ETHHub
-Mariano Conti
-Tim Coulter, CEO Truffle Suite
-Luis Cuende, Aragon
-Mark D'Agostino, GridPlus
-Damian "foobazzler" Durruty
-Figo Finozeros
-Alex Fisher, Michigan Ethereum Meetup Founder
-Brendan Forster
-Stefan George, CTO Gnosis
-Harry Glynn, ZKEducation
-Pedro Gomes, WalletConnect
-George Hallam
-David Hoffman
-Aftab "DCInvestor" Hossain, MolochDAO
-Andrew Keys, Co-Founder DARMA Capital
-Marius Kjærstad
-Martin Köppelmann, CEO Gnosis
-Justin Leroux, GridPlus
-Scott Lewis, DeFi Pulse
-Matteo Leibowitz
-Igor Lilic, ConsenSys
-Matthew "HuntingIsland" Light, Manu DeFi
-Matt Luongo, Thesis Co-Founder
-Brian McMichael, MakerDAO
-Jeremiah Nichol, r/ETHFinance Moderator
-Spencer Noon
-Cem Özer, Protocol Engineer
-JacobP (@jacoped), Ethereum Italia
-LeonP (@LeonPedreti), Ethereum Italia
-Andrew Redden, Groundhog
-Anthony Sassano, Set / ETHHub
-Chaz Schmidt, Defi Pulse
-Ameen Soleimani, Spankchain / MolochDAO
-Santi Siri, Democracy Earth
-Kain Warwick, Synthetix
-Patricio Worthhalter, POAP
+Hayden Adams, Uniswap  
+Andrew (cyber_hokie), EthereumDC  
+Ryan Sean Adams  
+Antiprosynthesis  
+Sam Bacha, FreightTrust.com  
+Eva Beylin, The Graph  
+Anthony Bertolino  
+BlockchainUnchained, r/ETHFinance Moderator  
+Eric Conner, Gnosis / ETHHub  
+Mariano Conti  
+Tim Coulter, CEO Truffle Suite  
+Luis Cuende, Aragon  
+Mark D'Agostino, GridPlus  
+Damian "foobazzler" Durruty  
+Figo Finozeros  
+Alex Fisher, Michigan Ethereum Meetup Founder  
+Brendan Forster  
+Stefan George, CTO Gnosis  
+Harry Glynn, ZKEducation  
+Pedro Gomes, WalletConnect  
+George Hallam  
+David Hoffman  
+Aftab "DCInvestor" Hossain, MolochDAO  
+Andrew Keys, Co-Founder DARMA Capital  
+Marius Kjærstad  
+Martin Köppelmann, CEO Gnosis  
+Justin Leroux, GridPlus  
+Scott Lewis, DeFi Pulse  
+Matteo Leibowitz  
+Igor Lilic, ConsenSys  
+Matthew "HuntingIsland" Light, Manu DeFi  
+Matt Luongo, Thesis Co-Founder  
+Brian McMichael, MakerDAO  
+Jeremiah Nichol, r/ETHFinance Moderator  
+Spencer Noon  
+Cem Özer, Protocol Engineer  
+JacobP (@jacoped), Ethereum Italia  
+LeonP (@LeonPedreti), Ethereum Italia  
+Andrew Redden, Groundhog  
+Anthony Sassano, Set / ETHHub  
+Chaz Schmidt, Defi Pulse  
+Ameen Soleimani, Spankchain / MolochDAO  
+Santi Siri, Democracy Earth  
+Kain Warwick, Synthetix  
+Patricio Worthhalter, POAP  
 
 ## Backwards Compatibility
 Not applicable.
