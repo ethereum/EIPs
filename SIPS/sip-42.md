@@ -1,5 +1,5 @@
 ---
-sip: 41
+sip: 42
 title: Gas Optimisations on issueSynths and burnSynths
 author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
@@ -13,7 +13,7 @@ Optimize the calls to issueSynths by ~35% & burnSynths by ~45%
 
 ## Abstract
 
-After the removal of XDRs in SIP-33 the ability to reduce the gas heavy operation of totalIssuedSynths() from 2 to 1 call became possible saving gas on;
+After the removal of XDRs in [SIP-33](https://sips.synthetix.io/sips/sip-33) the ability to reduce the gas heavy operation of totalIssuedSynths() from 2 to 1 call became possible saving gas on;
 - Synthetix.issueSynths (& issueMaxSynths)
 - Synthetix.burnSynths
 
