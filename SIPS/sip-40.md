@@ -1,7 +1,7 @@
 ---
 sip: 40
 title: Time lock on burning after min
-status: Proposed
+status: Approved
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125), Clinton Ennis (@hav-noms), Garth Travers (@garthtravers)
 discussions-to: https://discordapp.com/invite/AEdUHzt
 created: 2020-02-27
