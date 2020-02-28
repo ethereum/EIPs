@@ -22,7 +22,12 @@ If an SNX staker wants to burn consecutively to zero they can after the minimumS
 
 
 ## Specification
-
+- New EternalStorage Contract for Issuer
+ - Stores "LAST_ISSUE_EVENT" with timestamp of minters last mint event
+- Issuer Configuration
+ - minimumStakeTime: Minimum time required to be staked. So after minting this period must pass before burning above target c-ration will be allowed. Default 8 Hours. 
+- Issuer new function
+ - burnSynthsToTarget(): Helper function so anyone can burn Synths to the target c-ratio to be able to claim fees and rewards. 
 
 
 ## Rationale
