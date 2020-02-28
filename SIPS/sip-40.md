@@ -18,6 +18,8 @@ If an SNX staker wants to burn all debt they must wait until the minimumStakeTim
 
 ## Motivation
 
+The exploit involves frontrunning a drop in the ETH price by staking SNX and minting sUSD. Once the sETH price does drop, and the Synthetix system's total debt deflates, that staker's debt has deflated too (but not their sUSD balance). The staker then burns enough sUSD to unstake their SNX, leaving them with a small sUSD profit. 
+
 A wallet has recently started executing this exploit since the launch of fee reclamation. If it goes unresolved, this issue could lead to further debt for SNX stakers. Closing this loophole protects SNX stakers. 
 
 ## Specification
