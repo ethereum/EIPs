@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2547
 title: Composable Multiclass Token
 author: Ali Nuraldin (@Alirun), Andrey Belyakov <@AndreyBelyakov>
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/pull/2547
 status: Draft
 type: Standards Track
 category: ERC
