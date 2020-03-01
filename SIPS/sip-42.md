@@ -3,7 +3,7 @@ sip: 42
 title: Gas Optimisations on issueSynths and burnSynths
 author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Implemented
 created: 2020-02-28
 ---
 
