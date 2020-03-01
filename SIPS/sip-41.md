@@ -1,7 +1,7 @@
 ---
 sip: 41
 title: ProtocolDAO phase zero
-status: Proposed
+status: Approved
 author: Garth Travers (@garthtravers)
 discussions-to: https://discordapp.com/invite/AEdUHzt
 created: 2020-02-28
