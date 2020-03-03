@@ -21,7 +21,7 @@ Security has become a growing concern in DeFi as several high-profile exploits h
 
 ## Specification
 
-We will deploy a 3/5 multisig and transition contract ownership to this contract from the existing EOA.
+We will deploy a 3/5 multisig and transition contract ownership to this contract from the existing EOA. The actual contract is 4/6 but one of the accounts is a hot wallet so we should assume 3/5 is the practical threshold.
 
 ## Rationale
 
