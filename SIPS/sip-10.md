@@ -71,7 +71,18 @@ Not required at this stage
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-Not required at this stage
+
+- Deprecate existing `DelegateApprovals` contract that is attached to FeePool and supports only setting delegation for single action/s.
+
+  https://github.com/Synthetixio/synthetix/blob/master/contracts/DelegateApprovals.sol
+  
+- Doesn't require associatedState to be set to FeePool contract.
+ 
+- User's can set their delegated approvals directly on the new `DelegateApprovals` contract and desired level of actions they want to give each approved delegate address.
+
+- Synthetix / Issuer and FeePool will read from the `DelegateApprovals` as a single source of truth for the required delegations.
+
+- Add EternalStorage pattern to new `DelegateApprovals` contract to allow adding new delegation powers but also not lose existing approvals that have been set.  
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
