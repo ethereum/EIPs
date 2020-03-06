@@ -93,8 +93,8 @@ Each status change is requested by the EIP author and reviewed by the EIP editor
   * :arrow_right: Accepted (Core EIPs only) -- A successful Last Call without material changes or unaddressed technical complaints will become Accepted.
   * :arrow_right: Final (Non-Core EIPs) -- A successful Last Call without material changes or unaddressed technical complaints will become Final.
 * **Accepted (Core EIPs only)** -- This status signals that material changes are unlikely and Ethereum client developers should consider this EIP for inclusion. Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
-  * :arrow_right: Draft -- The Core Devs can decide to move this EIP back to the Draft status at their discretion. E.g. a major, but correctable, flaw was found in the EIP.
-  * :arrow_right: Rejected -- The Core Devs can decide to mark this EIP as Rejected at their discretion. E.g. a major, but uncorrectable, flaw was found in the EIP.
+  * :arrow_right: Draft -- The Core Devs can decide to move this EIP back to the Draft status at their discretion. Example cases include, but are not limited to, a major, but correctable, flaw was found in the EIP.
+  * :arrow_right: Rejected -- The Core Devs can decide to mark this EIP as Rejected at their discretion. Example cases include, but are not limited to, a major, but uncorrectable, flaw was found in the EIP.
   * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and adopted by the community, the status will be changed to “Final”.
 * **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
 
