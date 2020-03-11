@@ -3,7 +3,7 @@ sccp: 14
 title: Increase Collateralisation Ratio to 800%
 author: Garth Travers (@garthtravers)
 discussions-to: Discord
-status: Proposed
+status: Implemented
 created: 2020-03-04
 ---
 
