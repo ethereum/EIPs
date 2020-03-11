@@ -13,11 +13,11 @@ Increase ETH Collateral sETH Limit from 1000 to 2000.
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
-The ETH Collateral contract has almost reached its limit with currently 962 locked ETH of a potential 1500. If someone wants to lock and issue more than the remainder they currently cannot.
+The [ETH Collateral contract](https://etherscan.io/address/0x0F3d8ad599Be443A54c7934B433A87464Ed0DFdC) has almost reached its limit with currently 962 locked ETH of a potential 1500. If someone wants to issue more than the remainder they currently cannot. You can see the latest issuance numbers at [synthetix.exchange](https://synthetix.exchange/loans).
 
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
-The trial of ETH Collateral was originally specified to have a limit of 5000 sETH issuable or 7500 locked ETH. In light of the recent flash loan attacks in the DeFi space we opted for a very conservative limit of only 1000 sETH. 
+The [trial of ETH Collateral](https://sips.synthetix.io/sips/sip-35) was originally specified to have a limit of 5000 sETH issuable or 7500 locked ETH. In light of the recent flash loan attacks in the DeFi space we opted for a very conservative limit of only 1000 sETH. 
 This proposal is to only increase the limit to 2000 issuable sETH and continue to monitor its usage.
 
 ## Copyright
