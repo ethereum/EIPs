@@ -15,34 +15,15 @@ created: 2020-03-13
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 The current "first price auction" fee model in Ethereum is inefficient and needlessly costly to users. This EIP proposes a way to replace this with a mechanism that allows dynamically priced transaction fees and efficient transaction price discovery.
 
+## Abstract
+
+Based on [The Agoric Papers](https://agoric.com/papers/incentive-engineering-for-computational-resource-management/full-text/).
+
 Each transaction would have the option of providing parameters that specify an "escalating" bid, creating a time-based auction for validators to include that transaction.
 
-This creates highly efficient price discovery, where the price will always immediately fall to the highest price a user is willing to pay, and avoids overpayment by allowing users to specify a duration during which their bid price would increase.
+This creates highly efficient price discovery, where the price will always immediately fall to the highest bid price, which is not necessarily that user's highest price they would pay.
 
 ![escalator algorithm price chart](https://ethresear.ch/uploads/default/original/2X/0/042795efa4c2680d644bc66386cd2984a70293f8.gif)
-## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-Based on [The Agoric Papers](https://agoric.com/papers/incentive-engineering-for-computational-resource-management/full-text/). The `gasPrice` parameter is gone, and in its place are these parameters:
-
-- `START_PRICE`: The lowest price that the user would like to pay for the transaction.
-- `START_BLOCK`: The first block that this transaction is valid at.
-- `MAX_PRICE`: The maximum price the sender would be willing to pay to have this transaction processed.
-- `MAX_BLOCK`: The last block that the user is willing to wait for the transaction to be processed in.
-
-When processing a transaction, miners now receive a fee based off of a simple linear function, assuming `BLOCK` is the current block number.
-
-```javascript
-function txFee (startBlock, startPrice, maxBlock, maxPrice, blockNumber) {
-
-  if (blockNumber >= maxBlock) return maxPrice
-
-  const priceRange = maxPrice - startPrice
-  const blockRange = maxBlock - startBlock
-  const slope = priceRange / blockRange
-
-  return startPrice + (slope * (blockNumber - startBlock))
-}
-```
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
@@ -97,7 +78,8 @@ function txFee (startBlock, startPrice, maxBlock, maxPrice, blockNumber) {
   const slope = priceRange / blockRange
 
   return startPrice + (slope * (blockNumber - startBlock))
-}```
+}
+```
 
 ## Backwards Compatibility
 
