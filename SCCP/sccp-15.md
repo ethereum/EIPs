@@ -3,7 +3,7 @@ sccp: 15
 title: Increase ETH Collateral sETH Limit
 author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/kPPKsPb
-status: Proposed
+status: Implemented
 created: 2020-03-11
 ---
 
