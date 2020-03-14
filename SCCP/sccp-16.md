@@ -13,7 +13,10 @@ created: 2020-03-12
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 
-*NOTICE* THis change has been reverted.
+*NOTICE* 
+This change has been reverted.
+*NOTICE*
+
 Temporarily increase fee reclamation waiting period to an hour.
 
 ## Abstract
