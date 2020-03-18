@@ -28,9 +28,11 @@ Also allows hardware wallets to utilise an automated service to trade on synthet
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-Approve delegate address to trade on another wallet.
-Remove any delegated address from approval list.
-Only ability to call synthetix.exchange() for an approved wallet.
+
+function approveExchangeOnBehalf: Approve delegate address to trade on another wallet.
+function exchangeOnBehalf: Only ability to call synthetix.exchange() for an approved wallet.
+function removeExchangeOnBehalf: Remove any delegated address from approval list.
+
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
