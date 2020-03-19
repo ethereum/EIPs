@@ -28,30 +28,22 @@ A `SystemStatus` contract can hold various types of state for system events. The
 
 There are a number of conditions where the Synthetix system needs to be able to pause. These are as follows:
 
-1. **During upgrades**: `upgrade(bool upgrading)`: Currently we have a workaround to disable the entire protocol by setting `ExchangeRates.rateIsStale` period to `1`. This is fairly rudimentary and needs improvement. Moreover a better reject reason will go a ways towards helping users address concerns during these windows.
-2. **Security meaures**: `disableSynth(bool disable, bytes32)`: There have been occasions where synths have needed to be disabled immediately, such as during the attack on sMKR and iMKR. Moreover, we're continuing to build live monitoring software that can detect and disable synths whenever an attack is launched.
-3. **Freezing inverse synths**: `freezeSynth(bytes32, bool freeze, bool upperLimit)` This functionality, currently in our ExchangeRates contract, is better served here with the other disabling checks.
-4. **Pausing non-crypto synths**: `pauseSynth(bytes32, bool pause)` For when the markets supporting the prices of the underlying assets are closed - such as the weekends for forex and after hours for stocks and equities.
+1. **During upgrades**: Currently we have a workaround to disable the entire protocol by setting `ExchangeRates.rateIsStale` period to `1`. This is fairly rudimentary and needs improvement. Moreover a better reject reason will go a ways towards helping users address concerns during these windows.
+2. **Security meaures**: There have been occasions where synths have needed to be disabled immediately, such as during the attack on sMKR and iMKR (see [SIP-34](./sip-34.md)). This gives the team and community time to investigate the situation and determine the next steps with minimal impact to the rest of the system. Moreover, we're continuing to build live monitoring software that can detect and disable synths whenever an attack is launched.
 
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-1. **During upgrades**: All synth and SNX transfers disabled. All exchange, issue, burn, claim and mint functionality disabled. A revert reason of "System being upgraded... please stand by" to be provided. This will be managed by the `owner`.
-2. **Security meaures**: For the synth in question, all transfers and exchanges into or out of disabled. This will be managed by the `owner` and an oracle.
-3. **Freezing inverse synths**: For the synth in question, no more price updates will effect it. This will be performed automatically by an oracle.
-4. **Pausing non-crypto synths**: For the synth in question, all exchanges into and out of disabled. This will be performed automatically by an oracle.
+1. **System Pause**: All synth and SNX transfers disabled. All exchange, issue, burn, claim, loan and mint functionality disabled. This is both for system upgrades and under possible emergency situations. This will controlled by an access control (see below).
+2. **Synth Disabling**: For the synth in question, all transfers and exchanges into or out of disabled. Also controlled by an access control list.
+3. **Access Control**: A whitelist of addresses that can toggle the `System Pause` and the `Synth Disabling` processes, along with whether they can disable or re-enable. This whitelist will be managed by the `owner`.
 
 ## Rationale
 
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-On the authorization of disabling and re-enabling:
-
-1. Straightforward.
-2. A multisig owner can perform if users detect anomalies and report them, or automated monitoring tools can trigger this to respond more quickly in emergencies.
-3. Once we migrate to Chainlink completely, we will longer be able to react to changing prices on chainlink (we can only pull them). As such, we will need an oracle solution to invoke the freezing action.
-4. As with #3, we will need an oracle to automate this process.
+The Access Control allows the `owner` to configure the right kind of emergency system pause access to a range of manual and automated protection mechanism if anomalies or exploits are detected.
 
 ## Test Cases
 
