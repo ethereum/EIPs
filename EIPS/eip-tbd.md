@@ -33,12 +33,12 @@ The current gas pricing formula is defined in EIP-198. This formula divides a �
 `GQUADDIVISOR` is set to ‘20’ per EIP-198. We recommend changing the value of this parameter to ‘200’.
 
 ### Option (2): Modify ‘computational complexity’ function 
-A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing)
+A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
 
 Code defining an improved complexity function can be provided as needed, but this option is not recommended at this time.
 
 ### Option (3): Replace libraries used by ModExp precompiles
-ModExp benchmarks for different libraries can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing)
+ModExp benchmarks for different libraries can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
 
 While alternative libraries can provide improved performance, this option is not recommended at this time.
 
@@ -50,7 +50,7 @@ Changing the value of this parameter from 20 to 200 will reduce the gas cost of 
 ![Option 1 Graph](../assets/eip-tbd/GQuad_Change.png?raw=true)
 
 ### Option (2): Modify ‘computational complexity’ formula
-A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
+An alternative ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
 
 ![Option 2 Graph](../assets/eip-tbd/Complexity_Regression.png?raw=true)
 
