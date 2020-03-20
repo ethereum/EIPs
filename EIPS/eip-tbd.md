@@ -1,58 +1,74 @@
 ---
-eip: <to be assigned>
-title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
-discussions-to: <URL>
+eip: <to-be-assigned>
+title: Big integer modular exponentiation (EIP-198) gas cost
+author: Kelly Olson (@ineffectualproperty), Sean Gulley (@sean-sn), Simon Peffers (@simonatsn), Justin Drake (@justindrake), Dankrad Feist (@dankrad)
+discussions-to: TBD
 status: Draft
-type: <Standards Track | Meta | Informational>
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <EIP number(s)>
-replaces (*optional): <EIP number(s)>
+type: Standards Track
+category: Core
+created: 2020-03-20
+Requires: <EIP-198>
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
-
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+The EIP-198 ‘big integer modular exponentiation’, or `ModExp`, precompile is currently overpriced. Re-pricing this precompile will enable more cost efficient verification of RSA signatures, verifiable delay functions (VDFs), primality checks, and more.
 
 ## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-A short (~200 word) description of the technical issue being addressed.
+After benchmarking the ModExp precompile, we discovered that it is ‘overpriced’ relative to other precompiles. We also discovered that the current gas pricing formula could be improved to better estimate the computational complexity of various ModExp input variables. To improve the gas cost pricing for this precompile the following options are available:
+
+1. Changing the value of the GQUADDIVISOR parameter in the ModExp pricing formula to bring its costs more in-line with other precompiles
+2. Modifying the gas pricing formula to better reflect the computational complexity of ModExp operations
+3. Improving the underlying libraries beneath the ModExp Precompile
+4. Any combination of (1), (2), and (3)
+
+We recommend **Option (1)** which provides a large practical improvement to gas estimation while keeping implementation complexity low. Options (2) and (3) could also be implemented and would further improve the gas pricing costs for a broader range of use cases. Additional data can be provided for options (2) and (3) as desired.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+Modular exponentiation is a foundational arithmetic operation for many cryptographic functions including signatures, VDFs, SNARKs, accumulators, and more. Unfortunately, the ModExp precompile is currently over-priced, making these operations inefficient and expensive. By reducing the cost of this precompile, these cryptographic functions become more practical, enabling improved security, stronger randomness (VDFs), and more.
 
 ## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+The current gas pricing formula is defined in EIP-198. This formula divides a ‘computational complexity’ function by a ‘gas conversion’ parameter called ‘GQUADDIVISOR’ to arrive at a gas cost. 
+
+### **Recommended** Option (1): Change value of GQUADDIVISOR
+`GQUADDIVISOR` is set to ‘20’ per EIP-198. We recommend changing the value of this parameter to ‘200’.
+
+### Option (2): Modify ‘computational complexity’ function 
+A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing)
+
+Code defining an improved complexity function can be provided as needed, but this option is not recommended at this time.
+
+### Option (3): Replace libraries used by ModExp precompiles
+ModExp benchmarks for different libraries can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing)
+
+While alternative libraries can provide improved performance, this option is not recommended at this time.
 
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+### **Recommended** Option (1): Change value of GQUADDIVISOR:
+Changing the value of this parameter from 20 to 200 will reduce the gas cost of this precompile by a factor of 10 with minimal implementation changes. With this change, the cost of the ModExp precompile will have a higher cost (gas/second) than other precompiles such as ECRecover.
+
+![Option 1 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/GQuad%20Change.png?raw=true)
+
+### Option (2): Modify ‘computational complexity’ formula
+A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
+
+![Option 2 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/Complexity%20Regression.png?raw=true)
+
+The new complexity function has a better fit vs. the execution time when compared to the current complexity function. This better fit is because the new complexity formula accounts for the use of binary exponentiation algorithms that are used by ‘bigint’ libraries for large exponents. You may also notice the regression line of the proposed complexity function bisects the test vector data points. This is because the run time varies depending on if the modulus is even or odd.
+
+While modifying the computational complexity formula can improve gas estimation at a medium implementation cost, we do not recommend it at this time.
+
+### Option (3): Improving the ModExp precompile implementations
+
+![Option 3 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/Library%20Benchmarks.png?raw=true)
+
+Replacing the underlying library can improve the performance of the ModExp precompile by 2x-4x for large exponents, but comes at a high implementation cost. We do not recommend this option at this time.
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+As no underlying algorithms are being changed, there are no additional test cases to specify.
 
-## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
-
-## Security Considerations
-<!--All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.-->
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+## References
+[EIP-198](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
