@@ -11,7 +11,7 @@ Requires: <EIP-198>
 ---
 
 ## Simple Summary
-The EIP-198 ‘big integer modular exponentiation’, or `ModExp`, precompile is currently overpriced. Re-pricing this precompile will enable more cost efficient verification of RSA signatures, verifiable delay functions (VDFs), primality checks, and more.
+The [EIP-198](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md) ‘big integer modular exponentiation’, or `ModExp`, precompile is currently overpriced. Re-pricing this precompile will enable more cost efficient verification of RSA signatures, verifiable delay functions (VDFs), primality checks, and more.
 
 ## Abstract
 After benchmarking the ModExp precompile, we discovered that it is ‘overpriced’ relative to other precompiles. We also discovered that the current gas pricing formula could be improved to better estimate the computational complexity of various ModExp input variables. To improve the gas cost pricing for this precompile the following options are available:
@@ -21,7 +21,7 @@ After benchmarking the ModExp precompile, we discovered that it is ‘overpriced
 3. Improving the underlying libraries beneath the ModExp Precompile
 4. Any combination of (1), (2), and (3)
 
-We recommend **Option (1)** which provides a large practical improvement to gas estimation while keeping implementation complexity low. Options (2) and (3) could also be implemented and would further improve the gas pricing costs for a broader range of use cases. Additional data can be provided for options (2) and (3) as desired.
+We recommend **Option (1)** which provides a large practical improvement to gas estimation while keeping implementation complexity low. Options (2) and (3) could also be implemented and would further improve the gas pricing for a broader range of use cases. Additional data can be provided for options (2) and (3) as desired.
 
 ## Motivation
 Modular exponentiation is a foundational arithmetic operation for many cryptographic functions including signatures, VDFs, SNARKs, accumulators, and more. Unfortunately, the ModExp precompile is currently over-priced, making these operations inefficient and expensive. By reducing the cost of this precompile, these cryptographic functions become more practical, enabling improved security, stronger randomness (VDFs), and more.
@@ -47,12 +47,12 @@ While alternative libraries can provide improved performance, this option is not
 ### **Recommended** Option (1): Change value of GQUADDIVISOR:
 Changing the value of this parameter from 20 to 200 will reduce the gas cost of this precompile by a factor of 10 with minimal implementation changes. With this change, the cost of the ModExp precompile will have a higher cost (gas/second) than other precompiles such as ECRecover.
 
-![Option 1 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/GQuad%20Change.png?raw=true)
+![Option 1 Graph](../assets/eip-tbd/GQuad_Change.png?raw=true)
 
 ### Option (2): Modify ‘computational complexity’ formula
 A proposed ‘complexity’ function can be found at the following [spreadsheet](https://docs.google.com/spreadsheets/d/1Fq3d3wUjGN0R_FX-VPj7TKhCK33ac--P4QXB9MPQ8iw/edit?usp=sharing).
 
-![Option 2 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/Complexity%20Regression.png?raw=true)
+![Option 2 Graph](../assets/eip-tbd/Complexity_Regression.png?raw=true)
 
 The new complexity function has a better fit vs. the execution time when compared to the current complexity function. This better fit is because the new complexity formula accounts for the use of binary exponentiation algorithms that are used by ‘bigint’ libraries for large exponents. You may also notice the regression line of the proposed complexity function bisects the test vector data points. This is because the run time varies depending on if the modulus is even or odd.
 
@@ -60,7 +60,7 @@ While modifying the computational complexity formula can improve gas estimation 
 
 ### Option (3): Improving the ModExp precompile implementations
 
-![Option 3 Graph](https://github.com/ineffectualproperty/EIPs/blob/master/assets/eip-tbd/Library%20Benchmarks.png?raw=true)
+![Option 3 Graph](../assets/eip-tbd/Library_Benchmarks.png?raw=true)
 
 Replacing the underlying library can improve the performance of the ModExp precompile by 2x-4x for large exponents, but comes at a high implementation cost. We do not recommend this option at this time.
 
