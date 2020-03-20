@@ -3,7 +3,7 @@ sip: 44
 title: Synthetix & Synth Disabling
 status: Proposed
 author: Justin J Moses (@justinjmoses)
-discussions-to: <https://discordapp.com/invite/AEdUHzt>
+discussions-to: https://discordapp.com/invite/AEdUHzt
 
 created: 2020-02-28
 ---
