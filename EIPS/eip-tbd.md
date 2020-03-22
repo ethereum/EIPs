@@ -1,17 +1,17 @@
 ---
-eip: <to-be-assigned>
-title: Big integer modular exponentiation (EIP-198) gas cost
+eip: 2565
+title: Repricing of the EIP-198 ModExp precompile
 author: Kelly Olson (@ineffectualproperty), Sean Gulley (@sean-sn), Simon Peffers (@simonatsn), Justin Drake (@justindrake), Dankrad Feist (@dankrad)
 discussions-to: https://ethereum-magicians.org/t/big-integer-modular-exponentiation-eip-198-gas-cost/4150
 status: Draft
 type: Standards Track
 category: Core
 created: 2020-03-20
-Requires: <EIP-198>
+Requires: 198
 ---
 
 ## Simple Summary
-The [EIP-198](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md) ‘big integer modular exponentiation’, or `ModExp`, precompile is currently overpriced. Re-pricing this precompile will enable more cost efficient verification of RSA signatures, verifiable delay functions (VDFs), primality checks, and more.
+The [EIP-198](https://eips.ethereum.org/EIPS/eip-198) ‘big integer modular exponentiation’, or `ModExp`, precompile is currently overpriced. Re-pricing this precompile will enable more cost efficient verification of RSA signatures, verifiable delay functions (VDFs), primality checks, and more.
 
 ## Abstract
 After benchmarking the ModExp precompile, we discovered that it is ‘overpriced’ relative to other precompiles. We also discovered that the current gas pricing formula could be improved to better estimate the computational complexity of various ModExp input variables. To improve the gas cost pricing for this precompile the following options are available:
