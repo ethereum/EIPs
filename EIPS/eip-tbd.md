@@ -2,7 +2,7 @@
 eip: <to-be-assigned>
 title: Big integer modular exponentiation (EIP-198) gas cost
 author: Kelly Olson (@ineffectualproperty), Sean Gulley (@sean-sn), Simon Peffers (@simonatsn), Justin Drake (@justindrake), Dankrad Feist (@dankrad)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/big-integer-modular-exponentiation-eip-198-gas-cost/4150
 status: Draft
 type: Standards Track
 category: Core
