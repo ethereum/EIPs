@@ -24,6 +24,8 @@ There have been several [SCCPs](https://sips.synthetix.io/all-sccp) proposed to 
 
 Time based staking will also be a follow up implementation meaning that rewards will be earned based on your debt % over time for only 1 fee period. This is similar to how the [sETH unipool](https://sips.synthetix.io/sips/sip-31) and [curvepool's](https://etherscan.io/address/0x13B54E8271B3e45cE71D8f4fC73eA936873a34fC) work with their SNX staking rewards of their respective Liquidity Provider tokens.
 
+We're also aiming to have built a simple delegate Dapp to work in Mobile Dapp browsers. So you can BurnToTarget, Claim, Mint, Burn and Exchange on the run. 
+
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
