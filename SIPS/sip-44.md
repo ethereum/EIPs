@@ -14,13 +14,13 @@ created: 2020-02-28
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Add a new `SystemStatus` contract to allow both synth pausing and system upgrades.
+Add a new `SystemStatus` contract to allow both synth pausing and system upgrades, as well as other security measures.
 
 ## Abstract
 
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-A `SystemStatus` contract can hold various types of state for system events. These include: system upgrades, synths frozen due to inverse limits being hit, synths disabled due to security concerns, synths paused during out-of-trading hours for the underlying asset.
+A `SystemStatus` contract can hold various types of state for system events. These include: system upgrades, issuance and exchange controls, and synths disabled due to security concerns, or in the short term, suspended during out-of-trading hours for the underlying asset.
 
 ## Motivation
 
@@ -35,9 +35,18 @@ There are a number of conditions where the Synthetix system needs to be able to 
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-1. **System Pause**: All synth and SNX transfers disabled. All exchange, issue, burn, claim, loan and mint functionality disabled. This is both for system upgrades and under possible emergency situations. This will controlled by an access control (see below).
-2. **Synth Disabling**: For the synth in question, all transfers and exchanges into or out of disabled. Also controlled by an access control list.
-3. **Access Control**: A whitelist of addresses that can toggle the `System Pause` and the `Synth Disabling` processes, along with whether they can disable or re-enable. This whitelist will be managed by the `owner`.
+The following areas can be suspended:
+
+1. **System**: All synth and SNX transfers disabled. All exchange, issue, burn, claim, loan and mint functionality disabled. This is both for system upgrades and under possible emergency situations.
+2. **Issuance**: All sUSD issuance, burning and claiming disabled, along with any loan actions.
+3. **Exchange**: All synth exchanges and settlement.
+4. **Synth**: For the synth in question, all transfers of, settlement of, and exchanges into or out of disabled.
+
+Access to the above controls will be restricted to an `accessControlList`, a whitelist of addresses that for each section above, can `suspend` and/or `resume`. This whitelist will be managed by the `owner`.
+
+Furthermore, each suspension must include a `uint reason`. Apart from the single reason `1` for `SYSTEM_UPGRADE`, these reasons are purely for dApps and scripts to indicate to users why certain parts of the system are unavailable.
+
+> Note: **Exchange** suspension will remove `Exchange.exchangeEnabled` functionality and this SIP will remove it.
 
 ## Rationale
 
