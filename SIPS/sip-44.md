@@ -1,7 +1,7 @@
 ---
 sip: 44
 title: Synthetix & Synth Disabling
-status: Proposed
+status: Approved
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://discordapp.com/invite/AEdUHzt
 
