@@ -1,7 +1,7 @@
 ---
 layout: page
-title: SIP
+title: All SIPs
 ---
 
-{% assign sips=site.pages|where_exp:"page","page.sip > 0" %}
-{% include siptable.html sips=sips %}
+{% assign sips=site.pages|where_exp:"page","page.sip > 0" %} {% include
+siptable.html sips=sips %}

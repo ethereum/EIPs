@@ -13,7 +13,6 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Synthetix Improvement Proposals
 description: >-
   Synthetix Improvement Proposals (SIPs) describe standards for the Synthetix
   platform, including core protocol specifications, client APIs, and contract
@@ -21,10 +20,10 @@ description: >-
 url: "https://sips.synthetix.io"
 repository: Synthetixio/SIPs
 twitter_username: synthetix_io
-github_username:  synthetixio
+github_username: synthetixio
 header_pages:
- - all-sip.html
- - all-sccp.html
+  - all-sip.html
+  - all-sccp.html
 twitter:
   card: summary
   username: synthetix_io
@@ -32,17 +31,17 @@ twitter:
 # Build settings
 markdown: kramdown
 theme: minima
+plugins:
+  - jekyll-seo-tag
 
 permalink: /:slug
 
 defaults:
-  -
-    scope:
+  - scope:
       path: "SIPS"
     values:
       layout: "sip"
-  -
-    scope:
+  - scope:
       path: "SCCP"
     values:
       layout: "sccp"
