@@ -1,26 +1,17 @@
 ---
 eip: <to be assigned>
-title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: <Saving and Displaying Image Onchain for Universal Tokens>
+author: <Hua Zhang (@dgczhh), Yuefei Tan (@whtyfhas), Derek Zhou (@zhous)
 discussions-to: <URL>
 status: Draft
-type: <Standards Track | Meta | Informational>
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <EIP number(s)>
-replaces (*optional): <EIP number(s)>
+type: <ERC>
+category (*only required for Standard Track): <ERC>
+created: <2020-03-28>
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
-
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+
+A set of interfaces to save an SVG image in Ethereum, and to retrieve the image file from Ethereum for universal tokens. 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
