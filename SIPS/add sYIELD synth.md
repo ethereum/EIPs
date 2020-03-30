@@ -1,5 +1,5 @@
 ---
-sip: to be assigned
+sip: <to be assigned>
 title: Add sYIELD synth
 status: Proposed
 author: Nocturnalsheet (@nocturnalsheet), IanC
@@ -48,16 +48,16 @@ Variable rate (In future): Rates will increase to neutralise the debt pool if th
 
 sYIELD is a solution which aims to:
 
-1) Encourage traders to hold sYIELD in between trades and keep them in the ecosystem. 
+1) Encourage traders to hold sYIELD in between trades and keep them in the ecosystem.
 
 
-2) Attract people looking for higher stablecoins yield 
+2) Attract people looking for higher stablecoins yield
 
 
 3) Encourage SNX minters to hold their debt in sYIELD instead of sETH
 
 
-4) Create more demand for sUSD, helping to maintain and restore the peg 
+4) Create more demand for sUSD, helping to maintain and restore the peg
 
 
 5) Create more external borrowing and lending markets for sUSD as arbitrageurs will borrow sUSD to place into sYIELD if the interest rate of sYIELD is higher than the borrowing cost of sUSD
