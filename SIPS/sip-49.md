@@ -1,7 +1,7 @@
 ---
-sip: to be assigned
+sip: 49
 title: Add new synths for Hadar release
-status: Proposed 
+status: Proposed
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
