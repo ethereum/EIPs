@@ -3,7 +3,7 @@ sip: 49
 title: Add new synths for Hadar release
 status: Proposed
 author: Nocturnalsheet (@nocturnalsheet)
-discussions-to: (https://discordapp.com/invite/CDTvjHY)
+discussions-to: <https://discordapp.com/invite/CDTvjHY>
 
 created: 2020-03-30
 ---
@@ -14,7 +14,7 @@ created: 2020-03-30
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Add new long and inverse Synths for six new cryptocurrencies: Bitcoin Cash (BCC), Cardano (ADA), Dash, EOS, Monero (XMR), Ethereum Classic (ETC).
+Add new long and inverse Synths for six new cryptocurrencies: Bitcoin Cash (BCH), Cardano (ADA), Dash, EOS, Monero (XMR), Ethereum Classic (ETC).
 Add new long and inverse Synths for two new indices: FTSE 100 Index, Nikkei 225 Index
 Add new long and inverse Synths for one new commodity: Brent Crude Oil
 
