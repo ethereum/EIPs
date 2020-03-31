@@ -39,6 +39,6 @@ layout: default
     {% endif %}
   </table>
 
-  {{ content }}
+  {% include anchor_headings.html html=content anchorClass="anchor-link" beforeHeading=true %}
 
 </div>
