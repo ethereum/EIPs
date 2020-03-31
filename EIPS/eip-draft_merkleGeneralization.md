@@ -1,7 +1,7 @@
 ---
-eip:
+eip: 2579
 title: Merkle Tree Generalized Index
-author: naxe (github: ngmachado, twitter : @LogicB0x)
+author: naxe (ngmachado @LogicB0x)
 discussions-to: https://ethereum-magicians.org/t/merkle-tree-generalized-index/4162/
 status: Draft
 type: Standards Track
