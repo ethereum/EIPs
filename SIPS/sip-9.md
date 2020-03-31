@@ -1,7 +1,7 @@
 ---
 sip: 9
 title: Change Fee Claim Window To One Period
-status: Approved
+status: Implemented
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/TK5Vt4h
 created: 2019-07-16
@@ -28,11 +28,11 @@ We're also aiming to have built a simple delegate Dapp to work in Mobile Dapp br
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-
+https://github.com/Synthetixio/synthetix/pull/464/files?file-filters%5B%5D=.js
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-
+https://github.com/Synthetixio/synthetix/pull/464
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
