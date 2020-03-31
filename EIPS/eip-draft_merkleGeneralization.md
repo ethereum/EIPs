@@ -85,7 +85,7 @@ function getRoot(Data storage self,  bytes32[] memory nodes,  uint256[] memory g
 | Argument  |  Description  |
 | ----------| ------------------- |
 | Data self |  Placeholder for computations results |
-| Bytes32[] nodes | leaves and interceptions node information. Leaves and nodes are splitted with the BLANK POINT|
+| Bytes32[] nodes | leaves and interceptions node information. Leaves and nodes are split with the BLANK POINT|
 | uint256[] giop | Generalized Index information about given proofs and nodes |
 
 
