@@ -72,6 +72,14 @@ Now I will consider the ultimate results of the strategies listed above. Are use
 | Blocks regularly under-full, user wants urgent inclusion.           | User over-pays, but reliably gets transaction included.                                                                                                         | User bids at or over current price tier, gets transaction mined reliably.                    | User pays an expected amount, and gets transaction mined reliably.                                                 |
 | Blocks regularly under-full, user willing to wait for a good price. | User bids below the low end of the recently accepted prices, may need to wait for a while. If waiting too long, user may need to re-submit with a higher price. | User chooses their price, and waits for it, or manually re-submits.                          | User chooses their lowest price, but also their highest price and maximum wait time, so no resubmission is needed. |
 
+In all cases, the escalator algorithm as I have described is able to perform optimally.
+
+The current gas auction model works well under half-full and less conditions, but for users with urgent needs, has the downside of overpayment. For users seeking a low price, the current model has the downside of requiring re-submission, but has the benefit of always giving users a path towards reliable block inclusion.
+
+EIP-1559 also performs well under normal conditions, but under conditions where blocks are regularly full, the price discovery mechanism breaks, and miners will fall back to the `TIP` parameter to choose the transactions to include, meaning that under network congestion, EIP-1559 forces users to _either_ choose efficient prices or certainty of next-block inclusion.
+
+EIP-1559 also has all the re-submission issues of the current model in situations where a user would like to pay under the current market rate, but has certain time constraints limiting their patience. The Escalator algorithm is the only strategy listed here that allows users to discover the lowest possible price given the network conditions and their time constraints.
+
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
