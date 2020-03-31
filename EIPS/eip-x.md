@@ -33,9 +33,9 @@ EIP 1559 is currently being championed as an improvement for the Ethereum protoc
 
 To facilitate a more productive and concrete discussion about the gas fee market, I felt it was important to present an alternative that is clearly superior to the status quo, so that any claimed properties of EIP-1559 can be compared to a plausible alternative improvement.
 
-After presenting this EIP, I suggest the two algorithms be compared under all combinations of these conditions:
+I suggest the three gas payment algorithms be compared under all combinations of these conditions:
 
-- Blocks that are regularly not full, vs blocks that are full in a surprising ("black swan") series of fullness and escalating price.
+- Blocks that are regularly half full, Blocks that are regularly less than half full, and blocks that repeatedly full in a surprising ("black swan") series.
 - Users that are willing to wait for a price that may be below the market rate, vs users who value inclusion urgently and are willing to pay above market rate.
 
 We should then ask:
@@ -43,6 +43,23 @@ We should then ask:
 - Are users who want a good price likely to get included in a reasonable period of time? (Ideally within one block)
 
 I believe that under this analysis we will find that the escalator algorithm outperforms EIP-1559 in both normal and volatile conditions, for both high-stakes transactions and more casual users looking for a good price.
+
+While I think a deeper simulation/analysis should be completed, I will share my expected results under these conditions.
+
+### User Strategies Under Various Conditions and Algorithms
+
+| Gas Strategy                                                        | Current Single-Price                                                                                                                                                    | EIP 1559                                                                                                                                                                       | Escalator                                                                                                                                                                                    |
+|---------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Blocks regularly half full, user wants urgent inclusion.            | User bids within the range of prices that have been recently accepted, likely over-pays slightly.                                                                       | User bids one price tier over the current rate, and is likely included.                                                                                                        | User bids a range from the low end of recently included to the high end, and is likely included at the lowest rate possible.                                                                 |
+| Blocks regularly half full, user willing to wait for a good price.  | User bids below or near the low end of the recently accepted prices, may need to wait for a while. If waiting too long, user may need to re-submit with a higher price. | User bids under or at the current price tier, and may wait for the price to fall. If waiting too long, user may need to re-submit with a higher price.                         | User bids as low as they'd like, but set an upper bound on how long they're willing to wait before increasing price.                                                                         |
+| Blocks regularly full, user wants urgent inclusion.                 | User bids over the price of all recently accepted transactions, almost definitely over-paying significantly.                                                            | User bids over the current price tier, and needs to increase their `tip` parameter to be competitive on the next block, recreating the single-price auction price problem.     | User bids over a price that has been accepted consistently, with an escalating price in case that price is not high enough.                                                                  |
+| Blocks regularly full, user willing to wait for a good price.       | User bids below the low end of the recently accepted prices, may need to wait for a while. If waiting too long, user may need to re-submit with a higher price.         | User bids under or at the current price tier, and may wait for the price to fall. If waiting too long, user may need to re-submit with a higher price.                         | User bids as low as they'd like, but set an upper bound on how long they're willing to wait before increasing price.                                                                         |
+| Blocks regularly under-full, user wants urgent inclusion.           | User bids within or over the range of prices that have been recently accepted, likely over-pays slightly, and is likely included in the next block.                     | User bids at or over the current price tier, and is likely included in the next block.                                                                                         | User submits bid starting within recently accepted prices, is likely accepted in the next block.                                                                                             |
+| Blocks regularly under-full, user willing to wait for a good price. | User bids below the low end of the recently accepted prices, may need to wait for a while. If waiting too long, user may need to re-submit with a higher price.         | User bids at or under the current price tier, and is likely included in the next block. If bidding under and waiting too long, user may need to re-submit with a higher price. | User bids as low as they'd like, but set an upper bound on how long they're willing to wait before increasing price, is likely included in the next few blocks at the lowest possible price. |
+
+### User Results Under Various Conditions and Algorithms
+
+
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
