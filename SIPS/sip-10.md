@@ -3,7 +3,7 @@ sip: 10
 title: Upgrade Delegate Powers
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/CDTvjHY
-status: Approved
+status: Implemented
 created: 2019-07-16
 ---
 
@@ -60,14 +60,14 @@ Potential uses cases
  
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-Not required at this stage
-
+  https://github.com/Synthetixio/synthetix/blob/v2.21.6/test/contracts/DelegateApprovals.js
+  https://github.com/Synthetixio/synthetix/blob/v2.21.6/test/contracts/Issuer.js#L1703
+  https://github.com/Synthetixio/synthetix/blob/v2.21.6/test/contracts/Exchanger.js#L1230
+  
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
 - Deprecate existing `DelegateApprovals` contract that is attached to FeePool and supports only setting delegation for single action/s.
-
-  https://github.com/Synthetixio/synthetix/blob/master/contracts/DelegateApprovals.sol
   
 - Doesn't require associatedState to be set to FeePool contract.
  
@@ -76,6 +76,8 @@ Not required at this stage
 - Synthetix / Issuer and FeePool will read from the `DelegateApprovals` as a single source of truth for the required delegations.
 
 - Add EternalStorage pattern to new `DelegateApprovals` contract to allow adding new delegation powers but also not lose existing approvals that have been set.  
+
+https://github.com/Synthetixio/synthetix/blob/master/contracts/DelegateApprovals.sol
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
