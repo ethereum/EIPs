@@ -1,7 +1,7 @@
 ---
 sip: 46
 title: Address Resolver Gas Improvements
-status: Approved
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
