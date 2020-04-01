@@ -1,7 +1,7 @@
 ---
 sip: 47
 title: Prevent Empty Exchanges
-status: Approved
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
