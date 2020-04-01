@@ -3,7 +3,7 @@ sip: 14
 title: Allow delegation of Synthetix Exchange function to another address 
 author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/DQ8ehX4
-status: Approved
+status: Implemented
 created: 2019-08-01
 ---
 
@@ -43,11 +43,12 @@ function removeExchangeOnBehalf: Remove any delegated address from approval list
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-Not required at this stage
+https://github.com/Synthetixio/synthetix/blob/v2.21.6/test/contracts/Exchanger.js#L1230
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-Not required at this stage
+https://github.com/Synthetixio/synthetix/blob/v2.21.6/contracts/Exchanger.sol#L164
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
