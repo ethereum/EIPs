@@ -74,7 +74,7 @@ When the overlay trie is empty, phase 3 ends and phase 4 begins.
 
 ### Phase 4
 
-Phase 4 is the same as phase 4, except for the following changes:
+Phase 4 is the same as phase 3, except for the following changes:
 
   * Hₒ is dropped from the block header
 
