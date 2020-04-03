@@ -101,7 +101,7 @@ The implementation is still WIP, however a prototype version of the conversion p
 
 There are two issues that I can foresee:
 
-  * A targetted attack that would cause the overlay trie to be unreasonably large. Since gas costs will likely increase during the transition process, lengthening phase 3 is making Ethereum more expensive during a longer period of time. This could be solved by increasing the cost of `SSTORE` during phases 1 and 2.
+  * A targeted attack that would cause the overlay trie to be unreasonably large. Since gas costs will likely increase during the transition process, lengthening phase 3 is making Ethereum more expensive during a longer period of time. This could be solved by increasing the cost of `SSTORE` during phases 1 and 2.
   * If a large enough portion of the miners report a different value for the base binary tree root during phase 2, the start of phase 3 can be delayed indefinitely. At the limit, if miners representing more than 51% of the network are reporting an invalid value, they could be stealing funds without anyone having a say.
 
 ## Copyright
