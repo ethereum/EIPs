@@ -28,7 +28,7 @@ There is a long running interest in switching the state trie from a hexary forma
 
 ## Specification
 The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
-
+This specification follows the notation introduced by the [Yellow Paper](https://ethereum.github.io/yellowpaper). Prior to reading it is advisable to be familiar with the Yellow Paper.
 ### Binary tries
 
 This EIP assumes that a binary trie is defined like the MPT, except that:
