@@ -42,7 +42,7 @@ This EIP assumes that a binary trie is defined like the MPT, except that:
 
 Let _H₁_ be the previously agreed-upon block height at which phase 1 starts. For each block of height H₁ ≤ _h_ < H₂:
 
-  * Block headers contain a block header has a new Hₒ which is the _root of the overlay binary trie_
+  * Block headers contain a new Hₒ field, which is the _root of the overlay binary trie_;
   * Hᵣ ≡ P(H)ᵣ, i.e. the hexary trie root is the same as that of the block parent's. The hexary trie is referred to as the _hexary base trie_.
 
 The following is changed in the execution environment:
