@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2584
 title: Trie format transition with overlay trees
 author: Guillaume Ballet (@gballet)
 discussions-to: https://ethresear.ch/t/overlay-method-for-hex-bin-tree-conversion/7104
