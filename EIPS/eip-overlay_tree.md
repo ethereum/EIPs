@@ -19,7 +19,7 @@ This EIP describes a four phase process to complete the conversion.
 
   * In the first phase, all new state writes are made to an overlay binary trie, while the hexary trie is being converted to binary. The block format is changed to have two storage roots: the root of the hexary trie and the root of the binary trie.
   * The second phase starts when miners are done with the conversion and replace the hexary root with the newly calculated root.
-  * The third phase begins when a sufficient number of consecutive blocks report the same value: the overlay tree is progressively merged back into the newly converted binary base trie. A constant number of entries are deleted from the overlay and inserted into the base trie.
+  * The third phase begins when a sufficient number of consecutive blocks report the same value for `binary_trie_root`: the overlay tree is progressively merged back into the newly converted binary base trie. A constant number of entries are deleted from the overlay and inserted into the base trie.
   * The fourth and final phase begins when the overlay trie is empty. The field holding its root is removed from the block header.
 
 ## Motivation
