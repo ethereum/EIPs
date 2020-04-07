@@ -1,5 +1,5 @@
 ---
-sip: To be assigned
+sip: 51
 title: sETH & sUSD Liquidity Incentive
 status: Proposed
 author: Nocturnalsheet (@nocturnalsheet)
