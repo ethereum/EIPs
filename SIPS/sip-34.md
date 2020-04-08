@@ -41,6 +41,9 @@ TBD
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 In order to implement this quickly given the priority of the issue, we are proposing to temporarily freeze the oracle price feed at the current price until a longer term solution can be found and the community reaches consensus on the future status ok sMKR and iMKR.
 
+## Update (April 8, 2020): 
+We have removed s/iMKR from the system, and purged anyone who held those Synths into sUSD. 
+
 `sMKR` frozen at `443.3180`, `iMKR` frozen at `656.6820` in https://etherscan.io/tx/0x0069d23e7461c8c474fb388845428d480be8f087f5b934ad7d11a3b1a9b5e7d6.
 
 ## Copyright
