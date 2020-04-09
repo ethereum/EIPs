@@ -1,7 +1,7 @@
 ---
 sip: 51
 title: sETH & sUSD Liquidity Incentive
-status: Proposed
+status: Implemented
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/2MmKtHb
 
@@ -44,7 +44,9 @@ TBD
 
 ## Implementation
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-TDB
+The ProtocolDAO executed the transactions on 8/9 April, 2020.
+https://etherscan.io/tx/0xad50275df0cb41738b64a6bfddf67fb93e47ad2e05cd9d3584bd137a4d1e7fcb
+https://etherscan.io/tx/0x1a9c0a85c3fae8d9f1946f5fec6b792da9e6da11b0e87140be445d19db027dad#eventlog
 
 
 ## Copyright
