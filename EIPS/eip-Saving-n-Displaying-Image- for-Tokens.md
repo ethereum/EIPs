@@ -40,7 +40,7 @@ For a fungible token such as an ERC-20 token no such an ID is needed and our pro
 
 ```imageSvg```: we use a string variable to save an SVG image file's content.
 
-An SVG image that will be saved in the imageSvg string should include at least two attributes:"name", "description".
+An SVG image that will be saved in the imageSvg string should include at least two attributes:"name", "desc"(description).
 
 ```setTokenImageSvg```: for an ERC-721 or ERC-1155 token or a token implemented by a contract which has a member "ID" to specify its token type or token index we define an interface to associate an SVG image to the token's ID number. For an ERC-20 token or a token implemented by a contract which doesn't have a member "ID" to specify its token type or token index we define an interface to assign an SVG image to a member variable string of this token's contract.
 
