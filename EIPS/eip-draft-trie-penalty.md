@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2583
 title: Penalty for account trie misses
 author: Martin Holst Swende (@holiman)
 discussions-to: TBD
@@ -258,4 +258,3 @@ Not yet available.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
