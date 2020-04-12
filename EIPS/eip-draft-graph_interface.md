@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Graph Interface
-author: enrique.arizonbenito@gmail.com
+author: Enrique Arizón Benito <enrique.arizonbenito@gmail.com>
 discussions-to: https://gitter.im/ethereum/EIPs
 status: Draft
 type: Standards
