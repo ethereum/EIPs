@@ -65,3 +65,7 @@ There's room at this layer to allow for competing standards without breaking bas
 # 4. Applications Layer
 
 The applications layer specifies high level structures, abstractions, and conventions that allow different applications to support similar features and share data.
+
+# Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

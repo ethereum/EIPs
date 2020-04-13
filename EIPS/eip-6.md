@@ -23,3 +23,6 @@ The primary reason for us to change the term suicide is to show that people matt
 `SELFDESTRUCT` is added as an alias of `SUICIDE` opcode (rather than replacing it).
 https://github.com/ethereum/solidity/commit/a8736b7b271dac117f15164cf4d2dfabcdd2c6fd
 https://github.com/ethereum/serpent/commit/1106c3bdc8f1bd9ded58a452681788ff2e03ee7c
+
+### Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
