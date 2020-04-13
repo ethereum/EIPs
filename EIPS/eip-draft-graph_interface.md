@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: to be assigned
 title: Graph Interface
-author: Enrique Arizón Benito <enrique.arizonbenito@gmail.com>
-discussions-to: https://gitter.im/ethereum/EIPs
+author: earizon
+discussions-to: https://ethereum-magicians.org/t/standard-interface-fro-graph-alike-data/4197
 status: Draft
 type: Standards
 created: 2020-04-11
