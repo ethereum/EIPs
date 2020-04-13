@@ -14,7 +14,7 @@ Standard Network Graph interface
 ## Simple Summary
 <!-- }
 "If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. { -->
-Provide and standarised set of interfaces for graphs structures.
+Provide and standardised set of interfaces for graphs structures.
 
 ## Abstract
 <!--} 
@@ -24,13 +24,13 @@ Graphs provide a general mathematical description in terms of edge-node data rel
 ## Motivation
 <!-- }
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright. {-->
- Graphs relations amongst distributed entities arise naturally in claim-based identity frameworks, trust-systems, machine-to-machine RBAC security models, voting-delegation mechanisms, transitive relationships, economics models, architecture modeling, et ce tera. 
- The implementation of graphs can easely grow in complexity, since many graph-related problems soon become NP-like problems. By having a set of standarised interfaces and most probably a set of reference library implementations many contracts will be able to profit.
- Taking into account that data in a blockchain must represent assets, or more generally speaking, rights and obligations among subjects, the graph interface will focus on network-of-value use cases.  For example, graphs can be directed or no, but in network-of-value only directed graphs are usefuls, since contract rights and obligations are always directed and leaving freedom to choose will promote implementation errors.
+ Graphs relations amongst distributed entities arise naturally in claim-based identity frameworks, trust-systems, machine-to-machine RBAC security models, voting-delegation mechanisms, transitive relationships, economics models, architecture model standardization, et ce tera. 
+ The implementation of graphs can easily grow in complexity, since many graph-related problems soon become NP-like problems. By having a set of standardized interfaces and most probably a set of reference library implementations many contracts will be able to profit.
+ Taking into account that data in a blockchain must represent assets, or more generally speaking, rights and obligations among subjects, the graph interface will focus on network-of-value use cases.  For example, graphs can be directed or no, but in network-of-value only directed graphs are useful, since contract rights and obligations are always directed and leaving freedom to choose will promote implementation errors.
 
- Nodes in a Graph can be, a priori, of any time, but for the sake of simplification, and to avoid complex or flawed desings just nodes of type address will be considered. 
+ Nodes in a Graph can be, a priori, of any time, but for the sake of simplification, and to avoid complex or flawed designs just nodes of type address will be considered. 
 
-* Wallets can directly profit from graphs repesenting networks of neighbourgh trusts, opening the way to new business scenarios.
+* Wallets can directly profit from graphs representing networks of neighborhood trusts, opening the way to new business scenarios.
 * Complex right-delegation patterns become simple with the introduction of graphs.
 * Identity schemas will be much easier to implement with the help of graphs.
  
@@ -192,16 +192,16 @@ interface ObligationDirectedGraph {
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. { -->
 
  Graphs interfaces are well known and studied. The proposed interface will try to also promote "best-patterns" to avoid flawed implementations.
- For example self-souvering identity systems easely introduce design flaws, by designing identity around the "Me" or "self" person, breaking all the security principles of a blockchain design.
+ For example self-sovereign identity systems easily introduce design flaws, by designing identity around the "Me" or "self" person, breaking all the security principles of a blockchain design.
 
  Simple but no evident and so error-biased patterns will be described through interfaces.
 
- Transitive Rights/obligations, identity-claims systems, RBAC systems, ...  can be implemented with or without the directed Graphs interface. The graph approach will promote a more visual and intuitive interpretation of the use-case, and so, pottentially to safer, more reusable code as well as gaining more developer "traction". Actually is to be expected that simple graph implementations will use maps and list under the hood, but hidding all subtle, non-intuitive and error-prone details with no business value.
+ Transitive Rights/obligations, identity-claims systems, RBAC systems, ...  can be implemented with or without the directed Graphs interface. The graph approach will promote a more visual and intuitive interpretation of the use-case, and so, potentially to safer, more reusable code as well as gaining more developer "traction". Actually is to be expected that simple graph implementations will use maps and list under the hood, but hiding all subtle, non-intuitive and error-prone details with no business value.
 
- Smart-contract making use of deployed graph can play different roles. Some will act as graph builders, adding edges or nodes to the graphs, while othes can act as graph consumers. The concept of input/output proxy is introduced, again to promote best-development pattern approach.
+ Smart-contract making use of deployed graph can play different roles. Some will act as graph builders, adding edges or nodes to the graphs, while others can act as graph consumers. The concept of input/output proxy is introduced, again to promote best-development pattern approach.
 
 
- Once an standarized graph interface set is in place, it will promote a common language amongst developers in terms of high-level abstractions (vs low level Solidity data structures). The classification of graphs in terms of notarization, claims and obligations can cover many scenarios in a network-of-value. It's also expected that client tools will be able to profit from graph interfaces. 
+ Once an standardized graph interface set is in place, it will promote a common language amongst developers in terms of high-level abstractions (vs low level Solidity data structures). The classification of graphs in terms of notarization, claims and obligations can cover many scenarios in a network-of-value. It's also expected that client tools will be able to profit from graph interfaces. 
 
 ## Backwards Compatibility
 <!-- }
