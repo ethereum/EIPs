@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2602
 title: Disable null hash message for ecrecover precompile
 author: Wei Tang (@sorpaas)
-discussions-to: <URL>
+discussions-to: https://github.com/sorpaas/EIPs/issues/10
 status: Draft
 type: Standards Track
 category: Core 
