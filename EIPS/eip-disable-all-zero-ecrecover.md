@@ -1,6 +1,6 @@
 ---
 eip: 2602
-title: Disable null hash message for ecrecover precompile
+title: Disable null hash message verification for ecrecover precompile
 author: Wei Tang (@sorpaas)
 discussions-to: https://github.com/sorpaas/EIPs/issues/10
 status: Draft
