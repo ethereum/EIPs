@@ -2,7 +2,7 @@
 eip: 2604
 title: EXTBALANCE rename and conditional pricing
 author: wjmelements.eth <wjmelements@gmail.com> (@wjmelements)
-discussions-to: https://github.com/ethereum/EIPs/pull/2604
+discussions-to: https://ethereum-magicians.org/t/eip-2604-conditional-extbalance-repricing/
 status: Draft
 type: Standards Track
 category: Core
