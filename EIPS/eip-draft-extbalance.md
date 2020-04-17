@@ -1,8 +1,8 @@
 ---
-eip: 2605
+eip: 2604
 title: EXTBALANCE rename and conditional pricing
-author: wjmelements.eth <wjmelements@gmail.com> [@wjmelements](https://github.com/wjmelements)
-discussions-to: [Github](https://github.com/ethereum/EIPs/pull/2604)
+author: wjmelements.eth <wjmelements@gmail.com> (@wjmelements)
+discussions-to: https://github.com/ethereum/EIPs/pull/2604
 status: Draft
 type: Standards Track
 category: Core
