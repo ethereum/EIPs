@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2481
 title: "eth/66: request identifier"
 author: Christoph Burgdorf <christoph@ethereum.org>
 discussions-to: https://github.com/ethereum/EIPs/issues/2482
