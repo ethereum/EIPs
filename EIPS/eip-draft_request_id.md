@@ -41,9 +41,9 @@ in a GetBlockHeaders message. This may validly contain no block headers if none 
 requested block headers were found. The number of headers that can be requested in a
 single message may be subject to implementation-defined limits.
 
-Let's consider a client making many simultanous requests for `GetBlockHeaders` to one of its peers. By nature it can not be guaranteed that the expected responses arrive in the same order as they were sent. For the client to associate the incoming responses to the correct requests it has to loop through all pending requests trying to match it with the incoming response based on its contents.
+Let's consider a client making many simultaneous requests for `GetBlockHeaders` to one of its peers. By nature it can not be guaranteed that the expected responses arrive in the same order as they were sent. For the client to associate the incoming responses to the correct requests it has to loop through all pending requests trying to match it with the incoming response based on its contents.
 
-This can be particular tricky for responses that are ambigious such as empty responses.
+This can be particular tricky for responses that are ambiguous such as empty responses.
 
 This EIP proposes to change the `GetBlockHeaders` and the `BlockHeaders` command to include a `request_id` as shown below.
 
@@ -117,7 +117,7 @@ The ``request_id`` has the following characteristics:
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-**Q: The efficency gains might encourage clients to flood their peers with too many simultanous requests**
+**Q: The efficiency gains might encourage clients to flood their peers with too many simultaneous requests**
 
 Peers can always throttle or disconnect if they don't feel treated well. This is the same as today.
 
@@ -127,7 +127,7 @@ In practice, peers that serve the `les` protocol are much harder to find in the 
 
 **Q: Networking works today, isn't this just adding bloat?**
 
-This is adding a single integer per command while at the same time reducing code complexity and improving networking effiency. The addition seems justified.
+This is adding a single integer per command while at the same time reducing code complexity and improving networking efficiency. The addition seems justified.
 
 **Q: Why not demand request ids to be sequential?**
 
@@ -138,13 +138,13 @@ in the previous session.
 **Q: Why allow duplicate request ids?**
 
 The main benefit is flexibility and simplicity on the implementation side. Clients could decide to share
-the same ids across multiple different request types since they are naturally seperated anyway. Clients
+the same ids across multiple different request types since they are naturally separated anyway. Clients
 could even decide to not rely on request ids at all, therefore using the same constant request id across
 all requests.
 
 **Q: Why choose a 64-bit integer for the request ids**
 
-64-bit integer were choosen to keep compatibility with the `les` protocol.
+64-bit integer were chosen to keep compatibility with the `les` protocol.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
