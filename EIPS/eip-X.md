@@ -1,0 +1,192 @@
+---
+eip: <to be assigned>
+title: `permit`: 712-signed approvals
+author: Martin Lundfall (@Mrchico)
+discussions-to: <TBD>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2020-04-13
+requires: ERC20, ERC712
+---
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+A function `permit` extending ERC20 which allows for approvals to be made via `secp256k1` signatures. This kind "account abstraction for ERC20" brings about two main benefits:
+
+- transactions involving ERC20 operations can be paid using the token itself rather than ETH,
+- approve and pull operations can happen in a single transaction instead of two consecutive transactions,
+
+while adding as little as possible over the existing ERC20 standard.
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+Arguably one of the main reasons for the success of ERC20 tokens lies in the interplay between `approve` and `transferFrom`, 
+which allows for tokens to not only be transfered between externally owned accounts (EOA), but to be used in other contracts under application specific conditions by abstracting away `msg.sender` as the defining mechanism for token access control.
+
+However, a limiting factor in this design stems from the fact that the ERC20 `approve` function itself is defined in terms of `msg.sender`. This means that users _initial action_ involving ERC20 tokens must be performed by an EOA ^[1]. This means that token holders need to hold ETH to pay for transaction gas costs and, if they want to use the token in another DeFi system, that more than one transaction is required.
+
+This ERC extends the ERC20 standard with a new function `permit`, which allows users to modify the `allowance` mapping using a signed message, instead of through `msg.sender`. 
+
+For an improved user experience, the signed data is structured following [ERC-712](https://eips.ethereum.org/EIPS/eip-712), which already has wide spread adoption in major RPC providers.
+
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+While ERC20 tokens have become ubiquotous in the Ethereum ecosystem, their status remains that of second class tokens from the perspective of the protocol. The ability for users to interact with Ethereum without holding any ETH has been a [long outstanding goal](https://github.com/ethereum/EIPs/blob/ed621645c8f3bc5756492f327cda015f35d9f8da/EIPS/eip-101.md) and the [subject](https://eips.ethereum.org/EIPS/eip-1077) [of](https://eips.ethereum.org/EIPS/eip-777) [many](https://github.com/ethereum/EIPs/issues/1776#) [EIPs](https://eips.ethereum.org/EIPS/eip-1271).
+
+So far, many of these proposals have seen very little adoption, and the ones that have been adopted (such as ERC777), introduce a lot of additional functionality, causing [unexpected behavior in mainstream contracts](https://medium.com/consensys-diligence/uniswap-audit-b90335ac007).
+
+This ERC proposes an alternative solution which is designed to be as minimal as possible and to only address _one problem_: the lack of abstraction in the ERC20 `approve` method. 
+
+While it may be tempting to introduce `*_by_signature` counterparts for every ERC20 function, they are intentionally left out of this ERC20 for two reasons:
+
+ - the desired specifics of such functions, such as decision regarding fees for `transfer_by_signature`, possible batching algorithms, varies depending on the use case, and,
+ - they can be implemented using a combination of `permit` and additional helper contracts without loss of generality.
+
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+A new method 
+```sol
+function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+```
+and a new storage item
+```sol
+mapping(address=>uint) nonces;
+```
+with accompanying getter function are introduced, the semantics of which are as follows:
+
+For all addresses `owner`, `spender`, uint256s `value`, `deadline` and `nonce`, uint8 `v`, bytes32 `r` and `s`, 
+a call to `permit(owner, spender, value, deadline, v, r, s)` will set 
+`approval[owner][spender]` to `value`,
+increment `nonces[owner]` by 1,
+and emit a corresponding `Approval` event, 
+if and only if the following conditions are met:
+
+
+- The current blocktime is less than or equal to `deadline`.
+- `owner` is not the zero address.
+- `nonces[owner]` (before the state update) is equal to `nonce`.
+- `r`, `s` and `v` is a valid `secp256k1` signature from `owner` of the message:
+
+```sol
+keccak256(abi.encodePacked(
+   hex"1901",
+   keccak256(abi.encodePacked(
+            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+            keccak256(bytes(erc20name)),
+            keccak256(bytes(version)),
+            chainid,
+            tokenAddress)),
+   keccak256(abi.encodePacked(
+            keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
+            owner,
+            spender,
+            value,
+            nonce,
+            deadline))
+))
+```
+where `tokenAddress` is the address of the token contract, `chainid` is the chain id of the network it is deployed to and `erc20name` is the name of the token as defined by `ERC20`. `version` is a `string` defined at contract deployment which remains constant throughout the lifetime of the contract, but is otherwise unconstrained.
+
+In other words, the message is the 712 typed structure:
+    
+```js
+{
+  "types": {
+    "EIP712Domain": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "name": "verifyingContract",
+        "type": "address"
+      }
+    ],
+    "Permit": [{
+      "name": "owner",
+      "type": "address"
+      },
+      {
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "name": "nonce",
+        "type": "uint256"
+      },
+      {
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "primaryType": "Permit",
+    "domain": {
+      "name": erc20name,
+      "version": version,
+      "chainId": chainid,
+      "verifyingContract": tokenAddress
+  },
+  "message": {
+    "owner": owner,
+    "spender": spender,
+    "value": value,
+    "nonce": nonce,
+    "deadline": deadline
+  }
+}}
+```
+
+Note that nowhere in this definition we refer to `msg.sender`. The caller of the `permit` function can be any address.
+
+## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+The `permit` function is sufficient for enabling any operation involving erc20 tokens to be paid for using the token itself, rather than using ETH. 
+An example of a contract which enables gasless token transactions can be found [here](https://github.com/dapphub/ds-dach).
+
+It avoids any calls to unknown code.
+
+The `nonces` mapping is given for replay protection.
+
+The `deadline` variable can be set to 
+
+ERC712 typed messages are included because of its wide spread adoption in many wallet providers.
+
+
+## Backwards Compatibility
+There are currently two slightly differing implementations of this ERC, and we are forced to make a choice here for specificity.
+This implies that the given ERC deviates from the implementation given in the Dai and Chai ERC20 contracts. There, the `permit` method takes `nonce` as an additional argument, and the `uint256 value` argument is exchanged for `bool approval`, admitting binary approvals only. There is also a slight difference in argument names. The specification presented here is in line with the implementation in [Uniswap-v2](https://github.com/uniswap/uniswap-v2-core). This mismatch is a little unfortunate, but not very different from the variations found in ERC20 contracts. 
+
+## Test Cases
+Some basic test vector can be found here https://github.com/Uniswap/uniswap-v2-core/blob/master/test/UniswapV2ERC20.spec.ts.
+Additional test vectors for the Dai/Chai-like implementation are given at [chai.t.sol](https://github.com/dapphub/chai/blob/master/src/test/chai.t.sol).
+
+
+## Implementation
+[UniswapV2ERC20.sol](https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol)
+[Dai.sol](https://github.com/makerdao/dss/blob/master/src/dai.sol)
+[Chai.sol](https://github.com/makerdao/dss/blob/master/src/dai.sol)
+
+Note that the latter two implementations differ slightly from the presentation given here.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+[1] -  Unless the address owning the token is actually a contract wallet. Although contract wallets solves many of the same problems that motivates this EIP, they are currently only scarcely adopted in the ecosystem. Contract wallets suffer from a UX problem -- since they separate the EOA `owner` of the contract wallet from the contract wallet itself (which is meant to carry out actions on the `owner`s behalf and holds all of their funds), user interfaces need to be specifically designed to support them. The `permit` pattern reaps many of the same benefits while requiring little to no change in user interfaces.
+
