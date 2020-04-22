@@ -26,7 +26,7 @@ while adding as little as possible over the existing ERC20 standard.
 Arguably one of the main reasons for the success of ERC20 tokens lies in the interplay between `approve` and `transferFrom`, 
 which allows for tokens to not only be transfered between externally owned accounts (EOA), but to be used in other contracts under application specific conditions by abstracting away `msg.sender` as the defining mechanism for token access control.
 
-However, a limiting factor in this design stems from the fact that the ERC20 `approve` function itself is defined in terms of `msg.sender`. This means that users _initial action_ involving ERC20 tokens must be performed by an EOA ^[1]. This means that token holders need to hold ETH to pay for transaction gas costs and, if they want to use the token in another DeFi system, that more than one transaction is required.
+However, a limiting factor in this design stems from the fact that the ERC20 `approve` function itself is defined in terms of `msg.sender`. This means that users _initial action_ involving ERC20 tokens must be performed by an EOA <sup>[1]</sup>. This means that token holders need to hold ETH to pay for transaction gas costs and, if they want to use the token in another DeFi system, that more than one transaction is required.
 
 This ERC extends the ERC20 standard with a new function `permit`, which allows users to modify the `allowance` mapping using a signed message, instead of through `msg.sender`. 
 
@@ -164,7 +164,7 @@ It avoids any calls to unknown code.
 
 The `nonces` mapping is given for replay protection.
 
-The `deadline` variable can be set to 
+A common use case of `permit` has a relayer submit a `Permit` on behalf of the `owner`. In this scenario, the relaying party is essentially given a free option to submit or withold the `Permit`. If this is a cause of concern, the `owner` can limit the time a `Permit` is valid for by setting `deadline` to a value in the near future. The `deadline` argument can be set to `uint(-1)` to create `Permit`s that effectively never expire.
 
 ERC712 typed messages are included because of its wide spread adoption in many wallet providers.
 
