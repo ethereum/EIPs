@@ -81,7 +81,7 @@ Standard test cases for Solidity contract compling and deploying onto Ethereum t
 
 As weekly supply is compounded weekly using a compound formula with a terminal rate of 2.5% APR, the effective rate of inflation compounded weekly over a year is 2.53% APY.
 
-![equation](https://github.com/Synthetixio/SIPs/blob/master/SIPS/assets/sip24.png)
+![equation](https://user-images.githubusercontent.com/8297593/80077170-7a306c00-8590-11ea-89f3-3e6904121cf7.png)
 
 ## Copyright
 
