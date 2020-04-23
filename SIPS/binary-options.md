@@ -3,7 +3,7 @@ sip: 55
 title: Binary Options
 status: WIP
 author: Anton Jurisevic (@zyzek)
-discussions-to: <Discord Channel>
+discussions-to: https://discord.gg/kPPKsPb
 
 created: 2020-04-23
 ---
