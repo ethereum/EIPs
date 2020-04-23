@@ -1,5 +1,5 @@
 ---
-eip: to be assigned
+eip: 2222
 title: Graph Interface
 author: earizon
 discussions-to: https://ethereum-magicians.org/t/standard-interface-fro-graph-alike-data/4197
