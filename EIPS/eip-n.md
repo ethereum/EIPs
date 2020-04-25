@@ -65,44 +65,44 @@ When tenant right is valid, owner cannot transfer the usership. Once tenant righ
 #### ERC-N Interface
 ```solidity
 
-event TransferUser(address indexed from, address indexed to, uint256 indexed itemId, address operator);
-event ApprovalForUser(address indexed user, address indexed approved, uint256 itemId);
-event TransferOwner(address indexed from, address indexed to, uint256 indexed itemId, address operator);
-event ApprovalForOwner(address indexed owner, address indexed approved, uint256 itemId);
-event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
-event LienApproval(address indexed to, uint256 indexed itemId);
-event TenantRightApproval(address indexed to, uint256 indexed itemId);
-event LienSet(address indexed to, uint256 indexed itemId, bool status);
-event TenantRightSet(address indexed to, uint256 indexed itemId,bool status);
+  event TransferUser(address indexed from, address indexed to, uint256 indexed itemId, address operator);
+  event ApprovalForUser(address indexed user, address indexed approved, uint256 itemId);
+  event TransferOwner(address indexed from, address indexed to, uint256 indexed itemId, address operator);
+  event ApprovalForOwner(address indexed owner, address indexed approved, uint256 itemId);
+  event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+  event LienApproval(address indexed to, uint256 indexed itemId);
+  event TenantRightApproval(address indexed to, uint256 indexed itemId);
+  event LienSet(address indexed to, uint256 indexed itemId, bool status);
+  event TenantRightSet(address indexed to, uint256 indexed itemId,bool status);
 
-function balanceOfOwner(address owner) public view returns (uint256);
-function balanceOfUser(address user) public view returns (uint256);
-function userOf(uint256 itemId) public view returns (address);
-function ownerOf(uint256 itemId) public view returns (address);
+  function balanceOfOwner(address owner) public view returns (uint256);
+  function balanceOfUser(address user) public view returns (uint256);
+  function userOf(uint256 itemId) public view returns (address);
+  function ownerOf(uint256 itemId) public view returns (address);
 
-function safeTransferOwner(address from, address to, uint256 itemId) public;
-function safeTransferOwner(address from, address to, uint256 itemId, bytes memory data) public;
-function safeTransferUser(address from, address to, uint256 itemId) public;
-function safeTransferUser(address from, address to, uint256 itemId, bytes memory data) public;
+  function safeTransferOwner(address from, address to, uint256 itemId) public;
+  function safeTransferOwner(address from, address to, uint256 itemId, bytes memory data) public;
+  function safeTransferUser(address from, address to, uint256 itemId) public;
+  function safeTransferUser(address from, address to, uint256 itemId, bytes memory data) public;
 
-function approveForOwner(address to, uint256 itemId) public;
-function getApprovedForOwner(uint256 itemId) public view returns (address);
-function approveForUser(address to, uint256 itemId) public;
-function getApprovedForUser(uint256 itemId) public view returns (address);
-function setApprovalForAll(address operator, bool approved) public;
-function isApprovedForAll(address requester, address operator) public view returns (bool);
+  function approveForOwner(address to, uint256 itemId) public;
+  function getApprovedForOwner(uint256 itemId) public view returns (address);
+  function approveForUser(address to, uint256 itemId) public;
+  function getApprovedForUser(uint256 itemId) public view returns (address);
+  function setApprovalForAll(address operator, bool approved) public;
+  function isApprovedForAll(address requester, address operator) public view returns (bool);
 
-function approveLien(address to, uint256 itemId) public;
-function getApprovedLien(uint256 itemId) public view returns (address);
-function setLien(uint256 itemId) public;
-function getCurrentLien(uint256 itemId) public view returns (address);
-function revokeLien(uint256 itemId) public;
+  function approveLien(address to, uint256 itemId) public;
+  function getApprovedLien(uint256 itemId) public view returns (address);
+  function setLien(uint256 itemId) public;
+  function getCurrentLien(uint256 itemId) public view returns (address);
+  function revokeLien(uint256 itemId) public;
 
-function approveTenantRight(address to, uint256 itemId) public;
-function getApprovedTenantRight(uint256 itemId) public view returns (address);
-function setTenantRight(uint256 itemId) public;
-function getCurrentTenantRight(uint256 itemId) public view returns (address);
-function revokeTenantRight(uint256 itemId) public;
+  function approveTenantRight(address to, uint256 itemId) public;
+  function getApprovedTenantRight(uint256 itemId) public view returns (address);
+  function setTenantRight(uint256 itemId) public;
+  function getCurrentTenantRight(uint256 itemId) public view returns (address);
+  function revokeTenantRight(uint256 itemId) public;
 
 
 ```
@@ -155,24 +155,29 @@ This extension is analogous to the metadata extension of the ERC721 standard.
 ```
 
 ## Rationale
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+Prior to this propsosal, it seems there have been attempts to implement rental or lending at an application level or just with escrow. However, there are no standard proposal for such functions withour escrow.
+
+Architecture's principles are as follows.
+### Simple and flexible 
+The standard doesn't handle lending or rental functions directly.
+This is because simplicity makes flexible implementation of the standard and opens up further possibilities
+
+### ERC721 compatible and similarity
+As mentioned, the standard is fully compatible with ERC721. In addition to that, the manner of function is similar to ERC721.
 
 ## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+As mentioned in the specifications section, ERC-N can be fully ERC721 compatible by adding an extension function set.
+In addition to that, new functions introduced in ERC-N have many similarities to the existing functions in ERC721. Because of that, developers become able to learn and adopt a new standard quickly.
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
+Test is provided in [the reposotory](https://github.com/kohshiba/ERC-X).
+Powered by Truffle and Openzeppelin test helper.
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+[the reposotory](https://github.com/kohshiba/ERC-X).
 
 ## Security Considerations
-<!--All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.-->
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+Since it is expected that lien or tenant right will be controlled by the external contract, flaws within the external contract directly lead to unexpected behavior of the standard.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
