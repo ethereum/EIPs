@@ -155,7 +155,7 @@ This extension is analogous to the metadata extension of the ERC721 standard.
 ```
 
 ## Rationale
-Prior to this propsosal, it seems there have been attempts to implement rental or lending at an application level or just with escrow. However, there are no standard proposal for such functions withour escrow.
+Prior to this propsosal, it seems there have been attempts to implement rental or lending at an application level or just with escrow. However, there are no standard proposal for such functions without escrow.
 
 Architecture's principles are as follows.
 ### Simple and flexible 
