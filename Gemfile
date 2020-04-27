@@ -26,4 +26,3 @@ gem "html-proofer", '>=3.3.1'
 
 gem "eip_validator", ">=0.8.2"
 
-gem 'bundler', '~> 1.17', '>= 1.17.3'
