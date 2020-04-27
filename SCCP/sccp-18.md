@@ -2,7 +2,7 @@
 sccp: 18
 title: Temporary iETH limits
 author: Kain Warwick (@kaiynne)
-discussions-to: #sips-wips
+discussions-to: https://discord.gg/kPPKsPb
 status: Proposed
 created: 2020-04-27
 ---
