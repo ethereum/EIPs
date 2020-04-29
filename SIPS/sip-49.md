@@ -1,7 +1,7 @@
 ---
 sip: 49
 title: Add new synths for Hadar release
-status: Approved
+status: Implemented
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: <https://discordapp.com/invite/CDTvjHY>
 
