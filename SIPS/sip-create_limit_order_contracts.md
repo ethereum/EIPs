@@ -1,9 +1,9 @@
 ---
-sip: <to be assigned>
+sip: 54
 title: Limit Orders
-status: Proposal
+status: Proposed
 author: Tom Howard (@thowar2), Nour Haridy (@nourharidy)
-discussions-to: #limit-orders
+discussions-to: Discord: limit-orders
 
 created: 2020-04-27
 ---
