@@ -112,24 +112,24 @@ The smart contract architecture is summarised in the following diagram.
 
 #### Option Supply
 
-If we query the price of an underlying asset $U$ from an oracle at the maturity date, its price at maturity $P_U$ is either above or below the target price $P_U^{target}$. Users bid on each outcome to receive options that pay out in case that event occurs, exchanging tokens with the `BinaryOptionMarket` contract. That is, then events are $L$ and $S$:
+If we query the price of an underlying asset \\(U\\) from an oracle at the maturity date, its price at maturity \\(P_U\\) is either above or below the target price \\(P_U^{target}\\). Users bid on each outcome to receive options that pay out in case that event occurs, exchanging tokens with the `BinaryOptionMarket` contract. That is, then events are \\(L\\) and \\(S\\):
 
-* $L$: The event that $P_U \geq P_U^{target}$, when the "long" side of the market pays out.
-* $S$: The event that $P_U < P_U^{target}$, when the "short" side of the market pays out.
+* \\(L\\): The event that \\(P_U \geq P_U^{target}\\), when the "long" side of the market pays out.
+* \\(S\\): The event that \\(P_U < P_U^{target}\\), when the "short" side of the market pays out.
 
-We will define $Q_L$ and $Q_S$ to be the quantity of tokens bid on the long and short sides respectively.
+We will define \\(Q_L\\) and \\(Q_S\\) to be the quantity of tokens bid on the long and short sides respectively.
 
-At maturity, the entire value of bids from both sides of the market is paid out to the winning side, minus a fee $\phi$ for the market creator and fee pool. One or the other side paying out are mutually exclusive events, with each side of the market awarded $Q$ options, where
+At maturity, the entire value of bids from both sides of the market is paid out to the winning side, minus a fee \\(\phi\\) for the market creator and fee pool. One or the other side paying out are mutually exclusive events, with each side of the market awarded \\(Q\\) options, where
 
 \\[
 Q := (1 - \phi) (Q_L + Q_S)
 \\]
 
-The total quantity of options minted is $2Q$, but only $Q$ pay out at maturity.
+The total quantity of options minted is \\(2Q\\), but only \\(Q\\) pay out at maturity.
 
 #### Option Prices
 
-The market spent quantities $Q_L$ and $Q_S$ of tokens to exchange into $Q$ options per side, the overall option price is easily computed:
+The market spent quantities \\(Q_L\\) and \\(Q_S\\) of tokens to exchange into \\(Q\\) options per side, the overall option price is easily computed:
 
 \\[
 P_L := \frac{Q_L}{Q} = \frac{Q_L}{(1 - \phi) (Q_L + Q_S)}
@@ -139,26 +139,26 @@ P_L := \frac{Q_L}{Q} = \frac{Q_L}{(1 - \phi) (Q_L + Q_S)}
 P_S := \frac{Q_S}{Q} = \frac{Q_S}{(1 - \phi) (Q_L + Q_S)}
 \\]
 
-For example, assuming no fees, if $Q_L = Q_S = 100$, then $P_L = P_S = 0.5$. But if $50$ additional tokens are bid on $L$, then $P_L = 0.6$, while $P_S = 0.4$.
+For example, assuming no fees, if \\(Q_L = Q_S = 100\\), then \\(P_L = P_S = 0.5\\). But if \\(50\\) additional tokens are bid on \\(L\\), then \\(P_L = 0.6\\), while \\(P_S = 0.4\\).
 Thus increased demand for options on one side of the market increases the price on that side and reduces it on the other. Larger bids will shift the prices by correspondingly greater amounts.
 
-It is only at the end of the bidding period that the price is finalised, and users receive a pro-rated quantity of options according to the size of their bid. That is, if a user had bid $d$ tokens of the denominating asset $D$ on $L$, they would receive $\frac{d}{P_L}$ options. The case that the user had bid on $S$ is similar.
+It is only at the end of the bidding period that the price is finalised, and users receive a pro-rated quantity of options according to the size of their bid. That is, if a user had bid \\(d\\) tokens of the denominating asset \\(D\\) on \\(L\\), they would receive \\(\frac{d}{P_L}\\) options. The case that the user had bid on \\(S\\) is similar.
 
 #### Fees
 
-At the maturity date, $Q_L + Q_S$ Synths will have been exchanged into options, but only $Q = (1 - \phi) (Q_L + Q_S)$ options pay out. The remaining quantity of $\phi (Q_L + Q_S)$ tokens is owed to stakers and the market creator as a service fee.
+At the maturity date, \\(Q_L + Q_S\\) Synths will have been exchanged into options, but only \\(Q = (1 - \phi) (Q_L + Q_S)\\) options pay out. The remaining quantity of \\(\phi (Q_L + Q_S)\\) tokens is owed to stakers and the market creator as a service fee.
 
-There are distinct fee rates for the fee pool ($\phi_{pool}$) and for the market creator ($\phi_{creator}$), which are set by the community. The overall fee rate is the sum of these quantities: $\phi := \phi_{pool} + \phi_{creator}$.
+There are distinct fee rates for the fee pool (\\(\phi_{pool}\\)) and for the market creator (\\(\phi_{creator}\\)), which are set by the community. The overall fee rate is the sum of these quantities: \\(\phi := \phi_{pool} + \phi_{creator}\\).
 
 These fees should be transferred at maturity (upon invocation of a public function) rather than continuously, as it allows users to recover their full bids in case of an oracle interruption, as described in the Maturity section below.
 
 #### Equilibrium Prices
 
-Note that, neglecting fees, $P_L + P_S = 1$, reflecting the fact that $L$ and $S$ are complementary events.
+Note that, neglecting fees, \\(P_L + P_S = 1\\), reflecting the fact that \\(L\\) and \\(S\\) are complementary events.
 
-Without fees, the prices can be read off directly as odds, and in fact if the probability of $L$ paying off is $p$, then long options yield an expected profit of $p - P_L$ each. Meanwhile the expected profit on the short side is the exact negative of this: $(1 - p) - P_S = P_L - p$. The expected profit of buying an option is positive whenever its price is lower than its event's probability, so the prices should approach the probabilities.
+Without fees, the prices can be read off directly as odds, and in fact if the probability of \\(L\\) paying off is \\(p\\), then long options yield an expected profit of \\(p - P_L\\) each. Meanwhile the expected profit on the short side is the exact negative of this: \\((1 - p) - P_S = P_L - p\\). The expected profit of buying an option is positive whenever its price is lower than its event's probability, so the prices should approach the probabilities, if they are known.
 
-If the fee is nonzero, then $P_L + P_S = \frac{1}{1 - \phi}$, which somewhat higher than $1$. Under these conditions, it will only be rational for market participants to purchase options if they believe the market is mispriced by a margin larger than the fee rate.
+If the fee is nonzero, then \\(P_L + P_S = \frac{1}{1 - \phi}\\), which somewhat higher than \\(1\\). Under these conditions, it will only be rational for market participants to purchase options if they believe the market is mispriced by a margin larger than the fee rate.
 
 #### Options As Synths
 
@@ -176,12 +176,12 @@ In this way the debt associated with binary option Synths is located in a single
 
 A new options market is generated by the `BinaryOptionMarketFactory`; the contract creator must choose fixed values for:
 
-* $D$: The denominating asset (sUSD for all markets at first);
-* $O$: The price oracle for the underlying asset $U$, which implicitly sets $U$ as well;
-* $t_b$: The end of the bidding period;
-* $t_m$: The maturity date;
-* $P_U^{target}$: the target price of $U$ at maturity;
-* $Q_L$ / $Q_S$: the initial demand on each side of the market;
+* \\(D\\): The denominating asset (sUSD for all markets at first);
+* \\(O\\): The price oracle for the underlying asset \\(U\\), which implicitly sets \\(U\\) as well;
+* \\(t_b\\): The end of the bidding period;
+* \\(t_m\\): The maturity date;
+* \\(P_U^{target}\\): the target price of \\(U\\) at maturity;
+* \\(Q_L\\) / \\(Q_S\\): the initial demand on each side of the market;
 
 A new `BinaryOptionMarket` contract is instantiated with the specified parameters, and two child `Option` instances. ERC20 token transfer by these `Option` instances will initially be frozen, and it will not unlock until the trading period begins.
 
@@ -189,14 +189,14 @@ For discoverability purposes, the address of each new `BinaryOptionMarket` insta
 
 #### Initial Capital
 
-The market creation functionality of the `BinaryOptionMarketFactory` contract will be public; anyone at all will be able to create a market, provided they can meet the minimum capitalisation requirement $C$.
+The market creation functionality of the `BinaryOptionMarketFactory` contract will be public; anyone at all will be able to create a market, provided they can meet the minimum capitalisation requirement \\(C\\).
 The initial capital requirement will dissuade users from creating low-liquidity markets flippantly.
 
-Without initial positive values for $Q_L$ and $Q_S$, $P_L$ and $P_S$ are undefined. Therefore the market creator is required to contribute a minimum initial value of $C$ worth of tokens. No constraints are placed upon the initial division of funds between $Q_L$ and $Q_S$, which will determine the specific initial prices, but the sum $Q_L + Q_S$ must be worth more than $C$. The market creator will be awarded options for this initial capital, just like any other bidder.
+Without initial positive values for \\(Q_L\\) and \\(Q_S\\), \\(P_L\\) and \\(P_S\\) are undefined. Therefore the market creator is required to contribute a minimum initial value of \\(C\\) worth of tokens. No constraints are placed upon the initial division of funds between \\(Q_L\\) and \\(Q_S\\), which will determine the specific initial prices, but the sum \\(Q_L + Q_S\\) must be worth more than \\(C\\). The market creator will be awarded options for this initial capital, just like any other bidder.
 
 Along with setting initial prices, a strong reason that it is necessary to provide this initial liquidity is to ensure that when bids come into a new market, they don't swing the prices too aggressively. In a very thin market, small bids can cause drastic and undesirable shifts in price.
 
-The market creator should be able to remove their initial capital as long as the total bids in the market are worth more than $C$. Thus it is important for the author of a given market to carefully select its initial parameters. By selecting a combination of asset, timing, and target price that attracts demand, and by choosing initial prices that are reasonably fair, the market creator minimises their own risk by maximising the market's health.
+The market creator should be able to remove their initial capital as long as the total bids in the market are worth more than \\(C\\). Thus it is important for the author of a given market to carefully select its initial parameters. By selecting a combination of asset, timing, and target price that attracts demand, and by choosing initial prices that are reasonably fair, the market creator minimises their own risk by maximising the market's health.
 
 #### Oracles
 
@@ -206,35 +206,35 @@ Oracles are initially constrained to a trusted set, otherwise there is the stron
 
 #### Incentives
 
-Without a profit motive there is no reason to expect anyone to risk funds in the creation of these markets, and therefore a portion of the overall payout ($\phi_{creator}$) will go to the market creator at the maturity date. In the initial stages it may be necessary to subsidise the creation of these markets by means of inflationary rewards or other bounties. The implementation of such subsidies is an open question for the community to answer.
+Without a profit motive there is no reason to expect anyone to risk funds in the creation of these markets, and therefore a portion of the overall payout (\\(\phi_{creator}\\)) will go to the market creator at the maturity date. In the initial stages it may be necessary to subsidise the creation of these markets by means of inflationary rewards or other bounties. The implementation of such subsidies is an open question for the community to answer.
 
 ---
 
 ### Bidding Period
 
-The bidding period commences immediately after the contract is created, terminating at time $t_b$, when the trading period begins.
-During the bidding period, users may add or remove funds on either side of the market, allowing it to equilibrate, ultimately fixing the option prices from time $t_b$ onward.
+The bidding period commences immediately after the contract is created, terminating at time \\(t_b\\), when the trading period begins.
+During the bidding period, users may add or remove funds on either side of the market, allowing it to equilibrate, ultimately fixing the option prices from time \\(t_b\\) onward.
 
-The following addresses the long side $L$; the short $S$ case is symmetric.
+The following addresses the long side \\(L\\); the short \\(S\\) case is symmetric.
 
 #### Bids
 
-Users may bid to receive options that will pay out if outcome $L$ occurs. In order to do this, wallet $w$ deposits $d$ tokens of the denominating Synth $D$ with the `BinaryOptionMarket` contract. $Q_L$ and the associated `OptionL` contract's balance for wallet $w$ are both incremented by $d$.
+Users may bid to receive options that will pay out if outcome \\(L\\) occurs. In order to do this, wallet \\(w\\) deposits \\(d\\) tokens of the denominating Synth \\(D\\) with the `BinaryOptionMarket` contract. \\(Q_L\\) and the associated `OptionL` contract's balance for wallet \\(w\\) are both incremented by \\(d\\).
 
-If the user elects to bid with a Synth other than $D$, then the system will perform an automatic conversion to $D$.
+If the user elects to bid with a Synth other than \\(D\\), then the system will perform an automatic conversion to \\(D\\).
 
 #### Refunds
 
 If a user has already taken a position, they may refund it. A fee is charged for this to counteract toxic order flow and other manipulations available to actors with private information.
 
-If the user with wallet $w$ has already bid long $d$ tokens (of the denominating asset $D$), then they may refund any quantity $q \leq d$, and will receive $q (1 - \phi_{refund})$ tokens. $Q_L$ and the associated `OptionL` contract's balance for wallet $w$ are decremented by $d$. The remaining $q \cdot \phi_{refund}$ tokens are then rebalanced between $Q_L$ and $Q_S$ so that the odds are unaffected, but the fee stays in the pot.
+If the user with wallet \\(w\\) has already bid long \\(d\\) tokens (of the denominating asset \\(D\\)), then they may refund any quantity \\(q \leq d\\), and will receive \\(q (1 - \phi_{refund})\\) tokens. \\(Q_L\\) and the associated `OptionL` contract's balance for wallet \\(w\\) are decremented by \\(d\\). The remaining \\(q \cdot \phi_{refund}\\) tokens are then rebalanced between \\(Q_L\\) and \\(Q_S\\) so that the odds are unaffected, but the fee stays in the pot.
 
 A bidder may wish to refund their position because they have gained new information, or the underlying market conditions have changed. However, recall that placing a bid shifts prices for all existing bidders, so they may also wish to refund their position because the option price has shifted too much or they believe the options are now mispriced.
 
 When a bidder exits the market, the part of their bid that they leave behind compensates the market for the incorrect signal they previously transmitted, increasing the payoff for other users who stuck with their position.
 Be aware, however, that although this fee disincentivises churn and market toxicity, it also slightly distorts the market, creating a friction that stands in the way of the most rapid possible price discovery.
 
-If the bidder elects to refund into a Synth other than $D$, the system will perform an automatic conversion from $D$.
+If the bidder elects to refund into a Synth other than \\(D\\), the system will perform an automatic conversion from \\(D\\).
 
 ---
 
@@ -244,11 +244,11 @@ At the commencement of the trading period, bidding is disabled and ERC20 token t
 
 ### Balances
 
-It may be apparent that the `Option` contracts underlying each option market do not store the actual option balances, but rather store total bid for each wallet. To compute the actual balance of options (for the long side, for example), the value must be divided by $P_L$ before it is returned.
+It may be apparent that the `Option` contracts underlying each option market do not store the actual option balances, but rather store total bid for each wallet. To compute the actual balance of options (for the long side, for example), the value must be divided by \\(P_L\\) before it is returned.
 
 In this way, no reallocation of options needs to occur at the transition between the bidding and trading period, and users can compute their tentative option balance at current prices even while bidding is still ongoing.
 
-The same considerations apply to the computation of the total supply of options, which at all times will evaluate to $2Q$.
+The same considerations apply to the computation of the total supply of options, which at all times will evaluate to \\(2Q\\).
 
 ### Token Transfers
 
@@ -258,7 +258,7 @@ During the trading period, each `Option` contract offers full ERC20 functionalit
 
 ### Maturity
 
-Once the maturity date is reached, the oracle must be consulted and the outstanding options resolved to pay out $1$ token of $D$ or nothing. At their discretion, any user with a positive balance of options can then exercise them to obtain whatever payout they are owed.
+Once the maturity date is reached, the oracle must be consulted and the outstanding options resolved to pay out \\(1\\) token of \\(D\\) or nothing. At their discretion, any user with a positive balance of options can then exercise them to obtain whatever payout they are owed.
 
 #### Oracle Snapshot
 
@@ -277,7 +277,7 @@ Users should be able to exercise their options into any flavour of Synth they li
 
 In order to combat the proliferation of defunct options contracts, `BinaryOptionMarket` instances should implement a self-destruct function which can be invoked a long enough duration after the maturity date. Once this function is invoked, the contract and its two subsidiary `Option` instances will self destruct, and the corresponding entry deleted from the list of markets on the `BinaryOptionMarketFactory` contract.
 
-In order to incentivise this, the market creator must deposit $\gamma$ tokens into the new contract in addition to the initial capital. When the cleanup function is invoked by the contract creator, the contract will return the deposit along with any unclaimed tokens left in the contract.
+In order to incentivise this, the market creator must deposit \\(\gamma\\) tokens into the new contract in addition to the initial capital. When the cleanup function is invoked by the contract creator, the contract will return the deposit along with any unclaimed tokens left in the contract.
 
 Initially this function will only be available to the original author, but if after a short period the they do not act, then the deposit will be made available to any user willing to perform the labour of cleaning up.
 
@@ -301,15 +301,15 @@ In fact any predicate accepting inputs from Synthetix oracles could be used as a
 
 #### Multimodal Options Markets
 
-Although this structure has been defined for a binary outcome, it extends easily to any number of outcomes. In particular, if there are $n$ possible outcomes, then $n$ `Option` token contract instances are instantiated, one for each outcome.
+Although this structure has been defined for a binary outcome, it extends easily to any number of outcomes. In particular, if there are \\(n\\) possible outcomes, then \\(n\\) `Option` token contract instances are instantiated, one for each outcome.
 
-If $\Omega$ is an exhaustive set of mutually exclusive outcomes, and $Q_o$ is the quantity bid towards outcome $o \in \Omega$, then $Q := (1 - \phi) \sum_{o \in \Omega}{Q_o}$ is the number of options awarded to each outcome; $n \cdot Q$ options issued altogether, of which $Q$ will pay out. Then the price for outcome $o$ is $P_o := \frac{Q_o}{Q}$.
+If \\(\Omega\\) is an exhaustive set of mutually exclusive outcomes, and \\(Q_o\\) is the quantity bid towards outcome \\(o \in \Omega\\), then \\(Q := (1 - \phi) \sum_{o \in \Omega}{Q_o}\\) is the number of options awarded to each outcome; \\(n \cdot Q\\) options issued altogether, of which \\(Q\\) will pay out. Then the price for outcome \\(o\\) is \\(P_o := \frac{Q_o}{Q}\\).
 
-The binary version is just a special case of this more general structure; notice for example that it posesses the same property that, neglecting fees, the sum of all prices is $1$. Further, it still holds that it is expected to be profitable to buy a particular option whenever its price is less than the probability of its associated event occurring. As a result the prices can still be interpreted as the market's prediction of the odds of each event.
+The binary version is just a special case of this more general structure; notice for example that it posesses the same property that, neglecting fees, the sum of all prices is \\(1\\). Further, it still holds that it is expected to be profitable to buy a particular option whenever its price is less than the probability of its associated event occurring. As a result the prices can still be interpreted as the market's prediction of the odds of each event.
 
 These events could be any discrete set of outcomes, such as the results of political elections. Thus the multimodal parimutuel structure can function as a general prediction market, provided that good oracle sources for events of interest can be obtained.
 
-With multimodal markets understood, continuous quantities are also handled by discretising their ranges into buckets. For example, it would be possible for users to participate in a market focusing on the Ethereum price, where the possible outcomes were $\\$140$ or less, $\\$140 - \\$150$, and $\\$150$ or more. In principle any degree of granularity for these buckets is possible.
+With multimodal markets understood, continuous quantities are also handled by discretising their ranges into buckets. For example, it would be possible for users to participate in a market focusing on the Ethereum price, where the possible outcomes were \\($140\\) or less, \\($140 - $150\\), and \\($150\\) or more. In principle any degree of granularity for these buckets is possible.
 
 #### Limit Bids
 
@@ -328,19 +328,19 @@ These systems could be implemented as a smart contract or as a front-end overlay
 
 | Symbol | Description |
 | ------ | ----------- |
-| $U$   | The underlying asset of this market. It is assumed we have a reliable oracle $O$ supplying its instantaneous price. |
-| $D$   | The denominating Synth of a market. Options are priced in terms of $D$, hence bids, refunds, fees, etc. are computed as quantities of $D$. |
-| $t_b$, $t_m$  | The timestamps for the end of bidding and maturity, respectively, of a given contract. $t_b$ must be later than the contract creation time, and $t_m$ must be later than $t_b$. |
-| $P_U$, $P_U^{target}$ | $P_U$ is the price of $U$ queried from the oracle $O$ at the maturity date $t_m$. $P_U^{target}$ is the target price of $U$ at maturity, against which $P_U$ is compared to assess the maturity condition. |
-| $\phi_{pool}$, $\phi_{creator}$ | The platform fee rate paid to the fee pool and to the market creator respectively. These fees are paid at maturity. |
-| $\phi$ | The overall market fee, which is equal to $\phi_{pool} + \phi_{creator}$. $\phi$ must in the range $[0, 1]$. |
-| $\phi_{refund}$  | The fee rate to refund a bid. Its value must be in the range $[0, 1]$. |
-| $L$, $S$ | The possible outcomes at maturity. $L$ is the event that $P_U \geq P_U^{target}$; when the "long" side of the market pays out. $S$ is the event that $P_U < P_U^{target}$; when the "short" side of the market pays out. |
-| $Q_L$, $Q_S$ | The total funds on the long and short sides of the market respectively. |
-| $Q$ | The quantity of options awarded to each side of the market; this is equal to $(1 - \phi) (Q_L + Q_S)$. |
-| $P_L$, $P_S$ | The price of long and short options respectively. Defined as $P_L := \frac{Q_L}{Q}$ and $P_S := \frac{Q_S}{Q}$. |
-| $C$   | The minimum initial capitalisation of a new market. |
-| $\gamma$   | The self-destruction deposit. |
+| \\(U\\)   | The underlying asset of this market. It is assumed we have a reliable oracle \\(O\\) supplying its instantaneous price. |
+| \\(D\\)   | The denominating Synth of a market. Options are priced in terms of \\(D\\), hence bids, refunds, fees, etc. are computed as quantities of \\(D\\). |
+| \\(t_b\\), \\(t_m\\)  | The timestamps for the end of bidding and maturity, respectively, of a given contract. \\(t_b\\) must be later than the contract creation time, and \\(t_m\\) must be later than \\(t_b\\). |
+| \\(P_U\\), \\(P_U^{target}\\) | \\(P_U\\) is the price of \\(U\\) queried from the oracle \\(O\\) at the maturity date \\(t_m\\). \\(P_U^{target}\\) is the target price of \\(U\\) at maturity, against which \\(P_U\\) is compared to assess the maturity condition. |
+| \\(\phi_{pool}\\), \\(\phi_{creator}\\) | The platform fee rate paid to the fee pool and to the market creator respectively. These fees are paid at maturity. |
+| \\(\phi\\) | The overall market fee, which is equal to \\(\phi_{pool} + \phi_{creator}\\). \\(\phi\\) must in the range \\([0, 1]\\). |
+| \\(\phi_{refund}\\)  | The fee rate to refund a bid. Its value must be in the range \\([0, 1]\\). |
+| \\(L\\), \\(S\\) | The possible outcomes at maturity. \\(L\\) is the event that \\(P_U \geq P_U^{target}\\); when the "long" side of the market pays out. \\(S\\) is the event that \\(P_U < P_U^{target}\\); when the "short" side of the market pays out. |
+| \\(Q_L\\), \\(Q_S\\) | The total funds on the long and short sides of the market respectively. |
+| \\(Q\\) | The quantity of options awarded to each side of the market; this is equal to \\((1 - \phi) (Q_L + Q_S)\\). |
+| \\(P_L\\), \\(P_S\\) | The price of long and short options respectively. Defined as \\(P_L := \frac{Q_L}{Q}\\) and \\(P_S := \frac{Q_S}{Q}\\). |
+| \\(C\\)   | The minimum initial capitalisation of a new market. |
+| \\(\gamma\\)   | The self-destruction deposit. |
 
 ---
 
@@ -391,7 +391,7 @@ Under this proposal, exchange and transfer functionality could happen at all tim
 
 ### Basic Market Parameters
 
-It will be necessary to choose, via SCCP, the values of basic market parameters such as the minimum initial capitalisation $C$, the size of the self-destruction deposit $\gamma$, and the levels of the various fees.
+It will be necessary to choose, via SCCP, the values of basic market parameters such as the minimum initial capitalisation \\(C\\), the size of the self-destruction deposit \\(\gamma\\), and the levels of the various fees.
 
 It may also be the case that some of these parameters, such as the market creation fee, should be set by the market creators themselves, to allow competitive pricing of these services.
 
@@ -425,11 +425,11 @@ Several potential extensions have been listed above. It should be determined whi
 
 | Symbol | Description |
 | ------ | ----------- |
-| $C$   | The minimum value of the initial capitalisation of a new binary option market. This is a value of USD. |
-| $\gamma$   | The size of the self-destruction deposit. This is a value of the denominating asset $D$. |
-| $\phi_{pool}$   | The platform fee rate paid to the fee pool. This is a decimal number in the range $[0, 1]$. |
-| $\phi_{creator}$ | The fee rate paid to the creator of a market. This is a decimal number in the range $[0, 1]$. |
-| $\phi_{refund}$   | The fee rate to refund a bid. This is a decimal number in the range $[0, 1]$. |
+| \\(C\\)   | The minimum value of the initial capitalisation of a new binary option market. This is a value of USD. |
+| \\(\gamma\\)   | The size of the self-destruction deposit. This is a value of the denominating asset \\(D\\). |
+| \\(\phi_{pool}\\)   | The platform fee rate paid to the fee pool. This is a decimal number in the range \\([0, 1]\\). |
+| \\(\phi_{creator}\\) | The fee rate paid to the creator of a market. This is a decimal number in the range \\([0, 1]\\). |
+| \\(\phi_{refund}\\)   | The fee rate to refund a bid. This is a decimal number in the range \\([0, 1]\\). |
 
 ---
 
