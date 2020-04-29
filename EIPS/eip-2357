@@ -1,0 +1,38 @@
+---
+eip: 1010
+title: Total Difficulty in Block Header
+author: Tomasz K. Stanczak (@tkstanczak)
+discussions-to: ?
+status: Draft
+type: ?
+category: Core
+created: 2020-04-29
+---
+
+## Simple Summary
+
+This document proposes to replace Dififculty with Total Difficulty in the Ethereum block headers..
+
+## Abstract
+
+Replace field Difficulty with TotalDifficulty (sum of difficulties since genesis) in the Ethereum block header.
+
+## Motivation
+
+Simplify total difficulty verification in stateless clients.
+
+## Specification
+
+Difficulty field will be replaced with TotalDifficulty (sum of difficulties since genesis) in the Ethereum block header.
+
+## Rationale
+
+This simplifies the selection of the best peer, acceptance of the NewBlock broadcasts and stateless client execution without verification from genesis.
+
+## Backwards Compatibility
+
+Clients will have to understand that headers before the EIP will have Difficulty and not total difficulty field.
+
+## Copyright
+Copyright and related rights waived via
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/).
