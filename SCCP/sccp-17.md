@@ -3,7 +3,7 @@ sccp: 17
 title: Reduce incentives for sETH/ETH Uniswap pool
 author: IanC
 discussions-to: Discord
-status: Proposed
+status: Implemented
 created: 2020-04-25
 ---
 
