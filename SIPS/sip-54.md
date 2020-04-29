@@ -3,7 +3,7 @@ sip: 54
 title: Limit Orders
 status: Proposed
 author: Tom Howard (@thowar2), Nour Haridy (@nourharidy)
-discussions-to: Discord: limit-orders
+discussions-to: Discord - limit-orders
 
 created: 2020-04-27
 ---
