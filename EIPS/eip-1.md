@@ -24,7 +24,7 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 There are three types of EIP:
 
 - A **Standard Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories. Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification].
-  - **Core** - improvements requiring a consensus fork (e.g. [EIP5], [EIP101]), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP90], and the miner/node strategy changes 2, 3, and 4 of [EIP86]).
+  - **Core** - improvements requiring a network upgrade (e.g. [EIP5], [EIP101]), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP90], and the miner/node strategy changes 2, 3, and 4 of [EIP86]).
   - **Networking** - includes improvements around [devp2p] ([EIP8]) and [Light Ethereum Subprotocol], as well as proposed improvements to network protocol specifications of [whisper] and [swarm].
   - **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP6]) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
   - **ERC** - application-level standards and conventions, including contract standards such as token standards ([ERC20]), name registries ([ERC26], [ERC137]), URI schemes ([ERC67]), library/package formats ([EIP82]), and wallet formats ([EIP75], [EIP85]).
@@ -37,10 +37,16 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 ### Special requirements for Core EIPs
 
+#### EVM Changes
+
 If a **Core** EIP mentions or proposes changes to the EVM (Ethereum Virtual Machine), it should refer to the instructions by their mnemonics and define the opcodes of those mnemonics at least once. A preferred way is the following:
 ```
 REVERT (0xfe)
 ```
+
+#### Nomenclature
+
+Core EIPs are activated by nodes on the network at a coordinated block. While, strictly speaking, these events are technically "hard forks", for a large portion of users new to Ethereum, "hard fork" implies a chain split in a way that "network upgrade" does not. Given that the vast majority of past upgrades on Ethereum have been non-contentious, that the EIPs process focuses on technical standardization rather than upgrade coordination, and that the term "chain split" accurately describes the potential outcome of a contentious upgrade, the term "network upgrade" is preferred in EIPs. 
 
 ## EIP Work Flow
 
