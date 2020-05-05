@@ -1,5 +1,5 @@
 ---
-sccp: TBD
+sccp: 20
 title: Reduce SNX rewards for sETH/ETH Uniswap pool
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: https://discord.gg/kPPKsPb
