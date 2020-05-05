@@ -28,7 +28,6 @@ To increase the flexibility of the Synthetix exchange, limit order functionality
 *NOTES*:
  - The following specifications use syntax from Solidity `0.4.25` (or above)
  - In order for these contracts to be able to access user SNX tokens, they must approve the proxy contract address for each token individually using the ERC20 approve() function. We recommend a max uint (2^256 - 1) approval amount.
- - At the time this spec was written, executing orders will fail unless the proxy contract address is excempted for the fee reclamation cooldown by the Synthetix team.
 
 *Order of deployment*:
  1. The `Implementation` contract is deployed
@@ -101,7 +100,7 @@ This function allows the sender to withdraw funds associated with an array of ex
 
 It fetches each order's data using `StateStorage.getOrder()`, if each order's `submitter` is equal to `msg.sender`, has the `executed` property equal to `true` and `executionTimestamp + 3 minutes > block.timestamp`:
 
-1. The `destinationAmount` of the `destinationCurrencyKey` is transferred to `msg.sender`
+1. The `destinationAmount` of the `destinationCurrencyKey` is transferred to `msg.sender` using `Synth.transferAndSettle()`
 2. The order is deleted using `StateStorage.deleteOrder()`
 3. `Withdraw` event is emitted with the `orderID`.
 
