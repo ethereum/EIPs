@@ -1,5 +1,5 @@
 ---
-eip: xxx
+eip: eip-2628
 title: Header in StatusMessage
 author: Tomasz K. Stanczak (@tkstanczak)
 discussions-to: TBD
