@@ -3,7 +3,7 @@ sccp: 19
 title: Cancel ArbRewarder's SNX Rewards
 author: Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/kPPKsPb
-status: Proposed
+status: Implemented
 created: 2020-04-30
 ---
 
