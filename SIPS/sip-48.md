@@ -1,7 +1,7 @@
 ---
 sip: 48
 title: Allow Views to Return When Rates Are Stale
-status: Implemented
+status: Approved
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
