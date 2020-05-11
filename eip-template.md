@@ -30,6 +30,13 @@ A short (~200 word) description of the technical issue being addressed.
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 
+## Interface (OPTIONAL)
+For ERCs, define any interfaces here. You should use the latest released version of Solidity to document your interface. (When a better, cross-language option is available, the EIP editors will consider to require that instead.)
+
+Use NatSpec to the fullest extent possible. Many people will be using your interface, make it great.
+
+Note: since the Solidity language is evolving, editors may accept changes to a FINAL ERC to update the interface just to make it compile with the latest Solidity.
+
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
