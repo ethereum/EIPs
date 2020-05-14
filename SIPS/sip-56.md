@@ -91,16 +91,20 @@ New functions required in the upgradable `Exchanger` contract.
 Returns the exchange fee in sUSD.
 
 Deprecate existing fee view function `FeePool.exchangeFeeIncurred(uint value) public view returns (uint)`
-and move to `Exchanger.exchangeFeeForTrade`
+and move to `Exchanger.getAmountsForExchange`
 to accept the Synth trading pair as arguments to determine the exchange fee for the trade.
 
 **Function signature**
 
-`exchangeFeeForTrade(uint amount, bytes32 source, bytes32 destination) public view returns (uint)`
-
-- `uint amount`: Amount of the source Synth to exchange
-- `bytes32 source`: Synth exchanging from
-- `bytes32 destination`: Synth to exchange into
+`getAmountsForExchange(uint sourceAmount, bytes32 sourceCurrencyKey, bytes32 destinationCurrencyKey) public view returns (uint)`
+Parameters
+- `uint sourceAmount`: Amount of the source Synth to exchange
+- `bytes32 sourceCurrencyKey`: Synth exchanging from
+- `bytes32 destinationCurrencyKey`: Synth to exchange into
+Returns
+- `uint amountReceived`: The amount recieved after exchange fees
+- `uint fee`: The fees payable for the exchange
+- `uint exchangeFeeRate`: The exchange rate applied
 
 ## Rationale
 
