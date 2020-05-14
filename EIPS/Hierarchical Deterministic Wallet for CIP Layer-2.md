@@ -1,0 +1,55 @@
+---
+eip: <to be assigned>
+title: Hierarchical Deterministic Wallet for Computation Integrity Proof (CIP) Layer-2
+author: Tom Brand (tom@starkware.co), Louis Guthmann (louis@starkware.co)
+discussions-to: 
+status: Draft
+type: Standard Track 
+category (*only required for Standard Track): ERC
+created: 2020-05-13
+---
+
+## Simple Summary
+In the context of Computation Integrity Proof (CIP) Layer-2 solutions such as ZK-Rollups, users are required to sign messages on new elliptic curves optimized for those environnements. These curves are Baby Jubjub (in the context of the BN254 SNARK approach) and Arya in (the context of StarkEx). Extensive work has been done to provide secure ways to derive private keys. We leverage this work to define an efficient way to securely derive private keys from existing infrastructure, as well as creating domain separation between Layer-2 applications.
+
+## Abstract
+We provide a Derivation Path allowing a user to derive hierarchical keys for Layer-2 solutions depending on the zk-technology, the application, the user’s Layer-1 address, as well as an efficient grinding method to enforce the private key distribution within the curve domain.
+
+## Motivation
+TDB
+
+## Specification
+Starkware keys are derived with the following BIP43-compatible derivation path, with direct inspiration from BIP44:
+```
+m / purpose' / plugin' / application' / eth_address_1' / eth_address_2' / index
+```
+where:
+* `m` - is the seed
+* `purpose` - will be the EIP number
+* `plugin` - to allow various technologies to use this scheme if they want
+* `application` - to allow different applications
+* `eth_address_1 / eth_address_2` - will be the first and second 31 bits of the eth_address the user defines
+* `index` - to allow multiple keys per eth_address
+
+The key derivation should follow the following algorithm
+```
+N = secp256k1 curve order
+n = Layer2 curve order								
+path = stark derivation path
+BIP32() = Official BIP-0032 derivation function on secp256k1
+hash = SHA256
+i = 0
+root_key = BIP32(path)
+while True:
+	key = hash(root_key|i)
+	if (key < (N - (N % n))):
+		return key % n
+	i++
+```
+This algorithm has been defined to maintain efficiency on existing restricted devices. 
+
+Nota Bene: At each round, the probability for a key to be greater than (N - (N % n)) is < 2^(-5).
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
