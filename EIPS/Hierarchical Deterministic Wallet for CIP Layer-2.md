@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Hierarchical Deterministic Wallet for Computation Integrity Proof (CIP) Layer-2
 author: Tom Brand (tom@starkware.co), Louis Guthmann (louis@starkware.co)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/hierarchical-deterministic-wallet-for-computation-integrity-proof-cip-layer-2/4286
 status: Draft
 type: Standard Track 
 category (*only required for Standard Track): ERC
