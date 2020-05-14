@@ -1,11 +1,11 @@
 ---
-eip: <to be assigned>
+eip: 2645
 title: Hierarchical Deterministic Wallet for Computation Integrity Proof (CIP) Layer-2
 author: Tom Brand (tom@starkware.co), Louis Guthmann (louis@starkware.co)
 discussions-to: https://ethereum-magicians.org/t/hierarchical-deterministic-wallet-for-computation-integrity-proof-cip-layer-2/4286
 status: Draft
 type: Standard Track 
-category (*only required for Standard Track): ERC
+category: ERC
 created: 2020-05-13
 ---
 
@@ -25,7 +25,7 @@ m / purpose' / plugin' / application' / eth_address_1' / eth_address_2' / index
 ```
 where:
 * `m` - is the seed
-* `purpose` - will be the EIP number
+* `purpose` - 2645 the EIP number
 * `plugin` - to allow various technologies to use this scheme if they want
 * `application` - to allow different applications
 * `eth_address_1 / eth_address_2` - will be the first and second 31 bits of the eth_address the user defines
