@@ -58,10 +58,10 @@ Will allow the protocol DAO to set n number of exchangeFeeRates for n number of 
 
 **Function signature**
 
-`setExchangeFeeRateForSynths(bytes32 [synthKeys], uint256 [exchangeFeeRates]) onlyOwner`
+`setExchangeFeeRateForSynths(bytes32[] synthKeys, uint256[] exchangeFeeRates) onlyOwner`
 
-- `bytes32 [synthKeys]`: The array of currencyKeys for the synths to set
-- `uint256 [exchangeFeeRates]`: The array of rates
+- `bytes32[] synthKeys`: The array of currencyKeys for the synths to set
+- `uint256[] exchangeFeeRates`: The array of rates
 
 ### exchangeFeeRateForSynth
 
@@ -69,7 +69,7 @@ Return the exchange fee rate for a synth
 
 **Function signature**
 
-`exchangeFeeForSynth(bytes32 synth) public view returns (uint)`
+`exchangeFeeRateForSynth(bytes32 synth) public view returns (uint)`
 
 - `bytes32 synth`: synth key to request the rate for 
 
@@ -91,16 +91,16 @@ New functions required in the upgradable `Exchanger` contract.
 Returns the exchange fee in sUSD.
 
 Deprecate existing fee view function `FeePool.exchangeFeeIncurred(uint value) public view returns (uint)`
-and move to `Exchanger.feeRateForExchange`
-to accept the Synth trading pair as arguments to determine the exchange fee for the trade. 
+and move to `Exchanger.exchangeFeeForTrade`
+to accept the Synth trading pair as arguments to determine the exchange fee for the trade.
 
 **Function signature**
 
 `exchangeFeeForTrade(uint amount, bytes32 source, bytes32 destination) public view returns (uint)`
 
 - `uint amount`: Amount of the source Synth to exchange
-- `bytes32 source`: Synth exchanging from 
-- `bytes32 destination`: Synth to exchange into 
+- `bytes32 source`: Synth exchanging from
+- `bytes32 destination`: Synth to exchange into
 
 ## Rationale
 
@@ -112,7 +112,21 @@ It was considered that a `Synth` should store its own rate by having a setter fo
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
-TBD
+### FeePool
+
+1. Given the pDAO needs to set multiple rates. When owner sends an array of x Synths and rates then  store in the `FeePoolEternalStorage` on chain
+2. Given the pDAO needs to set a single rate. When owner sends an array of x Synths and rates that are already stored then the synth rates are updated.
+3. Given the pDAO needs to update multiple rates. When owner sends an array of 1 Synths and rates then  store in the `FeePoolEternalStorage` on chain
+4. Given the pDAO needs to update 1 rate. When owner sends an array of 1 Synths and rates that are already stored then the synth rates are updated.
+5. Given a synthKey, anyone can view the exchange fee rates for the synthKey
+6. When owner sends a rate greater than MAX_EXCHANGE_FEE_RATE then revert
+
+### Exchanger
+
+1. Given I have a synth balance to exchange and a destinationCurrencyKey then I can read the amountReceived, fee and exchangeFeeRate
+2. Given I exchange 100 sUSD into a Crypto Synth and the exchange Fee Rate is 0.030 the exchange fee should be .30 sUSD
+3. Given I exchange 100 sUSD valued Crypto Synth into sUSD and the Exchange Fee Rate is 0.010 the exchange fee should be .10 sUSD
+4. TBC
 
 ## Implementation
 
