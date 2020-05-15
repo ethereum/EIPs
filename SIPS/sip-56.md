@@ -127,10 +127,9 @@ It was considered that a `Synth` should store its own rate by having a setter fo
 
 ### Exchanger
 
-1. Given I have a synth balance to exchange and a destinationCurrencyKey then I can read the amountReceived, fee and exchangeFeeRate
-2. Given I exchange 100 sUSD into a Crypto Synth and the exchange Fee Rate is 0.030 the exchange fee should be .30 sUSD
-3. Given I exchange 100 sUSD valued Crypto Synth into sUSD and the Exchange Fee Rate is 0.010 the exchange fee should be .10 sUSD
-4. TBC
+1. Given I have a balance of Synth A and want to exchange into Synth B then I can view the `exchangeFeeRate`, `fee` and `amountReceived`
+2. Given I exchange Synth A into Synth B and then the exchange fee rate applied should be the rate of Synth B
+3. Given I exchange into a Synth then the exchange rate is stored for fee reclaimation, when I return x seconds later and have a settlement owed to the debt pool or rebate owing to me the exchange fee rate at the time of my exchange is used for settlment and not the current rate in case it has changed.
 
 ## Implementation
 
