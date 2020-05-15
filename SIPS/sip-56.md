@@ -1,7 +1,7 @@
 ---
 sip: 56
 title: Differential Fees
-status: WIP
+status: Proposed
 author: Clinton Ennis (@hav-noms)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
