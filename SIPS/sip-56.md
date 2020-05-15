@@ -26,9 +26,11 @@ Upgrading the `FeePool` to allow an array of Synths exchange rates to be set all
 
 There could be multiple pricing options TBD such as;
 
-1. Charge the fee rate of the synth being exchanged into. e.g. If sETH is 1% and sUSD was 0% then it would be free to exchange from sETH to sUSD.
-2. Charge the sum of the pair. e.g. if sETH is .5% and sUSD is .1% the total exchange fee would be 0.6%
-3. Charge the lowest of the pair. e.g. if sETH is .5% and sUSD is .1% the exchange fee would be 0.1%
+1. Charge the fee rate of the synth being exchanged into.
+2. ~~Charge the sum of the pair.~~
+3. ~~Charge the lowest of the pair.~~
+
+**UPDATE:** The proposed pricing method is 1.
 
 ## Motivation
 
