@@ -42,11 +42,13 @@ This means dApp writers need to be checking for the flag: `Synthetix.anySynthRat
   - `ExchangeRates.effectiveValue()` and `ExchangeRates.effectiveValueAtRound()`
   - `Synthetix.totalIssuedSynths()`, `Synthetix.totalIssuedSynthsExcludeEtherCollateral()`, `Synthetix.maxIssuableSynths()`
 - Synthetix to be given a new function `anySynthRateStale()` indicating if any synth is stale.
-- For mutative functions issue and burn functions:
+- For mutative issue and burn functions:
   - add a `require` that `anySynthRateStale()` must be `false`
   - and ensure the `SNX` rate is not stale
 - For an `exchange()`, add a `require` that `src` and `dest` are both not stale
-- For an SNX `transfer()` or `transferFrom()`, ensure `SNX` rate not stale
+- For an SNX `transfer()` or `transferFrom()`
+  - add a `require` that `anySynthRateStale()` must be `false`
+  - and ensure the `SNX` rate is not stale ensure `SNX` rate not stale along with `anySynthRateStale()`
 
 ## Rationale
 
@@ -58,13 +60,15 @@ The mutative functions above are to be explicitly given the checks that they rel
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
-TBD
+- Given any synth rate is stale or the rate of `SNX` is stale, when Synthetix issuance (`issue(.*)Synths()`) or burning (`burnSynths(.*)()`) is attempted, it reverts
+- Given any synth rate is stale or the rate of `SNX` is stale, when Synthetix transfer (`transfer(.*)()`) is attempted, it reverts
+- Given a synth rate is stale, when Synthetix exchange (`exchange(.*)()`) is attempted either from or to that synth, it reverts
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-https://github.com/Synthetixio/synthetix/pull/451
+[Synthetix PR #451](https://github.com/Synthetixio/synthetix/pull/451)
 
 ## Copyright
 
