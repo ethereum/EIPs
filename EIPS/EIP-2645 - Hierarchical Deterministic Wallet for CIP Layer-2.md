@@ -19,7 +19,7 @@ We provide a Derivation Path allowing a user to derive hierarchical keys for Lay
 TDB
 
 ## Specification
-Starkware keys are derived with the following BIP43-compatible derivation path, with direct inspiration from BIP44:
+Starkware keys are derived with the following [BIP43](https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki)-compatible derivation path, with direct inspiration from BIP44:
 ```
 m / purpose' / plugin' / application' / eth_address_1' / eth_address_2' / index
 ```
@@ -52,4 +52,3 @@ Nota Bene: At each round, the probability for a key to be greater than (N - (N %
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
