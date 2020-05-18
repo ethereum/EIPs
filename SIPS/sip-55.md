@@ -1,7 +1,7 @@
 ---
 sip: 55
 title: Synth Circuit Breaker (Phase One)
-status: Proposed
+status: Implemented
 author: Jackson Chan (@jacko125), Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
