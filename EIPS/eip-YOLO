@@ -1,0 +1,41 @@
+---
+eip: <to be assigned>
+title: Ephemeral TestNet Yolo
+author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+discussions-to: <URL>
+status: Draft
+type: Meta
+created: 2020-04-19
+---
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+This is the suggested template for new EIPs.
+
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
+
+The title should be 44 characters or less.
+
+**Disclaimer:This is for testing basic infrastructure. It will be nuked. It is not for deploying dapps, nor does it define what will go into mainnet. For information on network upgrades, please follow the relevant meta EIPs and ongoing discussion on Ethereum/pm.**
+
+## Abstract
+
+The specification for Ephemeral Testnet Yolo. Clients who wish to sync need to implement the following features into their client. It is for testing basic infrastructure and will be nuked.
+
+## Specification 
+
+Name: Yolo
+ID: `yolo-v1`
+
+  - EIP 2537
+  - EIP 2315 (current merged Specification)
+  - Option (1) of EIP-2565 
+    - ("GQUADDIVISOR is set to ‘20’ per EIP-198. We recommend changing the value of this parameter to ‘200’.”)
+
+
+## Timeline
+
+ - Deploy: May 26th 2020
+
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
