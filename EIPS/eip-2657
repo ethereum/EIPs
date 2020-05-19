@@ -1,0 +1,34 @@
+---
+eip: 2657
+title: Ephemeral Testnet Yolo
+author: James Hancock (@madeoftin)
+discussion-to: https://gitter.im/ethereum/AllCoreDevs
+status: Draft
+type: Meta
+created: 2020-04-19
+---
+
+**Disclaimer:This is for testing basic infrastructure. It will be nuked. It is not for deploying dapps, nor does it define what will go into mainnet. For information on network upgrades, please follow the relevant meta EIPs and ongoing discussion on Ethereum/pm.**
+
+## Abstract
+
+The specification for Ephemeral Testnet Yolo. Clients who wish to sync need to implement the following features into their client. It is for testing basic infrastructure and will be nuked.
+
+## Specification 
+
+Name: Yolo
+ID: `yolo-v1`
+
+  - EIP 2537
+  - EIP 2315 (current merged Specification)
+  - Option (1) of EIP-2565 
+    - ("GQUADDIVISOR is set to ‘20’ per EIP-198. We recommend changing the value of this parameter to ‘200’.”)
+
+
+## Timeline
+
+ - Deploy: May 26th 2020
+
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
