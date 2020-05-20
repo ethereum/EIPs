@@ -1,5 +1,5 @@
 ---
-sccp: TBD
+sccp: 22
 title: Reduce Rewards On Curve
 status: WIP
 author: <Kaleb Keny (@kaleb-keny)>
