@@ -48,48 +48,48 @@ Liquidations contract to mark an SNX staker for liquidation with a time delay to
 
 #### flagAccountForLiquidation(address account)
 
-**Function signature**
+Function signature
 
 `flagAccountForLiquidation(address account) external`
 
 #### removeAccountInLiquidation(address account)
 
-**Function signature**
+Function signature
 `removeAccountInLiquidation(address account) external onlyInternalContract`
 
 #### checkAndRemoveAccountInLiquidation(address account)
 
-**Function signature**
+Function signature
 
 `checkAndRemoveAccountInLiquidation(address account) external`
 
 #### isOpenForLiquidation(address account)
 
-**Function signature**
+Function signature
 
 `isOpenForLiquidation(address account) external`
 
 #### setLiquidationDelay(uint40 time)
 
-**Function signature**
+Function signature
 
 `setLiquidationDelay(uint40 time) onlyOwner`
 
 #### setLiquidationRatio(uint ratio)
 
-**Function signature**
+Function signature
 
 `setLiquidationRatio(uint ratio) onlyOwner`
 
 #### setLiquidationPenalty(uint penalty)
 
-**Function signature**
+Function signature
 
 `setLiquidationPenalty(uint penalty) onlyOwner`
 
 #### setLiquidationTargetRatio(uint target)
 
-**Function signature**
+Function signature
 
 `setLiquidationTargetRatio(uint target) onlyOwner`
 
@@ -99,7 +99,7 @@ Liquidations contract to mark an SNX staker for liquidation with a time delay to
 
 #### liquidateSynthetix(address account, uint synthAmount)
 
-**Function signature**
+Function signature
 
 `liquidateSynthetix(address account, uint synthAmount) external`
 
