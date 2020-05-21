@@ -84,6 +84,8 @@ pragma solidity >=0.4.24;
 interface ISynthetix {
     // Mutative Functions
     liquidateSynthetix(address account, uint synthAmount) external;
+
+}
 ```
 
 ### Escrowed SNX
