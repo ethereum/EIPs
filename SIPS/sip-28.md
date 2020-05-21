@@ -1,7 +1,7 @@
 ---
 sip: 28
 title: Audit Remediations
-status: Implemented 
+status: Rejected 
 author: Garth Travers (@garthtravers), Clinton Ennis (@hav-noms)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
