@@ -26,14 +26,14 @@ An SIP or SCCP must meet certain minimum criteria. It must be a clear and comple
 
 ## SIP Work Flow
 
-Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), and the [Synthetix Engineering Team].
+Parties involved in the process are the *author*, the [*SIP editors*](#sip-editors), the [Synthetix Core Contributors] and the Synthetix community.
 
 :warning: Before you begin, vet your idea, this will save you time. Ask the Synthetix community first if an idea is original to avoid wasting time on something that will be rejected based on prior research (searching the Internet does not always do the trick). It also helps to make sure the idea is applicable to the entire community and not just the author. Just because an idea sounds good to the author does not mean it will have the intend effect. The appropriate public forum to gauge interest around your SIP or SCCP is [the Synthetix Discord].
 
 Your role as the champion is to write the SIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea. Following is the process that a successful SIP will move along:
 
 ```
-[ WIP ] -> [ PROPOSED ] -> [ APPROVED ] -> [ IMPLEMENTED ]
+[ WIP ] -> [ PROPOSED ] -> [ APPROVED ] -> [ IMPLEMENTED ] X [ REJECTED ] 
 ```
 
 Each status change is requested by the SIP author and reviewed by the SIP editors. Use a pull request to update the status. Please include a link to where people should continue discussing your SIP. The SIP editors will process these requests as per the conditions below.
@@ -43,6 +43,8 @@ Each status change is requested by the SIP author and reviewed by the SIP editor
 * **Approved** -- This SIP has passed community governance and is now being prioritised for development.
   
 * **Implemented** -- This SIP has been implemented and deployed to mainnet.
+
+* **Rejected** -- This SIP has failed to reach community consensus.
 
 ## What belongs in a successful SIP?
 
