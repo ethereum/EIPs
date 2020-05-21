@@ -53,22 +53,22 @@ pragma solidity >=0.4.24;
 
 interface ILiquidations {
     // Views
-    function isOpenForLiquidation(address account) public view returns (bool);
+    function isOpenForLiquidation(address account) external view returns (bool);
 
     // Mutative Functions
-    flagAccountForLiquidation(address account) external;
+    function flagAccountForLiquidation(address account) external;
 
     // Restricted: used internally to Synthetix contracts
-    removeAccountInLiquidation(address account) external;
+    function removeAccountInLiquidation(address account) external;
 
-    checkAndRemoveAccountInLiquidation(address account) external;
+    function checkAndRemoveAccountInLiquidation(address account) external;
 
     // owner only
-    setLiquidationDelay(uint time) external;
+    function setLiquidationDelay(uint time) external;
 
-    setLiquidationRatio(uint ratio) external;
+    function setLiquidationRatio(uint ratio) external;
 
-    setLiquidationTargetRatio(uint target) external;
+    function setLiquidationTargetRatio(uint target) external;
 }
 ```
 
@@ -83,8 +83,7 @@ pragma solidity >=0.4.24;
 
 interface ISynthetix {
     // Mutative Functions
-    liquidateSynthetix(address account, uint synthAmount) external;
-
+    function liquidateSynthetix(address account, uint synthAmount) external;
 }
 ```
 
