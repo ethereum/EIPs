@@ -41,75 +41,55 @@ Liquidations contract to mark an SNX staker for liquidation with a time delay to
 
 **Parameters**
 
-* `Liquidation Delay`: Time before liquidation of under collateralised collateral.
-* `Liquidation Penalty`: % penalty on SNX collateral liquidated.
-* `Liquidation Ratio`: Collateral ratio liquidation can be initiated.
-* `Liquidation Target Ratio`: Target collateral ratio liquidations are capped at.
+- `Liquidation Delay`: Time before liquidation of under collateralised collateral.
+- `Liquidation Penalty`: % penalty on SNX collateral liquidated.
+- `Liquidation Ratio`: Collateral ratio liquidation can be initiated.
+- `Liquidation Target Ratio`: Target collateral ratio liquidations are capped at.
 
-#### flagAccountForLiquidation(address account)
+**Interface**
 
-Function signature
+```
+pragma solidity >=0.4.24;
 
-`flagAccountForLiquidation(address account) external`
+interface ILiquidations {
+    // Views
+    function isOpenForLiquidation(address account) public view returns (bool);
 
-#### removeAccountInLiquidation(address account)
+    // Mutative Functions
+    flagAccountForLiquidation(address account) external;
 
-Function signature
-`removeAccountInLiquidation(address account) external onlyInternalContract`
+    // Restricted: used internally to Synthetix contracts
+    removeAccountInLiquidation(address account) external;
 
-#### checkAndRemoveAccountInLiquidation(address account)
+    checkAndRemoveAccountInLiquidation(address account) external;
 
-Function signature
+    // owner only
+    setLiquidationDelay(uint time) external;
 
-`checkAndRemoveAccountInLiquidation(address account) external`
+    setLiquidationRatio(uint ratio) external;
 
-#### isOpenForLiquidation(address account)
-
-Function signature
-
-`isOpenForLiquidation(address account) external`
-
-#### setLiquidationDelay(uint40 time)
-
-Function signature
-
-`setLiquidationDelay(uint40 time) onlyOwner`
-
-#### setLiquidationRatio(uint ratio)
-
-Function signature
-
-`setLiquidationRatio(uint ratio) onlyOwner`
-
-#### setLiquidationPenalty(uint penalty)
-
-Function signature
-
-`setLiquidationPenalty(uint penalty) onlyOwner`
-
-#### setLiquidationTargetRatio(uint target)
-
-Function signature
-
-`setLiquidationTargetRatio(uint target) onlyOwner`
-
+    setLiquidationTargetRatio(uint target) external;
+}
+```
 
 ### Synthetix contract
+
 ---
 
-#### liquidateSynthetix(address account, uint synthAmount)
+Updates to the Synthetix contract interface
 
-Function signature
+```
+pragma solidity >=0.4.24;
 
-`liquidateSynthetix(address account, uint synthAmount) external`
-
-Parameters
-
-- `address account`: account to be liquidated
-- `uint synthAmount`: amount of sUSD synth the redeemer wants to redeem against the account
+interface ISynthetix {
+    // Mutative Functions
+    liquidateSynthetix(address account, uint synthAmount) external;
+```
 
 ### Escrowed SNX
+
 ---
+
 Current escrowed SNX tokens in the RewardsEscrow will require a planned upgrade to the RewardsEscrow contract as per [SIP-60](./sip-60.md) to be included as part of the redeemable SNX when liquidating snx collateral. The escrowed snx tokens will be transferred to the liquidator and appended to the rewardsEscrow.
 
 Mitigating this issue is the fact that in order to unlock all `transferrable` SNX a minter would have to repay all of their debt and re-issue debt at the issuance ratio (currently 800%).
@@ -120,13 +100,13 @@ The reasoning behind implementing a direct redemption liquidation mechanism with
 
 The rationale for these liquidation mechanisms are:
 
-* **Time Delay:** A time delay increases the cost to a malicious actor who attempts to manipulate the SNX price to trigger liquidations and reduces the risk of black swan events.
+- **Time Delay:** A time delay increases the cost to a malicious actor who attempts to manipulate the SNX price to trigger liquidations and reduces the risk of black swan events.
 
-* **Liquidation Penalty:** A liquidation penalty payable to the liquidator provides incentives for liquidators and minters to fix their collateral ratio. Liquidators can burn synths and claim SNX at a discounted rate.
+- **Liquidation Penalty:** A liquidation penalty payable to the liquidator provides incentives for liquidators and minters to fix their collateral ratio. Liquidators can burn synths and claim SNX at a discounted rate.
 
-* **Partial liquidations:** Partial liquidation of under collateralised SNX reduces the risk of minter's losing all their staked collateral from liquidation and allows a proportion of their debt to be paid back to fix their collateral ratio. Multiple liquidators can benefit from burning any amount of sUSD synth until the c-ratio is above the liquidation target ratio.
+- **Partial liquidations:** Partial liquidation of under collateralised SNX reduces the risk of minter's losing all their staked collateral from liquidation and allows a proportion of their debt to be paid back to fix their collateral ratio. Multiple liquidators can benefit from burning any amount of sUSD synth until the c-ratio is above the liquidation target ratio.
 
-* **Liquidation target ratio:** A liquidation target ratio works alongside partial liquidations allowing a proportion of snx to be liquidated until the staker's collateral ratio reaches above the liquidation target ratio. At this ratio it would provide enough buffer in the collateral to back the debt issued.
+- **Liquidation target ratio:** A liquidation target ratio works alongside partial liquidations allowing a proportion of snx to be liquidated until the staker's collateral ratio reaches above the liquidation target ratio. At this ratio it would provide enough buffer in the collateral to back the debt issued.
 
 ## Test Cases
 
