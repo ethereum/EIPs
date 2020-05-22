@@ -79,7 +79,7 @@ This function cancels a previously submitted and unexecuted order by the same `m
 function executeOrder(uint orderID) public;
 ```
 
-This function allows a `msg.sender` who has an execualready given the `Proxy` contract an allowance of `sourceCurrencyKey` to submit a new limit order.
+This function allows anyone to execute a limit order.
 
 It fetches the order data using `StateStorage.getOrder()`, if the amount received is larger than or equal to the order's `minDestinationAmount`:
 
