@@ -1,0 +1,67 @@
+---
+eip: <to be assigned>
+title: Repricing of precompiles, Keccak256 and STATICCALL
+author: Alex Vlasov (@shamatar)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2020-05-22
+replaces : 2046
+---
+
+<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+This EIP tries to solve problems with Ethereum precompiles and built-in EVM function:
+- `STATICCALL` to precompiles is insanely expensive for nothing: we call a pure function without storage access, but still pay `700` gas for it
+- If price of such calls is changed it may be necessary to adjust costs of some precompiles that have taken those wasted `700` gas into account 
+- "Older" precompiles are overpriced and their pricing formulas to not reflect the structure of underlying function
+- Keccak256 built-in function in EVM has pricing that does not reflect underlying hash function structure
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+`STATICCALL` opcode when used to call precompiles wastes gas. Costs of many precompiles and built-in functions are invalid at the current state of the clients.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+Motivation is simple: make pricing formulas accurately reflect resources (CPU time) requires to actually perform the called computations.
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+
+This EIP proposes the following changes:
+- `STATICCALL` cost to addresses below `1024` is set to zero
+- Small running time to perform gas estimation for precompile call is absorbed into the precompile cost itself
+- Precompiles are repricied as:
+  - `SHA256` precompile (address `0x02`) was priced as `60` gas plus `12` gas per `32` bytes of input. Now it should be priced as `12 + ((len(input) + 8)/64 + 1) * 5`
+  - RIPEMD precompile (address `0x03`) was priced as `600` gas plus `120` gas per `32` bytes of input. Now it should be priced as `16 + ((len(input) + 8)/64 + 1) * 6`
+  - `BNADD` precompile (address `0x06`) should be repriced from `150` gas to `350` gas
+  - `BNMUL` precompile (address `0x07`) should be repriced from `6000` gas to `6300` gas
+- Keccak256 built-in function was priced as `30` gas plus `6` gas per `32` bytes of the input. Now it should be priced as `16 + (len(input)/136 + 1)*13`
+  - If Geth implementation of Keccak256 is reworked than formula can be changed further to `16 + (len(input)/136 + 1)*2`
+
+## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+
+
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+Precompile repricings has happened in a past and can be considered standard procedure. Gas costs of many contracts is expected to reduce that may break re-entrancy protection measures based on fixed gas costs. In any case, such protection should have never been considered good and final.
+
+## Test Cases
+<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+There are no explicit test cases.
+
+## Implementation
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+
+
+## Security Considerations
+<!--All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.-->
+
+As descriped in backward compatibility section in some cases reduction of cost may allow e.g. re-entrancy that was not expected before, but we think that re-entrancy protection based on fixed gas costs is anyway flawed design decision.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
