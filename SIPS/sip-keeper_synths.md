@@ -62,10 +62,12 @@ The technical specification should outline the public API of the changes propose
 Test cases for an implementation are mandatory for SIPs but can be included with the implementation.
 
 ## Configurable Values (Via SCCP)
-<!--Please list all values configurable via SCCP under this implementation.-->
 MinBalance - This is the minimum value measured in sUSD that can be purged (1c)
+
 MaxValue - This is the maximum total value across all unpurged holders before resetPricing can be called ($10)
+
 FreezeIncentive - The amount of SNX paid to the caller of FreezeSynth
+
 PurgeIncentive - The amount of SNX paid to the caller of purge cycle
 
 ## Copyright
