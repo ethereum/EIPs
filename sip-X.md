@@ -34,25 +34,26 @@ This is the problem statement. This is the *why* of the SIP. It should clearly e
 2. Rationale
 3. Technical Specification
 4. Test Cases
+5. Configurable Values
 -->
 
-# Overview
+### Overview
 <!--This is a high level overview of *how* the SIP will solve the problem. The overview should clearly describe how the new feature will be implemented.-->
 This is a high level overview of *how* the SIP will solve the problem. The overview should clearly describe how the new feature will be implemented.
 
-# Rationale
+### Rationale
 <!--This is where you explain the reasoning behind how you propose to solve the problem. Why did you propose to implement the change in this way, what were the considerations and trade-offs. The rationale fleshes out what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 This is where you explain the reasoning behind how you propose to solve the problem. Why did you propose to implement the change in this way, what were the considerations and trade-offs. The rationale fleshes out what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 
-# Technical Specification
+### Technical Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones. 
 
-# Test Cases
+### Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 Test cases for an implementation are mandatory for SIPs but can be included with the implementation.
 
-## Configurable Values (Via SCCP)
+### Configurable Values (Via SCCP)
 <!--Please list all values configurable via SCCP under this implementation.-->
 Please list all values configurable via SCCP under this implementation.
 
