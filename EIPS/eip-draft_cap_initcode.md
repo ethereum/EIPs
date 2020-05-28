@@ -10,7 +10,7 @@ created: 2020-05-18
 
 ## Simple Summary
 
-Enforce a maximum size limit (`max_initcode_size`) of `49152` (`0x6000`) for `initcode`.
+Enforce a maximum size limit (`max_initcode_size`) of `49152` (`0xc000`) for `initcode`.
 
 ## Abstract
 
