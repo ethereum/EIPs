@@ -253,7 +253,7 @@ Test vector for all operations are expanded in this [gist](https://gist.github.c
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 There is a various choice of existing implementations:
 - C++ implementation EY/libff: https://github.com/EYBlockchain/zk-swap-libff
-- (wip) Rust implementation EY/Zexe: https://github.com/yelhousni/zexe
+- Rust implementation EY/Zexe: https://github.com/yelhousni/zexe/tree/youssef/BW6-761-Fq-ABLR-2ML-M
 - (wip) Rust implementation Consensys/gurvy: https://github.com/ConsenSys/gurvy
 
 ## Security Considerations
