@@ -156,7 +156,6 @@ Given Alice has issued synths with 800 SNX, with a debt balance of 533.33 sUSD a
 Given the following preconditions:
 
 - liquidation ratio is 200%
-- liquidation cap is 300%
 - liquidation penalty is 10%
 - and liqudatiion delay is set to _2_ weeks.
 
@@ -220,7 +219,7 @@ Then
 When
 
 - Bob now tries liquidating a larger amount of sUSD (1000 sUSD) against Alice's debt.
-- 1000 sUSD takes Alice's collateral ratio above the liquidation target ratio (300%)
+- 1000 sUSD takes Alice's collateral ratio above the liquidation target ratio (800%)
 
 Then
 
