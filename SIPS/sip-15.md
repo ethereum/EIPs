@@ -1,7 +1,7 @@
 ---
 sip: 15
 title: SNX liquidation mechanism
-status: WIP
+status: Proposed
 author: Jackson Chan (@jacko125), Kain Warwick (@kaiynne)
 discussions-to:
 created: 2019-08-20
