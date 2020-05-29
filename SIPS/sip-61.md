@@ -2,7 +2,7 @@
 sip: 61
 title: Keeper Synths
 status: WIP
-author: Kain Warwick (@kaiynne)
+author: Kain Warwick (@kaiynne), Justin Moses (@justinjmoses)
 discussions-to: https://discord.gg/kPPKsPb
 
 created: 2020-05-21
@@ -44,6 +44,9 @@ There are three attack vectors this incentive opens:
 The first attack is possible because you can currently trade into a frozen synth. An attacker could repeatedly trade into a frozen iSynth and purge themselves providing the payment was higher than the gas cost to purge the address. The solution to this to introduce a check on exchange to disallow trading into a frozen iSynth.
 
 The second attack relies on exchanging into iSynths then splitting the value across a number of accounts and then purging them to capture the SNX incentive. If there is no limit on the size of an address that can be purged and the SNX incentive was sufficiently large it could be profitable to exchange into thousands of accounts with dust as long as the marginal cost of the roundtrip exchange fees and gas costs of trade into and purge out of each wallet was less than the incentive. The current MinPurgeAmount is configurable (currently $0.01). It could still be profitable to split into addresses with values above $0.01 however this requires more funds at risk as another keeper could capture the incentive.
+
+***UPDATE***
+Kaleb on discord has pointed out that a form of colusion could undermine the incentives preventing this attack. Where the address that calls FreezeSynth could offer to buy frozen iSynths and then split them into many addresses to maximise the yield. Meaning that it would be optimal for any address that wins the race to call FreezeSynth to open a trustless escrow offer to buy as many of the frozen synth as possible and split them into many wallets. There are several potential mitigations to this type of collusion including preventing transfers. However, @justinjmoses is of the belief that the best approach is to instead apply a form of fe reclamation as discussed below. We will therefore review and revise this SIP before resubmitting.
 
 The third attack relies on small values being excluded from purging making it possible to move into many accounts with small balances that in sum are sufficiently large to be meaningful. To illustrate the issue, imagine we did not check the total Synth balance before ResetPrice is called. If we instantiate iETH when ETH is @ $200 if ETH hits $300 iETH will be $100 and frozen, if someone were to exchange $5k worth of sUSD into iETH and then split this into 5,000 wallets their iETH would triple in price when iETH was reset to $300. Clearly we must have a global limit on the total value of a Synth before the price can be reset MaxValue ensures this attack is not successful.
 
