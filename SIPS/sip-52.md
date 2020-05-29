@@ -28,13 +28,15 @@ Add an optional mechanism to fee reclamation where instead of a waiting period i
 
 The underlying assets of certain synths - such as forex, commodities, stocks and indicies - undergo spot market closures. For forex and commodities, spot market closures are weekends across all world timezones (Friday at 5 pm EST - Sunday 5 pm EST). For stocks and indicies, there are evenings, weekends and public holidays for in each market's region. During these periods where spot markets are closed, the futures markets continue to operate and world news continues to be delivered that may impact futures and shift the spot price at next market open. In order to prevent Synthetix traders taking advantage of these upcoming movements, we propose expanding fee reclamation for these synths, so that instead of waiting some number of time in the future, fee reclamation will wait until a new price has been received.
 
-Moreover, this functionality would be useful for leveraged synths. If on-chain prices are only updated every hour (and potentially variant per pricing network) and on a 1% deviation via Chainlink's decentralized pricing networks, leveraged synths with only a timed fee reclamation waiting period could expose the debt pool to significant frontrunning opportunites. Instead, this proposal would allow adding leveraged synths into this
+Moreover, this functionality would be useful for leveraged synths. If on-chain prices are only updated every hour (and potentially variant per pricing network) and on a 1% deviation via Chainlink's decentralized pricing networks, leveraged synths with only a timed fee reclamation waiting period could expose the debt pool to significant frontrunning opportunites. Instead, this proposal would allow adding leveraged synths into this.
+
+An event is emitted whenever the `mapping` for a synth is updated to provide information on whether the "timed" or "next-price" fee reclamation/rebate is applied for a given exchange in a particular block.
 
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-1. `Exchanger` would need a new `mapping(bytes32 => bool)` to track which synths require this new "next price" waiting period (others would continue to use the timed waiting period)
+1. `Exchanger` would need a new `mapping(bytes32 => bool)` to track which synths require this new "next price" waiting period (others would continue to use the timed waiting period), and an internal function that will emit an event `SynthFeeReclamationConfigChange` whenever a `mapping()` is changed.
 2. `Exchanger.maxSecsLeftInWaitingPeriod()` would always return `0` for those using the "next price" feature
 3. `ExchangeRates` needs new function to `getNextRoundId(fromRoundId, bytes32)`
 4. `Synthetix.isWaitingPeriod(bytes32)` would need to be amended, if any exchange into (`dest`), out of (`src`) (or both) a "next price" synth, then needs to lookup in `ExchangeRates.getNextRoundId()` to see if a new price has been received or not (for one or both)
@@ -45,6 +47,12 @@ Given the additional mechanism, an exchange's waiting period needs to consider b
 For example, imagine Alice exchanges `100 sAUD` (a next price synth) to `sETH` (a timed synth) on a weekend. Her exchange succeeds but now the next price waiting period on `sAUD` would extend until forex market open at Sunday 5pm ET. This would mean she couldn't exchange or transfer any `sETH` until then.
 
 > One potential way to solve this is to amend Fee Reclamation logic ([SIP-37](./sip-37.md)) to allow exchanges and transfers that are from funds not undergoing a waiting period. Imagine in the above scenario where Alice would have 0.5 sETH (if ETHUSD was at 200) after the exchange, she could be permitted to exchange or transfer ETH as long as she'd be left with at least 0.5 sETH to potentially reclaim from.
+
+### Events
+
+```solidity
+event SynthFeeReclamationConfigChange(bytes32 currencyKey, bool useNextPrice);
+```
 
 ## Rationale
 
