@@ -20,11 +20,15 @@ This will provide a much-needed improvement to the user experience during times 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 Transactions currently have no way to specify for how long they are valid. Once the transaction enters the network's mempool,
-it is impossible to forget the transaction. The only current option is to replace the transaction by fee. If the transaction
-appears to be dropped from the mempool, there is still no guarantee that no nodes still remember the pending transaction.
+it is impossible to forget the transaction. The only current option is to replace the transaction by submitting another
+transaction with the same nonce and a higher gas price. However, this is not a deterministic replacement.
+Nodes can still include the previously submitted transaction with the lower gas price.
+If the transaction appears to be dropped from the mempool (e.g. does not show up in Etherscan),
+there is still no guarantee that the transaction will not be included in a future block.
+This creates a number of UX issues for pending transactions.
 
-Transactions should expire after a user specified timestamp. This allows the wallet UX to determine that a transaction
-previously signed will never be included into a block.
+To solve this, transactions should expire after a user specified timestamp. 
+This enables the wallet UX to determine that a transaction previously signed will never be included into a block.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
