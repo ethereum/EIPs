@@ -32,11 +32,13 @@ This enables the wallet UX to determine that a transaction previously signed wil
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-If a user sets a gas price that is too low, a pending transaction may be stuck in their wallet for days.
-Later when the user returns to use their wallet again, the wallet is in a state where it cannot be used until the
-previous transaction is replaced with a transaction that has a higher gas price. Few users understand how this works.
+If a user sets a gas price that is too low, a pending transaction may become "stuck" in their wallet for days.
+Later when the user returns to use their wallet again, the wallet is in a state where it cannot be used, until the
+user sends an additional transaction with the same nonce and a higher gas price. Few users understand how this works.
+
 Transactions should automatically drop from the mempools after a user specified timestamp. This makes it much simpler
-for users to retry after sending a transaction with a bad gas price that gets stuck in the mempool. 
+for users to retry after sending a transaction with a bad gas price, as the situation will resolve itself once the 
+transactions expire. 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
