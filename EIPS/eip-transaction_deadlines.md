@@ -14,8 +14,8 @@ created: 2020-05-31
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 Once submitted, pending transactions can stick around for days, while the user's intentions often change after only minutes.
-Transactions should have associated `deadline`s that prevent a transaction from being included in a block with a timestamp
-that exceeds the deadline. This will provide a much needed improvement to the user experience during times of congestion. 
+Transactions should have `deadline`s that prevent a transaction from being included in a block after a given timestamp.
+This will provide a much-needed improvement to the user experience during times of congestion and volatile gas prices. 
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
