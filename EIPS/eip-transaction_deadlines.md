@@ -33,12 +33,14 @@ This enables the wallet UX to determine that a transaction previously signed wil
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 If a user sets a gas price that is too low, a pending transaction may become "stuck" in their wallet for days.
-Later when the user returns to use their wallet again, the wallet is in a state where it cannot be used, until the
-user sends an additional transaction with the same nonce and a higher gas price. Few users understand how this works.
+Once stuck, the user's wallet is unusable until they replace the problem transaction. Replacing transactions is
+an advanced process that few users understand. Users should *not* have to understand the advanced semantics of replacing
+transactions.
 
-Transactions should automatically drop from the mempools after a user specified timestamp. This makes it much simpler
-for users to retry after sending a transaction with a bad gas price, as the situation will resolve itself once the 
-transactions expire. 
+Instead, transactions should automatically drop from the mempools after a user or user wallet specified timestamp. 
+This makes it much simpler for users to reattempt sending a transaction with a bad gas price, 
+as the pending transaction situation will resolve itself once the transactions expire, and wallets can freely re-use the nonce
+knowing that the old transaction will never be included. 
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -58,10 +60,13 @@ their next transaction, they are confused that the old and new transaction have 
 select a much higher gas price for the second transaction.
 
 This partially solves the UX problem by time-boxing how long this situation may continue. Wallets may choose to treat certain
-operations as 'hot' operations, or may detect `deadline` parameters from TX arguments and automatically insert them into
-the transaction, to significantly improve the UX. Users will no longer have to do the replace by fee dance that is required
-once you are stuck in this situation, and will not have to pay gas to cancel transactions they no longer care about,
-which will also free up block capacity. And finally, nodes can easily decide whether to drop old pending transactions from the mempool.
+operations as 'hot' operations with very short deadlines, or may detect `deadline` parameters from TX arguments 
+and automatically insert them into the transaction, to significantly improve the UX. Users will no longer have to do 
+the replace-by-fee dance that is required once you become stuck in this situation, which is especially hairy when there
+are multiple pending transactions (replacing tx with nonce 1 does not replace tx with nonce 2 and 3.)
+
+Users also will not have to pay gas to cancel transactions they no longer care about, which will also free up block capacity.
+Finally, nodes can easily decide whether to drop old pending transactions from the mempool for transactions with a `deadline`.
 
 ## Backwards Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
