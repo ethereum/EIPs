@@ -272,7 +272,7 @@ When
 
 Then
 
-- ✅ Her account is removed from liquidation within liquidateSynthetix transaction
+- ❌ It fails and reverts with `account not open for liquidation`.
 - and no sUSD or debt is burned by Bob
 - and no SNX is liquidated and transferred to Bob.
 
