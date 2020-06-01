@@ -275,6 +275,7 @@ Then
 - ❌ It fails and reverts with `account not open for liquidation`.
 - and no sUSD or debt is burned by Bob
 - and no SNX is liquidated and transferred to Bob.
+- Alice account remains flagged for liquidation.
 
 ---
 
