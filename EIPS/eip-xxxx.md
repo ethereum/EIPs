@@ -37,7 +37,7 @@ The multiexponentiation operations are a generalization of point multiplication.
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/SW6 pair of curves. This precompile proposes a replacement of SW6 by BW6-761, which allows five times faster verification.
+The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/SW6 pair of curves. This precompile proposes a replacement of SW6 by BW6-761, which allows much faster verification.
 
 ### Proposed addresses table
 
