@@ -26,7 +26,7 @@ If `block.number >= X` we introduce *seven* separate precompiles to perform the 
 <!--TODO: consider removing BW6_G1_MUL-->
 - BW6_G1_MUL - to perform point multiplication on a curve defined over prime field
 - BW6_G1_MULTIEXP - to perform multiexponentiation on a curve defined over prime field
-- BW6_G2_ADD - to perform point addition on a curve twist defined over quadratic extension of the base field
+- BW6_G2_ADD - to perform point addition on a curve twist defined the base prime field
 <!--TODO: consider removing BW6_G2_MUL-->
 - BW6_G2_MUL - to perform point multiplication on a curve twist defined over the base prime field
 - BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
