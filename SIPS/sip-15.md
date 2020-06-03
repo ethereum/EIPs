@@ -62,7 +62,7 @@ The liquidation penalty is paid to the liquidator and is paid as a bonus on top 
 
 For example, given the liquidation penalty is 10%, when 100 SNX is liquidated, then `110 SNX` is transferred to the liquidator.
 
-The maximum liquidation penalty will be capped at `50%`.
+The maximum liquidation penalty will be capped at `25%`.
 
 ### Liquidations Contract
 
@@ -185,7 +185,7 @@ Then
 
 Given
 
-- Alice does not fix her c ratio by burning sUSD back to the Liquidation Target ratio
+- Alice does not fix her c ratio by burning sUSD back to the issuance target ratio
 - and two weeks have elapsed
 - and SNX is priced at USD 1.00
 
@@ -202,7 +202,7 @@ Then
 
 Given
 
-- After Bob's liquidating 100 sUSD worth of SNX, Alice collateral ratio at 158.77% is still below the liquidation target ratio.
+- After Bob's liquidating 100 sUSD worth of SNX, Alice collateral ratio at 158.77% is still below the issuance target ratio.
 
 When
 - Chad tries to liquidate Alice's SNX collateral with 50 sUSD
@@ -219,7 +219,7 @@ Then
 When
 
 - Bob now tries liquidating a larger amount of sUSD (1000 sUSD) against Alice's debt.
-- 1000 sUSD takes Alice's collateral ratio above the liquidation target ratio (800%)
+- 1000 sUSD takes Alice's collateral ratio above the issuance target ratio (800%)
 
 Then
 
@@ -232,7 +232,7 @@ Then
 When
 
 - Alice has been flagged for liquidation
-- and the price of SNX increases so her Collateral ratio is now above the liquidation target ratio
+- and the price of SNX increases so her Collateral ratio is now above the issuance target ratio
 - and she calls checkAndRemoveAccountInLiquidation
 
 Then
@@ -245,7 +245,7 @@ Then
 When
 
 - Alice has been flagged for liquidation
-- and the price of SNX doesn't change so she is still below the liquidation target ratio
+- and the price of SNX doesn't change so she is still below the issuance target ratio
 - and she calls checkAndRemoveAccountInLiquidation
 
 Then
@@ -267,7 +267,7 @@ When
 
 - Alice has been flagged for liquidation
 - and the liquidation deadline has passed
-- and her collateral ratio is above the liquidation target ratio
+- and her collateral ratio is above the issuance target ratio
 - and Bob tries to liquidate Alice calling `liquidateSynthetix()`
 
 Then
@@ -282,7 +282,7 @@ Then
 When
 
 - Alice has been flagged for liquidation
-- and she burns sUSD debt to fix her collateral ratio above the liquidation target ratio
+- and she burns sUSD debt to fix her collateral ratio above the issuance target ratio
 
 Then
 
