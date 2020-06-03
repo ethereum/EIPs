@@ -15,34 +15,52 @@ requires : xxxx
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-his precompile adds operations on BW6-761 curve (from EY/Inria  [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification for efficient one-layer composed proofs. It is inteded to replace the SW6 curve (from Zexe paper) for performance reasons.
+This precompile adds operations for the BW6-761 curve (from the EY/Inria [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification for efficient one-layer composed proofs. It is intended to replace the SW6 curve (from the [Zexe paper](https://eprint.iacr.org/2018/962.pdf)) for performance reasons.
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
 If `block.number >= X` we introduce *seven* separate precompiles to perform the following operations (addresses to be determined):
 
-- G1ADD - to perform point addition on a curve defined over prime field
-- G1MUL - to perform point multiplication on a curve defined over prime field
-- G1MULTIEXP - to perform multiexponentiation on a curve defined over prime field
-- G2ADD - to perform point addition on a curve twist defined over quadratic extension of the base field
-- G2MUL - to perform point multiplication on a curve twist defined over quadratic extension of the base field
-- G2MULTIEXP - to perform multiexponentiation on a curve twist defined over quadratic extension of the base field
-- PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
+- BW6_G1_ADD - to perform point addition on a curve defined over prime field
+<!--TODO: consider removing BW6_G1_MUL-->
+- BW6_G1_MUL - to perform point multiplication on a curve defined over prime field
+- BW6_G1_MULTIEXP - to perform multiexponentiation on a curve defined over prime field
+- BW6_G2_ADD - to perform point addition on a curve twist defined the base prime field
+<!--TODO: consider removing BW6_G2_MUL-->
+- BW6_G2_MUL - to perform point multiplication on a curve twist defined over the base prime field
+- BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over the base prime field
+- BW6_PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
 
-Multiexponentiation operation is included to efficiently aggregate public keys or individual signer's signatures during BLS signature verification, as well as public inputs in SNARKs.
+The multiexponentiation operations are a generalization of point multiplication.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-Motivation of this precompile is to allow efficient one layer composition of SNARK proofs. Currently this is done by Zexe using the BW6-761/SW6 pair of curves. This precompile proposes a replacement of SW6 by BW6-761 which allows five times faster verification.
+The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/SW6 pair of curves. This precompile proposes a replacement of SW6 by BW6-761, which allows much faster verification.
+
+### Proposed addresses table
+
+|Precompile          |Address   |
+|---|---|
+|BW6_G1_ADD          | 0x13     |
+<!--TODO: consider removing BW6_G1_MUL-->
+|BW6_G1_MUL          | 0x14     |
+|BW6_G1_MULTIEXP     | 0x15     |
+|BW6_G2_ADD          | 0x16     |
+<!--TODO: consider removing BW6_G2_MUL-->
+|BW6_G2_MUL          | 0x17     |
+|BW6_G2_MULTIEXP     | 0x18     |
+|BW6_PAIRING         | 0x19     |
+|BW6_MAP_FP_TO_G1    | 0x1a     |
+|BW6_MAP_FP_TO_G2    | 0x1b     |
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
 Curve parameters:
 
-BW6-761 (y^2=x^3-1) curve is fully defined by the following set of parameters:
+The BW6-761 `y^2=x^3-1` curve is fully defined by the following set of parameters:
 
 ```
 Base field modulus = 0x122e824fb83ce0ad187c94004faff3eb926186a81d14688528275ef8087be41707ba638e584e91903cebaff25b423048689c8ed12f9fd9071dcd3dc73ebff2e98a116c25667a8f8160cf8aeeaf0a437e6913e6870000082f49d00000000008b
@@ -74,73 +92,76 @@ loop_count_1 is negative = false
 loop_count_2 is negative = false
 ```
 
-#### Fine points and encoding of base elements
+#### Encoding
 
 ##### Field elements encoding:
 
 To encode points involved in the operation one has to encode elements of only the base field.
 
-Base field element (Fp) is encoded as `96` bytes by performing BigEndian encoding of the corresponding (unsigned) integer. Corresponding integer **must** be less than field modulus.
+The base field element (Fp) is encoded as `96` bytes by performing BigEndian encoding of the corresponding (unsigned) integer. The corresponding integer **must** be less than the base field modulus.
 
-If encodings to not follow this spec anywhere during parsing in the precompile the precompile *must* return an error.
+If encodings do not follow this spec anywhere during parsing in the precompile, the precompile *must* return an error.
 
 ##### Encoding of uncompressed points:
 
-Points in either G1 (in base field) or in G2 (in base field too) are encoded as byte concatenation of encodings of the `x` and `y` affine coordinates. Total encoding length for a G1/G2 point is thus `96` bytes.
+Points in both G1 and G2 can be expressed as `(x, y)` affine coordinates, where `x` and `y` are elements of the base field.
+Therefore, points in both G1 and G2 are encoded as the byte concatenation of the field element encodings of the `x` and `y` affine coordinates. The total encoding length for a G1/G2 point is thus `192` bytes.
 
-##### Point of infinity encoding:
+##### Point at infinity encoding:
 
-Also referred as "zero point". For BW6-761 (y^2=x^3-1) and its M-twisted (y^3=x^3+4) curves, point with coordinates `(0, 0)` (formal zeroes in Fp) is *not* on the curve, so encoding of such point `(0, 0)` is used as a convention to encode point of infinity.
+Also referred as the "zero point". For BW6-761 (`y^2=x^3-1`) and its M-twisted curves (`y^3=x^3+4`), the point with coordinates `(0, 0)` (formal zeros in Fp) is *not* on the curve, and so the encoding of `(0, 0)` is used as a convention to encode the point at infinity.
 
-##### Boolean encoding for subgroup checks:
+##### Encoding of scalars for multiplication and multiexponentiation operations:
 
-For subgroup checks it's required to encode whether it's required to run a subgroup check for the G1/G2 point or not. For this we encode a boolean as a *single byte* `0x00` for `false` and `0x01` for `true`.
+For multiplication and multiexponentiation operations, a scalar is encoded as `64` bytes by performing BigEndian encoding of the corresponding (unsigned) integer.
 
-##### Encoding of scalars for multiplication operation:
+Note that the main subgroup order for BW6-761 is actually only `377` bits (`48` bytes), but an encoding of `64` bytes has been chosen to have a `32`-byte-aligned ABI (representable as e.g. `bytes32[2]` or `uint256[2]`).
 
-Scalar for multiplication operation is encoded as `48` bytes by performing BigEndian encoding of the corresponding (unsigned) integer. Corresponding integer is **not** required to be less than or equal than main subgroup size.
+The corresponding integer is **not** required to be less than or equal to the main subgroup order.
 
 #### ABI for operations
 
 ##### ABI for G1 addition
 
-G1 addition call expects `384` bytes as an input that is interpreted as byte concatenation of two G1 points (`192` bytes each). Output is an encoding of addition operation result.
+G1 addition call expects `384` bytes as an input that is interpreted as the byte concatenation of two G1 points (point-encoded as `192` bytes each). Output is a point-encoding of the addition operation result.
 
 Error cases:
-- Either of points being not on the curve must result in error
-- Field elements encoding rules apply (obviously)
+- Either of the points being not on the curve
 - Input has invalid length
+- Field element encoding rules apply (obviously)
 
 ##### ABI for G1 multiplication
-
-G1 multiplication call expects `240` bytes as an input that is interpreted as byte concatenation of encoding of G1 point (`192` bytes) and encoding of a scalar value (`48` bytes). Output is an encoding of multiplication operation result.
+<!--TODO: consider removing BW6_G1_MUL-->
+G1 multiplication call expects `256` bytes as an input that is interpreted as the byte concatenation of the point-encoding of a G1 point (`192` bytes) and the encoding of a scalar value (`64` bytes). Output is a point-encoding of the multiplication operation result.
 
 Error cases:
-- Point being not on the curve must result in error
-- Field elements encoding rules apply (obviously)
+- Point being not on the curve
 - Input has invalid length
+- Field element encoding rules apply (obviously)
+- Scalar encoding rules apply (obviously)
 
 ##### ABI for G1 multiexponentiation
 
-G1 multiplication call expects `240*k` bytes as an input that is interpreted as byte concatenation of `k` slices each of them being a byte concatenation of encoding of G1 point (`192` bytes) and encoding of a scalar value (`48` bytes). Output is an encoding of multiexponentiation operation result.
+G1 multiplication call expects `256*k` bytes as an input that is interpreted as the byte concatenation of `k` slices, each of them being a byte concatenation of the point-encoding of a G1 point (`192` bytes) and the encoding of a scalar value (`64` bytes). Output is an encoding of the multiexponentiation operation result.
 
 Error cases:
-- Any of G1 points being not on the curve must result in error
-- Field elements encoding rules apply (obviously)
+- Any of the G1 points being not on the curve
 - Input has invalid length
+- Field element encoding rules apply (obviously)
+- Scalar encoding rules apply (obviously)
 
 ##### ABI for G2 addition
 
-G2 addition call expects `384` bytes as an input that is interpreted as byte concatenation of two G2 points (`192` bytes each). Output is an encoding of addition operation result.
+G2 addition call expects `384` bytes as an input that is interpreted as the byte concatenation of two G2 points (point-encoded as `192` bytes each). Output is a point-encoding of the addition operation result.
 
 Error cases:
-- Either of points being not on the curve must result in error
-- Field elements encoding rules apply (obviously)
+- Either of points being not on the curve
 - Input has invalid length
+- Field elements encoding rules apply (obviously)
 
 ##### ABI for G2 multiplication
-
-G2 multiplication call expects `240` bytes as an input that is interpreted as byte concatenation of encoding of G2 point (`192` bytes) and encoding of a scalar value (`48` bytes). Output is an encoding of multiplication operation result.
+<!--TODO: consider removing BW6_G2_MUL-->
+G2 multiplication call expects `256` bytes as an input that is interpreted as the byte concatenation of the point-encoding of a G2 point (`192` bytes) and the encoding of a scalar value (`64` bytes). Output is an encoding of multiplication operation result.
 
 Error cases:
 - Point being not on the curve must result in error
@@ -158,20 +179,24 @@ Error cases:
 
 ##### ABI for pairing
 
-Pairing call expects `386*k` bytes as an inputs that is interpreted as byte concatenation of `k` slices. Each slice has the following structure:
-- single byte to encode if the following G1 point needs a subgroup check
-- `192` bytes of G1 point encoding
-- single byte to encode if the following G2 point needs a subgroup check
-- `192` bytes of G2 point encoding
+Pairing call expects `384*k` bytes as an input, that is interpreted as the byte concatenation of `k` slices. Each slice has the following structure:
+- `192` bytes G1 point encoding
+- `192` bytes G2 point encoding
 
-Output is a single byte `0x01` if pairing result is equal to multiplicative identity in a pairing target field and `0x00` otherwise.
+Output is `32` bytes representing a boolean:
+
+- `0x0000000000000000000000000000000000000000000000000000000000000001` if the pairing result is equal the to multiplicative identity in the pairing target field; and
+- `0x0000000000000000000000000000000000000000000000000000000000000000` otherwise.
 
 Error cases:
-- Invalid encoding of any boolean variable must result in error
-- Any of G1 or G2 points being not on the curve must result in error
-- Any of G1 or G2 points for which subgroup check is requested in not actually in a subgroup
-- Field elements encoding rules apply (obviously)
+- Any of the G1 or G2 points being not on the curve
+- Any of the G1 or G2 points being not in the correct subgroup
 - Input has invalid length
+- Field elements encoding rules apply (obviously)
+
+#### Prevention of DDoS on error handling
+
+This precompile performs extensive computations and in case of any errors during execution it MUST consume all gas from the the gas schedule for the corresponding operation.
 
 #### TODO: Gas schedule
 
@@ -215,7 +240,7 @@ Each point (either G1 or G2) for which subgroup check is requested and performed
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
-Motivation section covers a total motivation to have operations over BW6-761 curve available. We also extend a rationale for move specific fine points.
+Motivation section covers a total motivation to have operations over BW6-761 curve available. We also extend a rationale for more specific fine points.
 
 #### Multiexponentiation as a separate call
 
