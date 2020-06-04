@@ -5,7 +5,7 @@ author: Spreek (@Spreek)
 status: WIP
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 created: 2020-06-04
-requires: [SIP-56](https://github.com/Synthetixio/SIPs/blob/master/SIPS/sip-56.md)
+requires: SIP-56
 ---
 
 ## Simple Summary
