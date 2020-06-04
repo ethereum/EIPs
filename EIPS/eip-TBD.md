@@ -1,8 +1,8 @@
 ---
-eip: TBD
-title: `request` method transport
+eip: 2696
+title: JavaScript `request` method RPC transport
 author: Micah Zoltu (@MicahZoltu)
-discussions-to: TBD
+discussions-to: https://github.com/ethereum/EIPs/issues/2697
 status: Draft
 review-period-end: TBD
 type: Standards Track
