@@ -1,7 +1,7 @@
 ---
 sip: 15
 title: SNX liquidation mechanism
-status: Approved
+status: Implemented
 author: Jackson Chan (@jacko125), Kain Warwick (@kaiynne)
 discussions-to:
 created: 2019-08-20
@@ -299,8 +299,7 @@ Please list all values configurable via SCCP under this implementation.
 - liquidationPenalty
 
 ## Implementation
-
-The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+https://github.com/Synthetixio/synthetix/releases/tag/v2.22.4
 
 ## Copyright
 
