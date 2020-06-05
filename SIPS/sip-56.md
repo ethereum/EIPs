@@ -1,7 +1,7 @@
 ---
 sip: 56
 title: Differential Fees
-status: Approved
+status: Implemented
 author: Clinton Ennis (@hav-noms)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
@@ -137,7 +137,7 @@ It was considered that a `Synth` should store its own rate by having a setter fo
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-TBD
+https://github.com/Synthetixio/synthetix/releases/tag/v2.22.4
 
 ## Copyright
 
