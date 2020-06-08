@@ -1,7 +1,7 @@
 ---
 sccp: 22
 title: Reduce Rewards On Curve
-status: Proposed
+status: Implemented
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: SNX-trading
  
