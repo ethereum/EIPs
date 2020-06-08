@@ -35,6 +35,7 @@ From the above table, as well as taking into account other idiosyncratic events 
 Using a target SNX price shock of 30% to 50%, we can infer the probabilities of such a shock taking place, using the probability  distribution of  returns of SNX inferred from historical prices. As can be expected, the longer the time horizon involved (i.e. the longer the grace period), the higher the volatility that can be expected of returns and therefore the greater the risk that a wallet becoming under uncollateralized.
 
 Modelling the probability distribution (with a Gaussian Mixture Model) we can infer the respective probabilities to different prices shocks across different time horizons:
+
 | Time\Shock | -30% | -40% | -50% |
 |:----:|:----:|:----:|:----:|
 |  **1D**  |  10% |  5%  |  2%  |
