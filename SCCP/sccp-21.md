@@ -3,7 +3,7 @@ sccp: 21
 title: Widen iSynth Price Bands
 author: Kain Warwick (@kaiynne)
 discussions-to: SIPS-WIPS
-status: Proposed
+status: Rejected
 created: 2020-05-05
 ---
 
