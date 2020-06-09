@@ -23,14 +23,14 @@ This precompile adds operations for the BW6-761 curve (from the EY/Inria [resear
 If `block.number >= X` we introduce *seven* separate precompiles to perform the following operations (addresses to be determined):
 
 - BW6_G1_ADD - to perform point addition on a curve defined over prime field
-<!--TODO: consider removing BW6_G1_MUL-->
 - BW6_G1_MUL - to perform point multiplication on a curve defined over prime field
 - BW6_G1_MULTIEXP - to perform multiexponentiation on a curve defined over prime field
 - BW6_G2_ADD - to perform point addition on a curve twist defined the base prime field
-<!--TODO: consider removing BW6_G2_MUL-->
 - BW6_G2_MUL - to perform point multiplication on a curve twist defined over the base prime field
 - BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over the base prime field
 - BW6_PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
+- BW6_MAP_FP_TO_G1 - to perform mapping of an element in the base field FP to a point (x,y) in the group G1
+- BW6_MAP_FP_TO_G2 - to perform mapping of an element in the base field FP to a point (x,y) in the group G2
 
 The multiexponentiation operations are a generalization of point multiplication.
 
@@ -44,11 +44,9 @@ The motivation of this precompile is to allow efficient one-layer composition of
 |Precompile          |Address   |
 |---|---|
 |BW6_G1_ADD          | 0x13     |
-<!--TODO: consider removing BW6_G1_MUL-->
 |BW6_G1_MUL          | 0x14     |
 |BW6_G1_MULTIEXP     | 0x15     |
 |BW6_G2_ADD          | 0x16     |
-<!--TODO: consider removing BW6_G2_MUL-->
 |BW6_G2_MUL          | 0x17     |
 |BW6_G2_MULTIEXP     | 0x18     |
 |BW6_PAIRING         | 0x19     |
@@ -131,7 +129,6 @@ Error cases:
 - Field element encoding rules apply (obviously)
 
 ##### ABI for G1 multiplication
-<!--TODO: consider removing BW6_G1_MUL-->
 G1 multiplication call expects `256` bytes as an input that is interpreted as the byte concatenation of the point-encoding of a G1 point (`192` bytes) and the encoding of a scalar value (`64` bytes). Output is a point-encoding of the multiplication operation result.
 
 Error cases:
@@ -160,7 +157,6 @@ Error cases:
 - Field elements encoding rules apply (obviously)
 
 ##### ABI for G2 multiplication
-<!--TODO: consider removing BW6_G2_MUL-->
 G2 multiplication call expects `256` bytes as an input that is interpreted as the byte concatenation of the point-encoding of a G2 point (`192` bytes) and the encoding of a scalar value (`64` bytes). Output is an encoding of multiplication operation result.
 
 Error cases:
