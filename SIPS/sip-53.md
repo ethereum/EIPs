@@ -115,7 +115,7 @@ resolves either long (the underlying asset's price is higher than or equal to th
 or short (the underlying asset's price is lower than the strike price).
 
 At this point, users may exercise the options they hold, which will destroy them.
-If the market resolved long, each long option pays out 1 sUSD, and each long option pays out nothing.
+If the market resolved long, each long option pays out 1 sUSD, and each short option pays out nothing.
 If the market resolved short, each long option pays out nothing, and each short option pays out 1 sUSD.
 
 These returns are paid from the total bids made on both sides during the bidding period.
@@ -283,7 +283,7 @@ The capital requirement also ensures that the market has initial prices: without
 \\(C\\).
 
 The particular division of funds between long and short sides of the market determines the initial prices, and reflects
-the market creator's initial belief about the odds. Just like any other bidder, the the market creator will be awarded
+the market creator's initial belief about the odds. Just like any other bidder, the market creator will be awarded
 options in return for this initial capital.
 
 A third reason it is necessary to provide this initial liquidity is to ensure that when bids come into a new market,
@@ -419,10 +419,10 @@ do not act, then the fees will be made available to any user willing to perform 
 At present these options are defined on a particular maturity condition, but the system could readily be augmented with
 a range of richer conditions.
 
-If the inputs inputs are restricted to only to a single price, there are many useful predicates that can be defined on
+If the inputs are restricted to only to a single price, there are many useful predicates that can be defined on
 that price beyond the over-under condition proposed in this document. For example, the options could pay out depending
 on whether the underlying price at maturity is within a percentage of its initial value.
-If inputs are not restricted to to a single price, comparisons can be made between several different oracle outputs.
+If inputs are not restricted to a single price, comparisons can be made between several different oracle outputs.
 For example, options could pay out based on whether the Nikkei 225 grew by more than the FTSE 100.
 
 In fact any predicate accepting inputs from Synthetix oracles could be used as a maturity condition for options.
