@@ -29,9 +29,8 @@ the market paying out the other side at maturity. This structure removes the nec
   * [Basic Dynamics](#basic-dynamics)
     * [Market Resolution](#market-resolution)
     * [Fees](#fees)
-    * [Option Supply and Prices](#option-prices)
+    * [Option Supply and Prices](#option-supply-and-prices)
     * [Market Equilibria](#market-equilibria)
-    * [Options As Synths](#options-as-synths)
   * [Market Creation](#market-creation)
     * [Initial Capital](#initial-capital)
     * [Oracles](#oracles)
@@ -44,7 +43,6 @@ the market paying out the other side at maturity. This structure removes the nec
     * [Oracle Snapshot](#oracle-snapshot)
     * [Exercising Options](#exercising-options)
   * [Destruction](#destruction)
-    * [Oracle Failure](#oracle-failure)
   * [Future Extensions](#future-extensions)
     * [Arbitrary Maturity Predicates](#arbitrary-maturity-predicates)
     * [Multimodal Options Markets](#multimodal-options-markets)
@@ -396,7 +394,7 @@ destroying those options so that they cannot be exercised again.
 If a user has unclaimed options at the time they call the exercise function, the options they are owed will be
 automatically claimed and exercised.
 
-#### Destruction
+### Destruction
 
 In order to combat the proliferation of defunct options contracts, `Market` instances implement a
 self-destruct function which can be invoked a period of time after the maturity date. Once this function is
@@ -529,7 +527,7 @@ Test cases are included with [the implementation](#implementation).
 ## Implementation
 
 A full smart contract implementation is provided in [a pull request](https://github.com/Synthetixio/synthetix/pull/537).
-There is also an [accompanying pull request](https://github.com/Synthetixio/synthetix-docs/pull/16) documentation.
+There is also an [accompanying pull request](https://github.com/Synthetixio/synthetix-docs/pull/16) for documentation.
 
 ---
 
