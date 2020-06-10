@@ -1,14 +1,14 @@
 ---
 sccp: 26
-title: Low c-ratio to 750%
+title: Lower c-ratio to 750%
 author: Andrew Kang (@rewkang)
 discussions-to: TBC
-status: WIP
+status: Implemented
 created: 2020-04-14
 ---
 
 ## Simple Summary
-Decrease the target Collateralisation Ratio for SNX stakers to 700%.
+Decrease the target Collateralisation Ratio for SNX stakers to 750%.
 
 ## Abstract
 There is currently a deficit of Synths (relative to demand) in the Synthetix ecosystem. Decreasing the target Collateralisation Ratio will cause some SNX stakers to increase amount of synths minted
