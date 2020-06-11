@@ -48,7 +48,9 @@ The technical specification should outline the public API of the changes propose
 
 **Trading Incentive Contract**
 
-When an exchange is made by a user on Synthetix Exchange, the amount of fees remitted (in sUSD) and user the funds are exchanged `from` will be recorded in the `Trading incentive contract`. Each `address` will accumulate the total of exchange fees that they generate for a period (tracked as a `periodID`) and the counter is reset when SNX for the incentives is deposited for the period and a user makes another trade. The total of the previous period will be stored on the next trade regardless of how long ago the last trade was.
+When an exchange is made by a user on Synthetix Exchange, the amount of fees remitted (in sUSD) and the user the funds are exchanged `from` will be recorded in the `Trading incentive contract`.
+
+The total exchange fees an `address` generates during a period (tracked via `periodID`) will be accumulated. The counter is reset when SNX for the incentives is deposited for the period and a user makes another trade. The accumulated total fees of the previous period will be stored on the next trade regardless of how long ago the last trade was.
 
 For exchanges occuring through integrations and exchange aggregators such as `1inch` there will be a function that allows an `address` to be passed through the exchange to be recorded against the originating address for the trading volume incentives.
 
