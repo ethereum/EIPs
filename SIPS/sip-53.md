@@ -144,14 +144,17 @@ list of active markets.
 If the price of an underlying asset \\(U\\) is queried from an oracle at the maturity date,
 its price at maturity \\(P_U\\) is either above or below the strike price \\(P_U^{\*}\\).
 Users bid on each outcome to receive options that pay out in case that event occurs,
-exchanging tokens with the `Market` contract.
+exchanging sUSD with the `Market` contract.
 
 At the maturity date the market resolves into exactly one of these events, which will be denoted \\(L\\) and \\(S\\):
 
 * \\(L\\): The event that \\(P_U \geq P_U^{\*}\\), when long options pay out 1 sUSD each.
 * \\(S\\): The event that \\(P_U < P_U^{\*}\\), when short options pay out 1 sUSD each.
 
-Further define \\(Q_L\\) and \\(Q_S\\) to be the quantity of tokens bid on the long and short sides respectively.
+And further define the quantities of sUSD bid on each side:
+
+* \\(Q_L\\): The value of sUSD bid on the long side of the market.
+* \\(Q_S\\): The value of sUSD bid on the short side of the market.
 
 #### Fees
 
@@ -160,17 +163,23 @@ During the bidding phase, bids and refunds are made, and fees are charged on the
 There are two basic fee rates:
 
 * \\(\phi\\): The fee charged on bids, to be paid to the market creator and fee pool.
-* \\(\phi_{refund}\\): The fee rate charged on refunds, which stays in the market, compensating the remaining bidders.
+* \\(\phi_{R}\\): The fee rate charged on refunds, which stays in the market, compensating the remaining bidders.
 
-After the bidding period has concluded, the total funds deposited in the contract is the sum of bids on both sides
-(\\(Q_L + Q_S\\)), plus any accrued refund fees (\\(\rho\\)).
+The market collects fees as bids are refunded, hence:
+
+* \\(Q_R\\): The total value of sUSD accrued as refund fees.
+
+After the bidding period has concluded, the total funds held in the contract is the sum of bids on both sides,
+plus any accrued refund fees; a value of (\\(Q_L + Q_S + Q_R\\)) sUSD.
 At maturity, the bidding fee is charged on the total deposits, and these fees are remitted to the market creator and
 fee pool. The remaining funds are paid out to winning option-holders.
 
 The specific quantities sent to the market creator vs the fee pool are determined by distinct fee rates for the fee pool
 (\\(\phi_{pool}\\)) and for the market creator (\\(\phi_{creator}\\)), and the overall fee rate is their sum:
 
-\\(\phi := \phi_{pool} + \phi_{creator}\\).
+\\[
+\phi := \phi_{pool} + \phi_{creator}
+\\]
 
 Note that fees are transferred at the destruction of the market (upon invocation of a public contract function) rather
 than continuously because the collected fees are used as an incentive for the market creator to clean up the market
@@ -183,19 +192,19 @@ participants in case any of these things occurs.
 
 #### Option Supply and Prices
 
-At the maturity date, a quantity \\((Q_L + Q_S + \rho\\)) sUSD is deposited in the market, of which
-\\(\phi (Q_L + Q_S + \rho)\\) sUSD is deducted as fees. The remaining quantity \\(Q\\) is paid to option holders on the
+At the maturity date, a quantity \\((Q_L + Q_S + Q_R\\)) sUSD is deposited in the market, of which
+\\(\phi (Q_L + Q_S + Q_R)\\) sUSD is deducted as fees. The remaining quantity \\(Q\\) is paid to option holders on the
 winning side of the market, with:
 
 \\[
-Q := (1 - \phi) (Q_L + Q_S + \rho)
+Q := (1 - \phi) (Q_L + Q_S + Q_R)
 \\]
 
 Since each option pays 1 sUSD, and L and S are mutually exclusive events, each side of the market
 must also be awarded \\(Q\\) options. So the total quantity of options minted is \\(2Q\\),
 but only \\(Q\\) mature in the money.
 
-The market spent quantities \\(Q_L\\) and \\(Q_S\\) of tokens to exchange into \\(Q\\) options per side, so the 
+The market spent quantities \\(Q_L\\) and \\(Q_S\\) of sUSD to exchange into \\(Q\\) options per side, so the 
 final option prices are easily computed:
 
 \\[
@@ -206,7 +215,7 @@ P_L := \frac{Q_L}{Q} \approx \frac{Q_L}{Q_L + Q_S}
 P_S := \frac{Q_S}{Q} \approx \frac{Q_S}{Q_L + Q_S}
 \\]
 
-Where the rightmost formulae are approximations obtained by neglecting fees, assuming \\(\phi\\) and \\(\rho\\) are
+Where the rightmost formulae are approximations obtained by neglecting fees, assuming \\(\phi\\) and \\(Q_R\\) are
 close to zero.
 
 For example, if \\(Q_L = Q_S = 100\\) sUSD, then \\(P_L = P_S \approx 0.5\\) sUSD per option.
@@ -240,16 +249,27 @@ So, modulo fees, each option price can be read off directly as the approximately
 
 The presence of fees has a small impact on prices, and thus the odds that the market predicts.
 
-If it is assumed that no refunds have been made (so \\(\rho = 0\\)), then \\(P_L + P_S = \frac{1}{1 - \phi}\\),
-which greater than 1. That is, it will only be rational for market participants to purchase options if they believe
-the market is mispriced relative to the true probabilities by a margin larger than the bidding fee rate. Given that the
-fee rates are close to zero, however, and there is high uncertainty before the maturity date,
-most of the time this will not be a major influence.
+Let us assume that the sum of all refunds is currently proportional with the size of the market by some volatility
+constant \\(v\\), then we can describe the accrued refund fees as follows:
 
-If on the other hand, \\(\phi = 0\\) is assumed, and refunds have been made, then
-\\(P_L + P_S = \frac{Q_L + Q_S}{Q_L + Q_S + \rho}\\), which is less than 1. In this case, the prices on both
-sides of the market have been discounted, and there should be extra demand attracted to the market sufficient
-to restore the sum of prices to within \\(\phi\\) of 1.
+\\[
+Q_R = v \cdot \phi_{R} \cdot (Q_L + Q_S)
+\\]
+
+Then we have:
+
+\\[
+P_L + P_S = \frac{1}{(1 + v \cdot \phi_{R})(1 - \phi)}
+\\]
+
+So as the bidding fee increases, prices increase. Assuming no refunds have been made, then the sum of prices
+is greater than 1; it will only be rational for market participants to purchase options if they believe the
+options are mispriced by a margin larger than the bidding fee rate. Given that the fee rates are close to zero, however,
+and there is high uncertainty before the maturity date, most of the time this will not be a major influence.
+
+On the other hand, if refunds are made, the volatility term increases, and prices decrease.
+Assuming \\(\phi = 0\\), the sum of prices is less than 1; both sides have been discounted, and there should be extra
+demand attracted, decreasing the volatility term enough to bring the sum of prices back down close to 1.
 
 ---
 
@@ -334,8 +354,8 @@ If a user has already taken a position, they may refund it. A fee is charged for
 and other manipulations available to actors with private information.
 
 If the user with wallet \\(w\\) has already bid \\(b\\) sUSD long, then they may refund any quantity \\(q \leq b\\),
-and will receive \\(q (1 - \phi_{refund})\\) sUSD. \\(Q_L\\) and the associated long `Option` contract's balance
-for wallet \\(w\\) are decremented by \\(b\\). The remaining \\(q \cdot \phi_{refund}\\) sUSD remains in the common pot,
+and will receive \\(q (1 - \phi_{R})\\) sUSD. \\(Q_L\\) and the associated long `Option` contract's balance
+for wallet \\(w\\) are decremented by \\(b\\). The remaining \\(q \cdot \phi_{R}\\) sUSD remains in the common pot,
 but not allocated to the total bids on either side, and so discounts the prices for both sides, incentivising further
 demand to make up for that which was withdrawn by the refund.
 
@@ -364,7 +384,7 @@ The same computation produces the total supply of options, which at all times wi
 \\(\frac{Q_L}{P_L} + \frac{Q_S}{P_S} = 2Q\\).
 
 During the trading period, each `Option` contract offers full ERC20 functionality, including `transfer`, `approve`, and
-`transferFrom`, supporting trading tokens on secondary markets.
+`transferFrom`, supporting trading options on secondary markets.
 
 ---
 
@@ -482,11 +502,11 @@ A related proposal for triggered order contracts is discussed in [SIP 54](https:
 | \\(P_U\\), \\(P_U^{\*}\\) | \\(P_U\\) is the price of \\(U\\) queried from the oracle \\(O\\) at the maturity date \\(t_m\\). \\(P_U^{\*}\\) is the strike price of \\(U\\), against which \\(P_U\\) is compared at maturity to resolve the market. |
 | \\(\phi_{pool}\\), \\(\phi_{creator}\\) | The platform fee rate paid to the fee pool and to the market creator respectively. These fees are paid at the market destruction. |
 | \\(\phi\\) | The overall market fee, which is equal to \\(\phi_{pool} + \phi_{creator}\\). \\(\phi\\) must in the range \\([0, 1]\\). |
-| \\(\phi_{refund}\\)  | The fee rate to refund a bid. Its value must be in the range \\([0, 1]\\). |
-| \\(\rho\\) | The accrued refund fees in a market. |
+| \\(\phi_{R}\\)  | The fee rate to refund a bid. Its value must be in the range \\([0, 1]\\). |
+| \\(Q_R\\) | The accrued refund fees in a market. |
 | \\(L\\), \\(S\\) | The possible outcomes at maturity. \\(L\\) is the event that \\(P_U \geq P_U^{\*} \\); when the "long" side of the market pays out. \\(S\\) is the event that \\(P_U < P_U^{\*}\\); when the "short" side of the market pays out. |
 | \\(Q_L\\), \\(Q_S\\) | The total funds on the long and short sides of the market respectively. |
-| \\(Q\\) | The quantity of options awarded to each side of the market; this is equal to \\((1 - \phi) (Q_L + Q_S + \rho)\\). |
+| \\(Q\\) | The quantity of options awarded to each side of the market; this is equal to \\((1 - \phi) (Q_L + Q_S + Q_R)\\). |
 | \\(P_L\\), \\(P_S\\) | The price of long and short options respectively. Defined as \\(P_L := \frac{Q_L}{Q}\\) and \\(P_S := \frac{Q_S}{Q}\\). |
 | \\(C\\)   | The minimum initial capitalisation of a new market. |
 
@@ -599,7 +619,7 @@ of the value owed to these wallets.
 | \\(C\\) | 1000 sUSD | The minimum value of the initial capitalisation of a new binary option market. This is a value of USD. |
 | \\(\phi_{pool}\\) | 0.8% | The platform fee rate paid to the fee pool. This is a decimal number in the range \\([0, 1]\\). |
 | \\(\phi_{creator}\\) | 0.2% | The fee rate paid to the creator of a market. This is a decimal number in the range \\([0, 1]\\). |
-| \\(\phi_{refund}\\) | 5% | The fee rate to refund a bid. This is a decimal number in the range \\([0, 1]\\). |
+| \\(\phi_{R}\\) | 5% | The fee rate to refund a bid. This is a decimal number in the range \\([0, 1]\\). |
 | max oracle price age | 2 hours | The oldest a price update can be to be considered acceptable for resolving a market. |
 | exercise duration | 2 weeks |How long options can be exercised before their market is eligible to be destroyed. |
 | creator destruction duration | 1 week | How long the market creator has exclusive rights to destroy the markets they have created. |
