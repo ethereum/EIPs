@@ -10,10 +10,7 @@ created: 2020-06-15
 ---
 
 ## Simple Summary
-This EIP intends to modify RPC to return transaction data for `eth_estimateGas` method. When transaction required state modification, (not a Solidity view or pure, it can't be execute without a transaction), the estimate endpoint returns the amount of gas needed but omit the returned value.
-
-## Abstract
-The estimate endpoint returns the amount of gas needed but omit the returned value.
+This EIP intends to modify RPC to return transaction data for `eth_estimateGas` method. When transaction required state modification, (not a Solidity view or pure, it can't be executed without a transaction), the estimate endpoint returns the amount of gas needed but omit the returned value. The propose of this change is to add the return value in the response.
 
 ## Motivation
 Pure of view function can be call without cost to "read" information and free of cost. State modifier function can be estimate to know the cost and if it will not fail, but there is no way to know the return value before executing the transaction in live. 
