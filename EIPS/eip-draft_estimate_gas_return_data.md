@@ -5,7 +5,7 @@ author: Jules Goullée (@julesGoullee)
 discussions-to: _
 status: Draft
 type: Standards Track
-category Interface
+category: Interface
 created: 2020-06-15
 ---
 
