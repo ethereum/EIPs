@@ -20,6 +20,7 @@ Pure of view function can be call without cost to "read" information and free of
 
 ## Specification
 `eth_estimateGas` Response:
+
 In place of:
 ```json
 { "result": 123456 }
