@@ -1,5 +1,5 @@
 ---
-sccp: TBA
+sccp: 28
 title: Reduce Rewards On Curve - SNX 32,000
 status: WIP
 author: Kaleb Keny (@kaleb-keny)
