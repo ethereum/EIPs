@@ -1,0 +1,132 @@
+---
+eip: <to be assigned>
+title: Transaction package
+author: Matt Garnett (@lightclient)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2020-06-16
+requires: 2718
+---
+
+## Simple Summary
+Creates a new transaction type which executes a package of one or more
+transactions.
+
+## Abstract
+After `FORK_BLOCK`, a new [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718)
+transaction of type `N` is recognized. Transactions of type `N` will define a
+list of transactions, which must be executed serially by clients. Execution
+information (e.g. `success`, `gas_used`, etc.) will be propagated forward to
+the next transaction. 
+
+## Motivation
+Meta-transaction relay contracts have historically been designed to catch
+reversions in their inner transactions by only passing a portion of the
+available gas to the subcall. This has been considered bad practice for a long
+time, but in the case of untrust subcalls -- it is the only available solution.
+Transaction packages are an alternative solution which allow multiple
+transactions to be bundled into one package and executed atomically.
+
+## Specification
+
+### Definitions
+
+```
+N = TBD transaction type number
+INTRINSIC_COST = TBD
+TOTAL_COST = INTRINSIC_COST + inner_txs.reduce(|itx, acc| acc += itx.value + itx.gas_price * itx.gas_limit)
+TOTAL_GAS_LIMIT = inner_txs.reduce(|itx, acc| acc += itx.gas_limit)
+TX_HASH = hash of transaction as defined below
+SENDER = ecrecover(hash, v, r, s)
+RESULT = result as defined below for the previous transaction, empty if its the first tx in a package
+```
+
+### Serialization
+After `FORK_BLOCK`, a new [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718)
+transaction type `N` will be interpreted as follows:
+
+`rlp([N, rlp([nonce, v, r, s, [inner_tx_0, ..., inner_tx_n]])`
+
+where `inner_tx_n` is defined as:
+
+`[chain_id, to, value, data, gas_limit, gas_price]`
+
+### Hashing
+The hash of transaction type `N` is defined to be the Keccak-256 hash of the
+rlp encoding of the entire transaction with `v`, `r`, and `s` values omitted.
+
+### Results
+Subsequent transactions will receive the result of the previous transaction via
+call data. Each element will be `0`-padded to 32 bytes and appended to the end
+of the inner transaction's `data` field before being passed to the EVM. Those
+elements are:
+
+| type    | Description  |
+|---|---|
+| uint256 | Status code for the termination of the previous transaction |
+| uint256 | Total amount of gas used by the previous transaction |
+| uint256 | The size of the return value | 
+| bytes32 | The return value of the previous transaction
+
+### Validation
+
+* (v, r, s) are a valid signature of the hash of the transaction
+* The nonce is one greater than recovered address' current nonce
+* The recovered address has a balance of at least `TOTAL_COST`
+* The `TOTAL_GAS_LIMIT` is less than the current block's `gas_limit`
+
+### Execution
+
+Transaction packages should be executed as follows:
+
+1. Deduct `TOTAL_COST` from `SENDER`'s balance
+2. Execute the first inner transaction in the list
+3. Refund any unused `gas`
+4. If there are no more transaction, stop
+5. Compute `RESULT` for the previously executed transaction
+6. Append `RESULT` to the next transaction's `data`
+7. Execute the transaction
+9. Goto `3`
+
+
+## Rationale
+
+#### Non-recursive inner transactions
+For simplicity, inner transactions are fully defined within this EIP. However,
+there is value in supporting recursive transaction definitions. For example,
+suppose there is a transaction type which can become invalid after a certain
+block number. It would be beneficial to support those types of transactions
+within a package, but the complexity of this EIP would dramatically increase.
+
+
+#### Appending result data to transaction input data
+Transaction data is defined in the Yellow Paper as "an unlimited size byte
+array specifying the input data of the message". Result data certainly falls
+under the definition of "input data of the message", where the message is the
+subsequent inner transaction. An alternative to this would be to hijack
+`RETURNDATASIZE (0x3D)` and `RETURNDATACOPY (0x3E)` in the first frame of the
+inner transaction's execution and return the `RESULT`. This was not initially
+chosen since this would make it possible to determine if a transaction is
+executing as part of a package. For similar reasons, adding new opcodes to
+expose the result data were not proposed.
+
+
+## Backwards Compatibility
+Contracts which rely on `ORIGIN (0x32) == CALLER (0x33) && RETURNDATASIZE
+(0x3E) == 0x00` will now always fail in transaction packages, unless they are
+the first executed transaction. It's unknown if any contracts conduct this
+check.
+
+## Test Cases
+TBD
+
+## Implementation
+TBD
+
+## Security Considerations
+TBD
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
