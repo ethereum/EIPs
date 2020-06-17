@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Transaction package
 author: Matt Garnett (@lightclient)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-transaction-package/4365
 status: Draft
 type: Standards Track
 category: Core
