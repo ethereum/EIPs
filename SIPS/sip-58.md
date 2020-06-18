@@ -53,8 +53,8 @@ Add an internal function `_settlementsOwing` that will emit an event `ExchangeEn
 Emit an event `ExchangeEntryReclaim` or `ExchangeEntryRebate` for each exchangeEntry within `_settlementsOwing` when `Exchanger.settle()` is invoked.
 
 ```solidity
-event ExchangeEntryReclaim(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint timestamp);
-event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes32 dest, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint timestamp);
+event ExchangeEntryReclaim(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd);
+event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes32 dest, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd);
 ```
 
 ### Exchanger.appendExchange ###
@@ -62,16 +62,8 @@ event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes3
 Emit an event `ExchangeEntryAppended` for each exchangeEntry created when a user makes an exchange. Capture details such as roundIdForSrc, roundIdForDest for Dapps to calculate the effectiveValue of the exchange at anytime by querying the onchain data.
 
 ```solidity
-event ExchangeEntryAppended(address indexed account, bytes32 src, uint amount, bytes32 dest, uint amountReceived, uint exchangeFeeRate, uint roundIdForSrc, uint roundIdForDest, uint timestamp);
+event ExchangeEntryAppended(address indexed account, bytes32 src, uint amount, bytes32 dest, uint amountReceived, uint exchangeFeeRate, uint roundIdForSrc, uint roundIdForDest);
 ```
-
-### ISynthetixInternal ###
-
-Add to ISynthetixInternal interface external functions for emitting event off Synthetix proxy.
-
-- ExchangeEntryReclaim
-- ExchangeEntryRebate
-- ExchangeEntryAppended
 
 ## Rationale
 
@@ -85,7 +77,7 @@ The decision to add an internal function `_settlementsOwing` that will emit indi
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
-- The above events are emitted off the Synthetix Proxy.
+- The events are emitted off the Exchanger contract.
 - When `Exchanger.settle()` is invoked, the `_settlementsOwing` function is invoked and returns (uint reclaimAmount, uint rebateAmount, uint numEntries).
 - When `Exchanger.settle()` is invoked, it emits `ExchangeEntryReclaim` event for each ExchangeEntry that has a reclaim amount - (`amountReceived > amountShouldHaveReceived`).
 - When `Exchanger.settle()` is invoked, it emits `ExchangeEntryRebate` event for each ExchangeEntry that has a rebate amount - (`amountShouldHaveReceived > amountReceived`).
