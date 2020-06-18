@@ -53,8 +53,8 @@ Add an internal function `_settlementsOwing` that will emit an event `ExchangeEn
 Emit an event `ExchangeEntryReclaim` or `ExchangeEntryRebate` for each exchangeEntry within `_settlementsOwing` when `Exchanger.settle()` is invoked.
 
 ```solidity
-event ExchangeEntryReclaim(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd);
-event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes32 dest, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd);
+event ExchangeEntryReclaim(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint exchangeTimestamp);
+event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes32 dest, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint exchangeTimestamp);
 ```
 
 ### Exchanger.appendExchange ###
@@ -62,7 +62,7 @@ event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes3
 Emit an event `ExchangeEntryAppended` for each exchangeEntry created when a user makes an exchange. Capture details such as roundIdForSrc, roundIdForDest for Dapps to calculate the effectiveValue of the exchange at anytime by querying the onchain data.
 
 ```solidity
-event ExchangeEntryAppended(address indexed account, bytes32 src, uint amount, bytes32 dest, uint amountReceived, uint exchangeFeeRate, uint roundIdForSrc, uint roundIdForDest);
+event ExchangeEntryAppended(address indexed account, bytes32 src, uint amount, bytes32 dest, uint amountReceived, uint exchangeFeeRate, uint roundIdForSrc, uint roundIdForDest, uint timestamp);
 ```
 
 ## Rationale
