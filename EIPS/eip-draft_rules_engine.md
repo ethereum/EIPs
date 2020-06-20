@@ -1,34 +1,24 @@
 ---
 eip: <to be assigned>
-title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: Rules Engine Standard
+author: Aaron Kendall (@jaerith), Juan Blanco <@juanfranblanco>
 discussions-to: <URL>
 status: Draft
-type: <Standards Track | Meta | Informational>
-category (*only required for Standard Track): <Core | Networking | Interface | ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <EIP number(s)>
-replaces (*optional): <EIP number(s)>
+type: Standards Track
+category : ERC
+created: 2020-06-20
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
 
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.
+An interface for using a smart contract as a rules engine.  A single deployed contract can register a data domain, create sets of rules that perform actions on that domain, and then invoke a set as an atomic transaction. 
 
 ## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
-A short (~200 word) description of the technical issue being addressed.
+This standard proposes an interface that will allow the creation of hierarchal sets of rules (i.e., Rule Trees) that can be invoked to evaluate and manipulate a registered data domain.  At the time of this draft, all intentions to insert additional functionality onto the blockchain requires the coding and creation of a newly deployed contract.  However, this standard will allow users to deploy a contract just once, one which will then allow them to create (and invoke) pipelines of commands within that contract.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
+At the time of this draft, all development for Ethereum requires writing the code that forms smart contracts and then deploying those contracts to Ethereum.  This requirement pertains to all cases, even for simple cases of examining a value and/or altering it.  However, less technical companies and users might also want to configure and deploy simple functionality onto the chain, without knowing the reveleant languages or details necessary.  By having the data domain and the predefined actions implemented along with this interface, a deployed instance of such a contract can provide functionality to no-code or little-code clients, allowing more users of various technical proficiency to interact with the Ethereum ecosystem.
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -47,8 +37,7 @@ All EIPs that introduce backwards incompatibilities must include a section descr
 Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
-The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+- [Wonka](https://github.com/Nethereum/Wonka/tree/master/Solidity/WonkaEngine)
 
 ## Security Considerations
 <!--All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.-->
