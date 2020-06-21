@@ -136,6 +136,20 @@ pragma solidity ^0.6.0;
 }
 ```
 
+### Considerations
+
+An argument could be made for interface functions that allow a RuleTree's owner to include others users as executors of the RuleTree.
+
+Another argument could be made for interface functions that allow an administrator to configure the origin point of an Attribute, such as whether the Attribute's value comes from a data structure (internal to the rules engine contract) or from calling a contract method (like an implementation of the Diamond Standard).
+
+Yet another argument could be made for interface functions that allow an administrator to extend the functionality catalog provided by the rules engine, by allowing the optional inclusion of methods that exist on other contracts.
+
+### Example
+
+A company wishes to deploy a contract with data points and functionality that are predefined and/or under the control of an administrator, and it aims to build a no-code client that will allow less-technical users to define actions within the rules engine contract.  In this example, the company wants one of its users to write the rules in a proprietary markup language, in order for the calculation of a VAT to be determined.  For the sake of transparency, [these rules](https://ipfs.infura.io/ipfs/QmPrZ9959c7SzzqdLkVgX28xM7ZrqLeT3ydvRAHCaL1Hsn) are published onto IPFS, so that they are accessible to auditors and possibly government officials.  The no-code client will then know how to parse the rules from the markup and communicate with the rules engine contract, establishing the RuleTree to be invoked later by the company's user(s) or off-chain programs.
+
+In order to calculate the value of the VAT, these provided rules invoke simple mathematical operations that can perform the calculation.  However, the implementation of the rules engine contract could possess other functionality called by rules, ones that could execute more complicated logic or call the methods of other contracts.
+
 ## Rationale
 
 ### Attributes
@@ -152,10 +166,18 @@ In the function addRule(), the data type for the right-hand value is 'string' si
 
 ## Implementation
 - [Wonka](https://github.com/Nethereum/Wonka/tree/master/Solidity/WonkaEngine)
+- [Wonka Rules Editor](https://github.com/jaerith/WonkaRulesBlazorEditor)
+
+The Wonka implementation supports this proposed interface and also implements all of the additional considerations mentioned above. 
 
 ## Security Considerations
 
 The deployer of the contract should be the owner and administrator, allowing for the addition of Attributes and RuleTrees.  Since a RuleTree is owned by a particular EOA (or contract address), the only accounts that should be able to execute the RuleTree should be its owner or the contract's owner/administrator.  If Attributes are defined to exist as data within other contracts, the implementation must take into account the possibility that RuleTree owners must have the security to access the data in those contracts.
+
+## References
+
+**Standards**
+- [ERC-2535 Diamond Standard](https://github.com/ethereum/EIPs/issues/2535)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
