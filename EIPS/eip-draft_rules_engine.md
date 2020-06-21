@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Rules Engine Standard
 author: Aaron Kendall (@jaerith), Juan Blanco <@juanfranblanco>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-rules-engine-interface/4374
 status: Draft
 type: Standards Track
 category : ERC
