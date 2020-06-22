@@ -142,7 +142,9 @@ An argument could be made for interface functions that allow a RuleTree's owner 
 
 Another argument could be made for interface functions that allow an administrator to configure the origin point of an Attribute, such as whether the Attribute's value comes from a data structure (internal to the rules engine contract) or from calling a contract method (like an implementation of the Diamond Standard).
 
-Yet another argument could be made for interface functions that allow an administrator to extend the functionality catalog provided by the rules engine, by allowing the optional inclusion of methods that exist on other contracts.
+Yet another argument could be made for interface functions that allow an administrator to extend the functionality catalog provided by the rules engine, by allowing other contracts' methods to be added as a rule operation.
+
+Also, an argument could be made for functions that calculate and report the range of potential cost for invoking a RuleTree.  Unlike the normal execution of a contract method, the Ethereum transaction costs of invoking a RuleTree are more dynamic, depending on its depth/breadth and the navigational flow during invocation.  Since the general cost of a RuleTree is unknown until the time of invocation, these functions could report the minimal amount of gas for a transaction (i.e., none of the Rules in a RuleTree are invoked) and the maximum amount for a transaction (i.e., all Rules in a RuleTree are invoked).
 
 ### Example
 
