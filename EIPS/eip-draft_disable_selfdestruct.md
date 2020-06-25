@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Disable SELFDESTRUCT
 author: Alexey Akhunov (@AlexeyAkhunov)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-for-disabling-selfdestruct-opcode/4382
 status: Draft
 type: Standards Track
 category: Core
