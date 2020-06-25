@@ -35,8 +35,8 @@ will reduce complexity of EVM going forward, disable GasToken2 (but not GasToken
 polymorthic contracts impossible.
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
-After certain block number, the semantics of `SELFDESTRUCT` becomes the same as the combination of `POP` followed by `STOP`. Gas cost is the same as the gas cost
-of `POP`, which is 2 gas. No value transfer occurs and no gas refund is given.
+After certain block number, the semantics of `SELFDESTRUCT` becomes the same as the combination of `POP`, followed by transferring remaining ETH
+to the address popped from the stack, followed by `STOP`. Gas cost is the same as the gas cost of non-zero value transfer, which is 9000 gas. No gas refund is given.
 
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
