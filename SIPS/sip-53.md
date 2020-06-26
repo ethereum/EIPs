@@ -1,7 +1,7 @@
 ---
 sip: 53
 title: Binary Options
-status: Proposed
+status: Approved
 author: Anton Jurisevic (@zyzek)
 discussions-to: https://discord.gg/kPPKsPb
 
