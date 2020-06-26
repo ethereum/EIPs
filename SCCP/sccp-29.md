@@ -1,5 +1,5 @@
 ---
-sccp: TBA
+sccp: 29
 title: End SNX rewards for sETH/ETH Uniswap pool v1
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: https://discord.gg/4GvuB3
