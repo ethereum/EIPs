@@ -42,7 +42,7 @@ the market paying out the other side at maturity. This structure removes the nec
   * [Maturity](#maturity)
     * [Oracle Snapshot](#oracle-snapshot)
     * [Exercising Options](#exercising-options)
-  * [Destruction](#destruction)
+  * [Expiry](#expiry)
   * [Future Extensions](#future-extensions)
     * [Arbitrary Maturity Predicates](#arbitrary-maturity-predicates)
     * [Multimodal Options Markets](#multimodal-options-markets)
@@ -96,7 +96,7 @@ No options exist at this point, as their price is indeterminate.
 
 In order to fix the option prices, users bid to receive options on one or the other side of the market.
 Bids cannot be transferred between wallets, but they can be refunded for a fee.
-At the termination of bidding the basic price of each option is fixed, according to the relative demand on eac
+At the termination of bidding the basic price of each option is fixed, according to the relative demand on each
 and no more bids or refunds are accepted.
 
 #### 2. Trading 
@@ -110,18 +110,21 @@ In this way the market price of each option can still float freely before the ma
 
 After the maturity date is reached, the price of the underlying asset is recorded, and the market
 resolves either long (the underlying asset's price is higher than or equal to the strike price),
-or short (the underlying asset's price is lower than the strike price).
+or short (the underlying asset's price is lower than the strike price). At this time, any collected
+fees are sent to the market creator and the Synthetix fee pool.
 
-At this point, users may exercise the options they hold, which will destroy them.
+Subsequently, users may exercise the options they hold, which will destroy them.
 If the market resolved long, each long option pays out 1 sUSD, and each short option pays out nothing.
 If the market resolved short, each long option pays out nothing, and each short option pays out 1 sUSD.
 
 These returns are paid from the total bids made on both sides during the bidding period.
 
-#### 4. Destruction
+#### 4. Expiry 
 
 After a time period allowing users to exercise their options,
-the market is destroyed. Any fees collected are sent to the market creator
+those markets expire, and the market can destroyed.
+
+Any fees collected are sent to the market creator
 and the Synthetix fee pool, and the market is removed from its parent manager's
 list of active markets.
 
@@ -181,9 +184,7 @@ The specific quantities sent to the market creator vs the fee pool are determine
 \phi := \phi_{pool} + \phi_{creator}
 \\]
 
-Note that fees are transferred at the destruction of the market (upon invocation of a public contract function) rather
-than continuously because the collected fees are used as an incentive for the market creator to clean up the market
-once it is defunct.
+These fees are transferred to the pool and the creator at the resolution of the market.
 
 The refund fee is intended to dampen price volatility caused by users exiting their positions too readily, and also to
 disincentivise malicious players from sending toxic price signals to the market, taking a position to affect the price
@@ -392,7 +393,8 @@ During the trading period, each `Option` contract offers full ERC20 functionalit
 
 Once the maturity date is reached, the oracle must be consulted and the outstanding options resolved to pay out 1 sUSD
 each, or nothing. At their discretion, any user with a positive balance of options can then exercise them to
-obtain whatever payout they are owed.
+obtain whatever payout they are owed. At the maturity date, any collected fees are paid out to the fee pool and the
+market creator.
 
 #### Oracle Snapshot
 
@@ -414,19 +416,13 @@ destroying those options so that they cannot be exercised again.
 If a user has unclaimed options at the time they call the exercise function, the options they are owed will be
 automatically claimed and exercised.
 
-### Destruction
+### Expiry
 
 In order to combat the proliferation of defunct options contracts, `Market` instances implement a
 self-destruct function which can be invoked a period of time after the maturity date. Once this function is
 invoked, the contract and its two subsidiary `Option` instances will self destruct, and the corresponding entry deleted
-from the list of markets on the `Manager` contract.
-
-To incentivise this behaviour, the fees collected in the market will not be transmitted to the market creator or fee
-pool until the contract is destroyed. When the destruction function is invoked by the contract creator,
-the contract will remit the fees along with any unclaimed tokens left in the contract.
-
-Initially this function will only be available to the original market creator, but if after a period of time they
-do not act, then the fees will be made available to any user willing to perform the labour of cleaning up.
+from the list of active markets on the `Manager` contract.
+Upon destruction, any the value of any unexercised options is remitted to the account invoking the expiry function.
 
 ---
 
@@ -532,7 +528,7 @@ From the perspective of the staking pool, the risk incurred in creating these ma
 market position the pool has to take is zero, outside of initial capitalisation. Yet these markets could represent a
 real driver of demand and fee generation, which will contribute to the overall health of the Synthetix ecosystem.
 
-The design proposed also leverages the existing structures Synthetix has constructed, as it can use as its inputs any
+The design proposed also leverages the existing structures Synthetix has built, as it can use as its inputs any
 price feed already available, while being enhanced for free whenever new prices are introduced. Similarly, the mechanism
 itself can be extended to a much broader catalogue of financial instruments, prediction markets, and so on.
 
@@ -546,7 +542,13 @@ Test cases are included with [the implementation](#implementation).
 
 ## Implementation
 
-A full smart contract implementation is provided in [a pull request](https://github.com/Synthetixio/synthetix/pull/537).
+A full implementation of the above specification is provided by the following smart contracts:
+
+* [`BinaryOptionMarketManager`](https://github.com/Synthetixio/synthetix/blob/0e78911f20bf24b9ed37e79f94a7cd3ebe7a51f9/contracts/BinaryOptionMarketManager.sol).
+* [`BinaryOptionMarketFactory`](https://github.com/Synthetixio/synthetix/blob/0e78911f20bf24b9ed37e79f94a7cd3ebe7a51f9/contracts/BinaryOptionMarketFactory.sol).
+* [`BinaryOptionMarket`](https://github.com/Synthetixio/synthetix/blob/0e78911f20bf24b9ed37e79f94a7cd3ebe7a51f9/contracts/BinaryOptionMarket.sol).
+* [`BinaryOption`](https://github.com/Synthetixio/synthetix/blob/0e78911f20bf24b9ed37e79f94a7cd3ebe7a51f9/contracts/BinaryOption.sol).
+
 There is also an [accompanying pull request](https://github.com/Synthetixio/synthetix-docs/pull/16) for documentation.
 
 ---
@@ -558,10 +560,10 @@ For example:
 
 ### Alternative Price Discovery Mechanism
 
-There is a potential alternative model for finding the price of each option that would remove the bidding period.
-In this design, options would be generated by a simple exchange of a single token for a pair of options.
-Any binary option market would generate one long option and one short option in exchange for a token of its denominating
-asset plus a fee. This works because although the specific prices of each option are not known, it is known that
+There exist a number of potential alternative models for finding the price of each option.
+One such alternative would remove the bidding period. In this design, options would be generated by a simple exchange of
+a $1 for a pair of options. Any binary option market would generate one long option and one short option in exchange for
+$1 plus a fee. This works because although the specific prices of each option are not known, it is known that
 together they will pay out a single token. Refunds would proceed similarly: a user would have to purchase one of each
 option to exchange back to other Synths.
 
@@ -605,8 +607,8 @@ provide immediate liquidity to the new binary options.
 
 ### Forced Option Exercise
 
-In the current design, at the destruction of a market, the value of any exercised options is 
-given to the market creator. However, in the future it may be useful to allow these wallets 
+In the current design, at the expiry of a market, the value of any unexercised options is 
+given to the account that cleans up the market. However, in the future it may be useful to allow these options 
 to be force-exercised after the maturity period by external parties, who would receive a portion
 of the value owed to these wallets.
 
@@ -621,9 +623,8 @@ of the value owed to these wallets.
 | \\(\phi_{creator}\\) | 0.2% | The fee rate paid to the creator of a market. This is a decimal number in the range \\([0, 1]\\). |
 | \\(\phi_{R}\\) | 5% | The fee rate to refund a bid. This is a decimal number in the range \\([0, 1]\\). |
 | max oracle price age | 2 hours | The oldest a price update can be to be considered acceptable for resolving a market. |
-| exercise duration | 2 weeks |How long options can be exercised before their market is eligible to be destroyed. |
-| creator destruction duration | 1 week | How long the market creator has exclusive rights to destroy the markets they have created. |
-| max time to maturity | 1 year | A safety constraint that limits how far in the future a maturity date can be set at market creation. |
+| expiry duration | 26 weeks | How long options can be exercised before their market is eligible to be destroyed. |
+| max time to maturity | 2 years | A safety constraint that limits how far in the future a maturity date can be set at market creation. |
 
 ---
 
