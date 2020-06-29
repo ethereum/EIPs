@@ -138,7 +138,7 @@ pragma solidity ^0.6.0;
 
 An argument could be made for interface functions that allow a RuleTree's owner to include others users as executors of the RuleTree.
 
-Another argument could be made for interface functions that allow an administrator to configure the origin point of an Attribute, such as whether the Attribute's value comes from a data structure (internal to the rules engine contract) or from calling a contract method (like an implementation of [the Diamond Standard](https://github.com/ethereum/EIPs/issues/2535)).
+Another argument could be made for interface functions that allow an administrator to configure the origin point of an Attribute, such as whether the Attribute's value comes from a data structure (internal to the rules engine contract) or from calling a contract method (like an implementation of the [Diamond Standard](https://github.com/ethereum/EIPs/issues/2535)).
 
 Yet another argument could be made for interface functions that allow an administrator to extend the functionality catalog provided by the rules engine, by allowing other contracts' methods to be added as a rule operation.
 
