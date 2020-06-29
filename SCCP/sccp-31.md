@@ -1,5 +1,5 @@
 ---
-sccp: TBA
+sccp: 31
 title: Increase Commodity Fees
 author: Kaleb Keny (@kaleb-keny)
 status: WIP
