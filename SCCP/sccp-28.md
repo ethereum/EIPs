@@ -1,7 +1,7 @@
 ---
 sccp: 28
 title: Reduce Rewards On Curve - SNX 32,000
-status: WIP
+status: Proposed
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: Governance
  
