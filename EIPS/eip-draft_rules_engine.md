@@ -28,7 +28,7 @@ pragma solidity ^0.6.0;
 
 /**
     @title ERC-2746 Rules Engine Standard
-    @dev See https://eips.ethereum.org/EIPS/eip-####
+    @dev See https://eips.ethereum.org/EIPS/eip-2746
  */
  interface ERCRulesEngine {
 
