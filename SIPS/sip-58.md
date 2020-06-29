@@ -44,17 +44,16 @@ Vice versa emitting extra information when an exchange transaction occurs such a
 
 ### Exchanger.settle ###
 
-Add an internal function `_settlementsOwing` that will emit an event `ExchangeEntryReclaim` for each reclaim and `ExchangeEntryRebate` for each rebate when `Exchanger.settle()` is invoked.
+Add an internal function `_settlementsOwing` that will emit an event `ExchangeEntrySettled` for each reclaim and  rebate when `Exchanger.settle()` is invoked.
 
-`Exchanger.settle()` will use `_settlementsOwing` to calculate the fee reclamation amounts.
+`Exchanger.settle()` will calculate the fee reclamation amounts and emit the event.
 
 **Event**
 
-Emit an event `ExchangeEntryReclaim` or `ExchangeEntryRebate` for each exchangeEntry within `_settlementsOwing` when `Exchanger.settle()` is invoked.
+Emit an event `ExchangeEntrySettled` for each exchangeEntry when `Exchanger.settle()` is invoked.
 
 ```solidity
-event ExchangeEntryReclaim(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint exchangeTimestamp);
-event ExchangeEntryRebate(address indexed from, bytes32 src, uint amount, bytes32 dest, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint exchangeTimestamp);
+event ExchangeEntrySettled(address indexed from, bytes32 src, uint amount, bytes32 dest, uint reclaimAmount, uint rebateAmount, uint srcRoundIdAtPeriodEnd, uint destRoundIdAtPeriodEnd, uint exchangeTimestamp);
 ```
 
 ### Exchanger.appendExchange ###
@@ -78,9 +77,9 @@ The decision to add an internal function `_settlementsOwing` that will emit indi
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
 
 - The events are emitted off the Exchanger contract.
-- When `Exchanger.settle()` is invoked, the `_settlementsOwing` function is invoked and returns (uint reclaimAmount, uint rebateAmount, uint numEntries).
-- When `Exchanger.settle()` is invoked, it emits `ExchangeEntryReclaim` event for each ExchangeEntry that has a reclaim amount - (`amountReceived > amountShouldHaveReceived`).
-- When `Exchanger.settle()` is invoked, it emits `ExchangeEntryRebate` event for each ExchangeEntry that has a rebate amount - (`amountShouldHaveReceived > amountReceived`).
+- When `Exchanger.settle()` is invoked, the `_settlementsOwing` function is invoked and returns (uint reclaimAmount, uint rebateAmount, uint numEntries, ExchangeEntrySettlements[] settlements).
+- When `Exchanger.settle()` is invoked, it emits `ExchangeEntrySettled` event with a non-zero reclaimAmount for each ExchangeEntry that has a reclaim amount - (`amountReceived > amountShouldHaveReceived`).
+- When `Exchanger.settle()` is invoked, it emits `ExchangeEntrySettled` event with a non-zero rebateAmount for each ExchangeEntry that has a rebate amount - (`amountShouldHaveReceived > amountReceived`).
 - When `Exchanger._exchange()` is invoked, it emits `ExchangeEntryAppended` event for each ExchangeEntry appended to the ExchangeState with details combined in.
 
 ## Implementation
