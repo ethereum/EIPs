@@ -27,7 +27,7 @@ For the clarification of terminology, an Attribute is a registered data point wi
 pragma solidity ^0.6.0;
 
 /**
-    @title ERC-#### Rules Engine Standard
+    @title ERC-2746 Rules Engine Standard
     @dev See https://eips.ethereum.org/EIPS/eip-####
  */
  interface ERCRulesEngine {
