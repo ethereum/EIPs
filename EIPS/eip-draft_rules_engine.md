@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2746
 title: Rules Engine Standard
 author: Aaron Kendall (@jaerith), Juan Blanco <@juanfranblanco>
 discussions-to: https://ethereum-magicians.org/t/eip-rules-engine-interface/4374
@@ -183,4 +183,3 @@ The deployer of the contract should be the owner and administrator, allowing for
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
