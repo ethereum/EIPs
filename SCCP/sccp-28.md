@@ -1,6 +1,6 @@
 ---
 sccp: 28
-title: Reduce Rewards On Curve - SNX 24,000
+title: Reduce Rewards On Curve - SNX 32,000
 status: Proposed
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: https://discord.gg/B3PtpY
@@ -9,7 +9,7 @@ created: <2020-06-29>
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-Decrease SNX incentives on the sUSD Curve pool by 50% to 24,000 SNX per week
+Decrease SNX incentives on the sUSD Curve pool to 32,000 SNX per week
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
