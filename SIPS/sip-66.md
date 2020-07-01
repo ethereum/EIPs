@@ -1,7 +1,7 @@
 ---
 sip: 66
 title: Reduce gas of SNX transfers for non-stakers
-status: Proposed
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
