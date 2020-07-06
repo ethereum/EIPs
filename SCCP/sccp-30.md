@@ -27,5 +27,8 @@ to capture more value
 7. Increased amount of SNX holders that will come to the platform will be able to see upcoming updates such as
 Synthetic Futures, sOIL, Limit Orders and Binary Options.
 8. It will allow us to further collect data on stability of the peg and allow precipitate the deamand.
+9. sUSD peg constantly moving to above 1 USD
+10. We now have liquidations
+11. We voting on reducing Liquidation window from 2 weeks to 3 days
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
