@@ -1,7 +1,7 @@
 ---
 sccp: 34
 title: Binary Options fees distribution
-author: dgornjakovic
+author: Danijel (@dgornjakovic)
 discussions-to: https://discord.gg/e9c5Cs
 status: WIP
 created: 2020-07-05
