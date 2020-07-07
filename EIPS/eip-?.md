@@ -1,0 +1,129 @@
+---
+eip: <to be assigned>
+title: A price-sensitive challenge process 
+author: Patrick McCorry (@stonecoldpat)
+discussions-to: <URL>
+status: draft
+type: Standards Track
+category: Core
+created: 2020-07-07
+---
+
+## Simple Summary
+
+Layer-1 blocks do not scale as blockchains like Ethereum support on the magnitude of ~15 transactions per second. When the network throughput ceiling is reached, it is common for the network fees to skyrocket for an extended period of time. The sudden increase in the network fee is problematic for smart contracts that incorporate time-based transactions (i.e. challenge periods) where an action must be completed by a fixed block deadline. Price-sensitive users may decide to wait as the network fee exceeds the utility from their transaction. Furthermore, while they may be willing to pay exceptionally high-fees, their software may fail to compete in the blockspace fee market when the network is significantly congested (e.g. Black Thursday). Applications with time-based actions include swift auctions (10-minute liquidation auctions), DAO voting mechanisms and nearly all layer-2 protocols. 
+
+To resolve the issue, it should be possible to extend the deadline for time-based actions if there is a sudden spike in the network fee that may prevent price-sensitive users from participating. However, to extend the deadline, the blockchain must have a gas-price oracle that can self-inspect the blockchain and measure fees paid by its users. If a gas oracle can be implemented, then it is feasible to determine, on a per-block bassis, if the network fees have become *unreasonable* for some smart contract participants. As we outline in this EIP, we propose the ```BASEFEE``` from EIP-1559 can be used as a gas-price oracle and the fixed deadline should be replaced with a sliding window.
+
+To summarise our proposal, if at least ```K``` of the ```N``` previous blocks could have accepted transactions with a *reasonable* fee, then it is assumed the smart contract participants should have performed their action. 
+
+## Abstract
+
+We propose the first price-sensitive challenge process in the form of a new opcode ```relativeDeadline(): bool``` and it has two components.
+
+**Defining max fee.** We define the ```MAXFEE``` as the maximum gas price the user is willing to pay for their transaction to be included in the blockchain. We re-use the ```BASEFEE``` from EIP-1559 to determine the minimum gas price a transaction must include in order to be accepted into the respective block. As long as ```MAXFEE >= BASEFEE```, then we know the transaction could have been accepted into the block. 
+
+**Sliding time window.** We change the challenge time period from a fixed deadline ```T``` to a sliding window such that the blockchain checks if ```K``` of the previous ```N``` blocks can include transactions that paid at most ```MAXFEE```. If that condition is not satisified, then the sliding window progresses until either 1) the ```BASEFEE``` comes down or 2) it reverts to a distant fixed deadline ```T```. 
+
+Note: If we assume the basefee is publicly accessible in a smart contract, then a new opcode is not required. However if it is implemented as a pre-compile, then the gas-costs for the lookup can potentially be cheaper. 
+## Motivation
+
+There are two common methods for designing contracts to enforce an action is performed in a timely manner:
+- **Absolute fixed deadline.** An agreed fixed deadline in advance.
+- **Relative fixed deadline.** The block deadline is fixed when an on-chain event is triggered. 
+
+An example of an absolute deadline is a DAO voting mechanism as all participants are aware when they need to submit their vote by. On the other hand, an example of the relative deadline is a payment channel when one party can trigger a dispute at any time and when it is triggered the counterparty has a fixed time period to respond. 
+
+In both cases, there is a fixed deadline that cannot be extended without the agreement of the parties involved (or an administrator). If the network fee spikes, then it can become unreasonable for some participants to submit their actions within the designated time period as the network fee exceeds their extractable value. If there is no immediate need to complete the action or reach a decision via the challenge period, then it may be desirable to delay the action until the network fees return to normal. 
+
+Our contribution is to propose the first mechanism that will continuously extend the deadline while taking into account the price-sensitivity of its users. We forsee the price-sensitive challenge process  being useful for protocols that optimistically require short deadlines such as swift auctions (e.g. [prevent the loss of $8m](https://medium.com/@whiterabbit_hq/black-thursday-for-makerdao-8-32-million-was-liquidated-for-0-dai-36b83cac56b6)), , payment channels, plasma challenges, rollup blocks, and applications where the network fees can exceed the user's utlity for participating such as DAO voting rounds. 
+
+## Specification
+
+We propose a new opcode `relativeDeadline()` that checks if the previous ```K``` of ```N``` blocks satisfied the condition ```MAXFEE >= BASEFEE``` or an absolute deadline of ```T``` was reached. 
+
+For the interface we propose: 
+
+```
+relativeDeadline(uint K, uint N, uint FEERATE, uint T): bool 
+```
+
+It has the following parameters:
+
+- `K`: A relative number of blocks that must satisify ```MAXFEE >= BASEFEE```
+- `N`: The sliding window size for the number of blocks to inspect 
+- `MAXFEE`: The pre-determined maximum fee rate that is considered *reasonable* to pay. 
+- `T`: A distant absolute deadline in the event the ```BASEFEE``` does not decrease. 
+
+At a high level, the opcode executes as follows:
+
+- If ```block.number >= T``` return TRUE, otherwise continue.
+- In a descending loop, count the number of blocks ```M``` from ```block.number``` to ```block.number - N``` that satisfies ```MAXFEE >= BASEFEE```.
+- If ```M >= K```, then return ```TRUE```; Otherwise return ```FALSE```.
+
+We provide a pseudo-implementation in Solidity of the specification in the implementation section.
+
+## Backwards Compatibility
+
+This EIP does not impact any existing smart contract on Ethereum. It adds functionality, but does not remove any. It must be implemented as a hard-fork on the network and thus all clients must upgrade to use it.
+
+## Test Cases
+
+- For ```BASEFEE=0```, the challenge period will finish at or after block ```K```. 
+- For ```MAXFEE > BASEFEE```, the challenge period will finish at or after block ```K```. 
+- For ```MAXFEE == BASEFEE```, the challenge period will finish at or after block ```K```.
+- For ```BASEFEE > MAXFEE```, the challenge period will not finish at or after block ```K```.
+- For an increasing base fee ```BASEFEE=[0,...,MAXFEE]```, the challenge period will finish at or after block ```K```. 
+
+Other tests may be required and this section will be updated. What is more important to evaluate now:
+
+- The opportunity and financial cost for a miner to circumvent the opcode. This includes artificially lowering the ```BASEFEE``` with smaller blocks (e.g. <10M gas). 
+- The performance cost of looking through up to ```N``` blocks to verify if the condition is satisfied. 
+
+## Implementation
+
+We provide pseudo-solidity for how to implement the opcode and at some point will have a sufficient proof of concept that can be installed as a pre-compile (hopefully with timing information etc). 
+
+```
+// Extends the deadline if the network is suffering from high fees. 
+function relativeDeadline(uint K, uint N, uint MAXFEE, uint T) public returns (bool) {
+    if(block.number >= T) {
+        return true;
+    }
+        
+    uint M = 0;
+    for(uint i=block.number; i>block.number - N; i--) {
+            
+        if(MAXFEE >= block.BASEFEE) {
+            M = M + 1;
+            if(M >= K) {
+                return true;
+            }
+        }
+    }
+        
+    return false;
+}
+```
+
+## Security Considerations
+
+There are some limitations and related work to explore for the proposal: 
+
+- **Explicit sampling.** The challenge period can only be finalised if a transaction is processed by the blockchain and the ```K``` of ```N``` condition is verified as true. Unlike the fixed deadline approach which is always final after block ```T```.
+- **Distant fixed deadline.** There is a non-negligence probability the ```BASEFEE``` increases and it never comes down. So a fixed deadline must always be defined. However it can be in the distant future and the challenge period can optimistically be finalised by ```K``` blocks. 
+- **```N``` is limited in size.** An upper-bound for ```N``` may be required to avoid large loops. Future work should consider how to compute an average-moving BASEFEE that can be used for quick lookups. 
+- **Gas future markets.** This proposal only focuses on extending the deadline such that the user does not have to pay significant fees. If a future market emerges, it may be possible for users to hedge against the risk of a fee spike. It appears that gas future markets are applicable to scenarios when the deadline must be fixed and it cannot be extended. Future work should explore the relationship of gas futuree markets and this sliding window challenge process. 
+- **Generalized gas oracle.** The ```BASEFEE``` represents the lowest fee required for a transaction to be accepted in the blockchain. In a way, it states "a block is considered congested if the 0th gas percentile of a block pays ```BASEFEE > MAXFEE```. It is possible to generalise this statement to say "a block is considered congested if the Xth gas percentile of a block pays ```BASEFEE > MAXFEE```". This mechanism should be further explored to obtain more gradular conditions such as *this block is only considered congested if 2,000,000th gas (20%) paid 20 gewi or less*. 
+- **Reliability of the base fee.** It is possible for the ```BASEFEE >= MAXFEE``` and for most transactions to pay a fee significantly higher than the ```BASEFEE```. We must assume (and further evaluate) whether the```BASEFEE``` quickly increases and follows the highest-fee paying transactions when there is congestion. The expected speed can impact how to pick ```K```.
+- **Opportuntiy cost to attack the base fee.** There are two scenarios to consider. First, we must evaluate how much it will cost a miner [1%,...,49%] to ensure that ```MAXFEE >= BASEFEE``` for at least ```K``` blocks. The miner can either fill blocks to increase the ```BASEFEE``` up to ```MAXFEE``` to maximise their profit, or mint empty blocks to reduce the ```BASEFEE``` and keep it below ```MAXFEE```. The best strategy depends on the state of the memory pool, the miner's size and whether the miner will pursue selfish mining strategies. Second, we must evaluate how much it will cost a miner [1%,...,49%] to ensure that ```BASEFEE >= MAXFEE``` until block ```T``` to disrupt the protocol. The miner is required to mint blocks of at least 10m gas that pays at least the ```BASEFEE >= MAXFEE```, so it is expected that this will be expensive. 
+
+We plan to explore the above limitations (alongside others) in an upcoming paper. We have decided to publish the proposal early to let the community discuss whether it is a useful addition to EIP-1559. Of course, it still lacks sufficient analysis in its current form and all discussion is welcome. 
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## Acknowledgements
+
+We thank Ayelet Mizrahi, Sarah Azouvi, Aviv Zohar, Ittay Eyal, Lisa Eckey, Hasu and Chris Buckland for discussions around the proposal.  
