@@ -1,7 +1,7 @@
 ---
-eip: <to be assigned>
+eip: 2773
 title: A price-sensitive challenge process 
-author: Patrick McCorry (@stonecoldpat)
+author: Patrick McCorry <@stonecoldpat>
 discussions-to: <URL>
 status: draft
 type: Standards Track
