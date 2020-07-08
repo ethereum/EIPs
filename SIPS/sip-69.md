@@ -24,6 +24,9 @@ The current sCEX implementation does not have FTX Token included nor CRO.
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 This SIP will update the assets included in sDeFi from SIP-22, in accordance with the weightages agreed upon in a poll to be created. This poll can be done via community votes on Twitter as per the previous rounds of proposals. 
 
+### Update (Jul 8, 2020): 
+Daryl has created a live [spreadsheet](https://docs.google.com/spreadsheets/d/1xfWPavj_T35qho7ppmdMdPiPpltI8jBb2QgoSJESIxE/edit#gid=0) featuring the weighting agreed upon by the community. 
+
 ## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 We will follow the existing protocol and the implementations of the index tokens and only change the assets included and their corresponding weightages. 
