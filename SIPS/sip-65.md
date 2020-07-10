@@ -20,7 +20,7 @@ Integrate a circuit breaker into each exchange, if the price of either Synth bei
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
 
-When any exchange is attempted, prior to executing the exchange the protocol will check to see the price difference on both the source and destination synths since the last exchange of either. If the price difference on either is over a certain threshold (SCCP modifible), then the synth will be suspended (via [SIP-44](./sip-44.md)) and the exchange prevented. It will then be up to the `protocolDAO` to investigate the issue and to activate the synth once again after reviewing the incident.
+When any exchange is attempted, prior to executing the exchange the protocol will check to see the price difference on both the source and destination synths since the last exchange of either. If the price difference on either is over a certain threshold (SCCP modifible), then the synth will be suspended (via [SIP-44](./sip-44.md)) and the exchange prevented. It will then be up to the protocolDAO to investigate the issue and to activate the synth once again after reviewing the incident.
 
 ## Motivation
 
@@ -48,15 +48,15 @@ This change will ensure that at the moment of exploit (trying to exchange one sy
 
 <!--This is a high level overview of *how* the SIP will solve the problem. The overview should clearly describe how the new feature will be implemented.-->
 
-The `Exchanger` contract will be amended to include a new `priceDeviationThreshold` parameter (configurable by SCCP).
+The `Exchanger` contract will be amended to include a new `priceDeviationThresholdFactor` parameter (configurable by SCCP, see below).
 
-Every time an exchange occurs, we will check that both the source and destination synth prices have not changed by more than the threshold. We will then persist these rates as the `lastExchangedRate` for both synths. If there is not `lastExchangeRate` for either synth, the contract will lookup the last three price changes on chain (which is more gas intensive but is a rare edge-case).
+Every time an exchange occurs, we will check that both the source and destination synth prices have not changed by more than the threshold. We will then persist these rates as the `lastExchangeRate` for both synths. If there is not a `lastExchangeRate` for either synth, the contract will lookup the last three price changes on chain and compare each of them to the current one (which is more gas intensive but is a rare edge-case).
 
-The function to check and potentially suspend will be publicly available, so that anyone may invoke it without needing to attempt an `exchange`.
+The function to check and potentially suspend will also be publicly available, so that anyone may invoke it without needing to attempt an `exchange`.
 
-In addition, we need to handle the settlement of a trade (see [SIP-37](./sip-37.md) for more details on trade settlement). Because settlement is called to process some past event (i.e. how much is owed when the price of the oracle after the waiting period ends is taken into account) - we cannot nor would not want to do any suspension during settlement. However, we also cannot leave the trade in an unsettled state and block future user exchanges. As such, we propose to waive any reclaims or rebates in the event that the amount received deviates from the amount that should have been received by more than the `priceDeviationThreshold`.
+In addition, we need to handle the settlement of a trade (see [SIP-37](./sip-37.md) for more details on trade settlement). Because settlement is called to process some past event (i.e. how much is owed when the price of the oracle after the waiting period ends is taken into account) - we cannot nor would not want to do any suspension during settlement. However, we also cannot leave the trade in an unsettled state and block future user exchanges. As such, we propose to waive any reclaims or rebates in the event that the amount received deviates from the amount that should have been received by more than the `priceDeviationThresholdFactor`.
 
-> There is a remote possibility that an exchange gets in before a spike, fronrunning a real rate change, but by the time the waiting period expires `N` minutes later, a spike occurs, and the exchange is settled with no fee reclaim. As such, the `protocolDAO`, when investigating suspended synths via price spikes, must also look through the unsettled exchanges performed right before the spike and determine the necessary course of action before resuming the synth in question.
+> There is a remote possibility that an exchange gets in before a spike, fronrunning a real rate change, but by the time the waiting period expires `N` minutes later, a spike occurs, and the exchange is settled with no fee reclaim. As such, the `protocolDAO`, when investigating suspended synths via price spikes, must also look through the unsettled exchanges performed right before the spike and determine the necessary course of action before resuming the synth in question. That being said, as long as the synth pricing is returned to normal after the outage, than the settlement occuring after that will not be cause for concern.
 
 Finally, as the suspension is limited to the synth, even in a case of a false positive - where a synth is suspended when it shouldn't be - the only concern is increased downtime for any user to exchange or transfer that synth. It will be on the protocolDAO to investigate and resume the synth after a thorough investigation.
 
@@ -91,15 +91,16 @@ In order to reduce gas as much as possible, this SIP proposes to store a `lastEx
 ```solidity
 
 // Views
-function isSynthPricingInvalid(bytes32 currencyKey) external view returns (bool);
+function isSynthRateInvalid(bytes32 currencyKey) external view returns (bool);
 
 // Mutative functions
-function suspendInvalidSynth(bytes32 currencyKey) external;
+function suspendSynthWithInvalidRate(bytes32 currencyKey) external;
+  // requires isSynthPricingInvalid(currencyKey) is true
 ```
 
 In order to save gas, each time a new `exchange` occurs, the price of both the `src` and `dest` synths will be stored locally in `Exchanger` (rather than looking back in `ExchangeRates` for some amount of time).
 
-Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSynth(currencyKey)` for either (or both) source or destination synth when `isSynthPricingInvalid(currencyKey)` is `true`.
+Additionally, `Exchanger.exchange` will be amended to perform `suspendSynthWithInvalidRate(currencyKey)` for either (or both) source or destination synth when `isSynthRateInvalid(currencyKey)` is `true`.
 
 ### Workflow
 
@@ -108,12 +109,12 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSyn
   - For both `src` and `dest` synths:
     - _Is there a previous rate for the synth?_
       - Yes:
-        - _Is the absolute % difference in rate now compared to the previous rate >= `priceDeviationThreshold`?_
+        - _Is the factor difference in rate now compared to the previous rate >= `priceDeviationThresholdFactor`?_
           - Yes: ✅🔚 Settle any unsettled trades into `src` as per usual (if `src` was the breach, then settle with no reclaim or rebate - see below), then suspend the synth and return immediately.
           - No: Persist the current rate as the last
       - No:
         - For each of the last `3` rounds,
-          - _Is the absolute % difference in rate now compared to the rate at current round >= `priceDeviationThreshold`?_
+          - _Is the factor difference in rate now compared to the rate at current round >= `priceDeviationThresholdFactor`?_
             - Yes: ✅🔚 Suspend the synth and return immediately.
             - No: Persist the current rate as the last
   - Then
@@ -121,7 +122,7 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSyn
 
 - `Synthetix.settle` invoked on `dest` for `user`
   - For each unsettled exchange from some `synth` to `dest`:
-    - _Is the absolute % difference in `amountReceived` compared `amountShouldHaveReceived` >= `priceDeviationThreshold`?_
+    - _Is the factor difference in `amountReceived` compared `amountShouldHaveReceived` >= `priceDeviationThresholdFactor`?_
       - Yes: Settle the exchange with `0` reclaim and `0` rebate
       - No: Settle the exchange as per usual
 
@@ -131,7 +132,7 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSyn
 
 #### Preconditions
 
-- Given the `priceDeviationThreshold` is set to `50%`
+- Given the `priceDeviationThresholdFactor` is set to `1.5` (stored on-chain as `1.5e18`)
 - And the `waitingPeriodSecs` is set to `180` (3 minutes)
 
 #### Common cases
@@ -139,16 +140,16 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSyn
 - Given there was previously an exchange for `sUSD` (or any synth) to `sETH`, recording the last sETH price as `200`
   - And the current market price of `sETH` is returning `500`
     - When a user attempts to exchange `sBTC` (or any other synth) into `sETH` (or from any synth into `sETH`)
-      - Then as `500` is more than `50%` away from `200` (i.e. it's more than `300`), `sETH` will be suspended, and the exchange will be prevented.
+      - Then as `500` is more than `1.5x` away from `200` (i.e. it's more than `300`), `sETH` will be suspended, and the exchange will be prevented.
   - And the current market price of `sETH` is returning `105`
     - When a user attempts to exchange `sBTC` (or any other synth) into `sETH`
-      - Then as `105` is less than `50%` away from `200` (i.e. it's above `100`), then the exchange will continue, and `105` will be persisted as the last price.
+      - Then as `105` is less than `0.5x` away from `200` (i.e. it's above `100`), then the exchange will continue, and `105` will be persisted as the last price.
         - When one minute elapses
         - And a new price for `sETH` is returned at `5`
         - And five minutes elapses (thus ending their waiting period)
         - And a new price for `sETH` is returned at `100`
         - And the `user` attempts to `exchange` `sETH` into any other synth
-          - Then as the price of `5` (the price at three minutes after their exchange) is more than `50%` away from `105` (i.e. below `52.5`), then the settlement will process with no reclaim or rebate.
+          - Then as the price of `5` (the price at three minutes after their exchange) is more than `0.5x` away from `105` (i.e. below `52.5`), then the settlement will process with no reclaim or rebate.
 
 #### Edge cases
 
@@ -160,12 +161,17 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendInvalidSyn
   - And the protocol upgrades `ExchangeRates` contract or a Chainlink `Aggregator` is replaced for a price
     - And there is no previous rates for `sETH`
       - Then the exchange will continue, persisting the current rate
+- Given ExchangeRates returns 0 for the `sETH` rate
+  - When a user attempts to exchange `sUSD` for `sETH`
+    - Then it fails with divide by 0 error from ExchangeRates.effectiveValue (as is current)
+  - When a user attempts to exchange `sETH` for `sUSD`
+    - Then it suspends the `sETH` synth as the `0` rate trips the circuit breaker
 
 ### Configurable Values (Via SCCP)
 
 <!--Please list all values configurable via SCCP under this implementation.-->
 
-- `priceDeviationThreshold` the absolute % amount that a price must deviate (from it's last exchange) to trigger the suspension.
+- `priceDeviationThresholdFactor` the factor from which that price must deviate (from it's last exchange) to trigger the suspension (stored with 18 decimals). For example, a factor `3` (stored as `3e18`) would mean that with an last exchange rate of `100` and a new rate of `300` or greater, or a new rate of `33.3` (recurring) and lower, would cause suspension.
 
 ## Copyright
 
