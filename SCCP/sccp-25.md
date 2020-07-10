@@ -3,7 +3,7 @@ sccp: 25
 title: Reduce Liquidation Time Delay
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: https://discord.gg/mXNj2x
-status: Proposed
+status: Implemented
 created: 2020-06-06
 ---
 
