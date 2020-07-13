@@ -3,7 +3,7 @@ sccp: 33
 title: Binary Options market undo
 author: Danijel (@dgornjakovic)
 discussions-to: https://discord.gg/e9c5Cs
-status: WIP
+status: Rejected
 created: 2020-07-05
 ---
 
@@ -13,6 +13,8 @@ This is the template for SCCPs.
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 If no bids have been placed yet the market creator should be able to undo the market and take back the sUSD he put into it.
+
+Superceded by [SIP-71](../SIPS/sip-71.md).
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
