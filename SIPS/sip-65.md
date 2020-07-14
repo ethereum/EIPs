@@ -143,13 +143,13 @@ Additionally, `Exchanger.exchange` will be amended to perform `suspendSynthWithI
       - Then as `500` is more than `1.5x` away from `200` (i.e. it's more than `300`), `sETH` will be suspended, and the exchange will be prevented.
   - And the current market price of `sETH` is returning `105`
     - When a user attempts to exchange `sBTC` (or any other synth) into `sETH`
-      - Then as `105` is less than `0.5x` away from `200` (i.e. it's above `100`), then the exchange will continue, and `105` will be persisted as the last price.
+      - Then as `105` is less than `0.67x` away from `200` (i.e. it's above `100`), then the exchange will continue, and `105` will be persisted as the last price.
         - When one minute elapses
         - And a new price for `sETH` is returned at `5`
         - And five minutes elapses (thus ending their waiting period)
         - And a new price for `sETH` is returned at `100`
         - And the `user` attempts to `exchange` `sETH` into any other synth
-          - Then as the price of `5` (the price at three minutes after their exchange) is more than `0.5x` away from `105` (i.e. below `52.5`), then the settlement will process with no reclaim or rebate.
+          - Then as the price of `5` (the price at three minutes after their exchange) is more than `0.67x` away from `105` (i.e. below `52.5`), then the settlement will process with no reclaim or rebate.
 
 #### Edge cases
 
