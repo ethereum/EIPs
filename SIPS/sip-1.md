@@ -3,7 +3,7 @@ sip: 1
 title: SIP Purpose and Guidelines
 status: Implemented
 author: Kain Warwick (@kaiynne)
-discussions-to: https://discord.gg/aApjG26
+discussions-to: https://research.synthetix.io/
 created: 2019-06-10
 updated: N/A
 ---
@@ -74,7 +74,7 @@ Each SIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` author:` <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 
-` * discussions-to:` \<a url pointing to the official discussion thread\>
+` * discussions-to:` \<a url pointing to the official discussion thread at research.synthetix.io\>
 
 ` status:` < WIP | PROPOSED | APPROVED | IMPLEMENTED >
 
@@ -108,7 +108,7 @@ if the email address is not given.
 
 #### `discussions-to` header
 
-While an SIP is in WIP or Proposed status, a `discussions-to` header will indicate the mailing list or URL where the SIP is being discussed.
+While an SIP is in WIP or Proposed status, a `discussions-to` header will indicate the URL at [research.synthetix.io](https://research.synthetix.io/) where the SIP is being discussed.
 
 #### `created` header
 
