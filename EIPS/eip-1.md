@@ -244,6 +244,8 @@ The current EIP editors are
 
 ` * Alex Beregszaszi (@axic)`
 
+` * Micah Zoltu (@MicahZoltu)`
+
 ## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
