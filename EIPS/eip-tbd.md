@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 2786
 title: Ethereum Provider Connect/Disconnect Events
 author: Micah Zoltu (@MicahZoltu), Erik Marks (@rekmarks)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/issues/2787
 status: Draft
 type: Standards Track
 category Interface
