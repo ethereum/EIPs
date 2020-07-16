@@ -65,6 +65,7 @@ The following semantics are enforced:
     * `CALL (0xF1)`
     * `CALLCODE (0xF2)`
     * `DELEGATECALL (0xF4)`
+    * `STATICCALL (0xFA)`
     * `CREATE2 (0xF5)`
     * `SELFDESTRUCT (0xFF)`
 
@@ -103,10 +104,10 @@ invariant is maintained.
 TODO
 
 ## Test Cases
-TODO
+See: https://github.com/quilt/tests/tree/account-abstraction
 
 ## Implementation
-TODO
+See: https://github.com/quilt/go-ethereum/tree/account-abstraction
 
 ## Security Considerations
 TBD
