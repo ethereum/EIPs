@@ -40,9 +40,14 @@ execution will revert and the contract will not pay for the execution.
 
 The following semantics are enforced:
 
-* AA transactions which do not call `PAYGAS` are considered invalid
-* After `PAYGAS` is first called, further calls during the same transaction
-  are treated as noops
+* Transactions, other than AA transactions, that call `PAYGAS` are considered
+  invalid.
+* AA transactions that do not call `PAYGAS` are considered invalid.
+* After `PAYGAS` is executed, further invokations during the same transaction
+  are treated as noops.
+* If `CALLER (0x33)` is invoked in a call intiated by an AA transaction and
+  `ORIGIN (0x32) == ADDRESS (0x30)`, then it must return
+  `0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`.
 * If `PAYGAS` is called after any of the following opcodes are encountered,
   it must revert:
     * `BALANCE (0x31)`
@@ -64,7 +69,35 @@ The following semantics are enforced:
     * `SELFDESTRUCT (0xFF)`
 
 ## Rationale
-TODO
+
+### Only AA transactions can call `PAYGAS`
+
+An alternative is that any transaction can call `PAYGAS`, but if the
+transaction has already been sponsored it acts as a noop. The downside to this
+approach is that it allows for standard transactions to modify the state of a
+contract that may have pending AA transactions.
+
+### AA transactions *must* call `PAYGAS`
+
+AA transactions are a special type of transaction that have no signature format
+defined by the protocol. Therefore, it is not clear who should pay for the
+transaction. Most of the time, a non-paying AA transaction would simply be
+dropped. However, it's possible that there are locked assets controlled by
+`0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA` and therefore a miner might be
+incentivezed to transfer ownership of those assets to themselves by mining a
+block with an AA transaction that does not call `PAYGAS`.
+
+### Disallow opcodes that access external data
+
+An invariant in the current protocol that is desirable to retain is the
+ability to validate transactions in constant time. Allowing the contract
+to access external data before it calls `PAYGAS` makes it possible to construct
+a contract which only pay gas if an external property is true (e.g. the value
+of another contract is `True`). This behaviour can be exploited to carry-out
+denial-of-service attacks on the network by nesting dependencies in a non-obvious
+way and invalidating the head -- thereby triggering a massive revalidation. By
+forcing AA transactions to not use external data before calling `PAYGAS`, this
+invariant is maintained.
 
 ## Backwards Compatibility
 TODO
