@@ -40,19 +40,14 @@ execution will revert and the contract will not pay for the execution.
 
 The following semantics are enforced:
 
-* Transactions, other than AA transactions, that call `PAYGAS` are considered
-  invalid.
-* AA transactions that do not call `PAYGAS` are considered invalid.
-* After `PAYGAS` is executed, further invokations during the same transaction
-  are treated as noops.
+* Transactions, other than AA transactions, that call `PAYGAS` are invalid.
+* AA transactions that do not call `PAYGAS` are invalid.
+* Multiple invocations of `PAYGAS` must cause a revert.
 * If `ORIGIN (0x32)` or `CALLER (0x33)` is invoked in the first frame of
   execution of a call intiated by an AA transaction, then it must return
   `0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`.
 * If `ORIGIN (0x32)` is invoked in any other frame of execution of an AA
   transaction it must return `tx.to`.
-* AA transactions must call a contract that starts with a prelude that verifies
-  `CALLER == 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`, otherwise the
-  transaction is invalid.
 * If `PAYGAS` is called after any of the following opcodes are encountered,
   it must revert:
     * `BALANCE (0x31)`
@@ -73,15 +68,11 @@ The following semantics are enforced:
     * `STATICCALL (0xFA)`
     * `CREATE2 (0xF5)`
     * `SELFDESTRUCT (0xFF)`
+* AA transactions' `tx.to` must be a contract that begins with a prelude that
+  verifies `CALLER == 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`, otherwise
+  the transaction is invalid.
 
 ## Rationale
-
-### Only AA transactions can call `PAYGAS`
-
-An alternative is that any transaction can call `PAYGAS`, but if the
-transaction has already been sponsored it acts as a noop. The downside to this
-approach is that it allows for standard transactions to modify the state of a
-contract that may have pending AA transactions.
 
 ### AA transactions *must* call `PAYGAS`
 
@@ -104,6 +95,13 @@ denial-of-service attacks on the network by nesting dependencies in a non-obviou
 way and invalidating the head -- thereby triggering a massive revalidation. By
 forcing AA transactions to not use external data before calling `PAYGAS`, this
 invariant is maintained.
+
+### AA transactions must call contracts with prelude
+
+The prelude is used to ensure that *only* AA transactions can call the
+contract. This is another measure taken to ensure the invariant described
+above. If this check did not occur, it would be possible for a transaction to
+invalidate an innumerable number of AA transactions.
 
 ## Backwards Compatibility
 TODO
