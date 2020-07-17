@@ -23,17 +23,17 @@ env:
 matrix:
   fast_finish: true
   include:
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer'
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer-external'
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='eip-validator'
     - python: 3.3
       env: TASK='codespell'
       before_script: "sudo pip install urllib3[secure] && sudo pip install codespell"
   allow_failures:
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer-external'
 
 notifications:
