@@ -81,9 +81,8 @@ For instance if ETH's total supply is 107,477,373 , a trader sends 100 ETHs to t
 Note: right after the foring contracts start, NDAO's pegging relationship with USD will be revoked.
 ## Backwards Compatibility
 EIP-2569:
+https://github.com/DAism2019/EIPs/blob/master/EIPS/eip-2569.md;
 https://github.com/ethereum/EIPs/pull/2569
-https://github.com/DAism2019/EIPs/blob/master/EIPS/eip-2569.md
-
 
 ## Conclusion
 Our proposal presents a solution for mass exit of validators and eliminates two consequences that will cause devastating damages to ETH 2.0.
