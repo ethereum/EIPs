@@ -45,9 +45,14 @@ The following semantics are enforced:
 * AA transactions that do not call `PAYGAS` are considered invalid.
 * After `PAYGAS` is executed, further invokations during the same transaction
   are treated as noops.
-* If `CALLER (0x33)` is invoked in a call intiated by an AA transaction and
-  `ORIGIN (0x32) == ADDRESS (0x30)`, then it must return
+* If `ORIGIN (0x32)` or `CALLER (0x33)` is invoked in the first frame of
+  execution of a call intiated by an AA transaction, then it must return
   `0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`.
+* If `ORIGIN (0x32)` is invoked in any other frame of execution of an AA
+  transaction it must return `tx.to`.
+* AA transactions must call a contract that starts with a prelude that verifies
+  `CALLER == 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`, otherwise the
+  transaction is invalid.
 * If `PAYGAS` is called after any of the following opcodes are encountered,
   it must revert:
     * `BALANCE (0x31)`
@@ -110,7 +115,18 @@ See: https://github.com/quilt/tests/tree/account-abstraction
 See: https://github.com/quilt/go-ethereum/tree/account-abstraction
 
 ## Security Considerations
-TBD
+
+### Transaction pool validation
+TODO
+
+#### Mass Invalidation
+TODO
+
+#### Peer denial-of-service
+TODO
+
+### Block invalidation attack
+TODO
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
