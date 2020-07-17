@@ -47,7 +47,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status != "Final" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
+  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status = "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 
 {% comment %}
@@ -59,7 +59,7 @@ https://schema.org/Article
     "@context": "http://schema.org",
     "@type": "Article",
     "author": "{% include authorlist.html authors=page.author %}",
-    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status != "Final" %} [DRAFT]{% endif %}",
+    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status = "Last Call" %} [DRAFT]{% endif %}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
 {% if page["discussions-to"] != undefined %}
     "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
