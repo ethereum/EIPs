@@ -1,5 +1,5 @@
 ---
-eip: XXX
+eip: 2792
 title: ABI Specification, Version 2
 author: Alex Beregszaszi (@axic), Christian Reitwiessner <chris@ethereum.org>;
 discussions-to: <this PR>
