@@ -51,7 +51,7 @@ https://schema.org/Article
     "@context": "http://schema.org",
     "@type": "Article",
     "author": "{% include authorlist.html authors=page.author %}",
-    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status = "Last Call" %} [DRAFT]{% endif %}",
+    "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
 {% if page["discussions-to"] != undefined %}
     "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
