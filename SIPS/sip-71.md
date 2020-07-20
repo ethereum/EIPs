@@ -1,7 +1,7 @@
 ---
 sip: 71
 title: Binary Options v1.1
-status: Proposed
+status: Approved
 author: Anton Jurisevic <@zyzek>, Danijel <@dgornjakovic>
 discussions-to: https://research.synthetix.io/t/binary-options-improvements/13
 
@@ -21,6 +21,9 @@ The binary option market manager and factory will be replaced, and existing mark
 * Allow market creators to disable bid withdrawals at market creation
 * Emit bid events for the initial capital at market creation
 * Fix a bug that prevents creators from exercising their options before expiry under certain circumstances
+
+As of the [Antares](https://github.com/Synthetixio/synthetix/releases/tag/v2.25.0) release, all but the first of these
+has been implemented. Removing the pool fee charge for creators is slated to be included in the next release.
 
 ## Motivation
 
@@ -80,7 +83,8 @@ expired.
 The intended fix will be as follows:
 
 * After maturity, report the deposited exercisable value to the losing `BinaryOption` instance as zero when claimable balances are computed.
-* Remove the assert statement that causes the transaction to revert
+* Replace the assert statement that caused the transaction to revert with a more-informative require statement.
+
 
 In consequence of these changes, the claimable option balance of losing bids will fall to zero at maturity, so that only winning options can be claimed. This has no fiscal consequences, as these options pay out nothing when exercised in any case. Options on both sides will still be claimable before maturity.
 
@@ -91,9 +95,6 @@ On existing markets, although most users will be unaffected, market creators sho
 * On affected markets that are still bidding: place bids on each side from separate wallets, sufficient to cover any affected balances. These can be exercised once other users have exercised their positions.
 * On affected markets no longer bidding: Once all unaffected options have been exercised, migrate any affected markets to a separate manager contract, so that the funds can be recovered in a controlled way at expiry.
 
-### Test Cases
-
-TBD
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
