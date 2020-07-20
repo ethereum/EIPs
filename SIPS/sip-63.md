@@ -3,7 +3,7 @@ sip: 63
 title: Trading Incentives
 status: WIP
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
-discussions-to: TBC
+discussions-to: https://research.synthetix.io/t/sip-63-trading-incentives/83
 
 created: 2020-05-28
 ---
