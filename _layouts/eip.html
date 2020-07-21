@@ -44,12 +44,12 @@ layout: default
 </div>
 {% comment %}
 Article schema specification:
-https://schema.org/Article
+https://schema.org/TechArticle
 {% endcomment %}
 <script type="application/ld+json">
   {
     "@context": "http://schema.org",
-    "@type": "Article",
+    "@type": "TechArticle",
     "author": "{{ page.author }}",
     "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
