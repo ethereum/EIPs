@@ -36,9 +36,9 @@ With the inputs below:
 | \\(d_{0}\\) | Days since the prior month contract expired |
 | \\(d_{1}\\) | Days remaining for the current front month contact |
 | \\(d_{2}\\) | Days remaining for the current 2nd month contract |
-| \\(P_{0}\\) | Orderbook mid-price of the current front month contract |
-| \\(P_{1}\\) | Orderbook mid-price of the current 2nd month contract |
-| \\(P_{2}\\) | Orderbook mid-price of the current 3rd month contract |
+| \\(P_{1}\\) | Orderbook mid-price of the current front month contract |
+| \\(P_{2}\\) | Orderbook mid-price of the current 2nd month contract |
+| \\(P_{3}\\) | Orderbook mid-price of the current 3rd month contract |
 
 There are implications for fee reclamation with this approach, given that futures markets close, these Synths will use the next price fee reclamation mechanism found here [SIP-52](https://sips.synthetix.io/sips/sip-52). This requires that during market closures the Chainlink aggregator contract published a stable price. Due to the continuous time aspect of the calculation the reference price will continually update even during market closures. This requires the node operators to subscribe to a market closure data feed to ensure the published price on-chain does not deviate outside a pre-defined range (likely 5bps) during market closures, which would trigger a next price update and cause all orders to fill at a stale price. There is a further implication for circuit breakers and other out of cycle market closures as these events would not be covered by the market closure data feed, in the case of a circuit breaker or other unscheduled market closure the data providers would continue to publish stale prices requiring these markets to be closed manually via the protocolDAO.
 
