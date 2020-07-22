@@ -1,5 +1,5 @@
 ---
-sccp: TBA
+sccp: 36
 title: Increase Fees on Stock Synths 50 bp
 author: Kaleb Keny (@kaleb-keny)
 status: Proposed
