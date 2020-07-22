@@ -50,9 +50,11 @@ https://schema.org/TechArticle
   {
     "@context": "http://schema.org",
     "@type": "TechArticle",
+    "headline": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}",
     "author": "{{ page.author }}",
     "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
+    "datePublished": "{{ page.created | date: "%Y-%m-%d" }}",
 {% if page["discussions-to"] != undefined %}
     "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
 {% endif %}    
