@@ -1,7 +1,7 @@
 ---
 sccp: 27
 title: Reduce Collateral Ratio For sETH Loans
-status: Proposed
+status: Approved
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: sip-35-eth-collateral 
 created: 2020-05-25
