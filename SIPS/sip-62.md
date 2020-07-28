@@ -1,7 +1,7 @@
 ---
 sip: 62
 title: Futures reference price methodology
-status: Proposed
+status: Approved
 author: Bill Mayott <bill.mayott@xbto.com>, Philippe Bekhazi <philippe@xbto.com>, Walton Comer <walton@xbto.com>, Kain Warwick (@kaiynne)
 discussions-to: https://discord.gg/VNFYvny
 
