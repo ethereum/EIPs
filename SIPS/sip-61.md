@@ -15,11 +15,11 @@ The current version of the iSynths (inverse price Synths) have price limits to p
 This SIP will change the iSynths purge and update pricing functions to be public and incentivised. The first address to call freezeSynth will be paid SNX as an incentive.
 
 ## Motivation
-While the iSynths are extremely useful and somewhat differentiated among DeFi assets, they have significant friction for users as the price bands required to prevent them becoming over or under leveraged mean they regularly freze and must be reset. This reset process also requires that all holders of the Synth are purged into sUSD first incurring high gas costs. 
+While the iSynths are extremely useful and somewhat differentiated among DeFi assets, they have significant friction for users as the price bands required to prevent them becoming over or under leveraged mean they regularly freze and must be reset. This reset process also requires that all holders of the Synth are purged into sUSD first incurring high gas costs.
 
-The reason the price bands are required is that if the price of the underlying Synth doubles the price of the iSynth will go to 0. As the price of the iSynth tends to 0 the amount of leverage increases. For example if an ETH iSynth was instantiated at $200 and ETH went to $399 then the iSynth would go to $1, so you would get $1 of price movement for each $1 spent on iETH versus $1 of price movement for every $400 spent on sETH. This property reverses in the other direction such that as the price of ETH drops you must buy significantly more iETH to get the same level of price movement as sETH. 
+The reason the price bands are required is that if the price of the underlying Synth doubles the price of the iSynth will go to 0. As the price of the iSynth tends to 0 the amount of leverage increases. For example if an ETH iSynth was instantiated at $200 and ETH went to $399 then the iSynth would go to $1, so you would get $1 of price movement for each $1 spent on iETH versus $1 of price movement for every $400 spent on sETH. This property reverses in the other direction such that as the price of ETH drops you must buy significantly more iETH to get the same level of price movement as sETH.
 
-This leverage neccesitates tight price bands and increasing or removing them would add significant risk to the network. The solution proposed in this SIP therefore leaves the bands as is and instead improves the purging and reset process by incentivising anyone to call public functions to manage iSynth freezing. 
+This leverage neccesitates tight price bands and increasing or removing them would add significant risk to the network. The solution proposed in this SIP therefore leaves the bands as is and instead improves the purging and reset process by incentivising anyone to call public functions to manage iSynth freezing.
 
 ## Specification
 
@@ -52,13 +52,13 @@ The third attack relies on small values being excluded from purging making it po
 
 Blocking trading into a frozen Synth reduces this attack vector significantly and ensuring there is significant risk that an attacker paying to seed many small accounts may lose the gas cost and eschange fees of this attack to a faster keeper who can afford to pay higher gas costs to call FreezeSynth due to their lower net cost.
 
-If this theoretical griefing attack or scalability become problematic there is an alternative solution which is to apply a new type of fee reclation ResetPriceReclaim. Rather than purging a keeper would call a function that would iterate over all wallets and apply ResetPriceReclaim or ResetPriceRebate then call Resetprice. This would mean that a reclaim or rebate entry would be registered against each address that would cover the change in price of the Synth after ResetPrice was called. 
+If this theoretical griefing attack or scalability become problematic there is an alternative solution which is to apply a new type of fee reclation ResetPriceReclaim. Rather than purging a keeper would call a function that would iterate over all wallets and apply ResetPriceReclaim or ResetPriceRebate then call Resetprice. This would mean that a reclaim or rebate entry would be registered against each address that would cover the change in price of the Synth after ResetPrice was called.
 
 This is similar to the proposed solution for a later upgrade of iSynths which rebalance daily and do not require freezing but instead use Fee Reclamation to track the daily repricing events in a cumulative fashion. That solution is outside the scope of this SIP.
 
 # Technical Specification
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
-The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones. 
+The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones.
 
 # Test Cases
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
