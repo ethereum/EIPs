@@ -1,7 +1,7 @@
 ---
 sip: 71
 title: Binary Options v1.1
-status: Approved
+status: Implemented
 author: Anton Jurisevic <@zyzek>, Danijel <@dgornjakovic>
 discussions-to: https://research.synthetix.io/t/binary-options-improvements/13
 
