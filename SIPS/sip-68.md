@@ -55,8 +55,8 @@ The staking and rewards tokens were hard coded addresses in each contract. Now t
 
 ### Pause stake when rewards completed
 
-When a `StakingRewards` campaign has completed the contract needs to prevent anyone from staking into it. They wont accrue any rewards and can cause issues with inverse Synths that need to be rebalanced which need to be purged.
-Adding `Pausable.sol` and modifer `notPaused` to `stake()` will allow the admin to set `paused` to `true` preventing anyone from staking. `SelfDestructible` has not been implemented and given the amout of value in these contracts probably best not to implement. 
+When a `StakingRewards` campaign has completed the contract needs to prevent anyone from staking into it. They won't accrue rewards and can cause blocking issues with inverse Synths that need to be rebalanced which need to be purged.
+Adding `Pausable.sol` and modifier `notPaused` to `stake()` will allow the admin to set `paused` to `true` preventing anyone from staking. `SelfDestructible` has not been implemented and given the amount of value in these contracts probably best not to implement. 
 
 
 
@@ -69,6 +69,8 @@ Add  `recoverERC20` and `setRewardsDuration` that have `onlyOwner` modifiers.
 `constructor` to take `_rewardsToken` & `_stakingToken` as arguments
 
 Refactor to remove the `LPTokenWrapper` contract. The original implementation to not include this.
+
+Inherit the `Pausable.sol` contract and add modifier `notPaused` to `stake()` 
 
 
 ### Test Cases
