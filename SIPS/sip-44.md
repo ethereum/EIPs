@@ -39,7 +39,7 @@ The following areas can be suspended:
 
 1. **System**: All synth and SNX transfers disabled. All exchange, issue, burn, claim, loan and mint functionality disabled. This is both for system upgrades and under possible emergency situations.
 2. **Issuance**: All sUSD issuance, burning and claiming disabled, along with any loan actions.
-3. **Exchange**: All synth exchanges and settlement.
+3. **Exchange**: All synth exchanges.
 4. **Synth**: For the synth in question, all transfers of, settlement of, and exchanges into or out of disabled.
 
 Access to the above controls will be restricted to an `accessControlList`, a whitelist of addresses that for each section above, can `suspend` and/or `resume`. This whitelist will be managed by the `owner`.
