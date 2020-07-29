@@ -26,6 +26,7 @@ Enhancements include:
 - Ability to update the rewards duration
 - Remove the redundant `LPTokenWrapper`
 - Refactor to set rewards and staking tokens via the constructor on deployment
+- Adding `Pausable` and `notPaused` to stake() to prevent staking into deprecated pools
 
 ## Motivation
 
@@ -51,6 +52,12 @@ The `LPTokenWrapper` added additional complexity to the code without adding any 
 ### Refactor to set rewards and staking tokens via the constructor on deployment
 
 The staking and rewards tokens were hard coded addresses in each contract. Now that there are many of these on MAINNET and deploying almost 1 a week, instead of having to edit the code directly it is prefered to send the staking and rewards tokens as arguments to the constructor on contract creation.
+
+### Pause stake when rewards completed
+
+When a `StakingRewards` campaign has completed the contract needs to prevent anyone from staking into it. They wont accrue any rewards and can cause issues with inverse Synths that need to be rebalanced which need to be purged.
+Adding `Pausable.sol` and modifer `notPaused` to `stake()` will allow the admin to set `paused` to `true` preventing anyone from staking. `SelfDestructible` has not been implemented and given the amout of value in these contracts probably best not to implement. 
+
 
 
 ### Technical Specification
@@ -84,7 +91,8 @@ Refactor to remove the `LPTokenWrapper` contract. The original implementation to
 - Constructor & Settings
   - should set rewards token on constructor
   - should staking token on constructor
-
+- Pausable
+  - should revert when stake is called when paused is true
 
 ### Configurable Values (Via SCCP)
 
