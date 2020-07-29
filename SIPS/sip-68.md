@@ -65,7 +65,9 @@ Adding `Pausable.sol` and modifier `notPaused` to `stake()` will allow the admin
 
 There is a multiplication overflow that can occur inside the rewardPerToken function, on [line 66](https://github.com/Synthetixio/synthetix/blob/c4dd4413cbbd3c0b40dfee2f9119af2dcb6a82e5/contracts/StakingRewards.sol#L66):
 
-```lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(_totalSupply)```
+```
+lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(_totalSupply)
+```
     
 An overflow occurs whenever `rewardRate >= 2^256 / (10^18 * (lastTimeRewardApplicable() - lastUpdateTime))`.
 
@@ -78,7 +80,7 @@ This can happen when the updateReward modifier is invoked, which will cause the 
   * `exit`
   * `notifyRewardAmount`
 
-The reward rate is set inside `notifyRewardAmount`, on L114/118, if a value that is too large is provided to the function.
+The reward rate is set inside `notifyRewardAmount`, if a value that is too large is provided to the function.
 Of particular note is that `notifyRewardAmount` is itself affected by this problem, which means that if the provided
 reward is incorrect, then the problem is unrecoverable.
 
@@ -94,7 +96,9 @@ that the reward rate is being set to a value in the appropriate range (for examp
 Specifically, this problem occurs when rewardRate is too high; it is set inside the `notifyRewardAmount` function on
 lines [114](https://github.com/Synthetixio/synthetix/blob/c4dd4413cbbd3c0b40dfee2f9119af2dcb6a82e5/contracts/StakingRewards.sol#L114) and [118](https://github.com/Synthetixio/synthetix/blob/c4dd4413cbbd3c0b40dfee2f9119af2dcb6a82e5/contracts/StakingRewards.sol#L118).
 
-```rewardRate = floor(reward / rewardsDuration) = (reward - k) / rewardsDuration```
+```
+rewardRate = floor(reward / rewardsDuration) = (reward - k) / rewardsDuration
+```
 
 for some `0 <= k < rewardsDuration`.
 
@@ -143,8 +147,7 @@ So the problem will not emerge whenever we require
 * `constructor` to take `_rewardsToken` & `_stakingToken` as arguments
 * Refactor to remove the `LPTokenWrapper` contract. The original implementation to not include this.
 * Revert the `notifyRewardAmount` transaction if the computer reward rate would pay out more than the balance of the contract over the reward period.
-
-Inherit the `Pausable.sol` contract and add modifier `notPaused` to `stake()` 
+* Inherit the `Pausable.sol` contract and add modifier `notPaused` to `stake()` 
 
 
 ### Test Cases
@@ -169,7 +172,11 @@ Inherit the `Pausable.sol` contract and add modifier `notPaused` to `stake()`
   - should staking token on constructor
 - Pausable
   - should revert when stake is called when paused is true
-
+- Overflow bugfix
+  - should revert `notifyRewardAmount` if reward is greater than the contract balance
+  - should revert `notifyRewardAmount` if reward plus any leftover from the previous period is greater than the contract balance
+  - should not revert `notifyRewardAmount` if reward is equal to the contract balance
+  
 ### Configurable Values (Via SCCP)
 
 <!--Please list all values configurable via SCCP under this implementation.-->
