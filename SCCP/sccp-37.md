@@ -2,7 +2,7 @@
 sccp: 37
 title: Increase Fees on Silver to 50 bp
 author: Kaleb Keny (@kaleb-keny)
-status: Approved
+status: Implemented
 discussions-to: <Governance-Channel>
 created: <2020-07-24>
 ---
