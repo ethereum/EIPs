@@ -1,7 +1,7 @@
 ---
 sip: 69
 title: Update Index Synths
-status: Approved
+status: Implemented
 author: Daryl Lau (@daryllautk)
 discussions-to: (https://discordapp.com/invite/CDTvjHY)
 
