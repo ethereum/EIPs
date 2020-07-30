@@ -1,7 +1,7 @@
 ---
 sip: 68
 title: Minor enhancements to StakingRewards.sol
-status: Proposed
+status: Approved
 author: Clinton Ennis (@hav-noms), Anton Jurisevic (@zyzek)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
