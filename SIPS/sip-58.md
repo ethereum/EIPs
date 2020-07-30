@@ -1,7 +1,7 @@
 ---
 sip: 58
 title: Emit every fee reclamation outcome during trade settlement
-status: Approved
+status: Implemented
 author: Jackson Chan (@jacko125)
 discussions-to: <https://discord.gg/ShGSzny>
 
