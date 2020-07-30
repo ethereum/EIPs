@@ -4,7 +4,7 @@ layout: default
 
 <div class="home">
   <h1 class="page-heading">
-    EIP {{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
   </h1>
   <table>
@@ -41,6 +41,13 @@ layout: default
 
   {{ content }}
 
+  <h2>Citation</h2>
+  <p>Please cite this document as:</p>
+  {% comment %}
+  IEEE specification for reference formatting:
+  https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
+  {% endcomment %}
+  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
