@@ -1,7 +1,7 @@
 ---
 sip: 65
 title: Decentralized Circuit Breaker
-status: Proposed
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
