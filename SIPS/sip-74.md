@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: 74
 title: Binary Markets with custom questions
 status: WIP
 author: @Danijel, @farmwell
