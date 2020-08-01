@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Add DID related methods to the JSON-RPC
 author: Joel Thorstensson (@oed)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/issues/2845
 status: Draft
 type: Standards Track
 category: Interface
