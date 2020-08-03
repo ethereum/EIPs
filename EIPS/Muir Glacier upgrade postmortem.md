@@ -1,7 +1,7 @@
 ---
 eip: TBD
-title: Muir Glacier upgrade postmortem report
-author: James Hancock and Pooja Ranjan 
+title: Muir Glacier retrospective
+author: James Hancock (@MadeofTin), Pooja Ranjan (@poojaranjan)
 discussions-to: https://ethereum-magicians.org/t/hard-fork-to-address-the-ice-age-eip-2387
 type: Informational
 status: Draft
@@ -10,7 +10,7 @@ created: 2020-07-20
 
 ## Abstract
 
-To describe the process of preparing and activating the Muir Glacier network upgrade.
+To provide a retrospective of Muir Glacier network upgrade.
 
 ## Motivation
 
@@ -34,7 +34,6 @@ Ethereum is growing and documentation of decisions & events that occurred during
 The Muir Glacier upgrade included the EIP for pushing back Ice Age. 3 out of 4 clients were perfect, and 4th client had a quick update after the fork without any negative effects. It took a day for block time to reduce to normal.
 
 **Mainnet deployment before Ropsten** - Mainnet went to 17 second blocks instead of the forecast 19-20s blocks. Ropsten was at 28s per https://ropsten-stats.parity.io/ which was originally calculated for about 6 Jan or so. Ropsten slowdown and mainnet speedup was pretty much the opposite of expectations. 
-
 
 ### EIP Included 
 
@@ -118,9 +117,17 @@ Suggestion Solution:
 
 An informational EIP with upgrade analysis should help in visibility and traceability of the scope of changes as well as provide an easy accessibility of historic data for community reference.
 
-## Resources
-* All Core Dev Gitter - https://gitter.im/ethereum/AllCoreDevs?at=5de7d9bf550662459868c742
-* Etherscan - https://etherscan.io/block/9200000
+## Test Cases
+
+Not applicable. 
+
+## Implementations
+
+This EIP is an implementation of standard format for network upgrade retrospective proposal.  
+
+## Security Considerations
+
+No foreseeable risk associated. This informational EIP is created to document an upgrade retrospective. 
 
 ## Copyright
 
