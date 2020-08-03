@@ -1,25 +1,25 @@
 ---
 eip: TBD
-title: Recommendation for creating Ethereum network upgrade analysis/postmortem report
-author: Pooja Ranjan 
-discussions-to: 
+title: Ethereum network upgrade retrospective template
+author: Pooja Ranjan (@poojaranjan)
+discussions-to: TBD
 status: Draft
 type: Meta
 created: 2020-07-20
 ---
 
-## Simple Summary
+## Abstract
 
-Recommendation for creating Ethereum network upgrade analysis report a.k.a. upgrade postmortem report.
+A template for creating network upgrade retrospective a.k.a. upgrade postmortem report. EIPs that follow this template are _informational_.
 
 ## Motivation
 
-The purpose of this document is to create a template to standardize the network upgrade analysis report. This has several advantages:
-* the report will describes the chain of events that occurred during the network upgrade process, 
-* it will help understand what combination of events created the scenario (successful or not), and 
-* how we can make it better for the future. 
+The purpose of this document is to create a template to standardize the network upgrade retrospective report. This report will be helpful 
+* to document the sequence of decisions made that lead to the upgrade,
+* to analyze decisions that could have been improvised, and
+* to document best practices for future upgrades.
+This template aims to standardize retrospective reports that will help future upgrade coordination process, prepare the community for potential process improvements, and recommend to save them in _Informational EIPs_ for references.
 
-This template aims to standardize network upgrade analysis report that will help shape the upgrade coordination and prepare community for potential process improvements and recommend a repository to save them for future references.
 
 ## Specification
 
@@ -85,7 +85,7 @@ The aim is to collect relevant information to support the need, process, and dep
 Not applicable. This is for documentation purpose only.
 
 ## Implementation
-Muir Glacier postmortem upgrade. 
+Reference implementation is available in Muir Glacier upgrade retrospective. 
 
 ## Copyright
 
