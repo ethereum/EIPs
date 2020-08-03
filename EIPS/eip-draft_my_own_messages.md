@@ -5,7 +5,7 @@ author: Giuseppe Bertone (@Neurone)
 discussions-to: https://github.com/InternetOfPeers/EIPs/issues/1
 status: Draft
 type: Standards Track
-category (*only required for Standard Track): ERC
+category: ERC
 created: 2020-08-02
 ---
 
