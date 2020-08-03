@@ -87,6 +87,9 @@ Not applicable. This is for documentation purpose only.
 ## Implementation
 Reference implementation is available in Muir Glacier upgrade retrospective. 
 
+## Security considerations
+No foreseeable security risk associated. This Meta EIP is created as a template for upgrade retrospective report. 
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
