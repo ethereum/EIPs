@@ -1,11 +1,11 @@
 ---
-sccp: <39>
-title: <Increase Forex Fees>
-author: <@Spreek>
-discussions-to: <Governance discord channel>
-status: WIP
+sccp: 39
+title: Increase Forex Fees
+author: Spreek (@Spreek)
+discussions-to: https://research.synthetix.io/t/sccp-increase-forex-fees/169
+status: Proposed
 created: <2020-08-01>
-requires (*optional): <SIP/SCCP number(s)>
+
 ---
 
 ## Simple Summary
