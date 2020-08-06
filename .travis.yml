@@ -28,6 +28,7 @@ matrix:
     - rvm: 2.6.0
       env: TASK='htmlproofer-external'
     - language: rust
+      cache: cargo
       before_script:
         - cargo install eipv --version=0.0.4
       env: TASK='eip-validator'
