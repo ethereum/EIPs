@@ -4,7 +4,6 @@ language: ruby, rust
 
 before_install:
   - gem install bundler -v '< 2'
-  - cargo install eipv
      
 cache:
   # Cache Ruby bundles
