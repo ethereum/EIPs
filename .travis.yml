@@ -1,9 +1,10 @@
 sudo: false # route your build to the container-based infrastructure for a faster build
 
-language: ruby
+language: ruby, rust
 
 before_install:
   - gem install bundler -v '< 2'
+  - cargo install eipv
      
 cache:
   # Cache Ruby bundles
@@ -27,7 +28,7 @@ matrix:
       env: TASK='htmlproofer'
     - rvm: 2.6.0
       env: TASK='htmlproofer-external'
-    - rvm: 2.6.0
+    - rust: 1.45.0
       env: TASK='eip-validator'
     - python: 3.3
       env: TASK='codespell'
