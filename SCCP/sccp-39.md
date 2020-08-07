@@ -3,7 +3,7 @@ sccp: 39
 title: Increase Forex Fees
 author: Spreek (@Spreek)
 discussions-to: https://research.synthetix.io/t/sccp-increase-forex-fees/169
-status: Proposed
+status: Approved
 created: <2020-08-01>
 
 ---
