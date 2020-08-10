@@ -74,7 +74,7 @@ Returns the image url of this token
 
 #### issuer
 
-Returns the issuer of this token. Only issuer can claim token and is the only beneficiary.
+Returns the issuer of this token. Only issuer can claim token and is the only beneficiary.
 
 #### transferIssuer
 
@@ -86,7 +86,7 @@ Transfer issuer role by changing its address.
 
 #### active
 
-User can make part of token balance 'active' as deposit to ensure micropayments. Token can only be claimed form active balance. This works likes 'increaseAllowance' in ERC20 with additional check on amount of active balance should be less equal than token balance.
+User can make part of token balance 'active' as deposit to ensure micropayments. Token can only be claimed form active balance. This works likes 'increaseAllowance' in ERC20 with additional check on amount of active balance should be less equal than token balance.
 
 | Parameter | Description |
 | ---------|-------------|
