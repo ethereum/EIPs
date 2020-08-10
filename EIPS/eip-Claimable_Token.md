@@ -1,6 +1,6 @@
 ---
-eip: <to be assigned>
-title: Claimable Token Standard
+eip: 2871
+title: Standard for BlockChain Mail Stamp
 author: Wansheng Li huhulws@gmail.com
 status: Draft
 type: Standards Track
@@ -74,7 +74,7 @@ Returns the image url of this token
 
 #### issuer
 
-Returns the issuer of this token. Only issuer can claim token and is the only beneficiary.
+Returns the issuer of this token.Only issuer can claim token and is the only beneficiary.
 
 #### transferIssuer
 
