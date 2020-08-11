@@ -77,12 +77,12 @@ The following semantics are enforced:
 ### AA transactions *must* call `PAYGAS`
 
 AA transactions are a special type of transaction that have no signature format
-defined by the protocol. Therefore, it is not clear who should pay for the
-transaction. Most of the time, a non-paying AA transaction would simply be
-dropped. However, it's possible that there are locked assets controlled by
-`0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA` and therefore a miner might be
-incentivezed to transfer ownership of those assets to themselves by mining a
-block with an AA transaction that does not call `PAYGAS`.
+defined by the protocol. Therefore, it's not immediately clear who should pay
+for the transaction. Most of the time, a non-paying AA transaction would simply
+be dropped. However, it's possible that there are locked assets controlled by
+`0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`. This could incentivize a miner to
+mine a block with an AA transaction that does not call `PAYGAS`, gaining control
+of any assets owned by `0xAA..AA`.
 
 ### Disallow opcodes that access external data
 
@@ -102,6 +102,21 @@ The prelude is used to ensure that *only* AA transactions can call the
 contract. This is another measure taken to ensure the invariant described
 above. If this check did not occur, it would be possible for a transaction to
 invalidate an innumerable number of AA transactions.
+
+There are drawbacks to the prelude mechanism. Upgrades to AA in the future may
+require modified logic in the prelude, which would require one of the
+following:
+* changing the bytecode in the affect contracts
+* changing the semantics of that specific bytecode prefix
+* introducing a new version of AA. 
+
+None of these solutions are desirable.
+
+The optimal solution is to recognize AA contracts at the protocol level as a
+type of account separate from EOAs and contracts. This would provide the
+flexibility to make modifications in the future, without the need to continue
+supporting legacy versions. This is not the path taken in this EIP due to the
+increased complexity and risk that an additional type would incur. 
 
 ## Backwards Compatibility
 TODO
