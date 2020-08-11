@@ -23,18 +23,18 @@ After `FORK_BLOCK`, the following changes will be recognized by the protocol.
 
 ### New Transaction Type
 A new EIP-2718 transaction with type `2` is introduced. Transactions of this
-type are referred to as "AA transactions". Their payload is be interpreted as
-`rlp([gas_limit, to, data])`.
+type are referred to as "AA transactions". Their payload should be interpreted
+as `rlp([gas_limit, to, data])`.
 
 ### `PAYGAS (0xAA)` Opcode
 
 A new opcode `PAYGAS (0xAA)` is introduced. It consumes a single stack element
 representing the `gas_price` that the contract is willing to pay for the
 subsequent execution. If the contract's balance is at least `gas_price *
-tx.gas_limit`, then that amount will subtracted from the contract's balance
-and execution will proceed. At the end of execution, the contract will be
-refunded for any remaining gas. If the contract's balance is too low, then
-execution will revert and the contract will not pay for the execution.
+tx.gas_limit`, then that amount will subtracted from the contract's balance and
+execution will proceed. At the end of execution, the contract will be refunded
+for any remaining gas. If the contract's balance is too low, then execution
+will revert and the contract will not pay for the execution.
 
 ### Execution Semantics
 
@@ -80,21 +80,35 @@ AA transactions are a special type of transaction that have no signature format
 defined by the protocol. Therefore, it's not immediately clear who should pay
 for the transaction. Most of the time, a non-paying AA transaction would simply
 be dropped. However, it's possible that there are locked assets controlled by
-`0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`. This could incentivize a miner to
-mine a block with an AA transaction that does not call `PAYGAS`, gaining control
-of any assets owned by `0xAA..AA`.
+`0xAA...AA`. This could incentivize a miner to mine a block with an AA
+transaction that does not call `PAYGAS`, gaining control of any assets owned by
+`0xAA...AA`.
 
 ### Disallow opcodes that access external data
 
-An invariant in the current protocol that is desirable to retain is the
-ability to validate transactions in constant time. Allowing the contract
-to access external data before it calls `PAYGAS` makes it possible to construct
-a contract which only pay gas if an external property is true (e.g. the value
-of another contract is `True`). This behaviour can be exploited to carry-out
-denial-of-service attacks on the network by nesting dependencies in a non-obvious
-way and invalidating the head -- thereby triggering a massive revalidation. By
-forcing AA transactions to not use external data before calling `PAYGAS`, this
-invariant is maintained.
+An important property of legacy transactions is the ability to validate them in
+constant time. This is due to the finite validity requirements of legacy
+transactions (e.g. signature recovery & nonce / balance check). 
+
+Allowing Abstract Accounts to access external data before they calls `PAYGAS`
+makes it possible to write validation logic with infinite validity requirements.
+Although clients can bound the validation computation to some rational amount,
+its impossible to bound the space of potential validity dependencies. 
+
+This can be extorted to create long, opaque chains of dependent transactions
+which can be completely invalidated by any incoming transaction. This forces
+miners must revalidate each one in the order they intend to include them in a
+block, and creates a denial-of-service attack vector.
+
+To avoid this, Abstract Accounts must be validatable in constant time. This is
+achieved by removing their ability to rely on data external to their own account.
+Miners can then adjust the number of AA transactions they are willing to validate
+per account on an as-needed basis.
+
+It's important that this execution semantic is enforced by the protocol and not
+just a transaction pool heuristic. If this were not the case, malicious miners
+could invalidate an innumerable number of pending transactions with a single
+transaction in a malicious, but valid, block.
 
 ### AA transactions must call contracts with prelude
 
