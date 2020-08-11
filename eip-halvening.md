@@ -59,6 +59,8 @@ Presently, [Ethereum is the most profitable ETHHash cryptocurrency to mine](http
 
 If this EIP is accepted, and assuming that (1) the Ethereum price stay on a level or upward trajectory, and (2) gas prices continue to be [higher than 30 gWei at low times + 110 gWei at peak times](https://gitcoin.co/gas/heatmap), there are no major security risks introduced to the network.
 
+Note that the outcome of this analysis is likely to hinge on whether EIP 1559 is implemented or not.
+
 If there is rough consensus that this EIP is directionally correct, I believe that a further economic analysis could be performed to prove to what degree the above assumptions (1) and (2) are correct.
 
 
