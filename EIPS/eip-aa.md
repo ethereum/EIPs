@@ -44,7 +44,7 @@ The following semantics are enforced:
 * AA transactions that do not call `PAYGAS` are invalid.
 * Multiple invocations of `PAYGAS` must cause a revert.
 * If `ORIGIN (0x32)` or `CALLER (0x33)` is invoked in the first frame of
-  execution of a call intiated by an AA transaction, then it must return
+  execution of a call initiated by an AA transaction, then it must return
   `0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`.
 * If `ORIGIN (0x32)` is invoked in any other frame of execution of an AA
   transaction it must return `tx.to`.
@@ -93,12 +93,12 @@ transactions (e.g. signature recovery & nonce / balance check).
 Allowing Abstract Accounts to access external data before they calls `PAYGAS`
 makes it possible to write validation logic with infinite validity requirements.
 Although clients can bound the validation computation to some rational amount,
-its impossible to bound the space of potential validity dependencies. 
+it's impossible to bound the space of potential validity dependencies. 
 
 This can be extorted to create long, opaque chains of dependent transactions
-which can be completely invalidated by any incoming transaction. This forces
-miners must revalidate each one in the order they intend to include them in a
-block, and creates a denial-of-service attack vector.
+that can be completely invalidated by a single new transaction. This forces
+miners to revalidate each one in the order they intend to include them in a
+block, creating a denial-of-service vector.
 
 To avoid this, Abstract Accounts must be validatable in constant time. This is
 achieved by removing their ability to rely on data external to their own account.
