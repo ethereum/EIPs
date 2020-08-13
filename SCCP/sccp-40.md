@@ -29,7 +29,7 @@ Network congestion is currently incredibly high - fast GWEI is around 250-280.
 
 Increasing the waiting period will allow us to reduce the update frequency of the oracle to save sDAO treasury gas costs.
 
-The Synthetix Oracle for crypto price feeds is burning too much ETH from the synthetixDAO treasury. It is intended to include the SNX community on voting on the use of these funds and in this congested period some evasive action is required to temporaliy slow down the ETH burn rate until Chainlink Phase 2 in the Pollux Realease in a few weeks.
+The Synthetix Oracle for crypto price feeds is burning too much ETH from the synthetixDAO treasury. It is intended to include the SNX community on voting on the use of these funds and in this congested period some evasive action is required to temporarily slow down the ETH burn rate until Chainlink Phase 2 in the Pollux release in a few weeks.
 
 There is a chance there could be follow up SCCPs to be voted on to increase the waiting period further if the gwei keeps rising. 
 
