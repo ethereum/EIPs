@@ -3,7 +3,7 @@ sccp: 40
 title: Increase Fee Reclamation Waiting Period to 10 minutes
 author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125), Justin J Moses (@justinjmoses), Kain Warwick (@kaiynne)
 discussions-to: https://discordapp.com/invite/AEdUHzt
-status: WIP
+status: Proposed
 created: 2020-08-13
 ---
 
