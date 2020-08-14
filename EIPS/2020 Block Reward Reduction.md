@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: 2020 Block Reward Reduction to 0.5 ETH
 author: John Lilic @jlilic twitter.com/johnlilic johnlilicEIP@gmail.com, Jerome de Tychey @jdetychey twitter.com/jdetychey,  Others
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-2878-block-reward-reduction-to-0-5-eth/
 status: Draft
 type: Standards Track
 category Core
