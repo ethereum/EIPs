@@ -4,11 +4,11 @@
 
 {% macro authors(authors) %}
     {% for author in authors %}
-        {{ author.name }}
+        
         {% if author.email %}
-            <a href="mailto:{{ author.email | safe }}">&lt{{ author.email | safe }}&gt</a>{% if not loop.last %},{% endif %}
+            <a href="mailto:{{ author.email | safe }}">{{ author.name }}</a>{% if not loop.last %},{% endif %}
         {% elif author.github %}
-            <a href="https://github.com/{{ author.github | safe }}">@{{ author.github | safe }}</a>{% if not loop.last %},{% endif %}
+            <a href="https://github.com/{{ author.github | safe }}">{{ author.name }}</a>{% if not loop.last %},{% endif %}
         {% endif %}
     {% endfor %}
 {% endmacro authors %}
