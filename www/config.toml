@@ -1,0 +1,13 @@
+title = "Ethereum Improvement Proposals"
+description = "Description"
+base_url = "https://eips.ethereum.com"
+
+compile_sass = true
+highlight_code = true
+build_search_index = true
+
+[extra]
+lang = "en"
+links = [{ name = "all", url = "/all.html" }]
+site = { author = "GitHub User", email = "your-email@domain.com" }
+twitter = "ethereum"

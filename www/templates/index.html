@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="{{ get_url(path="minima.css", trailing_slash=false) }}">
+
+        <!-- opengraph -->
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:url" content="{{ config.base_url }}" />
+        <meta property="og:site_name" content="{{ config.title }}" />
+
+        <!-- twitter -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@{{ config.extra.twitter }}" />
+
+        <script type="application/ld+json">
+            {
+              "@type": "WebSite",
+              "url": "{{ config.base_url }}",
+              "name": "{{ config.title }}",
+              "description": "{{ config.description }}",
+              "@context": "https://schema.org"
+            }
+        </script>
+
+        {% if config.generate_rss %}
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ get_url(path="rss.xml", trailing_slash=false) }}">
+        {% endif %}
+
+        {% block head %}
+        {% endblock head %}
+    </head>
+    <body>
+        <header class="site-header">
+            <div class="wrapper">
+                <a class="site-title" rel="author" href="{{ config.base_url }}">{{ config.title }}</a>
+                <nav class="site-nav">
+                    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+                    <label for="nav-trigger">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 18 15" width="18px" height="15px">
+                                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+                            </svg>
+                        </span>
+                    </label>
+
+                    <div class="trigger">
+                        {% for link in config.extra.links %}
+                            <a class="page-link" href="{{ link.url}}">{{ link.name }}</a>
+                        {% endfor %}
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <main class="page-content" aria-label="Content">
+            <div class="wrapper">
+                {% block content %}
+                <h1 class="page-heading">EIPs
+                  <a href="https://gitter.im/ethereum/EIPs?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://img.shields.io/gitter/room/ethereum/AllCoreDevs" alt="Gitter"></a>
+                  <a href="/last-call.xml"><img src="https://img.shields.io/badge/rss-Last Calls-red.svg" alt="RSS"></a>
+                </h1>
+                <p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+
+                <h2>Contributing</h2>
+                <p>First review <a href="EIPS/eip-1">EIP-1</a>. Then clone the repository and add your EIP to it. There is a <a href="https://github.com/ethereum/EIPs/blob/master/eip-template.md">template EIP here</a>. Then submit a Pull Request to Ethereum's <a href="https://github.com/ethereum/EIPs">EIPs repository</a>.</p>
+
+                <h2>EIP status terms</h2>
+                <ul>
+                  <li><strong>Draft</strong> - an EIP that is open for consideration and is undergoing rapid iteration and changes.</li>
+                  <li><strong>Last Call</strong> - an EIP that is done with its initial iteration and ready for review by a wide audience.</li>
+                  <li><strong>Accepted</strong> - a core EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author. The process for Core Devs to decide whether to encode an EIP into their clients as part of a hard fork is not part of the EIP process. If such a decision is made, the EIP will move to final. </li>
+                  <li><strong>Final (non-Core)</strong> - an EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author.</li>
+                  <li><strong>Final (Core)</strong> - an EIP that the Core Devs have decided to implement and release in a future hard fork or has already been released in a hard fork.</li>
+                </ul>
+
+                <h2>EIP Types</h2>
+
+                <p>EIPs are separated into a number of types, and each has its own list of EIPs.</p>
+
+                <h3>Standard Track ({{ section.pages | filter(attribute="extra.type", value="Standards Track") | length }})</h3>
+                <p>Describes any change that affects most or all Ethereum implementations, such as a change to the the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.</p>
+
+                <h4><a href="">Core</a> ({{ section.pages | filter(attribute="extra.category", value="Core") | length }})</h4>
+                <p>Improvements requiring a consensus fork (e.g. <a href="EIPS/eip-5">EIP-5</a>, <a href="EIPS/eip-101">EIP-101</a>), as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions (for example, the miner/node strategy changes 2, 3, and 4 of <a href="EIPS/eip-86">EIP-86</a>).</p>
+
+                <h4><a href="">Networking</a> ({{ section.pages | filter(attribute="extra.category", value="Networking") | length }})</h4>
+                <p>Includes improvements around devp2p (<a href="EIPS/eip-8">EIP-8</a>) and Light Ethereum Subprotocol, as well as proposed improvements to network protocol specifications of whisper and swarm.</p>
+
+                <h4><a href="">Interface</a> ({{ section.pages | filter(attribute="extra.category", value="Interface") | length }})</h4>
+                <p>Includes improvements around client API/RPC specifications and standards, and also certain language-level standards like method names (<a href="EIPS/eip-6">EIP-6</a>) and contract ABIs. The label “interface” aligns with the interfaces repo and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.</p>
+
+                <h4><a href="">ERC</a> ({{ section.pages | filter(attribute="extra.category", value="ERC") | length }})</h4>
+                <p>Application-level standards and conventions, including contract standards such as token standards (<a href="EIPS/eip-20">ERC-20</a>), name registries (<a href="EIPS/eip-137">ERC-137</a>), URI schemes (<a href="EIPS/eip-681">ERC-681</a>), library/package formats (<a href="EIPS/eip-190">EIP190</a>), and wallet formats (<a href="https://github.com/ethereum/EIPs/issues/85">EIP-85</a>).</p>
+
+                <h3><a href="">Meta</a> ({{ section.pages | filter(attribute="extra.type", value="Meta") | length }})</h3>
+                <p>Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.</p>
+
+                <h3><a href="">Informational</a> ({{ section.pages | filter(attribute="extra.type", value="Informational") | length }})</h3>
+                <p>Describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.</p>
+                {% endblock %}
+            </div>
+        </main>
+
+
+        <footer class="site-footer h-card">
+            <div class="wrapper">
+                <h2 class="footer-heading">{{ config.title | escape }}</h2>
+                <div class="footer-col-wrapper">
+                    <div class="footer-col footer-col-1">
+                        <ul class="contact-list">
+                            <li class="p-name">
+                                {% if config.extra.site.author %}
+                                {{ config.extra.site.author | escape }}
+                                {% else %}
+                                {{ config.title | escape }}
+                                {% endif %}
+                            </li>
+                            {% if config.extra.site.email -%}
+                            <li><a class="u-email" href="mailto:{{ config.extra.site.email }}">{{ config.extra.site.email }}</a></li>
+                            {% endif -%}
+                        </ul>
+                    </div>
+                    <div class="footer-col footer-col-3">
+                        <p>{{ config.description | escape }}</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
+</html>

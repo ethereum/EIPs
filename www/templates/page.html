@@ -1,0 +1,104 @@
+{% extends "index.html" %}
+{% import "post_macros.html" as post_macros %}
+
+{% block head %}
+{% set eip = page.extra.eip %}
+<title>EIP-{{ eip }}: {{ page.title | escape }}</title>
+<link rel="canonical" href="{{ config.base_url }}{{ page.relative_path }}" />
+<meta property="og:title" content="EIP-{{ eip }}: {{ page.title | escape }}" />
+<meta
+    name="description"
+    content="Details on Ethereum Improvement Proposal {{ eip}} (EIP-{{ eip }}): {{ page.title | escape }}"
+/>
+<meta
+    property="og:description"
+    content="Details on Ethereum Improvement Proposal {{ eip }} (EIP-{{ eip }}): {{ page.title | escape }}"
+/>
+<meta property="og:url" content="{{ config.base_url }}{{ page.relative_path }}" />
+<meta name="twitter:description" content="Details on Ethereum Improvement Proposal {{ eip }} (EIP {{ eip }}): {{ page.title | escape }}" />
+{% endblock head %}
+
+{% block content %}
+<div class="home">
+    <h1 class="page-heading">
+        EIP-{{ page.extra.eip }}: {{ page.title }}
+        <a href=""><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
+    </h1>
+    <table>
+        <tr>
+            <th>Author</th>
+            <td>{{ post_macros::authors(authors=page.extra.authors) }}</td>
+        </tr>
+
+        {% if page.extra.discussions_to %}
+          <tr>
+              <th>Discussions-To</th>
+              <td><a href="{{ page.extra.discussions_to }}">{{ page.extra.discussions_to }}</a></td>
+          </tr>
+        {% endif %}
+
+        <tr>
+            <th>Status</th>
+            <td>
+                {{ page.extra.status }}
+                {% if page.extra.review_period_end %}
+                  <strong>(review ends {{ page.extra.review_period_end }})</strong>
+                {% endif %}
+            </td>
+        </tr>
+
+        <tr>
+            <th>Type</th>
+            <td>{{ page.extra.type }}</td>
+        </tr>
+
+        {% if page.extra.category %}
+          <tr>
+              <th>Category</th>
+              <td>{{ page.extra.category }}</td>
+          </tr>
+        {% endif %}
+
+        <tr>
+            <th>Created</th>
+            <td>{{ page.extra.created }}</td>
+        </tr>
+
+        {% if page.extra.updated %}
+        <tr>
+            <th>Updated</th>
+            <td>{{ page.extra.updated }}</td>
+        </tr>
+        {% endif %}
+
+        {% if page.extra.requires %}
+          <tr>
+              <th>Requires</th>
+              <td>{{ page.extra.requires }}</td>
+          </tr>
+        {% endif %}
+
+        {% if page.extra.replaces %}
+          <tr>
+              <th>Replaces</th>
+              <td>{{ page.extra.replaces }}</td>
+          </tr>
+        {% endif %}
+
+        {% if page.extra.superseded_by %}
+          <tr>
+              <th>Superseded by</th>
+              <td>{{ page.extra.superseded_by }}</td>
+          </tr>
+        {% endif %}
+
+        {% if page.resolution %}
+          <tr>
+              <th>Resolution</th>
+              <td><a href="{{page.extra.resolution | urlencode }}">{{ page.resolution | urlencode }}</a></td>
+          </tr>
+        {% endif %}
+  </table>
+
+  {{ post_macros::polish(content=page.content) }}
+{% endblock content %}
