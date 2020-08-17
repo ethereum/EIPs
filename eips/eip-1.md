@@ -1,12 +1,14 @@
----
-eip: 1
-title: EIP Purpose and Guidelines
-status: Active
-type: Meta
-author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
-created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17
----
++++
+title = "EIP Purpose and Guidelines"
+
+[extra]
+eip = 1
+author = [{ name = "Martin Becze", email = "mb@ethereum.org" }, { name = "Hudson Jameson", email = "hudson@ethereum.org" }, { name = " and othe", github = "and other" }]
+status = "Active"
+type = "Meta"
+created = 2015-10-27
+updated = "2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17"
++++
 
 ## What is an EIP?
 

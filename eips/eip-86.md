@@ -1,12 +1,14 @@
----
-eip: 86
-title: Abstraction of transaction origin and signature
-author: Vitalik Buterin (@vbuterin)
-type: Standards Track
-category: Core
-status: Draft
-created: 2017-02-10
----
++++
+title = "Abstraction of transaction origin and signature"
+
+[extra]
+eip = 86
+author = [{ name = "Vitalik Buterin", github = "vbuterin" }]
+status = "Draft"
+type = "Standards Track"
+category = "Core"
+created = 2017-02-10
++++
 
 # Summary
 

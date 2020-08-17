@@ -1,12 +1,14 @@
----
-eip: 7
-title: DELEGATECALL
-author: Vitalik Buterin <v@buterin.com>
-status: Final
-type: Standards Track
-category: Core
-created: 2015-11-15
----
++++
+title = "DELEGATECALL"
+
+[extra]
+eip = 7
+author = [{ name = "Vitalik Buterin", email = "v@buterin.com" }]
+status = "Final"
+type = "Standards Track"
+category = "Core"
+created = 2015-11-15
++++
 
 ### Hard Fork
 [Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md)

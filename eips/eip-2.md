@@ -1,12 +1,14 @@
----
-eip: 2
-title: Homestead Hard-fork Changes
-author: Vitalik Buterin <v@buterin.com>
-status: Final
-type: Standards Track
-category: Core
-created: 2015-11-15
----
++++
+title = "Homestead Hard-fork Changes"
+
+[extra]
+eip = 2
+author = [{ name = "Vitalik Buterin", email = "v@buterin.com" }]
+status = "Final"
+type = "Standards Track"
+category = "Core"
+created = 2015-11-15
++++
 
 ### Meta reference
 

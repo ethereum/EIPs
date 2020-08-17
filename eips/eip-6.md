@@ -1,12 +1,14 @@
----
-eip: 6
-title: Renaming SUICIDE opcode
-author: Hudson Jameson <hudson@hudsonjameson.com>
-status: Final
-type: Standards Track
-category: Interface
-created: 2015-11-22
----
++++
+title = "Renaming SUICIDE opcode"
+
+[extra]
+eip = 6
+author = [{ name = "Hudson Jameson", email = "hudson@hudsonjameson.com" }]
+status = "Final"
+type = "Standards Track"
+category = "Interface"
+created = 2015-11-22
++++
 
 ### Abstract
 The solution proposed in this EIP is to change the name of the `SUICIDE` opcode in Ethereum programming languages with `SELFDESTRUCT`.

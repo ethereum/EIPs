@@ -1,12 +1,14 @@
----
-eip: 3
-title: Addition of CALLDEPTH opcode
-author: Martin Holst Swende <martin@swende.se>
-status: Abandoned
-type: Standards Track
-category: Core
-created: 2015-11-19
----
++++
+title = "Addition of CALLDEPTH opcode"
+
+[extra]
+eip = 3
+author = [{ name = "Martin Holst Swende", email = "martin@swende.se" }]
+status = "Abandoned"
+type = "Standards Track"
+category = "Core"
+created = 2015-11-19
++++
 
 # Abstract
 

@@ -1,12 +1,14 @@
----
-eip: 55
-title: Mixed-case checksum address encoding
-author: Vitalik Buterin <vitalik.buterin@ethereum.org>, Alex Van de Sande <avsa@ethereum.org>
-type: Standards Track
-category: ERC
-status: Final
-created: 2016-01-14
----
++++
+title = "Mixed-case checksum address encoding"
+
+[extra]
+eip = 55
+author = [{ name = "Vitalik Buterin", email = "vitalik.buterin@ethereum.org" }, { name = "Alex Van de Sande", email = "avsa@ethereum.org" }]
+status = "Final"
+type = "Standards Track"
+category = "ERC"
+created = 2016-01-14
++++
 
 # Specification
 

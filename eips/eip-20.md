@@ -1,12 +1,14 @@
----
-eip: 20
-title: ERC-20 Token Standard
-author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-type: Standards Track
-category: ERC
-status: Final
-created: 2015-11-19
----
++++
+title = "ERC-20 Token Standard"
+
+[extra]
+eip = 20
+author = [{ name = "Fabian Vogelsteller", email = "fabian@ethereum.org" }, { name = "Vitalik Buterin", email = "vitalik.buterin@ethereum.org" }]
+status = "Final"
+type = "Standards Track"
+category = "ERC"
+created = 2015-11-19
++++
 
 ## Simple Summary
 

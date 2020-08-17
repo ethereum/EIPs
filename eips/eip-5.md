@@ -1,13 +1,15 @@
----
-eip: 5
-title: Gas Usage for `RETURN` and `CALL*`
-author: Christian Reitwiessner <c@ethdev.com>
-status: Superseded
-type: Standards Track
-category: Core
-created: 2015-11-22
-superseded-by: 211
----
++++
+title = "Gas Usage for `RETURN` and `CALL*`"
+
+[extra]
+eip = 5
+author = [{ name = "Christian Reitwiessner", email = "c@ethdev.com" }]
+status = "Superseded"
+type = "Standards Track"
+category = "Core"
+created = 2015-11-22
+superseded_by = "211"
++++
 
 ### Abstract
 

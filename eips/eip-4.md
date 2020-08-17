@@ -1,12 +1,14 @@
----
-eip: 4
-title: EIP Classification
-author: Joseph Chow (@ethers)
-status: Superseded
-type: Meta
-created: 2015-11-17
-superseded-by: 1
----
++++
+title = "EIP Classification"
+
+[extra]
+eip = 4
+author = [{ name = "Joseph Chow", github = "ethers" }]
+status = "Superseded"
+type = "Meta"
+created = 2015-11-17
+superseded_by = "1"
++++
 
 # Abstract
 
