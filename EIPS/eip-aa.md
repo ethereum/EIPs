@@ -15,7 +15,17 @@ replaces: 86
 Account abstraction (AA) allows contracts to pay for users' transactions.
 
 ## Motivation
-TODO
+Transaction validity is defined rigidly by the protocol, precluding innovation.
+Allowing contracts to determine whether they will pay for a transaction makes
+it possible for developers to innovate in this area. If alternative
+requirements for transaction validity are added over time, Account Abstraction
+would actually reduce the protocol's resulting complexity. Over the years,
+there have been numerous proposals which would've benefited from
+contract-defined transaction validity. From obvious proposals, like
+multi-sig transaction, to more radical ones, such as allowing signatures to be
+batched and verified at the block level--these can be primarily implemented
+using Account Abstraction, instead of being explicitly defined and implemented
+in every client.
 
 ## Specification
 
