@@ -72,6 +72,10 @@ The following semantics are enforced:
   verifies `CALLER == 0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`, otherwise
   the transaction is invalid.
 
+
+### Mining Strategies
+TODO
+
 ## Rationale
 
 ### AA transactions *must* call `PAYGAS`
@@ -133,7 +137,15 @@ supporting legacy versions. This is not the path taken in this EIP due to the
 increased complexity and risk that an additional type would incur. 
 
 ## Backwards Compatibility
-TODO
+It is possible that an AA contract does not implement a replay protection
+mechanism, allowing a single transaction to be included multiple times
+on-chain. This would break the transaction uniqueness invariant currently
+maintained by the network and affect downstream applications which rely
+on this invariant.
+
+We anticipate to resolve this compatibility issue before this EIP reaches
+a finalized state, after which there will be no backwards compatibility
+concerns.
 
 ## Test Cases
 See: https://github.com/quilt/tests/tree/account-abstraction
@@ -143,16 +155,36 @@ See: https://github.com/quilt/go-ethereum/tree/account-abstraction
 
 ## Security Considerations
 
-### Transaction pool validation
-TODO
+Much of the work on this EIP has been focused on addressing the security
+concerns that arise in the `tx_pool`. Although the miner strategies laid out
+here are not required in a hard fork, they are important for maintaining the
+network's resilience.
 
-#### Mass Invalidation
-TODO
+### Transaction pool validation
+When a transaction enters the `tx pool`, the client is able to quickly
+ascertain whether the transaction is valid. Once it determines this, it can be
+confident that the transaction will continue to be valid unless a transaction
+from the same account invalidates it.
+
+#### Block invalidation attack
+The attack can be carried out as follows. Suppose an adversary has deployed
+many AA contracts. The adversary sends a valid transaction to each of the AA
+contracts. Before the transactions can be included in a block, the adversary
+releases a block with transactions to each of their AA contracts that
+invalidate the pending transactions. The transactions in the block can be very
+minimal, just enough to update a nonce--whereas the transactions that are
+pending would be maximally expensive to validate.
+
+This attack allows the adversary to force clients on the network to perform
+work disproportionate to the amount of work paid for on-chain. There is no
+"solution" to an attack like this. It's possible to carry out on today's
+network, but the cost of validation is so low that is not a concern.
+Significantly increasing the amount of computation required for validation
+gives adversaries a larger attack surface. This is why is is important for
+miners to follow the recommended mining strategies as they will minimize their
+vulnerability to attacks of this type.
 
 #### Peer denial-of-service
-TODO
-
-### Block invalidation attack
 TODO
 
 ## Copyright
