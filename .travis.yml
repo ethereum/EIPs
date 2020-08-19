@@ -1,6 +1,6 @@
-sudo: false # route your build to the container-based infrastructure for a faster build
+sudo: false 
 
-language: ruby, rust
+language: ruby
 
 before_install:
   - gem install bundler -v '< 2'
