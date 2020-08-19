@@ -12,7 +12,7 @@ replaces: 86
 ---
 
 ## Simple Summary
-Account abstraction (AA) allows contracts to pay for users' transactions.
+Account abstraction (AA) allows contracts to pay for user transactions.
 
 ## Motivation
 Transaction validity is defined rigidly by the protocol, precluding innovation.
