@@ -6,6 +6,8 @@ compile_sass = true
 highlight_code = true
 build_search_index = true
 
+ignored_content = ["*eip-20-token-standard.md"]
+
 [extra]
 lang = "en"
 links = [
