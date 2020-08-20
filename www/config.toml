@@ -8,6 +8,16 @@ build_search_index = true
 
 [extra]
 lang = "en"
-links = [{ name = "all", url = "/all.html" }]
+links = [
+	{ name = "All", url = "/all" },
+	{ name = "Core", url = "/core" },
+	{ name = "Networking", url = "/networking" },
+	{ name = "Interface", url = "/interface" },
+	{ name = "ERC", url = "/erc" },
+	{ name = "Meta", url = "/meta" },
+	{ name = "Informational", url = "/informational" }
+]
+
 site = { author = "GitHub User", email = "your-email@domain.com" }
 twitter = "ethereum"
+statuses = ["Last Call", "Final", "Accepted", "Active", "Draft", "Superseded", "Rejected", "Abandoned"]

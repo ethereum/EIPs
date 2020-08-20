@@ -1,0 +1,62 @@
+{% extends "index.html" %}
+{% import "post_macros.html" as post_macros %}
+
+{% block head %}
+<title>{{ page.title }} | Ethereum Improvement Proposals</title>
+<link rel="canonical" href="{{ page.permalink }}" />
+<meta property="og:title" content="{{ page.title }}" />
+<meta
+    name="description"
+    content="Details on Ethereum Improvement Proposal {{ page.title }}"
+/>
+<meta
+    property="og:description"
+    content="Details on Ethereum Improvement Proposal {{ page.title }}"
+/>
+<meta property="og:url" content="{{ page.permalink }}" />
+<meta name="twitter:description" content="Details on Ethereum Improvement Proposal {{ page.title }}" />
+{% endblock head %}
+
+{% block content %}
+<style type="text/css">
+  .eiptable .title {
+    width: 67%;
+  }
+
+  .eiptable .author {
+    width: 33%;
+  }
+</style>
+<h1>{{ page.title }}</h1>
+
+{% set all_eips = get_section(path="EIPS/_index.md") %}
+
+{% if page.extra.type != "All" %}
+    {% set all_eips = all_eips.pages | filter(attribute="extra.type", value=page.extra.type) %}
+
+    {% if page.extra.type == "Standards Track" %}
+        {% set all_eips = all_eips | filter(attribute="extra.category", value=page.extra.category) %}
+    {% endif %}
+{% endif %}
+
+{% for status in config.extra.statuses %}
+    {% set eips = all_eips | filter(attribute="extra.status", value=status)%}
+    {% set count = eips | length %}
+    {% if count > 0 %}
+        <h2 id="{{status | slugify}}">{{status}}</h2>
+        <table class="eiptable">
+            <thead>
+                <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+            </thead>
+            {% for page in eips %}
+                <tr>
+                    <td class="eipnum"><a href="{{ page.permalink }}">{{ page.extra.eip }}</a></td>
+                    <td class="title">{{ page.title }}</td>
+                    <td class="author">{{ post_macros::authors(authors=page.extra.author) }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endfor %}
+
+{% endblock content %}
