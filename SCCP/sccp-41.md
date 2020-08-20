@@ -2,18 +2,18 @@
 sccp: 41
 title: Lower C-Ratio by 100% to 600%
 status: Proposed
-author: Clinton Ennis (@hav-noms), Spreek (@Spreek)
+author: Clinton Ennis (@hav-noms), Spreek (@Spreek), Garth Travers (@garthtravers)
 discussions-to: governance
 created: 2020-08-20
 ---
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-Decrease the collateralization ratio to 600%
+This SCCP proposes to decrease the Collateralization Ratio to 600% from the current 700%. 
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
-The constraint on the supply of synth needs to be lifted in order to decrease the current price premium.
+There is currently a premium on sUSD compared to other stablecoins on Curve. Decreasing the Collateralization Ratio will help lift the supply of sUSD, with the aim of reducing the current price premium.
 
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
