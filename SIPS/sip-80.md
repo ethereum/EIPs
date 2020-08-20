@@ -2,7 +2,7 @@
 sip: 80
 title: Synthetic Futures 
 status: WIP
-author: Anton Juresevic (@zyzek), Jackson Chan (@jacko125), Kain Warwick (@kaiynne)
+author: Anton Jurisevic (@zyzek), Jackson Chan (@jacko125), Kain Warwick (@kaiynne)
 discussions-to: https://research.synthetix.io/t/sip-80-synthetic-futures/183
 created: 2020-08-06
 requires (*optional): 79
