@@ -2,7 +2,7 @@
 sccp: 41
 title: Lower C-Ratio by 100% to 600%
 status: Proposed
-author: Clinton Ennis (@hav-noms)
+author: Clinton Ennis (@hav-noms), Spreek (@Spreek)
 discussions-to: governance
 created: 2020-08-20
 ---
