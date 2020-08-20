@@ -64,7 +64,7 @@ Given the complexity of the design of synthetic futures, the rationale and trade
 
 ### Technical Specification
 
-#### Basic Contract and Market Parameters
+#### Contract and Market Parameters
 
 A position, opened on a specific market, may be either long or short.
 If it's long, then it gains value as the underlying asset appreciates.
@@ -100,7 +100,7 @@ open on that market. Additional parameters control the leverage offered on a par
 
 ---
 
-#### Margins and Leverage
+#### Leverage
 
 When a contract is opened, the account-holder chooses their initial leverage rate and margin, from
 which the contract size is computed. As profit is computed against the notional value of a contract, higher leverage
@@ -119,7 +119,7 @@ leveraged at 100x or more will immediately be liquidated by such an update.
 
 ---
 
-#### Exchange Fees
+#### Position Modification Fees
 
 Users must pay a fee whenever they increase the skew in the position, proportional with the skew they introduce.
 No exchange fee is charged for correcting the skew, nor for closing or reducing the size of a position.
@@ -139,7 +139,52 @@ and in particular always profitable when opening a position on the lighter side 
 
 ---
 
-#### Liquidations
+#### Aggregate Debt Calculation
+
+Each open contract contributes to the overall system debt of Synthetix.
+When a contract is opened, it accounts for a debt quantity exactly equal to the value of its initial margin.
+That same value of sUSD is burnt upon the creation of the contract. As the price of the base asset moves, however,
+the contract’s remaining margin changes, and so too does its debt contribution. In order to efficiently aggregate all
+these, each market keeps track of its overall debt contribution, which is updated whenever contracts are opened or
+closed.
+
+The overall market debt is the sum of the remaining margin in all contracts.
+As funding is merely transferred between accounts, it has no impact on the debt, and can be neglected.
+The possibility of negative remaining margin will also be neglected in the following computations,
+as such contributions can exist only transiently while contracts are awaiting liquidation.
+So long as insolvent contracts are liquidated within the 24-hour time lock specified in [SIP 40](sip-40.md), 
+the risk of a front-minting attack is minimal.
+These affordances will simplify calculations, and for the purposes of aggregated debt, 
+the remaining margin will be taken to be \\(m = m_e + r\\).
+
+The total debt is computed as follows.
+
+\\[D \ := \ \sum_{c \in C}{m^c}\\]
+\\[\ \ = \ p \ K  + \sum_{c \in C}{m_e^c} - (\sum_{c \in C_L}{v_e^c} - \sum_{c \in C_S}{v_e^c})\\]
+
+That is, the sum of remaining margins is equivalent to the notional skew, plus the sum of entry margins,
+minus the notional entry skew.
+
+Apart from the spot price \\(p\\), nothing in this expression changes but when positions are modified.
+Therefore we can keep track of everything in two variables: the skew value \\(K\\), and \\(\Delta_e\\) holding
+the sum of entry margins minus the notional entry skew. Then upon modification of a contract, these values
+can be updated as follows:
+
+\\[K \ \leftarrow \ K + s' \ q' - s \ q\\]
+\\[\Delta_e \ \leftarrow \ \Delta_e + m_e' - s' \ v_e' - m_e + s \ v_e\\]
+
+Where \\(s'\\), \\(q'\\), \\(m_e'\\), and \\(v_e'\\) are the contract's recomputed side, size, and initial margin
+and notional values after the contract is modified. 
+
+| Symbol | Description | Definition | Notes |
+| \\(\Delta_e\\) | Entry margin sum minus notional entry skew | \\[\Delta_e \ := \ \sum_{c \in C}{m_e^c} - (\sum_{c \in C_L}{v_e^c} - \sum_{c \in C_S}{v_e^c})\\] | - |
+| \\(D\\) | Market Debt | \\[D \ := \ max(p \ K + \Delta_e, 0)\\] | - |
+
+In this way the aggregate debt is efficiently computable at any time.
+
+---
+
+#### Liquidations and Keepers
 
 Once a position's remaining margin is exhausted, the position must be closed in a timely fashion,
 so that its contribution to the market skew and to the overall debt pool is accounted for as rapidly as possible,
@@ -277,51 +322,6 @@ Then settle funding and perform the contract update, including:
 
 \\[t_{last} \ \leftarrow \ now\\]
 \\[j^c \ \leftarrow \ \begin{cases} 0 & \ \text{if closing} \ c \\ \\ \newline n + 1 & \ \text{otherwise} \end{cases}\\]
-
----
-
-#### Aggregate Debt Calculation
-
-Each open contract contributes to the overall system debt of Synthetix.
-When a contract is opened, it accounts for a debt quantity exactly equal to the value of its initial margin.
-That same value of sUSD is burnt upon the creation of the contract. As the price of the base asset moves, however,
-the contract’s remaining margin changes, and so too does its debt contribution. In order to efficiently aggregate all
-these, each market keeps track of its overall debt contribution, which is updated whenever contracts are opened or
-closed.
-
-The overall market debt is the sum of the remaining margin in all contracts.
-As funding is merely transferred between accounts, it has no impact on the debt, and can be neglected.
-The possibility of negative remaining margin will also be neglected in the following computations,
-as such contributions can exist only transiently while contracts are awaiting liquidation.
-So long as insolvent contracts are liquidated within the 24-hour time lock specified in [SIP 40](sip-40.md), 
-the risk of a front-minting attack is minimal.
-These affordances will simplify calculations, and for the purposes of aggregated debt, 
-the remaining margin will be taken to be \\(m = m_e + r\\).
-
-The total debt is computed as follows.
-
-\\[D \ := \ \sum_{c \in C}{m^c}\\]
-\\[\ \ = \ p \ K  + \sum_{c \in C}{m_e^c} - (\sum_{c \in C_L}{v_e^c} - \sum_{c \in C_S}{v_e^c})\\]
-
-That is, the sum of remaining margins is equivalent to the notional skew, plus the sum of entry margins,
-minus the notional entry skew.
-
-Apart from the spot price \\(p\\), nothing in this expression changes but when positions are modified.
-Therefore we can keep track of everything in two variables: the skew value \\(K\\), and \\(\Delta_e\\) holding
-the sum of entry margins minus the notional entry skew. Then upon modification of a contract, these values
-can be updated as follows:
-
-\\[K \ \leftarrow \ K + s' \ q' - s \ q\\]
-\\[\Delta_e \ \leftarrow \ \Delta_e + m_e' - s' \ v_e' - m_e + s \ v_e\\]
-
-Where \\(s'\\), \\(q'\\), \\(m_e'\\), and \\(v_e'\\) are the contract's recomputed side, size, and initial margin
-and notional values after the contract is modified. 
-
-| Symbol | Description | Definition | Notes |
-| \\(\Delta_e\\) | Entry margin sum minus notional entry skew | \\[\Delta_e \ := \ \sum_{c \in C}{m_e^c} - (\sum_{c \in C_L}{v_e^c} - \sum_{c \in C_S}{v_e^c})\\] | - |
-| \\(D\\) | Market Debt | \\[D \ := \ max(p \ K + \Delta_e, 0)\\] | - |
-
-In this way the aggregate debt is efficiently computable at any time.
 
 ---
 
