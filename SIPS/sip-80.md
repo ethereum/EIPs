@@ -3,20 +3,20 @@ sip: 80
 title: Synthetic Futures 
 status: WIP
 author: TBD
-discussions-to: Create a new thread on https://research.synthetix.io and drop the link here
+discussions-to: https://research.synthetix.io/t/sip-80-synthetic-futures/183
 created: 2020-08-06
 requires (*optional): 79
 ---
 
 ## Simple Summary
 
-This SIP proposes the creation of pooled margin trading contracts, with the SNX debt pool acting as counterparty to
+This SIP proposes the creation of pooled synthetic futures contracts, with the SNX debt pool acting as counterparty to
 each trade.
 
 ## Abstract
 
-With the Synthetix debt pool as counterparty, users can gain leveraged exposure to a range of assets
-without holding the asset. PnL and liquidation calculations are simplified by denominating the margin in sUSD,
+With the Synthetix debt pool as counterparty, users can trade synthetic futures contracts to gain exposure to a range of assets
+without holding the asset. PnL and liquidation calculations are simplified by denominating the margin for each contract in sUSD,
 which can be minted and burnt as required, Therefore using Synthetix, users will not be exposed to volatility
 in the value of their margin, and they will always be liquidated when their margin is completely exhausted,
 with no requirement for a maintenance margin or deleveraging mechanisms. For similar reasons, no separate insurance
@@ -31,7 +31,7 @@ encouraging a neutral balance.
 ## Motivation
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is innaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-TBD
+The current design of Synths does not easily provide traders with a mechanism leveraged trading or for shorting assets, the iSynths are an approximation to a short position but have significant trade-offs in their current implementation. Synthetic futures contracts will enable a much expanded trading experience by enabling both leveraged price exposure and short exposure.
 
 ## Specification
 <!--The specification should describe the syntax and semantics of any new feature, there are five sections
@@ -45,12 +45,22 @@ TBD
 ### Overview
 <!--This is a high level overview of *how* the SIP will solve the problem. The overview should clearly describe how the new feature will be implemented.-->
 
-TBD
+There are a number of high level components required for the implementation of synthetic perpetual futures on Synthetix, they are outlined below:
+
+Market and contract parameters
+Leverage
+Position Fees
+Aggregate debt calculation
+Liquidations and Keepers
+Continuous funding rate
+Next price fulfillment
+
+Each of these components will be detailed below in the technical specification. Together they enable the system to offer leveraged trading, while charging a funding rate to reduce market skew and tracking the impact to the debt pool of each futures market.
 
 ### Rationale
 <!--This is where you explain the reasoning behind how you propose to solve the problem. Why did you propose to implement the change in this way, what were the considerations and trade-offs. The rationale fleshes out what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-TBD
+Given the complexity of the design of synthetic futures, the rationale and trade-offs are addressed in each component in the technical specification below.
 
 ### Technical Specification
 
