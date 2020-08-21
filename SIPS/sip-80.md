@@ -120,7 +120,7 @@ leveraged at 100x or more will immediately be liquidated by such an update.
 
 When a contract is closed, the funds in its margin are settled. After profit and funding are computed, the remaining
 margin of \\(m\\) sUSD will be minted into the account that created the contract, while any losses out of the initial
-margin (\\(max(\m_e - m, 0)\\)), will be minted into the fee pool. 
+margin (\\(max(m_e - m, 0)\\)), will be minted into the fee pool. 
 
 ---
 
