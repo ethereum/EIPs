@@ -2,7 +2,7 @@
 
 Many of these vectors are derived from [chfast/ethash](https://github.com/chfast/ethash)
 
-## fnv1a
+## ../assets/eip-1057/test-vectors.md#fnv1aprog
 
 |          `h` |          `d` |     _result_ |
 | -----------: | -----------: | -----------: |
@@ -123,7 +123,7 @@ For the first loop iteration of block 30,000 the seed to use for `fill_mix`
 would be `0xEE304846DDD0A47B`. A two dimensional `mix` array should be created
 passing the rows into `fill_mix` with the column number as the loop argument.
 
-The state of the mix array after the call to `progPowLoop` for block 30,000, 
+The state of the mix array after the call to `progPowLoop` for block 30,000,
 loop 1 are as follows.
 
 `mix[0]` -
