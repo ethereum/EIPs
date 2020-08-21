@@ -44,7 +44,7 @@ Worth adding here the main arguments in the camp of not lowering the c-ratio:
 
 Although I do think that these arguments and many others are valid, any change in c-ratio can be changed later via community vote in case the peg stabilizes. Until then, we as a community need to do our part in order to peg our main unit of account to its underlying. 
 
-Since the c-ratio was deisgned to be the lever for supporting supply and demand. It is forseen that the end of the yeild farming incentives to drop the peg in which the c-ratio may need to be used to increase the target c-ratio to reduce the sUSD supply
+Since the c-ratio was designed to be the lever for supporting supply and demand. It is forseen that the end of the yeild farming incentives to drop the peg in which the c-ratio may need to be used to increase the target c-ratio to reduce the sUSD supply.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
