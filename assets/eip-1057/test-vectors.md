@@ -2,7 +2,7 @@
 
 Many of these vectors are derived from [chfast/ethash](https://github.com/chfast/ethash)
 
-## fnv1aprog
+## fnv1a
 
 |          `h` |          `d` |     _result_ |
 | -----------: | -----------: | -----------: |
