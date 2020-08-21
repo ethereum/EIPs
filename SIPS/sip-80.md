@@ -47,15 +47,16 @@ The current design of Synths does not easily provide traders with a mechanism le
 
 There are a number of high level components required for the implementation of synthetic perpetual futures on Synthetix, they are outlined below:
 
-Market and contract parameters
-Leverage
-Position Fees
-Aggregate debt calculation
-Liquidations and Keepers
-Continuous funding rate
-Next price fulfillment
+* [Market and Contract Parameters](#market-and-contract-parameters)
+* [Leverage](#leverage)
+* [Position Fees](#position-fees)
+* [Aggregate Debt Calculation](#aggregate-debt-calculation)
+* [Liquidations and Keepers](#liquidations-and-keepers)
+* [Continuous funding rate](#skew-funding-rate)
+* [Next price fulfillment](#next-price-fulfillment)
 
-Each of these components will be detailed below in the technical specification. Together they enable the system to offer leveraged trading, while charging a funding rate to reduce market skew and tracking the impact to the debt pool of each futures market.
+Each of these components will be detailed below in the technical specification. Together they enable the system to offer leveraged trading,
+while charging a funding rate to reduce market skew and tracking the impact to the debt pool of each futures market.
 
 ### Rationale
 <!--This is where you explain the reasoning behind how you propose to solve the problem. Why did you propose to implement the change in this way, what were the considerations and trade-offs. The rationale fleshes out what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
@@ -64,7 +65,7 @@ Given the complexity of the design of synthetic futures, the rationale and trade
 
 ### Technical Specification
 
-#### Contract and Market Parameters
+#### Market and Contract Parameters
 
 A position, opened on a specific market, may be either long or short.
 If it's long, then it gains value as the underlying asset appreciates.
@@ -119,7 +120,7 @@ leveraged at 100x or more will immediately be liquidated by such an update.
 
 ---
 
-#### Position Modification Fees
+#### Position Fees
 
 Users must pay a fee whenever they increase the skew in the position, proportional with the skew they introduce.
 No exchange fee is charged for correcting the skew, nor for closing or reducing the size of a position.
@@ -260,7 +261,6 @@ is party to \\(Q_L + Q_S\\) in open contracts, its percentage return from fundin
 \\(\frac{i K}{Q_L + Q_S} \propto W^2\\), so it grows with the square of the proportional skew.
 This provides accelerating compensation as the risk increases.
 
-
 #### Accrued Funding Calculation
 
 Funding accrues continually, so any time the skew or base asset price changes, so too does
@@ -348,6 +348,16 @@ at the time the order was first submitted, rather than at the confirmation time.
 In order to avoid collisions, for the first implementation, there will be only one privileged keeper, whose profits
 will be paid into the fee pool. This will be done with a view to upgrading to a more robust and decentralised
 transaction relayer framework as the product matures.
+
+---
+
+### Extensions
+
+* Funding rate as automatic position size scaling, which would automatically bring the market into balance.
+* Paying a portion of the skew funding rate owed to the fee pool to the lighter side of the market, which would enhance the profitability of taking the counter position on market.
+* Mechanisms to constrain the overall size of each market, other than leverage and available sUSD.
+
+---
 
 ### Smart Contract Interface
 
