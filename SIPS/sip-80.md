@@ -48,7 +48,7 @@ The current design of Synths does not easily provide traders with a mechanism le
 There are a number of high level components required for the implementation of synthetic perpetual futures on Synthetix, they are outlined below:
 
 * [Market and Contract Parameters](#market-and-contract-parameters)
-* [Leverage](#leverage)
+* [Leverage and Margins](#leverage-and-margins)
 * [Position Fees](#position-fees)
 * [Aggregate Debt Calculation](#aggregate-debt-calculation)
 * [Liquidations and Keepers](#liquidations-and-keepers)
@@ -101,7 +101,7 @@ open on that market. Additional parameters control the leverage offered on a par
 
 ---
 
-#### Leverage
+#### Leverage and Margins
 
 When a contract is opened, the account-holder chooses their initial leverage rate and margin, from
 which the contract size is computed. As profit is computed against the notional value of a contract, higher leverage
@@ -117,6 +117,10 @@ increases the contract's liquidation risk.
 It is important to note that the granularity and frequency of oracle price updates constrains the maximum leverage
 that it's feasible to offer. If the oracle updates the price whenever it moves 1% or more, then any contracts
 leveraged at 100x or more will immediately be liquidated by such an update.
+
+When a contract is closed, the funds in its margin are settled. After profit and funding are computed, the remaining
+margin of \\(m\\) sUSD will be minted into the account that created the contract, while any losses out of the initial
+margin (\\(max(\m_e - m, 0)\\)), will be minted into the fee pool. 
 
 ---
 
@@ -211,8 +215,8 @@ A position may be liquidated whenever a price is received that causes:
 
 \\[m \leq P\\]
 
-Then the contract is closed, and the incentive is minted into the liquidating keeper's wallet at the time
-that the keeper executes the liquidation.
+Then the contract is closed, the incentive is minted into the liquidating keeper's wallet at the time
+that the keeper executes the liquidation, with the rest of the contract's initial margin going into the fee pool.
 
 It should be borne in mind that if gas prices are too high to allow liquidations to be profitable
 for liquidators, then liquidations will likely not be performed.
