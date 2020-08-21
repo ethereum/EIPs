@@ -1,7 +1,7 @@
 ---
 sccp: 35
 title: Reduce Rewards On Curve to 24,000 SNX
-status: Approved
+status: Implemented
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: https://discord.gg/B3PtpY
 created: 2020-07-18
