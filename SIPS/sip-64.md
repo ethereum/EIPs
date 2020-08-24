@@ -26,7 +26,7 @@ Take the `EternalStorage` contract pattern and generalize it for use in any numb
 
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is innaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-Currently the `EternalStorage` contract pattern is useful as storage for a single contract. However, using it means every new section of Synthetix requires its own instance of the storage contract, which continues to expand surface area of the project and requires more maintainence as each is paired to one single contract. Instead, this SIP proposes to create one central storage contract, where any contract can access storage mapped to
+Currently the `EternalStorage` contract pattern is useful as storage for a single contract. However, using it means every new section of Synthetix requires its own instance of the storage contract, which continues to expand surface area of the project and requires more maintainence as each is paired to one single contract. Instead, this SIP proposes to create one central storage contract, where any contract can access storage mapped to it by contract name using the `AddressResolver`.
 
 ## Specification
 
