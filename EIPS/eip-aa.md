@@ -195,7 +195,15 @@ miners to follow the recommended mining strategies as they will minimize their
 vulnerability to attacks of this type.
 
 #### Peer denial-of-service
-TODO
+Denial-of-Service attacks are difficult to defend, due to the difficulty in
+identifying sybils within a peer list. At any moment, one may decide (or be
+bribed) to initiate an attack. This is not a problem that Account Abstraction
+introduces. It can be accomplished against existing clients today by inundating
+a target with transactions whose signatures are invalid. However, due increased
+allotment of validation work allowed to AA, it's important bound the amount of
+computation an adversary can force a client to expend with invalid
+transactions. For this reason, it's best for the miner to follow the recommended
+mining stragies.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
