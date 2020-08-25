@@ -1,9 +1,9 @@
 ---
 sip: 79
-title: Deferred Transaction Gas Tank 
+title: Deferred Transaction Gas Tank
 status: WIP
 author: Anton Jurisevic (@zyzek), Clément Balestrat (@clementbalestrat), Clinton Ennis (@hav-noms)
-discussions-to: <Create a new thread on https://research.synthetix.io and drop the link here> 
+discussions-to: <Create a new thread on https://research.synthetix.io and drop the link here>
 
 created: 2020-08-19
 ---
@@ -55,7 +55,7 @@ Having a balance in the gas tank will not be required for standard exchange oper
 ### Overview
 <!--This is a high level overview of *how* the SIP will solve the problem. The overview should clearly describe how the new feature will be implemented.-->
 
-Any operation that needs to be deferred and executed by a keeper must measure its own gas consumption, reporting this 
+Any operation that needs to be deferred and executed by a keeper must measure its own gas consumption, reporting this
 quantity to the gas tank contract at the end of its execution. The gas tank will then consult the latest fast gas price
 from [Chainlink](https://feeds.chain.link/fast-gas-gwei), ensure that this does not exceed the user's configured
 maximum gas price, and reimburse the keeper from the user's balance, along with a fee to incentivise the execution.
@@ -206,9 +206,9 @@ Fetches the current ether price from Chainlink's [ETH / USD aggregation](https:/
 
 Returns the cost in ether to spend a given quantity of gas at the current gas price, plus the keeper fee,
 plus the execution cost of an invocation of the `spendGas` function.
-That is, this returns `gas * currentGasPrice() + SystemSettings.keeperFee() / currentEtherPrice() + cost(spendGas)`.
+That is, this returns `(gas + cost(spendGas)) * currentGasPrice() + SystemSettings.keeperFee() / currentEtherPrice()`.
 
-#### `spendGas`
+#### `payGas`
 
 **Signature:** `function payGas(address spender, address payable recipient, uint gas) external returns (uint etherSpent)`
 
