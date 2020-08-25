@@ -1,7 +1,7 @@
 ---
 sip: 75
 title: Keeper Synths - Phase 1
-status: WIP
+status: Proposed
 author: Kain Warwick (@kaiynne), Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/kPPKsPb
 
