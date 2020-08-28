@@ -11,7 +11,7 @@
   {% assign eips = include.eips|where:"status",status|sort:"eip" %}
   {% assign count = eips|size %}
   {% if count > 0 %}
-    <h2>{{status}}</h2>
+    <h2 id="{{status|slugify}}">{{status}}</h2>
     <table class="eiptable">
       <thead>
         <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
