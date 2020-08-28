@@ -34,6 +34,7 @@ twitter:
   username: ethereum
 
 # Build settings
+highlighter: rouge
 markdown: kramdown
 theme: minima
 kramdown:
@@ -42,6 +43,7 @@ kramdown:
   auto_ids: true
   # This is to ensure more determistic behaviour
   auto_id_stripping: true
+  syntax_highlighter: rouge
 
 permalink: /:slug
 
