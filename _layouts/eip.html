@@ -41,7 +41,7 @@ layout: default
 
   <div class="toc">
     <h2>Table of Contents</h2>
-    {% include toc.html html=content %}
+    {% include toc.html html=content sanitize=true h_max=3 %}
   </div>
 
   {{ content }}
