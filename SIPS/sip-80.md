@@ -97,7 +97,8 @@ open on that market. Additional parameters control the leverage offered on a par
 | \\(b\\) | Base asset | - | For example, BTC, ETH, and so on. The price \\(p\\) defined above refers to this asset. |
 | \\(Q_L\\), \\(Q_S\\) | Market Size | \\[Q_L \ := \ \sum_{c \in C_L}{q^c}\\] \\[Q_S \ := \ \sum_{c \in C_S}{q^c}\\] | The total size of all outstanding contracts on a given side of the market. |
 | \\(K\\) | Market skew | \\(K \ := \ Q_L - Q_S\\) | The excess contract units on one side or the other. When the skew is positive, longs outweigh shorts; when it is negative, shorts outweigh longs. When \\(K = 0\\), the market is perfectly balanced. |
-| \\(\lambda_{max}\\) | Maximum leverage | - | The size of a contract must not exceed its initial margin multiplied by the maximum leverage. |
+| \\(Q_{max}\\) | Open interest cap | - |  Orders cannot be opened that would cause the size of either side of the market to exceed this limit. We constrain both: \\[Q_L \leq Q_{max}\\] \\[Q_S \leq Q_{max}\\] The cap will initially be \\(1\,000\,000\\) units on each side of the market. |
+| \\(\lambda_{max}\\) | Maximum leverage | - | The size of a contract must not exceed its initial margin multiplied by the maximum leverage. Initially this will be no greater than 10. |
 
 ---
 
@@ -110,7 +111,7 @@ increases the contract's liquidation risk.
 | Symbol | Description | Definition | Notes |
 | ------ | ----------- | ---------- | ----- |
 | \\(\mu_e\\) | Initial margin ratio | - | The inverse of a contract's initial leverage. For example, \\(\mu_e = 0.5\\) corresponds to 2x leverage. |
-| \\(\mu_{min}\\) | Minimum initial margin ratio | - | The selected margin level must be no lower than this. We constrain \\[\mu_{min} \leq \mu_e\\]. Thus, this also constrains the maximum leverage. |
+| \\(\mu_{min}\\) | Minimum initial margin ratio | \\(\mu_{min} \ := \ \frac{1}{\lambda_{max}}\\) | The selected margin level must be no lower than this. We constrain \\[\mu_{min} \leq \mu_e\\]. Thus, this also constrains the maximum leverage. |
 | \\(m_e\\) | Initial margin | \\(m_e \ := \ \mu_e \ q \ p_e\\) | This is the quantity of sUSD the user initially spends to open a contract of \\(q\\) units of the base currency. The remaining \\(v_e - m_e\\) sUSD to pay for the rest of the position is "borrowed" from SNX holders, and it must be paid back when the position is closed. |
 | \\(m\\) | Remaining margin | \\(m \ := \ max(m_e + r + f, 0)\\) | A contract's remaining margin is its initial margin, plus its profit \\(r\\) and funding \\(f\\) (described below). When the remaining margin reaches zero, the position is liquidated, so that it can never take a negative value. |
 
