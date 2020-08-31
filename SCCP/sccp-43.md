@@ -2,7 +2,7 @@
 sccp: 43
 title: Pollux Updates for Chainlink Oracles
 author: Kain Warwick (@kaiynne), Justin Moses (@justinjmoses)
-discussions-to: <Create a new thread on https://research.synthetix.io and drop the link here>
+discussions-to: https://research.synthetix.io/t/sccp-43-pollux-changes/186
 status: WIP
 created: 2020-08-31
 requires: TBC
