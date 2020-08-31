@@ -1,5 +1,4 @@
-# Code Merkleization EIP draft
-
+---
 eip: 
 title: Chunk-Based Code Merkleization
 author: Sina Mahmoodi (@s1na), Alex Beregszaszi (@axic)
@@ -9,8 +8,7 @@ type: Standards Track
 category: Core
 created: 2020-08-25
 requires: 161, 170, 2584
-
-[toc]
+---
 
 ## Abstract
 
