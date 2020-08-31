@@ -20,6 +20,7 @@ The changes proposed are listed below:
 1. SystemSettings.rateStalePeriod: 25hrs
 2. SystemSettings.waitingPeriodSecs: 5mins x 60 = 300s
 3. SystemSettings.exchangeFeeRate(bytes32):
+
     a. Forex: 0.3% (same as current)
     
     b. Commodity: 0.3% (down from 1% currently)
