@@ -1,7 +1,7 @@
 ---
 sip: 83
 title: Total Issued Synths (Debt pool) Snapshots
-status: Proposed
+status: Implemented
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/t/sip-83-total-issued-synths-debt-pool-snapshots/190
 
