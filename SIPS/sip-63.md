@@ -1,7 +1,7 @@
 ---
 sip: 63
 title: Trading Incentives
-status: Proposed
+status: Implemented
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/t/sip-63-trading-incentives/83
 
