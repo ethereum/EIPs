@@ -1,7 +1,7 @@
 ---
 sip: 78
 title: iSynth limit reset must not trip circuit breaker
-status: Proposed
+status: Implemented
 author: Justin J Moses <@justinjmoses>
 discussions-to: https://research.synthetix.io/t/sip-78-isynth-limit-reset-must-not-trip-circuit-breaker/181
 
