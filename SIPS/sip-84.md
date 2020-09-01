@@ -13,15 +13,15 @@ requires: https://sips.synthetix.io/sips/sip-83
 
 <!--"If you can't explain it simply, you don't understand it well enough." Simply describe the outcome the proposed changes intends to achieve. This should be non-technical and accessible to a casual community member.-->
 
-Pause synths that are below the open interest threshold in order to reduce the gas costs of issuance, fee claiming and transfers
+Pause synths that are below the open interest threshold in order to reduce the gas costs of issuance, fee claiming and transfers. In addition for all traders with open positions at 10771675 sUSD will be paid to the value of the open position as compensation for having their position closed.
 
 ## Abstract
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
 
-This SIP proposes to pause synths with a supply below `50k USD` until a new SIP can be implemented that leverages Chainlink to reduce the cost of calculating the debt pool. Pausing these synths will reduce the cost of minting and burning by as much as 75%. While this proposal is not ideal, it is important as without it the migration to external oracles will increase the cost of minting and burning by more than 50%.
+This SIP proposes to pause synths with a supply below `30k USD` until a new SIP can be implemented that leverages Chainlink to reduce the cost of calculating the debt pool. Pausing these synths will reduce the cost of minting and burning by as much as 75%. While this proposal is not ideal, it is important as without it the migration to external oracles will increase the cost of minting and burning by more than 50%.
 
-We propose to freeze the prices of synths below the open interest threshold of `50k USD`, we will then purge them into `sUSD` and temporarily disconnect them until we can get a workaround implemented [sip-83](https://sips.synthetix.io/sips/sip-83).
+We propose to freeze the prices of synths below the open interest threshold of `30k USD`, we will then purge them into `sUSD` and temporarily disconnect them until we can get a workaround implemented [sip-83](https://sips.synthetix.io/sips/sip-83).
 
 ## Motivation
 
@@ -61,10 +61,6 @@ The table below reflects the Synths (and their inverses) that would be paused ba
 
 |  Synth   | Open Interest|
 |--------:|----------:|
-|    sBNB | 47,586.69 |
-|    sBCH | 41,088.75 |
-|    sLTC | 37,452.99 |
-|    sXTZ | 35,853.74 |
 |    sEOS | 27,165.32 |
 |    sCEX | 24,556.73 |
 |    sTRX | 18,874.18 |
