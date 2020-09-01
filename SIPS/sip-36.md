@@ -1,7 +1,7 @@
 ---
 sip: 36
 title: Chainlink Oracles Phase 2 - Cryptocurrencies, indexes 
-status: Approved
+status: Implemented
 author: Garth Travers (@garthtravers), Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/3uJ5rAy
 
