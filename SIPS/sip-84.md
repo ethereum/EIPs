@@ -57,6 +57,25 @@ Once temporarily reducing the number of Synths was deemed necessary we needed to
 
 <!--The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones.-->
 
+The table below reflects the Synths (and their inverses) that would be paused based on a threshold of 50k USD.
+
+|    sBNB | 47,586.69 |
+|--------:|----------:|
+|    sBCH | 41,088.75 |
+|    sLTC | 37,452.99 |
+|    sXTZ | 35,853.74 |
+|    sEOS | 27,165.32 |
+|    sCEX | 24,556.73 |
+|    sTRX | 18,874.18 |
+|   sFTSE | 11,836.85 |
+|    sJPY |  9,467.44 |
+|    sXMR |  9,215.42 |
+|    sCHF |  1,725.99 |
+|    sETC |  1,112.68 |
+|    sGBP |    453.27 |
+| sNIKKEI |      93.1 |
+|   sDASH |      87.8 |
+
 ### Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
