@@ -59,8 +59,9 @@ Once temporarily reducing the number of Synths was deemed necessary we needed to
 
 The table below reflects the Synths (and their inverses) that would be paused based on a threshold of 50k USD.
 
-|    sBNB | 47,586.69 |
+|  Synth   | Open Interest|
 |--------:|----------:|
+|    sBNB | 47,586.69 |
 |    sBCH | 41,088.75 |
 |    sLTC | 37,452.99 |
 |    sXTZ | 35,853.74 |
