@@ -1,7 +1,7 @@
 ---
 sip: 84
 title: Pause Synths Below Open Interest Threshold
-status: Proposed
+status: Implemented
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/t/sip-84-pause-synths-below-open-interest-threshold/189
 
