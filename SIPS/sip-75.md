@@ -1,7 +1,7 @@
 ---
 sip: 75
 title: Keeper Synths - Phase 1
-status: Proposed
+status: Implemented
 author: Kain Warwick (@kaiynne), Justin J Moses (@justinjmoses)
 discussions-to: https://discord.gg/kPPKsPb
 
