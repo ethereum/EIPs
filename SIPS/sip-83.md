@@ -6,7 +6,7 @@ author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/t/sip-83-total-issued-synths-debt-pool-snapshots/190
 
 created: 2020-08-31
-requires: TBC
+requires: https://sips.synthetix.io/sips/sip-84
 ---
 
 ## Simple Summary
@@ -27,7 +27,7 @@ We propose to add the ability to create a snapshot of the system's debt pool and
 
 In order to enable minting, burning and claiming rewards the system needs to know the size of the debt pool and the user's collateral ratio, calculating this value is expensive and contributes to the cost of each mint and burn transaction. This is because each time the system must read the price and amount of every synth in the system, currently 40+.
 
-In the current gas environment minting, burning and claiming costs can reach \$50 USD+ per tx or higher, with the migration to external oracles this could rise by 50-100% (See https://github.com/Synthetixio/SIPs/pull/232). This is due to the necessity of retrieving the latest prices and timestamp for each Synth from an external contract/s instead of reading all prices from our current `ExchangeRates` contract. About 70% of the gas costs are spent in calculating the total size of the debt pool during minting, burning and claiming rewards. Providing a snapshot of the total debt pool, calculated as:
+In the current gas environment minting, burning and claiming costs can reach \$50 USD+ per tx or higher, with the migration to external oracles this could rise by 50-100% (See https://sips.synthetix.io/sips/sip-84). This is due to the necessity of retrieving the latest prices and timestamp for each Synth from an external contract/s instead of reading all prices from our current `ExchangeRates` contract. About 70% of the gas costs are spent in calculating the total size of the debt pool during minting, burning and claiming rewards. Providing a snapshot of the total debt pool, calculated as:
 
 \\[ Debt pool = \sum{Synths Total Supply * Synth Price}\\]
 
