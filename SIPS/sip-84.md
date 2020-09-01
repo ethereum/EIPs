@@ -6,7 +6,7 @@ author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/t/sip-84-pause-synths-below-open-interest-threshold/189
 
 created: 2020-08-31
-requires: Insert SIP for debt aggregation calcs
+requires: https://sips.synthetix.io/sips/sip-83
 ---
 
 ## Simple Summary
@@ -21,7 +21,7 @@ Pause synths that are below the open interest threshold in order to reduce the g
 
 This SIP proposes to pause synths with a supply below `50k USD` until a new SIP can be implemented that leverages Chainlink to reduce the cost of calculating the debt pool. Pausing these synths will reduce the cost of minting and burning by as much as 75%. While this proposal is not ideal, it is important as without it the migration to external oracles will increase the cost of minting and burning by more than 50%.
 
-We propose to freeze the prices of synths below the open interest threshold of `50k USD`, we will then purge them into `sUSD` and temporarily disconnect them until we can get a workaround implemented ([sip-83](https://sips.synthetix.io/sips/sip-83)).
+We propose to freeze the prices of synths below the open interest threshold of `50k USD`, we will then purge them into `sUSD` and temporarily disconnect them until we can get a workaround implemented [sip-83](https://sips.synthetix.io/sips/sip-83).
 
 ## Motivation
 
