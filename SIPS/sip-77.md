@@ -1,7 +1,7 @@
 ---
 sip: 77
 title: StakingRewards bug fix's and Pausable stake()
-status: Proposed
+status: Implemented
 author: Clinton Ennis (@hav-noms), Anton Jurisevic (@zyzek)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
