@@ -15,8 +15,7 @@ elif [[ $TASK = 'htmlproofer-external' ]]; then
   bundle exec jekyll build
   bundle exec htmlproofer $HTMLPROOFER_OPTIONS --external_only
 elif [[ $TASK = 'eip-validator' ]]; then
-  ls | grep 'eip-' | grep -v 'eip-template.md' || EXIT=$?
-  if [ -z $EXIT ]; then
+  if [[ $(find . -maxdepth 1 -name 'eip-*' | wc -l) -ne 1 ]]; then
     echo "only 'eip-template.md' should be in the root"
     exit 1
   fi
