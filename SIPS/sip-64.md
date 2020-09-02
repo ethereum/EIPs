@@ -1,7 +1,7 @@
 ---
 sip: 64
 title: Flexible Contract Storage
-status: Approved
+status: Implemented
 author: Justin J Moses (@justinjmoses)
 discussions-to: <https://discordapp.com/invite/AEdUHzt>
 
