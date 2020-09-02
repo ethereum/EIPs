@@ -1,5 +1,5 @@
 ---
-sccp: tbd
+sccp: 46
 title: Lower C-Ratio by 100% to 500%
 status: Proposed
 author: Nocturnalsheet (@nocturnalsheet)
