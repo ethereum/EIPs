@@ -196,7 +196,7 @@ All generators and base points are written in the form (x,y).
     (9671717474070082183213120605117400219616337014328744928644933853176787189663, 16950150798460657717958625567821834550301663161624707787222815936182638968203)
     ```
 
-## Conversion of points
+### Conversion of points
 
 Following formulas allow to convert points from one form of the curve to another. We will denote the coordinates
 
@@ -359,5 +359,5 @@ Arithmetic of Baby Jubjub and some cryptographic primitives using the curve have
 - Solidity: https://github.com/yondonfu/sol-baby-jubjub
 - Go: https://github.com/iden3/go-iden3-crypto/tree/master/babyjub
 
-# Copyright
+## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
