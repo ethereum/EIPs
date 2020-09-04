@@ -3,7 +3,7 @@ sccp: 44
 title: Drop EtherCollateral fees to zero
 author: Clinton Ennis (@hav-noms)
 discussions-to:
-status: Proposed
+status: Implemented
 created: 2020-09-01
 ---
 
