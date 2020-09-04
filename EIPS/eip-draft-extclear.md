@@ -23,10 +23,10 @@ Enable new opcode to clear storage for `SELFDESTRUCTED`ed contracts.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
-`SELFDESTRUCT` is unnecessarily complex because it clears an unbounded amount of state from contract storage.
+`SELFDESTRUCT` is unnecessarily complex because it clears an unbounded amount of contract storage.
 It is computationally expensive for nodes to track all of the storage used in every contract in case the contract `SELFDESTRUCT`s.
 Further, contracts can be re-initialized using `CREATE2`, and then `SLOAD` prior storage.
-Therefore, several ethereum clients do not clear storage at all, and just check if the contract was initiated since `SLOAD`.
+Therefore, several ethereum clients do not clear storage at all, and just check if the contract was initiated since `SSTORE` during `SLOAD`.
 Nobody expected `SELFDESTRUCT` and `CREATE2` to increase the cost of `SLOAD`.
 Also, bugs in this implementation could split the network.
 
