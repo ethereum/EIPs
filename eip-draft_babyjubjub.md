@@ -142,7 +142,7 @@ which is the order of alt_bn128, the curve used to verfiy zk-SNARK proofs in Eth
 It is crucial that Baby Jubjub be safe against well-known attacks. To that end, we decided that the curve should pass [SafeCurves](https://safecurves.cr.yp.to/) security tests, as they are known for gathering the best known attacks against elliptic curves. Supporting evidence that Baby Jubjub satisfies the SafeCurves criteria can be found [here](https://github.com/barryWhiteHat/baby_jubjub).
 
 
-# Backwards Compatibility
+## Backward Compatibility
 <!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 
 Baby Jubjub is a twisted Edwards elliptic curve birational to different curves. So far, the curve has mainly been used in its original form, in Montomgery form. and in another (different representation) twisted Edwards form -- which we call the reduced twisted Edwards form.
