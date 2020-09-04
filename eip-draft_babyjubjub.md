@@ -101,7 +101,7 @@ y = 1695015079846065771795862556782183455030166316162470778722281593618263896820
 ```
 generates the subgroup of points `P` of Baby Jubjub satisfying `l * P = O`. That is, it generates the set of points of order `l` and origin `O`.
 
-## Arithmetic
+### Arithmetic
 
 Let `P1 = (x1, y1)` and `P2 = (x2, y2)` be two arbitrary points of Baby Jubjub. Then `P1 + P2 = (x3, y3)` is calculated in the following way:
 ```
