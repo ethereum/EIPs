@@ -91,7 +91,7 @@ y = 5472060717959818805561601436314318772137091100104008585924551046643952123905
 ```
 generates all `n` points of the curve.
 
-## Base point
+### Base Point
 
 The point `B = (x,y)` with coordinates
 
