@@ -149,7 +149,7 @@ Baby Jubjub is a twisted Edwards elliptic curve birational to different curves. 
 
 Below are the three representations and the birational maps that make it possible to map points from one form of the curve to another. In all cases, the generator and base points are written in the form **`(x,y)`.**
 
-## Forms of the curve
+### Forms of the Curve
 
 All generators and base points are written in the form (x,y).
 
