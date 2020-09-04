@@ -261,7 +261,7 @@ x = x'/(-f)
 y = y'
 ```
 
-# Test Cases
+## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 
 **Test 1 (Addition)**
