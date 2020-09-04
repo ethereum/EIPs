@@ -82,7 +82,7 @@ l = 2736030358979909402780800718157159386076813972158567259200215660948447373041
 ```
 The parameter `h` is called *cofactor* and `l` is a prime number of 251 bits.
 
-## Generator point 
+### Generator Point
 
 The point `G = (x,y)` with coordinates 
 ```
