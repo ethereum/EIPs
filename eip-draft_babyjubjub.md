@@ -63,7 +63,7 @@ d = 168696
 ```
 We call **Baby Jubjub** the curve `E(F_r)`, that is, the subgroup of `F_r`-rational points of `E`.
 
-## Order
+### Order
 
 Baby Jubjub has order 
 
