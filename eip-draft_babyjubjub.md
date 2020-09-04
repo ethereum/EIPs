@@ -110,7 +110,7 @@ y3 = (y1*y2 - a*x1*x2)/(1 - d*x1*x2*y1*y2)
 ```
 Note that both addition and doubling of points can be computed using a single formula. 
 
-# Rationale
+## Rationale
 <!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 The search for Baby Jubjub was motivated by the need for an elliptic curve that allows the implementation of elliptic-curve cryptography in `F_r`-arithmetic circuits. The curve choice was based on three main factors: type of curve, generation process and security criteria. This section describes how these factors were addressed. 
