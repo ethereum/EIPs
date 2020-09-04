@@ -5,7 +5,7 @@ author: William Morriss (@wjmelements)
 discussions-to: <TBD>
 status: Draft
 type: Standards Track
-category Core
+category: Core
 created: 2020-09-03
 replaces: 2751
 ---
