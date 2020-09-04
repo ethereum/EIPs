@@ -46,7 +46,7 @@ The implementation of most zk-SNARK protocols (e.g. [[Pinnochio]](https://eprint
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 
-## Definition
+### Definitions
 Let `F_r` be the prime finite field with `r` elements, where
 ```
 r = 21888242871839275222246405745257275088548364400416034343698204186575808495617
