@@ -9,7 +9,7 @@ category: ERC
 created:  2020-01-29
 ---
 
-# Simple Summary
+## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
 This proposal defines Baby Jubjub, an elliptic curve designed to work inside zk-SNARK circuits in Ethereum.
