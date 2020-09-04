@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: EXTCLEAR Opcode For SELFDESTRUCTed contracts
 author: William Morriss (@wjmelements)
-discussions-to: <TBD>
+discussions-to: https://ethereum-magicians.org/t/eip-2936-extclear-for-selfdestruct/4569
 status: Draft
 type: Standards Track
 category: Core
