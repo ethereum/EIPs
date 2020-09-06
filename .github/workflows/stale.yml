@@ -1,4 +1,5 @@
 name: "Mark stale PRs"
+
 on:
   schedule:
   - cron: "0 0 * * *"
