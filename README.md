@@ -8,7 +8,7 @@ A browsable version of all current and draft EIPs can be found on [the official 
 
 # Contributing
 
- 1. Review [EIP-1](EIPS/eip-1.md).
+ 1. Review [EIP-1](./EIPS/eip-1.md).
  2. Fork the repository by clicking "Fork" in the top right.
  3. Add your EIP to your fork of the repository. There is a [template EIP here](eip-template.md).
  4. Submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
