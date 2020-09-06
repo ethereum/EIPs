@@ -1,0 +1,17 @@
+name: "Mark stale PRs"
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-pr-message: 'There was no activity on this pull request for a significant amount of time. It will be closed soon. Please reach out to an editor, if you are still pursuing it.'
+        close-pr-message: 'This pull request was closed due to inactivity. If you are still pursuing it, please reopen the pull request.'
+        days-before-stale: 60
+        days-before-close: 7
+        stale-pr-label: 'stale'
