@@ -122,8 +122,7 @@ Each EIP should have the following parts:
 
 ## EIP Formats and Templates
 
-EIPs should be written in [markdown] format.
-Image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
+EIPs should be written in [markdown] format. There is a [template](https://github.com/ethereum/EIPs/blob/master/eip-template.md) to follow.
 
 ## EIP Header Preamble
 
@@ -215,7 +214,7 @@ EIPs may also have a `superseded-by` header indicating that an EIP has been rend
 
 ## Auxiliary Files
 
-EIPs may include auxiliary files such as diagrams. Such files must be named EIP-XXXX-Y.ext, where “XXXX” is the EIP number, “Y” is a serial number (starting at 1), and “ext” is replaced by the actual file extension (e.g. “png”).
+Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
 
 ## Transferring EIP Ownership
 
