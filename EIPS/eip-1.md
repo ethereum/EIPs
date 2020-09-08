@@ -3,7 +3,7 @@ eip: 1
 title: EIP Purpose and Guidelines
 status: Active
 type: Meta
-author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, and others
+author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 created: 2015-10-27
 updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17
 ---
@@ -22,7 +22,7 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 
 There are three types of EIP:
 
-- A **Standard Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories. Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification].
+- A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories. Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification].
   - **Core** - improvements requiring a consensus fork (e.g. [EIP-5], [EIP-101]), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86]).
   - **Networking** - includes improvements around [devp2p] ([EIP-8]) and [Light Ethereum Subprotocol], as well as proposed improvements to network protocol specifications of [whisper] and [swarm].
   - **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP-6]) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
@@ -136,13 +136,13 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * discussions-to:` *a url pointing to the official discussion thread*
 
-` status:` *Draft | Last Call | Accepted | Final | Active | Abandoned | Rejected | Superseded*
+` status:` *Draft, Last Call, Accepted, Final, Active, Abandoned, Rejected, or Superseded*
 
 `* review-period-end:` *date review period ends*
 
-` type:` *Standards Track | Informational | Meta*
+` type:` *Standards Track, Meta, or Informational*
 
-` * category:` *Core | Networking | Interface | ERC* (Standards Track EIPs only)
+` * category:` *Core, Networking, Interface, or ERC* (fill out for Standards Track EIPs only)
 
 ` created:` *date created on*
 
