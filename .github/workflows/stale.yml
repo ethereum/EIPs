@@ -2,7 +2,8 @@ name: "Mark stale PRs"
 
 on:
   schedule:
-  - cron: "0 0 * * *"
+  # Run this every hour, so we are not spammed with changes at once. Later we could consider changing this to once a day.
+  - cron: "0 * * * *"
 
 jobs:
   stale:
