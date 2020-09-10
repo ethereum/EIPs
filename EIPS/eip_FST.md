@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Finalizable Service Token
 author: Alessandro Partesotti <a.partesotti@gmail.com>
 discussions-to: https://github.com/ethereum/EIPs/issues/2965
-status: Draft
+status: Idea
 type: Standards Track
 category: ERC
 created: 2020-09-10
