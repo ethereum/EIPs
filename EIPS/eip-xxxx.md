@@ -1,7 +1,7 @@
 ---
 eip: xxxx
 title: BW6-761 curve operations
-author: Youssef El Housni (@yelhousni)
+author: Youssef El Housni (@yelhousni) and Aurore Guillevic
 discussions-to:
 status: Draft
 type: Standards Track
@@ -15,29 +15,29 @@ requires : xxxx
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-This precompile adds operations for the BW6-761 curve (from the EY/Inria [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification for efficient one-layer composed proofs. It is intended to replace the SW6 curve (from the [Zexe paper](https://eprint.iacr.org/2018/962.pdf)) for performance reasons.
+This precompile adds operations for the BW6-761 curve (from the EY/Inria [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification of one-layer composed proofs. It is intended to replace the CP6-782 curve from ([Zexelib](https://github.com/scipr-lab/zexe)) for performance reasons. This EIP is based on and tends to replace [EIP-2541](https://github.com/matter-labs/EIPs/blob/sw6_wrapping/EIPS/eip-2541.md).
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
 
-If `block.number >= X` we introduce *seven* separate precompiles to perform the following operations (addresses to be determined):
+If `block.number >= X` we introduce *nine* separate precompiles to perform the following operations (addresses to be determined):
 
-- BW6_G1_ADD - to perform point addition on a curve defined over prime field
-- BW6_G1_MUL - to perform point multiplication on a curve defined over prime field
-- BW6_G1_MULTIEXP - to perform multiexponentiation on a curve defined over prime field
-- BW6_G2_ADD - to perform point addition on a curve twist defined the base prime field
-- BW6_G2_MUL - to perform point multiplication on a curve twist defined over the base prime field
-- BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over the base prime field
+- BW6_G1_ADD - to perform point addition on a curve defined over a prime field
+- BW6_G1_MUL - to perform point multiplication on a curve defined over a prime field
+- BW6_G1_MULTIEXP - to perform multiexponentiation on a curve defined over a prime field
+- BW6_G2_ADD - to perform point addition on a curve twist defined the base a prime field
+- BW6_G2_MUL - to perform point multiplication on a curve twist defined over a prime field
+- BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over a prime field
 - BW6_PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
 - BW6_MAP_FP_TO_G1 - to perform mapping of an element in the base field FP to a point (x,y) in the group G1
 - BW6_MAP_FP_TO_G2 - to perform mapping of an element in the base field FP to a point (x,y) in the group G2
 
-The multiexponentiation operations are a generalization of point multiplication.
+The multiexponentiation operations are a generalization of point multiplication, but seperate precompiles are prosposed because running a single MUL through MULTIEXP seems to be 20% more expensive.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/SW6 pair of curves. This precompile proposes a replacement of SW6 by BW6-761, which allows much faster verification.
+The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/CP6-782 pair of curves. This precompile proposes a replacement of CP6-782 by BW6-761, which allows much faster operations.
 
 ### Proposed addresses table
 
@@ -63,18 +63,16 @@ The BW6-761 `y^2=x^3-1` curve is fully defined by the following set of parameter
 ```
 Base field modulus = 0x122e824fb83ce0ad187c94004faff3eb926186a81d14688528275ef8087be41707ba638e584e91903cebaff25b423048689c8ed12f9fd9071dcd3dc73ebff2e98a116c25667a8f8160cf8aeeaf0a437e6913e6870000082f49d00000000008b
 A coefficient = 0x0
-B coefficient = 0x122e824fb83ce0ad187c94004faff3eb926186a81d14688528275ef8087be41707ba638e584e91903cebaff25b423048689c8ed12f9fd9071dcd3dc73ebff2e98a116c25667a8f8160cf8aeeaf0a437e6913e6870000082f49d00000000008b
+B coefficient = 0x122e824fb83ce0ad187c94004faff3eb926186a81d14688528275ef8087be41707ba638e584e91903cebaff25b423048689c8ed12f9fd9071dcd3dc73ebff2e98a116c25667a8f8160cf8aeeaf0a437e6913e6870000082f49d00000000008a
 Main subgroup order = 0x1ae3a4617c510eac63b05c06ca1493b1a22d9f300f5138f1ef3622fba094800170b5d44300000008508c00000000001
 Extension tower:
-Fp3 construction:
-Fp cubic non-residue = 0x2
-Fp6 construction:
-Fp2 quadratic non-residue c0 = 0x0
-                          c1 = 0x1
-                          c3 = 0x0
+Fp3 construction: (Fp3 = Fp[u]/u^3+4)
+Fp cubic non-residue = 0x122e824fb83ce0ad187c94004faff3eb926186a81d14688528275ef8087be41707ba638e584e91903cebaff25b423048689c8ed12f9fd9071dcd3dc73ebff2e98a116c25667a8f8160cf8aeeaf0a437e6913e6870000082f49d000000000087
 Twist parameters:
 Twist type: M
-B coefficient for twist c0 = 0x4
+twist curve A coefficient c0 = 0x0
+                          c1 = 0x0
+twist curve B coefficient c0 = 0x4
                         c1 = 0x0
 Generators:
 G1:
@@ -83,9 +81,10 @@ Y = 0x58b84e0a6fc574e6fd637b45cc2a420f952589884c9ec61a7348d2a2e573a3265909f1af7e
 G2:
 X = 0x110133241d9b816c852a82e69d660f9d61053aac5a7115f4c06201013890f6d26b41c5dab3da268734ec3f1f09feb58c5bbcae9ac70e7c7963317a300e1b6bace6948cb3cd208d700e96efbc2ad54b06410cf4fe1bf995ba830c194cd025f1c
 Y = 0x17c3357761369f8179eb10e4b6d2dc26b7cf9acec2181c81a78e2753ffe3160a1d86c80b95a59c94c97eb733293fef64f293dbd2c712b88906c170ffa823003ea96fcd504affc758aa2d3a3c5a02a591ec0594f9eac689eb70a16728c73b61
-Pairing parameters:
-|loop_count_1| (first miller loop count) = 0x8508c00000000002
-|loop_count_2| (first miller loop count) = 0x23ed1347970dec008a442f991fffffffffffffffffffffff
+Pairing parameters: (TODO: change miller loop counts)
+e(P,Q)=(ML1(P,Q)*ML2(P,Q)^q)^FE
+|loop_count_1| (first miller loop ML1 count) = 0x8508c00000000002
+|loop_count_2| (second miller loop ML2 count) = 0x23ed1347970dec008a442f991fffffffffffffffffffffff
 loop_count_1 is negative = false
 loop_count_2 is negative = false
 ```
