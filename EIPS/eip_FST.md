@@ -22,12 +22,12 @@ The main focus of this token Is about a distributed service that can be used wit
 
 I will try to explain this inital idea by examples.
 
-### Application Example 1 (On Demand Service)
+## Application Example 1 (On Demand Service)
 
 A company wants to emit a license for software that it develops the machine with this software wants to send a paid token with its custom data to a user wallet to enable software X on machine Y for 1 yr.
 The token can't be transferred after finalization with or without data or after a certain amount of transfer. The multi transfer can be useful in case of using other contracts before, or using different company wallets.
 
-### Application Example 2 (Validation service)
+## Application Example 2 (Validation service)
 
 let Actor1 Actor2 buy 2 different Token and wants to make a Deal with a Validation using a contract Validator.
 
@@ -39,7 +39,7 @@ let Actor1 Actor2 buy 2 different Token and wants to make a Deal with a Validati
 
 I just thought an initial basic interface for this improvemnt
 
-```
+```solidity
 interface IERCXXX{
     /**
      * @dev Emitted when `tokenId` token is transfered from `from` to `to`.
