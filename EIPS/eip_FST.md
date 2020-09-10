@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: <to be assigned>
 title: Finalizable Service Token
 author: Alessandro Partesotti <a.partesotti@gmail.com>
 discussions-to: https://github.com/ethereum/EIPs/issues/2965
