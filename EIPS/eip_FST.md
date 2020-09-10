@@ -10,10 +10,10 @@ created: 2020-09-10
 ---
 
 ## Simple Summary
-A standard interface for Finalizable Service Token enables companies or professionals to emit a token for its services.
+An interface for Finalizable Service Token enables companies or professionals to emit a token for its services.
 
 ## Abstract 
-This improvemnt wnats to **standardize** a **service token transferable n-times** and **mintable**.
+This improvemnt wnats to **propose** a **service token transferable n-times** and **mintable**.
 
 The main focus of this token Is about a distributed service that can be used with this token. 
 
