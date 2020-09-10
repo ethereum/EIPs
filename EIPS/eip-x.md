@@ -26,7 +26,6 @@ This creates highly efficient price discovery, where the price will always immed
 ![escalator algorithm price chart](https://ethresear.ch/uploads/default/original/2X/0/042795efa4c2680d644bc66386cd2984a70293f8.gif)
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 Ethereum currently prices transaction fees using a simple first-price auction, which leads to well documented inefficiencies (some of which are documented in [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)) when users are trying to estimate what price will get a transaction included in a block, especially during times of price volatility and full blocks.
 
 EIP 1559 is currently being championed as an improvement for the Ethereum protocol, and while I agree that the gas market is very inefficient, since a change like this will affect all client and wallet implementations, the Ethereum community should make sure to make a selection based on solid reasoning and justifications, which I believe 1559 is currently lacking.
