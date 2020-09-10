@@ -122,7 +122,7 @@ function txFee (startBlock, startPrice, maxBlock, maxPrice, blockNumber) {
 Since a current `gasPrice` transaction is effectively a flat-escalated transaction bid, it is entirely compatible with this model, and so there is no concrete requirement to deprecate current transaction processing logic, allowing cold wallets and hardware wallets to continue working for the forseeable future.
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+TBD
 
 ## Implementation
 TBD
