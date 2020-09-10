@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Finalizable Service Token
-author: Alessandro Partesotti <a.partesotti@gmail.com>
+author: Alessandro Partesotti<a.partesotti@gmail.com>
 discussions-to: https://github.com/ethereum/EIPs/issues/2965
 status: Draft
 type: Standards Track
