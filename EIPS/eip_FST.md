@@ -15,7 +15,7 @@ A standard interface for Finalizable Service Token enables companies or professi
 ## Abstract 
 This improvemnt wnats to **standardize** a **service token transferable** n-times and **mintable**.
 
-The main focus of this token Is about a distributed service that can be used with this token.  I don't know if there are tokens similar or equivalent.
+The main focus of this token Is about a distributed service that can be used with this token. 
 
 ## Motivation
 I will try to explain this inital idea by examples.
