@@ -39,7 +39,7 @@ let Actor1 Actor2 buy 2 different Token and wants to make a Deal with a Validati
 
 I just thought an initial basic interface for this improvemnt
 
-
+```
 interface IERCXXX{
     /**
      * @dev Emitted when `tokenId` token is transfered from `from` to `to`.
@@ -140,4 +140,5 @@ interface IERCXXX{
     function getApproved(uint256 tokenId) external view returns (address operator);
 
 }
+```
 
