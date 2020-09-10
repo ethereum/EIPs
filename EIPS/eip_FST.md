@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Finalizable Service Token
 author: Alessandro Partesotti<a.partesotti@gmail.com>
-discussions-to: https://github.com/ethereum/EIPs/issues/2965
+discussions-to: https://ethereum-magicians.org/t/finalizable-service-token-fst-what-do-you-think/4594
 status: Draft
 type: Standards Track
 category: ERC
@@ -40,12 +40,16 @@ let Actor1 Actor2 buy 2 different Token and wants to make a Deal with a Validati
 I just thought an initial basic interface for this improvemnt
 
 ```solidity
+pragma solidity ^0.7.1;
+// SPDX-License-Identifier: MIT
+
 interface IERCXXX{
+
     /**
      * @dev Emitted when `tokenId` token is transfered from `from` to `to`.
      */
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-     /**
+        /**
      * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
      */
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -83,7 +87,7 @@ interface IERCXXX{
      * - `tokenId` token must exist.
      * Emits a {Transfer} event.
      */
-    function finalizeAndTransferFrom(address from,address to, uint256 tokenId, string data) external;
+    function finalizeAndTransferFrom(address from,address to, uint256 tokenId, string memory data) external;
 
      /**
      * @dev Transfer token from `from` to `to` and decrement the internal transfer counter.
@@ -104,7 +108,7 @@ interface IERCXXX{
      *
      * - `tokenId` token must exist.
      */
-    function getTokenData(uint256 tokenID) public view returns(string) external;
+    function getTokenData(uint256 tokenID) external view returns(string memory);
 
     /**
      * @dev Gets the remaining transfer for the given `tokenId`.
@@ -113,7 +117,7 @@ interface IERCXXX{
      *
      * - `tokenId` token must exist.
      */    
-    function getResidualTransfer(uint256 tokenId) public view returns(uint256) external;
+    function getResidualTransfer(uint256 tokenId) external view returns(uint256) ;
 
     /**
      * @dev Gives permission to `to` to transfer `tokenId` token to another account.
@@ -137,8 +141,134 @@ interface IERCXXX{
      *
      * - `tokenId` must exist.
      */
-    function getApproved(uint256 tokenId) external view returns (address operator);
+    function getApproved(uint256 tokenId) external view returns (address[] memory operators);
 
+
+}
+contract ERCxxx is IERCXXX{
+
+    string private _name;
+    string private _symbol;
+    mapping(address=>bool) private _approvedMinters;
+    mapping(uint256 => uint256) private _residualTransfer;
+    mapping(uint256 => address[]) private _tokenOwners;
+    mapping(uint256 => string) private _tokenData;
+    mapping(address => uint256) private _balances;
+
+    uint256[] private _tokens;
+
+
+
+    constructor(string memory tokenName, string memory tokenSymbol)
+    {
+        _name = tokenName;
+        _symbol = tokenSymbol;
+       
+        _approvedMinters[msg.sender] = true;
+    }
+    function Symbol()public view returns(string memory)
+    {
+        return _symbol;
+    }
+    function _exists(uint256 tokenId) private view returns(bool)
+    {
+        if(_tokenOwners[tokenId].length == 0)
+            return false;
+        return true;
+    }
+
+    function _isOwnerOf(address owner,uint256 tokenId) private view returns(bool)
+    {
+        address[] memory addr = _tokenOwners[tokenId];
+        for(uint256 i =0; i< addr.length; i++)
+        {
+            if(addr[i]==owner)
+                return true;
+        }
+        return false;
+    }
+    function mint(address to, uint256 tokenId, uint256 allowedMaxTransfer) public override
+    {
+        require(_approvedMinters[msg.sender],"ERCXXX: you can't mint this token");
+        require(to != address(0), "ERCXXX: mint require a not null address");
+        require(!_exists(tokenId), "ERCXXX: Token id already exists");
+        _tokens.push(tokenId);
+        _tokenOwners[tokenId].push(to);
+        _residualTransfer[tokenId] = allowedMaxTransfer;
+        _balances[to]++;
+    }
+    function totalSupply() public view override returns (uint256) {
+        return _tokens.length;
+    }
+
+    function _transfer(address from,address to, uint256 tokenId, string memory data) private {
+        
+        _residualTransfer[tokenId]--;
+        delete _tokenOwners[tokenId];
+        _tokenOwners[tokenId].push(to);
+        _tokenData[tokenId] = data;
+        _balances[from]--;
+        _balances[to]++;
+    }
+
+    function _transferCheck(address from,uint256 tokenId) private view
+    {
+        require(_residualTransfer[tokenId] > 0, "ERCXXX: transfer limit reached for this token");
+        require(_isOwnerOf(from,tokenId), "ERCXXX: only token owner can finalize and/or transfer");
+    }
+    function finalizeAndTransfer(address to, uint256 tokenId, string memory data) public
+    {
+        _transferCheck(msg.sender,tokenId);
+        _residualTransfer[tokenId]=1;
+        _transfer(msg.sender,to,tokenId,data);
+    }
+
+    function transfer(address to, uint256 tokenId) public
+    {
+        _transferCheck(msg.sender,tokenId);
+        _transfer(msg.sender,to,tokenId,"");
+    }
+    
+    function finalizeAndTransferFrom(address from,address to, uint256 tokenId, string memory data) public override
+    {
+        _transferCheck(from,tokenId);
+        _residualTransfer[tokenId]=1;
+        _transfer(from,to,tokenId,data);
+    }
+
+    function transferFrom(address from,address to, uint256 tokenId) public override
+    {
+        _transferCheck(from,tokenId);
+        _transfer(from,to,tokenId,"");
+    }
+
+
+    
+    function getResidualTransfer(uint256 tokenId) public view override returns(uint256)
+    {
+        return _residualTransfer[tokenId];
+    }
+    
+    function balanceOf(address wallet) public view override returns(uint256)
+    {
+        return _balances[wallet];
+    }
+
+    function approve(address to, uint256 tokenId) public override
+    {
+        _tokenOwners[tokenId].push(to);
+    }
+
+
+    function getApproved(uint256 tokenId) public view override returns (address[] memory operators)
+    {
+        return _tokenOwners[tokenId];
+    }
+    
+    function getTokenData(uint256 tokenID) public view override returns(string memory) 
+    {
+        return _tokenData[tokenID];
+    }
 }
 ```
 
