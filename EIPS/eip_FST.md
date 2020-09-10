@@ -13,14 +13,14 @@ created: 2020-09-10
 A standard interface for Finalizable Service Token enables companies or professionals to emit a token for its services.
 
 ## Abstract 
-This improvemnt wnats to **standardize** a **service token transferable** n-times and **mintable**.
+This improvemnt wnats to **standardize** a **service token transferable n-times** and **mintable**.
 
 The main focus of this token Is about a distributed service that can be used with this token. 
 
 ## Motivation
 I will try to explain this inital idea by examples.
 
-### Application Example 1 (Service on demand)
+### Application Example 1 (On Demand Service)
 A company wants to emit a license for software that it develops the machine with this software wants to send a paid token with its custom data to a user wallet to enable software X on machine Y for 1 yr.
 The token can't be transferred after finalization with or without data or after a certain amount of transfer. The multi transfer can be useful in case of using other contracts before, or using different company wallets.
 
