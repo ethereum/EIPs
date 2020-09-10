@@ -9,8 +9,6 @@ category: Core
 created: 2020-03-13
 ---
 
-<!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
-
 ## Simple Summary
 The current "first price auction" fee model in Ethereum is inefficient and needlessly costly to users. This EIP proposes a way to replace this with a mechanism that allows dynamically priced transaction fees and efficient transaction price discovery.
 
