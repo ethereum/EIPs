@@ -132,9 +132,5 @@ Since a current `gasPrice` transaction is effectively a flat-escalated transacti
 The security considerations for this EIP are:
 - None currently known.
 
-## Resources
-* [Original Magicians thread](https://ethresear.ch/t/another-simple-gas-fee-model-the-escalator-algorithm-from-the-agoric-papers/6399)
-
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
