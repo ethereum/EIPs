@@ -1,5 +1,5 @@
 ---
-eip: tbd
+eip: 2593
 title: Escalator fee market change for ETH 1.0 chain
 author: Dan Finlay <dan@danfinlay.com>
 discussions-to: https://ethresear.ch/t/another-simple-gas-fee-model-the-escalator-algorithm-from-the-agoric-papers/6399
