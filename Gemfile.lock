@@ -264,6 +264,3 @@ DEPENDENCIES
   minima (~> 2.0)
   sip_validator (>= 0.1.1)
   tzinfo-data
-
-BUNDLED WITH
-   1.16.1
