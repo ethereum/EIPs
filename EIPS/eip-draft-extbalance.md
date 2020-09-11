@@ -18,7 +18,6 @@ Renames `BALANCE` to `EXTBALANCE` and reduces `EXTBALANCE` cost when querying th
 This EIP renames `BALANCE` to `EXTBALANCE`.
 The gas cost of `EXTBALANCE` when the parameter matches the current address is reduced to a value slightly higher than the cost of `SELFBALANCE`.
 
-
 ## Motivation
 As the primary purpose of `EXTBALANCE` following EIP1884 is to query external accounts, the name is updated accordingly.
 
