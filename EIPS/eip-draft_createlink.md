@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2185
 title: CREATELINK opcode
 author: William Morriss (@wjmelements)
 discussions-to: [Github PR](https://github.com/ethereum/EIPs/pull/2185)
