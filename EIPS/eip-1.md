@@ -230,23 +230,15 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-` * Nick Johnson (@arachnid)`
-
-` * Casey Detrio (@cdetrio)`
-
-` * Hudson Jameson (@Souptacular)`
-
-` * Vitalik Buterin (@vbuterin)`
-
-` * Nick Savers (@nicksavers)`
-
-` * Martin Becze (@wanderer)`
-
-` * Greg Colvin (@gcolvin)`
-
-` * Alex Beregszaszi (@axic)`
-
-` * Micah Zoltu (@MicahZoltu)`
+- Nick Johnson (@arachnid)
+- Casey Detrio (@cdetrio)
+- Hudson Jameson (@Souptacular)
+- Vitalik Buterin (@vbuterin)
+- Nick Savers (@nicksavers)
+- Martin Becze (@wanderer)
+- Greg Colvin (@gcolvin)
+- Alex Beregszaszi (@axic)
+- Micah Zoltu (@MicahZoltu)
 
 ## EIP Editor Responsibilities
 
