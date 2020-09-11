@@ -19,7 +19,7 @@ This EIP renames `BALANCE` to `EXTBALANCE`.
 The gas cost of `EXTBALANCE` when the parameter matches the current address is reduced to a value slightly higher than the cost of `SELFBALANCE`.
 
 ## Motivation
-As the primary purpose of `EXTBALANCE` following EIP1884 is to query external accounts, the name is updated accordingly.
+As the primary purpose of `EXTBALANCE` following [EIP-1884](./eip-1884.md) is to query external accounts, the name is updated accordingly.
 
 `EXTBALANCE` existed prior to `SELFBALANCE` so it is used by several immutable contracts, including the Uniswap-V1 template, that predate the Istanbul hard fork.
 These contracts use `EXTBALANCE` to query their own balance.
