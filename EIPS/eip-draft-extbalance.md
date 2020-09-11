@@ -13,7 +13,6 @@ requires: 1884
 ## Simple Summary
 Renames `BALANCE` to `EXTBALANCE` and reduces `EXTBALANCE` cost when querying the current contract.
 
-
 ## Abstract
 This EIP renames `BALANCE` to `EXTBALANCE`.
 The gas cost of `EXTBALANCE` when the parameter matches the current address is reduced to a value slightly higher than the cost of `SELFBALANCE`.
