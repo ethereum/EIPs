@@ -162,7 +162,7 @@ Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd)
 
 #### `author` header
 
-The `author` header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
+The `author` header lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
 
 > Random J. User &lt;address@dom.ain&gt;
 
@@ -175,6 +175,10 @@ if the email address or GitHub username is included, and
 > Random J. User
 
 if the email address is not given.
+
+It is not possible to use both an email and a GitHub username at the same time. If important to include both, one could include their name twice, once with the GitHub username, and once with the email.
+
+At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
 #### `resolution` header
 
