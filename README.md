@@ -14,7 +14,7 @@ This repository tracks the ongoing status of EIPs. It contains:
 - [Final](https://eips.ethereum.org/all#final) and [Active](https://eips.ethereum.org/all#active) proposals that are recorded.
 - The [EIP process](EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
 
-Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the implementer to decide if these proposals will be useful to you and if they represent best practice.
+Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the reader to decide whether a proposal will be useful to them.
 
 Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).
 
