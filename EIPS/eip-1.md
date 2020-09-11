@@ -5,7 +5,7 @@ status: Active
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17, 2020-09-10
 ---
 
 ## What is an EIP?
@@ -285,6 +285,8 @@ May 19, 2019: The **Abandoned** status was introduced.
 Dec 4, 2019: The "Security Considerations" section was introduced.
 
 June 17, 2020: Canonicalizes the format for referencing EIPs by number in the "Style Guide".
+
+Sep 10, 2020: Require the `author` header to include at least one GitHub username.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
