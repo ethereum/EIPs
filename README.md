@@ -24,11 +24,6 @@ Once your first PR is merged, we have a bot that helps out by automatically merg
 
 The Ethereum Improvement Proposals repository exists as a place to share concrete proposals with potential users of the proposal and the Ethereum community at large.
 
-We promote high-quality, peer-reviewed proposals in two categories:
-
-- [Consensus Changes](EIPS/eip-1.md#eip-types) require people running an Ethereum client to update their software to implement the change. If enough people do not upgrade then an existing network will fork into two separate networks.
-- [Other Proposals](EIPS/eip-1.md#eip-types) do not require a change in client software and can be used by any interested party.
-
 ## Preferred Citation Format
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
