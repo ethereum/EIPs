@@ -21,15 +21,14 @@ This new standard meets the new era of asset tokens (or security tokens). These 
 ## Motivation
 In its ICO guidance dated February 16, 2018, FINMA (Swiss Financial Market Supervisory Authority) defines asset tokens as tokens representing assets and/or relative rights. It explicitly mentions that asset tokens are analogous to and can economically represent shares, bonds, or derivatives. The long list of relevant financial market laws mentioned above reveal that we need more methods than with Payment and Utility Token. 
 
-## Specification
-TODO:The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
-
 ## Rationale
 There are currently no token standards that expressly facilitate conformity to securities law and related regulations. EIP-1404 (Simple Restricted Token Standard) it’s not enough to address FINMA requirements around re-issuing securities to Investors.
 In Swiss law, an issuer must eventually enforce the restrictions of their token transfer with a “freeze” function. The token must be “revocable”, and we need to apply a white-list method for AML/KYC checks.
 
 ## Backwards Compatibility
-TODO:All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+This EIP does not introduce backward incompatibilities and is backward compatible with the older ERC20 token standard.
+This standard allows the implementation of ERC20 functions transfer, transferFrom, approve and allowance alongside to make a token fully compatible with ERC20.
+The token MAY implement decimals() for backward compatibility with ERC20. If implemented, it MUST always return 0.
 
 ## Implementation
 ``` js
