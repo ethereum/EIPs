@@ -32,7 +32,96 @@ In Swiss law, an issuer must eventually enforce the restrictions of their token 
 TODO:All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
 ## Implementation
-TODO:The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+``` js
+  interface IERCX {
+  
+  /// @dev This emits when funds are reassigned
+  event FundsReassigned(address _from, address _to, uint256 _amount);
+
+  /// @dev This emits when funds are revoked
+  event FundsRevoked(address _from, uint256 _amount);
+
+  /// @dev This emits when an address is frozen
+  event FundsFrozen(address _target);
+
+  /**
+  * @dev Transfer tokens from a specified address to another one
+  * @param _from The address from which the tokens are withdrawn
+  * @param _to The address that receives the tokens
+  * @return true if the tokens are transferred
+  */
+  function reassign(address _from, address _to) external;
+
+  /**
+  * @dev Transfer tokens from a specified address to the contract owner (issuer)
+  * @param _from The address from which the tokens are withdrawn
+  * @return true if the tokens are transferred
+  */
+  function revoke(address _from) external;
+
+  /**
+  * @dev getter to determine if address is in frozenlist
+  */
+  function frozenlist(address _operator) external view returns (bool);
+
+  /**
+  * @dev add an address to the frozenlist
+  * @param _operator address
+  * @return true if the address was added to the frozenlist, false if the address was already in the frozenlist
+  */
+  function addAddressToFrozenlist(address _operator) external;
+
+  /**
+  * @dev remove an address from the frozenlist
+  * @param _operator address
+  * @return true if the address was removed from the frozenlist,
+  * false if the address wasn't in the frozenlist in the first place
+  */
+  function removeAddressFromFrozenlist(address _operator) external;
+
+  /**
+  * @dev getter to determine if address is in whitelist
+  */
+  function whitelist(address _operator) external view returns (bool);
+
+  /**
+  * @dev add an address to the whitelist
+  * @param _operator address
+  * @return true if the address was added to the whitelist, false if the address was already in the whitelist
+  */
+  function addAddressToWhitelist(address _operator) external;
+
+  /**
+  * @dev remove an address from the whitelist
+  * @param _operator address
+  * @return true if the address was removed from the whitelist,
+  * false if the address wasn't in the whitelist in the first place
+  */
+  function removeAddressFromWhitelist(address _operator) external;
+
+  /**
+  * @dev add a new issuer address
+  * @param _operator address
+  * @return true if the address was not an issuer, false if the address was already an issuer
+  */
+  function addIssuer(address _operator) external;
+
+  /**
+  * @dev remove an address from issuers
+  * @param _operator address
+  * @return true if the address has been removed from issuers,
+  * false if the address wasn't in the issuer list in the first place
+  */
+  function removeIssuer(address _operator) external;
+
+  /**
+  * @dev Allows the current issuer to transfer his role to a newIssuer.
+  * @param _newIssuer The address to transfer the issuer role to.
+  */
+  function transferIssuer(address _newIssuer) external;
+
+}
+```
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
