@@ -12,7 +12,7 @@ requires: 721
 
 ## Simple Summary
 
-A standardized way to handle royalty payments for ERC-721 tokens, including publically viewable information and transfer events.
+A standardized way to handle royalty payments for ERC-721 tokens, including publically viewable information and notification of payment event.
 
 ## Abstract
 
