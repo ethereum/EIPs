@@ -9,7 +9,7 @@ created: 2020-09-14
 
 ## Simple Summary
 
-Raise fees on synths sXTZ, sXRP, sLTC, sADA, sBCH, sBNB, sLINK and sBTC and their respective inverses to 50 bp from 30 bp.
+Raise fees on synths sXTZ, sXRP, sLTC, sADA, sBCH, sBNB, sLINK, sETH and sBTC and their respective inverses to 50 bp from 30 bp.
 
 ## Abstract
 
