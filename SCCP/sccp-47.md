@@ -2,7 +2,7 @@
 sccp: 47
 title: Raise Fees on Crypto Synths to 50 bp
 author: Kaleb Keny (@kaleb-keny)
-status: Approved
+status: Implemented
 discussions-to: https://research.synthetix.io/
 created: 2020-09-14
 ---
@@ -19,7 +19,7 @@ Increase fees to 50 bp on synths which are pushed with a 1% deviation threshold.
 
 ## Motivation
 
-Analysis of on-chain data showed that front-running opportunities still exist with post migration to chainlink price oracles. 
+Analysis of on-chain data showed that front-running opportunities still exist with post migration to chainlink price oracles.
 Increasing fees to 50 bp on synths with a 1% deviation threshold push should help close this window while waiting for further changes to the oracle.
 
 ## Copyright
