@@ -125,7 +125,7 @@ For PoS protocols to be crypto-economically secure, in-protocol penalties are re
 
 Specifically the following significant penalties exist:
 * **Inactivity Leak**: an offline penalty that increases each epoch is applied to validators during extending times of no finality (e.g. one-third offline or not on the canonical chain). This ensures the chain can eventually regain finality even under catastrophic conditions.
-* **Slashing**: a penalty applied to validators that sign _explicitly malicious_ messages that could lead to the construction and finalization of two conflicting chains (e.g. two blocks or attestations in the same slot). This penalty is designed to scale up in proportion to the number of slashable validators in the same time period such that if a critical number (wrt chain safety) of slashings have occured, validators are _maximally_ punished.
+* **Slashing**: a penalty applied to validators that sign _explicitly malicious_ messages that could lead to the construction and finalization of two conflicting chains (e.g. two blocks or attestations in the same slot). This penalty is designed to scale up in proportion to the number of slashable validators in the same time period such that if a critical number (wrt chain safety) of slashings have occurred, validators are _maximally_ punished.
 
 For the initial launch of Phase 0, the parameters defining the magnitude of these penalties -- `INACTIVITY_PENALTY_QUOTIENT`, `PROPORTIONAL_SLASHING_MULTIPLIER`, and `MIN_SLASHING_PENALTY_QUOTIENT` -- have been tuned to be less punitive than their final intended values. This provides a more forgiving environment for early validators and client software in an effort to encourage validation in this early, higher technical-risk stage.
 
