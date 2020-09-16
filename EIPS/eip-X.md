@@ -1,6 +1,6 @@
 ---
 eip: 2982
-title: Serenity -- Phase 0
+title: Serenity Phase 0
 author: Danny Ryan (@djrtwo), Vitalik Buterin (@vbuterin)
 discussions-to: https://ethereum-magicians.org/t/serenity-phase-0-eip/4621
 status: Draft
