@@ -122,7 +122,7 @@ For more details, see this [eth2 calculator](https://docs.google.com/spreadsheet
 
 For PoS protocols to be crypto-economically secure, in-protocol penalties are required (see discussion of ["Nothing at Stake"](https://blog.ethereum.org/2014/11/25/proof-stake-learned-love-weak-subjectivity/)). Small offline penalties incentivize validator liveness, whereas (potentially) much larger penalties provide protocol security in tail-risk scenarios.
 
-Specifically the following significant penalties exist:
+Specifically, the following significant penalties exist:
 * **Inactivity Leak**: an offline penalty that increases each epoch is applied to validators during extending times of no finality (e.g. one-third offline or not on the canonical chain). This ensures the chain can eventually regain finality even under catastrophic conditions.
 * **Slashing**: a penalty applied to validators that sign _explicitly malicious_ messages that could lead to the construction and finalization of two conflicting chains (e.g. two blocks or attestations in the same slot). This penalty is designed to scale up in proportion to the number of slashable validators in the same time period such that if a critical number (wrt chain safety) of slashings have occurred, validators are _maximally_ punished.
 
