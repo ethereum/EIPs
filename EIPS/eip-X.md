@@ -148,7 +148,6 @@ For details regarding specification design rationale and decisions, see the foll
 * [Vitalik Buterin's Eth2 Annotated Spec](https://github.com/ethereum/annotated-spec/blob/master/phase0/beacon-chain.md)
 
 ## Backwards Compatibility
-<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
 This EIP does not introduce any layer 1 changes to Ethereum mainnet and is thus entirely forwards/backwards compatible.
 
 Instead, this EIP lays the groundwork for future backwards incompatibilities through the introduction of the new eth2 consensus mechanism in which Ethereum will be integrated in subsequent phases. To secure this mechanism, users move ether into the beacon chain and additional ether is issued. This EIP is a commitment to this path as being canonical and directly informing the future and roadmap of Ethereum mainnet.
