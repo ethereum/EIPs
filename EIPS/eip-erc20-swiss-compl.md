@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2020-09-08
-requires: eip-20
+requires: 20
 ---
 
 ## Simple Summary
