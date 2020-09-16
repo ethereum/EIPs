@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Serenity -- Phase 0
 author: Danny Ryan (@djrtwo), Vitalik Buterin (@vbuterin)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/serenity-phase-0-eip/4621
 status: Draft
 type: Standards Track
 category: Core
