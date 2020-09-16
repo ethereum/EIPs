@@ -153,7 +153,6 @@ This EIP does not introduce any layer 1 changes to Ethereum mainnet and is thus 
 Instead, this EIP lays the groundwork for future backwards incompatibilities through the introduction of the new eth2 consensus mechanism in which Ethereum will be integrated in subsequent phases. To secure this mechanism, users move ether into the beacon chain and additional ether is issued. This EIP is a commitment to this path as being canonical and directly informing the future and roadmap of Ethereum mainnet.
 
 ## Implementation
-<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
 The following implementations of eth2 Phase 0 exist and at the time of writing at least five are near production-ready and in testnet/audit phase:
 
