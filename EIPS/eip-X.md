@@ -157,7 +157,7 @@ Instead, this EIP lays the groundwork for future backwards incompatibilities thr
 The following implementations of eth2 Phase 0 exist and at the time of writing at least five are near production-ready and in testnet/audit phase:
 
 * [Cortex](https://github.com/NethermindEth/cortex) (.net)
-* [Lighthouse](https://github.com/NethermindEth/cortex) (rust)
+* [Lighthouse](https://github.com/sigp/lighthouse) (rust)
 * [Lodestar](https://github.com/ChainSafe/lodestar) (javascript)
 * [Nimbus](https://github.com/status-im/nim-beacon-chain) (nim)
 * [Prysm](https://github.com/prysmaticlabs/prysm/) (go)
