@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2020-09-15
-replaces: 1011
 ---
 
 ## Simple Summary
