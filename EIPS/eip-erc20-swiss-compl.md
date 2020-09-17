@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2980
 title: ERC-20-compatible Swiss Compliant Asset Token
 author: Gianluca Perletti (@Perlets9), Alan Scarpellini (@alanscarpellini), Roberto Gorini (@robertogorini), Manuel Olivi (@manvel79)
 discussions-to: Pull Request
@@ -12,11 +12,11 @@ requires: 20
 
 ## Simple Summary
 
-An interface for asset tokens (or security tokens), compliant with Swiss Law and compatible with ERC-20.
+An interface for asset tokens (or security tokens), compliant with Swiss Law and compatible with [ERC-20](./eip-20.md)
 
 ## Abstract
 
-This new standard is an ERC-20 compatible token with restrictions that comply with one or more one the following Swiss laws: Stock Exchange Act, the Banking Act, the Financial Market Infrastructure Act, the Act on Collective Investment Schemes and the Anti-Money Laundering Act. The Financial Services Act and the Financial Institutions Act must also be considered. The solution achieved meet also the European jurisdiction.
+This new standard is an [ERC-20](./eip-20.md) compatible token with restrictions that comply with one or more one the following Swiss laws: Stock Exchange Act, the Banking Act, the Financial Market Infrastructure Act, the Act on Collective Investment Schemes and the Anti-Money Laundering Act. The Financial Services Act and the Financial Institutions Act must also be considered. The solution achieved meet also the European jurisdiction.
 
 This new standard meets the new era of asset tokens (or security tokens). These new methods manage securities ownership during issuance and trading. The issuer is the only role that can manage a white-listing and the only one that is allowed to execute “freeze” or “revoke” functions.
 
@@ -35,7 +35,7 @@ Every ERC-toBeAssigned compliant contract must implement the ERCtoBeAssigned int
 ### ERCtoBeAssigned (Token Contract)
 
 ``` solidity
-interface ERCtoBeAssigned {
+interface ERC2980 extends ERC20 {
   
   /// @dev This emits when funds are reassigned
   event FundsReassigned(address from, address to, uint256 amount);
@@ -47,73 +47,14 @@ interface ERCtoBeAssigned {
   event FundsFrozen(address target);
 
   /**
-  * @dev Transfer tokens from a specified address to another one
-  * this operation can be performmed only by an Issuer.
-  * @param _from The address from which the tokens are withdrawn
-  * @param _to The address that receives the tokens
-  * @return true if the tokens are transferred
-  */
-  function reassign(address _from, address _to) external;
-
-  /**
-  * @dev Transfer tokens from a specified address to the Issuer who invokes the method
-  * this operation can be performmed only by an Issuer.
-  * @param _from The address from which the tokens are withdrawn
-  * @return true if the tokens are transferred
-  */
-  function revoke(address _from) external;
-
-  /**
   * @dev getter to determine if address is in frozenlist
   */
   function frozenlist(address _operator) external view returns (bool);
 
   /**
-  * @dev add an address to the frozenlist
-  * this operation can be performmed only by an Issuer.
-  * @param _operator address
-  * @return true if the address was added to the frozenlist, false if the address was already in the frozenlist
-  */
-  function addAddressToFrozenlist(address _operator) external;
-
-  /**
-  * @dev remove an address from the frozenlist
-  * this operation can be performmed only by an Issuer.
-  * @param _operator address
-  * @return true if the address was removed from the frozenlist,
-  * false if the address wasn't in the frozenlist in the first place
-  */
-  function removeAddressFromFrozenlist(address _operator) external;
-
-  /**
   * @dev getter to determine if address is in whitelist
   */
   function whitelist(address _operator) external view returns (bool);
-
-  /**
-  * @dev add an address to the whitelist
-  * this operation can be performmed only by an Issuer.
-  * @param _operator address
-  * @return true if the address was added to the whitelist, false if the address was already in the whitelist
-  */
-  function addAddressToWhitelist(address _operator) external;
-
-  /**
-  * @dev remove an address from the whitelist
-  * this operation can be performmed only by an Issuer.
-  * @param _operator address
-  * @return true if the address was removed from the whitelist,
-  * false if the address wasn't in the whitelist in the first place
-  */
-  function removeAddressFromWhitelist(address _operator) external;
-
-  /**
-  * @dev add a new issuer address
-  * this operation can be performmed only by the contract Owner.
-  * @param _operator address
-  * @return true if the address was not an issuer, false if the address was already an issuer
-  */
-  function addIssuer(address _operator) external;
 
   /**
   * @dev remove an address from issuers
@@ -134,7 +75,7 @@ interface ERCtoBeAssigned {
 }
 ```
 
-The ERCtoBeAssigned extends ERC-20. Due to the indivisible nature of asset tokens, the decimals number MUST be zero.
+The ERC-2980 extends [ERC-20](./eip-20.md). Due to the indivisible nature of asset tokens, the decimals number MUST be zero.
 
 ### Whitelist and Frozenlist
 
@@ -166,10 +107,6 @@ The token MAY implement decimals() for backward compatibility with ERC-20. If im
 A public Github repository will be added soon.
 
 ## References
-
-### Standards
-
-1. ERC-20 Token Standard. <https://eips.ethereum.org/EIPS/eip-20>
 
 ### Swiss Law
 
