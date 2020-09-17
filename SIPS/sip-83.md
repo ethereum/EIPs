@@ -134,7 +134,8 @@ When exchanges between non-sUSD synths occur, the prices are already retrieved t
 perform the exchange, but we will additionally retrieve the post-exchange total supplies of the involved non-sUSD
 synths to compute their total sUSD-denominated value. The delta between these value and the previously-computed ones
 will be applied to the total debt snapshot, and the new values cached to be used next time an exchange of those
-synths occurs. If an involved synth price is invalid at exchange time then in addition the 
+synths occurs. If an involved synth price is invalid at exchange time then in addition the cached validity flag must
+be tripped.
 
 In this way the current debt snapshot will be responsive to the latest price updates of those synths which are most
 frequently used, and the public keeper function will ideally only need to be invoked at times of extreme synth price
