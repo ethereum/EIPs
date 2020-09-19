@@ -53,7 +53,6 @@ With neither the built-in call frame nor the inserted code state, `CREATELINK` g
 Its gas should also be greater than the refund of `SELFDESTRUCT`, currently 24000.
 
 ## Test Cases
-<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
 Calling contract `0x3df7` reverts, returning `0xf700000000000000000000000000000000000000000000000000000000000000` and consuming 300001 gas.
 
 TODO add more test cases after specification undergoes more peer review.
