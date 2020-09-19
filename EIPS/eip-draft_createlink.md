@@ -14,7 +14,6 @@ created: 2019-07-09
 A cheaper way to proliferate identical smart contracts.
 
 ## Abstract
-<!--A short (~200 word) description of the technical issue being addressed.-->
 This EIP specifies a new opcode, `CREATELINK`, which creates a new contract matching the code of an existing address.
 
 ## Motivation
