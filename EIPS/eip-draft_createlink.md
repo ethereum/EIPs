@@ -16,7 +16,6 @@ A cheaper way to proliferate identical smart contracts.
 This EIP specifies a new opcode, `CREATELINK`, which creates a new contract matching the code of an existing address.
 
 ## Motivation
-<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 Hundreds of thousands of identical contracts are proliferating from contract factories.
 Because they share the same immutable code, a node implementation could detect these identical contracts and share their storage similar to how hard-linked files share theirs.
 New links require less storage than new code.
