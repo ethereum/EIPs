@@ -5,7 +5,7 @@ author: William Morriss (@wjmelements)
 discussions-to: [Github PR](https://github.com/ethereum/EIPs/pull/2185)
 status: Draft
 type: Standards Track
-category Core
+category: Core
 created: 2019-07-09
 ---
 
