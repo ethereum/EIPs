@@ -10,7 +10,6 @@ created: 2019-07-09
 ---
 
 ## Simple Summary
-<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 A cheaper way to proliferate identical smart contracts.
 
 ## Abstract
