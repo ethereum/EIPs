@@ -22,7 +22,6 @@ New links require less storage than new code.
 Therefore, empowering this design with an opcode will reduce the overhead of operating a node long-term.
 
 ## Specification
-<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
 As of `FORK_BLOCK_NUMBER`, `CREATELINK` (`0xf7`) becomes a valid opcode.
 `CREATELINK` pops one word, the target address.
 As with `BALANCE`, `EXTCODESIZE`, `EXTCODECOPY`, and `EXTCODEHASH`, the upper 12 bytes are zeroed.
