@@ -1,6 +1,6 @@
 ---
-eip: <to be assigned>
-title: Formal process of selection of EIPs for hardforks (Meta EIP#) 
+eip: 1929
+title: Selection of EIPs for network upgrade
 author: Pooja Ranjan (@poojaranjan)
 discussions-to: https://ethereum-magicians.org/t/proposal-of-a-formal-process-of-selection-of-eips-for-hardforks-meta-eip/3115
 status: Draft
@@ -8,63 +8,86 @@ type: Meta
 created: 2019-04-09
 requires : 233
 ---
+## Simple summary
 
+To describe a formal process of selection of EIPs for upcoming network upgrades (hardfork).
 
 ## Abstract
 
-To describe a formal process of selection of EIPs for upcoming hardfork (Meta EIP#).
-
+This proposal will help decouple the EIP process and the network upgrade process by following a new process of EIP selection for the upcoming upgrade in the Eth1.0-spec repository.
 
 ## Motivation
-    
-Recently, discussion to streamline the process of protocol upgrades is happening at various forum. In order to move from ad-hoc to fixed-schedule to release protocol upgrades, a process of EIP selection is proposed. 
 
-## Description
-
-This meta EIP provides a general outline process to propose, discuss and track progress of EIPs for upcoming hardfork (Meta EIP#). It recommends to make decision on a hard deadline and suggests to take all other proposals received after the deadline into a subsequent hardfork for a smooth upgrade.
+This meta EIP provides a general outline process to propose, discuss, and track the progress of EIPs for upcoming hardfork and clearly state the selection of proposal for a network upgrade. Whereas, in the present process, for a core EIP,  it is difficult to draw a line between the end of an EIP process (final state) and the beginning of the formal selection of proposals for a network upgrade.
 
 ## Specification
 
 A Meta EIP should be created and merged following the process mentioned in [EIP 233](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-233.md).
 
-###  EIP selection process for Meta EIP
+###  EIP selection process for for CFI
 
-**1.  Proposing an EIP**
+#### Preconditions to be proposed for consideration
+* Type of EIP -  Core 
+* Status of EIP - Any status between Draft to Final (ref: EIP-1)
+    
+#### Proposing an EIP
+* If you're an author, and still vetting the idea, please follow the guidelines mentioned in [EIP - 1](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-work-flow) to formalize your idea into an EIP.
+* Once an EIP/Pull request (at EIP GitHub) is created, open a new issue at [Eth1.0-specs repository](https://github.com/ethereum/eth1.0-specs) referring "EIP# to be considered for CFI". This can be created at any stage of the EIP process.
+* It will be then picked up by the Hardfork coordinators and added as Proposed EIP for CFI in the [project board](https://github.com/ethereum/eth1.0-specs/projects/1).
+* The author/proposer then adds it to the agenda of the next AllCoreDev meeting. 
 
-* If you're an author, and still vetting the idea, please follow guidelines mentioned in [EIP - 1](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-work-flow) to formalise your idea into an EIP.
+#### Socializing an EIP
+* Open a discussion thread, preferably at EthMagician. Share it in the Ethereum [allcoredevs Discord](https://discord.gg/PqxkpE), Reddit, and twitter (if need be).
+* Show up in the All core dev meetings for EIP to be introduced to the client teams. 
+* Show up in an episode of '[Peep an EIP](https://github.com/ethereum-cat-herders/PM/projects/2)' to share the importance, need, and application of the proposal in simple terms for community understanding. (Optional).
+    
+#### Reviewing an EIP
+The author or champion may reach out to [EIP Editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) or Hardfork coordinator for help in review the EIP, if not already reviewed. HF coordinator may coordinate with EIP Editors based on the interest/availability.
 
-* Once EIP is created, create a new issue at [ECH repository](https://github.com/ethereum-cat-herders/PM/issues) referring "*EIP# to be considered for next upgrade (Meta EIP#)*" , before the deadline for acceptance of proposals.
+#### Network upgrade process tracker
+The tracker is created at [Eth1.0-spec Projects](https://github.com/ethereum/eth1.0-specs).
 
-* It will be then picked up by the [HF coordinators](https://github.com/ethereum-cat-herders/PM/tree/master/Hard%20Fork%20Planning%20and%20Coordination) (Ethereum Cat Herders) and added as Proposed EIP under EIP tracker eg for [Istanbul](https://github.com/ethereum-cat-herders/PM/blob/master/Hard%20Fork%20Planning%20and%20Coordination/IstanbulHFEIPs.md).
-
-**2. Socializing an EIP**
-
-* Open a discussion thread preferably at EthMagician or publish a blog post for background, need and application of the EIP. Share it on  gitter, reddit and twitter (if need be).
-
-* Invite author to All core dev call to explain / discuss.
-
-
-**3. Reviewing an EIP**
-
-Author may reach out to [EIP Editors](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-editors) or HF coordinator for help in review the EIP, if not already reviewed. HF coordinator may coordinate with EIP Editors based on the interest / availability.
-
-**4. EIP Readiness Tracker**
-
-EIP Readiness Tracker may be a combination of [EIP tracker](https://github.com/ethereum-cat-herders/PM/blob/master/Hard%20Fork%20Planning%20and%20Coordination/IstanbulHFEIPs.md) and [Client Implementation Progress Tracker](https://github.com/ethereum/pm/wiki/Constantinople-Progress-Tracker). 
-
-| № | EIP  | Description |EIP Status | Client 1| Client 2| Client 3| Client 4 | Testnet | Include in HF / Meta EIP# 
-|---| -----|-------------|-----------| ------- | ------- | --------| -------- | --------| ----------------------- |
+| № | CFI applied  | CFI accepted |CI testnet applied | CI testnet approved| Public testnet| Mainnet accepted|
+|---| -----|-------------|-----------| ------- | ------- | --------| 
 | 1 |
 | 2 |
 | 3 |
 
+### Network upgrade stages
+    
+(Conditions for change in EFI stages)
+#### CFI applied 
+* EIP status - Draft-Final
+* An [issue](https://github.com/ethereum/eth1.0-specs/issues) created at Eth1.0-spec repo
+#### CFI accepted
+* EIP status - Review-Final
+* The decision to include in EFI in ACD meeting with the approval of at least 3 clients
+#### CI testnet applied
+* EIP status - Review-Final
+* ACD agrees to include the EIP on the developers testnet 
+* Implementation in clients participating in the developer's testnet
+#### CI testnet accepted
+* EIP status - Review-Final
+* Add to the hard fork Meta EIP
+### Public testnet
+* EIP status - Last call-Final
+* Deploy on public testnet  
+#### Mainnet accepted
+* EIP status - Accepted/Final
+* Deployed in a hardfork
+    
 
 ## Rationale
 
-An EIP readiness tracker for coordinating the hard fork should help in visibility and traceability of the scope of changes to the upcoming hardfork.
+The network upgrade process tracker for coordinating the network upgrade should help in the visibility and traceability of the scope of changes to the upcoming hardfork.
+
+## Implementation
+
+The proposed process is being followed for the upcoming 'Berlin upgrade' and the tracker is available at [Eth1.0-spec Projects](https://github.com/ethereum/eth1.0-specs/projects/1).
+
+## Security consideration 
+This is a change in process and not affecting any core protocol. No security concern has been observed so far.
 
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
-
