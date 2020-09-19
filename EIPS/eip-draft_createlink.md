@@ -51,7 +51,6 @@ Treating these cases as exceptional reduces the amount of work to be wasted by t
 
 With neither the built-in call frame nor the inserted code state, `CREATELINK` gas should be less than `CREATE`, currently 32000.
 Its gas should also be greater than the refund of `SELFDESTRUCT`, currently 24000.
-<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
 ## Test Cases
 <!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
