@@ -13,16 +13,18 @@ requires: https://sips.synthetix.io/sips/sip-84
 
 <!--"If you can't explain it simply, you don't understand it well enough." Simply describe the outcome the proposed changes intends to achieve. This should be non-technical and accessible to a casual community member.-->
 
-This SIP proposes to implement a mechanism to calculate and store a snapshot of the total issued synths (total debt pool) value for minting, burning and claiming rewards to significantly reduce the cost of these transactions.
+This SIP proposes to implement a mechanism to calculate and store a snapshot of the total issued synths
+(total debt pool) value for minting, burning and claiming rewards to significantly reduce the cost of these transactions.
 
 ## Abstract
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
 
-We propose to add the ability to create a snapshot of the system's debt pool and total issued synths that can be calculated on-chain, where the gas costs are paid by the invoking account, and used for subsequent minting, burning and reward claiming.
-The recomputation of the system debt pool will be managed by three distinct processes:
+We propose to add the ability to create a snapshot of the system's debt pool and total issued synths that can be
+calculated on-chain, where the gas costs are paid by the invoking account, and used for subsequent minting, burning and
+reward claiming. The recomputation of the system debt pool will be managed by three distinct processes:
 
-1. A public function that will compute and save a snapshot of the total system debt at current prices.
+1. Public functions to save or update a snapshot of the total system debt at current prices.
 2. On each synth exchange, minting, or burning operation the debt snapshot will be updated with the debt deltas of the involved synths.
 3. Periodic recomputation of the overall debt by minters rather than by keepers.
 
@@ -82,35 +84,42 @@ The debt pool snapshot captures the current synth prices and supplies at the tim
 to retrieve latest data on every operation, relying on the fact that Synthetix exchanges involve repricing one synth
 into another based on their respective USD prices.
 
-We propose a public function that can be called to update the debt pool snapshot and the caller will be paying the
-gas to execute the on-chain cost of reading the latest synth prices from external oracles and updating the total issued
-synths / debt pool snapshot value. Although this function will be expensive to execute, it provides a high level of
-utility for minting and burning transactions that subsequently rely on the snapshot of the synths prices and debt pool
-size. By frequent calls to this function, the debt pool snapshot can be kept arbitrarily accurate.
+We propose the addition of public functions that can be called to update the debt pool snapshot, with the caller
+paying the gas to execute the on-chain cost of reading the latest synth prices from external oracles and updating the
+debt pool snapshot value. By frequent calls to these functions, the debt pool snapshot can be kept arbitrarily accurate.
+Although they could be expensive to execute by themselves, these functions will provide a great deal
+of utility for subsequent minting and burning transactions that can read the cached value cheaply.
 
 To ensure that the liveness of the debt pool snapshot, a view will be exposed that reports the current
 `totalIssuedSynths` value and debt pool by reading the synth's prices and `synth.totalSupply` as occurs whenever the
-system debt is currently computed.
-An acceptable deviation between this reported system debt and the cached value will be established at an initial value
-of `2%`.
+system debt is currently computed. An acceptable deviation between this reported system debt and the cached value will
+be established at an initial value of `2%`. It may be useful in the future to reward the caller of this function
+if an invocation corrects a deviation that exceeded this bound.
+
 This will be monitored by a keeper bot paying for the gas to update the snapshot whenever the cached value breaches
-the acceptable deviation, up to a maximum update frequency.
+the acceptable deviation, up to a maximum update frequency. In order to save on gas, the keeper will have the option
+of only updating the debt contributions of a minimal subset of synths that would bring the total system debt snapshot
+back under the acceptable deviation, as there may be many synths whose contributions are negligible, and this facility
+would be useful in the case that an individual synth price moves dramatically by itself.
 
 The bot could also monitor the mempool for upcoming prices and pre-calculate the new `totalIssuedSynths` values to
 detect if it needs to update the debt pool snapshot after.
 
 #### Liveness
 
-To ensure that the debt pool snapshot is not stale, there will be a staleness check on the last `timestamp` of when the
-debt pool snapshot was updated. Minting, burning and claiming rewards will revert if the debt pool snapshot is stale
-until it has been updated.
+To ensure that the debt pool snapshot is not stale, there will be a staleness check on the last `timestamp` of when a
+complete debt pool snapshot was last computed. Minting, burning and claiming rewards will revert if the debt pool
+snapshot is stale until it has been updated.
 
-The staleness period will be initially set to `30 minutes` and is configurable via an SCCP.
+The staleness period will be initially set to `30 minutes` and will be configurable via an SCCP.
 
 An additional point is that Synthetix already tracks whether the rates being supplied to the system are individually
 stale, or have been invalidated by chainlink warning flags (see [SIP 76](sip-76.md)). Currently, if any synth price is
 invalid at the time of a system debt calculation, the operation that triggered it will fail. Therefore system debt
 updates must also cache in flexible storage the validity of the debt snapshot in order to maintain this safety check.
+As such any keeper bots performing the work of updating the system snapshot should monitor the validity of each
+synth rate, and trigger a snaphot if any rate falls invalid, to protect the system. With moves towards a generalised
+compensated keeper framework, triggering a snapshot when the system must be frozen may come with a reward.
 
 The debt snapshot function being public and unrestricted also means that, upon an invalid rate being fixed,
 the debt snapshot can be immediately recalculated by any account in order to re-enable dependent operations.
@@ -134,8 +143,7 @@ When exchanges between non-sUSD synths occur, the prices are already retrieved t
 perform the exchange, but we will additionally retrieve the post-exchange total supplies of the involved non-sUSD
 synths to compute their total sUSD-denominated value. The delta between these value and the previously-computed ones
 will be applied to the total debt snapshot, and the new values cached to be used next time an exchange of those
-synths occurs. If an involved synth price is invalid at exchange time then in addition the cached validity flag must
-be tripped.
+synths occurs.
 
 In this way the current debt snapshot will be responsive to the latest price updates of those synths which are most
 frequently used, and the public keeper function will ideally only need to be invoked at times of extreme synth price
@@ -153,7 +161,7 @@ Therefore in a future phase of the implementation it will be expedient to allow 
 heartbeats once every 15 minutes, for example.
 These heartbeats could either be computed by a separate compensated keeper function, or at the first mint, burn, or
 claim operations to be performed after a given heartbeat is due. However, given the extra expense involved, the gas cost
-of the recalculation will measured and rebated to the caller from a common pool of ether held in a manner similar to the
+of the recalculation will be measured and rebated to the caller from a common pool of ether held in a manner similar to the
 [deferred transaction gas tank](sip-79.md). This pool will be replenished by a small fee charged on the 
 execution cost of each mint, burn, and claim operation, which will be less than the gas saved for these function calls
 by eliminating continual system debt recomputations.
@@ -189,9 +197,11 @@ very high utility for them in gas savings.
 
 - `uint snapshotTimestamp` Timestamp of the debt pool snapshot: Updated when `Issuer.updateDebtPoolSnapshot()` is executed but not updated when mint, burn, or exchange transactions update the snapshot value.
 
-- `bool debtPoolSnapshotIsInvalid` True if and only if any rate involved in the computation of the cached debt pool snapshot was reported as invalid at the time of the snapshot. `Issuer._totalIssuedSynths` currently reports this value freshly-recomputed at each invocation, the new implementation should return the cached value instead.
+- `bool debtPoolSnapshotIsInvalid` True if and only if any rate involved in the computation of the cached debt pool snapshot (and SNX) was reported as invalid at the time of the snapshot. `Issuer._totalIssuedSynths` currently reports this value freshly-recomputed at each invocation, the new implementation should return the cached value instead.
 
 - `Issuer.updateDebtPoolSnapshot()` Public function that updates the `debtPoolSnapshot`, `snapshotTimestamp`, and `debtPoolSnapshotIsInvalid` to their latest values.
+
+- `Issuer.updateDebtPoolSnapshotForCurrencies(bytes32[] currencyKeys)` Public function that operates like `Issuer.updateDebtPoolSnapshot()`, but only accounts for the contributions of the provided currency keys. This may set `debtPoolSnapshotIsInvalid` to true, but not set it back to false, which requires a full recomputation of the system debt snapshot.
 
 - `Issuer.totalIssuedSynths()` Current view function to get latest total issued synths and debt pool size. Used by bot to view and calculate the % deviation between last snapshot and the current actual `totalIssuedSynths()`. Excludes any of the EtherCollateral backed synths generated as not backed by SNX collateral.
 
@@ -206,6 +216,11 @@ Test cases for an implementation are mandatory for SIPs but can be included with
 <!--Please list all values configurable via SCCP under this implementation.-->
 
 Please list all values configurable via SCCP under this implementation.
+
+| Parameter | initial Value |
+| --------- | ------------- |
+| Debt snapshot stale time | 30 minutes |
+| Debt snapshot max deviation | 2 percent |
 
 ## Copyright
 
