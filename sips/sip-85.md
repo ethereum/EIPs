@@ -120,7 +120,7 @@ The loan's `collateralAmount` and `loanAmount` will be updated after a partial l
 
 #### Functions
 
-##### `CreateLoan() payable` function
+##### `openLoan(uint256 _loanAmount) external payable` function
 
 - Require sUSD to mint does not exceed issueLimit
 - Require openLoanClosing to be false
