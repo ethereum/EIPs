@@ -5,7 +5,7 @@ author: John Lilic @jlilic twitter.com/johnlilic johnlilicEIP@gmail.com, Jerome 
 discussions-to: https://ethereum-magicians.org/t/eip-2878-block-reward-reduction-to-0-5-eth/
 status: Draft
 type: Standards Track
-category Core
+category: Core
 created: 2020-08-11
 ---
 
@@ -83,4 +83,3 @@ In this EIP we have laid out our economic evidence that reducing the block rewar
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
