@@ -71,33 +71,25 @@ The following is the standardization process for all EIPs in all Tracks:
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process.png)
 
-**Idea**
-An idea that is pre-draft. This is not tracked within the EIP Repository.
+**Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
 
-**Draft**
-The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
+**Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
 
-**Review**
-An EIP Author marks an EIP as ready for and requesting Peer Review.
+**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call**
-This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
 
 If this period results in necessary material changes it will revert the EIP to `REVIEW`.
 
-**Final**
-This EIP represents the final accepted standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-material clarifications.
+**Final** - This EIP represents the final accepted standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-material clarifications.
 
-**Stagnant**
-Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is algorithmically moved to `STANGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to`DRAFT`.
+**Stagnant** - Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is algorithmically moved to `STANGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to`DRAFT`.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
-**Withdrawn**
-The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
+**Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 
-**Living**
-A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
+**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
 
 ## What belongs in a successful EIP?
 
