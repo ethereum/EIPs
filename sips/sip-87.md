@@ -1,7 +1,7 @@
 ---
 sip: 87
 title: Add iETH incentive to RewardsDistribution
-status: Proposed
+status: Implemented
 author: Clinton Ennis (@hav-noms)
 discussions-to: governance
 created: 2020-08-31
