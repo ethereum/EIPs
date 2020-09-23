@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 2878
 title: 2020 Block Reward Reduction to 0.5 ETH
 author: John Lilic @jlilic twitter.com/johnlilic johnlilicEIP@gmail.com, Jerome de Tychey @jdetychey twitter.com/jdetychey,  Others
 discussions-to: https://ethereum-magicians.org/t/eip-2878-block-reward-reduction-to-0-5-eth/
@@ -83,5 +83,4 @@ In this EIP we have laid out our economic evidence that reducing the block rewar
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
 
