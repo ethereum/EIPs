@@ -1,5 +1,5 @@
 ---
-sccp: 48
+sccp: 49
 title: Distribute 16k SNX to iETH incentives
 author: Kain Warwick (@kaiynne)
 status: Implemented
