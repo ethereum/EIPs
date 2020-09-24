@@ -1,7 +1,7 @@
 ---
 sip: 86
 title: ExchangeRates Chainlink Aggregator V2V3
-status: WIP
+status: Implemented
 author: Clement Balestrat (@clementbalestrat)
 
 created: 2020-09-02
