@@ -79,7 +79,7 @@ The following is the standardization process for all EIPs in all Tracks:
 
 **Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
 
-If this period results in necessary material changes it will revert the EIP to `REVIEW`.
+If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
 **Final** - This EIP represents the final accepted standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-material clarifications.
 
