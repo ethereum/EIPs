@@ -4,35 +4,27 @@
 
 Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
 
-A browsable version of all current and draft EIPs can be found on [the official EIP site](https://eips.ethereum.org/).
+**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document. Ideas should be thoroughly discussed prior to opening a pull request, such as on the [Ethereum Magicians forums](https://ethereum-magicians.org) or in a GitHub issue in this repository.
 
-# Contributing
+This repository tracks the ongoing status of EIPs. It contains:
 
- 1. Review [EIP-1](EIPS/eip-1.md).
- 2. Fork the repository by clicking "Fork" in the top right.
- 3. Add your EIP to your fork of the repository. There is a [template EIP here](eip-template.md).
- 4. Submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+- [Draft](https://eips.ethereum.org/all#draft) proposals which intend to complete the EIP review process.
+- [Last Call](https://eips.ethereum.org/all#last-call) for proposals that may become final (see also [RSS feed](https://eips.ethereum.org/last-call.xml)).
+- [Accepted](https://eips.ethereum.org/all#accepted) proposals which are awaiting implementation or deployment by Ethereum client developers.
+- [Final](https://eips.ethereum.org/all#final) and [Active](https://eips.ethereum.org/all#active) proposals that are recorded.
+- The [EIP process](EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
 
-Your first PR should be a first draft of the final EIP. It must meet the formatting criteria enforced by the build (largely, correct metadata in the header). An editor will manually review the first PR for a new EIP and assign it a number before merging it. Make sure you include a `discussions-to` header with the URL to a discussion forum or open GitHub issue where people can discuss the EIP as a whole.
+Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the reader to decide whether a proposal will be useful to them.
 
-If your EIP requires images, the image files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
+Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).
 
 Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your GitHub username or your email address inside <triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
 
-When you believe your EIP is mature and ready to progress past the draft phase, you should do one of two things:
+## Project Goal
 
- - **For a Standards Track EIP of type Core**, ask to have your issue added to [the agenda of an upcoming All Core Devs meeting](https://github.com/ethereum/pm/issues), where it can be discussed for inclusion in a future hard fork. If implementers agree to include it, the EIP editors will update the state of your EIP to 'Accepted'.
- - **For all other EIPs**, open a PR changing the state of your EIP to 'Final'. An editor will review your draft and ask if anyone objects to its being finalised. If the editor decides there is no rough consensus - for instance, because contributors point out significant issues with the EIP - they may close the PR and request that you fix the issues in the draft before trying again.
+The Ethereum Improvement Proposals repository exists as a place to share concrete proposals with potential users of the proposal and the Ethereum community at large.
 
-# EIP Status Terms
-
-* **Draft** - an EIP that is undergoing rapid iteration and changes.
-* **Last Call** - an EIP that is done with its initial iteration and ready for review by a wide audience.
-* **Accepted** - a core EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author. The process for Core Devs to decide whether to encode an EIP into their clients as part of a hard fork is not part of the EIP process. If such a decision is made, the EIP will move to final.
-* **Final (non-Core)** - an EIP that has been in Last Call for at least 2 weeks and any technical changes that were requested have been addressed by the author.
-* **Final (Core)** - an EIP that the Core Devs have decided to implement and release in a future hard fork or has already been released in a hard fork. 
-
-# Preferred Citation Format
+## Preferred Citation Format
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
 
