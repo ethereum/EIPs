@@ -39,6 +39,7 @@ This scheme emulates `CREATE2` derivation but it cannot practically collude with
 #### Notes
 - The opcode behaves exactly as CALL in terms of gas consumption.
 - In the called context `CALLER` returns the impersonated address.
+- If value transfer is non-zero in the call, the value is transferred from the impersonated account, and not from the real caller. This can be used to transfer ethers out of an impersonated account.
 
 ### Motivation
 
