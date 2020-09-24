@@ -1,7 +1,7 @@
 ---
 sip: 85
 title: Ether Collateral v0.3
-status: Proposed
+status: Implemented
 author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/
 
