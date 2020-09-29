@@ -1,5 +1,5 @@
 ---
-eip: <undefined number>
+eip: 2997
 title: IMPERSONATECALL Opcode
 author: Sergio Demian Lerner (sergio.d.lerner@gmail.com)
 category: Core
