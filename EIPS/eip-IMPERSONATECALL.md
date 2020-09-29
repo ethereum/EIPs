@@ -8,9 +8,9 @@ status: Draft
 created: 2020-09-24
 ---
 
-### Overview
+## Abstract
 
-Add a new opcode, `IMPERSONATECALL` at `0xf6`, which is similar in idea to `CALL`, except that it impersonates a sender, i.e. the callee sees a sender different from the real caller. To prevent collisions with other deployed contract or externally owned accounts, the impersonated sender address is derived from the real caller address and a salt.
+Add a new opcode, `IMPERSONATECALL` at `0xf6`, which is similar in idea to `CALL (0xF1)`, except that it impersonates a sender, i.e. the callee sees a sender different from the real caller. To prevent collisions with other deployed contract or externally owned accounts, the impersonated sender address is derived from the real caller address and a salt.
 
 ### Specification
 
@@ -37,9 +37,9 @@ The impersonated sender address is computed as `keccak256( 0xff ++ address ++ sa
 This scheme emulates `CREATE2` derivation but it cannot practically collude with the `CREATE2` address space.
 
 #### Notes
-- The opcode behaves exactly as CALL in terms of gas consumption.
-- In the called context `CALLER` returns the impersonated address.
-- If value transfer is non-zero in the call, the value is transferred from the impersonated account, and not from the real caller. This can be used to transfer ethers out of an impersonated account.
+- The opcode behaves exactly as `CALL` in terms of gas consumption.
+- In the called context `CALLER (0x33)` returns the impersonated address.
+- If value transfer is non-zero in the call, the value is transferred from the impersonated account, and not from the real caller. This can be used to transfer ether out of an impersonated account.
 
 ### Motivation
 
@@ -91,4 +91,3 @@ Example 3
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
