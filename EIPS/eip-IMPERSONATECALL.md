@@ -2,6 +2,7 @@
 eip: 2997
 title: IMPERSONATECALL Opcode
 author: Sergio Demian Lerner (sergio.d.lerner@gmail.com)
+discussions-to: https://ethresear.ch/t/impersonatecall-opcode/8020
 category: Core
 type: Standards Track
 status: Draft
@@ -12,7 +13,11 @@ created: 2020-09-24
 
 Add a new opcode, `IMPERSONATECALL` at `0xf6`, which is similar in idea to `CALL (0xF1)`, except that it impersonates a sender, i.e. the callee sees a sender different from the real caller. To prevent collisions with other deployed contract or externally owned accounts, the impersonated sender address is derived from the real caller address and a salt.
 
-### Specification
+## Motivation
+
+Many times a "sponsor" company wants to deploy non-custodial smart wallets for all its users. The sponsor does not want to pay the deployment cost of each user contract in advance. Counterfactual contract creation enables this, yet it forces the sponsor to create the smart wallet (or a proxy contract to it) when the user wants to transfer ether or tokens out of his/her account. The contract creation cost is approximately 42000 gas. This proposal avoids this extra cost, and enables the creation of multi-wallets (wallets that serve multiple users) that can be commanded by EIP-712 based messages.
+
+## Specification
 
 `IMPERSONATECALL`: `0xf6`, takes 7 operands:
 
@@ -20,11 +25,11 @@ Add a new opcode, `IMPERSONATECALL` at `0xf6`, which is similar in idea to `CALL
 - `to`: the destination address whose code is to be executed;
 - `in_offset`: the offset into memory of the input;
 - `in_size`: the size of the input in bytes;
-- `out_offset`: the offset into memory of the output;
-- `out_size`: the size of the scratch pad for the output.
+- `ret_offset`: the offset into memory of the output;
+- `ret_size`: the size of the scratch pad for the output.
 - `salt` is a `32` bytes value (a stack item). 
 
-#### Computation of impersonated sender
+### Computation of impersonated sender
 
 The impersonated sender address is computed as `keccak256( 0xff ++ address ++ salt ++ zeros32)[12:]`.
 
@@ -34,35 +39,37 @@ The impersonated sender address is computed as `keccak256( 0xff ++ address ++ sa
 
 - The field zeros32 corresponds to 32 zero bytes.
 
-This scheme emulates `CREATE2` derivation but it cannot practically collude with the `CREATE2` address space.
+This scheme emulates `CREATE2` address derivation, but it cannot practically collude with the `CREATE2` address space.
 
-#### Notes
+### Notes
 - The opcode behaves exactly as `CALL` in terms of gas consumption.
 - In the called context `CALLER (0x33)` returns the impersonated address.
 - If value transfer is non-zero in the call, the value is transferred from the impersonated account, and not from the real caller. This can be used to transfer ether out of an impersonated account.
 
-### Motivation
 
-Many times a "sponsor" company wants to deploy non-custodial smart wallets for all its users. The sponsor does not want to pay the deployment cost of each user contract in advance. Counterfactual contract creation enables this, yet it forces the sponsor to create the smart wallet (or a proxy contract to it) when the user wants to transfer ether or tokens out of his/her account. The contract creation cost is approximately 42000 gas. This proposal avoids this extra cost, and enables the creation of multi-wallets (wallets that serve multiple users) that can be commanded by EIP-712 based messages.
 
-### Rationale
+## Rationale
 
 Even if `IMPERSONATECALL` requires hashing 3 words, implying an additional cost of 180 gas, we think the benefit of accounting for hashing doesn't not compensate increasing the complexity of the implementation.
+
+We use the zeros32 field to base address derivation in a pre-image of similar size than CREATE2 and reuse the existing address derivation functions. We also avoid worrying about address collisions between EOA derivation (65 bytes pre-image), CREATE derivation (from 23 to 27 bytes pre-image, for a 32bit nonce) and CREATE2 derivation (85 bytes pre-image). 
+
+An option is to omit the zeros32 field: the resulting length of the Keccak pre-image for IMPERSONATECALL address is 53 bytes , which does not generate address collision.
 
 While the same functionality could be provided in a pre-compiled contract, we believe using a new opcode is a cleaner solution.
 
 
-### Possible arguments against
+## Possible arguments against
 
 * You can replicate this functionality with counterfactual contract creation. We argue that the there is an important benefit of avoiding the deployment cost in case the sponsor needs to serve thousands of users.
 
-### Clarifications
+## Clarifications
 
-- This EIP makes collisions possible, yet practically impossible.
+- This EIP makes address collisions possible, yet practically impossible.
 
 - If a contract already exists with an impersonated address, the `IMPERSONATECALL` is executed in the same way, and the existing code will not be executed. It should  be noted that `SELFDESTRUCT` (`0xff`) cannot be executed directly with `IMPERSONATECALL` as no opcode is executed in the context of the impersonated account.
 
-### Examples
+## Test Cases
 
 We present 4 examples of impersonated address derivation:
 
