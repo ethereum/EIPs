@@ -6,7 +6,7 @@ discussions-to: https://github.com/ethereum/EIPs/issues/3012
 status: Draft
 type: Standards Track
 category : Interface
-created: 2020-09-3
+created: 2020-09-30
 requires (*optional): <EIP number(s)>
 replaces (*optional): <EIP number(s)>
 ---
