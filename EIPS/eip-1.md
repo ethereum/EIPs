@@ -23,10 +23,10 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 There are three types of EIP:
 
 - A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories. Standards Track EIPs consist of three parts, a design document, implementation, and finally if warranted an update to the [formal specification].
-  - **Core** - improvements requiring a consensus fork (e.g. [EIP-5], [EIP-101]), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86]).
-  - **Networking** - includes improvements around [devp2p] ([EIP-8]) and [Light Ethereum Subprotocol], as well as proposed improvements to network protocol specifications of [whisper] and [swarm].
-  - **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP-6]) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
-  - **ERC** - application-level standards and conventions, including contract standards such as token standards ([ERC20]), name registries ([ERC26], [ERC137]), URI schemes ([ERC67]), library/package formats ([EIP-82]), and wallet formats ([EIP-75], [EIP-85]).
+  - **Core** - improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86](./eip-86.md)).
+  - **Networking** - includes improvements around [devp2p] ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol], as well as proposed improvements to network protocol specifications of [whisper] and [swarm].
+  - **Interface** - includes improvements around client [API/RPC] specifications and standards, and also certain language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs]. The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
+  - **ERC** - application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-26](https://github.com/ethereum/EIPs/issues/26), [ERC-137](./eip-137.md)), URI schemes ([ERC-67](https://github.com/ethereum/EIPs/issues/67)), library/package formats ([EIP-82](https://github.com/ethereum/EIPs/issues/82)), and wallet formats ([EIP-75](https://github.com/ethereum/EIPs/issues/75), [EIP-85](https://github.com/ethereum/EIPs/issues/85)).
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
 - An **Informational EIP** describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
 
@@ -109,7 +109,7 @@ Other exceptional statuses include:
 
 Each EIP should have the following parts:
 
-- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1.md#eip-header-preamble) for details.
+- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](./eip-1.md#eip-header-preamble) for details.
 - Abstract - A short (~200 word) description of the technical issue being addressed.
 - Motivation (*optional) - The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
@@ -212,6 +212,10 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 EIPs may also have a `superseded-by` header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a `replaces` header containing the number of the EIP that it rendered obsolete.
 
+## Linking to other EIPs
+
+References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompaniede by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
+
 ## Auxiliary Files
 
 Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
@@ -294,26 +298,13 @@ See [the revision history for further details](https://github.com/ethereum/EIPs/
 
 ### Bibliography
 
-[EIP-5]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5.md
-[EIP-101]: https://github.com/ethereum/EIPs/issues/28
-[EIP-90]: https://github.com/ethereum/EIPs/issues/90
-[EIP-86]: https://github.com/ethereum/EIPs/issues/86#issue-145324865
 [devp2p]: https://github.com/ethereum/wiki/wiki/%C3%90%CE%9EVp2p-Wire-Protocol
-[EIP-8]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-8.md
 [Light Ethereum Subprotocol]: https://github.com/ethereum/wiki/wiki/Light-client-protocol
 [whisper]: https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview
 [swarm]: https://github.com/ethereum/go-ethereum/pull/2959
 [API/RPC]: https://github.com/ethereum/wiki/wiki/JSON-RPC
-[EIP-6]: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-6.md
 [contract ABIs]: https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
 [interfaces repo]: https://github.com/ethereum/interfaces
-[ERC-20]: https://github.com/ethereum/EIPs/issues/20
-[ERC-26]: https://github.com/ethereum/EIPs/issues/26
-[ERC-137]: https://github.com/ethereum/EIPs/issues/137
-[ERC-67]: https://github.com/ethereum/EIPs/issues/67
-[EIP-82]: https://github.com/ethereum/EIPs/issues/82
-[EIP-75]: https://github.com/ethereum/EIPs/issues/75
-[EIP-85]: https://github.com/ethereum/EIPs/issues/85
 [the Ethereum subreddit]: https://www.reddit.com/r/ethereum/
 [one of the Ethereum Gitter chat rooms]: https://gitter.im/ethereum/
 [pull request]: https://github.com/ethereum/EIPs/pulls
