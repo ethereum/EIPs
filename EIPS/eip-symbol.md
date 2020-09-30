@@ -45,7 +45,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_symbol","params":[],"id":1}'
 
 ## Rationale
 <!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion. -->
-(Similar to https://eips.ethereum.org/EIPS/eip-695)
+(Similar to https://eips.ethereum.org/EIPS/eip-695 and symbol from https://eips.ethereum.org/EIPS/eip-20)
 
 todo
 
