@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3014
 title: Create `eth_symbol` method for JSON-RPC
 author: Peter Grassberger (@PeterTheOne)
 discussions-to: https://github.com/ethereum/EIPs/issues/3012
