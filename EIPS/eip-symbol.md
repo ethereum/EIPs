@@ -49,10 +49,6 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"eth_symbol","params":[],"id":1}'
 
 todo
 
-## Implementation
-<!-- The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details. -->
-None yet.
-
 ## Security Considerations
 <!-- All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers. -->
 It is a read only endpoint. The information is only as trusted as the JSON-RPC node itself, it could supply wrong information and thereby trick the user in beleaving he/she is dealing with another native coin.
