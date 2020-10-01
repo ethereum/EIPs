@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category : Interface
 created: 2020-09-30
-replaces (*optional): <EIP number(s)>
 ---
 
 ## Simple Summary
