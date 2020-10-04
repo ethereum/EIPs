@@ -1,0 +1,193 @@
+---
+eip: <to be assigned>
+title: Contract Wallet Detection
+author: Ricardo Guilherme Schmidt (@3esmit)
+discussions-to: <to be assigned>
+status: Draft
+type: Informational
+created: 04-Oct-2020
+---
+
+## Simple Summary
+
+Provides a registry for checking if a contract is a user wallet.
+
+## Abstract
+
+The wallet software should warn users of common mistakes, such as transferring ERC20 to a contract which is not intended to handle it. User wallet contracts can be detected off-chain through analysis of common code hashes used for most users. 
+
+## Motivation
+
+Huge amounts of value have been lost due simple mistakes as sending all your tokens to the token contract itself, a common mistake by new (or tired) users, to paste the token address in the destination field, instead of pasting it on the wallet configuration. 
+
+Also, new users, coming from less advanced blockchains where all addresses are controlled by a person, willing to participate in a ethereum project, ends up sending value to the wrong contract, and/or directly (without using ERC20 approval design) to the project's contract.
+
+
+## Specification
+
+The contract should returns "Wallet" if the contract is registered as a "user wallet contract", and thus be capable move tokens received on that address.
+
+Undefined code hashes are considered as proxies by default, as proxies can have unique code per implementation (see ERC1167).
+
+The registry could also check for certain ERC-1820 signature to accept as a contract wallet.
+
+A democracy or a multisig between the ethereum developer community (Status, MetaMask, MyCrypto, MyEtherWallet, Argent, Gnosis, Aragon, Decentraland, and others), would control the registry, and would be able to approve the inclusion in a codehash->type map for defining all commonly used wallet contracts. 
+
+A script that connects to a full node would scan for combinations of function signatures inside contract code in state to guide controllers to the inclusion of all possible user wallets, even those with small tweaks that make them have a different code hash. 
+
+## Rationale
+
+A smart contract would allow wallets in a single request to find out if a destination address is safe to handle tokens. 
+Sharing the smart contract between all major wallets creates a standard that contributes with a better ethereum UX. 
+
+A democracy could replace the multisig, where the voters could be the former participants of the multisig, or any other more democratic method. 
+To provide backwards compatibility with all possible wallet contracts, a codehash map is the best solution. 
+
+## Backwards Compatibility
+
+At the current time, externally owned addresses (code size == 0) would still be considered safe, but with the mature of this specification, and the future of ethereum with account abstraction, all wallets would be a smart contract, and sending tokens to a mistyped address would also be covered. 
+
+Some Proxy standards are not compatible by default, as eip-1822, however this is easily manageable by the implementation contract, which can expose the function, or register itself as a token receiver through EIP-820.
+
+## Security Considerations
+
+The worst case scenario for this tool would be false positives (warning about risk of loss on a wallet contract) or false negatives (not warning when user is about to send tokens to an unrecoverable address), which would still be an improvement over current situation
+
+## Test Cases
+
+TBD
+
+## Implementation
+
+WIP
+TODO ERC1820 support or similar
+
+```solidity
+pragma solidity ^0.7.2;
+
+interface ERC897 {
+    function implementation() external view returns (address);
+}
+
+interface NonStandard {
+    function masterCopy() external view returns (address); //gnosis
+    function currentContract() external view returns (address); //decentraland
+    function contractImplementation() external view returns (address); //lime
+    //add others
+}
+
+/**
+ * @author Ricardo Guilherme Schmidt (Status Research & Development GmbH)
+ * @notice Registry of Wallet Codehashes and Wallet capability checker
+ */
+contract CodehashType {
+    event ControllerChanged(address newController);
+    event CodehashTypeSet(bytes32 codehash, CodeType indexed codeType);
+    enum CodeType { Undefined, Unknown, NoCode, Wallet, Proxy }
+    
+    address public controller;
+
+    mapping(bytes32 => CodeType) public codeTypeMap;
+
+    modifier onlyController(){
+        require(msg.sender == controller, "Unauthorized");
+        _;
+    }
+
+    /**
+     * @param nullHash codehash of a externally owned address (EOA)
+     */
+    constructor(bytes32 nullHash) {
+        codeTypeMap[nullHash] = CodeType.NoCode; 
+    }
+
+    /** 
+     * @param sample A deployed contract to define codehash type.
+     */
+    function setCodehash(address sample, CodeType codeType) external onlyController {
+        require(isContract(sample), "No code");
+        bytes32 codeHash = getCodeHash(sample);
+        codeTypeMap[codeHash] = codeType;
+        emit CodehashTypeSet(codeHash, codeType);
+    }
+
+    function changeController(address newController) external onlyController {
+        controller = newController;
+    }
+
+    /** 
+     * @notice Search for thecode type of current installed logic
+     * @param test An address in test.
+     */
+    function searchCodeType(address test) public view returns(CodeType codeType) {
+        codeType = codeTypeMap[getCodeHash(test)];
+        if(codeType == CodeType.Proxy || codeType == CodeType.Undefined){
+            address implementation = getImplementation(test);
+            if(implementation == address(0) || implementation == test){
+                return CodeType.Unknown;
+            }
+            codeType = searchCodeType(implementation);
+        }
+    }
+
+    /** 
+     * @notice Search for proxy implementation
+     * @param proxy Proxy in lookup.
+     */
+    function getImplementation(address proxy) public view returns(address) {
+        try ERC897(proxy).implementation() returns (address implementation) {
+            return implementation;
+        } catch {
+            
+        } try NonStandard(proxy).masterCopy() returns (address implementation) {
+            return implementation;
+        } catch {
+            
+        } try NonStandard(proxy).currentContract() returns (address implementation) {
+            return implementation;
+        } catch {
+            
+        } try NonStandard(proxy).contractImplementation() returns (address implementation) {
+            return implementation;
+        } catch {
+            
+        } //** other proxy detection */
+        try this.ERC1167implementation(proxy) returns (address implementation) {
+            return implementation;
+        }  catch {
+
+        }
+        return address(0);
+    }
+
+    /** 
+     * @notice Extracts implementation of a ERC1167 address
+     * @param proxy in lookup
+     */
+    function ERC1167implementation(address proxy) public view returns (address implementation) {     
+        assembly {
+            extcodecopy(proxy, implementation, 10, 20)
+        }
+        require(isContract(implementation), "Not ERC1167");
+    } 
+
+    /** 
+     * @notice Get current codehash of source
+     * @param source address to load code from
+     */
+    function getCodeHash(address source) public view returns (bytes32 codeHash) {
+        assembly { codeHash := extcodehash(source) }
+    }
+
+    function isContract(address test) public view returns (bool){
+        uint256 size;
+        assembly {
+            size := extcodesize(test)
+        }
+        return size > 0;
+    }
+}
+```
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
