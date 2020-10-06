@@ -1,7 +1,7 @@
 ---
 sccp: 50
 title: Pause s/iDEFI ahead of LEND->AAVE migration
-status: Approved
+status: Implemented
 author: Garth Travers (@garthtravers)
 discussions-to: governance
 created: 2020-10-01
