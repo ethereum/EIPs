@@ -1,13 +1,14 @@
 ---
-eip: xxxx
+eip: <to be assigned>
 title: BW6-761 curve operations
-author: Youssef El Housni (@yelhousni) and Aurore Guillevic
+author: Youssef El Housni (@yelhousni), Michael Connor (@iAmMichaelConnor) and Aurore Guillevic <aurore.guillevic@inria.fr>
 discussions-to:
 status: Draft
 type: Standards Track
 category: Core
-created:
-requires : xxxx
+created: 2020-10-05
+requires : 2539
+replaces : 2541
 ---
 
 <!--You can leave these HTML comments in your merged EIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new EIPs. Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
@@ -15,7 +16,7 @@ requires : xxxx
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
 
-This precompile adds operations for the BW6-761 curve (from the EY/Inria [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification of one-layer composed proofs. It is intended to replace the CP6-782 curve from ([Zexelib](https://github.com/scipr-lab/zexe)) for performance reasons. This EIP is based on and tends to replace [EIP-2541](https://github.com/matter-labs/EIPs/blob/sw6_wrapping/EIPS/eip-2541.md).
+This precompile adds operations for the BW6-761 curve (from the EY/Inria [research paper](https://eprint.iacr.org/2020/351.pdf)) as a precompile in a set necessary to *efficiently* perform SNARKs verification of one-layer composed proofs. It is intended to replace the CP6-782 curve from ([Zexelib](https://github.com/scipr-lab/zexe)) for performance reasons. This EIP is based on and tends to replace [EIP-2541](https://github.com/matter-labs/EIPs/blob/sw6_wrapping/EIPS/eip-2541.md). In most applications, BW6-761 is used as an outer curve to BLS12-377 considered in [EIP-2539](https://github.com/ethereum/EIPs/pull/2539).
 
 ## Abstract
 <!--A short (~200 word) description of the technical issue being addressed.-->
@@ -29,15 +30,13 @@ If `block.number >= X` we introduce *nine* separate precompiles to perform the f
 - BW6_G2_MUL - to perform point multiplication on a curve twist defined over a prime field
 - BW6_G2_MULTIEXP - to perform multiexponentiation on a curve twist defined over a prime field
 - BW6_PAIRING - to perform a pairing operations between a set of *pairs* of (G1, G2) points
-- BW6_MAP_FP_TO_G1 - to perform mapping of an element in the base field FP to a point (x,y) in the group G1
-- BW6_MAP_FP_TO_G2 - to perform mapping of an element in the base field FP to a point (x,y) in the group G2
 
 The multiexponentiation operations are a generalization of point multiplication, but seperate precompiles are prosposed because running a single MUL through MULTIEXP seems to be 20% more expensive.
 
 ## Motivation
 <!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
 
-The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/CP6-782 pair of curves. This precompile proposes a replacement of CP6-782 by BW6-761, which allows much faster operations.
+The motivation of this precompile is to allow efficient one-layer composition of SNARK proofs. Currently this is done by Zexe using the BLS12-377/CP6-782 pair of curves. This precompile proposes a replacement of CP6-782 by BW6-761, which allows much faster operations. For example, it was shown that verifying a Groth16 proof with BW6-761 is 30 times faster than with CP6-782.
 
 ### Proposed addresses table
 
@@ -50,8 +49,6 @@ The motivation of this precompile is to allow efficient one-layer composition of
 |BW6_G2_MUL          | 0x17     |
 |BW6_G2_MULTIEXP     | 0x18     |
 |BW6_PAIRING         | 0x19     |
-|BW6_MAP_FP_TO_G1    | 0x1a     |
-|BW6_MAP_FP_TO_G2    | 0x1b     |
 
 ## Specification
 <!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
@@ -81,7 +78,7 @@ Y = 0x58b84e0a6fc574e6fd637b45cc2a420f952589884c9ec61a7348d2a2e573a3265909f1af7e
 G2:
 X = 0x110133241d9b816c852a82e69d660f9d61053aac5a7115f4c06201013890f6d26b41c5dab3da268734ec3f1f09feb58c5bbcae9ac70e7c7963317a300e1b6bace6948cb3cd208d700e96efbc2ad54b06410cf4fe1bf995ba830c194cd025f1c
 Y = 0x17c3357761369f8179eb10e4b6d2dc26b7cf9acec2181c81a78e2753ffe3160a1d86c80b95a59c94c97eb733293fef64f293dbd2c712b88906c170ffa823003ea96fcd504affc758aa2d3a3c5a02a591ec0594f9eac689eb70a16728c73b61
-Pairing parameters: (TODO: change miller loop counts)
+Pairing parameters:
 e(P,Q)=(ML1(P,Q)*ML2(P,Q)^q)^FE
 |loop_count_1| (first miller loop ML1 count) = 0x8508c00000000002
 |loop_count_2| (second miller loop ML2 count) = 0x23ed1347970dec008a442f991fffffffffffffffffffffff
@@ -195,22 +192,28 @@ This precompile performs extensive computations and in case of any errors during
 
 #### TODO: Gas schedule
 
-Assuming a constant `30 MGas/second` following prices are suggested.
+** NOTE: gas costs are based on EIP1962 estimation strategy but do not fully include parsing of ABI, decoding and encoding of the result as a byte array.**
+
+Gas cost is derived by taking the average timing the same operations over different implementations and assuming a constant `30 MGas/second`. Since the execution time is machine-specific, this constant is determined based on execution times of [ECRECOVER](https://github.com/matter-labs/eip1962/blob/master/run_bn_pairing_estimate.sh) and [BNPAIR](https://github.com/matter-labs/eip1962/blob/master/run_bn_pairing_estimate.sh) precompiles on my machine and their proposed gas price (`43.5 MGas/s` for ECRECOVER and `16.5 MGas/s` for BNPAIR). Following are the proposed methods to time the precompile operations:
 
 ##### G1 addition
 
+Average timing of 1000 random samples
 `XXX` gas
 
 ##### G1 multiplication
 
+Average timing of 1000 samples of radnom worst-case of double-and-add algorithm (scalar of max bit length and max hamming weight and random base points in G1)
 `XXXXX` gas
 
 ##### G2 addition
 
+Average timing of 1000 random samples
 `XXXX` gas
 
 ##### G2 multiplication
 
+Average timing of 1000 samples of radnom worst-case of double-and-add algorithm (scalar of max bit length and max hamming weight and random base points in G2)
 `XXXXX` gas
 
 ##### G1/G2 Multiexponentiation
@@ -229,6 +232,7 @@ Discounts table as a vector of pairs `[k, discount]`:
 
 ##### Pairing operaiton
 
+Average timing of 1000 random samples (random points in G1 and G2) for different number of pairs with linear lifting:
 Base cost of the pairing operation is `XXXXX*k + XXXXX` where `k` is a number of pairs.
 
 Each point (either G1 or G2) for which subgroup check is requested and performed adds the corresponding G1/G2 multiplication cost to it.
@@ -272,10 +276,15 @@ Test vector for all operations are expanded in this [gist](https://gist.github.c
 ## Implementation
 <!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 There is a various choice of existing implementations:
+**Libraries:**
 - Rust implementation (EY/Zexe): https://github.com/yelhousni/zexe/tree/youssef/BW6-761-Fq-ABLR-2ML-M
 - C++ implementation (EY/libff): https://github.com/EYBlockchain/zk-swap-libff
 - Golang implementation (Consensys/gurvy): https://github.com/ConsenSys/gurvy
-- Golang implementation with Intel assembly (Onur Kilic): https://github.com/ConsenSys/gurvy
+**Stand-alone implementation:**
+- Golang implementation with Intel assembly (Onur Kilic): https://github.com/kilic/bw6
+**Precompiles:**
+- OpenEthereum (EY/Parity): https://github.com/EYBlockchain/solidity-elliptic-curves
+**Sripts:**
 - SageMath and Magma scripts: https://gitlab.inria.fr/zk-curves/bw6-761/
 
 ## Security Considerations
