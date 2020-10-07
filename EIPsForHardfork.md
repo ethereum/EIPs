@@ -1,7 +1,7 @@
 ---
 eip: 1929
 title: Selection of EIPs for network upgrade
-author: Pooja Ranjan (@poojaranjan)
+author: Pooja Ranjan (@poojaranjan), James Hancock (@MadeofTin)
 discussions-to: https://ethereum-magicians.org/t/proposal-of-a-formal-process-of-selection-of-eips-for-hardforks-meta-eip/3115
 status: Draft
 type: Meta 
@@ -22,7 +22,7 @@ This meta EIP provides a general outline process to propose, discuss, and track 
 
 ## Specification
 
-A Meta EIP should be created and merged following the process mentioned in [EIP 233](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-233.md).
+A Meta EIP should be created and merged following the process mentioned in [EIP-233](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-233.md).
 
 ###  EIP selection process for for CFI
 
@@ -47,8 +47,8 @@ The author or champion may reach out to [EIP Editors](https://github.com/ethereu
 #### Network upgrade process tracker
 The tracker is created at [Eth1.0-spec Projects](https://github.com/ethereum/eth1.0-specs).
 
-| № | CFI applied  | CFI accepted |CI testnet applied | CI testnet approved| Public testnet| Mainnet accepted|
-|---| -----|-------------|-----------| ------- | ------- | --------| 
+| № | CFI applied  | CFI approved |CI devnet waiting room | CI devnet active| Testing green light | Public testnet| Mainnet |
+|---| -----|-------------|-----------| ------- | ------- | --------| -------|
 | 1 |
 | 2 |
 | 3 |
@@ -59,21 +59,26 @@ The tracker is created at [Eth1.0-spec Projects](https://github.com/ethereum/eth
 #### CFI applied 
 * EIP status - Draft-Final
 * An [issue](https://github.com/ethereum/eth1.0-specs/issues) created at Eth1.0-spec repo
-#### CFI accepted
-* EIP status - Review-Final
+#### CFI approved
+* EIP status - Draft-Final
 * The decision to include in EFI in ACD meeting with the approval of at least 3 clients
-#### CI testnet applied
-* EIP status - Review-Final
+#### CI devnet waiting room
+* EIP status - Draft-Final
 * ACD agrees to include the EIP on the developers testnet 
 * Implementation in clients participating in the developer's testnet
-#### CI testnet accepted
+#### CI devnet active
+* EIP status - Draft-Final
+* At any time only one version of the devnet will be active.
+#### Testing green light
 * EIP status - Review-Final
+* EIPs on the latest version of the devnet 
+* Final list of EIPs for next upgrade
 * Add to the hard fork Meta EIP
 ### Public testnet
 * EIP status - Last call-Final
 * Deploy on public testnet  
 #### Mainnet accepted
-* EIP status - Accepted/Final
+* EIP status - Final
 * Deployed in a hardfork
     
 
