@@ -16,22 +16,32 @@ It is proposed to update the composition of the sDEFI index synth. The DeFi spac
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
 The proposal is to add YFI, UNI, NXM and CRV to sDEFI while removing ZRX, REP, LRC and BNT. The community has voted on the following initial weightage of the index:
-  - 15.00%	YFI
-  - 15.00%	AAVE
-  - 15.00%	SNX
-  - 10.00%	UNI
-  - 7.50%	COMP
-  - 7.50%	MKR
-  - 5.00%	NXM
-  - 5.00%	UMA
-  - 5.00%	REN
-  - 5.00%	KNC
-  - 5.00%	BAL
-  - 5.00%	CRV
-
+  
+  % Weightage | Ticker | Units
+  - 15.00% | YFI | 0.023
+  - 15.00% | AAVE | 9.28
+  - 15.00% | SNX | 111.09
+  - 10.00% | UNI | 94.58
+  - 7.50% | COMP | 1.96
+  - 7.50% | MKR | 0.41
+  - 5.00%	| NXM | 4.75
+  - 5.00%	| UMA | 20.40
+  - 5.00%	| REN | 591.08
+  - 5.00%	| KNC | 158.41
+  - 5.00%	| BAL | 9.18
+  - 5.00%	| CRV | 261.95
+  
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
-The purpose of the updated sDEFI index synth is to attract traders wishing to gain exposure to the burgeoning DeFi sector with one token. YFI, UNI, NXM and CRV are tokens of projects advancing the capabilities of every user in the DeFi space. YFI enables industrialized liquidity mining farming and custom asset management strategies at scale. Uniswap is the most decentralized piece of software enabling trustless swaps of ERC20 tokens with Ether or other ERC20 tokens. Nexus Mutual writes insurance policies enabling users to hedge the risk of DeFi smart contract failures. Curve is the most liquid stablecoin swap venue, enabling users to convert sUSD, USDT, USDC or DAI to a different flavor of stablecoin. Each of these tokens represents a project at the cutting edge of what is possible in DeFi.
+The purpose of the updated sDEFI index synth is to attract traders wishing to gain exposure to the burgeoning DeFi sector with one token. 
+
+YFI, UNI, NXM and CRV are tokens of projects advancing the capabilities of every user in the DeFi space. YFI enables industrialized liquidity mining farming and custom asset management strategies at scale. Uniswap is the most decentralized piece of software enabling trustless swaps of ERC20 tokens with Ether or other ERC20 tokens. Nexus Mutual writes insurance policies enabling users to hedge the risk of DeFi smart contract failures. Curve is the most liquid stablecoin swap venue, enabling users to convert sUSD, USDT, USDC or DAI to a different flavor of stablecoin. Each of these tokens represents a project at the cutting edge of what is possible in DeFi.
+
+As the DeFi sector has iterated and innovated some assets from the previous version of sDEFI are removed. These assets are ZRX, REP, LRC, and BNT. These are all projects with potential to have a positive impact on the capabilities of DeFi laymen users and power users but it is our view they no longer are digital assets representing the very forefront of what is possible in decentralised finance. 
+
+DEXs like ZRX and BNT are not quite as dominant in terms of platform volume and user engagement as UNI, for example, though SNX community member MJC has noted the next version of BNT could melt faces and surprise people to the upside. At this point, it's a speculation of what BNT can do more than what BNT can do right now. Similarly, LRC and REP have so far not shown themselves to be preferred protocols for many DeFi users. 
+
+The goal of the index is to provide exposure to the most innovative projects in DeFi right now. As the DeFi space continues to move quickly it is quite possible for previously excluded assets to rejoin the Index. 
 
 
 ## Copyright
