@@ -15,7 +15,7 @@ It is proposed to update the composition of the sDEFI index synth. The DeFi spac
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
-The proposal is to add YFI, UNI, NXM and CRV to sDEFI while removing ZRX, REP, LRC and BNT. The community has voted on the following initial weightage of the index:
+The proposal is to add YFI, UNI, wNXM and CRV to sDEFI while removing ZRX, REP, LRC and BNT. The community has voted on the following initial weightage of the index:
   
   % Weightage | Ticker | Units
   - 15.00% | YFI | 0.023
