@@ -14,7 +14,7 @@ layout: default
     {% endif %}
     <tr><th>Status</th><td>{{ page.status | xml_escape }}
     {% if page.review-period-end != undefined %}
-      <strong>(review ends {{ page.review-period-end | xml_escape }})</strong>
+      <tr><th>Review period ends</th><td>{{ page.review-period-end | xml_escape }}</td></tr>
     {% endif %}
     </td></tr>
     <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
