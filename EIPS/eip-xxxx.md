@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3030
 title: BLS Remote Signer HTTP API Standard
 author: Herman Junge <herman@sigmaprime.io>
 discussions-to: <URL>
