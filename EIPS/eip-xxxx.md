@@ -5,7 +5,7 @@ author: Herman Junge (hermanjunge)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
-category: ERC
+category: Interface
 created: 2020-09-30
 ---
 
