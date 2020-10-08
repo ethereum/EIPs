@@ -19,17 +19,17 @@ The proposal is to add YFI, UNI, wNXM and CRV to sDEFI while removing ZRX, REP, 
   
   % Weightage | Ticker | Units
   - 15.00% | YFI | 0.023
-  - 15.00% | AAVE | 9.28
-  - 15.00% | SNX | 111.09
-  - 10.00% | UNI | 94.58
-  - 7.50% | COMP | 1.96
-  - 7.50% | MKR | 0.41
-  - 5.00%	| WNXM | 4.75
-  - 5.00%	| UMA | 20.40
-  - 5.00%	| REN | 591.08
-  - 5.00%	| KNC | 158.41
-  - 5.00%	| BAL | 9.18
-  - 5.00%	| CRV | 261.95
+  - 15.00% | AAVE | 8.41
+  - 15.00% | SNX | 109.93
+  - 10.00% | UNI | 92.09
+  - 7.50% | COMP | 1.88
+  - 7.50% | MKR | 0.39
+  - 5.00%	| WNXM | 4.53
+  - 5.00%	| UMA | 19.47
+  - 5.00%	| REN | 598.03
+  - 5.00%	| KNC | 159.13
+  - 5.00%	| BAL | 9.05
+  - 5.00%	| CRV | 253.8
   
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
