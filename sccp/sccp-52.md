@@ -19,7 +19,10 @@ This SCCP proposes changing the debt snapshot stale time to 4 hours.
 
 The pDAO will call [`SystemSettings.setDebtSnapshotStaleTime(15000)`](https://etherscan.io/address/0x703D37fb776A4C905e28f7Ff23C73102ce36E08B#writeContract).
 Note that the argument is 15000 seconds, which is actually 4 hours and 10 minutes.
-This is to allow a snapshot heartbeat frequency of 4 hours, allowing the keeper bot 10 minutes of leeway.
+This is to allow a snapshot heartbeat frequency of 4 hours, allowing the keeper bot 10 minutes of leeway
+to mine the transaction. This will save significant resources.
+The keeper bot will still take snapshots earlier than 4 hours if the deviation exceeds the configured
+threshold of 2%, so lowering the frequency should not unduly impact the integrity of the system.
 
 ## Motivation
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
