@@ -111,7 +111,7 @@ To ensure that the debt pool snapshot is not stale, there will be a staleness ch
 complete debt pool snapshot was last computed. Minting, burning and claiming rewards will revert if the debt pool
 snapshot is stale until it has been updated.
 
-The staleness period will be initially set to `30 minutes` and will be configurable via an SCCP.
+The staleness period will be initially set to `60 minutes` and will be configurable via an SCCP.
 
 An additional point is that Synthetix already tracks whether the rates being supplied to the system are individually
 stale, or have been invalidated by chainlink warning flags (see [SIP 76](sip-76.md)). Currently, if any synth price is
@@ -219,7 +219,7 @@ Please list all values configurable via SCCP under this implementation.
 
 | Parameter | initial Value |
 | --------- | ------------- |
-| Debt snapshot stale time | 30 minutes |
+| Debt snapshot stale time | 60 minutes |
 | Debt snapshot max deviation | 2 percent |
 
 ## Copyright
