@@ -3,7 +3,7 @@ sccp: 52
 title: Change Debt Snapshot Stale Time to 4 Hours 
 author: Anton Jurisevic (@zyzek)
 discussions-to: https://research.synthetix.io/
-status: Proposed
+status: Implemented
 created: 2020-10-09
 ---
 
