@@ -1,5 +1,5 @@
 ---
-sip: <to be assigned>
+sip: 89
 title: Virtual Synths
 status: WIP
 author: Justin J Moses <@justinjmoses>
