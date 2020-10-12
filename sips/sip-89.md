@@ -3,7 +3,7 @@ sip: 89
 title: Virtual Synths
 status: WIP
 author: Justin J Moses <@justinjmoses>
-discussions-to: <Create a new thread on https://research.synthetix.io and drop the link here>
+discussions-to: https://research.synthetix.io/t/virtual-synths-sip/202
 
 created: 2020-10-06
 ---
