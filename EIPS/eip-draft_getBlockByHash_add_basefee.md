@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3041
 title: Add basefee in eth_getBlockByHash response
 author: Abdelhamid Bakhta (@abdelhamidbakhta)
 discussions-to:
