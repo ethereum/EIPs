@@ -28,6 +28,10 @@ The Ethereum Improvement Proposals repository exists as a place to share concret
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
 
+Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+
+And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
+
 # Validation
 
 EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
