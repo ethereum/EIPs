@@ -1,7 +1,7 @@
 ---
 sip: 90
 title: Transition SIPs/SCCPs to Snapshot Governance
-status: WIP
+status: Proposed
 author: Andy T CF (@andytcf)
 discussions-to: https://research.synthetix.io/t/transition-sips-sccps-to-snapshot-governance/209
 
