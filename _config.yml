@@ -55,6 +55,7 @@ defaults:
       layout: "eip"
 
 exclude:
+  - .github
   - Gemfile
   - Gemfile.lock
   - node_modules
