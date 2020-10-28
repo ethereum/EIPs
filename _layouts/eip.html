@@ -39,7 +39,7 @@ layout: default
     {% endif %}
   </table>
 
-  {{ content }}
+  {% include anchor_headings.html html=content anchorClass="anchor-link" beforeHeading=true %}
 
   <h2>Citation</h2>
   <p>Please cite this document as:</p>
