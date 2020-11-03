@@ -1,7 +1,7 @@
 ---
 sccp: 53
 title: Remove LEND Aggregator from ExchangeRates contract
-status: Proposed
+status: Implemented
 author: Jackson Chan (@jacko125)
 discussions-to: https://research.synthetix.io/
 created: 2020-10-21
