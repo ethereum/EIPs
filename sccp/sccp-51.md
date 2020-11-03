@@ -1,7 +1,7 @@
 ---
 sccp: 51
 title: Update sDEFI index
-status: Approved
+status: Implemented
 author: Farmwell (@farmwell), CryptoToit (@CryptoToit)
 discussions-to: https://research.synthetix.io/
 created: 2020-09-30
