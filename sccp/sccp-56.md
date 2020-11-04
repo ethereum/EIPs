@@ -13,7 +13,7 @@ created: 2020-11-03
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 
-Reduce exchange fees of trades intp `sETH`, `iETH`, `sBTC` and `iBTC` to `0.3%` to align with all other non-crypto synths.
+Reduce exchange fees of trades into `sETH`, `iETH`, `sBTC` and `iBTC` to `0.3%` to align with all other non-crypto synths.
 
 ## Abstract
 
