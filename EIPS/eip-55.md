@@ -2,7 +2,7 @@
 eip: 55
 title: Mixed-case checksum address encoding
 author: Vitalik Buterin <vitalik.buterin@ethereum.org>, Alex Van de Sande <avsa@ethereum.org>
-discussion-to: https://github.com/ethereum/eips/issues/55
+discussions-to: https://github.com/ethereum/eips/issues/55
 type: Standards Track
 category: ERC
 status: Final
