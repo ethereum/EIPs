@@ -67,43 +67,29 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ### EIP Process 
 
-Following is the process that a successful non-Core EIP will move along:
+The following is the standardization process for all EIPs in all tracks:
 
-```
-[ WIP ] -> [ DRAFT ] -> [ LAST CALL ] -> [ FINAL ]
-```
+![EIP Status Diagram](../assets/eip-1/EIP-process.png)
 
-Following is the process that a successful Core EIP will move along:
+**Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
 
-```
-[ IDEA ] -> [ DRAFT ] -> [ LAST CALL ] -> [ ACCEPTED ] -> [ FINAL ]
-```
+**Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
 
-Each status change is requested by the EIP author and reviewed by the EIP editors. Use a pull request to update the status. Please include a link to where people should continue discussing your EIP. The EIP editors will process these requests as per the conditions below.
+**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-* **Idea** -- Once the champion has asked the Ethereum community whether an idea has any chance of support, they will write a draft EIP as a [pull request]. Consider including an implementation if this will aid people in studying the EIP.
-  * :arrow_right: Draft -- If agreeable, EIP editor will assign the EIP a number (generally the issue or PR number related to the EIP) and merge your pull request. The EIP editor will not unreasonably deny an EIP.
-  * :x: Draft -- Reasons for denying draft status include being too unfocused, too broad, duplication of effort, being technically unsound, not providing proper motivation or addressing backwards compatibility, or not in keeping with the [Ethereum philosophy](https://github.com/ethereum/wiki/wiki/White-Paper#philosophy).
-* **Draft** -- Once the first draft has been merged, you may submit follow-up pull requests with further changes to your draft until such point as you believe the EIP to be mature and ready to proceed to the next status. An EIP in draft status must be implemented to be considered for promotion to the next status (ignore this requirement for core EIPs).
-  * :arrow_right: Last Call -- If agreeable, the EIP editor will assign Last Call status and set a review end date (`review-period-end`), normally 14 days later.
-  * :x: Last Call -- A request for Last Call status will be denied if material changes are still expected to be made to the draft. We hope that EIPs only enter Last Call once, so as to avoid unnecessary noise on the RSS feed.
-* **Last Call** -- This EIP will listed prominently on the https://eips.ethereum.org/ website (subscribe via RSS at [last-call.xml](/last-call.xml)).
-  * :x: -- A Last Call which results in material changes or substantial unaddressed technical complaints will cause the EIP to revert to Draft.
-  * :arrow_right: Accepted (Core EIPs only) -- A successful Last Call without material changes or unaddressed technical complaints will become Accepted.
-  * :arrow_right: Final (Non-Core EIPs) -- A successful Last Call without material changes or unaddressed technical complaints will become Final.
-* **Accepted (Core EIPs only)** -- This status signals that material changes are unlikely and Ethereum client developers should consider this EIP for inclusion. Their process for deciding whether to encode it into their clients as part of a hard fork is not part of the EIP process.
-  * :arrow_right: Draft -- The Core Devs can decide to move this EIP back to the Draft status at their discretion. E.g. a major, but correctable, flaw was found in the EIP.
-  * :arrow_right: Rejected -- The Core Devs can decide to mark this EIP as Rejected at their discretion. E.g. a major, but uncorrectable, flaw was found in the EIP.
-  * :arrow_right: Final -- Standards Track Core EIPs must be implemented in at least three viable Ethereum clients before it can be considered Final. When the implementation is complete and adopted by the community, the status will be changed to “Final”.
-* **Final** -- This EIP represents the current state-of-the-art. A Final EIP should only be updated to correct errata.
+**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
 
-Other exceptional statuses include:
+If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
-* **Active** -- Some Informational and Process EIPs may also have a status of “Active” if they are never meant to be completed. E.g. EIP 1 (this EIP).
-* **Abandoned** -- This EIP is no longer pursued by the original authors or it may not be a (technically) preferred option anymore.
-  * :arrow_right: Draft -- Authors or new champions wishing to pursue this EIP can ask for changing it to Draft status.
-* **Rejected** -- An EIP that is fundamentally broken or a Core EIP that was rejected by the Core Devs and will not be implemented. An EIP cannot move on from this state.
-* **Superseded** -- An EIP which was previously Final but is no longer considered state-of-the-art. Another EIP will be in Final status and reference the Superseded EIP. An EIP cannot move on from this state.
+**Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
+
+**Stagnant** - Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is moved to `STAGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `DRAFT`.
+
+>*EIP Authors are notified of any algorithmic change to the status of their EIP*
+
+**Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
+
+**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
 
 ## What belongs in a successful EIP?
 
@@ -136,7 +122,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * discussions-to:` *a url pointing to the official discussion thread*
 
-` status:` *Draft, Last Call, Accepted, Final, Active, Abandoned, Rejected, or Superseded*
+` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
 `* review-period-end:` *date review period ends*
 
