@@ -67,7 +67,7 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ### EIP Process 
 
-The following is the standardization process for all EIPs in all Tracks:
+The following is the standardization process for all EIPs in all tracks:
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process.png)
 
@@ -81,9 +81,9 @@ The following is the standardization process for all EIPs in all Tracks:
 
 If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
-**Final** - This EIP represents the final accepted standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
+**Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
 
-**Stagnant** - Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is algorithmically moved to `STANGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to`DRAFT`.
+**Stagnant** - Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is moved to `STAGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `DRAFT`.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
