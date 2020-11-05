@@ -3,7 +3,7 @@ sccp: 57
 title: Reduce fee reclamation window to three minutes (180 seconds)
 author: Jackson Chan (@jacko125), Justin Moses (@justinjmoses)
 discussions-to: https://research.synthetix.io/
-status: Proposed
+status: Approved
 created: 2020-11-04
 ---
 
