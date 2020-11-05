@@ -3,7 +3,7 @@ sccp: 56
 title: Reduce exchange fees of sETH and sBTC to 0.3%
 author: Justin J Moses (@justinjmoses)
 discussions-to: governance
-status: Proposed
+status: Approved
 created: 2020-11-03
 ---
 
