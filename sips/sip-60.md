@@ -45,10 +45,10 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 3. Update `checkAccountSchedule` to allow for terminal inflation and an unlimited escrow navigation through paging.
 4. Allowing anyone to `vest` an accounts escrowed tokens allows Synthetix network keepers to help support SNX holders and supports the [Liquidation system](https://sips.synthetix.io/sips/sip-15) to vest an under collateralised accounts vest-able SNX to be paid to the liquidator.
 5. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account to vest.
-TBD: Should the escrowed SNX be liquidated at a larger discount? or vested and transfered to the liquidator at the standard discount?
+TBD: Should the escrowed SNX be liquidated at a larger discount based on the escrow length remaining?
 
 ### Deprecate `HavvenEscrow` TokenSale contract
-There are still approx 1MM SNX in the [old token sale contract](https://contracts.synthetix.io/SynthetixEscrow). These escrow entries and bnalances should be migrated to the new escrow contract to;
+There are still approx 1MM SNX in the [old token sale contract](https://contracts.synthetix.io/SynthetixEscrow). These escrow entries and balances should be migrated to the new escrow contract to;
 
 1. Reduce the cross contract collateral calls
 2. Only need Dapps to support 1 escrow contract
