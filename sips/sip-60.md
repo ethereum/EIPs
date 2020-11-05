@@ -2,7 +2,7 @@
 sip: 60
 title: New Escrow Contract & Migration
 status: WIP
-author: Clinton Ennis (@hav-noms)
+author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: <https://discord.gg/ShGSzny>
 
 created: 2020-05-20
@@ -14,7 +14,7 @@ created: 2020-05-20
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Add new flexible escrow API to the SNX Escrow contract.
+Migrate to a new SNX escrow contract that supports, liquidations of escrowed SNX, L2 migration, flexible and infinite escrow support for terminal inflation migrate and deprecate token sale escrow contract and migrate all balances to new contract. 
 
 ## Abstract
 
@@ -46,6 +46,14 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 4. Allowing anyone to `vest` an accounts escrowed tokens allows Synthetix network keepers to help support SNX holders and supports the [Liquidation system](https://sips.synthetix.io/sips/sip-15) to vest an under collateralised accounts vest-able SNX to be paid to the liquidator.
 5. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account to vest.
 TBD: Should the escrowed SNX be liquidated at a larger discount? or vested and transfered to the liquidator at the standard discount?
+
+### Deprecate `HavvenEscrow` TokenSale contract
+There are still approx 1MM SNX in the [old token sale contract](https://contracts.synthetix.io/SynthetixEscrow). These escrow entries and bnalances should be migrated to the new escrow contract to;
+
+1. Reduce the cross contract collateral calls
+2. Only need Dapps to support 1 escrow contract
+3. Remove from the code base reducing surface area
+4. Allows liquidation support
 
 ## Specification
 
