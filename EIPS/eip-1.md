@@ -5,7 +5,7 @@ status: Living
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17
+updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17, 2020-09-10
 ---
 
 ## What is an EIP?
@@ -148,7 +148,7 @@ Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd)
 
 #### `author` header
 
-The `author` header optionally lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
+The `author` header lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the author header value must be:
 
 > Random J. User &lt;address@dom.ain&gt;
 
@@ -161,6 +161,10 @@ if the email address or GitHub username is included, and
 > Random J. User
 
 if the email address is not given.
+
+It is not possible to use both an email and a GitHub username at the same time. If important to include both, one could include their name twice, once with the GitHub username, and once with the email.
+
+At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
 #### `resolution` header
 
@@ -216,23 +220,15 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-` * Nick Johnson (@arachnid)`
-
-` * Casey Detrio (@cdetrio)`
-
-` * Hudson Jameson (@Souptacular)`
-
-` * Vitalik Buterin (@vbuterin)`
-
-` * Nick Savers (@nicksavers)`
-
-` * Martin Becze (@wanderer)`
-
-` * Greg Colvin (@gcolvin)`
-
-` * Alex Beregszaszi (@axic)`
-
-` * Micah Zoltu (@MicahZoltu)`
+- Nick Johnson (@arachnid)
+- Casey Detrio (@cdetrio)
+- Hudson Jameson (@Souptacular)
+- Vitalik Buterin (@vbuterin)
+- Nick Savers (@nicksavers)
+- Martin Becze (@wanderer)
+- Greg Colvin (@gcolvin)
+- Alex Beregszaszi (@axic)
+- Micah Zoltu (@MicahZoltu)
 
 ## EIP Editor Responsibilities
 
@@ -279,6 +275,8 @@ May 19, 2019: The **Abandoned** status was introduced.
 Dec 4, 2019: The "Security Considerations" section was introduced.
 
 June 17, 2020: Canonicalizes the format for referencing EIPs by number in the "Style Guide".
+
+Sep 10, 2020: Require the `author` header to include at least one GitHub username.
 
 See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
