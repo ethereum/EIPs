@@ -28,5 +28,8 @@ The current fee reclamation window was set to 5 minutes in [SCCP-43](.sccp-43.md
 
 A lower fee reclamation window improves the UX for traders trading on Synthetix exchange and other synth exchange products on L1.
 
+## UPDATE:
+After this was implemented it was required to rollback temporarily to allow settlement of all inverse synth exchanges in order to be able to purge and reset them. After the purge it was set back to 180 seconds as per the approved waiting period reduction. 
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
