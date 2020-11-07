@@ -12,7 +12,7 @@ created: 2015-11-22
 The solution proposed in this EIP is to change the name of the `SUICIDE` opcode in Ethereum programming languages with `SELFDESTRUCT`.
 
 ### Motivation
-Mental health is a very real issue for many people and small notions can make a difference. Those dealing with loss or depression would benefit from not seeing the word suicide in our a programming languages. By some estimates, 350 million people worldwide suffer from depression. The semantics of Ethereum's programming languages need to be reviewed often if we wish to grow our ecosystem to all types of developers.
+Mental health is a very real issue for many people and small notions can make a difference. Those dealing with loss or depression would benefit from not seeing the word suicide in our programming languages. By some estimates, 350 million people worldwide suffer from depression. The semantics of Ethereum's programming languages need to be reviewed often if we wish to grow our ecosystem to all types of developers.
 
 An Ethereum security audit commissioned by DEVolution, GmbH and [performed by Least Authority](https://github.com/LeastAuthority/ethereum-analyses/blob/master/README.md) recommended the following:
 > Replace the instruction name "suicide" with a less connotative word like "self-destruct", "destroy", "terminate", or "close", especially since that is a term describing the natural conclusion of a contract.

@@ -1,7 +1,7 @@
 ---
 eip: 86
 title: Abstraction of transaction origin and signature
-author: Vitalik Buterin
+author: Vitalik Buterin (@vbuterin)
 type: Standards Track
 category: Core
 status: Draft
