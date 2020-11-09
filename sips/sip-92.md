@@ -2,7 +2,7 @@
 sip: 92
 title: Historical iSynths Pricing Tracks When Last Frozen
 status: Proposed
-author: Justin J Moses <@justinjmoses>
+author: Justin J Moses (@justinjmoses)
 discussions-to: https://research.synthetix.io
 
 created: 2020-11-09
