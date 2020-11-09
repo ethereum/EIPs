@@ -1,7 +1,7 @@
 ---
 sccp: 46
 title: Lower C-Ratio by 100% to 500%
-status: Proposed
+status: Rejected
 author: Nocturnalsheet (@nocturnalsheet)
 discussions-to: governance
 created: 2020-09-02
@@ -48,3 +48,7 @@ Since the c-ratio was designed to be the lever for supporting supply and demand.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+## Voting Results
+
+The voting results can be found [here](https://discord.com/channels/413890591840272394/673764686134509568/750587768601575484).
