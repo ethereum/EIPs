@@ -1,5 +1,5 @@
 ---
-sccp: 94
+sccp: 58
 title: Increase Fees on DEFI and CEX to 100 bp
 author: Kaleb Keny (@kaleb-keny)
 status: Proposed
