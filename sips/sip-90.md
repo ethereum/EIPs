@@ -1,7 +1,7 @@
 ---
 sip: 90
 title: Transition SIPs/SCCPs to Snapshot Governance
-status: Proposed
+status: Implemented
 author: Andy T CF (@andytcf)
 discussions-to: https://research.synthetix.io/t/transition-sips-sccps-to-snapshot-governance/209
 
@@ -14,11 +14,13 @@ created: 2020-10-14
 
 <!--"If you can't explain it simply, you don't understand it well enough." Simply describe the outcome the proposed changes intends to achieve. This should be non-technical and accessible to a casual community member.-->
 
+
 Transition the current SCCP signaling process to off-chain signatures via snapshot [https://github.com/balancer-labs/snapshot](https://github.com/balancer-labs/snapshot).
 
 ## Abstract
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
+
 
 Use snapshot’s gas-less, off-chain governance platform [https://snapshot.page](https://snapshot.page) that will handle the SCCP/SIP signaling process of the Synthetix Protocol. The platform will enable community members to create SCCP/SIP proposals which will be able to be voted on via IPFS messages/signatures. Proposals created on snapshot will feature quadratic voting and votes will be weighted based on the user’s debt percentage in the last fee period.
 
