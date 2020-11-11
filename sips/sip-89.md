@@ -1,7 +1,7 @@
 ---
 sip: 89
 title: Virtual Synths
-status: Proposed
+status: Approved
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://research.synthetix.io/t/virtual-synths-sip/202
 
