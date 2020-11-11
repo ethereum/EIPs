@@ -12,7 +12,7 @@ created: 2020-05-18
 A method for converting futures market prices into a single reference price for Synths.
 
 ## Abstract
-This SIP describes a general approach to converting price data from futures markets into a single reference price, as well as a specific methodology for creating a non-expiring Crude Oil Index based on CME Light Sweet Crude Oil futures prices (Contract Code: CL) for a Synth with ticker symbol sOIL.
+This SIP describes a general approach to converting price data from futures markets into a single reference price, as well as a specific methodology for creating a non-expiring Crude Oil Index based on Brent Crude Oil futures prices for a Synth with ticker symbol sOIL.
 
 ## Motivation
 The creation of a single reference price for futures markets that incorporates information from the most liquid futures contracts enables assets like WTI and other commodities to be traded as synthetic assets within Synthetix. There is significant demand for these assets particularly given the liquidity of the underlying markets and the difficulty of access for the average trader. 
@@ -49,7 +49,7 @@ This method was chosen over other more strictly enforced constant-maturity metho
 The logic of these reference prices is implemented at the data provider level, with Chainlink node operators consuming this data and publishing it into aggregator contracts. In order to ensure the reliability of this data multiple data providers will be selected to feed the node operators all of which connect directly to raw data from the futures markets.
 
 ## Implementation
-The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.
+
 
 ## Configurable Values (Via SCCP)
 The primary configurable variable in this SIP is the number of days to expiry defined as X in the formula above.
