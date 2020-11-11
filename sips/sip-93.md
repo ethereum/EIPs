@@ -14,7 +14,7 @@ created: 2020-11-11
 
 <!--"If you can't explain it simply, you don't understand it well enough." Simply describe the outcome the proposed changes intends to achieve. This should be non-technical and accessible to a casual community member.-->
 
-This SIP proposes to supersede the current SCCP signaling process outlined in ([SIP-90](./sip-90.md)), with an extended version that features a delegated voting system. The delegated voting system is more in line with the preexisting Synthetix Governance system on discord whilst also providing the benefits of snapshot voting.
+This SIP proposes to supersede the current SCCP signaling process outlined in ([SIP-90](./sip-90.md)), with an extended version that features a delegated voting system. Delegated voting is more in line with the preexisting Synthetix Governance framework on discord whilst also providing the benefits of snapshot voting.
 
 ## Abstract
 
@@ -31,9 +31,7 @@ Each space will still have the benefits provided by using snapshot as covered in
 
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is inaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-The current implementation of SIP-90 was a large shift from preexisting Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) whilst providing large SNX holders with a disproportionate amount of voting weight drowning out the influence of average token holders.
-
-Porting over to this structure also enables Synthetix to eventually move towards a delegated migrator more seamlessly.
+The current implementation of SIP-90 was a large shift from previous Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) whilst providing large SNX holders with a disproportionate amount of voting weight reducing the influence of the majority of token holders.
 
 ## Specification
 
@@ -62,9 +60,9 @@ An example of the election process is as follows:
 2. Within the election period, nominees create proposals with their verified address relating to the current election count (i.e Spartan Council #0).
 3. Token holders vote on the proposals to signal their support on a nominee.
 4. At the end of the polling process the N number of proposals which received the most votes gain a seat on the Spartan Council.
-5. The protocol DAO issues a modified NFT to the council members to grant them a vote weight on the Synthetix Proposal space.
+5. The protocol DAO issues an NFT to the council members granting them the rigt to vote within the Synthetix Proposal space.
 
-- Synthetix Proposals - Changes in the protocol (starting with SCCPs) which are to be proposed will be posted on the synthetix proposal. Any wallet can create a proposal on this space which the Spartan Council will vote on. Proposals must reach an agreement of N/2 + 1 on a option for it to be enacted.
+- Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) which submitted to the SIPs github repo will be posted on the synthetix proposal space. Proposals must reach an agreement of N/2 + 1 on a option for it to be enacted.
 
 ### Rationale
 
@@ -80,7 +78,7 @@ The current use of the Spartan Council is more in line with the future goal of d
 
 <!--The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones.-->
 
-pDAO will need to create a modified version (or custom contract) of an NFT which can be revoked and issued to EOA’s, signifying a wallet is apart of the Spartan Council.
+pDAO will need to create a modified version (or custom contract) of an NFT which can be revoked and issued to EOA’s, signifying a wallet is part of the Spartan Council.
 Modifications to the current “Synthetix” space on snapshot, to house the Spartan Council Election process.
 Addition of a new “Synthetix Proposal” space that utilizes a new strategy to only explicitly count the pDAO issued NFT.
 
