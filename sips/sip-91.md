@@ -1,7 +1,7 @@
 ---
 sip: 91 
 title: Debt Cache Contract
-status: Approved
+status: Implemented
 author: Anton Jurisevic (@zyzek)
 discussions-to: https://research.synthetix.io/t/sip-91-debt-cache-contract/213
 
