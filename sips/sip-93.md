@@ -24,14 +24,14 @@ Following ([SIP-90](./sip-90.md)), the existing snapshot space will be renamed t
 
 Each space will still have the benefits provided by using snapshot as covered in ([SIP-90](./sip-90.md)), however, the strategies and purposes of each space are outlined below:
 
-- Spartan Council - will house the election process of Spartan Council members, will use the existing weighted debt strategy as outlined in ([SIP-90](./sip-90.md)).
+- Spartan Council - houses the election process of Spartan Council members, will use the existing weighted debt strategy as outlined in ([SIP-90](./sip-90.md)).
 - Synthetix Proposals - a space where proposals will be voted on by Spartan Council members, council members are assigned 1 vote each.
 
 ## Motivation
 
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is inaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-The current implementation of SIP-90 was a large shift from previous Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) whilst providing large SNX holders with a disproportionate amount of voting weight reducing the influence of the majority of token holders.
+The current implementation of SIP-90 was too large of a paradigm shift from historical forms of Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) whilst providing large SNX holders with a disproportionate amount of voting weight reducing the influence of the majority of token holders.
 
 ## Specification
 
@@ -49,8 +49,8 @@ The current implementation of SIP-90 was a large shift from previous Synthetix G
 
 There are two major components of the new proposed governance system:
 
-- Spartan Council
-- Synthetix Proposals
+1. Spartan Council
+2. Synthetix Proposals
 
 - Spartan Council - As a result of SIP-90, we have transitioned into a system that was previously 1 identity 1 vote to 1 identity N votes whilst also removing individuals who posses alternative skin in the game from the governance process. The Spartan Council will be a X periodic election where nominees are voted in by the Synthetix token holders reenabling the influence of community representatives who are able to debate and distill technical changes whilst also not directly providing large SNX holders a disproportionate voting weight in the outcome of proposals.
 
@@ -60,7 +60,7 @@ An example of the election process is as follows:
 2. Within the election period, nominees create proposals with their verified address relating to the current election count (i.e Spartan Council #0).
 3. Token holders vote on the proposals to signal their support on a nominee.
 4. At the end of the polling process the N number of proposals which received the most votes gain a seat on the Spartan Council.
-5. The protocol DAO issues an NFT to the council members granting them the rigt to vote within the Synthetix Proposal space.
+5. The protocol DAO issues an NFT to the council members granting them the right to vote within the Synthetix Proposal space.
 
 - Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) which submitted to the SIPs github repo will be posted on the synthetix proposal space. Proposals must reach an agreement of N/2 + 1 on a option for it to be enacted.
 
@@ -68,9 +68,9 @@ An example of the election process is as follows:
 
 <!--This is where you explain the reasoning behind how you propose to solve the problem. Why did you propose to implement the change in this way, what were the considerations and trade-offs. The rationale fleshes out what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
 
-From the feedback acquired in SIP-90 discussions, alternate designs included increasing the quadratic to cubic, time-weighting the debt, calculating escrow balances amongst other ideas.
+From the feedback acquired in SIP-90 discussions, alternate designs included increasing the quadratic weighting to cubic, considering time when weighing the debt, calculating escrowed balances and other similiar ideas.
 
-Although many of these solutions are valid in reducing the impact of large SNX holders they all seemed to miss the target in presenting a solution that provided the benefits of ipfs voting whilst still maintaining the status quo of the preexisting governance structure.
+Although many of these solutions are valid in reducing the impact of large SNX holders, their outcomes are too different from the status quo of the preexisting governance structure.
 
 The current use of the Spartan Council is more in line with the future goal of delegated voting within the Synthetix system and this SIP aims to slowly iterate towards it.
 
@@ -78,9 +78,9 @@ The current use of the Spartan Council is more in line with the future goal of d
 
 <!--The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones.-->
 
-pDAO will need to create a modified version (or custom contract) of an NFT which can be revoked and issued to EOA’s, signifying a wallet is part of the Spartan Council.
-Modifications to the current “Synthetix” space on snapshot, to house the Spartan Council Election process.
-Addition of a new “Synthetix Proposal” space that utilizes a new strategy to only explicitly count the pDAO issued NFT.
+- Protocol DAO (pDAO) will need to create a modified version (or custom contract) of an NFT which can be revoked and issued to EOA’s (Externally Owned Addresses), signifying a wallet is part of the Spartan Council.
+- Modifications to the current “Synthetix” space on snapshot, to house the Spartan Council Election process.
+- Addition of a new “Synthetix Proposal” space that utilizes a new strategy to explicitly count the pDAO issued NFT.
 
 ### Test Cases
 
@@ -90,8 +90,8 @@ Addition of a new “Synthetix Proposal” space that utilizes a new strategy to
 
 <!--Please list all values configurable via SCCP under this implementation.-->
 
-1. Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to be voted in..
-2. Re-election period - the period in which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power).
+- Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to be voted in.
+- Re-election period - the period in which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power).
 
 ## Copyright
 
