@@ -1,7 +1,7 @@
 ---
 sip: 94
 title: Virtual Synth Fix to Ensure Settlement Is Connected
-status: Proposed
+status: Approved
 author: Justin J Moses (@justinjmoses)
 discussions-to: https://research.synthetix.io
 
