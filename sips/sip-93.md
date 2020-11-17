@@ -63,6 +63,7 @@ An example of the election process is as follows:
 5. The protocol DAO issues an NFT to the council members granting them the right to vote within the Synthetix Proposal space.
 
 - Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) which submitted to the SIPs github repo will be posted on the synthetix proposal space. Proposals must reach an agreement of N/2 + 1 on a option for it to be enacted.
+- Despite the council reaching a consensus on a proposal, the protocol DAO still maintains full discretion over any changes to the protocol in this version of governance modification.
 
 ### Rationale
 
@@ -90,8 +91,11 @@ The current use of the Spartan Council is more in line with the future goal of d
 
 <!--Please list all values configurable via SCCP under this implementation.-->
 
-- Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to be voted in.
-- Re-election period - the period in which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power).
+- Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to reach consensus.
+- Re-election period - the period in which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power) - initially set at 1 month with the genesis election being 1st December 2020 (0:00 UTC)
+- Deadline for nominating for the next election - initially set at 48 hours prior to the election date.
+- Timelock period after a proposal is closed before a change is implemented - initially set to 24 hours.
+- Election period length where users will be able to vote - initially set at 1 week.
 
 ## Copyright
 
