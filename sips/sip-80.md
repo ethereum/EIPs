@@ -82,10 +82,10 @@ an arbitrary contract.
 
 | Symbol | Description | Definition | Notes |
 | ------ | ----------- | ---------- | ----- |
-| \\(q\\) | Contract size | \\(q \ := \ \frac{m_e}{\mu_e \ p_e} \\) | Measured in units of the base asset, for example a contract worth 10 BTC will have \\(q = 10\\). The contract size is computed from a user's margin and leverage. See the [margin](#margins-and-leverage) section for a definition of terms used in the definition. |
+| \\(q\\) | Contract size | \\(q \ := \ \frac{m_e \ \lambda_e}{p_e} \\) | Measured in units of the base asset, for example a contract worth 10 BTC will have \\(q = 10\\). The contract size is computed from a user's margin and leverage. See the [margin](#margins-and-leverage) section for a definition of terms used in the definition. |
 | \\(s\\) | Contract side indicator | \\(s^c \ := \ \begin{cases} 1 & \ \mbox{if } \ c \text{ is long} \\ \\ \newline -1 & \ \mbox{if } \ c \text{ is short} \\ \end{cases} \\) | The sign of \\(s\\) indicates whether a contract is long or short. |
 | \\(p\\) | Base asset spot price | - | We also define \\(p^c_e\\), the spot price when contract \\(c\\) was entered. |
-| \\(v\\) | Notional value | \\(v \ := \ q \ p\\) | This is the dollar value of the base currency units on a contract. In addition to the spot notional value, we also define the entry notional value \\(v_e := q \ p_e\\). |
+| \\(v\\) | Notional value | \\(v \ := \ q \ p\\) | This is the dollar value of the base currency units on a contract. In addition to the spot notional value, we also define the entry notional value \\(v_e := q \ p_e = m_e \ \lambda_e\\). |
 | \\(r\\) | Profit / loss | \\(r \ := \ s \ (v - v_e)\\) | The profit in a position is the change in its notional value since entry. Note that short profit is the negative of long profit, \\(r_L = v - v_e\\) and \\(r_S = -r_L\\). |
 
 Each market, implemented by a specific smart contract, is differentiated primarily by its base asset and the contracts
@@ -98,7 +98,7 @@ open on that market. Additional parameters control the leverage offered on a par
 | \\(Q_L\\), \\(Q_S\\) | Market Size | \\[Q_L \ := \ \sum_{c \in C_L}{q^c}\\] \\[Q_S \ := \ \sum_{c \in C_S}{q^c}\\] | The total size of all outstanding contracts on a given side of the market. |
 | \\(K\\) | Market skew | \\(K \ := \ Q_L - Q_S\\) | The excess contract units on one side or the other. When the skew is positive, longs outweigh shorts; when it is negative, shorts outweigh longs. When \\(K = 0\\), the market is perfectly balanced. |
 | \\(Q_{max}\\) | Open interest cap | - |  Orders cannot be opened that would cause the size of either side of the market to exceed this limit. We constrain both: \\[Q_L \leq Q_{max}\\] \\[Q_S \leq Q_{max}\\] The cap will initially be \\(1\,000\,000\\) units on each side of the market. |
-| \\(\lambda_{max}\\) | Maximum leverage | - | The size of a contract must not exceed its initial margin multiplied by the maximum leverage. Initially this will be no greater than 10. |
+| \\(\lambda_{max}\\) | Maximum Initial leverage | - | The notional value of a contract must not exceed its initial margin multiplied by the maximum leverage. Initially this will be no greater than 10. |
 
 ---
 
@@ -110,9 +110,8 @@ increases the contract's liquidation risk.
 
 | Symbol | Description | Definition | Notes |
 | ------ | ----------- | ---------- | ----- |
-| \\(\mu_e\\) | Initial margin ratio | - | The inverse of a contract's initial leverage. For example, \\(\mu_e = 0.5\\) corresponds to 2x leverage. |
-| \\(\mu_{min}\\) | Minimum initial margin ratio | \\(\mu_{min} \ := \ \frac{1}{\lambda_{max}}\\) | The selected margin level must be no lower than this. We constrain \\[\mu_{min} \leq \mu_e\\]. Thus, this also constrains the maximum leverage. |
-| \\(m_e\\) | Initial margin | \\(m_e \ := \ \mu_e \ q \ p_e\\) | This is the quantity of sUSD the user initially spends to open a contract of \\(q\\) units of the base currency. The remaining \\(v_e - m_e\\) sUSD to pay for the rest of the position is "borrowed" from SNX holders, and it must be paid back when the position is closed. |
+| \\(\lambda\\) | Leverage | \\(\lambda \ := \ \frac{v}{m}\\) | We also define \\(\lambda_e := \frac{v_e}{m_e}\\), the selected leverage when the position was entered. We constrain the entry leverage thus: \\[\lambda_e \leq \lambda_{max}\\] Note that the leverage in a position at a given time may exceed this value as its margin is exhausted. |
+| \\(m_e\\) | Initial margin | \\(m_e \ := \ \frac{q \ p_e}{\lambda_e}\\) | This is the quantity of sUSD the user initially spends to open a contract of \\(q\\) units of the base currency. The remaining \\(v_e - m_e\\) sUSD to pay for the rest of the position is "borrowed" from SNX holders, and it must be paid back when the position is closed. |
 | \\(m\\) | Remaining margin | \\(m \ := \ max(m_e + r + f, 0)\\) | A contract's remaining margin is its initial margin, plus its profit \\(r\\) and funding \\(f\\) (described below). When the remaining margin reaches zero, the position is liquidated, so that it can never take a negative value. |
 
 It is important to note that the granularity and frequency of oracle price updates constrains the maximum leverage
@@ -133,7 +132,7 @@ No exchange fee is charged for correcting the skew, nor for closing or reducing 
 | Symbol | Description | Definition | Notes |
 | \\(\phi\\) | Exchange fee rate | - | Account holders will be charged only on skew they introduce into the market when modifying orders. Initially, \\(\phi = 0.3\%\\). |
 
-If the user introduces \\(k\\) units of skew in the position, they will be charged a fee of \\(\phi \ k \ p\\) sUSD from their margin.  
+If the user increases the market skew by \\(k\\) units, they will be charged a fee of \\(\phi \ k \ p\\) sUSD from their margin.  
 For example, if a user opens an order on the heavier side of the market, then they are charged \\(\phi \ v_e\\).
 On the other hand, if they are submitting an order on the lighter side of the market, they will not be charged for that
 part of their order that reduces the skew, and only for the part that induces new skew.
