@@ -10,7 +10,7 @@ created: 2020-11-23
 
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-The iETH price limits were increased in [SCCP-18](./sccp-18.md) to support the iETH staking rewards incentives trial. This SCCP proposes to remove the temporary iETH limit increases as iETH has frozen at the upper limit and the new staking rewards contract has been upgraded to allow frozen synths to be purged and recovered from the contract itself.
+The iETH price limits were increased in [SCCP-18](./sccp-18) to support the iETH staking rewards incentives trial. This SCCP proposes to remove the temporary iETH limit increases as iETH has frozen at the upper limit and the new staking rewards contract has been upgraded to allow frozen synths to be purged and recovered from the contract itself.
 
 ## Abstract
 <!--A short (~200 word) description of the variable change proposed.-->
