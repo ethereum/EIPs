@@ -39,10 +39,10 @@ The current pair doesn’t rely on enough data sources we aim to improve this by
 Change ExchangeRates to point to the new WTI Aggregator for sOIL will require these steps;
 
 1. Suspend sOIL, iOIL synths to pause trading
-2. Purge holders back to sUSD (~$1500 in holdings)
-3. Update ExchangeRates OIL aggregators
-    v3 Aggregator Contract Address 0x2747254824f1731e016352e3267735fd9a6331C0
-    v3 Proxy Contract Address 0xf3584F4dd3b467e73C2339EfD008665a70A4185c
+2. Purge holders back to sUSD. [sOIL ~$1500 in holdings](https://etherscan.io/token/0x6d16cF3EC5F763d4d99cB0B0b110eefD93B11B56), [iOIL ~$7,400 in holdings](https://etherscan.io/token/0xa5a5df41883cdc00c4ccc6e8097130535399d9a3)
+3. Update [ExchangeRates](http://contracts.synthetix.io/ExchangeRates) OIL aggregators
+    v3 Aggregator Contract Address [0x2747254824f1731e016352e3267735fd9a6331C0](https://etherscan.io/address/0x2747254824f1731e016352e3267735fd9a6331C0)
+    v3 Proxy Contract Address [0xf3584F4dd3b467e73C2339EfD008665a70A4185c](https://etherscan.io/address/0xf3584F4dd3b467e73C2339EfD008665a70A4185c)
 4. Set new Inverse Pricing based on current price data
 5. Unsuspend sOIL and iOIL to resume trading
 
