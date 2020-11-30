@@ -1,7 +1,7 @@
 ---
 sip: 99
 title: Upgrade sOIL to use diversified Chainlink aggregator
-status: Approved
+status: Implemented
 author: Clinton Ennis (@hav-noms)
 created: 2020-11-26
 ---
