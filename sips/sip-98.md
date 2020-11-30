@@ -3,7 +3,7 @@ sip: 98
 title: Re-implement double exchange fee rate on swing trades
 author: Jackson Chan (@jacko125), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
-status: Proposed
+status: Approved
 created: 2020-11-27
 ---
 
