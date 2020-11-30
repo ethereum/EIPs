@@ -14,24 +14,24 @@ created: 2020-11-11
 
 <!--"If you can't explain it simply, you don't understand it well enough." Simply describe the outcome the proposed changes intends to achieve. This should be non-technical and accessible to a casual community member.-->
 
-This SIP proposes to supersede the current SCCP signaling process outlined in ([SIP-90](./sip-90.md)), with an extended version that features a delegated voting system. Delegated voting is more in line with the preexisting Synthetix Governance framework on discord whilst also providing the benefits of snapshot voting.
+This SIP proposes to supersede the current SCCP signaling process outlined in [SIP-90](./sip-90.md), with an extended version that features a delegated voting system. Delegated voting is more in line with the preexisting Synthetix Governance framework on [Discord](https://discord.com/invite/AEdUHzt) while also providing the benefits of Snapshot voting.
 
 ## Abstract
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
 
-Following ([SIP-90](./sip-90.md)), the existing snapshot space will be renamed to the “Spartan Council” whilst an additional snapshot space called “Synthetix Proposals” will be created.
+Following [SIP-90](./sip-90.md), the existing Snapshot space will be renamed to the “Spartan Council” while an additional snapshot space called “Synthetix Proposals” will be created.
 
-Each space will still have the benefits provided by using snapshot as covered in ([SIP-90](./sip-90.md)), however, the strategies and purposes of each space are outlined below:
+Each space will still have the benefits provided by using Snapshot as covered in [SIP-90](./sip-90.md), however, the strategies and purposes of each space are outlined below:
 
-- Spartan Council - houses the election process of Spartan Council members, will use the existing weighted debt strategy as outlined in ([SIP-90](./sip-90.md)).
-- Synthetix Proposals - a space where proposals will be voted on by Spartan Council members, council members are assigned 1 vote each.
+- Spartan Council - houses the election process of Spartan Council members, will use the existing weighted debt strategy as outlined in [SIP-90](./sip-90.md).
+- Synthetix Proposals - a space where proposals will be voted on by Spartan Council members. Council members are assigned 1 vote each.
 
 ## Motivation
 
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is inaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-The current implementation of SIP-90 was too large of a paradigm shift from historical forms of Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) whilst providing large SNX holders with a disproportionate amount of voting weight reducing the influence of the majority of token holders.
+The current implementation of SIP-90 was too large of a paradigm shift from historical forms of Synthetix Governance, reducing the influence of individuals who have alternative skin-in-the-game (reputation) while providing large SNX holders with a disproportionate amount of voting weight reducing the influence of the majority of token holders.
 
 ## Specification
 
@@ -52,18 +52,21 @@ There are two major components of the new proposed governance system:
 1. Spartan Council
 2. Synthetix Proposals
 
-- Spartan Council - As a result of SIP-90, we have transitioned into a system that was previously 1 identity 1 vote to 1 identity N votes whilst also removing individuals who posses alternative skin in the game from the governance process. The Spartan Council will be a X periodic election where nominees are voted in by the Synthetix token holders reenabling the influence of community representatives who are able to debate and distill technical changes whilst also not directly providing large SNX holders a disproportionate voting weight in the outcome of proposals.
+- Spartan Council - As a result of SIP-90, we have transitioned into a system that was previously "1 identity = 1 vote" to "1 identity = N votes" while also removing individuals who possess alternative skin-in-the-game from the governance process. The Spartan Council will consist of nominees who are voted in by the Synthetix token holders, re-enabling the influence of community representatives who are able to debate and distill technical changes while also not directly providing large SNX holders a disproportionate voting weight in the outcome of proposals.
 
-An example of the election process is as follows:
+- Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) that are submitted to the [SIPs Github repository](https://github.com/Synthetixio/SIPs) will be posted on the Synthetix Proposal space. Proposals must reach an agreement of N/2 + 1 (supermajority) on a option for it to be enacted.
 
-1. Token holders who want to participate in the Spartan Council election must nominate themselves via their discord identity and verified wallet address.
-2. Within the election period, nominees create proposals with their verified address relating to the current election count (i.e Spartan Council #0).
-3. Token holders vote on the proposals to signal their support on a nominee.
-4. At the end of the polling process the N number of proposals which received the most votes gain a seat on the Spartan Council.
-5. The protocol DAO issues an NFT to the council members granting them the right to vote within the Synthetix Proposal space.
+Within a Council Epoch, votes are liquid, so voters can remove or change their votes at any time.
 
-- Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) which submitted to the SIPs github repo will be posted on the synthetix proposal space. Proposals must reach an agreement of N/2 + 1 on a option for it to be enacted.
-- Despite the council reaching a consensus on a proposal, the protocol DAO still maintains full discretion over any changes to the protocol in this version of governance modification.
+If a Council Member loses enough votes during a Council Epoch to below a non-member, then the protocolDAO will manually retrieve the NFT from the departing Council Member and issue it to the new Council Member, giving them Council voting rights. This is a manual process, so there may be some lag before the protocolDAO carries this out. The protocolDAO will check the election standings before implementing any successful SCCP (or, in the future, SIP).
+
+Initially, SNX payments to Council Members will be paid manually by the synthetixDAO at the end of a Council Epoch, but there are plans to move to a streaming process. In the case of sufficient Council Member’s votes being pulled out before the end of a Council Epoch to remove them from the Council, they will receive SNX rewards proportionate to their time in the Council during that Epoch, up until the point at which their NFT is retrieved. The replacement Member will receive SNX rewards proportionate to their time in the Council after which their NFT is issued.
+
+- Despite the council reaching a consensus on a proposal, the protocolDAO still maintains full discretion over any changes to the protocol in this version of governance.
+
+![Example Timeline](assets/sip-93/example-timeline.png){: .center-image }
+
+Above is the example timeline for the genesis election, with helps understand the terminology of configurable values.
 
 ### Rationale
 
@@ -80,7 +83,7 @@ The current use of the Spartan Council is more in line with the future goal of d
 <!--The technical specification should outline the public API of the changes proposed. That is, changes to any of the interfaces Synthetix currently exposes or the creations of new ones.-->
 
 - Protocol DAO (pDAO) will need to create a modified version (or custom contract) of an NFT which can be revoked and issued to EOA’s (Externally Owned Addresses), signifying a wallet is part of the Spartan Council.
-- Modifications to the current “Synthetix” space on snapshot, to house the Spartan Council Election process.
+- Modifications to the current “Synthetix” space on Snapshot, to house the Spartan Council Election process.
 - Addition of a new “Synthetix Proposal” space that utilizes a new strategy to explicitly count the pDAO issued NFT.
 
 ### Test Cases
@@ -91,11 +94,11 @@ The current use of the Spartan Council is more in line with the future goal of d
 
 <!--Please list all values configurable via SCCP under this implementation.-->
 
+- Council Nominations Deadline - initially set at 48 hours prior to when the Election Period begins.
+- Election Period Length - at the end of the Election Period the council members will be issued NFTs (voters may still change their votes within the current Council Epoch).
+- Council Epoch - the period after which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power) - initially set at 1 month with the genesis election being 1st December 2020 (0:00 UTC)
+- Timelock period - period where the proposal is in review before being implemented, initially set at 24 hours.
 - Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to reach consensus.
-- Re-election period - the period in which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power) - initially set at 1 month with the genesis election being 1st December 2020 (0:00 UTC)
-- Deadline for nominating for the next election - initially set at 48 hours prior to the election date.
-- Timelock period after a proposal is closed before a change is implemented - initially set to 24 hours.
-- Election period length where users will be able to vote - initially set at 1 week.
 
 ## Copyright
 
