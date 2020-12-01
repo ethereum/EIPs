@@ -246,10 +246,11 @@ and paid into or out of its margin. Hence funding affects each contract's liquid
 | \\(W\\) | Proportional skew | \\[W \ := \ \frac{K}{Q_L + Q_S}\\] | The skew as a fraction of the total market size. |
 | \\(W_{max}\\) | Max funding skew threshold | - | The proportional skew at which the maximum funding rate will be charged (when \\(i = i_{max}\\)). Initially, \\(W_{max} = 100\%\\) | 
 | \\(i_{max}\\) | Maximum funding rate | - | A percentage per day. Initially \\(i_{max} = 10\%\\). |
-| \\(i\\) | Instantaneous funding rate | \\[i \ := \ clamp(\frac{W}{W_{max}}, -1, 1) \ i_{max} \\]  | A percentage per day. |
+| \\(i\\) | Instantaneous funding rate | \\[i \ := \ clamp(\frac{-W}{W_{max}}, -1, 1) \ i_{max} \\]  | A percentage per day. |
 
-The funding rate can be negative, and has the same sign as the skew. When \\(i\\) is positive, longs pay shorts, while
-when it is negative, shorts pay longs. When \\(K = i = 0\\), no funding is paid, as the market is balanced.
+The funding rate can be negative, and has the opposite sign to the skew, as funding flows against capital in the market.
+When \\(i\\) is positive, shorts pay longs, while when it is negative, longs pay shorts. When \\(K = i = 0\\),
+no funding is paid, as the market is balanced.
 
 Being computed against contract notional value, it is worth being aware that
 funding becomes more powerful relative to the margin as the base asset appreciates, and less powerful
@@ -257,12 +258,12 @@ as it depreciates.
 
 As the SNX debt pool is the counterparty to every contract, it is either the payer or payee of
 funding on every position, but it is always receiving more than it is paying. SNX holders
-receive \\(i \ K\\) in funding: this is a positive value which will be paid into the fee pool.
+receive \\(- i \ K\\) in funding: this is a positive value which will be paid into the fee pool.
 
 This funding flow increases directly as the skew increases, and also as the funding rate
 increases, which itself increases linearly with the skew (up to \\(W_{max}\\)). As the fee pool
 is party to \\(Q_L + Q_S\\) in open contracts, its percentage return from funding is
-\\(\frac{i K}{Q_L + Q_S} \propto W^2\\), so it grows with the square of the proportional skew.
+\\(\frac{- i K}{Q_L + Q_S} \propto W^2\\), so it grows with the square of the proportional skew.
 This provides accelerating compensation as the risk increases.
 
 #### Accrued Funding Calculation
