@@ -41,13 +41,13 @@ For example, if the exchange fee rate is 30 bips, it would make the swing trade 
 ## Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
-https://github.com/Synthetixio/synthetix/blob/v2.12.2/test/Synthetix.js#L2833
+https://github.com/Synthetixio/synthetix/blob/v2.34.0/test/contracts/Exchanger.spec.js#L2239
 
 ## Implementation
 
 <!--The implementations must be completed before any SIP is given status "Implemented", but it need not be completed before the SIP is "Approved". While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
 
-While implementing this SIP, sBTC and iBTC, sETH and iETH trading fees were also reduced back to 30bps, as they had been increased as per [SCCP-65](./sccp-65) and [SCCP-62](./sccp-62) to combat frontrunning that was observed utilising swing trades between short and long synths.
+While implementing this SIP, sBTC and iBTC, sETH and iETH trading fees were also reduced back to 30bps, as they had been increased as per [SCCP-65](https://sips.synthetix.io/SCCP/sccp-65) and [SCCP-62](https://sips.synthetix.io/SCCP/sccp-62) to combat frontrunning that was observed utilising swing trades between short and long synths.
 
 ## Copyright
 
