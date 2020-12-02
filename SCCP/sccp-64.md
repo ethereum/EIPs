@@ -3,7 +3,7 @@ sccp: 64
 title: Increase fees on iBTC to 0.50%
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2020-11-25
 
 ---

@@ -3,7 +3,7 @@ sccp: 61
 title: Increase fees on iETH to 0.50%
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2020-11-20
 ---
 

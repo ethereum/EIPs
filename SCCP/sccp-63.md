@@ -3,7 +3,7 @@ sccp: 63
 title: Remove Temporary iETH limits
 author: Kain Warwick (@kaiynne), Jackson Chan (@jacko125)
 discussions-to: https://discord.gg/kPPKsPb
-status: Proposed
+status: Implemented
 created: 2020-11-23
 
 ---

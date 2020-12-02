@@ -2,7 +2,7 @@
 sccp: 58
 title: Increase Fees on DEFI and CEX to 100 bp
 author: Kaleb Keny (@kaleb-keny)
-status: Proposed
+status: Implemented
 discussions-to: https://research.synthetix.io/
 created: 2020-11-11
 
