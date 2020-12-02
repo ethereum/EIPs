@@ -1,7 +1,7 @@
 ---
 sip: 93
 title: Supersede SIP-90 to Delegated Council Governance
-status: Proposed
+status: Approved
 author: Andy T CF (@andytcf)
 discussions-to: https://research.synthetix.io/t/supersede-sip-90-to-delegated-council-governance/227
 
