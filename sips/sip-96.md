@@ -3,7 +3,7 @@ sip: 96
 title: Blockchain Forks Framework for Synths
 status: Proposed
 author: Jackson Chan (@jacko125), Garth Travers (@garthtravers), Clinton Ennis (@hav-noms)
-discussions-to: <https://research.synthetix.io/>
+discussions-to: https://research.synthetix.io/
 
 created: 2020-11-16
 ---

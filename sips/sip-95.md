@@ -3,7 +3,7 @@ sip: 95
 title: Delist sBCH and iBCH for evaluation
 status: Approved
 author: Jackson Chan (@jacko125), Garth Travers (@garthtravers), Clinton Ennis (@hav-noms)
-discussions-to: <https://discordapp.com/invite/AEdUHzt>
+discussions-to: https://discordapp.com/invite/AEdUHzt
 
 created: 2020-11-16
 ---
@@ -31,7 +31,6 @@ There is uncertainty around the identity of BCH, as it has been forked into two 
 ## Rationale
 
 Since the BCH asset has forked into two new assets, each would need to be subject to the Delphi asset listing framework to meet the requirements to be able to be added back to the protocol.
-
 
 ## Specification
 
