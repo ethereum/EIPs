@@ -5,7 +5,6 @@ status: Living
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 created: 2015-10-27
-updated: 2015-12-07, 2016-02-01, 2018-03-21, 2018-05-29, 2018-10-17, 2019-05-19, 2019-12-04, 2020-06-17, 2020-09-10
 ---
 
 ## What is an EIP?
@@ -259,26 +258,6 @@ When referring to an EIP by number, it should be written in the hyphenated form 
 ## History
 
 This document was derived heavily from [Bitcoin's BIP-0001] written by Amir Taaki which in turn was derived from [Python's PEP-0001]. In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
-
-December 7, 2015: EIP-1 has been improved and will be placed as a PR.
-
-February 1, 2016: EIP-1 has added editors, made draft improvements to process, and has merged with Master stream.
-
-March 21, 2018: Minor edits to accommodate the new automatically-generated EIP directory on [eips.ethereum.org](https://eips.ethereum.org/).
-
-May 29, 2018: A last call process was added.
-
-Oct 17, 2018: The `updated` header was introduced.
-
-May 19, 2019: The **Abandoned** status was introduced.
-
-Dec 4, 2019: The "Security Considerations" section was introduced.
-
-June 17, 2020: Canonicalizes the format for referencing EIPs by number in the "Style Guide".
-
-Sep 10, 2020: Require the `author` header to include at least one GitHub username.
-
-See [the revision history for further details](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-1.md), which is also available by clicking on the History button in the top right of the EIP.
 
 ### Bibliography
 
