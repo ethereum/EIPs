@@ -21,7 +21,7 @@ The title should be 44 characters or less.
 If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. Imagine an email subject line, GitHub PR title, or forum post title.
 
 ## Abstract
-A short (~200 word) description of the technical issue being addressed.
+A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 
 ## Motivation
 The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
