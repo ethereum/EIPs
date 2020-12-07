@@ -17,7 +17,7 @@ The title should be 44 characters or less.-->
 
 ## Simple Summary
 
-Flash loaning allows smart contracts to lend an amount of tokens without a requirement for collateral, with the condition that they must be returned within the same transaction.
+Flash loans allow smart contracts to lend an amount of tokens without a requirement for collateral, with the condition that they must be returned within the same transaction.
 
 The aim of this ERC is to provide a standard interfaces and processes for flash lenders and borrowers, allowing for flash loan integration without a need to consider each particular implementation.
 
