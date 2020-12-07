@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3156
 title: Flash Loans
 author: Alberto Cuesta Cañada (@albertocuestacanada), Fiona Kobayashi (@fifikobayashi), fubuloubu (@fubuloubu)
 discussions-to: https://ethereum-magicians.org/t/flash-loan-eip-early-draft/4993/2
@@ -9,25 +9,13 @@ category: ERC
 created: 2020-11-15
 ---
 
-<!--This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.-->
-
 ## Simple Summary
 
-Flash loans allow smart contracts to lend an amount of tokens without a requirement for collateral, with the condition that they must be returned within the same transaction.
-
-The aim of this ERC is to provide a standard interfaces and processes for flash lenders and borrowers, allowing for flash loan integration without a need to consider each particular implementation.
-
-## Abstract
-
-Flash loans are rapidly gaining popularity. A standard that guides the community to use the same interface will allow for greater interoperability in the future.
-
-The use of standard processes and a clear description of the risks associated with flash loans will allow the community to create safer smart contracts.
+This ERC provides standard interfaces and processes for flash lenders and borrowers, allowing for flash loan integration without a need to consider each particular implementation.
 
 ## Motivation
+
+Flash loans allow smart contracts to lend an amount of tokens without a requirement for collateral, with the condition that they must be returned within the same transaction.
 
 Early adopters of the flash loan pattern, such as [Aave](https://github.com/aave/aave-protocol/blob/e8d020e9752fbd4807a3b55f9cf98a88dcfb674d/contracts/flashloan), [DxDy](https://help.dydx.exchange/en/articles/3724602-flash-loans), [Uniswap](https://uniswap.org/docs/v2/core-concepts/flash-swaps/) and the [Yield Protocol](https://github.com/yieldprotocol/fyDai/blob/master/contracts/FYDai.sol) have produced different interfaces and different use patterns. The diversification is expected to intensify, and with it the technical debt required to integrate with diverse flash lending patterns.
 
@@ -112,15 +100,13 @@ No backwards compatibility issues identified.
 
 ### Flash lending security considerations
 
-    
 #### Example - Transfer from receiver
 An implementation that allows flash lending to an arbitrary target, and that also takes the flash loaned amount from such target at the end of the transaction can be used to drain assets of a smart contract that trades a pair of assets based on internal balances.
 1. The attacker triggers a flash loan of 1 million DAI to an AMM trading DAI/ETH.
 2. The attacker sells 1000 ETH to the AMM trading pair, obtaining a larger amount of DAI than the pre-transaction price would have returned.
 3. The flash lender burns the 1 million DAI (plus possibly a fee) from the receiver (AMM trading pair), which bears the loss of having sold DAI to the attacker at an artificially depressed price.
 
-The key takeaway being that smart contracts trading on balances should not give blanket transfer approvals to smart contracts with flash loan features, unless they can be certain of their implementation.
-    
+The key takeaway being that smart contracts trading on balances should not give blanket transfer approvals to smart contracts with flash loan features, unless they can be certain of their implementation.    
 
 ### Flash minting external security considerations
 
@@ -157,9 +143,6 @@ In early implementations of the Yield Protocol flash loaned fyDai could be redee
 2. Redeem for Dai as much fyDai as the Yield Protocol collateral would allow.
 3. Trigger a stability rate increase with a call to `jug.drip` which would make the Yield Protocol uncollateralized.
 4. Liquidate the Yield Protocol CDP vault in MakerDAO.
-    
-    
-    
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
