@@ -1,7 +1,7 @@
 ---
 sip: 93
 title: Supersede SIP-90 to Delegated Council Governance
-status: Approved
+status: Implemented
 author: Andy T CF (@andytcf)
 discussions-to: https://research.synthetix.io/t/supersede-sip-90-to-delegated-council-governance/227
 
@@ -54,15 +54,25 @@ There are two major components of the new proposed governance system:
 
 - Spartan Council - As a result of SIP-90, we have transitioned into a system that was previously "1 identity = 1 vote" to "1 identity = N votes" while also removing individuals who possess alternative skin-in-the-game from the governance process. The Spartan Council will consist of nominees who are voted in by the Synthetix token holders, re-enabling the influence of community representatives who are able to debate and distill technical changes while also not directly providing large SNX holders a disproportionate voting weight in the outcome of proposals.
 
-- Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) that are submitted to the [SIPs Github repository](https://github.com/Synthetixio/SIPs) will be posted on the Synthetix Proposal space. Proposals must reach an agreement of N/2 + 1 (supermajority) on a option for it to be enacted.
+- Synthetix Proposals - Changes in the protocol (initially SCCPs, but eventually SIPs) that are submitted to the [SIPs Github repository](https://github.com/Synthetixio/SIPs) will be posted on the Synthetix Proposal space. Proposals must reach an supermajority agreement on a option for it to be enacted.
+
+**Liquid Democracy**
 
 Within a Council Epoch, votes are liquid, so voters can remove or change their votes at any time.
 
 If a Council Member loses enough votes during a Council Epoch to below a non-member, then the protocolDAO will manually retrieve the NFT from the departing Council Member and issue it to the new Council Member, giving them Council voting rights. This is a manual process, so there may be some lag before the protocolDAO carries this out. The protocolDAO will check the election standings before implementing any successful SCCP (or, in the future, SIP).
 
+**Council Payments**
+
 Initially, SNX payments to Council Members will be paid manually by the synthetixDAO at the end of a Council Epoch, but there are plans to move to a streaming process. In the case of sufficient Council Member’s votes being pulled out before the end of a Council Epoch to remove them from the Council, they will receive SNX rewards proportionate to their time in the Council during that Epoch, up until the point at which their NFT is retrieved. The replacement Member will receive SNX rewards proportionate to their time in the Council after which their NFT is issued.
 
-- Despite the council reaching a consensus on a proposal, the protocolDAO still maintains full discretion over any changes to the protocol in this version of governance.
+**pDAO Discretion**
+
+Despite the council reaching a consensus on a proposal, the protocolDAO still retains discretion over any changes to the protocol in this version of governance if required. However, this is only a last resort in case of emergency — the processes should all be optimised to minimise this potential occurence. Indeed, all of SIP-93 is intended to minimise the protocolDAO's discretion.
+
+**Meta-Governance**
+
+Any SCCP's that relate to configuring the values of this SIP will need to be voted on by the Spartan Council members. In order for this SCCP to pass, the Spartan Council must reach an unanimous decision.
 
 ![Example Timeline](assets/sip-93/example-timeline.png){: .center-image }
 
@@ -98,7 +108,7 @@ The current use of the Spartan Council is more in line with the future goal of d
 - Election Period Length - at the end of the Election Period the council members will be issued NFTs (voters may still change their votes within the current Council Epoch).
 - Council Epoch - the period after which token holders must redelegate their votes to new and existing council members (to prevent stagnation and ephemeral power) - initially set at 1 month with the genesis election being 1st December 2020 (0:00 UTC)
 - Timelock period - period where the proposal is in review before being implemented, initially set at 24 hours.
-- Spartan Council seat numbers - the number of seats available on the Spartan Council and thus N/2 + 1 is the required number for a decision to reach consensus.
+- Spartan Council seat numbers - the number of seats available on the Spartan Council and thus a supermajority `(N/2 + 1 - if N is even or to Ceiling(N/2) - if N is odd)` is the required number for a decision to reach consensus.
 
 ## Copyright
 
