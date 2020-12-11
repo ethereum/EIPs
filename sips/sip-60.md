@@ -57,13 +57,18 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 - Claiming allows the user / interface to specify which vesting entries to claim (ID of the vesting entry) for the accumulated SNX.
 - Removes the bottleneck of having on-chain calculation of what vesting entries can be vested / requirement for a sorted array of VestingEntries
 
-*New functions to support continuous reward claiming*
+**New functions to support continuous reward claiming**
 
 - `vest(address account, uint256[] calldata entryIDs)`
+
 - `timeSinceLastVested(address account, uint256 entryID)`
+
 - `ratePerSecond(address account, uint256 entryID)`
+
 - `getVestingQuantity(address account, uint256[] calldata entryIDs)`
+
 - `getVestingEntryClaimable(address account, uint256 entryID)`
+
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
