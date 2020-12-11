@@ -24,7 +24,7 @@ The current SNX [RewardEscrow](https://contracts.synthetix.io/RewardEscrow) cont
 
 It was not designed to be used as a general purpose escrow contract. New requirements include adding arbitary length escrow entries to be created by anyone as well as supporting the new terminal inflation and liquidation.
 
-This will require a migration of all escrowed SNX and escrow entries from the current [RewardEscrow](https://contracts.synthetix.io/RewardEscrow) to new Escrow contract.
+This will require a migration of all escrowed SNX and escrow entries from the current [RewardEscrow](https://contracts.synthetix.io/RewardEscrow) to new Reward Escrow V2 contract.
 
 ## Motivation
 
@@ -47,20 +47,39 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 5. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account in the escrow contract.
 6. Ability for account merging of escrowed tokens at specific time windows for people to merge their balances - [sip-13](https://sips.synthetix.io/sips/sip-13).
 7. Ability to migrate escrowed SNX and vesting entries to L2 OVM. An internal contract (base:SynthetixBridgeToOptimism) to clear all entries for a user (during the initial deposit phase of L2 migration).
+8. Continuous streaming of the escrowed SNX for each vesting entry. The escrowed SNX will be claimable based on the block timestamp, the amount emitted per second is determined by the duratoin of the escrow period and amount escrowed. i.e, Given 1000 SNX escrowed for 12 months, 500 SNX will be claimable after 6 months. Continuous vesting of escrowed SNX allows each vesting entry to be managed as an independent balance, allows vesting of one or multiple entries, account merging escrow entries, migration of escrowed SNX to L2 reward escrow contract.
 
-### Deprecate `HavvenEscrow` TokenSale contract
-There are still approx 1MM SNX in the [old token sale contract](https://contracts.synthetix.io/SynthetixEscrow). These escrow entries and balances should be migrated to the new escrow contract to;
+## Continuous Reward Escrow Emission / Claiming
 
-1. Reduce the cross contract collateral calls
-2. Only need Dapps to support 1 escrow contract
-3. Remove from the code base reducing surface area
-4. Allows liquidation support
+- Each escrow vesting entry is a continuous stream of SNX
+- The emission rate of the stream is based on the “amount of SNX escrowed / duration”.
+- Supports different escrow durations (6, 12, 24 months) and account merging by re-assigning vesting entries to new owner. Rate of SNX that is claimable for each vesting entry is calculated in SNX per seconds.
+- Claiming allows the user / interface to specify which vesting entries to claim (ID of the vesting entry) for the accumulated SNX.
+- Removes the bottleneck of having on-chain calculation of what vesting entries can be vested / requirement for a sorted array of VestingEntries
 
+*New functions to support continuous reward claiming*
+
+- `vest(address account, uint256[] calldata entryIDs)`
+- `timeSinceLastVested(address account, uint256 entryID)`
+- `ratePerSecond(address account, uint256 entryID)`
+- `getVestingQuantity(address account, uint256[] calldata entryIDs)`
+- `getVestingEntryClaimable(address account, uint256 entryID)`
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
 ```
+library VestingEntries {
+    struct VestingEntry {
+        uint64 endTime;
+        uint64 duration;
+        uint64 lastVested;
+        uint256 escrowAmount;
+        uint256 remainingAmount;
+    }
+}
+
+
 interface IRewardEscrowV2 {
     // Views
     function balanceOf(address account) external view returns (uint);
@@ -71,10 +90,28 @@ interface IRewardEscrowV2 {
 
     function totalVestedAccountBalance(address account) external view returns (uint);
 
-    function getVestingScheduleEntry(address account, uint index) external view returns (uint[2] memory);
+    function getVestingQuantity(address account, uint256[] calldata entryIDs) external view returns (uint);
+
+    function getVestingEntryClaimable(address account, uint256 entryID) external view returns (uint);
+
+    function timeSinceLastVested(address account, uint256 entryID) external view returns (uint);
+
+    function ratePerSecond(address account, uint256 entryID) external view returns (uint);
 
     // Mutative functions
-    function appendVestingEntry(address account, uint quantity) external;
+    function vest(address account, uint256[] calldata entryIDs) external;
+
+    function createEscrowEntry(
+        address beneficiary,
+        uint256 deposit,
+        uint256 duration
+    ) external;
+
+    function appendVestingEntry(
+        address account,
+        uint256 quantity,
+        uint256 duration
+    ) external;
 
     function migrateVestingSchedule(address _addressToMigrate) external;
 
@@ -84,23 +121,30 @@ interface IRewardEscrowV2 {
         uint256[] calldata vestedBalances
     ) external;
 
+    // Account Merging
+    function startMergingWindow() external;
+
+    function mergeAccount(address accountToMerge, uint256[] calldata entryIDs) external;
+
+    function nominateAccountToMerge(address account) external;
+
     // L2 Migration
     function importVestingEntries(
         address account,
-        uint64[] calldata timestamps,
-        uint256[] calldata amounts
+        uint256 escrowedAmount,
+        VestingEntries.VestingEntry[] calldata vestingEntries
     ) external;
 
     // Return amount of SNX transfered to SynthetixBridgeToOptimism deposit contract
-    function burnForMigration(address account) external returns (uint256, uint64[52] memory, uint256[52] memory);
-
-    function vest(address account) external;
+    function burnForMigration(address account, uint[] calldata entryIDs)
+        external
+        returns (uint256 escrowedAccountBalance, VestingEntries.VestingEntry[] memory vestingEntries);
 }
 ```
 
 ### Migration
 
-1. Synthetix contract will need to be upgraded to migrate the SNX from the old escrow contract to the new contract onchain. There will be a temporary function to allow the pdao to execute this.
+1. Synthetix contract will need to be upgraded to migrate the SNX from the old escrow contract to the new contract onchain. There will be a temporary function to allow the pdao to execute this on Synthetix.
 
 2. During the migration `Vest` needs to be disabled or effectivly fail to ensure integrity of escrow entries and SNX balances being migrated for all accounts.
 
@@ -116,34 +160,42 @@ interface IRewardEscrowV2 {
 
 With the launch of L2 Staking for SNX on the OVM testnet, users will be able to migrate all their SNX and escrowed SNX to L2 for staking and rewards. The vesting entries will be copied onto the L2 reward escrow contract that mirrors the migration process.
 
-1. The `SynthetixBridgeToOptimism.deposit()` transaction will vest any escrowed SNX that can be vested and transfer the remaining `totalEscrowedAccountBalance` SNX amount from the Reward escrow contract into the deposit contract. The vesting entries on L1 reward escrow will be deleted for the address.
+1. The `SynthetixBridgeToOptimism.depositAndMigrateEscrow()` transaction will vest any escrowed SNX that can be vested and transfer the remaining `totalEscrowedAccountBalance` SNX amount from the Reward escrow contract into the deposit contract. The vesting entries on L1 reward escrow will be deleted for the address.
 
-2. The L1 migration step is not required for stakers to migrate to L2 their escrowed SNX.
+2. The L1 migration step is required for stakers to migrate to L2 their escrowed SNX (if they have escrowed SNX on the old escrow contract).
 
-If the user has not migrated on L1 to the new escrow contract, the `SynthetixBridgeToOptimism.deposit()` function will read from the Old RewardEscrow to determine the remaining escrowed SNX and vesting entries to be migrated to L2. This reduces the steps and costs for stakers who want to move to L2 so that they won't need to pay the gas costs of L1 migration.
+If the user has not migrated on L1 to the new escrow contract, the `SynthetixBridgeToOptimism.depositAndMigrateEscrow()` function will fail.
 
 To prevent an address from migrating their SNX staking to L2 and then duplicating their vesting entries to the new Reward Escrow afterwards, `migrateVestingSchedule()` will fail if the address has already migrated to L2 first.
 
 Fields migrated to L2 Reward Escrow:
 
 ```
-Amount of SNX escrowed for address (totalEscrowedAccountBalance)
-52 Vesting entries for address
+    escrowedAccountBalance
+
+    And
+
+    struct VestingEntry {
+        uint64 endTime;
+        uint64 duration;
+        uint64 lastVested;
+        uint256 escrowAmount;
+        uint256 remainingAmount;
+    }
 ```
 
-3. Flag on L1 RewardEscrow that the address has been migrated to L2. L2 migration is an irreversible action.
+3. L2 migration is an irreversible action. Escrowed SNX on L2 will need to be vested on L2 first before withdrawing to L1.
 
 ### Account Merging
 
 - Require all debt to be burned before account merging is open for a staker.
-- Vest all of the escrowed SNX that can be vested first.
-- Approve and record the recipient address that will claim the new escrow SNX amount and vesting entries.
-- The recipient address will sign a transaction to merge the escrowed SNX amount to their existing `totalEscrowedAccountBalance` balance and append the vesting entries to their `vestingSchedules`.
-
+- Approve and record the recipient / destination address that will claim the new escrow SNX amount and vesting entries.
+- The recipient address will sign a transaction to merge the escrowed SNX amount and add to their existing `totalEscrowedAccountBalance` balance and append the vesting entries to their `vestingSchedules`.
 
 ## Test Cases
 
 <!--Test cases for an implementation are mandatory for SIPs but can be included with the implementation..-->
+
 TBD
 
 ## Implementation
