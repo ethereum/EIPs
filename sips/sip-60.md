@@ -14,7 +14,7 @@ created: 2020-05-20
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Migrate to a new SNX escrow contract that supports, liquidations of escrowed SNX, L2 migration, flexible and infinite escrow support for terminal inflation migrate and deprecate token sale escrow contract and migrate all balances to new contract.
+Migrate to a new SNX escrow contract that supports liquidations of escrowed SNX, L2 migration, flexible and infinite escrow support for terminal inflation, migrate and deprecate the existing reward escrow contract.
 
 ## Abstract
 
