@@ -35,19 +35,17 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 1. Only escrows SNX for 12 months.
 2. Only `FeePool` has the authority to create escrow entries.
 3. The escrow table `checkAccountSchedule` only supports returning up to 5 years of escrow entries from the initial inflationary supply.
-4. `Vest` can only be called by the owner of the SNX.
-5. Cannot support liquidations of escrowed SNX for [sip-15](https://sips.synthetix.io/sips/sip-15).
+4. Cannot support liquidations of escrowed SNX for [sip-15](https://sips.synthetix.io/sips/sip-15).
 
 ### Desired features for a general `SynthetixEscrow` contract
 
 1. Ability to add arbitrary escrow periods. e.g. 3 months to 2 years.
 2. Public escrowing. Allows any EOA or any contract to escrow SNX. Allowing SNX to be escrowed for protocol contributors, investors and funds or contracts that escrow some sort of incentive similar to the Staking Rewards.
 3. Update `checkAccountSchedule` to allow for terminal inflation and an unlimited escrow navigation through paging.
-4. Allowing anyone to `vest` an accounts escrowed tokens allows Synthetix network keepers to help support SNX holders and supports the [Liquidation system](https://sips.synthetix.io/sips/sip-15) to vest an under collateralised accounts vest-able SNX to be paid to the liquidator.
-5. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account in the escrow contract.
-6. Ability for account merging of escrowed tokens at specific time windows for people to merge their balances - [sip-13](https://sips.synthetix.io/sips/sip-13).
-7. Ability to migrate escrowed SNX and vesting entries to L2 OVM. An internal contract (base:SynthetixBridgeToOptimism) to clear all entries for a user (during the initial deposit phase of L2 migration).
-8. Continuous streaming of the escrowed SNX for each vesting entry. The escrowed SNX will be claimable based on the block timestamp, the amount emitted per second is determined by the duratoin of the escrow period and amount escrowed. i.e, Given 1000 SNX escrowed for 12 months, 500 SNX will be claimable after 6 months. Continuous vesting of escrowed SNX allows each vesting entry to be managed as an independent balance, allows vesting of one or multiple entries, account merging escrow entries, migration of escrowed SNX to L2 reward escrow contract.
+4. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account in the escrow contract.
+5. Ability for account merging of escrowed tokens at specific time windows for people to merge their balances - [sip-13](https://sips.synthetix.io/sips/sip-13).
+6. Ability to migrate escrowed SNX and vesting entries to L2 OVM. An internal contract (base:SynthetixBridgeToOptimism) to clear all entries for a user (during the initial deposit phase of L2 migration).
+7. Continuous streaming of the escrowed SNX for each vesting entry. The escrowed SNX will be claimable based on the block timestamp, the amount emitted per second is determined by the duratoin of the escrow period and amount escrowed. i.e, Given 1000 SNX escrowed for 12 months, 500 SNX will be claimable after 6 months. Continuous vesting of escrowed SNX allows each vesting entry to be managed as an independent balance, allows vesting of one or multiple entries, account merging escrow entries, migration of escrowed SNX to L2 reward escrow contract.
 
 ## Continuous Reward Escrow Emission / Claiming
 
@@ -59,7 +57,7 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 
 **New functions to support continuous reward claiming**
 
-- `vest(address account, uint256[] calldata entryIDs)`
+- `vest(uint256[] calldata entryIDs)`
 
 - `timeSinceLastVested(address account, uint256 entryID)`
 
@@ -97,6 +95,12 @@ interface IRewardEscrowV2 {
 
     function getVestingQuantity(address account, uint256[] calldata entryIDs) external view returns (uint);
 
+    function getVestingSchedules(
+        address account,
+        uint256 index,
+        uint256 pageSize
+    ) external view returns (VestingEntries.VestingEntry[] memory);
+
     function getVestingEntryClaimable(address account, uint256 entryID) external view returns (uint);
 
     function timeSinceLastVested(address account, uint256 entryID) external view returns (uint);
@@ -104,7 +108,7 @@ interface IRewardEscrowV2 {
     function ratePerSecond(address account, uint256 entryID) external view returns (uint);
 
     // Mutative functions
-    function vest(address account, uint256[] calldata entryIDs) external;
+    function vest(uint256[] calldata entryIDs) external;
 
     function createEscrowEntry(
         address beneficiary,
