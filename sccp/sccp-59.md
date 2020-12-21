@@ -2,7 +2,7 @@
 sccp: 59
 title: Reduce the target Collateralisation Ratio for SNX stakers to 500%
 author: Akin Sawyerr (@nottrunner)
-status: Proposed
+status: Implemented
 discussions-to: https://research.synthetix.io/t/sccp-58-reduce-target-collateralisation-ratio-to-500/225
 created: 2020-11-11
 
