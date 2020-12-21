@@ -3,7 +3,7 @@ sccp: 66
 title: Increase Spartan Council seats to 8
 author: Andy T CF (@andytcf)
 discussions-to: governance discord
-status: Proposed
+status: Implemented
 created: 2020-11-9
 ---
 
