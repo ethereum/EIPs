@@ -16,35 +16,36 @@ Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-
 
 Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-97">SIP-97</a> to following:
 
-<b>CollateralEth.sol</b>
+CollateralEth.sol <br />
 
-synths: sUSD, sETH
-minCratio: 130%
-minCollateral: 2
-issueFeeRate: 0.001
+synths: sUSD, sETH <br />
+minCratio: 130% <br />
+minCollateral: 2 <br />
+issueFeeRate: 0.001 <br />
 
-<b>CollateralErc20.sol</b>
+CollateralErc20.sol <br />
 
-synths: sUSD, sBTC
-minCratio: 130%
-minCollateral: 0.05
-issueFeeRate: 0.001
-underlyingAsset: 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D (renBTC address)
+synths: sUSD, sBTC <br />
+minCratio: 130% <br />
+minCollateral: 0.05 <br />
+issueFeeRate: 0.001 <br />
+underlyingAsset: 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D (renBTC address) <br />
 
-<b>CollateralManager.sol</b>
+CollateralManager.sol <br />
 
-baseBorrowRate 0.0005
-baseShortRate 0.0005
-maxDebt 10000000
+baseBorrowRate: 0.0005 <br />
+baseShortRate: 0.0005 <br />
+maxDebt: 10000000 <br />
 
-Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-103">SIP-103</a> to following:
+<b>Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-103">SIP-103</a> to following:</B>
 
-<b>CollateralShort.sol</b>
+CollateralShort.sol<br />
 
-synths: sBTC, sETH
-minCratio 120%
-minCollateral 1000
-issueFeeRate 0.003
+synths: sBTC, sETH<br />
+minCratio: 120%<br />
+minCollateral: 1000<br />
+issueFeeRate: 0.003<br />
+interactionDelay: 3600 <br /> 
 
 ## Motivation
 
