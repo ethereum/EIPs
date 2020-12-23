@@ -14,7 +14,7 @@ Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-
 
 ## Abstract
 
-Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-97">SIP-97</a> to following:
+<b>Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-97">SIP-97</a> to following:</b>
 
 CollateralEth.sol <br />
 
@@ -44,13 +44,13 @@ CollateralShort.sol<br />
 synths: sBTC, sETH<br />
 minCratio: 120%<br />
 minCollateral: 1000<br />
-issueFeeRate: 0.003<br />
+issueFeeRate: 0.005<br />
 interactionDelay: 3600 <br /> 
 
 ## Motivation
 
 - 130% min c-ratio equates to 76.9%, thats quite competitive against other lending protocols such as Aave/Compound which allows 75% and liquidation at 80% for ETH for example
-- Inception fee needs to be 0.30% on SIP-103 due to chainlink oracle latency.
+- Inception fee needs to be 0.5% on SIP-103 due to chainlink oracle latency.
 - Min collateral is set as close as possible to 1000 sUSD to allow bigger audience to be able to use Synthetix
 - Max debt is set initially at 10 Millions sUSD for security purposes and might be expanded later as we hit the ceiling
 
