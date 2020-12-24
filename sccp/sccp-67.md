@@ -33,8 +33,8 @@ underlyingAsset: 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D (renBTC address) <br
 
 CollateralManager.sol <br />
 
-baseBorrowRate: 0.0005 <br />
-baseShortRate: 0.0005 <br />
+baseBorrowRate: 0.005 (0.5%) <br />
+baseShortRate: 0.005 (0.5%) <br />
 maxDebt: 10000000 <br />
 
 <b>Set Initial Configurable Values for <a href="https://sips.synthetix.io/sips/sip-103">SIP-103</a> to following:</B>
