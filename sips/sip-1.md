@@ -136,6 +136,8 @@ The current SIP editors are
 
 ` * Clinton Ennis (@clints)`
 
+` * Andy CF (@andytcf)`
+
 ## SIP Editor Responsibilities
 
 For each new SIP that comes in, an editor does the following:
