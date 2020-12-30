@@ -1,11 +1,10 @@
 ---
 sccp: 67
-title: Change Configurable Values for SIP-97 and SIP-103  
+title: Change Configurable Values for SIP-97 and SIP-103
 author: SynthaMan, Kaleb
-status: Proposed
+status: Implemented
 discussions-to: https://discord.gg/7nMZMdbf
 created: 2020-12-22
-
 ---
 
 ## Simple Summary
@@ -45,7 +44,7 @@ synths: sBTC, sETH<br />
 minCratio: 120%<br />
 minCollateral: 1000<br />
 issueFeeRate: 0.005<br />
-interactionDelay: 3600 <br /> 
+interactionDelay: 3600 <br />
 
 ## Motivation
 
