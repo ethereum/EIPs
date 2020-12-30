@@ -3,7 +3,7 @@ sccp: 68
 title: Increase Fee Reclamation Waiting Period to 6 minutes
 author: Kaleb Keny (@kalebkeny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2020-12-24
 ---
 
@@ -12,7 +12,6 @@ created: 2020-12-24
 ## Simple Summary
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
-
 
 Increase fee reclamation waiting period to 6 minutes.
 
@@ -28,7 +27,6 @@ Increase fee reclamation waiting period to 6 minutes to accommodate network cong
 
 With the consistently high gas prices it has been taking chainlink around 8 minutes to fully reflect the price update of a significant price swing. This results in a narrow but potential front-running exploit to try and target the price update despite the high fees levied on crypto-to-crypto exchanges.
 Increasing fee reclamation time to 6 minutes will help close the potential exploit until I am able to propose other alternatives.
-
 
 ## Copyright
 
