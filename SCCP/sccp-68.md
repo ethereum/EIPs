@@ -3,7 +3,7 @@ sccp: 68
 title: Increase Fee Reclamation Waiting Period to 6 minutes
 author: Kaleb Keny (@kalebkeny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2020-12-24
 ---
 

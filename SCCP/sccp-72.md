@@ -3,7 +3,7 @@ sccp: 72
 title: Inverse Synths Leverage Fee Adjustment (iBNB)
 author: Kaleb (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2021-01-03
 ---
 
