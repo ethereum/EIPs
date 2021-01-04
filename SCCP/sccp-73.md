@@ -3,7 +3,7 @@ sccp: 73
 title: Inverse Synths Leverage Fee Adjustment (iETH)
 author: Kaleb (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2021-01-04
 ---
 
@@ -27,8 +27,6 @@ Proposing to adjust fees on trades into `iETH` to 70 bp as the higher gas prices
 
 `iETH` fees were set at 30 bp after reset, given that historically matching the link push frequency would not open any front-running gap. However, given the contiued pressure on gas prices, which are causing delays in terms oracle price push, as well as the current and continued increase in ETH price, I propose to increase fees on `iETH` to 70 bp.
 The leverage on `iETH` will be monitored and if the front-running gap were to recede, I would propose to lower fees back down.
-
-
 
 ## Copyright
 
