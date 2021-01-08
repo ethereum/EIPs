@@ -1,7 +1,7 @@
 ---
 sip: 97
 title: Multi-Collateral Loans
-status: Approved
+status: Implemented
 author: Michael Spain (@mjs-12), Clinton Ennis (@hav-noms)
 discussions-to: https://research.synthetix.io/t/sip-97-multi-collateral-loans/230
 created: 2020-11-19
@@ -84,6 +84,7 @@ In systems where borrowers access the collateral of other depositors, there is a
 ### Technical Specification
 
 Several new contracts will be deployed:
+
 - `Collateral.sol` which defines the core logic associated with opening and managing loans for a given collateral type.
 - `CollateralManager.sol` which aggregates information across the various collateral contracts and interfaces with `Issuer.sol`.
 - `CollateralEth.sol` which inherits from `Collateral.sol` and provides ETH specific implementation features.
@@ -151,22 +152,26 @@ For the collateral manager, the following values must be set.
 The following values are proposed as the initial configuration.
 
 `CollateralEth.sol`
+
 - `synths` sUSD, sETH
 - `minCratio` 150%
 - `minCollateral` 0.5
 - `issueFeeRate` 0
 
 `CollateralErc20.sol`
+
 - `synths` sUSD, sBTC
 - `minCratio` 150%
-- `minCollateral` 0.025  
+- `minCollateral` 0.025
 - `issueFeeRate` 0
 - `underlyingAsset` 0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D (renBTC address)
 
 `CollateralManager.sol`
+
 - `baseBorrowRate` 0
 - `baseShortRate` 0
 - `maxDebt` 5000000
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).

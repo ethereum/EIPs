@@ -138,6 +138,8 @@ The current SIP editors are
 
 ` * Andy CF (@andytcf)`
 
+` * Kaleb (@kaleb-keny)`
+
 ## SIP Editor Responsibilities
 
 For each new SIP that comes in, an editor does the following:
