@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3198
 title: BASEFEE opcode
 author: Abdelhamid Bakhta (@abdelhamidbakhta)
 discussions-to: URL
