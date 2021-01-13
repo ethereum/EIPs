@@ -2,7 +2,7 @@
 eip: 3198
 title: BASEFEE opcode
 author: Abdelhamid Bakhta (@abdelhamidbakhta)
-discussions-to: URL
+discussions-to: https://ethereum-magicians.org/t/eip-3198-basefeeopcode/5162
 status: Draft
 type: Standards Track
 category: Core
