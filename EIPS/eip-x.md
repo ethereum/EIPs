@@ -11,7 +11,7 @@ requires: 1559
 ---
 
 ## Simple Summary
-Add a `BASEFEE ($OPCODEVALUE)` that returns the value of the base fee at the `latest` block.
+Add a `BASEFEE ($OPCODEVALUE)` that returns the value of the base fee of the current block it is executing in. 
 
 ## Abstract
 
