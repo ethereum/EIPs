@@ -11,7 +11,7 @@ requires: 1559
 ---
 
 ## Simple Summary
-Add a `BASEFEE ($OPCODEVALUE)` that returns the value of the base fee of the current block it is executing in.
+Add a `BASEFEE (0x48)` that returns the value of the base fee of the current block it is executing in.
 
 ## Abstract
 
@@ -23,7 +23,7 @@ The intended use case would be for contracts to get the value of the base fee. T
 - Improve the security for state channels, plasma, optirolls and other fraud proof driven solutions. Having the `BASEFEE` as an input allows you to lengthen the challenge period automatically if you see that the `BASEFEE` is high.
 
 ## Specification
-Add a `BASEFEE` opcode at `($OPCODEVALUE)`, with gas cost `$OPCODEGASCOST`.
+Add a `BASEFEE` opcode at `(0x48)`, with gas cost `G_base`.
 
 ## Rationale
 
