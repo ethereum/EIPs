@@ -14,7 +14,7 @@ created: 2020-05-20
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 
-Migrate to a new SNX escrow contract that supports liquidations of escrowed SNX, L2 migration, flexible and infinite escrow support for terminal inflation, migrate and deprecate the existing reward escrow contract.
+Migrate to a new more flexible SNX escrow contract that supports arbitrary vesting entry lengths, L2 escrow migration and account merging. Allow users to migrate to the new contract and then deprecate the existing reward escrow contract.
 
 ## Abstract
 
@@ -35,135 +35,35 @@ This will require a migration of all escrowed SNX and escrow entries from the cu
 1. Only escrows SNX for 12 months.
 2. Only `FeePool` has the authority to create escrow entries.
 3. The escrow table `checkAccountSchedule` only supports returning up to 5 years of escrow entries from the initial inflationary supply.
-4. Cannot support liquidations of escrowed SNX for [sip-15](https://sips.synthetix.io/sips/sip-15).
 
 ### Desired features for a general `SynthetixEscrow` contract
 
 1. Ability to add arbitrary escrow periods. e.g. 3 months to 2 years.
 2. Public escrowing. Allows any EOA or any contract to escrow SNX. Allowing SNX to be escrowed for protocol contributors, investors and funds or contracts that escrow some sort of incentive similar to the Staking Rewards.
 3. Update `checkAccountSchedule` to allow for terminal inflation and an unlimited escrow navigation through paging.
-4. If an account being [liquidated](https://sips.synthetix.io/sips/sip-15) does not have enough transferable SNX in their account and the system needs to liquidate escrowed SNX being used as collateral then reassign the escrow amounts to the liquidators account in the escrow contract.
-5. Ability for account merging of escrowed tokens at specific time windows for people to merge their balances - [sip-13](https://sips.synthetix.io/sips/sip-13).
-6. Ability to migrate escrowed SNX and vesting entries to L2 OVM. An internal contract (base:SynthetixBridgeToOptimism) to clear all entries for a user (during the initial deposit phase of L2 migration).
-7. Continuous streaming of the escrowed SNX for each vesting entry. The escrowed SNX will be claimable based on the block timestamp, the amount emitted per second is determined by the duratoin of the escrow period and amount escrowed. i.e, Given 1000 SNX escrowed for 12 months, 500 SNX will be claimable after 6 months. Continuous vesting of escrowed SNX allows each vesting entry to be managed as an independent balance, allows vesting of one or multiple entries, account merging escrow entries, migration of escrowed SNX to L2 reward escrow contract.
+4. Ability for account merging of escrowed tokens at specific time windows for people to merge their balances - [sip-13](https://sips.synthetix.io/sips/sip-13).
+5. Ability to migrate escrowed SNX and vesting entries to L2 OVM. An internal contract (base:SynthetixBridgeToOptimism) to clear all entries for a user (during the initial deposit phase of L2 migration).
+6. Enable passing of escrow entry ID to the escrow contract, to allow the Dapps to read escrow entries offline and manage vesting rather than iterating through each entry on-chain.
 
-## Continuous Reward Escrow Emission / Claiming
-
-- Each escrow vesting entry is a continuous stream of SNX
-- The emission rate of the stream is based on the “amount of SNX escrowed / duration”.
-- Supports different escrow durations (6, 12, 24 months) and account merging by re-assigning vesting entries to new owner. Rate of SNX that is claimable for each vesting entry is calculated in SNX per seconds.
-- Claiming allows the user / interface to specify which vesting entries to claim (ID of the vesting entry) for the accumulated SNX.
-- Removes the bottleneck of having on-chain calculation of what vesting entries can be vested / requirement for a sorted array of VestingEntries
-
-**New functions to support continuous reward claiming**
-
-- `vest(uint256[] calldata entryIDs)`
-
-- `timeSinceLastVested(address account, uint256 entryID)`
-
-- `ratePerSecond(address account, uint256 entryID)`
-
-- `getVestingQuantity(address account, uint256[] calldata entryIDs)`
-
-- `getVestingEntryClaimable(address account, uint256 entryID)`
 
 ## Specification
 
 <!--The technical specification should describe the syntax and semantics of any new feature.-->
 
-```
-library VestingEntries {
-    struct VestingEntry {
-        uint64 endTime;
-        uint64 duration;
-        uint64 lastVested;
-        uint256 escrowAmount;
-        uint256 remainingAmount;
-    }
-}
-
-
-interface IRewardEscrowV2 {
-    // Views
-    function balanceOf(address account) external view returns (uint);
-
-    function numVestingEntries(address account) external view returns (uint);
-
-    function totalEscrowedAccountBalance(address account) external view returns (uint);
-
-    function totalVestedAccountBalance(address account) external view returns (uint);
-
-    function getVestingQuantity(address account, uint256[] calldata entryIDs) external view returns (uint);
-
-    function getVestingSchedules(
-        address account,
-        uint256 index,
-        uint256 pageSize
-    ) external view returns (VestingEntries.VestingEntry[] memory);
-
-    function getVestingEntryClaimable(address account, uint256 entryID) external view returns (uint);
-
-    function timeSinceLastVested(address account, uint256 entryID) external view returns (uint);
-
-    function ratePerSecond(address account, uint256 entryID) external view returns (uint);
-
-    // Mutative functions
-    function vest(uint256[] calldata entryIDs) external;
-
-    function createEscrowEntry(
-        address beneficiary,
-        uint256 deposit,
-        uint256 duration
-    ) external;
-
-    function appendVestingEntry(
-        address account,
-        uint256 quantity,
-        uint256 duration
-    ) external;
-
-    function migrateVestingSchedule(address _addressToMigrate) external;
-
-    function migrateAccountEscrowBalances(
-        address[] calldata accounts,
-        uint256[] calldata escrowBalances,
-        uint256[] calldata vestedBalances
-    ) external;
-
-    // Account Merging
-    function startMergingWindow() external;
-
-    function mergeAccount(address accountToMerge, uint256[] calldata entryIDs) external;
-
-    function nominateAccountToMerge(address account) external;
-
-    // L2 Migration
-    function importVestingEntries(
-        address account,
-        uint256 escrowedAmount,
-        VestingEntries.VestingEntry[] calldata vestingEntries
-    ) external;
-
-    // Return amount of SNX transfered to SynthetixBridgeToOptimism deposit contract
-    function burnForMigration(address account, uint[] calldata entryIDs)
-        external
-        returns (uint256 escrowedAccountBalance, VestingEntries.VestingEntry[] memory vestingEntries);
-}
-```
 
 ### Migration
 
-1. Synthetix contract will need to be upgraded to migrate the SNX from the old escrow contract to the new contract onchain. There will be a temporary function to allow the pdao to execute this on Synthetix.
+1. Synthetix contract will need to be upgraded to migrate the SNX from the old escrow contract to the new contract on chain.
 
-2. During the migration `Vest` needs to be disabled or effectivly fail to ensure integrity of escrow entries and SNX balances being migrated for all accounts.
+2. Claiming rewards and vesting on the new contract will be blocked for users with existing vesting entries who haven't migrated their previous vesting entries.
 
-3. `totalEscrowedAccountBalance` and `totalVestedAccountBalance` will be migrated by the protocol for all accounts on the OLD reward escrow to ensure users are allocated their collateral for staking on the new reward escrow contract.
+3. Users with existing vesting entries on the old rewards escrow will need to migrate their vesting entries across to the new contract. The migration will read from the address's existing entries and copy them from the old escrow contract.
 
-4. Claiming rewards and vesting on the new contract will be blocked for users with existing vesting entries who haven't migrated their previous vesting entries.
+4. The gas cost of writing all of these vesting entries to the new contract could be as high as 0.5 ETH per address, given this the proposal is for low SNX balances of less than 1,000 escrowed SNX all vesting entries are wiped and any escrowed SNX for these addresses is immediately available to vest. 
 
-5. Users with existing vesting entries on the old rewards escrow will need to migrate their vesting entries across to the new contract. The migration will read from the address's existing entries and copy them from the old escrow contract.
+5. For balances over 1,000 SNX any vesting entries beyond 52 weeks will be rolled up into a single entry that is immediately available to be vested.
 
-6. Any escrow SNX that can be vested will be vested first. This will mean that only the remaining 52 weeks of vesting entries will be copied to the new Reward Escrow.
+For the avoidance of doubt, there is no need to vest any escrowed SNX in order to migrate to the new escrow contract.
 
 ### L2 Escrow Migration
 
@@ -215,7 +115,7 @@ TBD
 
 <!--Please list all values configurable via SCCP under this implementation.-->
 
-TBD
+N/A
 
 ## Copyright
 
