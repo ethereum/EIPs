@@ -1,7 +1,7 @@
 ---
 sip: 60
 title: New Escrow Contract & Migration
-status: Approved
+status: Proposed
 author: Clinton Ennis (@hav-noms), Jackson Chan (@jacko125)
 discussions-to: <https://discord.gg/ShGSzny>
 
