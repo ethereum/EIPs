@@ -22,7 +22,7 @@ Migrate to a new more flexible SNX escrow contract that supports arbitrary vesti
 
 The current SNX [RewardEscrow](https://contracts.synthetix.io/RewardEscrow) contract is limited only allowing the [FeePool](https://contracts.synthetix.io/FeePool) to escrow SNX rewards from the inflationary supply.
 
-It was not designed to be used as a general purpose escrow contract. New requirements include adding arbitary length escrow entries to be created by anyone as well as supporting the new terminal inflation and liquidation.
+It was not designed to be used as a general purpose escrow contract. New requirements include adding arbitary length escrow entries to be created by anyone as well as supporting the new terminal inflation and migration from L1 to OVM L2.
 
 This will require a migration of all escrowed SNX and escrow entries from the current [RewardEscrow](https://contracts.synthetix.io/RewardEscrow) to new Reward Escrow V2 contract.
 
