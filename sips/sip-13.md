@@ -1,7 +1,7 @@
 ---
 sip: 13
 title: Account Merging
-status: Proposed
+status: Rejected
 author: Kain Warwick (@kaiynne), Clinton Ennis (@hav-noms)
 discussions-to: https://discord.gg/CDTvjHY
 
