@@ -10,6 +10,9 @@ created: 2019-08-14
 
 <!--You can leave these HTML comments in your merged SIP and delete the visible duplicate text guides, they will not appear and may be helpful to refer to if you edit it again. This is the suggested template for new SIPs. Note that an SIP number will be assigned by an editor. When opening a pull request to submit your SIP, please use an abbreviated title in the filename, `sip-draft_title_abbrev.md`. The title should be 44 characters or less.-->
 
+## NOTICE
+This functionality has now been implemented as part of SIP-60
+
 ## Simple Summary
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SIP.-->
 Staking rewards are currently locked for 52 weeks from the date the are claimed, despite being locked they can still be used as collateral. One of the consequences of this is that a staker who has earned rewards in a wallet is forced to continue to maintain this wallet. The purpose of locking these staking rewards was to ensure that they were not able to be transferred, however, this creates a problem if a wallet is compromised or if a user would like to cycle wallets. This SIP proposes a compromise where a staker can transfer the entire balance of their staking rewards to a different wallet.
