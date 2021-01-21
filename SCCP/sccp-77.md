@@ -1,7 +1,7 @@
 ---
 sccp: 77
 title: Update sDEFI and iDEFI
-status: Proposal
+status: Proposed
 author: Farmwell (@farmwell), CryptoToit (@CryptoToit)
 discussions-to: https://research.synthetix.io/
 created: 2021-01-21
