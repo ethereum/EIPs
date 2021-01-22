@@ -34,8 +34,8 @@ The Council in principle agreed to the following proposed weightage:
 | 15.00%       |  SNX     | 11.15  |
 | 15.00%       |  UNI     | 18.4   |
 | 10.00%       |  MKR     | 0.079  |
-| 7.50%        |  YFI     | 0.0016 |
-| 7.50%        |  SUSHI   | 7.87   |
+| 5.00%        |  YFI     | 0.0016 |
+| 5.00%        |  SUSHI   | 7.87   |
 | 5.00%        |  COMP    | 0.268  |
 | 5.00%        |  UMA     | 4.97   |
 | 5.00%        |  REN     | 75.09  |
