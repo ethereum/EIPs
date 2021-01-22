@@ -21,6 +21,8 @@ Change the current Spartan Council Epoch length from 1 month to 3 months (quarte
 
 Proposing to change the Spartan Council Epoch length to 3 months. Elections will only occur once every 3 months instead of monthly.
 
+This SCCP will not affect the current Spartan Council Epoch and if voted in successfully will take place from the next epoch.
+
 ## Motivation
 
 <!--The motivation is critical for SCCPs that want to update variables within Synthetix. It should clearly explain why the existing variable is not incentive aligned. SCCP submissions without sufficient motivation may be rejected outright.-->
