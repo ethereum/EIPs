@@ -13,7 +13,7 @@ created: 2021-01-23
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 
-Increase the account mergers duration from 7 days to 2 weeks (1209600 seconds) and putting into effect a new merging window.
+Increase the account mergers duration from 7 days to 2 weeks (1209600 seconds) and put into effect a new merging window.
 
 ## Abstract
 
