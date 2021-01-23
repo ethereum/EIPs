@@ -3,7 +3,7 @@ sccp: 76
 title: Decrease Spartan Council seats to 7
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance discord
-status: Proposed
+status: Rejected
 created: 2021-01-21
 ---
 
