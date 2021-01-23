@@ -1,7 +1,7 @@
 ---
 sccp: 79
 title: Increase Account Mergers Deadline 
-author: Kaleb Keny
+author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
 status: Proposed
 created: 2021-01-23
