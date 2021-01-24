@@ -100,6 +100,11 @@ of a canonical way to describe them.
 
 ```solidity
 eth_signDescribedMessage(address, describer, describerInput)
+// Result: {
+//   description: "Hello World",
+//   data: "0x...", // described data
+//   signature: "0x..."
+// }
 ```
 
 Compute the **description string** and **described data** by
@@ -115,7 +120,8 @@ additionally provide a way to examine the described data.
 
 If accepted, the computed **described data** is signed
 acording to EIP-191, with the *version
-byte* of `0xTBD` and the *version specific data* of describer address.
+byte* of `0xTBD` and the *version specific data* of describer
+address.
 
 That is:
 
@@ -123,6 +129,9 @@ That is:
 0x19   0xTBD   DESCRIBER_ADDRESS   0xDESCRIBED_DATA
 ```
 
+The returned result includes the **described data**, allowing
+dapps that use paramters computed in the contract to be
+available.
 
 ### Sending Described Transactions
 
@@ -135,6 +144,10 @@ eth_sendDescribedTransaction(address, {
   gasPrice: 9000000000,
   describerInput: "0x1234...",
 })
+// Result: {
+//   description: "Hello World",
+//   transaction: "0x...", // serialized signed transaction
+// }
 ```
 
 Compute the **description string** and **described data** by
@@ -148,8 +161,10 @@ along with fee and value information. Optionally, a wallet may
 wish to additionally provide a way to further examine the
 transaction.
 
-If accepted, the transaction data is set to the computed **described data**, the
-derived transaction is signed and sent.
+If accepted, the transaction data is set to the computed
+**described data**, the derived transaction is signed and sent,
+and the **description string** and serialized signed
+transaction is returned.
 
 
 ### Signing Described Transaction
@@ -163,6 +178,10 @@ eth_signDescribedTransaction(address, {
   gasPrice: 9000000000,
   describerInput: "0x1234...",
 })
+// Result: {
+//   description: "Hello World",
+//   transaction: "0x...", // serialized signed transaction
+// }
 ```
 
 Compute the **description string** and **described data** by
@@ -178,7 +197,8 @@ transaction.
 
 If accepted, the transaction data is set to the computed
 **described data**, the derived transaction is signed (and not
-sent) and the signature returned.
+sent) and the **description string** and serialized signed
+transaction is returned.
 
 ### Description Strings
 
