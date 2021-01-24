@@ -214,7 +214,7 @@ multi-locale options, similar to multipart/form-data.
 
 ### Alternatives
 
-- NatSpec and company; these languages are usually quite large and complex, requiring entire JavaScript VMs with ample processing power and memory, as well as sandboxing to reduce security concerns. One goal of this is to reduce the complexity to something that could execute on hardware wallets and simpler wallets.
+- [NatSpec](https://docs.soliditylang.org/en/latest/natspec-format.html) and company; these languages are usually quite large and complex, requiring entire JavaScript VMs with ample processing power and memory, as well as additional sandboxing to reduce security concerns. One goal of this is to reduce the complexity to something that could execute on hardware wallets and other simple wallets.
 
 - Custom Languages; whatever language is used requires a level of expressiveness to handle a large number of possibilities and re-inventing the wheel. EVM already exists (it may not be ideal), but it is there and can handle everything necessary.
 
