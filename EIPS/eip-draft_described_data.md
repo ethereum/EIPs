@@ -101,7 +101,7 @@ of a canonical way to describe them.
 ```solidity
 eth_signDescribedMessage(address, describer, describerInput)
 // Result: {
-//   description: "Hello World",
+//   description: "text/plain;Hello World",
 //   data: "0x...", // described data
 //   signature: "0x..."
 // }
@@ -145,7 +145,7 @@ eth_sendDescribedTransaction(address, {
   describerInput: "0x1234...",
 })
 // Result: {
-//   description: "Hello World",
+//   description: "text/plain;Hello World",
 //   transaction: "0x...", // serialized signed transaction
 // }
 ```
@@ -179,7 +179,7 @@ eth_signDescribedTransaction(address, {
   describerInput: "0x1234...",
 })
 // Result: {
-//   description: "Hello World",
+//   description: "text/plain;Hello World",
 //   transaction: "0x...", // serialized signed transaction
 // }
 ```
