@@ -12,7 +12,9 @@ requires: [EIP-191](/EIPS/eip-191)
 
 ## Simple Summary
 
-@TODO
+A technique for contract authors to enable wallets to provide
+a human-readable description of what a given contract
+interaction (via a transaction or signed message) will perform.
 
 
 ## Abstract
@@ -178,14 +180,25 @@ If accepted, the transaction data is set to the computed
 **described data**, the derived transaction is signed (and not
 sent) and the signature returned.
 
+### Description Strings
+
+A **description string** must begin with a mime-type followed
+by a semi-colon (`;`). This EIP specifies only the `text/plain`
+mime-type, but future EIPs may specify additional types to
+enable more rich processing, such as `text/markdown` so that
+addresses can be linkable within clients or to enable
+multi-locale options, similar to multipart/form-data.
+
 
 ## Rationale
 
-@TODO:
-  The rationale fleshes out the specification by describing what
-  motivated the design and why particular design decisions were
-  made. It should describe alternate designs that were considered and
-  related work, e.g. how the feature is supported in other languages.
+### Alternatives
+
+- NatSpec and company; these languages are usually quite large and complex, requiring entire JavaScript VMs with ample processing power and memory, as well as sandboxing to reduce security concerns. One goal of this is to reduce the complexity to something that could execute on hardware wallets and simpler wallets.
+
+- Custom Languages; whatever language is used requires a level of expressiveness to handle a large number of possibilities and re-inventing the wheel. EVM already exists (it may not be ideal), but it is there and can handle everything necessary.
+
+- @TOOD: More
 
 
 ## Backwards Compatibility
@@ -230,7 +243,7 @@ Input:
   Described Input:    0x  00...a9059cbb  00...8ba1f109551bd432803012645ac136ddd64dba72  00...de0b6b3a7640000
 
 Output:
-  Description String: "Send 4 DAI to ricmoo.firefly.eth"
+  Description String: "text/plain;Send 4 DAI to ricmoo.firefly.eth"
   Described Data:     0xa9059cbb0000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000000de0b6b3a7640000
 
 Signing:
@@ -246,7 +259,7 @@ Input:
   Described Input:    0x  00...095ea7b3  00...8ba1f109551bd432803012645ac136ddd64dba72  00...de0b6b3a7640000
 
 Output:
-  Description String: "Approve 0x1234...5678 to spend up to 1.0 DAI on your behalf."
+  Description String: "text/plain;Approve 0x1234...5678 to spend up to 1.0 DAI on your behalf."
   Described Data:     0x095ea7b30000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000000de0b6b3a7640000
 
 Signing:
@@ -264,7 +277,7 @@ Input:
   Value:              1e18 wei
 
 Output:
-  Description String: 'Wrap (spend) 1.0 ether and mint 1.0 WETH to "ricmoo.firefly.eth" (0x8ab...d2).'
+  Description String: 'text/plain;Wrap (spend) 1.0 ether and mint 1.0 WETH to "ricmoo.firefly.eth" (0x8ab...d2).'
   Described Data:     0x1249c58b
 
 Signing:
@@ -283,7 +296,7 @@ Input:
   Described Input:    0x  00...a9059cbb  00...8ba1f109551bd432803012645ac136ddd64dba72  00...539
 
 Output:
-  Description String: 'Transfer kitty #1337 to "ricmoo.firefly.eth" (0x8ab...d2).'
+  Description String: 'text/plain;Transfer kitty #1337 to "ricmoo.firefly.eth" (0x8ab...d2).'
   Described Data:     0x1249c58b
 
 Signing:
@@ -309,7 +322,7 @@ Input:
 Output:
   // Optional; this could check the committment exists? Would break pre-signing transactions though
   // Can do sanity checks on duration, price, etc.
-  Description String: 'Register the name "ricmoo.eth" for 3 months for 1.25 DAI (up to 0.123 ether will be converted at the market price).'
+  Description String: 'text/plain;Register the name "ricmoo.eth" for 3 months for 1.25 DAI (up to 0.123 ether will be converted at the market price).'
   Described Data:     0x85f6d155 @TODO
 
 Signing:
@@ -322,8 +335,23 @@ Signing:
 
 @TODO (consider adding it as one or more files in `../assets/eip-####/`)
 
+I will add examples in Solidity and JavaScript.
+
 
 ## Security Considerations
+
+### Escaping Text
+
+Wallets must be careful when displaying text provided by
+contracts and proper efforts must be taken to sanitize
+it, for example, be sure to consider:
+
+- HTML could be enbedded to attempt to trick web-based wallets into [executing code](https://en.wikipedia.org/wiki/Code_injection) using the script tag (possibly uploading any private keys to a server)
+- Other marks which require escaping could be included, such as quotes (`"`"), formatting ('\n' (new line), `\f` (form feed), `\t` (tab), any of many [non-standard whitespaces](https://en.wikipedia.org/wiki/Whitespace_character#Spaces_in_Unicode)), back-slassh (`\`)
+- UTF-8 has had bugs in the past which could allow arbitrary code execution and [crashing renderers](https://osxdaily.com/2015/05/27/bug-crashes-messages-app-ios-workaround/); consider using the UTF-8 replacement character (or *something*) for code-points outside common planes or common sub-sets within planes
+- [Homoglyphs attacks](https://en.wikipedia.org/wiki/IDN_homograph_attack)
+- [Right-to-left](https://en.wikipedia.org/wiki/Right-to-left_mark) mark may affect rendering
+- Many other things, deplnding on your environment
 
 ### Distinguished Signed Data
 
@@ -371,19 +399,13 @@ or moved above to meaningful sections
 **NOTES:**
 
 - Clients should perform addditional due diligence when describing addresses, for example via reverse records
-- Hardware wallets to be fed the required results from eth_getProof along with the describer and display on-device the expected operation
+- Hardware wallets can be fed the required results from eth_getProof along with the describer and display on-device the expected operation
 - I am assuming there will be an invalid byte as an opcode that starts a eWASM so that those fail on EVM, and are identifable on compatible engines; this should allow this to be backwards and forwards compatible too
-- While Solidity is not awesome at string manipulation, there is nothing precluding a new compiler which simplifies string operations that compiles to bytecode.
-- For popular legacy contracts, bytecode can be baked into wallets
-- When signing described data, the `to` address must be entangled in the signature to prevent replaying. In the case of transactions, this is implicitly handled by the `to` in the transaction. In messages, this is handled by including the to address in the EIP-191 *version specific data*.
-
-
-**THOUGHTS:**
-
-- It would be nice if there was a way for a contract to delegate its describer; ENS?
-- Localization is quite important; there should be a way to encode this... TBD
+- While Solidity is not awesome at string manipulation, there is nothing precluding a new compiler which simplifies string operations that compiles to bytecode or more advanced string libraries.
+- For popular legacy contracts, bytecode can be baked into wallets, or deployed on chain with the describer address baked in
+- When signing described data, the `to` address must be entangled in the signature to prevent replaying. In the case of transactions, this is implicitly handled by the `to` in the transaction. In messages, this is handled by including the to address in the EIP-191 *version specific data*. This is similar to the domain in [EIP-712](/EIPS/eip-712), but allows for the dapp developer to define their own replay strategy (if any is desired)
+- Localization is quite important; there should be a way to encode this... This can be a separate EIP
 - Should a simple Markdown be supported? Keep in mind chain data must then be markdown-escaped.
-- Start all descriptions with a mime type? text/plain can be upgraded in the futre to text/markdown?
 
 **Desired Features:**
 
