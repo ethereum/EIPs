@@ -1,0 +1,131 @@
+---
+eip: <to be assigned>
+title: Crosschain Identifier Specification
+author: Weijia Zhang <weijia@wanchain.org>, Peter Robinson <peter.robinson@consensys.net>
+discussions-to:
+status: Draft
+type: Standards Track
+category: ERC
+created: 2020-10-21
+requires (*optional): <EIP number(s)>
+replaces (*optional): <EIP number(s)>
+---
+
+## Simple Summary
+
+Today chainid definition as specified in EIP-155 is an integer type.  This is not unique enough to identify all public and private blockchains.  A blockchain identifier (crosschain id) should be unique and satisfy the following requirements:
+
+should provide identification, description, and discovery of blockchains.
+should provide unique identification of each blockchain in the crosschain service ecosystem.
+should provide descriptions for a blockchain identities such as chainId, name, type, consensus scheme etc.
+should provide discovery mechanism for supported blockchains and also for new blockchains in the ecosystem.
+should provide a mechanism for a joining blockchain to register to the ecosystem.
+should provide a mechanism for a blockchain to edit properties or unregister from the crosschain ecosystem.
+should provide a mechanism to get some critical information of the blockchain
+should provide a mechanism to differentiate an original blockchain and a forked blockchain
+should provide a mechanism to verify a chainid without external registration service
+
+Hence we provide a specification for using a 32 byte identifier to represent any blockchain.  We call this identifier crosschain-id.
+
+## Abstract
+
+A short (~200 word) description of the technical issue being addressed.
+
+Crosschain operations include transfer of assets, data, message, events, and commands from one blockchain to another. In order to improve interoperability of crosschain operations, there is a need to uniquely identify source blockchain, target blockchains, and any relay chains that help facilite blockchain information tranfer.  The identifier should follow a standard format so that all platforms and decentralize applications can use this identifier to represent a blockchain and also some information in the identifier to get some characteristis of the blockchain.  We name this blockchain identifier as crosschain-id and expect Ethereum community to use crosschain-id to represent any public or private blockchain.  The crosschain-id is a 32 byte hex string and with some bytes extracted from blockchain hash and some manually defined to characterize a blockchain.  We also propose a registration and lookup service to retrieve blockchain metadata from the crosschain-id.
+
+## Motivation
+
+EIP-155 was proposed by Vitalik to provide a unique identifier to a blockchain to provide simple relay attack protection.  This specification defines an integer for Chainid for a blockchain and sign the chainid into a transaction data and hence present attackers to send same transaction to different blockchains. This specification will require blockchains to define a chainid and register the chainid in a public repository.
+
+The challenge of using an integer for chainid is that it is not broad enough to cover all blockchains and it does not prevent different blockchains using the same chainid.  Also, it does not address the issue for two forked blockchains having the same chainid.
+
+Hence there is need for a more robust blockchain identifier that will overcome these drawbacks, especially for crosschain operations where multiple chains are involved.
+
+## Specification
+
+The section specifies a) The crosschain id definition b) the registration smart contract the defines metadata to be associated with a crosschain id; and c) the basic functions to parse and process a crosschain id.
+
+### Definition of a 32 byte crosschain id
+
+| Name          | Size(bytes) | Description |
+|---------------|-------------|-------------|
+| Truncated Block Hash | 16 | This is the block hash of the genesis block or the block hash of of the block immediate prior to the fork for a fork of a blockchain. The 16 bytes is the 16 least significant bytes, assuming network byte order. See table XYZA below for a list of existing blockchains. |
+|Native Chain ID| 4 | This is the **Chain Id** value that should be used with the blockchain when signing transactions. For blockchains that do not have a concept of **Chain Id**, this value is zero.|
+|Chain Type| 2 |  See table XYZ below the current list of chain types. |
+| Governance Identifier | 2 |  For new blockchains, a governance_identifier can be specified to identify an original **owner** of a blockchain, to help settle forked / main chain disputes. For all existing blockchains and for blockchains that do not have the concept of an **owner**, this field is zero. |
+| Reserved | 7 | Reserved for future use. Use 000000 for now. |
+| Checksum | 1 | Used to verify the integrity of the identifier. This integrity check is targetted at detecting Crosschain Identifiers mis-typed by human users. The value is calculated as the truncated SHA256 message digest of the rest of the identifier, using the least significant byte, assuming network byte order. Note that this checksum byte only detects integrity with a probability of one in 256. This probability is adequate for the intended usage of detecting typographical errors by people manually entering the Crosschain Identifier. |
+
+### Definition of crosschain id registration smart contract
+
+The crosschain registration smart contract provides a registration service to crosschain id and its associated meta data.  The smart contract should support the following meta data.
+
+|Metadata Name| Description  | Examples|
+|-------------|--------------|---------|
+|Crosschain Id|32 byte hex id|0xabc. See the crosschain id section for details|
+|Long Name|A long naname describing the blockchain.  Maximum length is 80 characters.|This long name could be **Ethereum Mainnet**, **Bitcoin Cash**, **Wanchain Mainnet** etc|
+|Short Name|An abbreviated name for the blockchain. Maximum length is four characters.|For public blockchains, this will match the standard blockchain exchange name. For example, **ETC**, **BTC**, or **WAN**.|
+|Nickname|Nickname of the chain. Maximum length is 10 characters.|Names such as **Rinkeby** or **Ropsten**.|
+|Chain Type|A meta data for the type of the blockchains such as public or private, permissioned or permissionless| Private:permissioned|
+|Chain Category|A parameter to identify whether this is mainnet, or testnet|"mainnet", "testnet"|
+|Chain IP addresses and Service Provider Id|A set of IP addresses of static nodes that can be contacted to submit a crosschain transaction, and the associated name information for the company providing the service.|125.125.125.125, 10.10.20.20|
+|Name Service Type|The contract naming service available on the blockchain.|The type of service, for instance **ENS**.|
+|Name Service Address|The address of the name service contract on the blockchain.| |
+
+### Crosshchain Identifier Registration Contract
+
+To register crosschian/blockchain id, there should be grace period for comments before it become official and verified.  The registration service should support the following functions
+
+* RegisterBlockchainId
+* ModifyName
+* ModifyParameters
+* VerifyBlockchainId
+* QueryBlockChainId
+* LookupBlockchainId
+* QueryBlockchainOwner
+* QueryBlockchainName(Blockchain-id, NameType)
+* QueryParentBlockchainId
+
+## Rationale
+
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
+With the success of Bitcoin and Ethereum, various blockchains such as EOS, Ripple, Litecoin, Besu, Wanchain and the like have been developed and are growing at a fast pace.  There are also other private and consortium blockchains such as Hyperledger Fabric, Hyperledger Besu, Stellar, Corda, Quorum that only allow nodes with permitted identities to join the blockchain network.  The growth of public and private blockchains imposes
+challenges for inter-chain interoperability, particularly when these chains are
+heterogeneous and incompatible.
+Enterprise Ethereum Alliance formed Crosschain Interoperability Task Force (CITF) to look into common crosschain problems and solutions. CITF team noticed that there is a lack of unique identifier to charaterise and describe a blockchain. Several proprosals were discussed in EEA Crosschain Interoperability Task Force meetings and discussions.  We have considered various alternative specifications such as using a random unique hex string to represent a blockchain.  The drawback of this method is that the random id can not be used to verify a blockchain's intrinsic identity such as the blockhash of the genesis block.  A second alternative is simply using a genesis blockhash to represent a blockchain id for crosschain operations.  The drawback of this is that this id does not have information about the property of the blockchain and it has problem when a blockchain is forked into two blockchain.  After various discussion, we finally came up with hybrid crosschain identity specification that allows a blockchain to be identified and verified both manually and through computer programs.
+
+## Backwards Compatibility
+
+Crosschainid can be backward compatible with EIP-155.  The crosschain id contains a 4 byte segment to record the chainid based on EIP-155.
+
+## Test Cases
+
+The test cases should cover the generation of crosschain id, the parsing of an crosschain id to ensure the various segments of the crosschain id meets the specification.
+For the crosschain registration smart contract, the test cases should cover the testing of all functions and also need to ensure that the security of each functions are properly implemented.
+
+## Implementation
+
+The implementation requires the following
+
+* Generate the crosschain id based on the format defined in the specification.  
+* Parse the crosschain id based on the format defined in the spefication.
+* For metadata asssociated with the crosschainid, the medadata needs to be registered with a smart contract.  The smart contract should implement the functions defined in the speficification.
+* Once a smart contract is deployed, the owner of the smart contract can publish the smart contract address, ABI and also crosschain id specification version.
+* Once a crosschain id is registered in the smart contract with extended metadata, there should be a waiting period for the community to review the registration and raise objection if there is inconsistency.
+
+## Security Considerations
+
+Security are considered in the following areas:
+Collision of crosschain id:  Two blockchains can contain the same crosschain id and hence making the mistakenly transfer assets to a wrong blockchain.  
+This security concern is addressed by comparing the hash of the crosschain id with the hash of the genesis block.  It it matches, then the crosschain id is verified.  If not, the crosschain id can be compared with the forked blockhash.  If none of the blockhash match the crosschain id hash, then the crosschain id cannot be verified.
+
+Preventing relay attack: Although crosschain id by itself is different from chainid and it is not signed into blockchain transaction, the crosschain id can still be used for presenting relay attack. An application that handles crosschain transaction can verified the crosschain id with its blockhash and decide whether the tranaction is valid or not. Any transaction with a non-verifiable crosschain id will be rejected.
+
+The crosschain-id are not required be signed into blockchaid tx.
+For blockchains that do not cryptographically sign crosschain id into the blocks, the crosschain id cannot be verified with the blocks itself and have to be verified with external smart contract address and offchain utilities implemented based on the crosschain id specification.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+EEA copyright waived
