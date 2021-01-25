@@ -1,5 +1,5 @@
 ---
-sccp: 81
+sccp: 82
 title: Decrease Collateralization Ratio on sUSD Loans to 130% from 150%
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
