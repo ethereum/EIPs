@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2021-01-23
-requires: [EIP-191](/EIPS/eip-191)
+requires: 191
 ---
 
 ## Simple Summary
@@ -120,7 +120,7 @@ string to the user. Optionally, a wallet may wish to
 additionally provide a way to examine the described data.
 
 If accepted, the computed **described data** is signed
-acording to EIP-191, with the *version
+acording to [EIP-191](./eip-191.md), with the *version
 byte* of `0x00` and the *version specific data* of describer
 address.
 
@@ -252,14 +252,15 @@ and the matching data can be computed (i.e. `commit(hash(name, owner, secret))`)
 
 ## Backwards Compatibility
 
-All signatures for messages are generated using EIP-191 which
-had a previously compatible version byte of `0x00`, so there
-should be no concerns with backwards compatibility.
+All signatures for messages are generated using [EIP-191](./eip-191.md)
+which had a previously compatible version byte of `0x00`, so
+there should be no concerns with backwards compatibility.
 
 
 ## Test Cases
 
-All test cases below use the private key `TBD`.
+All test cases below use the private key `TBD` on the Ropsten
+network (i.e. chainId: `0x03` ).
 
 ## Messages
 
@@ -452,7 +453,7 @@ or moved above to meaningful sections
 - I am assuming there will be an invalid byte as an opcode that starts a eWASM so that those fail on EVM, and are identifable on compatible engines; this should allow this to be backwards and forwards compatible too
 - While Solidity is not awesome at string manipulation, there is nothing precluding a new compiler which simplifies string operations that compiles to bytecode or more advanced string libraries.
 - For popular legacy contracts, bytecode can be baked into wallets, or deployed on chain with the describer address baked in
-- When signing described data, the `to` address must be entangled in the signature to prevent replaying. In the case of transactions, this is implicitly handled by the `to` in the transaction. In messages, this is handled by including the to address in the EIP-191 *version specific data*. This is similar to the domain in [EIP-712](/EIPS/eip-712), but allows for the dapp developer to define their own replay strategy (if any is desired)
+- When signing described data, the `to` address must be entangled in the signature to prevent replaying. In the case of transactions, this is implicitly handled by the `to` in the transaction. In messages, this is handled by including the to address in the EIP-191 *version specific data*. This is similar to the domain in [EIP-712](./eip-712.md), but allows for the dapp developer to define their own replay strategy (if any is desired)
 - Localization is quite important; there should be a way to encode this... This can be a separate EIP
 - Should a simple Markdown be supported? Keep in mind chain data must then be markdown-escaped.
 
