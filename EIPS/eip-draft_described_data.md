@@ -31,11 +31,11 @@ When using an Ethereum Wallet (e.g. MetaMask, Clef, Hardware
 Wallets) users must accept and authorize signing messages or
 sending transactions.
 
-Due to the complexity of Turing Completeness, the description a
-Wallet can possibly come up with for some binary data to the
-user is often difficult to understand, and possibly impossible
-in the case the wallet is asked to sign an arbitrary hash of
-some data.
+Due to the complexity of Ethereum transactions, wallets are very
+limitd in their ability to provide insight into the contents of
+transactions user are approving; outside special-cased support
+for common transactions such as ERC20 transfers, this often amounts
+to asking the user to sign an opaque blob of binary data.
 
 This EIP presents a method for dapp developers to enable a more
 comfortable user experience by providing wallets with a means
@@ -44,7 +44,10 @@ will happen.
 
 It does not address malicious contracts which wish to lie, it
 only addresses honest contracts that want to make their user's
-life better. Security must be handled orthogonally.
+life better. We believe that this is a reasonable security model,
+as transaction descriptions can be audited at the same time as
+contract code, allowing auditors and code reviewers to check that
+transaction descriptions are accurate as part of their review.
 
 
 ## Specification
@@ -58,27 +61,25 @@ function eipXXXDescription(bytes inputs) view returns (string description, bytes
 ```
 
 The method MUST be executable in a static context, i.e. any
-logX, sstore, etc., (including through indirect calls) MUST
-revert. Note that calling VALUE in a static context is
-permitted, and useful for transactions, such as the `mint()`
-function in WETH, which may wish to describe the amount of
-ether that will be wrapped.
+side effects (logX, sstore, etc., (including through indirect
+calls) will be ignored.
 
 During evaluation, the `ADDRESS` (i.e. `to`), `CALLER`
-(i.e. `from`), `VALUE`, and `GASPRICE` must be correctly passed
-in so the EVM operates correctly. For signing described
-messages, `VALUE` should always be 0.
+(i.e. `from`), `VALUE`, and `GASPRICE` must be the same as the
+values for the transaction being described, so that the
+code generating the description can rely on them. For signing
+described messages, `VALUE` should always be 0.
 
 When executing the bytecode, best efforts should be made to
 ensure `BLOCKHASH`, `NUMBER`, `TIMESTAMP` and `DIFFICULTY`
 match the `"latest"` block. The `COINBASE` should be the zero
 address.
 
-If the execution result is of a length that is congruent to
-`4 mod 32`, and the first 4 bytes represent the selector
-`Error(string)`, the reason string should be displayed to the
-user. If the result length is otherwise not congruent to
-`0 mod 32`, then a generic evaluation error should be shown.
+If evaluating the function results in a revert, and the return
+data is of a length that is congruent to `4 mod 32`, and the
+first 4 bytes represent the selector `Error(string)`, the
+reason string should be displayed to the user. If evaluation
+reverts otherwise, then a generic evaluation error should be shown.
 In either case, the signing is aborted.
 
 
@@ -120,13 +121,13 @@ additionally provide a way to examine the described data.
 
 If accepted, the computed **described data** is signed
 acording to EIP-191, with the *version
-byte* of `0xTBD` and the *version specific data* of describer
+byte* of `0x00` and the *version specific data* of describer
 address.
 
 That is:
 
 ```
-0x19   0xTBD   DESCRIBER_ADDRESS   0xDESCRIBED_DATA
+0x19   0x00   DESCRIBER_ADDRESS   0xDESCRIBED_DATA
 ```
 
 The returned result includes the **described data**, allowing
