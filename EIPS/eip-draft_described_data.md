@@ -215,25 +215,27 @@ multi-locale options, similar to multipart/form-data.
 
 ### Meta Description
 
-There have been many attemps to solve this problem, many of
-which attempt to examine or encode the final transaction data
-or message data.
+There have been many attempts to solve this problem, many of
+which attempt to examine the encoded transaction data or
+message data directly.
 
-In many cases, the data that would be necessary for the
-description is not present in the transaction data or message
-data.
+In many cases, the information that would be necessary for a
+meaningful description is not present in the final encoded
+transaction data or message data.
 
 Instead this EIP uses an indirect description of the data.
 
 For example, the `commit(bytes32)` method of ENS places a
-commitement **hash** on-chain which is the *blinded* name and
-address; since the name is blinded in the data, it is not
-available to be described.
+commitement **hash** on-chain. The hash contains the
+**blinded** name and address; since the name is blinded, the
+encoded data (i.e. the hash) no longer contains the original
+values and is insufficient to access the necessary values to
+be included in a description.
 
-By instead describing the commitment indirectly, the name and
-address are still available, so a meaningful description can be
-derived (e.g. "commit to NAME for ADDRESS") and the matching
-data can be computed (i.e. `commit(hash(name, owner, secret))`).
+By instead describing the commitment indirectly (with the
+original information intact: NAME, ADDRESS and SECRET) a
+meaningful description can be computed (e.g. "commit to NAME for ADDRESS (with SECRET)")
+and the matching data can be computed (i.e. `commit(hash(name, owner, secret))`).
 
 ### Alternatives
 
@@ -250,8 +252,8 @@ data can be computed (i.e. `commit(hash(name, owner, secret))`).
 
 ## Backwards Compatibility
 
-All signatures are generated using EIP-191 which had a
-previously compatible version byte of `0x00`, so there
+All signatures for messages are generated using EIP-191 which
+had a previously compatible version byte of `0x00`, so there
 should be no concerns with backwards compatibility.
 
 
