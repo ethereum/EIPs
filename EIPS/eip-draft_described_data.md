@@ -250,8 +250,8 @@ data can be computed (i.e. `commit(hash(name, owner, secret))`).
 
 ## Backwards Compatibility
 
-All signatures are generated using EIP-191
-with the previously unused *version byte* `0xTBD`, so there
+All signatures are generated using EIP-191 which had a
+previously compatible version byte of `0x00`, so there
 should be no concerns with backwards compatibility.
 
 
