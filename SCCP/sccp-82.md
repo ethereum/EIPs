@@ -32,7 +32,7 @@ Decreasing the collateralization ratio aims at achieving the following:
  - Increase it's utilization, which stands at around 30%, through increased leverage incentive.
  - Allow people who have already taken out loans to draw out more ETH held, with minimal risk of liquidation.
 
-I should mention that the loan program is well suited to address the peg issue, given that they bear no cost on borrowers (no minting fee - no interest rate) and the only deterred is having the risk of being liquidated at 130% if this sccp passes.
+I should mention that the loan program is well suited to address the peg issue, given that it bears no cost on borrowers (no minting fee - no interest rate) and the only deterrent is the risk of being liquidated at 130% if this sccp passes. Although if you're an ETH Ultra Bull, as most of us are, this is a non-issue. 
 Also would need to mention that despite the loan trial end date, I would not vote on ending the program until at least a month, given that the state of the peg which requires that borrowers tap these loans without worrying about having to unwind them in the near future.
 
 
