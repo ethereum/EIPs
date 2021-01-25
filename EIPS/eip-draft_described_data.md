@@ -66,8 +66,8 @@ ether that will be wrapped.
 
 During evaluation, the `ADDRESS` (i.e. `to`), `CALLER`
 (i.e. `from`), `VALUE`, and `GASPRICE` must be correctly passed
-in so the EVM operates correctly. For signing described
-messages, `VALUE` should always be 0.
+in so the EVM operates correctly. For signing
+**described messages**, `VALUE` should always be 0.
 
 When executing the bytecode, best efforts should be made to
 ensure `BLOCKHASH`, `NUMBER`, `TIMESTAMP` and `DIFFICULTY`
@@ -212,11 +212,37 @@ multi-locale options, similar to multipart/form-data.
 
 ## Rationale
 
+### Meta Description
+
+There have been many attemps to solve this problem, many of
+which attempt to examine or encode the final transaction data
+or message data.
+
+In many cases, the data that would be necessary for the
+description is not present in the transaction data or message
+data.
+
+Instead this EIP uses an indirect description of the data.
+
+For example, the `commit(bytes32)` method of ENS places a
+commitement **hash** on-chain which is the *blinded* name and
+address; since the name is blinded in the data, it is not
+available to be described.
+
+By instead describing the commitment indirectly, the name and
+address are still available, so a meaningful description can be
+derived (e.g. "commit to NAME for ADDRESS") and the matching
+data can be computed (i.e. `commit(hash(name, owner, secret))`).
+
 ### Alternatives
 
 - [NatSpec](https://docs.soliditylang.org/en/latest/natspec-format.html) and company; these languages are usually quite large and complex, requiring entire JavaScript VMs with ample processing power and memory, as well as additional sandboxing to reduce security concerns. One goal of this is to reduce the complexity to something that could execute on hardware wallets and other simple wallets.
 
 - Custom Languages; whatever language is used requires a level of expressiveness to handle a large number of possibilities and re-inventing the wheel. EVM already exists (it may not be ideal), but it is there and can handle everything necessary.
+
+- The data A used to describe operated on the data and attempted to describe it; often the data 
+
+- The signTypedData [EIP-712](/EIPs/eip-712) has many parallels to what this EIP aims to solve
 
 - @TOOD: More
 
