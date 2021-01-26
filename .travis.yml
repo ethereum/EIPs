@@ -1,4 +1,4 @@
-sudo: false # route your build to the container-based infrastructure for a faster build
+sudo: false 
 
 language: ruby
 
@@ -23,17 +23,20 @@ env:
 matrix:
   fast_finish: true
   include:
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer'
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer-external'
-    - rvm: 2.3.0
+    - language: rust
+      cache: cargo
+      before_script:
+        - cargo install eipv --version=0.1.0
       env: TASK='eip-validator'
     - python: 3.3
       env: TASK='codespell'
       before_script: "sudo pip install urllib3[secure] && sudo pip install codespell"
   allow_failures:
-    - rvm: 2.3.0
+    - rvm: 2.6.0
       env: TASK='htmlproofer-external'
 
 notifications:
