@@ -267,7 +267,6 @@ privateKey = "0x6283185307179586476925286766559005768394338798750211641949889184
 
 ## Messages
 
-```
 ## Messages
 
 ```
@@ -291,8 +290,6 @@ Signing:
 
 All transaction test cases use the ropsten network (chainId: 3)
 and for all unspecified properties use 0.
-
-### Standard ERC-20 Interactions
 
 ```
 Example: ERC-20 transfer
