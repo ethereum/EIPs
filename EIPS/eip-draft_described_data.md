@@ -397,6 +397,7 @@ contracts and proper efforts must be taken to sanitize
 it, for example, be sure to consider:
 
 - HTML could be enbedded to attempt to trick web-based wallets into [executing code](https://en.wikipedia.org/wiki/Code_injection) using the script tag (possibly uploading any private keys to a server)
+- In general, extreme care must be used when rendering HTML; consider the ENS names `<span style="display:none">not-</span>ricmoo.eth` or `&thinsp;ricmoo.eth`, which if rendered without care would appear as `ricmoo.eth`, which it is not
 - Other marks which require escaping could be included, such as quotes (`"`), formatting (`\n` (new line), `\f` (form feed), `\t` (tab), any of many [non-standard whitespaces](https://en.wikipedia.org/wiki/Whitespace_character#Spaces_in_Unicode)), back-slassh (`\`)
 - UTF-8 has had bugs in the past which could allow arbitrary code execution and [crashing renderers](https://osxdaily.com/2015/05/27/bug-crashes-messages-app-ios-workaround/); consider using the UTF-8 replacement character (or *something*) for code-points outside common planes or common sub-sets within planes
 - [Homoglyphs attacks](https://en.wikipedia.org/wiki/IDN_homograph_attack)
