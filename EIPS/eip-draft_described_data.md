@@ -265,9 +265,7 @@ All test cases below use the private key:
 privateKey = "0x6283185307179586476925286766559005768394338798750211641949889184";
 ```
 
-## Messages
-
-## Messages
+### Messages
 
 ```
 Example: login with signed message
@@ -286,7 +284,7 @@ Signing:
   Signature: 0x40e7e79b8c550899d76bcc45a4aebe1c1b0aef8931c21a1975cfe273728df3905a83335bfaa5cb2137c7430b36af93138e578cb4538dfc4276d20be64955dab01b
 ```
 
-## Transactions
+### Transactions
 
 All transaction test cases use the ropsten network (chainId: 3)
 and for all unspecified properties use 0.
