@@ -338,6 +338,7 @@ Example: WETH mint()
 Input:
   Address:            0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
   Describer Input:    0x1249c58b00000000000000000000000000000000000000000000000000000000
+  Value:              1.23 ether
 
 Output:
   Description:        text/plain;Mint 1.23 WETH (spending 1.23 ether)?
