@@ -57,7 +57,7 @@ simultaneously by evaluating **describer** bytecode, passed
 **describedInput** as the calldata with the encoded method:
 
 ```solidity
-function eipXXXDescription(bytes inputs) view returns (string description, bytes data);
+function eipXXXDescribe(bytes inputs) view returns (string description, bytes data);
 ```
 
 The method MUST be executable in a static context, i.e. any
@@ -259,127 +259,96 @@ there should be no concerns with backwards compatibility.
 
 ## Test Cases
 
-All test cases below use the private key `TBD` on the Ropsten
-network (i.e. chainId: `0x03` ).
+All test cases below use the private key:
+
+```
+privateKey = "0x6283185307179586476925286766559005768394338798750211641949889184";
+```
 
 ## Messages
 
 ```
+## Messages
+
+```
+Example: login with signed message
+  - sends selector login()
+  - received data with selector doLogin(bytes32 timestamp)
 Input:
-  Address: @TODO
-  Describer Bytecode:
-  Describer Input:
+  Address:         0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
+  Describer Input: 0xb34e97e800000000000000000000000000000000000000000000000000000000
 
 Output:
-  Description String: @TODO
-  Described Data:     @TODO
+  Description: Log into ethereum.org?
+  Data: 0x14629d780000000000000000000000000000000000000000000000000000000060101f06
 
 Signing:
-  Preimage:  @TODO
-  Signature: @TODO
+  Preimage:  0x19008325ca88cba1c533ec75d0e9af9c3fee7780c19d14629d780000000000000000000000000000000000000000000000000000000060101f06
+  Signature: 0x40e7e79b8c550899d76bcc45a4aebe1c1b0aef8931c21a1975cfe273728df3905a83335bfaa5cb2137c7430b36af93138e578cb4538dfc4276d20be64955dab01b
 ```
 
 ## Transactions
 
+All transaction test cases use the ropsten network (chainId: 3)
+and for all unspecified properties use 0.
+
 ### Standard ERC-20 Interactions
 
 ```
+Example: ERC-20 transfer
 Input:
-  Described Bytecode: @TODO: 
-  // - Could query ENS for reverse records
-  // - Could query contract "symbol" from `to` field (via: `address` opcode?)
-  // ABI Encoded (bytes4, address, uint) which the bytecode can decode; each value is 32-byte aligned
-  //                      Selector       Address                                        Amount  
-  Described Input:    0x  00...a9059cbb  00...8ba1f109551bd432803012645ac136ddd64dba72  00...de0b6b3a7640000
+  Address:            0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
+  Describer Input:    0xa9059cbb000000000000000000000000000000000000000000000000000000000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000002b992b75cbeb6000
 
 Output:
-  Description String: "text/plain;Send 4 DAI to ricmoo.firefly.eth"
-  Described Data:     0xa9059cbb0000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000000de0b6b3a7640000
+  Description:        text/plain;Send 3.14159 TOKN to "ricmoose.eth" (0x8ba1f109551bD432803012645Ac136ddd64DBA72)?
+  Described Data:     0xa9059cbb0000000000000000000000000000000000000000000000002b992b75cbeb60000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba72
 
 Signing:
-  Serializalized Unsigned Transaction: @TODO
-  Signature:                           @TODO
+  Signed Transaction: 0xf8a2808080948325ca88cba1c533ec75d0e9af9c3fee7780c19d80b844a9059cbb0000000000000000000000000000000000000000000000002b992b75cbeb60000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba7229a00895b3aba1e82140682827a60a9e9483a6addf4992813ee9b1f99993703f36f7a06e39c89c013b67dced7c1dd58e49496a20697c58deb875db8a1243f747544c2f
 ```
 
 ```
+Example: ERC-20 approve
 Input:
-  Described Bytecode: @TODO
-  // ABI Encoded (bytes4, address, uint) which the bytecode can decode; each value is 32-byte aligned
-  //                      Selector       Address                                        Amount  
-  Described Input:    0x  00...095ea7b3  00...8ba1f109551bd432803012645ac136ddd64dba72  00...de0b6b3a7640000
+  Address:            0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
+  Describer Input:    0x095ea7b3000000000000000000000000000000000000000000000000000000000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000002b992b75cbeb6000
 
 Output:
-  Description String: "text/plain;Approve 0x1234...5678 to spend up to 1.0 DAI on your behalf."
-  Described Data:     0x095ea7b30000000000000000000000008ba1f109551bd432803012645ac136ddd64dba720000000000000000000000000000000000000000000000000de0b6b3a7640000
+  Description:        text/plain;Approve "ricmoose.eth" (0x8ba1f109551bD432803012645Ac136ddd64DBA72) to manage 3.14159 TOKN tokens?
+  Described Data:     0xa9059cbb0000000000000000000000000000000000000000000000002b992b75cbeb60000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba72
 
 Signing:
-  Serializalized Unsigned Transaction: @TODO
-  Signature:                           @TODO
+  Signed Transaction: 0xf8a2808080948325ca88cba1c533ec75d0e9af9c3fee7780c19d80b844a9059cbb0000000000000000000000000000000000000000000000002b992b75cbeb60000000000000000000000000008ba1f109551bd432803012645ac136ddd64dba7229a00895b3aba1e82140682827a60a9e9483a6addf4992813ee9b1f99993703f36f7a06e39c89c013b67dced7c1dd58e49496a20697c58deb875db8a1243f747544c2f
 ```
 
-### Minting (e.g. WETH)
-
 ```
+Example: ENS commit
 Input:
-  Describer Bytecode: @TODO 
-  //                     selector("Mint()")
-  Describer Input:    0x 00...1249c58b
-  Value:              1e18 wei
+  Address:            0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
+  Describer Input:    0x0f0e373f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000e31f43c1d823afaa67a8c5fbb8348176d225a79e65462b0520ef7d3df61b9992ed3bea0c56ead753be7c8b3614e0ce01e4cac41b00000000000000000000000000000000000000000000000000000000000000087269636d6f6f7365000000000000000000000000000000000000000000000000
 
 Output:
-  Description String: 'text/plain;Wrap (spend) 1.0 ether and mint 1.0 WETH to "ricmoo.firefly.eth" (0x8ab...d2).'
+  Description:        text/plain;Commit to the ENS name "ricmoose.eth" for 0xE31f43C1d823AfAA67A8C5fbB8348176d225A79e?
+  Described Data:     0xf14fcbc8e4a4f2bb818545497be34c7ab30e6e87e0001df4ba82e7c8b3f224fbaf255b91
+
+Signing:
+  Signed Transaction: 0xf881808080948325ca88cba1c533ec75d0e9af9c3fee7780c19d80a4f14fcbc8e4a4f2bb818545497be34c7ab30e6e87e0001df4ba82e7c8b3f224fbaf255b912aa0717a6833ccfd1b9b441cf3a283b90ea68e333305d544bb18ecca2181ef5ac619a0190595552265807c95968f9a2ac47b69796c5b41e0ec51ff389f0347737e8cda
+```
+
+```
+Example: WETH mint()
+Input:
+  Address:            0x8325Ca88cbA1c533ec75D0E9AF9c3feE7780c19D
+  Describer Input:    0x1249c58b00000000000000000000000000000000000000000000000000000000
+
+Output:
+  Description:        text/plain;Mint 1.23 WETH (spending 1.23 ether)?
   Described Data:     0x1249c58b
 
 Signing:
-  Serializalized Unsigned Transaction: @TODO
-  Signature:                           @TODO
+  Signed Transaction: 0xf869808080948325ca88cba1c533ec75d0e9af9c3fee7780c19d881111d67bb1bb0000841249c58b2aa0e8a77166d32e1011b02067d777e5e484fbd89911805694ccb5757eb2094a79b4a0627f58532c68010f9a5736bcba6fe8e97c603dc77e2aea0371cf4120bf26d35d
 ```
-
-### ERC-721 (e.g. Cryptokitties)
-
-```
-Input:
-  Describer Bytecode: @TODO 
-  //                     selector("Mint()")
-  // ABI Encoded (bytes4, address, uint) which the bytecode can decode; each value is 32-byte aligned
-  //                      Selector       Address                                        TokenID  
-  Described Input:    0x  00...a9059cbb  00...8ba1f109551bd432803012645ac136ddd64dba72  00...539
-
-Output:
-  Description String: 'text/plain;Transfer kitty #1337 to "ricmoo.firefly.eth" (0x8ab...d2).'
-  Described Data:     0x1249c58b
-
-Signing:
-  Serializalized Unsigned Transaction: @TODO
-  Signature:                           @TODO
-```
-
-### ERC-721 (e.g. ENS)
-
-```
-Input:
-  Describer Bytecode: @TODO 
-  //                     register(string name, address owner, uint duration, buytes32 secret)
-  Described Input:    abi.encode([
-                        id("register(string,address,uint256,bytes32)"),
-                        "ricmoo",
-                        0x1234,
-                        1234,
-                        0x1234
-                      ])
-  Value:              123 wei
-
-Output:
-  // Optional; this could check the committment exists? Would break pre-signing transactions though
-  // Can do sanity checks on duration, price, etc.
-  Description String: 'text/plain;Register the name "ricmoo.eth" for 3 months for 1.25 DAI (up to 0.123 ether will be converted at the market price).'
-  Described Data:     0x85f6d155 @TODO
-
-Signing:
-  Serializalized Unsigned Transaction: @TODO
-  Signature:                           @TODO
-```
-
 
 ## Reference Implementation
 
