@@ -3,7 +3,7 @@ sccp: 70
 title: Raise maxDebt on Multi-Collateral Loans to sUSD 20 million from sUSD 10 million
 author: Kaleb
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2020-12-31
 
 ---
