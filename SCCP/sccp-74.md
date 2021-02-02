@@ -3,7 +3,7 @@ sccp: 74
 title: Time lock on burning after minting Adjustment
 author: SynthaMan (@SNXified)
 discussions-to: governance
-status: Proposed
+status: Rejected
 created: 2021-01-09
 ---
 
