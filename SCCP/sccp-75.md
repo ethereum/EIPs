@@ -3,7 +3,7 @@ sccp: 75
 title: Inverse Synths Leverage Fee Adjustment (iLINK)
 author: Kaleb (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Rejected
 created: 2021-01-10
 ---
 
