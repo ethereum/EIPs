@@ -3,7 +3,7 @@ sccp: 84
 title: Lower Fees on iETH
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2021-02-03
 ---
 
