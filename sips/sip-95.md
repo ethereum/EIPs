@@ -1,7 +1,7 @@
 ---
 sip: 95
 title: Delist sBCH and iBCH for evaluation
-status: Approved
+status: Implemented
 author: Jackson Chan (@jacko125), Garth Travers (@garthtravers), Clinton Ennis (@hav-noms)
 discussions-to: https://discordapp.com/invite/AEdUHzt
 
