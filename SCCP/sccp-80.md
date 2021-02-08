@@ -33,7 +33,7 @@ I should mention that fees could potentially pushed further lower, on the synths
 |  CCY  | Previous Rate | New Rate | Rate Decrease|
 |:-----:|:-------------:|:--------:|:-----------:|
 |  sETH |       30      |    25    |       5     |
-|  iETH |       70      |    50    |      20     |
+|  iETH |       70      |    40    |      30     |
 |  sXTZ |      100      |    85    |      15     |
 |  iXTZ |      100      |    85    |      15     |
 |  sEOS |      100      |    85    |      15     |
@@ -45,7 +45,7 @@ I should mention that fees could potentially pushed further lower, on the synths
 |  sXRP |      100      |    90    |      10     |
 
 
-I'd like to thank every member of the synthetix community for their continued unrelenting support and trust through out 2020. 
+I'd like to thank every member of the synthetix community for their continued unrelenting support and trust through out 2020.
 I look forward to a period where we have consistent healthy robust exchange volume, with fees and fee-adjustment period lowered to the minimum on L1 (in future work).
 
 ## Copyright
