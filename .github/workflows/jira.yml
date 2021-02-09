@@ -1,0 +1,9 @@
+- name: Find JIRA ticket references
+  id: jira
+  uses: AsasInnab/regex-action@v1
+  with:
+    regex_pattern: 'JIR-[0-9]+'
+    regex_flags: 'gim'
+    search_string: ' My jira ticket number is JIR-12345'
+- name: Echo JIRA reference
+  run: echo "My JIRA ticket number is ${{ steps.jira.outputs.first_match }}"
