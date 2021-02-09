@@ -1,0 +1,2 @@
+- name: PR Automation
+  uses: devjoes/pr-automation@v0.1.0
