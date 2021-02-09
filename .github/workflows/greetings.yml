@@ -13,7 +13,9 @@ jobs:
         uses: ./.github/actions # Uses an action in the root directory
         id: hello
         with:
-          who-to-greet: 'Mona the Octocat'
+          regex_pattern: 'JIR-[0-9]+'
+          regex_flags: 'gim'
+          search_string: ' My jira ticket number is JIR-12345'
       # Use the output from the `hello` step
       - name: Get the output time
         run: echo "The time was ${{ steps.hello.outputs.time }}"
