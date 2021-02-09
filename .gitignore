@@ -2,3 +2,4 @@ _site
 .sass-cache
 .jekyll-metadata
 vendor
+.github/actions/node_modules

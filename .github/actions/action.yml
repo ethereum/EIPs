@@ -1,0 +1,22 @@
+name: "Match a PR against a regex pattern"
+description: "Match a PR against a regex pattern and output true / false"
+inputs:
+  regex_pattern:
+    description: "regex pattern"
+    required: true
+  regex_flags:
+    description: "regex flag"
+    required: true
+  search_string:
+    description: "search string"
+    required: true
+outputs:
+  first_match:
+    description: "first regex match"
+
+runs:
+  using: "node12"
+  main: "dist/index.js"
+branding:
+  icon: 'code'  
+  color: 'blue'

@@ -1,0 +1,14 @@
+{
+  "name": "auto-merge-eip",
+  "version": "1.0.0",
+  "description": "auto merge eip",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.2.6"
+  }
+}
