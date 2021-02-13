@@ -50,7 +50,7 @@ Additional proposal for future consideration:
 - Consider (in a separate EIP) creating new oracles with shifted to father future (e.g. by one year forward once per year) the minimum finish times and spreading the transferred funds between several such oracles.
 
 ## Rationale
-The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only way to recover the economy.
+The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
 
 The economical model of Future Salaries is described in [this research article preprint](https://github.com/vporton/gitcoin-web/blob/future/app/assets/docs/science-salaries.pdf).
 
