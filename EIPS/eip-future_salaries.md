@@ -5,7 +5,7 @@ author: Victor Porton <porton@narod.ru>
 status: Draft
 type: Standards Track
 category: Core
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format> # FIXME
+created: 2021-02-13
 ---
 
 ## Simple Summary
