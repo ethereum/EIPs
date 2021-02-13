@@ -65,6 +65,7 @@ The security considerations are:
 - `DonateETH` also needs to be audited.
 - The value of wrapped ETH transferred to `SalaryWithDAO` may happen to decrease with time (despite that this EIP itself and some others aim to increase ETH value), so (as it were told to be discussed in a separate EIP) need to consider alternative DeFi schemes than simply wrapping ETH in ERC-1155.
 - Future Salaries system is expected to create big unfounded bubbles of somebody's personal tokens. This problem seems inevitable, but the existing problems this EIP aims to solve are much worse.
+- The DAO may switch to a non-effective or biased way of voting (for example to being controlled by one human) thus distributing funds unfairly. This problem could be solved by a future fork of Ethereum that would "confiscate" funds from the DAO.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
