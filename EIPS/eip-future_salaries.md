@@ -28,7 +28,7 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 1. Finish the smart contract audit (it was already paid for) of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts.
 2. After the audit is finished, deploy these contracts (together with a DAOstack DAO controlling the `DefaultDAOInterface` with voting tokens initially allocated by a community consensus) and create an oracle ID using the `SalaryWithDAO` API.
 3. Audit and deploy [DonateETH](https://github.com/vporton/donations/blob/main/contracts/DonateETH.sol) redirecting ETH payments to this oracle, too.
-4. Discuss the fractions of miners fees and transfer fees of ETH to be transferred to `DonateETH` at every mining and transfer operation.
+4. Every some amount of time (e.g. every day) create a transaction to transfer an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
 5. Change the Ethereum clients to do these ETH transfers.
 
 ## Rationale
@@ -39,7 +39,9 @@ The economical model of Future Salaries is described in [this research article p
 Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes.
 
 ## Backwards Compatibility
-There are possibilities of incompatibilites with applications (but not contracts, because contracts don't "know" how ETH is transferred) that have made assumptions about ETH transfers all occurring either as miner payments or transactions, as this introduces a new mechanism for moving ETH around the system. It is likely that most of such incompatibilities to be minor and rarely meeting in practice.
+There are no backward incompatibilities.
+
+We do ETH transfers as transactions, so there are no troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
 
 ## Security Considerations
 The security considerations are:
