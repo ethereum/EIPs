@@ -25,6 +25,8 @@ This SCCP provides for adding to sDEFI:
 This SCCP furher provides for removing from sDEFI:
   * Wrapped version of Nexus Mutual, wNXM
 
+Additionally, this SCCP proposes the sDEFI index synth to be paused from trading during the rebalance period. At the end of the rebalancing, the sDEFI will trade at roughly the same index price as it currently trades at. However, since this will effectively be a newly constructed product, some users may wish to exit the sDEFI prior to rebalancing. 
+
 The Spartan Council was presented with three different options for weighting the index. 
 The Council in principle agreed to the following proposed weightage: 
 
