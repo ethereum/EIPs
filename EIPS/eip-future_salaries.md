@@ -25,6 +25,8 @@ This proposal solves two problems at once:
 Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 ## Specification
+(TBD)
+
 1. Finish the smart contract audit (it was already paid for) of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts.
 2. After the audit is finished, deploy these contracts (together with a DAOstack DAO controlling the `DefaultDAOInterface` with voting tokens initially allocated by a community consensus) and create an oracle ID using the `SalaryWithDAO` API.
 3. Audit and deploy [DonateETH](https://github.com/vporton/donations/blob/main/contracts/DonateETH.sol) redirecting ETH payments to this oracle, too.
