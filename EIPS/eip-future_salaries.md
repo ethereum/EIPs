@@ -1,7 +1,7 @@
 ---
 eip: 3267
 title: Giving Ethereum fees to Future Salaries
-author: Victor Porton <porton@narod.ru>
+author: Victor Porton (@vporton), Victor Porton <porton@narod.ru>
 status: Draft
 type: Standards Track
 category: Core
