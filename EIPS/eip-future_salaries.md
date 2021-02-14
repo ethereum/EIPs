@@ -27,9 +27,13 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 ## Specification
 (TBD)
 
-Addresses of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts - TBD.
+`SalaryWithDAO` = `TBD`
 
-Change the Ethereum clients to create a transaction every some amount of time (every day? - TBD) to mint an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
+`DefaultDAOInterface` = `TBD`
+
+Prior to `FORK_BLOCK_NUMBER`, the contracts [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
+
+Change the Ethereum clients to create a transaction every some amount of time (the first transaction of every day in UTC? - TBD) to mint an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
 
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
