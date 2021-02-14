@@ -27,11 +27,9 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 ## Specification
 (TBD)
 
-1. Finish the smart contract audit (it was already paid for) of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts.
-2. After the audit is finished, deploy these contracts (together with a DAOstack DAO controlling the `DefaultDAOInterface` with voting tokens initially allocated by a community consensus) and create an oracle ID using the `SalaryWithDAO` API.
-3. Audit and deploy [DonateETH](https://github.com/vporton/donations/blob/main/contracts/DonateETH.sol) redirecting ETH payments to this oracle, too.
-4. Every some amount of time (e.g. every day) create a transaction to mint an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
-5. Change the Ethereum clients to do these ETH transfers.
+Addresses of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts - TBD.
+
+Change the Ethereum clients to create a transaction every some amount of time (every day? - TBD) to mint an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
 
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
