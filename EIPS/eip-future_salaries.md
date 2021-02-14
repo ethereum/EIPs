@@ -12,7 +12,7 @@ created: 2021-02-13
 Transfer a part of Ethereum transfer/mining fees to Future Salaries contract
 
 ## Abstract
-Part of mining/transfer fees to the contract `SalaryWithDAO` to incentivize traders to pay to common good producers. That directly benefits not only common good producers but miners/validators, too.
+Transfer a part (exact fractions - TBD) of mining/transfer fees to the contract `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
 
 ## Motivation
 There are two motivations:
