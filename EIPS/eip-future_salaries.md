@@ -2,7 +2,7 @@
 eip: 3267
 title: Giving Ethereum fees to Future Salaries
 author: Victor Porton (@vporton), Victor Porton <porton@narod.ru>
-discussions-to: https://www.g2.com/discussions/38029-discussion-of-eip-3267
+discussions-to: https://www.g2.com/discussions/38029-discussion-of-eip-3267 (TBD: moving to https://ethereum-magicians.org)
 status: Draft
 type: Standards Track
 category: Core
