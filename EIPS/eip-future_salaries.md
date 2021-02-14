@@ -2,6 +2,7 @@
 eip: 3267
 title: Giving Ethereum fees to Future Salaries
 author: Victor Porton (@vporton), Victor Porton <porton@narod.ru>
+discussions-to: https://www.g2.com/discussions/38029-discussion-of-eip-3267
 status: Draft
 type: Standards Track
 category: Core
@@ -41,13 +42,6 @@ As the above mentioned RFC explains, it is good for miners/validators, because:
 3. Audit and deploy [DonateETH](https://github.com/vporton/donations/blob/main/contracts/DonateETH.sol) redirecting ETH payments to this oracle, too.
 4. Discuss the fractions of miners fees and transfer fees of ETH to be transferred to `DonateETH` at every mining and transfer operation.
 5. Change the Ethereum clients to do these ETH transfers.
-
-In the future (it should be a separate EIP) we can switch to some more sophisticated DeFi scheme (`SalaryWithDAO` contract does support donations in DeFi token) of converting ETH to ERC-1155 tokens to be transferred to `SalaryWithDAO` than simply wrapping ETH into ERC-1155 token by `DonateETH`, to increase future value of the tokens transferred to `SalaryWithDAO`.
-
-Additional proposal for future consideration:
-
-- Consider (by the DAO voting) "obliging" the above mentioned DAO by a smart contract (with ownership transfer) to set the minimum oracle finish date in the future to some fixed value (need to discuss the exact number of years to lock funds for).
-- Consider (in a separate EIP) creating new oracles with shifted to father future (e.g. by one year forward once per year) the minimum finish times and spreading the transferred funds between several such oracles.
 
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
