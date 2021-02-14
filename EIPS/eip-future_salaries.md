@@ -16,25 +16,13 @@ Transfer a part of Ethereum transfer/mining fees to Future Salaries contract
 Transfer a part (exact fractions - TBD) of mining/transfer fees to the contract `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
 
 ## Motivation
-There are two motivations:
+This proposal solves two problems at once:
 
-1. It provides a big amount of "money" to common good producers. That obviously personally benefits common good producers, allowing them to live better human lives, it increases peoples' and organizations' both abilities and incentives to produce common goods. That benefits the humanity as a whole and the Ethereum ecosystem in particular. In my opinion (Victor Porton), this is crucial for survival of mankind because of the following reasons: a. Suppose an important scientific discovery was wrongly published and because of the wide-spread "no-republication of already published" scientific ethic it may become that there will be nothing in the mankind what would make this discovery to enter into scientific databases and/or raise reasonably high in search engines result pages. This would effectively mean that a part of science is missing in human knowledge (it could be rediscovered but not re-published due to the above described reasons). A missing part of the science would make the entire science development stuck. So, mankind would become unable to resist exestential problems (like climate change or asteroid impact) and likely die completely in near future. b. There is no other known (already discovered) economical incentive to finance climate actions than this proposal. So if this proposal won't be accepted, we are unable to resist climate change. You may assume that humanity has a way to overcome these problems and you are right: a way is this EIP.
+1. It provides a big amount of "money" to common good producers. That obviously personally benefits common good producers, allowing them to live better human lives, it increases peoples' and organizations' both abilities and incentives to produce common goods. That benefits the humanity as a whole and the Ethereum ecosystem in particular. See more in the discussion why it's crucial.
 
-2. This would effectively decrease circulating ETH supply. The necessity to decrease the (circulating) ETH supply (by locking ETH in Future Salaries system for a long time) is a well-known important things to be done.
+2. This would effectively decrease circulating ETH supply. The necessity to decrease the (circulating) ETH supply (by locking ETH in Future Salaries system for a long time) is a well-known important thing to be done.
 
-> For a multi-asset smart contract platform to function as a store of value, proper incentives must be put in place to align in the growth in value of a network's assets with its underlying security. Or put another way, the platform's native token must be a good value capture of the platform's aggregate asset value. If the intrinsic value of a platform's native token is limited to transaction fee payment, its value would be determined solely by transaction demand, instead of the demand of asset storage. (https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0001-positioning/0001-positioning.md)
-
-In other words, we need to measure the ETH "real" value. This EIP proposes to allocate *much* (it probably may be more than 90%) of miner's ETH fees to Future Salaries contract. So the cost of ETH will be associated with the real ("job") value of the conditional tokens of this contract.
-
-So, this proposal partly solves both the well-known problems of
-- decreasing (ciculating) ETH supply
-- making ETH cost proportionally increasing when tokens' value increases (in other word incresing the ETH intristic value)
-
-As the above mentioned RFC explains, it is good for miners/validators, because:
-- It reduces manipulation incentives such as selfish mining
-- It highly increases the security of the Ethereum network
-- It increases the ETH intristic value, so miners/validators spend less on energy per amount of money earned.
-- There is the danger (https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0001-positioning/0001-positioning.md) that without radical measures like this proposal the value of ETH (not of Ethereum tokens) will become zero in some future, so greatly downshifting miners/validators.
+Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 ## Specification
 1. Finish the smart contract audit (it was already paid for) of [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts.
