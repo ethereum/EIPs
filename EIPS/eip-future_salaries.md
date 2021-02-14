@@ -39,7 +39,7 @@ The economical model of Future Salaries is described in [this research article p
 Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes.
 
 ## Backwards Compatibility
-This EIP requires a hard fork, so we need some time for all clients to be updated. The change in clients is however trivial and the update won't require much time.
+There are possibilities of incompatibilites with applications (but not contracts, because contracts don't "know" how ETH is transferred) that have made assumptions about ETH transfers all occurring either as miner payments or transactions, as this introduces a new mechanism for moving ETH around the system. It is likely that most of such incompatibilities to be minor and rarely meeting in practice.
 
 ## Security Considerations
 The security considerations are:
