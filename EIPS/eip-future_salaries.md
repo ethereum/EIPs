@@ -33,7 +33,7 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 Prior to `FORK_BLOCK_NUMBER`, the contracts [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
 
-Change the Ethereum clients to create a transaction every some amount of time (the first transaction of every day in UTC? - TBD) to mint an agreed upon (requires further discussion) amount of ETH to `DonateETH`.
+Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed (the exact number - TBD) fraction of the transfered/mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account). Every some time (e.g. first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
 
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
@@ -45,7 +45,7 @@ Funding multiple oracles with different finish time would alleviate the future t
 ## Backwards Compatibility
 There are no backward incompatibilities.
 
-We do ETH transfers as transactions, so there are no troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
+Because transferring to the aforementioned account is neither mining nor a transaction, we get a new kinds of ETH transfers, so there may be some (expected moderate impact) troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
 
 ## Security Considerations
 The security considerations are:
