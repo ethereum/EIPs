@@ -35,6 +35,8 @@ Prior to `FORK_BLOCK_NUMBER`, the contracts [SalaryWithDAO](https://github.com/v
 
 Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed (the exact number - TBD) fraction of the transfered/mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account). Every some time (e.g. first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
 
+Because this EIP solves a similar problem, cancel any other EIPs that burn ETH (except gas fees) during transfers or mining. (TBD: We should transfer more ETH in this EIP than we burned accodingly older accepted EIPs, because this EIP has the additional advantages of: 1. funding common goods; 2. better aligning values of ETH and values of tokens).
+
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
 
