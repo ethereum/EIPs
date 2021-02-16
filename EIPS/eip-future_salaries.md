@@ -51,7 +51,7 @@ Because transferring to the aforementioned account is neither mining nor a trans
 
 ## Security Considerations
 The security considerations are:
-- The DAO may switch to a non-effective or biased way of voting (for example to being controlled by one human) thus distributing funds unfairly. This problem could be solved by a future fork of Ethereum that would "confiscate" funds from the DAO.
+- The DAO that controls account restoration may switch to a non-effective or biased way of voting (for example to being controlled by one human) thus distributing funds unfairly. This problem could be solved by a future fork of Zilliqa that would "confiscate" control from the DAO.
 
 See more in the discussion.
 
