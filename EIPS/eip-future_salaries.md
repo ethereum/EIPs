@@ -13,7 +13,7 @@ created: 2021-02-13
 Transfer a part of Ethereum transfer/mining fees to Future Salaries contract
 
 ## Abstract
-Transfer a part (exact fractions - TBD) of mining/transfer fees to the contract `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
+Transfer a part (exact fractions - TBD) of mining/transfer fees to the `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
 
 ## Motivation
 This proposal solves two problems at once:
@@ -31,7 +31,7 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 `DefaultDAOInterface` = `TBD`
 
-Prior to `FORK_BLOCK_NUMBER`, the contracts [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
+Prior to `FORK_BLOCK_NUMBER`, [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
 
 Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed (the exact number - TBD) fraction of the transfered/mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account). Every some time (e.g. first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
 
