@@ -42,7 +42,7 @@ The Future Salaries is the _only_ known system of distributing significant funds
 
 The economical model of Future Salaries is described in [this research article preprint](https://github.com/vporton/gitcoin-web/blob/future/app/assets/docs/science-salaries.pdf).
 
-Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes.
+Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ZIL from the circulation forever.
 
 ## Backwards Compatibility
 There are no backward incompatibilities.
