@@ -45,8 +45,6 @@ The economical model of Future Salaries is described in [this research article p
 Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ZIL from the circulation forever.
 
 ## Backwards Compatibility
-There are no backward incompatibilities.
-
 Because transferring to the aforementioned account is neither mining nor a transaction, we get a new kinds of ETH transfers, so there may be some (expected moderate impact) troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
 
 ## Security Considerations
