@@ -1,6 +1,6 @@
 ---
 sccp: 82
-title: Decrease Collateralization Ratio on sUSD Loans to 130% from 150%
+title: Decrease Collateralization&Liquidation Ratio on sUSD Loans to 130% from 150%
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
 status: Proposed
@@ -14,13 +14,13 @@ created: 2021-01-25
 
 <!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the SCCP.-->
 
-Decrease the `collateralisationRatio` on sUSD ETH backed loans (for the old loan trial contract) to 130% from 150%.
+Decrease the `collateralisationRatio` and `liquidationRatio` on sUSD ETH backed loans (for the old loan trial contract) to 130% from 150%.
 
 ## Abstract
 
 <!--A short (~200 word) description of the variable change proposed.-->
 
-Given the state of the peg, this sccp proposes to decrease the collateralization ratio of sUSD loans to 130% from 150% in order to increase the attractiveness of these loans through a higher maximum leverage.
+Given the state of the peg, this sccp proposes to decrease the collateralization and liquidation ratio of sUSD loans to 130% from 150% in order to increase the attractiveness of these loans through a higher maximum leverage.
 
 ## Motivation
 
