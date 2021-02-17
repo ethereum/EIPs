@@ -54,7 +54,7 @@ The Future Salaries is the _only_ known system of distributing significant funds
 
 The economical model of Future Salaries is described in [this research article preprint](../assets/eip-3267/science-salaries.pdf).
 
-Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ZIL from the circulation forever.
+Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ETH from the circulation forever.
 
 ## Backwards Compatibility
 Because transferring to the aforementioned account is neither mining nor a transaction, we get a new kinds of ETH transfers, so there may be some (expected moderate impact) troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
