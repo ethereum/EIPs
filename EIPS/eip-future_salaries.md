@@ -40,7 +40,7 @@ Because this EIP solves a similar problem, cancel any other EIPs that burn ETH (
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
 
-The economical model of Future Salaries is described in [this research article preprint](https://github.com/ethereum/EIPs/raw/future-salaries/assets/eip-3267/science-salaries.pdf).
+The economical model of Future Salaries is described in [this research article preprint](https://github.com/ethereum/EIPs/raw/master/assets/eip-3267/science-salaries.pdf).
 
 Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ZIL from the circulation forever.
 
