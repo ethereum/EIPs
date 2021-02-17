@@ -13,7 +13,7 @@ created: 2021-02-13
 Transfer a part of Ethereum transfer/mining fees to Future Salaries contract
 
 ## Abstract
-Transfer a part (exact fractions - TBD) of mining/transfer fees to the `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
+Transfer a part (exact fractions - TBD) of mining/transfer fees + (probably: TBD) some minted ETH to the `DonateETH` contract configured to transfer to `SalaryWithDAO` contract.
 
 ## Motivation
 This proposal solves two problems at once:
@@ -27,29 +27,41 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 ## Specification
 (TBD)
 
-`SalaryWithDAO` = `TBD`
+`SalaryWithDAO` = `TBD` (`address`)
 
-`DefaultDAOInterface` = `TBD`
+`DefaultDAOInterface` = `TBD` (`address`)
 
-Prior to `FORK_BLOCK_NUMBER`, [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
+`MintPerPeriod` = `TBD` (`uint256`)
 
-Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed (the exact number - TBD) fraction of the transferred/mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account). Every some time (e.g. first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
+`TransferFraction` = `TBD` (0..1)
+
+`MineFraction` = `TBD` (0..1)
+
+[The contracts source](../assets/eip-3267/contracts)
+
+Prior to `FORK_BLOCK_NUMBER`, `SalaryWithDAO` and `DefaultDAOInterface` contracts will be deployed to the network and exist at the above specified addresses.
+
+Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed fraction `TransferFraction` of the transferred ETH and `MineFraction` of the mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account).
+
+Change the Ethereum clients to mint `MintPerPeriod` ETH to the contract `DonateETH` every some time (e.g. the first transaction of the first block every UTC day - TBD how often).
+
+Change the Ethereum clients to every some time (e.g. the second transaction of the first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
 
 Because this EIP solves a similar problem, cancel any other EIPs that burn ETH (except gas fees) during transfers or mining. (TBD: We should transfer more ETH in this EIP than we burned accordingly older accepted EIPs, because this EIP has the additional advantages of: 1. funding common goods; 2. better aligning values of ETH and values of tokens).
 
 ## Rationale
 The Future Salaries is the _only_ known system of distributing significant funds to common good producers. (Quadratic funding aimed to do a similar thing, but in practice as we see on GitCoin it favors a few developers, ignores project of highly advanced scientific research that is hard to explain to an average developer, and encourages colluding, and it just highly random due to small number of donors. Also quadratic funding simply does not gather enough funds to cover common good needs). So this EIP is the only known way to recover the economy.
 
-The economical model of Future Salaries is described in [this research article preprint](https://github.com/vporton/gitcoin-web/blob/future/app/assets/docs/science-salaries.pdf).
+The economical model of Future Salaries is described in [this research article preprint](../assets/eip-3267/science-salaries.pdf).
 
-Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ZIL from the circulation forever.
+Funding multiple oracles with different finish time would alleviate the future trouble that the circulating ETH (or other tokens) supply would suddenly increase when the oracle finishes. It would effectively exclude some ETH from the circulation forever.
 
 ## Backwards Compatibility
 Because transferring to the aforementioned account is neither mining nor a transaction, we get a new kinds of ETH transfers, so there may be some (expected moderate impact) troubles with applications that have made assumptions about ETH transfers all occurring either as miner payments or transactions.
 
 ## Security Considerations
 The security considerations are:
-- The DAO that controls account restoration may switch to a non-effective or biased way of voting (for example to being controlled by one human) thus distributing funds unfairly. This problem could be solved by a future fork of Zilliqa that would "confiscate" control from the DAO.
+- The DAO that controls account restoration may switch to a non-effective or biased way of voting (for example to being controlled by one human) thus distributing funds unfairly. This problem could be solved by a future fork of Ethereum that would "confiscate" control from the DAO.
 
 See more in the discussion.
 
