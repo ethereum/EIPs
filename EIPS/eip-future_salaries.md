@@ -1,3 +1,4 @@
+
 ---
 eip: 3267
 title: Giving Ethereum fees to Future Salaries
