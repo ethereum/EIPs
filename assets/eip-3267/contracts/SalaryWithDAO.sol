@@ -41,7 +41,7 @@ contract SalaryWithDAO is BaseRestorableSalary {
         return _createOracle();
     }
 
-    /// Register a salary recepient.
+    /// Register a salary recipient.
     ///
     /// Can be called both before or after the oracle finish. However registering after the finish is useless.
     ///

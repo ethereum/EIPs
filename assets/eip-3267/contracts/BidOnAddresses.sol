@@ -17,7 +17,7 @@ import "./BaseBidOnAddresses.sol";
 ///
 /// We receive funds in ERC-1155, see also https://github.com/vporton/wrap-tokens
 contract BidOnAddresses is BaseBidOnAddresses {
-    uint constant INITIAL_CUSTOMER_BALANCE = 1000 * 10**18; // an arbitrarily choosen value
+    uint constant INITIAL_CUSTOMER_BALANCE = 1000 * 10**18; // an arbitrarily chosen value
 
     /// Customer registered.
     /// @param sender `msg.sender`.

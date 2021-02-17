@@ -216,7 +216,7 @@ abstract contract BaseLock is
 
     /// Transfer to `msg.sender` the collateral ERC-1155 token.
     ///
-    /// The amount transfered is proportional to the score of `_condition` by the oracle.
+    /// The amount transferred is proportional to the score of `_condition` by the oracle.
     /// @param _collateralContractAddress The ERC-1155 collateral token contract.
     /// @param _collateralTokenId The ERC-1155 collateral token ID.
     /// @param _oracleId From which oracle's "account" to withdraw.
@@ -329,7 +329,7 @@ abstract contract BaseLock is
         return userUsedRedeemMap[_user][_condition];
     }
 
-    /// Retrive the end of the grace period.
+    /// Retrieve the end of the grace period.
     /// @param _oracleId For which oracle.
     function gracePeriodEnd(uint64 _oracleId) public view returns (uint) {
         return gracePeriodEnds[_oracleId];
@@ -351,7 +351,7 @@ abstract contract BaseLock is
         _mint(originalToCurrentAddress(_customer), _condition, _amount, _data);
     }
 
-    /// Calculate the share of a conditon in an oracle's market.
+    /// Calculate the share of a condition in an oracle's market.
     /// @param _oracleId The oracle ID.
     /// @return Uses `ABDKMath64x64` number ID.
     function _calcRewardShare(uint64 _oracleId, uint256 _condition) internal virtual view returns (int128);
@@ -372,7 +372,7 @@ abstract contract BaseLock is
     /// @param _collateralContractAddress The ERC-1155 contract of the collateral token.
     /// @param _collateralTokenId The ERC-1155 ID of the collateral token.
     /// @param _oracleId The oracle ID.
-    /// Note: It does not conflict with other tokens kinds, becase the only other one is the uint64 conditional.
+    /// Note: It does not conflict with other tokens kinds, because the only other one is the uint64 conditional.
     function _collateralDonatedPerOracleTokenId(IERC1155 _collateralContractAddress, uint256 _collateralTokenId, uint64 _oracleId)
         internal pure returns (uint256)
     {
@@ -382,7 +382,7 @@ abstract contract BaseLock is
     /// Generate the ERC-1155 token ID that counts amount of donations for a ERC-1155 collateral token.
     /// @param _collateralContractAddress The ERC-1155 contract of the collateral token.
     /// @param _collateralTokenId The ERC-1155 ID of the collateral token.
-    /// Note: It does not conflict with other tokens kinds, becase the only other one is the uint64 conditional.
+    /// Note: It does not conflict with other tokens kinds, because the only other one is the uint64 conditional.
     function _collateralDonatedTokenId(IERC1155 _collateralContractAddress, uint256 _collateralTokenId)
         internal pure returns (uint256)
     {

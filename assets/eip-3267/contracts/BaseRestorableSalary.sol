@@ -30,7 +30,7 @@ abstract contract BaseRestorableSalary is BaseSalary {
 
     /// Give the user the "permission" to move funds from `_oldAccount` to `_newAccount`.
     ///
-    /// This function is intented to be called by an attorney or the user to move to a new account.
+    /// This function is intended to be called by an attorney or the user to move to a new account.
     /// @param _oldAccount is a current address.
     /// @param _newAccount is a new address.
     function permitRestoreAccount(address _oldAccount, address _newAccount) public {
@@ -52,7 +52,7 @@ abstract contract BaseRestorableSalary is BaseSalary {
 
     /// Retire the user's "permission" to move funds from `_oldAccount` to `_newAccount`.
     ///
-    /// This function is intented to be called by an attorney.
+    /// This function is intended to be called by an attorney.
     /// @param _oldAccount is an old current address.
     /// @param _newAccount is a new address.
     /// (In general) it isn't allowed to be called by `msg.sender == _oldAccount`,
@@ -153,7 +153,7 @@ abstract contract BaseRestorableSalary is BaseSalary {
     /// Check that `_newAccount` is the user that has the right to restore funds from `_oldAccount`.
     ///
     /// We also allow funds restoration by attorneys for convenience of users.
-    /// This is not an increased security risk, because a dishonest attorney can anyway tranfer money to himself.
+    /// This is not an increased security risk, because a dishonest attorney can anyway transfer money to himself.
     modifier checkMovedOwner(address _oldAccount, address _newAccount) virtual {
         if (_msgSender() != _newAccount) {
             checkAllowedRestoreAccount(_oldAccount, _newAccount); // only authorized "attorneys" or attorney DAOs

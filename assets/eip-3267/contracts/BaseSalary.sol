@@ -130,7 +130,7 @@ contract BaseSalary is BaseBidOnAddresses {
     /// Otherwise an investor would gain if he kills a scientist to reduce the circulating supply of his token to increase the price.
     /// Allowing old tokens to be exchangeable for new ones? (Allowing the reverse swap would create killer's gain.)
     /// Additional benefit of this solution: We can have different rewards at different stages of project,
-    /// what may be benefical for early startups funding.
+    /// what may be beneficial for early startups funding.
     ///
     /// Problem to be solved later: There should be an advice to switch to a new token at each milestone of a project?
     ///

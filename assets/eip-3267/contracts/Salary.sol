@@ -9,7 +9,7 @@ contract Salary is BaseSalary {
     /// @param _uri The ERC-1155 token URI.
     constructor(string memory _uri) BaseSalary(_uri) { }
 
-    /// Register a salary recepient.
+    /// Register a salary recipient.
     ///
     /// Can be called both before or after the oracle finish. However registering after the finish is useless.
     ///
