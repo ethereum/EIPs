@@ -1,6 +1,6 @@
 ---
 sccp: 86
-title: Increase Account Mergers Deadline 
+title: Initialize New Account Merging Window
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
 status: Proposed
