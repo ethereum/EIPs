@@ -31,7 +31,9 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 `DefaultDAOInterface` = `TBD`
 
-Prior to `FORK_BLOCK_NUMBER`, [SalaryWithDAO](https://github.com/vporton/future-contracts/blob/master/contracts/SalaryWithDAO.sol) and [DefaultDAOInterface](https://github.com/vporton/future-contracts/blob/master/contracts/DefaultDAOInterface.sol) contracts will be deployed to the network and exist at the above specified addresses.
+[The contracts source (draft).](https://github.com/ethereum/EIPs/tree/master/assets/eip-3267/contracts)
+
+Prior to `FORK_BLOCK_NUMBER`, `SalaryWithDAO` and `DefaultDAOInterface` contracts will be deployed to the network and exist at the above specified addresses.
 
 Change the Ethereum clients to transfer at every ETH transfer and every ETH mine a fixed (the exact number - TBD) fraction of the transferred/mined ETH to a fixed account (decide the account number, it can be for example `0x00000000000000000000000000000000000000001` or even `0x00000000000000000000000000000000000000000` or a random account). Every some time (e.g. first block every UTC day - TBD how often) transfer the entire ETH from this account to the contract `DonateETH`.
 
