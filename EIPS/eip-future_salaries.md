@@ -31,7 +31,7 @@ Paradoxically, it will directly benefit miners/validators, see the discussion.
 
 `DefaultDAOInterface` = `TBD`
 
-[The contracts source (draft).](https://github.com/ethereum/EIPs/tree/master/assets/eip-3267/contracts)
+[The contracts source](../assets/eip-3267/contracts)
 
 Prior to `FORK_BLOCK_NUMBER`, `SalaryWithDAO` and `DefaultDAOInterface` contracts will be deployed to the network and exist at the above specified addresses.
 
