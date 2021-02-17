@@ -13,3 +13,19 @@ Dependencies (Node.js packages):
 The contracts to be deployed are:
 - SalaryWithDAO
 - DefaultDAOInterface
+
+The sources:
+- [ERC1155/ERC1155.sol](./ERC1155/ERC1155.sol)
+- [ERC1155/ERC1155TokenReceiver.sol](./ERC1155/ERC1155TokenReceiver.sol)
+- [ERC1155/ERC1155WithTotals.sol](./ERC1155/ERC1155WithTotals.sol)
+- [ERC1155/IERC1155.sol](./ERC1155/IERC1155.sol)
+- [ERC1155/IERC1155TokenReceiver.sol](./ERC1155/IERC1155TokenReceiver.sol)
+- [BaseBidOnAddresses.sol](./BaseBidOnAddresses.sol)
+- [BaseLock.sol](./BaseLock.sol)
+- [BaseRestorableSalary.sol](./BaseRestorableSalary.sol)
+- [BaseSalary.sol](./BaseSalary.sol)
+- [BidOnAddresses.sol](./BidOnAddresses.sol)
+- [DAOInterface.sol](./DAOInterface.sol)
+- [DefaultDAOInterface.sol](./DefaultDAOInterface.sol)
+- [Salary.sol](./Salary.sol)
+- [SalaryWithDAO.sol](./SalaryWithDAO.sol)
