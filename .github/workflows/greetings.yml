@@ -9,11 +9,15 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Node
+      - name: Setup Node.js Enviornment
         uses: actions/setup-node@v2
         with:
           node-version: '15'
-      - name: Hello world action step
+          check-latest: true
+      - run: npm install
+      - run: npm test
+        
+      - name: Perform Action
         uses: ./.github/actions # Uses an action in the root directory
         id: hello
         with:
