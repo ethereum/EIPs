@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '15'
       - name: Hello world action step
         uses: ./.github/actions # Uses an action in the root directory
         id: hello
