@@ -15,7 +15,6 @@ jobs:
           node-version: '15'
           check-latest: true
       - run: npm install
-      - run: npm test
         
       - name: Perform Action
         uses: ./.github/actions # Uses an action in the root directory
