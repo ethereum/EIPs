@@ -12,6 +12,7 @@ const main = async (Github: Github) => {
 
   const payload = context.payload;
   
+  console.log(1);
   if (request.headers) {
     const event = context.eventName;
     console.log(`Got Github webhook event ${event}`);
