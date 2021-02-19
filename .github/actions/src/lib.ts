@@ -1,4 +1,4 @@
-import { File, Github, PR } from "./types";
+import { CompareCommits, File, Github, PR } from "./types";
 import frontmatter from "front-matter";
 
 const FILE_RE = new RegExp("^EIPS/eip-(d+).md$");
@@ -185,22 +185,23 @@ let users_by_email = {};
 //   })
 // }
 
-export const check_pr = (request: any, Github: Github) => async (reponame: string, prnum: number, owner: string) => {
-  console.log(`Checking PR ${prnum} on ${reponame} owner of repo is ${owner}`)
-  const repos = await Github.search.repos({q: reponame});
-  console.log(`repos found: ${repos.data.total_count}`)
-  const repo = repos.data.items.find(repo => repo.name === reponame);
-  console.log(`repo: ${JSON.stringify(repo)}`)
-  const pr = await Github.pulls.get({repo: repo.full_name, owner: repo.owner.login, pull_number: prnum})
-  console.log(`pr: ${pr}`)
+export const check_pr = (request: CompareCommits, Github: Github) => async (reponame: string, prnum: number, owner: string) => {
+  console.log(`Checking PR ${prnum} on ${reponame}`)
+  const {data: repo} = await Github.repos.get({
+    owner,
+    repo: reponame
+  })
+  console.log(`repo full name: `, repo.full_name)
+
+  const {data: pr} = await Github.pulls.get({repo: repo.name, owner: repo.owner.login, pull_number: prnum})
   let response = "";
 
-  if ( pr.data.merged ) {
+  if ( pr.merged ) {
     console.log("PR %d is already merged; quitting", prnum)
     return;
   }
-  if (pr.data.mergeable_state != 'clean') {
-    console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`)
+  if (pr.mergeable_state != 'clean') {
+    console.log(`PR ${prnum} mergeable state is ${pr.mergeable_state}; quitting`)
     return;
   }
 
@@ -209,7 +210,7 @@ export const check_pr = (request: any, Github: Github) => async (reponame: strin
   let eips = []
   let errors = []
   console.log(files || "no files")
-  // files.map(file => {
+  // files.map((file: File) => {
   //   const [eip, error] = check_file(Github)(pr, file)
   //   if (eip){
   //       eips.push(eip)
@@ -246,15 +247,15 @@ export const check_pr = (request: any, Github: Github) => async (reponame: strin
     response = `Merging PR ${prnum}!`;
 
     const eipNumbers = eips.join(', ');
-    Github.pulls.merge({
-      pull_number: pr.data.number,
-      repo: pr.data.base.repo.full_name,
-      owner: pr.data.base.repo.owner.login,
-      commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
-      commit_message: MERGE_MESSAGE,
-      merge_method: "squash",
-      sha: pr.data.head.sha
-    })
+    // Github.pulls.merge({
+    //   pull_number: pr.number,
+    //   repo: pr.base.repo.full_name,
+    //   owner: pr.base.repo.owner.login,
+    //   commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
+    //   commit_message: MERGE_MESSAGE,
+    //   merge_method: "squash",
+    //   sha: pr.head.sha
+    // })
   } else if (errors.length > 0 && eips.length > 0) {
     let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n"
     message += errors.join("\n - ");

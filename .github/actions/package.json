@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=testing jest __tests__",
-    "build": "ncc build ./src/index.ts --minify",
-    "watch": "ncc build ./src/index.ts --watch --minify"
+    "build": "ncc build ./src/index.ts",
+    "watch": "ncc build ./src/index.ts --watch",
+    "it": "node -r dotenv/config dist/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@zeit/ncc": "^0.22.3",
+    "dotenv": "^8.2.0",
     "front-matter": "^4.0.2",
     "typescript": "^4.1.5"
   }
