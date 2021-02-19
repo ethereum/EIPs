@@ -18,9 +18,9 @@ const main = async (Github: Github) => {
 
   console.log(request);
   
-  const payload = JSON.parse(request["payload"]);
   const headers = request.headers;
-  console.log(headers.type)
+  console.log(headers);
+  console.log(headers.type);
   // if (headers)) {
     
   //   const event = request.headers["X-Github-Event"];
