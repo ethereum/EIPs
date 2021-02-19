@@ -9,6 +9,10 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '15'
       - name: Hello world action step
         uses: ./.github/actions # Uses an action in the root directory
         id: hello
