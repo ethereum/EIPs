@@ -15,6 +15,8 @@ const main = async (Github: Github) => {
     owner: context.repo.owner,
     repo: context.repo.repo
   })
+
+  console.log(request);
   
   const payload = JSON.parse(request["payload"]);
   const headers = request.headers;
