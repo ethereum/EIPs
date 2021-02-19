@@ -24,7 +24,7 @@ const main = async (Github: Github) => {
     }
   } else {
     console.log(`Processing build ${payload.sender.type}...`);
-    if (!payload.pull_request.number) {
+    if (!payload.pull_request?.number) {
       console.log(
         "Build ?? is not a PR build; quitting"
       );
