@@ -5795,11 +5795,11 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 // import Github from "github-api";
-const githubToken = process.env.GITHUB_TOKEN;
-const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(githubToken);
 try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
+    const githubToken = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("token");
+    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(githubToken);
     console.log(`Hello ${nameToGreet}!`);
     const time = new Date().toTimeString();
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("time", time);
@@ -6055,9 +6055,9 @@ catch (error) {
 //       message += errors.join("\n - ");
 //       post_comment(pr, message)
 //     }
-// app = webapp2.WSGIApplication([
-//     ('/merge/', MergeHandler),
-// ], debug=True)
+// // app = webapp2.WSGIApplication([
+// //     ('/merge/', MergeHandler),
+// // ], debug=True)
 
 
 /***/ }),
