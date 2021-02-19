@@ -5794,18 +5794,20 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
 
 
+// import frontmatter from "front-matter";
 // import Github from "github-api";
+// const githubToken = process.env.GITHUB_TOKEN
+// const Github = getOctokit(githubToken);
 try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
-    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)("");
     console.log(`Hello ${nameToGreet}!`);
     const time = new Date().toTimeString();
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("time", time);
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload, undefined, 2);
     console.log(`The event payload: ${payload}`);
-    Github.log.info("testing");
+    // Github.log.info("testing");
 }
 catch (error) {
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
