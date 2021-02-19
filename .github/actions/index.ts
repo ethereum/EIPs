@@ -6,6 +6,10 @@ import {context, getOctokit } from "@actions/github";
 // const githubToken = process.env.GITHUB_TOKEN
 // const Github = getOctokit(githubToken);
 
+const test = async (github: any) => {
+  console.log(await github.users.getByUsername({username: "alita-moore"}))
+}
+
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = getInput("who-to-greet");
@@ -19,10 +23,13 @@ try {
   console.log(`The event payload: ${payload}`);
 
   Github.log.info("testing");
-  console.log(Github.users.getByUsername({username: "alita-moore"}))
+  test(Github)
+  // console.log(Github.users.getByUsername({username: "alita-moore"}))
 } catch (error) {
   setFailed(error.message);
 }
+
+
 
 // from github import Github
 

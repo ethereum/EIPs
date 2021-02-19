@@ -5792,12 +5792,24 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(530);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
 
 // import frontmatter from "front-matter";
 // import Github from "github-api";
 // const githubToken = process.env.GITHUB_TOKEN
 // const Github = getOctokit(githubToken);
+const test = (github) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(yield github.users.getByUsername({ username: "alita-moore" }));
+});
 try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
@@ -5810,7 +5822,8 @@ try {
     const payload = JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload, undefined, 2);
     console.log(`The event payload: ${payload}`);
     Github.log.info("testing");
-    console.log(Github.users.getByUsername({ username: "alita-moore" }));
+    test(Github);
+    // console.log(Github.users.getByUsername({username: "alita-moore"}))
 }
 catch (error) {
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
