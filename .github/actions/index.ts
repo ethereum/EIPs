@@ -1,14 +1,15 @@
 import { getInput, setOutput, setFailed } from "@actions/core";
-import {context, getOctokit} from "@actions/github";
+import {context, getOctokit } from "@actions/github";
 import frontmatter from "front-matter";
 // import Github from "github-api";
 
-const githubToken = process.env.GITHUB_TOKEN
-const Github = getOctokit(githubToken);
 
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = getInput("who-to-greet");
+  const githubToken = getInput("token");
+
+  const Github = getOctokit(githubToken);
   console.log(`Hello ${nameToGreet}!`);
   const time = new Date().toTimeString();
   setOutput("time", time);
@@ -310,6 +311,6 @@ try {
 
 
 
-// app = webapp2.WSGIApplication([
-//     ('/merge/', MergeHandler),
-// ], debug=True)
+// // app = webapp2.WSGIApplication([
+// //     ('/merge/', MergeHandler),
+// // ], debug=True)

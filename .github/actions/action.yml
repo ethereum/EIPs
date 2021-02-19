@@ -10,6 +10,9 @@ inputs:
   search_string:
     description: "search string"
     required: true
+  token:
+    description: "is ${{ secrets.GITHUB_TOKEN }}"
+    required: true
 outputs:
   first_match:
     description: "first regex match"
