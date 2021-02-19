@@ -3,6 +3,12 @@ import { getOctokit, context } from "@actions/github";
 import { Github } from "./types";
 
 const main = async (Github: Github) => {
+  console.log({
+    base: context.payload.pull_request?.base?.sha,
+    head: context.payload.pull_request?.head?.sha,
+    owner: context.repo.owner,
+    repo: context.repo.repo
+  })
   const request = await Github.repos.compareCommits({
     base: context.payload.pull_request?.base?.sha,
     head: context.payload.pull_request?.head?.sha,
