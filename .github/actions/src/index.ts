@@ -23,7 +23,7 @@ const main = async (Github: Github) => {
       const prnum = pr.number;
       const reponame = payload.repository.full_name;
       console.log(`Processing review on PR ${reponame}/${prnum}...`);
-      check_pr(request, Github)(context.repo.repo, prnum);
+      check_pr(request, Github)(context.repo.repo, prnum, context.repo.owner);
     }
   } else {
     console.log(`Processing build ${payload.sender.type}...`);
@@ -36,7 +36,7 @@ const main = async (Github: Github) => {
     const prnum = payload.pull_request.number;
     const repo = `${payload.repository.owner.name}/${payload.repository.name}`;
     console.log(`prnum: ${prnum}, repo: ${repo}`)
-    check_pr(request, Github)(repo, prnum);
+    check_pr(request, Github)(repo, prnum, context.repo.owner);
   }
 
   // console.log(request);
