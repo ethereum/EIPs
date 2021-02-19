@@ -19,7 +19,7 @@ const main = async (Github: Github) => {
   console.log(request);
   
   const headers = request.headers;
-  console.log(headers || "undefined");
+  console.log(Object.keys(headers));
   console.log(request["headers"] || "undefined");
   // console.log(headers.type);
   // if (headers)) {
