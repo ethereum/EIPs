@@ -5798,8 +5798,7 @@ __nccwpck_require__.r(__webpack_exports__);
 try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
-    const githubToken = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("token");
-    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(githubToken);
+    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)("");
     console.log(`Hello ${nameToGreet}!`);
     const time = new Date().toTimeString();
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("time", time);
