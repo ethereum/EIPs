@@ -8,11 +8,11 @@ const main = async (Github: Github) => {
     head: context.payload.pull_request?.head?.sha,
     owner: context.repo.owner,
     repo: context.repo.repo
-  }).catch();
+  }).catch(() => {});
   const payload = context.payload;
   
   console.log(1);
-  if (request?.headers) {
+  if (request) {
     const event = context.eventName;
     console.log(`Got Github webhook event ${event}`);
     if (event == "pull_request") {
