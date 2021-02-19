@@ -16,7 +16,7 @@ const main = async (Github: Github) => {
   if (request.headers) {
     const event = context.eventName;
     console.log(`Got Github webhook event ${event}`);
-    if (event == "pull_request_review") {
+    if (event == "pull_request") {
       const pr = payload.pull_request;
       const prnum = pr.number;
       const repo = payload.repository.full_name;
@@ -37,7 +37,7 @@ const main = async (Github: Github) => {
     // check_pr(repo, prnum);
   }
 
-  console.log(request);
+  // console.log(request);
 }
 
 try {
