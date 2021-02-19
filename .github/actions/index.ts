@@ -14,7 +14,7 @@ try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
-  const token = process.env.ACTIONS_RUNTIME_TOKEN;
+  const token = process.env.GITHUB_TOKEN;
   const Github = getOctokit(token);
   const time = new Date().toTimeString();
   setOutput("time", time);
