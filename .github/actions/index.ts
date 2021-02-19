@@ -10,7 +10,7 @@ try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
-  getOctokit(process.env.GITHUB_TOKEN)
+  const Github = getOctokit(process.env.GITHUB_TOKEN)
   console.log(`token testsetset`)
   const time = new Date().toTimeString();
   setOutput("time", time);
@@ -18,7 +18,8 @@ try {
   const payload = JSON.stringify(context.payload, undefined, 2);
   console.log(`The event payload: ${payload}`);
 
-  // Github.log.info("testing");
+  Github.log.info("testing");
+  console.log(Github.users.getByUsername({username: "alita-moore"}))
 } catch (error) {
   setFailed(error.message);
 }

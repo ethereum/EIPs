@@ -5802,14 +5802,15 @@ try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
     console.log(`Hello ${nameToGreet}!`);
-    (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(process.env.GITHUB_TOKEN);
+    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(process.env.GITHUB_TOKEN);
     console.log(`token testsetset`);
     const time = new Date().toTimeString();
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("time", time);
     // Get the JSON webhook payload for the event that triggered the workflow
     const payload = JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload, undefined, 2);
     console.log(`The event payload: ${payload}`);
-    // Github.log.info("testing");
+    Github.log.info("testing");
+    console.log(Github.users.getByUsername({ username: "alita-moore" }));
 }
 catch (error) {
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
