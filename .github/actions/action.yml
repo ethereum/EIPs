@@ -16,7 +16,7 @@ outputs:
 
 runs:
   using: "node12"
-  main: "dist/index.ts"
+  main: "dist/index.js"
 branding:
   icon: 'code'  
   color: 'blue'
