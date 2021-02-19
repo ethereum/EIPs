@@ -23,7 +23,7 @@ const main = async (Github: Github) => {
       const prnum = pr.number;
       const reponame = payload.repository.full_name;
       console.log(`Processing review on PR ${reponame}/${prnum}...`);
-      check_pr(request, Github)(reponame, prnum);
+      check_pr(request, Github)(context.repo.repo, prnum);
     }
   } else {
     console.log(`Processing build ${payload.sender.type}...`);
