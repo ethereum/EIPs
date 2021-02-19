@@ -185,11 +185,14 @@ let users_by_email = {};
 //   })
 // }
 
-export const check_pr = (request: any, Github: Github) => async (reponame, prnum) => {
+export const check_pr = (request: any, Github: Github) => async (reponame: string, prnum: number) => {
   console.log(`Checking PR ${prnum} on ${reponame}`)
-  const repos = await Github.search.repos(reponame);
+  const repos = await Github.search.repos({q: reponame});
+  console.log(`repos ${repos}`)
   const repo = repos.data.items.find(repo => repo.name === reponame);
+  console.log(`repo: ${repo}`)
   const pr = await Github.pulls.get({repo: repo.full_name, owner: repo.owner.login, pull_number: prnum})
+  console.log(`pr: ${pr}`)
   let response = "";
 
   if ( pr.data.merged ) {

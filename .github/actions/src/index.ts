@@ -21,9 +21,9 @@ const main = async (Github: Github) => {
     if (event == "pull_request") {
       const pr = payload.pull_request;
       const prnum = pr.number;
-      const repo = payload.repository.full_name;
-      console.log(`Processing review on PR ${repo}/${prnum}...`);
-      check_pr(request, Github)(repo, prnum);
+      const reponame = payload.repository.full_name;
+      console.log(`Processing review on PR ${reponame}/${prnum}...`);
+      check_pr(request, Github)(reponame, prnum);
     }
   } else {
     console.log(`Processing build ${payload.sender.type}...`);
