@@ -1,18 +1,18 @@
-// import { File, Github, PR } from "./types";
-// import frontmatter from "front-matter";
+import { File, Github, PR } from "./types";
+import frontmatter from "front-matter";
 
-// const FILE_RE = new RegExp("^EIPS/eip-(d+).md$");
-// const AUTHOR_RE = new RegExp("[(<]([^>)]+)[>)]");
-// const MERGE_MESSAGE = `
-// Hi, I'm a bot! This change was automatically merged because:
-//  - It only modifies existing Draft, Review, or Last Call EIP(s)
-//  - The PR was approved or written by at least one author of each modified EIP
-//  - The build is passing
-// `;
+const FILE_RE = new RegExp("^EIPS/eip-(d+).md$");
+const AUTHOR_RE = new RegExp("[(<]([^>)]+)[>)]");
+const MERGE_MESSAGE = `
+Hi, I'm a bot! This change was automatically merged because:
+ - It only modifies existing Draft, Review, or Last Call EIP(s)
+ - The PR was approved or written by at least one author of each modified EIP
+ - The build is passing
+`;
 
 // const EIPInfo = { EIPInfo: ["number", "authors"] };
 
-// let users_by_email = {};
+let users_by_email = {};
 
 // const find_user_by_email = (Github: Github) => (email: string) => {
 //   if (!users_by_email[email]) {
@@ -142,8 +142,8 @@
 //   return check_pr(request["repo"], JSON.parse(request["pr"]))
 // }
 
-// const get_approvals = (pr) => {
-//   let approvals = '@' + pr.user.login.toLowerCase()
+// const get_approvals = (pr: PR) => {
+//   let approvals = '@' + pr.data.user.login.toLowerCase()
 //   const reviews = pr.get_reviews()
 
 //   reviews.map(review => {
@@ -185,76 +185,78 @@
 //   })
 // }
 
-// const check_pr = (request: any, Github: Github) => async (reponame, prnum) => {
-//   console.log(`Checking PR ${prnum} on ${reponame}`)
-//   const repos = await Github.search.repos(reponame);
-//   const repo = repos.data.items.find(repo => repo.name === reponame);
-//   const pr = await Github.pulls.get({repo: repo.full_name, owner: repo.owner.login, pull_number: prnum})
-//   let response = "";
+export const check_pr = (request: any, Github: Github) => async (reponame, prnum) => {
+  console.log(`Checking PR ${prnum} on ${reponame}`)
+  const repos = await Github.search.repos(reponame);
+  const repo = repos.data.items.find(repo => repo.name === reponame);
+  const pr = await Github.pulls.get({repo: repo.full_name, owner: repo.owner.login, pull_number: prnum})
+  let response = "";
 
-//   if ( pr.data.merged ) {
-//     console.log("PR %d is already merged; quitting", prnum)
-//     return;
-//   }
-//   if (pr.data.mergeable_state != 'clean') {
-//     console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`)
-//     return;
-//   }
+  if ( pr.data.merged ) {
+    console.log("PR %d is already merged; quitting", prnum)
+    return;
+  }
+  if (pr.data.mergeable_state != 'clean') {
+    console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`)
+    return;
+  }
 
-//   const files = request.data.files;
+  const files = request.data.files;
 
-//   let eips = []
-//   let errors = []
-//   files.map(file => {
-//     const [eip, error] = check_file(Github)(pr, file)
-//     if (eip){
-//         eips.push(eip)
-//     }
-//     if (error) {
-//       console.log(error)
-//       errors.push(error)
-//     }
-//   })
+  let eips = []
+  let errors = []
+  console.log(files || "no files")
+  // files.map(file => {
+  //   const [eip, error] = check_file(Github)(pr, file)
+  //   if (eip){
+  //       eips.push(eip)
+  //   }
+  //   if (error) {
+  //     console.log(error)
+  //     errors.push(error)
+  //   }
+  // })
 
-//   let reviewers = new Set()
-//   const approvals = get_approvals(pr)
-//   console.log(`Found approvals for ${prnum}: ${approvals}`)
-//   // TODO: define eip types
-//   eips.map(eip => {
-//     const authors: Set<string> = eip.authors;
-//     const number: string = eip.number;
-//     console.log(`EIP ${number} has authors: ${authors}`);
-//     if (authors.size == 0) {
-//       errors.push(`EIP ${number} has no identifiable authors who can approve PRs`)
-//     } else if ([...approvals].find(authors.has)){
-//       errors.push(`EIP ${number} requires approval from one of (${authors})`);
-//       [...authors].map(author => {
-//         if (author.startsWith('@')) {
-//           reviewers.add(author.slice(1))
-//         }
-//       })
-//     }
-//   })
+  let reviewers = new Set()
+  // const approvals = get_approvals(pr)
+  // console.log(`Found approvals for ${prnum}: ${approvals}`)
+ 
+  eips.map(eip => {
+    const authors: Set<string> = eip.authors;
+    const number: string = eip.number;
+    console.log(`EIP ${number} has authors: ${authors}`);
+    if (authors.size == 0) {
+      errors.push(`EIP ${number} has no identifiable authors who can approve PRs`)
+    }// } else if ([...approvals].find(authors.has)){
+    //   errors.push(`EIP ${number} requires approval from one of (${authors})`);
+    //   [...authors].map(author => {
+    //     if (author.startsWith('@')) {
+    //       reviewers.add(author.slice(1))
+    //     }
+    //   })
+    // }
+  })
       
 
-//   if (errors.length === 0){
-//     console.log(`Merging PR ${prnum}!`);
-//     response = `Merging PR ${prnum}!`;
+  if (errors.length === 0){
+    console.log(`Merging PR ${prnum}!`);
+    response = `Merging PR ${prnum}!`;
 
-//     const eipNumbers = eips.join(', ');
-//     Github.pulls.merge({
-//       pull_number: pr.data.number,
-//       repo: pr.data.base.repo.full_name,
-//       owner: pr.data.base.repo.owner.login,
-//       commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
-//       commit_message: MERGE_MESSAGE,
-//       merge_method: "squash",
-//       sha: pr.data.head.sha
-//     })
-//   } else if (errors.length > 0 && eips.length > 0) {
-//     let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n"
-//     message += errors.join("\n - ");
+    const eipNumbers = eips.join(', ');
+    Github.pulls.merge({
+      pull_number: pr.data.number,
+      repo: pr.data.base.repo.full_name,
+      owner: pr.data.base.repo.owner.login,
+      commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
+      commit_message: MERGE_MESSAGE,
+      merge_method: "squash",
+      sha: pr.data.head.sha
+    })
+  } else if (errors.length > 0 && eips.length > 0) {
+    let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n"
+    message += errors.join("\n - ");
 
-//     post_comment(Github)(pr, message)
-//   }
-// }
+    console.log(`posting comment: ${message}`)
+    // post_comment(Github)(pr, message)
+  }
+}

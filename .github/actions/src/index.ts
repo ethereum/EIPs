@@ -1,6 +1,9 @@
 import { setFailed } from "@actions/core";
 import { getOctokit, context } from "@actions/github";
+import { check_pr } from "./lib";
 import { Github } from "./types";
+
+
 
 const main = async (Github: Github) => {
   const request = await Github.repos.compareCommits({
@@ -12,7 +15,7 @@ const main = async (Github: Github) => {
   const payload = context.payload;
   
   console.log(1);
-  if (request) {
+  if (request && request.headers) {
     const event = context.eventName;
     console.log(`Got Github webhook event ${event}`);
     if (event == "pull_request") {
@@ -20,7 +23,7 @@ const main = async (Github: Github) => {
       const prnum = pr.number;
       const repo = payload.repository.full_name;
       console.log(`Processing review on PR ${repo}/${prnum}...`);
-      // check_pr(repo, prnum);
+      check_pr(request, Github)(repo, prnum);
     }
   } else {
     console.log(`Processing build ${payload.sender.type}...`);
@@ -33,7 +36,7 @@ const main = async (Github: Github) => {
     const prnum = payload.pull_request.number;
     const repo = `${payload.repository.owner.name}/${payload.repository.name}`;
     console.log(`prnum: ${prnum}, repo: ${repo}`)
-    // check_pr(repo, prnum);
+    check_pr(request, Github)(repo, prnum);
   }
 
   // console.log(request);
