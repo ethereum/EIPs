@@ -1,14 +1,14 @@
 import { getInput, setOutput, setFailed } from "@actions/core";
 import {context, getOctokit } from "@actions/github";
-import frontmatter from "front-matter";
+// import frontmatter from "front-matter";
 // import Github from "github-api";
 
+const githubToken = process.env.GITHUB_TOKEN
+const Github = getOctokit(githubToken);
 
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = getInput("who-to-greet");
-
-  const Github = getOctokit("");
   console.log(`Hello ${nameToGreet}!`);
   const time = new Date().toTimeString();
   setOutput("time", time);
