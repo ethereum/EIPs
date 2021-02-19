@@ -11,7 +11,7 @@ try {
   const nameToGreet = getInput("who-to-greet");
   console.log(`Hello ${nameToGreet}!`);
   getOctokit(process.env.GITHUB_TOKEN)
-  console.log(`token ${process.env.ACTIONS_RUNTIME_TOKEN.length} | ${process.env.GITHUB_TOKEN}`)
+  console.log(`token testsetset`)
   const time = new Date().toTimeString();
   setOutput("time", time);
   // Get the JSON webhook payload for the event that triggered the workflow
