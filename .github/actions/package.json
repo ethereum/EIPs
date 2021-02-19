@@ -4,7 +4,9 @@
   "description": "auto merge eip",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=testing jest __tests__",
+    "build": "ncc build ./src/index.ts --minify",
+    "watch": "ncc build ./src/index.ts --watch --minify"
   },
   "author": "",
   "license": "ISC",
