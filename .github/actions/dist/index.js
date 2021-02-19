@@ -5807,23 +5807,23 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 // import Github from "github-api";
 // const githubToken = process.env.GITHUB_TOKEN
 // const Github = getOctokit(githubToken);
-const test = (github) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(yield github.users.getByUsername({ username: "alita-moore" }));
+const test = (Github) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(yield Github.users.getByUsername({ username: "alita-moore" }));
 });
 try {
     // `who-to-greet` input defined in action metadata file
     const nameToGreet = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)("who-to-greet");
     console.log(`Hello ${nameToGreet}!`);
-    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(process.env.GITHUB_TOKEN);
-    console.log(`token testsetset`);
+    const token = process.env.ACTIONS_RUNTIME_TOKEN;
+    const Github = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
     const time = new Date().toTimeString();
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput)("time", time);
     // Get the JSON webhook payload for the event that triggered the workflow
-    const payload = JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
-    Github.log.info("testing");
+    // const payload = JSON.stringify(context.payload, undefined, 2);
+    // console.log(`The event payload: ${payload}`);
+    Github.log.info("testing1");
+    Github.log.debug("testing2");
     test(Github);
-    // console.log(Github.users.getByUsername({username: "alita-moore"}))
 }
 catch (error) {
     (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(error.message);
