@@ -16,7 +16,6 @@ jobs:
           regex_pattern: 'JIR-[0-9]+'
           regex_flags: 'gim'
           search_string: ' My jira ticket number is JIR-12345'
-          token: ${{ secrets.GITHUB_TOKEN }}
       # Use the output from the `hello` step
       - name: Get the output time
         run: echo "My JIRA ticket number is ${{ steps.hello.outputs.first_match }}"
