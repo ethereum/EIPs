@@ -6284,7 +6284,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
             errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
         }
         else if (nonAuthors.length > 0) {
-            errors.push(`\t- EIP ${number} requires approval from one of (${authors})`);
+            errors.push(`\t- EIP ${number} requires approval from one of (${[...authors]})`);
             [...authors].map(author => {
                 if (author.startsWith('@')) {
                     reviewers.add(author.slice(1));
