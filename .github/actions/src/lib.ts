@@ -290,38 +290,6 @@ export const check_pr = (request: CompareCommits, Github: Github) => async (
   }
 };
 
-// const post = (request: any, Github: Github) => {
-//   const payload = JSON.parse(request["payload"]);
-//   if (request.headers.includes("X-Github-Event")) {
-
-//     const event = request.headers["X-Github-Event"];
-//     console.log(`Got Github webhook event ${event}`);
-//     if (event == "pull_request_review") {
-//       const pr = payload["pull_request"];
-//       const prnum = pr["number"];
-//       const repo = pr["base"]["repo"]["full_name"];
-//       console.log("Processing review on PR ${repo}/${prnum}...");
-//       check_pr(repo, prnum);
-//     }
-//   } else {
-//     console.log(`Processing build ${payload["number"]}...`);
-//     if (payload["pull_request_number"] === null) {
-//       console.log(
-//         "Build %s is not a PR build; quitting",
-//         payload["number"]
-//       );
-//       return;
-//     }
-//     const prnum = payload["pull_request_number"];
-//     const repo = `${payload["repository"]["owner_name"]}/${payload["repository"]["name"]}`;
-//     check_pr(repo, prnum);
-//   }
-// };
-
-// const get = (request: any) => {
-//   return check_pr(request["repo"], JSON.parse(request["pr"]))
-// }
-
 const post_comment = async (pr: PR, message: string) => {
   const Github = getOctokit(process.env.GITHUB_TOKEN);
   const me = pr.data.user;
@@ -358,9 +326,41 @@ const post_comment = async (pr: PR, message: string) => {
 
   // if comment does not exist, create a new one
   Github.issues.createComment({
-    owner: pr.data.base.repo.owner.login,
-    repo: pr.data.base.repo.full_name,
-    issue_number: pr.data.number,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: context.issue.number,
     body: message
   })
 }
+
+// const post = (request: any, Github: Github) => {
+//   const payload = JSON.parse(request["payload"]);
+//   if (request.headers.includes("X-Github-Event")) {
+
+//     const event = request.headers["X-Github-Event"];
+//     console.log(`Got Github webhook event ${event}`);
+//     if (event == "pull_request_review") {
+//       const pr = payload["pull_request"];
+//       const prnum = pr["number"];
+//       const repo = pr["base"]["repo"]["full_name"];
+//       console.log("Processing review on PR ${repo}/${prnum}...");
+//       check_pr(repo, prnum);
+//     }
+//   } else {
+//     console.log(`Processing build ${payload["number"]}...`);
+//     if (payload["pull_request_number"] === null) {
+//       console.log(
+//         "Build %s is not a PR build; quitting",
+//         payload["number"]
+//       );
+//       return;
+//     }
+//     const prnum = payload["pull_request_number"];
+//     const repo = `${payload["repository"]["owner_name"]}/${payload["repository"]["name"]}`;
+//     check_pr(repo, prnum);
+//   }
+// };
+
+// const get = (request: any) => {
+//   return check_pr(request["repo"], JSON.parse(request["pr"]))
+// }
