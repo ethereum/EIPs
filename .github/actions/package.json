@@ -17,6 +17,7 @@
     "@zeit/ncc": "^0.22.3",
     "dotenv": "^8.2.0",
     "front-matter": "^4.0.2",
+    "node-fetch": "^2.6.1",
     "typescript": "^4.1.5"
   }
 }
