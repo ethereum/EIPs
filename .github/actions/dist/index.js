@@ -6132,7 +6132,7 @@ const matchAll = (rawString, regex, group) => {
 const getAuthors = (rawAuthorList) => __awaiter(void 0, void 0, void 0, function* () {
     const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
     const resolved = yield Promise.all(authors.map(resolveAuthor));
-    return resolved;
+    return new Set(resolved);
 });
 const parseFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
     const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
@@ -6209,6 +6209,21 @@ const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, fun
         return [null, `Error checking file ${file.filename}`];
     }
 });
+const get_approvals = (pr) => __awaiter(void 0, void 0, void 0, function* () {
+    let approvals = new Set();
+    approvals.add('@' + pr.data.user.login.toLowerCase());
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    const { data: reviews } = yield Github.pulls.listReviews({ owner: github.context.repo.owner, repo: github.context.repo.repo, pull_number: pr.data.number });
+    console.log(`\t- ${reviews.length} reviews were found for the PR`);
+    reviews.map(review => {
+        if (review.state == "APPROVED") {
+            approvals.add('@' + review.user.login.toLowerCase());
+        }
+    });
+    const _approvals = [...approvals];
+    console.log(`\t- Found approvers for pr number ${pr.data.number}: ${_approvals.join(" & ")}`);
+    return _approvals;
+});
 const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Checking PR ${prnum} on ${reponame}`);
     const { data: repo } = yield Github.repos.get({
@@ -6238,7 +6253,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
     const contents = yield Promise.all(files.map(parseFile));
     contents.map((file) => console.log(`file name ${file.name} has length ${file.content.body.length}`));
     console.log("---------");
-    yield files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Promise.all(files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const [eip, error] = yield check_file(pr, file);
             if (eip) {
@@ -6252,24 +6267,28 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
         catch (err) {
             console.log(err);
         }
-    }));
+    })));
+    console.log(`----- Getting PR approvals`);
+    const approvals = yield get_approvals(pr);
+    console.log(`------ Reviewing authors and approvers`);
     let reviewers = new Set();
-    // const approvals = get_approvals(pr)
-    // console.log(`Found approvals for ${prnum}: ${approvals}`)
     eips.map((eip) => {
         const authors = eip.authors;
         const number = eip.number;
-        console.log(`EIP ${number} has authors: ${authors}`);
+        console.log(`\t- EIP ${number} has authors: ${[...authors]} with size ${authors.size}`);
+        const nonAuthors = approvals.filter(approver => !authors.has(approver));
+        console.log(`\t- EIP ${number} has non-author approvers: ${nonAuthors}`);
         if (authors.size == 0) {
             errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
-        } // } else if ([...approvals].find(authors.has)){
-        //   errors.push(`EIP ${number} requires approval from one of (${authors})`);
-        //   [...authors].map(author => {
-        //     if (author.startsWith('@')) {
-        //       reviewers.add(author.slice(1))
-        //     }
-        //   })
-        // }
+        }
+        else if (nonAuthors.length > 0) {
+            errors.push(`\t- EIP ${number} requires approval from one of (${authors})`);
+            [...authors].map(author => {
+                if (author.startsWith('@')) {
+                    reviewers.add(author.slice(1));
+                }
+            });
+        }
     });
     if (errors.length === 0) {
         console.log(`Merging PR ${prnum}!`);
@@ -6287,9 +6306,10 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
     }
     else if (errors.length > 0 && eips.length > 0) {
         let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
-        message += errors.join("\n - ");
-        console.log(`posting comment: ${message}`);
-        // post_comment(Github)(pr, message)
+        message += errors.join("\n\t\t - ");
+        console.log(`------- Posting Comment`);
+        console.log(`\t- comment body:\n\t\t"""\n\t\t${message}\n\t\t"""`);
+        post_comment(pr, message);
     }
 });
 // const post = (request: any, Github: Github) => {
@@ -6321,42 +6341,45 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
 // const get = (request: any) => {
 //   return check_pr(request["repo"], JSON.parse(request["pr"]))
 // }
-// const get_approvals = (pr: PR) => {
-//   let approvals = '@' + pr.data.user.login.toLowerCase()
-//   const reviews = pr.get_reviews()
-//   reviews.map(review => {
-//     if (review.state == "APPROVED") {
-//       approvals += '@' + review.user.login.toLowerCase()
-//     }
-//   })
-//   return approvals
-// }
-// const post_comment = (Github: Github) => async (pr: PR, message: string) => {
-//   const me = Github.get_user()
-//   const {data: comments} = await Github.issues.listComments();
-//   // If comment already exists, edit that
-//   for (const comment of comments) {
-//     if (comment.user.login == me.login) {
-//       console.log("Found comment by self");
-//     }
-//     if (comment.body != message) {
-//       Github.issues.updateComment({
-//         owner: comment.user.login,
-//         repo: pr.data.base.repo.full_name,
-//         comment_id: comment.id,
-//         body: message
-//       })
-//       return;
-//     }
-//   }
-//   // if comment does not exist, create a new one
-//   Github.issues.createComment({
-//     owner: pr.data.base.repo.owner.login,
-//     repo: pr.data.base.repo.full_name,
-//     issue_number: pr.data.number,
-//     body: message
-//   })
-// }
+const post_comment = (pr, message) => __awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    const me = pr.data.user;
+    console.log(`\t- Got user ${me.login}`);
+    const { data: comments } = yield Github.issues.listComments({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: github.context.issue.number
+    });
+    console.log(`\t- Found issue number ${github.context.issue.number} with ${comments.length} comments associated with it`);
+    // If comment already exists, edit that
+    for (const comment of comments) {
+        if (comment.user.login == me.login) {
+            console.log("\t- Found comment by self (github bot)");
+            console.log(`\t- Current comment body:\n\t\t"""\n\t\t${comment.body}\n\t\t"""`);
+            if (comment.body != message) {
+                console.log(`\t- Comment differs from current errors, so updating...`);
+                Github.issues.updateComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    comment_id: comment.id,
+                    body: message
+                }).catch(err => {
+                    console.log(err);
+                });
+                return;
+            }
+            console.log(`\t- No change in error comment; quiting...`);
+            return;
+        }
+    }
+    // if comment does not exist, create a new one
+    Github.issues.createComment({
+        owner: pr.data.base.repo.owner.login,
+        repo: pr.data.base.repo.full_name,
+        issue_number: pr.data.number,
+        body: message
+    });
+});
 
 // CONCATENATED MODULE: ./src/index.ts
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
