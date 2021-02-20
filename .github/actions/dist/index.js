@@ -6072,50 +6072,226 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
+
+
 const FILE_RE = /^EIPS\/eip-(\d+)\.md$/mg;
-const AUTHOR_RE = new RegExp("[(<]([^>)]+)[>)]");
+const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
 const MERGE_MESSAGE = `
 Hi, I'm a bot! This change was automatically merged because:
  - It only modifies existing Draft, Review, or Last Call EIP(s)
  - The PR was approved or written by at least one author of each modified EIP
  - The build is passing
 `;
+const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
 let _EIPInfo = [];
 const EIPInfo = (number, authors) => {
     _EIPInfo.push({ number, authors });
     return { number, authors };
 };
 let users_by_email = {};
-const find_user_by_email = (Github) => (email) => {
+const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
     if (!users_by_email[email]) {
-        const results = Github.search_users(email);
-        if (results.length > 0) {
-            console.log("Recording mapping from %s to %s", email, results[0].login);
-            users_by_email[email] = "@" + results[0].login;
+        console.log(`Searching for user by email: ${email}`);
+        const { data: results } = yield Github.search.users({ q: email });
+        console.log(`\t found ${results.total_count} results`);
+        if (results.total_count > 0) {
+            console.log(`\t Recording mapping from ${email} to ${results.items[0].login}`);
+            users_by_email[email] = "@" + results.items[0].login;
+            return "@" + results.items[0].login;
         }
         else {
-            console.log("No github user found for %s", email);
+            console.log("No github user found, using email instead");
         }
     }
     else
         return users_by_email[email];
+});
+const resolveAuthor = (author) => __awaiter(void 0, void 0, void 0, function* () {
+    if (author[0] === "@") {
+        return author.toLowerCase();
+    }
+    else {
+        // Email address
+        const queriedUser = yield findUserByEmail(author);
+        return (queriedUser || author).toLowerCase();
+    }
+});
+/** This functionality is supported in es2020, but for the purposes
+ * of compatibility (and because it's quite simple) it's built explicitly
+ */
+const matchAll = (rawString, regex, group) => {
+    let match = regex.exec(rawString);
+    let matches = [];
+    while (match != null) {
+        matches.push(match[group]);
+        match = regex.exec(rawString);
+    }
+    return matches;
 };
-const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
-// // class MergeHandler(webapp2.RequestHandler):
-// const resolve_author = (author: string) => {
-//   if (author[0] === "@") {
-//     return author.toLowerCase();
-//   } else {
-//     // Email address
-//     return (find_user_by_email(author) || author).toLowerCase();
-//   }
-// };
-const get_authors = (authorlist) => {
-    const authors = authorlist.map((author) => author.match(AUTHOR_RE));
-    console.log(authors);
-    return new Set(authors);
-    // return new Set(authors.map(resolve_author);
-};
+const getAuthors = (rawAuthorList) => __awaiter(void 0, void 0, void 0, function* () {
+    const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
+    const resolved = yield Promise.all(authors.map(resolveAuthor));
+    return resolved;
+});
+const parseFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
+    const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
+    const decodeContent = (rawFile) => Buffer.from(rawFile.content, "base64").toString();
+    const rawFile = yield fetchRawFile(file);
+    return { path: rawFile.path, name: rawFile.name, content: front_matter_default()(decodeContent(rawFile)) };
+});
+const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    const parsedFile = yield parseFile(file);
+    const fileName = parsedFile.path;
+    console.log(`---- check_file: ${fileName}`);
+    try {
+        const match = fileName.search(FILE_RE);
+        if (match === -1) {
+            return [null, `File ${fileName} is not an EIP`];
+        }
+        const eipnum = fileName.match(/(\d+)/)[0];
+        console.log(`Found EIP number as ${eipnum} for file name ${fileName}`);
+        if (file.status == "added") {
+            return [null, `Contains new file ${fileName}`];
+        }
+        console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
+        const basedata = parsedFile.content;
+        console.log("got attributes...");
+        console.log(basedata.attributes);
+        const status = basedata.attributes["status"];
+        console.log("----- Retrieving authors from EIP raw authors list");
+        const authors = yield getAuthors(basedata.attributes["author"]);
+        console.log(`authors: ${authors}`);
+        if (!ALLOWED_STATUSES.has(status.toLowerCase())) {
+            return [
+                null,
+                `EIP ${eipnum} is in state ${status}, not Draft or Last Call`,
+            ];
+        }
+        const eip = EIPInfo(eipnum, authors);
+        console.log(`--------`);
+        console.log(`eip attribute: ${basedata.attributes["eip"]}\textracted num: ${eipnum}`);
+        if (basedata.attributes["eip"] !== parseInt(eipnum)) {
+            return [
+                eip,
+                `EIP header in ${fileName} does not match: ${basedata.attributes["eip"]}`,
+            ];
+        }
+        console.log(`eips in header + file name matched!`);
+        // checking head <---> base
+        console.log("------ Checking Head <--> Base commit consistency...");
+        console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
+        const head = yield Github.repos.getCommit({ owner: github.context.repo.owner, repo: github.context.repo.repo, ref: pr.head.sha }); // ref=pr.head.sha
+        const headdata = yield parseFile(head.data.files[0]).then(res => res.content);
+        console.log("head commit attributes...");
+        console.log(headdata.attributes);
+        if (headdata.attributes["eip"] != parseInt(eipnum)) {
+            console.log(`head and base commits had non-matching eip numbers; head: ${headdata.attributes["eip"]} -- base: ${eipnum}`);
+            return [
+                eip,
+                `EIP header in modified file ${fileName} does not match: ${headdata.attributes["eip"]}`,
+            ];
+        }
+        else if (headdata.attributes["status"].toLowerCase() !=
+            basedata.attributes["status"].toLowerCase()) {
+            console.log(`A status change was detected; head: ${headdata.attributes["status"].toLowerCase()} -- base: ${basedata.attributes["status"].toLowerCase()}`);
+            return [
+                eip,
+                `Trying to change EIP ${eipnum} state from ${basedata.attributes["status"]} to ${headdata.attributes["status"]}`,
+            ];
+        }
+        console.log("No errors with the file were detected!");
+        return [eip, null];
+    }
+    catch (e) {
+        console.warn("Exception checking file %s", file.filename);
+        return [null, `Error checking file ${file.filename}`];
+    }
+});
+const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`Checking PR ${prnum} on ${reponame}`);
+    const { data: repo } = yield Github.repos.get({
+        owner,
+        repo: reponame,
+    });
+    console.log(`repo full name: `, repo.full_name);
+    const pr = yield Github.pulls.get({
+        repo: repo.name,
+        owner: repo.owner.login,
+        pull_number: prnum,
+    });
+    let response = "";
+    if (pr.data.merged) {
+        console.log("PR %d is already merged; quitting", prnum);
+        return;
+    }
+    if (pr.data.mergeable_state != "clean") {
+        console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`);
+        return;
+    }
+    const files = request.data.files;
+    let eips = [];
+    let errors = [];
+    console.log("---------");
+    console.log(`${files.length} file found!` || "no files");
+    const contents = yield Promise.all(files.map(parseFile));
+    contents.map((file) => console.log(`file name ${file.name} has length ${file.content.body.length}`));
+    console.log("---------");
+    yield files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const [eip, error] = yield check_file(pr, file);
+            if (eip) {
+                eips.push(eip);
+            }
+            if (error) {
+                console.log(error);
+                errors.push(error);
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }));
+    let reviewers = new Set();
+    // const approvals = get_approvals(pr)
+    // console.log(`Found approvals for ${prnum}: ${approvals}`)
+    eips.map((eip) => {
+        const authors = eip.authors;
+        const number = eip.number;
+        console.log(`EIP ${number} has authors: ${authors}`);
+        if (authors.size == 0) {
+            errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
+        } // } else if ([...approvals].find(authors.has)){
+        //   errors.push(`EIP ${number} requires approval from one of (${authors})`);
+        //   [...authors].map(author => {
+        //     if (author.startsWith('@')) {
+        //       reviewers.add(author.slice(1))
+        //     }
+        //   })
+        // }
+    });
+    if (errors.length === 0) {
+        console.log(`Merging PR ${prnum}!`);
+        response = `Merging PR ${prnum}!`;
+        const eipNumbers = eips.join(", ");
+        // Github.pulls.merge({
+        //   pull_number: pr.number,
+        //   repo: pr.base.repo.full_name,
+        //   owner: pr.base.repo.owner.login,
+        //   commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
+        //   commit_message: MERGE_MESSAGE,
+        //   merge_method: "squash",
+        //   sha: pr.head.sha
+        // })
+    }
+    else if (errors.length > 0 && eips.length > 0) {
+        let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
+        message += errors.join("\n - ");
+        console.log(`posting comment: ${message}`);
+        // post_comment(Github)(pr, message)
+    }
+});
 // const post = (request: any, Github: Github) => {
 //   const payload = JSON.parse(request["payload"]);
 //   if (request.headers.includes("X-Github-Event")) {
@@ -6181,154 +6357,6 @@ const get_authors = (authorlist) => {
 //     body: message
 //   })
 // }
-const parseFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
-    const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
-    const decodeContent = (rawFile) => Buffer.from(rawFile.content, "base64").toString();
-    const rawFile = yield fetchRawFile(file);
-    return { path: rawFile.path, name: rawFile.name, content: front_matter_default()(decodeContent(rawFile)) };
-});
-const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, function* () {
-    const parsedFile = yield parseFile(file);
-    const fileName = parsedFile.path;
-    console.log(`---- check_file: ${fileName}`);
-    try {
-        const match = fileName.search(FILE_RE);
-        if (match === -1) {
-            return [null, `File ${fileName} is not an EIP`];
-        }
-        console.log(`eipnum search matches: ${match} trying to match the filename: ${fileName}`);
-        const eipnum = match[0];
-        if (file.status == "added") {
-            return [null, `Contains new file ${fileName}`];
-        }
-        console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
-        const basedata = parsedFile.content;
-        console.log(basedata.attributes);
-        const status = basedata.attributes["status"];
-        const author = basedata.attributes["author"];
-        if (ALLOWED_STATUSES.has(status.toLowerCase())) {
-            return [
-                null,
-                `EIP ${eipnum} is in state ${status}, not Draft or Last Call`,
-            ];
-        }
-        const eip = EIPInfo(eipnum, get_authors(author));
-        console.log(_EIPInfo, eip);
-        // if (basedata.attributes["eip"] !== eipnum) {
-        //   return [
-        //     eip,
-        //     `EIP header in ${fileName} does not match: ${basedata.attributes["eip"]}`,
-        //   ];
-        // }
-        // console.log(
-        //   `Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`
-        // );
-        // const head = pr.head.repo.get_contents(file.filename, pr.head.sha); // ref=pr.head.sha
-        // const headdata = frontmatter(btoa(head.content));
-        // if (headdata.attributes["eip"] != eipnum) {
-        //   return [
-        //     eip,
-        //     `EIP header in modified file ${fileName} does not match: ${headdata.attributes["eip"]}`,
-        //   ];
-        // } else if (
-        //   headdata.attributes["status"].toLowerCase() !=
-        //   basedata.attributes["status"].toLowerCase()
-        // ) {
-        //   return [
-        //     eip,
-        //     `Trying to change EIP ${eipnum} state from ${basedata.attributes["status"]} to ${headdata.attributes["status"]}`,
-        //   ];
-        // }
-        return [eip, null];
-    }
-    catch (e) {
-        console.warn("Exception checking file %s", file.filename);
-        return [null, `Error checking file ${file.filename}`];
-    }
-});
-const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Checking PR ${prnum} on ${reponame}`);
-    const { data: repo } = yield Github.repos.get({
-        owner,
-        repo: reponame,
-    });
-    console.log(`repo full name: `, repo.full_name);
-    const pr = yield Github.pulls.get({
-        repo: repo.name,
-        owner: repo.owner.login,
-        pull_number: prnum,
-    });
-    let response = "";
-    if (pr.data.merged) {
-        console.log("PR %d is already merged; quitting", prnum);
-        return;
-    }
-    if (pr.data.mergeable_state != "clean") {
-        console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`);
-        return;
-    }
-    const files = request.data.files;
-    let eips = [];
-    let errors = [];
-    console.log("---------");
-    console.log(`${files.length} file found!` || "no files");
-    const contents = yield Promise.all(files.map(parseFile));
-    contents.map((file) => console.log(`file name ${file.name} has length ${file.content.body.length}`));
-    console.log("---------");
-    files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const [eip, error] = yield check_file(pr, file);
-            if (eip) {
-                eips.push(eip);
-            }
-            if (error) {
-                console.log(error);
-                errors.push(error);
-            }
-        }
-        catch (err) {
-            console.log(err);
-        }
-    }));
-    let reviewers = new Set();
-    // const approvals = get_approvals(pr)
-    // console.log(`Found approvals for ${prnum}: ${approvals}`)
-    eips.map((eip) => {
-        const authors = eip.authors;
-        const number = eip.number;
-        console.log(`EIP ${number} has authors: ${authors}`);
-        if (authors.size == 0) {
-            errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
-        } // } else if ([...approvals].find(authors.has)){
-        //   errors.push(`EIP ${number} requires approval from one of (${authors})`);
-        //   [...authors].map(author => {
-        //     if (author.startsWith('@')) {
-        //       reviewers.add(author.slice(1))
-        //     }
-        //   })
-        // }
-    });
-    if (errors.length === 0) {
-        console.log(`Merging PR ${prnum}!`);
-        response = `Merging PR ${prnum}!`;
-        const eipNumbers = eips.join(", ");
-        // Github.pulls.merge({
-        //   pull_number: pr.number,
-        //   repo: pr.base.repo.full_name,
-        //   owner: pr.base.repo.owner.login,
-        //   commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
-        //   commit_message: MERGE_MESSAGE,
-        //   merge_method: "squash",
-        //   sha: pr.head.sha
-        // })
-    }
-    else if (errors.length > 0 && eips.length > 0) {
-        let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
-        message += errors.join("\n - ");
-        console.log(`posting comment: ${message}`);
-        // post_comment(Github)(pr, message)
-    }
-});
 
 // CONCATENATED MODULE: ./src/index.ts
 var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -6407,6 +6435,7 @@ try {
 }
 catch (error) {
     Object(core.setFailed)(error.message);
+    console.log(error);
 }
 
 

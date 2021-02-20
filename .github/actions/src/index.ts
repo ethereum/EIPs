@@ -69,4 +69,5 @@ try {
   main(Github)
 } catch (error) {
   setFailed(error.message);
+  console.log(error);
 }
