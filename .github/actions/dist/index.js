@@ -6241,10 +6241,12 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
         console.log("PR %d is already merged; quitting", prnum);
         return;
     }
-    if (pr.data.mergeable_state != "clean") {
-        console.log(`PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`);
-        return;
-    }
+    // if (pr.data.mergeable_state != "clean") {
+    //   console.log(
+    //     `PR ${prnum} mergeable state is ${pr.data.mergeable_state}; quitting`
+    //   );
+    //   return;
+    // }
     const files = request.data.files;
     let eips = [];
     let errors = [];
