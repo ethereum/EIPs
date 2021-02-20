@@ -26,7 +26,7 @@ This SCCP provides for adding to sDEFI:
 - 1inch.exchange's 1INCH
 - Bancor's BNT
 
-This SCCP furher provides for removing from sDEFI:
+This SCCP further provides for removing from sDEFI:
 
 - Wrapped version of Nexus Mutual, wNXM
 
