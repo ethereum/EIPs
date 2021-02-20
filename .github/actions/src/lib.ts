@@ -292,7 +292,7 @@ export const check_pr = (request: CompareCommits, Github: Github) => async (
 
 const post_comment = async (pr: PR, message: string) => {
   const Github = getOctokit(process.env.GITHUB_TOKEN);
-  const me = pr.data.user;
+  const {data: me} = await Github.users.getAuthenticated()
   console.log(`\t- Got user ${me.login}`)
   const {data: comments} = await Github.issues.listComments({
     owner: context.repo.owner,

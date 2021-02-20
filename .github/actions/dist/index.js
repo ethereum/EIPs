@@ -6316,7 +6316,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
 });
 const post_comment = (pr, message) => __awaiter(void 0, void 0, void 0, function* () {
     const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
-    const me = pr.data.user;
+    const { data: me } = yield Github.users.getAuthenticated();
     console.log(`\t- Got user ${me.login}`);
     const { data: comments } = yield Github.issues.listComments({
         owner: github.context.repo.owner,
