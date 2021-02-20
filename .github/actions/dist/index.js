@@ -6346,6 +6346,7 @@ const post_comment = (pr, message) => __awaiter(void 0, void 0, void 0, function
         }
     }
     // if comment does not exist, create a new one
+    console.log(`\t- Posting a new comment`);
     Github.issues.createComment({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,

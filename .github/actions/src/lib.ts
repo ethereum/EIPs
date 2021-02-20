@@ -325,6 +325,7 @@ const post_comment = async (pr: PR, message: string) => {
   }
 
   // if comment does not exist, create a new one
+  console.log(`\t- Posting a new comment`)
   Github.issues.createComment({
     owner: context.repo.owner,
     repo: context.repo.repo,
