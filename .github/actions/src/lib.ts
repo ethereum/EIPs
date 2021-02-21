@@ -1,81 +1,9 @@
 import { CompareCommits, File, Files, Github, ParsedFile, PR } from "./types";
-import fetch from "node-fetch";
 import { context } from "@actions/github";
-import frontmatter from "front-matter";
+import { getAuthors, parseFile, getApprovals } from "./utils";
 import { getOctokit } from "@actions/github";
-
-const FILE_RE = /^EIPS\/eip-(\d+)\.md$/mg;
-const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
-const MERGE_MESSAGE = `
-Hi, I'm a bot! This change was automatically merged because:
- - It only modifies existing Draft, Review, or Last Call EIP(s)
- - The PR was approved or written by at least one author of each modified EIP
- - The build is passing
-`;
-const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
-
-let _EIPInfo: { number: string; authors: any }[] = [];
-const EIPInfo = (number: string, authors: any) => {
-  _EIPInfo.push({ number, authors });
-  return { number, authors };
-};
-
-let users_by_email = {};
-
-const findUserByEmail = async (email: string): Promise<string | undefined> => {
-  const Github = getOctokit(process.env.GITHUB_TOKEN);
-  if (!users_by_email[email]) {
-    console.log(`Searching for user by email: ${email}`)
-    const { data: results } = await Github.search.users({ q: email })
-    console.log(`\t found ${results.total_count} results`)
-    if (results.total_count > 0) {
-      console.log(`\t Recording mapping from ${email} to ${results.items[0].login}`);
-      users_by_email[email] = "@" + results.items[0].login;
-      return "@" + results.items[0].login;
-    } else {
-      console.log("No github user found, using email instead");
-    }
-  } else return users_by_email[email];
-};
-
-const resolveAuthor = async (author: string) => {
-  if (author[0] === "@") {
-    return author.toLowerCase();
-  } else {
-    // Email address
-    const queriedUser = await findUserByEmail(author);
-    return (queriedUser || author).toLowerCase();
-  }
-};
-
-/** This functionality is supported in es2020, but for the purposes
- * of compatibility (and because it's quite simple) it's built explicitly
- */
-const matchAll = (rawString: string, regex: RegExp, group: number): string[] => {
-  let match = regex.exec(rawString);
-  let matches = [];
-  while (match != null) {
-    matches.push(match[group]);
-    match = regex.exec(rawString);
-  }
-  return matches;
-}
-
-const getAuthors = async (rawAuthorList: string) => {
-  const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
-  const resolved = await Promise.all(authors.map(resolveAuthor));
-  return new Set(resolved)
-};
-
-const parseFile = async (file: File): Promise<ParsedFile> => {
-  const fetchRawFile = (file: File): Promise<any> =>
-    fetch(file.contents_url, { method: "get" }).then((res) => res.json());
-  const decodeContent = (rawFile: any) =>
-    Buffer.from(rawFile.content, "base64").toString();
-  const rawFile = await fetchRawFile(file);
-
-  return { path: rawFile.path, name: rawFile.name, content: frontmatter(decodeContent(rawFile)) };
-};
+import { FILE_RE } from "./regex";
+import { ALLOWED_STATUSES } from "./constants";
 
 const check_file = async ({ data: pr }: PR, file: File): Promise<[{number: string, authors: Set<string>}, string]> => {
   const Github = getOctokit(process.env.GITHUB_TOKEN);
@@ -115,7 +43,7 @@ const check_file = async ({ data: pr }: PR, file: File): Promise<[{number: strin
         `EIP ${eipnum} is in state ${status}, not Draft or Last Call`,
       ];
     }
-    const eip = EIPInfo(eipnum, authors);
+    const eip = { number: eipnum, authors }
     
     console.log(`--------`)
     console.log(`eip attribute: ${basedata.attributes["eip"]}\textracted num: ${eipnum}`)
@@ -159,24 +87,6 @@ const check_file = async ({ data: pr }: PR, file: File): Promise<[{number: strin
     return [null, `Error checking file ${file.filename}`];
   }
 };
-
-const get_approvals = async (pr: PR) => {
-  let approvals: Set<string> = new Set();
-  approvals.add('@' + pr.data.user.login.toLowerCase())
-  const Github = getOctokit(process.env.GITHUB_TOKEN);
-  const {data: reviews} = await Github.pulls.listReviews({ owner: context.repo.owner, repo: context.repo.repo, pull_number: pr.data.number })
-  console.log(`\t- ${reviews.length} reviews were found for the PR`)
-
-  reviews.map(review => {
-    if (review.state == "APPROVED") {
-      approvals.add('@' + review.user.login.toLowerCase())
-    }
-  })
-
-  const _approvals = [...approvals]
-  console.log(`\t- Found approvers for pr number ${pr.data.number}: ${_approvals.join(" & ")}`)
-  return _approvals
-}
 
 export const check_pr = (request: CompareCommits, Github: Github) => async (
   reponame: string,
@@ -240,7 +150,7 @@ export const check_pr = (request: CompareCommits, Github: Github) => async (
   }));
 
   console.log(`----- Getting PR approvals`)
-  const approvals = await get_approvals(pr);
+  const approvals = await getApprovals(pr);
   
   console.log(`------ Reviewing authors and approvers`)
   let reviewers: Set<string> = new Set();

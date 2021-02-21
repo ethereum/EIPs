@@ -40,7 +40,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(486);
+/******/ 		return __webpack_require__(521);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -5779,7 +5779,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOctokit = exports.context = void 0;
 const Context = __importStar(__webpack_require__(262));
-const utils_1 = __webpack_require__(521);
+const utils_1 = __webpack_require__(902);
 exports.context = new Context.Context();
 /**
  * Returns a hydrated octokit ready to use for GitHub Actions
@@ -6040,7 +6040,60 @@ exports.getState = getState;
 
 /***/ }),
 
-/***/ 486:
+/***/ 510:
+/***/ (function(module) {
+
+module.exports = addHook;
+
+function addHook(state, kind, name, hook) {
+  var orig = hook;
+  if (!state.registry[name]) {
+    state.registry[name] = [];
+  }
+
+  if (kind === "before") {
+    hook = function (method, options) {
+      return Promise.resolve()
+        .then(orig.bind(null, options))
+        .then(method.bind(null, options));
+    };
+  }
+
+  if (kind === "after") {
+    hook = function (method, options) {
+      var result;
+      return Promise.resolve()
+        .then(method.bind(null, options))
+        .then(function (result_) {
+          result = result_;
+          return orig(result, options);
+        })
+        .then(function () {
+          return result;
+        });
+    };
+  }
+
+  if (kind === "error") {
+    hook = function (method, options) {
+      return Promise.resolve()
+        .then(method.bind(null, options))
+        .catch(function (error) {
+          return orig(error, options);
+        });
+    };
+  }
+
+  state.registry[name].push({
+    hook: hook,
+    orig: orig,
+  });
+}
+
+
+/***/ }),
+
+/***/ 521:
 /***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6052,15 +6105,32 @@ var core = __webpack_require__(470);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __webpack_require__(469);
 
-// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
-var lib = __webpack_require__(454);
-var lib_default = /*#__PURE__*/__webpack_require__.n(lib);
-
 // EXTERNAL MODULE: ./node_modules/front-matter/index.js
 var front_matter = __webpack_require__(662);
 var front_matter_default = /*#__PURE__*/__webpack_require__.n(front_matter);
 
-// CONCATENATED MODULE: ./src/lib.ts
+// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
+var lib = __webpack_require__(454);
+var lib_default = /*#__PURE__*/__webpack_require__.n(lib);
+
+// CONCATENATED MODULE: ./src/regex.ts
+const FILE_RE = /^EIPS\/eip-(\d+)\.md$/mg;
+const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
+/**
+ * This functionality is supported in es2020, but for the purposes
+ * of compatibility (and because it's quite simple) it's built explicitly
+ */
+const matchAll = (rawString, regex, group) => {
+    let match = regex.exec(rawString);
+    let matches = [];
+    while (match != null) {
+        matches.push(match[group]);
+        match = regex.exec(rawString);
+    }
+    return matches;
+};
+
+// CONCATENATED MODULE: ./src/utils.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -6074,73 +6144,79 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const FILE_RE = /^EIPS\/eip-(\d+)\.md$/mg;
-const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
-const MERGE_MESSAGE = `
-Hi, I'm a bot! This change was automatically merged because:
- - It only modifies existing Draft, Review, or Last Call EIP(s)
- - The PR was approved or written by at least one author of each modified EIP
- - The build is passing
-`;
-const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
-let _EIPInfo = [];
-const EIPInfo = (number, authors) => {
-    _EIPInfo.push({ number, authors });
-    return { number, authors };
-};
-let users_by_email = {};
-const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
-    if (!users_by_email[email]) {
-        console.log(`Searching for user by email: ${email}`);
-        const { data: results } = yield Github.search.users({ q: email });
-        console.log(`\t found ${results.total_count} results`);
-        if (results.total_count > 0) {
-            console.log(`\t Recording mapping from ${email} to ${results.items[0].login}`);
-            users_by_email[email] = "@" + results.items[0].login;
-            return "@" + results.items[0].login;
-        }
-        else {
-            console.log("No github user found, using email instead");
-        }
-    }
-    else
-        return users_by_email[email];
-});
-const resolveAuthor = (author) => __awaiter(void 0, void 0, void 0, function* () {
-    if (author[0] === "@") {
-        return author.toLowerCase();
-    }
-    else {
-        // Email address
-        const queriedUser = yield findUserByEmail(author);
-        return (queriedUser || author).toLowerCase();
-    }
-});
-/** This functionality is supported in es2020, but for the purposes
- * of compatibility (and because it's quite simple) it's built explicitly
- */
-const matchAll = (rawString, regex, group) => {
-    let match = regex.exec(rawString);
-    let matches = [];
-    while (match != null) {
-        matches.push(match[group]);
-        match = regex.exec(rawString);
-    }
-    return matches;
-};
-const getAuthors = (rawAuthorList) => __awaiter(void 0, void 0, void 0, function* () {
-    const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
-    const resolved = yield Promise.all(authors.map(resolveAuthor));
-    return new Set(resolved);
-});
 const parseFile = (file) => __awaiter(void 0, void 0, void 0, function* () {
     const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
     const decodeContent = (rawFile) => Buffer.from(rawFile.content, "base64").toString();
     const rawFile = yield fetchRawFile(file);
     return { path: rawFile.path, name: rawFile.name, content: front_matter_default()(decodeContent(rawFile)) };
 });
-const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, function* () {
+const getAuthors = (rawAuthorList) => __awaiter(void 0, void 0, void 0, function* () {
+    const resolveAuthor = (author) => __awaiter(void 0, void 0, void 0, function* () {
+        if (author[0] === "@") {
+            return author.toLowerCase();
+        }
+        else {
+            // Email address
+            const queriedUser = yield findUserByEmail(author);
+            return (queriedUser || author).toLowerCase();
+        }
+    });
+    const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+        const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+        console.log(`Searching for user by email: ${email}`);
+        const { data: results } = yield Github.search.users({ q: email });
+        console.log(`\t found ${results.total_count} results`);
+        if (results.total_count > 0) {
+            console.log(`\t Recording mapping from ${email} to ${results.items[0].login}`);
+            return "@" + results.items[0].login;
+        }
+        console.log("No github user found, using email instead");
+    });
+    const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
+    const resolved = yield Promise.all(authors.map(resolveAuthor));
+    return new Set(resolved);
+});
+const getApprovals = (pr) => __awaiter(void 0, void 0, void 0, function* () {
+    let approvals = new Set();
+    approvals.add('@' + pr.data.user.login.toLowerCase());
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    const { data: reviews } = yield Github.pulls.listReviews({ owner: github.context.repo.owner, repo: github.context.repo.repo, pull_number: pr.data.number });
+    console.log(`\t- ${reviews.length} reviews were found for the PR`);
+    reviews.map(review => {
+        if (review.state == "APPROVED") {
+            approvals.add('@' + review.user.login.toLowerCase());
+        }
+    });
+    const _approvals = [...approvals];
+    console.log(`\t- Found approvers for pr number ${pr.data.number}: ${_approvals.join(" & ")}`);
+    return _approvals;
+});
+
+// CONCATENATED MODULE: ./src/constants.ts
+const MERGE_MESSAGE = `
+    Hi, I'm a bot! This change was automatically merged because:
+    - It only modifies existing Draft, Review, or Last Call EIP(s)
+    - The PR was approved or written by at least one author of each modified EIP
+    - The build is passing
+    `;
+const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
+
+// CONCATENATED MODULE: ./src/lib.ts
+var lib_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
+
+const check_file = ({ data: pr }, file) => lib_awaiter(void 0, void 0, void 0, function* () {
     const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
     const parsedFile = yield parseFile(file);
     const fileName = parsedFile.path;
@@ -6169,7 +6245,7 @@ const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, fun
                 `EIP ${eipnum} is in state ${status}, not Draft or Last Call`,
             ];
         }
-        const eip = EIPInfo(eipnum, authors);
+        const eip = { number: eipnum, authors };
         console.log(`--------`);
         console.log(`eip attribute: ${basedata.attributes["eip"]}\textracted num: ${eipnum}`);
         if (basedata.attributes["eip"] !== parseInt(eipnum)) {
@@ -6209,22 +6285,7 @@ const check_file = ({ data: pr }, file) => __awaiter(void 0, void 0, void 0, fun
         return [null, `Error checking file ${file.filename}`];
     }
 });
-const get_approvals = (pr) => __awaiter(void 0, void 0, void 0, function* () {
-    let approvals = new Set();
-    approvals.add('@' + pr.data.user.login.toLowerCase());
-    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
-    const { data: reviews } = yield Github.pulls.listReviews({ owner: github.context.repo.owner, repo: github.context.repo.repo, pull_number: pr.data.number });
-    console.log(`\t- ${reviews.length} reviews were found for the PR`);
-    reviews.map(review => {
-        if (review.state == "APPROVED") {
-            approvals.add('@' + review.user.login.toLowerCase());
-        }
-    });
-    const _approvals = [...approvals];
-    console.log(`\t- Found approvers for pr number ${pr.data.number}: ${_approvals.join(" & ")}`);
-    return _approvals;
-});
-const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void 0, void 0, void 0, function* () {
+const check_pr = (request, Github) => (reponame, prnum, owner) => lib_awaiter(void 0, void 0, void 0, function* () {
     console.log(`Checking PR ${prnum} on ${reponame}`);
     const { data: repo } = yield Github.repos.get({
         owner,
@@ -6255,7 +6316,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
     const contents = yield Promise.all(files.map(parseFile));
     contents.map((file) => console.log(`file name ${file.name} has length ${file.content.body.length}`));
     console.log("---------");
-    yield Promise.all(files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Promise.all(files.map((file) => lib_awaiter(void 0, void 0, void 0, function* () {
         try {
             const [eip, error] = yield check_file(pr, file);
             if (eip) {
@@ -6271,7 +6332,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
         }
     })));
     console.log(`----- Getting PR approvals`);
-    const approvals = yield get_approvals(pr);
+    const approvals = yield getApprovals(pr);
     console.log(`------ Reviewing authors and approvers`);
     let reviewers = new Set();
     eips.map((eip) => {
@@ -6314,7 +6375,7 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => __awaiter(void
         post_comment(pr, message);
     }
 });
-const post_comment = (pr, message) => __awaiter(void 0, void 0, void 0, function* () {
+const post_comment = (pr, message) => lib_awaiter(void 0, void 0, void 0, function* () {
     const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
     const { data: me } = yield Github.users.getAuthenticated();
     console.log(`\t- Got user ${me.login}`);
@@ -6464,120 +6525,6 @@ catch (error) {
     console.log(error);
 }
 
-
-/***/ }),
-
-/***/ 510:
-/***/ (function(module) {
-
-module.exports = addHook;
-
-function addHook(state, kind, name, hook) {
-  var orig = hook;
-  if (!state.registry[name]) {
-    state.registry[name] = [];
-  }
-
-  if (kind === "before") {
-    hook = function (method, options) {
-      return Promise.resolve()
-        .then(orig.bind(null, options))
-        .then(method.bind(null, options));
-    };
-  }
-
-  if (kind === "after") {
-    hook = function (method, options) {
-      var result;
-      return Promise.resolve()
-        .then(method.bind(null, options))
-        .then(function (result_) {
-          result = result_;
-          return orig(result, options);
-        })
-        .then(function () {
-          return result;
-        });
-    };
-  }
-
-  if (kind === "error") {
-    hook = function (method, options) {
-      return Promise.resolve()
-        .then(method.bind(null, options))
-        .catch(function (error) {
-          return orig(error, options);
-        });
-    };
-  }
-
-  state.registry[name].push({
-    hook: hook,
-    orig: orig,
-  });
-}
-
-
-/***/ }),
-
-/***/ 521:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
-const Context = __importStar(__webpack_require__(262));
-const Utils = __importStar(__webpack_require__(127));
-// octokit + plugins
-const core_1 = __webpack_require__(448);
-const plugin_rest_endpoint_methods_1 = __webpack_require__(842);
-const plugin_paginate_rest_1 = __webpack_require__(299);
-exports.context = new Context.Context();
-const baseUrl = Utils.getApiBaseUrl();
-const defaults = {
-    baseUrl,
-    request: {
-        agent: Utils.getProxyAgent(baseUrl)
-    }
-};
-exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
-/**
- * Convience function to correctly format Octokit Options to pass into the constructor.
- *
- * @param     token    the repo PAT or GITHUB_TOKEN
- * @param     options  other options to set
- */
-function getOctokitOptions(token, options) {
-    const opts = Object.assign({}, options || {}); // Shallow clone - don't mutate the object provided by the caller
-    // Auth
-    const auth = Utils.getAuthString(token, opts);
-    if (auth) {
-        opts.auth = auth;
-    }
-    return opts;
-}
-exports.getOctokitOptions = getOctokitOptions;
-//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
@@ -10203,6 +10150,67 @@ exports.graphql = graphql$1;
 exports.withCustomRequest = withCustomRequest;
 //# sourceMappingURL=index.js.map
 
+
+/***/ }),
+
+/***/ 902:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
+const Context = __importStar(__webpack_require__(262));
+const Utils = __importStar(__webpack_require__(127));
+// octokit + plugins
+const core_1 = __webpack_require__(448);
+const plugin_rest_endpoint_methods_1 = __webpack_require__(842);
+const plugin_paginate_rest_1 = __webpack_require__(299);
+exports.context = new Context.Context();
+const baseUrl = Utils.getApiBaseUrl();
+const defaults = {
+    baseUrl,
+    request: {
+        agent: Utils.getProxyAgent(baseUrl)
+    }
+};
+exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
+/**
+ * Convience function to correctly format Octokit Options to pass into the constructor.
+ *
+ * @param     token    the repo PAT or GITHUB_TOKEN
+ * @param     options  other options to set
+ */
+function getOctokitOptions(token, options) {
+    const opts = Object.assign({}, options || {}); // Shallow clone - don't mutate the object provided by the caller
+    // Auth
+    const auth = Utils.getAuthString(token, opts);
+    if (auth) {
+        opts.auth = auth;
+    }
+    return opts;
+}
+exports.getOctokitOptions = getOctokitOptions;
+//# sourceMappingURL=utils.js.map
 
 /***/ }),
 
