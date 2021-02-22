@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3279
 title: Smart Contract Deployer Transactions Fee Share
 author: @tarekskr
 status: Draft
