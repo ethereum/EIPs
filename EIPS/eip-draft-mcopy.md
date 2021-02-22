@@ -21,14 +21,20 @@ This was recognised and alleviated early on with the introduction of the "identi
 memory copying by the use of `CALL`'s input and output memory offsets. Its cost is `15 + 3 * (length / 32)` gas, plus
 the call overhead. The identity precompile was rendered ineffective by the raise of the cost of `CALL` to 700.
 
-Copying exact words can be accomplished with `<offset> MLOAD <offset> MSTORE` or `<offset> DUP1 MLOAD DUP1 MSTORE`,
-at a cost of at least 12 gas. This is fairly efficient if the offsets are known upfront and the copying can be unrolled.
+Copying exact words can be accomplished with `<offset> MLOAD <offset> MSTORE` or `<offset> DUP1 MLOAD DUP2 MSTORE`,
+at a cost of at least 12 gas per word. This is fairly efficient if the offsets are known upfront and the copying can be unrolled.
 In case copying is implemented at runtime with arbitrary starting offsets, besides the control flow overhead, the offset
-will need to be increment using `32 ADD`, adding at least 6 gas per word.
+will need to be incremented using `32 ADD`, adding at least 6 gas per word.
 
 Copying non-exact words is more tricky, as for the last partial word, both the source and destination needs to be loaded,
 masked, or'd, and stored again. This overhead is significant. One edge case is if the last "partial word" is a single byte,
 it can be efficiently stored using `MSTORE8`.
+
+As example use case, copying 256 bytes costs:
+- at least 757 gas pre-EIP-2929 using the identity precompile
+- at least 157 gas post-EIP-2929 using the identity precompile
+- at least 96 gas using unrolled `MLOAD`/`MSTORE` instructions
+- 33 gas using this EIP
 
 Memory copying is used by languages like Solidity, where we expect this improvement to provide efficient means building
 data structures. Including efficient sliced access of memory objects.
