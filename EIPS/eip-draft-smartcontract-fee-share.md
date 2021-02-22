@@ -1,7 +1,7 @@
 ---
 eip: 3279
 title: Smart Contract Deployer Transactions Fee Share
-author: @tarekskr
+author: tarekskr (@tarekskr)
 status: Draft
 type: Standards Track
 category: Core
