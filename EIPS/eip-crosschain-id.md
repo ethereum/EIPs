@@ -27,7 +27,6 @@ Hence we provide a specification for using a 32 byte identifier to represent any
 
 ## Abstract
 
-A short (~200 word) description of the technical issue being addressed.
 
 Crosschain operations include transfer of assets, data, message, events, and commands from one blockchain to another. In order to improve interoperability of crosschain operations, there is a need to uniquely identify source blockchain, target blockchains, and any relay chains that help facilite blockchain information tranfer.  The identifier should follow a standard format so that all platforms and decentralize applications can use this identifier to represent a blockchain and also some information in the identifier to get some characteristis of the blockchain.  We name this blockchain identifier as crosschain-id and expect Ethereum community to use crosschain-id to represent any public or private blockchain.  The crosschain-id is a 32 byte hex string and with some bytes extracted from blockchain hash and some manually defined to characterize a blockchain.  We also propose a registration and lookup service to retrieve blockchain metadata from the crosschain-id.
 
