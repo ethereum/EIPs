@@ -85,7 +85,6 @@ To register crosschian/blockchain id, there should be grace period for comments 
 
 ## Rationale
 
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
 With the success of Bitcoin and Ethereum, various blockchains such as EOS, Ripple, Litecoin, Besu, Wanchain and the like have been developed and are growing at a fast pace.  There are also other private and consortium blockchains such as Hyperledger Fabric, Hyperledger Besu, Stellar, Corda, Quorum that only allow nodes with permitted identities to join the blockchain network.  The growth of public and private blockchains imposes
 challenges for inter-chain interoperability, particularly when these chains are
 heterogeneous and incompatible.
