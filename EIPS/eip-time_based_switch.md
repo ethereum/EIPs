@@ -1,0 +1,172 @@
+---
+eip: <to be assigned>
+title: Time Based Switch
+author: Branislav Djalic (@Omodaka9375), Malisa Pusonja (@horohronos), Ivor Jugo (@ivorrr)
+discussions-to: https://github.com/ethereum/EIPs/issues/3286
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): ERC
+created: 2021-02-23
+---
+
+## Simple Summary
+This EIP provides standard interfaces and processes for safe, conditional transactions based on user predefined timestamps. It would enable users to secure their accounts from lockout after account activity ceased for a predefining fallback address to transfer the funds.
+
+## Abstract
+This EIP standard addresses the user's need to enable the transfer of his fund from an account that he can not access anymore, whatever the reason is. 
+
+We are aware of the complexity and technical knowledge that a user must have to operate with his crypto accounts securely, when we add that the users' costs of time and liability only on themselves for storing their funds, it could be one of the reasons why mass adoption still didn't come.
+
+By providing a trusted decentralized way to trigger this kind of scheduled transaction in the future, this EIP will help to avoid diversification of similar products and establish a universal solution to all future implementations. 
+
+The creator/user is required to fulfill a set of predefined rules when creating a time switch contract (Will go through more details in the specification section):
+
+* Time represents the timestamp between the current moment and the scheduled one. 
+* Assets and amount of the token that he is willing to transfer.
+* Recipients address and the percentage of funds that each one of them will get.
+* Executor address, which can trigger the transactions.
+
+## Motivation
+At this point, there is no standardized, inherent way for a user to have some secure switch that acts as a last line of defense against losing long-time access to an account.
+
+By adopting and standardizing the primary mechanism behind a time based switch, we eliminate the need to consider each particular implementation. This EIP is meant to address wide use cases and setup scenarios on top of it while keeping the core trustable and functional.
+
+Let's list the possible application layer use cases for such a standard: 
+
+1. Lost access to an account
+Users can set up an account and create a switch for it in such a way that, even if he loses his private keys in the future, the funds will be transferred to a predefined secondary account after a period of time.
+
+2. Cryptographic "Testament" or "Last Will."
+Imagine you would like to store your cryptocurrency savings in a contract that will be accessible by members of the family, but only after something has happened to us. Let's say we should "check-in" by evoking some contract function calls every so often.
+If we don't check in on time, something presumably happened to us, and they can withdraw the funds. The proportion of funds they would each receive could either be explicitly set in the contract or be left to decide by consensus among the family members.
+
+3. An insurance fund
+Lock funds and tokens temporarily in a smart contract as a way of insuring them until a certain date.
+
+4. Pension or Savings account
+Another application of locking funds could be to create a small pension fund or time-based savings account, i.e., one that prevents the owner from withdrawing any funds before a certain time in the future. (It could be particularly useful for addicted crypto traders in helping keep their ether intact.)
+
+5. Family trust fund
+Let's imagine we would like to give ether, ERC token, or NFT to someone for their 18th birthday. We could write down on a piece of paper the beneficiary account's private key and the address holding the funds and hand it over to them in an envelope. The only thing they would have to do is call a function on the contract from their account once they are 18, and all the funds will be transferred to them.
+
+6. Vesting
+The most common reason at the moment to lock funds is called "vesting." Imagine that you have just raised a successful ICO and your company still holds a majority of tokens distributed between your team members.
+It would be beneficial to all parties involved to ensure that people's tokens cannot be traded straightaway. If there are no controls in place, anyone might take action by selling all their tokens, cashing out, and quitting the company. This would negatively affect the market price and make all remaining contributors to the project unhappy.
+
+7. DEFI Yielding
+Protect the deposited liquidity or the pool itself.
+
+## Specification
+TBS (Time Based Switch) feature integrates smart contracts and uses events/callbacks to inform the user about the TBS state.
+
+The user creates his TBS by calling the createSwitch function together with four parameters. This returns a signed transaction and puts it in a queue for due execution based on block height or a timestamp.
+
+```
+function createSwitch(uint _time, uint _amount, address_executor, address payable _benefitor)
+    doesntExist
+    checkAmount(_amount)
+    checkTime(_time)
+    public
+    Payable 
+{...}
+```
+
+TBS creation will produce a signed transaction that is put on hold until/if the trigger hits.
+All signed transactions are stored in the TBS queue object in the contract.
+
+Only the executor address is able to trigger a funds transfer when the defined timestamp has expired. The triggered event can be defined as any type of transaction or a specific transaction or blockchain information. Besides that, the creator will determine a percentage of balance dispersed per fallback address.
+
+``` 
+function tryExecuteSwitch(address account)
+    onlyValid(account)
+    onlyExecutorsOrOwner(account)
+    public
+    Payable
+{...}
+```
+
+Required event listener methods for tokens transfer are:
+```approveToken, withdrawToken```
+
+TBS will keep track/store all created switches to be later updated by the owners at will.
+The changeable variables would be:
+
+* Change function fallback addresses as owner
+* Change function condition variables as owner
+* Cancel TBS as an owner
+
+## Rationale
+This EIP standard is a ground layer with default functionality on top of which anyone could build a Dapp or integrate it in his product while allowing for safe and gas-efficient implementations. 
+
+TBS smart contracts should be implemented/imported as a library with only a couple of public functions. Beneficiary logic, notifications, and any other implementation (see motivation) can be abstracted from this standard and implemented on top of it. 
+
+Here are some of the different approaches may include this standard:
+
+* Custom wallet integration for TBS setup
+* (De)centralized notifications/reminders before an action occur.
+* Custom fallback consensus and validation logic
+* Multi TBS setup
+* NFT transfers 
+
+We also considered a solution that triggers the tokens transfer. Still, after long consideration, we decided that it should be implemented on the application layer because we wanted to leave a more extensive range of integration with this standard. 
+
+## Backwards Compatibility
+This standard is compatible with any fungible and non-fungible token, such as ERC-20 or ERC-721.
+
+## Reference Implementation
+https://github.com/Omodaka9375/Time-Based-Switch-on-Ethereum/blob/main/contracts/TimeBasedSwitch.sol
+
+## Security Considerations
+
+### Logic Bugs
+Mitigation against logic bugs:
+* Following latest Solidity coding standards
+* Following general best practices for software development
+* Using OpenZeppelin standard library (Ownership, Lifecycle, ReentrancyGuard)
+* Keeping contract logic very simple, and abstracting complicated methods to the front-end
+
+### Recursive Calls
+* Adopting modify first, pay last design pattern
+* Checking that any single input can only result in a single payment
+
+### Integer Arithmetic Overflow
+* Validating that adding a new switch to existing account wouldn't cause an overflow
+* Validating that adding a new beneficiary/executor wouldn't cause an overflow
+* Validating that adding new tokens wouldn't cause an overflow
+* No user inputted variables affect balance tracking
+* All arithmetic operations reviewed (4+'s, 5-'s)
+
+### Poison Data
+Avoiding malicious user input:
+* Adding `onlyAllowed` checks on privileged queries to the switch
+* Adding `onlyExecutorsOrOwner` privileged actions to the switch
+* Validate `switch` whenever the user inputs it
+* Validate `amount` whenever the user inputs it
+* Validate that a specified switch `time` parameter is set to minimum 1 day or 86400 seconds
+
+### Exposed Functions
+There is no exposed withdrawal function that can "drain" the switch.
+Once created funds can't be taken out of the switch, only added on top.
+Switch can be terminated early by the owner, in which case the funds are returned back to the owner.  
+
+All contract functions which are public have appropriate checks for:
+* Contract Owner
+* Switch Owner
+* Switch Executor
+* Switch beneficiary
+
+### Exposed Secrets
+TBS does not store any secret information on the blockchain.
+
+### Miner Vulnerabilities
+TBS uses 'block.timestamp' to track and schedule transactions in the future only. The switch lifetime is defined as a minimum of 1 day. There are no current security considerations regarding outside dependencies for this core feature.
+
+### Gas Limit
+Avoiding gas limit issues:
+* Not using loops in TBS
+* No strings, only byte32
+* No SafeMath to reduce contract size and dependencies
+* All searches are in constant time or O(1), with the exception of ERC20 tokens, where performance is in proportion to the number of tokens added to the switch or O(N).
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
