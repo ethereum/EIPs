@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2020-10-21
-replaces (*optional): <EIP number(s)>
 ---
 
 ## Simple Summary
