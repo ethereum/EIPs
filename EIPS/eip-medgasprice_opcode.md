@@ -1,0 +1,93 @@
+---
+eip: <to be assigned>
+title: OPCODE 0x46 MEDGASPRICE
+author: Justice Hudson (@jchancehud)
+discussions-to:
+status: Draft
+type: Standards Track
+category: Core
+created: 2021-05-03
+---
+
+## Simple Summary
+
+An opcode allowing smart contracts to access information about recent gas prices.
+
+## Abstract
+
+There is an existing opcode `0x3a GASPRICE` that allows contracts to access the gas price of the current transaction. This value can be used to impose a maximum gas price on contract calls by setting a constant value, but cannot be used as a long term solution given the fluctuation of gas prices over time. The proposed opcode `0x46 MEDGASPRICE` would return the median gas price for the parent block. This would allow the implementation of upper bounds on transaction gas prices as a function of the last block median gas price.
+
+## Motivation
+
+With the emergence of rollups as core mechanisms in scaling Ethereum there are a number of common transactions that can be front-run. Optimistic rollups rely on the submission of fraud proofs to maintain the integrity of their systems. As a result actors submitting fraud proofs typically receive a financial reward for doing so. This opens a trivial front-running strategy of watching the mempool for fraud proof submissions and copying such transactions with a much higher gas price to reap the reward. Such front-runners do not perform validation independently and de-incentivize others from performing validation. Adding a mechanism enforcing an upper bound on gas prices for a transaction could be an effective defense against such front-running attacks.
+
+## Specification
+
+If `block.number >= TBD`, add a new opcode:
+
+MEDGASPRICE: 0x46
+
+Pushes the median gas price of the parent block onto the stack.<br />
+Gas costs: 8
+
+The name `MEDGASPRICE` was chosen because the median gas price of the network can only be calculated from the latest complete block. Thus transactions being executed should expect the median gas price to be calculated from the previous block.
+
+## Rationale
+
+Consider a smart contract that wants to implement a first come first serve mechanism. Such a mechanism must defeat the inherently pay-to-win nature of the gas price market. Enforcing a maximum gas price for a transaction relies on the fact that transactions of the same gas price are generally processed in a first in first out way by Ethereum miners. A contract currently has few options for setting a max gas price:
+
+- Set a constant value at a reasonable rate given the current gas prices
+- Allow an individual or group of individuals to adjust a max gas price over time
+
+More elaborate schemes could likely be constructed but all would involve storing gas price information on chain increasing the number of transactions and costing Ether.
+
+Given a median gas price opcode a contract can set a maximum gas price as a function of the last blocks gas price. This can easily be implemented using a strategy such as the following:
+
+```
+// Assume that block.medgasprice is bound to the MEDGASPRICE opcode
+
+function submitFraudProof(bytes calldata proof) public {
+  require(tx.gasprice <= maxGasPrice());
+  // process the fraud proof and provide a reward (if valid)
+}
+
+function maxGasPrice() public view returns (uint) {
+  return 3 * block.medgasprice;
+}
+```
+
+Given the contract implementation above a client would simply call `maxGasPrice` to determine the gas price to use when submitting a fraud proof. This particular implementation allows up to 3x the median gas price of the last block to be used.
+
+## Backwards Compatibility
+
+This proposal introduces a single new opcode. No backwards incompatibilities should be introduced.
+
+## Forwards Compatibility
+
+EIP 1557 plans to change the fee market in a number of ways. Most notably is the creation of a base fee that is burned. In this context an "inclusion fee" still exists as a part of the total fee. Consider the following two cases:
+
+##### Block sizes are increasing (all available gas is being consumed)
+
+In this case there will be bidding contention in the inclusion fee to incentivize miners to include transactions. A `MEDGASPRICE` operator would still be helpful as an attacker could supply a high inclusion fee to bump honest transactions.
+
+##### Block sizes are decreasing (excess gas is available)
+
+In this case an attacker could specify a high inclusion fee to incentivize miners to include their transaction early in the block. Miners are incentivized to do so as including expensive transactions first reduces the risk of a revert (and partial refund) occurring.
+
+Given these two cases this EIP seems relevant in the context of EIP 1557.
+
+Post EIP 1557 the `MEDGASPRICE` operator should return the median `effective_gas_price` of the previous block.
+
+An additional opcode `BASEGASPRICE` (0x47) should be added so contracts can determine the inclusion fee at runtime (by subtracting from `GASPRICE`). Without such an opcode the anti front-running strategies described in this document do not work.
+
+## Security Considerations
+
+The strategy described for preventing front-running by setting an upper bound on the gas price of transactions has a few caveats:
+
+1. It relies on miners being impartial. Reordering transactions with the same gas price is a trivial means of defeating this strategy.
+2. It relies on the implicit behavior of miners ordering transactions of the same value in the order received. This is not standard behavior but seems to be general practice.
+3. The value returned by `MEDGASPRICE` may fluctuate rapidly between blocks. If a transaction is not included immediately it may either fail (if the gas price drops) or become vulnerable to front-running (if the gas price increases).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
