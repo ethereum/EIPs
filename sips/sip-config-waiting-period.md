@@ -1,5 +1,5 @@
 ---
-sip: ???
+sip: 118
 title: Conditionally skipping fee reclamation
 status: Proposed
 author:
@@ -17,13 +17,13 @@ Allow for bypassing unnecessary fee reclamation functionality when waiting perio
 
 <!--A short (~200 word) description of the proposed change, the abstract should clearly describe the proposed change. This is what *will* be done if the SIP is implemented, not *why* it should be done or *how* it will be done. If the SIP proposes deploying a new contract, write, "we propose to deploy a new contract that will do x".-->
 
-[SIP-114](./sip-???.md) will enable synth exchanging on L2. Given that transaction (and hence oracle) frontrunning is highly unlikely to occur (even though not technically impossible) on Optimisic Ethereum (OE), there is no need for storing exchanges and settling them after a certain amount of time has elapsed. This SIP proposes to skip fee reclamation if the waiting period is 0, which can be very efficient when trading on Optimism.
+[SIP-117](./sip-117.md) will enable synth exchanging on L2. Given that transaction (and hence oracle) frontrunning is highly unlikely to occur (even though not technically impossible) on Optimisic Ethereum (OE), there is no need for storing exchanges and settling them after a certain amount of time has elapsed. This SIP proposes to skip fee reclamation if the waiting period is 0, which can be very efficient when trading on Optimism.
 
 ## Motivation
 
 <!--This is the problem statement. This is the *why* of the SIP. It should clearly explain *why* the current state of the protocol is inadequate.  It is critical that you explain *why* the change is needed, if the SIP proposes changing how something is calculated, you must address *why* the current calculation is innaccurate or wrong. This is not the place to describe how the SIP will address the issue!-->
 
-In Phase 1 of the [transition to Optimistic Ethereum](https://blog.synthetix.io/the-optimistic-ethereum-transition), basic synth functionality is going to be enabled, already proposed in [SIP-???](./sip-???.md). Every time a user exchanges a synth for another, the trade is stored temporarily and can be settled after a certain waiting period (`waitingPeriodSecs` in `SystemSettings`) has elapsed, currently set to 6 minutes. For further details please check [SIP-37](./sip-37.md). This procedure will not be needed on OE (unless proven otherwise later), thus, if the waiting period is set to 0 then part of the overhead imposed by settlement will be skipped.
+In Phase 1 of the [transition to Optimistic Ethereum](https://blog.synthetix.io/the-optimistic-ethereum-transition), basic synth functionality is going to be enabled, already proposed in [SIP-117](./sip-117.md). Every time a user exchanges a synth for another, the trade is stored temporarily and can be settled after a certain waiting period (`waitingPeriodSecs` in `SystemSettings`) has elapsed, currently set to 6 minutes. For further details please check [SIP-37](./sip-37.md). This procedure will not be needed on OE (unless proven otherwise later), thus, if the waiting period is set to 0 then part of the overhead imposed by settlement will be skipped.
 
 ## Specification
 
