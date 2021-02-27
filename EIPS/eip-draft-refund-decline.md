@@ -1,12 +1,12 @@
 ---
-eip: <to be assigned>
+eip: 3300
 title: Phase out refunds
 author: William Morriss (@wjmelements)
 discussions-to: [TODO Set Ethereum Magicians Discussion](https://github.com/ethereum/EIPS/pulls)
 status: Draft
 type: Standards Track
 category: Core
-created: 2019-07-06
+created: 2020-02-26
 replaces: 3298
 ---
 
