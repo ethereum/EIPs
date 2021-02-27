@@ -1,0 +1,66 @@
+---
+eip: <to be assigned>
+title: Phase out refunds
+author: William Morriss (@wjmelements)
+discussions-to: [TODO Set Ethereum Magicians Discussion](https://github.com/ethereum/EIPS/pulls)
+status: Draft
+type: Standards Track
+category: Core
+created: 2019-07-06
+replaces: 3298
+---
+
+## Simple Summary
+<!--"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP.-->
+Phases out the `SSTORE` and `SELFDESTRUCT` gas refunds.
+
+## Abstract
+<!--A short (~200 word) description of the technical issue being addressed.-->
+This EIP would define a block when the `SSTORE` and `SELFDESTRUCT` refunds would begin to diminish.
+The refund would step linearly downward, eroding the implicit value of such refunds at an accelerating pace.
+
+## Motivation
+<!--The motivation is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.-->
+Refunds increase block elasticity, so the block gas target can exceed the number established by miners by up to 2x.
+This can cause hesitancy for miners to increase the block gas target.
+
+Refunds, tokenized or not, are valuable to their holders, especially during congestion.
+If refunds must be removed, a gradual change in their value would be less-disruptive to the gas market than sudden abolition.
+Refund consumption would proceed, especially during periods of congestion, and the refunds would be cleaned up from the state.
+Refund creation, driven by demand, would naturally diminish as the efficiency of the refunds fall.
+As the refund value approaches the activation cost, the tokens will approach zero, but in periods of congestion they will be cleaned up.
+
+This change is less work for the protocol developers than compensation and cleanup, while likely still achieving cleanup.
+
+
+## Specification
+<!--The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).-->
+On the block this EIP activates, and again every 100 blocks, the gas refunds for `SELFDESTRUCT` and `SSTORE` would diminish by 1, until reaching their refund activation cost.
+When reaching their refund activation cost, refunds will be removed.
+The refund activation cost of `SSTORE` is defined to be the lowest possible opcode cost of setting a nonzero value to zero.
+The refund activation cost of `SELFDETRUCT` is defined to be the lowest possible opcode cost of `SELFDESTRUCT`.
+
+
+## Rationale
+<!--The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.-->
+The refunds would become worthless before they fall below their theoretical activation cost, so they can be safely removed at that point.
+Activation costs are defined this way to be compatible with other EIPs that may change gas costs in the future.
+
+The rate of diminishing specified would currently require (24000-5000) * 100 = 1,900,000 blocks for `SELFDESTRUCT` and (15000-800) * 100 = 1,420,000 blocks for `SSTORE`.
+This timeframe is currently about a year, which should be more than enough flexibility for the remaining refunds to be consumed.
+
+## Backwards Compatibility
+<!--All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.-->
+This proposal breaks gas refunds, which contribute to block elasticity.
+The effect of this will be increased gas price volatility: higher highs and lower lows.
+
+## Test Cases
+<!--Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.-->
+TODO
+
+## Implementation
+<!--The implementations must be completed before any EIP is given status "Final", but it need not be completed before the EIP is accepted. While there is merit to the approach of reaching consensus on the specification and rationale before writing code, the principle of "rough consensus and running code" is still useful when it comes to resolving many discussions of API details.-->
+TODO
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
