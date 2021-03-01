@@ -3,7 +3,7 @@ sccp: 78
 title: Change Spartan Council Epoch to quarterly (3 months)
 author: Andy T CF (@andytcf)
 discussions-to: governance
-status: Proposed
+status: Approved
 created: 2021-01-21
 ---
 
