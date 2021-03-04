@@ -7,7 +7,8 @@
     "test": "NODE_ENV=testing jest __tests__",
     "build": "ncc build ./src/index.ts",
     "watch": "ncc build ./src/index.ts --watch",
-    "it": "node -r dotenv/config dist/index.js"
+    "it": "node -r dotenv/config dist/index.js",
+    "prettier-changed": "prettier --write",
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "@zeit/ncc": "^0.22.3",
     "dotenv": "^8.2.0",
     "front-matter": "^4.0.2",
+    "lint-changed": "0.0.0-development",
     "node-fetch": "^2.6.1",
     "typescript": "^4.1.5"
   },
@@ -28,7 +30,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "git-format-staged -f 'prettier --ignore-unknown --stdin --stdin-filepath \"{}\"' ."
+      "pre-commit": "lint-changed"
     }
-  }
+  },
+  "lint-staged": {
+    "*.js|*.ts": [
+        "npm run prettier-changed"
+    ]
+}
 }
