@@ -1,9 +1,9 @@
-import { CompareCommits, File, Files, Github, ParsedFile, PR } from "./types";
+import { CompareCommits, EIP, File, Files, Github, ParsedFile, PR, Request } from "./types";
 import { context } from "@actions/github";
 import { getAuthors, parseFile, getApprovals } from "./utils";
 import { getOctokit } from "@actions/github";
 import { FILE_RE } from "./regex";
-import { ALLOWED_STATUSES } from "./constants";
+import { ALLOWED_STATUSES, MERGE_MESSAGE } from "./constants";
 
 const check_file = async ({ data: pr }: PR, file: File): Promise<[{number: string, authors: Set<string>}, string]> => {
   const Github = getOctokit(process.env.GITHUB_TOKEN);
@@ -88,27 +88,81 @@ const check_file = async ({ data: pr }: PR, file: File): Promise<[{number: strin
   }
 };
 
-export const check_pr = (request: CompareCommits, Github: Github) => async (
-  reponame: string,
-  prnum: number,
-  owner: string
-) => {
-  console.log(`Checking PR ${prnum} on ${reponame}`);
+export const getRequest = () => {
+  const Github = getOctokit(process.env.GITHUB_TOKEN);
+  return Github.repos.compareCommits({
+    base: context.payload.pull_request?.base?.sha,
+    head: context.payload.pull_request?.head?.sha,
+    owner: context.repo.owner,
+    repo: context.repo.repo
+  }).catch(() => {});
+}
+
+export const checkRequest = async (request: Request) => {
+  const payload = context.payload;
+  
+  if (request && request.headers) {
+    const event = context.eventName;
+    console.log(`Got Github webhook event ${event}`);
+    if (event == "pull_request") {
+      const pr = payload.pull_request;
+      const prNum = pr.number;
+      const repoName = payload.repository.full_name;
+      console.log(`Processing review on PR ${repoName}/${prNum}...`);
+      return {
+        repoName: context.repo.repo,
+        prNum,
+        owner: context.repo.owner
+      }
+    }
+  } else {
+    console.log(`Processing build ${payload.sender.type}...`);
+    if (!payload.pull_request?.number) {
+      console.log(
+        "Build ?? is not a PR build; quitting"
+      );
+      return;
+    }
+    const prNum = payload.pull_request.number;
+    const repoName = `${payload.repository.owner.name}/${payload.repository.name}`;
+    console.log(`prnum: ${prNum}, repo: ${repoName}`)
+    return {
+      repoName,
+      prNum,
+      owner: context.repo.owner
+    }
+  }
+}
+
+type CheckPr = {
+  repoName: string,
+  prNum: number,
+  owner: string,
+  request: Request
+}
+
+export const checkPr = async ({repoName, prNum, owner, request}: CheckPr) => {
+  const Github = getOctokit(process.env.GITHUB_TOKEN);
+
+  if (!request) {
+    throw "request is not defined";
+  }
+
+  console.log(`Checking PR ${prNum} on ${repoName}`);
   const { data: repo } = await Github.repos.get({
     owner,
-    repo: reponame,
+    repo: repoName,
   });
+  
   console.log(`repo full name: `, repo.full_name);
-
   const pr = await Github.pulls.get({
     repo: repo.name,
     owner: repo.owner.login,
-    pull_number: prnum,
+    pull_number: prNum,
   });
-  let response = "";
 
   if (pr.data.merged) {
-    console.log("PR %d is already merged; quitting", prnum);
+    console.log("PR %d is already merged; quitting", prNum);
     return;
   }
   // if (pr.data.mergeable_state != "clean") {
@@ -120,10 +174,7 @@ export const check_pr = (request: CompareCommits, Github: Github) => async (
 
   const files = request.data.files;
 
-  let eips: {
-    number: string;
-    authors: Set<string>;
-  }[] = [];
+  let eips: EIP[] = [];
   let errors = [];
   console.log("---------");
   console.log(`${files.length} file found!` || "no files");
@@ -175,33 +226,25 @@ export const check_pr = (request: CompareCommits, Github: Github) => async (
     }
   });
 
-  if (errors.length === 0) {
-    console.log(`Merging PR ${prnum}!`);
-    response = `Merging PR ${prnum}!`;
-
-    const eipNumbers = eips.join(", ");
-    // Github.pulls.merge({
-    //   pull_number: pr.number,
-    //   repo: pr.base.repo.full_name,
-    //   owner: pr.base.repo.owner.login,
-    //   commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
-    //   commit_message: MERGE_MESSAGE,
-    //   merge_method: "squash",
-    //   sha: pr.head.sha
-    // })
-  } else if (errors.length > 0 && eips.length > 0) {
-    let message =
-      "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
-    message += errors.join("\n\t\t - ");
-
-    console.log(`------- Posting Comment`)
-    console.log(`\t- comment body:\n\t\t"""\n\t\t${message}\n\t\t"""`);
-    post_comment(pr, message)
-  }
+  return { errors, pr, files, eips }
 };
 
-const post_comment = async (pr: PR, message: string) => {
+type PostComment = {
+  errors: string[],
+  pr: PR,
+  eips: EIP[]
+}
+
+export const postComment = async ({errors, pr, eips}: PostComment) => {
   const Github = getOctokit(process.env.GITHUB_TOKEN);
+
+  let message =
+    "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
+  message += errors.join("\n\t\t - ");
+
+  console.log(`------- Posting Comment`)
+  console.log(`\t- comment body:\n\t\t"""\n\t\t${message}\n\t\t"""`);
+
   const {data: me} = await Github.users.getAuthenticated()
   console.log(`\t- Got user ${me.login}`)
   const {data: comments} = await Github.issues.listComments({
@@ -242,6 +285,33 @@ const post_comment = async (pr: PR, message: string) => {
     issue_number: context.issue.number,
     body: message
   })
+}
+
+type Merge = {
+  pr: PR,
+  eips: EIP[]
+}
+
+export const merge = ({pr: _pr, eips}: Merge) => {
+  const pr = _pr.data;
+  const prNum = pr.number;
+  const Github = getOctokit(process.env.GITHUB_TOKEN);
+  const eipNumbers = eips.join(", ");
+
+  console.log(`Merging PR ${pr.number}!`);
+  Github.pulls.merge({
+    pull_number: pr.number,
+    repo: pr.base.repo.full_name,
+    owner: pr.base.repo.owner.login,
+    commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prNum})`,
+    commit_message: MERGE_MESSAGE,
+    merge_method: "squash",
+    sha: pr.head.sha
+  })
+
+  return {
+    response: `Merging PR ${prNum}!`
+  }
 }
 
 // const post = (request: any, Github: Github) => {

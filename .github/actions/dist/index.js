@@ -6285,21 +6285,68 @@ const check_file = ({ data: pr }, file) => lib_awaiter(void 0, void 0, void 0, f
         return [null, `Error checking file ${file.filename}`];
     }
 });
-const check_pr = (request, Github) => (reponame, prnum, owner) => lib_awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Checking PR ${prnum} on ${reponame}`);
+const getRequest = () => {
+    var _a, _b, _c, _d;
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    return Github.repos.compareCommits({
+        base: (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha,
+        head: (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo
+    }).catch(() => { });
+};
+const checkRequest = (request) => lib_awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const payload = github.context.payload;
+    if (request && request.headers) {
+        const event = github.context.eventName;
+        console.log(`Got Github webhook event ${event}`);
+        if (event == "pull_request") {
+            const pr = payload.pull_request;
+            const prNum = pr.number;
+            const repoName = payload.repository.full_name;
+            console.log(`Processing review on PR ${repoName}/${prNum}...`);
+            return {
+                repoName: github.context.repo.repo,
+                prNum,
+                owner: github.context.repo.owner
+            };
+        }
+    }
+    else {
+        console.log(`Processing build ${payload.sender.type}...`);
+        if (!((_a = payload.pull_request) === null || _a === void 0 ? void 0 : _a.number)) {
+            console.log("Build ?? is not a PR build; quitting");
+            return;
+        }
+        const prNum = payload.pull_request.number;
+        const repoName = `${payload.repository.owner.name}/${payload.repository.name}`;
+        console.log(`prnum: ${prNum}, repo: ${repoName}`);
+        return {
+            repoName,
+            prNum,
+            owner: github.context.repo.owner
+        };
+    }
+});
+const checkPr = ({ repoName, prNum, owner, request }) => lib_awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    if (!request) {
+        throw "request is not defined";
+    }
+    console.log(`Checking PR ${prNum} on ${repoName}`);
     const { data: repo } = yield Github.repos.get({
         owner,
-        repo: reponame,
+        repo: repoName,
     });
     console.log(`repo full name: `, repo.full_name);
     const pr = yield Github.pulls.get({
         repo: repo.name,
         owner: repo.owner.login,
-        pull_number: prnum,
+        pull_number: prNum,
     });
-    let response = "";
     if (pr.data.merged) {
-        console.log("PR %d is already merged; quitting", prnum);
+        console.log("PR %d is already merged; quitting", prNum);
         return;
     }
     // if (pr.data.mergeable_state != "clean") {
@@ -6353,30 +6400,14 @@ const check_pr = (request, Github) => (reponame, prnum, owner) => lib_awaiter(vo
             });
         }
     });
-    if (errors.length === 0) {
-        console.log(`Merging PR ${prnum}!`);
-        response = `Merging PR ${prnum}!`;
-        const eipNumbers = eips.join(", ");
-        // Github.pulls.merge({
-        //   pull_number: pr.number,
-        //   repo: pr.base.repo.full_name,
-        //   owner: pr.base.repo.owner.login,
-        //   commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prnum})`,
-        //   commit_message: MERGE_MESSAGE,
-        //   merge_method: "squash",
-        //   sha: pr.head.sha
-        // })
-    }
-    else if (errors.length > 0 && eips.length > 0) {
-        let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
-        message += errors.join("\n\t\t - ");
-        console.log(`------- Posting Comment`);
-        console.log(`\t- comment body:\n\t\t"""\n\t\t${message}\n\t\t"""`);
-        post_comment(pr, message);
-    }
+    return { errors, pr, files, eips };
 });
-const post_comment = (pr, message) => lib_awaiter(void 0, void 0, void 0, function* () {
+const postComment = ({ errors, pr, eips }) => lib_awaiter(void 0, void 0, void 0, function* () {
     const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    let message = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
+    message += errors.join("\n\t\t - ");
+    console.log(`------- Posting Comment`);
+    console.log(`\t- comment body:\n\t\t"""\n\t\t${message}\n\t\t"""`);
     const { data: me } = yield Github.users.getAuthenticated();
     console.log(`\t- Got user ${me.login}`);
     const { data: comments } = yield Github.issues.listComments({
@@ -6415,6 +6446,25 @@ const post_comment = (pr, message) => lib_awaiter(void 0, void 0, void 0, functi
         body: message
     });
 });
+const merge = ({ pr: _pr, eips }) => {
+    const pr = _pr.data;
+    const prNum = pr.number;
+    const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN);
+    const eipNumbers = eips.join(", ");
+    console.log(`Merging PR ${pr.number}!`);
+    Github.pulls.merge({
+        pull_number: pr.number,
+        repo: pr.base.repo.full_name,
+        owner: pr.base.repo.owner.login,
+        commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prNum})`,
+        commit_message: MERGE_MESSAGE,
+        merge_method: "squash",
+        sha: pr.head.sha
+    });
+    return {
+        response: `Merging PR ${prNum}!`
+    };
+};
 // const post = (request: any, Github: Github) => {
 //   const payload = JSON.parse(request["payload"]);
 //   if (request.headers.includes("X-Github-Event")) {
@@ -6482,43 +6532,20 @@ if (process.env.NODE_ENV === "development") {
     };
     github.context.eventName = "pull_request";
 }
-const main = (Github) => src_awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e;
-    const request = yield Github.repos.compareCommits({
-        base: (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha,
-        head: (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha,
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo
-    }).catch(() => { });
-    const payload = github.context.payload;
-    if (request && request.headers) {
-        const event = github.context.eventName;
-        console.log(`Got Github webhook event ${event}`);
-        if (event == "pull_request") {
-            const pr = payload.pull_request;
-            const prnum = pr.number;
-            const reponame = payload.repository.full_name;
-            console.log(`Processing review on PR ${reponame}/${prnum}...`);
-            check_pr(request, Github)(github.context.repo.repo, prnum, github.context.repo.owner);
-        }
+const main = () => src_awaiter(void 0, void 0, void 0, function* () {
+    const request = yield getRequest();
+    const { repoName, prNum, owner } = yield checkRequest(request);
+    const { errors, pr, files, eips } = yield checkPr({ repoName, prNum, owner, request });
+    // if no errors, then merge
+    if (errors.length === 0) {
+        return yield merge({ pr, eips });
     }
-    else {
-        console.log(`Processing build ${payload.sender.type}...`);
-        if (!((_e = payload.pull_request) === null || _e === void 0 ? void 0 : _e.number)) {
-            console.log("Build ?? is not a PR build; quitting");
-            return;
-        }
-        const prnum = payload.pull_request.number;
-        const repo = `${payload.repository.owner.name}/${payload.repository.name}`;
-        console.log(`prnum: ${prnum}, repo: ${repo}`);
-        if (request)
-            check_pr(request, Github)(repo, prnum, github.context.repo.owner);
+    if (errors.length > 0 && eips.length > 0) {
+        postComment({ errors, pr, eips });
     }
 });
 try {
-    const token = process.env.GITHUB_TOKEN;
-    const Github = Object(github.getOctokit)(token);
-    main(Github);
+    main();
 }
 catch (error) {
     Object(core.setFailed)(error.message);

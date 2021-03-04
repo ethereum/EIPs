@@ -4,6 +4,8 @@ import frontmatter from "front-matter";
 export type Github = ReturnType<typeof getOctokit>;
 const Github = getOctokit("fake");
 
+export type Request = void | UnPromisify<ReturnType<typeof Github.repos.compareCommits>>;
+
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 export type PR = UnPromisify<ReturnType<typeof Github.pulls.get>>;
 
@@ -18,3 +20,8 @@ export type ParsedFile = {
     name: string,
     content: ReturnType<typeof frontmatter>
 }
+
+export type EIP = {
+    number: string;
+    authors: Set<string>;
+  }
