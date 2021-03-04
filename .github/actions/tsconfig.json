@@ -1,6 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "moduleResolution": "node"
-  }
+      "allowJs": true,
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "isolatedModules": true,
+      "lib": [
+          "es6", "es2017"
+      ],
+      "moduleResolution": "node",
+      "noEmit": true,
+      "strict": true,
+      "target": "esnext",
+      "baseUrl": "./",
+      "paths": {
+          "src/*": ["src/*"]
+      }
+  },
+  "exclude": [
+      "node_modules"
+  ]
 }

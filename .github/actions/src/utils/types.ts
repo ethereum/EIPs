@@ -1,10 +1,10 @@
 import { getOctokit } from "@actions/github";
-import frontmatter from "front-matter";
+import frontmatter, { FrontMatterResult } from "front-matter";
 
 export type Github = ReturnType<typeof getOctokit>;
 const Github = getOctokit("fake");
 
-export type Request = void | UnPromisify<ReturnType<typeof Github.repos.compareCommits>>;
+export type Request = UnPromisify<ReturnType<typeof Github.repos.compareCommits>>;
 
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 export type PR = UnPromisify<ReturnType<typeof Github.pulls.get>>;
@@ -18,10 +18,17 @@ export type File = typeof _files_[0];
 export type ParsedFile = {
     path: string,
     name: string,
-    content: ReturnType<typeof frontmatter>
+    status: string,
+    content: FrontMatterResult<any>
 }
 
 export type EIP = {
-    number: string;
-    authors: Set<string>;
-  }
+  number: string;
+  authors: Set<string>;
+}
+
+export type PostComment = {
+  errors: string[],
+  pr: PR,
+  eips: EIP[]
+}
