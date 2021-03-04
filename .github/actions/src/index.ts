@@ -18,10 +18,7 @@ if (process.env.NODE_ENV === "development") {
   context.repo.owner = process.env.REPO_OWNER_NAME;
   // @ts-ignore
   context.repo.repo = process.env.REPO_NAME;
-  context.payload.repository = {
-
-  
-    
+  context.payload.repository  = {
     // @ts-ignore
     name: process.env.REPO_NAME,
     owner: {
