@@ -15,7 +15,7 @@ outputs:
     description: "first regex match"
 
 runs:
-  using: "node12"
+  using: "node14"
   main: "dist/index.js"
 branding:
   icon: 'code'  
