@@ -6,79 +6,9 @@ import frontmatter, { FrontMatterResult } from "front-matter";
 import { context } from "@actions/github/lib/utils";
 import fetch from "node-fetch";
 
-export const parseFile = async (file: File): Promise<ParsedFile> => {
-  const Github = getOctokit(GITHUB_TOKEN);
-  const files = Github.repos.getContent;
-
-  const fetchRawFile = (file: File): Promise<any> =>
-    fetch(file.contents_url, { method: "get" }).then((res: any) => res.json());
-  const decodeContent = (rawFile: any) =>
-    Buffer.from(rawFile.content, "base64").toString();
-  const rawFile = await fetchRawFile(file);
-
-  return {
-    path: rawFile.path,
-    name: file.filename,
-    status: file.status,
-    content: frontmatter(decodeContent(rawFile))
-  };
-};
-
 type GetFilesReturn = Promise<{
   files: ParsedFile[];
 }>;
-
-export const getFiles = async (request: Request): GetFilesReturn => {
-  const files = request.data.files;
-
-  console.log("---------");
-  console.log(`${files.length} file found!` || "no files");
-
-  const contents = await Promise.all(files.map(parseFile));
-  contents.map((file: ParsedFile) => {
-    console.log(
-      `file name ${file.name} has length ${file.content.body.length}`
-    );
-  });
-  console.log("---------");
-
-  return { files: contents };
-};
-
-export const getAuthors = async (rawAuthorList: string) => {
-  const resolveAuthor = async (author: string) => {
-    if (author[0] === "@") {
-      return author.toLowerCase();
-    } else {
-      // Email address
-      const queriedUser = await findUserByEmail(author);
-      return (queriedUser || author).toLowerCase();
-    }
-  };
-
-  const findUserByEmail = async (
-    email: string
-  ): Promise<string | undefined> => {
-    const Github = getOctokit(process.env.GITHUB_TOKEN || "");
-
-    console.log(`Searching for user by email: ${email}`);
-    const { data: results } = await Github.search.users({ q: email });
-    console.log(`\t found ${results.total_count} results`);
-
-    if (results.total_count > 0) {
-      console.log(
-        `\t Recording mapping from ${email} to ${results.items[0].login}`
-      );
-      return "@" + results.items[0].login;
-    }
-    console.log("No github user found, using email instead");
-  };
-
-  const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
-  const resolved = await Promise.all(authors.map(resolveAuthor));
-
-  return new Set(resolved);
-};
 
 type CheckFileReturn = Promise<[EIP | null, string | null]>;
 
@@ -188,4 +118,73 @@ export const checkFile = async (
     console.warn("Exception checking file %s", parsedFile.name);
     return [null, `Error checking file ${parsedFile.name}`];
   }
+};
+
+export const parseFile = async (file: File): Promise<ParsedFile> => {
+  // TODO: there's probably a way to do this with octokit (better for maintaining types)
+  const fetchRawFile = (file: File): Promise<any> =>
+    fetch(file.contents_url, { method: "get" }).then((res: any) => res.json());
+  const decodeContent = (rawFile: any) =>
+    Buffer.from(rawFile.content, "base64").toString();
+  
+  const rawFile = await fetchRawFile(file);
+
+  return {
+    path: rawFile.path,
+    name: file.filename,
+    status: file.status,
+    content: frontmatter(decodeContent(rawFile))
+  };
+};
+
+export const getFiles = async (request: Request): GetFilesReturn => {
+  const files = request.data.files;
+
+  console.log("---------");
+  console.log(`${files.length} file found!` || "no files");
+
+  const contents = await Promise.all(files.map(parseFile));
+  contents.map((file: ParsedFile) => {
+    console.log(
+      `file name ${file.name} has length ${file.content.body.length}`
+    );
+  });
+  console.log("---------");
+
+  return { files: contents };
+};
+
+const findUserByEmail = async (
+  email: string
+): Promise<string | undefined> => {
+  const Github = getOctokit(process.env.GITHUB_TOKEN || "");
+
+  console.log(`Searching for user by email: ${email}`);
+  const { data: results } = await Github.search.users({ q: email });
+  console.log(`\t found ${results.total_count} results`);
+
+  if (results.total_count > 0) {
+    console.log(
+      `\t Recording mapping from ${email} to ${results.items[0].login}`
+    );
+    return "@" + results.items[0].login;
+  }
+  console.log("No github user found, using email instead");
+};
+
+const getAuthors = async (rawAuthorList: string) => {
+  const resolveAuthor = async (author: string) => {
+    if (author[0] === "@") {
+      return author.toLowerCase();
+    } else {
+      // Email address
+      const queriedUser = await findUserByEmail(author);
+      return (queriedUser || author).toLowerCase();
+    }
+  };
+
+  const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
+  const resolved = await Promise.all(authors.map(resolveAuthor));
+
+  return new Set(resolved);
 };

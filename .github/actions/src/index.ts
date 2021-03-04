@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === "development") {
     },
     number: 1
   };
-
   // @ts-ignore
   context.repo.owner = process.env.REPO_OWNER_NAME;
   // @ts-ignore
