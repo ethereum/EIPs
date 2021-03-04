@@ -1,0 +1,59 @@
+---
+eip: <to be assigned>
+title: Account gas storage opcodes
+author: William Morriss (@wjmelements)
+discussions-to: TODO EthereumMagicians URL
+status: Draft
+type: Standards Track
+category Core
+created: 2020-03-04
+---
+
+## Simple Summary
+Allows contract accounts to store gas that can be transfered to the refund counter.
+
+## Abstract
+A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+
+## Motivation
+The refund mechanism is currently being used by gas tokens to arbitrage gas price.
+This brings gas supply elasticity and price stability by moving gas from blocks with less demand to blocks with more demand.
+Unfortunately this rewards unnecessary state growth.
+By introducing a superior gas storage mechanism, the gas market will require less storage and computation.
+
+## Specification
+Contract accounts gain an unsigned gas refund counter, initially zero.
+
+Three new opcodes are introduced to manage this state.
+
+* `SELFGAS`: Pushes the current account's gas refund counter onto the stack.
+Shares gas pricing with `SELFBALANCE`.
+* `USEGAS`: Pops `amount` from the stack.
+The minimum of `amount` and the current account's gas refund counter is transferred to the execution context's refund counter.
+Costs `5000` gas.
+* `STOREGAS`: Pops `amount` from the stack.
+Costs `5000 + amount` gas.
+Increases the current account's gas refund counter by `amount`.
+
+## Rationale
+By reusing the execution context's refund counter we can reuse its 50% DoS protection, which limits its block elasticity contribution to 2x.
+
+The gas costs are based on similar opcodes `SELFBALANCE` and `SSTORE`.
+
+Most accounts will store no gas, so the per-account storage overhead should be minimal or even zero in the normal case.
+
+## Backwards Compatibility
+Because the gas is added to the refund counter, no compatibility issues are anticipated.
+
+## Test Cases
+TODO
+
+## Reference Implementation
+TODO
+
+## Security Considerations
+DoS is already limited by the 50% refund limit.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
