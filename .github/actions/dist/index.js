@@ -6917,8 +6917,8 @@ const COMMENT_HEADER = "Hi! I'm a bot, and I wanted to automerge your PR, but co
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 
 // CONCATENATED MODULE: ./src/utils/regex.ts
-const FILE_RE = /^EIPS\/eip-(\d+)\.md$/mg;
-const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
+const FILE_RE = /^EIPS\/eip-(\d+)\.md$/gm;
+const AUTHOR_RE = /[(<]([^>)]+)[>)]/gm;
 /**
  * This functionality is supported in es2020, but for the purposes
  * of compatibility (and because it's quite simple) it's built explicitly
@@ -7010,12 +7010,14 @@ const postComment = ({ errors, pr, eips }) => PostComment_awaiter(void 0, void 0
             console.log(`\t- Current comment body:\n\t\t"""\n\t\t${comment.body}\n\t\t"""`);
             if (comment.body != message) {
                 console.log(`\t- Comment differs from current errors, so updating...`);
-                Github.issues.updateComment({
+                Github.issues
+                    .updateComment({
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     comment_id: comment.id,
                     body: message
-                }).catch(err => {
+                })
+                    .catch((err) => {
                     console.log(err);
                 });
                 return;
@@ -7067,7 +7069,12 @@ const parseFile = (file) => CheckFile_awaiter(void 0, void 0, void 0, function* 
     const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
     const decodeContent = (rawFile) => Buffer.from(rawFile.content, "base64").toString();
     const rawFile = yield fetchRawFile(file);
-    return { path: rawFile.path, name: file.filename, status: file.status, content: front_matter_default()(decodeContent(rawFile)) };
+    return {
+        path: rawFile.path,
+        name: file.filename,
+        status: file.status,
+        content: front_matter_default()(decodeContent(rawFile))
+    };
 });
 const getFiles = (request) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
     const files = request.data.files;
@@ -7135,7 +7142,7 @@ const checkFile = ({ data: pr }, parsedFile) => CheckFile_awaiter(void 0, void 0
         if (!ALLOWED_STATUSES.has(status.toLowerCase())) {
             return [
                 null,
-                `EIP ${eipNum} is in state ${status}, not Draft or Last Call`,
+                `EIP ${eipNum} is in state ${status}, not Draft or Last Call`
             ];
         }
         const eip = { number: eipNum, authors };
@@ -7144,25 +7151,29 @@ const checkFile = ({ data: pr }, parsedFile) => CheckFile_awaiter(void 0, void 0
         if (basedata.attributes["eip"] !== parseInt(eipNum)) {
             return [
                 eip,
-                `EIP header in ${fileName} does not match: ${basedata.attributes["eip"]}`,
+                `EIP header in ${fileName} does not match: ${basedata.attributes["eip"]}`
             ];
         }
         console.log(`eips in header + file name matched!`);
         // checking head <---> base
         console.log("------ Checking Head <--> Base commit consistency...");
         console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
-        const head = yield Github.repos.getCommit({ owner: utils.context.repo.owner, repo: utils.context.repo.repo, ref: pr.head.sha }); // ref=pr.head.sha
+        const head = yield Github.repos.getCommit({
+            owner: utils.context.repo.owner,
+            repo: utils.context.repo.repo,
+            ref: pr.head.sha
+        }); // ref=pr.head.sha
         if (!head.data.files) {
             throw "no files at head";
         }
-        const headdata = yield parseFile(head.data.files[0]).then(res => res.content);
+        const headdata = yield parseFile(head.data.files[0]).then((res) => res.content);
         console.log("head commit attributes...");
         console.log(headdata.attributes);
         if (headdata.attributes["eip"] != parseInt(eipNum)) {
             console.log(`head and base commits had non-matching eip numbers; head: ${headdata.attributes["eip"]} -- base: ${eipNum}`);
             return [
                 eip,
-                `EIP header in modified file ${fileName} does not match: ${headdata.attributes["eip"]}`,
+                `EIP header in modified file ${fileName} does not match: ${headdata.attributes["eip"]}`
             ];
         }
         else if (headdata.attributes["status"].toLowerCase() !=
@@ -7170,7 +7181,7 @@ const checkFile = ({ data: pr }, parsedFile) => CheckFile_awaiter(void 0, void 0
             console.log(`A status change was detected; head: ${headdata.attributes["status"].toLowerCase()} -- base: ${basedata.attributes["status"].toLowerCase()}`);
             return [
                 eip,
-                `Trying to change EIP ${eipNum} state from ${basedata.attributes["status"]} to ${headdata.attributes["status"]}`,
+                `Trying to change EIP ${eipNum} state from ${basedata.attributes["status"]} to ${headdata.attributes["status"]}`
             ];
         }
         console.log("No errors with the file were detected!");
@@ -7202,13 +7213,13 @@ const checkPr = ({ repoName, prNum, owner, files }) => CheckPr_awaiter(void 0, v
     console.log(`Checking PR ${prNum} on ${repoName}`);
     const { data: repo } = yield Github.repos.get({
         owner,
-        repo: repoName,
+        repo: repoName
     });
     console.log(`repo full name: `, repo.full_name);
     const pr = yield Github.pulls.get({
         repo: repo.name,
         owner: ((_a = repo.owner) === null || _a === void 0 ? void 0 : _a.login) || github.context.repo.owner,
-        pull_number: prNum,
+        pull_number: prNum
     });
     if (pr.data.merged) {
         console.error(`PR ${prNum} is already merged; quitting`);
@@ -7245,15 +7256,15 @@ const checkPr = ({ repoName, prNum, owner, files }) => CheckPr_awaiter(void 0, v
         const authors = eip.authors;
         const number = eip.number;
         console.log(`\t- EIP ${number} has authors: ${[...authors]} with size ${authors.size}`);
-        const nonAuthors = approvals.filter(approver => !authors.has(approver));
+        const nonAuthors = approvals.filter((approver) => !authors.has(approver));
         console.log(`\t- EIP ${number} has non-author approvers: ${nonAuthors}`);
         if (authors.size == 0) {
             errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
         }
         else if (nonAuthors.length > 0) {
             errors.push(`\t- EIP ${number} requires approval from one of (${[...authors]})`);
-            [...authors].map(author => {
-                if (author.startsWith('@')) {
+            [...authors].map((author) => {
+                if (author.startsWith("@")) {
                     reviewers.add(author.slice(1));
                 }
             });
@@ -7265,16 +7276,20 @@ const getApprovals = (pr) => CheckPr_awaiter(void 0, void 0, void 0, function* (
     var _b;
     let approvals = new Set();
     if ((_b = pr.data.user) === null || _b === void 0 ? void 0 : _b.login) {
-        approvals.add('@' + pr.data.user.login.toLowerCase());
+        approvals.add("@" + pr.data.user.login.toLowerCase());
     }
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const { data: reviews } = yield Github.pulls.listReviews({ owner: github.context.repo.owner, repo: github.context.repo.repo, pull_number: pr.data.number });
+    const { data: reviews } = yield Github.pulls.listReviews({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        pull_number: pr.data.number
+    });
     console.log(`\t- ${reviews.length} reviews were found for the PR`);
-    reviews.map(review => {
+    reviews.map((review) => {
         var _a, _b;
         if (review.state == "APPROVED") {
             if ((_a = review.user) === null || _a === void 0 ? void 0 : _a.login) {
-                approvals.add('@' + ((_b = review.user) === null || _b === void 0 ? void 0 : _b.login.toLowerCase()));
+                approvals.add("@" + ((_b = review.user) === null || _b === void 0 ? void 0 : _b.login.toLowerCase()));
             }
         }
     });
@@ -7357,7 +7372,7 @@ const getRequest = () => {
         base: (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha,
         head: (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha,
         owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+        repo: github.context.repo.repo
     })
         .catch(() => { });
 };
@@ -7368,7 +7383,12 @@ const main = () => main_awaiter(void 0, void 0, void 0, function* () {
     }
     const { repoName, prNum, owner } = yield checkRequest(request);
     const { files } = yield getFiles(request);
-    const { errors, pr, eips } = yield checkPr({ repoName, prNum, owner, files: files });
+    const { errors, pr, eips } = yield checkPr({
+        repoName,
+        prNum,
+        owner,
+        files: files
+    });
     // if no errors, then merge
     if (errors.length === 0) {
         return yield merge({ pr, eips });
@@ -7415,7 +7435,7 @@ try {
 }
 catch (error) {
     Object(core.setFailed)(error.message);
-    console.log(error);
+    console.error(error);
 }
 
 

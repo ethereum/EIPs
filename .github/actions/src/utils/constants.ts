@@ -5,5 +5,6 @@ export const MERGE_MESSAGE = `
     - The build is passing
     `;
 export const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
-export const COMMENT_HEADER = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n"
+export const COMMENT_HEADER =
+  "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
 export const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";

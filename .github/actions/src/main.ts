@@ -10,7 +10,7 @@ export const getRequest = () => {
       base: context.payload.pull_request?.base?.sha,
       head: context.payload.pull_request?.head?.sha,
       owner: context.repo.owner,
-      repo: context.repo.repo,
+      repo: context.repo.repo
     })
     .catch(() => {});
 };
@@ -24,7 +24,12 @@ export const main = async () => {
 
   const { repoName, prNum, owner } = await checkRequest(request);
   const { files } = await getFiles(request);
-  const { errors, pr, eips } = await checkPr({ repoName, prNum, owner, files: files as ParsedFile[] });
+  const { errors, pr, eips } = await checkPr({
+    repoName,
+    prNum,
+    owner,
+    files: files as ParsedFile[]
+  });
 
   // if no errors, then merge
   if (errors.length === 0) {
