@@ -1,6 +1,5 @@
 import { getOctokit } from "@actions/github";
-import { GITHUB_TOKEN, MERGE_MESSAGE } from "src/utils/constants";
-import { PR, EIP } from "src/utils/types";
+import { PR, EIP, GITHUB_TOKEN, MERGE_MESSAGE } from "src/utils";
 
 export type Merge = {
   pr: PR,

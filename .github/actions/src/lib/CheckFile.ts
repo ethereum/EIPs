@@ -7,6 +7,9 @@ import { context } from "@actions/github/lib/utils";
 import fetch from "node-fetch";
 
 export const parseFile = async (file: File): Promise<ParsedFile> => {
+  const Github = getOctokit(GITHUB_TOKEN);
+  const files = Github.repos.getContent
+
   const fetchRawFile = (file: File): Promise<any> =>
     fetch(file.contents_url, { method: "get" }).then((res: any) => res.json());
   const decodeContent = (rawFile: any) =>
@@ -16,18 +19,20 @@ export const parseFile = async (file: File): Promise<ParsedFile> => {
   return { path: rawFile.path, name: file.filename, status: file.status, content: frontmatter(decodeContent(rawFile))};
 };
 
-export const getFiles = async (request: Request) => {
+type GetFilesReturn = Promise<{
+  files: ParsedFile[]
+}>;
+
+export const getFiles = async (request: Request): GetFilesReturn => {
   const files = request.data.files;
 
   console.log("---------");
   console.log(`${files.length} file found!` || "no files");
 
   const contents = await Promise.all(files.map(parseFile));
-  // contents.map((file: ParsedFile) => {
-  //   console.log(`file name ${file.name} has length ${file.content.body.length}`)
-  // }
-    
-  // );
+  contents.map((file: ParsedFile) => {
+    console.log(`file name ${file.name} has length ${file.content.body.length}`)
+  });
   console.log("---------");
   
   return { files: contents }

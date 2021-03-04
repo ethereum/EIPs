@@ -1,22 +1,19 @@
 {
   "compilerOptions": {
-      "allowJs": true,
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true,
-      "isolatedModules": true,
-      "lib": [
-          "es6", "es2017"
-      ],
-      "moduleResolution": "node",
-      "noEmit": true,
-      "strict": true,
-      "target": "esnext",
-      "baseUrl": "./",
-      "paths": {
-          "src/*": ["src/*"]
-      }
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "baseUrl": "./",
+    "target": "es2015",
+    "paths": {
+    "src/*": ["src/*"]
+    },
+    "noImplicitAny": false
   },
   "exclude": [
-      "node_modules"
+    "node_modules"
   ]
 }

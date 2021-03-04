@@ -1,7 +1,6 @@
 import { getOctokit } from "@actions/github";
-import { context } from "@actions/github/lib/utils";
-import { GITHUB_TOKEN } from "src/utils/constants";
-import { EIP, ParsedFile, PR, Request } from "src/utils/types";
+import { context } from "@actions/github";
+import { EIP, ParsedFile, PR, GITHUB_TOKEN } from "src/utils";
 import { checkFile } from "./CheckFile";
 
 export type CheckPr = {

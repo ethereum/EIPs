@@ -7,7 +7,7 @@ export const AUTHOR_RE = /[(<]([^>)]+)[>)]/mg;
  */
 export const matchAll = (rawString: string, regex: RegExp, group: number): string[] => {
   let match = regex.exec(rawString);
-  let matches = [];
+  let matches: string[] = [];
   while (match != null) {
     matches.push(match[group]);
     match = regex.exec(rawString);

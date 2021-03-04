@@ -1,6 +1,7 @@
 import { context, getOctokit } from "@actions/github";
 import { GITHUB_TOKEN } from "src/utils/constants";
 import { checkPr, checkRequest, merge, postComment, getFiles } from "src/lib";
+import { ParsedFile } from "./utils";
 
 export const getRequest = () => {
   const Github = getOctokit(GITHUB_TOKEN);
@@ -23,7 +24,7 @@ export const main = async () => {
 
   const { repoName, prNum, owner } = await checkRequest(request);
   const { files } = await getFiles(request);
-  const { errors, pr, eips } = await checkPr({ repoName, prNum, owner, files });
+  const { errors, pr, eips } = await checkPr({ repoName, prNum, owner, files: files as ParsedFile[] });
 
   // if no errors, then merge
   if (errors.length === 0) {

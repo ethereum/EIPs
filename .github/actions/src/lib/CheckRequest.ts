@@ -1,5 +1,5 @@
 import { context } from "@actions/github";
-import { Request } from "src/utils/types";
+import { Request } from "src/utils";
 
 type CheckRequestReturn = Promise<{
   repoName: string;
