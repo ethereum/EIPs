@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: OPCODE 0x46 MEDGASPRICE
 author: Justice Hudson (@jchancehud)
-discussions-to:
+discussions-to: https://ethereum-magicians.org/t/medgasprice-opcode-eip/5480
 status: Draft
 type: Standards Track
 category: Core
