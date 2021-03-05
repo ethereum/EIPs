@@ -64,7 +64,7 @@ This proposal introduces a single new opcode. No backwards incompatibilities sho
 
 ## Forwards Compatibility
 
-EIP 1557 plans to change the fee market in a number of ways. Most notably is the creation of a base fee that is burned. In this context an "inclusion fee" still exists as a part of the total fee. Consider the following two cases:
+[EIP 1559](https://eips.ethereum.org/EIPS/eip-1559) plans to change the fee market in a number of ways. Most notably is the creation of a base fee that is burned. In this context an "inclusion fee" still exists as a part of the total fee. Consider the following two cases:
 
 ##### Block sizes are increasing (all available gas is being consumed)
 
@@ -74,9 +74,9 @@ In this case there will be bidding contention in the inclusion fee to incentiviz
 
 In this case an attacker could specify a high inclusion fee to incentivize miners to include their transaction early in the block. Miners are incentivized to do so as including expensive transactions first reduces the risk of a revert (and partial refund) occurring.
 
-Given these two cases this EIP seems relevant in the context of EIP 1557.
+Given these two cases this EIP seems relevant in the context of EIP 1559.
 
-Post EIP 1557 the `MEDGASPRICE` operator should return the median `effective_gas_price` of the previous block.
+Post EIP 1559 the `MEDGASPRICE` operator should return the median `effective_gas_price` of the previous block.
 
 An additional opcode `BASEGASPRICE` (0x47) should be added so contracts can determine the inclusion fee at runtime (by subtracting from `GASPRICE`). Without such an opcode the anti front-running strategies described in this document do not work.
 
