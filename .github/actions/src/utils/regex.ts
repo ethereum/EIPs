@@ -18,3 +18,6 @@ export const matchAll = (
   }
   return matches;
 };
+
+/** to find the EIP number in a file name */
+export const EIP_NUM_RE = /(\d+)/;

@@ -6915,6 +6915,16 @@ const MERGE_MESSAGE = `
 const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
 const COMMENT_HEADER = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+var FrontMatterAttributes;
+(function (FrontMatterAttributes) {
+    FrontMatterAttributes["status"] = "status";
+    FrontMatterAttributes["eip"] = "eip";
+    FrontMatterAttributes["author"] = "author";
+})(FrontMatterAttributes || (FrontMatterAttributes = {}));
+var EipStatus;
+(function (EipStatus) {
+    EipStatus["draft"] = "draft";
+})(EipStatus || (EipStatus = {}));
 
 // CONCATENATED MODULE: ./src/utils/regex.ts
 const FILE_RE = /^EIPS\/eip-(\d+)\.md$/gm;
@@ -6932,6 +6942,8 @@ const matchAll = (rawString, regex, group) => {
     }
     return matches;
 };
+/** to find the EIP number in a file name */
+const EIP_NUM_RE = /(\d+)/;
 
 // CONCATENATED MODULE: ./src/utils/types.ts
 
@@ -7063,9 +7075,60 @@ var CheckFile_awaiter = (undefined && undefined.__awaiter) || function (thisArg,
 
 
 
+const checkFile = (pr, parsedFile) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
+    const filename = parsedFile.path;
+    try {
+        // New files should be manually reviewed
+        if (parsedFile.status == "added") {
+            return [null, `Contains new file ${filename}`];
+        }
+        // File name is formatted as an EIP
+        const match = filename.search(FILE_RE);
+        if (match === -1) {
+            return [null, `File ${filename} is not an EIP`];
+        }
+        // EIP number is defined
+        const eipNumMatch = filename.match(EIP_NUM_RE);
+        const filenameEipNum = eipNumMatch && parseInt(eipNumMatch[0]);
+        if (!filenameEipNum) {
+            return [
+                null,
+                `No EIP number was found to be associated with file name ${filename}`
+            ];
+        }
+        // Collect pr diff
+        const { base, head } = yield getBaseAndHeadFile(pr, filename);
+        // Verify EIP number in the file name matches the most recent commit's attribute
+        if (head.eipNum !== filenameEipNum) {
+            return [
+                null,
+                `EIP header in modified file ${filename} does not match: ${filenameEipNum}`
+            ];
+        }
+        const eip = { number: head.eipNum.toString(), authors: head.authors };
+        // Check status
+        if (head.status !== base.status) {
+            return [
+                eip,
+                `Trying to change EIP ${head.eipNum} state from ${base.status} to ${head.status}`
+            ];
+        }
+        else if (!ALLOWED_STATUSES.has(base.status)) {
+            return [
+                null,
+                `EIP ${filenameEipNum} is in state ${status}, not Draft or Last Call`
+            ];
+        }
+        // no errors found...
+        return [eip, null];
+    }
+    catch (e) {
+        console.warn(`Error checking file ${parsedFile.name}: ${e}`);
+        return [null, `Error checking file ${parsedFile.name}: ${e}`];
+    }
+});
 const parseFile = (file) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const files = Github.repos.getContent;
+    // TODO: there's probably a way to do this with octokit (better for maintaining types)
     const fetchRawFile = (file) => lib_default()(file.contents_url, { method: "get" }).then((res) => res.json());
     const decodeContent = (rawFile) => Buffer.from(rawFile.content, "base64").toString();
     const rawFile = yield fetchRawFile(file);
@@ -7078,16 +7141,58 @@ const parseFile = (file) => CheckFile_awaiter(void 0, void 0, void 0, function* 
 });
 const getFiles = (request) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
     const files = request.data.files;
-    console.log("---------");
-    console.log(`${files.length} file found!` || "no files");
     const contents = yield Promise.all(files.map(parseFile));
-    contents.map((file) => {
-        console.log(`file name ${file.name} has length ${file.content.body.length}`);
-    });
-    console.log("---------");
     return { files: contents };
 });
+const getBaseAndHeadFile = ({ data: pr }, filename) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    // Get base and head commits
+    const baseCommit = yield Github.repos
+        .getCommit({
+        owner: utils.context.repo.owner,
+        repo: utils.context.repo.repo,
+        ref: pr.base.sha
+    })
+        .then((res) => res.data);
+    const headCommit = yield Github.repos
+        .getCommit({
+        owner: utils.context.repo.owner,
+        repo: utils.context.repo.repo,
+        ref: pr.head.sha
+    })
+        .then((res) => res.data);
+    // Get and parse head and base file
+    const baseFile = (_a = baseCommit.files) === null || _a === void 0 ? void 0 : _a.filter((file) => file.filename === filename);
+    const headFile = (_b = headCommit.files) === null || _b === void 0 ? void 0 : _b.filter((file) => file.filename === filename);
+    if (!baseFile || !headFile) {
+        throw `Failed to find file at head and base: the requested file '${filename}' is either new or was renamed`;
+    }
+    const baseParsedFile = yield parseFile(baseFile[0]);
+    const headParsedFile = yield parseFile(headFile[0]);
+    // Organize information cleanly
+    return {
+        head: {
+            eipNum: headParsedFile.content.attributes[FrontMatterAttributes.eip],
+            status: headParsedFile.content.attributes[FrontMatterAttributes.status].toLowerCase(),
+            authors: yield getAuthors(headParsedFile.content.attributes[FrontMatterAttributes.author])
+        },
+        base: {
+            eipNum: baseParsedFile.content.attributes[FrontMatterAttributes.eip],
+            status: baseParsedFile.content.attributes[FrontMatterAttributes.status].toLowerCase(),
+            authors: yield getAuthors(baseParsedFile.content.attributes[FrontMatterAttributes.author])
+        }
+    };
+});
 const getAuthors = (rawAuthorList) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
+    const findUserByEmail = (email) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
+        const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN || "");
+        const { data: results } = yield Github.search.users({ q: email });
+        if (results.total_count > 0) {
+            return "@" + results.items[0].login;
+        }
+        console.warn(`No github user found, using email instead: ${email}`);
+    });
     const resolveAuthor = (author) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
         if (author[0] === "@") {
             return author.toLowerCase();
@@ -7098,99 +7203,9 @@ const getAuthors = (rawAuthorList) => CheckFile_awaiter(void 0, void 0, void 0, 
             return (queriedUser || author).toLowerCase();
         }
     });
-    const findUserByEmail = (email) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
-        const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN || "");
-        console.log(`Searching for user by email: ${email}`);
-        const { data: results } = yield Github.search.users({ q: email });
-        console.log(`\t found ${results.total_count} results`);
-        if (results.total_count > 0) {
-            console.log(`\t Recording mapping from ${email} to ${results.items[0].login}`);
-            return "@" + results.items[0].login;
-        }
-        console.log("No github user found, using email instead");
-    });
     const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
     const resolved = yield Promise.all(authors.map(resolveAuthor));
     return new Set(resolved);
-});
-const checkFile = ({ data: pr }, parsedFile) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const fileName = parsedFile.path;
-    console.log(`---- check_file: ${fileName}`);
-    try {
-        const match = fileName.search(FILE_RE);
-        if (match === -1) {
-            return [null, `File ${fileName} is not an EIP`];
-        }
-        const eipNumMatch = fileName.match(/(\d+)/);
-        if (!eipNumMatch) {
-            throw "no eip number";
-        }
-        const eipNum = eipNumMatch[0];
-        console.log(`Found EIP number as ${eipNum} for file name ${fileName}`);
-        if (parsedFile.status == "added") {
-            return [null, `Contains new file ${fileName}`];
-        }
-        console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
-        const basedata = parsedFile.content;
-        console.log("got attributes...");
-        console.log(basedata.attributes);
-        const status = basedata.attributes["status"];
-        console.log("----- Retrieving authors from EIP raw authors list");
-        const authors = yield getAuthors(basedata.attributes["author"]);
-        console.log(`authors: ${authors}`);
-        if (!ALLOWED_STATUSES.has(status.toLowerCase())) {
-            return [
-                null,
-                `EIP ${eipNum} is in state ${status}, not Draft or Last Call`
-            ];
-        }
-        const eip = { number: eipNum, authors };
-        console.log(`--------`);
-        console.log(`eip attribute: ${basedata.attributes["eip"]}\textracted num: ${eipNum}`);
-        if (basedata.attributes["eip"] !== parseInt(eipNum)) {
-            return [
-                eip,
-                `EIP header in ${fileName} does not match: ${basedata.attributes["eip"]}`
-            ];
-        }
-        console.log(`eips in header + file name matched!`);
-        // checking head <---> base
-        console.log("------ Checking Head <--> Base commit consistency...");
-        console.log(`Getting file ${fileName} from ${pr.base.user.login}@${pr.base.repo.name}/${pr.base.sha}`);
-        const head = yield Github.repos.getCommit({
-            owner: utils.context.repo.owner,
-            repo: utils.context.repo.repo,
-            ref: pr.head.sha
-        }); // ref=pr.head.sha
-        if (!head.data.files) {
-            throw "no files at head";
-        }
-        const headdata = yield parseFile(head.data.files[0]).then((res) => res.content);
-        console.log("head commit attributes...");
-        console.log(headdata.attributes);
-        if (headdata.attributes["eip"] != parseInt(eipNum)) {
-            console.log(`head and base commits had non-matching eip numbers; head: ${headdata.attributes["eip"]} -- base: ${eipNum}`);
-            return [
-                eip,
-                `EIP header in modified file ${fileName} does not match: ${headdata.attributes["eip"]}`
-            ];
-        }
-        else if (headdata.attributes["status"].toLowerCase() !=
-            basedata.attributes["status"].toLowerCase()) {
-            console.log(`A status change was detected; head: ${headdata.attributes["status"].toLowerCase()} -- base: ${basedata.attributes["status"].toLowerCase()}`);
-            return [
-                eip,
-                `Trying to change EIP ${eipNum} state from ${basedata.attributes["status"]} to ${headdata.attributes["status"]}`
-            ];
-        }
-        console.log("No errors with the file were detected!");
-        return [eip, null];
-    }
-    catch (e) {
-        console.warn("Exception checking file %s", parsedFile.name);
-        return [null, `Error checking file ${parsedFile.name}`];
-    }
 });
 
 // CONCATENATED MODULE: ./src/lib/CheckPr.ts
