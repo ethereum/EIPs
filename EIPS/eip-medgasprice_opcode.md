@@ -6,7 +6,7 @@ discussions-to: https://ethereum-magicians.org/t/medgasprice-opcode-eip/5480
 status: Draft
 type: Standards Track
 category: Core
-created: 2021-05-03
+created: 2021-03-05
 ---
 
 ## Simple Summary
