@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 3336
 title: Paged memory allocation for the EVM
 author: Nick Johnson (@arachnid)
-discussions-to: <URL>
+discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Core
