@@ -3,7 +3,7 @@ sccp: 86
 title: Initialize New Account Merging Window
 author: Kaleb Keny (@kaleb-keny)
 discussions-to: governance
-status: Proposed
+status: Implemented
 created: 2021-02-17
 ---
 
