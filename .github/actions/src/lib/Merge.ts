@@ -6,8 +6,7 @@ export type Merge = {
   eips: EIP[];
 };
 
-export const merge = async ({ pr: _pr, eips }: Merge) => {
-  const pr = _pr.data;
+export const merge = async ({ pr, eips }: Merge) => {
   const prNum = pr.number;
   const Github = getOctokit(GITHUB_TOKEN);
   const eipNumbers = eips.join(", ");

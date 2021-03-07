@@ -6948,6 +6948,7 @@ const EIP_NUM_RE = /(\d+)/;
 // CONCATENATED MODULE: ./src/utils/types.ts
 
 const types_Github = Object(github.getOctokit)("fake");
+const PR = () => types_Github.pulls.get().then(res => res.data);
 var _compared_;
 var _files_;
 
@@ -6968,8 +6969,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
-const merge = ({ pr: _pr, eips }) => __awaiter(void 0, void 0, void 0, function* () {
-    const pr = _pr.data;
+const merge = ({ pr, eips }) => __awaiter(void 0, void 0, void 0, function* () {
     const prNum = pr.number;
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
     const eipNumbers = eips.join(", ");
@@ -7144,7 +7144,7 @@ const getFiles = (request) => CheckFile_awaiter(void 0, void 0, void 0, function
     const contents = yield Promise.all(files.map(parseFile));
     return { files: contents };
 });
-const getBaseAndHeadFile = ({ data: pr }, filename) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
+const getBaseAndHeadFile = (pr, filename) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
     // Get base and head commits
@@ -7165,7 +7165,7 @@ const getBaseAndHeadFile = ({ data: pr }, filename) => CheckFile_awaiter(void 0,
     // Get and parse head and base file
     const baseFile = (_a = baseCommit.files) === null || _a === void 0 ? void 0 : _a.filter((file) => file.filename === filename);
     const headFile = (_b = headCommit.files) === null || _b === void 0 ? void 0 : _b.filter((file) => file.filename === filename);
-    if (!baseFile || !headFile) {
+    if (!(headFile && headFile[0]) || !(baseFile && baseFile[0])) {
         throw `Failed to find file at head and base: the requested file '${filename}' is either new or was renamed`;
     }
     const baseParsedFile = yield parseFile(baseFile[0]);
@@ -7186,7 +7186,7 @@ const getBaseAndHeadFile = ({ data: pr }, filename) => CheckFile_awaiter(void 0,
 });
 const getAuthors = (rawAuthorList) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
     const findUserByEmail = (email) => CheckFile_awaiter(void 0, void 0, void 0, function* () {
-        const Github = Object(github.getOctokit)(process.env.GITHUB_TOKEN || "");
+        const Github = Object(github.getOctokit)(GITHUB_TOKEN);
         const { data: results } = yield Github.search.users({ q: email });
         if (results.total_count > 0) {
             return "@" + results.items[0].login;
@@ -7223,20 +7223,32 @@ var CheckPr_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 const checkPr = ({ repoName, prNum, owner, files }) => CheckPr_awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    console.log(`Checking PR ${prNum} on ${repoName}`);
-    const { data: repo } = yield Github.repos.get({
-        owner,
-        repo: repoName
-    });
-    console.log(`repo full name: `, repo.full_name);
-    const pr = yield Github.pulls.get({
-        repo: repo.name,
-        owner: ((_a = repo.owner) === null || _a === void 0 ? void 0 : _a.login) || github.context.repo.owner,
+    const { data: pr } = yield Github.pulls.get({
+        repo: github.context.repo.repo,
+        owner: github.context.repo.owner,
         pull_number: prNum
     });
-    if (pr.data.merged) {
+    // Get base and head commits
+    const baseCommit = yield Github.repos
+        .getCommit({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        ref: pr.base.sha
+    })
+        .then((res) => res.data);
+    const headCommit = yield Github.repos
+        .getCommit({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        ref: pr.head.sha
+    })
+        .then((res) => res.data);
+    let eips = [];
+    let errors = [];
+    const approvals = yield getApprovals(pr);
+    let reviewers = new Set();
+    if (pr.merged) {
         console.error(`PR ${prNum} is already merged; quitting`);
         throw `PR ${prNum} is already merged; quitting`;
     }
@@ -7246,9 +7258,7 @@ const checkPr = ({ repoName, prNum, owner, files }) => CheckPr_awaiter(void 0, v
     //   );
     //   return;
     // }
-    let eips = [];
-    let errors = [];
-    yield Promise.all(files.map((file) => CheckPr_awaiter(void 0, void 0, void 0, function* () {
+    const indexEip = (file) => CheckPr_awaiter(void 0, void 0, void 0, function* () {
         try {
             const [eip, error] = yield checkFile(pr, file);
             if (eip) {
@@ -7262,42 +7272,40 @@ const checkPr = ({ repoName, prNum, owner, files }) => CheckPr_awaiter(void 0, v
         catch (err) {
             console.log(err);
         }
-    })));
-    console.log(`----- Getting PR approvals`);
-    const approvals = yield getApprovals(pr);
-    console.log(`------ Reviewing authors and approvers`);
-    let reviewers = new Set();
-    eips.map((eip) => {
-        const authors = eip.authors;
-        const number = eip.number;
-        console.log(`\t- EIP ${number} has authors: ${[...authors]} with size ${authors.size}`);
-        const nonAuthors = approvals.filter((approver) => !authors.has(approver));
-        console.log(`\t- EIP ${number} has non-author approvers: ${nonAuthors}`);
-        if (authors.size == 0) {
-            errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
-        }
-        else if (nonAuthors.length > 0) {
-            errors.push(`\t- EIP ${number} requires approval from one of (${[...authors]})`);
-            [...authors].map((author) => {
-                if (author.startsWith("@")) {
-                    reviewers.add(author.slice(1));
-                }
-            });
-        }
     });
+    yield Promise.all(files.map(indexEip));
+    eips.map(checkEip(approvals, errors, reviewers));
     return { errors, pr, eips };
 });
+const checkEip = (approvals, errors, reviewers) => (eip) => {
+    const authors = eip.authors;
+    const number = eip.number;
+    console.log(`\t- EIP ${number} has authors: ${[...authors]} with size ${authors.size}`);
+    const nonAuthors = approvals.filter((approver) => !authors.has(approver));
+    console.log(`\t- EIP ${number} has non-author approvers: ${nonAuthors}`);
+    if (authors.size == 0) {
+        errors.push(`EIP ${number} has no identifiable authors who can approve PRs`);
+    }
+    else if (nonAuthors.length > 0) {
+        errors.push(`\t- EIP ${number} requires approval from one of (${[...authors]})`);
+        [...authors].map((author) => {
+            if (author.startsWith("@")) {
+                reviewers.add(author.slice(1));
+            }
+        });
+    }
+};
 const getApprovals = (pr) => CheckPr_awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _a;
     let approvals = new Set();
-    if ((_b = pr.data.user) === null || _b === void 0 ? void 0 : _b.login) {
-        approvals.add("@" + pr.data.user.login.toLowerCase());
+    if ((_a = pr.user) === null || _a === void 0 ? void 0 : _a.login) {
+        approvals.add("@" + pr.user.login.toLowerCase());
     }
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
     const { data: reviews } = yield Github.pulls.listReviews({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        pull_number: pr.data.number
+        pull_number: pr.number
     });
     console.log(`\t- ${reviews.length} reviews were found for the PR`);
     reviews.map((review) => {
@@ -7309,7 +7317,7 @@ const getApprovals = (pr) => CheckPr_awaiter(void 0, void 0, void 0, function* (
         }
     });
     const _approvals = [...approvals];
-    console.log(`\t- Found approvers for pr number ${pr.data.number}: ${_approvals.join(" & ")}`);
+    console.log(`\t- Found approvers for pr number ${pr.number}: ${_approvals.join(" & ")}`);
     return _approvals;
 });
 

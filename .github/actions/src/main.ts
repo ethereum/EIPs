@@ -1,7 +1,7 @@
 import { context, getOctokit } from "@actions/github";
 import { GITHUB_TOKEN } from "src/utils/constants";
 import { checkPr, checkRequest, merge, postComment, getFiles } from "src/lib";
-import { ParsedFile } from "./utils";
+import { ParsedFile, EIP } from "./utils";
 
 export const getRequest = () => {
   const Github = getOctokit(GITHUB_TOKEN);
@@ -15,6 +15,9 @@ export const getRequest = () => {
     .catch(() => {});
 };
 
+export const ERRORS: string[] = [];
+export const EIPs: EIP[] = [];
+
 export const main = async () => {
   const request = await getRequest();
 
@@ -24,19 +27,17 @@ export const main = async () => {
 
   const { repoName, prNum, owner } = await checkRequest(request);
   const { files } = await getFiles(request);
-  const { errors, pr, eips } = await checkPr({
-    repoName,
+  const { pr } = await checkPr({
     prNum,
-    owner,
     files: files as ParsedFile[]
   });
 
   // if no errors, then merge
-  if (errors.length === 0) {
-    return await merge({ pr, eips });
+  if (ERRORS.length === 0) {
+    return await merge({ pr, eips: EIPs });
   }
 
-  if (errors.length > 0 && eips.length > 0) {
-    return await postComment({ errors, pr, eips });
+  if (ERRORS.length > 0 && EIPs.length > 0) {
+    return await postComment({ errors: ERRORS, pr, eips: EIPs });
   }
 };
