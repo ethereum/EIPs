@@ -40,7 +40,7 @@ The breakdown of the program is as follows:
 | **Total** 	| **$27.7M** 	| **93% Utilization** 	|
 
 
-Want to take the opportunity to mention that the loan program can be accesses on this [portal](https://synthetix.surge.sh/) which now display the liquidation price on shorts. Thank you Mitch!
+Want to take the opportunity to mention that the loan program which can be accessed on this [portal](https://synthetix.surge.sh/)  now display the liquidation price on shorts. Thank you Mitch!
 
 ## Copyright
 
