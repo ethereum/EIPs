@@ -23,7 +23,11 @@ title: Synthetix Improvement Proposals
 <h2>Contributing</h2>
 <ol>
   <li>Review <a href="https://sips.synthetix.io/sips/sip-1">SIP-1</a>.</li>
-  <li>Fork the repository by clicking "Fork" in the top right.</li>
+  <li>
+    Fork the repository by visiting the SIPs
+    <a href="https://github.com/Synthetixio/SIPs">repo</a> and pressing "Fork"
+    in the top right.
+  </li>
   <li>
     Add your SIP to your fork of the repository. There is a
     <a href="https://github.com/Synthetixio/SIPs/blob/master/sip-x.md"
@@ -47,30 +51,50 @@ title: Synthetix Improvement Proposals
 <p>
   If your SIP requires images, the image files should be included in a
   subdirectory of the `assets` folder for that SIP as follow:
-  <code>assets/sip-X</code> (for sip <b>X</b>). When linking to an image in the
-  SIP, use relative links such as <code>../assets/sip-X/image.png</code>.
+  <code>sips/assets/sip-X</code> (for sip <b>X</b>). When linking to an image in
+  the SIP, use relative links such as <code>../assets/sip-X/image.png</code>.
 </p>
 <p>
   When you believe your SIP is mature and ready to progress past the WIP phase,
-  you should ask to have your issue added to the next governance call where it
-  can be discussed for inclusion in a future platform upgrade. If the community
-  agrees to include it, the SIP editors will update the state of your SIP to
-  <code>Approved</code>.
+  you should reach out to a Spartan Council member on discord by searching
+  members with the "Spartan Council" role or finding them within the #governance
+  channel. The Spartan Council will schedule in a call with the SIP author to go
+  through the SIP in more detail.
+</p>
+
+<p>
+  If the Spartan Council has found that the SIP is valid, they will assign the
+  <code>Proposed</code> status and call the SIP to a snapshot vote within the
+  <code>spartancouncil.eth</code> snapshot space connected on the
+  <a href="https://staking.synthetix.io/"> staking </a> dApp. Once the voting
+  has ended, the SIP is assigned either a <code>Approved</code> or
+  <code>Rejected</code> status depending on whether the SIP voting has reached a
+  super majority.
+</p>
+
+<p>
+  Once the SIP has been implemented by either the protocol DAO or the SIP author
+  and relevant parties, the SIP is assigned the <code>Implemented</code> status.
+  Community members who successfully reach this stage are entitled to a reward
+  from the Synthetix Protocol.
 </p>
 
 <h2>SIP status terms</h2>
 <ul>
   <li><strong>WIP</strong> - a SIP that is still being developed.</li>
   <li>
-    <strong>Proposed</strong> - a SIP that is ready to be reviewed in a
-    governance call.
+    <strong>Proposed</strong> - a SIP that has been reviewed in a Spartan
+    Council SIP interview.
   </li>
   <li>
-    <strong>Approved</strong> - a SIP that has been accepted for implementation
-    by the Synthetix community.
+    <strong>Approved</strong> - a SIP that has successfully reached a super
+    majority Spartan Council vote in favour.
   </li>
   <li>
-    <strong>Implemented</strong> - a SIP that has been released to mainnet.
+    <strong>Implemented</strong> - a SIP that has been released to main-net.
   </li>
-  <li><strong>Rejected</strong> - a SIP that has been rejected.</li>
+  <li>
+    <strong>Rejected</strong> - a SIP that has failed to reach a supermajority
+    Spartan Council vote in favour.
+  </li>
 </ul>
