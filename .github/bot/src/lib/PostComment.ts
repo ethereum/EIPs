@@ -16,7 +16,6 @@ export const postComment = async () => {
   // If comment already exists, update it
   for  (const comment of comments) {
     if (comment.user?.login == me.login && comment.body != message) {
-      console.log("updating comment")
       Github.issues
         .updateComment({
           owner: context.repo.owner,
@@ -32,7 +31,6 @@ export const postComment = async () => {
     }
   }
 
-  console.log("posting new comment")
   // else create a new one
   Github.issues.createComment({
     owner: context.repo.owner,

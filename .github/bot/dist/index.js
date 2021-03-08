@@ -10363,7 +10363,6 @@ const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* 
     // If comment already exists, update it
     for (const comment of comments) {
         if (((_a = comment.user) === null || _a === void 0 ? void 0 : _a.login) == me.login && comment.body != message) {
-            console.log("updating comment");
             Github.issues
                 .updateComment({
                 owner: github.context.repo.owner,
@@ -10377,7 +10376,6 @@ const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* 
             return;
         }
     }
-    console.log("posting new comment");
     // else create a new one
     Github.issues.createComment({
         owner: github.context.repo.owner,
@@ -10700,7 +10698,6 @@ const main = () => src_awaiter(void 0, void 0, void 0, function* () {
         fileDiffs.map(checkEIP);
         // Check each approval list
         yield Promise.all(fileDiffs.map(checkApprovals));
-        console.log(ERRORS);
         // if no errors, then merge
         if (ERRORS.length === 0) {
             console.log("merging");

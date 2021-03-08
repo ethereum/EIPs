@@ -69,8 +69,7 @@ const main = async () => {
     
     // Check each approval list
     await Promise.all(fileDiffs.map(checkApprovals));
-    console.log(ERRORS);
-
+    
     // if no errors, then merge
     if (ERRORS.length === 0) {
       console.log("merging")

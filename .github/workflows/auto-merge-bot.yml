@@ -1,0 +1,22 @@
+on: [pull_request, push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Enviornment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          check-latest: false
+      - name: auto-merge-bot
+        uses: ./.github/bot # Uses an action in the root directory
+        id: auto-merge-bot
+        with:
+        env:
+          GITHUB_TOKEN: ${{ secrets.EIPS_TOKEN }} # https://help.github
