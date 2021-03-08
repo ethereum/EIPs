@@ -8,11 +8,11 @@ import {
   ContentFile,
   EipStatus,
   getFilenameEipNum,
-  FileStatus
+  FileStatus,
+  ERRORS
 } from "src/utils";
 import frontmatter, { FrontMatterResult } from "front-matter";
 import { context } from "@actions/github/lib/utils";
-import { ERRORS } from "src/main";
 import { assertPr } from "./Assertions";
 
 export type FileDiff = {

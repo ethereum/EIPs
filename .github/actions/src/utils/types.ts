@@ -1,6 +1,5 @@
 import { getOctokit } from "@actions/github";
-import frontmatter, { FrontMatterResult } from "front-matter";
-import { EipStatus } from "./constants"
+import { EipStatus } from "./Constants"
 import { Endpoints } from "@octokit/types";
 
 export type Github = ReturnType<typeof getOctokit>;

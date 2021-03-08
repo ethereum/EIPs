@@ -1,5 +1,4 @@
-import { FILE_RE, ALLOWED_STATUSES, File, getFilenameEipNum } from "src/utils";
-import { ERRORS } from "src/main";
+import { FILE_RE, ALLOWED_STATUSES, File, getFilenameEipNum, ERRORS } from "src/utils";
 import { FileDiff } from "./GetFileDiff";
 
 export const checkEIP = (diff: FileDiff) => {

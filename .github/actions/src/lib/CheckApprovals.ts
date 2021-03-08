@@ -1,8 +1,6 @@
 import { context, getOctokit } from "@actions/github";
-import { ERRORS } from "src/main";
-import { EIP, GITHUB_TOKEN, PR } from "src/utils";
+import { GITHUB_TOKEN, ERRORS } from "src/utils";
 import { assertPr } from "./Assertions";
-import { assertPullNumber } from "./Assertions";
 import { FileDiff } from "./GetFileDiff";
 
 export const checkApprovals = async (file: FileDiff) => {

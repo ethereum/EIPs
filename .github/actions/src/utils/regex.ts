@@ -24,6 +24,10 @@ export const matchAll = (
   return matches;
 };
 
+/**
+ * Extracts the EIP number from a given filename (or returns null)
+ * @param filename EIP filename
+ */
 export const getFilenameEipNum = (filename: string) => {
   const eipNumMatch = filename.match(EIP_NUM_RE);
   return eipNumMatch && parseInt(eipNumMatch[0]);
