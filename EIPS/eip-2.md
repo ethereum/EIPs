@@ -10,7 +10,7 @@ created: 2015-11-15
 
 ### Meta reference
 
-[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md).
+[Homestead](./eip-606.md).
 
 ### Parameters
 

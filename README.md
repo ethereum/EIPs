@@ -12,7 +12,7 @@ This repository tracks the ongoing status of EIPs. It contains:
 - [Last Call](https://eips.ethereum.org/all#last-call) for proposals that may become final (see also [RSS feed](https://eips.ethereum.org/last-call.xml)).
 - [Accepted](https://eips.ethereum.org/all#accepted) proposals which are awaiting implementation or deployment by Ethereum client developers.
 - [Final](https://eips.ethereum.org/all#final) and [Active](https://eips.ethereum.org/all#active) proposals that are recorded.
-- The [EIP process](EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
+- The [EIP process](./EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
 
 Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the reader to decide whether a proposal will be useful to them.
 
@@ -27,6 +27,10 @@ The Ethereum Improvement Proposals repository exists as a place to share concret
 ## Preferred Citation Format
 
 The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+
+Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+
+And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
 
 # Validation
 
