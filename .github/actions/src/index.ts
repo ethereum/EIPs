@@ -1,6 +1,7 @@
 import { setFailed } from "@actions/core";
 import { context } from "@actions/github";
-import { main } from "./main";
+import { ERRORS, main } from "src/main";
+import { EVENTS } from "./utils";
 
 if (process.env.NODE_ENV === "development") {
   console.log("establishing development context");
@@ -28,12 +29,14 @@ if (process.env.NODE_ENV === "development") {
     },
     full_name: `${process.env.REPO_OWNER}/${process.env.REPO_NAME}`
   };
-  context.eventName = "pull_request";
+  context.eventName = EVENTS.pullRequest;
 }
 
 try {
-  main();
+  void main();
 } catch (error) {
+  ERRORS.push(`An Exception Occured While Linting: ${error}`)
+  console.log(ERRORS);
   setFailed(error.message);
   console.error(error);
 }

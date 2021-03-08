@@ -18,3 +18,11 @@ export enum FrontMatterAttributes {
 export enum EipStatus {
   draft = "draft"
 }
+
+export enum FileStatus {
+  added = "added"
+}
+
+export enum EVENTS {
+  pullRequest = "pull_request"
+}

@@ -1,14 +1,12 @@
 import { getOctokit } from "@actions/github";
-import { PR, EIP, GITHUB_TOKEN, MERGE_MESSAGE } from "src/utils";
+import { GITHUB_TOKEN, MERGE_MESSAGE } from "src/utils";
+import { assertPr } from "./Assertions";
+import { FileDiff } from "./GetFileDiff";
 
-export type Merge = {
-  pr: PR;
-  eips: EIP[];
-};
-
-export const merge = async ({ pr, eips }: Merge) => {
-  const prNum = pr.number;
+export const merge = async (diffs: FileDiff[]) => {
+  const pr = await assertPr();
   const Github = getOctokit(GITHUB_TOKEN);
+  const eips = diffs.map(diff => diff.head.eipNum);
   const eipNumbers = eips.join(", ");
 
   console.log(`Merging PR ${pr.number}!`);
@@ -16,13 +14,13 @@ export const merge = async ({ pr, eips }: Merge) => {
     pull_number: pr.number,
     repo: pr.base.repo.full_name,
     owner: pr.base.repo.owner.login,
-    commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${prNum})`,
+    commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${pr.number})`,
     commit_message: MERGE_MESSAGE,
     merge_method: "squash",
     sha: pr.head.sha
   });
 
   return {
-    response: `Merging PR ${prNum}!`
+    response: `Merging PR ${pr.number}!`
   };
 };
