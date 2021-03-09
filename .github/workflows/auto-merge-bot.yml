@@ -1,9 +1,9 @@
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
   hello_world_job:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: EIP Auto-Merge Bot
     steps:
       # To use this repository's private action,
       # you must check out the repository
