@@ -10354,7 +10354,7 @@ var PostComment_awaiter = (undefined && undefined.__awaiter) || function (thisAr
 const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const message = COMMENT_HEADER + "\n\t - " + ERRORS.join("\n\t\ - ");
+    const message = COMMENT_HEADER + "\n\t - " + ERRORS.join("\n\t - ");
     const { data: me } = yield Github.users.getAuthenticated();
     const { data: comments } = yield Github.issues.listComments({
         owner: github.context.repo.owner,
@@ -10363,17 +10363,19 @@ const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* 
     });
     // If comment already exists, update it
     for (const comment of comments) {
-        if (((_a = comment.user) === null || _a === void 0 ? void 0 : _a.login) == me.login && comment.body != message) {
-            Github.issues
-                .updateComment({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                comment_id: comment.id,
-                body: message
-            })
-                .catch((err) => {
-                console.log(err);
-            });
+        if (((_a = comment.user) === null || _a === void 0 ? void 0 : _a.login) == me.login) {
+            if (comment.body != message) {
+                Github.issues
+                    .updateComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    comment_id: comment.id,
+                    body: message
+                })
+                    .catch((err) => {
+                    console.log(err);
+                });
+            }
             return;
         }
     }
