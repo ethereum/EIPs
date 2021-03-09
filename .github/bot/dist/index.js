@@ -10298,9 +10298,9 @@ const assertPr = () => __awaiter(void 0, void 0, void 0, function* () {
     if (pr.merged) {
         throw `PR ${prNum} is already merged; quitting`;
     }
-    if (pr.mergeable_state != "clean") {
-        throw `PR ${prNum} mergeable state is ${pr.mergeable_state}; quitting`;
-    }
+    // if (pr.mergeable_state != "clean") {
+    //   throw `PR ${prNum} mergeable state is ${pr.mergeable_state}; quitting`;
+    // }
     return pr;
 });
 
