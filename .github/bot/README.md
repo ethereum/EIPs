@@ -3,11 +3,23 @@
 This Github Actions integrated bot lints EIPs and provides feedback for authors, its goal is to catch simple problems and merge simple changes automatically.
 # Usage
 
+```yml
+on: [pull_request]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: EIP Auto-Merge Bot
+    steps:
+      - name: auto-merge-bot
+        uses: ./.github/bot
+        id: auto-merge-bot
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+```
+
 # Contributing
-I won't fault you for making mistakes with these, but they should be considered when reviewing a PR
-
 ## Development Enviornment Setup
-
 ### Requirements
 1) node package manager (npm)
 2) Github Token 
@@ -24,6 +36,7 @@ I won't fault you for making mistakes with these, but they should be considered 
 GITHUB_TOKEN = <YOUR GITHUB TOKEN>
 NODE_ENV = development
 
+PULL_NUMBER = <pull_number>
 BASE_SHA = <base sha of the PR>
 HEAD_SHA = <head sha of the PR>
 REPO_OWNER_NAME = <your login>
@@ -34,43 +47,27 @@ GITHUB_REPOSITORY = <your login>/EIPs
 
 ### npm scripts
 
-This repo uses ncc; ncc compiles the code into a single pure js file, and that makes it easier for github to execute. But it also means we have to both build the output and commit it. So, when developing do..
+This repo uses ncc; ncc compiles the code into a single pure js file, and that makes it easier for github to execute. But you have to build and commit your changes.
 
 ```
 npm run watch // re-builds after each save
 npm run build // re-builds
-npm run it // runs the action using a basic development
+npm run it    // runs the action using a basic development
 ```
 ### Troubleshooting
 - <i>I make changes but nothing changes when I `npm run it`</i>
   - This repo requires that the changes be compiled in a pure js distribution `dist/index.js`
   - Try running `npm run build` and see if that helps
   - If it does, make sure to keep `npm run watch` running in the background while you make changes, it'll re-compile whenever changes are made and make life easier
-- <i>When I run I'm getting unexplainable errors with my github requests.</i>
+- <i>When I run it, I'm getting unexplainable errors with my github requests.</i>
   - Github limits the number requests from a given IP, this may be avoidable if you only use the `octokit` but a VPN also works just fine
-
-## Important Context
-#### || There are **two GLOBAL** variables ||
-These are two globl variables `ERRORS` & `EIPs`, and you should be careful about accessing them. Only do so under certain circumstances
-
-- `src/main.ts/ERRORS` (for non-critical errors)
-  - When **TO** touch `ERRORS`...
-    - Filename is formatted incorrectly
-    - The eip changed status from draft -> last call
-  - How to access
-    - `ERRORS.push("File EIPS/foo.md is not an EIP")`
-
-ERRORS is global for the sake of convenience, but its use in an asynchronous enviornment causes order of errors pushed to be non-guaranteed. At the time of writing this, it makes more sense to just ignore it, but it's worth keeping in mind.
-
 ## Code Style Guidelines (in no particular order)
-This repo is a living repo, and it will grow with the EIP drafting and editing process. As such, it's important to maintain code quality for the sake of readability and maintanability sake. Also, this is open-source and will benefit from strict code quality guidelines. The guidelines are, of course, mutable but please thoroughly explain each proposed rule change.
+This repo is a living repo, and it will grow with the EIP drafting and editing process. It's important to maintain code quality.
 
 1) Define every type (including octokit)
 2) Make clean and clear error messages
-3) Keep methods shallow where feasible
-4) Avoid Abstraction
-5) Always use [enums](https://www.sohamkamani.com/javascript/enums/) when defining restricted string types
-6) Don't use `export default ...`
+3) Avoid abstraction
+4) Use [enums](https://www.sohamkamani.com/javascript/enums/) as much as possible
 ## Explanations of Style Guidenlines
 A couple things to keep in mind if you end up making changes to this
 
@@ -82,22 +79,7 @@ Sometimes [Octokit types](https://www.npmjs.com/package/@octokit/types) can be d
 #### 2. <ins>Make clean and clear error messages</ins>
 This bot has a single goal: catch simple mistakes automatically and save the editors time. Unclear errors means that it is more likely that 
 
-#### 3. <ins>Keep logic shallow where feasible</ins>
-Maintaining code readability is very important in this repo; but sometimes it becomes all too tempting to obfuscate all logic into sub-methods to make the high-level actions more clear. While I generally think this is a good thing, keep in mind that somtimes obfuscation makes things more confusing.
-```javascript
-\\ DONT DO THIS
-const foo = () => bar() ? "bar" : "foo" // layer 1
-const bar = () => baz() ? true : false  // layer 2
-const baz = () => true                  // layer 3
-
-\\ DO THIS
-const foo = () => {                
-  const bar = baz() ? true : false      // layer 1
-  return bar ? "bar" : "foo"            // layer 1
-}
-const baz = () => true                  // layer 2
-```
-#### 4. <ins>Avoid Abstraction</ins>
+#### 3. <ins>Avoid Abstraction</ins>
 Only abstract if necessary, keep things in one file where applicable; other examples of okay abstraction are types, regex, and methods used more than 3 times. Otherwise, it's often cleaner to just re-write things.
 ```javascript
 // DON'T DO THIS
@@ -121,7 +103,7 @@ export const foo = () => baz();
 const baz = () => "baz"
 export const bar = () => baz();
 ```
-#### 5. <ins>Always use enum when defining restricted string types</ins>
+#### 4. <ins>Always use enum when defining restricted string types</ins>
 In short, enums make code easier to read, trace, and maintain. 
 
 But here's a brief info if you haven't worked with them before
