@@ -11,7 +11,7 @@
     "prettier-changed": "prettier --write"
   },
   "author": "",
-  "license": "ISC",
+  "license": "CC0-1.0",
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
