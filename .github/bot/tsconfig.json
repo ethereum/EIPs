@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "strict": true,
+    "baseUrl": "./",
+    "target": "es2015",
+    "paths": {
+    "src/*": ["src/*"]
+    },
+    "noImplicitAny": false
+  },
+  "exclude": [
+    "./node_modules/*"
+  ]
+}
