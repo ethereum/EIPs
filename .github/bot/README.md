@@ -24,7 +24,7 @@ jobs:
 1) node package manager (npm)
 2) Github Token 
 3) Forked Repo
-4) node version manager (nvm)
+4) nodejs
 
 ### Quick Start
 1) Download your forked `EIPS` repo
@@ -44,21 +44,7 @@ REPO_NAME = EIPs
 GITHUB_REPOSITORY = <your login>/EIPs
 ```
 5) `npm run it`
-
-### npm scripts
-
-This repo uses ncc; ncc compiles the code into a single pure js file, and that makes it easier for github to execute. But you have to build and commit your changes.
-
-```
-npm run watch // re-builds after each save
-npm run build // re-builds
-npm run it    // runs the action using a basic development
-```
 ### Troubleshooting
-- <i>I make changes but nothing changes when I `npm run it`</i>
-  - This repo requires that the changes be compiled in a pure js distribution `dist/index.js`
-  - Try running `npm run build` and see if that helps
-  - If it does, make sure to keep `npm run watch` running in the background while you make changes, it'll re-compile whenever changes are made and make life easier
 - <i>When I run it, I'm getting unexplainable errors with my github requests.</i>
   - Github limits the number requests from a given IP, this may be avoidable if you only use the `octokit` but a VPN also works just fine
 ## Code Style Guidelines (in no particular order)
@@ -77,7 +63,7 @@ Define every type, no `any` types. The time it takes to define a type now will s
 Sometimes [Octokit types](https://www.npmjs.com/package/@octokit/types) can be difficult to index, but it's important that whenever possible the types are defined and assumptions protected.
 
 #### 2. <ins>Make clean and clear error messages</ins>
-This bot has a single goal: catch simple mistakes automatically and save the editors time. Unclear errors means that it is more likely that 
+This bot has a single goal: catch simple mistakes automatically and save the editors time. So clear error messages that allow the PR author to change it themselves is very important.
 
 #### 3. <ins>Avoid Abstraction</ins>
 Only abstract if necessary, keep things in one file where applicable; other examples of okay abstraction are types, regex, and methods used more than 3 times. Otherwise, it's often cleaner to just re-write things.
