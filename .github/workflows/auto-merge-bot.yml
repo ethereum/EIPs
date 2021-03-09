@@ -17,6 +17,5 @@ jobs:
       - name: auto-merge-bot
         uses: ./.github/bot # Uses an action in the root directory
         id: auto-merge-bot
-        with:
         env:
           GITHUB_TOKEN: ${{ secrets.EIPS_TOKEN }} # https://help.github
