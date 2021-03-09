@@ -1,7 +1,7 @@
 name: "Auto Merge EIP"
 description: "A bot that lints EIP edits, finds common errors, and can auto-merge"
 inputs:
-  token:
+  GITHUB-TOKEN:
     description: |-
       The Github token to be used by this bot when merging, posting comments, or requesting reviewers
     required: true
@@ -11,7 +11,6 @@ runs:
   steps:
     - run: cd .github/bot && npm ci && npm run build
       shell: bash
-    - run: cd .github/bot && GITHUB_TOKEN=${{ inputs.token }} node dist/index.js
+    - run: cd .github/bot && GITHUB_TOKEN=${{ inputs.GITHUB-TOKEN }} node dist/index.js
       shell: bash
     
-        
