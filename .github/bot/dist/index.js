@@ -40,7 +40,7 @@ module.exports =
 /******/ 	// the startup function
 /******/ 	function startup() {
 /******/ 		// Load entry module and return exports
-/******/ 		return __webpack_require__(983);
+/******/ 		return __webpack_require__(787);
 /******/ 	};
 /******/ 	// initialize runtime
 /******/ 	runtime(__webpack_require__);
@@ -8248,6 +8248,561 @@ module.exports = require("zlib");
 
 /***/ }),
 
+/***/ 787:
+/***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __webpack_require__(470);
+
+// CONCATENATED MODULE: ./src/utils/Constants.ts
+const MERGE_MESSAGE = `
+    Hi, I'm a bot! This change was automatically merged because:
+    - It only modifies existing Draft, Review, or Last Call EIP(s)
+    - The PR was approved or written by at least one author of each modified EIP
+    - The build is passing
+    `;
+const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
+const COMMENT_HEADER = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+var FrontMatterAttributes;
+(function (FrontMatterAttributes) {
+    FrontMatterAttributes["status"] = "status";
+    FrontMatterAttributes["eip"] = "eip";
+    FrontMatterAttributes["author"] = "author";
+})(FrontMatterAttributes || (FrontMatterAttributes = {}));
+var EipStatus;
+(function (EipStatus) {
+    EipStatus["draft"] = "draft";
+})(EipStatus || (EipStatus = {}));
+var FileStatus;
+(function (FileStatus) {
+    FileStatus["added"] = "added";
+})(FileStatus || (FileStatus = {}));
+var EVENTS;
+(function (EVENTS) {
+    EVENTS["pullRequest"] = "pull_request";
+})(EVENTS || (EVENTS = {}));
+
+// CONCATENATED MODULE: ./src/utils/Regex.ts
+/** matches correctly formatted filenames */
+const FILE_RE = /^EIPS\/eip-(\d+)\.md$/gm;
+/** matches authors names formated like (...) */
+const AUTHOR_RE = /[(<]([^>)]+)[>)]/gm;
+/** to find the EIP number in a file name */
+const EIP_NUM_RE = /(\d+)/;
+/**
+ * This functionality is supported in es2020, but for the purposes
+ * of compatibility (and because it's quite simple) it's built explicitly
+ */
+const matchAll = (rawString, regex, group) => {
+    let match = regex.exec(rawString);
+    let matches = [];
+    while (match != null) {
+        matches.push(match[group]);
+        match = regex.exec(rawString);
+    }
+    return matches;
+};
+/**
+ * Extracts the EIP number from a given filename (or returns null)
+ * @param filename EIP filename
+ */
+const getFilenameEipNum = (filename) => {
+    const eipNumMatch = filename.match(EIP_NUM_RE);
+    return eipNumMatch && parseInt(eipNumMatch[0]);
+};
+
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __webpack_require__(469);
+
+// CONCATENATED MODULE: ./src/utils/Types.ts
+
+const Types_Github = Object(github.getOctokit)("fake");
+const CompareCommits = () => Types_Github.repos.compareCommits().then(res => res.data);
+const PR = () => Types_Github.pulls.get().then(res => res.data);
+const Commit = () => Types_Github.repos.getCommit().then(res => res.data);
+const Files = () => Types_Github.repos.compareCommits().then(res => res.data.files);
+const File = () => Types_Github.repos.compareCommits().then(res => res.data.files[0]);
+const CommitFiles = () => Types_Github.repos.compareCommits().then(res => res.data.base_commit.files);
+const CommitFile = () => Types_Github.repos.compareCommits().then(res => res.data.base_commit.files && res.data.base_commit.files[0]);
+const Repo = () => Types_Github.repos.get().then(res => res.data);
+
+// CONCATENATED MODULE: ./src/utils/Globals.ts
+const ERRORS = [];
+
+// CONCATENATED MODULE: ./src/utils/index.ts
+
+
+
+
+
+// CONCATENATED MODULE: ./src/lib/Assertions.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+const assertEvent = () => {
+    const event = github.context.eventName;
+    if (event !== EVENTS.pullRequest) {
+        throw `Only events of type ${EVENTS.pullRequest} are allowed`;
+    }
+    return event;
+};
+const assertPullNumber = () => {
+    var _a;
+    const payload = github.context.payload;
+    if (!((_a = payload.pull_request) === null || _a === void 0 ? void 0 : _a.number)) {
+        throw "Build does not have a PR number associated with it; quitting...";
+    }
+    return payload.pull_request.number;
+};
+const assertPr = () => __awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const prNum = assertPullNumber();
+    const { data: pr } = yield Github.pulls.get({
+        repo: github.context.repo.repo,
+        owner: github.context.repo.owner,
+        pull_number: prNum
+    });
+    if (pr.merged) {
+        throw `PR ${prNum} is already merged; quitting`;
+    }
+    // if (pr.mergeable_state != "clean") {
+    //   throw `PR ${prNum} mergeable state is ${pr.mergeable_state}; quitting`;
+    // }
+    return pr;
+});
+const assertAuthors = (file) => {
+    // take from base to avoid people adding themselves and being able to approve
+    const authors = file.base.authors && [...file.base.authors];
+    // Make sure there are authors
+    if (!authors || authors.length === 0) {
+        throw `${file.head.name} has no identifiable authors who can approve the PR (only considering the base version)`;
+    }
+    return authors;
+};
+
+// CONCATENATED MODULE: ./src/lib/Merge.ts
+var Merge_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+const merge = (diffs) => Merge_awaiter(void 0, void 0, void 0, function* () {
+    const pr = yield assertPr();
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const eips = diffs.map(diff => diff.head.eipNum);
+    const eipNumbers = eips.join(", ");
+    yield Github.pulls.merge({
+        pull_number: pr.number,
+        repo: github.context.repo.repo,
+        owner: github.context.repo.owner,
+        commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${pr.number})`,
+        commit_message: MERGE_MESSAGE,
+        merge_method: "squash",
+        sha: pr.head.sha
+    });
+    return {
+        response: `Merging PR ${pr.number}!`
+    };
+});
+
+// CONCATENATED MODULE: ./src/lib/PostComment.ts
+var PostComment_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const message = COMMENT_HEADER + "\n\t - " + ERRORS.join("\n\t - ");
+    const { data: me } = yield Github.users.getAuthenticated();
+    const { data: comments } = yield Github.issues.listComments({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: github.context.issue.number
+    });
+    // If comment already exists, update it
+    for (const comment of comments) {
+        if (((_a = comment.user) === null || _a === void 0 ? void 0 : _a.login) == me.login) {
+            if (comment.body != message) {
+                Github.issues
+                    .updateComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    comment_id: comment.id,
+                    body: message
+                })
+                    .catch((err) => {
+                    console.log(err);
+                });
+            }
+            return;
+        }
+    }
+    // else create a new one
+    Github.issues.createComment({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: github.context.issue.number,
+        body: message
+    });
+});
+
+// CONCATENATED MODULE: ./src/lib/CheckEip.ts
+
+const checkEIP = ({ head, base }) => {
+    // establish comparisons
+    const headMatchesSelf = head.filenameEipNum === head.eipNum;
+    const baseFileMatchesHead = base.filenameEipNum === head.eipNum;
+    const baseMatchesHead = base.eipNum === head.eipNum;
+    // Checks if most recent EIP matches self
+    if (!headMatchesSelf) {
+        ERRORS.push(`EIP header in file ${head.name} does not match: ${base.name}`);
+    }
+    // Check for EIP number change
+    if (headMatchesSelf && !(baseMatchesHead || baseFileMatchesHead)) {
+        ERRORS.push(`Base EIP has number ${base.eipNum} which was changed to head ${head.eipNum}; EIP number changing is not allowd`);
+    }
+    // Check if status was changed
+    if (head.status !== base.status) {
+        ERRORS.push(`Trying to change EIP ${head.eipNum} state from ${base.status} to ${head.status}`);
+    }
+    // Check if base statuses are not allowed
+    else if (!ALLOWED_STATUSES.has(head.status)) {
+        ERRORS.push(`${head.name} is in state ${head.status}, not ${[
+            ...ALLOWED_STATUSES
+        ].join(" or ")}`);
+    }
+};
+const isValidEipFilename = (file) => {
+    const filename = file.filename;
+    // File name is formatted correctly and is in the EIPS folder
+    const match = filename.search(FILE_RE);
+    if (match === -1) {
+        ERRORS.push(`Filename ${filename} is not in EIP format 'EIPS/eip-####.md'`);
+        return false;
+    }
+    // EIP number is defined within the filename and can be parsed
+    const filenameEipNum = getFilenameEipNum(filename);
+    if (!filenameEipNum) {
+        ERRORS.push(`No EIP number was found to be associated with filename ${filename}`);
+        return false;
+    }
+    return true;
+};
+
+// EXTERNAL MODULE: ./node_modules/front-matter/index.js
+var front_matter = __webpack_require__(662);
+var front_matter_default = /*#__PURE__*/__webpack_require__.n(front_matter);
+
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/utils.js
+var utils = __webpack_require__(521);
+
+// CONCATENATED MODULE: ./src/lib/GetFileDiff.ts
+var GetFileDiff_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
+
+const getFileDiff = (file) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+    const pr = yield assertPr();
+    const filename = file.filename;
+    // Get and parse head and base file
+    const base = yield getParsedContent(filename, pr.base.sha);
+    const head = yield getParsedContent(filename, pr.head.sha);
+    // Organize information cleanly
+    return {
+        head: yield formatFile(head),
+        base: yield formatFile(base)
+    };
+});
+const formatFile = (file) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+    const filenameEipNum = getFilenameEipNum(file.name);
+    if (!filenameEipNum) {
+        throw `Failed to extract eip number from file "${file.path}"`;
+    }
+    return {
+        eipNum: file.content.attributes[FrontMatterAttributes.eip],
+        status: file.content.attributes[FrontMatterAttributes.status].toLowerCase(),
+        authors: yield getAuthors(file.content.attributes[FrontMatterAttributes.author]),
+        name: file.name,
+        filenameEipNum
+    };
+});
+const getParsedContent = (filename, sha) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const decodeData = (data) => {
+        const encoding = data.encoding;
+        return Buffer.from(data.content, data.encoding).toString();
+    };
+    // Collect the file contents at the given sha reference frame
+    const data = (yield Github.repos
+        .getContent({
+        owner: utils.context.repo.owner,
+        repo: utils.context.repo.repo,
+        path: filename,
+        ref: sha
+    })
+        .then((res) => res.data));
+    // Assert type assumptions
+    if (!(data === null || data === void 0 ? void 0 : data.content)) {
+        throw `requested file ${filename} at ref sha ${sha} contains no content`;
+    }
+    if (!(data === null || data === void 0 ? void 0 : data.path)) {
+        throw `requested file ${filename} at ref sha ${sha} has no path`;
+    }
+    if (!(data === null || data === void 0 ? void 0 : data.name)) {
+        throw `requested file ${filename} at ref sha ${sha} has no name`;
+    }
+    // Return parsed information
+    return {
+        path: data.path,
+        name: data.name,
+        content: front_matter_default()(decodeData(data))
+    };
+});
+const getAuthors = (rawAuthorList) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+    if (!rawAuthorList)
+        return;
+    const findUserByEmail = (email) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+        const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+        const { data: results } = yield Github.search.users({ q: email });
+        if (results.total_count > 0) {
+            return "@" + results.items[0].login;
+        }
+        console.warn(`No github user found, using email instead: ${email}`);
+    });
+    const resolveAuthor = (author) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
+        if (author[0] === "@") {
+            return author.toLowerCase();
+        }
+        else {
+            // Email address
+            const queriedUser = yield findUserByEmail(author);
+            return (queriedUser || author).toLowerCase();
+        }
+    });
+    const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
+    const resolved = yield Promise.all(authors.map(resolveAuthor));
+    return new Set(resolved);
+});
+const isFilePreexisting = (file) => {
+    if (file.status === FileStatus.added) {
+        ERRORS.push(`File with name ${file.filename} is new and new files must be reviewed`);
+        return false; // filters the files out
+    }
+    return true;
+};
+
+// CONCATENATED MODULE: ./src/lib/CheckApprovals.ts
+var CheckApprovals_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+const removeApproved = (file) => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
+    const approvals = yield getApprovals();
+    const authors = assertAuthors(file);
+    // remove approvals from authors present on base commit
+    const hasAuthorApproval = !!approvals.find((approver) => authors.includes(approver));
+    console.log(hasAuthorApproval);
+    if (hasAuthorApproval)
+        return;
+    ERRORS.push(`${file.head.name} requires approval from one of (${authors.map(getJustLogin)})`);
+    return file;
+});
+const getJustLogin = (author) => {
+    if (author.startsWith("@")) {
+        return author.slice(1);
+    }
+    return author;
+};
+const requestReviewers = (reviewers) => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const pr = yield assertPr();
+    yield Github.pulls.requestReviewers({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        pull_number: pr.number,
+        reviewers: reviewers.map(getJustLogin)
+    });
+});
+const getApprovals = () => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const pr = yield assertPr();
+    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+    const { data: reviews } = yield Github.pulls.listReviews({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        pull_number: pr.number
+    });
+    // Starting with set to prevent repeats
+    const approvals = new Set();
+    // Add self to approver list
+    if ((_a = pr.user) === null || _a === void 0 ? void 0 : _a.login) {
+        approvals.add("@" + pr.user.login.toLowerCase());
+    }
+    // Only add approvals if the approver has a username
+    for (const review of reviews) {
+        const isApproval = review.state == "APPROVED";
+        const reviewer = (_b = review.user) === null || _b === void 0 ? void 0 : _b.login;
+        if (isApproval && reviewer) {
+            approvals.add("@" + reviewer.toLowerCase());
+        }
+    }
+    return [...approvals];
+});
+
+// CONCATENATED MODULE: ./src/lib/index.ts
+
+
+
+
+
+
+
+// CONCATENATED MODULE: ./src/index.ts
+var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
+
+if (process.env.NODE_ENV === "development") {
+    console.log("establishing development context");
+    github.context.payload.pull_request = {
+        base: {
+            sha: process.env.BASE_SHA
+        },
+        head: {
+            sha: process.env.HEAD_SHA
+        },
+        number: parseInt(process.env.PULL_NUMBER || "") || 0
+    };
+    // @ts-ignore
+    github.context.repo.owner = process.env.REPO_OWNER_NAME;
+    // @ts-ignore
+    github.context.repo.repo = process.env.REPO_NAME;
+    github.context.payload.repository = {
+        // @ts-ignore
+        name: process.env.REPO_NAME,
+        owner: {
+            key: "",
+            // @ts-ignore
+            login: process.env.REPO_OWNER_NAME,
+            name: process.env.REPO_OWNER_NAME
+        },
+        full_name: `${process.env.REPO_OWNER}/${process.env.REPO_NAME}`
+    };
+    github.context.eventName = EVENTS.pullRequest;
+}
+const main = () => src_awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    try {
+        const Github = Object(github.getOctokit)(GITHUB_TOKEN);
+        // Verifies correct enviornment and request context
+        assertEvent();
+        assertPullNumber();
+        yield assertPr();
+        // Collect the changes made in the given PR from base <-> head
+        const comparison = yield Github.repos
+            .compareCommits({
+            base: (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha,
+            head: (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha,
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo
+        })
+            .then(res => {
+            return res.data;
+        });
+        // Filter PR's files to get EIP files only
+        const allFiles = comparison.files;
+        const editedFiles = allFiles.filter(isFilePreexisting);
+        const eipFiles = editedFiles.filter(isValidEipFilename);
+        // Extracts relevant information from file at base and head of PR 
+        const fileDiffs = yield Promise.all(eipFiles.map(getFileDiff));
+        // Check each EIP content
+        fileDiffs.map(checkEIP);
+        // Check each approval list
+        const notApproved = yield Promise.all(fileDiffs.map(removeApproved));
+        const authors = notApproved.map(file => file && assertAuthors(file));
+        // all other tests passed except missing reviewers, request reviews
+        if (ERRORS.length === authors.length) {
+            for (const eipAuthors of authors) {
+                eipAuthors && (yield requestReviewers(eipAuthors));
+            }
+        }
+        // if no errors, then merge
+        if (ERRORS.length === 0) {
+            console.log("merging");
+            // return await merge(fileDiffs);
+        }
+        if (ERRORS.length > 0) {
+            return yield postComment();
+        }
+    }
+    catch (error) {
+        console.error(error);
+        ERRORS.push(`An Exception Occured While Linting: ${error}`);
+        console.log(ERRORS);
+        Object(core.setFailed)(error.message);
+    }
+});
+main();
+
+
+/***/ }),
+
 /***/ 794:
 /***/ (function(module) {
 
@@ -10165,559 +10720,6 @@ function checkBypass(reqUrl) {
     return false;
 }
 exports.checkBypass = checkBypass;
-
-
-/***/ }),
-
-/***/ 983:
-/***/ (function(__unusedmodule, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-
-// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
-var core = __webpack_require__(470);
-
-// CONCATENATED MODULE: ./src/utils/Constants.ts
-const MERGE_MESSAGE = `
-    Hi, I'm a bot! This change was automatically merged because:
-    - It only modifies existing Draft, Review, or Last Call EIP(s)
-    - The PR was approved or written by at least one author of each modified EIP
-    - The build is passing
-    `;
-const ALLOWED_STATUSES = new Set(["draft", "last call", "review"]);
-const COMMENT_HEADER = "Hi! I'm a bot, and I wanted to automerge your PR, but couldn't because of the following issue(s):\n\n";
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
-var FrontMatterAttributes;
-(function (FrontMatterAttributes) {
-    FrontMatterAttributes["status"] = "status";
-    FrontMatterAttributes["eip"] = "eip";
-    FrontMatterAttributes["author"] = "author";
-})(FrontMatterAttributes || (FrontMatterAttributes = {}));
-var EipStatus;
-(function (EipStatus) {
-    EipStatus["draft"] = "draft";
-})(EipStatus || (EipStatus = {}));
-var FileStatus;
-(function (FileStatus) {
-    FileStatus["added"] = "added";
-})(FileStatus || (FileStatus = {}));
-var EVENTS;
-(function (EVENTS) {
-    EVENTS["pullRequest"] = "pull_request";
-})(EVENTS || (EVENTS = {}));
-
-// CONCATENATED MODULE: ./src/utils/Regex.ts
-/** matches correctly formatted filenames */
-const FILE_RE = /^EIPS\/eip-(\d+)\.md$/gm;
-/** matches authors names formated like (...) */
-const AUTHOR_RE = /[(<]([^>)]+)[>)]/gm;
-/** to find the EIP number in a file name */
-const EIP_NUM_RE = /(\d+)/;
-/**
- * This functionality is supported in es2020, but for the purposes
- * of compatibility (and because it's quite simple) it's built explicitly
- */
-const matchAll = (rawString, regex, group) => {
-    let match = regex.exec(rawString);
-    let matches = [];
-    while (match != null) {
-        matches.push(match[group]);
-        match = regex.exec(rawString);
-    }
-    return matches;
-};
-/**
- * Extracts the EIP number from a given filename (or returns null)
- * @param filename EIP filename
- */
-const getFilenameEipNum = (filename) => {
-    const eipNumMatch = filename.match(EIP_NUM_RE);
-    return eipNumMatch && parseInt(eipNumMatch[0]);
-};
-
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __webpack_require__(469);
-
-// CONCATENATED MODULE: ./src/utils/Types.ts
-
-const Types_Github = Object(github.getOctokit)("fake");
-const CompareCommits = () => Types_Github.repos.compareCommits().then(res => res.data);
-const PR = () => Types_Github.pulls.get().then(res => res.data);
-const Commit = () => Types_Github.repos.getCommit().then(res => res.data);
-const Files = () => Types_Github.repos.compareCommits().then(res => res.data.files);
-const File = () => Types_Github.repos.compareCommits().then(res => res.data.files[0]);
-const CommitFiles = () => Types_Github.repos.compareCommits().then(res => res.data.base_commit.files);
-const CommitFile = () => Types_Github.repos.compareCommits().then(res => res.data.base_commit.files && res.data.base_commit.files[0]);
-const Repo = () => Types_Github.repos.get().then(res => res.data);
-
-// CONCATENATED MODULE: ./src/utils/Globals.ts
-const ERRORS = [];
-
-// CONCATENATED MODULE: ./src/utils/index.ts
-
-
-
-
-
-// CONCATENATED MODULE: ./src/lib/Assertions.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-const assertEvent = () => {
-    const event = github.context.eventName;
-    if (event !== EVENTS.pullRequest) {
-        throw `Only evnets of type ${EVENTS.pullRequest} are allowed`;
-    }
-    return event;
-};
-const assertPullNumber = () => {
-    var _a;
-    const payload = github.context.payload;
-    if (!((_a = payload.pull_request) === null || _a === void 0 ? void 0 : _a.number)) {
-        throw "Build does not have a PR number associated with it; quitting...";
-    }
-    return payload.pull_request.number;
-};
-const assertPr = () => __awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const prNum = assertPullNumber();
-    const { data: pr } = yield Github.pulls.get({
-        repo: github.context.repo.repo,
-        owner: github.context.repo.owner,
-        pull_number: prNum
-    });
-    if (pr.merged) {
-        throw `PR ${prNum} is already merged; quitting`;
-    }
-    console.log(pr.mergeable_state);
-    // if (pr.mergeable_state != "clean") {
-    //   throw `PR ${prNum} mergeable state is ${pr.mergeable_state}; quitting`;
-    // }
-    return pr;
-});
-
-// CONCATENATED MODULE: ./src/lib/Merge.ts
-var Merge_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-const merge = (diffs) => Merge_awaiter(void 0, void 0, void 0, function* () {
-    const pr = yield assertPr();
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const eips = diffs.map(diff => diff.head.eipNum);
-    const eipNumbers = eips.join(", ");
-    console.log(`Merging PR ${pr.number}!`);
-    yield Github.pulls.merge({
-        pull_number: pr.number,
-        repo: pr.base.repo.full_name,
-        owner: pr.base.repo.owner.login,
-        commit_title: `Automatically merged updates to draft EIP(s) ${eipNumbers} (#${pr.number})`,
-        commit_message: MERGE_MESSAGE,
-        merge_method: "squash",
-        sha: pr.head.sha
-    });
-    return {
-        response: `Merging PR ${pr.number}!`
-    };
-});
-
-// CONCATENATED MODULE: ./src/lib/PostComment.ts
-var PostComment_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-const postComment = () => PostComment_awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const message = COMMENT_HEADER + "\n\t - " + ERRORS.join("\n\t - ");
-    const { data: me } = yield Github.users.getAuthenticated();
-    const { data: comments } = yield Github.issues.listComments({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: github.context.issue.number
-    });
-    // If comment already exists, update it
-    for (const comment of comments) {
-        if (((_a = comment.user) === null || _a === void 0 ? void 0 : _a.login) == me.login) {
-            if (comment.body != message) {
-                Github.issues
-                    .updateComment({
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    comment_id: comment.id,
-                    body: message
-                })
-                    .catch((err) => {
-                    console.log(err);
-                });
-            }
-            return;
-        }
-    }
-    // else create a new one
-    Github.issues.createComment({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: github.context.issue.number,
-        body: message
-    });
-});
-
-// CONCATENATED MODULE: ./src/lib/CheckEip.ts
-
-const checkEIP = (diff) => {
-    checkEIPNumber(diff);
-    checkEIPStatus(diff);
-};
-const checkEIPNumber = ({ base, head }) => {
-    // establish comparisons
-    const headMatchesSelf = head.filenameEipNum === head.eipNum;
-    const baseFileMatchesHead = base.filenameEipNum === head.eipNum;
-    const baseMatchesHead = base.eipNum === head.eipNum;
-    // Checks if most recent EIP matches self
-    if (!headMatchesSelf) {
-        ERRORS.push(`EIP header in file ${head.name} does not match: ${base.name}`);
-    }
-    // Check for EIP number change
-    if (headMatchesSelf && !(baseMatchesHead || baseFileMatchesHead)) {
-        ERRORS.push(`Base EIP has number ${base.eipNum} which was changed to head ${head.eipNum}; EIP number changing is not allowd`);
-    }
-};
-const checkEIPStatus = ({ base, head }) => {
-    // Check if status was changed
-    if (head.status !== base.status) {
-        ERRORS.push(`Trying to change EIP ${head.eipNum} state from ${base.status} to ${head.status}`);
-    }
-    // Check if base statuses are not allowed
-    else if (!ALLOWED_STATUSES.has(head.status)) {
-        ERRORS.push(`${head.name} is in state ${head.status}, not ${[
-            ...ALLOWED_STATUSES
-        ].join(" or ")}`);
-    }
-};
-const isValidEipFilename = (file) => {
-    const filename = file.filename;
-    // File name is formatted correctly and is in the EIPS folder
-    const match = filename.search(FILE_RE);
-    if (match === -1) {
-        ERRORS.push(`Filename ${filename} is not in EIP format 'EIPS/eip-####.md'`);
-        return false;
-    }
-    // EIP number is defined within the filename and can be parsed
-    const filenameEipNum = getFilenameEipNum(filename);
-    if (!filenameEipNum) {
-        ERRORS.push(`No EIP number was found to be associated with filename ${filename}`);
-        return false;
-    }
-    return true;
-};
-
-// EXTERNAL MODULE: ./node_modules/front-matter/index.js
-var front_matter = __webpack_require__(662);
-var front_matter_default = /*#__PURE__*/__webpack_require__.n(front_matter);
-
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/utils.js
-var utils = __webpack_require__(521);
-
-// CONCATENATED MODULE: ./src/lib/GetFileDiff.ts
-var GetFileDiff_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-
-
-const getFileDiff = (file) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-    const pr = yield assertPr();
-    const filename = file.filename;
-    // Get and parse head and base file
-    const base = yield getParsedContent(filename, pr.base.sha);
-    const head = yield getParsedContent(filename, pr.head.sha);
-    // Organize information cleanly
-    return {
-        head: yield formatFile(head),
-        base: yield formatFile(base)
-    };
-});
-const formatFile = (file) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-    const filenameEipNum = getFilenameEipNum(file.name);
-    if (!filenameEipNum) {
-        throw `Failed to extract eip number from file "${file.path}"`;
-    }
-    return {
-        eipNum: file.content.attributes[FrontMatterAttributes.eip],
-        status: file.content.attributes[FrontMatterAttributes.status].toLowerCase(),
-        authors: yield getAuthors(file.content.attributes[FrontMatterAttributes.author]),
-        name: file.name,
-        filenameEipNum
-    };
-});
-const getParsedContent = (filename, sha) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const decodeData = (data) => {
-        const encoding = data.encoding;
-        return Buffer.from(data.content, data.encoding).toString();
-    };
-    // Collect the file contents at the given sha reference frame
-    const data = (yield Github.repos
-        .getContent({
-        owner: utils.context.repo.owner,
-        repo: utils.context.repo.repo,
-        path: filename,
-        ref: sha
-    })
-        .then((res) => res.data));
-    // Assert type assumptions
-    if (!(data === null || data === void 0 ? void 0 : data.content)) {
-        throw `requested file ${filename} at ref sha ${sha} contains no content`;
-    }
-    if (!(data === null || data === void 0 ? void 0 : data.path)) {
-        throw `requested file ${filename} at ref sha ${sha} has no path`;
-    }
-    if (!(data === null || data === void 0 ? void 0 : data.name)) {
-        throw `requested file ${filename} at ref sha ${sha} has no name`;
-    }
-    // Return parsed information
-    return {
-        path: data.path,
-        name: data.name,
-        content: front_matter_default()(decodeData(data))
-    };
-});
-const getAuthors = (rawAuthorList) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-    if (!rawAuthorList)
-        return;
-    const findUserByEmail = (email) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-        const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-        const { data: results } = yield Github.search.users({ q: email });
-        if (results.total_count > 0) {
-            return "@" + results.items[0].login;
-        }
-        console.warn(`No github user found, using email instead: ${email}`);
-    });
-    const resolveAuthor = (author) => GetFileDiff_awaiter(void 0, void 0, void 0, function* () {
-        if (author[0] === "@") {
-            return author.toLowerCase();
-        }
-        else {
-            // Email address
-            const queriedUser = yield findUserByEmail(author);
-            return (queriedUser || author).toLowerCase();
-        }
-    });
-    const authors = matchAll(rawAuthorList, AUTHOR_RE, 1);
-    const resolved = yield Promise.all(authors.map(resolveAuthor));
-    return new Set(resolved);
-});
-const isFilePreexisting = (file) => {
-    if (file.status === FileStatus.added) {
-        ERRORS.push(`File with name ${file.filename} is new and new files must be reviewed`);
-        return false; // filters the files out
-    }
-    return true;
-};
-
-// CONCATENATED MODULE: ./src/lib/index.ts
-
-
-
-
-
-
-// CONCATENATED MODULE: ./src/lib/CheckApprovals.ts
-var CheckApprovals_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-const checkApprovals = (file) => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
-    const approvals = yield getApprovals();
-    const authors = file.base.authors && [...file.base.authors];
-    // Make sure there are authors
-    if (!authors || authors.length === 0) {
-        ERRORS.push(`${file.head.name} has no identifiable authors who can approve the PR (only considering the base version)`);
-        return;
-    }
-    // remove approvals from authors present on base commit
-    const nonAuthorApprovals = approvals.filter((approver) => !(authors === null || authors === void 0 ? void 0 : authors.includes(approver)));
-    const authorApprovals = approvals.filter((approver) => authors === null || authors === void 0 ? void 0 : authors.includes(approver));
-    const authorsToRequest = authors.filter(author => !authorApprovals.includes(author));
-    if (authorApprovals.length === 0) {
-        ERRORS.push(`${file.head.name} requires approval from one of (${authorsToRequest.map(getJustLogin)})`);
-    }
-    // requestReviewers(authorsToRequest.map(getJustLogin));
-});
-const getJustLogin = (author) => {
-    if (author.startsWith("@")) {
-        return author.slice(1);
-    }
-    return author;
-};
-const requestReviewers = (reviewers) => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const pr = yield assertPr();
-    return yield Github.pulls.requestReviewers({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: pr.number,
-        reviewers
-    }).then(res => { var _a; return (_a = res.data.requested_reviewers) === null || _a === void 0 ? void 0 : _a.map(reviewer => reviewer === null || reviewer === void 0 ? void 0 : reviewer.login); });
-});
-const getApprovals = () => CheckApprovals_awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const pr = yield assertPr();
-    const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-    const { data: reviews } = yield Github.pulls.listReviews({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        pull_number: pr.number
-    });
-    // Starting with set to prevent repeats
-    const approvals = new Set();
-    // Add self to approver list
-    if ((_a = pr.user) === null || _a === void 0 ? void 0 : _a.login) {
-        approvals.add("@" + pr.user.login.toLowerCase());
-    }
-    // Only add approvals if the approver has a username
-    for (const review of reviews) {
-        const isApproval = review.state == "APPROVED";
-        const reviewer = (_b = review.user) === null || _b === void 0 ? void 0 : _b.login;
-        if (isApproval && reviewer) {
-            approvals.add("@" + reviewer.toLowerCase());
-        }
-    }
-    return [...approvals];
-});
-
-// CONCATENATED MODULE: ./src/index.ts
-var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-
-
-
-if (process.env.NODE_ENV === "development") {
-    console.log("establishing development context");
-    github.context.payload.pull_request = {
-        base: {
-            sha: process.env.BASE_SHA
-        },
-        head: {
-            sha: process.env.HEAD_SHA
-        },
-        number: 1
-    };
-    // @ts-ignore
-    github.context.repo.owner = process.env.REPO_OWNER_NAME;
-    // @ts-ignore
-    github.context.repo.repo = process.env.REPO_NAME;
-    github.context.payload.repository = {
-        // @ts-ignore
-        name: process.env.REPO_NAME,
-        owner: {
-            key: "",
-            // @ts-ignore
-            login: process.env.REPO_OWNER_NAME,
-            name: process.env.REPO_OWNER_NAME
-        },
-        full_name: `${process.env.REPO_OWNER}/${process.env.REPO_NAME}`
-    };
-    github.context.eventName = EVENTS.pullRequest;
-}
-const main = () => src_awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
-    try {
-        const Github = Object(github.getOctokit)(GITHUB_TOKEN);
-        // Verifies correct enviornment and request context
-        assertEvent();
-        assertPullNumber();
-        yield assertPr();
-        // Collect the changes made in the given PR from base <-> head
-        const comparison = yield Github.repos
-            .compareCommits({
-            base: (_b = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) === null || _b === void 0 ? void 0 : _b.sha,
-            head: (_d = (_c = github.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.head) === null || _d === void 0 ? void 0 : _d.sha,
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo
-        })
-            .then(res => {
-            return res.data;
-        });
-        // Filter PR's files to get EIP files only
-        const allFiles = comparison.files;
-        const editedFiles = allFiles.filter(isFilePreexisting);
-        const eipFiles = editedFiles.filter(isValidEipFilename);
-        // Extracts relevant information from file at base and head of PR 
-        const fileDiffs = yield Promise.all(eipFiles.map(getFileDiff));
-        // Check each EIP file
-        fileDiffs.map(checkEIP);
-        // Check each approval list
-        yield Promise.all(fileDiffs.map(checkApprovals));
-        // if no errors, then merge
-        if (ERRORS.length === 0) {
-            console.log("merging");
-            return yield merge(fileDiffs);
-        }
-        if (ERRORS.length > 0) {
-            return yield postComment();
-        }
-    }
-    catch (error) {
-        console.error(error);
-        ERRORS.push(`An Exception Occured While Linting: ${error}`);
-        console.log(ERRORS);
-        Object(core.setFailed)(error.message);
-    }
-});
-main();
 
 
 /***/ }),

@@ -2,9 +2,8 @@ import { setFailed } from "@actions/core";
 import { EVENTS, ERRORS } from "./utils";
 import { context, getOctokit } from "@actions/github";
 import { GITHUB_TOKEN } from "src/utils/Constants";
-import { assertPr, merge, postComment, getFileDiff, isFilePreexisting, isValidEipFilename, checkEIP, assertEvent, assertPullNumber } from "src/lib";
+import { assertPr, merge, postComment, getFileDiff, isFilePreexisting, isValidEipFilename, checkEIP, assertEvent, assertPullNumber, assertAuthors, removeApproved, requestReviewers } from "src/lib";
 import { CompareCommits } from "./utils";
-import { checkApprovals } from "./lib/CheckApprovals";
 
 if (process.env.NODE_ENV === "development") {
   console.log("establishing development context");
@@ -15,7 +14,7 @@ if (process.env.NODE_ENV === "development") {
     head: {
       sha: process.env.HEAD_SHA
     },
-    number: 1
+    number: parseInt(process.env.PULL_NUMBER || "") || 0
   };
   // @ts-ignore
   context.repo.owner = process.env.REPO_OWNER_NAME;
@@ -64,16 +63,24 @@ const main = async () => {
     // Extracts relevant information from file at base and head of PR 
     const fileDiffs = await Promise.all(eipFiles.map(getFileDiff));
     
-    // Check each EIP file
+    // Check each EIP content
     fileDiffs.map(checkEIP);
     
     // Check each approval list
-    await Promise.all(fileDiffs.map(checkApprovals));
-    
+    const notApproved = await Promise.all(fileDiffs.map(removeApproved));
+    const authors = notApproved.map(file => file && assertAuthors(file));
+
+    // all other tests passed except missing reviewers, request reviews
+    if (ERRORS.length === authors.length) {
+      for (const eipAuthors of authors) {
+        eipAuthors && await requestReviewers(eipAuthors)
+      }
+    }
+
     // if no errors, then merge
     if (ERRORS.length === 0) {
       console.log("merging")
-      return await merge(fileDiffs);
+      // return await merge(fileDiffs);
     }
 
     if (ERRORS.length > 0) {
