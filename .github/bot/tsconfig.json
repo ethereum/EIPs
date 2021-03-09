@@ -1,17 +1,24 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "moduleResolution": "node",
-    "noEmit": true,
+    "noEmit": false,
     "strict": true,
-    "baseUrl": "./",
-    "target": "es2015",
-    "paths": {
-    "src/*": ["src/*"]
-    },
-    "noImplicitAny": false
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "sourceMap": true,
+    "inlineSources": true,
   },
   "exclude": [
     "./node_modules/*"

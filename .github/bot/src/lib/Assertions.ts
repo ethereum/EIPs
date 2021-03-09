@@ -1,5 +1,5 @@
 import { context, getOctokit } from "@actions/github";
-import { EVENTS, GITHUB_TOKEN } from "src/utils";
+import { EVENTS, GITHUB_TOKEN } from "../utils";
 import { FileDiff } from "./GetFileDiff";
 
 export const assertEvent = () => {
@@ -54,3 +54,10 @@ export const assertAuthors = (file: FileDiff) => {
 
   return authors;
 };
+
+const encodings = ["ascii", "utf8", "utf-8", "utf16le", "ucs2", "ucs-2", "base64", "latin1", "binary", "hex"] as const
+type Encodings = typeof encodings[number]
+export function assertEncoding(maybeEncoding: string, context: string): asserts maybeEncoding is Encodings {
+  // any here because of https://github.com/microsoft/TypeScript/issues/26255
+  if (!encodings.includes(maybeEncoding as any)) throw new Error(`Unknown encoding of ${context}: ${maybeEncoding}`);
+}

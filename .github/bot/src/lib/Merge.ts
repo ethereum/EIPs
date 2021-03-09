@@ -1,5 +1,5 @@
 import { getOctokit, context } from "@actions/github";
-import { GITHUB_TOKEN, MERGE_MESSAGE } from "src/utils";
+import { GITHUB_TOKEN, MERGE_MESSAGE } from "../utils";
 import { assertPr } from "./Assertions";
 import { FileDiff } from "./GetFileDiff";
 
