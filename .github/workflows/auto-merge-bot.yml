@@ -14,8 +14,7 @@ jobs:
         with:
           node-version: '12'
           check-latest: false
-      - run: npm install
-      - run: npm run build
+      - run: cd .github/bot && npm install && npm run build
       - name: auto-merge-bot
         uses: ./.github/bot # Uses an action in the root directory
         id: auto-merge-bot
