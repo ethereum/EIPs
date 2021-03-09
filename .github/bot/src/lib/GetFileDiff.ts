@@ -20,9 +20,7 @@ export type FileDiff = {
   base: FormattedFile;
 };
 
-export const getFileDiff = async (
-  file: File
-): Promise<FileDiff> => {
+export const getFileDiff = async (file: File): Promise<FileDiff> => {
   const pr = await assertPr();
   const filename = file.filename;
   // Get and parse head and base file
@@ -36,12 +34,18 @@ export const getFileDiff = async (
   };
 };
 
-export type FormattedFile = { eipNum: number; status: EipStatus; authors?: Set<string>, name: string, filenameEipNum: number};
+export type FormattedFile = {
+  eipNum: number;
+  status: EipStatus;
+  authors?: Set<string>;
+  name: string;
+  filenameEipNum: number;
+};
 
 const formatFile = async (file: ParsedContent): Promise<FormattedFile> => {
   const filenameEipNum = getFilenameEipNum(file.name);
   if (!filenameEipNum) {
-    throw `Failed to extract eip number from file "${file.path}"`
+    throw `Failed to extract eip number from file "${file.path}"`;
   }
 
   return {
@@ -130,9 +134,11 @@ const getAuthors = async (rawAuthorList?: string) => {
 };
 
 export const isFilePreexisting = (file: File) => {
-  if (file.status === FileStatus.added){
-    ERRORS.push(`File with name ${file.filename} is new and new files must be reviewed`)
+  if (file.status === FileStatus.added) {
+    ERRORS.push(
+      `File with name ${file.filename} is new and new files must be reviewed`
+    );
     return false; // filters the files out
   }
-  return true
-}
+  return true;
+};

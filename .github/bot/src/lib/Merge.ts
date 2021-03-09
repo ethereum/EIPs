@@ -6,7 +6,7 @@ import { FileDiff } from "./GetFileDiff";
 export const merge = async (diffs: FileDiff[]) => {
   const pr = await assertPr();
   const Github = getOctokit(GITHUB_TOKEN);
-  const eips = diffs.map(diff => diff.head.eipNum);
+  const eips = diffs.map((diff) => diff.head.eipNum);
   const eipNumbers = eips.join(", ");
 
   await Github.pulls.merge({

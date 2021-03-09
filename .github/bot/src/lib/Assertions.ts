@@ -6,10 +6,10 @@ export const assertEvent = () => {
   const event = context.eventName;
 
   if (event !== EVENTS.pullRequest) {
-    throw `Only events of type ${EVENTS.pullRequest} are allowed`
+    throw `Only events of type ${EVENTS.pullRequest} are allowed`;
   }
 
-  return event
+  return event;
 };
 
 export const assertPullNumber = () => {
@@ -19,14 +19,14 @@ export const assertPullNumber = () => {
     throw "Build does not have a PR number associated with it; quitting...";
   }
 
-  return payload.pull_request.number
-}
+  return payload.pull_request.number;
+};
 
 export const assertPr = async () => {
   const Github = getOctokit(GITHUB_TOKEN);
 
   const prNum = assertPullNumber();
-  const {data: pr} = await Github.pulls.get({
+  const { data: pr } = await Github.pulls.get({
     repo: context.repo.repo,
     owner: context.repo.owner,
     pull_number: prNum
@@ -49,8 +49,8 @@ export const assertAuthors = (file: FileDiff) => {
 
   // Make sure there are authors
   if (!authors || authors.length === 0) {
-    throw `${file.head.name} has no identifiable authors who can approve the PR (only considering the base version)`
-  } 
+    throw `${file.head.name} has no identifiable authors who can approve the PR (only considering the base version)`;
+  }
 
-  return authors
-}
+  return authors;
+};

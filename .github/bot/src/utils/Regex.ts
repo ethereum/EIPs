@@ -5,7 +5,6 @@ export const AUTHOR_RE = /[(<]([^>)]+)[>)]/gm;
 /** to find the EIP number in a file name */
 export const EIP_NUM_RE = /(\d+)/;
 
-
 /**
  * This functionality is supported in es2020, but for the purposes
  * of compatibility (and because it's quite simple) it's built explicitly
@@ -31,4 +30,4 @@ export const matchAll = (
 export const getFilenameEipNum = (filename: string) => {
   const eipNumMatch = filename.match(EIP_NUM_RE);
   return eipNumMatch && parseInt(eipNumMatch[0]);
-}
+};

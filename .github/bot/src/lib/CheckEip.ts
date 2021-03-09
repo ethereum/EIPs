@@ -1,7 +1,13 @@
-import { FILE_RE, ALLOWED_STATUSES, File, getFilenameEipNum, ERRORS } from "src/utils";
+import {
+  FILE_RE,
+  ALLOWED_STATUSES,
+  File,
+  getFilenameEipNum,
+  ERRORS
+} from "src/utils";
 import { FileDiff } from "./GetFileDiff";
 
-export const checkEIP = ({head, base}: FileDiff) => {
+export const checkEIP = ({ head, base }: FileDiff) => {
   // establish comparisons
   const headMatchesSelf = head.filenameEipNum === head.eipNum;
   const baseFileMatchesHead = base.filenameEipNum === head.eipNum;
@@ -25,7 +31,7 @@ export const checkEIP = ({head, base}: FileDiff) => {
       `Trying to change EIP ${head.eipNum} state from ${base.status} to ${head.status}`
     );
   }
-  
+
   // Check if base statuses are not allowed
   else if (!ALLOWED_STATUSES.has(head.status)) {
     ERRORS.push(
