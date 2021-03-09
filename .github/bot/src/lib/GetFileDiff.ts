@@ -10,17 +10,17 @@ import {
   getFilenameEipNum,
   FileStatus,
   ERRORS
-} from "src/utils";
+} from "../utils";
 import frontmatter, { FrontMatterResult } from "front-matter";
 import { context } from "@actions/github/lib/utils";
-import { assertPr } from "./Assertions";
+import { assertPr, assertEncoding } from "./Assertions";
 
 export type FileDiff = {
   head: FormattedFile;
   base: FormattedFile;
 };
 
-export const getFileDiff = async (file: File): Promise<FileDiff> => {
+export const getFileDiff = async (file: NonNullable<File>): Promise<FileDiff> => {
   const pr = await assertPr();
   const filename = file.filename;
   // Get and parse head and base file
@@ -72,7 +72,8 @@ const getParsedContent = async (
   const Github = getOctokit(GITHUB_TOKEN);
   const decodeData = (data: ContentFile) => {
     const encoding = data.encoding;
-    return Buffer.from(data.content, data.encoding as any).toString();
+    assertEncoding(encoding, filename);
+    return Buffer.from(data.content, encoding).toString();
   };
 
   // Collect the file contents at the given sha reference frame
@@ -112,10 +113,11 @@ const getAuthors = async (rawAuthorList?: string) => {
   ): Promise<string | undefined> => {
     const Github = getOctokit(GITHUB_TOKEN);
     const { data: results } = await Github.search.users({ q: email });
-    if (results.total_count > 0) {
+    if (results.total_count > 0 && results.items[0] !== undefined) {
       return "@" + results.items[0].login;
     }
     console.warn(`No github user found, using email instead: ${email}`);
+    return undefined;
   };
 
   const resolveAuthor = async (author: string) => {
@@ -133,7 +135,7 @@ const getAuthors = async (rawAuthorList?: string) => {
   return new Set(resolved);
 };
 
-export const isFilePreexisting = (file: File) => {
+export const isFilePreexisting = (file: NonNullable<File>) => {
   if (file.status === FileStatus.added) {
     ERRORS.push(
       `File with name ${file.filename} is new and new files must be reviewed`

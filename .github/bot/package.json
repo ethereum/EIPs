@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=testing jest __tests__",
-    "build": "ncc build ./src/index.ts",
-    "watch": "ncc build ./src/index.ts --watch",
+    "build": "npx tsc",
+    "watch": "npx tsc --watch",
     "it": "node -r dotenv/config dist/index.js",
     "prettier-changed": "prettier --write"
   },

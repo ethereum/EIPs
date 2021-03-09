@@ -4,7 +4,7 @@ import {
   File,
   getFilenameEipNum,
   ERRORS
-} from "src/utils";
+} from "../utils";
 import { FileDiff } from "./GetFileDiff";
 
 export const checkEIP = ({ head, base }: FileDiff) => {
@@ -42,7 +42,7 @@ export const checkEIP = ({ head, base }: FileDiff) => {
   }
 };
 
-export const isValidEipFilename = (file: File) => {
+export const isValidEipFilename = (file: NonNullable<File>) => {
   const filename = file.filename;
 
   // File name is formatted correctly and is in the EIPS folder
