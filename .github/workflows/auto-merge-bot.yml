@@ -1,7 +1,7 @@
 on: [pull_request]
 
 jobs:
-  hello_world_job:
+  auto_merge_bot:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
     steps:
@@ -15,4 +15,4 @@ jobs:
         uses: ./.github/bot # Uses an action in the root directory
         id: auto-merge-bot
         with:
-          GITHUB-TOKEN: ${{ secrets.TOKEN }} # https://help.github
+          GITHUB-TOKEN: ${{ secrets.TOKEN }} 
