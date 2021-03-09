@@ -2,7 +2,7 @@ name: "Auto Merge EIP"
 description: "A bot that lints EIP edits, finds common errors, and can auto-merge"
 
 runs:
-  using: "node14"
+  using: "node12"
   main: "dist/index.js"
 branding:
   icon: 'code'  
