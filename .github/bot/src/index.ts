@@ -1,7 +1,7 @@
 import { setFailed } from "@actions/core";
 import { EVENTS, ERRORS } from "./utils";
 import { context, getOctokit } from "@actions/github";
-import { GITHUB_TOKEN } from "src/utils/Constants";
+import { GITHUB_TOKEN } from "./utils/Constants";
 import {
   assertPr,
   merge,
@@ -15,7 +15,7 @@ import {
   assertAuthors,
   removeApproved,
   requestReviewers
-} from "src/lib";
+} from "./lib";
 import { CompareCommits } from "./utils";
 
 if (process.env.NODE_ENV === "development") {

@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=testing jest __tests__",
-    "build": "ncc build ./src/index.ts",
-    "watch": "ncc build ./src/index.ts --watch",
+    "build": "npx tsc",
+    "watch": "npx tsc --watch",
     "it": "node -r dotenv/config dist/index.js",
     "prettier-changed": "prettier --write"
   },
   "author": "",
-  "license": "ISC",
+  "license": "CC0-1.0",
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
