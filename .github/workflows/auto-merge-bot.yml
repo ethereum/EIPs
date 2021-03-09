@@ -12,7 +12,7 @@ jobs:
       - name: Setup Node.js Enviornment
         uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: '14'
           check-latest: false
       - run: cd .github/bot && npm ci && npm run build
       - name: auto-merge-bot
