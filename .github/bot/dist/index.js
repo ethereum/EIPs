@@ -8784,8 +8784,7 @@ const main = () => src_awaiter(void 0, void 0, void 0, function* () {
         }
         // if no errors, then merge
         if (ERRORS.length === 0) {
-            console.log("merging");
-            // return await merge(fileDiffs);
+            return yield merge(fileDiffs);
         }
         if (ERRORS.length > 0) {
             return yield postComment();

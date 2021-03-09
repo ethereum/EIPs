@@ -79,8 +79,7 @@ const main = async () => {
 
     // if no errors, then merge
     if (ERRORS.length === 0) {
-      console.log("merging")
-      // return await merge(fileDiffs);
+      return await merge(fileDiffs);
     }
 
     if (ERRORS.length > 0) {
