@@ -5,18 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
     steps:
-      # To use this repository's private action,
-      # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Node.js Enviornment
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-          check-latest: true
-      - run: cd .github/bot && npm ci && npm run build
+          node-version: '12.X'
       - name: auto-merge-bot
         uses: ./.github/bot # Uses an action in the root directory
         id: auto-merge-bot
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }} # https://help.github
+        with:
+          token: ${{ secrets.TOKEN }} # https://help.github
