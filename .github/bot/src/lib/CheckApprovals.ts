@@ -12,7 +12,6 @@ export const removeApproved = async (file: FileDiff) => {
     authors.includes(approver)
   );
 
-  console.log(hasAuthorApproval);
   if (hasAuthorApproval) return;
 
   ERRORS.push(
