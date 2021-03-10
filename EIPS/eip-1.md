@@ -207,6 +207,10 @@ EIPs may also have a `superseded-by` header indicating that an EIP has been rend
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
 
+## Linking to outside sources
+
+EIPs **MUST NOT** link to external domains.
+
 ## Auxiliary Files
 
 Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
