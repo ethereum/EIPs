@@ -1,0 +1,73 @@
+---
+eip: <to be assigned>
+title: JSON-RPC method to sign Ethereum messages (eth_signMessage)
+author: Pedro Gomes <@pedrouid>
+discussions-to: <to be assigned>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-03-10
+requires: 191, 1474
+---
+
+## Simple Summary
+Introduces a new JSON-RPC method name to request Ethereum message signatures in light of eth_sign and personal_sign history
+
+## Abstract
+This proposal aims to reduce the fragmentation of both decentralizated applications and wallets regarding JSON-RPC methods to request message signatures. Also aims to incentivize implementers to move away from legacy methods that may have inherited broken implementations.
+
+## Motivation
+Ethereum message signing is a useful tool to interoperate between decentralized applications and wallets allowing public key derivation from signatures, proving ownership of an account among other use-cases. Many standards have been built on top of existing JSON-RPC methods like eth_sign, personal_sign, eth_signTypedData, etc. However there has been a long and troubled history of fragamentation of both implementations and documentation. Most importantly there is the history of the eth_sign which was originally implemented on Geth client as an unprefixed signature. This posed the problem to allow any arbitrary data to be signed with the private key controlling the account for anything on the secp256k1 curve. With this acknoledgement there was the introduction of personal_sign which intended to fix this issue with prefixed signatures. This method however has a completely different prefix and even has reversed parameters when compared to eth_sign.
+Later on the eth_sign was standardized by EIP-1474 to use prefixed signatures but most implementations in production continued to support the old behavior of eth_sign. Hence the fragementation started to occur where new applications would implement the new eth_sign behavior and old applications would implement the old eth_sign behavior with personal_sign support in parallel. Typed Data signing (EIP-712) has had its own troubled history and many have hoped to completely replace message signing but now on its fourth iteration the specification is still far from finalized as new edge cases are found.
+
+Therefore the motivation for this proposal is to eliminate the fragmentation between eth_sign implementations and slowly deprecate the use of personal_sign which is not part of EIP-1474. By introducing a new method for the new and standardized eth_sign behavior with prefixed signatures we can have both old and new applications using the same method without any inconsistencies of order of parameters or use of unprefixed signatures.
+
+## Specification
+### eth_signMessage
+
+#### Description
+
+Calculates an Ethereum-specific signature in the form of `keccak256("\x19Ethereum Signed Message:\n" + len(message) + message))`
+
+#### Parameters
+
+|#|Type|Description|
+|-|-|-|
+|1|{[`Data`](#data)}|address to use for signing|
+|2|{[`Data`](#data)}|data to sign|
+
+#### Returns
+
+{[`Data`](#data)} - signature hash of the provided data
+
+#### Example
+
+```sh
+# Request
+curl -X POST --data '{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "method": "eth_signMessage",
+    "params": ["0x9b2055d370f73ec7d8a03e965129118dc8f5bf83", "0xdeadbeaf"]
+}' <url>
+
+# Response
+{
+    "id": 1337,
+    "jsonrpc": "2.0",
+    "result": "0xa3f20717a250c2b0b729b7e5becbff67fdaef7e0699da4de7ca5895b02a170a12d887fd3b17bfdce3481f10bea41f45ba9f709d39ce8325427b57afcfc994cee1b"
+}
+```
+
+## Rationale
+The specification maintains the parameters of the standardized eth_sign method with the prefixed signature behavior using a new method name that is less ambigious.
+
+## Backwards Compatibility
+
+Wallets supporting either eth_sign or personal_sign should support this method in parallel for backwards-compatibility. Additionally EIP-1474 should replace eth_sign from its specification before finalization
+
+## Security Considerations
+This inherites the security considerations of prefixed messages from the new eth_sign and personal_sign
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
