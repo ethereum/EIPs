@@ -207,7 +207,7 @@ EIPs may also have a `superseded-by` header indicating that an EIP has been rend
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
 
-If the referenced EIP is not in final/living status at the time you are referencing it, you **MUST** refer to it as `EIP-N [DRAFT]`. This is consistent with the preferred citation format at https://github.com/ethereum/EIPs/blob/master/_layouts/eip.html#L55. And also, this is helpful because something that is said about a draft EIP may no longer be accurate when the EIP is finalized.
+An EIP **MUST NOT** make reference to another draft EIP. This is because something that is said about a draft EIP may no longer be accurate when it is finalized.
 
 ## Auxiliary Files
 
