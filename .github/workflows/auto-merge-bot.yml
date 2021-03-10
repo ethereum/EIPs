@@ -10,7 +10,7 @@ jobs:
       - name: Setup Node.js Enviornment
         uses: actions/setup-node@v2
         with:
-          node-version: '12.X'
+          node-version: '14'
       - name: auto-merge-bot
         uses: ./.github/bot # Uses an action in the root directory
         id: auto-merge-bot
