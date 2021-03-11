@@ -6,6 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
+    "pretty": true,
     "noEmit": false,
     "strict": true,
     "noEmitOnError": true,
@@ -19,11 +20,10 @@
     "outDir": "./build",
     "sourceMap": true,
     "inlineSources": true,
-    // Relative path break transpilation + running with node because typescript doesn't automatically map relative paths for some reason
-    // "baseUrl": "./",
-    // "paths": {
-    //   "src/*": ["src/*"]
-    // }
+    "baseUrl": "./",
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
   "exclude": [
     "./node_modules/*"

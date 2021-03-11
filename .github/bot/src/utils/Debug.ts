@@ -11,7 +11,7 @@ export const __MAIN__ = async (debugEnv?: NodeJS.ProcessEnv) => {
 
   // by instantiating after context and env are custom set,
   // it allows for a custom environment that's setup programmatically
-  const main = require("../main").main;
+  const main = require("src/main").main;
   return await main();
 }
 

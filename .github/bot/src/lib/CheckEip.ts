@@ -4,7 +4,7 @@ import {
   File,
   getFilenameEipNum,
   ERRORS
-} from "../utils";
+} from "src/utils";
 import { FileDiff } from "./GetFileDiff";
 
 export const checkEIP = ({ head, base }: FileDiff) => {

@@ -1,5 +1,5 @@
 import { context, getOctokit } from "@actions/github";
-import { EVENTS, GITHUB_TOKEN } from "../utils";
+import { EVENTS, GITHUB_TOKEN } from "src/utils";
 import { FileDiff } from "./GetFileDiff";
 
 export const assertEvent = () => {

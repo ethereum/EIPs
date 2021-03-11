@@ -1,4 +1,4 @@
-
+require('module-alias/register')
 import { main } from "./main";
 import { __MAIN__ } from "./utils";
 
