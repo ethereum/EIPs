@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "build": "npx tsc",
-    "watch": "npx tsc --watch",
+    "build": "npx tsc --p ./tsconfig.run.json",
+    "watch": "npx tsc --watch --p ./tsconfig.run.json",
     "it": "node -r dotenv/config dist/index.js",
     "prettier-changed": "prettier --write"
   },

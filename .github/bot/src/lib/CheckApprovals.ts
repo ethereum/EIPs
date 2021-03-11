@@ -1,5 +1,5 @@
 import { context, getOctokit } from "@actions/github";
-import { GITHUB_TOKEN, ERRORS } from "../utils";
+import { GITHUB_TOKEN, ERRORS } from "src/utils";
 import { assertAuthors, assertPr } from "./Assertions";
 import { FileDiff } from "./GetFileDiff";
 
