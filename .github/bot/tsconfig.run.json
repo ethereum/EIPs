@@ -19,10 +19,11 @@
     "outDir": "./build",
     "sourceMap": true,
     "inlineSources": true,
-    "baseUrl": "./",
-    "paths": {
-      "src/*": ["src/*"]
-    }
+    // Relative path break transpilation + running with node because typescript doesn't automatically map relative paths for some reason
+    // "baseUrl": "./",
+    // "paths": {
+    //   "src/*": ["src/*"]
+    // }
   },
   "exclude": [
     "./node_modules/*",

@@ -7,7 +7,7 @@
     "test": "jest",
     "build": "npx tsc --p ./tsconfig.run.json",
     "watch": "npx tsc --watch --p ./tsconfig.run.json",
-    "it": "node -r dotenv/config dist/index.js",
+    "it": "node -r dotenv/config build/index.js",
     "prettier-changed": "prettier --write"
   },
   "author": "",
@@ -34,7 +34,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --changed"
     }
   }
 }

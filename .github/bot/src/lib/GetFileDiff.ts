@@ -10,7 +10,7 @@ import {
   getFilenameEipNum,
   FileStatus,
   ERRORS
-} from "src/utils";
+} from "../utils";
 import frontmatter, { FrontMatterResult } from "front-matter";
 import { context } from "@actions/github/lib/utils";
 import { assertPr, assertEncoding } from "./Assertions";

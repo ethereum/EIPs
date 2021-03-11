@@ -1,8 +1,27 @@
-import { context } from "@actions/github";
+
 import { EVENTS } from "./Constants";
 
-export const setEnvAsContext = (env: NodeJS.ProcessEnv) => {
-  console.log("establishing development context...");
+export const __MAIN__ = async (debugEnv?: NodeJS.ProcessEnv) => {
+  const isDebug = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
+
+  if (!isDebug) throw new Error("trying to run debug without proper auth");
+  
+  // setup debug env
+  setDebugContext(debugEnv);
+
+  // by instantiating after context and env are custom set,
+  // it allows for a custom environment that's setup programmatically
+  const main = require("../main").main;
+  return await main();
+}
+
+const setDebugContext = (debugEnv?: NodeJS.ProcessEnv) => {
+  const env = {...process.env, ...debugEnv};
+  process.env = env;
+
+  // By instantiating after above it allows it to initialize with custom env
+  const context = require("@actions/github").context;
+
   context.payload.pull_request = {
     base: {
       sha: env.BASE_SHA
