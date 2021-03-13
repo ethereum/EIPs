@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Since this is your first issue, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.'
+        pr-message: 'Since this is your first pull request, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.'

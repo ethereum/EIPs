@@ -14,11 +14,19 @@
     <h2 id="{{status|slugify}}">{{status}}</h2>
     <table class="eiptable">
       <thead>
-        <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+        {% if status == "Last Call" %}
+          <tr>
+          <th class="eipnum">Number</th><th class="date">Review ends</th><th class="title">Title</th><th class="author">Author</th></tr>
+        {% else %}
+          <tr><th class="eipnum">Number</th><th class="title">Title</th><th class="author">Author</th></tr>
+        {% endif %}
       </thead>
       {% for page in eips %}
         <tr>
           <td class="eipnum"><a href="{{page.url|relative_url}}">{{page.eip|xml_escape}}</a></td>
+          {% if status == "Last Call" and page.review-period-end != undefined %}
+            <td class="date">{{ page.review-period-end | xml_escape }}</td>
+          {% endif %}
           <td class="title">{{page.title|xml_escape}}</td>
           <td class="author">{% include authorlist.html authors=page.author %}</td>
         </tr>
