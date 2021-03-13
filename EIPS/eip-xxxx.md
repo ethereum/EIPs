@@ -20,15 +20,39 @@ Ethereum's block gas limit is currently dictated by block producers and is not e
 
 ## Motivation
 
-Both Ethereum's Proof of Work and Proof of Stake designs assume that block producers are financially rational, but does not assume block producers to be benevolent, except when it comes to choosing the block gas limit, where it is assume that block producers care about the long term health and decentralisation of the chain. Indeed, the block gas limit is one of the only parameters in Ethereum that is not dictated by node consensus, but instead is chosen by block producers. This decision was initially made to allow quick changes in the block gas limit in case in became urgent. However, as the last two years have shown, increasing the block gas limit leads to marginal benefits regarding gas prices, but can cause significant damage to the long term health of the chain. It is therefore a critical parameters that should require node consensus to avoid any sudden harmful change by a small number of actors.
+Both Ethereum's Proof of Work and Proof of Stake designs assume that block producers are financially rational, but does not assume block producers to be benevolent. There is one exception however, and it is when it comes to choosing the block gas limit, where it is assume that block producers care about the long term health and decentralisation of the chain. Indeed, the block gas limit is one of the only parameters in Ethereum that is not dictated by node consensus, but instead is chosen by block producers. This decision was initially made to allow quick changes in the block gas limit in case in became urgent. However, as the last two years have shown, increasing the block gas limit leads to marginal benefits regarding gas prices, but can cause significant damage to the long term health of the chain. It is therefore a critical parameters that should require node consensus to avoid any sudden harmful change imposed by a small number of actors to the rest of the network.
 
 ## Specification
 
+#### Block Header
+
+As of `FORK_BLOCK_NUMBER`, remove `gasLimit` field from the block header (Yellow Paper section 4.3)
+
+#### Consensus
+
+As of `FORK_BLOCK_NUMBER`, change the headers gas limit validity check such that `header.gasUsed` **MUST** be smaller than `BLOCK_GAS_LIMIT`, where `BLOCK_GAS_LIMIT` is a hard-coded constant set to 25,000,000. 
+
+#### EVM
+
+The `GASLIMIT` opcode (0x45) should return the constant 25,000,000 as of `FORK_BLOCK_NUMBER`.
+
 ## Rationale
+
+#### Removing the gasLimit from the header
+
+The gas limit was only present in the header as it was defined by the block producer. Since this value is now a constant accessible to all nodes, there is little benefit to having the gasLimit in the header anymore. 
+
+####Limit Selected
+
+The 25,000,000 value is being proposed in consideration of EIP-1559, which will use a target gas limit of 12,500,000 gas.
 
 ## Backwards Compatibility
 
+Removing the gasLimit value from the header may break some analytic tools that rely on this field.
+
 ## Security Considerations
+
+
 
 ## Copyright
 
