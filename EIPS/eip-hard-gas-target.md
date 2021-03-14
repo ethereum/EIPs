@@ -1,6 +1,6 @@
 ---
 eip: xxxx
-title: Non-Malleable Block Gas Target
+title: Hardcoded Block Gas Target
 author: Philippe Castonguay (@PhABC)
 discussions-to: xxxx
 status: Draft
@@ -52,6 +52,8 @@ The 12,500,000 value is being proposed as it's the current block gas limit as of
 Removing the gas target value from block headers may break some analytic tools that rely on this field.
 
 ## Security Considerations
+Rapid changes to the gas target will likely be more difficult to execute, which could be problematic if an urgent situation arised that required changing the gas target.
+
 
 ## Copyright
 
