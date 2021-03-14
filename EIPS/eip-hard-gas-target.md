@@ -24,19 +24,15 @@ Both Ethereum's Proof of Work and Proof of Stake designs assume that block produ
 ## Specification
 Refer to `gasLimit` as `gasTarget` post EIP-1559.
 
-#### Consensus
+#### Added Consensus Constraint
 
-As of `FORK_BLOCK_NUMBER`, change the headers gas limit validity check such that `header.gasUsed` **MUST** be **smaller** than `BLOCK_GAS_TARGET * ELASTICITY_MULTIPLIER` where `BLOCK_GAS_LIMIT` is a hard-coded constant set to `12,500,000` and `ELASTICITY_MULTIPLIER` is `2` as per [EIP-1559 specifications](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#specification). In addition, the `header.gasLimit` **MUST** be equal to `BLOCK_GAS_LIMIT`.
-
-#### EVM
-
-The `GASLIMIT` opcode (0x45) should return the constant `12,500,000` as of `FORK_BLOCK_NUMBER`.
+As of `FORK_BLOCK_NUMBER`, the `header.gasLimit` **MUST** be equal to `BLOCK_GAS_LIMIT`, where `BLOCK_GAS_LIMIT` is a hardcoded constant set to `12,500,000`.
 
 ## Rationale
 
-#### Validating GasLimit in Block Headers
+#### Keeping gasLimit in Block Headers
 
-While it would be possible to remove the `gasLimit` field from block headers, it would change the data structure to be hashed, which could lead to unintended consequences. It is therefore easier to leave the gasLimit as part of block headers. However, since this in-header value is set by the block producer, it should be validated against `BLOCK_GAS_LIMIT` in case it is used by off-chain tools or contracts.
+While it would be possible to remove the `gasLimit` field from block headers, it would change the data structure to be hashed, which could lead to unintended consequences. It is therefore easier to leave the gasLimit as part of block headers. 
 
 #### Chosen Gas Limit
 
@@ -47,7 +43,7 @@ The `12,500,000` value is being proposed as it's the current block gas limit as 
 This EIP is backward compatible.
 
 ## Security Considerations
-Rapid changes to the gas limit will likely be more difficult to execute, which could be problematic if an urgent situation arise that required changing the gas limitt.
+Rapid changes to the gas limit will likely be more difficult to execute, which could be problematic if an urgent situation arise that required changing the gas limit.
 
 
 ## Copyright
