@@ -1,6 +1,6 @@
 ---
 eip: xxxx
-title: Non-Malleable Block Gas Limit
+title: Non-Malleable Block Gas Target
 author: Philippe Castonguay (@PhABC)
 discussions-to: xxxx
 status: Draft
@@ -12,7 +12,7 @@ created: 2020-03-13
 
 ## Simple Summary
 
-Hardcode the block gas target (previously known as gas limit before eip-1559) to 12,500,000 gas per block.
+Hardcode the block gas target (previously known as gas limit before [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)) to 12,500,000 gas per block.
 
 ## Abstract
 
