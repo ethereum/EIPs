@@ -13,7 +13,7 @@ created: 2021-03-13
 Provides for a predictable, issuance neutral reduction of block rewards to 1 over a one year time span while reducing the uncertainties and risks associated with sudden changes to mining economics.
 
 ## Abstract
-Sets the block reward to 3 ETH and then incrementally decreases it every block for 4,000,000 blocks (approximately 1 year) until it reaches 1 ETH.
+Sets the block reward to 3 ETH and then incrementally decreases it every block for 2,362,000 blocks (approximately 1 year) until it reaches 1 ETH.
 
 ## Motivation
 Unnecessarily abrupt changes to the Ethereum ecosystem cause disruption and disharmony resulting in the disenfranchisement of community members while undermining stability and confidence.  While moves from Proof-of-Work to Proof-of-State will undoubtedly cause friction between those community members vested in either, all benefit from a measured, predictable transition.
