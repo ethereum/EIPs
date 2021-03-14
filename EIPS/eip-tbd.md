@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3374
 title: Predictable Proof-of-Work (POW) Sunsetting 
 author: @Query0x
 discussions-to: <tbd>
@@ -16,7 +16,7 @@ Provides for a predictable, issuance neutral reduction of block rewards to 1 ove
 Sets the block reward to 3 ETH and then incrementally decreases it every block for 2,362,000 blocks (approximately 1 year) until it reaches 1 ETH.
 
 ## Motivation
-Unnecessarily abrupt changes to the Ethereum ecosystem cause disruption and disharmony resulting in the disenfranchisement of community members while undermining stability and confidence.  While moves from Proof-of-Work to Proof-of-State will undoubtedly cause friction between those community members vested in either, all benefit from a measured, predictable transition.
+Unnecessarily abrupt changes to the Ethereum ecosystem cause disruption and disharmony resulting in the disenfranchisement of community members while undermining stability and confidence.  While moves from Proof-of-Work to Proof-of-Stake will undoubtedly cause friction between those community members vested in either, all benefit from a measured, predictable transition.
 
 This proposal:
 
