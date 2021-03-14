@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2020-03-13
-
 ---
 
 ## Simple Summary
