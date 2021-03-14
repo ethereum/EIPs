@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 3382
 title: Hardcoded Block Gas Target
 author: Philippe Castonguay (@PhABC)
 discussions-to: xxxx
