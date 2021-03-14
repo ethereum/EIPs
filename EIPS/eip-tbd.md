@@ -21,7 +21,7 @@ Unnecessarily abrupt changes to the Ethereum ecosystem cause disruption and dish
 This proposal:
 
 1) Is issuance neutral.  There is no overall increase in mining rewards.
-2) Smooths the immediate impact of EIP-1559 on mining economics reducing the likeihood of reactionary responses;
+2) Smooths the immediate impact of [EIP-1559](./eip-1559) on mining economics reducing the likeihood of reactionary responses;
 3) Introduces an ongoing, predictable reduction in future mining rewards down to 1, effectively "sunsetting" POW and codifying the move to POS;
 4) Removes economic incentives for continued development of ASICs;
 5) Allows the impacts of decreasing miner rewards to be measured and monitored rather than relying on conjecture and game theory, so adjustments can be made if necessary.
