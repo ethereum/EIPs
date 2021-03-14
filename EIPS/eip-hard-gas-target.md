@@ -24,13 +24,9 @@ Both Ethereum's Proof of Work and Proof of Stake designs assume that block produ
 ## Specification
 Refer to `gasLimit` as `gasTarget` post EIP-1559.
 
-#### Block Header
-
-As of `FORK_BLOCK_NUMBER`, remove `gasLimit` field from block headers.
-
 #### Consensus
 
-As of `FORK_BLOCK_NUMBER`, change the headers gas limit validity check such that `header.gasUsed` **MUST** be smaller than `BLOCK_GAS_TARGET * ELASTICITY_MULTIPLIER` where `BLOCK_GAS_LIMIT` is a hard-coded constant set to `12,500,000`, not the current gas limit included in block headers and `ELASTICITY_MULTIPLIER` is `2` as per [EIP-1559 specifications](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#specification).
+As of `FORK_BLOCK_NUMBER`, change the headers gas limit validity check such that `header.gasUsed` **MUST** be **smaller** than `BLOCK_GAS_TARGET * ELASTICITY_MULTIPLIER` where `BLOCK_GAS_LIMIT` is a hard-coded constant set to `12,500,000` and `ELASTICITY_MULTIPLIER` is `2` as per [EIP-1559 specifications](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#specification). In addition, the `header.gasLimit` **MUST** be equal to `BLOCK_GAS_LIMIT`.
 
 #### EVM
 
@@ -38,9 +34,9 @@ The `GASLIMIT` opcode (0x45) should return the constant `12,500,000` as of `FORK
 
 ## Rationale
 
-#### Removing the gasLimit from the header
+#### Validating GasLimit in Block Headers
 
-The gas limit was only present in block headers as it was defined by the block producers. Since this value is now a constant accessible to all nodes, there is little benefit to having the gas limit in the block headers. This would cause a change to the data structure to be hashed for block headers, but EIP-1559 already [imposes a change](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#block-hash-changing) to the data structure.
+While it would be possible to remove the `gasLimit` field from block headers, it would change the data structure to be hashed, which could lead to unintended consequences. It is therefore easier to leave the gasLimit as part of block headers. However, since this in-header value is set by the block producer, it should be validated against `BLOCK_GAS_LIMIT` in case it is used by off-chain tools or contracts.
 
 #### Chosen Gas Limit
 
@@ -48,7 +44,7 @@ The `12,500,000` value is being proposed as it's the current block gas limit as 
 
 ## Backwards Compatibility
 
-Removing the gas limit value from block headers may break some analytic tools that rely on this field and contracts that do on-chain block verification. EIP-1559 likely already breaks the latter. 
+This EIP is backward compatible.
 
 ## Security Considerations
 Rapid changes to the gas limit will likely be more difficult to execute, which could be problematic if an urgent situation arise that required changing the gas limitt.
