@@ -12,11 +12,11 @@ created: 2020-03-13
 
 ## Simple Summary
 
-Hardcode the block gas target (previously known as *block gas limit* before [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)) to 12,500,000 gas per block.
+Hardcode the block gas target (previously known as *block gas limit* before [EIP-1559](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)) to `12,500,000` gas per block.
 
 ## Abstract
 
-Ethereum's block gas target is currently dictated by block producers and is not enforced when validating blocks in clients. This EIP proposes to hardcode the block gas target to 12,500,000.
+Ethereum's block gas target is currently dictated by block producers and is not enforced when validating blocks in clients. This EIP proposes to hardcode the block gas target to `12,500,000`.
 
 ## Motivation
 
@@ -31,11 +31,11 @@ As of `FORK_BLOCK_NUMBER`, remove `gas_target` field from block headers.
 
 #### Consensus
 
-As of `FORK_BLOCK_NUMBER`, change the headers gas target validity check such that `header.gasUsed` **MUST** be smaller than `BLOCK_GAS_TARGET * ELASTICITY_MULTIPLIER` where `BLOCK_GAS_LIMIT` is a hard-coded constant set to 12,500,000, not the current gas target included in block headers and `ELASTICITY_MULTIPLIER` is **2** as per [EIP-1559 specifications](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#specification).
+As of `FORK_BLOCK_NUMBER`, change the headers gas target validity check such that `header.gasUsed` **MUST** be smaller than `BLOCK_GAS_TARGET * ELASTICITY_MULTIPLIER` where `BLOCK_GAS_LIMIT` is a hard-coded constant set to `12,500,000`, not the current gas target included in block headers and `ELASTICITY_MULTIPLIER` is `2` as per [EIP-1559 specifications](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md#specification).
 
 #### EVM
 
-The `GASLIMIT` opcode (0x45) should return the constant 12,500,000 as of `FORK_BLOCK_NUMBER`.
+The `GASLIMIT` opcode (0x45) should return the constant `12,500,000` as of `FORK_BLOCK_NUMBER`.
 
 ## Rationale
 
@@ -45,7 +45,7 @@ The gas target was only present in block headers as it was defined by the block 
 
 #### Gas Target Selected
 
-The 12,500,000 value is being proposed as it's the current block gas limit as of time of writing this EIP. The actual amount could be altered with a subsequent EIP to avoid deviating from the core intent of this EIP.
+The `12,500,000` value is being proposed as it's the current block gas limit as of time of writing this EIP. The actual amount could be altered with a subsequent EIP to avoid deviating from the core intent of this EIP.
 
 ## Backwards Compatibility
 
