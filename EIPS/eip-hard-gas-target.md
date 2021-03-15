@@ -45,7 +45,6 @@ This EIP is backward compatible.
 ## Security Considerations
 Rapid changes to the gas limit will likely be more difficult to execute, which could be problematic if an urgent situation arise that required changing the gas limit.
 
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
