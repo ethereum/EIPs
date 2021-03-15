@@ -12,7 +12,8 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@1.0.0 # Uses an action in the root directory
+        uses: alita-moore/EIP-Bot@1.0.8 # Uses an action in the root directory
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
+          VERSION: 1.0.8
