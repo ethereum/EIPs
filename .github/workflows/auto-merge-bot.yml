@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Node.js Enviornment
+      - name: Setup Node.js Environment
         uses: actions/setup-node@v2
         with:
           node-version: '14'
