@@ -1,4 +1,4 @@
-on: [pull_request]
+on: [workflow_dispatch]
 
 jobs:
   auto_merge_bot:
