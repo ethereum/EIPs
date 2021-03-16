@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@1.0.10 # Uses an action in the root directory
+        uses: alita-moore/EIP-Bot@master # Uses an action in the root directory
         continue-on-error: true
         id: auto-merge-bot
         with:
