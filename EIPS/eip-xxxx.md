@@ -1,0 +1,113 @@
+---
+eip: XXXX
+title: Median gas premium 
+author: HexZorro (@hexzorro), strongly based on [EIP-1559 Aug-2020](https://github.com/ethereum/EIPs/blob/54aa23ef6d1ec21d8642d67b5bed15d5ef9396e0/EIPS/eip-1559.md).
+discussions-to: <to be assigned>
+status: Draft
+type: Standards Track
+category: Core
+created: 2021-03-18
+---
+
+## Simple Summary
+A transaction pricing mechanism that includes a fixed-per-block network fee that is *not*-burned plus a *median* premium fee per transaction. Also, dynamically expands/contracts block sizes to deal with transient congestion. We target the following goals:
+
+* Gas prices spikes are mathematically smoothed out.
+* Final gas price paid by the sender is, most of the time, smaller than the maximum gas price specified by sender. 
+* Gas pricing is more robust to sender manipulation or miner manipulation.
+* All fees go to miners.
+
+
+## Abstract
+There is a base fee per gas in protocol, which can move up or down by a maximum of 1/8 in each block. The base fee per gas is adjusted by the protocol to target an average gas usage per block instead of an absolute gas usage per block.  The base fee is increased when blocks are over the gas limit target and decreases when blocks are under the gas limit target. The base fee per gas is *not burned*. Transaction senders specify their fees by providing *only one value*:
+
+* The fee cap which represents the maximum total (base fee + gas premium) that the transaction sender would be willing to pay to get their transaction included. Resembles the current maximum gas price specified by senders but in this protocol change proposal the final gas price paid, most of the time, will be lower than the proposed by the transaction sender. 
+
+Then there is a gas premium that is directly computed as 50% of (fee cap - base fee). This gas premium gets added onto the base fee to calculate the gas price that will be used in the weighted median computation. The gas premium, determined directly by a specified fee cap, can either be set to a fairly low value to compensate miners for uncle rate risk only with the base fee, or to a high value to compete during sudden bursts of activity. Using all transactions that the miner wants to include in the block, a **weighted median gas premium** is computed, not considering in the computation 5% of gas price outliers on the upper-side for extra robustness against miner manipulation. The median gas premium *plus the base fee* is given to the miner. 
+
+The rationale behind the premium being 50% of (fee cap - base fee) is that at any given point the average network sender has an average fee cap, and we assume that between base fee and fee cap the sender has no specific preference, as long as the transaction is included in some block. Then, the sender is happy with a median premium among this uniform range. Another justification can be that the user also knows that this new version of the pricing protocol for the complete block uses a median, then is fair for him to apply a median within his preferential range, assuming an uniform sampling there.
+
+
+## Motivation
+Ethereum currently prices transaction fees using a simple auction mechanism, where users send transactions with bids ("gasprices") and miners choose transactions with the highest bids, and transactions that get included pay the bid that they specify. This leads to several large sources of inefficiency:
+
+* **Current extreme volatility of gas prices is hurting user experience**: if you observe  online gas price metrics, the current trends in recommended gas prices can change substantially by the minute, making the user experience in the network very awkward. Also, gas volatility makes the mining business more unpredictable and costly, because miners need to spend money hedging the risks.
+* **Mismatch between volatility of transaction fee levels and social cost of transactions**: bids to include transactions on mature public blockchains, that have enough usage so that blocks are full, tend to be extremely volatile. On Ethereum, minimum bids range between 1 nanoeth (10^9 nanoeth = 1 ETH), but sometimes go over 100 nanoeth and have reached over 200 nanoeth. This clearly creates many inefficiencies, because it's absurd to suggest that the cost incurred by the network from accepting one more transaction into a block actually is 200x more when gas prices are 200 nanoeth than when they are 1 nanoeth; in both cases, it's a difference between 8 million gas and 8.02 million gas.
+* **Needless delays for users**: because of the hard per-block gas limit coupled with natural volatility in transaction volume, transactions often wait for several blocks before getting included, but this is socially unproductive; no one significantly gains from the fact that there is no "slack" mechanism that allows one block to be bigger and the next block to be smaller to meet block-by-block differences in demand.
+* **Inefficiencies of first price auctions**: The current approach, where transaction senders publish a transaction with a bid a maximum fee, miners choose the highest-paying transactions, and everyone pays what they bid. This is well-known in mechanism design literature to be highly inefficient, and so complex fee estimation algorithms are required. But even these algorithms often end up not working very well, leading to frequent fee overpayment. We need a more stable fee metric that is computed inside the protocol.
+
+The proposal in this EIP is to start with a base fee amount which is adjusted up and down by the protocol based on how congested the network is. When the network exceeds the target per-block gas usage, the base fee increases slightly and when capacity is below the target, it decreases slightly. Because these base fee changes are constrained, the maximum difference in base fee from block to block is predictable. This then allows wallets to auto-set the gas fees for users in a highly reliable fashion. It is expected that most users will not have to manually adjust gas fees, even in periods of high network activity. For most users the base fee will be estimated by their wallet and a small gas premium related to the urgency and the priority they want to instill into the transaction. 
+
+An important aspect of this fee system is that miners get to keep the median gas premium. There are several arguments in favor of miners continuing to earn base fees, mainly related to fairness of smaller miners already invested in mining hardware.
+
+The transition to this gas price system will occur in two phases, in the first phase both legacy and EIPXXXX transactions will be accepted by the protocol. Over the course of this first phase the amount of gas available for processing legacy transactions will decrease while the amount of gas available for processing EIPXXXX transactions will increase, moving gas from the legacy pool into the EIPXXXX pool until the legacy pool is depleted and the EIPXXXX pool contains the entire gas maximum. After all of the gas has transitioned to the EIPXXXX pool, the second, finalized, phase is entered and legacy transactions will no longer be accepted on the network.
+
+## Specification
+### Definitions
+
+Because there can be no extra fields added with this proposal, is very posible that `INITIAL_FORK_BLOCK_NUMBER == FINAL_FORK_BLOCK_NUMBER`, that is, a classic fork without a long migration time.
+
+* `FORK_BLOCK_NUMBER`: TBD.  Block number at or after which EIP-XXXX transactions are valid.
+* `BLOCK_GAS_TARGET`: 10th item in the block header: The gas limit field, controlled by miner voting.  Previously referred to colloquially as `gas limit`, now referred to as `gas target`.  Controlled by miners in the same way as before where each miner can increase or decrease it by a very small amount relative to the parent block.
+* `CURRENT_BLOCK`: The current block that is being worked with (either being validated, or being produced).
+* `BASE_FEE`: State mantained by the miners. Represents the base minimum amount of nanoeth spent for every unit of gas a transaction uses. Not included as transaction data.
+* `BASE_FEE_MAX_CHANGE_DENOMINATOR`: `8`
+* `BASE_FEE_MAX_CHANGE`: `CURRENT_BLOCK.parent.BASE_FEE / BASE_FEE_MAX_CHANGE_DENOMINATOR`. The maximum amount the `BASE_FEE` can change between blocks (either up or down).
+* `LEGACY_GAS_PRICE`: Median gas price in `FORK_BLOCK_NUMBER - 1`.
+* `INITIAL_BASE_FEE` : `LEGACY_GAS_PRICE`.
+* `BASE_FEE_CHANGE`: `CURRENT_BLOCK.parent.BASE_FEE`. The amount that the BASE_FEE will increase in `CURRENT_BLOCK` relative to `CURRENT_BLOCK.parent`.
+
+### Process
+* At `block.number == INITIAL_FORK_BLOCK_NUMBER` we set `BASE_FEE = INITIAL_BASE_FEE`
+* `BASE_FEE` is set as follows
+  * Let `delta = block.gas_used - TARGET_GASUSED` (possibly negative).
+  * Set `BASE_FEE = PARENT_BASE_FEE + PARENT_BASE_FEE * delta // TARGET_GASUSED // BASE_FEE_MAX_CHANGE_DENOMINATOR`
+  * Clamp the resulting `BASE_FEE` inside of the allowable bounds if needed, where a valid `BASE_FEE` is one such that `abs(BASE_FEE - PARENT_BASE_FEE) <= max(1, PARENT_BASE_FEE // BASE_FEE_MAX_CHANGE_DENOMINATOR)`
+* EIP-XXXX transactions are encoded the same as the current ones `rlp([nonce, gasPrice, gasLimit, to, value, data, v, r, s])` where `v,r,s` is a signature of `rlp([nonce, gasPrice, gasLimit, to, value, data])` and `gasPrice` is the `FEE_CAP` specified by the sender according to this proposal.
+* To produce EIPXXXX transactions, the new `FEE_CAP` field (maintaining legacy name of `gasPrice` in the transaction) is set as follows (and the `GAS_PREMIUM` is computed as specified):
+  * `FEE_CAP`: `tx.gasPrice`, serves as the absolute maximum that the transaction sender is willing to pay.
+  * `GAS_PREMIUM = (FEE_CAP - BASE_FEE) / 2` serves as a sender-preferred median premium to the miner, beyond the base fee.
+  * If `FEE_CAP < BASE_FEE` then the transaction is considered invalid and cannot be included in the current block, but might be included in future blocks.
+* During transaction execution, for EIPXXXX transactions we calculate the cost to the `tx.origin` and the gain to the `block.coinbase` as follows:
+  * Set `GASPRICE = BASE_FEE + median((tx_i.gasPrice - BASE_FEE) / 2)` among all transactions `tx_i` included in the same block, *weighted by gas consumed* and not including the top 5% of outlier gas price in calculation. By weighted median without 5% of the upper-side outliers, we mean that each gas unit spent is ordered according to the corresponding transaction by `BASE_FEE + tx.gasPrice / 2` and then the value chosen will be the one separating the lower 95% in two parts. The 5%, or similar, removal is to give extra robustness against miner manipulation, because as current network utilization has been around 97% for the last 6 months the miners can include their own transactions on the empty 3% to try to manipulate and increase the median price (even this manipulation effect will be very small on the final price).
+  * Let `GASUSED` be the gas used during the transaction execution/state transition.
+  * The `tx.origin` initially pays `GASPRICE * tx.gasLimit`, and gets refunded `GASPRICE * (tx.gasLimit - GASUSED)`
+  * The `block.coinbase` gains `GASPRICE * GASUSED`.
+
+The miners can still use a `greedy` strategy to include new transactions in the proposed blocks by adding the transactions ordered by larger `FEE_CAP` first. This is similar to how current blocks are filled, and is a consequence of `FEE_CAP` and `GAS_PREMIUM` being a positive linear function of each other.
+
+## Backwards Compatibility
+
+The backward compatibility is very straightforward because there are no new fields added to the transactions. Pricing of the gas per block is still fast to compute but a little more complex. We split the EIPXXXX upgrade into two phases with a transition period during which both legacy and EIPXXXX transactions can be accepted so that compatibility with wallets and other ETH-adjacent software is maintained while their maintainers have time to upgrade to using the new transaction type. During this transition period legacy transactions are accepted and processed identically to the current implementation, with the only difference being that the amount of gas (gas limit) dedicated to processing legacy transactions is calculated as above and decreases over this period.
+
+## Security Considerations
+
+* Senders cannot manipulate the minimum fee because the minimum `BASE_FEE` is controlled by the miners with small increments or decrements on each new block proposed.
+* Above the `BASE_FEE` the senders have a very limited ability to manipulate and lower the final gas price they pay because they have to move the weighted median close to `BASE_FEE` and, as we know, this is a very robust statistic.
+* Miners have a very limited ability to manipulate and raise the final gas price paid by senders above `BASE_FEE` because to influence the final gas price they have to stuff fake transactions beyond the top 5% of the blocks. In average and currently, only the top 3% of the block is empty, so to fill-up 5% of the block they need to start dropping profitable transactions to reach 5%. Only beyond 5% of the top block gas they can start moving the median a little and the median is still a very robust statistic, not liable to being easily manipulated.
+
+## Summary
+
+This proposal targets the following goals:
+
+* Reducing gas price extreme volatility, characterized by big gas price spikes.
+* Maintain gas price preference, i.e. transaction senders willing to pay extra in fees will be rewarded with early preferential inclusion in the blocks, because the miners want to maximize their profits and include transactions with higher fee caps first to maximize the median.
+* All valid transactions will be eventually included in a block. Because the weighted median is used, the miner can still apply a *greedy* strategy to include first the transactions with the largest `FEE_CAP` and eventually all transactions will be included. If we use for example, another theoretical alternative of the *minimum premium* among all block transactions some transactions might be left in the mempool forever because their premium is too small and hurts the overall minimum.
+* Miners have no immediate incentives to introduce high gas price transactions of their own to artificially boost the price. To do so they have to fill at least 5% of the block with fake transactions, to start moving a bit of the price . This is due to the robustness of the median statistic, not very amenable to manipulation, plus the 5% buffer that is bigger than the current average 3% of the unused gas block.
+
+## Resources
+* [Call notes](https://github.com/ethereum/pm/blob/master/All%20Core%20Devs%20Meetings/Meeting%2077.md)
+* [Original Magicians thread](https://ethereum-magicians.org/t/eip-1559-fee-market-change-for-eth-1-0-chain/2783)
+* [Ethresear.ch Post w/ Vitalik’s Paper](https://ethresear.ch/t/draft-position-paper-on-resource-pricing/2838)
+* [Go-ethereum implementation](https://github.com/vulcanize/go-ethereum-EIPXXXX)
+* [Implementation-specific Magicians thread](https://ethereum-magicians.org/t/eip-1559-go-etheruem-implementation/3918)
+* [First and second-price auctions and improved transaction-fee markets](https://ethresear.ch/t/first-and-second-price-auctions-and-improved-transaction-fee-markets/2410)
+* [The Challenges of Bitcoin Transaction Fee Estimation](https://blog.bitgo.com/the-challenges-of-bitcoin-transaction-fee-estimation-e47a64a61c72)
+* [Gas Now](https://www.gasnow.org/)
+* [Five arguments against fee burning in EIP-1559](https://ethereum-magicians.org/t/five-arguments-against-fee-burning-in-eip-1559/5184)
+* [Robust statistics - Median](https://en.wikipedia.org/wiki/Robust_statistics#Examples)
+* [Evidence of Mempool Manipulation on Black Thursday: Hammerbots, Mempool Compression, and Spontaneous Stuck Transactions](https://www.blocknative.com/blog/mempool-forensics)
+* [Ethereum Network Utilization](https://etherscan.io/chart/networkutilization)
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
