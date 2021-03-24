@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@1.1.0 # v1.1.0 does not have the ability to merge
+        uses: alita-moore/EIP-Bot@1.1.1 # v1.1.1 does not have the ability to merge and throws and error on non-merge like posting comment
         continue-on-error: true
         id: auto-merge-bot
         with:
