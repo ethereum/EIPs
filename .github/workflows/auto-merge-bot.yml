@@ -1,4 +1,4 @@
-on: [workflow_dispatch]
+on: [pull_request]
 
 jobs:
   auto_merge_bot:
@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@1.0.10 # Uses an action in the root directory
+        uses: alita-moore/EIP-Bot@1.1.0 # v1.1.0 does not have the ability to merge
         continue-on-error: true
         id: auto-merge-bot
         with:
