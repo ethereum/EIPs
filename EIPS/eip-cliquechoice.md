@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 3436
 title: Expanded Clique Block Choice Rule
 author: Danno Ferrin (@shemnon)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-3436-expanded-clique-block-choice-rule/5809
 status: Draft
 type: Standards Track
 category: Networking
@@ -19,7 +19,7 @@ Add a four step block rule to Clique that should reduce block production deadloc
 The current specification of Clique allows for multiple competing blocks from producers but does not
 provide any strategies to pick blocks aside from the current "highest total difficulty" rule. This
 EIP proposes a four step choice rule of highest total difficulty, shortest chain, most recently
-in-turn, and lowest hash. This would prevent deadlocks that have occurred in production systems.
+in-turn, and lowest hash. This would prevent deadlocks that have ocurred in production systems.
 
 ## Motivation
 
