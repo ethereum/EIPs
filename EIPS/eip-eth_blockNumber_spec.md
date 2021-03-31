@@ -1,5 +1,5 @@
 ---
-eip: 
+eip: 3410
 title: JSPON RPC eth_blockNumber Spec
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
 discussions-to: https://github.com/ethereum-oasis/eth1.x-JSON-RPC-API-standard
@@ -43,7 +43,7 @@ _(none)_
 
 ##### Returns
 
-{[`Quantity`](#quantity)} - number of the latest block
+{[`Quantity`](https://eips.ethereum.org/EIPS/eip-1474#quantity)} - number of the latest block
 
 ##### Example
 
@@ -68,7 +68,7 @@ curl -X POST --data '{
 The definition of being able to serve the full state has been introduced to clarify the behaviour in the midst of fast sync and similar.
 
 ## Backwards Compatibility
-Tha clarifications of the spec may require some breaking edge cases behaviour on the existing client implementations. If you have relied on the eth_blockNumber returning the fast sync progress information then you will need to expect 0 returned now.
+The clarifications of the spec may require some breaking edge cases behaviour on the existing client implementations. If you have relied on the eth_blockNumber returning the fast sync progress information then you will need to expect 0 returned now.
 
 ## Test Cases
 Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
