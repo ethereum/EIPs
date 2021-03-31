@@ -1,7 +1,7 @@
 ---
 eip: 3410
 title: JSPON RPC eth_blockNumber Spec
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: Tomasz K. Stanczak (@tkstanczak)
 discussions-to: https://github.com/ethereum-oasis/eth1.x-JSON-RPC-API-standard
 status: Draft
 type: Standards Track
