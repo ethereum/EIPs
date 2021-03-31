@@ -27,12 +27,6 @@ eth_blockNumber is the most commonly called JSON RPC endpoint, yet it has some u
 
 Returns the number of the block that is the current chain head (the latest best processed and verified block on the chain).
 <br/>The number of the chain head is returned if the node has ability of serving the header, body, and the full state starting from the state root of the block having the number in a finite time.
- * If the node is in the process of fast sync then it should return 0.
- * If the node is in the process of beam sync then it should return 0.
- * If the node is in the process of snap sync then it should return 0.
- * If the node is a light client then it should assume that it is capable of delivering a full state and return the current chain head number.
- * If the node is in the process of archive sync then it should return the latest fully processed block number.
-  
 <br/>The node may know a higher block number but still return a lower one if the lower number block has higher total difficulty or if the higher number block has not been fully processed yet.
 <br/>Provides no promise on for how long the node will keep the block details so if you request the block data for the given block number any time after receiving the block number itself, you may get a null response.
 <br/>Returns an error if the node has not yet processed or failed to process the genesis block. Some nodes MAY decide not to enable JSON RPC if the genesis block calculation has not been done yet.
