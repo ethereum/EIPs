@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Interface
 created: 2021-03-17
-requires (*optional): EIP-1474
+requires: EIP-1474
 ---
 
 ## Simple Summary
