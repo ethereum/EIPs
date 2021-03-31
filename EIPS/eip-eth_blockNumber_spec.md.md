@@ -1,18 +1,18 @@
 ---
-eip: <to be assigned>
+eip: 
 title: JSPON RPC eth_blockNumber Spec
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum-oasis/eth1.x-JSON-RPC-API-standard
 status: Draft
 type: Standards Track
-category Interface
+category: Interface
 created: 2021-03-17
 requires (*optional): EIP-1474
 ---
 
 This is the suggested template for new EIPs.
 
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
+Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-eth_blockNumber_spec.md`.
 
 The title should be 44 characters or less.
 
