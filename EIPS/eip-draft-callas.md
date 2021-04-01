@@ -34,8 +34,22 @@ Their victims currently have no way to recover their funds.
 
 
 ## Specification
+Adds a new opcode (`SUDO`) at `0xf8`.
+`SUDO` pops 8 parameters from the stack.
+Besides the sender parameter, the parameters shall match `CALL`.
 
+1. Gas: Integer; Gas allowance for message call
+2. Sender: Address, truncated to lower 40 bytes; Sets `CALLER` inside the call frame
+3. To: Address, truncated to lower 40 bytes; sets `ADDRESS`
+4. Value: Integer, raises exception amount specified is less than the value in Sender account; transferred with call to recipient balance, sets `CALLVALUE`
+5. InStart: Integer; beginning of memory to use for `CALLDATA`
+6. InSize: Integer; beginning of memory to use for `CALLDATA`
+7. OutStart: Integer; beginning of memory to replace with `RETURNDATA`
+8. OutSize: Integer; maximum `RETURNDATA` to place in memory
 
+Following execution, `SUDO` pushes a result value to the stack, indicating success or failure.
+If the call ended with `STOP`, `RETURN`, or `SELFDESTRUCT`, `1` is pushed.
+If the call ended with `REVERT`, `INVALID`, or an EVM assertion, `0` is pushed.
 
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
