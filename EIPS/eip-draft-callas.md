@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 3455
 title: SUDO Opcode
 author: William Morriss (@wjmelements), Baptiste Vauthey (@thabaptiser)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-3455-sudo-opcode/5860
 status: Draft
 type: Standards Track
 category Core
