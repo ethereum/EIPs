@@ -32,6 +32,13 @@ Many scammers have received ETH via trust-trading.
 Their victims currently have no way to recover their funds.
 `SUDO` fixes this.
 
+Another common use case would be a forgotten private key.
+Many users have accidentally locked up tokens and ether by losing their private keys.
+This is inefficient and provides a bad user experience.
+To accomodate new and inexperienced users, there needs to be a way to recover funds after the private key has been lost.
+`SUDO` fixes this.
+
+Finally, there are many tokens and ether sitting in smart contracts locked due to a bug. We could finally close [#156](https://github.com/ethereum/EIPs/issues/156) as reclaiming ether from stuck accounts becomes trivial.
 
 ## Specification
 Adds a new opcode (`SUDO`) at `0xf8`.
