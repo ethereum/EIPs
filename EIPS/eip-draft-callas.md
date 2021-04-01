@@ -32,7 +32,7 @@ Many scammers have received ETH via trust-trading.
 Their victims currently have no way to recover their funds.
 `SUDO` fixes this.
 
-Large amounts of sers have accidentally locked up tokens and ether by losing their private keys.
+Large amounts of users have accidentally locked up tokens and ether by losing their private keys.
 This is inefficient and provides a bad user experience.
 To accomodate new and inexperienced users, there needs to be a way to recover funds after the private key has been lost.
 `SUDO` fixes this.
