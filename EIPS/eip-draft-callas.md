@@ -47,7 +47,7 @@ Adds a new opcode (`SUDO`) at `0xf8`.
 `SUDO` pops 8 parameters from the stack.
 Besides the sender parameter, the parameters shall match `CALL`.
 
-1. Gas: Integer; Gas allowance for message call
+1. Gas: Integer; Maximum gas allowance for message call, safely using current gas counter if the counter is lower
 2. Sender: Address, truncated to lower 40 bytes; Sets `CALLER` inside the call frame
 3. To: Address, truncated to lower 40 bytes; sets `ADDRESS`
 4. Value: Integer, raises exception amount specified is less than the value in Sender account; transferred with call to recipient balance, sets `CALLVALUE`
@@ -61,7 +61,8 @@ If the call ended with `STOP`, `RETURN`, or `SELFDESTRUCT`, `1` is pushed.
 If the call ended with `REVERT`, `INVALID`, or an EVM assertion, `0` is pushed.
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+The `GAS` parameter is first so that callers can tediously compute how much of their remaining gas to send at the last possible moment.
+The remaining parameters inherited from `CALL` are in the same order, with sender inserted between.
 
 ## Backwards Compatibility
 All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
