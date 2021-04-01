@@ -29,7 +29,7 @@ This happens because users paste the token address into the recipient fields.
 Currently there is no way to recover these tokens.
 `SUDO` fixes this.
 
-Many scammers have received ETH via trust-trading.
+Many scammers have fraudulently received tokens and ETH via trust-trading.
 Their victims currently have no way to recover their funds.
 `SUDO` fixes this.
 
