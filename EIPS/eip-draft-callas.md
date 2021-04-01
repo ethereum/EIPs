@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: SUDO Opcode
-author: William Morriss (@wjmelements)
+author: William Morriss (@wjmelements), Baptiste Vauthey (@thabaptiser)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
