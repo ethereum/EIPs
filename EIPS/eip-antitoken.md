@@ -1,11 +1,11 @@
 ---
 eip: <to be assigned>
 title: Antitoken
-author: hazae41 (@hazae41) <hazae41@gmail.com>
-discussions-to: 
+author: hazae41 (@hazae41)
+discussions-to: https://github.com/ethereum/EIPs/issues/3477
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2021-04-06
 ---
 
