@@ -11,10 +11,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - name: show directory
-        run: ls -a && cd .. && echo ---- && ls -a && cd .. && echo ----- && ls -a && cd .. && echo ------ && ls -a
       - name: Run .travis.yml build script
         uses: ktomk/run-travis-yml@v1
+        with:
+          file: .travis.yml
+          steps: |
+            before_install
+            script
+          allow-failure: false
       - name: auto-merge-bot
         uses: alita-moore/EIP-Bot@a1eb27be4f4e580fd96c5ee650d6fd61c95d1d2d # tag 1.1.1
         id: auto-merge-bot
