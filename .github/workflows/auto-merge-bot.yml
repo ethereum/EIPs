@@ -6,7 +6,7 @@ jobs:
     name: EIP Auto-Merge Bot
     steps:
       - name: Run .travis.yml build script
-        uses: ktomk/run-travis-yml@v1
+        uses: ktomk/run-travis-yml@v1.7
         with:
           file: .travis.yml
           steps: |
