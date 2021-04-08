@@ -7,6 +7,7 @@ jobs:
     steps:
       - name: show directory
         run: ls
+        shell: bash
       - name: Run .travis.yml build script
         uses: ktomk/run-travis-yml@v1
       - name: Checkout
