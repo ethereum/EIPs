@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
     steps:
+      - name: show directory
+        run: ls
       - name: Run .travis.yml build script
         uses: ktomk/run-travis-yml@v1
       - name: Checkout
