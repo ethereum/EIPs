@@ -11,6 +11,7 @@ jobs:
           file: .travis.yml
           steps: |
             before_install
+            install
             script
           allow-failure: false
       - name: Checkout
