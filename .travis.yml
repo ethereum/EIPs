@@ -1,9 +1,9 @@
-sudo: true
+sudo: false
 
 language: ruby
 
 before_install:
-  - gem install bundler -v '< 2'
+  - sudo gem install bundler -v '< 2'
      
 cache:
   # Cache Ruby bundles
