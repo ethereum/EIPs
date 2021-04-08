@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
     steps:
+      - name: Run .travis.yml build script
+        uses: ktomk/run-travis-yml@v1
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Node.js Environment
