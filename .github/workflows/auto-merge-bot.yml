@@ -1,5 +1,5 @@
 on: [pull_request]
-
+name: Auto-Merge Bot
 jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
@@ -12,8 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@83def55233002790da6746afabe4724b8ee4f940 # tag 1.1.1
-        continue-on-error: true
+        uses: alita-moore/EIP-Bot@a1eb27be4f4e580fd96c5ee650d6fd61c95d1d2d # tag 1.1.1
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
