@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Transaction Data Opcodes
 author: Alex Papageorgiou (@alex-ppg)
-discussions-to: <ADD_MAGICIANS_HERE>
+discussions-to: https://ethereum-magicians.org/t/eip-draft-transaction-data-opcodes/6017
 status: Draft
 type: Standards Track
 category: Core
