@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@b01871952c665a400aa107d618164ee09a3dc45d # tag 1.1.1
+        uses: alita-moore/EIP-Bot@01abc40143277dec9c669c2a757ebfbeec04cfd3 # tag 1.1.1
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
