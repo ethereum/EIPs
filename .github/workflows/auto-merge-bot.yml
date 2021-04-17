@@ -1,21 +1,5 @@
-
+on: [pull_request_target, pull_request_review]
 name: Auto-Merge Bot
-
-on:
-  pull_request_review:
-  pull_request_target:
-  deployment_status:
-  workflow_run:
-    workflows:
-      - travis-ci
-      - continuous-integration/travis-ci/pr
-      - ci
-      - travis
-      - a
-      - e
-    types:
-      - completed
-      
 jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
