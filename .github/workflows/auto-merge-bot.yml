@@ -12,6 +12,7 @@ on:
       - ci
       - travis
       - a
+      - e
     types:
       - completed
       
