@@ -19,7 +19,6 @@ jobs:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
   test:
     runs-on: ubuntu-latest
-    needs: auto_merge_bot
     name: test
     steps:
       - name: Checkout
