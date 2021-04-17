@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3508
 title: Transaction Data Opcodes
 author: Alex Papageorgiou (@alex-ppg)
 discussions-to: https://ethereum-magicians.org/t/eip-draft-transaction-data-opcodes/6017
