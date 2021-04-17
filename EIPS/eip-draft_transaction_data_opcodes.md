@@ -39,10 +39,6 @@ These instructions are meant to operate identically to their `CALL`-prefixed cou
 
 The `ENTRYPOINT` instruction uses 0 stack arguments and pushes the original `to` member of the transaction onto the stack. The address yielded by the instruction is a 160-bit value padded to 256-bits. The operation costs `G_base` to execute, similarly to `ORIGIN` (`0x32`).
 
-### Node Specification
-
-All instructions are meant to provide access to previously inaccessible data that did not exist in the execution context of the EVM. As a result, the data needs to be provided to the execution environments of all contract calls, similarly to how `ORIGIN` data is available as such. A reference implementation will be provided for `go-ethereum` (Golang) that implements the EIP at both the EVM level as well as the node level.
-
 ### Compiler Specification
 
 High-level programming languages that compile to EVM bytecode should provide support for these new instructions from a high-level perspective by introducing new members to the transactional context they already support for the `ORIGIN` instruction.
