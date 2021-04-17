@@ -3,7 +3,7 @@ sudo: false
 language: ruby
 
 before_install:
-  - sudo gem install bundler -v '< 2'
+  - gem install bundler -v '< 2'
      
 cache:
   # Cache Ruby bundles
