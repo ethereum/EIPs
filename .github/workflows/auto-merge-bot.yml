@@ -1,4 +1,4 @@
-on: [pull_request_target]
+on: [pull_request_target, pull_request_review]
 name: Auto-Merge Bot
 jobs:
   auto_merge_bot:
@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@c312303620a40e05554de582d2fd20366ca62e05 # tag 1.1.1
+        uses: alita-moore/EIP-Bot@a3abd721e9a3613e23f798d9fb84d330b111682e # tag 1.1.1
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
