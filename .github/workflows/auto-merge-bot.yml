@@ -8,6 +8,10 @@ on:
   workflow_run:
     workflows:
       - travis-ci
+      - continuous-integration/travis-ci/pr
+      - ci
+      - travis
+      - a
     types:
       - completed
       
