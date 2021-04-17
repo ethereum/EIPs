@@ -39,10 +39,6 @@ These instructions are meant to operate identically to their `CALL`-prefixed cou
 
 The `ENTRYPOINT` instruction uses 0 stack arguments and pushes the original `to` member of the transaction onto the stack. The address yielded by the instruction is a 160-bit value padded to 256-bits. The operation costs `G_base` to execute, similarly to `ORIGIN` (`0x32`).
 
-### Compiler Specification
-
-High-level programming languages that compile to EVM bytecode should provide support for these new instructions from a high-level perspective by introducing new members to the transactional context they already support for the `ORIGIN` instruction.
-
 ## Rationale
 
 ### Naming Conventions
