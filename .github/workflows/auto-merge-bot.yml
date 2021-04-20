@@ -32,7 +32,6 @@ jobs:
         if: ${{ github.event_name == 'pull_request_review' }}
         uses: alita-moore/EIP-Bot@delete-failed-on-review
         id: delete-failed-on-review
-        continue-on-error: true
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
       - name: auto-merge-bot
