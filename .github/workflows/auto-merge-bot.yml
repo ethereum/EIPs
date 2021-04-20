@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@await-ci-pass
+        uses: alita-moore/EIP-Bot@43b282a7998774c5a3e59bce50052919e0890495
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
