@@ -1,6 +1,6 @@
 ---
 eip: TBD
-title: Optional access lists
+title: Reduce access list cost
 author: Matt Garnett (@lightclient)
 discussions-to: TBD
 status: Draft
