@@ -19,10 +19,10 @@ jobs:
         id: await-ci
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-  auto_merge_bot:
+  rerun_bot_on_review:
     runs-on: ubuntu-latest
-    needs: [await_ci]
-    name: EIP Auto-Merge Bot
+    needs: [await_ci, pull_request_review]
+    name: Rerun Bot on Review
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,6 +36,17 @@ jobs:
         id: rerun-pull-request-target-on-review
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
+  auto_merge_bot:
+    runs-on: ubuntu-latest
+    needs: [await_ci, rerun_bot_on_review, pull_request_target]
+    name: EIP Auto-Merge Bot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: auto-merge-bot
         if: ${{ github.event_name == 'pull_request_target' }}
         uses: alita-moore/EIP-Bot@bbc378a87486973e55d7073b09e0d8e6088326b4
