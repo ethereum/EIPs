@@ -1,11 +1,11 @@
 ---
 eip: <to be assigned>
 title: <Versatile NFT Standard>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: Will Wang <will@solv.finance>, Mike Meng <myan@solv.finance>, Yee Tsai <yee@solv.finance>, Ryan Chow <ryanchow@solv.finance>, Zhongxin Wu <wuzhongxin@solv.finance>, Yuyi Wang <>
 discussions-to: <URL>
 status: Draft
-type: <Standards Track>
-category <ERC>
+type: Standards Track
+category: ERC
 created: <2020-12-01>
 requires: <EIP-721, EIP-20, EIP-165>
 ---
@@ -14,7 +14,9 @@ requires: <EIP-721, EIP-20, EIP-165>
 A set of standard interfaces for contracts that representing versatile types of digital assets. A single vnft contract can represent/contain any kind of, or various combinations of digital assets, i.e. fungible tokens, non-fungible tokens, or other vnfts.
 
 ## Abstract
-A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+This standard describes a set of smart contract interfaces that can represent any number of fungible tokens, or one or more non-fungible tokens, named as underlying assets. The representation itself is semi-fungible, that is: besides its ID property, it has an amount property, called 'units', which can be treated as quantity attributes 'within' the token. 
+
+The _id argument contained in each function's argument set indicates a specific token or token type in a transaction.
 
 ## Motivation
 The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
