@@ -7,17 +7,11 @@ status: Draft
 type: <Standards Track>
 category <ERC>
 created: <2020-12-01>
-requires (*optional): <EIP-721, EIP-20, EIP-165>
+requires: <EIP-721, EIP-20, EIP-165>
 ---
 
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less.
-
 ## Simple Summary
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. Imagine an email subject line, GitHub PR title, or forum post title.
+A set of standard interfaces for contracts that representing versatile type of assets. A single deployed vnft contract can represent/contain any kind of, of any  combination of digital assets, i.e. fungible tokens, non-fungible tokens, or vnfts.
 
 ## Abstract
 A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
