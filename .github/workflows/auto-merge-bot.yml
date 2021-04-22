@@ -1,4 +1,7 @@
-on: [pull_request_target, pull_request_review]
+on: 
+  pull_request_target:
+  pull_request_review:
+    types: [submitted]
 name: Auto-Merge Bot
 jobs:
   await_ci:
@@ -28,8 +31,8 @@ jobs:
         with:
           node-version: '14'
       - name: Re-run pull_request_target bot run on pull_request_review
-        if: ${{ github.event_name == 'pull_request_review' }}
-        uses: alita-moore/EIP-Bot@43acce04e1d1b1e1b30b1a499095daa1da8fec7c
+        if: ${{ github.event_name == 'pull_request_review'}}
+        uses: alita-moore/EIP-Bot@724e1eeaca560e4cf06dcc3f2345e94e7541fad9
         id: rerun-pull-request-target-on-review
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
