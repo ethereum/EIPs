@@ -11,7 +11,7 @@ requires: <EIP-721, EIP-20, EIP-165>
 ---
 
 ## Simple Summary
-A set of standard interfaces for contracts that representing versatile type of assets. A single deployed vnft contract can represent/contain any kind of, of any  combination of digital assets, i.e. fungible tokens, non-fungible tokens, or vnfts.
+A set of standard interfaces for contracts that representing versatile type of assets. A single deployed vnft contract can represent/contain any kind of, or any  combination of digital assets, i.e. fungible tokens, non-fungible tokens, or vnfts.
 
 ## Abstract
 A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
