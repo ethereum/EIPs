@@ -22,7 +22,7 @@ jobs:
   rerun_bot_on_review:
     if: ${{ github.event_name == 'pull_request_review'}}
     runs-on: ubuntu-latest
-    needs: [await_ci, pull_request_review]
+    needs: [await_ci]
     name: Rerun Bot on Review
     steps:
       - name: Checkout
