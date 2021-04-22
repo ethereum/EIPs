@@ -29,7 +29,7 @@ jobs:
           node-version: '14'
       - name: Re-run pull_request_target bot run on pull_request_review
         if: ${{ github.event_name == 'pull_request_review' }}
-        uses: alita-moore/EIP-Bot@2d1488c095474bca046baa9919886200c51117c3
+        uses: alita-moore/EIP-Bot@43acce04e1d1b1e1b30b1a499095daa1da8fec7c
         id: rerun-pull-request-target-on-review
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
