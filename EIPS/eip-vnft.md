@@ -16,8 +16,6 @@ A set of standard interfaces for contracts that representing versatile types of 
 ## Abstract
 This standard describes a set of smart contract interfaces that can represent any number of fungible tokens, or one or more non-fungible tokens, named as underlying assets. The representation itself is semi-fungible, that is: besides its ID property, it has an amount property, called 'units', which can be treated as quantity attributes 'within' the token. 
 
-The _id argument contained in each function's argument set indicates a specific token or token type in a transaction.
-
 ## Motivation
 The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
 
