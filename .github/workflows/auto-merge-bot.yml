@@ -35,7 +35,7 @@ jobs:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
       - name: auto-merge-bot
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: alita-moore/EIP-Bot@43b282a7998774c5a3e59bce50052919e0890495
+        uses: alita-moore/EIP-Bot@bbc378a87486973e55d7073b09e0d8e6088326b4
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
