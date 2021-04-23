@@ -39,7 +39,7 @@ jobs:
   auto_merge_bot:
     if: ${{ github.event_name == 'pull_request_target' }}
     runs-on: ubuntu-latest
-    needs: [await_ci, rerun_bot_on_review]
+    needs: [await_ci]
     name: EIP Auto-Merge Bot
     steps:
       - name: Checkout
