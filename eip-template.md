@@ -18,7 +18,7 @@ Note that an EIP number will be assigned by an editor. When opening a pull reque
 The title should be 44 characters or less.
 
 ## Simple Summary
-If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. Imagine an email subject line, GitHub PR title, or forum post title.
+"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. Imagine an email subject line, GitHub PR title, or forum post title.
 
 ## Abstract
 A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
