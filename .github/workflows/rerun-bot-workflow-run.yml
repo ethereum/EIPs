@@ -1,16 +1,15 @@
-name: Test
-
+name: Workflow run re-run auto-merge-bot on review
 on:
   workflow_run:
     workflows:
-      - Auto-Merge Bot
+      - Rerun Bot
     types:
       - requested
 
 jobs:
   test-job:
     runs-on: ubuntu-latest
-    name: EIP Auto-Merge Bot
+    name: Rerun Bot (workflow_run)
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -19,7 +18,8 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@bbc378a87486973e55d7073b09e0d8e6088326b4
-        id: auto-merge-bot
+        uses: alita-moore/EIP-Bot@1691e224a91987815161b82e48d50f467cd2f61f # rerun-pull-request-target-on-review 
+        id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
+          WORKFLOW-ID: ${{github.event.workflow_run.id}}
