@@ -7,7 +7,7 @@ on:
       - requested
 
 jobs:
-  test-job:
+  rerun-bot:
     runs-on: ubuntu-latest
     name: Rerun Bot (workflow_run)
     steps:
