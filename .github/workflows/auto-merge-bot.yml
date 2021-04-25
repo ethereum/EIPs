@@ -1,7 +1,4 @@
-on: 
-  pull_request_target:
-  pull_request_review:
-    types: [submitted]
+on: [pull_request_target]
 name: Auto-Merge Bot
 jobs:
   await_ci:
@@ -15,29 +12,11 @@ jobs:
         with:
           node-version: '14'
       - name: await-ci
-        uses: alita-moore/EIP-Bot@372a671f9eb63df50b1659ccfbe94594c7bbfc29
+        uses: alita-moore/EIP-Bot@372a671f9eb63df50b1659ccfbe94594c7bbfc29 # await-ci-pass
         id: await-ci
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-  rerun_bot_on_review:
-    if: ${{ github.event_name == 'pull_request_review' }}
-    runs-on: ubuntu-latest
-    needs: [await_ci]
-    name: Rerun Bot on Review
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Re-run pull_request_target bot run on pull_request_review
-        uses: alita-moore/EIP-Bot@724e1eeaca560e4cf06dcc3f2345e94e7541fad9
-        id: rerun-pull-request-target-on-review
-        with:
-          GITHUB-TOKEN: ${{ secrets.TOKEN }}
   auto_merge_bot:
-    if: ${{ github.event_name == 'pull_request_target' }}
     runs-on: ubuntu-latest
     needs: [await_ci]
     name: EIP Auto-Merge Bot
@@ -49,8 +28,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        
-        uses: alita-moore/EIP-Bot@bbc378a87486973e55d7073b09e0d8e6088326b4
+        uses: alita-moore/EIP-Bot@1b25b8093d7c0acfbe45a534a150097dbef75b84 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
