@@ -1,0 +1,25 @@
+name: Test
+
+on:
+  workflow_run:
+    workflows:
+      - Auto-Merge Bot
+    types:
+      - requested
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    name: EIP Auto-Merge Bot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: auto-merge-bot
+        uses: alita-moore/EIP-Bot@bbc378a87486973e55d7073b09e0d8e6088326b4
+        id: auto-merge-bot
+        with:
+          GITHUB-TOKEN: ${{ secrets.TOKEN }}
