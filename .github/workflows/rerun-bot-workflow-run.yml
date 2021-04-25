@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@66b16b5363b0077c58680d1dfe1c3fb07c0d032b # rerun-pull-request-target-on-review 
+        uses: alita-moore/EIP-Bot@b0eb574e6e08545df596c314bdd4ee8416481859 # rerun-pull-request-target-on-review 
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
