@@ -1,6 +1,6 @@
 ---
 eip: TBD
-title: Chain Context Type Transactions
+title: Restricted Chain Context Type Transactions
 author: Isaac Ardis <isaac.ardis@gmail.com>
 discussions-to: TBD
 status: Draft
