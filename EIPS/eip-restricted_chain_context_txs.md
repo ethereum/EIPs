@@ -21,8 +21,8 @@ to a chain meeting certain contextual requirements.
 
 We introduce a new EIP-2718 transaction type with the format `0x45 || rlp([chainId, chainContext, nonce, gasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])`. 
 
-This proposed `chainContext` adds a constraint on the validity of a transaction to a chain segment meeting
-the referenced value(s). Several contexts are defined as subclasses of this type:
+This proposed `chainContext` element adds a constraint on the validity of a transaction to a chain segment meeting
+the referenced value(s). Several contexts are tentatively defined as subclasses of this type:
 
 - `segmentId`
 - `eligibleMinerList`
@@ -133,7 +133,7 @@ Encoding should follow the same rules as the optional `accessList` value.
 
 - `ANNOTATION_PREFIX` `4`. 
 
-Constrains the validity of a transaction by a chain context subclass referencing the timestamp of the block including the transaction (a unix epoch relative value).
+Constrains the validity of a transaction by a chain context subclass referencing the timestamp of the block including the transaction (in seconds-since Unix epoch).
 The transaction is only valid when included in a block having a `timestamp` less than the value annotated.
 
 ##### Encoding
