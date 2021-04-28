@@ -1,0 +1,50 @@
+---
+eip: <to be assigned>
+title: Reject new contracts starting with the 0xEF byte
+author: Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0)
+discussions-to: https://ethereum-magicians.org/t/evm-object-format-eof/5727/4
+status: Draft
+type: Standards Track
+category: Core
+created: 2021-03-16
+---
+
+## Abstract
+
+Disallow new code starting with the `0xEF` byte to be deployed. Code already existing in the account trie starting with `0xEF` byte is not affected semantically by this change.
+
+## Motivation
+
+Contracts conforming to the EVM Object Format (EOF), described by [EIP-nnnn](./eip-nnnn.md), are going to be validated at deploy time. In order to guarantee that every EOF-formatted contract in the state is valid, we need to prevent already deployed (and not validated) contracts from being recognized as such format. This will be achieved by choosing a byte sequence for the *magic* that doesn't exist in any of the already deployed contracts. To prevent the growth of the search space and to limit the analysis to the contracts existing before this fork, we disallow the starting byte of the format (the first byte of the magic).
+
+## Specification
+
+After `block.number == HF_BLOCK` new contract creation (via create transaction, `CREATE` or `CREATE2` instructions) results in an exceptional abort if the _code_'s first byte is `0xEF`. 
+
+### Remarks
+
+The *initcode* is the code executed in the context of the *create* transaction, `CREATE`, or `CREATE2` instructions. The *initcode* returns *code* (via the `RETURN` instruction), which is inserted into the account. See section 7 ("Contract Creation") in the Yellow Paper for more information.
+
+The opcode `0xEF` is currently an undefined instruction, therefore: *It pops no stack items and pushes no stack items, and it causes an exceptional abort when executed.* This means *initcode* or already deployed *code* starting with this instruction will continue to abort execution.
+
+## Rationale
+
+The `0xEF` byte was chosen because it resembles **E**xecutable **F**ormat.
+
+## Test Cases
+
+TBA
+
+## Backwards Compatibility
+
+This is a breaking change given new code starting with the `0xEF` byte will not be deployable, and contract creation will result in a failure. However, given bytecode is executed starting at its first byte, code deployed with `0xEF` as the first byte is not executable anyway.
+
+While this means no currently executable contract is affected, it does rejects deployment of new data contracts starting with the `0xEF` byte.
+
+## Security Considerations
+
+The authors are not aware of any security or DoS risks posed by this change.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
