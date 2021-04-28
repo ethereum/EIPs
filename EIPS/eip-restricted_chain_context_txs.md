@@ -171,8 +171,6 @@ can readily be removed. Standing on the shoulders of EIP2930 is only intended to
 the adoption of next-generation transactions.
 
 
-## Reference
-
 ## Copyright
 
 Copyright and related rights waved via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
