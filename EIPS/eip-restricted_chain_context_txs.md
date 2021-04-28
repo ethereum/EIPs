@@ -1,7 +1,7 @@
 ---
 eip: 3534
 title: Restricted Chain Context Type Transactions
-author: Isaac Ardis <isaac.ardis@gmail.com>
+author: Isaac Ardis (@whilei)
 discussions-to: TBD
 status: Draft
 type: Standards Track
