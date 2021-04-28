@@ -10,8 +10,6 @@ created: 2021-04-20
 requires: 2718, 2930
 ---
 
-# Restricted Chain Context Type Transactions
-
 ## Simple Summary
 
 Add a transaction type which contains a _Chain Context_ value restricting a transaction's validity
