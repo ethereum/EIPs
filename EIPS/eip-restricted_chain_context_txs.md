@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2021-04-20
-requires: EIP-2718, EIP-2930
+requires: 2718, 2930
 ---
 
 # Restricted Chain Context Type Transactions
