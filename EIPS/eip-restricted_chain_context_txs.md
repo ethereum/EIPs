@@ -2,7 +2,7 @@
 eip: 3534
 title: Restricted Chain Context Type Transactions
 author: Isaac Ardis (@whilei)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/eip-3534-restricted-chain-context-transaction-type/6112
 status: Draft
 type: Standards Track
 category: Core
