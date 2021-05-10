@@ -1,4 +1,4 @@
-on: [pull_request_target]
+on: [pull_request_target, pull_request]
 name: Auto-Merge Bot
 jobs:
   await_ci:
@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: await-ci
-        uses: alita-moore/EIP-Bot@bd41acc24e173acbfbc831ca6e448f38f3e7bab6 # await-ci-pass
+        uses: ethereum/EIP-Bot@bd41acc24e173acbfbc831ca6e448f38f3e7bab6 # await-ci-pass
         id: await-ci
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: alita-moore/EIP-Bot@1b25b8093d7c0acfbe45a534a150097dbef75b84 # master
+        uses: ethereum/EIP-Bot@1b25b8093d7c0acfbe45a534a150097dbef75b84 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
