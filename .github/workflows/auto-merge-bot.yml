@@ -1,4 +1,4 @@
-on: [pull_request_target, pull_request]
+on: [pull_request_target]
 name: Auto-Merge Bot
 jobs:
   await_ci:
