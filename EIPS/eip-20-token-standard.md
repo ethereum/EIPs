@@ -1,1 +1,1 @@
-Moved to [EIP 20](https://eips.ethereum.org/EIPS/eip-20).
+Moved to [EIP-20](./eip-20.md).
