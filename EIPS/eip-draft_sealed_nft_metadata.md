@@ -110,23 +110,29 @@ const sealedMetadata: SealedMetaDataJson = {
 
 ## Rationale
 
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+**Rationale for rule not explicitly requiring that sealed URI be hosted on decentralized filestorage**
+
+In order for this standard to remain future proof there is no validation within the smart contract that would verify the sealed URI is hosted on IPFS or another decentralized file storage system. The standard allows potential collectors and platforms to validate the URI on the client.
+
+**Rationale to include many NFT metadata objects, or URIs in one JSON file**
+
+By including metadata for many NFTs in one JSON file we can eliminate the need for many transactions to set the metadata for multiple NFTs. Given that this file should not change NFT platforms, or explorers can cache the metadata within the file.
+
+**Rationale for emitting `Sealed` event**
+
+Platforms and explorers can use the `Sealed` event to automatically cache metadata, or update information regarding specified NFTs.
+
+**Rationale for allowing URIs as values in the JSON file**
+
+If a token's metadata is very large, or there are many tokens you can save file space by referencing another URI rather than storing the metadata JSON within the top level metadata file.
 
 ## Backwards Compatibility
 
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-## Test Cases
-
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.
-
-## Reference Implementation
-
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+There is no backwards compatibility with existing standards. This is an extension which could be added to existing NFT standards.
 
 ## Security Considerations
 
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+There are no security considerations related directly to the implementation of this standard.
 
 ## Copyright
 
