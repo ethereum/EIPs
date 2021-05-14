@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 3569
 title: Sealed NFT Metadata Standard
 author: Sean Papanikolas (@pizzarob)
 discussions-to: TBD
