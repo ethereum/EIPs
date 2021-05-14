@@ -5,7 +5,7 @@ author: Sean Papanikolas (@pizzarob)
 discussions-to: TBD
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2021-05-07
 ---
 
