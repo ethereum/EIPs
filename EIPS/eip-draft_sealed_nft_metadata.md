@@ -2,7 +2,7 @@
 eip: 3569
 title: Sealed NFT Metadata Standard
 author: Sean Papanikolas (@pizzarob)
-discussions-to: TBD
+discussions-to: https://github.com/ethereum/EIPs/pull/3569
 status: Draft
 type: Standards Track
 category: ERC
