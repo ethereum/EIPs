@@ -1,0 +1,34 @@
+on: [pull_request_target]
+name: Auto-Merge Bot
+jobs:
+#   await_ci:
+#     runs-on: ubuntu-latest
+#     name: Await Travis CI Success
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - name: Setup Node.js Environment
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: '14'
+#       - name: await-ci
+#         uses: ethereum/EIP-Bot@bd41acc24e173acbfbc831ca6e448f38f3e7bab6 # await-ci-pass
+#         id: await-ci
+#         with:
+#           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
+  auto_merge_bot:
+    runs-on: ubuntu-latest
+#     needs: [await_ci]
+    name: EIP Auto-Merge Bot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: auto-merge-bot
+        uses: ethereum/EIP-Bot@4a2847df2fb9d1b8d46924744658f72534f1cbf3 # master
+        id: auto-merge-bot
+        with:
+          GITHUB-TOKEN: ${{ secrets.TOKEN }} 
