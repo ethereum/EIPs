@@ -106,7 +106,7 @@ In this proposal, we use `targetNFT()` to retrieve the contract address of NFT a
       interfaceID == this.supportsInterface.selector || //ERC165
       interfaceID == this.targetNFT.selector || // targetNFT()
       interfaceID == this.sendRoyalty.selector || // sendRoyalty()
-      interfaceID == this.withdrawRoyalty.selector ||
+      interfaceID == this.withdrawRoyalty.selector || // withdrawRoyalty()
       interfaceID == this.targetNFT.selector ^ this.sendRoyalty.selector ^ this.withdrawRoyalty.selector;// FNFT
   }
 ```
@@ -170,3 +170,15 @@ async function checkFNFT(web3) {
   return NFTownerOf.toLowerCase() === RFTAddress.toLowerCase(); // check if the owner of NFT is the FNFT Contract
 }                                
 ```
+
+**Royalty-Distribution-Logic**
+Although it is easy to abstractly say what to do in certain function, implementing rule-of-reason logic of distributing royalty needs much consideration.
+There are some **KEY PRINCIPLES** that we have to comply with when designing this logic.
+
+**(1)** Royalty must be distributed by the ratio of my current stake(share) with totalsupply.
+
+**(2)** Royalty must be distributed by the ratio of royalty sent at the time compensated(given).
+
+*For instance, A owned 80% and B owned 20% of totalsupply in 2020 which is when 100ether was given as Royalty.
+But, in 2021 B owns 80% and A owns 20% of totalsupply. Both of them didn't withdraw their royalty until now and no royalty was given in 2021. When A withdraws his royalty now which A should receive 80ethers since he owned 80% of totalsupply at the very moment of royalty given. When B withdraws his royalty he receives 20ethers since he owned 20% of totalsupply at the very moment the royalty was given. Only the ratio of my stake at the moment royalty is given needs to be the only factor that matters because  the timing
+of withdrawal totally depends on the owner's decision.*
