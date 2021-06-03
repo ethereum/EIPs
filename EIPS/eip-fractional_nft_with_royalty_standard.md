@@ -21,21 +21,21 @@ to ERC-20 token holders.
 Utilizing ERC-165 Standard Interface Detection, it detects if a ERC-20 token is representing the shared ownership of ERC-721 Non-Fungible Token.
 ERC-165 implementation of this proposal makes it possible to verify from both contract and offchain level if it adheres to this proposal(standard).
 This proposal makes small changes to existing ERC-20 Token Standard and ERC-721 Token Standard to support most of software working on top of this existing token standard.
-By sending ether to the address of the ERC-20 Contract it will distribute the amount of ether per holders and keep it inside the chain.
+By sending ether to the address of the ERC-20 Contract Address(owner of NFT) it will distribute the amount of ether per holders and keep it inside the chain.
 Whenever the owner of the contract calls the function for withdrawing their proportion of royalty, they will receive the exact amount of compensation according to their amount 
-of share at that very moment.
+of share at that very moment of being compensated.
 
 ## Motivation
 It is evident that many industries need cryptographically verifiable method to represent shared ownership.
 ERC-721 Non-Fungible Token standards are ubiquitously used to represent ownership of assets from digital assets such as Digital artworks, Game items(characters), Virtual real estate
-to real-world assets such as Real estate, artworks, cars, etc.
+to real-world assets such as Real estate, Artworks, Cars, etc.
 As more assets are registered as ERC-721 Non-Fungible Token demands for fractional ownership will rise.
 
 Fractional ownership does not only mean that we own a portion of assets.
 But It also means that we need to obtain financial compensation whenever the asset is making profit through any kinds of financial activities.
 For instance, token holders of NFT representing World Trade Center should receive monthly rent from tenants.
 Token holders of NFT representing "Everydays-The First 5000 days" should receive advertisement charge, exhibition fees whenever their artwork is being used for financial activities.
-It is crucial for smart-contract(verifable system) to implement this distribution feature to prevent any kinds of fraud regarding royalty compensation. Following the fair royalty distribution system which works on top of completely verifable environment(blockchain) will the flourish the NFT market by giving back compensation to investors.
+It is crucial for smart-contract(verifable system) to implement this distribution system to prevent any kinds of fraud regarding royalty compensation. Following the fair royalty distribution system which works on top of completely verifable environment(blockchain) will the flourish the NFT market by giving back compensation to investors.
 
 To make this possible this proposal implements a rule-of-reason logic to distribute income fairly to the holders.
 In order to make this royalty-distribution-system work with little changes from the standard and comply with distribution logic, several math operations and mappings are additionally used.
@@ -43,11 +43,11 @@ By implementing this standard, wallets will be able to determine if a erc20 toke
 everywhere that supports the ERC-20 and this proposal(standard) will support fractional NFT tokens.
 
 ## Specification
-**(1) Third parties need to distinguish Fractional-NFT from other token standards.**
+
+**Smart Contracts Implementing this Standard MUST implement all of the functions in BELOW**
   
-ERC-165 Standard Interface Detection `supportsInterface()` needs to be included to determine whether this contract supports this standard.
-In this proposal, we use `targetNFT()` to retrieve the contract address of NFT and the token ID of NFT, `sendRoyalty()` to send royalty to token holders, `withdrawRoyalty()` to withdraw royalty they received with `sendRoyalty()`.
-  
+**Smart contracts implementing the FNFT standard MUST implement the ERC-165 `supportsInterface()`
+     and MUST return the constant value `true` if `0xdb453760` is passed through the `interfaceID` argument**
 ```solidity
 pragma solidity >=0.7.0 <0.9.0;
 
@@ -56,6 +56,49 @@ pragma solidity >=0.7.0 <0.9.0;
   Note: The ERC-165 identifier for this interface is 0xdb453760;
 */
 interface FNFT /* is ERC20, ERC165 */{
+  
+  /**
+    @dev 'RoyaltySent' MUST emit when royalty is given.
+    The '_sender' argument MUST be the address of the account sending(giving) royalty to token owners.
+    The '_value' argument MUST be the value(amount) of ether '_sender' is sending to the token owners.
+  **/
+  event RoyaltySent(address indexed _sender, uint256 _value);
+
+  /**
+    @dev 'RoyaltyWithdrawn' MUST emit when royalties are withdrawn.
+    The '_withdrawer' argument MUST be the address of the account withdrawing royalty of his portion.
+    The '_value' argument MUST be the value(amount) of ether '_withdrawer' is withdrawing.
+  **/
+  event RoyaltyWithdrawn(address indexed _withdrawer, uint256 _value);  
+
+  /**
+    This function is to get the NFT Token information this FNFT token is pointing to.
+    The '_nftToken' return value should return contract address this FNFT is pointing to (representing).
+    The '_nftTokenId' return value should return token Id of NFT token this FNFT is pointing to (representing)
+  **/
+  function targetNFT() external view returns(address _nftToken, uint256 _nftTokenId);
+                                
+  /**
+    This function is for sending royalty to token owners.
+  **/
+  function sendRoyalty() external payable;
+                                
+  /**
+    This function is for withdrawing the amount of royalty received.
+    Only called by the owner of tokens.
+    Or addresses that used to own this token.
+  **/
+  function withdrawRoyalty() external;
+}
+ 
+```
+                                
+**(1) Third parties need to distinguish Fractional-NFT from other token standards.**
+  
+ERC-165 Standard Interface Detection `supportsInterface()` needs to be included to determine whether this contract supports this standard.
+In this proposal, we use `targetNFT()` to retrieve the contract address of NFT and the token ID of NFT, `sendRoyalty()` to send royalty to token holders, `withdrawRoyalty()` to withdraw royalty they received with `sendRoyalty()`.
+
+```solidity
   /* Smart contracts implementing the FNFT standard MUST implement the ERC-165 "supportsInterface()" 
      and MUST return the constant value 'true' if '0xdb453760' is passed through the interfaceID argument.*/
   function supportsInterface(bytes4 interfaceID) external view returns(bool) {
@@ -66,12 +109,8 @@ interface FNFT /* is ERC20, ERC165 */{
       interfaceID == this.withdrawRoyalty.selector ||
       interfaceID == this.targetNFT.selector ^ this.sendRoyalty.selector ^ this.withdrawRoyalty.selector;// FNFT
   }
-  function targetNFT() external view returns(address _nftToken, uint256 _nftTokenId);
-  function sendRoyalty() external;
-  function withdrawRoyalty() external;
-}
- 
 ```
+                                
 **(2) Third parties need to know the NFT contract address this FNFT is pointing to and the tokenID of the NFT.**
                                 
 This is the on-chain scenario:                                
@@ -94,16 +133,24 @@ contract CheckFNFT {
 }                                
 ```  
 
-off-chain scenario using ethers.js in javascript:
-```
+off-chain scenario:
+                                
+using ethers.js in javascript:
+```javascript
 async function checkFNFT(ethers) {                              
   const FNFTABI = [...]; // abi for FNFT
   const FNFTAddress = '0x9874563210123456789asdfdsa'; // address for the deployed FNFT contract
   const ERC721ABI = [...]; // abi for ERC-721 NFT
   const provider = ethers.getDefaultProvider(); // connection to mainnet
                                 
-  const FNFTContract = new ethers.Contract(FNFTAddress, FNFTABI, provider);
+  const FNFTContract = new ethers.Contract(FNFTAddress, FNFTABI, provider); // instance of  deployed FNFT contract
+  const [ERC721Address, ERC721TokenId] = await FNFTContract.targetNFT(); // retrieve the address of the NFT
   
+  const ERC721Contract = new ethers.Contract(ERC721ABI, ERC721Address, provider); // deployed NFT contract according to FNFT return data
+  const isERC721 = await ERC721Contract.supportsInterface('0x80ac58cd'); // check if it is ERC-721
+  const NFTownerOf = await ERC721Contract.ownerOf(ERC721TokenId); // retrieve the owner of NFT Token
+  return NFTownerOf.toLowerCase() === FNFTAddress.toLowerCase(); // check if the owner of NFT is the FNFT Contract
+ 
 }                                
 ```                                
 web3.js                                
