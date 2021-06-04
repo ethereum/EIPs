@@ -171,7 +171,7 @@ async function checkFNFT(web3) {
 }                                
 ```
 
-**Royalty-Distribution-Logic**
+**Royalty-Distribution-Logic :**
 Although it is easy to abstractly say what to do in certain function, implementing rule-of-reason logic of distributing royalty needs much consideration.
 There are some **KEY PRINCIPLES** that we have to comply with when designing this logic.
 
@@ -186,6 +186,106 @@ of withdrawal totally depends on the owner's decision.*
 **(3)** Cannot withdraw Royalty you already did.
 
 ## Reference Implementation
-```
+This is an implementation of some smart of FNFT contract.
+It is an extension of ERC-20 Token Contract.
+```solidity
+pragma solidity ^0.8.0;
 
+contract FNFT /*is ERC20, ERC165*/ {
+    mapping (address => uint256) userIndex;
+    mapping (address => bool) ownerHistory;
+    uint totalsupply = 0;
+    //uint[] balances;
+    
+    struct Info {
+        uint256 balances;
+        uint256 royaltyIndex;
+    }
+    Info[] userInfo;
+    
+    struct RoyaltyInfo {
+        Info[] userInfo;
+        uint256 royalty;
+    }
+    RoyaltyInfo[] royaltyInfo;
+    uint256 royaltyCounter = 0;
+    
+    /**
+    @dev 'RoyaltySent' MUST emit when royalty is given.
+    The '_sender' argument MUST be the address of the account sending(giving) royalty to token owners.
+    The '_value' argument MUST be the value(amount) of ether '_sender' is sending to the token owners.
+    **/
+    event RoyaltySent(address indexed _sender, uint256 _value);
+    
+    /**
+    @dev 'RoyaltyWithdrawal' MUST emit when royalties are withdrawn.
+    The '_withdrawer' argument MUST be the address of the account withdrawing royalty of his portion.
+    The '_value' argument MUST be the value(amount) of ether '_withdrawer' is withdrawing.
+    **/
+    event RoyaltyWithdrawal(address indexed _withdrawer, uint256 _value); 
+
+    function supportsInterface(bytes4 interfaceID) external view returns(bool) {
+    return
+      interfaceID == this.supportsInterface.selector || //ERC165
+      interfaceID == this.targetNFT.selector || // targetNFT()
+      interfaceID == this.sendRoyalty.selector || // sendRoyalty()
+      interfaceID == this.withdrawRoyalty.selector || // withdrawRoyalty()
+      interfaceID == this.targetNFT.selector ^ this.sendRoyalty.selector ^ this.withdrawRoyalty.selector;// FNFT
+    }
+    /* OpenZeppelin */
+     function _transfer(address sender, address recipient, uint256 amount) internal virtual {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        //require(recipient != address(0), "ERC20: transfer to the zero address");
+        //_beforeTokenTransfer(sender, recipient, amount);
+        //uint256 senderBalance = _balances[sender];
+        //require(senderBalance >= amount, "ERC20: transfer amount exceeds balance");
+        //unchecked {
+        //    _balances[sender] = senderBalance - amount;
+        //}
+        //_balances[recipient] += amount;
+        
+        /* FNFT logic below this added  */
+        if(ownerHistory[recipient] != true) {
+            ownerHistory[recipient] == true;
+            userIndex[recipient] = royaltyCounter;
+            userInfo.push(Info(amount, royaltyCounter));
+        }
+        
+        /* FNFT */
+        
+        //emit Transfer(sender, recipient, amount);
+    }
+    
+    
+    /**
+     * Functions such as balanceOf should return balance according to 
+     * the different logic(structure) of contract unlike 
+     * the conventional balances[tokenOwner]
+     **/
+    function balanceOf(address tokenOwner) public view returns (uint balance) {
+        return userInfo[userIndex[tokenOwner]].balances;
+    }
+    
+    function targetNFT() public returns(address _nftContract, uint _tokenId) {
+        return (_nftContract, _tokenId);
+    }
+    
+    function sendRoyalty() public payable returns(bool){
+        royaltyInfo[royaltyCounter++] = RoyaltyInfo({userInfo: userInfo, royalty: msg.value});
+        // Emit RoyaltySent Event
+        emit RoyaltySent(msg.sender, msg.value);
+        return true;
+    }
+    
+    function withdrawRoyalty () public payable {
+        if(!ownerHistory[msg.sender] || userInfo[userIndex[msg.sender]].royaltyIndex == royaltyCounter) return;/* maybe throwing Error logic is needed */
+        uint royaltySum = 0; // temporary holder of royalty sum
+        for(uint i = userInfo[userIndex[msg.sender]].royaltyIndex; i < royaltyCounter; i++) {
+            royaltySum += (royaltyInfo[i].userInfo[userIndex[msg.sender]].balances / totalsupply) * royaltyInfo[i].royalty;
+        }
+        userInfo[userIndex[msg.sender]].royaltyIndex = royaltyCounter;
+        msg.sender.transfer(royaltySum);
+    }    
+    
+}
 ```
