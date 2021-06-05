@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Fractional nft with Royalty Distribution system
 author: Yongjun Kim (@PowerStream3604)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/issues/3601
 status: Draft
 type: Standards Track
 category : ERC
