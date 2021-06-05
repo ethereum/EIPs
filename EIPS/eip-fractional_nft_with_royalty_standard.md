@@ -307,18 +307,26 @@ the royalty distribution logic.
 **Major Security Risks To Consider**
 
 **(1)** Math operation in `withdrawRoyalty()`
-* using external library that has been verified is recommended
+* Using external library that has been verified is recommended
 * Prevent underflow, overflow
-* Round off, ROund up issues when dividing and multiplying
+* Round off, Round up issues when dividing and multiplying
 
 **(2)** Variables that holds the state of royalty should not be modified outside the contract
 * Only functions and operations should be able to change their state in the right situation.
-                                                                                      
+
+### Usage
+Although this standard is intended for NFTs. This can also be used for distributing royalty or compensation to ERC-20 token holders.
+This standard is also applicable to be used solely for distributing compensation to ERC-20 token holders without any correlations with ERC-721(NFT);
+### Compatibility with EIP-2981
+When complying with this standard I recommend people to ensure compatibility with EIP-2981 
+by adding `royaltyInfo()` and returning the information needed to compensation the creator of the asset whenever the asset is sold and resold.       
+                                                                               
 ## References
 * [ERC-20 Token Standard](https://eips.ethereum.org/EIPS/eip-20)
 * [ERC-721 Non-Fungible Token Standard](https://eips.ethereum.org/EIPS/eip-721)
 * [ERC-1633 Re-Fungible Token Standard(RFT)](https://eips.ethereum.org/EIPS/eip-1633)
 * [OpenZeppelin ERC-20](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20)
+
 ## Copyright
 Please cite this document as:
 
