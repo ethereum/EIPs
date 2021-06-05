@@ -167,7 +167,7 @@ async function checkFNFT(web3) {
   const isERC721 = await ERC721Contract.methods.supportsInterface('0x80ac58cd').call(); // check if it is ERC-721
   const NFTownerOf = await ERC721Contract.methods.ownerOf(ERC721TokenId).call(); // retrieve the owner of NFT token
   
-  return NFTownerOf.toLowerCase() === RFTAddress.toLowerCase(); // check if the owner of NFT is the FNFT Contract
+  return NFTownerOf.toLowerCase() === FNFTAddress.toLowerCase(); // check if the owner of NFT is the FNFT Contract
 }                                
 ```
 
@@ -184,10 +184,21 @@ But, in 2021 B owns 80% and A owns 20% of totalsupply. Both of them didn't withd
 of withdrawal totally depends on the owner's decision.*
 
 **(3)** Cannot withdraw Royalty you already did.
+## Rationale
+The design of royalty receiver withdrawing their royalty was considered due to gas efficiency. If any of functions in this contract send ether to all of the holders whenever or regularly royalty is received, huge amount of gas consumption is inevitable.
+In order to handle those issues, this standard(proposal) makes the withdrawer to do most of the calculation for his own withdrawal and 
+the sender to do the least as impossible.
+                           
+## Backwards Compatibility
+This contract is compatible with the existing EIPs since it doesn't modify the existing specifications but just adds 3 functions to provide  Royalty distribution systems.
+Depending on the implementaion, data type, logic and additional validations and manipulations might be needed.
+However, complying with the existing standards won't be an issue but additional gas might be needed for calling `functions`
+in this standard.
 
 ## Reference Implementation
 This is an implementation of some smart of FNFT contract.
 It is an extension of ERC-20 Token Contract.
+                                
 ```solidity
 pragma solidity ^0.8.0;
 
@@ -244,18 +255,16 @@ contract FNFT /*is ERC20, ERC165*/ {
         //}
         //_balances[recipient] += amount;
         
-        /* FNFT logic below this added  */
+        /* FNFT logic, below this added  */
         if(ownerHistory[recipient] != true) {
             ownerHistory[recipient] == true;
-            userIndex[recipient] = royaltyCounter;
+            userIndex[recipient] = userInfo.length;
             userInfo.push(Info(amount, royaltyCounter));
         }
-        
         /* FNFT */
         
         //emit Transfer(sender, recipient, amount);
     }
-    
     
     /**
      * Functions such as balanceOf should return balance according to 
@@ -281,11 +290,36 @@ contract FNFT /*is ERC20, ERC165*/ {
         if(!ownerHistory[msg.sender] || userInfo[userIndex[msg.sender]].royaltyIndex == royaltyCounter) return;/* maybe throwing Error logic is needed */
         uint royaltySum = 0; // temporary holder of royalty sum
         for(uint i = userInfo[userIndex[msg.sender]].royaltyIndex; i < royaltyCounter; i++) {
-            royaltySum += (royaltyInfo[i].userInfo[userIndex[msg.sender]].balances / totalsupply) * royaltyInfo[i].royalty;
+            /* Should consider using safe math library to divide and multiply safely. 
+             * Overflow and underflow should be prevented.                                                                         
+             */
+            royaltySum += (royaltyInfo[i].userInfo[userIndex[msg.sender]].balances * royaltyInfo[i].royalty) / totalsupply;
         }
         userInfo[userIndex[msg.sender]].royaltyIndex = royaltyCounter;
         msg.sender.transfer(royaltySum);
+        emit RoyltyWithdrawn(msg.sender, royaltySum);
     }    
-    
 }
 ```
+## Security Considerations
+There might be many flaws that might exist when implementing this standard since math operations and complex logic is underlying 
+the royalty distribution logic.
+**Major Security Risks To Consider**
+
+**(1)** Math operation in `withdrawRoyalty()`
+* using external library that has been verified is recommended
+* Prevent underflow, overflow
+* Round off, ROund up issues when dividing and multiplying
+
+**(2)** Variables that holds the state of royalty should not be modified outside the contract
+* Only functions and operations should be able to change their state in the right situation.
+                                                                                      
+## References
+* [ERC-20 Token Standard](https://eips.ethereum.org/EIPS/eip-20)
+* [ERC-721 Non-Fungible Token Standard](https://eips.ethereum.org/EIPS/eip-721)
+* [ERC-1633 Re-Fungible Token Standard(RFT)](https://eips.ethereum.org/EIPS/eip-1633)
+* [OpenZeppelin ERC-20](https://docs.openzeppelin.com/contracts/2.x/api/token/erc20)
+## Copyright
+Please cite this document as:
+
+[Kim yongjun](mailto:helloyongjun3604@gmail.com) "EIP-<to-be-considered>: NFT Royalty Distribution Standard" June 2021
