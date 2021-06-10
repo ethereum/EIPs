@@ -31,7 +31,7 @@ There is currently a discussion to move to 256-bit addresses on Ethereum, which 
 
 Most attacks that can occur via address collisions are quite impractical: They involve users sending funds to an address before a contract is deployed. This is a very rare application in practice and users can easily circumvent the attack by never sending funds to a contract until it has been safely deployed with enough confirmations.
 
-However, the yellow paper does not explicitly specify how a client should handle the case where a transaction is send from an account that already has contract code deployed; presumably because this was considered infeasible at the time. The assumption is that most client would allow this transaction in their current state.
+However, the yellow paper does not explicitly specify how a client should handle the case where a transaction is sent from an account that already has contract code deployed; presumably because this was considered infeasible at the time. The assumption is that most client would allow this transaction in their current state.
 
 This EIP is to specify this behaviour to always forbid such transactions. This fixes most realistic or serious attacks due to address collisions.
 
