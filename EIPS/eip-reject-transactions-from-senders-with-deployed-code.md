@@ -1,7 +1,7 @@
 ---
 eip: 3607
 title: Reject transactions from senders with deployed code
-author: Dankrad Feist @dankrad, Dmitry Khovratovich @khovratovich, Marius van der Wijden @MariusVanDerWijden
+author: Dankrad Feist (@dankrad), Dmitry Khovratovich (@khovratovich), Marius van der Wijden (@MariusVanDerWijden)
 discussions-to: https://github.com/ethereum/EIPs/issues/3608
 status: Draft
 type: Standards Track
