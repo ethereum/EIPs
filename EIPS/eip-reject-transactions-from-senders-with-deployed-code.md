@@ -45,7 +45,7 @@ Any transaction where `tx.sender` has a `CODESIZE != 0` MUST be rejected as inva
 We note that it was always the expected that a contract account's behaviour is constrainted by the code in that contract -- which means that the account's funds should not suddenly be spendable by some private key. It was just implicitly assumed in the past that a 160 bit address length is enough to provide collision resistance, and thus that this case could never occur. In that sense, this EIP should be seen as a clarification of protocol behaviour in a previously undefined case rather than an explicit upgrade of consensus rules.
 
 This does not exclude all possible attack vectors, only the most serious one. Further possible attack vectors via address collisions between contracts and EOAs are:
-1. An attacker can convince a user to send funds to an account before it is deployed. Some applications require this behaviour (e.g. state channels)
+1. An attacker can convince a user to send funds to an account before it is deployed. Some applications require this behaviour (e.g. state channels).
 2. A chain reorg can happen after a contract is deployed. If the reorg removes the contract deployment transaction the funds can still be accessed using the private key.
 3. A contract can self desctruct, with the stated intention that ERC20s (or other tokens) in the contract would be burned. However, they can now be accessed by a key for that address.
 
