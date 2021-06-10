@@ -61,10 +61,10 @@ Private networks may have deployed contracts which also work as EOAs at genesis 
 
 Given a genesis allocation of  
 ```
-Address: common.HexToAddress("0x71562b71999873DB5b286dF957af199Ec94617F7")
-Balance: big.NewInt(1000000000000000000), // 1 ether
+Address: 0x71562b71999873DB5b286dF957af199Ec94617F7
+Balance: 1000000000000000000 // 1 ether
 Nonce:   0,
-Code:    common.FromHex("0xB0B0FACE"),
+Code:    0xB0B0FACE",
 ```
 Every transaction send by the private key corresponding to `0x715656...` (
 `b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291`) fails.
