@@ -18,7 +18,7 @@ jobs:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
   auto_merge_bot:
     runs-on: ubuntu-latest
-#     needs: [await_ci]
+    needs: [await_ci]
     name: EIP Auto-Merge Bot
     steps:
       - name: Checkout
@@ -28,7 +28,8 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@4a2847df2fb9d1b8d46924744658f72534f1cbf3 # master
+        uses: ethereum/EIP-Bot@df4f5dcb4e97abff477dfb959e94b2ca35e3ae23 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
+          MERGE_ENABLED: true
