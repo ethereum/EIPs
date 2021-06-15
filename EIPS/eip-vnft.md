@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: <Versatile NFT Standard>
-author: Will Wang <will@solv.finance>, Mike Meng <myan@solv.finance>, Yee Tsai <yee@solv.finance>, Ryan Chow <ryanchow@solv.finance>, Zhongxin Wu <wuzhongxin@solv.finance>, Yuyi Wang <>
+author: Will Wang <will@solv.finance>, Mike Meng <myan@solv.finance>, Yee Tsai <yee@solv.finance>, Ryan Chow <ryanchow@solv.finance>, Zhongxin Wu <wuzhongxin@solv.finance>, Jincai Du <dujincai@solv.finance>
 discussions-to: <URL>
 status: Draft
 type: Standards Track
