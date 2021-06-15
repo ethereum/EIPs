@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: '14'
       - name: await-ci
-        uses: ethereum/EIP-Bot@bd41acc24e173acbfbc831ca6e448f38f3e7bab6 # await-ci-pass
+        uses: ethereum/EIP-Bot@3b0a2a29b41ed12dd45f12816cc4ae369be2be46 # await-ci-pass
         id: await-ci
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
