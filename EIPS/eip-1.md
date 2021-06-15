@@ -173,7 +173,7 @@ The `resolution` header is required for Standards Track EIPs only. It contains a
 
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, examples for places to discuss your EIP is [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect).
+While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, an example of a place to discuss your EIP is [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect).
 
 No `discussions-to` header is necessary if the EIP is being discussed privately with the author.
 
