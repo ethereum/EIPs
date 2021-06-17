@@ -3,7 +3,6 @@ name: Auto-Merge Bot
 jobs:
   enable-auto-merge:
     runs-on: ubuntu-latest
-
     steps:
     - uses: alexwilson/enable-github-automerge-action@main
       with:
@@ -19,7 +18,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@fa0b63d0f2019f220fda0d4c98200cb55bf3db68 # master
+        uses: ethereum/EIP-Bot@aae7f7949446e433ede47434412b355ffe539726 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
