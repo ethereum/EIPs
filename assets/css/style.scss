@@ -18,6 +18,6 @@
 
 main.page-content {
   div.wrapper {
-    max-width: calc(1280px - (30px * 2));
+    max-width: unset;
   }
 }
