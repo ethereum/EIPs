@@ -214,11 +214,11 @@ interface IVNFTReceiver {
 ```
 
 
-###  Token Manipulation Rules 
+### Token Manipulation Rules 
 
 #### Scenarios
 
-##### Transfer
+**_Transfer_**
 	
 Since a VNFT token is ERC-721 compatible, it has ID level transfer and units level transfer.
 
@@ -242,12 +242,12 @@ The main difference between two kinds of interface is that whether the applicati
 Since partial transferring of a token will possiblly result in new token id creation, it's important to give the implementing contract the ability to do that. On the other side, since part of a token can be transferred in to a token with same slot, we want to keep the flexibility for apps to determine whether to use this ability, resulting in less contract complexity and less gas consumption.
 
 
-##### Merge
+**_Merge_**
 
 Several tokes with same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId); `, the targetTokenId can be one of the merged tokens, in this situation, other tokens are merged into this one, rather than generating a new token.
 
 
-##### Split
+**_Split_**
 
 One token can be splt into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);`, this will result in several newly generated tokens, with each contains units equal to the parameter. 
 
