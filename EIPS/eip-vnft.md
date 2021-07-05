@@ -21,7 +21,7 @@ VNFT is a kind of ERC-721 compatible NFT, with each token ID represents a single
 
 Tokenization of assets is one of the most important pattern in blockchain/DeFi apps nowadays, normally there are two ways for tokenizing assets: the fungible way and the non-fungible way. The first one generally uses ERC-20 standard, in the case that every user's assets deposited into a DeFi contract are fungible to each other's, so the ERC-20 standard provides most flexible way to manipulate these derived asset tokens. The second one mainly uses ERC-721 type token standard, for the purpose that every one's asset needs to be described by one or more custom properties, for example, in a DEX platform that allow individual positions for certain price ranges, the LP token needs to be implemented in an ERC-721 way, since every position should be distinguished from each other due to their different price ranges, even if the value of assets contained in two positions are equal. 
 
-Both methods have obvious disadvantiges, for the ERC-20 way, one need to create seperate ERC-20 contract for each different value of customizable properties, which is practically unacceptable. For the ERC-721 way, there is no quantitative relationship between the representing token and the represented underlying assets, hence significantlly reduces the liquidity and manageability of the token.
+Both methods have obvious disadvantiges, for the ERC-20 way, one need to create seperate ERC-20 contract for each different value/combination of customizable properties, which is practically unacceptable. For the ERC-721 way, there is no quantitative relationship between the representing token and the represented underlying assets, hence significantlly reduces the liquidity and manageability of the token.
 	
 The simple and direct way to solve the problem is to add amount property directly to ERC-721 token, make it best for both customization and semi-fungibility. Nevertheless, ERC-721 compatibility will help the new standard easily utilizing all the infrastructures already support ERC-721, result in fast adoptance.
 
@@ -214,11 +214,12 @@ interface IVNFTReceiver {
 ```
 
 
-### Token Manipulation Rules 
+### Token Manipulation
+
 
 #### Scenarios
 
-**_Transfer_**
+**_Transfer:_**
 	
 Since a VNFT token is ERC-721 compatible, it has ID level transfer and units level transfer.
 
@@ -242,14 +243,15 @@ The main difference between two kinds of interface is that whether the applicati
 Since partial transferring of a token will possiblly result in new token id creation, it's important to give the implementing contract the ability to do that. On the other side, since part of a token can be transferred in to a token with same slot, we want to keep the flexibility for apps to determine whether to use this ability, resulting in less contract complexity and less gas consumption.
 
 
-**_Merge_**
+**_Merge:_**
 
 Several tokes with same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId); `, the targetTokenId can be one of the merged tokens, in this situation, other tokens are merged into this one, rather than generating a new token.
 
 
-**_Split_**
+**_Split:_**
 
 One token can be splt into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);`, this will result in several newly generated tokens, with each contains units equal to the parameter. 
+
 
 
 #### Rules
