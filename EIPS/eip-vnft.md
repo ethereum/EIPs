@@ -361,40 +361,6 @@ This is the “VNFT Metadata JSON Schema” referenced above.
 }
 ```
 
-
-
-
-##### JSON Schema
-```json
-{
-    "title": "Token Metadata",
-    "type": "object",
-    "properties": {
-        "name": {
-            "type": "string",
-            "description": "Identifies the asset to which this token represents",
-        },
-        "decimals": {
-            "type": "integer",
-            "description": "The number of decimal places that the token amount should display - e.g. 18, means to divide the token amount by 1000000000000000000 to get its user representation."
-        },
-        "description": {
-            "type": "string",
-            "description": "Describes the asset to which this token represents"
-        },
-        "image": {
-            "type": "string",
-            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
-        },
-        "properties": {
-            "type": "object",
-            "description": "Arbitrary properties. Values may be strings, numbers, object or arrays.",
-        }
-    }
-}
-```
-
-
 ### Approval
 
 VNFT adds a new approval model, that is, on can approve operators to partially transfer units from a token with certain ID, the new interface is:
