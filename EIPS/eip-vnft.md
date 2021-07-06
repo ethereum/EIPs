@@ -319,10 +319,6 @@ One token can be splt into several tokens, using`split(uint256 tokenId, uint256[
 - MUST check if `_to` is a smart contract (code size > 0). If so, `safeTransferFrom` MUST call `onVNFTReceived` on `_to` and MUST revert if the return value does not match `bytes4(keccak256("onVNFTReceived(address,address,uint256,uint256,bytes)"))`
 
 
-##### A solidity example of the keccak256 generated constants for the various magic values (these MAY be used by implementation):
-
-
-
 ### Metadata 
 
 
