@@ -39,7 +39,7 @@ pragma solidity 0.7.6;
 /**
  * @title VNFT Versatile Non-Fungible Token Standard
  * @dev See https://eips.ethereum.org/EIPS/eip-VNFT
- * Note: the ERC-165 identifier for this interface is ?????
+ * Note: the ERC-165 identifier for this interface is 0x1487d183.
  */
 interface VNFT /* is ERC721 */{
 
@@ -206,6 +206,7 @@ Smart contracts MUST implement all of the functions in the IVNFTReceiver interfa
         @param units     The units of tokenId being transferred
         @param data      Additional data with no specified format
         @return           `bytes4(keccak256("onVNFTReceived(address,address,uint256,uint256,bytes)"))`
+	Note: the ERC-165 identifier for this interface is 0xb382cdcd.
  */
 interface IVNFTReceiver {
     function onVNFTReceived(address operator, address from, uint256 tokenId,
@@ -359,40 +360,6 @@ This is the “VNFT Metadata JSON Schema” referenced above.
     }
 }
 ```
-
-
-
-
-##### JSON Schema
-```json
-{
-    "title": "Token Metadata",
-    "type": "object",
-    "properties": {
-        "name": {
-            "type": "string",
-            "description": "Identifies the asset to which this token represents",
-        },
-        "decimals": {
-            "type": "integer",
-            "description": "The number of decimal places that the token amount should display - e.g. 18, means to divide the token amount by 1000000000000000000 to get its user representation."
-        },
-        "description": {
-            "type": "string",
-            "description": "Describes the asset to which this token represents"
-        },
-        "image": {
-            "type": "string",
-            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this token represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
-        },
-        "properties": {
-            "type": "object",
-            "description": "Arbitrary properties. Values may be strings, numbers, object or arrays.",
-        }
-    }
-}
-```
-
 
 ### Approval
 
