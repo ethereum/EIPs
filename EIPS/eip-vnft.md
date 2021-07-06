@@ -245,12 +245,12 @@ Since partial transferring of a token will possiblly result in new token id crea
 
 **_Merge:_**
 
-Several tokes with same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId); `, the targetTokenId can be one of the merged tokens, in this situation, other tokens are merged into this one, rather than generating a new token.
+Several tokes with same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId); ` the targetTokenId should already exist, and cannot be one of the merged tokens. After merging, the target token owns all the units from merged tokens, and merged tokens will be burned.
 
 
 **_Split:_**
 
-One token can be splt into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);`, this will result in several newly generated tokens, with each contains units equal to the parameter. 
+One token can be splt into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);` this will result in several newly generated tokens, with each contains units equal to the parameter. 
 
 
 
