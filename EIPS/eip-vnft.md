@@ -39,7 +39,7 @@ pragma solidity 0.7.6;
 /**
  * @title VNFT Versatile Non-Fungible Token Standard
  * @dev See https://eips.ethereum.org/EIPS/eip-VNFT
- * Note: the ERC-165 identifier for this interface is ?????
+ * Note: the ERC-165 identifier for this interface is 0x1487d183.
  */
 interface VNFT /* is ERC721 */{
 
@@ -206,6 +206,7 @@ Smart contracts MUST implement all of the functions in the IVNFTReceiver interfa
         @param units     The units of tokenId being transferred
         @param data      Additional data with no specified format
         @return           `bytes4(keccak256("onVNFTReceived(address,address,uint256,uint256,bytes)"))`
+	Note: the ERC-165 identifier for this interface is 0xb382cdcd.
  */
 interface IVNFTReceiver {
     function onVNFTReceived(address operator, address from, uint256 tokenId,
