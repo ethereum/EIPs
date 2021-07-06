@@ -389,11 +389,12 @@ There are mainly two reasons we keep the unsafe transfer interfaces:
 
 ### Approval
 
-For maximum semantical compatibility with ERC721, we decided to make the relationship between two levels of approval like that:
+For maximum semantical compatibility with ERC721, as well as simplifying the approval model, we decided to make the relationship between two levels of approval like that:
 
 1. Approval of an id does not result in the ability to partial transfer units from this id by the approved operator;
 2. Approval of all units in a token does not result in the ability to transfer the token entity by the approved operator;
-3. `setApprovalForAll` will result in the ability to partial transfer units from any token, as well as the ability to transfer any token entities of the owner.
+3. `setApprovalForAll` will result in the ability to transfer any tokens from the owner, as well as the ability to partial transfer units from any token.
+3. `setApprovalForAll` will result in the ability to approve any tokens of the owner to third parties, as well as the ability to approve partial transfer units of any token to third parties.
 
 
 ## Backwards Compatibility
