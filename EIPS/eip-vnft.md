@@ -447,6 +447,9 @@ As metioned at very beginning, a VNFT contract is basically an ERC721 contract, 
 
 **Articles & Discussions**
 
+- [How vnft can improve position management in uniswap-v3](https://solvprotocol.medium.com/how-vnft-can-improve-position-management-in-uniswap-v3-221ab49a8cb2)
+- [What are digital assets](https://unizon.pro/en/7632.html)
+- [Vnft tokens vs.erc-20 vs. erc-721](https://medium.com/solv-blog/vnft-tokens-vs-erc-20-vs-erc-721-e75843053786)
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
