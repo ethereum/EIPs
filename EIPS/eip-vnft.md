@@ -23,7 +23,7 @@ Tokenization of assets is one of the most important pattern in blockchain/DeFi a
 
 Both methods have obvious disadvantiges, for the ERC-20 way, one need to create seperate ERC-20 contract for each different value/combination of customizable properties, which is practically unacceptable. For the ERC-721 way, there is no quantitative relationship between the representing token and the represented underlying assets, hence significantlly reduces the liquidity and manageability of the token.
 	
-The simple and direct way to solve the problem is to add amount property directly to ERC-721 token, make it best for both customization and semi-fungibility. Nevertheless, ERC-721 compatibility will help the new standard easily utilizing all the infrastructures already support ERC-721, result in fast adoptance.
+The most simple and direct way to solve the problem is to add amount property directly to ERC-721 token, make it best for both property customization and semi-fungibility. Nevertheless, ERC-721 compatibility will help the new standard easily utilizing existing infrastructures, result in fast adoptance.
 
 	
 
