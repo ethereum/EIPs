@@ -11,19 +11,19 @@ requires: <EIP-721, EIP-165>
 ---
 
 ## Simple Summary
-This standard describes a set of smart contract interfaces, as an extension of ERC-721, makes a NFT semi-fungible, that is: besides its ERC-721 ID property, it has an quantitative property, called 'units', which can be treated as quantities contained in an ERC-721 token. 
+This standard describes a set of smart contract interfaces, as an extension of ERC-721, makes an NFT semi-fungible, that is: besides its ERC-721 ID property, it has a quantitative property, called 'units', which can be treated as quantities contained in an ERC-721 token.
 
 ## Abstract
 
-VNFT is a kind of ERC-721 compatible NFT, with each token ID represents a single entity. However, it has a 'units' property, representing amount contained within the token, since the amount contained in one token is fungible by nature, a single token can be split in to several different tokens, with certain properties maintained unchanged and the sum of the amount of all newly generated tokens eaquals to that of the original one. Nevertheless, each VNFT has a 'SLOT' attribute, which means they are logically the same kind of business entities, so that tokens of same slot can be merged together, result in a new token with the amount identical to the sum of the merged ones.
+VNFT is a kind of ERC-721 compatible NFT, with each token ID representing a single entity. However, it has a 'units' property, representing the amount contained within the token, since the amount contained in one token is fungible by nature, a single token can be split in to several different tokens, with certain properties maintained unchanged and the sum of the amounts of all newly generated tokens equals to that of the original one. Nevertheless, each VNFT has a 'SLOT' attribute, which means they are logically the same kind of business entities, so that tokens can be merged to a target token with the same slot, resulting in the target token to own all units from the merged tokens, which will then be burnt.
 
 ## Motivation
 
-Tokenization of assets is one of the most important pattern in blockchain/DeFi apps nowadays, normally there are two ways for tokenizing assets: the fungible way and the non-fungible way. The first one generally uses ERC-20 standard, in the case that every user's assets deposited into a DeFi contract are fungible to each other's, so the ERC-20 standard provides most flexible way to manipulate these derived asset tokens. The second one mainly uses ERC-721 type token standard, for the purpose that every one's asset needs to be described by one or more custom properties, for example, in a DEX platform that allow individual positions for certain price ranges, the LP token needs to be implemented in an ERC-721 way, since every position should be distinguished from each other due to their different price ranges, even if the value of assets contained in two positions are equal. 
+Tokenization of assets is one of the most important patterns in blockchain/DeFi apps nowadays, normally there are two ways for tokenizing assets: the fungible way and the non-fungible way. The first one generally uses the ERC-20 standard, in the case that every user's assets deposited into a DeFi contract are fungible to that of others, so the ERC-20 standard provides the most flexible way to manipulate these derived asset tokens. The second one mainly uses the ERC-721 type token standard, for the purpose that everyone's asset needs to be described by one or more custom properties, for example, in a DEX platform that allows individual positions for certain price ranges, the LP token needs to be implemented in an ERC-721 way, since every position should be distinguished from each other due to their different price ranges, even if the values of assets contained in the two positions are equal. 
 
-Both methods have obvious disadvantiges, for the ERC-20 way, one need to create seperate ERC-20 contract for each different value/combination of customizable properties, which is practically unacceptable. For the ERC-721 way, there is no quantitative relationship between the representing token and the represented underlying assets, hence significantlly reduces the liquidity and manageability of the token.
+Both methods have obvious disadvantages, for the ERC-20 way, one needs to create a separate ERC-20 contract for each different value/combination of customizable properties, which is practically unacceptable. For the ERC-721 way, there is no quantitative relationship between the representing token and the represented underlying assets, hence significantly reduces the liquidity and manageability of the token.
 	
-The most simple and direct way to solve the problem is to add amount property directly to ERC-721 token, make it best for both property customization and semi-fungibility. Nevertheless, ERC-721 compatibility will help the new standard easily utilizing existing infrastructures, result in fast adoptance.
+The most simple and direct way to solve the problem is to add an amount property directly to ERC-721 token, making it best for both property customization and semi-fungibility. Nevertheless, the ERC-721 compatibility will help the new standard easily utilizing existing infrastructures, resulting in fast adoptance.
 
 	
 
@@ -196,7 +196,7 @@ Smart contracts MUST implement all of the functions in the IVNFTReceiver interfa
 ```javascript
  /**
         @notice Handle the receipt of a VNFT token type.
-        @dev An VNFT-compliant smart contract MUST call this function on the token recipient contract, at the end of a `safeTransferFrom` after the balance has been updated.        
+        @dev A VNFT-compliant smart contract MUST call this function on the token recipient contract, at the end of a `safeTransferFrom` after the balance has been updated.        
         This function MUST return `bytes4(keccak256("onVNFTReceived(address,address,uint256,uint256,bytes)"))` (i.e. 0xb382cdcd) if it accepts the transfer.
         This function MUST revert if it rejects the transfer.
         Return of any other value than the prescribed keccak256 generated value MUST result in the transaction being reverted by the caller.
@@ -223,9 +223,9 @@ interface IVNFTReceiver {
 	
 Since a VNFT token is ERC-721 compatible, it has ID level transfer and units level transfer.
 
-The ID level transfer should obey ERC721 transfer rules with neither restrictions nor special treatments.
+The ID level transfer SHOULD obey ERC721 transfer rules with neither extra restrictions nor special treatments.
 
-The units level transfer has two type of interfaces, and both have safe and unsafe version:
+The units level transfer has two types of interfaces, and both have safe and unsafe versions:
 
 ```solidity
 	
@@ -238,19 +238,19 @@ The units level transfer has two type of interfaces, and both have safe and unsa
 	    external returns (uint256 newTokenId);
 
 ```
-The main difference between two kinds of interface is that whether the application or the contract is responsible for determining/generating the target token ID in the transference.
+The main difference between the two kinds of interface is whether the application or the contract is responsible for determining/generating the target token ID in the transfer.
 
-Since partial transferring of a token will possiblly result in new token id creation, it's important to give the implementing contract the ability to do that. On the other side, since part of a token can be transferred in to a token with same slot, we want to keep the flexibility for apps to determine whether to use this ability, resulting in less contract complexity and less gas consumption.
+Since partial transfer of a token will possibly result in new token id creation, it's important to give the implementing contract the ability to do that. On the other hand, since part of a token can be transferred to a token with the same slot, we want to keep the flexibility for dapps to determine whether to use this ability, resulting in less contract complexity and less gas consumption.
 
 
 **_Merge:_**
 
-Several tokes with same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId); ` the targetTokenId should already exist, and cannot be one of the merged tokens. After merging, the target token owns all the units from merged tokens, and merged tokens will be burned.
+Several tokes with the same SLOT can be merged together using `merge(uint256[] calldata tokenIds, uint256 targetTokenId);`. `targetTokenId` should already exist, and cannot be one of `tokenIds`. After merging, `targetTokenId` owns all the units from the merged tokens, and the merged tokens will be burned.
 
 
 **_Split:_**
 
-One token can be splt into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);` this will result in several newly generated tokens, with each contains units equal to the parameter. 
+One token can be split into several tokens, using`split(uint256 tokenId, uint256[] calldata units) returns (uint256[] memory newTokenIds);`. This will result in several newly generated tokens containing units equal to the parameter `units`.
 
 
 
@@ -258,18 +258,18 @@ One token can be splt into several tokens, using`split(uint256 tokenId, uint256[
 
 **_approving rules:_**
 
-- For compatible with ERC721, there are three kinds of approving operations, which SHOULD be used to indicate different levels of approving.
-- `setApprovalForAll` SHOULD indicate the top level of approving, the authorized operators is capable of handling all tokens, including their units, owned by the owner.
-- The ERC721 level `approve` SHOULD indicate that the `_tokenId` is approved to the operator, but not the units of that token.
-- The VNFT level `approve` with the `_units` parameter SHOULD indicate that only the specified amount of units are approved to the operator, but not the whole token.
+- For being compatible with ERC721, there are three kinds of approving operations, which SHOULD be used to indicate different levels of approval.
+- `setApprovalForAll` SHOULD indicate the top level of approval, the authorized operators are capable of handling all tokens, including their units, owned by the owner.
+- The ID level `approve` SHOULD indicate that the `_tokenId` is approved to the operator, but not the units of that token.
+- The units level `approve` with the `_units` parameter SHOULD indicate that only the specified amount of units are approved to the operator, but not the whole token.
 - Any `approve` MUST revert if `msg.sender` is equal to `_to` or `_operator`.
-- The VNFT `approve` MUST revert if `msg.sender` is not the owner of `_tokenId`.
-- The VNFT `approve` MUST emit the `ApprovalUnits` event.
+- The units level `approve` MUST revert if `msg.sender` is not the owner of `_tokenId` nor set approval for all tokens.
+- The units level `approve` MUST emit the `ApprovalUnits` event.
 
 **_splitting rules:_**
 
 - MUST revert if `_tokenId` is not a valid token.
-- MUST revert if `msg.sender` is neither the owner of `_tokenId` nor having been set approval for all.
+- MUST revert if `msg.sender` is neither the owner of `_tokenId` nor set approval for all.
 - MUST revert if the sum of all `_units` exceeds the actual amount of units in `_tokenId`.
 - MUST return an array containing the ids of the generated tokens after splitting.
 - MUST emit the `Split` event.
@@ -277,7 +277,7 @@ One token can be splt into several tokens, using`split(uint256 tokenId, uint256[
 **_merging rules:_**
 
 - MUST revert if `_targetTokenId` or any of `_tokenIds` is not a valid token.
-- MUST revert if the owner of `tokenid` is not the owner of `_targetTokenId`.
+- MUST revert if the owner of `tokenId` is not the owner of `_targetTokenId`.
 - MUST revert if `msg.sender` is neither the owner of all `_tokenIds` and `targetTokenId` nor having been set approval for all.
 - MUST revert if any of `_tokenIds` is equal to `_targetTokenId`.
 - Each of `_tokenIds` MUST be burnt after being merged.
@@ -319,17 +319,21 @@ One token can be splt into several tokens, using`split(uint256 tokenId, uint256[
 - MUST check if `_to` is a smart contract (code size > 0). If so, `safeTransferFrom` MUST call `onVNFTReceived` on `_to` and MUST revert if the return value does not match `bytes4(keccak256("onVNFTReceived(address,address,uint256,uint256,bytes)"))`
 
 
+##### A solidity example of the keccak256 generated constants for the various magic values (these MAY be used by implementation):
+
+
+
 ### Metadata 
 
 
 #### Metadata Extensions
 
-VNFT metadata extensions is compatible ERC721 metadata extension.
+VNFT metadata extensions are compatible ERC721 metadata extensions.
 
 
 #### VNFT Metadata URI JSON Schema
 
-This is the “VNFT Metadata JSON Schema” referenced above.
+This is the "VNFT Metadata JSON Schema" referenced above.
 
 ```json
 {
@@ -396,7 +400,7 @@ This is the “VNFT Metadata JSON Schema” referenced above.
 
 ### Approval
 
-VNFT adds a new approval model, that is, on can approve operators to partially transfer units from a token with certain ID, the new interface is:
+VNFT adds a new approval model, that is, one can approve operators to partial transfer units from a token with certain ID, the new interface is:
 ```function approve(address to, uint256 tokenId, uint256 units); ```
 
 
@@ -405,28 +409,29 @@ VNFT adds a new approval model, that is, on can approve operators to partially t
 
 ### Metadata generation
 
-Since VNFT is designed for representing underlying assets, rather than artifacts for gaming or arts, the implementation SHOULD give out the metadata directly from contract code, rather than give a URL of a server for returning metadata.
+Since VNFT is designed for representing underlying assets, rather than artifacts for gaming or arts, the implementation should give out the metadata directly from contract code, rather than give a URL of a server for returning metadata.
 
 
 ### Design decision: Keep unsafe transfer
 
-There are mainly two reasons we keep unsafe transfer interfaces:
+There are mainly two reasons we keep the unsafe transfer interfaces:
 
 1. Since VNFT is ERC721 compatible, we must keep compatibility for all wallets and contracts that are still calling unsafe transfer interfaces for ERC721 tokens.
-2. We want to keep the ability that apps can trigger business logic on contracts by simply transfer VNFT tokens to them, that is, a contract can put business logic in ONVNFTReceived function so that it can be called when ever a token is transferred using SafeTransferFrom. However, in this situation, an approved contract  with customized transfer funcitons like depost etc. SHOULD never call SafeTransferFrom since it will result in confusion that whether ONVNFTReceived is called by itself or other apps that safe transfer a token to it.
+2. We want to keep the ability that dapps can trigger business logic on contracts by simply transferring VNFT tokens to them, that is, a contract can put business logic in `onVNFTReceived` function so that it can be called whenever a token is transferred using `safeTransferFrom`. However, in this situation, an approved contract with customized transfer functions like deposit etc. SHOULD never call `safeTransferFrom` since it will result in confusion that whether `onVNFTReceived` is called by itself or other dapps that safe transfer a token to it.
 
 
 ### Approval
 
-For maximum semantical compatibility with ERC721, we decided to make the relationship between two level of approval like that:
+For maximum semantical compatibility with ERC721, we decided to make the relationship between two levels of approval like that:
 
-1. Approve of an id does not result in the ability to partial transfer units from this id by the approved ovperator;
-2. SetApprovalForAll will result in the ability to partial transfer units from any token, as well as transfer any token themselves.
+1. Approval of an id does not result in the ability to partial transfer units from this id by the approved operator;
+2. Approval of all units in a token does not result in the ability to transfer the token entity by the approved operator;
+3. `setApprovalForAll` will result in the ability to partial transfer units from any token, as well as the ability to transfer any token entities of the owner.
 
 
 ## Backwards Compatibility
 	
-As metioned at very beginning, a VNFT contract is basically an ERC721 contract, hence it is 100% compatible with ERC721.
+As mentioned at the very beginning, a VNFT contract is basically an ERC721 contract, hence it is 100% compatible with ERC721.
 
 
 ## References
