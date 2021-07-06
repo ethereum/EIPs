@@ -398,7 +398,7 @@ This is the “VNFT Metadata JSON Schema” referenced above.
 ```
 
 
-### Approval（蔡一）
+### Approval
 
 VNFT adds a new approval model, that is, on can approve operators to partially transfer units from a token with certain ID, the new interface is:
 ```function approve(address to, uint256 tokenId, uint256 units); ```
