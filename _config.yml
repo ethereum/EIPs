@@ -18,7 +18,7 @@ description: >-
   Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
   platform, including core protocol specifications, client APIs, and contract
   standards.
-url: "http://eips.ethereum.org"
+url: "https://eips.ethereum.org"
 twitter_username: ethereum
 github_username:  ethereum
 header_pages:
@@ -27,15 +27,23 @@ header_pages:
  - networking.html
  - interface.html
  - erc.html
- - informational.html
  - meta.html
+ - informational.html
 twitter:
   card: summary
   username: ethereum
 
 # Build settings
+highlighter: rouge
 markdown: kramdown
 theme: minima
+kramdown:
+  parse_block_html: false
+  # This is the default, but be explicit as some EIPs depend on it
+  auto_ids: true
+  # This is to ensure more determistic behaviour
+  auto_id_stripping: true
+  syntax_highlighter: rouge
 
 permalink: /:slug
 
@@ -47,6 +55,7 @@ defaults:
       layout: "eip"
 
 exclude:
+  - .github
   - Gemfile
   - Gemfile.lock
   - node_modules
@@ -54,4 +63,7 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
-  - eip-X.md
+  - eip-template.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+  - README.md

@@ -382,3 +382,7 @@ Running B's `ingress-mac` keccak state on the string "foo" yields the hash
 ```text
 ingress-mac("foo") = 0c7ec6340062cc46f5e9f1e3cf86f8c8c403c5a0964f5df0ebd34a75ddc86db5
 ```
+
+### Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
