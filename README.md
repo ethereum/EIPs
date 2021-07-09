@@ -52,13 +52,13 @@ The EIP repository contains an "auto merge" feature to ease the workload for EIP
 
 1. Open Terminal.
 
-2. Check whether you have Ruby 2.1.0 or higher installed:
+2. Check whether you have Ruby 2.7.x or higher installed:
 
 ```sh
 $ ruby --version
 ```
 
-3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+3. If you don't have Ruby installed, install Ruby 2.7.x or higher.
 
 4. Install Bundler:
 
