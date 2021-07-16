@@ -21,3 +21,14 @@ main.page-content {
     max-width: unset;
   }
 }
+
+div.warning {
+  background-color: #f9e7e5;
+  border: solid 1px #c0392b;
+  border-radius: 6px;
+  line-height: 18px;
+  overflow: hidden;
+  padding: 12px;
+  display: inline-block;
+  margin-bottom: 15px;
+}

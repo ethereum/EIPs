@@ -2,6 +2,12 @@
 layout: default
 ---
 
+{% if page.status != "Final" and page.status != "Living" %}
+  <div class="warning">
+    ⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+  </div>
+{% endif %}
+
 <div class="home">
   <h1 class="page-heading">
     EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
