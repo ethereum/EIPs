@@ -2,6 +2,28 @@
 layout: default
 ---
 
+{% if page.status == "Draft" %}
+  <div class="draft">
+    ⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+  </div>
+{% elsif page.status == "Review" %}
+  <div class="review">
+    📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+  </div>
+{% elsif page.status == "Last Call" %}
+  <div class="lastcall">
+    📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+  </div>
+{% elsif page.status == "Stagnant" %}
+  <div class="stagnant">
+    🚧 This EIP had no activity for at least 6 months.
+  </div>
+{% elsif page.status == "Withdrawn" %}
+  <div class="withdrawn">
+    🛑 This EIP has been withdrawn.
+  </div>
+{% endif %}
+
 <div class="home">
   <h1 class="page-heading">
     EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}

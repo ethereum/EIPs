@@ -21,3 +21,42 @@ main.page-content {
     max-width: unset;
   }
 }
+
+.status {
+  border-radius: 6px;
+  line-height: 18px;
+  overflow: hidden;
+  padding: 12px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.draft {
+  @extend .status;
+  background-color: #fffbea;
+  border: solid 1px #f1c40f;
+}
+
+.review {
+  @extend .status;
+  background-color: #f0f7fb;
+  border: solid 1px #3498db;
+}
+
+.lastcall {
+  @extend .status;
+  background-color: #e7f6f0;
+  border: solid 1px #27ae60;
+}
+
+.stagnant {
+  @extend .status;
+  background-color: #ffdead;
+  border: solid 1px #ff6700;
+}
+
+.withdrawn {
+  @extend .status;
+  background-color: #f9e7e5;
+  border: solid 1px #c0392b;
+}
