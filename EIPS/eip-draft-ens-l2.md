@@ -1,0 +1,72 @@
+---
+eip: <to be assigned>
+title: Offchain resolution for ENS
+author: Nick Johnson (@arachnid), 0age (@oage)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-07-21
+requires: 137, 3668
+---
+
+## Simple Summary
+Specifies an updated resolution process for ENS that supports offchain resolution and wildcard lookups.
+
+## Abstract
+Instead of using the resolution process from EIP 137, clients should start with the provided name and check successively shorter suffixes until they find a name with a resolver. Then, they should use the process described in EIP 3668 to query the resolver.
+
+## Motivation
+Making ENS scalable requires providing ways to create and update ENS names that don't incur L1 transaction fees. Rather than picking one L2 and moving all of ENS to it, this EIP utilises EIP 3668 to support resolving records held on any external system, without introducing new trust assumptions (unless the owner of the name desires it). Combined with a new process for finding resolvers, this allows for moving entire subtrees of the ENS hierarchy to external systems.
+
+## Specification
+Compliant ENS clients MUST perform the following sequence when determining the resolver for a given name:
+
+ 1. Set `name` to the supplied name, after normalisation as specified in EIP-137.
+ 2. Apply the namehash algorithm to derive the `node`, as specified in EIP-137.
+ 3. Call the ENS Registry contract, supplying the node as the argument to `resolver(bytes32 node) constant returns (address)`.
+ 3. If an address other than the null address is returned, halt and use the returned address as the resolver.
+ 4. If `name` consists of a single label (eg, has no dots), halt without finding a resolver.
+ 5. Otherwise, strip the leftmost label from `name`, and go to step 2.
+
+In the event that a resolver is located via this process, the client MUST supply the namehash of the original name to the resolver as its first argument when retrieving records.
+
+If a resolver is found, the client MUST use the contract call process described in EIP 3668 to call the desired resolver function and obtain a result.
+
+### Pseudocode
+```javascript
+async function getResolver(name) {
+    while(true) {
+        const node = namehash(name);
+        const resolver = await ENS_REGISTRY.resolver(node);
+        if(resolver != '0x0000000000000000000000000000000000000000000000000000000000000000') {
+            return resolver;
+        }
+        if(!name.includes('.')) {
+            return null;
+        }
+        name = name.split('.').slice(1).join('.');
+    }
+}
+```
+
+## Rationale
+Introducing wildcard resolution is necessary in order to support delegating more than a single name at a time to an offchain resolution system. Supporting arbitrary levels of wildcards (eg, 'foo.bar.baz.eth' can be resolved by 'baz.eth') adds minimal complexity, and allows for arbitrary-depth subtress of the ENS hierarchy to be delegated to other systems.
+
+Combining this with the function call procedure outlined in EIP 3668 ensures that a minimum amount of extra complexity is added to the resolution process, while still supporting the maximum amount of flexibility for name owners.
+
+## Backwards Compatibility
+Existing ENS clients will fail to resolve names that require wildcard resolution and refuse to interact with them, while upgraded resolvers will understand both types of name.
+
+## Reference Implementation
+TBD
+
+## Security Considerations
+While compliant ENS clients will continue to refuse to resolve records without a resolver, there is still the risk that an improperly-configured client will refer to an incorrect resolver, or will not reject interactions with the null address when a resolver cannot be located.
+
+Additionally, resolvers supporting completely arbitrary wildcard subdomain resolution will increase the likelihood of funds being sent to unintended recipients as a result of typos. Applications that implement such resolvers should consider making additional name validation available to clients depending on the context, or implementing features that support recoverability of funds.
+
+There is also the possibility that some applications might require that no resolver be set for certain subdomains. For this to be problematic, the parent domain would need to successfully resolve the given subdomain node — to the knowledge of the authors, no application currently supports this feature or expects that subdomains should not resolve to a record.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
