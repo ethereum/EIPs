@@ -1,3 +1,5 @@
+Hard forks will not happen unless they are announced here first.
+
 # Ethereum Improvement Proposals (EIPs)
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
