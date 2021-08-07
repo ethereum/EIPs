@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: <VedariusARussell (@youtac_va), Vedarius Russell (ferraribtsutac@gmail.com), Vedarius Russell (ytbigvinny27), Vedarius Russell mafiamuzikut@icloud.com) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): Vedarius Russell (@itsYoutacRRS)>
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
