@@ -1,0 +1,322 @@
+---
+eip: 
+title: ERC Standard for Multiple Types of Fungible-Tokens
+author: Zhao Li(@1999321)、Yuefei Tan (@whtyfhas)、Derek Zhou (@zhous)  
+discussions-to:
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-08-01
+requires: 4000
+---
+
+## Simple Summary
+
+A standard that manages multiple types of fungible tokens in a single contract.
+
+## Abstract
+
+This standard covers some situations that the ERC-20 standard and ERC-1155 standard can hardly handle. It allows multiple types of fungible tokens to be sent to multiple receiving addresses via our proposed interface `transferBatchMul` and allows multip le types of fungible tokens to be sent from multiple sending addresses to multiple receiving addresses via our proposed interface `transferFromBatchMul`. This standard greatl y reduces the gas consumption in transactions of multiple types of fungible tokens. In addition the standard allows both setting of an approval for a single token via an interface `approve(uint256 id,address spender, uint256 amount)` and setting of approvals uniformly for all types of  tokens via an interface `approve(address spender,bool _status)`.
+
+## Motivation
+
+The ERC-20 token standard defines a single fungible token’s attributes and interfaces. When interacting with multiple types of fungible tokens, multiple token contracts each of which defines a single token need to be developed and deployed. The ERC-1155 token standard combines both fungible tokens and non-fungible tokens but lacks both an interface to set an approval for a spender for an id specified type of fungible token and an interface to set an approval for multiple spenders for an id specified type of fungible token. In addition both the ERC-20 and the ERC-1155 token standards lack interfaces to transact from multiple sending addresses to multiple receiving addresses. This proposed standard covers these use cases and allows multiple types of fungible tokens to be transacted from multiple sending addresses to multiple receiving addresses.   
+
+## Specification
+
+Interfaces: eip.aol
+```solidity
+pragma solidity ^0.8.0;
+pragma abicoder v2;
+
+interface IEIP {
+    
+    function totalSupply(uint256 id) external view returns (uint256);
+
+    function balanceOf(uint256 id,address account) external view returns (uint256);
+
+    function transfer(uint256 id,address recipient, uint256 amount) external returns (bool);
+    
+    function transferBatch(uint256[] memory ids,address recipient,uint256[] memory amounts)external returns(bool);
+    
+    function transferBatchMul(uint256[] memory ids,address[]memory recipient,uint256[] memory amounts)external returns(bool);
+
+    function allowance(uint256 id,address owner, address spender) external view returns (uint256);
+
+    function approve(uint256 id,address spender, uint256 amount) external returns (bool);
+    
+    function approve(address spender,bool status) external returns(bool);
+    
+    function transferFromBatch(uint256[] memory ids,address sender,address recipient,uint256[] memory amounts)external returns(bool);
+    
+    function transferFromBatchMul(uint256[] memory ids,address[]memory sender,address[]memory recipient,uint256[] memory amounts)external returns(bool);
+
+    function transferFrom(uint256 id,address sender, address recipient, uint256 amount) external returns (bool);
+
+    event Transfer(uint256 id,address indexed from, address indexed to, uint256 value);
+
+    event Approval(uint256 id,address indexed owner, address indexed spender, uint256 value);
+    
+    event TransferBatch(uint256[] ids,address indexed from,address indexed to,uint256[] value);
+    
+    event TransferBatchNoIndexed(uint256[] ids,address[] from,address[] to,uint256[] value);
+    
+    event ApproveBatch(uint256[] ids,address indexed from,address indexed to,uint256[] value);
+    
+    event ApproveBatchNoIndexed(uint256[] ids,address[] from,address to,uint256[] value);
+}
+```
+
+Each of the interfaces `totalSupply`,`balanceOf`,`transfer`,`allowance`,`transferFrom`,`approve(uint256 id,address spender, uint256 amount)`  introduces a new parameter id  in the ERC-20's corresponding interface's parameter list to specify a fungible token's type. 
+
+
+`approve(address spender,bool status)` is similar to ERC-1155's interface. I t allows an approval to be set uniformly for all types of tokens.
+
+`transferBatch` and `transferFromBatch` remove the parameter bytes memory data that the ERC-1155 standard uses and implement batch transactions.
+
+`transferBatchMul` implements transactions of multiple types of fungible tokens to multiple receiving addresses.
+
+`transferFromBatchMul` implements transactions of multiple types of fungible tokens from multiple sending addresses to multiple receiving addresses.
+
+
+## Rationale
+
+The ERC-20 token standard defines a single fungible token. The ERC-1155 token standard defines multiple types of tokens and specifies each token type by using a parameter `id`. By  using this parameter `id`, the ERC-1155 token standard greatly reduces the gas consumption in transactions of multiple types of tokens, compared with the ERC-20 token standard. Therefore our proposed standard uses a parameter `id` as well to specify a token type in order to reduce the gas consumption for  transactions of multiple types of tokens in one call operation via `transferBatch` or `transferFromBatch`. In our proposed st andard, each type of fungible token is specified by an id, therefore we add an interface `approve(uint256 id,address spender, uint256 amount)` for applications to set an approval for the id specified type of fungible token. In order to set approvals for multiple types of fungible tokens in minimum operations we introduce a function a`pprove(address spender,bool _status)`  to set approvals uniformly for all types of fungible tokens in one call operation. To handle a transaction of multiple types of fungible tokens from one sending address to multiple receiving addresses we introduce an interface `transferBatchMul` . To handle a transaction of multiple types of fungible tokens from multiple sending addresses to multiple receiving addresses we introduce an interface `transferFromBatchMul` .     
+
+## Backwards Compatibility
+
+Our proposed standard strictly adheres to the EIP rules and specifications, therefore our standard is backwork compatible with existing EIPs. 
+
+## Reference Implementation
+
+Example implementation of a signing contract:
+```solidity
+
+pragma solidity ^0.8.0;
+pragma abicoder v2;
+import "./eip.sol";
+
+struct ERC20Info{
+    uint32 id;
+    address manager;
+    string name;
+    string symbol;
+    uint256 totalSupply;
+    uint8 decimals;
+}
+
+contract ERC20s is IEIP{
+    struct ERC20{
+        uint32 id;
+        address manager;
+        string name;
+        string symbol;
+        uint256 totalSupply;
+        uint8 decimals;
+        mapping(address => uint256) balances;
+        mapping(address => mapping(address => uint256)) allowances;
+    }
+    mapping(uint256 => ERC20) private allERC20;
+    mapping(address => mapping(address => bool)) public approveAll;
+    uint32 public nextId = 1;
+    
+    modifier idInUse(uint256 id) {
+        require(bytes(allERC20[id].name).length != 0 || id == 0,"ERC20s:id not in use");
+        _;
+    }
+    // function supportsInterface(bytes4 interfaceId) public view virtual  returns (bool) {
+    //     return interfaceId == type(IERC20s).interfaceId
+    //         || super.supportsInterface(interfaceId);
+    // }
+    function totalSupply(uint256 id) external override view idInUse(id) returns (uint256){
+        return allERC20[id].totalSupply;
+    }
+
+    function balanceOf(uint256 id,address account) external override view idInUse(id) returns (uint256){
+        return allERC20[id].balances[account];
+    }
+
+    function transfer(uint256 id,address recipient, uint256 amount) external override idInUse(id) returns (bool){
+        _transfer(id,msg.sender,recipient,amount);
+        return true;
+    }
+    
+    function transferBatch(uint256[] memory ids,address recipient,uint256[] memory amounts)external override returns(bool){
+        _transferBatch(ids,msg.sender,recipient,amounts);
+        return true;
+    }
+    
+    function transferBatchMul(uint256[] memory ids,address[]memory recipient,uint256[] memory amounts)external override returns(bool){
+        _transferBatchMul(ids,createMsg(msg.sender,ids.length),recipient,amounts);
+        return true;
+    }
+
+    function allowance(uint256 id,address owner, address spender) external view override returns (uint256){
+        return allERC20[id].allowances[owner][spender];
+    }
+
+    function approve(uint256 id,address spender, uint256 amount) external override idInUse(id) returns (bool){
+        _approve(id,msg.sender,spender,amount);
+        return true;
+    }
+    
+    function approve(address spender,bool _status) external override returns(bool){
+        approveAll[msg.sender][spender] = _status;
+        return true;
+    }
+
+    function increaseAllowance(uint256 id,address spender, uint256 addedValue) external idInUse(id) {
+        _approve(id,msg.sender,spender,allERC20[id].allowances[msg.sender][spender] + addedValue);
+    }
+    
+    function decreaseAllowance(uint256 id,address spender, uint256 subtractedValue) external idInUse(id) {
+        require(allERC20[id].allowances[msg.sender][spender] > subtractedValue,"not enough");
+        _approve(id,msg.sender, spender, allERC20[id].allowances[msg.sender][spender] - subtractedValue);
+    }
+    
+    function  transferFrom(uint256 id,address sender, address recipient, uint256 amount) external override idInUse(id) returns(bool) {
+        if(approveAll[sender][msg.sender]){
+            _transfer(id,sender,recipient,amount);
+        }
+        else{
+            require(allERC20[id].allowances[sender][msg.sender] >= amount,"ERC20:approve not enough");
+            _transfer(id,sender,recipient,amount);
+            _approve(id,sender,msg.sender,allERC20[id].allowances[sender][msg.sender] - amount);
+        }
+        return true;
+    }
+    
+    function transferFromBatch(uint256[] memory ids,address sender,address recipient,uint256[] memory amounts)external override returns(bool){
+        if(approveAll[sender][msg.sender]){
+            _transferBatch(ids,sender,recipient,amounts);
+        }
+        else{
+            for(uint256 i = 0;i < ids.length;i++){
+                require(allERC20[ids[i]].allowances[sender][msg.sender] >= amounts[i],"ERC20:approve not enough");
+            }
+            _transferBatch(ids,sender,recipient,amounts);
+            _approveBatch(ids,sender,msg.sender,amounts);
+        }
+        return true;
+    }
+    
+    function transferFromBatchMul(uint256[] memory ids,address[]memory sender,address[]memory recipient,uint256[] memory amounts)external override returns(bool){
+        bool _status = true;
+        for(uint256 i = 0;i < ids.length;i++){
+            if(!approveAll[sender[i]][msg.sender])
+                _status = false;
+        }
+        if(_status){
+            _transferBatchMul(ids,sender,recipient,amounts);
+        }
+        else{
+            for(uint256 i = 0;i < ids.length;i++){
+                require(allERC20[ids[i]].allowances[sender[i]][msg.sender] >= amounts[i],"ERC20:approve not enough");
+            }
+            _transferBatchMul(ids,sender,recipient,amounts);
+            _approveBatch(ids,sender,msg.sender,amounts);
+        }
+        return true;
+    }
+    
+    function _transfer(uint256 id,address sender, address recipient, uint256 amount) internal virtual {
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+        
+        allERC20[id].balances[sender] = allERC20[id].balances[sender] - amount;
+        allERC20[id].balances[recipient] = allERC20[id].balances[recipient] + amount;
+        emit Transfer(id,sender, recipient, amount);
+    }
+    
+    function _transferBatch(uint256[] memory ids,address sender,address recipient,uint256[] memory amounts) internal virtual{
+        require(sender != address(0), "ERC20: transfer from the zero address");
+        require(recipient != address(0), "ERC20: transfer to the zero address");
+        
+        require(ids.length == amounts.length,"ERC20s: length not equal");
+        for(uint256 i = 0;i < ids.length;i++){
+            if(amounts[i] == 0){
+                continue;
+            }
+            require(bytes(allERC20[ids[i]].name).length != 0 || ids[i] == 0,"ERC20s: ERC20 not in use");
+            allERC20[ids[i]].balances[sender] = allERC20[ids[i]].balances[sender] - amounts[i];
+            allERC20[ids[i]].balances[recipient] = allERC20[ids[i]].balances[recipient] + amounts[i];
+        }
+        emit TransferBatch(ids,sender,recipient,amounts);
+    }
+    
+    function _transferBatchMul(uint256[] memory ids,address[]memory sender,address[]memory recipient,uint256[] memory amounts) internal virtual{
+        
+        require(ids.length == amounts.length && sender.length == recipient.length && sender.length == amounts.length,"ERC20s: length not equal");
+        for(uint256 i = 0;i < ids.length;i++){
+            require(sender[i] != address(0), "ERC20: transfer from the zero address");
+            require(recipient[i] != address(0), "ERC20: transfer to the zero address");
+            require(bytes(allERC20[ids[i]].name).length != 0 || ids[i] == 0,"ERC20s: ERC20 not in use");
+            if(amounts[i] == 0){
+                continue;
+            }
+            allERC20[ids[i]].balances[sender[i]] = allERC20[ids[i]].balances[sender[i]] - amounts[i];
+            allERC20[ids[i]].balances[recipient[i]] = allERC20[ids[i]].balances[recipient[i]] + amounts[i];
+        }
+        emit TransferBatchNoIndexed(ids,sender,recipient,amounts);
+    }
+    
+    function _approve(uint256 id,address owner, address spender, uint256 amount) internal virtual {
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+
+        allERC20[id].allowances[owner][spender] = amount;
+        emit Approval(id,owner, spender, amount);
+    }
+    
+    function _approveBatch(uint256[] memory ids,address owner,address spender,uint256[] memory amounts)internal virtual{
+        require(owner != address(0), "ERC20: approve from the zero address");
+        require(spender != address(0), "ERC20: approve to the zero address");
+        
+        require(ids.length == amounts.length,"ERC20s: length not equal");
+        for(uint256 i = 0;i < ids.length;i++){
+            require(bytes(allERC20[ids[i]].name).length != 0 || ids[i] == 0,"ERC20s: ERC20 not in use");
+            if(amounts[i] == 0){
+                continue;
+            }
+            allERC20[ids[i]].allowances[owner][spender] = allERC20[ids[i]].allowances[owner][spender] - amounts[i];
+            amounts[i] = allERC20[ids[i]].allowances[owner][spender];
+        }
+        
+        emit ApproveBatch(ids,owner,spender,amounts);
+    }
+    
+    function _approveBatch(uint256[] memory ids,address[] memory owner,address spender,uint256[] memory amounts)internal virtual{
+        require(ids.length == amounts.length  && owner.length == amounts.length,"ERC20s: length not equal");
+        
+        for(uint256 i = 0;i < ids.length;i++){
+            require(bytes(allERC20[ids[i]].name).length != 0 || ids[i] == 0,"ERC20s: ERC20 not in use");
+            if(amounts[i] == 0){
+                continue;
+            }
+            allERC20[ids[i]].allowances[owner[i]][spender] = allERC20[ids[i]].allowances[owner[i]][spender] - amounts[i];
+            amounts[i] = allERC20[ids[i]].allowances[owner[i]][spender];
+        }
+        
+        emit ApproveBatchNoIndexed(ids,owner,spender,amounts);
+    }
+    
+    function createMsg(address _msg,uint256 len) internal view returns(address[] memory data){
+        data = new address[](len);
+        for(uint256 i = 0;i < len;i++){
+            data[i] = _msg;
+        }
+    }
+    
+    function _createERC20(uint256 id,string memory name,string memory symbol,uint8 _decimals) internal {
+        require(bytes(allERC20[id].name).length == 0,"ERC20s: ERC20 in use");
+        allERC20[id].name = name;
+        allERC20[id].symbol = symbol;
+        allERC20[id].decimals = _decimals;
+    }
+}
+```
+
+Copyright
+
+Copyright and related rights waived via CC0.
+ 
