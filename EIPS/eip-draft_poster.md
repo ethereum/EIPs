@@ -1,0 +1,143 @@
+```
+---
+eip: <to be assigned>
+title: Poster
+author: Auryn Macmillan (@auryn-macmillan)
+discussions-to: https://ethereum-magicians.org/t/eip-poster-a-ridiculously-simple-general-purpose-social-media-smart-contract/6751
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-07-31
+---
+```
+
+# [Poster](https://github.com/ETHPoster/contract)
+## Simple Summary
+A ridiculously simple general purpose social media smart contract.
+It takes a string as a parameter and emits that string, along with msg.sender, as an event. That's it.
+
+## Motivation
+Poster is intended to be used as a base layer for decentralized social media. It can be deployed to the same address (via the singleton factory) on just about any EVM compatible network. Any Ethereum account can make posts to the deployement of Poster on its local network.
+
+## Specification
+
+### Contract
+
+```solidity
+contract Poster {
+    event NewPost(address indexed account, string content);
+
+    function post(string calldata content) public {
+        emit NewPost(msg.send, content);
+    }
+}
+```
+
+### ABI
+```json
+[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        }
+      ],
+      "name": "NewPost",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        }
+      ],
+      "name": "post",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+]
+```
+
+### Standard json format for Twitter-like posts
+
+```json
+{
+  "content": [
+    {
+      "type": "microblog",
+      "text": "this is the first post in a thread"
+    },
+    {
+      "type": "microblog",
+      "text": "this is the second post in a thread",
+      "replyTo": "this[0]"
+    },
+    {
+      "type": "microblog",
+      "text": "this is a reply to some other post",
+      "replyTo": "some_post_id"
+    },
+    {
+      "type": "microblog",
+      "text": "this is a post with an image",
+      "image": "ipfs://ipfs_hash"
+    },
+    {
+      "type": "delete",
+      "target": "some_post_id"
+    },
+    {
+      "type": "like",
+      "target": "some_post_id"
+    },
+    {
+      "type": "repost",
+      "target": "some_post_id"
+    },
+    {
+      "type": "follow",
+      "target": "some_account"
+    },
+    {
+      "type": "unfollow",
+      "target": "some_account"
+    },
+    {
+      "type": "block",
+      "target": "some_account"
+    },
+    {
+      "type": "report",
+      "target": "some_account or some_post_id"
+    }
+  ]
+}
+
+```
+
+## Implementation
+
+Poster has been deployed at `0x0000000000A84Fe7f5d858c8A22121c975Ff0b42` on multiple networks using the [Singleton Factory](https://eips.ethereum.org/EIPS/eip-2470). If it is not yet deployed on your chosen network, you can use the Singleton Factory to deploy an instance of Poster at the same address on just about any EVM compatible network using these parameters:
+
+> **initCode:** `0x608060405234801561001057600080fd5b50610189806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c80638ee93cf314610030575b600080fd5b61004361003e366004610099565b610045565b005b3373ffffffffffffffffffffffffffffffffffffffff167f6babe127d1599cad37c523a2dd29c5d02acd7132a883e378a2d9b42ec75a1fa9838360405161008d929190610106565b60405180910390a25050565b600080602083850312156100ab578182fd5b823567ffffffffffffffff808211156100c2578384fd5b818501915085601f8301126100d5578384fd5b8135818111156100e3578485fd5b8660208285010111156100f4578485fd5b60209290920196919550909350505050565b60006020825282602083015282846040840137818301604090810191909152601f9092017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016010191905056fea264697066735822122091369fb6f397ae303a741fb470a163a0384d9152cd15b5887f5f0b68e5a3c8e964736f6c63430008000033`
+>
+>
+>
+> **salt:** `0x51a9566bdb2664f8cb31cd79d50e2c10ea34f765e27bc8e3ff3c60175ad4cb6c`
+
+The source code is available in the [Poster contract repo](https://github.com/ETHPoster/contract/blob/master/contracts/Poster.sol).
+
+When verifying on the source code on a block explorer, make sure to set the optimizer to `yes` and the runs to `10000000`.
