@@ -2,7 +2,7 @@
 ---
 eip: <to be assigned>
 title: Poster
-author: Auryn Macmillan (@auryn-macmillan)
+author: Auryn Macmillan <@auryn-macmillan>
 discussions-to: https://ethereum-magicians.org/t/eip-poster-a-ridiculously-simple-general-purpose-social-media-smart-contract/6751
 status: Draft
 type: Standards Track
