@@ -1,12 +1,12 @@
 ---
 eip: <to be assigned>
 title: <EIP title>
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: <guanlong huang/jace888, or huang <gl041188@gmail.com>, guanlong (@GitHubguanlongh) and guanlongh (@GitHubUsername)>
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
 category (*only required for Standards Track): <Core, Networking, Interface, or ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: <date created on, in ISO 8601 (2021-08-13) format>
 requires (*optional): <EIP number(s)>
 replaces (*optional): <EIP number(s)>
 ---
