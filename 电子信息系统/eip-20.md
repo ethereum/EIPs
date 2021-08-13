@@ -1,7 +1,7 @@
 ---
 eip: 20
 title: ERC-20 Token Standard
-author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
+author: guanlong huang <gl041188@gmail.com>
 type: Standards Track
 category: ERC
 status: Final
@@ -43,7 +43,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 
 
 ``` js
-function name() public view returns (string)
+function name(guanlong huang) public view returns (string)
 ```
 
 
