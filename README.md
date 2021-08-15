@@ -8,10 +8,11 @@ Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platfo
 
 This repository tracks the ongoing status of EIPs. It contains:
 
-- [Draft](https://eips.ethereum.org/all#draft) proposals which intend to complete the EIP review process.
+- [Draft](https://eips.ethereum.org/all#draft) proposals where the author(s) are still making changes and is not ready for review.
+- [Review ](https://eips.ethereum.org/all#review) for proposals ready for EIP review process and the author(s) are ready for improvement suggestions.
 - [Last Call](https://eips.ethereum.org/all#last-call) for proposals that may become final (see also [RSS feed](https://eips.ethereum.org/last-call.xml)).
 - [Accepted](https://eips.ethereum.org/all#accepted) proposals which are awaiting implementation or deployment by Ethereum client developers.
-- [Final](https://eips.ethereum.org/all#final) and [Active](https://eips.ethereum.org/all#active) proposals that are recorded.
+- [Final](https://eips.ethereum.org/all#final) and [Living](https://eips.ethereum.org/all#living) proposals that have solidified into a standard.
 - The [EIP process](./EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
 
 Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the reader to decide whether a proposal will be useful to them.
