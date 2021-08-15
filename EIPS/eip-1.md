@@ -96,7 +96,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 Each EIP should have the following parts:
 
-- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](./eip-1.md#eip-header-preamble) for details.
+- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. Irrespective of the category, the title should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
 - Abstract - A short (~200 word) description of the technical issue being addressed.
 - Motivation (*optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
