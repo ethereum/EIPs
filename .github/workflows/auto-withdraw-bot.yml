@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-withdraw-bot
-        uses: ethereum/EIP-Bot@a8bae07d5124287539524c6a2b7cc095e66c6811 # master
+        uses: ethereum/EIP-Bot@3d12afa46df84f7747cb5b01ba9abb0e748a9ee3 # mark-eips-stale
         id: auto-withdraw-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
