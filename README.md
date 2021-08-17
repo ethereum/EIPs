@@ -45,7 +45,7 @@ eip_validator <INPUT_FILES>
 
 # Automerger
 
-The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can GitHub approve the change to have it auto-merged by the [eip-automerger](https://github.com/eip-automerger/automerger) bot.
+The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can GitHub approve the change to have it auto-merged. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
 
 # Local development
 
