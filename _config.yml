@@ -19,13 +19,7 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "https://eips.ethereum.org"
-twitter_username: ethereum
 github_username:  ethereum
-youtube_username: channel/UCNOfzGXD_C9YMYmnefmPH0g
-
-twitter:
-  card: summary
-  username: ethereum
 
 header_pages:
  - all.html
