@@ -1,6 +1,7 @@
 ---
 eip: <to be assigned>
-title: <EIP title>
+title: <The EIP title is a few words, not a complete sentence>
+description: <Description is one full (short) sentence>
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets): FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
 discussions-to: <URL>
 status: Draft
@@ -17,11 +18,8 @@ Note that an EIP number will be assigned by an editor. When opening a pull reque
 
 The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category. 
 
-## Simple Summary
-"If you can't explain it simply, you don't understand it well enough." Provide a simplified and layman-accessible explanation of the EIP. Imagine an email subject line, GitHub PR title, or forum post title.
-
 ## Abstract
-A short (~200 word) description of the technical issue being addressed. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 
 ## Motivation
 The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
