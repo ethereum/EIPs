@@ -19,8 +19,8 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "https://eips.ethereum.org"
-twitter_username: ethereum
 github_username:  ethereum
+
 header_pages:
  - all.html
  - core.html
@@ -29,9 +29,6 @@ header_pages:
  - erc.html
  - meta.html
  - informational.html
-twitter:
-  card: summary
-  username: ethereum
 
 # Build settings
 highlighter: rouge
