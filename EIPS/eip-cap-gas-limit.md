@@ -1,7 +1,7 @@
 ---
-eip: <to be assigned>
-title: Cap Gas Target
-description: Set an in-protocol cap for the gas target
+eip: 3756
+title: Cap Gas Limit
+description: Set an in-protocol cap for the gas limit
 author: lightclient (@lightclient)
 discussions-to: <URL>
 status: Draft
@@ -12,33 +12,34 @@ created: 2021-08-21
 
 ## Abstract
 
-Sets an in-protocol cap for the gas target.
+Sets an in-protocol cap for the gas limit.
 
 ## Motivation
 
-High gas target increases pressure on the network. In the benign case, it
-increases the state and history faster than we can sustain. In the malicious
-case, it amplifies the devestation of certain denial-of-service attacks.
+A high gas limit increases pressure on the network. In the benign case, it
+increases the size of the state and history faster than we can sustain. In the
+malicious case, it amplifies the devestation of certain denial-of-service
+attacks.
 
 ## Specification
 
-As of the fork block `N`, consider blocks with a `gas_target` greater than
-`15,000,000` invalid.
+As of the fork block `N`, consider blocks with a `gas_limit` greater than
+`30,000,000` invalid.
 
 ## Rationale
 
-### Why Cap the Gas Target
+### Why Cap the Gas Limit
 
-The gas target is currently under the control of block proposers. They have the
-ability to increase the gas target to whatever they value they desire. This
+The gas limit is currently under the control of block proposers. They have the
+ability to increase the gas limit to whatever they value they desire. This
 allows them to bypass the All Core Devs process for protocol changes and may
 harm the protocol.
 
-### No Fixed Gas Target
+### No Fixed Gas Limit
 
-A valuable property of proposers choosing the gas target is they can scale it
+A valuable property of proposers choosing the gas limit is they can scale it
 down quickly if the network becomes unstable or is receiving certain types of
-attacks. For this reason, we maintain their ability to lower the gas target
+attacks. For this reason, we maintain their ability to lower the gas limit
 _below_ 15,000,000.
 
 ## Backwards Compatibility
