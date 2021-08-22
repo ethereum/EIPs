@@ -1,5 +1,5 @@
 ---
-eip: 720
+eip: 3754
 title: A Vanilla Non-Fungible Token Standard
 description: A vanilla NFT standard by removing data fields and functions related to `URI`.
 author: Simon Tian <simon@dtopia.me>
