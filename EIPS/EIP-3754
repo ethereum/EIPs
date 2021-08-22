@@ -26,7 +26,7 @@ from others.
 This standard is to remove data fields and functions related to `URI` from the current ERC721 implementation.
 
 ```
-interface ERC720 {
+interface ERC3754 {
     function balanceOf(address owner) external view returns (uint256);
     function ownerOf(uint256 tokenId) external view returns (address);
     function name() external view returns (string memory);
@@ -46,10 +46,10 @@ NFTs do not have to be associated with any external metadata or links to media c
 This can also reduce the costs in explaining this new type of NFTs.
 
 ## Backwards Compatibility
-ERC720 is a simplified version of ERC721. There is no further backwards compatibility required.
+ERC3754 is a simplified version of ERC721. There is no further backwards compatibility required.
 
 ## Reference Implementation
-https://github.com/simontianx/ERC720
+https://github.com/simontianx/ERC3754
 
 ## Security Considerations
 Since all `URI` related data fields and functions are removed, the security is enhanced. Tokens can be minted without having `URI`s prepared. Errors in dealing with `URI`s can be avoided.
