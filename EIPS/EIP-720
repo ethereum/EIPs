@@ -1,7 +1,7 @@
 ---
 eip: 720
-title: A Simple Non-Fungible Token Standard
-description: <Description is one full (short) sentence>
+title: A Vanilla Non-Fungible Token Standard
+description: A vanilla NFT standard by removing data fields and functions related to `URI`.
 author: Simon Tian <simon@dtopia.me>
 discussions-to: https://github.com/ethereum/EIPs/issues/3753
 status: Draft
@@ -13,21 +13,19 @@ replaces (*optional): <EIP number(s)>
 ---
 
 ## Abstract
-The current ERC721 NFT standard has gained a lot of attention due to its ability to be associated with external contents via a data field `URI`. However, this is also handicaping people from thinking of NFTs not having any external associations. This 
-stardard is going to reduce the ERC721 standard by removing the `URI` data field and introduce a naked NFT that is ideal for representing abstract ownership such as rights. This is particularly useful when a layer of abstraction can be built on top of it.
+The ERC721 NFT standard has gained much popularity for its capability of being associated with external contents via the data field `URI`. However, this is also handicapping NFTs not having external associations. This 
+stardard is going to simplifiy the ERC721 standard by removing data fields and functions related to `URI` and introduce a vanilla NFT that is ideal for representing abstract ownership such as rights. This can open up 
+more possibilities by allowing layers of abstraction being built on top of it.
 
 ## Motivation
-In developing dtopia.me, NFTs are used as symbols of ownership of certain utilities that are built upon ERC721 NFTs. This introduces difficulty in explaining what a NFT without `URI` can do to people who are deeply rooted in the current understanding of NFTs.
-A new standard for this type of NFTs must be developed to separate itself from the NFTs that are associated with external contents.
+In developing `dtopia.me`, NFTs represent ownership of utilities that are built upon ERC721 NFTs. Technically, it is possible to set all `URI` to an empty string to effectively obtain the same NFTs proposed in this standard, 
+however, this introduces difficulty in explaining what an NFT without `URI` can do to people who are deeply rooted in the current understanding of NFTs. A new standard for this type of NFTs must be developed to distinguish itself 
+from others.
 
 ## Specification
-This standard is to remove all data fields as well as functions related to `URI` from ERC721 implementation.
+This standard is to remove data fields and functions related to `URI` from the current ERC721 implementation.
 
 ```
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.0;
-
 interface ERC720 {
     function balanceOf(address owner) external view returns (uint256);
     function ownerOf(uint256 tokenId) external view returns (address);
@@ -44,13 +42,14 @@ interface ERC720 {
 }
 ```
 ## Rationale
-NFTs do not have to be associated with any external metadata or links to media contents. They can exist as standalone abstract atomic tokens. Such tokens allow layers of utilities built on top of them to open up new possibilities.
-Such implementation can be seen in projects like dtopia.me.
+NFTs do not have to be associated with any external metadata or links to media contents. They can exist as standalone abstract atomic tokens. Such tokens allow layers of abstract utilities built on top of them. New possibilities can be opened up because of this simplification. 
+This can also reduce the costs in explaining this new type of NFTs.
 
 ## Backwards Compatibility
-ERC720 is a backward version to ERC721. There is no further backwards compatibility required.
+ERC720 is a simplified version of ERC721. There is no further backwards compatibility required.
 
 ## Reference Implementation
+https://github.com/simontianx/ERC720
 
 ## Security Considerations
 Since all `URI` related data fields and functions are removed, the security is enhanced. Tokens can be minted without having `URI`s prepared. Errors in dealing with `URI`s can be avoided.
