@@ -145,6 +145,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * resolution:` *a url pointing to the resolution of this EIP*
 
+` * withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.*
+
 Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
