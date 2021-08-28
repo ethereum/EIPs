@@ -3,11 +3,11 @@ on:
     # A job that runs every sunday at 00:00
     - cron:  '0 0 * * 0'
 
-name: Auto Withdraw Bot
+name: Auto Stagnant Bot
 jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
-    name: Auto Withdraw Bot
+    name: Auto Stagnant Bot
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -15,8 +15,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - name: auto-withdraw-bot
-        uses: ethereum/EIP-Bot@3d12afa46df84f7747cb5b01ba9abb0e748a9ee3 # mark-eips-stale
-        id: auto-withdraw-bot
+      - name: auto-stagnant-bot
+        uses: ethereum/EIP-Bot@b6a3ea6e7e1ca89391dc8c220905f7af72998193 # mark-eips-stale
+        id: auto-stagnant-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
