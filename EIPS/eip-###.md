@@ -1,4 +1,4 @@
-
+---
 eip:
 title: Time proof non-fungible Token
 author: Cyberforker(cyberforker@outlook.com)
@@ -241,9 +241,7 @@ interface ERC165 {
 The 0.8.0 Solidity grammar is not expressive enough to document the tpNFT standard. There may be other grammars in the future to make the above functions more complete:
     
     - Setting tpNFT to immutable is achieved by restricting three update functions through modifiers. Logically the internal variables of tpNFT can still be updated, such as through some functions that SHOULD NOT be implemented, or delegatecall()(which is MUST NOT implement)and diamond standards eip-2535, etc.
-<!-- ITimeProofNonFungibleToken.sol
-### Mint
-### Update -->
+
 ## Rationale
    **Design motivation**
 
@@ -267,7 +265,7 @@ The 0.8.0 Solidity grammar is not expressive enough to document the tpNFT standa
     4. Gas savings design
        1. The uint64 of four timestamps variables in the struct of TimeProof are arranged consecutively in the struct as one uint256.
        2. The maximum value of Uint64 is 18446744073709551615 (584942417355 years), which is sufficient for saving the timestamp.  
-       3. In three update functions, if the value ​​of the calldata and the parameter(URI or description or hashedproof) in the storage of tpNFT are both zero, the update will be skipped to save Gas and meet the needs of mint empty NFT.
+       3. In three update functions, if the value of the calldata and the parameter(URI or description or hashedproof) in the storage of tpNFT are both zero, the update will be skipped to save Gas and meet the needs of mint empty NFT.
    
 **ERC-165 Interface**
 We chose Standard Interface Detection (ERC-165) to expose the interfaces that a tpNFT smart contract supports.
