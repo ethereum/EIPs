@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-stagnant-bot
-        uses: ethereum/EIP-Bot@b6a3ea6e7e1ca89391dc8c220905f7af72998193 # mark-eips-stale
+        uses: ethereum/EIP-Bot@695e64c194456ebde5b9a102adc7443958bd364a # mark-eips-stale
         id: auto-stagnant-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
