@@ -19,29 +19,28 @@ Based on the tokenURI parameter of ERC721, the plain text parameter and the encr
 With these improvements, we can provide new possibilities for NFT, enabling NFT to map and capture time-level value.
 Here are some brand new applications that can be achieved by tpNFT based on this extension. I believe you can find more and more interesting applications to bring more functions to the blockchain.
 
-    1. Governance: As a proof of timestamp for governance voting, it is used to verify the validity of the vote and obtain governance incentives.
-    2. Invention and creation: The idea is stored on the chain to prove that the idea existed before a certain point in time. And you can temporarily hide the specific technical implementation details through Hash encryption. Open source projects： Similarly to previous one to used to prove the originality of their products and leave a proof of their own open source.
-    3. Scientific discoveries: Publish the publicly available content of relevant scientific discoveries in plain text, and fix some temporarily undisclosed demonstration details through encrypted parameters. Engrave the brilliance of human wisdom on the blockchain. The timestamp proves that it will not lie.
-    4. Prophecy: Make predictions and cast them into tpNFT with time proof ability, as proof of personal ability, or as a certificate for receiving bonuses.
-    5. Identity: Participating in a series of on-chain behaviors through tpNFT, including the prophecy mentioned in the previous point, revolves around tpNFT's timestamp proof, which has become a natural proof of identity.
-    6. Legacy: Binding assets to a tpNFT, others can receive part or all of the assets by submitting the preimage of encryption parameter(Hash or HashTree). We have another EIP to solve the front-running attacks.
-    7. Dynamic NFT: With tpNFT, we only need a little improvement than can get a brand new type of NFT which state on the chain will automatically change over time without consuming any gas fees. Such features can open up new areas for games, installation art, financial contracts, and so on.
+- Governance: As a proof of timestamp for governance voting, it is used to verify the validity of the vote and obtain governance incentives.
+- Invention and creation: The idea is stored on the chain to prove that the idea existed before a certain point in time. And you can temporarily hide the specific technical implementation details through Hash encryption. Open source projects： Similarly to previous one to used to prove the originality of their products and leave a proof of their own open source.
+- Scientific discoveries: Publish the publicly available content of relevant scientific discoveries in plain text, and fix some temporarily undisclosed demonstration details through encrypted parameters. Engrave the brilliance of human wisdom on the blockchain. The timestamp proves that it will not lie.
+- Prophecy: Make predictions and cast them into tpNFT with time proof ability, as proof of personal ability, or as a certificate for receiving bonuses.
+- Identity: Participating in a series of on-chain behaviors through tpNFT, including the prophecy mentioned in the previous point, revolves around tpNFT's timestamp proof, which has become a natural proof of identity.
+- Legacy: Binding assets to a tpNFT, others can receive part or all of the assets by submitting the preimage of encryption parameter(Hash or HashTree). We have another EIP to solve the front-running attacks.
+- Dynamic NFT: With tpNFT, we only need a little improvement than can get a brand new type of NFT which state on the chain will automatically change over time without consuming any gas fees. Such features can open up new areas for games, installation art, financial contracts, and so on.
    
 Summarize: From a philosophical point of view, The NFT of the ERC721 standard is mainly used to anchor and map things related to space, while tpNFT is used for related to time.
     
 ## Motivation
 Compared to other possible solutions for on-chain time proof such as CallData or ERC721 they only solve partial problems.
-
-    1. Write directly in calldata on ethereum:  
-       1. Tokenless related capabilities: no collection, no structured organization of data, no ownership, and not transferable.  
-       2. No subsequent modification is possible, which in itself will also cause more storage space on the chain to be occupied.
-    2. ERC721
-       1. Unupdateable: The parameters cannot be updated, or the parameters can be updated but the imtamability will be lost and the credibility will be reduced. The timestamp of tpNFT proves that we meet the requirements of both updatability and credibility.
-       2. Lack of timestamp proof: When mint an NFT, we directly ignored the time attribute and time value of the mapping object, while tpNFT solved this problem. 
-       3. Lack of encryption information storage: Based on the above points, we found that it is still unable to solve the problem of encryption Hash storage without leaking key information. To solve this problem, we added encryption Hash storage parameter to tpNFT, and also under the management of timestamp proof.  
-       4. Limited on-chain interaction and execution potential: Other contracts on the chain cannot interact directly with the NFT for timestamp + content validation to perform some automated logic, including but not limited to governance, prophecy, legacy processing, and other requirements mentioned in the summary. TpNFT's timestamp proof + other three parameters (description, URI, Hash encryption) provides a convenient possibility for the third party contract to directly interact, verify, and execute through the tpNFT contract interface.  
-          1. The major difference between the on-chain timestamp and the timestamp stored in the log is that the on-chain timestamp parameters can be accessed directly by other contracts, thus allowing for composability. 
-          2. The NFT has a time attribute that can make interactions with external accounts or between NFTs produce different results at different times, which provides a logical basis for the time dynamics of NFT.  
+- Write directly in calldata on ethereum:  
+   - Tokenless related capabilities: no collection, no structured organization of data, no ownership, and not transferable.  
+   - No subsequent modification is possible, which in itself will also cause more storage space on the chain to be occupied.
+- ERC721
+   - Unupdateable: The parameters cannot be updated, or the parameters can be updated but the imtamability will be lost and the credibility will be reduced. The timestamp of tpNFT proves that we meet the requirements of both updatability and credibility.
+   - Lack of timestamp proof: When mint an NFT, we directly ignored the time attribute and time value of the mapping object, while tpNFT solved this problem. 
+   - Lack of encryption information storage: Based on the above points, we found that it is still unable to solve the problem of encryption Hash storage without leaking key information. To solve this problem, we added encryption Hash storage parameter to tpNFT, and also under the management of timestamp proof.  
+   - Limited on-chain interaction and execution potential: Other contracts on the chain cannot interact directly with the NFT for timestamp + content validation to perform some automated logic, including but not limited to governance, prophecy, legacy processing, and other requirements mentioned in the summary. TpNFT's timestamp proof + other three parameters (description, URI, Hash encryption) provides a convenient possibility for the third party contract to directly interact, verify, and execute through the tpNFT contract interface.  
+      - The major difference between the on-chain timestamp and the timestamp stored in the log is that the on-chain timestamp parameters can be accessed directly by other contracts, thus allowing for composability. 
+      - The NFT has a time attribute that can make interactions with external accounts or between NFTs produce different results at different times, which provides a logical basis for the time dynamics of NFT.  
 
 Inspired by and based on ERC721's associated token ownership, we have implemented a tpNFT architecture that combines renewability and timestamp proof and supports the preservation of encrypted content, addressing the problems of other known solutions and giving NFT time attributes. This standard is based on and fully follows the ERC721 series of methods. Additional superset methods based on ERC721 implementation are as follows:
 ## Specification
@@ -57,18 +56,18 @@ pragma solidity ^0.8.0;
 /// Note: the ERC-165 identifier for this interface is 0x12feabc7.
 interface TimeProofNonFungibleToken {
     /// @dev This emits when the tokenURI of tokenId has been updated.
-    /// And also the tokenUriUpdateTimestamp will been set to the current time: block.timestamp.
+    /// And also the tokenUriUpdateTimestamp MUST been set to the blocktimestamp: block.timestamp.
     event UpdateURI(uint256 indexed tokenId, string tokenURI);
     /// @dev This emits when the description of tokenId has been updated.
-    /// And also the descriptionUpdateTimestamp will been set to the current time: block.timestamp.
+    /// And also the descriptionUpdateTimestamp MUST been set to the blocktimestamp: block.timestamp.
     event UpdateDescription(uint256 indexed tokenId, string description);
     /// @dev This emits when the hashProof of tokenId has been updated.
-    /// And also the hashedProofUpdateTimestamp will been set to the current time: block.timestamp.
+    /// And also the hashedProofUpdateTimestamp MUST been set to the blocktimestamp: block.timestamp.
     event UpdateHashProof(uint256 indexed tokenId, bytes32 hashedProof);
 
     /**
      * @notice Mint basic tpNFT without description and hashedProof to the caller.
-     * During mint, the createTimestamp of tpNFT will also be set.
+     * During mint, the createTimestamp of tpNFT MUST be updated to the current block timestamp.
      * @dev NFTs assigned to the zero address are considered invalid,
      * and this function throws for queries about the zero address.
      * @param tokenURI the URI you want to set for tpNFT.
@@ -80,9 +79,9 @@ interface TimeProofNonFungibleToken {
 
     /**
      * @notice Mint full tpNFT with tokenURI, description, and hashedProof to the caller.
-     * During mint, the createTimestamp of tpNFT will also be set. If the token URI, description,
+     * During mint, the createTimestamp of tpNFT MUST be updated to the current block timestamp. If the token URI, description,
      * and hashedProof are not empty or zero, the corresponding tokenUriUpdateTimestamp,
-     * descriptionUpdateTimestamp, and hashedProofUpdateTimestamp of the tpNFT  will also be set.
+     * descriptionUpdateTimestamp, and hashedProofUpdateTimestamp of the tpNFT MUST be updated to the current block timestamp.
      * @dev NFTs assigned to the zero address are considered invalid,
      * and this function throws for queries about the zero address.
      * @param tokenURI the URI you want to set for tpNFT.
@@ -98,7 +97,7 @@ interface TimeProofNonFungibleToken {
 
     /**
      * @notice Mint basic tpNFT without description and hashedProof to the address 'to'.
-     * During mint, the createTimestamp of tpNFT will also be set.
+     * During mint, the createTimestamp of tpNFT MUST be updated to the current block timestamp.
      * @dev NFTs assigned to the zero address are considered invalid,
      * and this function throws for queries about the zero address.
      * @param to the address the new tpNFT to receive.
@@ -111,9 +110,9 @@ interface TimeProofNonFungibleToken {
 
     /**
      * @notice Mint full tpNFT with tokenURI, description, and hashedProof to the address 'to'.
-     * During mint, the createTimestamp of tpNFT will also be set. If the token URI, description,
+     * During mint, the createTimestamp of tpNFT MUST be updated to the current block timestamp. If the token URI, description,
      * and hashedProof are not empty or zero, the corresponding tokenUriUpdateTimestamp,
-     * descriptionUpdateTimestamp, and hashedProofUpdateTimestamp of the tpNFT  will also be set.
+     * descriptionUpdateTimestamp, and hashedProofUpdateTimestamp of the tpNFT MUST be updated to the current block timestamp.
      * @dev NFTs assigned to the zero address are considered invalid,
      * and this function throws for queries about the zero address.
      * @param to the address the new tpNFT to receive.
