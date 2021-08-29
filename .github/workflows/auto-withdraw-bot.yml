@@ -1,0 +1,22 @@
+on:
+  schedule:
+    # A job that runs every sunday at 00:00
+    - cron:  '0 0 * * 0'
+
+name: Auto Stagnant Bot
+jobs:
+  auto_merge_bot:
+    runs-on: ubuntu-latest
+    name: Auto Stagnant Bot
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: auto-stagnant-bot
+        uses: ethereum/EIP-Bot@695e64c194456ebde5b9a102adc7443958bd364a # mark-eips-stale
+        id: auto-stagnant-bot
+        with:
+          GITHUB-TOKEN: ${{ secrets.TOKEN }}
