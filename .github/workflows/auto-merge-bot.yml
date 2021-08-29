@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@a2c93a62c6b5ab9f4986c08e537e0651baf9dd36 # master
+        uses: ethereum/EIP-Bot@b6cf981087e888b5d7fbd4726458c453f8491532 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
