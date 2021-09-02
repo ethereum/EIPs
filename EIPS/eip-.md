@@ -1,9 +1,9 @@
 ---
-eip: xxxx
+eip: 3788
 title: Strict enforcement of chainId
 description: Strictly enforce the chainId on transactions based on the chain.
 author: Gregory Markou (@GregTheGreek)
-discussions-to: 
+discussions-to: tbd
 status: Draft
 type: Standards Track
 category: Core
