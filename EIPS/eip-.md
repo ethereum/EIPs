@@ -19,11 +19,13 @@ Reject transactions that do not explicitly have the same chainId as the node's c
 
 Per [EIP-155](./eip-155.md) a transaction with a `chainId = 0` is considered to be a valid 
 transaction. This was a feature to offer developers the ability to sumbit replayable transactions 
-across different chains. With the rise of evm combatible chains that use forks, or packages
-from popular Ethereum clients, we are putting user funds at risk as we see users leveraging
-Ethereum alternatives. This EIP aims to eliminate any potential developer or user error that 
-could result in a replayable transaction griefing, or stealing funds from a user.
-
+across different chains. With the rise of evm combatible chains, many of which use forks, or packages
+from popular Ethereum clients, we are putting user funds at risk. This is because most wallet
+interfaces do not expose the chainId to the user, meaning they typically do not have insight
+into what chainId they are signing. Should a malicious actor (or accidental) choose to, they
+can easily have users submit transactions with a `chainId = 0` on a non-mainnet network, allowing
+the malicious actor to replay the transaction on ethereum mainnet (or other networks for that matter)
+as a grief or sophisticated attack.
 
 ## Specification
 
