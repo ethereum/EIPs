@@ -48,7 +48,7 @@ This ensures that users will not have transactions pending that will be guarante
 prevents the transaction from being included in a block.
 
 ## Backwards Compatibility
-This breaks all applications or tooling that submit transactions with a `chainId == 0`.
+This breaks all applications or tooling that submit transactions with a `chainId == 0` after block number `N`.
 
 ## Test Cases
 TBD
