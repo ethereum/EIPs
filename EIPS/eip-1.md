@@ -90,7 +90,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 
-**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
+**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
 ## What belongs in a successful EIP?
 
