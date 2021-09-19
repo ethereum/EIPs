@@ -11,7 +11,7 @@ jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
-    if: ${{github.event.pull_request.draft == false && !contains( toJson(github), '1272989785' )}}
+    if: github.event.pull_request.draft == false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
