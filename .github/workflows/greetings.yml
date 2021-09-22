@@ -9,5 +9,5 @@ jobs:
     - uses: actions/first-interaction@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Since this is your first issue, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.\n\nIf this issue is created to be added as a “discussion-to” place for an EIP or discuss an idea, please close this and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/)'
-        pr-message: 'Since this is your first pull request, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.\n\nIf this is discussing a proposal, please close this issue and create a post on ethereum magicians'
+        issue-message: 'Since this is your first issue, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.\n\nIf this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).'
+        pr-message: 'Since this is your first pull request, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.\n\nIf this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).'
