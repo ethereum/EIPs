@@ -1,6 +1,4 @@
-# Ethereum Improvement Proposals (EIPs)
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+# 以太坊改进提案（中文翻译） (EIPs)
 
 Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
 

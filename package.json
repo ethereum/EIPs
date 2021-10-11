@@ -1,0 +1,16 @@
+{
+  "name": "eips",
+  "version": "1.0.0",
+  "description": "EIPs Chinese language version",
+  "main": " ",
+  "repository": "git@github.com:ethlibrary/EIPs.git",
+  "author": "izayl <izayl@163.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  },
+  "scripts": {
+    "dev": "vuepress dev EIPS",
+    "build": "vuepress build EIPS"
+  }
+}
