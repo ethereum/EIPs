@@ -1,18 +1,18 @@
 
 # Networking (11)
 ---
-| Eip                    | Title                                                   | Author                                                                 | Type            | Category   | Status    | Created    | Requires | Discussions to                                                                    |
-| ---------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------- | --------------- | ---------- | --------- | ---------- | -------- | --------------------------------------------------------------------------------- |
-| [eip-1459](./eip-1459) | Node Discovery via DNS                                  | Felix Lange <fjl@ethereum.org>, Péter Szilágyi <peter@ethereum.org>    | Standards Track | Networking | Draft     | 2018-09-26 | 778      | https://github.com/ethereum/devp2p/issues/50                                      |
-| [eip-2124](./eip-2124) | Fork identifier for chain compatibility checks          | Péter Szilágyi <peterke@gmail.com>, Felix Lange <fjl@ethereum.org>     | Standards Track | Networking | Final     | 2019-05-03 |          | https://github.com/ethereum/EIPs/issues/2125                                      |
-| [eip-2364](./eip-2364) | eth/64: forkid-extended protocol handshake              | Péter Szilágyi <peterke@gmail.com>                                     | Standards Track | Networking | Stagnant  | 2019-11-08 | 2124     | https://github.com/ethereum/EIPs/issues/2365                                      |
-| [eip-2464](./eip-2464) | eth/65: transaction announcements and retrievals        | Péter Szilágyi <peterke@gmail.com>, Gary Rong <garyrong0905@gmail.com> | Standards Track | Networking | Stagnant  | 2020-01-13 | 2364     | https://github.com/ethereum/EIPs/issues/2465                                      |
-| [eip-2481](./eip-2481) | eth/66: request identifier                              | Christoph Burgdorf (@cburgdorf)                                        | Standards Track | Networking | Last Call | 2020-01-17 | 2464     | https://github.com/ethereum/EIPs/issues/2482                                      |
-| [eip-2976](./eip-2976) | Typed Transactions over Gossip                          | Micah Zoltu (@MicahZoltu)                                              | Standards Track | Networking | Last Call | 2020-09-13 | 2718     | https://ethereum-magicians.org/t/eip-2976-eth-typed-transactions-over-gossip/4610 |
-| [eip-627](./eip-627)   | Whisper Specification                                   | Vlad Gluhovsky <gluk256@gmail.com>                                     | Standards Track | Networking | Final     | 2017-05-05 |          |                                                                                   |
-| [eip-706](./eip-706)   | DEVp2p snappy compression                               | Péter Szilágyi <peter@ethereum.org>                                    | Standards Track | Networking | Final     | 2017-09-07 |          |                                                                                   |
-| [eip-778](./eip-778)   | Ethereum Node Records (ENR)                             | Felix Lange <fjl@ethereum.org>                                         | Standards Track | Networking | Final     | 2017-11-23 |          | https://github.com/ethereum/devp2p/issues/43                                      |
-| [eip-8](./eip-8)       | devp2p Forward Compatibility Requirements for Homestead | Felix Lange <felix@ethdev.com>                                         | Standards Track | Networking | Final     | 2015-12-18 |          |                                                                                   |
-| [eip-868](./eip-868)   | Node Discovery v4 ENR Extension                         | Felix Lange <fjl@ethereum.org>                                         | Standards Track | Networking | Final     | 2018-02-02 | 8, 778   | https://github.com/ethereum/devp2p/issues/44                                      |
+| Eip                | Title                                                   | Created    | Status    | Category   | Type            |
+| ------------------ | ------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
+| [8](./eip-8)       | devp2p Forward Compatibility Requirements for Homestead | 2015-12-18 | Final     | Networking | Standards Track |
+| [627](./eip-627)   | Whisper Specification                                   | 2017-05-05 | Final     | Networking | Standards Track |
+| [706](./eip-706)   | DEVp2p snappy compression                               | 2017-09-07 | Final     | Networking | Standards Track |
+| [778](./eip-778)   | Ethereum Node Records (ENR)                             | 2017-11-23 | Final     | Networking | Standards Track |
+| [868](./eip-868)   | Node Discovery v4 ENR Extension                         | 2018-02-02 | Final     | Networking | Standards Track |
+| [1459](./eip-1459) | Node Discovery via DNS                                  | 2018-09-26 | Draft     | Networking | Standards Track |
+| [2124](./eip-2124) | Fork identifier for chain compatibility checks          | 2019-05-03 | Final     | Networking | Standards Track |
+| [2364](./eip-2364) | eth/64: forkid-extended protocol handshake              | 2019-11-08 | Stagnant  | Networking | Standards Track |
+| [2464](./eip-2464) | eth/65: transaction announcements and retrievals        | 2020-01-13 | Stagnant  | Networking | Standards Track |
+| [2481](./eip-2481) | eth/66: request identifier                              | 2020-01-17 | Last Call | Networking | Standards Track |
+| [2976](./eip-2976) | Typed Transactions over Gossip                          | 2020-09-13 | Last Call | Networking | Standards Track |
 
     

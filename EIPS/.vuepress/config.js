@@ -16,7 +16,8 @@ const metas = allEipFiles.map(file => {
   const filename = path.parse(file).name
   return {
     ...meta,
-    eip: `[${filename}](./${filename})`,
+    filename,
+    // eip: `[${meta.eip}](./${filename})`,
     created: meta.created ? format(new Date(meta.created), 'yyyy-MM-dd') : '-',
   }
 })
@@ -40,7 +41,16 @@ const getSidebarChildren = arr => {
 const genSummary = summary => {
   const keys = Object.keys(summary).filter(k => k !== 'undefined')
   keys.map(key => {
-    const content = summary[key]
+    const content = _.sortBy(summary[key], 'eip').map(s => {
+      return {
+        eip: `[${s.eip}](./${s.filename})`,
+        title: s.title,
+        created: s.created,
+        status: s.status,
+        category: s.category,
+        type: s.type,
+      }
+    })
     const tableJSON = tablemark(content)
     const markdown = `
 # ${key} (${content.length})
