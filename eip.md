@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4363
 title: Transaction index OpCode
 author: Edgar (@fxfactorial), Dean (@decanus)
 status: Draft
