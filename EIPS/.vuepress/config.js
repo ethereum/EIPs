@@ -1,42 +1,61 @@
 const yamlHeaderParser = require('yaml-front-matter')
+const tablemark = require('tablemark')
+const { format } = require('date-fns')
 const fs = require('fs')
 const path = require('path')
+const _ = require('lodash')
 const allEipFiles = fs
   .readdirSync(path.resolve(__dirname, '../'))
   .filter(file => file.includes('eip'))
 
-const EIP_STATUS = {}
-const EIP_TYPE = {}
-const EIP_CATE = {}
-
-allEipFiles.map(file => {
+const metas = allEipFiles.map(file => {
   const meta = yamlHeaderParser.loadFront(
     fs.readFileSync(`${__dirname}/../${file}`, 'utf8')
   )
-  if (meta.status) {
-    EIP_STATUS[meta.status] = (EIP_STATUS[meta.status] || 0) + 1
-  }
-  if (meta.type) {
-    EIP_TYPE[meta.type] = (EIP_TYPE[meta.type] || 0) + 1
-  }
-  if (meta.category) {
-    EIP_CATE[meta.category] = (EIP_CATE[meta.category] || 0) + 1
+  delete meta.__content
+  const filename = path.parse(file).name
+  return {
+    ...meta,
+    eip: `[${filename}](./${filename})`,
+    created: meta.created ? format(new Date(meta.created), 'yyyy-MM-dd') : '-',
   }
 })
 
+const EIP_STATUS = _.groupBy(metas, 'status')
+const EIP_CATE = _.groupBy(metas, 'category')
+const EIP_TYPE = _.groupBy(metas, 'type')
+
+const getSummaryPath = item =>
+  `/summary/${item
+    .split(' ')
+    .join('-')
+    .toLowerCase()}`
+
 const getSidebarChildren = arr => {
-  return Object.keys(arr).map(item => [
-    `/summary/${item
-      .split(' ')
-      .join('-')
-      .toLowerCase()}`,
-    `${item} (${arr[item]})`,
-  ])
+  return Object.keys(arr)
+    .filter(k => k !== 'undefined')
+    .map(item => [getSummaryPath(item), `${item} (${arr[item].length})`])
 }
 
-console.log(getSidebarChildren(EIP_STATUS))
-console.log(getSidebarChildren(EIP_TYPE))
-console.log(getSidebarChildren(EIP_CATE))
+const genSummary = summary => {
+  const keys = Object.keys(summary).filter(k => k !== 'undefined')
+  keys.map(key => {
+    const content = summary[key]
+    const tableJSON = tablemark(content)
+    const markdown = `
+# ${key} (${content.length})
+---
+${tableJSON}
+    `
+    fs.writeFileSync(
+      path.resolve(__dirname, `../${getSummaryPath(key)}.md`),
+      markdown
+    )
+  })
+}
+genSummary(EIP_STATUS)
+genSummary(EIP_TYPE)
+genSummary(EIP_CATE)
 
 module.exports = {
   title: '以太坊改进提案 EIPs',

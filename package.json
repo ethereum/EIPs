@@ -7,6 +7,9 @@
   "author": "izayl <izayl@163.com>",
   "license": "MIT",
   "devDependencies": {
+    "date-fns": "^2.25.0",
+    "lodash": "^4.17.21",
+    "tablemark": "^2.0.0",
     "vuepress": "^1.8.2",
     "yaml-front-matter": "^4.1.1"
   },
