@@ -1,0 +1,31 @@
+---
+eip: <to be assigned>
+title: Transaction index OpCode
+author: Edgar (@fxfactorial), Dean (@decanus)
+status: Draft
+type: Standards Track
+category: Core
+created: 2021-10-12
+---
+
+## Abstract
+
+This EIP adds an opcode that returns the current transactions.
+
+## Motivation
+
+Currently users are completely at the mercy of those who order transactions. This means that malicious actors can exploit the ordering of transactions at the users expense. A popular example of this is sandwhich attacks on AMMs, wherein a transaction is put in between 2 others that front-run it.
+
+
+## Specification
+
+Adds a new opcode `TXINDEX` at 0x49, which uses 0 stack arguments. It pushes the current transaction index onto the stack. Transaction Index is a 256-bit value. The operation costs G_base to execute.
+
+## Reference Implementation
+
+ - A dummy implementation in [go-ethereum@feature/tx-index](https://github.com/dialecticch/go-ethereum/tree/feature/tx-index).
+ - Usage of the opcode in [UniswapV3](https://github.com/fxfactorial/uniswap-v3-core/commit/2e605d8f3fe4ccc8c8c0c78eb71674c220348b65).
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
