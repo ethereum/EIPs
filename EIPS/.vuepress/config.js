@@ -43,7 +43,7 @@ const genSummary = summary => {
   keys.map(key => {
     const content = _.sortBy(summary[key], 'eip').map(s => {
       return {
-        eip: `[${s.eip}](./${s.filename})`,
+        eip: `[${s.eip}](/${s.filename})`,
         title: s.title,
         created: s.created,
         status: s.status,
