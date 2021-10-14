@@ -230,6 +230,11 @@ The current EIP editors are
 - Hudson Jameson (@Souptacular)
 - Nick Savers (@nicksavers)
 
+Emeritus EIP editors are 
+
+- Casey Detrio (@cdetrio)
+- Martin Becze (@wanderer)
+
 ## EIP Editor Responsibilities
 
 For each new EIP that comes in, an editor does the following:
