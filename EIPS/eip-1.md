@@ -135,15 +135,9 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` created:` *date created on*
 
-` * updated:` *comma separated list of dates*
-
 ` * requires:` *EIP number(s)*
 
 ` * replaces:` *EIP number(s)*
-
-` * superseded-by:` *EIP number(s)*
-
-` * resolution:` *a url pointing to the resolution of this EIP*
 
 Headers that permit lists must separate elements with commas.
 
