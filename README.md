@@ -2,22 +2,9 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
+Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards. **Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).**
 
-**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document. Ideas should be thoroughly discussed prior to opening a pull request, such as on the [Ethereum Magicians forums](https://ethereum-magicians.org) or in a GitHub issue in this repository.
-
-This repository tracks the ongoing status of EIPs. It contains:
-
-- [Draft](https://eips.ethereum.org/all#draft) proposals where the author(s) are still making changes and is not ready for review.
-- [Review ](https://eips.ethereum.org/all#review) for proposals ready for EIP review process and the author(s) are ready for improvement suggestions.
-- [Last Call](https://eips.ethereum.org/all#last-call) for proposals that may become final (see also [RSS feed](https://eips.ethereum.org/last-call.xml)).
-- [Accepted](https://eips.ethereum.org/all#accepted) proposals which are awaiting implementation or deployment by Ethereum client developers.
-- [Final](https://eips.ethereum.org/all#final) and [Living](https://eips.ethereum.org/all#living) proposals that have solidified into a standard.
-- The [EIP process](./EIPS/eip-1.md#eip-work-flow) that governs the EIP repository.
-
-Achieving "Final" status in this repository only represents that a proposal has been reviewed for technical accuracy. It is solely the responsibility of the reader to decide whether a proposal will be useful to them.
-
-Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).
+**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document.
 
 Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your GitHub username or your email address inside \<triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
 
