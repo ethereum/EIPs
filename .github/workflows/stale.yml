@@ -1,4 +1,4 @@
-name: "Mark stale PRs"
+name: "Mark stale PRs & Issues"
 
 on:
   schedule:
@@ -6,8 +6,9 @@ on:
   - cron: "0 * * * *"
 
 jobs:
-  stale:
+  stale-pr:
     runs-on: ubuntu-latest
+    name: "Mark stale PRs"
     steps:
     - uses: actions/stale@v3
       with:
@@ -17,7 +18,17 @@ jobs:
         days-before-stale: 60
         days-before-close: 7
         stale-pr-label: 'stale'
+  stale-issue:
+    runs-on: ubuntu-latest
+    name: "Mark stale issues"
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 180
+        days-before-close: 14
+        stale-pr-label: 'stale'
         stale-issue-label: 'stale'
         stale-issue-message: 'There has been no activity on this issue for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.'
         close-issue-message: 'This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.'
-        
+     
