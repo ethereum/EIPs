@@ -20,8 +20,14 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@310fd6cead3459789b27043539886d929fd2930e # master
+        uses: ethereum/EIP-Bot@950d79ddd687f4c78bca2ae49c234d7ebfce0d1f # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
           MERGE_ENABLED: false
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+          ERC_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+          INTERFACE_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+          META_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+          INFORMATIONAL_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
