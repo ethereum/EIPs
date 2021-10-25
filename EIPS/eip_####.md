@@ -2,7 +2,7 @@
 
 Description: A standard interface for tip tokens that allows tipping to holders of NFTs and multi tokens
 
-Author: Jules Lai (aka Julian Bushell) <jlai\*at\*fabstir.com>
+Author: Jules Lai (@julesl23), aka Julian Bushell
 
 Discussions-to: <URL>
 
