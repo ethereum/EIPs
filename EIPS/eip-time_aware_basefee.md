@@ -7,7 +7,7 @@ discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
-created: 2021-10-27
+created: 2021-10-28
 ---
 
 ## Abstract
@@ -33,53 +33,29 @@ Abstract is a multi-sentence (short paragraph) technical summary. This should be
         - gas limit elasticity would again give us the capability to compensate for this throughput reduction to some extent
 
 ## Specification
-The relevant part of the pseudocode specification of EIP-1559 is:
+Using the pseudocode language of [EIP-1559](https://eips.ethereum.org/EIPS/eip-1), the updated base fee calculation becomes:
 
-```python=
-BASE_FEE_MAX_CHANGE_DENOMINATOR = 8
-
-
-
-
-parent_gas_target = self.parent(block).gas_limit // ELASTICITY_MULTIPLIER
-parent_gas_limit = self.parent(block).gas_limit
-parent_base_fee_per_gas = self.parent(block).base_fee_per_gas
-parent_gas_used = self.parent(block).gas_used
-
-if parent_gas_used == parent_gas_target:
-    expected_base_fee_per_gas = parent_base_fee_per_gas
-elif parent_gas_used > parent_gas_target:
-    gas_used_delta = parent_gas_used - parent_gas_target
-    base_fee_per_gas_delta = max(parent_base_fee_per_gas * gas_used_delta // parent_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR, 1)
-    expected_base_fee_per_gas = parent_base_fee_per_gas + base_fee_per_gas_delta
-else:
-    gas_used_delta = parent_gas_target - parent_gas_used
-    base_fee_per_gas_delta = parent_base_fee_per_gas * gas_used_delta // parent_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR
-    expected_base_fee_per_gas = parent_base_fee_per_gas - base_fee_per_gas_delta
-```
-
-This update would only require changes to lines (2, 3, 5), 6, 15, 19:
-
-```python=
+```python
 BASE_FEE_MAX_CHANGE_DENOMINATOR = 8
 BLOCK_TIME_TARGET = 12
-BLOCK_TIME_CONSIDERATION_CAP = 23
+MAX_GAS_TARGET_PERCENT = 95
 
-parent_considered_block_time = min(self.parent(block).timestamp - self.parent(self.parent(block)).timestamp, BLOCK_TIME_CONSIDERATION_CAP)
-parent_gas_target = self.parent(block).gas_limit * parent_considered_block_time // ELASTICITY_MULTIPLIER // BLOCK_TIME_TARGET
 parent_gas_limit = self.parent(block).gas_limit
+parent_block_time = self.parent(block).timestamp - self.parent(self.parent(block)).timestamp
+parent_base_gas_target = parent_gas_limit // ELASTICITY_MULTIPLIER
+parent_adjusted_gas_target = min(parent_base_gas_target * parent_block_time // BLOCK_TIME_TARGET, parent_gas_limit * MAX_GAS_TARGET_PERCENT // 100)
 parent_base_fee_per_gas = self.parent(block).base_fee_per_gas
 parent_gas_used = self.parent(block).gas_used
 
-if parent_gas_used == parent_gas_target:
+if parent_gas_used == parent_adjusted_gas_target:
     expected_base_fee_per_gas = parent_base_fee_per_gas
-elif parent_gas_used > parent_gas_target:
-    gas_used_delta = parent_gas_used - parent_gas_target
-    base_fee_per_gas_delta = max(parent_base_fee_per_gas * gas_used_delta * ELASTICITY_MULTIPLIER // parent_gas_limit // BASE_FEE_MAX_CHANGE_DENOMINATOR, 1)
+elif parent_gas_used > parent_adjusted_gas_target:
+    gas_used_delta = parent_gas_used - parent_adjusted_gas_target
+    base_fee_per_gas_delta = max(parent_base_fee_per_gas * gas_used_delta // parent_base_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR, 1)
     expected_base_fee_per_gas = parent_base_fee_per_gas + base_fee_per_gas_delta
 else:
-    gas_used_delta = parent_gas_target - parent_gas_used
-    base_fee_per_gas_delta = parent_base_fee_per_gas * gas_used_delta * ELASTICITY_MULTIPLIER // parent_gas_limit // BASE_FEE_MAX_CHANGE_DENOMINATOR
+    gas_used_delta = parent_adjusted_gas_target - parent_gas_used
+    base_fee_per_gas_delta = parent_base_fee_per_gas * gas_used_delta // parent_base_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR
     expected_base_fee_per_gas = parent_base_fee_per_gas - base_fee_per_gas_delta
 ```
 
