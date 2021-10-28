@@ -14,16 +14,129 @@ created: 2021-10-27
 Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 
 ## Motivation
-The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
+- current EIP-1559 base fee adjustment: based on block gas usage
+- in effect, control loop that targets stable throughput per block
+- not ideal under PoW under two aspects:
+    - block time variability:
+        - block gas usage tries to measure demand at current base fee level, but gas usage is proportional to block time, introducing noise to the used signal
+        - block time variability => "incorrect" demand signals => "incorrect" base fee adjustments => increased base fee volatility
+    - reduced throughput during consensus issues:
+        - if chain forks, block times go up for a while, before difficulty is adjusted
+        - gas limit elasticity would give us the capability to compensate for this throughput reduction to some extent
+- also not ideal under PoS:
+    - missed slots:
+        - while general block times become regular, occasionally slots are missed, doubling the block time for the next block (or more, if that slot is also missed)
+        - missed slots still send incorrect signal (demand looks 2x as high as it is), leading to base fee spikes after missed slots
+        - incentive to attack network via block proposer DOS, as each missed slot directly reduces network throughput
+    - consensus issues:
+        - worse than under PoW, as longer time for self-healing (several weeks for inactivity leaks as opposed to several hours for difficulty adjustments)
+        - gas limit elasticity would again give us the capability to compensate for this throughput reduction to some extent
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+The relevant part of the pseudocode specification of EIP-1559 is:
+
+```python=
+BASE_FEE_MAX_CHANGE_DENOMINATOR = 8
+
+
+
+
+parent_gas_target = self.parent(block).gas_limit // ELASTICITY_MULTIPLIER
+parent_gas_limit = self.parent(block).gas_limit
+parent_base_fee_per_gas = self.parent(block).base_fee_per_gas
+parent_gas_used = self.parent(block).gas_used
+
+if parent_gas_used == parent_gas_target:
+    expected_base_fee_per_gas = parent_base_fee_per_gas
+elif parent_gas_used > parent_gas_target:
+    gas_used_delta = parent_gas_used - parent_gas_target
+    base_fee_per_gas_delta = max(parent_base_fee_per_gas * gas_used_delta // parent_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR, 1)
+    expected_base_fee_per_gas = parent_base_fee_per_gas + base_fee_per_gas_delta
+else:
+    gas_used_delta = parent_gas_target - parent_gas_used
+    base_fee_per_gas_delta = parent_base_fee_per_gas * gas_used_delta // parent_gas_target // BASE_FEE_MAX_CHANGE_DENOMINATOR
+    expected_base_fee_per_gas = parent_base_fee_per_gas - base_fee_per_gas_delta
+```
+
+This update would only require changes to lines (2, 3, 5), 6, 15, 19:
+
+```python=
+BASE_FEE_MAX_CHANGE_DENOMINATOR = 8
+BLOCK_TIME_TARGET = 12
+BLOCK_TIME_CONSIDERATION_CAP = 23
+
+parent_considered_block_time = min(self.parent(block).timestamp - self.parent(self.parent(block)).timestamp, BLOCK_TIME_CONSIDERATION_CAP)
+parent_gas_target = self.parent(block).gas_limit * parent_considered_block_time // ELASTICITY_MULTIPLIER // BLOCK_TIME_TARGET
+parent_gas_limit = self.parent(block).gas_limit
+parent_base_fee_per_gas = self.parent(block).base_fee_per_gas
+parent_gas_used = self.parent(block).gas_used
+
+if parent_gas_used == parent_gas_target:
+    expected_base_fee_per_gas = parent_base_fee_per_gas
+elif parent_gas_used > parent_gas_target:
+    gas_used_delta = parent_gas_used - parent_gas_target
+    base_fee_per_gas_delta = max(parent_base_fee_per_gas * gas_used_delta * ELASTICITY_MULTIPLIER // parent_gas_limit // BASE_FEE_MAX_CHANGE_DENOMINATOR, 1)
+    expected_base_fee_per_gas = parent_base_fee_per_gas + base_fee_per_gas_delta
+else:
+    gas_used_delta = parent_gas_target - parent_gas_used
+    base_fee_per_gas_delta = parent_base_fee_per_gas * gas_used_delta * ELASTICITY_MULTIPLIER // parent_gas_limit // BASE_FEE_MAX_CHANGE_DENOMINATOR
+    expected_base_fee_per_gas = parent_base_fee_per_gas - base_fee_per_gas_delta
+```
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+
+### Design Choices
+
+- include block time in base fee adjustment: make "block gas target" proportional to block time
+- results in control loop that targets stable throughput per time
+- addresses problems listed above:
+    - reduces / removes base fee volatility inroduced by PoW block time variability
+    - reduces / removes base fee volatility inroduced by PoS missed slots
+    - reduces incentive to DOS block proposers
+    - reduces / removes impact of chain forks on throughput
+- drawback: during demand spikes under PoS, missed slots can delay base fee increase
+
+#### Current EIP-1559 Update Rule
+
+$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n}{G_n})$, where:
+
+$b_n$ : base fee at block $n$\
+$\frac{1}{8}$ : maximum base fee change rate\
+$g_n$ : gas used by block $n$\
+$G_n$ : gas target for block $n$
+
+
+#### Block Time Based Update Rule
+
+$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n\frac{t_n}{T_n}}{G_n})$, where:
+
+$t_n$ : block time for block $n$, i.e. `block.timestamp - parent.timestamp`\
+$T_n$ : block time target
+
+#### Capped Block Time Based Update Rule
+
+In practice it is sensible to introduce an upper limit to the block time used by the update rule:
+
+- during chain forks, block gas targets above 50% reduce the ability to pick up on demand increases
+- in the extreme, with 50%+ of proposers offline, the base fee could not increase at all
+- fee market would revert to a first-price auction on top of the current base fee level
+- base fee would even leak downwards due to small residual fee block space (<21k)
+- alternative: bound block gas target to below elasticity limit
+
+$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n\frac{\text{min}(t_n, T_{\text{max}})}{T_n}}{G_n})$, where:
+
+$T_{\text{max}}$ : maximum block time to consider (e.g. 23s or 24s for PoS)
+
+### Future Changes
+
+- exponential base fee update
+    - more elegant properties
+    - slightly more involved change to include efficient deterministic exponentiation
+- variable block gas limits (dependent on block times)
+    - feasible to the extent the bottleneck for block gas limits is state growth, not networking / computation
 
 ## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+- only small adjustments to existing base fee calculation tooling
 
 ## Test Cases
 tbd
@@ -32,7 +145,8 @@ tbd
 tbd
 
 ## Security Considerations
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+- timestamp manipulation
+- easier to suppress base fee increase => higher miner collaboration incentive
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
