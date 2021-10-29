@@ -11,26 +11,33 @@ created: 2021-10-28
 ---
 
 ## Abstract
-Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+This EIP proposes to modify the base fee calculation to take block times into account and target a stable throughput per time instead of per block. Its aim is to keep changes to the calculation to a minimum, only introducing a variable block gas target proportional to the block time. The EIP can in principle be applied to either a proof of work or a proof of stake chain, however the security implications for the proof of work case remain unexplored. 
 
 ## Motivation
-- current EIP-1559 base fee adjustment: based on block gas usage
-- in effect, control loop that targets stable throughput per block
-- not ideal under PoW under two aspects:
-    - block time variability:
-        - block gas usage tries to measure demand at current base fee level, but gas usage is proportional to block time, introducing noise to the used signal
-        - block time variability => "incorrect" demand signals => "incorrect" base fee adjustments => increased base fee volatility
-    - reduced throughput during consensus issues:
-        - if chain forks, block times go up for a while, before difficulty is adjusted
-        - gas limit elasticity would give us the capability to compensate for this throughput reduction to some extent
-- also not ideal under PoS:
-    - missed slots:
-        - while general block times become regular, occasionally slots are missed, doubling the block time for the next block (or more, if that slot is also missed)
-        - missed slots still send incorrect signal (demand looks 2x as high as it is), leading to base fee spikes after missed slots
-        - incentive to attack network via block proposer DOS, as each missed slot directly reduces network throughput
-    - consensus issues:
-        - worse than under PoW, as longer time for self-healing (several weeks for inactivity leaks as opposed to several hours for difficulty adjustments)
-        - gas limit elasticity would again give us the capability to compensate for this throughput reduction to some extent
+
+The current base fee calculation uses the gas usage of a block as the signal to determine whether current demand for block space is too high (base fee should be lowered) or too high (base fee should be increased). This choice of signal is however flawed, as it does not take the block time into account. Generally speaking, a 20s block can be expected to be twice as full as a 10s block at the same demand level, and using the same gas target for both is accordingly incorrect. In practice, there are several undesirable consequences of this flawed signal:
+
+### Base Fee Volatility under Proof of Work
+
+Under proof of work (PoW), block times are stochastic, and for that reason there exists a large general block time variability. This variability contributes to the base fee volatility, where the base fee can be expected to oscillate around the equilibrium value even under perfectly stable demand.
+
+### Missed Slots
+
+Under proof of stake (PoS), block times are generally uniform (always 12s), but missed slots lead to individual blocks with increased block time (24s, 36s, ...). Under the current update rule, such missed slots will therefore result in perceived demand spikes and thus to small unwarranted base fee spikes.
+
+More importantly, these missed slots direcly reduce the overall throughput of the execution chain by one full block (full here meaning gas target). While the immediately following block can be expected to include the "delayed" transactions of the missed slot, the resulting base fee spike then results in subsequent under-full blocks, so that in the end the block space of the missed block is lost for the chain. 
+
+This is particularly problematic, as it makes denial of service (DOS) attacks on block proposers a straight forward way of compromising overall chain performance.
+
+### Throughput Degradation During Consensus Issues
+
+A more severe version of individual missed slots can be caused by consensus issues that prevent a significant portion of block proposers from continuing to create blocks. This can be due to block proposers forking off (and creating blocks on their own fork), being unable to keep up with the current chain head for another reason, or simply being unable to create valid blocks.
+
+In all these situations, average block times go up significantly, causing chain throughput to fall by the same fraction. While this effect is already present under PoW, the self-healing mechanism of difficulty adjustments is relatively quick to kick in and restore normal block times. Under PoS on the other hand, the automatic self-healing mechanism can be extremely slow, with potentially up to a third of missed slots for several months, or several weeks of more than a third of missed slots.
+
+For all those reasons it would be desirable to target a stable throughput per time instead of per block, by taking block time into account during the base fee calculation.
+
+To maximize the chance of this EIP being included in the merge fork, the adjustments are kept to a minimum, with more involved changes discussed in the rationale section.
 
 ## Specification
 Using the pseudocode language of [EIP-1559](/EIPS/eip-1559.md), the updated base fee calculation becomes:
