@@ -102,7 +102,8 @@ class World(ABC):
     - slightly more involved change to include efficient deterministic exponentiation
 
 ## Backwards Compatibility
-- only small adjustments to existing base fee calculation tooling
+
+The EIP has minimal impact on backwards compatibility, only requiring updates to existing base fee calculation tooling.
 
 ## Test Cases
 tbd
@@ -111,8 +112,19 @@ tbd
 tbd
 
 ## Security Considerations
-- timestamp manipulation
-- easier to suppress base fee increase => higher miner collaboration incentive
+
+### Timestamp Manipulation
+
+Under PoW, miners are in control over the timestamp field of their blocks. While there are some enforced limits to valid timestamps, implications regarding potential timestamp manipulation are nontrivial and remain unexplored for this EIP.
+
+Under PoS, each slot has a [fixed assigned timestamp](https://github.com/ethereum/consensus-specs/blob/v1.1.3/specs/merge/beacon-chain.md#process_execution_payload), rendering any timestamp manipulation by block proposers impossible.
+
+### Suppressing Base Fee Increases
+As discussed in the rationale, a high value for `MAX_GAS_TARGET_PERCENT` during times of many offline block proposers results in a small remaining signal space for genuine demand increases that should result in base fee increases. This in turn decreases the cost for block proposers for suppresing these base fee increases, instead forcing the fallback to a first-price priority fee auction.
+
+While the arguments of incentive incompatibility for base fee suppression of the the base EIP-1559 case still apply here, with a decreasing cost of this individually irrational behavior the risk for overriding psychological factors becomes more significant.
+
+Even in such a case the system degradation would however be graceful, as it would only temporarily suspend the base fee burn. As soon as the missing block proposers would come back online, the system would return to its ordinary EIP-1559 equilibrium.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
