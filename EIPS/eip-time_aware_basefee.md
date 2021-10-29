@@ -33,7 +33,7 @@ Abstract is a multi-sentence (short paragraph) technical summary. This should be
         - gas limit elasticity would again give us the capability to compensate for this throughput reduction to some extent
 
 ## Specification
-Using the pseudocode language of [EIP-1559](/EIPS/eip-1559), the updated base fee calculation becomes:
+Using the pseudocode language of [EIP-1559](/EIPS/eip-1559.md), the updated base fee calculation becomes:
 
 ```python
 ...
