@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Micropayments Standard for NFTs and Multi Tokens
 description: A standard interface for tip tokens that allows tipping to holders of NFTs and multi tokens
 author: Jules Lai (@julesl23), aka Julian Bushell
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-proposal-micropayments-standard-for-nfts-and-multi-tokens/7366
 status: Draft
 type: Standards Track
 category: ERC
