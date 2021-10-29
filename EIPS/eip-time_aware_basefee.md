@@ -78,28 +78,56 @@ class World(ABC):
 
 ## Rationale
 
-### Design Choices
+### Mechanism
 
-- include block time in base fee adjustment: make "block gas target" proportional to block time
-- results in control loop that targets stable throughput per time
-- addresses problems listed above:
-    - reduces / removes base fee volatility inroduced by PoW block time variability
-    - reduces / removes base fee volatility inroduced by PoS missed slots
-    - reduces incentive to DOS block proposers
-    - reduces / removes impact of chain forks on throughput
-- drawback: during demand spikes under PoS, missed slots can delay base fee increase
+The proposed new base fee calculation only adjusts the block gas target by scaling it with the block time, capped at a maximum percent of the overall block gas limit:
+
+#### Current Base Fee Calculation
+
+![](../assets/eip-time_aware_basefee/old_formula.png)
+
+#### Proposed Base Fee Calculation
+
+![](../assets/eip-time_aware_basefee/new_formula.png)
+
+This new calculation thus targets a stable throughput per time instead of per block.
+
+### Limitations
+
+Under PoS, block time increases always come in multiples of full blocks (e.g. a single missed slot = 24s instead of 12s block time). This would already require a doubling of the block gas target even for a single missed slot. However, with the block elasticity currently set to 2, this target would be equal to the block gas limit, and thus is reduced slightly, according to the `MAX_GAS_TARGET_PERCENT` parameter. The reason for the existence of this parameter is twofold:
+
+- Ensure that the signal remains meaningful: A target equal to or greater than the gas limit could never be reached, so the base fee would always be reduced after a missed slot.
+- Ensure that the base fee can still react to genuine demand increases: During times of many offline block proposers (and thus many missed slots), genuine demand increases still need a way to eventually result in a base fee increase, to avoid a fallback to a first-price priority fee auction.
+
+However, this means that even a single missed slot cannot be fully compensated. Even worse, any second or further sequential missed slot cannot be compensated at all, as the gas target is already at its max. This effect becomes more pronounced as the share of offline validators increases:
 
 ![](../assets/eip-time_aware_basefee/degradation.png)
 
-### Future Changes
+As can be observed, while this EIP does indeed increase the robustness of the network throughput in cases of offline validators, it does so imperfectly. Furthermore, there is a tradeoff effected by the `MAX_GAS_TARGET_PERCENT` parameter, with a higher value resulting in a higher network robustness, but a more impaired base fee adjustment mechanism during times of frequent missed slots.
+
+### Possible Extensions
+
+These limitations directly result from the design goal of a minimal change, to maximize chances of being included in the merge. There are natural ways of extending the EIP design to more effectively handle offline validators, at the expense of somewhat more extensive changes:
+
+#### Persistent Multi-Slot Buffer
+
+To be able to compensate multiple consecutive missed slots, a gas buffer could be introduced, that would allow the gas beyond the block elasticity to be carried forward to future blocks. To avoid long-run buffer accumulation that would delay a return to normal operations once block proposers are back online, a cap on the buffer would be added. Even for a relatively small buffer cap, the throughput robustness is significantly improved:
 
 ![](../assets/eip-time_aware_basefee/degradation_buffers.png)
+
+With an elasticity still at 2, there is no way of avoiding the eventual breakdown for more than 50% offline block proposers.
+
+The main implementation complexity for this approach comes from the introduction of the buffer as a new persistent field. To retain the ability for calculating base fees only based on headers, it would have to be added to the block header.
+
+#### Increased Block Elasticity
+
+In addition to the introduction of a buffer, increasing the block elasticity is another tool for increasing throughput robustness. The following diagram shows the effect of different elasticity levels, both in the presence and absence of a persistent buffer:
+
 ![](../assets/eip-time_aware_basefee/degradation_elasticity.png)
 
+Again, a clear positive effect can be observed.
 
-- exponential base fee update
-    - more elegant properties
-    - slightly more involved change to include efficient deterministic exponentiation
+The main additional complexity here would come from the increased peak load (networking, compute & disk access) of multiple sequential overfull blocks. Note though that PoS with its minimum block time of 12s significantly reduces worst case peak stress as compared to PoW.
 
 ## Backwards Compatibility
 
