@@ -11,31 +11,31 @@ created: 2021-10-28
 ---
 
 ## Abstract
-This EIP proposes to modify the base fee calculation to take block times into account and target a stable throughput per time instead of per block. Its aim is to keep changes to the calculation to a minimum, only introducing a variable block gas target proportional to the block time. The EIP can in principle be applied to either a proof of work or a proof of stake chain, however the security implications for the proof of work case remain unexplored. 
+This EIP proposes accounting for time between blocks in the base fee calculation to target a stable throughput by time, instead of by block. Aiming to minimize changes to the calculation, it only introduces a variable block gas target proportional to the block time. The EIP can, in principle, be applied to either a Proof-of-Work or a Proof-of-Stake chain, however the security implications for the proof of work case remain unexplored. 
 
 ## Motivation
 
-The current base fee calculation uses the gas usage of a block as the signal to determine whether current demand for block space is too high (base fee should be lowered) or too high (base fee should be increased). This choice of signal is however flawed, as it does not take the block time into account. Generally speaking, a 20s block can be expected to be twice as full as a 10s block at the same demand level, and using the same gas target for both is accordingly incorrect. In practice, there are several undesirable consequences of this flawed signal:
+The current base fee calculation chooses the gas usage of a block as the signal to determine whether demand for block space is too low (indicating that the base fee should be lowered) or too high (indicating that the base fee should be increased). While simple, this choice of signal has drawbacks: it does not take the block time into account. Assuming a relatively constant demand, a proposer constructing a block after 20 seconds will have transactions available with twice the gas of a proposer constructing a block after 10 seconds. Using the same gas target for both is accordingly sub-optimal. In practice, there are several undesirable consequences of this flawed signal:
 
-### Base Fee Volatility under Proof of Work
+### Base Fee Volatility Under Proof of Work
 
-Under proof of work (PoW), block times are stochastic, and for that reason there exists a large general block time variability. This variability contributes to the base fee volatility, where the base fee can be expected to oscillate around the equilibrium value even under perfectly stable demand.
+Under proof of work (PoW), block times are stochastic, and for that reason there exists large block time variability. This variability contributes to the base fee volatility, where the base fee can be expected to oscillate around the equilibrium value even under perfectly stable demand.
 
 ### Missed Slots
 
-Under proof of stake (PoS), block times are generally uniform (always 12s), but missed slots lead to individual blocks with increased block time (24s, 36s, ...). Under the current update rule, such missed slots will therefore result in perceived demand spikes and thus to small unwarranted base fee spikes.
+Under proof of stake (PoS), block times are ideally uniform (always 12s), but missed slots lead to individual blocks with increased block time (24s, 36s, ...). Such missed slots will result in the next block being overfull, and with the current update rule, signal a fake demand spike and thus cause a small unwarranted base fee spike.
 
-More importantly, these missed slots direcly reduce the overall throughput of the execution chain by one full block (full here meaning gas target). While the immediately following block can be expected to include the "delayed" transactions of the missed slot, the resulting base fee spike then results in subsequent under-full blocks, so that in the end the block space of the missed block is lost for the chain. 
+More importantly, these missed slots directly reduce the overall throughput of the execution chain by the gas target of one block. While the next block can be expected to include the "delayed" transactions of the missed slot, the resulting base fee spike then results in some number of under-full blocks. In the end the block space of the missed slot is lost for the chain. 
 
-This is particularly problematic, as it makes denial of service (DOS) attacks on block proposers a straight forward way of compromising overall chain performance.
+This is particularly problematic because a Denial-of-Service (DoS) attack on block proposers can cause them to miss slots, and compromises the overall chain performance.
 
 ### Throughput Degradation During Consensus Issues
 
 A more severe version of individual missed slots can be caused by consensus issues that prevent a significant portion of block proposers from continuing to create blocks. This can be due to block proposers forking off (and creating blocks on their own fork), being unable to keep up with the current chain head for another reason, or simply being unable to create valid blocks.
 
-In all these situations, average block times go up significantly, causing chain throughput to fall by the same fraction. While this effect is already present under PoW, the self-healing mechanism of difficulty adjustments is relatively quick to kick in and restore normal block times. Under PoS on the other hand, the automatic self-healing mechanism can be extremely slow, with potentially up to a third of missed slots for several months, or several weeks of more than a third of missed slots.
+In all these situations, average block times go up significantly, causing chain throughput to fall by the same fraction. While this effect is already present under PoW, the self-healing mechanism of difficulty adjustments is relatively quick to kick in and restore normal block times. On the other hand, under PoS the automatic self-healing mechanism can be extremely slow: potentially several months to return to normal with up to a third of slots missed, or several weeks if more than a third of slots are missed.
 
-For all those reasons it would be desirable to target a stable throughput per time instead of per block, by taking block time into account during the base fee calculation.
+For all these reasons, it would be desirable to target a stable throughput per time instead of per block, by taking block time into account during the base fee calculation.
 
 To maximize the chance of this EIP being included in the merge fork, the adjustments are kept to a minimum, with more involved changes discussed in the rationale section.
 
@@ -94,12 +94,12 @@ This new calculation thus targets a stable throughput per time instead of per bl
 
 ### Limitations
 
-Under PoS, block time increases always come in multiples of full blocks (e.g. a single missed slot = 24s instead of 12s block time). This would already require a doubling of the block gas target even for a single missed slot. However, with the block elasticity currently set to 2, this target would be equal to the block gas limit, and thus is reduced slightly, according to the `MAX_GAS_TARGET_PERCENT` parameter. The reason for the existence of this parameter is twofold:
+Under PoS, block time increases always come in multiples of full blocks (e.g. a single missed slot = 24s instead of 12s block time). Accounting for this already requires doubling the block gas target, even for a single missed slot. However, with the block elasticity currently set to 2, this target would be equal to the block gas limit. Having the new target equal to the block gas limit is less than ideal, and thus is reduced slightly, according to the `MAX_GAS_TARGET_PERCENT` parameter. The reason for the existence of this parameter is twofold:
 
 - Ensure that the signal remains meaningful: A target equal to or greater than the gas limit could never be reached, so the base fee would always be reduced after a missed slot.
 - Ensure that the base fee can still react to genuine demand increases: During times of many offline block proposers (and thus many missed slots), genuine demand increases still need a way to eventually result in a base fee increase, to avoid a fallback to a first-price priority fee auction.
 
-However, this means that even a single missed slot cannot be fully compensated. Even worse, any second or further sequential missed slot cannot be compensated at all, as the gas target is already at its max. This effect becomes more pronounced as the share of offline validators increases:
+However, this means that even a single missed slot cannot be fully compensated. Even worse, any second or further sequential missed slot cannot be compensated for at all, as the gas target is already at its max. This effect becomes more pronounced as the share of offline validators increases:
 
 ![](../assets/eip-time_aware_basefee/degradation.png)
 
