@@ -33,7 +33,7 @@ Abstract is a multi-sentence (short paragraph) technical summary. This should be
         - gas limit elasticity would again give us the capability to compensate for this throughput reduction to some extent
 
 ## Specification
-Using the pseudocode language of [EIP-1559](https://eips.ethereum.org/EIPS/eip-1559), the updated base fee calculation becomes:
+Using the pseudocode language of [EIP-1559](/EIPS/eip-1559), the updated base fee calculation becomes:
 
 ```python
 ...
@@ -82,44 +82,17 @@ class World(ABC):
     - reduces / removes impact of chain forks on throughput
 - drawback: during demand spikes under PoS, missed slots can delay base fee increase
 
-#### Current EIP-1559 Update Rule
-
-$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n}{G_n})$, where:
-
-$b_n$ : base fee at block $n$\
-$\frac{1}{8}$ : maximum base fee change rate\
-$g_n$ : gas used by block $n$\
-$G_n$ : gas target for block $n$
-
-
-#### Block Time Based Update Rule
-
-$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n\frac{t_n}{T_n}}{G_n})$, where:
-
-$t_n$ : block time for block $n$, i.e. `block.timestamp - parent.timestamp`\
-$T_n$ : block time target
-
-#### Capped Block Time Based Update Rule
-
-In practice it is sensible to introduce an upper limit to the block time used by the update rule:
-
-- during chain forks, block gas targets above 50% reduce the ability to pick up on demand increases
-- in the extreme, with 50%+ of proposers offline, the base fee could not increase at all
-- fee market would revert to a first-price auction on top of the current base fee level
-- base fee would even leak downwards due to small residual fee block space (<21k)
-- alternative: bound block gas target to below elasticity limit
-
-$b_{n+1} = b_n * (1 + \frac{1}{8}\frac{g_n-G_n\frac{\text{min}(t_n, T_{\text{max}})}{T_n}}{G_n})$, where:
-
-$T_{\text{max}}$ : maximum block time to consider (e.g. 23s or 24s for PoS)
+![](../assets/eip-time_aware_basefee/degradation.png)
 
 ### Future Changes
+
+![](../assets/eip-time_aware_basefee/degradation_buffers.png)
+![](../assets/eip-time_aware_basefee/degradation_elasticity.png)
+
 
 - exponential base fee update
     - more elegant properties
     - slightly more involved change to include efficient deterministic exponentiation
-- variable block gas limits (dependent on block times)
-    - feasible to the extent the bottleneck for block gas limits is state growth, not networking / computation
 
 ## Backwards Compatibility
 - only small adjustments to existing base fee calculation tooling
