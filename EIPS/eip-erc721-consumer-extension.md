@@ -22,20 +22,19 @@ extends the existing [ERC-721](https://eips.ethereum.org/EIPS/eip-721).
 
 Many [ERC-721](https://eips.ethereum.org/EIPS/eip-721) contracts introduce their own custom role that grants permissions
 for utilising/consuming a given NFT instance. The need for that role stems from the fact that other than owning the NFT
-instance, there are other actions that could be performed on an NFT. For example various metaverses (Decentraland /
-CryptoVoxels) use `operator`/`contributor` roles for Land (ERC-721), so that owners of the land can authorise other
-addresses to deploy scenes to them (f.e commissioning a service company to develop a scene).
+instance, there are other actions that can be performed on a NFT. For example various metaverses use`operator`
+/`contributor`
+roles for Land (ERC-721), so that owners of the land can authorise other addresses to deploy scenes to them (f.e
+commissioning a service company to develop a scene).
 
-Another example is TODO
-
-It is so common for NFTs to have utility other than simply owning it that it requires a separate `consumer` role that it
+It is common for NFTs to have utility other than simply owning it that it requires a separate `consumer` role that it
 should be standardized to allow compatibility with user interfaces and contracts that mange contracts.
 
-Examples of kinds of contracts and applications that can benefit from this standard:
+Having a `consumer` role will enable protocols to integrate and build on top of dApps that issue ERC721 tokens.
 
-- All Metaverses that have land and other types of digital assets that have utility other than owning the NFT (scene
-  deployment on land, renting land/characters/clothes/passes to events)
-- TODO example with non-metaverse related stuff
+Example of kinds of contracts and applications that can benefit from this standard are predominantly metaverses that
+have land and other types of digital assets in those metaverse (scene deployment on land, renting
+land/characters/clothes/passes to events etc.)
 
 ## Specification
 
@@ -47,7 +46,7 @@ consumer extension** is OPTIONAL for ERC-721 contracts.
 
 ```solidity
 /// @title ERC-721 Consumer Role extension
-///  Note: the ERC-165 identifier for this interface is 0xTODO_FILL_IN
+///  Note: the ERC-165 identifier for this interface is 0x953c8dfa
 interface ERC721Consumer /* is ERC721 */ {
 
     /// @notice This emits when consumer of a _tokenId changes.
