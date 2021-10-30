@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2021-10-30
-requires: [ERC721](https://eips.ethereum.org/EIPS/eip-721)
+requires: 721
 ---
 
 ## Abstract
