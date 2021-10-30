@@ -3,7 +3,7 @@ eip: 1
 title: EIP Purpose and Guidelines
 status: Living
 type: Meta
-author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
+author: jace8883 <jace833@pm.me>, guanlong huang<gl041188@gmail.com>, et al.
 created: 2015-10-27
 ---
 
