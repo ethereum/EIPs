@@ -1,23 +1,23 @@
 ---
-eip: <to be assigned>
+eip: 4393
 title: Micropayments Standard for NFTs and Multi Tokens
 description: A standard interface for tip tokens that allows tipping to holders of NFTs and multi tokens
-author: Jules Lai (@julesl23), aka Julian Bushell
+author: Jules Lai (@julesl23)
 discussions-to: https://ethereum-magicians.org/t/eip-proposal-micropayments-standard-for-nfts-and-multi-tokens/7366
 status: Draft
 type: Standards Track
 category: ERC
 created: 2021-10-24
-requires: 721, 1155, 165
+requires: 165, 721, 1155
 ---
 
 ## Abstract
 
-For the purpose of this proposal, a micropayment is termed as a financial transaction that involves usually a small sum of money, called "tips", that are sent for specific [ERC-721](https://eips.ethereum.org/EIPS/eip-721) NFTs and [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) multi tokens as rewards to their holders. A holder (also referred to as controller) is used here as a more generic term for owner in a semantic sense, as NFTs may represent non-digital assets, such as services etc.
+For the purpose of this proposal, a micropayment is termed as a financial transaction that involves usually a small sum of money, called "tips", that are sent for specific [ERC-721](./eip-721.md) NFTs and [ERC-1155](./eip-1155.md) multi tokens as rewards to their holders. A holder (also referred to as controller) is used here as a more generic term for owner in a semantic sense, as NFTs may represent non-digital assets, such as services etc.
 
-This standard proposal outlines a generalised way to allow tipping via implementation of an ITipToken interface. The interface is intentionally kept to a minimum in order to allow for maximum use cases.
+This standard proposal outlines a generalised way to allow tipping via implementation of an `ITipToken` interface. The interface is intentionally kept to a minimum in order to allow for maximum use cases.
 
-A user first deposits a compatible [ERC-20](https://eips.ethereum.org/EIPS/eip-20) to the tip token contract that is then held in escrow, in exchange for tip tokens. These tip tokens can then be sent by the user to NFTs and multi-tokens (that have been approved by the tip token contract for tipping) to be redeemed for the original ERC20 deposits on withdrawal by the holders as rewards.
+A user first deposits a compatible [ERC-20](./eip-20.md) to the tip token contract that is then held in escrow, in exchange for tip tokens. These tip tokens can then be sent by the user to NFTs and multi-tokens (that have been approved by the tip token contract for tipping) to be redeemed for the original ERC20 deposits on withdrawal by the holders as rewards.
 
 Some use cases include:
 
@@ -39,7 +39,7 @@ These can all leverage the security, immediacy and transparency of blockchain.
 
 ## Motivation
 
-A cheap way to send tips to any type of NFT or multi token. This can be achieved by gas optimising the tip token contract and sending the tips in batches using the tipBatch function from the interface.
+A cheap way to send tips to any type of NFT or multi token. This can be achieved by gas optimising the tip token contract and sending the tips in batches using the `tipBatch` function from the interface.
 
 To make it easy to implement into dapps a tipping service to reward the NFT and multi token holders. Allows for fairer distribution of revenue back to NFT holders from the user community.
 
@@ -234,7 +234,7 @@ interface ITipToken {
 
 ### Tip Token transfer and value calculations
 
-Tip token values are exchanged with ERC20 deposits and vice-versa. It is left to the tip token implementer to decide on the price of a tip token and hence how much tip to mint in exchange for the ERC20 deposited.
+Tip token values are exchanged with ERC-20 deposits and vice-versa. It is left to the tip token implementer to decide on the price of a tip token and hence how much tip to mint in exchange for the ERC-20 deposited.
 
 Whenever a user sends a tip, an equivalent value of deposited ERC20 MUST be transferred to a pending account for the NFT or multi-token holder, and the tip tokens sent MUST be burnt. This equivalent value is calculated using a simple formula:
 
