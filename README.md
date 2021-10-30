@@ -1,2 +1,23 @@
-# eip-721-1155-consumer-extension
-Repository containing a reference implementation of the ERC721 &amp; ERC1155 Consumer extensions
+<div align="center">
+
+# ERC721 Consumer Extension
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
+This project provides a reference implementation of the proposed `ERC721Consumer` OPTIONAL extension.
+
+## Install
+
+In order to install the required dependencies you need to execute:
+```shell
+npm install
+```
+
+## Compile
+
+In order to compile the solidity contracts you need to execute:
+```shell
+npx hardhat compile
+```
