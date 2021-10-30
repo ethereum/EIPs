@@ -1,13 +1,6 @@
 on: [pull_request_target]
 name: Auto-Merge Bot
 jobs:
-  enable-auto-merge:
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
-    steps:
-    - uses: alexwilson/enable-github-automerge-action@main
-      with:
-        github-token: ${{ secrets.TOKEN }}
   auto_merge_bot:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
