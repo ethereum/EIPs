@@ -1,0 +1,152 @@
+---
+eip: <to be assigned>
+title: ERC721 Consumer Extension
+description: Standard interface extension for ERC721 Consumer role  
+author: Daniel Ivanov <daniel.k.ivanov95@gmail.com>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-10-30
+requires: [ERC721](https://eips.ethereum.org/EIPS/eip-721)
+---
+
+## Abstract
+
+This specification defines standard functions outlining a `consumer` role for instance(s)
+of [ERC-721](https://eips.ethereum.org/EIPS/eip-721). An implementation allows reading the current `consumer` for a
+given NFT (`tokenId`) along with a standardized event for when an `consumer` has changed. The proposal depends on and
+extends the existing [ERC-721](https://eips.ethereum.org/EIPS/eip-721).
+
+## Motivation
+
+Many [ERC-721](https://eips.ethereum.org/EIPS/eip-721) contracts introduce their own custom role that grants permissions
+for utilising/consuming a given NFT instance. The need for that role stems from the fact that other than owning the NFT
+instance, there are other actions that could be performed on an NFT. For example various metaverses (Decentraland /
+CryptoVoxels) use `operator`/`contributor` roles for Land (ERC-721), so that owners of the land can authorise other
+addresses to deploy scenes to them (f.e commissioning a service company to develop a scene).
+
+Another example is TODO
+
+It is so common for NFTs to have utility other than simply owning it that it requires a separate `consumer` role that it
+should be standardized to allow compatibility with user interfaces and contracts that mange contracts.
+
+Examples of kinds of contracts and applications that can benefit from this standard:
+
+- All Metaverses that have land and other types of digital assets that have utility other than owning the NFT (scene
+  deployment on land, renting land/characters/clothes/passes to events)
+- TODO example with non-metaverse related stuff
+
+## Specification
+
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+Every contract compliant to the `ERC721 Consumer` extension MUST implement the `ERC721Consumer` interface. The **
+consumer extension** is OPTIONAL for ERC-721 contracts.
+
+```solidity
+/// @title ERC-721 Consumer Role extension
+///  Note: the ERC-165 identifier for this interface is 0xTODO_FILL_IN
+interface ERC721Consumer /* is ERC721 */ {
+
+    /// @notice This emits when consumer of a _tokenId changes.
+    /// address(0) used as previousConsumer indicates that there was no consumer set prior to this event
+    /// address(0) used as a newConsumer indicates that the consumer role is absent  
+    event ConsumerChanged(address indexed previousConsumer, address indexed newConsumer);
+
+    /// @notice Get the consumer of a token
+    /// @dev address(0) consumer address indicates that there is no consumer currently set for that token
+    /// @param _tokenId The identifier for a token
+    /// @return The address of the consumer of the token
+    function consumerOf(uint256 _tokenId) view external returns (address);
+
+    /// @notice Set the address of the new consumer for the given token instance
+    /// @dev Throws unless `msg.sender` is the current owner, an authorised operator, or the approved address for this token. Throws if `_tokenId` is not valid token
+    /// @dev Set _newConsumer to address(0) to renounce the consumer role. 
+    /// @param _newConsumer The address of the new consumer for the token instance.
+    function changeConsumer(address _newConsumer, uint256 _tokenId) external;
+}
+```
+
+Every contract implementing the `ERC721Consumer` extension is free to define the permissions of a `consumer` (e.g. what
+are consumers allowed to do within their system) with only one exception - consumers MUST NOT be considered owners,
+authorised operators or approved addresses as per the ERC721 specification. Thus, they MUST NOT be able to execute
+transfers & approvals.
+
+The `consumerOf()` function MAY be implemented as `pure` or `view`.
+
+The `changeConsumer(address _newConsumer, uint256 _tokenId)` function MAY be implemented as `public` or `external`.
+
+The `ConsumerChanged` event MUST be emitted when a consumer is changed.
+
+## Rationale
+
+Key factors influencing the standard:
+
+- Keeping the number of functions in the interfaces to a minimum to prevent contract bloat.
+- Simplicity
+- Gas Efficiency
+- Not reusing or overloading other already existing roles (e.g. owners, operators, approved addresses)
+
+### Name
+
+The chosen name resonates with the purpose of its existence. Consumers can be considered entities that utilise the token
+instances, without necessarily having ownership rights to it.
+
+The other name for the role that was considered was `operator`, however it is already defined and used within
+the `ERC721` standard.
+
+### Restriction on the Permissions
+
+There are numerous use-cases where a distinct role for NFTs is required that MUST NOT have owner permissions. A contract
+that implements the consumer role and grants ownership permissions to the consumer renders this standard pointless.
+
+## Backwards Compatibility
+
+There are no other standards that define a similar role for NFTs and the name (`consumer`) is not used by other ERC721
+related standards.
+
+## Reference Implementation
+
+The following is a snippet for reference implementation of the ERC721Consumer extension. The full repository can be
+found [here](https://github.com/Daniel-K-Ivanov/eip-721-consumer-extension)
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./IERC721Consumer.sol";
+
+contract ConsumerImpl is IERC721Consumer, ERC721 {
+
+    mapping(uint256 => address) consumers;
+
+    constructor() ERC721("ReferenceImpl", "RIMPL") {
+    }
+
+    function consumerOf(uint256 _tokenId) view external returns (address) {
+        return consumers[_tokenId];
+    }
+
+    function changeConsumer(address _newConsumer, uint256 _tokenId) external {
+        require(msg.sender == this.ownerOf(_tokenId), "IERC721Consumer: caller is not owner nor approved");
+
+        address previousConsumer = consumers[_tokenId];
+        consumers[_tokenId] = _newConsumer;
+        emit ConsumerChanged(previousConsumer, _newConsumer);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721) returns (bool) {
+        return interfaceId == type(IERC721Consumer).interfaceId || super.supportsInterface(interfaceId);
+    }
+}
+```
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
