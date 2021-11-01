@@ -3,8 +3,6 @@ on:
   workflow_run:
     workflows:
       - Rerun Bot
-    types:
-      - requested
 
 jobs:
   rerun-bot:
@@ -18,8 +16,10 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@983960684e010eb6ad6e7bd168169e4d57a17cf8 # rerun-pull-request-target-on-review 
+        uses: ethereum/EIP-Bot@d41fda65e1d311ce82b85f2e8db3fdbd5965acf5 # rerun-pull-request-target-on-review 
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
           WORKFLOW-ID: ${{github.event.workflow_run.id}}
+          ID-TO-RERUN: "6519819"
+          EVENT-TYPE: "pull_request_target"
