@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@d41fda65e1d311ce82b85f2e8db3fdbd5965acf5 # rerun-pull-request-target-on-review 
+        uses: ethereum/EIP-Bot@861580f67cf96116b1d9b7684d7fffb1be71e24f # rerun-pull-request-target-on-review 
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
