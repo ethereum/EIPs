@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '14'
       - name: rerun-workflow
-        uses: ethereum/EIP-Bot@46a208079423f5cd183ec9496614143f58761af0 # manual-bot-rerun
+        uses: ethereum/EIP-Bot@90d0591e71314dc1430c6cde91bb787e185e0b4b # manual-bot-rerun
         id: rerun-workflow
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
