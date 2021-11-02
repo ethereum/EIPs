@@ -13,7 +13,6 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./ITipToken.sol";
-import "hardhat/console.sol";
 
 /// @title Micropayments Standard for NFTs and Multi Tokens
 /// @author Jules Lai
@@ -23,7 +22,7 @@ contract TipToken is ITipToken, ERC20, Ownable {
     using SafeERC20 for IERC20;
 
     // nft => (id => holder)
-    mapping(address => mapping(uint256 => address)) internal _idToAccount;
+    mapping(address => mapping(uint256 => address[])) internal _idToAccount;
 
     // user => deposit balance
     mapping(address => uint256) internal _depositBalances;
@@ -57,32 +56,32 @@ contract TipToken is ITipToken, ERC20, Ownable {
     /// MUST revert if 'holder' is the zero address.
     /// MUST revert if 'nft' has not approved the tip token contract address.
     /// MUST emit the 'ApprovalForNFT' event to reflect approval or not approval
-    /// @param holder The holder of the NFT (NFT controller)
+    /// @param holders The holders of the NFT (NFT controllers)
     /// @param nft The NFT contract address
     /// @param id The NFT token id
     /// @param approved True if the 'holder' is approved, false to revoke approval
     function setApprovalForNFT(
-        address holder,
+        address[] memory holders,
         address nft,
         uint256 id,
         bool approved
     ) external override onlyOwner {
-        require(holder != address(0), "Holder cannot be zero address");
         require(nft != address(0), "NFT cannot be zero address");
 
         require(
             IERC165(nft).supportsInterface(type(IERC1155).interfaceId)
-                ? IERC1155(nft).isApprovedForAll(holder, address(this))
+                ? _erc1155IsApprovedForAll(nft, holders)
                 : IERC165(nft).supportsInterface(type(IERC721).interfaceId)
-                ? IERC721(nft).isApprovedForAll(holder, address(this))
+                ? holders.length == 1 &&
+                    IERC721(nft).isApprovedForAll(holders[0], address(this))
                 : false,
             "Unable to set approval"
         );
 
-        if (approved) _idToAccount[nft][id] = holder;
-        else _idToAccount[nft][id] = address(0);
+        if (approved) _idToAccount[nft][id] = holders;
+        else delete _idToAccount[nft][id];
 
-        emit ApprovalForNFT(holder, nft, id, approved);
+        emit ApprovalForNFT(holders, nft, id, approved);
     }
 
     /// @notice Checks if 'holder' and 'nft' with token 'id' have been approved
@@ -100,7 +99,14 @@ contract TipToken is ITipToken, ERC20, Ownable {
         address nft,
         uint256 id
     ) external view override returns (bool) {
-        return _idToAccount[nft][id] == holder;
+        if (_idToAccount[nft][id].length == 0) return false;
+
+        address[] memory holders = _idToAccount[nft][id];
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (_idToAccount[nft][id][i] == holder) return true;
+        }
+
+        return false;
     }
 
     /// @notice Deposit an ERC20 compatible token in exchange for tip tokens
@@ -267,38 +273,78 @@ contract TipToken is ITipToken, ERC20, Ownable {
         uint256 id,
         uint256 amount
     ) internal {
-        address holder = _idToAccount[nft][id];
-        require(holder != address(0), "NFT not approved");
+        address[] memory holders = _idToAccount[nft][id];
+
+        require(holders.length > 0, "NFT not approved");
         require(
             IERC165(nft).supportsInterface(type(IERC1155).interfaceId)
-                ? IERC1155(nft).balanceOf(holder, id) == 1 &&
-                    IERC1155(nft).isApprovedForAll(holder, address(this))
-                : IERC165(nft).supportsInterface(type(IERC721).interfaceId) &&
-                    IERC721(nft).ownerOf(id) == holder &&
-                    IERC721(nft).isApprovedForAll(holder, address(this)),
+                ? _erc1155IsApprovedForAll(nft, holders)
+                : IERC165(nft).supportsInterface(type(IERC721).interfaceId)
+                ? holders.length == 1 &&
+                    IERC721(nft).isApprovedForAll(holders[0], address(this))
+                : false,
             "NFT to tip not available"
         );
 
         uint256 rewardTokenBalance = _depositBalances[user];
-
         uint256 tipTokenBalance = IERC20(address(this)).balanceOf(user);
 
-        uint256 rewardTokenAmountToTip = (rewardTokenBalance * amount) /
+        uint256 totalRewardTokenAmount = (rewardTokenBalance * amount) /
             tipTokenBalance;
 
         super._burn(user, amount);
 
-        _depositBalances[user] -= rewardTokenAmountToTip;
-        _rewardsPending[holder] += rewardTokenAmountToTip;
+        _depositBalances[user] -= totalRewardTokenAmount;
+        uint256[] memory rewardTokenAmountToHolders = new uint256[](
+            holders.length
+        );
+
+        if (holders.length == 1) {
+            _rewardsPending[holders[0]] += totalRewardTokenAmount;
+            rewardTokenAmountToHolders[0] = totalRewardTokenAmount;
+        } else {
+            uint256[] memory ids = new uint256[](holders.length);
+            for (uint256 i = 0; i < holders.length; i++) ids[i] = id;
+
+            uint256[] memory erc1155Balances = IERC1155(nft).balanceOfBatch(
+                holders,
+                ids
+            );
+            uint256 totalERC1155Balance;
+
+            for (uint256 i = 0; i < holders.length; i++)
+                totalERC1155Balance += erc1155Balances[i];
+
+            // pay out in the proportion of balances held
+            uint256 actualTotalRewardTokenAmount;
+            for (uint256 i = 0; i < holders.length; i++) {
+                uint256 holderERC1155Balance = IERC1155(nft).balanceOf(
+                    holders[i],
+                    id
+                );
+                uint256 rewardTokenAmountToHolder = (totalRewardTokenAmount *
+                    holderERC1155Balance) / totalERC1155Balance;
+                actualTotalRewardTokenAmount += rewardTokenAmountToHolder;
+
+                _rewardsPending[holders[i]] += rewardTokenAmountToHolder;
+                rewardTokenAmountToHolders[i] = rewardTokenAmountToHolder;
+            }
+
+            // adjust for rounding errors
+            _rewardsPending[holders[0]] += (totalRewardTokenAmount -
+                actualTotalRewardTokenAmount);
+            rewardTokenAmountToHolders[0] -= (totalRewardTokenAmount -
+                actualTotalRewardTokenAmount);
+        }
 
         emit Tip(
             user,
-            holder,
+            _idToAccount[nft][id],
             nft,
             id,
             amount,
             _rewardToken,
-            rewardTokenAmountToTip
+            rewardTokenAmountToHolders
         );
     }
 
@@ -336,5 +382,19 @@ contract TipToken is ITipToken, ERC20, Ownable {
 
         _depositBalances[sender] -= rewardTokenTransferAmount;
         _depositBalances[recipient] += rewardTokenTransferAmount;
+    }
+
+    /// @notice Returns true only if all 'holders' of 'nft' have approved TipToken contract as 'nft' operator
+    function _erc1155IsApprovedForAll(address nft, address[] memory holders)
+        private
+        view
+        returns (bool)
+    {
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (!IERC1155(nft).isApprovedForAll(holders[i], address(this)))
+                return false;
+        }
+
+        return true;
     }
 }

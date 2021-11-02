@@ -1,3 +1,4 @@
+const { BigNumber } = require('@ethersproject/bignumber');
 const { expect, assert } = require('chai');
 const { ethers } = require('hardhat');
 
@@ -62,10 +63,10 @@ describe('TipToken contract', () => {
       await expect(
         myTipToken
           .connect(serviceProvider)
-          .setApprovalForNFT(holder.address, myERC721.address, nftTokenId, true)
+          .setApprovalForNFT([holder.address], myERC721.address, nftTokenId, true)
       )
         .to.emit(myTipToken, 'ApprovalForNFT')
-        .withArgs(holder.address, myERC721.address, nftTokenId, true);
+        .withArgs([holder.address], myERC721.address, nftTokenId, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -102,12 +103,12 @@ describe('TipToken contract', () => {
         .to.emit(myTipToken, 'Tip')
         .withArgs(
           user1.address,
-          holder.address,
+          [holder.address],
           myERC721.address,
           nftTokenId,
           amountToTip,
           token1.address,
-          amountToken1Reward
+          [amountToken1Reward]
         );
 
       // Check that correct amount of tips from user1 have been burned
@@ -145,7 +146,7 @@ describe('TipToken contract', () => {
       // myTipToken approves users to send myTipToken tip tokens to myERC1155's token that has id nftTokenId
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC1155.address, nftTokenId, true);
+        .setApprovalForNFT([holder.address], myERC1155.address, nftTokenId, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -201,7 +202,7 @@ describe('TipToken contract', () => {
       await expect(
         myTipToken
           .connect(serviceProvider)
-          .setApprovalForNFT(user1.address, myERC1155.address, 1, true)
+          .setApprovalForNFT([user1.address], myERC1155.address, 1, true)
       ).to.be.revertedWith('Unable to set approval');
     });
 
@@ -213,7 +214,7 @@ describe('TipToken contract', () => {
       await myERC1155.mint(holder.address, myERC1155.address, nftTokenId, 1, []);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC1155.address, nftTokenId, false);
+        .setApprovalForNFT([holder.address], myERC1155.address, nftTokenId, false);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -259,7 +260,7 @@ describe('TipToken contract', () => {
       // myTipToken gives approval that users can send myTipToken tips to NFT myERC721
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC721.address, nftTokenId, true);
+        .setApprovalForNFT([holder.address], myERC721.address, nftTokenId, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -317,7 +318,7 @@ describe('TipToken contract', () => {
       await myERC1155.mint(holder.address, nftTokenId2, 1, []);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC1155.address, nftTokenId2, true);
+        .setApprovalForNFT([holder.address], myERC1155.address, nftTokenId2, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -374,7 +375,7 @@ describe('TipToken contract', () => {
       await myERC721.safeMint(holder.address, nftTokenId);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC721.address, nftTokenId, true);
+        .setApprovalForNFT([holder.address], myERC721.address, nftTokenId, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -410,13 +411,13 @@ describe('TipToken contract', () => {
 
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC1155.address, nftTokenId, true);
+        .setApprovalForNFT([holder.address], myERC1155.address, nftTokenId, true);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC1155.address, nftTokenId2, true);
+        .setApprovalForNFT([holder.address], myERC1155.address, nftTokenId2, true);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder2.address, myERC1155.address, nftTokenId3, true);
+        .setApprovalForNFT([holder2.address], myERC1155.address, nftTokenId3, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
       await token1.connect(user3).approve(myTipToken.address, depositToken3);
@@ -498,7 +499,7 @@ describe('TipToken contract', () => {
       await myERC721.safeMint(holder.address, nftTokenId);
       await myTipToken
         .connect(serviceProvider)
-        .setApprovalForNFT(holder.address, myERC721.address, nftTokenId, true);
+        .setApprovalForNFT([holder.address], myERC721.address, nftTokenId, true);
 
       await token1.connect(user1).approve(myTipToken.address, depositToken1);
 
@@ -575,7 +576,7 @@ describe('TipToken contract', () => {
     });
 
     it('test TipToken supportsInterface: ITipToken', async () => {
-      let ITipTokenInterface = '0x47947434';
+      let ITipTokenInterface = '0x985A3267';
       assert((await myTipToken.supportsInterface(ITipTokenInterface)) === true);
     });
 
@@ -586,6 +587,108 @@ describe('TipToken contract', () => {
       await expect(myTipToken2.deployTransaction)
         .to.emit(myTipToken2, 'InitializeTipToken')
         .withArgs(myTipToken2.address, token1.address, owner.address);
+    });
+
+    it('test tip for ERC1155 from shared holders', async () => {
+      // myERC1155 authorises myTipToken to send it tips
+      await myERC1155.connect(holder).setApprovalForAll(myTipToken.address, true);
+      await myERC1155.connect(holder2).setApprovalForAll(myTipToken.address, true);
+
+      const nftTokenId = 1;
+
+      const holderPercentHoldings = 25;
+      const holder2PercentHoldings = 75;
+      await myERC1155.mint(holder.address, nftTokenId, holderPercentHoldings, []);
+      await myERC1155.mint(holder2.address, nftTokenId, holder2PercentHoldings, []);
+
+      // myTipToken approves users to send myTipToken tip tokens to myERC1155's token that has id nftTokenId
+      await expect(
+        myTipToken
+          .connect(serviceProvider)
+          .setApprovalForNFT([holder.address, holder2.address], myERC1155.address, nftTokenId, true)
+      )
+        .to.emit(myTipToken, 'ApprovalForNFT')
+        .withArgs([holder.address, holder2.address], myERC1155.address, nftTokenId, true);
+
+      await token1.connect(user1).approve(myTipToken.address, depositToken1);
+
+      // user deposits to receive tip tokens
+      const user1BalanceBefore = await myTipToken.balanceOf(user1.address);
+      await myTipToken.connect(user1).deposit(user1.address, depositToken1);
+      const user1BalanceAfter = await myTipToken.balanceOf(user1.address);
+
+      // Check total tip balance
+      const totalTipTokenAmount = depositToken1.mul(ethers.constants.WeiPerEther).div(price);
+      expect(user1BalanceAfter.sub(user1BalanceBefore)).to.be.equal(totalTipTokenAmount);
+
+      const amountToken1Reward = depositToken1
+        .mul(ethers.constants.WeiPerEther)
+        .div(ethers.utils.parseEther('3'));
+
+      const amountToTip = totalTipTokenAmount
+        .mul(ethers.constants.WeiPerEther)
+        .div(ethers.utils.parseEther('3'));
+
+      const holderToken1Reward = amountToken1Reward
+        .mul(BigNumber.from(holderPercentHoldings))
+        .div(BigNumber.from(100));
+      const holder2Token1Reward = amountToken1Reward
+        .mul(BigNumber.from(holder2PercentHoldings))
+        .div(BigNumber.from(100));
+
+      const tokenPendingHolderPendingBalanceBefore = await myTipToken.rewardPendingOf(
+        holder.address
+      );
+
+      const tokenPendingHolder2PendingBalanceBefore = await myTipToken.rewardPendingOf(
+        holder2.address
+      );
+
+      // Tip a third of the tips
+      await expect(myTipToken.connect(user1).tip(myERC1155.address, nftTokenId, amountToTip))
+        .to.emit(myTipToken, 'Tip')
+        .withArgs(
+          user1.address,
+          [holder.address, holder2.address],
+          myERC1155.address,
+          nftTokenId,
+          amountToTip,
+          token1.address,
+          [holderToken1Reward, holder2Token1Reward]
+        );
+
+      // Check that correct amount of tips from user1 have been burned
+      const user1BalanceFinal = await myTipToken.balanceOf(user1.address);
+      expect(user1BalanceAfter.sub(user1BalanceFinal)).to.be.equal(amountToTip);
+
+      const tokenPendingHolderPendingBalanceAfter = await myTipToken.rewardPendingOf(
+        holder.address
+      );
+
+      const tokenPendingHolder2PendingBalanceAfter = await myTipToken.rewardPendingOf(
+        holder2.address
+      );
+
+      expect(
+        tokenPendingHolderPendingBalanceAfter.sub(tokenPendingHolderPendingBalanceBefore)
+      ).to.be.equal(holderToken1Reward);
+
+      expect(
+        tokenPendingHolder2PendingBalanceAfter.sub(tokenPendingHolder2PendingBalanceBefore)
+      ).to.be.equal(holder2Token1Reward);
+
+      const holderBalanceBefore = await token1.balanceOf(holder.address);
+      await myTipToken.connect(holder).withdraw(holderToken1Reward);
+
+      const holder2BalanceBefore = await token1.balanceOf(holder2.address);
+      await myTipToken.connect(holder2).withdraw(holder2Token1Reward);
+
+      // check amount holder receives
+      const holderBalanceAfter = await token1.balanceOf(holder.address);
+      expect(holderBalanceAfter.sub(holderBalanceBefore)).to.be.equal(holderToken1Reward);
+
+      const holder2BalanceAfter = await token1.balanceOf(holder2.address);
+      expect(holder2BalanceAfter.sub(holder2BalanceBefore)).to.be.equal(holder2Token1Reward);
     });
   });
 });

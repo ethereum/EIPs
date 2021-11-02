@@ -3,12 +3,12 @@ pragma solidity >=0.7.0 <0.9.0;
 
 interface ITipToken {
     /// @dev This emits when the tip token implementation approves the address
-    /// of an an NFT for tipping.
-    /// The zero address indicates there is no approved address.
+    /// of an NFT for tipping.
+    /// The holders of the 'nft' are approved to receive rewards.
     /// When an NFT Transfer event emits, this also indicates that the approved
-    /// address for that NFT (if any) is reset to none.
+    /// addresses for that NFT (if any) is reset to none.
     event ApprovalForNFT(
-        address indexed holder,
+        address[] holders,
         address indexed nft,
         uint256 indexed id,
         bool approved
@@ -51,27 +51,27 @@ interface ITipToken {
     /// will be held pending until the holder withdraws the reward tokens.
     event Tip(
         address indexed user,
-        address indexed holder,
+        address[] holder,
         address indexed nft,
         uint256 id,
         uint256 amount,
         address rewardToken,
-        uint256 rewardTokenAmount
+        uint256[] rewardTokenAmount
     );
 
     /// @notice Enable or disable approval for tipping for a single NFT held
-    /// by holder
+    /// by a holder or a multi token shared by holders
     /// @dev MUST revert if calling nft's supportsInterface does not return
     /// true for either IERC721 or IERC1155.
-    /// MUST revert if 'holder' is the zero address.
+    /// MUST revert if any of the 'holders' is the zero address.
     /// MUST revert if 'nft' has not approved the tip token contract address.
     /// MUST emit the 'ApprovalForNFT' event to reflect approval or not approval
-    /// @param holder The holder of the NFT (NFT controller)
+    /// @param holders The holders of the NFT (NFT controllers)
     /// @param nft The NFT contract address
     /// @param id The NFT token id
     /// @param approved True if the 'holder' is approved, false to revoke approval
     function setApprovalForNFT(
-        address holder,
+        address[] memory holders,
         address nft,
         uint256 id,
         bool approved
@@ -93,13 +93,16 @@ interface ITipToken {
         uint256 id
     ) external returns (bool);
 
-    /// @notice Sends tip from msg.sender to holder of a single NFT
-    /// @dev If NFT has not been approved for tipping, MUST revert
+    /// @notice Sends tip from msg.sender to holder of a single NFT or
+    /// to shared holders of a multi token
+    /// @dev If 'nft' has not been approved for tipping, MUST revert
     /// MUST revert if 'nft' is zero address.
     /// MUST burn the tip 'amount' to the 'holder' and send the reward to
-    /// an account pending for the 'holder'.
+    /// an account pending for the holder(s).
+    /// If 'nft' is a multi token that has multiple holders then each holder
+    /// MUST receive tip amount in proportion of their balance of multi tokens
     /// MUST emit the 'Tip' event to reflect the amounts that msg.sender tipped
-    /// to holder's 'nft'.
+    /// to holder(s) of 'nft'.
     /// @param nft The NFT contract address
     /// @param id The NFT token id
     /// @param amount Amount of tip tokens to send to the holder of the NFT
@@ -118,8 +121,8 @@ interface ITipToken {
     /// each holder and for which nft and from whom, can be reconstructed.
     /// @param users User accounts to tip from
     /// @param nfts The NFT contract addresses whose holders to tip to
-    /// @param ids The NFT token ids that uniquely identifies the nft
-    /// @param amounts Amount of tip tokens to send to the holder of the NFT
+    /// @param ids The NFT token ids that uniquely identifies the 'nfts'
+    /// @param amounts Amount of tip tokens to send to the holders of the NFTs
     function tipBatch(
         address[] memory users,
         address[] memory nfts,
@@ -133,7 +136,7 @@ interface ITipToken {
     /// amount of tip tokens to tip over the user's tip tokens balance available
     /// multiplied by the user's deposit balance.
     /// The deposited tokens can be held in the tip tokens contract account or
-    /// in an external eschrow. This will depend on the tip token implementation.
+    /// in an external escrow. This will depend on the tip token implementation.
     /// Each tip token contract MUST handle only one type of ERC20 compatible
     /// reward for deposits.
     /// This token address SHOULD be passed in to the tip token constructor or
@@ -170,8 +173,8 @@ interface ITipToken {
 
     /// @notice The amount of reward token owed to 'holder'
     /// @dev The pending tokens can come from the tip token contract account
-    /// or from an external eschrow, depending on tip token implementation
-    /// @param holder The holder of an NFT (NFT controller)
+    /// or from an external escrow, depending on tip token implementation
+    /// @param holder The holder of NFT(s) (NFT controller)
     /// @return The amount of reward tokens owed to the holder from tipping
     function rewardPendingOf(address holder) external view returns (uint256);
 }
