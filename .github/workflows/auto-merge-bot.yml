@@ -24,3 +24,10 @@ jobs:
           INTERFACE_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
           META_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
           INFORMATIONAL_EDITORS: "@MicahZoltu,@lightclient,@arachnid,@cdetrio,@Souptacular,@vbuterin,@nicksavers,@wanderer,@gcolvin,@axic"
+  enable-auto-merge:
+    runs-on: ubuntu-latest
+    needs: ["auto_merge_bot"]
+    steps:
+    - uses: alexwilson/enable-github-automerge-action@1.0.0
+      with:
+        github-token: ${{ secrets.TOKEN }}
