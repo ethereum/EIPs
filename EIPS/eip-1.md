@@ -247,7 +247,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Style Guide
 
+### EIP numbers
+
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+
+### RFC 2119
+
+EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+
+> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ## History
 
