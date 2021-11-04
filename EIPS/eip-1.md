@@ -167,9 +167,9 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed. As mentioned above, an example of a place to discuss your EIP is [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect).
+While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-As an exception, `discussions-to` cannot point to GitHub pull requests.
+The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 #### `type` header
 
