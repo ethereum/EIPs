@@ -20,7 +20,7 @@ jobs:
           MERGE_ENABLED: false
           CORE_EDITORS: "@MicahZoltu,@lightclient,@axic"
           ERC_EDITORS: "@lightclient,@axic"
-          NETWORKING_EDITORS: "@lightclient,@axic"
+          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
           INTERFACE_EDITORS: "@lightclient,@axic"
           META_EDITORS: "@lightclient,@axic"
           INFORMATIONAL_EDITORS: "@lightclient,@axic"
