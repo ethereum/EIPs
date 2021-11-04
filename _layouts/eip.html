@@ -51,14 +51,8 @@ layout: default
     {% if page.requires != undefined %}
       <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
     {% endif %}
-    {% if page.replaces != undefined %}
-      <tr><th>Replaces</th><td>{% include eipnums.html eips=page.replaces %}</td></tr>
-    {% endif %}
-    {% if page["superseded-by"] != undefined %}
-      <tr><th>Superseded by</th><td>{% include eipnums.html eips=page.superseded-by %}</td></tr>
-    {% endif %}
-    {% if page.resolution != undefined %}
-      <tr><th>Resolution</th><td><a href="{{page.resolution | uri_escape }}">{{ page.resolution | xml_escape }}</a></td></tr>
+    {% if page["withdrawal-reason"] != undefined %}
+      <tr><th>Withdrawal reason</th><td>{{ page["withdrawal-reason"] | xml_escape }}</td></tr>
     {% endif %}
   </table>
 
