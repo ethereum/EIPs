@@ -237,7 +237,7 @@ interface ITipToken {
 
 ### Tip Token transfer and value calculations
 
-Tip token values are exchanged with ERC-20 deposits and vice-versa. It is left to the tip token implementer to decide on the price of a tip token and hence how much tip to mint in exchange for the ERC-20 deposited.
+Tip token values are exchanged with ERC-20 deposits and vice-versa. It is left to the tip token implementer to decide on the price of a tip token and hence how much tip to mint in exchange for the ERC-20 deposited. One possibility is to have fixed conversion rates per geographical region so that users from poorer countries are able to send the same number of tips as those from richer nations for the same level of appreciation for content/assets etc. Hence, not skewed by average wealth when it comes to analytics to discover what NFTs are actually popular, allowing creators to have a level playing field.
 
 Whenever a user sends a tip, an equivalent value of deposited ERC20 MUST be transferred to a pending account for the NFT or multi-token holder, and the tip tokens sent MUST be burnt. This equivalent value is calculated using a simple formula:
 
