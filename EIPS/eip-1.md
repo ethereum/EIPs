@@ -139,11 +139,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * requires:` *EIP number(s)*
 
-` * replaces:` *EIP number(s)*
-
-` * superseded-by:` *EIP number(s)*
-
-` * resolution:` *a url pointing to the resolution of this EIP*
+` * withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.*
 
 Headers that permit lists must separate elements with commas.
 
@@ -169,15 +165,11 @@ It is not possible to use both an email and a GitHub username at the same time. 
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
-#### `resolution` header
-
-The `resolution` header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
-
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, an example of a place to discuss your EIP is [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect).
+While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-As an exception, `discussions-to` cannot point to GitHub pull requests.
+The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 #### `type` header
 
@@ -198,10 +190,6 @@ The `updated` header records the date(s) when the EIP was updated with "substant
 #### `requires` header
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
-
-#### `superseded-by` and `replaces` headers
-
-EIPs may also have a `superseded-by` header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a `replaces` header containing the number of the EIP that it rendered obsolete.
 
 ## Linking to other EIPs
 
@@ -225,14 +213,14 @@ The current EIP editors are
 - Matt Garnett (@lightclient)
 - Micah Zoltu (@MicahZoltu)
 - Greg Colvin (@gcolvin)
-- Nick Johnson (@arachnid)
-- Vitalik Buterin (@vbuterin)
-- Hudson Jameson (@Souptacular)
-- Nick Savers (@nicksavers)
 
 Emeritus EIP editors are 
 
 - Casey Detrio (@cdetrio)
+- Nick Johnson (@arachnid)
+- Vitalik Buterin (@vbuterin)
+- Hudson Jameson (@Souptacular)
+- Nick Savers (@nicksavers)
 - Martin Becze (@wanderer)
 
 ## EIP Editor Responsibilities
@@ -259,7 +247,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Style Guide
 
+### EIP numbers
+
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+
+### RFC 2119
+
+EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+
+> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ## History
 
