@@ -30,7 +30,7 @@ matrix:
     - language: rust
       cache: cargo
       before_script:
-        - cargo install eipv --version=0.1.0
+        - cargo install eipv --version=0.3.0
       env: TASK='eip-validator'
     - python: 3.3
       env: TASK='codespell'
@@ -38,12 +38,6 @@ matrix:
   allow_failures:
     - rvm: 2.6.0
       env: TASK='htmlproofer-external'
-
-notifications:
-  webhooks:
-    urls:
-      - https://ethlab-183014.appspot.com/merge/
-    on_success: always
 
 addons:
   apt:
