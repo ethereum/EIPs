@@ -1,9 +1,9 @@
 ---
-eip: XXX_add_once_assigned_a_number
+eip: 4430
 title: Described Transactions
 description: Contract methods to compute human-readable descriptions for machine readable transaction data.
 author: Richard Moore (@ricmoo), Nick Johnson (@arachnid)
-discussions-to: XXX_add_once_assigned_a_number
+discussions-to: https://github.com/ethereum/EIPs/issues/4431
 status: Draft
 type: Standards Track
 category: ERC
