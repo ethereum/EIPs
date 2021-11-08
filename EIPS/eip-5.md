@@ -1,12 +1,12 @@
-### Title
-
-      EIP: 5
-      Title: Gas Usage for `RETURN` and `CALL*`
-      Author: Christian Reitwiessner <c@ethdev.com>
-      Status: Draft
-      Type: Standards Track
-      Layer: Consensus (hard-fork)
-      Created: 2015-11-22
+---
+eip: 5
+title: Gas Usage for `RETURN` and `CALL*`
+author: Christian Reitwiessner <c@ethdev.com>
+status: Final
+type: Standards Track
+category: Core
+created: 2015-11-22
+---
 
 ### Abstract
 
@@ -21,10 +21,10 @@ the time the `CALL` returns.
 
 ### Specification
 
-The gas and memory semantics for `CALL` and `CALLCODE` (and `DELEGATE_CALL`, if adopted, see EIP-4)
+The gas and memory semantics for `CALL`, `CALLCODE` and `DELEGATECALL` (called later as `CALL*`)
 are changed in the following way (`CREATE` does not write to memory and is thus unaffected):
 
-Suppose the arguments to `CALL` / `CALLCODE` are `gas, address, value, input_start, input_size, output_start, output_size)`,
+Suppose the arguments to `CALL*` are `gas, address, value, input_start, input_size, output_start, output_size`,
 then, at the beginning of the opcode, gas for growing memory is only charged for `input_start + input_size`, but not
 for `output_start + output_size`.
 
@@ -107,7 +107,7 @@ The change in semantics affects existing contracts in two ways:
    all be written in a way, though, such that objects in memory are _relocatable_,
    i.e. their absolute position in memory and their relative position to other
    objects does not matter. This is of course not the case for arrays, but they
-   are allocated in a single allocation and not with an intermidiate `CALL`.
+   are allocated in a single allocation and not with an intermediate `CALL`.
 
 
 ### Implementation

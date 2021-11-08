@@ -1,24 +1,73 @@
-# EIP [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-Ethereum Improvement Proposal. EIPs propose and describe changes made to Ethereum Protocol.
+# Ethereum Improvement Proposals (EIPs)
 
-People wishing to submit EIPs first should propose their idea an issue or document as pull request. After discussion it will be published here. We are fairly liberal with approving EIPs and try not to be too involved in decision making on behalf of the community. Having an EIP here does not make it a formally accepted standard until its status becomes Active. For a EIP to become Active requires the mutual consent of the community. Those proposing changes should consider that ultimately consent may rest with the consensus of the Ethereum users.
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ethereum/EIPs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-# Contributing
-First review [EIP-1](EIPS/eip-1.mediawiki). Then clone the repository and add your EIP to it. There is a [template EIP here](eip-X.mediawiki). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards. **Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).**
 
-# Current EIPS
-| Number        |Title         | Author | Type  | Layer        | Status / Discussion | 
-| ------------- | ------------ | ------ | ----- | -------------| ------------------- |
-| [1](EIPS/eip-1.mediawiki)    | EIP Purpose and Guidelines | Martin Becze | Meta | | Active |
-| [2](EIPS/eip-2.mediawiki)    | Homestead Hard-fork Changes | Vitalik Buterin | Standard | homestead (hard-fork) | Accepted |
-| [3](EIPS/eip-3.mediawiki)    | Addition of CALLDEPTH opcode | Martin Holst Swende | Standard | Consensus (hard-fork) | [Draft](https://github.com/ethereum/EIPs/issues/25) |
-| [4](EIPS/eip-4.mediawiki)    | EIP Classification | Joseph Chow | Meta | | Draft |
-| [5](EIPS/eip-5.md)    | Gas Usage for `RETURN` and `CALL*` | Christian Reitwiessner | Standard | Consensus (hard-fork) | [Draft](https://github.com/ethereum/EIPs/issues/8) |
-| [6](EIPS/eip-6.md)    | Renaming Suicide Variable | Hudson Jameson | Meta |  | [Draft](https://github.com/ethereum/EIPs/pull/42) |
-| [7](EIPS/eip-7.md)    | DELEGATECALL | Vitalik Buterin | Standard | homestead (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/23) |
-| [8](EIPS/eip-8.md)    | devp2p Forward Compatibility Requirements for Homestead | Felix Lange | Standard | Networking | [Accepted](https://github.com/ethereum/EIPs/pull/49) |
-| [150](https://github.com/ethereum/EIPs/issues/150)    | Gas cost changes for IO-heavy operations | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/150) |
-| [155](https://github.com/ethereum/EIPs/issues/155)    | Simple replay attack protection | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/155) |
-| [160](https://github.com/ethereum/EIPs/issues/160)    | EXP cost increase | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/160) |
-| [161](https://github.com/ethereum/EIPs/issues/161)    | State trie clearing (invariant-preserving alternative) | Gavin Wood | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/161) |
-| [170](https://github.com/ethereum/EIPs/issues/170)    | Contract code size limit | Vitalik Buterin | Standard | Consensus (hard-fork) | [Accepted](https://github.com/ethereum/EIPs/issues/170) |
+**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document.
+
+Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your GitHub username or your email address inside \<triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
+
+## Project Goal
+
+The Ethereum Improvement Proposals repository exists as a place to share concrete proposals with potential users of the proposal and the Ethereum community at large.
+
+## Preferred Citation Format
+
+The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+
+Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+
+And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
+
+# Validation
+
+EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
+
+It is possible to run the EIP validator locally:
+```sh
+gem install eip_validator
+eip_validator <INPUT_FILES>
+```
+
+# Automerger
+
+The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can GitHub approve the change to have it auto-merged. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
+
+# Local development
+
+## Prerequisites
+
+1. Open Terminal.
+
+2. Check whether you have Ruby 2.1.0 or higher installed:
+
+```sh
+$ ruby --version
+```
+
+3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+
+4. Install Bundler:
+
+```sh
+$ gem install bundler
+```
+
+5. Install dependencies:
+
+```sh
+$ bundle install
+```
+
+## Build your local Jekyll site
+
+1. Bundle assets and start the server:
+
+```sh
+$ bundle exec jekyll serve
+```
+
+2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
+
+More information on Jekyll and GitHub pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
