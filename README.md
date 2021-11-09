@@ -4,12 +4,12 @@
 
 本项目是由 [EIPs 英文官方仓库](https://github.com/ethereum/EIPs) 翻译而来，后续版本将会持续和英文版本保持一致更新。
 
-查看所有 EIPs 中文翻译：<https://eips.ethlibrary.io>
+查看所有 EIPs 中文翻译：<https://eips.ethlibrary.io/zh>
 
 
 ## 参与贡献翻译
 
-请查看 [EIPs 中文新手翻译指南](https://eips.ethlibrary.io/zh/getting-started)。
+请查看 [EIPs 中文新手翻译指南](https://github.com/ethlibrary/EIPs/wiki/EIPs-%E4%B8%AD%E6%96%87%E6%96%B0%E6%89%8B%E7%BF%BB%E8%AF%91%E6%8C%87%E5%8D%97)。
 
 ## 本地运行
 
