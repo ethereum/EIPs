@@ -1,71 +1,55 @@
 # 以太坊改进提案（中文翻译） (EIPs)
 
-Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards. **Browse all current and draft EIPs on [the official EIP site](https://eips.ethereum.org/).**
+以太坊改进提案（Ethereum Improvement Proposals (EIPs)）描述了以太坊的标准化改进，包括核心协议、规范、客户端 API 接口和合约标准。更多关于 EIPS 的概念，请参见 [以太坊中文官网描述](https://ethereum.org/zh/eips/)。
 
-**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document.
+本项目是由 [EIPs 英文官方仓库](https://github.com/ethereum/EIPs) 翻译而来，后续版本将会持续和英文版本保持一致更新。
 
-Once your first PR is merged, we have a bot that helps out by automatically merging PRs to draft EIPs. For this to work, it has to be able to tell that you own the draft being edited. Make sure that the 'author' line of your EIP contains either your GitHub username or your email address inside \<triangular brackets>. If you use your email address, that address must be the one publicly shown on [your GitHub profile](https://github.com/settings/profile).
+查看所有 EIPs 中文翻译：<https://eips.ethlibrary.io>
 
-## Project Goal
 
-The Ethereum Improvement Proposals repository exists as a place to share concrete proposals with potential users of the proposal and the Ethereum community at large.
+## 参与贡献翻译
 
-## Preferred Citation Format
+请查看 [EIPs 中文新手翻译指南](https://eips.ethlibrary.io/zh/getting-started)。
 
-The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+## 本地运行
 
-Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+如果你只参与翻译，可以忽略以下内容。
 
-And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
+如果你需要在你本地预览所有页面，或者自己部署在服务器上，你可以参考以下步骤：
 
-# Validation
+## 安装
 
-EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
+1. 打开终端
 
-It is possible to run the EIP validator locally:
-```sh
-gem install eip_validator
-eip_validator <INPUT_FILES>
-```
-
-# Automerger
-
-The EIP repository contains an "auto merge" feature to ease the workload for EIP editors.  If a change is made via a PR to a draft EIP, then the authors of the EIP can GitHub approve the change to have it auto-merged. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
-
-# Local development
-
-## Prerequisites
-
-1. Open Terminal.
-
-2. Check whether you have Ruby 2.1.0 or higher installed:
+2. 检查是否已经安装了 `node` 和 `yarn`:
 
 ```sh
-$ ruby --version
+$ node -v
+
+$ yarn -v
 ```
 
-3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+3. 如果没有安装 `node`，请到 [安装页面](https://nodejs.org/en/) 下载并安装。
+   如果没有安装 `yarn`, 请到 [安装页面](https://yarnpkg.com/lang/en/docs/install/) 下载并安装。
 
-4. Install Bundler:
+5. 安装项目依赖:
 
 ```sh
-$ gem install bundler
+$ yarn
 ```
 
-5. Install dependencies:
+## 本地运行
+
+1. 执行 `yarn run dev` 命令开启本地服务器。
 
 ```sh
-$ bundle install
+$ yarn run dev
 ```
 
-## Build your local Jekyll site
+2. 在你的浏览器里访问 `http://localhost:8000`，进行预览
 
-1. Bundle assets and start the server:
+## 打包构建
 
 ```sh
-$ bundle exec jekyll serve
+$ yarn run build
 ```
-
-2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
-
-More information on Jekyll and GitHub pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
