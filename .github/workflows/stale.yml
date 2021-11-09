@@ -18,6 +18,7 @@ jobs:
         days-before-stale: 60
         days-before-close: 7
         stale-pr-label: 'stale'
+        exempt-issue-labels: 'discussion-url'
   stale-issue:
     runs-on: ubuntu-latest
     name: "Mark stale issues"
