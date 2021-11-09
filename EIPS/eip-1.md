@@ -123,7 +123,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
-` * discussions-to:` *a url pointing to the official discussion thread*
+` discussions-to:` *a url pointing to the official discussion thread*
 
 ` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
