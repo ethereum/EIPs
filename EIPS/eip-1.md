@@ -78,7 +78,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
 If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
@@ -127,7 +127,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
-` * review-period-end:` *date review period ends*
+` * last-call-deadline:` *The date last call period ends on*
 
 ` type:` *Standards Track, Meta, or Informational*
 
