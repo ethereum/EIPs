@@ -1,10 +1,10 @@
 # EIPs 
 
-Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.
+以太坊改进提案（EIPs）描述了以太坊平台的标准，包括核心协议规范、客户端 APIs 和合约标准。  
 
-## Contributing
+## 贡献
 
-First review [EIP-1](./eip-1.md). Then clone the [repository](https://github.com/ethereum/EIPs) and add your EIP to it. There is a [template EIP here](https://github.com/ethereum/EIPs/blob/master/eip-template.md). Then submit a Pull Request to Ethereum's [EIPs repository](https://github.com/ethereum/EIPs).
+首先，请阅读 [EIP-1](./eip-1.md)。然后复制 [repository](https://github.com/ethereum/EIPs) 并且添加你的 EIP。这里有一个 [EIP 模版](https://github.com/ethereum/EIPs/blob/master/eip-template.md)。然后提交 PR 到以太坊的 [EIPs repository](https://github.com/ethereum/EIPs)。
 
 ## EIP status terms
 
