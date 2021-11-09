@@ -1,5 +1,5 @@
 
-# Living (1)
+# Ethereum EIPs: Living (1)
 ---
 | Eip         | Title                      | Created    | Status | Category | Type  |
 | ----------- | -------------------------- | ---------- | ------ | -------- | ----- |

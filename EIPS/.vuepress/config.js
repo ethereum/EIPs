@@ -67,7 +67,7 @@ const genSummary = (summary, locale) => {
     })
     const tableJSON = tablemark(content)
     const markdown = `
-# ${key} (${content.length})
+# Ethereum EIPs: ${key} (${content.length})
 ---
 ${tableJSON}
     `
@@ -88,7 +88,7 @@ const getSidebar = locale => {
   return [
     {
       title: locale.allListSubTitle,
-      path: '/summary/all',
+      path: '/',
       collapsable: false,
     },
     {

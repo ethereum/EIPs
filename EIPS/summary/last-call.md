@@ -1,5 +1,5 @@
 
-# Last Call (8)
+# Ethereum EIPs: Last Call (9)
 ---
 | Eip               | Title                                                    | Created    | Status    | Category   | Type            |
 | ----------------- | -------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
@@ -11,5 +11,6 @@
 | [2535](/eip-2535) | Diamonds, Multi-Facet Proxy                              | 2020-02-22 | Last Call | ERC        | Standards Track |
 | [2976](/eip-2976) | Typed Transactions over Gossip                           | 2020-09-13 | Last Call | Networking | Standards Track |
 | [2982](/eip-2982) | Serenity Phase 0                                         | 2020-09-15 | Last Call |            | Informational   |
+| [3076](/eip-3076) | Slashing Protection Interchange Format                   | 2020-10-27 | Last Call | Interface  | Standards Track |
 
     
