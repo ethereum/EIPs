@@ -1,7 +1,8 @@
 {
   "name": "eips",
   "version": "1.0.0",
-  "description": "EIPs Chinese language version",
+  "homepage": "https://eips.ethlibrary.io",
+  "description": "EIPs Chinese translation version",
   "main": " ",
   "repository": "git@github.com:ethlibrary/EIPs.git",
   "author": "izayl <izayl@163.com>",
