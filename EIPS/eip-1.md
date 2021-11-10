@@ -56,13 +56,13 @@ Once the idea has been vetted, your next responsibility will be to present (by m
 
 For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP. 
 
-The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue].  
+The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue](https://github.com/ethereum/pm/issues).  
 
 The AllCoreDevs call serve as a way for client implementers to do three things. First, to discuss the technical merits of EIPs. Second, to gauge what other clients will be implementing. Third, to coordinate EIP implementation for network upgrades.
 
 These calls generally result in a "rough consensus" around what EIPs should be implemented. This "rough consensus" rests on the assumptions that EIPs are not contentious enough to cause a network split and that they are technically sound.
 
-:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum] thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
+:warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum](https://ethereum-magicians.org/) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
 *In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.* 
 
@@ -90,14 +90,14 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 
-**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
+**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
 ## What belongs in a successful EIP?
 
 Each EIP should have the following parts:
 
-- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](./eip-1.md#eip-header-preamble) for details.
-- Abstract - A short (~200 word) description of the technical issue being addressed.
+- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
+- Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 - Motivation (*optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
@@ -117,7 +117,9 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` eip:` *EIP number* (this is determined by the EIP editor)
 
-` title:` *EIP title*
+` title:` *The EIP title is a few words, not a complete sentence*
+
+` description:` *Description is one full (short) sentence*
 
 ` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
@@ -125,7 +127,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
-`* review-period-end:` *date review period ends*
+` * review-period-end:` *date review period ends*
 
 ` type:` *Standards Track, Meta, or Informational*
 
@@ -137,11 +139,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` * requires:` *EIP number(s)*
 
-` * replaces:` *EIP number(s)*
-
-` * superseded-by:` *EIP number(s)*
-
-` * resolution:` *a url pointing to the resolution of this EIP*
+` * withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.*
 
 Headers that permit lists must separate elements with commas.
 
@@ -167,17 +165,11 @@ It is not possible to use both an email and a GitHub username at the same time. 
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
-#### `resolution` header
-
-The `resolution` header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
-
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, examples for places to discuss your EIP include [Ethereum topics on Gitter](https://gitter.im/ethereum/topics), an issue in this repo or in a fork of this repo, [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect), and [Reddit r/ethereum](https://www.reddit.com/r/ethereum/).
+While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-No `discussions-to` header is necessary if the EIP is being discussed privately with the author.
-
-As a single exception, `discussions-to` cannot point to GitHub pull requests.
+The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 #### `type` header
 
@@ -199,10 +191,6 @@ The `updated` header records the date(s) when the EIP was updated with "substant
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
 
-#### `superseded-by` and `replaces` headers
-
-EIPs may also have a `superseded-by` header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a `replaces` header containing the number of the EIP that it rendered obsolete.
-
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
@@ -221,15 +209,19 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Nick Johnson (@arachnid)
+- Alex Beregszaszi (@axic)
+- Matt Garnett (@lightclient)
+- Micah Zoltu (@MicahZoltu)
+- Greg Colvin (@gcolvin)
+
+Emeritus EIP editors are 
+
 - Casey Detrio (@cdetrio)
-- Hudson Jameson (@Souptacular)
+- Nick Johnson (@arachnid)
 - Vitalik Buterin (@vbuterin)
+- Hudson Jameson (@Souptacular)
 - Nick Savers (@nicksavers)
 - Martin Becze (@wanderer)
-- Greg Colvin (@gcolvin)
-- Alex Beregszaszi (@axic)
-- Micah Zoltu (@MicahZoltu)
 
 ## EIP Editor Responsibilities
 
@@ -255,7 +247,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Style Guide
 
+### EIP numbers
+
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+
+### RFC 2119
+
+EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+
+> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ## History
 
