@@ -150,7 +150,8 @@ EIP 应以 [markdown][] 格式编写。 有一个模板可以遵循。
 
 `status:` *草稿、审核、最后通话、最终、停滞、撤回、存续*
 
-`* review-period-end:` *审查周期结束*
+`* last-call-deadline:` *审查周期结束* (Optional field, only needed when status is `Last Call`)
+
 
 `type:` *标准跟踪、元数据或信息*
 
