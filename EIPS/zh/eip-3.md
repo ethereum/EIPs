@@ -1,47 +1,48 @@
 ---
 eip: 3
-title: Addition of CALLDEPTH opcode
+title: 新增 CALLDEPTH 操作码
 author: Martin Holst Swende <martin@swende.se>
-status: Withdrawn
-type: Standards Track
-category: Core
+status: 已撤销
+type: 标准跟踪
+category: 核心
 created: 2015-11-19
 ---
 
-# Abstract
+# 摘要
 
-This is a proposal to add a new opcode, `CALLDEPTH`. The `CALLDEPTH` opcode would return the remaining available call stack depth.
+这是一个添加新操作码 `CALLDEPTH` 的建议。 `CALLDEPTH` 操作码将返回剩余的可用调用堆栈深度。
 
-# Motivation
+# 动机
 
-There is a limit specifying how deep contracts can call other contracts; the call stack. The limit is currently `256`. If a contract invokes another contract (either via `CALL` or `CALLCODE`), the operation will fail if the call stack depth limit has been reached.
+调用堆栈限制了一个合约可以调用其他合约的深度。目前的限制是 `256`。如果一个合约调用另一个合约（通过 `CALL` 或 `CALLCODE`），如果已经达到调用堆栈深度限制，操作将失败。
 
-This behaviour makes it possible to subject a contract to a "call stack attack" [1]. In such an attack, an attacker first creates a suitable depth of the stack, e.g. by recursive calls. After this step, the attacker invokes the targeted contract. If the targeted calls another contract, that call will fail. If the return value is not properly checked to see if the call was successful, the consequences could be damaging.
+这种行为使得合约有可能受到“调用堆栈攻击”[1]。在这种攻击中，攻击者首先创建一个合适的堆栈深度，例如通过递归调用。在这一步之后，攻击者调用目标合约。如果目标调用另一个合同，该调用将失败。如果没有正确地检查返回值以确定调用是否成功，那么结果可能是有害的。
 
-Example:
+例子：
 
-1. Contract `A` wants to be invoked regularly, and pays Ether to the invoker in every block.
-2. When contract `A` is invoked, it calls contracts `B` and `C`, which consumes a lot of gas. After invocation, contract `A` pays Ether to the caller.
-3. Malicious user `X` ensures that the stack depth is shallow before invoking A. Both calls to `B` and `C` fail, but `X` can still collect the reward.
+1. 合约 `A` 希望被定期调用，并在每个块中向调用方支付 Ether。
+2. 当合约 `A` 被调用时，它调用合约 `B` 和 `C`，这将消耗大量的 gas。调用之后，合约 `A` 将 Ether 支付给调用方。
+3. 恶意用户 `X` 在调用 A 之前确保堆栈深度较浅。对 `B` 和 `C` 的调用都失败了，但 `X` 仍然可以获得奖励。
 
-It is possible to defend against this in two ways:
+有两种方法可以防止这种情况：
 
-1. Check return value after invocation.
-2. Check call stack depth experimentally. A library [2] by Piper Merriam exists for this purpose. This method is quite costly in gas.
+1. 调用后检查返回值。
+2. 通过实验检查调用堆栈深度。由 Piper Merriam 编写的[2]库可以解决这个问题。但这种方法的 gas 成本很高。
 
 
-[1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word ''stack'' has a different meaning within the EVM, and is not to be confused with the ''call stack''.
+[1] 又称“浅栈攻击”和“栈攻击”。然而，准确地说，“堆栈（stack）”一词在 EVM 中有不同的含义，不能与“调用堆栈（call stack）”混淆。
 
 [2] https://github.com/pipermerriam/ethereum-stack-depth-lib
 
-# Specification
 
-The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made.
+# 规范
 
-# Rationale
+操作码 `CALLDEPTH` 应该返回剩余的调用堆栈深度。值 `0` 表示调用堆栈已耗尽，不能再进行调用。
 
-The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
+# 基本原理
 
-# Implementation
+实际的调用堆栈深度以及调用堆栈深度限制在执行期间存在于 EVM 中，但在 EVM 中不可用。实现应该相当简单，并将提供一种廉价的方法来防止调用堆栈攻击。
 
-Not implemented.
+# 实现
+
+没有实现。
