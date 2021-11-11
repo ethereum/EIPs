@@ -78,7 +78,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
 If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
@@ -113,7 +113,7 @@ EIPs should be written in [markdown] format. There is a [template](https://githu
 
 ## EIP Header Preamble
 
-Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
 ` eip:` *EIP number* (this is determined by the EIP editor)
 
@@ -121,25 +121,23 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 ` description:` *Description is one full (short) sentence*
 
-` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
+` author:` *The list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
-` * discussions-to:` *a url pointing to the official discussion thread*
+` discussions-to:` *The url pointing to the official discussion thread*
 
 ` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
-` * review-period-end:` *date review period ends*
+` last-call-deadline:` *The date last call period ends on* (Optional field, only needed when status is `Last Call`)
 
-` type:` *Standards Track, Meta, or Informational*
+` type:` *One of `Standards Track`, `Meta`, or `Informational`*
 
-` * category:` *Core, Networking, Interface, or ERC* (fill out for Standards Track EIPs only)
+` category:` *One of `Core`, `Networking`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
 
-` created:` *date created on*
+` created:` *Date the EIP was created on*
 
-` * updated:` *comma separated list of dates*
+` requires:` *EIP number(s)* (Optional field)
 
-` * requires:` *EIP number(s)*
-
-` * withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.*
+` withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
 Headers that permit lists must separate elements with commas.
 
@@ -182,10 +180,6 @@ The `category` header specifies the EIP's category. This is required for standar
 #### `created` header
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
-
-#### `updated` header
-
-The `updated` header records the date(s) when the EIP was updated with "substantial" changes. This header is only valid for EIPs of Draft and Active status.
 
 #### `requires` header
 
