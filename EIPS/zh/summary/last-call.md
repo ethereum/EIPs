@@ -1,16 +1,16 @@
 
-# Ethereum EIPs: Last Call (9)
+# 以太坊改进提案 EIPs: 最后征求意见中 Last Call (9)
 ---
-| Eip               | Title                                                    | Created    | Status    | Category   | Type            |
-| ----------------- | -------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
-| [173](/eip-173)   | Contract Ownership Standard                              | 2018-06-07 | Last Call | ERC        | Standards Track |
-| [1191](/eip-1191) | Add chain id to mixed-case checksum address encoding     | 2018-03-18 | Last Call | ERC        | Standards Track |
-| [1271](/eip-1271) | Standard Signature Validation Method for Contracts       | 2018-07-25 | Last Call | ERC        | Standards Track |
-| [2266](/eip-2266) | Atomic Swap-based American Call Option Contract Standard | 2019-08-17 | Last Call | ERC        | Standards Track |
-| [2481](/eip-2481) | eth/66: request identifier                               | 2020-01-17 | Last Call | Networking | Standards Track |
-| [2535](/eip-2535) | Diamonds, Multi-Facet Proxy                              | 2020-02-22 | Last Call | ERC        | Standards Track |
-| [2976](/eip-2976) | Typed Transactions over Gossip                           | 2020-09-13 | Last Call | Networking | Standards Track |
-| [2982](/eip-2982) | Serenity Phase 0                                         | 2020-09-15 | Last Call |            | Informational   |
-| [3076](/eip-3076) | Slashing Protection Interchange Format                   | 2020-10-27 | Last Call | Interface  | Standards Track |
+| Eip                     | Title                                                    | Created    | Status    | Category   | Type            |
+| ----------------------- | -------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
+| [173](/zh/eip-173.md)   | Contract Ownership Standard                              | 2018-06-07 | Last Call | ERC        | Standards Track |
+| [1191](/zh/eip-1191.md) | Add chain id to mixed-case checksum address encoding     | 2018-03-18 | Last Call | ERC        | Standards Track |
+| [1271](/zh/eip-1271.md) | Standard Signature Validation Method for Contracts       | 2018-07-25 | Last Call | ERC        | Standards Track |
+| [2266](/zh/eip-2266.md) | Atomic Swap-based American Call Option Contract Standard | 2019-08-17 | Last Call | ERC        | Standards Track |
+| [2481](/zh/eip-2481.md) | eth/66: request identifier                               | 2020-01-17 | Last Call | Networking | Standards Track |
+| [2535](/zh/eip-2535.md) | Diamonds, Multi-Facet Proxy                              | 2020-02-22 | Last Call | ERC        | Standards Track |
+| [2976](/zh/eip-2976.md) | Typed Transactions over Gossip                           | 2020-09-13 | Last Call | Networking | Standards Track |
+| [2982](/zh/eip-2982.md) | Serenity Phase 0                                         | 2020-09-15 | Last Call |            | Informational   |
+| [3076](/zh/eip-3076.md) | Slashing Protection Interchange Format                   | 2020-10-27 | Last Call | Interface  | Standards Track |
 
     

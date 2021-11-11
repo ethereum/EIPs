@@ -3,6 +3,7 @@
   "label": "English",
   "selectText": "languages",
   "siteTitle": "EIPs",
+  "summaryTitle": "Ethereum EIPs",
   "siteDescription": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
   "aboutUs": "About US",
   "editLinkText": "Edit this page on GitHub",

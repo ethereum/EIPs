@@ -56,8 +56,13 @@ const genSummary = (summary, locale) => {
 
   keys.map(key => {
     const content = _.sortBy(summary[key], 'eip').map(s => {
+      const filePath = path.join(
+        '/',
+        locale.language === 'en' ? '' : 'zh',
+        s.filename
+      )
       return {
-        eip: `[${s.eip}](/${s.filename})`,
+        eip: `[${s.eip}](${filePath}.md)`,
         title: s.title,
         created: s.created,
         status: s.status,
@@ -67,7 +72,7 @@ const genSummary = (summary, locale) => {
     })
     const tableJSON = tablemark(content)
     const markdown = `
-# Ethereum EIPs: ${key} (${content.length})
+# ${locale.summaryTitle}: ${locale[key]} (${content.length})
 ---
 ${tableJSON}
     `
@@ -88,7 +93,7 @@ const getSidebar = locale => {
   return [
     {
       title: locale.allListSubTitle,
-      path: '/',
+      path: locale.language === 'en' ? '/' : '/zh/',
       collapsable: false,
     },
     {
