@@ -62,6 +62,7 @@ interface ITipToken {
     /// The holders of the 'nft' are approved to receive rewards.
     /// When an NFT Transfer event emits, this also indicates that the approved
     /// addresses for that NFT (if any) is reset to none.
+    /// Note: the ERC-165 identifier for this interface is 0x985A3267.
     event ApprovalForNFT(
         address[] holders,
         address indexed nft,
@@ -304,7 +305,7 @@ This EIP does not stress a need for tip token secondary markets or other use cas
 
 ## Reference Implementation
 
-A [reference/example implementation and tests](https://github.com/ethereum/EIPs/assets/eip-####) in the GitHub repository that can use be used to assist in implementing this specification.
+A [reference/example implementation and tests](https://github.com/julesl23/eip_msnmt) in the GitHub repository that can use be used to assist in implementing this specification.
 
 ## Security Considerations
 
