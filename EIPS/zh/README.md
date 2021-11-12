@@ -6,7 +6,7 @@
 
 首先，请阅读 [EIP-1](./eip-1.md)。然后复制 [repository](https://github.com/ethereum/EIPs) 并且添加你的 EIP。这里有一个 [EIP 模版](https://github.com/ethereum/EIPs/blob/master/eip-template.md)。然后提交 PR 到以太坊的 [EIPs repository](https://github.com/ethereum/EIPs)。
 
-## EIP status terms
+## EIP 状态术语
 
 - **Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
 - **Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
