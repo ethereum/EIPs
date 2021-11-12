@@ -78,7 +78,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (review-period-end), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
 If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
 
@@ -90,14 +90,14 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 
-**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. Any changes to these EIPs will move between `REVIEW` and `LIVING` states.
+**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
 ## What belongs in a successful EIP?
 
 Each EIP should have the following parts:
 
-- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), and the author details. See [below](./eip-1.md#eip-header-preamble) for details.
-- Abstract - A short (~200 word) description of the technical issue being addressed.
+- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
+- Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 - Motivation (*optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
@@ -113,35 +113,31 @@ EIPs should be written in [markdown] format. There is a [template](https://githu
 
 ## EIP Header Preamble
 
-Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order. Headers marked with "*" are optional and are described below. All other headers are required.
+Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
 ` eip:` *EIP number* (this is determined by the EIP editor)
 
-` title:` *EIP title*
+` title:` *The EIP title is a few words, not a complete sentence*
 
-` author:` *a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
+` description:` *Description is one full (short) sentence*
 
-` * discussions-to:` *a url pointing to the official discussion thread*
+` author:` *The list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
+
+` discussions-to:` *The url pointing to the official discussion thread*
 
 ` status:` *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
-`* review-period-end:` *date review period ends*
+` last-call-deadline:` *The date last call period ends on* (Optional field, only needed when status is `Last Call`)
 
-` type:` *Standards Track, Meta, or Informational*
+` type:` *One of `Standards Track`, `Meta`, or `Informational`*
 
-` * category:` *Core, Networking, Interface, or ERC* (fill out for Standards Track EIPs only)
+` category:` *One of `Core`, `Networking`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
 
-` created:` *date created on*
+` created:` *Date the EIP was created on*
 
-` * updated:` *comma separated list of dates*
+` requires:` *EIP number(s)* (Optional field)
 
-` * requires:` *EIP number(s)*
-
-` * replaces:` *EIP number(s)*
-
-` * superseded-by:` *EIP number(s)*
-
-` * resolution:` *a url pointing to the resolution of this EIP*
+` withdrawal-reason:` *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
 Headers that permit lists must separate elements with commas.
 
@@ -167,15 +163,11 @@ It is not possible to use both an email and a GitHub username at the same time. 
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
-#### `resolution` header
-
-The `resolution` header is required for Standards Track EIPs only. It contains a URL that should point to an email message or other web resource where the pronouncement about the EIP is made.
-
 #### `discussions-to` header
 
-While an EIP is a draft, a `discussions-to` header will indicate the mailing list or URL where the EIP is being discussed. As mentioned above, an example of a place to discuss your EIP is [Ethereum Magicians](https://ethereum-magicians.org/) (this is suitable for EIPs that may be contentious or have a strong governance aspect).
+While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-As an exception, `discussions-to` cannot point to GitHub pull requests.
+The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
 #### `type` header
 
@@ -189,17 +181,9 @@ The `category` header specifies the EIP's category. This is required for standar
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
-#### `updated` header
-
-The `updated` header records the date(s) when the EIP was updated with "substantial" changes. This header is only valid for EIPs of Draft and Active status.
-
 #### `requires` header
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
-
-#### `superseded-by` and `replaces` headers
-
-EIPs may also have a `superseded-by` header indicating that an EIP has been rendered obsolete by a later document; the value is the number of the EIP that replaces the current document. The newer EIP must have a `replaces` header containing the number of the EIP that it rendered obsolete.
 
 ## Linking to other EIPs
 
@@ -219,16 +203,19 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Nick Johnson (@arachnid)
+- Alex Beregszaszi (@axic)
+- Matt Garnett (@lightclient)
+- Micah Zoltu (@MicahZoltu)
+- Greg Colvin (@gcolvin)
+
+Emeritus EIP editors are 
+
 - Casey Detrio (@cdetrio)
-- Hudson Jameson (@Souptacular)
+- Nick Johnson (@arachnid)
 - Vitalik Buterin (@vbuterin)
+- Hudson Jameson (@Souptacular)
 - Nick Savers (@nicksavers)
 - Martin Becze (@wanderer)
-- Greg Colvin (@gcolvin)
-- Alex Beregszaszi (@axic)
-- Micah Zoltu (@MicahZoltu)
-- Matt Garnett (@lightclient)
 
 ## EIP Editor Responsibilities
 
@@ -254,7 +241,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Style Guide
 
+### EIP numbers
+
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+
+### RFC 2119
+
+EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+
+> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ## History
 
