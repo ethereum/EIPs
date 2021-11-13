@@ -1,8 +1,8 @@
-When opening a pull request to submit a new EIP, please use the suggested template: https://github.com/ethereum/EIPs/blob/master/eip-template.md
+<!-- 请将 EIP-x 改成你翻译的 EIP 编号，如 EIP-1559 -->
+### 翻译：EIP-x
 
-We have a GitHub bot that automatically merges some PRs. It will merge yours immediately if certain criteria are met:
+- [ ] 翻译时参考过 [区块链术语 - by EthFans](https://github.com/editor-Ajian/List-of-translation-of-crypto-terms-by-EthFans/blob/under-finalized/Blockchain%20and%20Ethereum%20Terminology.md)
+- [ ] 翻译时中英文标点准确
 
- - The PR edits only existing draft PRs.
- - The build passes.
- - Your GitHub username or email address is listed in the 'author' header of all affected PRs, inside <triangular brackets>.
- - If matching on email address, the email address is the one publicly listed on your GitHub profile.
+### 翻译参考链接：
+
