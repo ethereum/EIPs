@@ -70,7 +70,7 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 The following is the standardization process for all EIPs in all tracks:
 
-![EIP Status Diagram](../assets/eip-1/EIP-process.png)
+![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
 **Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
 
@@ -84,7 +84,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
 
-**Stagnant** - Any EIP in `DRAFT` or `REVIEW` if inactive for a period of 6 months or greater is moved to `STAGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `DRAFT`.
+**Stagnant** - Any EIP in `DRAFT` or `REVIEW` or `LAST CALL` if inactive for a period of 6 months or greater is moved to `STAGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `DRAFT` or it's earlier status. If not resurrected, a proposal may stay forever in the this status. 
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
