@@ -9,7 +9,10 @@
 
 ## 参与贡献翻译
 
-请查看 [EIPs 中文新手翻译指南](https://github.com/ethlibrary/EIPs/wiki/EIPs-%E4%B8%AD%E6%96%87%E6%96%B0%E6%89%8B%E7%BF%BB%E8%AF%91%E6%8C%87%E5%8D%97)。
+请查看：
+- [区块链术语的翻译对照 - by EthFans](https://github.com/editor-Ajian/List-of-translation-of-crypto-terms-by-EthFans/blob/under-finalized/Blockchain%20and%20Ethereum%20Terminology.md)
+- [EIPs 中文新手翻译指南](https://github.com/ethlibrary/EIPs/wiki/EIPs-%E4%B8%AD%E6%96%87%E6%96%B0%E6%89%8B%E7%BF%BB%E8%AF%91%E6%8C%87%E5%8D%97)。
+
 
 ## 本地运行
 
