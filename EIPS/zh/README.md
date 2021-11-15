@@ -6,16 +6,16 @@
 
 首先，请阅读 [EIP-1](./eip-1.md)。然后复制 [repository](https://github.com/ethereum/EIPs) 并且添加你的 EIP。这里有一个 [EIP 模版](https://github.com/ethereum/EIPs/blob/master/eip-template.md)。然后提交 PR 到以太坊的 [EIPs repository](https://github.com/ethereum/EIPs)。
 
-## EIP status terms
+## EIP 状态术语
 
-- **Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
-- **Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
-- **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
-- **Last Call** - This is the final review window for an EIP before moving to FINAL. An EIP editor will assign Last Call status and set a review end date (review-period-end), typically 14 days later. If this period results in necessary normative changes it will revert the EIP to Review.
-- **Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
-- **Stagnant** - Any EIP in Draft or Review if inactive for a period of 6 months or greater is moved to Stagnant. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to Draft.
-- **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
-- **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
+- **想法** - 这个想法仍在起草前阶段. 这还未被 EIP 仓库追踪。
+- **草案** - 这是进展中的 EIP 的第一个正式跟踪阶段。在格式正确的情况下，EIP 将由 EIP 编辑合并到 EIP 库中。
+- **审议** - 该 EIP 作者发出明确信号：该 EIP 已准备好接受外部审议。
+- **最后征求意见** - 这是 EIP 在转入完结（FINAL）之前的最后审核机会。EIP 编辑将分配 Last Call 状态，并设定 review 结束日期（审核期结束），通常是 14 天后。如果这个阶段产生了必要的规范性修改，它将把 EIP 状态恢复为审议状态。
+- **完结** - 本 EIP 代表最终标准。最终的 EIP 是以确定状态存在的，只应在纠正勘误和增加非规范性订正时进行更新。
+- **停滞** - 任何处于草案或审议中的 EIP，如果在 6 个月或更长时间内没有进展，将被移至停滞状态。作者或 EIP 编辑可以通过将其移回草案，使 EIP 从这种状态中复活。
+- **已撤销** - EIP 作者已经撤回了拟议的 EIP。此状态具有终结性，不能再使用这个 EIP 号复活。如果继续这个提案内容，它将被视为一个新的提案。
+- **续用中** - 旨在为持续更新且未达到最终状态的 EIP 提供的一种特殊状态。这包括最有名的 EIP-1。
 
 ## EIP Types
 
