@@ -1,67 +1,69 @@
 ---
 eip: 4
-title: EIP Classification
+title: EIP 分类
 author: Joseph Chow (@ethers)
-status: Final
+status: 已完结
 type: Meta
 created: 2015-11-17
 superseded-by: 1
 ---
 
-# Abstract
+# 摘要
 
-This document describes a classification scheme for EIPs, adapted from [BIP 123](https://github.com/bitcoin/bips/blob/master/bip-0123.mediawiki).
+本文件描述了 EIP 的分类方案，改编自 [BIP 123](https://github.com/bitcoin/bips/blob/master/bip-0123.mediawiki)。
 
-EIPs are classified by system layers with lower numbered layers involving more intricate interoperability requirements.
+EIP 是按系统层分类的，系统层编号较低，涉及更复杂的互操作性需求。
 
-The specification defines the layers and sets forth specific criteria for deciding to which layer a particular standards EIP belongs.
+该规范定义了各个层，并提出了决定一个特定标准 EIP 属于哪一层的条件。
 
-# Motivation
+# 动机
 
-Ethereum is a system involving a number of different standards. Some standards are absolute requirements for interoperability while others can be considered optional, giving implementors a choice of whether to support them.
+以太坊是一个涉及许多不同标准的系统。一些标准是互操作性的绝对要求，而另一些标准可以被认为是可选的，让实现者可以选择是否支持它们。
 
-In order to have a EIP process which more closely reflects the interoperability requirements, it is necessary to categorize EIPs accordingly. Lower layers present considerably greater challenges in getting standards accepted and deployed.
+为了有一个更紧密地反映互操作性需求的 EIP 过程，有必要对 EIP 进行相应的分类。较低层次在使标准被接受和部署方面有相当大的挑战。
 
-# Specification
+# 规范
 
-Standards EIPs are placed in one of four layers:
+标准 EIP 分为以下四层:
 
-1. Consensus
-2. Networking
+1. 共识
+2. 网络
 3. API/RPC
-4. Applications
+4. 应用
 
-# 1. Consensus Layer
+# 1. 共识层
 
-The consensus layer defines cryptographic commitment structures. Its purpose is ensuring that anyone can locally evaluate whether a particular state and history is valid, providing settlement guarantees, and assuring eventual convergence.
+共识层定义加密的承诺结构。它的目的是确保任何人都能在本地评估一个特定的状态和历史是否有效，提供解决保障，并确保最终的融合。
 
-The consensus layer is not concerned with how messages are propagated on a network.
+共识层不关心消息如何在网络上传播。
 
-Disagreements over the consensus layer can result in network partitioning, or forks, where different nodes might end up accepting different incompatible histories. We further subdivide consensus layer changes into soft forks and hard forks.
+对共识层的分歧可能导致网络划分或分叉，不同的节点可能最终接受不同的不兼容的历史。我们进一步将共识层的变化细分为软分叉和硬分叉。
 
-## Soft Forks
+## 软分叉
 
-In a soft fork, some structures that were valid under the old rules are no longer valid under the new rules. Structures that were invalid under the old rules continue to be invalid under the new rules.
+在软分叉中，一些在旧规则下有效的结构在新规则下不再有效。在旧规则下无效的结构在新规则下仍然无效。
 
-## Hard Forks
+## 硬分叉
 
-In a hard fork, structures that were invalid under the old rules become valid under the new rules.
+在硬分叉中，在旧规则下无效的结构在新规则下有效。
 
-# 2. Networking Layer
+# 2. 网络层
 
-The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les).  RLPx is excluded and tracked in the [https://github.com/ethereum/devp2p devp2p repository].
+网络层指定以太坊线路协议 (eth) 和轻以太坊子协议 (les) 。RLPx 在 [https://github.com/ethereum/devp2p devp2p仓库] 中被排除并跟踪。
 
-Only a subset of subprotocols are required for basic node interoperability. Nodes can support further optional extensions.
+基本节点互操作性只需要子协议的一个子集。节点可以支持进一步的可选扩展。
 
-It is always possible to add new subprotocols without breaking compatibility with existing protocols, then gradually deprecate older protocols. In this manner, the entire network can be upgraded without serious risks of service disruption.
+总是可以添加新的子协议而不破坏与现有协议的兼容性，然后逐渐弃用旧协议。通过这种方式，可以在不存在严重业务中断风险的情况下，对整个网络进行升级。
 
 
-# 3. API/RPC Layer
+# 3. API/RPC 层
 
-The API/RPC layer specifies higher level calls accessible to applications. Support for these EIPs is not required for basic network interoperability but might be expected by some client applications.
+API/RPC 层指定应用程序可访问的更高级别调用。基本网络互操作性并不需要对这些 EIP 的支持，但某些客户机应用程序可能需要这些支持。
 
-There's room at this layer to allow for competing standards without breaking basic network interoperability.
+在这一层有允许竞争标准而不破坏基本网络互操作性的空间。
 
-# 4. Applications Layer
+# 4. 应用层
 
-The applications layer specifies high level structures, abstractions, and conventions that allow different applications to support similar features and share data.
+应用程序层指定高层结构、摘要和公约，允许不同的应用程序支持类似的特性和共享数据。
+
+
