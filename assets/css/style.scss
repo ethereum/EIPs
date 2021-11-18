@@ -4,6 +4,14 @@
 
 @import 'minima';
 
+.site-header {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .page-content {
   a.anchor-link {
     width: 16px;
