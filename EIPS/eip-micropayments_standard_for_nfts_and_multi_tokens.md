@@ -254,6 +254,21 @@ If not inheriting from ERC20, then minting the tip tokens MUST emit event Transf
 
 ERC-1155 allows for shared holders of a token id. Imagine a scenario where an article represented by an NFT was written by multiple contributors. Here, each contributor is a holder and the fractional sharing percentage between them can be represented by the balance that each holds in the ERC-1155 token id. So for two holders A and B of ERC-1155 token 1, if holder A's balance is 25 and holder B's is 75 then any tip sent to token 1 would distribute 25% of the reward pending to holder A and the remaining 75% pending to holder B.
 
+Here is an example implementation of ITipToken contract data structures:
+
+```
+    // Mapping from NFT/multi token to token id to holder(s)
+    mapping(address => mapping(uint256 => address[])) private _tokenIdToHolders;
+
+    // Mapping from user to user's deposit balance
+    mapping(address => uint256) private _depositBalances;
+
+    // Mapping from holder to holder's reward pending amount
+    mapping(address => uint256) private _rewardsPending;
+```
+
+This copes with ERC-721 contracts that must have unique token ids and single holders (to be compliant with the standard), and ERC-1155 contracts that can have multiple token ids and multiple holders per instance. The `tip` function implementation would then access `_tokenIdToHolders` via indices NFT/multi token address and token id to distribute to holder's or holders' `_rewardsPending`.
+
 ### Caveats
 
 To keep the ITipToken interface simple and general purpose, each tip token contract MUST use one ERC20 compatible deposit type at a time. If tipping is required to support many ERC20 deposits then each tip token contract MUST be deployed separately per ERC20 compatible type required. Thus, if tipping is required from both ETH and BTC wrapper ERC20 deposits then the tip token contract is deployed twice. The tip token contract's constructor is REQUIRED to pass in the address of the ERC20 token supported for the deposits for the particular tip token contract. Or in the case for upgradeable tip token contracts, an initialize method is REQUIRED to pass in the ERC20 token address.
@@ -302,10 +317,6 @@ A tip token contract can be fully compatible with ERC20 specification and inheri
 What hasn't been carried over to tip token standard, is the ability for a spender of other users' tips. For the moment, this standard does not foresee a need for this.
 
 This EIP does not stress a need for tip token secondary markets or other use cases where identifying the tip token type with names rather than addresses might be useful, so these functions were left out of the ITipToken interface and is the remit for implementers.
-
-## Reference Implementation
-
-A [reference/example implementation and tests](https://github.com/julesl23/eip_msnmt) in the GitHub repository that can use be used to assist in implementing this specification.
 
 ## Security Considerations
 
