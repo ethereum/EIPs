@@ -19,8 +19,8 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "https://eips.ethereum.org"
-twitter_username: ethereum
 github_username:  ethereum
+
 header_pages:
  - all.html
  - core.html
@@ -29,11 +29,9 @@ header_pages:
  - erc.html
  - meta.html
  - informational.html
-twitter:
-  card: summary
-  username: ethereum
 
 # Build settings
+highlighter: rouge
 markdown: kramdown
 theme: minima
 kramdown:
@@ -42,6 +40,7 @@ kramdown:
   auto_ids: true
   # This is to ensure more determistic behaviour
   auto_id_stripping: true
+  syntax_highlighter: rouge
 
 permalink: /:slug
 
@@ -53,6 +52,7 @@ defaults:
       layout: "eip"
 
 exclude:
+  - .github
   - Gemfile
   - Gemfile.lock
   - node_modules
