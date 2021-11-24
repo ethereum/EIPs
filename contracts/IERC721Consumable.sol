@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /// @title ERC-721 Consumer Role extension
 ///  Note: the ERC-165 identifier for this interface is 0x953c8dfa
-interface IERC721Consumer is IERC721 {
+interface IERC721Consumable is IERC721 {
 
     /// @notice Emitted when `owner` changes the `consumer` of an NFT
     /// The zero address for consumer indicates that there is no consumer address

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERC721Consumer.sol";
+import "./IERC721Consumable.sol";
 
-contract ConsumerImpl is IERC721Consumer, ERC721 {
+contract ERC721Consumable is IERC721Consumable, ERC721 {
 
     // Mapping from token ID to consumer address
     mapping (uint256 => address) _tokenConsumers;
@@ -27,15 +27,29 @@ contract ConsumerImpl is IERC721Consumer, ERC721 {
         address owner = this.ownerOf(_tokenId);
         require(msg.sender == owner || isApprovedForAll(owner, msg.sender),
             "ERC721Consumer: changeConsumer caller is not owner nor approved for all");
+        _changeConsumer(_consumer, _tokenId);
+    }
 
+    /**
+     * @dev Changes the consumer
+     * Requirement: `tokenId` must exist
+     */
+    function _changeConsumer(address _consumer, uint256 _tokenId) internal {
         _tokenConsumers[_tokenId] = _consumer;
-        emit ConsumerChanged(owner, _consumer, _tokenId);
+        emit ConsumerChanged(this.ownerOf(_tokenId), _consumer, _tokenId);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721) returns (bool) {
-        return interfaceId == type(IERC721Consumer).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC721Consumable).interfaceId || super.supportsInterface(interfaceId);
     }
+
+    function _beforeTokenTransfer(address _from, address _to, uint256 _tokenId) internal virtual override (ERC721) {
+        super._beforeTokenTransfer(_from, _to, _tokenId);
+
+        _changeConsumer(address(0), _tokenId);
+    }
+
 }
