@@ -6,21 +6,30 @@ import "./IERC721Consumer.sol";
 
 contract ConsumerImpl is IERC721Consumer, ERC721 {
 
-    mapping (uint256 => address) consumers;
+    // Mapping from token ID to consumer address
+    mapping (uint256 => address) _tokenConsumers;
 
     constructor() ERC721("ReferenceImpl", "RIMPL") {
     }
 
+    /**
+     * @dev See {IERC721Consumer-consumerOf}
+     */
     function consumerOf(uint256 _tokenId) view external returns (address) {
-        return consumers[_tokenId];
+        require(_exists(_tokenId), "ERC721Consumer: consumer query for nonexistent token");
+        return _tokenConsumers[_tokenId];
     }
 
-    function changeConsumer(address _newConsumer, uint256 _tokenId) external {
-        require(msg.sender == this.ownerOf(_tokenId), "IERC721Consumer: caller is not owner nor approved");
+    /**
+     * @dev See {IERC721Consumer-changeConsumer}
+     */
+    function changeConsumer(address _consumer, uint256 _tokenId) external {
+        address owner = this.ownerOf(_tokenId);
+        require(msg.sender == owner || isApprovedForAll(owner, msg.sender),
+            "ERC721Consumer: changeConsumer caller is not owner nor approved for all");
 
-        address previousConsumer = consumers[_tokenId];
-        consumers[_tokenId] = _newConsumer;
-        emit ConsumerChanged(previousConsumer, _newConsumer);
+        _tokenConsumers[_tokenId] = _consumer;
+        emit ConsumerChanged(owner, _consumer, _tokenId);
     }
 
     /**

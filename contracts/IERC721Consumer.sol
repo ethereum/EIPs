@@ -7,20 +7,24 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 ///  Note: the ERC-165 identifier for this interface is 0x953c8dfa
 interface IERC721Consumer is IERC721 {
 
-    /// @notice This emits when consumer of a token changes.
-    /// address(0) used as previousConsumer indicates that there was no consumer set prior to this event
-    /// address(0) used as a newConsumer indicates that the consumer role is absent
-    event ConsumerChanged(address indexed previousConsumer, address indexed newConsumer);
+    /// @notice Emitted when `owner` changes the `consumer` of an NFT
+    /// The zero address for consumer indicates that there is no consumer address
+    /// When a Transfer event emits, this also indicates that the consumer address
+    /// for that NFT (if any) is set to none
+    event ConsumerChanged(address indexed owner, address indexed consumer, uint256 indexed tokenId);
 
-    /// @notice Get the consumer of a token
-    /// @dev address(0) consumer address indicates that there is no consumer currently set for that token
-    /// @param _tokenId The identifier for a token
-    /// @return The address of the consumer of the token
+    /// @notice Get the consumer address of an NFT
+    /// @dev The zero address indicates that there is no consumer
+    /// Throws if `_tokenId` is not a valid NFT
+    /// @param _tokenId The NFT to get the consumer address for
+    /// @return The consumer address for this NFT, or the zero address if there is none
     function consumerOf(uint256 _tokenId) view external returns (address);
 
-    /// @notice Set the address of the new consumer for the given token
-    /// @dev Throws unless `msg.sender` is the current owner, an authorised operator or the approved address for this token. Throws if `_tokenId` is not valid token
-    /// @dev Set _newConsumer to address(0) to renounce the consumer role.
-    /// @param _newConsumer The address of the new consumer for the token.
-    function changeConsumer(address _newConsumer, uint256 _tokenId) external;
+    /// @notice Change or reaffirm the consumer address for an NFT
+    /// @dev The zero address indicates there is no consumer address
+    /// Throws unless `msg.sender` is the current NFT owner, an authorised
+    /// operator of the current owner or approved address
+    /// Throws if `_tokenId` is not valid NFT
+    /// @param _consumer The new consumer of the NFT
+    function changeConsumer(address _consumer, uint256 _tokenId) external;
 }
