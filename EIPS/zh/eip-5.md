@@ -2,73 +2,73 @@
 eip: 5
 title:
 author: Christian Reitwiessner <c@ethdev.com>
-status: Final
-type: Standards Track
-category: Core
+status: 最终
+type: 标准跟踪
+category: 核心
 created: 2015-11-22
 superseded-by: 211
 ---
 
-### Abstract
+### 摘要
 
-This EIP makes it possible to call functions that return strings and other dynamically-sized arrays. Currently, when another contract / function is called from inside the Ethereum Virtual Machine, the size of the output has to be specified in advance. It is of course possible to give a larger size, but gas also has to be paid for memory that is not written to, which makes returning dynamically-sized data both costly and inflexible to the extent that it is actually unusable.
+这个EIP使得调用返回字符串和其他动态大小数组的函数成为可能。目前，当从以太坊虚拟机内部调用另一个合约/函数时，输出的大小必须提前指定。当然可以提供更大的大小，但也必须为没有写入的内存支付 `gas` ，这使得返回动态大小的数据既昂贵又不灵活，以至于它实际上是不可用的。
 
-The solution proposed in this EIP is to charge gas only for memory that is actually written to at the time the `CALL` returns.
+在这个EIP中提出的解决方案是只对在 `CALL` 返回时实际写入的内存收费。
 
-### Specification
+### 规范
 
-The gas and memory semantics for `CALL`, `CALLCODE` and `DELEGATECALL` (called later as `CALL*`) are changed in the following way (`CREATE` does not write to memory and is thus unaffected):
+`CALL`， `CALLCODE` 和 `DELEGATECALL` (后来称为 `CALL*` )的 `gas` 和内存语义以以下方式更改( `CREATE` 不会写入内存，因此不受影响):
 
-Suppose the arguments to `CALL*` are `gas, address, value, input_start, input_size, output_start, output_size`, then, at the beginning of the opcode, gas for growing memory is only charged for `input_start + input_size`, but not for `output_start + output_size`.
+假设 `CALL*` 的参数是 `gas, address, value, input_start, input_size, output_start, output_size` ，那么，在操作码的开始部分，用于增长内存的 `gas` 只对 `input_start + input_size` 收费，而对 `output_start + output_size` 不收费。
 
-If the called contract returns data of size `n`, the memory of the calling contract is grown to `output_start + min(output_size, n)` (and the calling contract is charged gas for that) and the output is written to the area `[output_start, output_start + min(n, output_size))`.
+如果被调用的合约返回大小为 `n` 的数据，调用合约的内存将增长为 `output_start + min(output_size, n)` (调用合约为此要花费 `gas`)，并且输出被写入区域 `[output_start, output_start + min(n, output_size))`。
 
-The calling contract can run out of gas both at the beginning of the opcode and at the end of the opcode.
+调用合约可能在操作码的开始和结束时耗尽 `gas`。
 
-After the call, the `MSIZE` opcode should return the size the memory was actually grown to.
+在调用之后， `MSIZE` 操作码应该返回内存实际增长到的大小。
 
-### Motivation
+### 动机
 
-In general, it is good practise to reserve a certain memory area for the output of a call, because letting a subroutine write to arbitrary areas in memory might be dangerous. On the other hand, it is often hard to know the output size of a call prior to performing the call: The data could be in the storage of another contract which is generally inaccessible and determining its size would require another call to that contract.
+一般来说，为调用的输出保留一个特定的内存区域是一个很好的习惯，因为让一个子程序写入内存中的任意区域可能是危险的。另一方面，在执行调用之前通常很难知道调用的输出大小: 数据可能在另一个合约的存储中，而该合约通常是不可访问的，确定其大小需要对该合约进行另一次调用。
 
-Furthermore, charging gas for areas of memory that are not actually written to is unnecessary.
+此外，没有必要为实际上没有写入的内存区域花费 `gas`。
 
-This proposal tries to solve both problems: A caller can choose to provide a gigantic area of memory at the end of their memory area. The callee can "write" to it by returning and the caller is only charged for the memory area that is actually written.
+这个建议试图解决两个问题: 调用者可以选择在其内存区域的末端提供一个巨大的内存区域。被调用者可以通过返回来“写入”它，调用者只对实际写入的内存区域收费。
 
-This makes it possible to return dynamic data like strings and dynamically-sized arrays in a very flexible way. It is even possible to determine the size of the returned data: If the caller uses `output_start = MSIZE` and `output_size = 2**256-1`, the area of memory that was actually written to is `(output_start, MSIZE)` (here, `MSIZE` as evaluated after the call). This is important because it allows "proxy" contracts which call other contracts whose interface they do not know and just return their output, i.e. they both forward the input and the output. For this, it is important that the caller (1) does not need to know the size of the output in advance and (2) can determine the size of the output after the call.
-
-
-### Rationale
-
-This way of dealing with the problem requires a minimal change to the Ethereum Virtual Machine. Other means of achieving a similar goal would have changed the opcodes themselves or the number of their arguments. Another possibility would have been to only change the gas mechanics if `output_size` is equal to `2**256-1`. Since the main difficulty in the implementation is that memory has to be enlarged at two points in the code around `CALL`, this would not have been a simplification.
-
-At an earlier stage, it was proposed to also add the size of the returned data on the stack, but the `MSIZE` mechanism described above should be sufficient and is much better backwards compatible.
-
-Some comments are available at https://github.com/ethereum/EIPs/issues/8
-
-### Backwards Compatibility
-
-This proposal changes the semantics of contracts because contracts can access the gas counter and the size of memory.
-
-On the other hand, it is unlikely that existing contracts will suffer from this change due to the following reasons:
-
-Gas:
-
-The VM will not charge more gas than before. Usually, contracts are written in a way such that their semantics do not change if they use up less gas. If more gas were used, contracts might go out-of-gas if they perform a tight estimation for gas needed by sub-calls. Here, contracts might only return more gas to their callers.
-
-Memory size:
-
-The `MSIZE` opcode is typically used to allocate memory at a previously unused spot. The change in semantics affects existing contracts in two ways:
-
-1. Overlaps in allocated memory. By using `CALL`, a contract might have wanted to allocate a certain slice of memory, even if that is not written to by the called contract. Subsequent uses of `MSIZE` to allocate memory might overlap with this slice that is now smaller than before the change. It is though unlikely that such contracts exist.
-
-2. Memory addresses change. Rather general, if memory is allocated using `MSIZE`, the addresses of objects in memory will be different after the change. Contract should all be written in a way, though, such that objects in memory are _relocatable_, i.e. their absolute position in memory and their relative position to other objects does not matter. This is of course not the case for arrays, but they are allocated in a single allocation and not with an intermediate `CALL`.
+这使得以非常灵活的方式返回动态数据(如字符串和动态大小的数组)成为可能。甚至可以确定返回数据的大小: 如果调用者使用 `output_start = MSIZE` 和 `output_size = 2**256-1` ，实际写入的内存区域是 `(output_start, MSIZE)` (这里的 `MSIZE` 在调用后求值)。这很重要，因为它允许“代理”合约调用它们不知道接口的其他合约，只返回它们的输出，即它们都转发输入和输出。为此，调用者 (1)不需要预先知道输出的大小，(2)可以在调用后确定输出的大小，这一点很重要。
 
 
-### Implementation
+### 原理
 
-VM implementers should take care not to grow the memory until the end of the call and after a check that sufficient gas is still available. Typical uses of the EIP include "reserving" `2**256-1` bytes of memory for the output.
+这种处理问题的方法需要对以太坊虚拟机进行极小的更改。实现类似目标的其他方法可能会改变操作码本身或它们的参数数量。另一种可能是，如果 `output_size` 等于 `2**256-1` ，则只更改 `gas` 语法。由于实现的主要困难是内存必须在 `CALL` 附近的代码中扩大两个点，这不会是一个简化。
 
-Python implementation:
+在更早的阶段，我们还建议在堆栈上增加返回数据的大小，但上面描述的 `MSIZE` 机制应该足够了，而且向后兼容要好得多。
 
-  old: http://vitalik.ca/files/old.py new: http://vitalik.ca/files/new.py
+在 https://github.com/ethereum/EIPs/issues/8 上可以找到一些相关的评论
+
+### 向后兼容性
+
+这个提议改变了合约的语义，因为合约可以访问 `gas` 计数器和内存大小。
+
+另一方面，由于以下原因，现有合约不太可能受到影响:
+
+#### Gas:
+
+虚拟机将不会比以前收取更多的 `gas`。通常，合约是这样写的，即使他们用了更少的 `gas`，他们的语义也不会改变。如果使用了更多的 `gas `，如果他们对次级呼叫所需的 `gas` 进行严格估计，合约可能就会失效。在这里，合约可能只会返回给他们的调用者更多的 `gas`。
+
+#### 内存大小:
+
+`MSIZE` 操作码通常用于在以前未使用的位置分配内存。语义上的变化以两种方式影响现有的合约:
+
+1. 在分配的内存中重叠。通过使用 `CALL` ，一个合约可能想要分配一个特定的内存片，即使这个内存片没有被被调用的合约写入。后续使用 `MSIZE` 分配内存可能会与现在比更改之前更小的这个片重叠。不过，这种合约不太可能存在。
+
+2. 内存地址的变化。一般来说，如果内存是使用 `MSIZE` 来分配的，那么内存中对象的地址在改变后将会不同。合约应该以一种方式写入，这样内存中的对象是 `_relocatable_` ，即它们在内存中的绝对位置以及它们与其他对象的相对位置都不重要。这当然不是数组的情况，但它们是在单个分配中分配的，而不是通过中间的 `CALL` 。
+
+
+### 实现
+
+虚拟机实现者应该注意，在调用结束和检查是否仍然有足够的 `gas` 可用之前，不要增加内存。EIP的典型用途包括为输出“保留” `2**256-1` 字节的内存。
+
+`Python` 实现:
+
+  旧: http://vitalik.ca/files/old.py 新: http://vitalik.ca/files/new.py
