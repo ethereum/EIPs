@@ -13,7 +13,7 @@ contract ERC721Consumable is IERC721Consumable, ERC721 {
     }
 
     /**
-     * @dev See {IERC721Consumer-consumerOf}
+     * @dev See {IERC721Consumable-consumerOf}
      */
     function consumerOf(uint256 _tokenId) view external returns (address) {
         require(_exists(_tokenId), "ERC721Consumer: consumer query for nonexistent token");
@@ -21,7 +21,7 @@ contract ERC721Consumable is IERC721Consumable, ERC721 {
     }
 
     /**
-     * @dev See {IERC721Consumer-changeConsumer}
+     * @dev See {IERC721Consumable-changeConsumer}
      */
     function changeConsumer(address _consumer, uint256 _tokenId) external {
         address owner = this.ownerOf(_tokenId);
