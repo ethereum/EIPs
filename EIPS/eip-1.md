@@ -48,7 +48,7 @@ REVERT (0xfe)
 
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on [the Ethereum Magicians forum] to do this, but you can also use [one of the Ethereum Gitter chat rooms], [the Ethereum subreddit] or [the Issues section of this repository]. 
+Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on [the Ethereum Magicians forum](https://ethereum-magicians.org/) to do this. 
 
 Once the idea has been vetted, your next responsibility will be to present (by means of an EIP) the idea to the reviewers and all interested parties, invite editors, developers, and the community to give feedback on the aforementioned channels. You should try and gauge whether the interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the work required for implementing a Core EIP will be much greater than for an ERC and the EIP will need sufficient interest from the Ethereum client teams. Negative community feedback will be taken into consideration and may prevent your EIP from moving past the Draft stage.
 
@@ -78,13 +78,13 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `FINAL`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
-If this period results in necessary normative changes it will revert the EIP to `REVIEW`.
+If this period results in necessary normative changes it will revert the EIP to `Review`.
 
 **Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
 
-**Stagnant** - Any EIP in `DRAFT` or `REVIEW` or `LAST CALL` if inactive for a period of 6 months or greater is moved to `STAGNANT`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `DRAFT` or it's earlier status. If not resurrected, a proposal may stay forever in the this status. 
+**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in the this status. 
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
