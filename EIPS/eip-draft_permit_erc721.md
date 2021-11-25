@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4494
 title: Permit for ERC721 NFTs
 description: ERC712-singed approvals for ERC721 NFTs
 author: Simon Fremaux (@dievardump), William Schwab (@wschwab)
