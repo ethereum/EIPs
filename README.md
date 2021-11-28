@@ -21,3 +21,9 @@ In order to compile the solidity contracts you need to execute:
 ```shell
 npx hardhat compile
 ```
+
+## Tests
+
+```shell
+npx hardhat test
+```
