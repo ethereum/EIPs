@@ -22,12 +22,12 @@ And please consider anything published at https://eips.ethereum.org/ with a stat
 
 # Validation
 
-EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eip_validator](https://rubygems.org/gems/eip_validator).
+EIPs must pass some validation tests.  The EIP repository ensures this by running tests using [html-proofer](https://rubygems.org/gems/html-proofer) and [eipv](https://github.com/lightclient/eipv).
 
 It is possible to run the EIP validator locally:
 ```sh
-gem install eip_validator
-eip_validator <INPUT_FILES>
+cargo install eipv
+eipv <INPUT FILE / DIRECTORY>
 ```
 
 # Automerger
