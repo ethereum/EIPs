@@ -1,6 +1,6 @@
 ---
 title: "Non-Fungible Token with usage rights"
-author: KKimos <bol@zju.edu.cn>
+author: Kimos <bol@zju.edu.cn>
 status: Draft
 type: Standards Track
 category: ERC
