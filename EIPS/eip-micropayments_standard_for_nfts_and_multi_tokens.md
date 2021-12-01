@@ -102,7 +102,7 @@ interface ITipToken {
         address owner_
     );
 
-    /// @dev This emits everytime a user tips an NFT holder.
+    /// @dev This emits every time a user tips an NFT holder.
     /// Also includes the reward token address and the reward token amount that
     /// will be held pending until the holder withdraws the reward tokens.
     event Tip(
@@ -215,7 +215,7 @@ interface ITipToken {
     /// @param amount Amount of ERC20 token to withdraw as a reward
     function withdraw(uint256 amount) external payable;
 
-    /// @notice MUST have idential behaviour to ERC20 balanceOf and is the amount
+    /// @notice MUST have identical behaviour to ERC20 balanceOf and is the amount
     /// of tip tokens held by 'user'
     /// @param user The user account
     /// @return The balance of tip tokens held by user
