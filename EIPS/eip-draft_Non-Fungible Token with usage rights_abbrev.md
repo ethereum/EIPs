@@ -1,7 +1,7 @@
 ---
 eip: 
 title: "Non-Fungible Token with usage rights"
-author: Kimos <bol@zju.edu.cn>
+author: KKimos <bol@zju.edu.cn>
 status: Draft
 category: ERC
 created: 2021-12-01
