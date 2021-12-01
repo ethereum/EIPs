@@ -1,8 +1,8 @@
 ---
 title: "Non-Fungible Token with usage rights"
-author: Kimos <bol@zju.edu.cn>
 status: Draft
 type: Standards Track
+author: KKimos <bol@zju.edu.cn>
 category: ERC
 created: 2021-12-01
 requires: 165, 721
