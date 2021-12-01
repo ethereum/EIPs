@@ -25,16 +25,14 @@ Introduce XTNDR, a prefix opcode to specify the bytes that immediately follow ar
 
 ## Motivation
 
-
-
+All EVM opcodes are single-byte, which encourages careful choice when introducing new opcodes. 
+Additionally, high-level blockchain and EVM policies (such as gas prices of operations) often concern tradeoffs between data size, network requirements for propagation and ease of execution. These changes would allow a greater range of space-time tradeoffs of smart contracts, through situationally allowing smaller contract sizes which are more complex to execute. This may allow greater flexibility in high-level policies and eventually network efficiency.
 
 ## Specification
 
 The XTNDR opcode is at 0xED. 
 ED followed by a numeric value is interpreted indicates a multi-byte variadic opcode.
 Two-byte sequences starting with ED and followed by a non-numeric value is to be interpreted as a single opcode from 'extended space'.
-
-
 
 
 XTNDR introduces variadic opcodes (VOPs) which may be considered as a versioning of the fixed-adicity opcodes through address extension. Each opcode that has a suitable variadic extension that otherwise doesn't affect their functioning (e.g associative operations can be batched through 'joins') must have the suffix byte of it's extended version sequence identical to it's fixed-adicity address.
