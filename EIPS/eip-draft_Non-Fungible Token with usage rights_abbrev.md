@@ -1,8 +1,8 @@
 ---
-eip: 
 title: "Non-Fungible Token with usage rights"
 author: KKimos <bol@zju.edu.cn>
 status: Draft
+type: Standards Track
 category: ERC
 created: 2021-12-01
 requires: 165, 721
@@ -36,7 +36,7 @@ Different from 2615, we only added a right to use, so that we can get all the fu
 
 This standard adds the user role, and users can transfer their own usage rights.
 
-### ERCX- Interface
+### ERC-X Interface
 
 ```solidity
 event TransferUser(address from,address to,uint256 tokenId);
@@ -69,17 +69,17 @@ function approveUser(address to, uint256 tokenId) external;
 function getApprovedUser(uint256 tokenId) external view returns (address operator);
 ```
 
-### ERCX- Receiver
+### ERC-X Receiver
 
 ```solidity
 function onERCXReceived(address operator, address from, uint256 itemId, uint256 layer, bytes memory data) public returns(bytes4);
 ```
 
-### ERCX Extensions
+### ERC-X Extensions
 
 Extensions here are provided to help developers build with this standard.
 
-#### 1. ERCX- Emurable	
+#### 1. ERC-X Emurable	
 
 ```solidity
 function tokenOfUserByIndex(address owner, uint256 index) external view returns (uint256 tokenId);
