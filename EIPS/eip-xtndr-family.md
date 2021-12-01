@@ -1,11 +1,11 @@
 # EIP: XTNDR opcode family
 
-| Author |  | 
-| -------- | -------- | 
-| **Status**  | Draft |
-| **Type** |    Standards Track   |
-| **Category** | Core |
-| **Created** | 2021-11-30 |
+title: XTNDR family opcode
+description: Opcodespace extension via prefix, variadic opcodes and bytecode compression through macros
+author: Brayton Goodall, Mihir Faujdar
+type: Standards Track
+category: Core
+created: 2021-11-30
 
 
 ## Table of Contents
