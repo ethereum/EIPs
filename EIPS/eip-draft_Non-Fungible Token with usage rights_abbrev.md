@@ -1,4 +1,5 @@
 ---
+eip: 4512
 title: "Non-Fungible Token with usage rights"
 status: Draft
 type: Standards Track
