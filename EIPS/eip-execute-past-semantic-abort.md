@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4511
 title: Execute Past Semantic Abort
 description: Allow clients to choose to continue to execute instructions after EVM bytecode interpretation would revert
 author: Levi Aul (@tsutsu)
