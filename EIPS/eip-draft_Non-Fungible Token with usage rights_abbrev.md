@@ -1,6 +1,7 @@
 ---
 eip: 4512
-title: "Non-Fungible Token with usage rights"
+title: Non-Fungible Token with usage rights
+description: Separation of Non-Fungible Token ownership and usage rights , Truly in line with real life.
 status: Draft
 type: Standards Track
 author: KKimos <bol@zju.edu.cn>
