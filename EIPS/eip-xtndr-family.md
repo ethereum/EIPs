@@ -50,9 +50,9 @@ Adicity is determined by the value immediately following the XTNDR opcode. Immed
 
 An example of a variadic arithmetic sequence would be:
 
-XTNDR 11 ADD 4 17 8 1A 66 9 2 2 7 1 3 2
+XTNDR 11 ADD 4 17 8 10 66 9 2 2 7 1 3 2
 
-which performs addition over 11 values (in the usual order as if pairwise evaluated in sequential order).
+which performs addition over 11 values (in the usual order as if pairwise evaluated in sequential order), equivalent to 4 + 17 + 8 + 10 + 66 + 9 + 2 + 2 + 7 + 1 + 3 + 2. This returns a value of 131. 
 
 This may be applied to a logical operation over more operands than currently supported. An example of the assembly for extending the greater-than operation (0x11) to a sequence of 6 numbers to check if it is a monotonically decreasing sequence is:
 
@@ -78,6 +78,8 @@ The 'macro memory' is preferred to be a contiguous portion of address (opcode) s
 Greatly increasing the amount of opcode space available will substantially reduce the consequences of adding niche, application-specific opcodes or those which are of speculative value. This may eventually allow replacing precompiles with multi-byte opcodes if this proves more efficient, or allowing parts of already implemented precompiles to be represented as multi-byte opcodes to allow for more modular cryptographic techniques.
 
 This method is in some respects simpler than other proposals for improving the 'bytecode density' of the EVM ISA, whilst also being broadly compatible with those other proposals. 
+
+Additionally, as gas accounting imposes a non-negligible overhead during execution, storing the gas costs of particular predictable sequences in their own (exclusive) area of memory may be more efficient.
 
 ## Backwards Compatibility
 
