@@ -39,11 +39,11 @@ The atributes do not need to be given in an specific order. The designer of the 
  
 Asset and user are optional attributes but at least one of them should be used in a SmartNFT. In the case of using only the attribute user, two states define if the token is assigned or not to a user. Figure 1 shows the corresponding states in a flow chart. When a token is created, transferred or unassigned, the token state is set to “notAssigned”. If the token is assigned to a valid user, the state is set to "userAssigned".
  
-![Figure 1 : Flow chart of the token states with user defined (and asset undefined)](/Images/Figure1.png)
+![Figure 1 : Flow chart of the token states with user defined (and asset undefined)](/../assets/eip_SmartNFT/images/Figure1.png)
   
 In the case of defining the asset attribute but not the user attribute, two states define if the token is waiting for authentication with the owner or authentication has finished successfully. Figure 2 shows the corresponding states in a flow chart. When a token is created or transferred to a new owner, then the token change its state to "waitingForOwner". In this state, the token is waiting for authentication by the owner. Once the asset is authenticated, its associated token changes its state to "engagedWithOwner".
 
-![Figure 2 : Flow chart of the token states with asset defined (and user undefined)](/Images/Figure2.jpg)
+![Figure 2 : Flow chart of the token states with asset defined (and user undefined)](/../assets/eip_SmartNFT/images/Figure2.jpg)
  
 Finally, if both the asset and user attributes are defined. The states define if the asset has been authenticated or not by the owner or the user (waitingForOwner, engagedWithOwner, waitingForUser and engagedWithUser respectively). The flow chart in Figure 3 shows all the possible state changes. The states related to the owner are the same as in Figure 2. The difference is that from the state “EngagedWithOwner”, the token can be assigned to a user. When a user is assigned, from the states "EngagedWithOwner", "waitingForUser" or "engagedWithUser", the token change its state to "waitingForUser". Once the asset is authenticated by the user, the state of its associated token is set to "engagedWithUser", and the user is able to use the token or asset.
 
