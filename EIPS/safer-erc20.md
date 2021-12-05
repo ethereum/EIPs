@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4524
 title: Safer ERC20
 description: Extending ERC20 with ERC165 and adding safeTransfer (like ERC721 and ERC1155)
 author: William Schwab (@wschwab)
@@ -31,6 +31,8 @@ pragma solidity 0.8.10;
 import './IERC20.sol';
 import './IERC165.sol';
 
+// the EIP-165 interfaceId for this interface is 0x534f5876
+
 interface SaferERC20 is IERC20, IERC165 {
   function safeTransfer(address to, uint256 amount) external returns(bool);
   function safeTransfer(address to, uint256 amount, bytes memory data) external returns(bool);
@@ -38,7 +40,9 @@ interface SaferERC20 is IERC20, IERC165 {
   function safeTransferFrom(address from, address to, uint256 amount, bytes memory data) external returns(bool);
 }
 ```
-In addition, a contract accepting safe transfers MUST implement the following if it wishes to accept safe transfers:
+`safeTransfer` and `safeTransferFrom` MUST transfer as expected to EOA addresses, and to contracts implementing `ERC20Receiver` and returning the function selector (`0x4fc35859`) when called, and MUST revert when transferring to a contract which either does not have `ERC20Receiver` implemented, or does not return the function selector when called.
+
+In addition, a contract accepting safe transfers MUST implement the following if it wishes to accept safe transfers, and MUST return the function selector (`0x4fc35859`):
 ```solidity
 pragma solidity 0.8.10;
 
