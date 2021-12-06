@@ -2,51 +2,51 @@
 eip: 7
 title: DELEGATECALL
 author: Vitalik Buterin <v@buterin.com>
-status: Final
-type: Standards Track
-category: Core
+status: 最终
+type: 标准跟踪
+category: 核心
 created: 2015-11-15
 ---
 
-### Hard Fork
+### 硬分叉
 [Homestead](./eip-606.md)
 
-### Parameters
-- Activation:
-  - Block >= 1,150,000 on Mainnet
-  - Block >= 494,000 on Morden
-  - Block >= 0 on future testnets
+### 参数
+- 激活:
+  - 主网上的区块 >= 1,150,000
+  - `Morden` 上的区块 >= 494,000
+  - 未来的测试网上的区块 >= 0
 
-### Overview
+### 概述
 
-Add a new opcode, `DELEGATECALL` at `0xf4`, which is similar in idea to `CALLCODE`, except that it propagates the sender and value from the parent scope to the child scope, i.e. the call created has the same sender and value as the original call.
+在 `0xf4` 添加一个新的操作码 `DELEGATECALL` ，这在思想上类似于 `CALLCODE` ，除了它将发送方和值从父范围传播到子范围，即创建的调用具有与原始调用相同的发送方和值。
 
-### Specification
+### 规范
 
-`DELEGATECALL`: `0xf4`, takes 6 operands:
-- `gas`: the amount of gas the code may use in order to execute;
-- `to`: the destination address whose code is to be executed;
-- `in_offset`: the offset into memory of the input;
-- `in_size`: the size of the input in bytes;
-- `out_offset`: the offset into memory of the output;
-- `out_size`: the size of the scratch pad for the output.
+`DELEGATECALL`: `0xf4`, 接受6个操作数:
+- `gas`: 代码执行时可能使用的 `gas` 量;
+- `to`: 要执行代码的目的地址;
+- `in_offset`: 输入到内存的偏移量;
+- `in_size`: 输入的字节大小;
+- `out_offset`: 输出到内存的偏移量;
+- `out_size`: 输出的草稿板的大小。
 
-#### Notes on gas
-- The basic stipend is not given; `gas` is the total amount the callee receives.
-- Like `CALLCODE`, account creation never happens, so the upfront gas cost is always `schedule.callGas` + `gas`.
-- Unused gas is refunded as normal.
+#### `gas` 注意事项
+- 没有发放基本津贴; `gas` 是被调用者收到的总金额。
+- 像 `CALLCODE` ，帐户创建从来没有发生，所以前期的 `gas` 成本总是 `schedule.callGas` + `gas` 。
+- 未使用的 `gas` 正常退还。
 
-#### Notes on sender
-- `CALLER` and `VALUE` behave exactly in the callee's environment as they do in the caller's environment.
+#### 发送者说明
+- `CALLER` 和 `VALUE` 在被调用者的环境中表现得和在调用者的环境中一样。
 
-#### Other notes
-- The depth limit of 1024 is still preserved as normal.
+#### 其他事项
+- 1024的深度限制仍然保持正常。
 
-### Rationale
+### 基本原理
 
-Propagating the sender and value from the parent scope to the child scope makes it much easier for a contract to store another address as a mutable source of code and ''pass through'' calls to it, as the child code would execute in essentially the same environment (except for reduced gas and increased callstack depth) as the parent.
+将发送者和值从父范围传播到子范围更便于合约存储另一个地址作为可变资源代码和 ''pass through'' 调用它,子代码和父代码是在本质上相同的环境(减少 `gas` 和增加 `callstack` 深度除外)中执行。
 
-Use case 1: split code to get around 3m gas barrier
+用例1:分割代码得到大约 3m `gas` 屏障
 
 ```python
 ~calldatacopy(0, 0, ~calldatasize())
@@ -59,7 +59,7 @@ elif ~calldataload(0) < 2**253 * 2:
 ...
 ```
 
-Use case 2: mutable address for storing the code of a contract:
+用例2:用于存储合约代码的可变地址:
 
 ```python
 if ~calldataload(0) / 2**224 == 0x12345678 and self.owner == msg.sender:
@@ -68,8 +68,8 @@ else:
     ~delegate_call(msg.gas - 10000, self.delegate, 0, ~calldatasize(), ~calldatasize(), 10000)
     ~return(~calldatasize(), 10000)
 ```
-The child functions called by these methods can now freely reference `msg.sender` and `msg.value`.
+这些方法调用的子函数现在可以自由地引用 `msg.sender` 和 `msg.value` 。
 
-### Possible arguments against
+### 可能反对的理由
 
-* You can replicate this functionality by just sticking the sender into the first twenty bytes of the call data. However, this would mean that code would need to be specially compiled for delegated contracts, and would not be usable in delegated and raw contexts at the same time.
+*你可以复制这个功能，只要把发送者插入到调用数据的前20个字节。然而，这将意味着代码将需要专门为委托合约进行编译，并且不能同时在委托环境和原始环境中使用
