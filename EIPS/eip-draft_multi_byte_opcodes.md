@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4520
 title: Mult-byte opcodes prefixed by EB and EC.
 description: Future opcodes may be introduced at 
 author: Brayton Goodall (@Spore-Druid-Bray), Mihir Faujdar (@uink45)
