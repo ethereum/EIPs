@@ -1,7 +1,7 @@
 ---
 eip: 4520
 title: Mult-byte opcodes prefixed by EB and EC.
-description: Future opcodes may be introduced at 
+description: Reserve `0xEB` and `0xEC` for usage as extended opcode space. 
 author: Brayton Goodall (@Spore-Druid-Bray), Mihir Faujdar (@uink45)
 discussions-to: https://ethereum-magicians.org/t/multi-byte-opcodes/7681
 type: Standards Track
