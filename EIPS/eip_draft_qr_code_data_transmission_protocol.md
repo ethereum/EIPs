@@ -1,8 +1,8 @@
 ---
 eip: eip_draft_qr_code_data_transmission_protocol
-title: QR Code data transmission protocol for Ethereum
-description: QR Code data transmission protocol between wallet and offline signer.
-author: Aaron Chen (@aaronisme), Sora Lee (@soralit), ligi(@ligi), AndreasGassmann (@andreasgassmann), xardass(@xardass), Lixin Liu (@BitcoinLixin)
+title: QR Code data transmission protocol for the Ethereum wallets
+description: QR Code data transmission protocol between wallets and offline signers.
+author: Aaron Chen (@aaronisme), Sora Lee (@soralit), ligi(@ligi), Dan Miller(@danjm), AndreasGassmann (@andreasgassmann), xardass(@xardass), Lixin Liu (@BitcoinLixin)
 discussions-to: https://ethereum-magicians.org/t/add-qr-code-scanning-between-software-wallet-cold-signer-hardware-wallet/6568
 status: Draft
 type: Standards Track
@@ -11,13 +11,13 @@ created: 2021-12-07
 ---
 
 ## Abstract
-This EIP is for proposing the process and data transmission protocol via QR Code to make offline signer work with watch-only wallet
+This EIP is for proposing the process and data transmission protocol via QR Code between the offline signers and the watch-only wallets
 
 ## Motivation
-Currently more and more users would like to use complete offline signers like hardware wallets, mobile phones on offline mode to manage their private keys. In order to sign transaction or data, these offline signers have to work with an watch-only wallet. these watch-only will prepare the data to be sign. The data transmission method between offline signers and watch-only wallets will include QR Code, USB, Bluetooth, and file transfer.Compare with other data transmission method like USB, Bluetooth, and file transfer, the QR Code data transmission have these advantages.
+Currently, more and more users would like to use complete offline signers like hardware wallets, mobile phones on offline mode to manage their private keys. In order to sign transactions or data, these offline signers have to work with a watch-only wallet. these watch-only will prepare the data to be signed. The data transmission method between offline signers and watch-only wallets will include QR Code, USB, Bluetooth, and file transfer. Compare with other data transmission method like USB, Bluetooth, and file transfer, the QR Code data transmission have these advantages.
 
 - Transparency and Security: Compared to USB or Bluetooth, users can easily decode the data in QR Code (with the help of some tools), it can let users know what they are going to sign. this Transparency can provide more security.
-- Better Compatibility: Compared to USB and Bluetooth, the QR Code data transmission have better compatibility, normally it will not be broken by other software change like browser upgrade. system upgrade etc.
+- Better Compatibility: Compared to USB and Bluetooth, the QR Code data transmission has better compatibility, normally it will not be broken by other software changes like browser upgrade. system upgrade etc.
 - Better User experience: The QR Code data transmission can provide a better user experience compared to USB, Bluetooth, and file transfer especially in the mobile environment.
 - Smaller attack surface. USB and Bluetooth have a higher attack surface than QR-Codes.
 
@@ -31,14 +31,14 @@ This EIP presents a standard process and data transmission protocol for offline 
 
 ### Process:
 In order to work with offline signers, the watch-only wallet should follow the following process.
-1. offline signers provide public key information to watch-only wallets to generate addresses and sync balance etc via QR Code.
-2. a watch-only wallet generates the unsigned data and sends it to an offline signer to sign it including transactions, typed data, etc via QR Code.
-3. an offline signer signs the data and provides a signature back to the watch-only wallet via QR Code.
-4. a watch-only wallet gets the signature and constructs the signed data (transaction) and performs the following activities like broadcasting the transaction etc.
+1. The offline signer provides public key information to watch-only wallets to generate addresses and sync balance etc via QR Code.
+2. The watch-only wallet generates the unsigned data and sends it to an offline signer to sign it including transactions, typed data, etc via QR Code.
+3. The offline signer signs the data and provides a signature back to the watch-only wallet via QR Code.
+4. The watch-only wallet gets the signature and constructs the signed data (transaction) and performs the following activities like broadcasting the transaction etc.
 
 ### Data Transmission Protocol
 
-Since one QR Code can contain a limited size of data, the animated QR Codes should be included for data transmission. The [BlockchainCommons](https://github.com/BlockchainCommons/) have published a series data transmission protocol called Uniform Resources (UR). It provides a basic method for encoding data to the animated QR Codes. This EIP will use UR and extend its current definition. For more info about UR, please check out [here](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md).
+Since one QR Code can only contain a limited size of data, the animated QR Codes should be included for data transmission. The [BlockchainCommons](https://github.com/BlockchainCommons/) have published a series data transmission protocol called Uniform Resources (UR). It provides a basic method for encoding data to the animated QR Codes. This EIP will use UR and extend its current definition. For more info about UR, please check out [here](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-005-ur.md).
 
 [Concise Binary Object Representation(CBOR)](https://datatracker.ietf.org/doc/html/rfc7049) will be used for binary data encoding. [Concise Data Definition Language(CDDL)](https://datatracker.ietf.org/doc/html/rfc8610) will be used for expressing the CBOR.
 
@@ -86,7 +86,7 @@ The following specification is written in Concise Data Definition Language(CDDL)
 ```
 
 #### CDDL for Extended Public Keys
-Since the purpose of the key is to transfer public key data, the definition of `crypto-hdkey` will be kept only for public keys usage.
+Since the purpose is to transfer public key data, the definition of `crypto-hdkey` will be kept only for public keys usage.
 
 The following specification is written in Concise Data Definition Language [CDDL] and includes the crypto-keypath spec above.
 ```
@@ -190,7 +190,7 @@ This EIP is using some existing UR types like `crypto-keypath` and `crypto-hdkey
 
 Currently, UR has provided some existing types like `crypto-keypath` and `crypto-hdkey`, And It is quite easy to add new type and definitions for new usage.
 
-#### UR has an active airgapped wallet community.
+#### UR has an active air-gapped wallet community.
 Currently, the UR has an active [airgapped wallet community](https://github.com/BlockchainCommons/Airgapped-Wallet-Community) which moves the UR forward.
 
 Based on the following reasons, in this EIP we are using some existing UR types and propose two new UR types `eth-sign-request` and `eth-signature`.
