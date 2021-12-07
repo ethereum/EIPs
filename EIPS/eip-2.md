@@ -16,7 +16,7 @@ created: 2015-11-15
 
 |   FORK_BLKNUM   | CHAIN_NAME  |
 |-----------------|-------------|
-|    1,150,000    | Main net    |
+|    1,150,000    | Mainnet     |
 |   494,000       | Morden      |
 |    0            | Future testnets    |
 
