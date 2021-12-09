@@ -13,11 +13,17 @@ requires: 165, 721, 1155
 
 ## Abstract
 
-For the purpose of this proposal, a micropayment is termed as a financial transaction that involves usually a small sum of money, called "tips", that are sent for specific [ERC-721](./eip-721.md) NFTs and [ERC-1155](./eip-1155.md) multi tokens as rewards to their holders. A holder (also referred to as controller) is used here as a more generic term for owner in a semantic sense, as NFTs may represent non-digital assets, such as services etc.
+This standard outlines a smart contract interface for tipping to non-fungible and multi tokens. Holders of the tokens are able to withdraw the tips as [ERC-20](./eip-20.md) rewards.
 
-This standard proposal outlines a generalised way to allow tipping via implementation of an `ITipToken` interface. The interface is intentionally kept to a minimum in order to allow for maximum use cases.
+For the purpose of this EIP, a micropayment is termed as a financial transaction that involves usually a small sum of money called "tips" that are sent to specific [ERC-721](./eip-721.md) NFTs and [ERC-1155](./eip-1155.md) multi tokens, as rewards to their holders. A holder (also referred to as controller) is used as a more generic term for owner, as NFTs may represent non-digital assets such as services.
 
-A user first deposits a compatible [ERC-20](./eip-20.md) to the tip token contract that is then held in escrow, in exchange for tip tokens. These tip tokens can then be sent by the user to NFTs and multi-tokens (that have been approved by the tip token contract for tipping) to be redeemed for the original ERC20 deposits on withdrawal by the holders as rewards.
+## Motivation
+
+A cheap way to send tips to any type of NFT or multi token. This can be achieved by gas optimising the tip token contract and sending the tips in batches using the `tipBatch` function from the interface.
+
+To make it easy to implement into dapps a tipping service to reward the NFT and multi token holders. Allows for fairer distribution of revenue back to NFT holders from the user community.
+
+To make the interface as minimal as possible in order to allow adoption into many different use cases.
 
 Some use cases include:
 
@@ -37,21 +43,13 @@ Some use cases include:
 
 These can all leverage the security, immediacy and transparency of blockchain.
 
-## Motivation
-
-A cheap way to send tips to any type of NFT or multi token. This can be achieved by gas optimising the tip token contract and sending the tips in batches using the `tipBatch` function from the interface.
-
-To make it easy to implement into dapps a tipping service to reward the NFT and multi token holders. Allows for fairer distribution of revenue back to NFT holders from the user community.
-
-To make the interface as minimal as possible in order to allow adoption into many different use cases.
-
 ## Specification
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+This standard proposal outlines a generalised way to allow tipping via implementation of an `ITipToken` interface. The interface is intentionally kept to a minimum in order to allow for maximum use cases.
 
-Smart contracts implementing the ERC-xxxx standard MUST implement all of the functions in the ERC-xxxx interface. MUST also emit the events specified in the interface so that a complete state of the tip token contract can be derived from the events emitted alone.
+Smart contracts implementing this EIP standard MUST implement all of the functions in this EIP interface. MUST also emit the events specified in the interface so that a complete state of the tip token contract can be derived from the events emitted alone.
 
-Smart contracts implementing the ERC-xxxx standard MUST implement the ERC-165 supportsInterface function and MUST return the constant value true if 0x985A3267 is passed through the interfaceID argument. Note that revert in this document MAY mean a require, throw (not recommended as depreciated) or revert solidity statement with or without error messages.
+Smart contracts implementing this EIP standard MUST implement the ERC-165 supportsInterface function and MUST return the constant value true if 0x985A3267 is passed through the interfaceID argument. Note that revert in this document MAY mean a require, throw (not recommended as depreciated) or revert solidity statement with or without error messages.
 
 Note that, nft (or NFT in caps) in the code and as mentioned in this document, MAY also refer to an ERC-1155 fungible token.
 
@@ -70,7 +68,7 @@ interface ITipToken {
         bool approved
     );
 
-    /// @dev This emits when a user has deposited an ERC20 compatible token to
+    /// @dev This emits when a user has deposited an ERC-20 compatible token to
     /// the tip token's contract address or to an external address.
     /// This also indicates that the deposit has been exchanged for an
     /// amount of tip tokens
@@ -81,7 +79,7 @@ interface ITipToken {
         uint256 tipTokenAmount
     );
 
-    /// @dev This emits when a holder withdraws an amount of ERC20 compatible
+    /// @dev This emits when a holder withdraws an amount of ERC-20 compatible
     /// reward. This reward comes from the tip token's contract address or from
     /// an external address, depending on the tip token implementation
     event Withdraw(
@@ -91,9 +89,9 @@ interface ITipToken {
     );
 
     /// @dev This emits when the tip token constructor or initialize method is
-    /// executed. The 'rewardToken_' address is passed to the ERC20 constructor or
+    /// executed. The 'rewardToken_' address is passed to the ERC-20 constructor or
     /// initialize method.
-    /// Importantly the ERC20 compatible token 'rewardToken_' to use as reward
+    /// Importantly the ERC-20 compatible token 'rewardToken_' to use as reward
     /// to NFT holders is set at this time and remains the same throughout the
     /// lifetime of the tip token contract.
     event InitializeTipToken(
@@ -186,36 +184,36 @@ interface ITipToken {
         uint256[] memory amounts
     ) external;
 
-    /// @notice Deposit an ERC20 compatible token in exchange for tip tokens
+    /// @notice Deposit an ERC-20 compatible token in exchange for tip tokens
     /// @dev The price of tip tokens can be different for each deposit as
     /// the amount of reward token sent ultimately is a ratio of the
     /// amount of tip tokens to tip over the user's tip tokens balance available
     /// multiplied by the user's deposit balance.
     /// The deposited tokens can be held in the tip tokens contract account or
     /// in an external escrow. This will depend on the tip token implementation.
-    /// Each tip token contract MUST handle only one type of ERC20 compatible
+    /// Each tip token contract MUST handle only one type of ERC-20 compatible
     /// reward for deposits.
     /// This token address SHOULD be passed in to the tip token constructor or
-    /// initialize method. SHOULD revert if ERC20 reward for deposits is
+    /// initialize method. SHOULD revert if ERC-20 reward for deposits is
     /// zero address.
     /// MUST emit the 'Deposit' event that shows the user, deposited token details
     /// and amount of tip tokens minted in exchange
     /// @param user The user account
-    /// @param amount Amount of ERC20 token to deposit in exchange for tip tokens.
+    /// @param amount Amount of ERC-20 token to deposit in exchange for tip tokens.
     /// This deposit is to be used later as the reward token
     function deposit(address user, uint256 amount) external payable;
 
-    /// @notice An NFT holder can withdraw their tips as an ERC20 compatible
+    /// @notice An NFT holder can withdraw their tips as an ERC-20 compatible
     /// reward at a time of their choosing
     /// @dev MUST revert if not enough balance pending available to withdraw.
     /// MUST send 'amount' to msg.sender account (the holder)
     /// MUST reduce the balance of reward tokens pending by the 'amount' withdrawn.
     /// MUST emit the 'Withdraw' event to show the holder who withdrew, the reward
     /// token address and 'amount'
-    /// @param amount Amount of ERC20 token to withdraw as a reward
+    /// @param amount Amount of ERC-20 token to withdraw as a reward
     function withdraw(uint256 amount) external payable;
 
-    /// @notice MUST have identical behaviour to ERC20 balanceOf and is the amount
+    /// @notice MUST have identical behaviour to ERC-20 balanceOf and is the amount
     /// of tip tokens held by 'user'
     /// @param user The user account
     /// @return The balance of tip tokens held by user
@@ -224,7 +222,7 @@ interface ITipToken {
     /// @notice The balance of deposit available to become rewards when
     /// user sends the tips
     /// @param user The user account
-    /// @return The remaining balance of the ERC20 compatible token deposited
+    /// @return The remaining balance of the ERC-20 compatible token deposited
     function balanceDepositOf(address user) external view returns (uint256);
 
     /// @notice The amount of reward token owed to 'holder'
@@ -236,19 +234,23 @@ interface ITipToken {
 }
 ```
 
+### Tipping and rewards to holders
+
+A user first deposits a compatible ERC-20 to the tip token contract that is then held in escrow, in exchange for tip tokens. These tip tokens can then be sent by the user to NFTs and multi-tokens (that have been approved by the tip token contract for tipping) to be redeemed for the original ERC-20 deposits on withdrawal by the holders as rewards.
+
 ### Tip Token transfer and value calculations
 
 Tip token values are exchanged with ERC-20 deposits and vice-versa. It is left to the tip token implementer to decide on the price of a tip token and hence how much tip to mint in exchange for the ERC-20 deposited. One possibility is to have fixed conversion rates per geographical region so that users from poorer countries are able to send the same number of tips as those from richer nations for the same level of appreciation for content/assets etc. Hence, not skewed by average wealth when it comes to analytics to discover what NFTs are actually popular, allowing creators to have a level playing field.
 
-Whenever a user sends a tip, an equivalent value of deposited ERC20 MUST be transferred to a pending account for the NFT or multi-token holder, and the tip tokens sent MUST be burnt. This equivalent value is calculated using a simple formula:
+Whenever a user sends a tip, an equivalent value of deposited ERC-20 MUST be transferred to a pending account for the NFT or multi-token holder, and the tip tokens sent MUST be burnt. This equivalent value is calculated using a simple formula:
 
-_total user balance of ERC20 deposit _ tip amount / total user balance of tip tokens\*
+_total user balance of ERC-20 deposit _ tip amount / total user balance of tip tokens\*
 
-Thus adding \*free\* tips to a user's balance of tips for example, simply dilutes the overall value of each tip for that user, as collectively they still refer to the same amount of ERC20 deposited.
+Thus adding \*free\* tips to a user's balance of tips for example, simply dilutes the overall value of each tip for that user, as collectively they still refer to the same amount of ERC-20 deposited.
 
-Note if the tip token contract inherits from an ERC20, tips can be transferred from one user to another directly. The deposit amount would be already in the tip token contract (or an external escrow account) so only tip token contract's internal mapping of user account to deposit balances needs to be updated. It is RECOMMENDED that the tip amount be burnt from user A and then minted back to user B in the amount that keeps user B's average ERC20 deposited value per tip the same, so that the value of the tip does not fluctuate in the process of tipping.
+Note if the tip token contract inherits from an ERC-20, tips can be transferred from one user to another directly. The deposit amount would be already in the tip token contract (or an external escrow account) so only tip token contract's internal mapping of user account to deposit balances needs to be updated. It is RECOMMENDED that the tip amount be burnt from user A and then minted back to user B in the amount that keeps user B's average ERC-20 deposited value per tip the same, so that the value of the tip does not fluctuate in the process of tipping.
 
-If not inheriting from ERC20, then minting the tip tokens MUST emit event Transfer(address indexed from, address indexed to, uint256 value) where sender is the zero address for a mint and to is the zero address for a burn. The Transfer event MUST be the same signature as the Transfer function in the IERC20 interface.
+If not inheriting from ERC-20, then minting the tip tokens MUST emit event Transfer(address indexed from, address indexed to, uint256 value) where sender is the zero address for a mint and to is the zero address for a burn. The Transfer event MUST be the same signature as the Transfer function in the IERC20 interface.
 
 ### Royalty distribution to shared holders
 
@@ -271,18 +273,18 @@ This copes with ERC-721 contracts that must have unique token ids and single hol
 
 ### Caveats
 
-To keep the ITipToken interface simple and general purpose, each tip token contract MUST use one ERC20 compatible deposit type at a time. If tipping is required to support many ERC20 deposits then each tip token contract MUST be deployed separately per ERC20 compatible type required. Thus, if tipping is required from both ETH and BTC wrapper ERC20 deposits then the tip token contract is deployed twice. The tip token contract's constructor is REQUIRED to pass in the address of the ERC20 token supported for the deposits for the particular tip token contract. Or in the case for upgradeable tip token contracts, an initialize method is REQUIRED to pass in the ERC20 token address.
+To keep the ITipToken interface simple and general purpose, each tip token contract MUST use one ERC-20 compatible deposit type at a time. If tipping is required to support many ERC-20 deposits then each tip token contract MUST be deployed separately per ERC-20 compatible type required. Thus, if tipping is required from both ETH and BTC wrapper ERC-20 deposits then the tip token contract is deployed twice. The tip token contract's constructor is REQUIRED to pass in the address of the ERC-20 token supported for the deposits for the particular tip token contract. Or in the case for upgradeable tip token contracts, an initialize method is REQUIRED to pass in the ERC-20 token address.
 
-This EIP does not provide details for where the ERC20 reward deposits are held. It MUST be available at the time a holder withdraws the rewards that they are owed. A RECOMMENDED implementation would be to keep the deposits locked in the tip token contract address. By keeping a mapping structure that records the balances pending to holders then the
+This EIP does not provide details for where the ERC-20 reward deposits are held. It MUST be available at the time a holder withdraws the rewards that they are owed. A RECOMMENDED implementation would be to keep the deposits locked in the tip token contract address. By keeping a mapping structure that records the balances pending to holders then the
 deposits can remain where they are when a user tips, and only transferred out to a holder's address when a holder withdraws it as their reward.
 
-This standard does not specify the type of ERC20 compatible deposits allowed. Indeed, could be tip tokens themselves. But it is RECOMMENDED that balances of the deposits be checked after transfer to find out the exact amount deposited to keep internal accounting consistent. In case, for example, the ERC20 contract takes fees and hence reduces the actual amount deposited.
+This standard does not specify the type of ERC-20 compatible deposits allowed. Indeed, could be tip tokens themselves. But it is RECOMMENDED that balances of the deposits be checked after transfer to find out the exact amount deposited to keep internal accounting consistent. In case, for example, the ERC-20 contract takes fees and hence reduces the actual amount deposited.
 
 ### Minimising Gas Costs
 
 By caching tips off-chain and then batching them up to call the tipBatch method of the ITipToken interface then essentially the cost of initialising transactions is paid once rather than once per tip. Plus, further gas savings can be made off-chain if multiple tips sent by the same user to the same NFT token are accumulated together and sent as one entry in the batch.
 
-Further savings can be made by grouping users together sending to the same NFT, so that checking the validity of the NFT and whether it is an ERC721 or ERC1155, is performed once for each group.
+Further savings can be made by grouping users together sending to the same NFT, so that checking the validity of the NFT and whether it is an ERC-721 or ERC-1155, is performed once for each group.
 
 Clever ways to minimise on-chain state updating of the deposit balances for each user and the reward balances of each holder, can help further to minimise the gas costs when sending in a batch if the batch is ordered beforehand. For example, can avoid the checks if the next NFT in the batch is the same. This left to the tip token contract implementer. Whatever optimisation is applied, it MUST still allow information of which account tipped which account and for what NFT to be reconstructed from the Tip and the TipBatch events emitted.
 
@@ -302,17 +304,17 @@ This mechanism allows consumers of the NFT a secure way to easily tip and reward
 
 ### New Business Models
 
-To take the music use case for example. Traditionally since the industry transitioned from audio distributed on physical medium such as CDs, to an online digital distribution model via streaming, the music industry has been controlled by oligopolies that served to help in the transition. They operate a fixed subscription model and from that they set the amount of royalty distribution to content creators; such as the singers, musicians etc. Using tip tokens represent an additional way for fans of music to reward the content creators. Each song or track is represented by an NFT and fans are able to tip the song (hence the NFT) that they like, and in turn the content creators of the NFT are able to receive the ERC20 rewards that the tips were bought for. A fan led music industry with decentralisation and tokenisation is expected to bring new revenue, and bring fans and content creators closer together.
+To take the music use case for example. Traditionally since the industry transitioned from audio distributed on physical medium such as CDs, to an online digital distribution model via streaming, the music industry has been controlled by oligopolies that served to help in the transition. They operate a fixed subscription model and from that they set the amount of royalty distribution to content creators; such as the singers, musicians etc. Using tip tokens represent an additional way for fans of music to reward the content creators. Each song or track is represented by an NFT and fans are able to tip the song (hence the NFT) that they like, and in turn the content creators of the NFT are able to receive the ERC-20 rewards that the tips were bought for. A fan led music industry with decentralisation and tokenisation is expected to bring new revenue, and bring fans and content creators closer together.
 
 Across the board in other industries a similar ethos can be applied where third party controllers move to a more facilitating role rather than a monetary controlling role that exists today.
 
 ### Guaranteed audit trail
 
-As the Ethereum ecosystem continues to grow, many dapps are relying on traditional databases and explorer API services to retrieve and categorize data. The ERC-xxxx standard guarantees that event logs emitted by the smart contract MUST provide enough data to create an accurate record of all current tip token and ERC20 reward balances. A database or explorer can provide indexed and categorized searches of every tip token and reward sent to NFT holders from the events emitted by any tip token contract that implements this standard. Thus, the state of the tip token contract can be reconstructed from the events emitted alone.
+As the Ethereum ecosystem continues to grow, many dapps are relying on traditional databases and explorer API services to retrieve and categorize data. This EIP standard guarantees that event logs emitted by the smart contract MUST provide enough data to create an accurate record of all current tip token and ERC-20 reward balances. A database or explorer can provide indexed and categorized searches of every tip token and reward sent to NFT holders from the events emitted by any tip token contract that implements this standard. Thus, the state of the tip token contract can be reconstructed from the events emitted alone.
 
 ## Backwards Compatibility
 
-A tip token contract can be fully compatible with ERC20 specification and inherit some functions such as transfer if the tokens are allowed to be sent directly to other users. Note that balanceOf has been adopted and MUST be the number of tips held by a user's address. If inheriting from, for example, OpenZeppelin's implementation of ERC20 token then their contract is responsible for maintaining the balance of tip token. Therefore, tip token balanceOf function SHOULD simply directly call the parent (super) contract's balanceOf function.
+A tip token contract can be fully compatible with ERC-20 specification and inherit some functions such as transfer if the tokens are allowed to be sent directly to other users. Note that balanceOf has been adopted and MUST be the number of tips held by a user's address. If inheriting from, for example, OpenZeppelin's implementation of ERC-20 token then their contract is responsible for maintaining the balance of tip token. Therefore, tip token balanceOf function SHOULD simply directly call the parent (super) contract's balanceOf function.
 
 What hasn't been carried over to tip token standard, is the ability for a spender of other users' tips. For the moment, this standard does not foresee a need for this.
 
