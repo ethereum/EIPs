@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Wrapped Deposits
 description: A singleton contract for managing asset deposits.
 author: Justice Hudson (@jchancehud)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740
 status: Draft
 type: Informational
 created: 2021-12-11
