@@ -6,14 +6,14 @@ author: Justice Hudson (@jchancehud)
 discussions-to: <URL>
 status: Draft
 type: Informational
-created: 2021-12-06
+created: 2021-12-11
 ---
 
 ## Abstract
 The wrapped deposit contract handles deposits of assets (Ether, ERC20, ERC721) on behalf of a user. A user must only approve a spend limit once and then an asset may be deposited to any number of different applications that support deposits from the contract.
 
 ## Motivation
-The current user flow for depositing assets in dapps is unnecessarily expensive and insecure. To deposit an ERC20 asset a user must either
+The current user flow for depositing assets in dapps is unnecessarily expensive and insecure. To deposit an ERC20 asset a user must either:
 
   - send an approve transaction for the exact amount being sent, before making a deposit; for every deposit.
   - send an approve transaction for an infinite spend amount before making deposits.
@@ -49,12 +49,12 @@ interface EtherReceiver {
 }
 ```
 
-A receiving contract MAY implement any of these functions as desired. If a given function is not implemented deposits MUST not be accepted for that asset type.
+A receiving contract MAY implement any of these functions as desired. If a given function is not implemented deposits MUST not be sent for that asset type.
 
 ## Rationale
 Having a single contract that processes all token transfers allows users to submit a single approval per token to deposit to any number of contracts. The user does not have to trust receiving contracts with token spend approvals and receiving contracts have their complexity reduced by not having to implement token transfers themselves.
 
-User experience is improved because a simple dapp can be implemented with the messaging: "enable token for use in other apps".
+User experience is improved because a simple global dapp can be implemented with the messaging: "enable token for use in other apps".
 
 ## Reference Implementation
 https://github.com/jchancehud/wrapped-deposit
@@ -129,7 +129,7 @@ contract WrappedDeposit {
 }
 ```
 ## Security Considerations
-The wrapped deposit implementation should be as small as possible to reduce the risk of bugs. The contract should be small enough that an average engineer can read and understand it in less than an hour.
+The wrapped deposit implementation should be as small as possible to reduce the risk of bugs. The contract should be small enough that an engineer can read and understand it in a few minutes.
 
 Receiving contracts MUST verify that `msg.sender` is equal to the wrapped deposit contract. Failing to do so allows anyone to simulate deposits.
 
