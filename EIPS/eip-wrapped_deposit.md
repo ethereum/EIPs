@@ -6,7 +6,7 @@ author: Justice Hudson (@jchancehud)
 discussions-to: https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740
 status: Draft
 type: Standards Track
-catrgory: ERC
+category: ERC
 created: 2021-12-11
 ---
 
