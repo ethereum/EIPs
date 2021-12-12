@@ -15,7 +15,7 @@ The wrapped deposit contract handles deposits of assets (Ether, ERC20, ERC721) o
 ## Motivation
 The current user flow for depositing assets in dapps is unnecessarily expensive and insecure. To deposit an ERC20 asset a user must either:
 
-  - send an approve transaction for the exact amount being sent, before making a deposit; for every deposit.
+  - send an approve transaction for the exact amount being sent, before making a deposit, and then repeat this process for every subsequent deposit.
   - send an approve transaction for an infinite spend amount before making deposits.
 
 The first option is inconvenient, and expensive. The second option is insecure. Further, explaining approvals to new or non-technical users is confusing. This has to be done in _every_ dapp that supports ERC20 deposits.
