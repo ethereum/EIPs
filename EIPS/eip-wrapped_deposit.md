@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4546
 title: Wrapped Deposits
 description: A singleton contract for managing asset deposits.
 author: Justice Hudson (@jchancehud)
