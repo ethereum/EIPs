@@ -5,7 +5,8 @@ description: A singleton contract for managing asset deposits.
 author: Justice Hudson (@jchancehud)
 discussions-to: https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740
 status: Draft
-type: Informational
+type: Standards Track
+catrgory: ERC
 created: 2021-12-11
 ---
 
