@@ -26,34 +26,34 @@
 - **续用中** - 旨在为持续更新且未达到最终状态的 EIP 提供的一种特殊状态。这包括最有名的 EIP-1。
 <!-- - **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1. -->
 
-## EIP Types
+## EIP 类型
 
-EIPs are separated into a number of types, and each has its own list of EIPs.
+EIP 有若干类型，每一种类型都有自己的 EIP 清单。
 
-### [Standard Track](./summary/standards-track.md)
+### [标准跟踪](./summary/standards-track.md)
 
-Describes any change that affects most or all Ethereum implementations, such as a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Furthermore Standard EIPs can be broken down into the following categories.
+描述影响大多数/ 全部以太坊实现的任何变化，例如网络协议的更改、块或交易有效性规则的更改、应用程序标准或约定，或影响以太坊应用程序交互的任何更改或添加。标准跟踪 EIP 细分为以下几类。
 
-### [Core](./summary/core.md)
+### [核心](./summary/core.md)
 
-Improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions (for example, the miner/node strategy changes 2, 3, and 4 of EIP-86).
+核心提案包含产生共识分叉的改进(如：[EIP-5](./eip-5.md), [EIP-101](./eip-101.md))，以及一些不一定是共识部分但可能与“核心开发”讨论相关的变更（例如，矿工/节点策略更改 EIP-86 的 2，3 和 4）。
 
-### [Networking](./summary/networking.md)
+### [网络](./summary/networking.md)
 
-Includes improvements around devp2p ([EIP-8](./eip-8.md)) and Light Ethereum Subprotocol, as well as proposed improvements to network protocol specifications of whisper and swarm.
+包括围绕 devp2p（[EIP-8](./eip-8.md)）和轻客户端子协议的改进，以及对 whisper 和 swarm 网络协议规范的改进建议。
 
-### [Interface](./summary/interface.md)
+### [接口](./summary/interface.md)
 
-Includes improvements around client API/RPC specifications and standards, and also certain language-level standards like method names (EIP-6) and contract ABIs. The label “interface” aligns with the interfaces repo and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
+包括有关客户端 API/RPC 规范和标准的改进，以及某些语言层面的标准，如方法名（EIP6）和合约 ABI。标签"接口"与接口库一致，在 EIP 被提交到 EIP 库之前，讨论应该主要发生在该库中。
 
 ### [ERC](./summary/erc.md)
 
-Application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-137](./eip-137.md)), URI schemes ([ERC-681](./eip-681.md)), library/package formats ([EIP190](./eip-190.md)), and wallet formats ([EIP-85](https://github.com/ethereum/EIPs/issues/85)).
+ERC 是 Ethereum Request for Comment 的缩写，包含如：代币标准合约（[ERC-20](./eip-20.md)），名称注册（[ERC-137](./eip-137.md)），URI schemes （[ERC-681](./eip-681.md)），库/包格式（[EIP190](./eip-190.md) 和钱包格式 ([EIP-85](https://github.com/ethereum/EIPs/issues/85))。
 
 ### [Meta](./summary/meta.md)
 
-Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
+描述以太坊的改进过程（或事件），也被视为过程 EIP（Process EIP）。 流程 EIP 类似于标准跟踪 EIP，但也适用于描述以太坊协议外的内容。 他们可能会提出一个实现，但不会加入到以太坊的代码库; 这些提案经常需要社区共识; 与信息 EIP 不同，它们不仅仅是建议，用户通常不能随意忽略它们。 提案包括程序，指南，决策过程的变更以及以太坊开发中使用的工具或环境的变更。任何 Meta-EIP 也被称为是一个过程 EIP。
 
-### [Informational](./summary/informational.md)
+### [信息提案](./summary/informational.md)
 
-Describes a Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
+描述以太坊设计问题，或向以太坊社区提供一般指导方针或信息，但没有提出新功能。 信息提案不一定代表以太坊社区的共识或推荐，因此用户和实施者可以自由地忽略信息 EIP 或遵循他们的建议。
