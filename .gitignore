@@ -8,6 +8,8 @@ vendor
 
 # Production
 /EIPS/.vuepress/dist
+/EIPS/.vuepress/.temp
+/EIPS/.vuepress/.cache
 
 # Misc
 .DS_Store
