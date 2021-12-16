@@ -76,7 +76,7 @@ function encodeType(primaryType) {
 }
 
 function typeHash(primaryType) {
-    return ethUtil.keccak256(encodeType(primaryType));
+    return ethUtil.keccakFromString(encodeType(primaryType), 256);
 }
 
 function encodeData(primaryType, data) {
@@ -92,7 +92,7 @@ function encodeData(primaryType, data) {
         let value = data[field.name];
         if (field.type == 'string' || field.type == 'bytes') {
             encTypes.push('bytes32');
-            value = ethUtil.keccak256(value);
+            value = ethUtil.keccakFromString(value, 256);
             encValues.push(value);
         } else if (types[field.type] !== undefined) {
             encTypes.push('bytes32');
@@ -123,7 +123,7 @@ function signHash() {
     );
 }
 
-const privateKey = ethUtil.keccak256('cow');
+const privateKey = ethUtil.keccakFromString('cow', 256);
 const address = ethUtil.privateToAddress(privateKey);
 const sig = ethUtil.ecsign(signHash(), privateKey);
 
