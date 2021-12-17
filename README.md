@@ -1,5 +1,3 @@
-![vercel](https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg)
-
 # 以太坊改进提案（中文翻译） (EIPs)
 
 以太坊改进提案（Ethereum Improvement Proposals (EIPs)）描述了以太坊的标准化改进，包括核心协议、规范、客户端 API 接口和合约标准。更多关于 EIPS 的概念，请参见 [以太坊中文官网描述](https://ethereum.org/zh/eips/)。
@@ -58,3 +56,5 @@ $ yarn run dev
 ```sh
 $ yarn run build
 ```
+
+<a href="https://vercel.com?utm_source=ethlibrary&utm_campaign=oss"><img src="https://www.datocms-assets.com/31049/1618983297-powered-by-vercel.svg" /></a>
