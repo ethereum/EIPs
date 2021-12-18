@@ -4,6 +4,7 @@ export default ({ Vue }) => {
       $pageHeader() {
         const frontmatter = this.$page.frontmatter
         const { eip, title, home } = frontmatter
+        if (!eip) return ''
         const pageHeader = home ? '' : `EIP${eip} - ${title}`
         return pageHeader
       },
