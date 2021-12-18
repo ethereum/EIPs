@@ -130,6 +130,8 @@ var a = (module.exports = {
   ga: '',
   markdown: {
     lineNumbers: true,
+
+    extractHeaders: ['h1', 'h2', 'h3', 'h4'],
   },
 
   themeConfig: {

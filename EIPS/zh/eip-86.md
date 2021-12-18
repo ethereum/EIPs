@@ -1,10 +1,10 @@
 ---
 eip: 86
-题目: 交易起源和签名的抽象概念
+title: 交易起源和签名的抽象概念
 author: Vitalik Buterin (@vbuterin)
-类型: 标准跟踪
-分类: 核心
-状态: 草案
+type: 标准跟踪
+category: 核心
+status: 草案
 created: 2017-02-10
 ---
 
