@@ -12,6 +12,24 @@
 
     <PageNav v-bind="{ sidebarItems }" />
 
+    <template v-if="$pageHeader">
+      <div class="giscus theme-default-content" />
+      <script
+        src="https://giscus.app/client.js"
+        data-repo="ethlibrary/EIPS"
+        data-repo-id="R_kgDOGMqduA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOGMqduM4CAU6x"
+        data-mapping="url"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async
+      ></script>
+    </template>
+
     <a
       class="vercel"
       href="https://vercel.com?utm_source=ethlibrary&utm_campaign=oss"

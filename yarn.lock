@@ -903,11 +903,6 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@giscus/vue@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@giscus/vue/-/vue-1.0.0.tgz#c3f8bdf5c7e6cca598285b9e577722d8e20f82f1"
-  integrity sha512-hwJx4tU1kdT8KW4OQsr7srps7QldU70ne5bEz+hKzCQE8TQzXyiYiGofh7VqmF5Wx4wuVkTkgy0fE89k0dq6jQ==
-
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"

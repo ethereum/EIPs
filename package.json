@@ -18,7 +18,5 @@
     "dev": "vuepress dev EIPS",
     "build": "vuepress build EIPS"
   },
-  "dependencies": {
-    "@giscus/vue": "^1.0.0"
-  }
+  "dependencies": {}
 }
