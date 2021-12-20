@@ -36,8 +36,8 @@ contract ERCX is IERCX , ERC721 {
         require(to != user, "ERCX: approval to current user");
 
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId) || _isApprovedOrUser(_msgSender(), tokenId),
-            "ERCX: approve caller is not owner nor approved for all"
+            _isApprovedOrUser(_msgSender(), tokenId),
+            "ERCX: approve caller is not user"
         );
 
         _approveUser(to, tokenId);
