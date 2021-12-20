@@ -7,6 +7,7 @@ on:
 
 jobs:
   stale-pr:
+    if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     name: "Mark stale PRs"
     steps:
@@ -19,6 +20,7 @@ jobs:
         stale-pr-message: 'There has been no activity on this pull request for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.'
         close-pr-message: 'This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.'
   stale-issue:
+    if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     name: "Mark stale issues"
     steps:
