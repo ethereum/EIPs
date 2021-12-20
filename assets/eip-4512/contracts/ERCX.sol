@@ -138,7 +138,7 @@ contract ERCX is IERCX , ERC721 {
     function _isApprovedOrUser(address spender, uint256 tokenId) internal view virtual returns (bool) {
         require(ERC721._exists(tokenId), "ERCX: operator query for nonexistent token");
         address user = ERCX.userOf(tokenId);
-        return (spender == user || getApprovedUser(tokenId) == user);
+        return (spender == user || spender == getApprovedUser(tokenId) );
     }
     
     /**
