@@ -229,7 +229,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number or, if preferred by the author, the Issue # if there was discussion in [the Issues section of this repository](https://github.com/ethereum/EIPs/issues) about this EIP)
+- Assign an EIP number (generally the PR number, but the decision is with the editors)
 
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
 
