@@ -18,12 +18,12 @@ jobs:
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
           MERGE_ENABLED: false
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic"
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin"
           ERC_EDITORS: "@lightclient,@axic"
           NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
           INTERFACE_EDITORS: "@lightclient,@axic"
-          META_EDITORS: "@lightclient,@axic"
-          INFORMATIONAL_EDITORS: "@lightclient,@axic"
+          META_EDITORS: "@lightclient,@axic,@gcolvin"
+          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin"
   enable-auto-merge:
     runs-on: ubuntu-latest
     needs: ["auto_merge_bot"]
