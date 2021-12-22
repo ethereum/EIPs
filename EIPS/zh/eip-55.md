@@ -1,17 +1,17 @@
 ---
 eip: 55
-title: Mixed-case checksum address encoding
+title: 混合大小写校验和地址编码
 author: Vitalik Buterin <vitalik.buterin@ethereum.org>, Alex Van de Sande <avsa@ethereum.org>
 discussions-to: https://github.com/ethereum/eips/issues/55
-type: Standards Track
+type: 标准追踪
 category: ERC
-status: Final
+status: 最终
 created: 2016-01-14
 ---
 
-# Specification
+# 规范
 
-Code:
+代码:
 
 ``` python
 import eth_utils
@@ -58,18 +58,18 @@ test("0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb")
 
 ```
 
-In English, convert the address to hex, but if the `i`th digit is a letter (ie. it's one of `abcdef`) print it in uppercase if the `4*i`th bit of the hash of the lowercase hexadecimal address is 1 otherwise print it in lowercase.
+在英语中，将地址转换为十六进制，但如果第 `i` 位是一个字母 (比如它是 `abcde` 中的一个），如果小写十六进制地址的哈希值的第 `4*i` 位为 1 ，则用大写打印，否则用小写打印。
 
-# Rationale
+# 基本原理
 
-Benefits:
-- Backwards compatible with many hex parsers that accept mixed case, allowing it to be easily introduced over time
-- Keeps the length at 40 characters
-- On average there will be 15 check bits per address, and the net probability that a randomly generated address if mistyped will accidentally pass a check is 0.0247%. This is a ~50x improvement over ICAP, but not as good as a 4-byte check code.
+好处:
+- 向后兼容许多接受混合大小写的十六进制解析器，允许它随着时间的推移很容易引入
+- 保持长度为 40 个字符
+- 平均每个地址将有 15 个检查位，并且一个随机生成的地址如果键入错误将意外通过检查的净概率是 0.0247%。与 `ICAP` 相比，这是大约 50 倍的改进，但不如 4 字节的检查代码好。
 
-# Implementation
+# 实现
 
-In javascript:
+在 `javascript` 中:
 
 ```js
 const createKeccakHash = require('keccak')
@@ -96,22 +96,22 @@ function toChecksumAddress (address) {
 '0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359'
 ```
 
-Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i.e. the hex address encoded as ASCII):
+注意，`Keccak256` 哈希的输入是小写的十六进制字符串(即编码为 `ASCII` 的十六进制地址):
 
 ```
     var hash = createKeccakHash('keccak256').update(Buffer.from(address.toLowerCase(), 'ascii')).digest()
 ```
 
-# Test Cases
+# 测试用例
 
 ```
-# All caps
+# 全部大写
 0x52908400098527886E0F7030069857D2E4169EE7
 0x8617E340B3D01FA5F11F306F4090FD50E238070D
-# All Lower
+# 全部小写
 0xde709f2102306220921060314715629080e2fb77
 0x27b1fdb04752bbc536007a920d24acb045561c26
-# Normal
+# 正常
 0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed
 0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359
 0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB
