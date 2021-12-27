@@ -1,0 +1,105 @@
+---
+eip: <to be assigned>
+title: ERC-721 Delegator Extension
+description: Enables ERC721 to be loaned
+author: AFKDAO
+discussions-to: https://github.com/ethereum/EIPs/issues/4608
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-12-28
+requires: 721
+---
+
+
+
+## Abstract
+The optional ERC721 Delegator Extension provides a standardized function which could enable ERC721to be loaned. 
+
+
+
+## Motivation
+The ERC721 standard does not realize the separation of ownership and use rights, which makes it difficult to realize the loan of ERC721. Solving this problem will help make ERC721 more widely used.
+
+
+
+
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+
+
+**setDelegator**
+
+Set or remove `delegator` for the owner. The delegator has no direct permission, just an additional attribute. 
+
+Requirements:
+
+- `tokenId` MUST exist.
+
+`function setDelegator(address delegator, uint256 tokenId) external;`
+
+
+
+**delegatorOf**
+
+Returns the delegator of the `tokenId` token.
+
+Requirements:
+
+- `tokenId` MUST exist.
+
+`function delegatorOf(uint256 tokenId) external view returns (address);`
+
+
+
+**safeTransferFrom**
+
+Safely transfers `tokenId` token from `from` to `to`
+
+ `delegator` won't be cleared if `reserved` is true.
+
+Requirements:
+
+- `from` cannot be the zero address.
+
+- `to` cannot be the zero address.
+
+- `tokenId` token must exist and be owned by `from`.
+
+- If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
+
+- If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+
+- If `reserved` is true, it won't clear the `delegator`.
+
+`function safeTransferFrom(address from, address to, uint256 tokenId, bool reserved) external;`
+
+
+
+
+
+## Rationale
+
+When considering adding a layer of delegate extension to ERC721, the first thing to consider is the safety and convenience for Owners and developers. Therefore, the delegate will not have any transferable or authorized permissions. What the delegator can do is defined by the developer when it is implemented.
+
+
+
+## Backwards Compatibility
+ERC721 Delegator is just an extension of ERC721, anyone can re-develop based on this extension, or rewrite after inheritance.
+
+
+
+## Test Cases
+This extension will not affect consensus changes.  
+
+
+
+## Security Considerations
+This extension does not have a direct impact on the security of ERC721 itself, and the potential security risks may come from the developer's implementation.
+
+
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
