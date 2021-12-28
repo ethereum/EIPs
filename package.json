@@ -16,7 +16,8 @@
   },
   "scripts": {
     "dev": "vuepress dev EIPS",
-    "build": "vuepress build EIPS"
+    "build": "vuepress build EIPS",
+    "sync": "./scripts/sync.js"
   },
   "dependencies": {}
 }
