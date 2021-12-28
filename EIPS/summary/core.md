@@ -1,5 +1,5 @@
 
-# Ethereum EIPs: Core (166)
+# Ethereum EIPs: Core (168)
 ---
 | Eip                  | Title                                                                                                        | Created    | Status    | Category | Type            |
 | -------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- | --------- | -------- | --------------- |
@@ -49,7 +49,7 @@
 | [1087](/eip-1087.md) | Net gas metering for SSTORE operations                                                                       | 2018-05-17 | Stagnant  | Core     | Standards Track |
 | [1108](/eip-1108.md) | Reduce alt_bn128 precompile gas costs                                                                        | 2018-05-21 | Final     | Core     | Standards Track |
 | [1109](/eip-1109.md) | PRECOMPILEDCALL opcode (Remove CALL costs for precompiled contracts)                                         | 2018-05-22 | Stagnant  | Core     | Standards Track |
-| [1153](/eip-1153.md) | Transient storage opcodes                                                                                    | 2018-06-15 | Stagnant  | Core     | Standards Track |
+| [1153](/eip-1153.md) | Transient storage opcodes                                                                                    | 2018-06-15 | Draft     | Core     | Standards Track |
 | [1227](/eip-1227.md) | Defuse Difficulty Bomb and Reset Block Reward                                                                | 2018-07-18 | Stagnant  | Core     | Standards Track |
 | [1234](/eip-1234.md) | Constantinople Difficulty Bomb Delay and Block Reward Adjustment                                             | 2018-07-19 | Final     | Core     | Standards Track |
 | [1240](/eip-1240.md) | Remove Difficulty Bomb                                                                                       | 2018-07-21 | Withdrawn | Core     | Standards Track |
@@ -118,7 +118,7 @@
 | [2935](/eip-2935.md) | Save historical block hashes in state                                                                        | 2020-09-03 | Stagnant  | Core     | Standards Track |
 | [2936](/eip-2936.md) | EXTCLEAR Opcode For SELFDESTRUCTed contracts                                                                 | 2020-09-03 | Stagnant  | Core     | Standards Track |
 | [2937](/eip-2937.md) | SET_INDESTRUCTIBLE opcode                                                                                    | 2020-09-04 | Stagnant  | Core     | Standards Track |
-| [2938](/eip-2938.md) | Account Abstraction                                                                                          | 2020-09-04 | Draft     | Core     | Standards Track |
+| [2938](/eip-2938.md) | Account Abstraction                                                                                          | 2020-09-04 | Stagnant  | Core     | Standards Track |
 | [2970](/eip-2970.md) | IS_STATIC opcode                                                                                             | 2020-09-13 | Stagnant  | Core     | Standards Track |
 | [2972](/eip-2972.md) | Wrapped Legacy Transactions                                                                                  | 2020-09-12 | Withdrawn | Core     | Standards Track |
 | [2997](/eip-2997.md) | IMPERSONATECALL Opcode                                                                                       | 2020-09-24 | Stagnant  | Core     | Standards Track |
@@ -149,11 +149,11 @@
 | [3520](/eip-3520.md) | Transaction Destination Opcode                                                                               | 2021-04-16 | Stagnant  | Core     | Standards Track |
 | [3521](/eip-3521.md) | Reduce access list cost                                                                                      | 2021-04-15 | Stagnant  | Core     | Standards Track |
 | [3529](/eip-3529.md) | Reduction in refunds                                                                                         | 2021-04-22 | Final     | Core     | Standards Track |
-| [3534](/eip-3534.md) | Restricted Chain Context Type Transactions                                                                   | 2021-04-20 | Draft     | Core     | Standards Track |
+| [3534](/eip-3534.md) | Restricted Chain Context Type Transactions                                                                   | 2021-04-20 | Stagnant  | Core     | Standards Track |
 | [3540](/eip-3540.md) | EVM Object Format (EOF) v1                                                                                   | 2021-03-16 | Review    | Core     | Standards Track |
 | [3541](/eip-3541.md) | Reject new contract code starting with the 0xEF byte                                                         | 2021-03-16 | Final     | Core     | Standards Track |
 | [3554](/eip-3554.md) | Difficulty Bomb Delay to December 2021                                                                       | 2021-05-06 | Final     | Core     | Standards Track |
-| [3584](/eip-3584.md) | Block Access List                                                                                            | 2021-05-22 | Draft     | Core     | Standards Track |
+| [3584](/eip-3584.md) | Block Access List                                                                                            | 2021-05-22 | Stagnant  | Core     | Standards Track |
 | [3607](/eip-3607.md) | Reject transactions from senders with deployed code                                                          | 2021-06-10 | Review    | Core     | Standards Track |
 | [3651](/eip-3651.md) | Warm COINBASE                                                                                                | 2021-07-12 | Draft     | Core     | Standards Track |
 | [3670](/eip-3670.md) | EOF - Code Validation                                                                                        | 2021-06-23 | Review    | Core     | Standards Track |
@@ -166,8 +166,10 @@
 | [3860](/eip-3860.md) | Limit and meter initcode                                                                                     | 2021-07-16 | Review    | Core     | Standards Track |
 | [3978](/eip-3978.md) | Gas refunds on reverts                                                                                       | 2021-09-16 | Draft     | Core     | Standards Track |
 | [4200](/eip-4200.md) | Static relative jumps                                                                                        | 2021-07-16 | Draft     | Core     | Standards Track |
-| [4345](/eip-4345.md) | Difficulty Bomb Delay to June 2022                                                                           | 2021-10-05 | Review    | Core     | Standards Track |
+| [4345](/eip-4345.md) | Difficulty Bomb Delay to June 2022                                                                           | 2021-10-05 | Final     | Core     | Standards Track |
 | [4396](/eip-4396.md) | Time-Aware Base Fee Calculation                                                                              | 2021-10-28 | Draft     | Core     | Standards Track |
 | [4399](/eip-4399.md) | Supplant DIFFICULTY opcode with RANDOM                                                                       | 2021-10-30 | Draft     | Core     | Standards Track |
+| [4488](/eip-4488.md) | Transaction calldata gas cost reduction with total calldata limit                                            | 2021-11-23 | Draft     | Core     | Standards Track |
+| [4520](/eip-4520.md) | Mult-byte opcodes prefixed by EB and EC.                                                                     | 2021-12-01 | Draft     | Core     | Standards Track |
 
     

@@ -1,5 +1,5 @@
 
-# Ethereum EIPs: Final (88)
+# Ethereum EIPs: Final (89)
 ---
 | Eip                  | Title                                                                                        | Created    | Status | Category   | Type            |
 | -------------------- | -------------------------------------------------------------------------------------------- | ---------- | ------ | ---------- | --------------- |
@@ -91,5 +91,6 @@
 | [3529](/eip-3529.md) | Reduction in refunds                                                                         | 2021-04-22 | Final  | Core       | Standards Track |
 | [3541](/eip-3541.md) | Reject new contract code starting with the 0xEF byte                                         | 2021-03-16 | Final  | Core       | Standards Track |
 | [3554](/eip-3554.md) | Difficulty Bomb Delay to December 2021                                                       | 2021-05-06 | Final  | Core       | Standards Track |
+| [4345](/eip-4345.md) | Difficulty Bomb Delay to June 2022                                                           | 2021-10-05 | Final  | Core       | Standards Track |
 
     

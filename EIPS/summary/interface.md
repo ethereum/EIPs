@@ -22,7 +22,7 @@
 | [2003](/eip-2003.md) | EVMC modules for implementations of precompiled contracts                   | 2019-05-09 | Stagnant  | Interface | Standards Track |
 | [2015](/eip-2015.md) | Wallet Update Ethereum Chain RPC Method (`wallet_updateEthereumChain`)      | 2019-05-12 | Stagnant  | Interface | Standards Track |
 | [2159](/eip-2159.md) | Common Prometheus Metrics Names for Clients                                 | 2019-07-01 | Final     | Interface | Standards Track |
-| [2255](/eip-2255.md) | Wallet Permissions System                                                   | 2019-08-22 | Draft     | Interface | Standards Track |
+| [2255](/eip-2255.md) | Wallet Permissions System                                                   | 2019-08-22 | Stagnant  | Interface | Standards Track |
 | [2256](/eip-2256.md) | wallet_getOwnedAssets JSON-RPC Method                                       | 2019-08-29 | Stagnant  | Interface | Standards Track |
 | [2566](/eip-2566.md) | Human Readable Parameters for Contract Function Execution                   | 2020-03-23 | Stagnant  | Interface | Standards Track |
 | [2696](/eip-2696.md) | JavaScript `request` method RPC transport                                   | 2020-06-04 | Final     | Interface | Standards Track |

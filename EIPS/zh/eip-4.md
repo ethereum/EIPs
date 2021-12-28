@@ -2,7 +2,7 @@
 eip: 4
 title: EIP 分类
 author: Joseph Chow (@ethers)
-status: 已完结
+status: Final
 type: Meta
 created: 2015-11-17
 superseded-by: 1

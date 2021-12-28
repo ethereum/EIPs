@@ -2,9 +2,9 @@
 eip: 7
 title: DELEGATECALL
 author: Vitalik Buterin <v@buterin.com>
-status: 最终
-type: 标准跟踪
-category: 核心
+status: Final
+type: Standards Track
+category: Core
 created: 2015-11-15
 ---
 

@@ -1,17 +1,16 @@
 
-# 以太坊改进提案 EIPs: 已完结 Final (88)
+# 以太坊改进提案 EIPs: 已完结 Final (87)
 ---
 | Eip                     | Title                                                                                        | Created    | Status | Category   | Type            |
 | ----------------------- | -------------------------------------------------------------------------------------------- | ---------- | ------ | ---------- | --------------- |
 | [2](/zh/eip-2.md)       | Homestead Hard-fork Changes                                                                  | 2015-11-15 | Final  | Core       | Standards Track |
-| [4](/zh/eip-4.md)       | EIP Classification                                                                           | 2015-11-17 | Final  |            | Meta            |
+| [4](/zh/eip-4.md)       | EIP 分类                                                                                       | 2015-11-17 | Final  |            | Meta            |
 | [5](/zh/eip-5.md)       | Gas Usage for `RETURN` and `CALL*`                                                           | 2015-11-22 | Final  | Core       | Standards Track |
 | [6](/zh/eip-6.md)       | Renaming SUICIDE opcode                                                                      | 2015-11-22 | Final  | Interface  | Standards Track |
 | [7](/zh/eip-7.md)       | DELEGATECALL                                                                                 | 2015-11-15 | Final  | Core       | Standards Track |
 | [8](/zh/eip-8.md)       | devp2p Forward Compatibility Requirements for Homestead                                      | 2015-12-18 | Final  | Networking | Standards Track |
-| [20](/zh/eip-20.md)     | Token Standard                                                                               | 2015-11-19 | Final  | ERC        | Standards Track |
-| [55](/zh/eip-55.md)     | Mixed-case checksum address encoding                                                         | 2016-01-14 | Final  | ERC        | Standards Track |
-| [100](/zh/eip-100.md)   | Change difficulty adjustment to target mean block time including uncles                      | 2016-04-28 | Final  | Core       | Standards Track |
+| [20](/zh/eip-20.md)     | 代币标准                                                                                         | 2015-11-19 | Final  | ERC        | Standards Track |
+| [55](/zh/eip-55.md)     | 混合大小写校验和地址编码                                                                                 | 2016-01-14 | Final  | ERC        | Standards Track |
 | [137](/zh/eip-137.md)   | Ethereum Domain Name Service - Specification                                                 | 2016-04-04 | Final  | ERC        | Standards Track |
 | [140](/zh/eip-140.md)   | REVERT instruction                                                                           | 2017-02-06 | Final  | Core       | Standards Track |
 | [141](/zh/eip-141.md)   | Designated invalid EVM instruction                                                           | 2017-02-09 | Final  | Core       | Standards Track |
@@ -37,23 +36,23 @@
 | [234](/zh/eip-234.md)   | Add `blockHash` to JSON-RPC filter options.                                                  | 2017-03-24 | Final  | Interface  | Standards Track |
 | [600](/zh/eip-600.md)   | Ethereum purpose allocation for Deterministic Wallets                                        | 2017-04-13 | Final  | ERC        | Standards Track |
 | [601](/zh/eip-601.md)   | Ethereum hierarchy for deterministic wallets                                                 | 2017-04-13 | Final  | ERC        | Standards Track |
-| [606](/zh/eip-606.md)   | Hardfork Meta: Homestead                                                                     | 2017-04-23 | Final  |            | Meta            |
+| [606](/zh/eip-606.md)   | 硬分叉: 家园                                                                                      | 2017-04-23 | Final  |            | Meta            |
 | [607](/zh/eip-607.md)   | Hardfork Meta: Spurious Dragon                                                               | 2017-04-23 | Final  |            | Meta            |
 | [608](/zh/eip-608.md)   | Hardfork Meta: Tangerine Whistle                                                             | 2017-04-23 | Final  |            | Meta            |
-| [609](/zh/eip-609.md)   | Hardfork Meta: Byzantium                                                                     | 2017-04-23 | Final  |            | Meta            |
+| [609](/zh/eip-609.md)   | 硬分叉修改提案：拜占庭分叉                                                                                | 2017-04-23 | Final  |            | Meta            |
 | [627](/zh/eip-627.md)   | Whisper Specification                                                                        | 2017-05-05 | Final  | Networking | Standards Track |
 | [649](/zh/eip-649.md)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                  | 2017-06-21 | Final  | Core       | Standards Track |
 | [658](/zh/eip-658.md)   | Embedding transaction status code in receipts                                                | 2017-06-30 | Final  | Core       | Standards Track |
 | [681](/zh/eip-681.md)   | URL Format for Transaction Requests                                                          | 2017-08-01 | Final  | ERC        | Standards Track |
 | [695](/zh/eip-695.md)   | Create `eth_chainId` method for JSON-RPC                                                     | 2017-08-21 | Final  | Interface  | Standards Track |
 | [706](/zh/eip-706.md)   | DEVp2p snappy compression                                                                    | 2017-09-07 | Final  | Networking | Standards Track |
-| [721](/zh/eip-721.md)   | Non-Fungible Token Standard                                                                  | 2018-01-24 | Final  | ERC        | Standards Track |
+| [721](/zh/eip-721.md)   | 非同质化代币标准                                                                                     | 2018-01-24 | Final  | ERC        | Standards Track |
 | [777](/zh/eip-777.md)   | Token Standard                                                                               | 2017-11-20 | Final  | ERC        | Standards Track |
 | [778](/zh/eip-778.md)   | Ethereum Node Records (ENR)                                                                  | 2017-11-23 | Final  | Networking | Standards Track |
 | [779](/zh/eip-779.md)   | Hardfork Meta: DAO Fork                                                                      | 2017-11-26 | Final  |            | Meta            |
 | [820](/zh/eip-820.md)   | Pseudo-introspection Registry Contract                                                       | 2018-01-05 | Final  | ERC        | Standards Track |
 | [868](/zh/eip-868.md)   | Node Discovery v4 ENR Extension                                                              | 2018-02-02 | Final  | Networking | Standards Track |
-| [1013](/zh/eip-1013.md) | Hardfork Meta: Constantinople                                                                | 2018-04-20 | Final  |            | Meta            |
+| [1013](/zh/eip-1013.md) | 硬分叉：君士坦丁堡                                                                                    | 2018-04-20 | Final  |            | Meta            |
 | [1014](/zh/eip-1014.md) | Skinny CREATE2                                                                               | 2018-04-20 | Final  | Core       | Standards Track |
 | [1052](/zh/eip-1052.md) | EXTCODEHASH opcode                                                                           | 2018-05-02 | Final  | Core       | Standards Track |
 | [1108](/zh/eip-1108.md) | Reduce alt_bn128 precompile gas costs                                                        | 2018-05-21 | Final  | Core       | Standards Track |
@@ -64,8 +63,8 @@
 | [1283](/zh/eip-1283.md) | Net gas metering for SSTORE without dirty maps                                               | 2018-08-01 | Final  | Core       | Standards Track |
 | [1344](/zh/eip-1344.md) | ChainID opcode                                                                               | 2018-08-22 | Final  | Core       | Standards Track |
 | [1363](/zh/eip-1363.md) | Payable Token                                                                                | 2020-01-31 | Final  | ERC        | Standards Track |
-| [1559](/zh/eip-1559.md) | Fee market change for ETH 1.0 chain                                                          | 2019-04-13 | Final  | Core       | Standards Track |
-| [1679](/zh/eip-1679.md) | Hardfork Meta: Istanbul                                                                      | 2019-01-04 | Final  |            | Meta            |
+| [1559](/zh/eip-1559.md) | ETH 1.0 链的手续费市场改革                                                                            | 2019-04-13 | Final  | Core       | Standards Track |
+| [1679](/zh/eip-1679.md) | 硬分叉：伊斯坦布尔                                                                                    | 2019-01-04 | Final  |            | Meta            |
 | [1716](/zh/eip-1716.md) | Hardfork Meta: Petersburg                                                                    | 2019-01-21 | Final  |            | Meta            |
 | [1820](/zh/eip-1820.md) | Pseudo-introspection Registry Contract                                                       | 2019-03-04 | Final  | ERC        | Standards Track |
 | [1884](/zh/eip-1884.md) | Repricing for trie-size-dependent opcodes                                                    | 2019-03-28 | Final  | Core       | Standards Track |
@@ -90,6 +89,6 @@
 | [3198](/zh/eip-3198.md) | BASEFEE opcode                                                                               | 2021-01-13 | Final  | Core       | Standards Track |
 | [3529](/zh/eip-3529.md) | Reduction in refunds                                                                         | 2021-04-22 | Final  | Core       | Standards Track |
 | [3541](/zh/eip-3541.md) | Reject new contract code starting with the 0xEF byte                                         | 2021-03-16 | Final  | Core       | Standards Track |
-| [3554](/zh/eip-3554.md) | Difficulty Bomb Delay to December 2021                                                       | 2021-05-06 | Final  | Core       | Standards Track |
+| [3554](/zh/eip-3554.md) | 难度炸弹延迟至 2021 年 12 月                                                                          | 2021-05-06 | Final  | Core       | Standards Track |
 
     

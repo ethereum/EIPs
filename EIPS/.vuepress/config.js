@@ -6,27 +6,48 @@ const path = require('path')
 const _ = require('lodash')
 const { en, zh } = require('./locales')
 
-const allEipFiles = fs
-  .readdirSync(path.resolve(__dirname, '../'))
-  .filter(file => file.includes('eip'))
+const localePath = {
+  en: '../',
+  zh: '../zh/',
+}
 
-const metas = allEipFiles.map(file => {
-  const meta = yamlHeaderParser.loadFront(
-    fs.readFileSync(`${__dirname}/../${file}`, 'utf8')
-  )
-  delete meta.__content
-  const filename = path.parse(file).name
-  return {
-    ...meta,
-    filename,
-    // eip: `[${meta.eip}](./${filename})`,
-    created: meta.created ? format(new Date(meta.created), 'yyyy-MM-dd') : '-',
-  }
-})
+const eipFiles = localePath =>
+  fs
+    .readdirSync(path.resolve(__dirname, localePath))
+    .filter(file => file.includes('eip'))
+    .map(file => path.resolve(__dirname, localePath, file))
 
-const EIP_STATUS = _.groupBy(metas, 'status')
-const EIP_CATE = _.groupBy(metas, 'category')
-const EIP_TYPE = _.groupBy(metas, 'type')
+const [enMetas, zhMetas] = [
+  eipFiles(localePath.en),
+  eipFiles(localePath.zh),
+].map(files =>
+  files.map(filePath => {
+    const meta = yamlHeaderParser.loadFront(fs.readFileSync(filePath, 'utf8'))
+    delete meta.__content
+    const filename = path.parse(filePath).name
+    return {
+      ...meta,
+      filename,
+      // eip: `[${meta.eip}](./${filename})`,
+      created: meta.created
+        ? format(new Date(meta.created), 'yyyy-MM-dd')
+        : '-',
+    }
+  })
+)
+
+const [EIP_STATUS_EN, EIP_STATUS_ZH] = [
+  _.groupBy(enMetas, 'status'),
+  _.groupBy(zhMetas, 'status'),
+]
+const [EIP_CATE_EN, EIP_CATE_ZH] = [
+  _.groupBy(enMetas, 'category'),
+  _.groupBy(zhMetas, 'category'),
+]
+const [EIP_TYPE_EN, EIP_TYPE_ZH] = [
+  _.groupBy(enMetas, 'type'),
+  _.groupBy(zhMetas, 'type'),
+]
 
 const getSummaryPath = (item, lang) => {
   let root
@@ -82,12 +103,12 @@ ${tableJSON}
     )
   })
 }
-genSummary(EIP_STATUS, en)
-genSummary(EIP_STATUS, zh)
-genSummary(EIP_TYPE, en)
-genSummary(EIP_TYPE, zh)
-genSummary(EIP_CATE, en)
-genSummary(EIP_CATE, zh)
+genSummary(EIP_STATUS_EN, en)
+genSummary(EIP_STATUS_ZH, zh)
+genSummary(EIP_TYPE_EN, en)
+genSummary(EIP_TYPE_ZH, zh)
+genSummary(EIP_CATE_EN, en)
+genSummary(EIP_CATE_ZH, zh)
 
 const getSidebar = locale => {
   return [
@@ -99,17 +120,26 @@ const getSidebar = locale => {
     {
       title: locale.eipsByStatus,
       collapsable: false,
-      children: getSidebarChildren(EIP_STATUS, locale),
+      children: getSidebarChildren(
+        locale.language === 'zh' ? EIP_STATUS_ZH : EIP_STATUS_EN,
+        locale
+      ),
     },
     {
       title: locale.eipsByTypes,
       collapsable: false,
-      children: getSidebarChildren(EIP_TYPE, locale),
+      children: getSidebarChildren(
+        locale.language === 'zh' ? EIP_TYPE_ZH : EIP_TYPE_EN,
+        locale
+      ),
     },
     {
       title: locale.eipsByCategory,
       collapsable: false,
-      children: getSidebarChildren(EIP_CATE, locale),
+      children: getSidebarChildren(
+        locale.language === 'zh' ? EIP_CATE_ZH : EIP_CATE_EN,
+        locale
+      ),
     },
   ]
 }

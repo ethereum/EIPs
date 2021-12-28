@@ -1,5 +1,5 @@
 
-# Ethereum EIPs: Standards Track (372)
+# Ethereum EIPs: Standards Track (378)
 ---
 | Eip                  | Title                                                                                                        | Created    | Status    | Category   | Type            |
 | -------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- | --------- | ---------- | --------------- |
@@ -46,7 +46,7 @@
 | [615](/eip-615.md)   | Subroutines and Static Jumps for the EVM                                                                     | 2016-12-10 | Stagnant  | Core       | Standards Track |
 | [616](/eip-616.md)   | SIMD Operations for the EVM                                                                                  | 2017-04-25 | Stagnant  | Core       | Standards Track |
 | [627](/eip-627.md)   | Whisper Specification                                                                                        | 2017-05-05 | Final     | Networking | Standards Track |
-| [634](/eip-634.md)   | Storage of text records in ENS                                                                               | 2017-05-17 | Stagnant  | ERC        | Standards Track |
+| [634](/eip-634.md)   | Storage of text records in ENS                                                                               | 2017-05-17 | Draft     | ERC        | Standards Track |
 | [649](/eip-649.md)   | Metropolis Difficulty Bomb Delay and Block Reward Reduction                                                  | 2017-06-21 | Final     | Core       | Standards Track |
 | [658](/eip-658.md)   | Embedding transaction status code in receipts                                                                | 2017-06-30 | Final     | Core       | Standards Track |
 | [663](/eip-663.md)   | Unlimited SWAP and DUP instructions                                                                          | 2017-07-03 | Stagnant  | Core       | Standards Track |
@@ -103,7 +103,7 @@
 | [1123](/eip-1123.md) | Revised Ethereum Smart Contract Packaging Standard                                                           | 2018-06-01 | Withdrawn | ERC        | Standards Track |
 | [1129](/eip-1129.md) | Standardised DAPP announcements                                                                              | 2018-05-31 | Stagnant  | ERC        | Standards Track |
 | [1132](/eip-1132.md) | Extending ERC20 with token locking capability                                                                | 2018-06-03 | Stagnant  | ERC        | Standards Track |
-| [1153](/eip-1153.md) | Transient storage opcodes                                                                                    | 2018-06-15 | Stagnant  | Core       | Standards Track |
+| [1153](/eip-1153.md) | Transient storage opcodes                                                                                    | 2018-06-15 | Draft     | Core       | Standards Track |
 | [1154](/eip-1154.md) | Oracle Interface                                                                                             | 2018-06-13 | Withdrawn | ERC        | Standards Track |
 | [1155](/eip-1155.md) | Multi Token Standard                                                                                         | 2018-06-17 | Final     | ERC        | Standards Track |
 | [1167](/eip-1167.md) | Minimal Proxy Contract                                                                                       | 2018-06-22 | Final     | ERC        | Standards Track |
@@ -189,7 +189,7 @@
 | [1959](/eip-1959.md) | New Opcode to check if a chainID is part of the history of chainIDs                                          | 2019-04-20 | Stagnant  | Core       | Standards Track |
 | [1962](/eip-1962.md) | EC arithmetic and pairings with runtime definitions                                                          | 2019-04-22 | Stagnant  | Core       | Standards Track |
 | [1965](/eip-1965.md) | Method to check if a chainID is valid at a specific block Number                                             | 2019-04-20 | Stagnant  | Core       | Standards Track |
-| [1967](/eip-1967.md) | Standard Proxy Storage Slots                                                                                 | 2019-04-24 | Draft     | ERC        | Standards Track |
+| [1967](/eip-1967.md) | Standard Proxy Storage Slots                                                                                 | 2019-04-24 | Review    | ERC        | Standards Track |
 | [1973](/eip-1973.md) | Scalable Rewards                                                                                             | 2019-04-01 | Stagnant  | ERC        | Standards Track |
 | [1985](/eip-1985.md) | Sane limits for certain EVM parameters                                                                       | 2018-08-01 | Stagnant  | Core       | Standards Track |
 | [1996](/eip-1996.md) | Holdable Token                                                                                               | 2019-04-10 | Stagnant  | ERC        | Standards Track |
@@ -217,7 +217,7 @@
 | [2193](/eip-2193.md) | dType Alias Extension - Decentralized Type System                                                            | 2019-07-16 | Stagnant  | ERC        | Standards Track |
 | [2200](/eip-2200.md) | Structured Definitions for Net Gas Metering                                                                  | 2019-07-18 | Final     | Core       | Standards Track |
 | [2242](/eip-2242.md) | Transaction Postdata                                                                                         | 2019-08-16 | Stagnant  | Core       | Standards Track |
-| [2255](/eip-2255.md) | Wallet Permissions System                                                                                    | 2019-08-22 | Draft     | Interface  | Standards Track |
+| [2255](/eip-2255.md) | Wallet Permissions System                                                                                    | 2019-08-22 | Stagnant  | Interface  | Standards Track |
 | [2256](/eip-2256.md) | wallet_getOwnedAssets JSON-RPC Method                                                                        | 2019-08-29 | Stagnant  | Interface  | Standards Track |
 | [2266](/eip-2266.md) | Atomic Swap-based American Call Option Contract Standard                                                     | 2019-08-17 | Last Call | ERC        | Standards Track |
 | [2304](/eip-2304.md) | Multichain address resolution for ENS                                                                        | 2019-09-09 | Stagnant  | ERC        | Standards Track |
@@ -228,12 +228,12 @@
 | [2333](/eip-2333.md) | BLS12-381 Key Generation                                                                                     | 2019-09-30 | Draft     | ERC        | Standards Track |
 | [2334](/eip-2334.md) | BLS12-381 Deterministic Account Hierarchy                                                                    | 2019-09-30 | Draft     | ERC        | Standards Track |
 | [2335](/eip-2335.md) | BLS12-381 Keystore                                                                                           | 2019-09-30 | Stagnant  | ERC        | Standards Track |
-| [2364](/eip-2364.md) | eth/64: forkid-extended protocol handshake                                                                   | 2019-11-08 | Review    | Networking | Standards Track |
+| [2364](/eip-2364.md) | eth/64: forkid-extended protocol handshake                                                                   | 2019-11-08 | Last Call | Networking | Standards Track |
 | [2384](/eip-2384.md) | Muir Glacier Difficulty Bomb Delay                                                                           | 2019-11-20 | Final     | Core       | Standards Track |
 | [2386](/eip-2386.md) | Ethereum 2 Hierarchical Deterministic Walletstore                                                            | 2019-11-21 | Stagnant  | ERC        | Standards Track |
 | [2390](/eip-2390.md) | Geo-ENS                                                                                                      | 2019-11-15 | Stagnant  | ERC        | Standards Track |
 | [2400](/eip-2400.md) | URL Format for Transaction Receipts                                                                          | 2019-11-05 | Stagnant  | ERC        | Standards Track |
-| [2464](/eip-2464.md) | eth/65: transaction announcements and retrievals                                                             | 2020-01-13 | Review    | Networking | Standards Track |
+| [2464](/eip-2464.md) | eth/65: transaction announcements and retrievals                                                             | 2020-01-13 | Last Call | Networking | Standards Track |
 | [2470](/eip-2470.md) | Singleton Factory                                                                                            | 2020-01-15 | Stagnant  | ERC        | Standards Track |
 | [2474](/eip-2474.md) | Coinbase calls                                                                                               | 2020-01-19 | Stagnant  | Core       | Standards Track |
 | [2477](/eip-2477.md) | Token Metadata Integrity                                                                                     | 2020-01-02 | Stagnant  | ERC        | Standards Track |
@@ -250,7 +250,7 @@
 | [2544](/eip-2544.md) | ENS Wildcard Resolution                                                                                      | 2020-02-28 | Draft     | ERC        | Standards Track |
 | [2565](/eip-2565.md) | ModExp Gas Cost                                                                                              | 2020-03-20 | Final     | Core       | Standards Track |
 | [2566](/eip-2566.md) | Human Readable Parameters for Contract Function Execution                                                    | 2020-03-23 | Stagnant  | Interface  | Standards Track |
-| [2569](/eip-2569.md) | Saving and Displaying Image Onchain for Universal Tokens                                                     | 2020-03-28 | Stagnant  | ERC        | Standards Track |
+| [2569](/eip-2569.md) | Saving and Displaying Image Onchain for Universal Tokens                                                     | 2020-03-28 | Draft     | ERC        | Standards Track |
 | [2583](/eip-2583.md) | Penalty for account trie misses                                                                              | 2020-02-21 | Stagnant  | Core       | Standards Track |
 | [2584](/eip-2584.md) | Trie format transition with overlay trees                                                                    | 2020-04-03 | Stagnant  | Core       | Standards Track |
 | [2593](/eip-2593.md) | Escalator fee market change for ETH 1.0 chain                                                                | 2020-03-13 | Stagnant  | Core       | Standards Track |
@@ -285,7 +285,7 @@
 | [2935](/eip-2935.md) | Save historical block hashes in state                                                                        | 2020-09-03 | Stagnant  | Core       | Standards Track |
 | [2936](/eip-2936.md) | EXTCLEAR Opcode For SELFDESTRUCTed contracts                                                                 | 2020-09-03 | Stagnant  | Core       | Standards Track |
 | [2937](/eip-2937.md) | SET_INDESTRUCTIBLE opcode                                                                                    | 2020-09-04 | Stagnant  | Core       | Standards Track |
-| [2938](/eip-2938.md) | Account Abstraction                                                                                          | 2020-09-04 | Draft     | Core       | Standards Track |
+| [2938](/eip-2938.md) | Account Abstraction                                                                                          | 2020-09-04 | Stagnant  | Core       | Standards Track |
 | [2942](/eip-2942.md) | EthPM URI Specification                                                                                      | 2020-09-04 | Stagnant  | ERC        | Standards Track |
 | [2970](/eip-2970.md) | IS_STATIC opcode                                                                                             | 2020-09-13 | Stagnant  | Core       | Standards Track |
 | [2972](/eip-2972.md) | Wrapped Legacy Transactions                                                                                  | 2020-09-12 | Withdrawn | Core       | Standards Track |
@@ -331,38 +331,39 @@
 | [3372](/eip-3372.md) | 5 FNV primes for ethash                                                                                      | 2021-03-13 | Stagnant  | Core       | Standards Track |
 | [3374](/eip-3374.md) | Predictable Proof-of-Work (POW) Sunsetting                                                                   | 2021-03-13 | Withdrawn | Core       | Standards Track |
 | [3382](/eip-3382.md) | Hardcoded Block Gas Limit                                                                                    | 2021-03-13 | Withdrawn | Core       | Standards Track |
-| [3386](/eip-3386.md) | ERC-721 and ERC-1155 to ERC-20 Wrapper                                                                       | 2021-03-12 | Draft     | ERC        | Standards Track |
+| [3386](/eip-3386.md) | ERC-721 and ERC-1155 to ERC-20 Wrapper                                                                       | 2021-03-12 | Stagnant  | ERC        | Standards Track |
 | [3403](/eip-3403.md) | Partial removal of refunds                                                                                   | 2021-03-16 | Stagnant  | Core       | Standards Track |
 | [3416](/eip-3416.md) | Median Gas Premium                                                                                           | 2021-03-18 | Stagnant  | Core       | Standards Track |
 | [3436](/eip-3436.md) | Expanded Clique Block Choice Rule                                                                            | 2021-03-25 | Review    | Core       | Standards Track |
-| [3440](/eip-3440.md) | ERC-721 Editions Standard                                                                                    | 2021-04-20 | Draft     | ERC        | Standards Track |
-| [3448](/eip-3448.md) | Meta Proxy Factory                                                                                           | 2021-03-29 | Draft     | ERC        | Standards Track |
+| [3440](/eip-3440.md) | ERC-721 Editions Standard                                                                                    | 2021-04-20 | Stagnant  | ERC        | Standards Track |
+| [3448](/eip-3448.md) | MetaProxy Standard                                                                                           | 2021-03-29 | Review    | ERC        | Standards Track |
 | [3450](/eip-3450.md) | Standardized Shamir Secret Sharing Scheme for BIP-39 Mnemonics                                               | 2021-03-29 | Stagnant  | ERC        | Standards Track |
 | [3475](/eip-3475.md) | Multiple Callable Bonds                                                                                      | 2021-04-05 | Draft     | ERC        | Standards Track |
 | [3508](/eip-3508.md) | Transaction Data Opcodes                                                                                     | 2021-04-16 | Stagnant  | Core       | Standards Track |
 | [3520](/eip-3520.md) | Transaction Destination Opcode                                                                               | 2021-04-16 | Stagnant  | Core       | Standards Track |
 | [3521](/eip-3521.md) | Reduce access list cost                                                                                      | 2021-04-15 | Stagnant  | Core       | Standards Track |
-| [3525](/eip-3525.md) | Fractionalized NFT Standard                                                                                  | 2020-12-01 | Draft     | ERC        | Standards Track |
+| [3525](/eip-3525.md) | Semi-Fungible Token Standard                                                                                 | 2020-12-01 | Draft     | ERC        | Standards Track |
 | [3529](/eip-3529.md) | Reduction in refunds                                                                                         | 2021-04-22 | Final     | Core       | Standards Track |
-| [3534](/eip-3534.md) | Restricted Chain Context Type Transactions                                                                   | 2021-04-20 | Draft     | Core       | Standards Track |
+| [3534](/eip-3534.md) | Restricted Chain Context Type Transactions                                                                   | 2021-04-20 | Stagnant  | Core       | Standards Track |
 | [3540](/eip-3540.md) | EVM Object Format (EOF) v1                                                                                   | 2021-03-16 | Review    | Core       | Standards Track |
 | [3541](/eip-3541.md) | Reject new contract code starting with the 0xEF byte                                                         | 2021-03-16 | Final     | Core       | Standards Track |
 | [3554](/eip-3554.md) | Difficulty Bomb Delay to December 2021                                                                       | 2021-05-06 | Final     | Core       | Standards Track |
-| [3561](/eip-3561.md) | Trust Minimized Upgradeability Proxy                                                                         | 2021-05-09 | Draft     | ERC        | Standards Track |
+| [3561](/eip-3561.md) | Trust Minimized Upgradeability Proxy                                                                         | 2021-05-09 | Stagnant  | ERC        | Standards Track |
 | [3569](/eip-3569.md) | Sealed NFT Metadata Standard                                                                                 | 2021-05-07 | Draft     | ERC        | Standards Track |
-| [3584](/eip-3584.md) | Block Access List                                                                                            | 2021-05-22 | Draft     | Core       | Standards Track |
+| [3584](/eip-3584.md) | Block Access List                                                                                            | 2021-05-22 | Stagnant  | Core       | Standards Track |
 | [3589](/eip-3589.md) | Assemble assets into NFTs                                                                                    | 2021-05-24 | Draft     | ERC        | Standards Track |
 | [3607](/eip-3607.md) | Reject transactions from senders with deployed code                                                          | 2021-06-10 | Review    | Core       | Standards Track |
 | [3643](/eip-3643.md) | T-REX - Token for Regulated EXchanges                                                                        | 2021-07-09 | Draft     | ERC        | Standards Track |
 | [3651](/eip-3651.md) | Warm COINBASE                                                                                                | 2021-07-12 | Draft     | Core       | Standards Track |
-| [3668](/eip-3668.md) | Durin: Secure offchain data retrieval                                                                        | 2020-07-19 | Draft     | ERC        | Standards Track |
+| [3668](/eip-3668.md) | CCIP Read: Secure offchain data retrieval                                                                    | 2020-07-19 | Draft     | ERC        | Standards Track |
 | [3670](/eip-3670.md) | EOF - Code Validation                                                                                        | 2021-06-23 | Review    | Core       | Standards Track |
 | [3675](/eip-3675.md) | Upgrade consensus to Proof-of-Stake                                                                          | 2021-07-22 | Draft     | Core       | Standards Track |
 | [3690](/eip-3690.md) | EOF - JUMPDEST Table                                                                                         | 2021-06-23 | Review    | Core       | Standards Track |
 | [3709](/eip-3709.md) | Remove Support for Type 1 Transactions                                                                       | 2021-08-07 | Draft     | Interface  | Standards Track |
-| [3722](/eip-3722.md) | Poster                                                                                                       | 2021-07-31 | Draft     | ERC        | Standards Track |
+| [3722](/eip-3722.md) | Poster                                                                                                       | 2021-07-31 | Review    | ERC        | Standards Track |
 | [3754](/eip-3754.md) | A Vanilla Non-Fungible Token Standard                                                                        | 2021-08-21 | Draft     | ERC        | Standards Track |
 | [3756](/eip-3756.md) | Gas Limit Cap                                                                                                | 2021-08-21 | Draft     | Core       | Standards Track |
+| [3770](/eip-3770.md) | Chain-specific addresses                                                                                     | 2021-08-26 | Draft     | ERC        | Standards Track |
 | [3772](/eip-3772.md) | Compressed Integers                                                                                          | 2021-08-27 | Draft     | ERC        | Standards Track |
 | [3779](/eip-3779.md) | Safer Control Flow for the EVM                                                                               | 2021-08-30 | Draft     | Core       | Standards Track |
 | [3788](/eip-3788.md) | Strict enforcement of chainId                                                                                | 2021-09-02 | Draft     | Core       | Standards Track |
@@ -371,9 +372,14 @@
 | [3978](/eip-3978.md) | Gas refunds on reverts                                                                                       | 2021-09-16 | Draft     | Core       | Standards Track |
 | [4200](/eip-4200.md) | Static relative jumps                                                                                        | 2021-07-16 | Draft     | Core       | Standards Track |
 | [4337](/eip-4337.md) | Account Abstraction via Entry Point Contract specification                                                   | 2021-09-29 | Draft     | ERC        | Standards Track |
-| [4345](/eip-4345.md) | Difficulty Bomb Delay to June 2022                                                                           | 2021-10-05 | Review    | Core       | Standards Track |
+| [4345](/eip-4345.md) | Difficulty Bomb Delay to June 2022                                                                           | 2021-10-05 | Final     | Core       | Standards Track |
+| [4361](/eip-4361.md) | Sign-In with Ethereum.                                                                                       | 2021-10-11 | Draft     | ERC        | Standards Track |
 | [4396](/eip-4396.md) | Time-Aware Base Fee Calculation                                                                              | 2021-10-28 | Draft     | Core       | Standards Track |
 | [4399](/eip-4399.md) | Supplant DIFFICULTY opcode with RANDOM                                                                       | 2021-10-30 | Draft     | Core       | Standards Track |
+| [4400](/eip-4400.md) | ERC-721 Consumable Extension                                                                                 | 2021-10-30 | Draft     | ERC        | Standards Track |
 | [4444](/eip-4444.md) | Bound Historical Data in Execution Clients                                                                   | 2021-11-02 | Draft     | Networking | Standards Track |
+| [4488](/eip-4488.md) | Transaction calldata gas cost reduction with total calldata limit                                            | 2021-11-23 | Draft     | Core       | Standards Track |
+| [4494](/eip-4494.md) | Permit for ERC-721 NFTs                                                                                      | 2021-11-25 | Draft     | ERC        | Standards Track |
+| [4520](/eip-4520.md) | Mult-byte opcodes prefixed by EB and EC.                                                                     | 2021-12-01 | Draft     | Core       | Standards Track |
 
     

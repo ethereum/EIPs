@@ -2,9 +2,9 @@
 eip: 3
 title: 新增 CALLDEPTH 操作码
 author: Martin Holst Swende <martin@swende.se>
-status: 已撤销
-type: 标准跟踪
-category: 核心
+status: Withdrawn
+type: Standards Track
+category: Core
 created: 2015-11-19
 ---
 

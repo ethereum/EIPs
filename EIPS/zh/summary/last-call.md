@@ -1,5 +1,5 @@
 
-# 以太坊改进提案 EIPs: 最后征求意见中 Last Call (9)
+# 以太坊改进提案 EIPs: 最后征求意见中 Last Call (8)
 ---
 | Eip                     | Title                                                    | Created    | Status    | Category   | Type            |
 | ----------------------- | -------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
@@ -11,6 +11,5 @@
 | [2535](/zh/eip-2535.md) | Diamonds, Multi-Facet Proxy                              | 2020-02-22 | Last Call | ERC        | Standards Track |
 | [2976](/zh/eip-2976.md) | Typed Transactions over Gossip                           | 2020-09-13 | Last Call | Networking | Standards Track |
 | [2982](/zh/eip-2982.md) | Serenity Phase 0                                         | 2020-09-15 | Last Call |            | Informational   |
-| [3076](/zh/eip-3076.md) | Slashing Protection Interchange Format                   | 2020-10-27 | Last Call | Interface  | Standards Track |
 
     

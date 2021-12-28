@@ -2,9 +2,9 @@
 eip: 20
 title: 代币标准
 author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
-type: 标准跟踪（Standards Track）
+type: Standards Track
 category: ERC
-status: 完结（Final）
+status: Final
 created: 2015-11-19
 ---
 

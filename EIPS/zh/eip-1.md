@@ -1,7 +1,7 @@
 ---
 eip: 1
 title: EIP 用途和指南
-status: 续用中
+status: Living
 type: Meta
 author: Martin Becze <mb@ethereum.org>、Hudson Jameson <hudson@ethereum.org> 等。
 created: 2015-10-27

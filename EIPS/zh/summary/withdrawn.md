@@ -1,9 +1,9 @@
 
-# 以太坊改进提案 EIPs: 已撤销 Withdraw (23)
+# 以太坊改进提案 EIPs: 已撤销 Withdraw (22)
 ---
 | Eip                     | Title                                                               | Created    | Status    | Category  | Type            |
 | ----------------------- | ------------------------------------------------------------------- | ---------- | --------- | --------- | --------------- |
-| [3](/zh/eip-3.md)       | Addition of CALLDEPTH opcode                                        | 2015-11-19 | Withdrawn | Core      | Standards Track |
+| [3](/zh/eip-3.md)       | 新增 CALLDEPTH 操作码                                                    | 2015-11-19 | Withdrawn | Core      | Standards Track |
 | [875](/zh/eip-875.md)   | Simpler NFT standard with batching and native atomic swaps          | 2018-02-08 | Withdrawn | ERC       | Standards Track |
 | [908](/zh/eip-908.md)   | Reward clients for a sustainable network                            | 2018-03-01 | Withdrawn | Core      | Standards Track |
 | [999](/zh/eip-999.md)   | Restore Contract Code at 0x863DF6BFa4469f3ead0bE8f9F2AAE51c91A907b4 | 2018-04-04 | Withdrawn | Core      | Standards Track |
@@ -18,7 +18,6 @@
 | [2025](/zh/eip-2025.md) | Block Rewards Proposal for funding Eth1.x                           | 2019-04-20 | Withdrawn | Core      | Standards Track |
 | [2458](/zh/eip-2458.md) | Updates and Updated-by Header                                       | 2020-01-06 | Withdrawn |           | Informational   |
 | [2711](/zh/eip-2711.md) | Sponsored, expiring and batch transactions.                         | 2020-06-11 | Withdrawn | Core      | Standards Track |
-| [2733](/zh/eip-2733.md) | Transaction Package                                                 | 2020-06-16 | Withdrawn | Core      | Standards Track |
 | [2780](/zh/eip-2780.md) | Reduce intrinsic transaction gas                                    | 2020-07-11 | Withdrawn | Core      | Standards Track |
 | [2786](/zh/eip-2786.md) | Ethereum Provider Connect/Disconnect Events                         | 2020-07-15 | Withdrawn | Interface | Standards Track |
 | [2972](/zh/eip-2972.md) | Wrapped Legacy Transactions                                         | 2020-09-12 | Withdrawn | Core      | Standards Track |

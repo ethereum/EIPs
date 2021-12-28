@@ -1,5 +1,5 @@
 
-# Ethereum EIPs: ERC (155)
+# Ethereum EIPs: ERC (159)
 ---
 | Eip                  | Title                                                                                 | Created    | Status    | Category | Type            |
 | -------------------- | ------------------------------------------------------------------------------------- | ---------- | --------- | -------- | --------------- |
@@ -15,7 +15,7 @@
 | [205](/eip-205.md)   | ENS support for contract ABIs                                                         | 2017-02-06 | Stagnant  | ERC      | Standards Track |
 | [600](/eip-600.md)   | Ethereum purpose allocation for Deterministic Wallets                                 | 2017-04-13 | Final     | ERC      | Standards Track |
 | [601](/eip-601.md)   | Ethereum hierarchy for deterministic wallets                                          | 2017-04-13 | Final     | ERC      | Standards Track |
-| [634](/eip-634.md)   | Storage of text records in ENS                                                        | 2017-05-17 | Stagnant  | ERC      | Standards Track |
+| [634](/eip-634.md)   | Storage of text records in ENS                                                        | 2017-05-17 | Draft     | ERC      | Standards Track |
 | [681](/eip-681.md)   | URL Format for Transaction Requests                                                   | 2017-08-01 | Final     | ERC      | Standards Track |
 | [721](/eip-721.md)   | Non-Fungible Token Standard                                                           | 2018-01-24 | Final     | ERC      | Standards Track |
 | [725](/eip-725.md)   | General key-value store and execution standard                                        | 2017-10-02 | Draft     | ERC      | Standards Track |
@@ -93,7 +93,7 @@
 | [1922](/eip-1922.md) | zk-SNARK Verifier Standard                                                            | 2018-09-14 | Stagnant  | ERC      | Standards Track |
 | [1923](/eip-1923.md) | zk-SNARK Verifier Registry Standard                                                   | 2018-12-22 | Stagnant  | ERC      | Standards Track |
 | [1948](/eip-1948.md) | Non-fungible Data Token                                                               | 2019-04-18 | Stagnant  | ERC      | Standards Track |
-| [1967](/eip-1967.md) | Standard Proxy Storage Slots                                                          | 2019-04-24 | Draft     | ERC      | Standards Track |
+| [1967](/eip-1967.md) | Standard Proxy Storage Slots                                                          | 2019-04-24 | Review    | ERC      | Standards Track |
 | [1973](/eip-1973.md) | Scalable Rewards                                                                      | 2019-04-01 | Stagnant  | ERC      | Standards Track |
 | [1996](/eip-1996.md) | Holdable Token                                                                        | 2019-04-10 | Stagnant  | ERC      | Standards Track |
 | [2009](/eip-2009.md) | Compliance Service                                                                    | 2019-05-09 | Stagnant  | ERC      | Standards Track |
@@ -120,7 +120,7 @@
 | [2525](/eip-2525.md) | ENSLogin                                                                              | 2020-02-19 | Stagnant  | ERC      | Standards Track |
 | [2535](/eip-2535.md) | Diamonds, Multi-Facet Proxy                                                           | 2020-02-22 | Last Call | ERC      | Standards Track |
 | [2544](/eip-2544.md) | ENS Wildcard Resolution                                                               | 2020-02-28 | Draft     | ERC      | Standards Track |
-| [2569](/eip-2569.md) | Saving and Displaying Image Onchain for Universal Tokens                              | 2020-03-28 | Stagnant  | ERC      | Standards Track |
+| [2569](/eip-2569.md) | Saving and Displaying Image Onchain for Universal Tokens                              | 2020-03-28 | Draft     | ERC      | Standards Track |
 | [2612](/eip-2612.md) | permit – 712-signed approvals                                                         | 2020-04-13 | Stagnant  | ERC      | Standards Track |
 | [2615](/eip-2615.md) | Non-Fungible Token with mortgage and rental functions                                 | 2020-04-25 | Stagnant  | ERC      | Standards Track |
 | [2645](/eip-2645.md) | Hierarchical Deterministic Wallet for Layer-2                                         | 2020-05-13 | Stagnant  | ERC      | Standards Track |
@@ -143,20 +143,24 @@
 | [3156](/eip-3156.md) | Flash Loans                                                                           | 2020-11-15 | Final     | ERC      | Standards Track |
 | [3224](/eip-3224.md) | Described Data                                                                        | 2021-01-23 | Draft     | ERC      | Standards Track |
 | [3234](/eip-3234.md) | Batch Flash Loans                                                                     | 2021-01-31 | Stagnant  | ERC      | Standards Track |
-| [3386](/eip-3386.md) | ERC-721 and ERC-1155 to ERC-20 Wrapper                                                | 2021-03-12 | Draft     | ERC      | Standards Track |
-| [3440](/eip-3440.md) | ERC-721 Editions Standard                                                             | 2021-04-20 | Draft     | ERC      | Standards Track |
-| [3448](/eip-3448.md) | Meta Proxy Factory                                                                    | 2021-03-29 | Draft     | ERC      | Standards Track |
+| [3386](/eip-3386.md) | ERC-721 and ERC-1155 to ERC-20 Wrapper                                                | 2021-03-12 | Stagnant  | ERC      | Standards Track |
+| [3440](/eip-3440.md) | ERC-721 Editions Standard                                                             | 2021-04-20 | Stagnant  | ERC      | Standards Track |
+| [3448](/eip-3448.md) | MetaProxy Standard                                                                    | 2021-03-29 | Review    | ERC      | Standards Track |
 | [3450](/eip-3450.md) | Standardized Shamir Secret Sharing Scheme for BIP-39 Mnemonics                        | 2021-03-29 | Stagnant  | ERC      | Standards Track |
 | [3475](/eip-3475.md) | Multiple Callable Bonds                                                               | 2021-04-05 | Draft     | ERC      | Standards Track |
-| [3525](/eip-3525.md) | Fractionalized NFT Standard                                                           | 2020-12-01 | Draft     | ERC      | Standards Track |
-| [3561](/eip-3561.md) | Trust Minimized Upgradeability Proxy                                                  | 2021-05-09 | Draft     | ERC      | Standards Track |
+| [3525](/eip-3525.md) | Semi-Fungible Token Standard                                                          | 2020-12-01 | Draft     | ERC      | Standards Track |
+| [3561](/eip-3561.md) | Trust Minimized Upgradeability Proxy                                                  | 2021-05-09 | Stagnant  | ERC      | Standards Track |
 | [3569](/eip-3569.md) | Sealed NFT Metadata Standard                                                          | 2021-05-07 | Draft     | ERC      | Standards Track |
 | [3589](/eip-3589.md) | Assemble assets into NFTs                                                             | 2021-05-24 | Draft     | ERC      | Standards Track |
 | [3643](/eip-3643.md) | T-REX - Token for Regulated EXchanges                                                 | 2021-07-09 | Draft     | ERC      | Standards Track |
-| [3668](/eip-3668.md) | Durin: Secure offchain data retrieval                                                 | 2020-07-19 | Draft     | ERC      | Standards Track |
-| [3722](/eip-3722.md) | Poster                                                                                | 2021-07-31 | Draft     | ERC      | Standards Track |
+| [3668](/eip-3668.md) | CCIP Read: Secure offchain data retrieval                                             | 2020-07-19 | Draft     | ERC      | Standards Track |
+| [3722](/eip-3722.md) | Poster                                                                                | 2021-07-31 | Review    | ERC      | Standards Track |
 | [3754](/eip-3754.md) | A Vanilla Non-Fungible Token Standard                                                 | 2021-08-21 | Draft     | ERC      | Standards Track |
+| [3770](/eip-3770.md) | Chain-specific addresses                                                              | 2021-08-26 | Draft     | ERC      | Standards Track |
 | [3772](/eip-3772.md) | Compressed Integers                                                                   | 2021-08-27 | Draft     | ERC      | Standards Track |
 | [4337](/eip-4337.md) | Account Abstraction via Entry Point Contract specification                            | 2021-09-29 | Draft     | ERC      | Standards Track |
+| [4361](/eip-4361.md) | Sign-In with Ethereum.                                                                | 2021-10-11 | Draft     | ERC      | Standards Track |
+| [4400](/eip-4400.md) | ERC-721 Consumable Extension                                                          | 2021-10-30 | Draft     | ERC      | Standards Track |
+| [4494](/eip-4494.md) | Permit for ERC-721 NFTs                                                               | 2021-11-25 | Draft     | ERC      | Standards Track |
 
     

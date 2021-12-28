@@ -1,5 +1,5 @@
 
-# Ethereum EIPs: Last Call (9)
+# Ethereum EIPs: Last Call (11)
 ---
 | Eip                  | Title                                                    | Created    | Status    | Category   | Type            |
 | -------------------- | -------------------------------------------------------- | ---------- | --------- | ---------- | --------------- |
@@ -7,6 +7,8 @@
 | [1191](/eip-1191.md) | Add chain id to mixed-case checksum address encoding     | 2018-03-18 | Last Call | ERC        | Standards Track |
 | [1271](/eip-1271.md) | Standard Signature Validation Method for Contracts       | 2018-07-25 | Last Call | ERC        | Standards Track |
 | [2266](/eip-2266.md) | Atomic Swap-based American Call Option Contract Standard | 2019-08-17 | Last Call | ERC        | Standards Track |
+| [2364](/eip-2364.md) | eth/64: forkid-extended protocol handshake               | 2019-11-08 | Last Call | Networking | Standards Track |
+| [2464](/eip-2464.md) | eth/65: transaction announcements and retrievals         | 2020-01-13 | Last Call | Networking | Standards Track |
 | [2481](/eip-2481.md) | eth/66: request identifier                               | 2020-01-17 | Last Call | Networking | Standards Track |
 | [2535](/eip-2535.md) | Diamonds, Multi-Facet Proxy                              | 2020-02-22 | Last Call | ERC        | Standards Track |
 | [2976](/eip-2976.md) | Typed Transactions over Gossip                           | 2020-09-13 | Last Call | Networking | Standards Track |

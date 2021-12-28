@@ -3,9 +3,9 @@ eip: 55
 title: 混合大小写校验和地址编码
 author: Vitalik Buterin <vitalik.buterin@ethereum.org>, Alex Van de Sande <avsa@ethereum.org>
 discussions-to: https://github.com/ethereum/eips/issues/55
-type: 标准追踪
+type: Standards Track
 category: ERC
-status: 最终
+status: Final
 created: 2016-01-14
 ---
 
