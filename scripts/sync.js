@@ -14,7 +14,9 @@ enEips.forEach(file => {
   if (!fs.existsSync(filePath)) {
     count++
     console.log(`sync ${file}`)
-    fs.copyFileSync(path.join(EN_PATH, file), path.join(ZH_PATH, file))
+    let fileContent = fs.readFileSync(path.join(EN_PATH, file), 'utf8')
+    fileContent = fileContent.replaceAll('(../assets', '(../../assets')
+    fs.writeFileSync(path.join(ZH_PATH, file), fileContent)
   }
 })
 
