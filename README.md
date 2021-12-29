@@ -6,6 +6,11 @@
 
 查看所有 EIPs 中文翻译：<https://eips.ethlibrary.io/zh>
 
+## 翻译说明
+
+1. 在翻译之前，请先阅读 EIP 相关的专有名词文档：https://github.com/ethlibrary/EIPs/blob/master/EIPS/.vuepress/locales/zh.json.
+2. 在翻译的时候，为了形式统一，你只需要翻译标题和内容，而不需要翻译状态。
+
 ## 推荐翻译
 
 以太坊升级当前已经转变到以 EIP 为中心，我们建议优先翻译以下硬分叉相关的 EIP。
