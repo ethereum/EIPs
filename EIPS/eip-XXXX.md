@@ -12,9 +12,6 @@ Created: 1/8/2022
 An ERC token/currency capable of being created in multiple languages (Java, Rust, Python, Go, etc).
 
 ## Abstract
-Today, millions of websites are created every week in many languages. What if the Ethereum ecosystem could also do the same, but with currencies and tokens?
-
-## Motivation
 While building the *[Light Client Infrastructure for the Teku Client (for Ethereum 2)](https://github.com/jeyakatsa/teku/tree/master/light-client),* a discovery was made; clients serve as arbiters or "bridges" to the Ethereum main chain.
 | ETH2 Client   | Language     | Team                |
 |:--------------|:------------ |:------------------- |
@@ -24,6 +21,9 @@ While building the *[Light Client Infrastructure for the Teku Client (for Ethere
 | Prysm         | Go           | Prysmatic Labs      |
 
 Such clients offer differing languages that connect with the transactions offered on Ethereum, thus concluding if said clients can offer a base layer capable of inferring transactions from Ethereum's base layer, can tokens created in said languages also offer the same results?
+
+## Motivation
+Today, millions of websites are created every week in many languages. What if the Ethereum ecosystem could also do the same, but with currencies and tokens?
 
 ## Specification
 >The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
