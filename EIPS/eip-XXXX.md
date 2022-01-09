@@ -63,10 +63,8 @@ public class SimpleStorage {
 }
 ```
 
-##### Architecture Example:
-![](https://imgur.com/hs8WlUw.jpg)
-
 ## Rationale
+![](https://imgur.com/hs8WlUw.jpg)
 
 ### Minting
 Overall scope/goal for this proposal is for these tokens to be minted as easy as NFTs. This could be accomplished simply from a "button" within a dApp/App that mints a new token, *other simpler possibilities open to discussion*. The Total & Circulating Supply of these tokens are to be minted by dApps/Apps integrated within the logic-base implemented by the developer.
