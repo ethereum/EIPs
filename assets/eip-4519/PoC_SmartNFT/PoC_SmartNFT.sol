@@ -11,7 +11,7 @@ contract smartNFT_SC is ERC721,smartNFT{
     address manufacturer;                                   //Address of manufacturer and owner of Smart Contract
     uint256 tokenCounter;                                   //To give a genuine tokenID based on the number of tokens created
     mapping(uint256 => address) ownerOfSD;                  //To khow who is the owner of a specific owner
-    mapping(address => uint256) tokenIDOfBCA;               //To khow which is the tokenID associated to a secure device
+    mapping(address => uint256) tokenIDOfBCA;               //To khow which is the tokenID associated to a secure device from the address
     mapping(address => uint256) ownerBalance;               //To know how many tokens an owner has
     mapping(address => uint256) userBalance;                //To know how many tokens a user can use
     
