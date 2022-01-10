@@ -17,7 +17,7 @@ contract smartNFT_SC is ERC721,smartNFT{
     
     struct Token_Struct{
         address approved;                                   //Indicate who can transfer this token, 0 if no one
-        address SD;                                         //Indicate the BCA of the secure device associated to this token
+        address SD;                                         //Indicate the address of the secure device associated to this token
         address user;                                       //Indicate who can use this secure device
         States state;                                       //If blocked (false) then token should be verified by new user or new owner
         uint256 hashK_OD;                                   //Hash of the Key shared between owner and device
