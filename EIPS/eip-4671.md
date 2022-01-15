@@ -36,9 +36,9 @@ A standard interface for <u>**non-tradable tokens**</u>, aka <u>**NTT**</u>s.
 
 ## Abstract
 
-NTTs represent inherently personal possessions (material or immaterial), such as university diplomas, online training certificates, government issued documents (national id, driving licence, visa, wedding, etc.), badges, labels, and so on.
+NTTs represent inherently personal possessions (material or immaterial), such as university diploma, online training certificates, government issued documents (national id, driving licence, visa, wedding, etc.), badges, labels, and so on.
 
-As the name implies, NTTs are not made to be traded or sold. They don't have monetary value. They only serve as a **proof of possession**.
+As the name implies, NTTs are not made to be traded or transfered. They don't have monetary value. They are personally delivered to **you**, and they only serve as a **proof of possession**.
 
 ## Motivation
 
@@ -50,7 +50,7 @@ By providing a common interface for this type of tokens, we allow more applicati
 
 ## Specification
 
-A single NTT contract, is seen as representing one type of badge by one authority. For instance, one NTT contract for MIT diplomas, one NTT contract for the state driving licences, and so on...
+A single NTT contract, is seen as representing one type of badge by one authority. For instance, one NTT contract for PSN achievements, another for Ethereum EIP creators, and so on...
 
 * An address might possess multiple tokens, which are indexed.
 * An authority who delivers a certificate should be in position to invalidate it. Think of driving licences or weddings. However, it cannot delete your token.
