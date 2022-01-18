@@ -66,6 +66,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 interface INTT is IERC165 {
+    /// Event emitted when a token is minted by `issuer` to `owner`
+    event Minted(address issuer, address owner, uint256 index);
+
+    /// Event emitted when token `index` of `owner` is invalidated
+    event Invalidated(address owner, uint256 index);
+
     /// @notice Count all tokens assigned to an owner
     /// @param owner Address for whom to query the balance
     /// @return Number of tokens owned by `owner`
@@ -305,6 +311,7 @@ abstract contract NTT is INTT, INTTMetadata, ERC165 {
     function _invalidate(address owner, uint256 index) internal virtual {
         Token storage token = _getTokenOrRevert(owner, index);
         token.valid = false;
+        emit Invalidated(owner, index);
     }
 
     /// @notice Mint a new token
@@ -313,6 +320,7 @@ abstract contract NTT is INTT, INTTMetadata, ERC165 {
         Token[] storage tokens = _balances[owner];
         tokens.push(Token(msg.sender, true));
         _total += 1;
+        emit Minted(msg.sender, owner, tokens.length);
     }
 
     /// @return True if the caller is the contract's creator, false otherwise
