@@ -1,0 +1,8 @@
+# .kodiak.toml
+version = 1
+
+[merge]
+
+method = "squash"
+
+notify_on_conflict = false
