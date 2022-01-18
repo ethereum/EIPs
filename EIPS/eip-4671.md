@@ -69,8 +69,8 @@ interface INTT is IERC165 {
     /// Event emitted when a token is minted by `issuer` to `owner`
     event Minted(address issuer, address owner, uint256 index);
 
-    /// Event emitted when token `index` of `owner` is invalidated
-    event Invalidated(address owner, uint256 index);
+    /// Event emitted when token `index` of `owner` is invalidated by `operator`
+    event Invalidated(address operator, address owner, uint256 index);
 
     /// @notice Count all tokens assigned to an owner
     /// @param owner Address for whom to query the balance
@@ -311,7 +311,7 @@ abstract contract NTT is INTT, INTTMetadata, ERC165 {
     function _invalidate(address owner, uint256 index) internal virtual {
         Token storage token = _getTokenOrRevert(owner, index);
         token.valid = false;
-        emit Invalidated(owner, index);
+        emit Invalidated(msg.sender, owner, index);
     }
 
     /// @notice Mint a new token
