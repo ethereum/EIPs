@@ -1,5 +1,10 @@
+// using ethereumjs-util 7.1.3
 const ethUtil = require('ethereumjs-util');
+
+// using ethereumjs-abi 0.6.9
 const abi = require('ethereumjs-abi');
+
+// using chai 4.3.4
 const chai = require('chai');
 
 const typedData = {
