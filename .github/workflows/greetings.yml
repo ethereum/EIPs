@@ -1,20 +1,30 @@
 name: Greetings
 
-on: [pull_request, issues]
+on:
+  issues:
+    types:
+      - opened
+  pull_request_target:
+    types:
+      - opened
 
 jobs:
-  greeting:
-    if: github.repository == 'ethereum/eips'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: |
-          Since this is your first issue, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
-          
-          If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
-        pr-message: |
-          Since this is your first pull request, we kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
-          
-          If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
+  greetings:
+      runs-on: ubuntu-latest
+      steps:
+      - name: Create Comment (issue)
+        if: github.event_name == 'issues'
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            We kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
+            If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
+      - name: Create Comment (pull request)
+        if: github.event_name == 'pull_request_target'
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            We kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
+            If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
