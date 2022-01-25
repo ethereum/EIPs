@@ -1,0 +1,34 @@
+on: [pull_request_target]
+name: Auto-Merge Bot
+jobs:
+  auto_merge_bot:
+    runs-on: ubuntu-latest
+    name: EIP Auto-Merge Bot
+    if: github.event.pull_request.draft == false && github.repository == 'ethereum/eips'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: auto-merge-bot
+        uses: ethereum/EIP-Bot@96c1145fa4635c4c0984338541509538f0cf0ab4 # master
+        id: auto-merge-bot
+        with:
+          GITHUB-TOKEN: ${{ secrets.TOKEN }} 
+          MERGE_ENABLED: false
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin"
+          ERC_EDITORS: "@lightclient,@axic"
+          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
+          INTERFACE_EDITORS: "@lightclient,@axic"
+          META_EDITORS: "@lightclient,@axic,@gcolvin"
+          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin"
+  enable-auto-merge:
+    if: github.repository == 'ethereum/eips'
+    runs-on: ubuntu-latest
+    needs: ["auto_merge_bot"]
+    steps:
+    - uses: alexwilson/enable-github-automerge-action@1.0.0
+      with:
+        github-token: ${{ secrets.TOKEN }}
