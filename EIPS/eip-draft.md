@@ -1,0 +1,185 @@
+---
+eip: nnnn
+title: EOF - Functions
+description: Individual sections for functions with `CALLF` and `RETF` instructions
+author: Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-01-10
+requires: 3540, 3670
+---
+
+## Abstract
+
+Introduce the ability to have several code sections in EOF-formatted ([EIP-3540](./eip-3540.md)) bytecode, each one representing a separate subroutine/function. Two new opcodes,`CALLF` and `RETF`, are introduced to call and return from such a function.
+
+## Motivation
+
+**TODO**
+
+- everything is a dynamic jump
+- solidity makes sure that most jumps are actually not dynamic, but it would need to be proved by tools before EVMs can turn on optimisations
+- EIP-4200 adds RJUMP which removes the need for *most* dynamic jump cases, but not everything can be solved
+- this EIP removes the need of using JUMP for the remaining cases
+- this EIP also introduces further analysis opportunity with ensuring how many inputs and outputs should there be in a given function
+- this EIP additionally makes it sure that stack underflow (i.e. reading in the caller's stack) is not allowed
+
+## Specification
+
+### EOF container changes
+
+1. The requirement of [EIP-3540](./eip-3540.md) "Exactly one code section MUST be present." is relaxed to "At least one code section MUST be present.", i.e. multiple code sections (`kind = 1`) are allowed.
+2. Total number of code sections MUST NOT exceed 1024.
+3. All code sections MUST precede a data section, if data section is present.
+4. New section with `kind = 3` is introduced - type section.
+5. Exactly one type section MUST be present.
+6. Type section MUST directly precede all code sections. 
+7. Type section contains a sequence of pairs of byte: 1st byte in a pair encodes number of inputs, and 2nd byte encodes number of outputs of the code section with the same index. *Note:* This implies that there is a limit of 256 stack for the input and in the output.
+8. Therefore type section size MUST be `n * 2` bytes, where `n` is the number of code sections.
+9. First code section MUST have 0 inputs and 0 outputs. 
+
+To summarize, a well-formed EOF bytecode will have the following format:
+```
+bytecode := format, magic, version, type_section_header, (code_section_header)+, [data_section_header], 0, type_section_contents, (code_section_contents)+, [data_section_contents]
+
+type_section_header := 3, number_of_code_sections * 2 # section kind and size
+type_section_contents := 0, 0, code_section_1_inputs, code_section_1_outputs, code_section_2_inputs, code_section_2_outputs, ..., code_section_n_inputs, code_section_n_outputs
+```
+
+### New execution state in EVM
+
+Return stack is introduced, separate from the data stack. It is a stack of items representing execution state to return to after function execution is finished. Each item comprises: code section index, offset in the code section (PC value), calling function stack height. 
+
+Note: Implementations are free to choose particular encoding for a stack item. In the specification below we assume that representation is three unsigned integers: `code_section_index`, `offset`, `stack_height`.
+
+Return stack is limited to a maximum 1024 items.
+
+Additionally EVM keeps track of an index of currently executing section - `current_section_index`.
+
+### New instructions
+
+We introduce two new instructions:
+
+1. `CALLF` (`0x5e`)
+2. `RETF` (`0x5f`)
+
+If the code is legacy bytecode, both of these instructions result in an *exceptional halt*. (*Note: This means no change to behaviour.*)
+
+First we define several helper values:
+- `caller_stack_height = return_stack.top().stack_height` - stack height value saved in the top item of return stack
+- `type[i].inputs = type_section_contents[i * 2]` - number of inputs of ith section
+- `type[i].outputs = type_section_contents[i * 2 + 1]` - number of outputs of ith section
+
+If the code is valid EOF1, the following execution rules apply:
+
+#### `CALLF` 
+
+1. Has one immediate argument,`code_section_index`, encoded as a 16-bit unsigned big-endian value.
+2. If data stack has less than `caller_stack_height +  type[code_section_index].inputs`, execution results in exceptional halt.
+3. If return stack already has `1024` items, execution results in exceptional halt.
+4. Pops nothing and pushes nothing to data stack.
+5. Pushes to return stack an item:
+```
+(code_section_index = current_section_index, 
+offset = PC_post_instruction,
+stack_height = data_stack.height - types[code_section_index].inputs)
+```
+
+Under `PC_post_instruction` we mean the PC position after the entire immediate argument of `CALLF`. Data stack height is saved as it was before function inputs were pushed.
+
+> Note: code validation rules of EIP-3670 guarantee there is always an instruction following `CALLF` (since terminating instruction is required to be final one in the section), therefore `PC_post_instruction` always points to an instruction inside section bounds.
+
+6. Sets `current_section_index` to `code_section_index` and `PC` to `0`, and execution continues in the called section.
+
+#### `RETF`
+
+1. Does not have immediate arguments.
+2. If data stack has less than `caller_stack_height + types[code_section_index].outputs`, execution results in exceptional halt.
+3. Pops nothing and pushes nothing to data stack.
+4. Pops an item from return stack and sets `current_section_index` and `PC` to values from this item.
+    4.1. If return stack is empty after this, execution halts with success.
+
+### Code Validation
+
+In addition to container format validation rules above, we extend code section validation rules (as defined in [EIP-3670](./eip-3670.md)).
+
+1. Code validation rules of EIP-3670 are applied to every code section.
+2. EIP-3670 requires that immediate arguments of instructions (`PUSHn`, `RJUMP`, `RJUMPI`) are inside code section bounds. This rule is extended to include `CALLF` into the list of such instructions. That is, 2 bytes directly following `CALLF` must be inside code section.
+
+> TODO In case EIP-3670 includes terminator instruction requirement:
+> 3. List of allowed terminating instructions is extended to include `RETF`.
+> (rule 2 above is not really needed then, is is implied from this)
+3. Code section is invalid in case an immediate argument of any `CALLF` is greater than or equal to the total number of code sections.
+4. `RJUMP` and `RJUMPI` immediate argument value (jump destination relative offset) validation:
+    4.1. Code section is invalid in case offset points to a position outside of section bounds.
+    4.2. Code section is invalid in case offset points to one of two bytes directly following `CALLF` instruction.
+
+### Execution
+
+1. Execution starts at the first byte of the first code section, and PC is set to 0.
+2. Return stack is initialized to contain one item: `(code_section_index = 0, offset = 0, stack_height = 0)`
+3. Jumps destinations are allowed only to be inside current code section. `JUMP` and `JUMPI` result in exceptional halt when destination is outside of current section bounds.
+4. If any instruction would change the stack to height below `caller_stack_height`, execution results in exceptional halt. This rule replaces the old stack underflow check.
+
+#### Implications on the JUMPDEST analysis
+
+- Analysis is done separately for each section, i.e. output of entire analysis is `number_of_code_sections` lists of possible jump destinations.
+- Analysis is extended to consider 2 bytes directly following `CALLF` to be invalid jump destination
+
+## Rationale
+
+### EOF container: one type section with a list vs multiple type sections
+
+Version with multiple type sections would look like:
+```
+format, magic, version, (type_section_header)+, (code_section_header)+, [data_section_header], 0, (type_section_contents)+, (code_section_contents)+, [data_section_contents]
+```
+```
+type_section_header := 3, 2 // section kind and size
+type_section_0_contents := 0, 0
+type_section_n_contents := code_section_n_inputs, code_section_n_outputs
+```
+TODO
+
+### EOF container: inline type section contents
+
+```
+format, magic, version, (type_section_header)+, (code_section_header)+, [data_section_header], 0, (code_section_contents)+, [data_section_contents]
+```
+```
+type_section_n_header := 3, code_section_n_inputs, code_section_n_outputs
+```
+This is compact but violates section definition from EIP-3540.
+
+TODO
+
+### EOF container: type sections vs type information inside "typed code" sections
+
+```
+format, magic, version, code_section_header, (typed_code_section_header)+, [data_section_header], 0, code_section_contents, (typed_code_section_contents)+, [data_section_contents]
+```
+```
+typed_code_section_header := 3, size
+type_code_section_contents := inputs, outputs, <executable_bytes>
+```
+TODO
+
+### `RETF` in the top frame ends execution vs exceptionally halts
+
+TODO
+
+## Backwards Compatibility
+
+This change poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).
+
+The new execution state and multi-section control flow pose no risk to backwards compatibility, because it is a generalization of executing a single code section. Executing existing contracts (both legacy and EOF1) has no user-observable changes.
+
+## Security Considerations
+
+TBA
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
