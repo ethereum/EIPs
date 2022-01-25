@@ -1,0 +1,43 @@
+---
+eip: <to be assigned>
+title: Transaction Expiration
+description: Proposes a Transaction Expiration Block for every transaction.
+author: Lucas Vinzon<lucasvinzon@gmail.com>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): Core
+created: 2022-01-25
+requires (*optional):
+---
+
+## Abstract
+When in Ethereum Mempool, every transaction should expire after a certain amount of blocks resulting in no cost to its users. 15.000 blocks would effectively have every transaction on the Mempool for two days.
+
+## Motivation
+Gas cost, usability and serving its purpose for its users. Prevents unexperienced users to waste resources.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+
+Once in the Mempool ALL transactions MUST expire after a certain amount of blocks. It is OPTIONAL to lower the amount of blocks it will be live on the Mempool. It SHALL NOT result in gas cost to users.
+
+## Rationale
+Ethereum currently has a lot of pending transactions. Those transactions have little to no value to its users since most of them will fail or never occur. Their existence in the Mempool inflates gas cost since they are referred to when estimating transaction costs for users. This significantly reduces usability and increases friction. It would also be forgiving to unexperienced users who set transactions that are not meant to fulfill, further wasting resources. This proposal highly values usability and preventing wasting resources, serving its purpose as a network.
+
+## Backwards Compatibility
+--
+
+## Test Cases
+--
+
+## Reference Implementation
+--
+
+## Security Considerations
+--
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
