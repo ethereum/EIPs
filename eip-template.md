@@ -43,5 +43,12 @@ An optional section that contains a reference/example implementation that people
 ## Security Considerations
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
+## References
+An optional section that contains references to documents other than Ethereum Improvement Proposals.  Normative references should be to other published specifications, such as IEEE and ISO documents.  Non-normative references should be rare, minimal, and used only when needed to provide adequate context for review.  References should include internet links when available.  Choose stable, official links to the extent possible.
+  
+References should be formatted according to the style requested for our own documents.  For example, 
+  
+>  Martin Becze, Hudson Jameson, et al., "EIP-1: EIP Purpose and Guidelines," Ethereum Improvement Proposals, no. 1, October 2015. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1.
+
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
