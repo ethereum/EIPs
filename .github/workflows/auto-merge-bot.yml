@@ -13,17 +13,17 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@96c1145fa4635c4c0984338541509538f0cf0ab4 # master
+        uses: ethereum/EIP-Bot@c67a5f0e3d6027df6bf8aa180ddd6af398ae3ede # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          MERGE_ENABLED: false
           CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin"
           ERC_EDITORS: "@lightclient,@axic"
           NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
           INTERFACE_EDITORS: "@lightclient,@axic"
           META_EDITORS: "@lightclient,@axic,@gcolvin"
           INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin"
+          MAINTAINERS: "@alita-moore,@mryalamanchi"
   enable-auto-merge:
     if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
