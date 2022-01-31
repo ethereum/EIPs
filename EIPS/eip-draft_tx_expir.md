@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Transaction Expiration
 description: Proposes a Transaction Expiration Block for every transaction.
-author: Lucas Vinzon<lucasvinzon@gmail.com>
+author: Lucas Vinzon (@SnowPrimate)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
