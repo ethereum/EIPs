@@ -11,7 +11,7 @@ created: 2021-01-29
 ---
 
 ## Abstract
-This EIP defines a standard format for transmitting the deposit contract Merkle tree in a compresed form during weak subjectivity sync. This allows newly syncing consensus clients to reconstruct the deposit tree much faster than downloading all historical deposits. The format proposed also allows clients to prune deposits that are no longer needed to participate fully in consensus (see [Deposit Finalization Flow](#deposit-finalization-flow)).
+This EIP defines a standard format for transmitting the deposit contract Merkle tree in a compressed form during weak subjectivity sync. This allows newly syncing consensus clients to reconstruct the deposit tree much faster than downloading all historical deposits. The format proposed also allows clients to prune deposits that are no longer needed to participate fully in consensus (see [Deposit Finalization Flow](#deposit-finalization-flow)).
 
 ## Motivation
 Most client implementations require beacon nodes to download and store every deposit log since the launch of the deposit contract in order to reconstruct the deposit Merkle tree. This approach requires nodes to store far more deposits than necessary to fully participate in consensus. It also needlessly increases the time it takes for new nodes to fully sync, which is especially noticable during weak subjectivity sync. Furthermore, if [EIP-4444](./eip-4444.md) is adopted, it will not always be possible to download all historical deposit logs from full nodes.
@@ -46,7 +46,7 @@ Where the hashes in the `finalized` vector are defined in the [Deposit Finalizat
 
 #### Deposit Finalization Flow
 
-During deposit processing, the beacon chain requires deposits to be submitted along with a Merkle path to the deposit root. This is required exactly once for each deposit. When a deposit has been processed by the beacon chain and the [deposit finalization conditions](#deposit-finalization-conditions) have been met, many of the hashes along the path to the deposit root will never be required again to construct Merkle proofs on chain. These unnecessary hashes MAY be pruned to save space. The image below illustrates the evolution of the deposit Merkle tree under this process alongside the corresponding `DepositTreeSnapshot` at each stage:
+During deposit processing, the beacon chain requires deposits to be submitted along with a Merkle path to the deposit root. This is required exactly once for each deposit. When a deposit has been processed by the beacon chain and the [deposit finalization conditions](#deposit-finalization-conditions) have been met, many of the hashes along the path to the deposit root will never be required again to construct Merkle proofs on chain. These unnecessary hashes MAY be pruned to save space. The image below illustrates the evolution of the deposit Merkle tree under this process alongside the corresponding `DepositTreeSnapshot` as new deposits are added and older deposits become finalized:
 
 ![Deposit Tree Evolution](../assets/eip-draft_deposit_contract_snapshot_interface/deposit_tree_evolution.png)
 
@@ -72,7 +72,7 @@ The deposit contract can only provide the tree at the head of the chain. Because
 
 #### Why not Reconstruct the Tree from a Deposit in the Beacon Chain?
 
-In principal, a node could scan backwards through the chain starting from the weak subjectivity checkpoint to locate a suitable [`Deposit`](https://github.com/ethereum/consensus-specs/blob/v1.1.9/specs/phase0/beacon-chain.md#deposit), and then extract the rightmost branch of the tree from that. The node would also need to extract the `eth1_block_hash` from which to start syncing new deposits from the `Eth1Data` in the corresponding `BeaconState`. This approach is less desirable for a few reasons:
+In principle, a node could scan backwards through the chain starting from the weak subjectivity checkpoint to locate a suitable [`Deposit`](https://github.com/ethereum/consensus-specs/blob/v1.1.9/specs/phase0/beacon-chain.md#deposit), and then extract the rightmost branch of the tree from that. The node would also need to extract the `eth1_block_hash` from which to start syncing new deposits from the `Eth1Data` in the corresponding `BeaconState`. This approach is less desirable for a few reasons:
 
 * More difficult to implement due to the edge cases involved in finding a suitable deposit to anchor to (the rightmost branch of the latest not-yet-included deposit is required)
 * This would make backfilling the blocks a requirement for reconstructing the deposit tree and therefore a requirement for block production
@@ -99,11 +99,12 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 --->
 
 ## Reference Implementation
-This implementation optimized for readability over efficiency. If `tree` is a `MerkleTree`, then the `DepositTreeSnapshot` can be obtained by calling `tree.get_snapshot()` and a new instance of the tree can be recovered from the snapshot by calling `MerkleTree.from_snapshot()`. See the [Deposit Finalization Conditions](#deposit-finalization-conditions) section for discussion on when the tree can be pruned by calling `tree.finalize()`.
+This implementation lacks error checking and is optimized for readability over efficiency. If `tree` is a `DepositTree`, then the `DepositTreeSnapshot` can be obtained by calling `tree.get_snapshot()` and a new instance of the tree can be recovered from the snapshot by calling `DepositTree.from_snapshot()`. See the [Deposit Finalization Conditions](#deposit-finalization-conditions) section for discussion on when the tree can be pruned by calling `tree.finalize()`.
 
+Generating proofs for deposits against an earlier version of the tree is relatively fast in this implementation; just create a copy of the finalized tree with `copy = DepositTree.from_snapshot(tree.get_snapshot())` and then append the remaining deposits to the desired count with `copy.push_leaf(deposit)`. Proofs can then be obtained with `copy.get_proof(index)`.
 ```python
 from __future__ import annotations
-from typing import List
+from typing import List, Union
 from dataclasses import dataclass
 from abc import ABC,abstractmethod
 
@@ -115,22 +116,43 @@ class DepositTreeSnapshot:
     deposits: uint64
     eth1_block_hash: Hash32
 
+@dataclass
+class DepositTree:
+    tree: MerkleTree
+    mix_in_length: uint
+    finalized_eth1_block: Hash32
+    def get_snapshot(self) -> DepositTreeSnapshot:
+        finalized = []
+        deposits = self.tree.get_finalized(finalized)
+        return DepositTreeSnapshot(finalized, deposits, self.finalized_eth1_block)
+    def from_snapshot(snapshot: DepositTreeSnapshot) -> DepositTree:
+        tree = MerkleTree.from_snapshot_parts(snapshot.finalized, snapshot.deposits, DEPOSIT_CONTRACT_DEPTH)
+        return DepositTree(tree, snapshot.deposits, snapshot.eth1_block_hash)
+    def finalize(self, eth1_data: Eth1Data):
+        self.finalized_eth1_block = eth1_data.block_hash
+        self.tree.finalize(eth1_data.deposit_count, DEPOSIT_CONTRACT_DEPTH)
+    def get_proof(self, index: uint) -> Union[Hash32, List[Hash32]]:
+        leaf, proof = self.tree.generate_proof(index, DEPOSIT_CONTRACT_DEPTH)
+        proof.append(to_le_bytes(self.mix_in_length))
+        return leaf, proof
+    def get_root(self) -> Hash32:
+        return sha256(self.tree.get_root() + to_le_bytes(self.mix_in_length))
+    def push_leaf(self, leaf: Hash32):
+        self.mix_in_length += 1
+        self.tree.push_leaf(leaf, DEPOSIT_CONTRACT_DEPTH)
+
 class MerkleTree():
     @abstractmethod
     def get_root(self) -> Hash32:
-	# returns the root of this tree
         pass
     @abstractmethod
     def is_full(self) -> bool:
-	# returns whether or not this tree is full
         pass
     @abstractmethod
-    def push_leaf(self, elem: Hash32, level: uint) -> MerkleTree:
-	# push a leaf onto this tree
+    def push_leaf(self, leaf: Hash32, level: uint) -> MerkleTree:
         pass
     @abstractmethod
     def finalize(self, deposits_to_finalize: uint, level: uint) -> MerkleTree:
-	# prune the tree of hashes that are no longer necessary
         pass
     @abstractmethod
     def get_finalized(self, result: List[Hash32]) -> uint:
@@ -142,34 +164,39 @@ class MerkleTree():
             return Zero(depth)
         if not(depth):
             return Leaf(leaves[0])
-        split = min(2**(depth-1), len(leaves))
+        split = min(2**(depth - 1), len(leaves))
         left = MerkleTree.create(leaves[0:split], depth - 1)
         right = MerkleTree.create(leaves[split:], depth - 1)
         return Node(left, right)
-    def finalize_deposits(self, deposit_count: uint):
-        self.finalize(deposit_count, DEPOSIT_CONTRACT_DEPTH)
-    def get_snapshot(self, eth1_block_hash: Hash32) -> DepositTreeSnapshot:
-        finalized = []
-        deposits = self.get_finalized(finalized)
-        return DepositTreeSnapshot(finalized, deposits, eth1_block_hash)
-    def from_snapshot(snapshot: DepositTreeSnapshot) -> MerkleTree:
-        return MerkleTree.__from_snapshot_parts(snapshot.finalized, snapshot.deposits, DEPOSIT_CONTRACT_DEPTH)
-    def __from_snapshot_parts(finalized: List[Hash32], deposits: uint, level: uint) -> MerkleTree:
+    def from_snapshot_parts(finalized: List[Hash32], deposits: uint, level: uint) -> MerkleTree:
         if not(finalized) or not(deposits):
             # empty tree
             return Zero(level)
         if deposits == 2**level:
             return Finalized(deposits, finalized[0])
-
-        left_subtree = 2**(level-1)
+        left_subtree = 2**(level - 1)
         if deposits <= left_subtree:
-            left = MerkleTree.__from_snapshot_parts(finalized, deposits, level - 1)
+            left = MerkleTree.from_snapshot_parts(finalized, deposits, level - 1)
             right = Zero(level - 1)
             return Node(left, right)
         else:
             left = Finalized(left_subtree, finalized[0])
-            right = MerkleTree.__from_snapshot_parts(finalized[1:], deposits - left_subtree, level - 1)
+            right = MerkleTree.from_snapshot_parts(finalized[1:], deposits - left_subtree, level - 1)
             return Node(left, right)
+    def generate_proof(self, index: uint, depth: uint) -> Union[Hash32, List[Hash32]]:
+        proof = []
+        node = self
+        while depth > 0:
+            ith_bit = (index >> (depth - 1)) & 0x1
+            if ith_bit == 1:
+                proof.append(node.left.get_root())
+                node = node.right
+            else:
+                proof.append(node.right.get_root())
+                node = node.left
+            depth -= 1
+        proof.reverse()
+        return node.get_root(), proof
 
 @dataclass
 class Finalized(MerkleTree):
@@ -205,20 +232,20 @@ class Node(MerkleTree):
         return sha256(self.left.get_root(), self.right.get_root())
     def is_full(self) -> bool:
         return self.right.is_full()
-    def push_leaf(self, elem: Hash32, level: uint) -> MerkleTree:
+    def push_leaf(self, leaf: Hash32, level: uint) -> MerkleTree:
         if not(self.left.is_full()):
-            self.left = self.left.push_leaf(elem, level - 1)
+            self.left = self.left.push_leaf(leaf, level - 1)
         else:
-            self.right = self.right.push_leaf(elem, level - 1)
+            self.right = self.right.push_leaf(leaf, level - 1)
         return self
     def finalize(self, deposits_to_finalize: uint, level: uint) -> MerkleTree:
         deposits = 2**level
         if deposits <= deposits_to_finalize:
             return Finalized(deposits, self.get_root())
         self.left = self.left.finalize(deposits_to_finalize, level - 1)
-        deposits_to_finalize -= deposits / 2
-        if deposits_to_finalize > 0:
-            self.right = self.right.finalize(deposits_to_finalize, level - 1)
+	if deposits_to_finalize > deposits / 2:
+            remaining = deposits_to_finalize - deposits / 2
+            self.right = self.right.finalize(remaining, level - 1)
         return self
     def get_finalized(self, result: List[Hash32]) -> uint:
         return self.left.get_finalized(result) + self.right.get_finalized(result)
@@ -230,8 +257,8 @@ class Zero(MerkleTree):
         return zerohashes[self.n]
     def is_full(self) -> bool:
         return False
-    def push_leaf(self, elem: Hash32, level: uint) -> MerkleTree:
-        return MerkleTree.create([elem], level)
+    def push_leaf(self, leaf: Hash32, level: uint) -> MerkleTree:
+        return MerkleTree.create([leaf], level)
     def get_finalized(self, result: List[Hash32]) -> uint:
         return 0
 ```
@@ -241,8 +268,8 @@ An optional section that contains a reference/example implementation that people
 --->
 
 #### Existing Implementations
-* [`lighthouse`](https://github.com/sigp/lighthouse/pull/2915)
-* [`nimbus`](https://github.com/status-im/nimbus-eth2/commit/372c9b798c005102c7777a16aaa7c822267330fa)
+* [lighthouse](https://github.com/sigp/lighthouse/pull/2915)
+* [nimbus](https://github.com/status-im/nimbus-eth2/commit/372c9b798c005102c7777a16aaa7c822267330fa)
 
 ## Security Considerations
 
@@ -257,7 +284,7 @@ Care must be taken not to send a snapshot which includes deposits that haven't b
 1. A finalized checkpoint exists where the corresponding `state` has `state.eth1_data == eth1data`
 2. A finalized checkpoint exists where the corresponding `state` has `state.eth1_deposit_index >= eth1_data.deposit_count`
 
-When these conditions are met, the tree can be pruned in the [reference implementation](#reference-implementation) by calling `tree.finalize_deposits(eth1_data.deposit_count)`
+When these conditions are met, the tree can be pruned in the [reference implementation](#reference-implementation) by calling `tree.finalize(eth1_data)`
 
 #### Deposit Queue Exceeds EIP-4444 Pruning Period
 
