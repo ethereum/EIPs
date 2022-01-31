@@ -6,9 +6,8 @@ author: Benjamin Chodroff (@benjaminchodroff), Jim McDonald (@mcdee)
 discussions-to: https://ethereum-magicians.org/t/consensus-layer-withdrawal-protection/8161
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): Interface
+category: Interface
 created: 2022-01-30
-requires (*optional): <EIP number(s)>
 ---
 
 ## Abstract
