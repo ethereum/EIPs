@@ -6,9 +6,8 @@ author: Lucas Vinzon (@SnowPrimate)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): Core
+category: Core
 created: 2022-01-25
-requires (*optional):
 ---
 
 ## Abstract
