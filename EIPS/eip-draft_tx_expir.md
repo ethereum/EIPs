@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4721
 title: Transaction Expiration
 description: Proposes a Transaction Expiration Block for every transaction.
 author: Lucas Vinzon (@SnowPrimate)
