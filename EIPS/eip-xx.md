@@ -11,7 +11,7 @@ created: 2022-02-04
 ---
 
 ## Abstract
-Essentially converting Solidity Keywords into Java Dependencies in order for a library of Smart-Contracts implementations to be buils in the Java programming language.
+Converting Solidity Keywords into Java Dependencies in order for a library of Smart-Contract implementations to be built in the Java programming language.
 
 ## Motivation
 Currently, there are ***200,000 Solidity/Ethereum Developers (Worldwide*** *(source: [TrustNodes](https://www.trustnodes.com/2018/07/22/ethereums-ecosystem-estimated-200000-developers-truffle-seeing-80000-downloads-month))* ***)*** and ***7.1million Java Developers (Worldwide*** *(source: [Daxx](https://www.daxx.com/blog/development-trends/number-software-developers-world#:~:text=According%20to%20SlashData%2C%20the%20number,%2C6%20million%20(source)))* ***)*** respectfully.
@@ -57,7 +57,7 @@ public class SimpleStorage {
 ## Rationale
 
 ### Solidity Keywords to Java Dependency conversion process:
-The `uint` keyword in Solidity essentially represents a pre-packaged library containing a 256 bit byte. In Java, a dependency was created to suplement for the Solidity keyword as follows:
+The `uint` keyword in Solidity essentially represents a pre-packaged library containing a 256 bit byte. In Java, a dependency is created to suplement for the Solidity keyword as follows:
 
 ##### `Uint256` Java Dependency (in place of `uint` Solidity Keyword) example:
 ```java
