@@ -23,7 +23,7 @@ And please consider anything published at https://eips.ethereum.org/ with a stat
 
 ## Automerger
 
-This repository contains an "auto merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if that EIP's authors will approve the PR on GitHub. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
+This repository contains an "auto merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if the EIP's authors approve the PR on GitHub. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
 
 ## Validation
 
