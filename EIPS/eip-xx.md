@@ -1,5 +1,5 @@
 ---
-eip: xx *number to be determined by editor*
+eip: 4780
 title: smart contracts in java
 author: jeremy akatsa (@jeyakatsa)
 description: java smart contract creation
