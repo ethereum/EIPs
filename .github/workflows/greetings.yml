@@ -20,11 +20,3 @@ jobs:
           body: |
             We kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
             If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
-      - name: Create Comment (pull request)
-        if: github.event_name == 'pull_request_target'
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.number }}
-          body: |
-            We kindly remind you to check out [EIP-1](https://eips.ethereum.org/EIPS/eip-1) for guidance.
-            If this issue was created as a “discussions-to” for an EIP or to discuss an idea for an EIP, please close it and create a thread at [Fellowship of Ethereum Magicians](https://ethereum-magicians.org/).
