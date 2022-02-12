@@ -6,6 +6,7 @@ on:
 name: Auto Stagnant Bot
 jobs:
   auto_merge_bot:
+    if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     name: Auto Stagnant Bot
     steps:
