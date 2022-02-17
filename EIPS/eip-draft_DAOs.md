@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/t/standardizing-daos/7400
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-02-16
+created: 2022-02-17
 requires: 
 ---
 
