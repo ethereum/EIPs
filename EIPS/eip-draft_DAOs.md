@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Decentralized Autonomous Organizations
 description: A standard URI and JSON schema for decentralized autonomous organizations (DAOs).
-author: Joshua Tan, Isaac Patka, Ido Gershtein, Eyal Eithcowich, Michael Zargham, Sam Furter
+author: Joshua Tan <@thelastjosh>, Isaac Patka <@ipatka>, Ido Gershtein <ido@daostack.io>, Eyal Eithcowich <eyal@deepdao.io>, Michael Zargham <@mzargham>, Sam Furter <@nivida>
 discussions-to: https://ethereum-magicians.org/t/standardizing-daos/7400
 status: Draft
 type: Standards Track
@@ -212,11 +212,7 @@ In-person events will be held at Schelling Point 2022 and at ETHDenver 2022, whe
 
 ## Reference Implementations
 
-[Moloch](https://www.notion.so/Moloch-aae911e40a6141629391ec2211a03937)
-
-[DAOstack](https://www.notion.so/DAOstack-56789a872173492db05b055ffcc829f6)
-
-[Compound](https://www.notion.so/Compound-3eccb62570554daab3c5f5b97fbeff51)
+A number of basic [reference implementations](https://github.com/metagov/daostar) have been published, including ones for Moloch, DAOstack, and Compound.
 
 ## Security Considerations
 
