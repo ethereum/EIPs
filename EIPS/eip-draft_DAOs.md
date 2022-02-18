@@ -1,17 +1,14 @@
 ---
-eip: <to be assigned>
+eip: 4824
 title: Decentralized Autonomous Organizations
 description: A standard URI and JSON schema for decentralized autonomous organizations (DAOs).
-author: Joshua Tan <@thelastjosh>, Isaac Patka <@ipatka>, Ido Gershtein <ido@daostack.io>, Eyal Eithcowich <eyal@deepdao.io>, Michael Zargham <@mzargham>, Sam Furter <@nivida>
+author: Joshua Tan (@thelastjosh), Isaac Patka (@ipatka), Ido Gershtein <ido@daostack.io>, Eyal Eithcowich <eyal@deepdao.io>, Michael Zargham (@mzargham), Sam Furter (@nivida)
 discussions-to: https://ethereum-magicians.org/t/standardizing-daos/7400
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-02-17
-requires: 
 ---
-
-# Decentralized Autonomous Organizations
 
 ## Abstract
 
@@ -220,21 +217,6 @@ This standard defines the interfaces for the DAO URIs but does not specify the r
 
 Indexers that rely on the data returned by the URI should take caution if DAOs return executable code from the URIs. This executable code might be intended to get the freshest information on membership, proposals, and activity log, but it could also be used to run unrelated tasks.
 
-## History
-
-## References
-
-1. Dilger, W. (1997). Decentralized autonomous organization of the intelligent home according to the principle of the immune system’. *1997 IEEE International Conference on Systems, Man, and Cybernetics. Computational Cybernetics and Simulation*, 351–356. [https://doi.org/10.1109/ICSMC.1997.625775](https://doi.org/10.1109/ICSMC.1997.625775)
-2. Buterin, V. (2013a). *Ethereum whitepaper: A next-generation smart contract and decentralized application platform* [White Paper]. [https://blockchainlab.com/pdf/Ethereum_white_paper-a_next_generation_smart_contract_and_decentralized_application_platform-vitalik-buterin.pdf](https://blockchainlab.com/pdf/Ethereum_white_paper-a_next_generation_smart_contract_and_decentralized_application_platform-vitalik-buterin.pdf)
-3. JSON-LD Schema. [https://json-ld.org/](https://json-ld.org/)
-4. CAIP-10. [https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md)
-
 ## Copyright
 
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
-
-## Citation
-
-Please cite this document as:
-
-Joshua Z. Tan, Isaac Patka, Ido Gershtein, Michael Zargham, Eyal Eithcowich, and Sam Furter, “EIP Working Paper: Decentralized Autonomous Organizations.”
