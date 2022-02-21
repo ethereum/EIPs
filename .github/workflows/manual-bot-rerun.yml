@@ -16,6 +16,7 @@ on:
       
 jobs:
   rerun-bot:
+    if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     name: Manual Bot Rerun
     steps:
