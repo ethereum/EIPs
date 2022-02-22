@@ -156,8 +156,8 @@ class MerkleTree():
         pass
     @abstractmethod
     def get_finalized(self, result: List[Hash32]) -> uint:
-	# returns the number of finalized deposits in the tree
-	# while populating result with the finalized hashes
+        # returns the number of finalized deposits in the tree
+        # while populating result with the finalized hashes
         pass
     def create(leaves: List[Hash32], depth: uint) -> MerkleTree:
         if not(leaves):
@@ -243,7 +243,7 @@ class Node(MerkleTree):
         if deposits <= deposits_to_finalize:
             return Finalized(deposits, self.get_root())
         self.left = self.left.finalize(deposits_to_finalize, level - 1)
-	if deposits_to_finalize > deposits / 2:
+        if deposits_to_finalize > deposits / 2:
             remaining = deposits_to_finalize - deposits / 2
             self.right = self.right.finalize(remaining, level - 1)
         return self
