@@ -38,9 +38,9 @@ contract Ownable
   }
 }
 
-/// @title          ERC-TODO Hierarchical Domains Standard Implementation
+/// @title          ERC-4834 Hierarchical Domains Standard Implementation
 /// @author         Pandapip1
-/// @notice         https://eips.ethereum.org/EIPS/eip-TODO
+/// @notice         https://eips.ethereum.org/EIPS/eip-4834
 contract IDomain is IDomain, Ownable {
     //// States
     mapping(string => IDomain) public subdomains;
@@ -96,6 +96,6 @@ contract IDomain is IDomain, Ownable {
     }
 
     function supportsInterface(bytes4 interfaceID) external view returns (bool) {
-        return interfaceID == 0xTODO;
+        return interfaceID == 0x12E2;
     }
 }
