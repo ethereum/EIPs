@@ -13,10 +13,10 @@ interface IERC165 {
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
 
-/// @title          ERC-TODO Heirarchal Domains Standard
+/// @title          ERC-4835 Heirarchal Domains Standard
 /// @author         Pandapip1
-/// @dev            https://eips.ethereum.org/EIPS/eip-TODO
-///                 The ERC-165 identifier for this interface is 0xTODO.
+/// @dev            https://eips.ethereum.org/EIPS/eip-4835
+///                 The ERC-165 identifier for this interface is 0x12E2.
 interface IDomain is IERC165 {
     //// CRUD
 
