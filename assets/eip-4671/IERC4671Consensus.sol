@@ -9,11 +9,11 @@ interface IERC4671Consensus is IERC4671 {
     /// @return Addresses of the voters
     function voters() external view returns (address[] memory);
 
-    /// @notice Cast a vote to mint a badge for a specific address
-    /// @param owner Address for whom to mint the badge
+    /// @notice Cast a vote to mint a token for a specific address
+    /// @param owner Address for whom to mint the token
     function approveMint(address owner) external;
 
-    /// @notice Cast a vote to invalidate a specific badge
-    /// @param badgeId Identifier of the badge to invalidate
-    function approveInvalidate(uint256 badgeId) external;
+    /// @notice Cast a vote to invalidate a specific token
+    /// @param tokenId Identifier of the token to invalidate
+    function approveInvalidate(uint256 tokenId) external;
 }

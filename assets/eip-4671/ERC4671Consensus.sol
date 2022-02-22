@@ -21,7 +21,7 @@ abstract contract ERC4671Consensus is ERC4671, IERC4671Consensus {
     // Mapping from voter to invalidation approvals
     mapping(address => mapping(uint256 => bool)) private _invalidateApprovals;
 
-    // Mapping from badgeId to invalidation counts
+    // Mapping from tokenId to invalidation counts
     mapping(uint256 => uint256) private _invalidateApprovalCounts;
 
     constructor (string memory name_, string memory symbol_, address[] memory voters_) ERC4671(name_, symbol_) {
@@ -37,8 +37,8 @@ abstract contract ERC4671Consensus is ERC4671, IERC4671Consensus {
         return _votersArray;
     }
 
-    /// @notice Cast a vote to mint a badge for a specific address
-    /// @param owner Address for whom to mint the badge
+    /// @notice Cast a vote to mint a token for a specific address
+    /// @param owner Address for whom to mint the token
     function approveMint(address owner) public virtual override {
         require(_voters[msg.sender], "You are not a voter");
         require(!_mintApprovals[msg.sender][owner], "You already approved this address");
@@ -50,16 +50,16 @@ abstract contract ERC4671Consensus is ERC4671, IERC4671Consensus {
         }
     }
 
-    /// @notice Cast a vote to invalidate a badge for a specific address
-    /// @param badgeId Identifier of the badge to invalidate
-    function approveInvalidate(uint256 badgeId) public virtual override {
+    /// @notice Cast a vote to invalidate a token for a specific address
+    /// @param tokenId Identifier of the token to invalidate
+    function approveInvalidate(uint256 tokenId) public virtual override {
         require(_voters[msg.sender], "You are not a voter");
-        require(!_invalidateApprovals[msg.sender][badgeId], "You already approved this address");
-        _invalidateApprovals[msg.sender][badgeId] = true;
-        _invalidateApprovalCounts[badgeId] += 1;
-        if (_invalidateApprovalCounts[badgeId] == _votersArray.length) {
-            _resetInvalidateApprovals(badgeId);
-            _invalidate(badgeId);
+        require(!_invalidateApprovals[msg.sender][tokenId], "You already approved this address");
+        _invalidateApprovals[msg.sender][tokenId] = true;
+        _invalidateApprovalCounts[tokenId] += 1;
+        if (_invalidateApprovalCounts[tokenId] == _votersArray.length) {
+            _resetInvalidateApprovals(tokenId);
+            _invalidate(tokenId);
         }
     }
 
@@ -76,10 +76,10 @@ abstract contract ERC4671Consensus is ERC4671, IERC4671Consensus {
         _mintApprovalCounts[owner] = 0;
     }
 
-    function _resetInvalidateApprovals(uint256 badgeId) private {
+    function _resetInvalidateApprovals(uint256 tokenId) private {
         for (uint256 i=0; i<_votersArray.length; i++) {
-            _invalidateApprovals[_votersArray[i]][badgeId] = false;
+            _invalidateApprovals[_votersArray[i]][tokenId] = false;
         }
-        _invalidateApprovalCounts[badgeId] = 0;
+        _invalidateApprovalCounts[tokenId] = 0;
     }
 }
