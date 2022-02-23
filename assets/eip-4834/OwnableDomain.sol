@@ -1,101 +1,173 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.9;
 
-// NOTE: This is very untested!!!
+// NOTE: This is very untested. Do not use!
 
-contract Ownable
-{
-  string public constant NOT_CURRENT_OWNER = "018001";
-  string public constant CANNOT_TRANSFER_TO_ZERO_ADDRESS = "018002";
-  address public owner;
+import './IDomain.sol';
 
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
-  );
-
-  constructor()
-    public
-  {
-    owner = msg.sender;
-  }
-
-  modifier onlyOwner()
-  {
-    require(msg.sender == owner, NOT_CURRENT_OWNER);
-    _;
-  }
-
-  function transferOwnership(
-    address _newOwner
-  )
-    public
-    onlyOwner
-  {
-    require(_newOwner != address(0), CANNOT_TRANSFER_TO_ZERO_ADDRESS);
-    emit OwnershipTransferred(owner, _newOwner);
-    owner = _newOwner;
-  }
-}
-
-/// @title          ERC-4834 Hierarchical Domains Standard Implementation
-/// @author         Pandapip1
+/// @title          ERC-4834 Ownable Implementation
+/// @author         Pandapip1 (@Pandapip1)
 /// @notice         https://eips.ethereum.org/EIPS/eip-4834
-contract IDomain is IDomain, Ownable {
+contract NaiveDomain is IDomain, ERC165Storage, Ownable {
     //// States
     mapping(string => IDomain) public subdomains;
     mapping(string => bool) public subdomainsPresent;
+    
+    //// Events
+    
+    /// @notice     Emitted when createDomain is called
+    /// @param      sender msg.sender for createDomain
+    /// @param      name name for createDomain
+    /// @param      subdomain subdomain in createDomain
+    event SubdomainCreate(address indexed sender, string name, IDomain subdomain);
+
+    /// @notice     Emitted when setDomain is called
+    /// @param      sender msg.sender for setDomain
+    /// @param      name name for setDomain
+    /// @param      subdomain subdomain in setDomain
+    /// @param      oldSubdomain the old subdomain
+    event SubdomainUpdate(address indexed sender, string name, IDomain subdomain, IDomain oldSubdomain);
+
+    /// @notice     Emitted when deleteDomain is called
+    /// @param      sender msg.sender for deleteDomain
+    /// @param      name name for deleteDomain
+    /// @param      subdomain the old subdomain
+    event SubdomainDelete(address indexed sender, string name, IDomain subdomain);
+
+
+    //// Constructor
+
+    constructor() {
+        _registerInterface(0x1234); // TODO: ERC165
+    }
+
 
     //// CRUD
 
+    /// @notice     Query if a domain has a subdomain with a given name
+    /// @param      name The subdomain to query
+    /// @return     `true` if the domain has a subdomain with the given name, `false` otherwise
     function hasDomain(string memory name) external view returns (bool) {
         return subdomainsPresent[name];
     }
 
+    /// @notice     Fetch the subdomain with a given name
+    /// @dev        This should revert is `hasDomain(name)` is `false`
+    /// @param      name The subdomain to fetch
+    /// @return     The subdomain with the given name
     function getDomain(string memory name) external view returns (IDomain) {
         require(hasDomain(name));
         return subdomains[name];
     }
-    
-    function setDomain(string memory name, IDomain subdomain) external {
-        require(canSetDomain(msg.sender, name, subdomain));
-        subdomains[name] = subdomain;
+
+    /// @notice     Create a subdomain with a given name
+    /// @dev        This should revert if `canCreateDomain(msg.sender, name, pointer)` is `false`
+    /// @param      name The subdomain name to be created
+    /// @param      subdomain The subdomain to create
+    function createDomain(string memory name, IDomain subdomain) external {
+        require(!hasDomain(name));
+        require(canCreateDomain(msg.sender, name, subdomain));
+        
         subdomainsPresent[name] = true;
+        subdomains[name] = subdomain;
+
+        emit SubdomainCreate(msg.sender, name, subdomain);
     }
 
+    /// @notice     Update a subdomain with a given name
+    /// @dev        This should revert if `canSetDomain(msg.sender, name, pointer)` is `false`
+    /// @param      name The subdomain name to be updated
+    /// @param      subdomain The subdomain to set
+    function setDomain(string memory name, IDomain subdomain) external {
+        require(hasDomain(name));
+        require(canSetDomain(msg.sender, name, subdomain));
+
+        IDomain oldSubdomain = subdomains[name];
+        subdomains[name] = subdomain;
+
+        emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
+    }
+
+    /// @notice     Delete the subdomain with a given name
+    /// @dev        This should revert is `hasDomain(name)` is `false` or if
+    ///             `canDeleteDomain(msg.sender, name, this)` is `false`
+    /// @param      name The subdomain to delete
     function deleteDomain(string memory name) external {
+        require(hasDomain(name));
         require(canDeleteDomain(msg.sender, name));
-        subdomainsPresent[name] = false;
+
+        subdomainsPresent[name] = false; // Only need to mark it as deleted
+
+        emit SubdomainDelete(msg.sender, name, subdomains[name]);
     }
 
 
-    //// Access Control
+    //// Pare   nt Domain Access Control
 
+    /// @notice     Get if an account can create a subdomain with a given name
+    /// @dev        It is highly suggested to return `false` if `hasDomain(name)` is `true`
+    ///             and `getDomain(name).canUpdateSubdomain(msg.sender, this, subdomain)` is `false`,
+    ///             or if `subdomain.canPointSubdomain(msg.sender, name, this) is `false`
+    /// @param      updater The account that may or may not be able to create/update a subdomain
+    /// @param      name The subdomain name that would be created/updated
+    /// @param      subdomain The subdomain that would be set
+    /// @return     Whether an account can update or create the subdomain
+    function canCreateDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
+        return owner() == updater || subdomain.canPointSubdomain(updater, name, this);
+    }
+
+    /// @notice     Get if an account can update or create a subdomain with a given name
+    /// @dev        It is highly suggested to return `false` if
+    ///             `subdomains[name].canUpdateSubdomain(msg.sender, this, subdomain)` is `false`,
+    ///             or if `subdomain.canPointSubdomain(msg.sender, name, this) is `false`
+    /// @param      updater The account that may or may not be able to create/update a subdomain
+    /// @param      name The subdomain name that would be created/updated
+    /// @param      subdomain The subdomain that would be set
+    /// @return     Whether an account can update or create the subdomain
     function canSetDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
-        if (hasDomain(name)) {
-            return (updater == this.owner || getDomain(name).canSetSubdomain(updater, name, this, subdomain)) && subdomain.canPointSubdomain(sender, name, this);
-        } else {
-            return msg.sender == this.owner && subdomain.canPointSubdomain(updater, name, this);
-        }
-    }
-    
-    function canSetSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) external view returns (bool) {
-        return updater == this.owner;
+        return owner() == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
-    function canPointSubdomain(address updater, string memory name, IDomain parent) external view returns (bool) {
-        return true;
-    }
-
+    /// @notice     Get if an account can delete the subdomain with a given name
+    /// @dev        It is highly suggested to return `false` if `getDomain(name).canDeleteSubdomain(msg.sender, name, this)` is `false`
+    /// @param      updater The account that may or may not be able to delete a subdomain
+    /// @param      name The subdomain to delete
+    /// @return     Whether an account can delete the subdomain
     function canDeleteDomain(address updater, string memory name) external view returns (bool) {
-        return hasDomain(name) && (updater == this.owner || getDomain(name).canDeleteSubdomain(updater, name, this));
-    }
-    
-    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external view returns (bool) {
-        return updater == this.owner;
+        return owner() == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
-    function supportsInterface(bytes4 interfaceID) external view returns (bool) {
-        return interfaceID == 0x12E2;
+
+    //// Subdomain Access Control
+
+    /// @notice     Get if an account can point this domain as a subdomain
+    /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
+    /// @param      updater The account that may be moving the subdomain
+    /// @param      name The subdomain name
+    /// @param      parent The parent domain
+    /// @return     Whether an account can update the subdomain
+    function canPointSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+        return owner() == updater;
+    }
+
+    /// @notice     Get if an account can move the subdomain away from the current domain
+    /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
+    /// @param      updater The account that may be moving the subdomain
+    /// @param      name The subdomain name
+    /// @param      parent The parent domain
+    /// @param      newSubdomain The domain that will be set next
+    /// @return     Whether an account can update the subdomain
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) external virtual view returns (bool) {
+        return owner() == updater;
+    }
+
+    /// @notice     Get if an account can point this domain as a subdomain
+    /// @dev        May be called by `canDeleteDomain` of the parent domain - implement access control here!!!
+    /// @param      updater The account that may or may not be able to delete a subdomain
+    /// @param      name The subdomain to delete
+    /// @param      parent The parent domain
+    /// @return     Whether an account can delete the subdomain
+    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+        return owner() == updater;
     }
 }
