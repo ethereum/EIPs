@@ -8,7 +8,7 @@ import './IDomain.sol';
 /// @title          ERC-4834 Ownable Implementation
 /// @author         Pandapip1 (@Pandapip1)
 /// @notice         https://eips.ethereum.org/EIPS/eip-4834
-contract NaiveDomain is IDomain, ERC165Storage, Ownable {
+contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     //// States
     mapping(string => IDomain) public subdomains;
     mapping(string => bool) public subdomainsPresent;
