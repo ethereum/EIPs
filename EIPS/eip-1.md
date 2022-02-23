@@ -230,9 +230,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 Once the EIP is ready for the repository, the EIP editor will:
 
 - Assign an EIP number (generally the PR number, but the decision is with the editors)
-
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
-
 - Send a message back to the EIP author with the next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
