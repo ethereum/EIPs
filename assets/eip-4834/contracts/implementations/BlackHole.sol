@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 // NOTE: This is an example for how canMoveDomain can be abused. Do not use this for an actual domain, it might work.
 
 import '../interfaces/IDomain.sol';
-import '../openzeppelin/utils/introspection/ERC165Storage.sol';
+import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 
 /// @title          ERC-4834 Demo Potential Exploit
 /// @author         Pandapip1 (@Pandapip1)

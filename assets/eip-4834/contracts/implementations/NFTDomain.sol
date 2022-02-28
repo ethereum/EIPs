@@ -4,8 +4,8 @@ pragma solidity ^0.8.9;
 // NOTE: This is very untested and not very well-implemented anyways. Do not use!
 
 import '../interfaces/IDomain.sol';
-import '../openzeppelin/utils/introspection/ERC165Storage.sol';
-import '../openzeppelin/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
+import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
 /// @title          ERC-4834 ERC-721 Implementation
 /// @author         Pandapip1 (@Pandapip1)

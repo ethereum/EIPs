@@ -4,8 +4,8 @@ pragma solidity ^0.8.9;
 // NOTE: This is very untested. Do not use!
 
 import '../interfaces/IDomain.sol';
-import '../openzeppelin/utils/introspection/ERC165Storage.sol';
-import '../openzeppelin/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 /// @title          ERC-4834 Ownable Implementation
 /// @author         Pandapip1 (@Pandapip1)

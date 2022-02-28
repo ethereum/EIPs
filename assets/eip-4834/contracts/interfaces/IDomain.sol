@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.9;
 
-import "../openzeppelin/interfaces/IERC165.sol";
+import "@openzeppelin/contracts/interfaces/IERC165.sol";
 
 // TODO: EIP-165 identifier
 
