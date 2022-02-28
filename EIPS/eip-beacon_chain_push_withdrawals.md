@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 4863
 title: Beacon chain push withdrawals
 description: Support validator withdrawals from the beacon chain to the EVM via a new "push-style" transaction type.
 author: Alex Stokes (@ralexstokes), Danny Ryan (@djrtwo)
