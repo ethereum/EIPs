@@ -18,7 +18,7 @@ Add block validations to ensure the withdrawal transactions are sound with respe
 
 ## Motivation
 
-This EIP provides a way for validators withdrawals made on the beacon chain to enter into the EVM.
+This EIP provides a way for validator withdrawals made on the beacon chain to enter into the EVM.
 The architecture is "push"-based, rather than "pull"-based, where withdrawals are required to be processed in the execution block as soon as they are dequeued from the beacon chain.
 
 This approach is more involved than "pull"-based alternatives (e.g. [EIP-4788](./eip-4788.md) + user-space withdrawal contract) with respect to the core protocol (by providing a new transaction type with special semantics) but does provide tighter integration of a critical feature into the protocol itself.
@@ -41,10 +41,11 @@ The `TransactionPayload` is an SSZ-encoded container given by the following sche
 ```python
 class WithdrawalTransaction(Container):
     address: ExecutionAddress
-    amount: Wei
+    amount: EncodedWei
 ```
 
-where `ExecutionAddress` is an alias for a `Bytes20` SSZ type and `Wei` is an alias for a `Bytes32` SSZ type.
+where `ExecutionAddress` is an alias for a `Bytes20` SSZ type and `EncodedWei` is an alias for a `Bytes32` SSZ type.
+
 Refer to the [SSZ specs](https://github.com/ethereum/consensus-specs/blob/master/ssz/simple-serialize.md) for further details on layout and encoding.
 
 ### Block validity
@@ -55,51 +56,59 @@ If the execution client receives a block where this is not the case, it **MUST**
 
 ### Transaction processing
 
-When processing a transaction with `WITHDRAWAL_TX_TYPE` type, the implementation should make a balance transfer for `amount` Wei to the `address` specified by the `WithdrawalTransaction`.
-There is no source for this balance transfer, much like the coinbase transfer.
+When processing a transaction with `WITHDRAWAL_TX_TYPE` type, the implementation should increase the balance of the `address` specified by
+the `WithdrawalTransaction` by the `amount` of wei specified.
 
-This balance transfer is unconditional and **MUST** not fail.
+This balance change is unconditional and **MUST** not fail.
 
 This transaction type has no associated gas costs.
+
+Implementations should take care to decode the correct amount of wei from the `EncodedWei` value, which represents a 256-bit unsigned integer value in little-endian byte order.
 
 TODO: add logs?
 
 ## Rationale
 
-### Push vs pull
+### Push vs pull approach
 
-cheaper for validators
+This push approach gives validators a small subsidy with respect to processing, in lieu of needing to buy gas via normal EVM processing that would be required for a pull-based approach.
 
-happens automatically
+This style also happens automatically when the requisite conditions are met on the beacon chain which is nicer UX for validators.
 
-### Why a new transaction type? And why no gas?
+### Why a new transaction type?
 
-Special semantics
+This EIP suggests a new transaction type as it has special semantics different from other existing types of EVM transactions.
 
-Firewall off generic EVM excution from this type of processing to simplify testing, security review.
+An entirely new transaction type firewalls off generic EVM excution from this type of processing to simplify testing and security review of withdrawals.
 
-### Why no gas costs for new transaction type?
+### Why no (gas) costs for new transaction type?
 
 The maximum number of this transaction type that can reach the execution layer at a given time is bounded (enforced by the consensus layer) and this limit is kept small so that
-any gas required is negligible in the context of the broader block gas limit.
+any execution layer operational costs are negligible in the context of the broader block execution.
 
 ### Why only balance updates? No general EVM execution?
 
-more general processing introduces the risk of failures, which complicates accounting on the beacon chain
+More general processing introduces the risk of failures, which complicates accounting on the beacon chain.
 
-generic execution doesn't pull its weight given this increase in complexity
+This EIP suggests a route for withdrawals that provides most of the benefits for a minimum of the (complexity) cost.
 
-### Why block validations?
+### Why new block validations?
 
-ensure only those receipts genuinely made on the beacon chain are passed to the EVM
+The beacon chain must be able to efficiently validate that the withdrawal transactions in a given execution block are
+the ones expected based on its own internal scheduling logic to maintain the soundness of the withdrawal mechanism.
 
-provide efficient means for beacon chain to check this
+By requiring all withdrawal transactions to be at the front of every block where they are applicable, the algorithm to
+check consistency becomes a straightforward linear walk from the start of the list until a known, bounded (small) number.
+
+Having a simple ordering scheme like this facilitates optimizations clients may do with respect to withdrawal processing, which
+would be hampered if withdrawal transactions could be placed in the block freely.
 
 ### SSZ vs RLP, and their boundary
 
-< explain where we put the translation boundary from SSZ to RLP >
+The beacon chain produces data with the SSZ serialization scheme. The execution layer currently uses RLP.
 
-point out that the transaction hash is hash of RLP of SSZ encoding, not the hash tree root of the SSZ
+There has to be some translation boundary from SSZ to RLP here and this EIP tries to minimize the number of
+places new logic is needed in either location.
 
 ## Backwards Compatibility
 
