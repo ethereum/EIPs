@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 
 // NOTE: This is very untested and not very well-implemented anyways. Do not use!
 
-import '../interfaces/IDomain.sol';
+import './IDomain.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 
