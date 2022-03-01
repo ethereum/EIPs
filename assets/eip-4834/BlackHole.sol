@@ -19,53 +19,53 @@ contract BlackHole is IDomain, ERC165Storage {
 
     //// Well, "crud."
 
-    function hasDomain(string memory name) external view returns (bool) {
+    function hasDomain(string memory name) public view returns (bool) {
         return true;
     }
 
-    function getDomain(string memory name) external view returns (IDomain) {
+    function getDomain(string memory name) public view returns (IDomain) {
         return this;
     }
 
-    function createDomain(string memory name, IDomain subdomain) external {
+    function createDomain(string memory name, IDomain subdomain) public {
         require(false);
     }
 
-    function setDomain(string memory name, IDomain subdomain) external {
+    function setDomain(string memory name, IDomain subdomain) public {
         require(false);
     }
 
-    function deleteDomain(string memory name) external {
+    function deleteDomain(string memory name) public {
         require(false);
     }
 
 
     //// Parent Domain Access Control
 
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
+    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
         return false;
     }
 
-    function canSetDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
+    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
         return false;
     }
 
-    function canDeleteDomain(address updater, string memory name) external view returns (bool) {
+    function canDeleteDomain(address updater, string memory name) public view returns (bool) {
         return false;
     }
 
 
     //// Subdomain Access Control
 
-    function canPointSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+    function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
         return true;
     }
 
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) external virtual view returns (bool) {
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
         return false; // Exploit: part 1
     }
 
-    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+    function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
         return false; // Exploit: part 2
     }
 }

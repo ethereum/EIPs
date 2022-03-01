@@ -28,7 +28,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @notice     Query if a domain has a subdomain with a given name
     /// @param      name The subdomain to query
     /// @return     `true` if the domain has a subdomain with the given name, `false` otherwise
-    function hasDomain(string memory name) external view returns (bool) {
+    function hasDomain(string memory name) public view returns (bool) {
         return subdomainsPresent[name];
     }
 
@@ -36,7 +36,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @dev        This should revert is `hasDomain(name)` is `false`
     /// @param      name The subdomain to fetch
     /// @return     The subdomain with the given name
-    function getDomain(string memory name) external view returns (IDomain) {
+    function getDomain(string memory name) public view returns (IDomain) {
         require(this.hasDomain(name));
         return subdomains[name];
     }
@@ -45,7 +45,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @dev        This should revert if `canCreateDomain(msg.sender, name, pointer)` is `false`
     /// @param      name The subdomain name to be created
     /// @param      subdomain The subdomain to create
-    function createDomain(string memory name, IDomain subdomain) external {
+    function createDomain(string memory name, IDomain subdomain) public {
         require(!this.hasDomain(name));
         require(this.canCreateDomain(msg.sender, name, subdomain));
         
@@ -59,7 +59,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @dev        This should revert if `canSetDomain(msg.sender, name, pointer)` is `false`
     /// @param      name The subdomain name to be updated
     /// @param      subdomain The subdomain to set
-    function setDomain(string memory name, IDomain subdomain) external {
+    function setDomain(string memory name, IDomain subdomain) public {
         require(this.hasDomain(name));
         require(this.canSetDomain(msg.sender, name, subdomain));
 
@@ -73,7 +73,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @dev        This should revert is `hasDomain(name)` is `false` or if
     ///             `canDeleteDomain(msg.sender, name, this)` is `false`
     /// @param      name The subdomain to delete
-    function deleteDomain(string memory name) external {
+    function deleteDomain(string memory name) public {
         require(this.hasDomain(name));
         require(this.canDeleteDomain(msg.sender, name));
 
@@ -93,7 +93,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      name The subdomain name that would be created/updated
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
+    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
         return owner() == updater || subdomain.canPointSubdomain(updater, name, this);
     }
 
@@ -105,7 +105,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      name The subdomain name that would be created/updated
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
-    function canSetDomain(address updater, string memory name, IDomain subdomain) external view returns (bool) {
+    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
         return owner() == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
@@ -114,7 +114,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      updater The account that may or may not be able to delete a subdomain
     /// @param      name The subdomain to delete
     /// @return     Whether an account can delete the subdomain
-    function canDeleteDomain(address updater, string memory name) external view returns (bool) {
+    function canDeleteDomain(address updater, string memory name) public view returns (bool) {
         return owner() == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
@@ -127,7 +127,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      name The subdomain name
     /// @param      parent The parent domain
     /// @return     Whether an account can update the subdomain
-    function canPointSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+    function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
         return owner() == updater;
     }
 
@@ -138,7 +138,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      parent The parent domain
     /// @param      newSubdomain The domain that will be set next
     /// @return     Whether an account can update the subdomain
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) external virtual view returns (bool) {
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
         return owner() == updater;
     }
 
@@ -148,7 +148,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     /// @param      name The subdomain to delete
     /// @param      parent The parent domain
     /// @return     Whether an account can delete the subdomain
-    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external virtual view returns (bool) {
+    function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
         return owner() == updater;
     }
 }
