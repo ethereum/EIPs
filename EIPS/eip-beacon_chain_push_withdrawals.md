@@ -41,10 +41,10 @@ The `TransactionPayload` is an SSZ-encoded container given by the following sche
 ```python
 class WithdrawalTransaction(Container):
     address: ExecutionAddress
-    amount: Gwei
+    amount: Wei
 ```
 
-where `ExecutionAddress` is an alias for a `Bytes20` SSZ type and `Gwei` is an alias for a `uint64` SSZ type.
+where `ExecutionAddress` is an alias for a `Bytes20` SSZ type and `Wei` is an alias for a `Bytes32` SSZ type.
 Refer to the [SSZ specs](https://github.com/ethereum/consensus-specs/blob/master/ssz/simple-serialize.md) for further details on layout and encoding.
 
 ### Block validity
@@ -55,7 +55,7 @@ If the execution client receives a block where this is not the case, it **MUST**
 
 ### Transaction processing
 
-When processing a transaction with `WITHDRAWAL_TX_TYPE` type, the implementation should make a balance transfer for `amount` Gwei to the `address` specified by the `WithdrawalTransaction`.
+When processing a transaction with `WITHDRAWAL_TX_TYPE` type, the implementation should make a balance transfer for `amount` Wei to the `address` specified by the `WithdrawalTransaction`.
 There is no source for this balance transfer, much like the coinbase transfer.
 
 This balance transfer is unconditional and **MUST** not fail.
