@@ -21,10 +21,10 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     mapping(uint256 => Token) private _tokens;
 
     // Mapping from owner to token ids
-    mapping(address => uint256[]) private _indexedTokenIds;
+    mapping(address => uint256[]) internal _indexedTokenIds;
 
     // Mapping from owner to number of valid tokens
-    mapping(address => uint256) private _numberOfValidTokens;
+    mapping(address => uint256) internal _numberOfValidTokens;
 
     // Token name
     string private _name;
