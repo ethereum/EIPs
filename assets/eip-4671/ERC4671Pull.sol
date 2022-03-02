@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./ERC4671.sol";
 import "./IERC4671Pull.sol";
 
-abstract contract ERC4671SelfTransferable is ERC4671, IERC4671Pull {
+abstract contract ERC4671Pull is ERC4671, IERC4671Pull {
     using ECDSA for bytes32;
 
     /// @notice Pull a token from the owner wallet to the caller's wallet
