@@ -38,6 +38,7 @@ abstract contract ERC4671Pull is ERC4671, IERC4671Pull {
                 }
                 tokenIds.pop();
                 _indexedTokenIds[recipient].push(tokenId);
+                emit Pulled(owner, recipient);
                 return;
             }
         }
