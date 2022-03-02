@@ -84,7 +84,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     }
 
 
-    //// Pare   nt Domain Access Control
+    //// Parent Domain Access Control
 
     /// @notice     Get if an account can create a subdomain with a given name
     /// @dev        It is highly suggested to return `false` if `hasDomain(name)` is `true`
