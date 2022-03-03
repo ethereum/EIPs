@@ -3,7 +3,7 @@ eip: 4863
 title: Beacon chain push withdrawals
 description: Support validator withdrawals from the beacon chain to the EVM via a new "push-style" transaction type.
 author: Alex Stokes (@ralexstokes), Danny Ryan (@djrtwo)
-discussions-to: https://ethereum-magicians.org/t/eip-4863-beacon-chain-push-withdrawals/8465
+discussions-to: https://ethereum-magicians.org/t/eip-4863-beacon-chain-push-withdrawals/8465, https://github.com/ethereum/go-ethereum/pull/24468
 status: Draft
 type: Standards Track
 category: Core
@@ -113,12 +113,6 @@ places new logic is needed in either location.
 ## Backwards Compatibility
 
 No issues.
-
-## Reference Implementation
-
-A draft PR containing a prototype implementation in Geth can be found here:
-
-https://github.com/ethereum/go-ethereum/pull/24468
 
 ## Security Considerations
 
