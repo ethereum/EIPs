@@ -207,6 +207,7 @@ The current EIP editors are
 - Matt Garnett (@lightclient)
 - Micah Zoltu (@MicahZoltu)
 - Greg Colvin (@gcolvin)
+- Sam Wilson (@SamWilsn)
 
 Emeritus EIP editors are 
 
