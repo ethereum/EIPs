@@ -19,7 +19,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     //// Constructor
 
     constructor() {
-        _registerInterface(0x7702b1cd00000000000000000000000000000000000000000000000000000000);
+        _registerInterface(0x7702b1cd);
     }
 
 
