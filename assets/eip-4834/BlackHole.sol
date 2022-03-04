@@ -13,7 +13,7 @@ contract BlackHole is IDomain, ERC165Storage {
     //// Constructor
 
     constructor() {
-        _registerInterface(0x7702b1cd);
+        _registerInterface(type(IDomain).interfaceId);
     }
 
 

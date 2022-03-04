@@ -3,12 +3,9 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/interfaces/IERC165.sol";
 
-// TODO: EIP-165 identifier
-
 /// @title          ERC-4835 Heirarchal Domains Standard
 /// @author         Pandapip1
 /// @dev            https://eips.ethereum.org/EIPS/eip-4835
-///                 The ERC-165 identifier for this interface is 0x7702b1cd
 interface IDomain is IERC165 {
     //// Events
     

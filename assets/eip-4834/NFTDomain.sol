@@ -6,6 +6,9 @@ pragma solidity ^0.8.9;
 import './IDomain.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
+
 
 /// @title          ERC-4834 ERC-721 Implementation
 /// @author         Pandapip1 (@Pandapip1)
@@ -19,7 +22,9 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     //// Constructor
 
     constructor() ERC721("Basic ERC721 Domain", "ERC4834") {
-        _registerInterface(0x7702b1cd);
+        _registerInterface(type(IDomain).interfaceId);
+        _registerInterface(type(IERC721).interfaceId);
+        _registerInterface(type(IERC721Metadata).interfaceId);
         _mint(msg.sender, 0);
     }
 
@@ -95,7 +100,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
     function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(1) == updater || subdomain.canPointSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomain.canPointSubdomain(updater, name, this);
     }
 
     /// @notice     Get if an account can update or create a subdomain with a given name
@@ -107,7 +112,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
     function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(1) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
     /// @notice     Get if an account can delete the subdomain with a given name
@@ -116,7 +121,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      name The subdomain to delete
     /// @return     Whether an account can delete the subdomain
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return ownerOf(1) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
 
@@ -129,7 +134,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      parent The parent domain
     /// @return     Whether an account can update the subdomain
     function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     /// @notice     Get if an account can move the subdomain away from the current domain
@@ -140,7 +145,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      newSubdomain The domain that will be set next
     /// @return     Whether an account can update the subdomain
     function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     /// @notice     Get if an account can point this domain as a subdomain
@@ -150,7 +155,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     /// @param      parent The parent domain
     /// @return     Whether an account can delete the subdomain
     function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, IERC165, ERC165Storage) returns (bool) {
