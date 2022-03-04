@@ -19,7 +19,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
     //// Constructor
 
     constructor() ERC721("Basic ERC721 Domain", "ERC4834") {
-        _registerInterface(0x1234); // TODO: ERC165
+        _registerInterface(0x7702b1cd00000000000000000000000000000000000000000000000000000000);
         _mint(msg.sender, 0);
     }
 

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/interfaces/IERC165.sol";
 /// @title          ERC-4835 Heirarchal Domains Standard
 /// @author         Pandapip1
 /// @dev            https://eips.ethereum.org/EIPS/eip-4835
-///                 The ERC-165 identifier for this interface is 0x1234 // TODO: ERC165
+///                 The ERC-165 identifier for this interface is 0x7702b1cd00000000000000000000000000000000000000000000000000000000
 interface IDomain is IERC165 {
     //// Events
     
