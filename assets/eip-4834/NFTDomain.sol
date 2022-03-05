@@ -102,7 +102,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
     function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(1) == updater || subdomain.canPointSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomain.canPointSubdomain(updater, name, this);
     }
 
     /// @notice     Get if an account can update or create a subdomain with a given name
@@ -114,7 +114,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      subdomain The subdomain that would be set
     /// @return     Whether an account can update or create the subdomain
     function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(1) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
     /// @notice     Get if an account can delete the subdomain with a given name
@@ -123,7 +123,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      name The subdomain to delete
     /// @return     Whether an account can delete the subdomain
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return ownerOf(1) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
 
@@ -136,7 +136,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      parent The parent domain
     /// @return     Whether an account can update the subdomain
     function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     /// @notice     Get if an account can move the subdomain away from the current domain
@@ -147,7 +147,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      newSubdomain The domain that will be set next
     /// @return     Whether an account can update the subdomain
     function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     /// @notice     Get if an account can point this domain as a subdomain
@@ -157,7 +157,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     /// @param      parent The parent domain
     /// @return     Whether an account can delete the subdomain
     function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(1) == updater;
+        return ownerOf(0) == updater;
     }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC165Storage) returns (bool) {
