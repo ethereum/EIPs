@@ -21,10 +21,13 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     mapping(uint256 => Token) private _tokens;
 
     // Mapping from owner to token ids
-    mapping(address => uint256[]) internal _indexedTokenIds;
+    mapping(address => uint256[]) private _indexedTokenIds;
+
+    // Mapping from token id to index
+    mapping(address => mapping(uint256 => uint256)) private _tokenIdIndex;
 
     // Mapping from owner to number of valid tokens
-    mapping(address => uint256) internal _numberOfValidTokens;
+    mapping(address => uint256) private _numberOfValidTokens;
 
     // Token name
     string private _name;
@@ -142,11 +145,23 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     /// @return tokenId Identifier of the minted token
     function _mint(address owner) internal virtual returns (uint256 tokenId) {
         tokenId = _total;
-        _tokens[tokenId] = Token(msg.sender, owner, true);
-        _indexedTokenIds[owner].push(tokenId);
-        _numberOfValidTokens[owner] += 1;
-        _total += 1;
+        _mintUnsafe(owner, tokenId, true);
         emit Minted(owner, tokenId);
+        _total += 1;
+    }
+
+    /// @notice Mint a given tokenId
+    /// @param owner Address for whom to assign the token
+    /// @param tokenId Token identifier to assign to the owner
+    /// @param valid Boolean to assert of the validity of the token 
+    function _mintUnsafe(address owner, uint256 tokenId, bool valid) internal {
+        require(_tokens[tokenId].owner == address(0), "Cannot mint an assigned token");
+        _tokens[tokenId] = Token(msg.sender, owner, valid);
+        _tokenIdIndex[owner][tokenId] = _indexedTokenIds[owner].length;
+        _indexedTokenIds[owner].push(tokenId);
+        if (valid) {
+            _numberOfValidTokens[owner] += 1;
+        }
     }
 
     /// @return True if the caller is the contract's creator, false otherwise
@@ -154,12 +169,37 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         return msg.sender == _creator;
     }
 
-    /// @notice Retrieve a Token or revert if it does not exist
+    /// @notice Retrieve a token or revert if it does not exist
     /// @param tokenId Identifier of the token
     /// @return The Token struct
     function _getTokenOrRevert(uint256 tokenId) internal view virtual returns (Token storage) {
         Token storage token = _tokens[tokenId];
         require(token.owner != address(0), "Token does not exist");
         return token;
+    }
+
+    /// @notice Remove a token
+    /// @param tokenId Token identifier to remove
+    function _removeToken(uint256 tokenId) internal virtual {
+        Token storage token = _getTokenOrRevert(tokenId);
+        address owner = token.owner;
+        delete _tokens[tokenId];
+        _removeFromUnorderedArray(_indexedTokenIds[owner], _tokenIdIndex[owner][tokenId]);
+        delete _tokenIdIndex[owner][tokenId];
+        if (token.valid) {
+            assert(_numberOfValidTokens[owner] > 0);
+            _numberOfValidTokens[owner] -= 1;
+        }
+    }
+
+    /// @notice Removes an entry in an array by its index
+    /// @param array Array for which to remove the entry
+    /// @param index Index of the entry to remove
+    function _removeFromUnorderedArray(uint256[] storage array, uint256 index) internal {
+        require(index < array.length, "Trying to delete out of bound index");
+        if (index != array.length - 1) {
+            array[index] = array[array.length - 1];
+        }
+        array.pop();
     }
 }
