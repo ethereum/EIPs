@@ -25,7 +25,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721 {
         _registerInterface(type(IDomain).interfaceId);
         _registerInterface(type(IERC721).interfaceId);
         _registerInterface(type(IERC721Metadata).interfaceId);
-        _mint(msg.sender, 0);
+        _mint(msg.sender, 1);
     }
 
 
