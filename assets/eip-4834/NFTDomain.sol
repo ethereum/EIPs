@@ -160,7 +160,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         return ownerOf(1) == updater;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721, IERC165, ERC165Storage) returns (bool) {
-        return ERC165Storage(this).supportsInterface(interfaceId) || ERC721(this).supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC165Storage) returns (bool) {
+        return ERC165Storage(this).supportsInterface(interfaceId);
     }
 }
