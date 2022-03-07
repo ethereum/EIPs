@@ -15,7 +15,6 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     //// States
     mapping(string => IDomain) public subdomains;
     mapping(string => bool) public subdomainsPresent;
-    mapping(string => address) public lastUpdaters;
 
 
     //// Constructor
@@ -46,7 +45,6 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         
         subdomainsPresent[name] = true;
         subdomains[name] = subdomain;
-        lastUpdaters[name] = msg.sender;
 
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
@@ -57,7 +55,6 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
 
         IDomain oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
-        lastUpdaters[name] = msg.sender;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
     }
@@ -79,11 +76,11 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     }
 
     function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return lastUpdaters[name] == msg.sender || ownerOf(0) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return lastUpdaters[name] == msg.sender || ownerOf(0) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
+        return ownerOf(0) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
 

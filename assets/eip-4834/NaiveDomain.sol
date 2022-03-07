@@ -10,7 +10,6 @@ contract NaiveDomain is IDomain, ERC165Storage {
     //// States
     mapping(string => IDomain) public subdomains;
     mapping(string => bool) public subdomainsPresent;
-    mapping(string => address) public lastUpdaters;
 
     //// Constructor
 
@@ -36,7 +35,6 @@ contract NaiveDomain is IDomain, ERC165Storage {
         
         subdomainsPresent[name] = true;
         subdomains[name] = subdomain;
-        lastUpdaters[name] = msg.sender;
 
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
@@ -47,7 +45,6 @@ contract NaiveDomain is IDomain, ERC165Storage {
 
         IDomain oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
-        lastUpdaters[name] = msg.sender;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
     }
@@ -69,11 +66,11 @@ contract NaiveDomain is IDomain, ERC165Storage {
     }
 
     function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return lastUpdaters[name] == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+        return subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return lastUpdaters[name] == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
+        return subdomains[name].canDeleteSubdomain(updater, name, this);
     }
 
 
