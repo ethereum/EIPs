@@ -185,9 +185,9 @@ The `created` header records the date that the EIP was assigned a number. Both h
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
 
-## Linking to External Resources
+## Direct Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Excersise extreme caution when adding external resources. Direct link e.g. [URI](https://datatracker.ietf.org/doc/html/rfc3986) **SHOULD NOT** be included. External resources, if hosted centralized, may disappear, move, or change unexpectedly or manipulated by adversary, creating security and abuse harm. Exceptions to this rule are: other well recognized standards such as IETF RFCs or content hosted in decentralized persistant storage.
 
 ## Linking to other EIPs
 
