@@ -14,6 +14,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     //// States
     mapping(string => IDomain) public subdomains;
     mapping(string => bool) public subdomainsPresent;
+    mapping(string => address) public lastUpdaters;
 
 
     //// Constructor
@@ -51,6 +52,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         
         subdomainsPresent[name] = true;
         subdomains[name] = subdomain;
+        lastUpdaters[name] = msg.sender;
 
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
@@ -65,6 +67,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
 
         IDomain oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
+        lastUpdaters[name] = msg.sender;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
     }
