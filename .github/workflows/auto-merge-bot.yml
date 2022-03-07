@@ -17,12 +17,12 @@ jobs:
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin"
-          ERC_EDITORS: "@lightclient,@axic"
-          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
-          INTERFACE_EDITORS: "@lightclient,@axic"
-          META_EDITORS: "@lightclient,@axic,@gcolvin"
-          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin"
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn"
+          ERC_EDITORS: "@lightclient,@axic,@SamWilsn"
+          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
+          INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn"
+          META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
+          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           MAINTAINERS: "@alita-moore,@mryalamanchi"
   enable-auto-merge:
     if: github.repository == 'ethereum/eips'
