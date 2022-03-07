@@ -100,7 +100,7 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         return "";
     }
 
-    /// @return Total number of tokens emitted by the contract
+    /// @return Total number of tokens emitted
     function total() public view override returns (uint256) {
         return _total;
     }
@@ -113,6 +113,13 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         uint256[] storage ids = _indexedTokenIds[owner];
         require(index < ids.length, "Token does not exist");
         return ids[index];
+    }
+
+    /// @notice Get a tokenId by it's index, where 0 <= index < total()
+    /// @param index Index of the token
+    /// @return tokenId of the token
+    function tokenByIndex(uint256 index) public view virtual override returns (uint256) {
+        return index;
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
@@ -135,8 +142,8 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         Token storage token = _getTokenOrRevert(tokenId);
         require(token.valid, "Token is already invalid");
         token.valid = false;
+        assert(_numberOfValidTokens[token.owner] > 0);
         _numberOfValidTokens[token.owner] -= 1;
-        assert(_numberOfValidTokens[token.owner] >= 0);
         emit Invalidated(token.owner, tokenId);
     }
 
