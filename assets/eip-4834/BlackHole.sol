@@ -6,9 +6,6 @@ pragma solidity ^0.8.9;
 import './IDomain.sol';
 import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 
-/// @title          ERC-4834 Demo Potential Exploit
-/// @author         Pandapip1 (@Pandapip1)
-/// @notice         https://eips.ethereum.org/EIPS/eip-4834
 contract BlackHole is IDomain, ERC165Storage {
     //// Constructor
 
