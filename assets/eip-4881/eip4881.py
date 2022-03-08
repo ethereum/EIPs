@@ -30,6 +30,6 @@ def to_le_bytes(i: int) -> bytes:
     return i.to_bytes(32, byteorder='little')
 
 zerohashes = [b'\x00' * 32]
-for i in range(1, DEPOSIT_CONTRACT_DEPTH+1):
+for i in range(1, DEPOSIT_CONTRACT_DEPTH):
     zerohashes.append(sha256(zerohashes[i-1] + zerohashes[i-1]))
 

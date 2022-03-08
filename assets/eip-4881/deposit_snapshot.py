@@ -3,19 +3,19 @@ from __future__ import annotations
 from typing import List, Union
 from dataclasses import dataclass
 from abc import ABC,abstractmethod
-from eipDRAFT import DEPOSIT_CONTRACT_DEPTH,Hash32,sha256,to_le_bytes,zerohashes
+from eip4881 import DEPOSIT_CONTRACT_DEPTH,Hash32,sha256,to_le_bytes,zerohashes
 
 @dataclass
 class DepositTreeSnapshot:
     finalized: List[Hash32]
     deposits: uint64
-    eth1_block_hash: Hash32
+    execution_block_hash: Hash32
 
 @dataclass
 class DepositTree:
     tree: MerkleTree
     mix_in_length: uint
-    finalized_eth1_block: Hash32
+    finalized_execution_block: Hash32
     def new() -> DepositTree:
         merkle = MerkleTree.create([], DEPOSIT_CONTRACT_DEPTH)
         return DepositTree(merkle, 0, zerohashes[0])
@@ -23,14 +23,14 @@ class DepositTree:
         # omitted check to ensure this DepositTree has been finalized before
         finalized = []
         deposits = self.tree.get_finalized(finalized)
-        return DepositTreeSnapshot(finalized, deposits, self.finalized_eth1_block)
+        return DepositTreeSnapshot(finalized, deposits, self.finalized_execution_block)
     def from_snapshot(snapshot: DepositTreeSnapshot) -> DepositTree:
         # omitted snapshot validation checks
         tree = MerkleTree.from_snapshot_parts(
             snapshot.finalized, snapshot.deposits, DEPOSIT_CONTRACT_DEPTH)
-        return DepositTree(tree, snapshot.deposits, snapshot.eth1_block_hash)
+        return DepositTree(tree, snapshot.deposits, snapshot.execution_block_hash)
     def finalize(self, eth1_data: Eth1Data):
-        self.finalized_eth1_block = eth1_data.block_hash
+        self.finalized_execution_block = eth1_data.block_hash
         self.tree.finalize(eth1_data.deposit_count, DEPOSIT_CONTRACT_DEPTH)
     def get_proof(self, index: uint) -> Union[Hash32, List[Hash32]]:
         # omitted check to ensure index > finalized deposit index
@@ -156,6 +156,11 @@ class Node(MerkleTree):
 class Zero(MerkleTree):
     n: uint64
     def get_root(self) -> Hash32:
+        if self.n == DEPOSIT_CONTRACT_DEPTH:
+            # Handle the entirely empty tree case. This is included for
+            # consistency/clarity as the zerohashes array is typically
+            # only defined from 0 to DEPOSIT_CONTRACT_DEPTH - 1.
+            return sha256(zerohashes[self.n - 1] + zerohashes[self.n - 1])
         return zerohashes[self.n]
     def is_full(self) -> bool:
         return False

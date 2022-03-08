@@ -3,7 +3,7 @@ import pytest
 import yaml
 from dataclasses import dataclass
 from deposit_snapshot import DepositTree,DepositTreeSnapshot
-from eipDRAFT import DepositData,DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,zerohashes
+from eip4881 import DepositData,DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,zerohashes
 
 @dataclass
 class DepositTestCase:
@@ -41,7 +41,7 @@ def read_test_cases(filename):
                 snapshot = DepositTreeSnapshot(
                     finalized,
                     int(test_case['snapshot']['deposits']),
-                    get_bytes(test_case['snapshot']['eth1_block_hash'])
+                    get_bytes(test_case['snapshot']['execution_block_hash'])
                 )
                 result.append(DepositTestCase(
                     deposit_data,
