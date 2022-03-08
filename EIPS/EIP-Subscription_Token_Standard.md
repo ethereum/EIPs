@@ -162,7 +162,7 @@ The NFT's metadata can store information of the asset/service offered to the sub
 
 ### Subscription expiry
 
-When the subscription token balance falls to zero for a subscriber (signifying that the subscription has expired) then it is up to the implementor on how to handle this for their particular use case. For example, a provider may stop streaming media service to a subscriber. For an NFT that represents an image stored off-chain, perhaps the NFT's `uri` function no longer returns back a link to its metadata.
+When the subscription token balance falls to zero for a subscriber (signifying that the subscription has expired) then it is up to the implementer on how to handle this for their particular use case. For example, a provider may stop streaming media service to a subscriber. For an NFT that represents an image stored off-chain, perhaps the NFT's `uri` function no longer returns back a link to its metadata.
 
 ### Caveats
 
@@ -187,7 +187,7 @@ Traditional subscription models, particularly with streaming services, control o
 
 ## Backwards Compatibility
 
-A subscription token contract can be fully compatible with ERC-20 specification to allow, for example, transfers from one subscriber to another subscriber or user. ERC-20 methods `name`, `symbol` and `balanceOf` are already part of the specification of this proposal, and it is left to the implementor to choose whether to implement the rest of ERC-20's interface by considering their own use case.
+A subscription token contract can be fully compatible with ERC-20 specification to allow, for example, transfers from one subscriber to another subscriber or user. ERC-20 methods `name`, `symbol` and `balanceOf` are already part of the specification of this proposal, and it is left to the implementer to choose whether to implement the rest of ERC-20's interface by considering their own use case.
 
 Use of subscription tokens is in effect an indirect way to control the lifetime of an NFT. As such it is assumed that this arrangement would work best when the NFTs and subscription token contracts subscribing to the NFTs, are deployed by the same platform or decentralised app. It MUST NOT have an impact or dependencies to existing NFTs that have not approved the subscription token as an operator. Indeed in this case, any other parties wouldn't be aware of and any NFT lifetime dependencies will be ignored, hence should not work anyway. To this end, this proposal specifies that the 'nft' MUST have approved the `subscriptionToken` contract address as operator.
 
