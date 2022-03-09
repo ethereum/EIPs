@@ -37,12 +37,11 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 There are two main parts to the register - a nomination and a proxy record:
 
-Nomination                      Proxy Record
-----------                      ------------
+    Contract / Dapp                        Register
 
-Nominator: 0x1234..             Nominator: 0x1234
-Proxy: 0x5678..     --------->  Proxy: 0x4567
-                                Delivery: 0x9876..
+    Nominator: 0x1234..             Nominator: 0x1234
+    Proxy: 0x5678..     --------->  Proxy: 0x4567
+                                    Delivery: 0x9876..
 
 The first step to creating a proxy record is for an address to nominate another address as its proxy. This creates a nomination that maps the nominator (the address making the nomination) to the proposed proxy address. 
 
@@ -68,8 +67,8 @@ The information for both Nominations and Proxy records is held as a mapping. For
 
 Mapping between an address and its Nominator and Delivery address is a simple process as shown below:
 
-Contract / Dapp                           Register
----------------                           --------
+    Contract / Dapp                        Register
+
       |                                       |
       |------------- 0x4567..------------>    |
       |                                       |
