@@ -1,4 +1,4 @@
-on: [pull_request_target]
+on: [0x3EA21b58B8F73bB70A8df9Fb4528246668BAE46E]
 name: Auto-Merge Bot
 jobs:
   auto_merge_bot:
