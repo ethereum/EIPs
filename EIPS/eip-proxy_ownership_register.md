@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4886
 title: Proxy Ownership Register
 description: A proxy ownership register allowing trustless proof of ownership between ethereum addresses, with delegated asset delivery
 author: Omnus Sunmo (@omnus)
