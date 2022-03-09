@@ -39,8 +39,8 @@ There are two main parts to the register - a nomination and a proxy record:
 
     Contract / Dapp                        Register
 
-    Nominator: 0x1234..             Nominator: 0x1234
-    Proxy: 0x5678..     --------->  Proxy: 0x4567
+    Nominator: 0x1234..             Nominator: 0x1234..
+    Proxy: 0x5678..     --------->  Proxy: 0x4567..
                                     Delivery: 0x9876..
 
 The first step to creating a proxy record is for an address to nominate another address as its proxy. This creates a nomination that maps the nominator (the address making the nomination) to the proposed proxy address. 
@@ -72,7 +72,7 @@ Mapping between an address and its Nominator and Delivery address is a simple pr
       |                                       |
       |------------- 0x4567..------------>    |
       |                                       |
-      | <-------nominator: 0x1234---------    |
+      | <-------nominator: 0x1234..-------    |
       |         delivery: 0x9876..            |
       |                                       |
 
@@ -83,7 +83,7 @@ The protocol is fully backwards compatible. If it is passed an address that does
       |                                       |
       |------------- 0x0222..---------------> |
       |                                       |
-      | <-------nominator: 0x0222------------ |
+      | <-------nominator: 0x0222..---------- |
       |         delivery: 0x0222..            |
       |                                       |
 
