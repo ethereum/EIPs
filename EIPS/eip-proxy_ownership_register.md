@@ -70,9 +70,9 @@ Mapping between an address and its Nominator and Delivery address is a simple pr
     Contract / Dapp                        Register
 
       |                                       |
-      |------------- 0x4567..------------>    |
+      |------------- 0x4567..---------------> |
       |                                       |
-      | <-------nominator: 0x1234..-------    |
+      | <-------nominator: 0x1234..---------- |
       |         delivery: 0x9876..            |
       |                                       |
 
@@ -87,7 +87,7 @@ The protocol is fully backwards compatible. If it is passed an address that does
       |         delivery: 0x0222..            |
       |                                       |
 
-If the EPS register is passed the address of a Nominator it will revert. This is of vital importance. The purpose of the proxy is that the Proxy address is operating on behalf of the Nominator. The Proxy address therefore can derive the same benefits as the Nominator (for example discord roles based on the Nominator's holdings, or mint NFTs that require another NFT to be held). It is therefore imperative that the Nominator in an active proxy cannot also interact and derive these benefits, otherwise two addresses represent the same holding. A Nominator can of course delete the Proxy Record at any time and interact on it's own behalf, with the Proxy address instantly losing any benefits associate with the proxy relationship.
+If the EPS register is passed the address of a Nominator it will revert. This is of vital importance. The purpose of the proxy is that the Proxy address is operating on behalf of the Nominator. The Proxy address therefore can derive the same benefits as the Nominator (for example discord roles based on the Nominator's holdings, or mint NFTs that require another NFT to be held). It is therefore imperative that the Nominator in an active proxy cannot also interact and derive these benefits, otherwise two addresses represent the same holding. A Nominator can of course delete the Proxy Record at any time and interact on it's own behalf, with the Proxy address instantly losing any benefits associated with the proxy relationship.
 
 Full technical information is at https://docs.epsproxy.com/. 
 
@@ -97,7 +97,7 @@ The rationale for this design was to provide an easy and convenient way to prove
 
 In addition to the loss of user's assets it is clear that these events damage confidence in the community in general. Users make decisions based on both actual and perceived risk, and it presents a barrier for new users accessing and using ethereum.
 
-My vision is an ethereum where user's setup a new hardware wallet for assets they wish to hold long term, then make one single contract interaction with that wallet: to nominate a hot wallet proxy. That user can always prove they own assets on that address, and they can specify it as a delivery address for new asset delivery.
+My vision is an ethereum where users setup a new hardware wallet for assets they wish to hold long-term, then make one single contract interaction with that wallet: to nominate a hot wallet proxy. That user can always prove they own assets on that address, and they can specify it as a delivery address for new asset delivery.
 
 ## Backwards Compatibility
 
@@ -121,7 +121,7 @@ The core intention of the eip is to improve user security by better safeguarding
 
 I've considered potential negative security implications and cannot envisage any. The proxy record can only become operational when a nomination has been confirmed by a proxy address, both addresses therefore having provided signed proof. 
 
-From a usability perspective the key risk is in users specifying the incorrect asset delivery address, though it is noted that this burden of accuracy is not different to that currently on the network.
+From a usability perspective the key risk is in users specifying the incorrect asset delivery address, though it is noted that this burden of accuracy is no different to that currently on the network.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
