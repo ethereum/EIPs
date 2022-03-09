@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Proxy Ownership Register
 description: A proxy ownership register allowing trustless proof of ownership between ethereum addresses, with delegated asset delivery
 author: Omnus Sunmo (@omnus)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-pending-a-proxy-ownership-and-asset-delivery-register/8559
 status: Draft
 type: Standards Track
 category: ERC
