@@ -79,12 +79,12 @@ Contract / Dapp                           Register
 
 The protocol is fully backwards compatible. If it is passed an address that does not have an active mapping it will pass back the received address as both the Nominator and Delivery address, thereby preserving functionality as the address is acting on its own behalf.
 
-Contract / Dapp                           Register
+      Contract / Dapp                       Register
 
       |                                       |
-      |------------- 0x0222..------------>    |
+      |------------- 0x0222..---------------> |
       |                                       |
-      | <-------nominator: 0x0222---------    |
+      | <-------nominator: 0x0222------------ |
       |         delivery: 0x0222..            |
       |                                       |
 
