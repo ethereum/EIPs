@@ -38,8 +38,8 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 There are two main parts to the register - a nomination and a proxy record:
 
 Nomination                      Proxy Record
-     |                                |
-     |                                |
+----------                      ------------
+
 Nominator: 0x1234..             Nominator: 0x1234
 Proxy: 0x5678..     --------->  Proxy: 0x4567
                                 Delivery: 0x9876..
@@ -69,6 +69,7 @@ The information for both Nominations and Proxy records is held as a mapping. For
 Mapping between an address and its Nominator and Delivery address is a simple process as shown below:
 
 Contract / Dapp                           Register
+---------------                           --------
       |                                       |
       |------------- 0x4567..------------>    |
       |                                       |
@@ -79,6 +80,7 @@ Contract / Dapp                           Register
 The protocol is fully backwards compatible. If it is passed an address that does not have an active mapping it will pass back the received address as both the Nominator and Delivery address, thereby preserving functionality as the address is acting on its own behalf.
 
 Contract / Dapp                           Register
+---------------                           --------
       |                                       |
       |------------- 0x0222..------------>    |
       |                                       |
