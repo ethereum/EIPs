@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Proxy Ownership Register
-description: A proxy ownership register allowing trustless proof of ownership between ethereum addresses and delegated asset delivery
+description: A proxy ownership register allowing trustless proof of ownership between ethereum addresses, with delegated asset delivery
 author: Omnus Sunmo (@omnus)
 discussions-to: <URL>
 status: Draft
@@ -24,9 +24,9 @@ To make full use of ethereum users often need to prove their ownership of existi
 
  There are more examples, with the unifying theme being that the user must make use of the address with the assets to derive the platform benefit. This means the addresses holding these assets cannot be truly 'cold', and is a gift to malicious developers seeking to steal valuable assets. For example, a new project can offer free NFTs to holders of an existing NFT asset. The existing holders have to prove ownership by minting from the wallet with the asset that determined eligibility. This presents numerous possible attack vectors for a malicious developer who knows that all users interacting with the contract have an asset of that type.
 
- Possibly even more damaging is the effect on user conidence across the whole ecosystem. Users become reluctant to interact with apps and smart contracts for fear of putting their assets at risk. They may also decide not to store assets in cold wallet addresses as they need to prove they own them on a regular basis. A pertinent example is the user trying to decide whether to 'vault' their NFT and lose access to a discord channel, or keep their NFT in another wallet, or even to connect their 'vault' to discord.
+ Possibly even more damaging is the effect on user confidence across the whole ecosystem. Users become reluctant to interact with apps and smart contracts for fear of putting their assets at risk. They may also decide not to store assets in cold wallet addresses as they need to prove they own them on a regular basis. A pertinent example is the user trying to decide whether to 'vault' their NFT and lose access to a discord channel, or keep their NFT in another wallet, or even to connect their 'vault' to discord.
 
- Ethereum is amazing at providing trustless proofs. I believe that the *only* time you should need to interact using the wallet that holds an asset is if you intend to sell that asset. If you merely wish to prove ownership (to access a resource, or get an airdrop, mint an NFT, or vote in a DAO), you should do this through a trustless proof stored on chain.
+ Ethereum is amazing at providing trustless proofs. I believe that the *only* time you should need to interact using the wallet that holds an asset is if you intend to sell that asset. If you merely wish to prove ownership (to access a resource, or get an airdrop, mint an NFT, or vote in a DAO), you should do this through a trustless proof stored on-chain.
 
  Furthermore, you should be able to decide where new assets are delivered, rather than them being delivered to the wallet providing the interaction. This allows hot wallets to acquire assets sent directly to a cold wallet 'vault', possibly even the one they are representing in terms of asset ownership.
 
@@ -50,14 +50,14 @@ This is not a proxy record on the register at this stage, as the proxy address n
 When accepting a nomination the proxy address sets the delivery address for that proxy record. The proxy address remains in control of updating that delivery address as required. Both the nominator and proxy can delete the proxy record and nomination at any time. The proxy will continue forever if not deleted - it is eternal.
 
 The register is a single smart contract that stores all nomination and register records. The information held for each is as follows:
-Nomination:
-The address of the Nominator
-The address of the Proposed Proxy
+ * Nomination:
+    * The address of the Nominator
+    * The address of the Proposed Proxy
 
-Proxy Record:
-The address of the Nominator
-The address of the Proxy
-The delivery address for proxied deliveries
+* Proxy Record:
+    * The address of the Nominator
+    * The address of the Proxy
+    * The delivery address for proxied deliveries
 
 Any address can act as a Nominator or a Proxy. A Nomination must have been made first in order for an address to accept acting as a Proxy. 
 
