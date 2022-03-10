@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 4895
 title: Beacon chain push withdrawals as operations
 description: Support validator withdrawals from the beacon chain to the EVM via a new "system-level" operation type.
 author: Alex Stokes (@ralexstokes), Danny Ryan (@djrtwo)
