@@ -21,7 +21,7 @@ import "@epsproxy/contracts/Proxiable.sol";
 *   specified on the EPS register. In addition this demonstrates:
 *     (c) Checking of the contract balance of the Nominator to determine eligibility. In
 *         this use of the EPS register risk to the eligibility asset is entirely eliminated
-*         as the contract interation is with the proxy address, which does not hold the 
+*         as the contract interaction is with the proxy address, which does not hold the 
 *         asset, not the nominator.
 */ 
 contract EPSGenesis is ERC1155, Ownable, ERC1155Burnable, ERC1155Supply, Proxiable {

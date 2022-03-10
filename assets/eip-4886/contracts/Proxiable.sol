@@ -55,7 +55,7 @@ abstract contract Proxiable is Context {
   /**
   * @dev Returns an ERC20 token balance for the nominator, if a proxy record exists, or for the address
   * passed in if no proxy record exists, IF we have been passed a bool indicating
-  * that a proxied address is in use. This fuction should be used in conjunction with an off-chain call
+  * that a proxied address is in use. This function should be used in conjunction with an off-chain call
   * to proxyRecordExists that determines if a proxy address is in use, which is then passed in on the call 
   * to the contract inheriting this method. This saves gas for anyone who is NOT using a proxy as we do not needlessly check for proxy details.
   */
@@ -83,7 +83,7 @@ abstract contract Proxiable is Context {
   /**
   * @dev Returns an ERC721 token balance for the nominator, if a proxy record exists, or for the address
   * passed in if no proxy record exists, IF we have been passed a bool indicating
-  * that a proxied address is in use. This fuction should be used in conjunction with an off-chain call
+  * that a proxied address is in use. This function should be used in conjunction with an off-chain call
   * to proxyRecordExists that determines if a proxy address is in use, which is then passed in on the call 
   * to the contract inheriting this method . This saves gas for anyone who is NOT using a proxy as we do not needlessly check for proxy details.
   */

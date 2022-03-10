@@ -50,7 +50,7 @@ abstract contract ERC721Proxied is Context, ERC721, Proxiable {
 
   /**
   * @dev call safemint after determining the delivery address IF we have been passed a bool indicating
-  * that a proxied address is in use. This fuction should be used in conjunction with an off-chain call
+  * that a proxied address is in use. This function should be used in conjunction with an off-chain call
   * to _proxyRecordExists that determines if a proxy address is in use. This saves gas for anyone who is
   * NOT using a proxy as we do not needlessly check for proxy details.
   */
