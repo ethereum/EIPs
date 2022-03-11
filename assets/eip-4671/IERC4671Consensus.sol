@@ -13,7 +13,7 @@ interface IERC4671Consensus is IERC4671 {
     /// @param owner Address for whom to mint the token
     function approveMint(address owner) external;
 
-    /// @notice Cast a vote to invalidate a specific token
-    /// @param tokenId Identifier of the token to invalidate
-    function approveInvalidate(uint256 tokenId) external;
+    /// @notice Cast a vote to revoke a specific token
+    /// @param tokenId Identifier of the token to revoke
+    function approveRevoke(uint256 tokenId) external;
 }

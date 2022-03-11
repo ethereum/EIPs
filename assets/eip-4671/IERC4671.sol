@@ -8,8 +8,8 @@ interface IERC4671 is IERC165 {
     /// Event emitted when a token `tokenId` is minted for `owner`
     event Minted(address owner, uint256 tokenId);
 
-    /// Event emitted when token `tokenId` of `owner` is invalidated
-    event Invalidated(address owner, uint256 tokenId);
+    /// Event emitted when token `tokenId` of `owner` is revoked
+    event Revoked(address owner, uint256 tokenId);
 
     /// @notice Count all tokens assigned to an owner
     /// @param owner Address for whom to query the balance
@@ -21,7 +21,7 @@ interface IERC4671 is IERC165 {
     /// @return Address of the owner of `tokenId`
     function ownerOf(uint256 tokenId) external view returns (address);
 
-    /// @notice Check if a token hasn't been invalidated
+    /// @notice Check if a token hasn't been revoked
     /// @param tokenId Identifier of the token
     /// @return True if the token is valid, false otherwise
     function isValid(uint256 tokenId) external view returns (bool);

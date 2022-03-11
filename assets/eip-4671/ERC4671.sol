@@ -61,7 +61,7 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         return _getTokenOrRevert(tokenId).owner;
     }
 
-    /// @notice Check if a token hasn't been invalidated
+    /// @notice Check if a token hasn't been revoked
     /// @param tokenId Identifier of the token
     /// @return True if the token is valid, false otherwise
     function isValid(uint256 tokenId) public view virtual override returns (bool) {
@@ -136,15 +136,15 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         return "";
     }
 
-    /// @notice Mark the token as invalidated
+    /// @notice Mark the token as revoked
     /// @param tokenId Identifier of the token
-    function _invalidate(uint256 tokenId) internal virtual {
+    function _revoke(uint256 tokenId) internal virtual {
         Token storage token = _getTokenOrRevert(tokenId);
         require(token.valid, "Token is already invalid");
         token.valid = false;
         assert(_numberOfValidTokens[token.owner] > 0);
         _numberOfValidTokens[token.owner] -= 1;
-        emit Invalidated(token.owner, tokenId);
+        emit Revoked(token.owner, tokenId);
     }
 
     /// @notice Mint a new token
