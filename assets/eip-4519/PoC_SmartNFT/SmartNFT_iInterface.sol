@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-/// @title smartNFT: Hardblock - ERC-721 Non-Fungible Token Standard based
+/// @title smartNFT: Hardblock - ERC-721 Non-Fungible Token Standard-based
 interface smartNFT{
     /// @dev This emits when an user of a NFT changes
     ///  This event emits when the user of a token is assigned
