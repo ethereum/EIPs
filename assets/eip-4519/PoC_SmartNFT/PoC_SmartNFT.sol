@@ -61,7 +61,7 @@ contract smartNFT_SC is ERC721,smartNFT{
         //Check the sender and the token state
         require((ownerOfSD[_tokenId] == msg.sender) && (Secure_Token[_tokenId].state >= States.engagedWithOwner));
         if((Secure_Token[_tokenId].timestamp + Secure_Token[_tokenId].timeout) > block.timestamp){
-            //Only to avoid overflow, for example in address 0.
+            //Only to avoid overflow, for example, in address 0.
             if(userBalance[Secure_Token[_tokenId].user]>0){
                 //Update the balance of tokens assigned to the old user
                 userBalance[Secure_Token[_tokenId].user]--;
