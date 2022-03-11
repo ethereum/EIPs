@@ -36,7 +36,10 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     string private _symbol;
 
     // Total number of tokens emitted
-    uint256 private _total;
+    uint256 private _emittedCount;
+
+    // Total number of token holders
+    uint256 private _holdersCount;
 
     // Contract creator
     address private _creator;
@@ -100,9 +103,14 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
         return "";
     }
 
-    /// @return Total number of tokens emitted
-    function total() public view override returns (uint256) {
-        return _total;
+    /// @return emittedCount Number of tokens emitted
+    function emittedCount() public view override returns (uint256) {
+        return _emittedCount;
+    }
+
+    /// @return holdersCount Number of token holders  
+    function holdersCount() public view override returns (uint256) {
+        return _holdersCount;
     }
 
     /// @notice Get the tokenId of a token using its position in the owner's list
@@ -151,10 +159,10 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     /// @param owner Address for whom to assign the token
     /// @return tokenId Identifier of the minted token
     function _mint(address owner) internal virtual returns (uint256 tokenId) {
-        tokenId = _total;
+        tokenId = _emittedCount;
         _mintUnsafe(owner, tokenId, true);
         emit Minted(owner, tokenId);
-        _total += 1;
+        _emittedCount += 1;
     }
 
     /// @notice Mint a given tokenId
@@ -163,6 +171,9 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     /// @param valid Boolean to assert of the validity of the token 
     function _mintUnsafe(address owner, uint256 tokenId, bool valid) internal {
         require(_tokens[tokenId].owner == address(0), "Cannot mint an assigned token");
+        if (_indexedTokenIds[owner].length == 0) {
+            _holdersCount += 1;
+        }
         _tokens[tokenId] = Token(msg.sender, owner, valid);
         _tokenIdIndex[owner][tokenId] = _indexedTokenIds[owner].length;
         _indexedTokenIds[owner].push(tokenId);
@@ -189,14 +200,16 @@ abstract contract ERC4671 is IERC4671, IERC4671Metadata, IERC4671Enumerable, ERC
     /// @param tokenId Token identifier to remove
     function _removeToken(uint256 tokenId) internal virtual {
         Token storage token = _getTokenOrRevert(tokenId);
-        address owner = token.owner;
-        delete _tokens[tokenId];
-        _removeFromUnorderedArray(_indexedTokenIds[owner], _tokenIdIndex[owner][tokenId]);
-        delete _tokenIdIndex[owner][tokenId];
-        if (token.valid) {
-            assert(_numberOfValidTokens[owner] > 0);
-            _numberOfValidTokens[owner] -= 1;
+        _removeFromUnorderedArray(_indexedTokenIds[token.owner], _tokenIdIndex[token.owner][tokenId]);
+        if (_indexedTokenIds[token.owner].length == 0) {
+            assert(_holdersCount > 0);
+            _holdersCount -= 1;
         }
+        if (token.valid) {
+            assert(_numberOfValidTokens[token.owner] > 0);
+            _numberOfValidTokens[token.owner] -= 1;
+        }
+        delete _tokens[tokenId];
     }
 
     /// @notice Removes an entry in an array by its index
