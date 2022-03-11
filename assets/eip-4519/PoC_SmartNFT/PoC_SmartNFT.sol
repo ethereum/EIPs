@@ -19,7 +19,7 @@ contract smartNFT_SC is ERC721,smartNFT{
         address approved;                                   //Indicate who can transfer this token, 0 if no one
         address SD;                                         //Indicate the address of the secure device associated to this token
         address user;                                       //Indicate who can use this secure device
-        States state;                                       //If blocked (false) then token should be verified by new user or new owner
+        States state;                                       //If blocked (false) then token should be verified by a new user or a new owner
         uint256 hashK_OD;                                   //Hash of the Key shared between owner and device
         uint256 hashK_UD;                                   //Hash of the Key shared between user and device
         uint256 dataEngagement;                             //Public Key to create K_OD or K_UD depending on token state
