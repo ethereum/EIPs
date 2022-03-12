@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "./ERC4671.sol";
 import "./IERC4671Consensus.sol";
 
-abstract contract ERC4671Consensus is ERC4671, IERC4671Consensus {
+contract ERC4671Consensus is ERC4671, IERC4671Consensus {
     // Consensus voters addresses
     mapping(address => bool) private _voters;
     address[] private _votersArray;
