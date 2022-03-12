@@ -1,7 +1,7 @@
 ---
 eip: 4671
 title: Non-Tradable Tokens Standard
-description: A standard interface for non-tradable tokens, aka badges.
+description: A standard interface for non-tradable tokens, aka badges or souldbound NFTs.
 author: Omar Aflak (@omaraflak), Pol-Malo Le Bris, Marvin Martin (@MarvinMartin24)
 discussions-to: https://ethereum-magicians.org/t/eip-4671-non-tradable-token/7976
 status: Review
@@ -21,7 +21,7 @@ In other words, the possession of a token carries a strong meaning in itself dep
 
 ## Motivation
 
-We have seen in the past smart contracts being used to deliver university diplomas or driving licenses, for food labeling or attendance to events, and much more. All of these implementations are different, but they have a common ground: they are **non-tradable**.
+We have seen in the past smart contracts being used to deliver university diplomas or driving licenses, for food labeling or attendance to events, and much more. All of these implementations are different, but they have a common ground: the tokens are **non-tradable**.
 
 The blockchain has been used for too long as a means of speculation, and non-tradable tokens want to be part of the general effort aiming to provide usefulness through the blockchain.
 
