@@ -1,0 +1,1118 @@
+---
+EIP: TBD
+
+Title: Royalty Bearing NFTs
+
+Description: This proposal outlines the structure of an extension of the ERC721 standard for NFTs to correctly define, process, and pay (hierarchical) onchain royalties from NFT sales, and goes beyond [EIP-2981](https://eips.ethereum.org/EIPS/eip-2981).
+
+Author: Andreas Freund (@Therecanbeonlyone1969) 
+
+discussions-to: https://ethereum-magicians.org/t/royalty-bearing-nfts/8453
+
+Status: Draft
+
+Type: Standards Track
+
+Category: ERC
+
+Created: 2022-03-14
+
+Requires: ERC721, ERC165, ERC2771
+---
+
+## Abstract
+The proposal directly connects NFTs and royalties in a smart contract architecture extending the ERC721 standard, with the aim of precluding central authorities from manipulating or circumventing payments to those who are legally entitled to them.
+
+The proposal builds upon the [OpenZeppelin Smart Contract Toolbox](https://github.com/OpenZeppelin/openzeppelin-contracts) architecture, and extends it to include royalty account management (CRUD), royalty balance and payments management, simple trading capabilities -- Listing/De-Listing/Buying -- and capabilities to trace trading on exchanges. The royalty management capabilities allow for hierarchical royalty structures, referred to herein as royalty trees, to be established by logically connecting a "parent" NFT to its "children", and recursively enabling NFT "children" to have more children. 
+
+## Motivation
+The management of royalties is an age-old problem characterized by complex contracts, opaque management, plenty of cheating and fraud. 
+
+The above is especially true for a hierarchy of royalties, where one or more assets is derived from an original asset such as a print from an original painting, or a song is used in the creation of another song, or distribution rights and compensation are managed through a series of affiliates. 
+
+In the example below, the artist who created the original is eligible to receive proceeds from every sale, and resale, of a print. 
+
+![Fig1](https://i.imgur.com/Py6bYQw.png)
+
+
+The basic concept for hierarchical royalties utilizing the above "ancestry concept" is demonstrated in the figure below.
+
+![Fig2](https://i.imgur.com/7MtWzBV.png)
+
+
+In order to solve for the complicated inheritance problem, this proposal breaks down the recursive problem of the hierarchy tree of depth N into N separate problems, one for each layer. This allows us to traverse the tree from its lowest level upwards to its root most efficiently.
+
+This affords creators, and the distributors of art derived from the original, the opportunity to achieve passive income from the creative process, enhancing the value of an NFT, since it now not only has intrinsic value but also comes with an attached cash flow.
+
+## Specification Outline
+
+This proposal introduces several new concepts as extensions to the ERC721 standard:
+* **Royalty Account (RA)**
+    * A Royalty Account is attached to each NFT through its `tokenId` and consists of several sub-accounts which can be accounts of individuals or other RAs. A Royalty Account is identified by an account identifier.
+* **Account Type**
+    * This specifies if an RA Sub Account belongs to an individual (user) or is another RA. If there is another RA as an RA Sub Account, the allocated balance needs to be reallocated to the Sub Accounts making up the referenced RA.
+* **Royalty Split**
+    * The percentage each Sub Account receives based on a sale of an NFT that is associated with an RA
+* **Royalty Balance**
+    * The royalty balance associated with an RA
+* **Sub Account Royalty Balance**
+    * The royalty balance associated to each RA Sub Account. Note that only individual accounts can carry a balance that can be paid out. That means that if an RA Sub Account is an RA, its final Sub Account balance must be zero, since all RA balances must be allocated to individual accounts. 
+* **Token Type**
+    * Token Type is given as either ETH or the symbol of the supported ERC 20/223/777 tokens such as `DAI`
+* **Asset ID**
+    * This is the `tokenId` the RA belongs to.
+* **Parent**
+    * This indicates which `tokenId` is the immediate parent of the `tokenId` to which an RA belongs.
+
+### Data Structures
+
+In order to create an interconnected data structure linking NFTs to RAs that is search optimized requires the following additions to the global data structures of an ERC721:
+
+* Adding structs for a Royalty Account and associated Royalty Sub Accounts to establish the concept of a Royalty Account with sub accounts.
+* Defining an `raAccountId` as the keccak256 hash of `tokenId`, the actual `owner` address, and the current block number, `block.blocknumber`
+* Mapping a `tokenId` to an `raAccountID` in order to connect an RA `raAccountId` to a `tokenId`
+* Mapping the `raAccountID` to a `RoyaltyAccount` in order to connect the account identifier to the actual account.
+* An `ancestry` mapping of the parent-to-child NFT relationship
+* A mapping of supported token types to their origin contracts and last validated balance (for trading and royalty payment purposes)
+* A mapping with a struct for a registered payment to be made in the `executePayment` function and validated in `safeTransferFrom`. This is sufficient, because a payment once received and distributed in the `safeTransferFrom` function will be removed from the mapping.
+* A mapping for listing NFTs to be sold
+
+### Royalty Account Functions
+
+Definitions and interfaces for the Royalty Account RUD (Read-Update-Delete) functions. Because the RA is created in the minting function, there is no need to have a function to create a royalty account separately.
+
+### Minting of a royalty bearing NFT
+
+When an NFT is minted, an RA must be created and associated with the NFT and the NFT owner, and, if there is an ancestor, with the ancestor's RA. To this end the specification utilizes the `_safemint` function in a newly defined `mint` function and applies various business rules on the input variables.
+
+### Listing NFTs for Sale and removing a listing
+
+Authorized user addresses can list NFTs for sale for non-exchange mediated NFT purchases.
+
+### Payment Function from Buyer to Seller
+
+To avoid royalty circumvention, a buyer will always pay the NFT contract directly and not the seller. The seller is paid through the royalty distribution and can later request a payout.
+
+The payment process depends on whether the payment is received in ETH or an ERC 20 token:
+* ERC 20 Token
+    1. The Buyer must `approve` the NFT contract for the purchase price, `payment` for the selected payment token (ERC20 contract address).
+    2. For an ERC20 payment token, the Buyer must then call the `executePayment` in the NFT contract -- the ERC20 is not directly involved.
+* For a non-ERC20 payment, the Buyer must send a protocol token (ETH) to the NFT contract, and is required to send `msg.data` encoded as an array of purchased NFTs `uint256[] tokenId`.
+
+### Modified NFT Transfer function including required Trade data to allocate royalties
+
+The input parameters must satisfy several requirements for the NFT to be transferred AFTER the royalties have been properly distributed. Furthermore, the ability to transfer more than one token at a time is also considered.
+
+The proposal defines:
+* Input parameter validation
+* Payment Parameter Validation
+* Distributing Royalties
+* Update Royalty Account ownership with payout
+* Transferring Ownership of the NFT 
+* Removing the Payment entry in `registeredPayment` after successful transfer
+
+##### Distributing Royalties
+
+The approach to distributing royalties is to break down the hierarchical structure of interconnected Royalty Accounts into layers and then process one layer at time, where each relationship between a token and its ancestor is utilized to traverse the Royalty Account chain until the root ancestor and associated RA is reached.
+
+### Paying out Royalties to the NFT owner -- `from` address in `safeTransferFrom` function
+
+This is the final part of the proposal.
+
+There are two versions of the payout function -- a `public` function and an `internal` function.
+
+The public function has the following interface:
+```
+function royaltyPayOut (uint256 tokenId, address RAsubaccount, address payable payoutAccount, uint256 amount) public virtual nonReentrant returns (bool)
+```
+
+where we only need the `tokenId`, the RA Sub Account address, `_RAsubaccount` which is the `owner`, and the amount to be paid out, `_amount`. Note that the function has [`nonReentrant` modifier protection](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol), because funds are being payed out.
+
+#### Sending a Payout Payment
+
+The following steps need to be taken:
+* find the RA Sub Account based on `RAaccount` and the `subaccountPos` and extract the balance
+* extract `tokentype` from the Sub Account
+* based on the token type, send the payout payment (not exceeding the available balance)
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Data Structures: Specifications and Rationales
+
+#### Royalty Account and Royalty Sub Accounts
+
+In order to create an interconnected data structure linking NFTs to RAs that is search optimized requires to make the following additions to the global data structures of an ERC721.
+
+Note, a Royalty Account is defined as a collection of Royalty Sub Accounts linked to a meta account. This meta account is comprised of general account identifiers particular to the NFT it is linked to such as asset identifier, parent identifier etc.
+
+#### **[R1]**
+
+*There MUST be a struct for a Royalty Account as minimally defined below.*
+```
+///
+/// @dev Definition of the struct for a Royalty Account.
+///
+/// @param  assetId is the tokenId of the NFT to which the RA belongs
+/// @param  parent is the tokenId of the NFT from which the NFT to which this RA belongs, is derived
+/// @param  royaltysplitForItsChildren is the royalty percentage to be paid to the RA belonging to the parent NFT from its immediate descendants
+/// @param  tokentype of the royalty balance in this Royalty Account
+/// @param  balance is the total RA account balance and must be equal to the sum of the subaccount balances
+/// @param  the struct array for the Royalty Sub-Accounts
+
+struct RoyaltyAccount {
+    uint256 assetId;
+    uint256 parent;
+    uint256 royaltySplitForItsChildren;
+    string tokentype;
+    uint256 balance;
+    RASubAccount[] rasubaccount;
+}
+```
+#### **[R2]**
+
+*There MUST be a struct for a Royalty Sub-Account linked to a Royalty Account, the minimal set of which is defined below.*
+```
+///
+/// @dev Definition of the struct for a Royalty Sub0Account.
+///
+/// @param isIndividual is the account type identifier, and is a boolean variable, and if set to true, the Royalty Account is that of an individual, if set to false, the Royalty Account is the Royalty Account of the parent NFT
+/// @param royaltysplit gives the royalty percentage for the Royalty Sub-Account as a decimal value smaller than 1 once converted from a uint256 integer
+/// @param royaltybalance is the royalty balance of the Royalty Sub-Account
+/// @param accountid is the address of the owner of the Royalty Sub-Account. If isIndividual is set to true, the address is the address of the owner, and if isIndividual is set to false, the address is defined by the `raAccountId` of the Royalty Account of the parent NFT
+
+struct RASubAccount {
+    bool isIndividual; 
+    uint256 royaltysplit;
+    uint256 royaltybalance;
+    address accountId;
+}
+```
+
+#### **[R3]** 
+
+*The account identifier of a Royalty Account, `raAccountId`, MUST be unique.*
+
+#### **[O1]** 
+
+*The `raAccountId` MAY be defined as the keccak256 hash of `tokenId`, the actual `owner` address, and the current block number, `block.blocknumber`.*
+```
+address memory raAccountId = address(bytes20(keccak256(tokenId,owner,block.blocknumber));
+```
+
+#### **[R4]** 
+
+*The `tokenId` of a NFT MUST be mapped to a `raAccountID` in order to connect an `raAccountId` to a `tokenId`.*
+```
+mapping (uint256 => address) private _tokenindextoRA;
+```
+
+#### **[R5]**
+
+*`raAccountID` MUST be mapped to a `RoyaltyAccount` in order to connect the Royalty  Account identifier to the Royalty Account.*
+```
+mapping (address => RoyaltyAccount) private _royaltyaccount;
+```
+
+#### Print (Child) NFTs
+
+The set of requirement to manage Parent-Child NFT Relationships and constraints at each level of the NFT (family) tree e.g. number of children permitted, NFT parents have to be mapped to their immediate NFT children are as follows.
+
+#### **[R6]**
+
+*There MUST be a struct that encodes the necessary data for direct parent-child relationships the minimal set of which is defined below.*
+```
+///
+/// @dev Definition of the struct that allows for direct parent-child relationships.
+///
+/// @param maxchildren represents the maximum number of children a parent NFT can have.
+/// @param ancestrylevel represents the level of ancestry of the child NFTs in a generation from the genesis NFT
+/// @param children is the array of children tokenIds of an NFT parent
+struct Child {
+    uint256 maxchildren;
+    uint256 ancestryLevel;
+    uint256[] children;
+}
+```
+
+#### **[R7]**
+*There MUST be an `ancestry` mapping of the parent-to-child NFT relationship.*
+```
+mapping (uint256 => Child) private ancestry
+```
+
+#### **[O2]**
+*The `maxchildren` variable MAY be updatable.*
+
+#### **[O3]** 
+
+*There MAY be a global, updatable limit for the number of NFT children an NFT parent may have.*
+
+The update of a global value of the maximum number of NFT children an NFT parent can have, may be implemented for example through a function as given below:
+```
+///
+/// @dev Function to update the global number of maxchildren a parent can have
+///
+/// @param _tokenId is the tokenId of the parent
+/// @param _newMaxChildren is the new, global maximum number of child NFTs a parent NFT can have
+/// @dev the function returns true if success
+function updateMaxChildren(uint 256 _tokenId, uint256 _newMaxChildren) public virtual returns (bool) { 
+
+        // @dev ensure that msg.sender has the role minter
+        require(hasRole(MINTER_ROLE, _msgSender()) || address(this), "Caller must have minter role or be NFT contract to update Max Number of Children");
+            
+        uint256 memory activechildren = ancestry[_tokenId].children.length;
+        
+        // @dev the new maximum number of must be larger than the current number of NFT children 
+        require(_newMaxChildren > activechildren, "New Max. number of children lower than current active children");
+        
+        ancestry[_tokenId].maxchildren = _newMaxChildren;
+        
+        return true;
+};
+```
+#### NFT Payment Tokens
+
+In order to capture royalties, an NFT contract must be involved in NFT trading. Therefore, the NFT contract needs to be aware of NFT payments, which in turn requires the NFT contract to be aware which tokens can be used for trading.
+
+This document first defines the required data structures to track trading and payments.
+
+#### **[R8]**
+
+*There MUST be a mapping of supported token types to the addresses of the corresponding token contracts.*
+
+```
+mapping (string => address) private allowedToken
+```
+
+Since the NFT contract is managing royalty distributions and payouts as well as sales, it needs to track the last available balances of the allowed token types owned by the contract.  
+
+#### **[R9]**
+
+*There MUST be a mapping of the last validated balance of an allowed token type in the contract to the respective allowed token contract.*
+```
+mapping (address => uint256) private lastBalanceAllowedToken
+```
+
+#### NFT Listings and Payments
+
+Since the contract is directly involved in the sales process, a capability to list one or more NFTs for sale is required.
+
+#### **[R10]**
+
+*There MUST be a struct that encodes the required data of a sales listing, the minimal set of which is defined below.*
+
+```
+///
+/// @dev Definition of the struct for a listing one or more NFTs for sale.
+///
+/// @param seller is the address of the NFT seller.
+/// @param listedtokens is the array of tokenIds listed for sales
+/// @param tokentype is the allowed payment token type for the listing
+/// @param price is the price for the entirety of the listing
+
+struct ListedNFT {
+    address seller;
+    uint256[] listedtokens;
+    string tokenType;
+    uint256 price;
+}
+```
+
+#### **[R11]**
+
+*In order to identify a listing, there MUST be a mapping of the `ListedNFT` struct to a listing identifier.*
+
+Such an identifier for example could be the tokenId of the first token in the listing as defined below  
+```
+mapping (uint256 => ListedNFT) private listedNFT
+```
+
+Besides listings, the contract is required to manage sales as well. This requires the capability to register a payment, either for immediate execution or for later payment such as in an auction situation.
+
+#### **[R12]**
+
+*There MUST be a struct that allows to encode the necessary data for a payment registration to be used by the contract in managing sales and royalties, the minimal set of which is defined below.*
+
+```
+///
+/// @dev Definition of the struct for a payment registration.
+///
+/// @param buyer is the address of the prospective buyer
+/// @param boughtTokens is the tokens from a listing to be bought
+/// @param tokentype is the token type the payment is made in
+/// @param payment is the amount of the payment
+
+struct RegisteredPayment {
+    address buyer;
+    uint256[] boughtTokens;
+    string tokenType;
+    uint256 payment;
+}
+```
+#### **[R13]**
+
+*In order to be able to identify a registered payment, there MUST be a mapping between the registered payment struct and an identifier.*
+```
+mapping (uint256 => RegisteredPayment) private registeredPayment
+```
+Note that the identifier in the mapping can for example be the first token to be sold. This is sufficient because a payment once received and distributed will be removed from the mapping.
+
+#### Contract Constructor and Global Variables and their update functions
+
+This standard extends the current ERC721 constructor, and adds several global variables to recognize the special role of the creator of an NFT, and the fact that the contract is now directly involved in managing sales and royalties.
+
+#### **[R14]**
+
+*The minimal contract constructor MUST conform to the structure given below.*
+
+```
+///
+/// @dev Definition of the contract constructor
+///
+/// @param name as in ERC721
+/// @param symbol as in ERC721
+/// @param baseTokenURI as in ERC721
+/// @param allowedTokenTypes is the array of allowed tokens for payment
+/// @param allowedTokenAddresses is the array of the contract addresses of the allowed tokens for payment
+
+constructor(
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        string[] memory allowedTokenTypes,
+        address[] memory allowedTokenAddresses,
+    ) ERC721(name, symbol) {
+        _baseTokenURI = baseTokenURI;
+        /// @dev _msgSender() should be the default administrator
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        /// @dev _msgSender requires the minter role such that an address can mint. This may be the same as the creator address
+        _setupRole(MINTER_ROLE, _msgSender());
+
+        /// @dev the length of the initiating token arrays must be the same
+        require(allowedTokenTypes.length == allowedTokenAddresses.length, 'Numbers of allowed tokens');
+
+        /// @dev add the token types and and their addresses to the mappings 
+        for (uint256 i = 0; i < allowedTokenTypes.length; i++) {
+            addAllowedTokenType(allowedTokenTypes[i], allowedTokenAddresses[i]);
+        }
+
+        /// @dev To comply with the NFT tree logic, tokenId must start from 1 not 0
+        _tokenIdTracker.increment();
+    }
+```
+
+Note, that his document is using `_msgSender()` to align with the [Open Zeppelin implementation of the ERC2771 standard](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/metatx/ERC2771Context.sol) in place of `msg.sender`.
+
+#### **[O4]**
+
+*Role definitions MAY be defined as global variables the following way*
+```
+bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
+bytes32 public constant CREATOR_Role = keccak256("CREATOR_ROLE");
+```
+
+#### **[O5]**
+
+*The contract constructor MAY contain the following, additional global parameters:*
+```
+address creatorAddress,
+uint256 numGenerations
+uint256 private _maxSubAccount;
+uint256 private _minRoyaltySplit;
+```
+This can give the creator of an NFT a special role within the access control structure of the contract, and, limits the maximum number of generations, maximum number of Royalty Sub Accounts, and minimal amount of the royalty percentage splits between Royalty Sub Accounts to both ensure that out-of-gas errors are minimized and that certain attack royalty distribution attack vectors are mitigated (see [Security Considerations](#Security-Considerations) for details).
+
+#### **[O6]**
+
+*The contract constructor MAY assign `_msgSender()` and the creator address special roles such as pausing transfers:* 
+```
+_setupRole(PAUSER_ROLE, _msgSender());
+_setupRole(CREATOR_ROLE, creatorAddress);
+```
+
+#### **[O7]**
+
+*The `_numGenerations` global variable MAY be updatable but only by addresses with the `CREATOR_ROLE` or through a delegated authority function.*
+
+An example of such an update function is given below:
+```
+/// @dev Function to update the maximum number of allowed NFT generations 
+/// @param newMaxNumber is the new maximum of generations
+function updateMaxGenerations(uint256 newMaxNumber) public virtual returns (bool) { 
+        /// @dev ensure that msg.sender has the role creator
+        /// @dev the address(this) condition allows for a delegation function to call this function
+        require(hasRole(CREATOR_ROLE, _msgSender()) || _msgSender() == address(this), "Caller must have creator role or be NFT Contract to update Max Number of Generations");
+        
+        _numGenerations = newMaxNumber;
+        
+        return true;
+};
+```
+#### **[O8]**
+
+*The `_maxrsubaccounts` and `_minroyaltysplit` global variables MAY be updatable but only by addresses with the `CREATOR_ROLE` or through a delegated authority function.*
+
+An example of such an update function for the two global variables above to which access is given only by the owning / managing contract that manages all access is given below:
+```
+/// @dev Function to update _maxrsubaccounts and _minroyaltysplit global variables
+/// @param maxrSubAccounts sets the number of maximum Royalty Sub Accounts
+/// @param minRoyaltySplit sets the minimum percentage allowed for a royalty split
+function updateRAccountLimits(uint256 maxSubAccounts, uint256 minRoyaltySplit) public virtual onlyOwner returns (bool) {
+        
+        /// @dev ensure that msg.sender has the role creator
+        /// @dev the address(this) condition allows for a delegation function to call this function
+        require(hasRole(CREATOR_ROLE, _msgSender()) || address(this) == _msgSender(), 'Creator role required');
+        
+        /// @dev validates that a royalty split edge case is not violated
+        require(_royaltySplitTT + minRoyaltySplit < 10000, 'Royalty Split to TT + Minimal Split is > 100%');
+        
+        _maxSubAccount = maxSubAccounts;
+        _minRoyaltySplit = minRoyaltySplit;
+        
+        return true;
+    }
+```
+
+#### **[O9]**
+
+*Furthermore, the creator of the original NFT MAY delegate authority to special functions such as altering the maximum number of generations and maximum number of children in a generation to a 3rd party using a `delegateAuthorty` function.*
+
+An example of such a function is given below:
+```
+/// @dev Function to delegate authority from CREATOR_ROLE to execute a function to a delegate
+/// @param functionSig is the signature of the function to which access is delegated
+/// @param _functionData is the calldata for the delegated function call
+/// @param documentHash is the delegation message signed by the creator
+/// @param sigV and sigR are the signature prefixes
+/// @param sigS is the array for the digital signature
+
+function delegateAuthority (bytes4 functionSig, bytes calldata _functionData, bytes32  documentHash, uint8[] memory sigV, bytes32[] memory sigR, bytes32[] memory sigS) public virtual returns (bool) {
+
+    /// @dev ensure that the function signature is registered
+    require(functionSig[functionSig],"Not a valid function to call");
+    
+    bytes memory prefix = "\x19Ethereum Signed Message:\n32";
+    bytes32 prefixedProof = keccak256(abi.encodePacked(prefix, documentHash));
+    address recovered = ecrecover(prefixedProof, sigV[0], sigR[0], sigS[0]);
+    
+    /// @dev ensure that the signature is from the creator
+    require(hasRole(CREATOR_ROLE,recovered),"Signature was not from creator");
+    
+    /// @dev contract calls itself with the delegated function call 
+    (bool success, ) = address(this).call(_functionData);
+    
+    require(success, returns false);
+    
+    returns true;
+    
+}
+```
+
+#### **[O10]**
+
+*Note that the `functionSig` mapping MAY be defined as:*
+```
+mapping (bytes4 => bool) public functionSig;
+```
+
+#### **[O11]**
+
+*The function to populate the `functionSig` mapping MAY be defined as follows:*
+```
+/// @dev Function sets the function signature of functions that can be delegated
+/// @param functionSig is the signature of the function for which delegation should be allowed
+function setFunctionSignature (bytes4 functionSig) public virtual returns (bool) {
+        require(hasRole(CREATOR_ROLE,_msgSender()) || hasRole(CREATOR_ROLE,_msgSender()), "msg.Sender is neither Admin nor Creator");
+        functionSig[functionSig] = true;
+        returns true;
+}
+```
+#### **[CR1<O11]**
+
+*Note that `_functionSig` MUST be calculated as follows: 
+`bytes4(keccak256("functionname(types of input variables that are comma separated)")`.* 
+
+For example, `bytes4(keccak256("updateMaxGenerations(uint256)")`.
+
+### Royalty Account Management: Specifications and Rationales
+
+Below are the definitions and interfaces for the Royalty Account RUD (Read-Update-Delete) functions. Since a Royalty Account is created in the NFT minting function, there is no need to have a separate function to create a royalty account.
+
+
+#### Get a Royalty Account through the NFT token index
+
+There is only one get function required because a Royalty Account and its sub accounts can be retrieved through the `tokenId` in the `ancestry` field of the Royalty Account. 
+
+#### **[R15]**
+
+*The `getRoyaltyAccount` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to fetch a Royalty Account for a given tokenId
+/// @param tokenId is the identifier of the NFT to which a Royalty Account is attached
+
+function getRoyaltyAccount (uint256 tokenId) public view virtual returns (address,
+            RoyaltyAccount memory,
+            RASubAccount[] memory);
+```
+
+#### **[R16]**
+
+*The following business rules MUST be enforced in the `getRoyaltyAccount` function:*
+* *`tokenId` exists and is not burned*
+* *`address memory accountId  = _tokenindextoRA[_tokenId];` retrieves the royalty account identifier from the mapping.*
+* *`RoyaltyAccount memory account = _royaltyaccount[accountId];` retrieves the royalty account struct from the mapping.*
+
+#### Update a Royalty Account
+
+In order to update a Royalty Account, the caller must have both the 'tokenId' and the `RoyaltyAccount` itself which can be obtained from the Royalty Account getter function. 
+
+#### **[R17]**
+
+*The `updateRoyaltyAccount` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to update a Royalty Account and its Sub Accounts
+/// @param tokenId is the identifier of the NFT to which the Royalty Account to be updated is attached
+/// @param RoyaltyAccount is the Royalty Account and associated Royalty Sub Accounts with updated values  
+
+function updateRoyaltyAccount (uint256 _tokenId, `RoyaltyAccount memory _raAccount) public virtual returns (bool)
+```
+
+The update functionality of a Royalty Account, while straightforward, is also highly nuanced. To avoid complicated change control rules such as multi-signature rules, Royalty Account changes are kept simple.
+
+Note that in the rules below, `_msgSender()` is to be read as `msg.sender` or an address approved by the `owner`; meaning that `getApproved (assetID) = _msgSender()`.
+
+#### **[R18]**
+
+*The business rules for the update function are as follows:*
+1. *The `assetId` data property MUST NOT be changed.*
+2. *The `ancestor` data property MUST NOT be updated.* 
+3. *The `tokentype` data property MUST NOT be updated.* 
+4. *The `royaltyBalance` data property in a Royalty Sub Account MUST NOT be changed.*
+5. *The `royaltySplitFromOffspring` data property MUST NOT be changed.*
+6. *The new `royaltySplit` values MUST be larger than or equal to the `_minRoyaltySplit` global variable.*
+7. *The number of existing Royalty Sub Account plus the number of new Royalty Sub Accounts to be added MUST be smaller or equal to the `_maxSubAccount` global variable.*
+8. *The sum of all `royaltySplit` data properties across all existing and new Royalty Sub Accounts MUST equal to 1 or its equivalent numerical value at all times.*
+9. *`_msgSender()` MUST be equal to an `accountId` in the Royalty Sub Account of the Royalty Account to be modified with `isIndividual` set to `true`* 
+    
+    9.1 *the Sub Account belonging to `accountId` MUST NOT be removed*
+    
+    9.2 *`royaltySplit` MUST only be decreased, and either the existing Sub Account `royaltySplit` data properties MUST be increased accordingly such that the sum of all `royaltySplit` data properties remains equal to 1 or its numerical equivalent, or one or more new Royalty Sub Accounts MUST be added according to rule 12 below.*
+    
+    9.3 *`balance` MUST NOT be changed*
+    
+    9.4 *`accountID` MUST NOT be NULL*
+
+10. *If `_msgSender()` is equal to the `accountId` of one of the Sub Account owners with `isIndividual` set to `true`, additional Royalty Sub Accounts MAY be added* 
+    
+    10.1 *if the `royaltySplit` of the Royalty Sub Account belonging to `_msgSender()` is reduced*
+    
+        10.1.1 *then the `balance` in each new Royalty Sub Account MUST be zero*
+    
+        10.1.2 *the sum of the new`royaltySplit` data properties MUST be equal to the `royaltySplit` of the Royalty Sub Account of `_msgSender()` before it was modified*
+    
+    10.2 *new `accountId` data properties MUST not be NULL*
+
+11. *If the Royalty Account update is correct, the function returns `true`, otherwise `false`.* 
+
+#### Deleting a Royalty Account
+
+While sometimes deleting a Royalty Account is necessary, even convenient, it is a very costly function in terms of gas, and should not be used unless one is absolutely sure that the conditions enumerated below are met.
+
+#### **[R19]**
+
+*The `deleteRoyaltyAccount` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to delete a Royalty Account
+/// @param tokenId is the identifier of the NFT to which the Royalty Account to be updated is attached
+
+function deleteRoyaltyAccount (uint256 _tokenId) public virtual returns (bool)
+```
+#### **[R20]**
+
+*The business rules for this function are as follows:*
+* *`_tokenId` MUST be burned, i.e., have owner `address(0)`.*
+* *all `tokenId` numbers genealogically related to `_tokenId` either as ancestors or offspring MUST also be burnt.* 
+* *all balances in the Royalty Sub Accounts MUST be zero.*
+
+### NFT Minting: Specifications and Rationales
+
+#### **[R21]**
+
+*When a new NFT is minted a Royalty Account with one or more Royalty Sub Accounts MUST be created and associated with the NFT and the NFT owner, and, if there is an ancestor, with the ancestor's Royalty Account.* 
+
+To this end the specification utilizes the ERC721 `_safemint` function in a newly defined `mint` function, and applies various business rules on the function's input variables.
+
+#### **[D1]**
+
+*Note, that the `mint` function SHOULD have the ability to mint more than one NFT at a time.* 
+
+#### **[R22]**
+
+*Also, note that the `owner` of a new NFT MUST be the NFT contract itself.* 
+
+#### **[R23]**
+
+*The non-contract owner of the NFT MUST be set as `isApproved` which allows the non-contract owner to operate just like the `owner`.* 
+
+This strange choice in the two requirements above is necessary, because the NFT contract functions as an escrow for payments and royalties, and, hence, needs to be able to track payments received from buyers and royalties due to recipients, and to associate them with a valid `tokenId`.
+
+#### **[R24]**
+
+*For compactness of the input, and since the token meta data might vary from token to token the following minimal data structure in the `mint` function MUST be adhered to:*
+```
+///
+/// @dev Defines the data structure required to mint one or more tokens ans associate them with one or more Royalty Accounts
+///
+/// @param parent is the parent tokenId of the (child) token, and if set to 0 then there is no parent.
+/// @param canBeParent indicates if a tokenId can have children or not.
+/// @param maxChildren defines how many children an NFT can have.
+/// @param royaltySplitForItsChildren is the royalty percentage split that a child has to pay to its parent.
+/// @param uri is the unique token URI of the NFT
+struct NFTToken {
+    uint256 parent;
+    bool canBeParent;
+    uint256 maxchildren;
+    uint256 royaltySplitForItsChildren;
+    string uri;
+}
+```
+
+#### **[R25]**
+
+*The `mint` function interface MUST adhere to the definition below:*
+```
+/// @dev Function creates one or more new NFTs with its relevant meta data necessary for royalties, and a Royalty Account with its associated met data for `to` address. The tokenId(s) will be automatically assigned (and available on the emitted {IERC721-Transfer} event).
+/// @param to is the address to which the NFT(s) are minted
+/// @param nfttoken is an array of struct type NFTToken for the meta data of the minted NFT(s)
+/// @param tokentype is the type of allowed payment token for the NFT
+
+function mint(address to, NFTToken[] memory nfttoken, string tokentype) public virtual
+```
+#### **[R26]**
+
+*The following business rules for the `mint` function's input data MUST be fulfilled:*
+- *The number of tokens to be minted MUST NOT be zero.*
+- *`_msgSender()` MUST have either the `MINTER_ROLE` or the `CREATOR_Role`.*
+- *`to` address MUST NOT be the zero address.*
+- *`to` address MUST NOT be a contract, unless it has been whitelisted -- see [Security Considerations](#Security-Considerations) for more details.* 
+- *`tokenType` MUST be a token type supported by the contract.*
+- *`royaltySplitForItsChildren` MUST be less or equal to 100% or numerical equivalent thereof less any constraints such as platform fees* 
+- *If the new NFT(s) cannot have children, `royaltySplitForItsChildren` MUST be zero.*
+- *If the new NFT(s) has a parent, the parent NFT `tokenId` MUST exist.*
+- *The `ancestryLevel` of the parent MUST be less than the maximum number of allowed generations.*
+- *The number of allowed children for an NFT to be minted MUST be less than the maximum number of allowed children.*
+
+### Listing and De-Listing of NFTs for Direct Sales: Specifications and Rationales
+
+In the sales process, we need to minimally distinguish two types of transactions
+- Exchange-mediated sales
+- Direct sales
+
+The first type of transaction does not require that the smart contract is aware of a sales listing since the exchange contract will trigger payment and transfer transactions directly with the NFT contract as the owner. However, for the latter transaction type it is essential, since direct sales are required to be mediated at every step by the smart contract. 
+
+#### **[R27]**
+
+*For direct sales, NFT listing, und de-listing, transactions MUST be executed through the NFT smart contract.*   
+
+Exchange-mediated sales will be discussed when this document discusses payments.
+
+In direct sales, authorized user addresses can list NFTs for sale, see the business rules below.
+
+#### **[R28]**
+
+*The `listNFT` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to list one or more NFTs for direct sales
+/// @param tokenIds is the array of tokenIds to be included in the listing
+/// @param price is the price set by the owner for the listed NFT(s)
+/// @param tokenType is the payment token type allowed for the listing
+
+function listNFT (uint256[] tokenIds, uint256 price, string tokenType) public virtual returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+#### **[R29]**
+
+*The business rules of the `listNFT` function are as follows:*
+- there MUST NOT already be a listing for one or more NFTs in the `listedNFT` mapping of the proposed listing.
+- `_msgSender()` MUST be equal to `getApproved(tokenId[i])` for all NFTs in the proposed listing.
+- `tokentype` MUST be supported by the smart contract.
+- `price` MUST be larger than `0`.
+
+#### **[R30]**
+If the conditions in [**[R29]**](#r29) are met, then the `listedNFT` mapping MUST be updated.
+
+Authorized user addresses can also remove a direct sale listing of NFTs. 
+
+#### **[R31]**
+
+*The `removeNFTListing` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to de-list one or more NFTs for direct sales
+/// @param listingId is the identifier of the NFT listing
+
+function removeNFTListing (uint256 listingId) public virtual returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+#### **[R32]**
+
+*The business rules of the `removeNFTListing` function below MUST be adhered to:*
+- *`registeredPayment[listingId]` entry must be NULL*
+- *`_msgSender() = getApproved(tokenId)` for the NFT listing* 
+
+#### **[R33]**
+
+*If the conditions in [**[R32]**](#r32) are met, then the mapping for the listing MUST be removed.*
+
+### Payments for NFT Sales: Specifications and Rationales
+
+As noted before, a buyer will always pay the NFT contract directly and not the seller. The seller is paid through the royalty distribution and can later request a payout to their wallet.
+
+#### **[R34]**
+
+*The payment process requires either one or two steps:*
+1. *For an ERC20 token*
+    - *The buyer MUST `approve` the NFT contract for the purchase price, `payment`, for the selected payment token type.*
+    - *The buyer MUST call the `executePayment` function.*
+2. *For a protocol token* 
+    - *The buyer MUST call a payment fallback function with `msg.data` not NULL.*
+
+#### **[R35]**
+
+*For an ERC20 token type, the required `executePayment` function interface MUST adhere to the definition below*:
+```
+/// @dev Function to make a NFT direct sales or exchange-mediate sales payment
+/// @param receiver is the address of the receiver of the payment
+/// @param seller is the address of the NFT seller 
+/// @param tokenIds are the tokenIds of the NFT to be bought
+/// @param payment is the amount of that payment to be made
+/// @param tokenType is the type of payment token
+/// @param trxntype is the type of payment transaction -- minimally direct sales or exchange-mediated
+
+function executePayment (address receiver, address seller, uint 256[] tokenIds, uint256 payment, string tokenType, int256 trxntype) public virtual returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+#### **[R36]**
+
+*Independent of `trxntype`, the business rules for the input data are as follows:*
+- *All purchased NFTs in the `tokenIds` array MUST exist and MUST NOT be burned.*
+- *`tokenType` MUST be a supported token.*
+- *`trxntype` MUST be set to either `0` (direct sale) or `1` (exchange-mediate sale), or another supported type.*
+- *`receiver` MAY be NULL but MUST NOT be the Zero Address.*
+- *`seller` MUST be the address in the corresponding listing.*
+- *`_msgSender()` MUST not be a contract, unless it is whitelisted in the NFT contract.*
+
+In the following, this document will only discuss the differences between the two minimally required transaction types.
+
+#### **[O12]**
+
+*Other transaction types (`trxntype`) than `0` and `1` and the business rules associated to those new types MAY be defined by an implementation of this standard.*
+
+#### **[R37]**
+
+*For `trxntype = 0`, the payment data MUST to be validated against the listing, based on the following rules:*
+- *NFT(s) MUST be listed*
+- *`payment` MUST be larger or equal to the listing price.*
+- *The listed NFT(s) MUST match the NFT(s) in the payment data.* 
+- *The listed NFT(s) MUST be controlled by `seller`.*
+
+#### **[R38]**
+
+*If all checks in [**[R36]**](#r36), and in [**[R37]**](#r37) for `trxntype = 0`, are passed, the `executePayment` function MUST call the `transfer` function in the ERC20 contract identified by `tokenType` with `recipient = address(this)` and `amount = payment`.* 
+
+Note the NFT contract pays itself from the available allowance set in the `approve` transaction from the buyer.
+
+#### **[R39]**
+
+*For `trxntype = 1`, and for a successful payment, the `registeredPayment` mapping MUST updated with the payment, such that it can be validated when the NFT is transferred in a separate `safeTransferFrom` call, and `true` MUST be returned as the return value of the function, if successful, `false` otherwsie.*
+
+#### **[R40]**
+
+*For `trxntype = 0`, an `internal` version of the `safeTransferFrom` function with message data MUST be called to transfer the NFTs to the buyer, and upon success, the buyer MUST be given the `MINTER_ROLE`, unless the buyer already has that role.*
+
+Note, the `_safeTransferFrom` function has the same structure as `safeTransferFrom` but skips the input data validation.
+
+#### **[R41]**
+
+*For `trxntype = 0`, and if the NFT transfer is successful, the listing of the NFT MUST be removed.* 
+
+#### **[R42]**
+
+*For a protocol token as a payment token, and independent of `trxntype`, the buyer MUST send protocol tokens to the NFT contract as the escrow, and `msg.data` MUST encode the array of paid for NFTs `uint256[] tokenIds`.*
+
+#### **[R43]**
+
+*For the NFT contract to receive a protocol token, a payable fallback function (`fallback() external payable`) MUST be implemented.*
+
+Note that since the information for which NFTs the payment was for must be passed, a simple `receive()` fallback function cannot be allowed since it does not allow for `msg.data` to be sent with the transaction.
+
+#### **[R44]**
+
+*`msg.data` for the fallback function MUST minimally contain the following data:
+`address memory seller, uint256[] memory _tokenId, address memory receiver, int256 memory trxntype`*
+
+#### **[R45]**
+
+*If `trxntype` is not equal to either '0' or '1', or another supported type, then the fallback function MUST `revert`.*
+
+#### **[R46]**
+
+*For `trxntype` equal to either '0' or '1', the requirements [**[R36]**](#r36) through [**[R41]**](#r41) MUST be satisfied for the fallback function to successfully execute, otherwise the fallback function MUST `revert`.*
+
+#### **[R47]**
+
+*In case of a transaction failure (Direct Sales, `trxntype = 0`), or the buyer of the NFT listing changing their mind (Exchange-mediated Sales, `trxntype = 1`), the submitted payment MUST be able reverteable using the `reversePayment` function where the function interface is defined below:*
+```
+/// @dev Definition of the function enabling the reversal of a payment before the sale is complete
+/// @param paymentId is the unique identifier for which a payment was made
+/// @param tokenType is the type of payment token used in the payment
+function reversePayment(uint256 paymentId, string memory tokenType) public virtual nonReentrant returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+Note, that the function has `reentrancy` protection through `nonReentrant` from the [Open Zeppelin library](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol) since funds are being paid out.
+
+#### **[R48]**
+
+*The business rules for the `reversePayment` function are as follows:*
+- *There MUST be registered payment for a given `paymentId` and `tokenType`.*
+- *`_msgSender()` MUST be the buyer address in the registered payment.*
+- *The payment amount must be larger than `0`.*
+- *The registered payment MUST be removed when the payment has been successfully reverted, otherwise the function must fail.*
+
+
+### Modified NFT Transfer function: Specifications and Rationales
+
+This document adheres to the ERC721 interface format for the `safeTransferFrom` function as given below:
+```
+function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external virtual override
+```
+
+Note, that the input parameters must satisfy several requirements for the NFT(s) to be transferred AFTER royalties have been properly distributed. Note also, that the ability to transfer more than one token at a time is required. However, the standard interface only allows one token to be transferred at a time. In order to remain compliant with the ERC721 standard, this document uses `tokenId` only for the first NFT to be transferred. All other transfer relevant data is encoded in `_data`. 
+
+The high-level requirements are as follows:
+* The payment parameters of the trade encoded in `_data` must be validated.
+* The seller and the sold NFT token(s) must exist, and the seller must be the owner of the token.
+* `_msgSender()` must be the seller address or an approved address.
+* the payment of the trade received by the NFT smart contract is correctly disbursed to all Royalty Sub Account owners.
+* the NFT token is transferred after all Royalty Sub Accounts and their holders associated with the NFT token(s) have been properly credited.
+
+Also, note that in order to avoid royalty circumvention attacks, there is only one NFT transfer function. 
+
+**[R49]**
+
+*Therefore, `transferFrom` and `safeTransferFrom` without `data` MUST be disabled.*
+
+This can be achieved through for example a `revert` statement in an `override` function.
+
+#### **[R50]**
+
+*The requirements on input parameters of the function are as follows*:
+* *`from` MUST not be `address(0)`.*
+* *`from` MUST be the owner or `approved` for `tokenId` and the other tokens included in `_data`.*
+* *`from` MUST not be a smart contract unless whitelisted.*
+* *a Royalty Account MUST be associated to `tokenId` and the other tokens included in `_data`.*
+* *`_data` MUST NOT be NULL.*
+* *`_msgSender()` MUST be equal to `from` or an `approved` address, or a whitelisted contract.*
+
+#### **[D2]**
+
+*Note, that in the context of this document only the scenario where the calling contract is still being created, i.e., the constructor being executed is a possible attack vector, and SHOULD to be carefully treated in the transfer scenario.* 
+
+Turning to the `_data` object.
+
+#### **[R51]**
+
+*The `_data` object MUST minimally contain the following payment parameters:*
+* *Seller Address as `address`.*
+* *Buyer Address as `address`.*
+* *Receiver Address as `address.*
+* *Token identifiers as `uint256[]`.*
+* *Token type used for payment e.g. `ETH`.*
+* *Payment amount paid to NFT contract as `uint256`.*
+* *a registered payment identifier.*
+* *blockchain ID, `block.chainid`, of the underlying blockchain.*
+
+#### **[R52]**
+
+*The following business rules MUST be met for the payment data in '_data':*
+* *`seller == from`.*
+* *`tokenId[0] == tokenId`.*
+* *Each token in `_tokenId` has an associated Royalty Account.*
+* *`chainid == block.chainid`.*
+* *`buyer = registeredPayment[paymentId].buyer`.*
+* *`receiver == to`.*
+* *the receiver of the token is not the buyer.*
+* *For all NFTs in the payment, `tokenId[i] = registeredPayment[paymentId].boughtTokens[i]`.*
+* *`tokentype` is supported in the contract.* 
+* *`allowedToken[tokentype]` is not NULL.*
+* *`tokentypeaddress == allowedToken[tokentype]`.*
+* *`tokentype = registeredPayment[paymentId].tokenType`.*
+* *`payment > lastBalanceAllowedToken[allowedToken[listingId]]`.*
+* *`payment = registeredPayment[paymentId].payment`.*
+
+#### Distributing Royalties in the transfer function
+
+The approach to distributing royalties is to break down the hierarchical structure of interconnected Royalty Accounts into layers, and then process one layer at time, where each relationship between a NFT and its ancestor is utilized to traverse the Royalty Account chain until the root ancestor and its associated Royalty Account.
+
+Note, that the distribution function assumes that the payment made is for ALL tokens in the requested transfer. That means, that `payment` for the distribution function is equally divided between all NFTs included in the payment. 
+
+#### **[R53]**
+
+*The `distributePayment` function interface MUST adhere to the definition below:
+```
+/// @dev Function to distribute a payment as royalties to a chain of Royalty Accounts
+/// @param tokenId is a tokenId included in the sale and used to look up the associated Royalty Account
+/// @param payment is the payment (portion) to be distributed as royalties
+
+function distributePayment (uint256 tokenId, uint265 payment) internal virtual returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+As mentioned before, the internal `distributePayment` function is called within the modified `safeTransferFrom` function.
+
+Note, that it is necessary to multiply two `uint256` numbers with each other -- the payment amount with the royalty split percentage expressed as a whole number e.g. `10000 = 100%`. And then divide the result by the whole number representing `100%` in order to arrive at the correct application of the royalty split percentage to the payment amount. This requires careful treatment of numbers in the implementation to prevent issues such as buffer over or under runs.
+
+#### **[R54]**
+
+*The processing logic of `distributePayment` function MUST be as follows:*
+* *Load the Royalty Account (`RA`) and associated Royalty Sub Accounts using the passed `tokenId`.*
+* *For each Royalty Sub Account in `RA` apply the following rules:*
+    * *If a Royalty Sub Account in `RA` has `isIndividual` set to `true` then*
+        * *apply the royalty percentage of that Royalty Sub Account to `payment` and add the calculated amount, e.g. `royaltyAmountTemp`, to the `royaltybalance` of that Royalty Sub Account.*
+        * *emit an event as a notification of payment to the `accountId` of the Royalty Sub Account containing: assetId, accountId, tokentype, royaltybalance.*
+        * *in the RA add `royaltyamountTemp` amount to `balance`*
+    * *If a Royalty Sub Account in `RA` has `isIndividual` set to `false` then*
+        * *apply the royalty percentage of that Royalty Sub Account to `payment` and store temporarily in a new variable e.g. `RApaymenttemp`, but do not update the `royaltybalance` of the Royalty Sub Account which remains `0`.*
+    * *then use `ancestor` to obtain the `RA` connected to `ancestor` via a look up through the Royalty Account mapping.*
+    * *load the new RA*
+        * *if `isIndividual` of the Royalty Sub Account is set to `true`, pass through the Royalty Sub Accounts of the next `RA`, and apply the rule for `isIndividual = true`.*
+        * *if `isIndividual` of the Royalty Sub Account is set to `false`, pass through the Royalty Sub Accounts of the next `RA`, and apply the rule for `isIndividual = false`.*
+    * *Repeat the procedures for `isIndividual` equal to `true` and `false` until a `RA` is reached that does not have an `ancestor`, and where all Royalty Sub Accounts have`isIndividual` set to `true`, and apply the rule for a Royalty Sub Account that has `isIndividual` set to `true` to all Royalty Sub Accounts in that `RA`.*
+
+#### Update Royalty Sub Account ownership with payout to approved address (`from`)
+
+In order to simplify the ownership transfer, first the approved address -- the non-contract NFT owner --, `from`, is paid out its share of the royalties. And then the Royalty Sub Account is updated with the new owner, `to`. This step repeats for each token to be transferred.
+
+#### **[R55]**
+
+*The business rules are as follows:*
+* *the internal version of the`royaltyPayOut` function MUST pay out the entire royalty balance of the Royalty Sub Account owned by the `from` address to the `from` address.*
+* *the Royalty Sub Account MUST only be updated with the new owner only once the payout function has successfully completed and the `royaltybalance = 0`.*
+
+The last step in the process chain is transferring the NFTs in the purchase to the `to` address. 
+
+#### **[R56]**
+
+*For every NFT (in the batch) the 'to' address MUST be `approved' (ERC721 function) to complete the ownership transfer:* 
+
+```
+_approve(to, tokenId[i]);
+```
+
+The technical NFT owner remains the NFT contract.
+
+#### Removing the Payment entry in `registeredPayment` after successful transfer
+
+Only after the real ownership of the NFT, the approved address, has been updated, the payment registry entry can be removed to allow the transferred NFTs to be sold again.
+
+#### **[R57]**
+
+*After the `approve` relationship has been successfully updated to the `to` address, the registered payment MUST be removed.*
+```
+delete registeredPayment[_tokenId[[0]];
+```
+
+### Paying out Royalties to the `from` address in `safeTransferFrom` function
+
+There are two versions of the payout function -- a `public` and an `internal` function.
+
+#### **[R58]**
+
+*The public `royaltyPayOut` function interface MUST adhere to the definition below:*
+```
+/// @dev Function to payout a royalty payment
+/// @param tokenId is the identifier of the NFT token
+/// @param RAsubaccount is the address of the Royalty Sub Account from which the payout should happen
+/// @param receiver is the address to receive the payout
+/// @param amount is the amount to be paid out
+
+function royaltyPayOut (uint256 tokenId, address RAsubaccount, address payable payoutAccount, uint256 amount) public virtual nonReentrant returns (bool)
+```
+The Boolean return value is `true` for a successful function execution, and `false` for an unsuccessful function execution.
+
+Note, that the function has `reentrancy` protection through `nonReentrant` from the [Open Zeppelin library](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol) since funds are being paid out.
+
+#### **[R59]**
+
+*The input parameters of the `royaltyPayOut` function MUST satisfy the following requirements:*
+* *`_msgSender() == RAsubaccount`.*
+* *`tokenId` must exist and MUST NOT be burned.*
+* *`tokenId` must be associated with a Royalty Account.*
+* *`RAsubaccount` must be a valid `accountId` in a Royalty Sub Account of the Royalty Account of the `tokenId'.*
+* *`isIndividual == true` for the Royalty Sub Account, `RAsubaccount`.*
+* *`amount <= royaltybalance` of the Royalty Sub Account, `RAsubaccount.*`
+
+#### **[R60]**
+
+*The internal `_royaltyPayOut` function interface MUST adhere to the definition below*:
+```
+function _royaltyPayOut (uint256 tokenId, address RAsubaccount, address payable payoutAccount, uint256 amount) public virtual returns (bool)
+```
+#### **[R61]**
+
+*The internal `_royaltyPayOut` function MUST perform the following actions:
+* *send the payment to the `payoutaccount`.*
+* *update the `royaltybalance` of the `RAsubaccount` of the Royalty Account upon successful transfer.*
+
+#### Sending a Payout Payment
+
+#### **[R62]**
+
+*The following steps MUST be taken to send out a royalty payment to its recipient:*
+* *find the Royalty Sub Account.*
+* *extract `tokentype` from the Royalty Sub Account.*
+* *based on the token type send to the `payoutAccount` either*
+    * *'ETH' / relevant protocol token or*
+    * *another token based on token type* 
+* *and only if the payout transaction is successful, deduct `amount` from `royaltybalance` of the Royalty Sub Account,`RAsubaccount`, and then return `true` as the function return parameter, otherwise return `false`.* 
+
+## Backwards Compatibility
+This EIP is backwards compatible to the ERC721 standard introducing new interfaces and functionality but retaining the core interfaces and functionality of the ERC-721 standard.
+
+## Test Cases
+A full test suite is part of the reference implementation.
+
+## Reference Implementation
+The Treetrunk reference implementation of the standard can be found [here](https://github.com/treetrunkio/treetrunk-nft-reference-implementation).
+
+## Security Considerations
+Given that this EIP introduces royalty collection, distribution, and payouts to the ERC-721 standard, the number of attack vectors increases. The most important attack vector categories and their mitigation are discussed below:
+
+- **Payments and Payouts**:
+    - Reentrancy attacks are mitigated through a reentrancy protection on all payment functions. See for example the Open Zeppelin [reference implementation](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol).
+    - Payouts from unauthorized accounts. Mitigation: Royalty Sub Accounts require at least that `msg.sender` is the Royalty Sub Account owner.
+    - Payments could get stuck in the NFT contract if the `executePayment` function fails. Mitigation: For exchange-mediated sales, a buyer can always reverse a payment with `reversePayment` if the `executePayment` function fails. For direct sales, `reversePayment` will be directly triggered in the `executePayment` function.
+- **Circumventing Royalties**:
+    - Offchain Key exchanges
+        - Exchanging a private key for money off chain can not be prevented in any scenario. 
+    -  Smart Contract Wallets as NFT owners
+        - A Smart Contract Wallet controlled by multiple addresses could own an NFT and the owners could transfer the asset within the wallet with an off chain money exchange. Mitigation: Prohibit that Smart Contracts can own an NFT unless explicitly allowed to accommodate special scenarios such as collections.
+    - Denial of Royalty Disbursement 
+        - An attacker who has purchased one or more NFTs in a given generation of an NFT family can cause out of gas errors or run time errors for the contract, if they add many spurious royalty sub-accounts with very low royalty split percentages, and then mint more prints of those purchased NFTs, and then repeat that step until the set `maxGeneration` limit is reached. An NFT trade at the bottom of the hierarchy will then require a lot of code cycles because of the recursive nature of the royalty distribution function. Mitigation: Limit the number of royalty sub-accounts per NFT and impose a royalty split percentage limit.
+        - Following the same approach as above but now targeting the `addListNFT` function, an attacker can force an out of gas error or run time errors in the `executePayment` function by listing many NFTs at a low price, and then performing a purchase from another account. Mitigation: Limit the number of NFTs that can be included in one listing.
+        - The creator of the NFT family could set the number of generations too high such that the royalty distribution function could incur and out of gas or run time error because of the recursive nature of the function. Mitigation: Limiting the `maxNumberGeneration` by the creator.
+    - General Considerations: The creator of an NFT family must carefully consider the business model for the NFT family and then set the parameters such as maximum number of generations, royalty sub-accounts, number of prints per print, number of NFTs in a listing, and the maximum and minimum royalty split percentage allowed. 
+
+- **Phishing Attacks**
+    - NFT phishing attacks often target the `approve` and `setApprovalForAll` functions by tricking owners of NFTs to sign transactions adding the attacker account as approved for one or all NFTs of the victim. Mitigation: This contract is not vulnerable to these type of phishing attacks because all NFT transfers are sales, and the NFT contract itself is the owner of all NFTs. This means that transfers after a purchase are achieved by setting the new owner in the `_approve` function. Calling the public 'approve' function will cause the function call to error out because `msg.sender' of the malicious transaction cannot be the NFT owner.
+    - NFT phishing attack targeting the `addListNFT` function to trick victim to list one or more NFTs at a very low price and the attacker immediately registering a payment, and executing that payment right away. Mitigation: Implement a waiting period for a purchase can be affected giving the victim time to call the `removeListNFT` function. In addition, an implementer could require Two-Factor-Authentication either built into the contract or by utilizing an authenticator app such as Google Authenticator built into a wallet software. 
+
+Besides the usage of professional security analysis tools, it is also recommended that each implementation performs a security audit of its implementation.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
