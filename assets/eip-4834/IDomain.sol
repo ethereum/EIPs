@@ -9,20 +9,20 @@ import "@openzeppelin/contracts/interfaces/IERC165.sol";
 interface IDomain is IERC165 {
     //// Events
     
-    /// @notice     Must be emitted when createDomain is called
+    /// @notice     Must be emitted when a new subdomain is created (eg. through `createDomain`.)
     /// @param      sender msg.sender for createDomain
     /// @param      name name for createDomain
     /// @param      subdomain subdomain in createDomain
     event SubdomainCreate(address indexed sender, string name, address subdomain);
 
-    /// @notice     Must be emitted when setDomain is called
+    /// @notice     Must be emitted when the resolved address for a domain is changed (eg. with `setDomain`)
     /// @param      sender msg.sender for setDomain
     /// @param      name name for setDomain
     /// @param      subdomain subdomain in setDomain
     /// @param      oldSubdomain the old subdomain
     event SubdomainUpdate(address indexed sender, string name, address subdomain, address oldSubdomain);
 
-    /// @notice     Must be emitted when deleteDomain is called
+    /// @notice     Must be emitted when a domain is unmapped (eg. with `deleteDomain`)
     /// @param      sender msg.sender for deleteDomain
     /// @param      name name for deleteDomain
     /// @param      subdomain the old subdomain
@@ -37,7 +37,7 @@ interface IDomain is IERC165 {
     function hasDomain(string memory name) external view returns (bool);
 
     /// @notice     Fetch the subdomain with a given name
-    /// @dev        This should revert is `hasDomain(name)` is `false`
+    /// @dev        This should revert if `hasDomain(name)` is `false`
     /// @param      name The subdomain to fetch
     /// @return     The subdomain with the given name
     function getDomain(string memory name) external view returns (address);
@@ -97,7 +97,7 @@ interface IDomain is IERC165 {
 
     //// Subdomain Access Control
 
-    /// @notice     Get if an account can point this domain as a subdomain
+    /// @notice     Get if an account can set this domain as a subdomain
     /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
     /// @param      updater The account that may be moving the subdomain
     /// @param      name The subdomain name
@@ -114,7 +114,7 @@ interface IDomain is IERC165 {
     /// @return     Whether an account can update the subdomain
     function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) external view returns (bool);
 
-    /// @notice     Get if an account can point this domain as a subdomain
+    /// @notice     Get if an account can unset this domain as a subdomain
     /// @dev        May be called by `canDeleteDomain` of the parent domain - implement access control here!!!
     /// @param      updater The account that may or may not be able to delete a subdomain
     /// @param      name The subdomain to delete
