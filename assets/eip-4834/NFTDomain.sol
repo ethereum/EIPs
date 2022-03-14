@@ -13,7 +13,7 @@ import '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
 
 contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
     //// States
-    mapping(string => IDomain) public subdomains;
+    mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
 
 
@@ -34,12 +34,12 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         return subdomainsPresent[name];
     }
 
-    function getDomain(string memory name) public view returns (IDomain) {
+    function getDomain(string memory name) public view returns (address) {
         require(this.hasDomain(name));
         return subdomains[name];
     }
 
-    function createDomain(string memory name, IDomain subdomain) public {
+    function createDomain(string memory name, address subdomain) public {
         require(!this.hasDomain(name));
         require(this.canCreateDomain(msg.sender, name, subdomain));
         
@@ -49,11 +49,11 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
 
-    function setDomain(string memory name, IDomain subdomain) public {
+    function setDomain(string memory name, address subdomain) public {
         require(this.hasDomain(name));
         require(this.canSetDomain(msg.sender, name, subdomain));
 
-        IDomain oldSubdomain = subdomains[name];
+        address oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
@@ -71,31 +71,106 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
 
     //// Parent Domain Access Control
 
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(0) == updater || subdomain.canPointSubdomain(updater, name, this);
+    function canCreateDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (this.hasDomain(name)) {
+            return false;
+        }
+
+        // Is user owner
+        bool isTheOwner = this.ownerOf(0) == updater;
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Default
+        return isTheOwner;
     }
 
-    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return ownerOf(0) == updater || subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+    function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
+
+        // Is user owner
+        bool isTheOwner = this.ownerOf(0) == updater;
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canMove = isTheOwner;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canMove = currentAsDomain.canMoveSubdomain(updater, name, this, subdomain);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canMove) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return ownerOf(0) == updater || subdomains[name].canDeleteSubdomain(updater, name, this);
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
+
+        // Is user owner
+        bool isTheOwner = this.ownerOf(0) == updater;
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canDel = isTheOwner;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canDel = currentAsDomain.canDeleteSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canDel) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
 
     //// Subdomain Access Control
 
     function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(0) == updater;
+        return true;
     }
 
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
-        return ownerOf(0) == updater;
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) public virtual view returns (bool) {
+        return this.ownerOf(0) == updater;
     }
 
     function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return ownerOf(0) == updater;
+        return this.ownerOf(0) == updater;
     }
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC165Storage) returns (bool) {

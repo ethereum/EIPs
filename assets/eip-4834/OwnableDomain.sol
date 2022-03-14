@@ -9,7 +9,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract OwnableDomain is IDomain, ERC165Storage, Ownable {
     //// States
-    mapping(string => IDomain) public subdomains;
+    mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
 
 
@@ -26,12 +26,12 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         return subdomainsPresent[name];
     }
 
-    function getDomain(string memory name) public view returns (IDomain) {
+    function getDomain(string memory name) public view returns (address) {
         require(this.hasDomain(name));
         return subdomains[name];
     }
 
-    function createDomain(string memory name, IDomain subdomain) public {
+    function createDomain(string memory name, address subdomain) public {
         require(!this.hasDomain(name));
         require(this.canCreateDomain(msg.sender, name, subdomain));
         
@@ -41,11 +41,11 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
 
-    function setDomain(string memory name, IDomain subdomain) public {
+    function setDomain(string memory name, address subdomain) public {
         require(this.hasDomain(name));
         require(this.canSetDomain(msg.sender, name, subdomain));
 
-        IDomain oldSubdomain = subdomains[name];
+        address oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
@@ -63,30 +63,104 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
 
     //// Parent Domain Access Control
 
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return subdomain.canPointSubdomain(updater, name, this);
+    function canCreateDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (this.hasDomain(name)) {
+            return false;
+        }
+
+        // Is user owner
+        bool isTheOwner = this.owner() == updater;
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Default
+        return isTheOwner;
     }
 
-    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+    function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
+
+        // Is user owner
+        bool isTheOwner = this.owner() == updater;
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canMove = isTheOwner;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canMove = currentAsDomain.canMoveSubdomain(updater, name, this, subdomain);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canMove) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return subdomains[name].canDeleteSubdomain(updater, name, this);
-    }
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
 
+        // Is user owner
+        bool isTheOwner = this.owner() == updater;
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canDel = isTheOwner;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canDel = currentAsDomain.canDeleteSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canDel) {
+            return false;
+        }
+
+        // Default
+        return true;
+    }
 
     //// Subdomain Access Control
 
     function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return owner() == updater;
+        return true;
     }
 
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
-        return owner() == updater;
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) public virtual view returns (bool) {
+        return this.owner() == updater;
     }
 
     function canDeleteSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return owner() == updater;
+        return this.owner() == updater;
     }
 }

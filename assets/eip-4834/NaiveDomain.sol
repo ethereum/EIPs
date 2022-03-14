@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
 
 contract NaiveDomain is IDomain, ERC165Storage {
     //// States
-    mapping(string => IDomain) public subdomains;
+    mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
 
     //// Constructor
@@ -24,13 +24,12 @@ contract NaiveDomain is IDomain, ERC165Storage {
         return subdomainsPresent[name];
     }
 
-    function getDomain(string memory name) public view returns (IDomain) {
+    function getDomain(string memory name) public view returns (address) {
         require(this.hasDomain(name));
         return subdomains[name];
     }
 
-    function createDomain(string memory name, IDomain subdomain) public {
-        require(!this.hasDomain(name));
+    function createDomain(string memory name, address subdomain) public {
         require(this.canCreateDomain(msg.sender, name, subdomain));
         
         subdomainsPresent[name] = true;
@@ -39,18 +38,16 @@ contract NaiveDomain is IDomain, ERC165Storage {
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
 
-    function setDomain(string memory name, IDomain subdomain) public {
-        require(this.hasDomain(name));
+    function setDomain(string memory name, address subdomain) public {
         require(this.canSetDomain(msg.sender, name, subdomain));
 
-        IDomain oldSubdomain = subdomains[name];
+        address oldSubdomain = subdomains[name];
         subdomains[name] = subdomain;
 
         emit SubdomainUpdate(msg.sender, name, subdomain, oldSubdomain);
     }
 
     function deleteDomain(string memory name) public {
-        require(this.hasDomain(name));
         require(this.canDeleteDomain(msg.sender, name));
 
         subdomainsPresent[name] = false; // Only need to mark it as deleted
@@ -61,16 +58,82 @@ contract NaiveDomain is IDomain, ERC165Storage {
 
     //// Parent Domain Access Control
 
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return subdomain.canPointSubdomain(updater, name, this);
+    function canCreateDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (this.hasDomain(name)) {
+            return false;
+        }
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
-    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
-        return subdomains[name].canMoveSubdomain(updater, name, this, subdomain) && subdomain.canPointSubdomain(updater, name, this);
+    function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
+
+        // Pointable Check
+        IDomain subdomainAsDomain = subdomain;
+        bool canPoint = true;
+        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canPoint) {
+            return false;
+        }
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canMove = true;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canMove = currentAsDomain.canMoveSubdomain(updater, name, this, subdomain);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canMove) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
-        return subdomains[name].canDeleteSubdomain(updater, name, this);
+        // Existence Check
+        if (!this.hasDomain(name)) {
+            return false;
+        }
+
+        // Permissions Check
+        IDomain currentAsDomain = subdomains[name];
+        bool canDel = true;
+        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
+            if (isDomain) {
+                canDel = currentAsDomain.canDeleteSubdomain(updater, name, this);
+            }
+        } catch (bytes memory /*lowLevelData*/) { }
+        if (!canDel) {
+            return false;
+        }
+
+        // Default
+        return true;
     }
 
 
@@ -80,7 +143,7 @@ contract NaiveDomain is IDomain, ERC165Storage {
         return true;
     }
 
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) public virtual view returns (bool) {
         return true;
     }
 

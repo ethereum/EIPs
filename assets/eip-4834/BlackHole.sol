@@ -20,15 +20,15 @@ contract BlackHole is IDomain, ERC165Storage {
         return true;
     }
 
-    function getDomain(string memory name) public view returns (IDomain) {
+    function getDomain(string memory name) public view returns (address) {
         return this;
     }
 
-    function createDomain(string memory name, IDomain subdomain) public {
+    function createDomain(string memory name, address subdomain) public {
         require(false);
     }
 
-    function setDomain(string memory name, IDomain subdomain) public {
+    function setDomain(string memory name, address subdomain) public {
         require(false);
     }
 
@@ -39,11 +39,11 @@ contract BlackHole is IDomain, ERC165Storage {
 
     //// Parent Domain Access Control
 
-    function canCreateDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
+    function canCreateDomain(address updater, string memory name, address subdomain) public view returns (bool) {
         return false;
     }
 
-    function canSetDomain(address updater, string memory name, IDomain subdomain) public view returns (bool) {
+    function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
         return false;
     }
 
@@ -58,7 +58,7 @@ contract BlackHole is IDomain, ERC165Storage {
         return true;
     }
 
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, IDomain newSubdomain) public virtual view returns (bool) {
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) public virtual view returns (bool) {
         return false; // Exploit: part 1
     }
 
