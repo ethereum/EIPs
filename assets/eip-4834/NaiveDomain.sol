@@ -103,11 +103,7 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
 
 
     //// Subdomain Access Control
-
-    function canPointSubdomain(address updater, string memory name, IDomain parent) public virtual view returns (bool) {
-        return true;
-    }
-
+    
     function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) public virtual view returns (bool) {
         return true;
     }

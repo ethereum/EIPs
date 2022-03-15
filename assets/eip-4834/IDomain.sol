@@ -97,14 +97,6 @@ interface IDomain is IERC165 {
 
     //// Subdomain Access Control
 
-    /// @notice     Get if an account can set this domain as a subdomain
-    /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
-    /// @param      updater The account that may be moving the subdomain
-    /// @param      name The subdomain name
-    /// @param      parent The parent domain
-    /// @return     Whether an account can update the subdomain
-    function canPointSubdomain(address updater, string memory name, IDomain parent) external view returns (bool);
-
     /// @notice     Get if an account can move the subdomain away from the current domain
     /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
     /// @param      updater The account that may be moving the subdomain
