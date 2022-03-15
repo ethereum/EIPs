@@ -3,15 +3,16 @@ pragma solidity ^0.8.9;
 
 // NOTE: This is very untested and not very well-implemented anyways. Do not use!
 
-import './IDomain.sol';
-import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
+import "./IDomain.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-import '@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol';
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 
 
-contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
+contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable, ERC165Checker {
     //// States
     mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
@@ -81,19 +82,10 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         bool isTheOwner = this.ownerOf(0) == updater;
 
         // Pointable Check
-        IDomain subdomainAsDomain = subdomain;
-        bool canPoint = true;
-        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canPoint) {
-            return false;
-        }
+        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
 
-        // Default
-        return isTheOwner;
+        // Return
+        return isTheOwner && isPointable;
     }
 
     function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
@@ -106,31 +98,13 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         bool isTheOwner = this.ownerOf(0) == updater;
 
         // Pointable Check
-        IDomain subdomainAsDomain = subdomain;
-        bool canPoint = true;
-        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canPoint) {
-            return false;
-        }
+        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
 
-        // Permissions Check
-        IDomain currentAsDomain = subdomains[name];
-        bool canMove = isTheOwner;
-        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canMove = currentAsDomain.canMoveSubdomain(updater, name, this, subdomain);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canMove) {
-            return false;
-        }
+        // Auth Check
+        bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
 
-        // Default
-        return true;
+        // Return
+        return (isTheOwner || isMovable) && isPointable;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
@@ -142,20 +116,11 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         // Is user owner
         bool isTheOwner = this.ownerOf(0) == updater;
 
-        // Permissions Check
-        IDomain currentAsDomain = subdomains[name];
-        bool canDel = isTheOwner;
-        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canDel = currentAsDomain.canDeleteSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canDel) {
-            return false;
-        }
+        // Auth Check
+        bool isDeletable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canDeleteDomain(updater, name, this);
 
-        // Default
-        return true;
+        // Return
+        return isTheOwner || isDeletable;
     }
 
 
@@ -173,7 +138,8 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable {
         return this.ownerOf(0) == updater;
     }
 
+    //// ERC-165 Overrides
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC165Storage) returns (bool) {
-        return ERC165Storage(this).supportsInterface(interfaceId);
+        return ERC165Storage.supportsInterface(interfaceId);
     }
 }

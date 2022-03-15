@@ -3,11 +3,12 @@ pragma solidity ^0.8.9;
 
 // NOTE: This is very untested. Do not use!
 
-import './IDomain.sol';
-import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import "./IDomain.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OwnableDomain is IDomain, ERC165Storage, Ownable {
+contract OwnableDomain is IDomain, ERC165Storage, Ownable, ERC165Checker {
     //// States
     mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
@@ -73,19 +74,10 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         bool isTheOwner = this.owner() == updater;
 
         // Pointable Check
-        IDomain subdomainAsDomain = subdomain;
-        bool canPoint = true;
-        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canPoint) {
-            return false;
-        }
+        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
 
-        // Default
-        return isTheOwner;
+        // Return
+        return isTheOwner && isPointable;
     }
 
     function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
@@ -98,31 +90,13 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         bool isTheOwner = this.owner() == updater;
 
         // Pointable Check
-        IDomain subdomainAsDomain = subdomain;
-        bool canPoint = true;
-        try subdomainAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canPoint = subdomainAsDomain.canPointSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canPoint) {
-            return false;
-        }
+        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
 
-        // Permissions Check
-        IDomain currentAsDomain = subdomains[name];
-        bool canMove = isTheOwner;
-        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canMove = currentAsDomain.canMoveSubdomain(updater, name, this, subdomain);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canMove) {
-            return false;
-        }
+        // Auth Check
+        bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
 
-        // Default
-        return true;
+        // Return
+        return (isTheOwner || isMovable) && isPointable;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {
@@ -134,20 +108,11 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable {
         // Is user owner
         bool isTheOwner = this.owner() == updater;
 
-        // Permissions Check
-        IDomain currentAsDomain = subdomains[name];
-        bool canDel = isTheOwner;
-        try currentAsDomain.supportsInterface(type(IDomain).interfaceId) returns (bool isDomain) {
-            if (isDomain) {
-                canDel = currentAsDomain.canDeleteSubdomain(updater, name, this);
-            }
-        } catch (bytes memory /*lowLevelData*/) { }
-        if (!canDel) {
-            return false;
-        }
+        // Auth Check
+        bool isDeletable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canDeleteDomain(updater, name, this);
 
-        // Default
-        return true;
+        // Return
+        return isTheOwner || isDeletable;
     }
 
     //// Subdomain Access Control

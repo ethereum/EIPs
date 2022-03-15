@@ -49,13 +49,13 @@ interface IDomain is IERC165 {
     function createDomain(string memory name, address subdomain) external;
 
     /// @notice     Update a subdomain with a given name
-    /// @dev        This should revert if `canSetDomain(msg.sender, name, pointer)` is `false` of if the domain doesn't exist
+    /// @dev        This should revert if `canSetDomain(msg.sender, name, pointer)` is `false` of if the domain does not exist
     /// @param      name The subdomain name to be updated
     /// @param      subdomain The subdomain to set
     function setDomain(string memory name, address subdomain) external;
 
     /// @notice     Delete the subdomain with a given name
-    /// @dev        This should revert if the domain doesn't exist or if
+    /// @dev        This should revert if the domain does not exist or if
     ///             `canDeleteDomain(msg.sender, name, this)` is `false`
     /// @param      name The subdomain to delete
     function deleteDomain(string memory name) external;

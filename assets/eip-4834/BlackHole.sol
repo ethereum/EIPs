@@ -3,8 +3,8 @@ pragma solidity ^0.8.9;
 
 // NOTE: This is an example for how canMoveDomain can be abused. Do not use this for an actual domain, it might work.
 
-import './IDomain.sol';
-import '@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
+import "./IDomain.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 
 contract BlackHole is IDomain, ERC165Storage {
     //// Constructor
