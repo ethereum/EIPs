@@ -65,11 +65,8 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
             return false;
         }
 
-        // Pointable Check
-        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
-
         // Return
-        return isPointable;
+        return true;
     }
 
     function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
@@ -78,14 +75,11 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
             return false;
         }
 
-        // Pointable Check
-        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
-
         // Auth Check
         bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
 
         // Return
-        return isMovable && isPointable;
+        return isMovable;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {

@@ -81,11 +81,8 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable, ERC165Checker {
         // Is user owner
         bool isTheOwner = this.ownerOf(0) == updater;
 
-        // Pointable Check
-        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
-
         // Return
-        return isTheOwner && isPointable;
+        return isTheOwner;
     }
 
     function canSetDomain(address updater, string memory name, address subdomain) public view returns (bool) {
@@ -97,14 +94,11 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable, ERC165Checker {
         // Is user owner
         bool isTheOwner = this.ownerOf(0) == updater;
 
-        // Pointable Check
-        bool isPointable = !this.supportsInterface(subdomain, type(IDomain).interfaceId) || IDomain(subdomain).canPointSubdomain(updater, name, this);
-
         // Auth Check
         bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
 
         // Return
-        return (isTheOwner || isMovable) && isPointable;
+        return isTheOwner || isMovable;
     }
 
     function canDeleteDomain(address updater, string memory name) public view returns (bool) {

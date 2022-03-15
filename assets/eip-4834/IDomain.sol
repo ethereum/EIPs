@@ -65,8 +65,6 @@ interface IDomain is IERC165 {
 
     /// @notice     Get if an account can create a subdomain with a given name
     /// @dev        This must return `false` if `hasDomain(name)` is `true`.
-    ///             If `subdomain` is a domain, this should return `false` if
-    ///             `subdomain.canPointSubdomain(msg.sender, name, this) is `false`.
     /// @param      updater The account that may or may not be able to create/update a subdomain
     /// @param      name The subdomain name that would be created/updated
     /// @param      subdomain The subdomain that would be set
@@ -75,8 +73,6 @@ interface IDomain is IERC165 {
 
     /// @notice     Get if an account can update or create a subdomain with a given name
     /// @dev        This must return `false` if `hasDomain(name)` is `false`.
-    ///             If `subdomain` is a domain, this should return `false` if
-    ///             `subdomain.canPointSubdomain(msg.sender, name, this) is `false`.
     ///             If `getDomain(name)` is also a domain, this should return `false` if
     ///             `getDomain(name).canMoveSubdomain(msg.sender, this, subdomain)` is `false`.
     /// @param      updater The account that may or may not be able to create/update a subdomain
