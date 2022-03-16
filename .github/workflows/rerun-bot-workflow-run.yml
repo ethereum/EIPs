@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Remove Submodules
+        run: git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
       - name: Setup Node.js Environment
         uses: actions/setup-node@v2
         with:
