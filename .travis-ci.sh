@@ -6,6 +6,7 @@ HTMLPROOFER_OPTIONS="./_site --internal-domains=eips.ethereum.org --check-html -
 if [[ $TASK = 'htmlproofer' ]]; then
   bundle exec jekyll doctor
   bundle exec jekyll build
+  bundle exec git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
   bundle exec htmlproofer $HTMLPROOFER_OPTIONS --disable-external
 
   # Validate GH Pages DNS setup
@@ -13,6 +14,7 @@ if [[ $TASK = 'htmlproofer' ]]; then
 elif [[ $TASK = 'htmlproofer-external' ]]; then
   bundle exec jekyll doctor
   bundle exec jekyll build
+  bundle exec git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
   bundle exec htmlproofer $HTMLPROOFER_OPTIONS --external_only
 elif [[ $TASK = 'eip-validator' ]]; then
   if [[ $(find . -maxdepth 1 -name 'eip-*' | wc -l) -ne 1 ]]; then
@@ -21,5 +23,6 @@ elif [[ $TASK = 'eip-validator' ]]; then
   fi
   eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 elif [[ $TASK = 'codespell' ]]; then
+  git config --file .gitmodules --get-regexp path | awk '{ print $2 }' | xargs -I {} rm -rf {}
   codespell -q4 -I .codespell-whitelist -S ".git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css"
 fi
