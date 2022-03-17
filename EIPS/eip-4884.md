@@ -2,7 +2,7 @@
 eip: 4884
 title: Rentable NFT Standard
 description: An extension for NFT contracts to enable tokens to be rentable
-author: Muhammed Emin Aydın (@muhammedea)
+author: Muhammed Emin Aydın (@muhammedea), Dmitry Savonin (@dmitry123)
 discussions-to: https://github.com/ethereum/EIPs/issues/4918
 status: Draft
 type: Standards Track
