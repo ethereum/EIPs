@@ -2,7 +2,7 @@
 eip: 4911
 title: Composability Extension For ERC-721 Standard
 description: An extension of the ERC-721 standard to enable NFT tokens to own other NFT tokens
-author: Muhammed Emin Aydın (@muhammedea)
+author: Muhammed Emin Aydın (@muhammedea), Dmitry Savonin (@dmitry123)
 discussions-to: https://ethereum-magicians.org/t/erc-4911-composability-extension-for-erc-721-standard/8304
 status: Draft
 type: Standards Track
