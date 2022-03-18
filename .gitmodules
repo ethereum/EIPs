@@ -1,3 +1,0 @@
-[submodule "assets/eip-4834/OpenZeppelin"]
-	path = assets/eip-4834/OpenZeppelin
-	url = https://github.com/OpenZeppelin/openzeppelin-contracts
