@@ -1,7 +1,7 @@
 ---
 eip: 20
 title: Token Standard
-author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
+author: Sean Michael hutcheson II <shutcheson748@gmail.com>
 type: Standards Track
 category: ERC
 status: Final
