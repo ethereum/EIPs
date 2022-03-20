@@ -1,0 +1,191 @@
+---
+eip: <to be assigned>
+title: Generic Token Upgrade Standard
+description: Create a standard interface for upgrading ERC20 token contracts.
+author: John Peterson <john.peterson@coinbase.com>, Roberto Bayardo <roberto.bayardo@coinbase.com>, David Núñez <david@nucypher.com>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2021-11-02
+requires: 20
+---
+
+
+## Abstract
+
+The following standard allows for the implementation of a standard API for ERC20 token upgrades. This standard specifies an interface that supports the conversion of tokens from one contract (called the "source token") to those from another (called the "destination token"), as well as several helper methods to provide basic information about the token upgrade (i.e. the address of the source and destination token contracts, the ratio that source will be upgraded to destination, etc.). 
+
+## Motivation
+
+Token contract upgrades typically require each asset holder to exchange their old tokens for new ones using a bespoke interface provided by the developers.This standard interface will allow asset holders as well as centralized and decentralized exchanges to conduct token upgrades more efficiently since token contract upgrade scripts will be essentially reusable. Standardization will reduce the security overhead involved in verifying the functionality of the upgrade contracts. It will also provide asset issuers clear guidance on how to effectively implement a token upgrade. 
+
+## Specification
+Please Note: Methods marked with (Optional Ext.) are a part of the optional extension for downgrade functionality and may remain unimplemented if downgrade functionality is not required.
+### Token Upgrade Interface Contract
+``` js
+interface IEIPXXXX {
+```
+#### Methods
+
+#### upgradeSource
+
+Returns the address of the original (source) token that will be upgraded.
+
+``` js
+/// @dev A getter to determine the contract that is being upgraded from ("source contract")
+/// @return The address of the source token contract
+function upgradeSource() external view returns(address)
+```
+
+#### upgradeDestination
+
+Returns the address of the token contract that is being upgraded to. 
+
+``` js
+/// @dev A getter to determine the contract that is being upgraded to ("destination contract")
+/// @return The address of the destination token contract
+function upgradeDestination() external view returns(address)
+```
+
+#### isUpgradeActive
+
+Returns the current status of the upgrade contract. Status MUST return "true" when the upgrade contract is functional and serving upgrades. It MUST return "false" when the upgrade contract is not currently serving upgrades. 
+
+``` js
+/// @dev The method will return true when the contract is serving upgrades and otherwise false
+/// @return The status of the upgrade as a boolean
+function isUpgradeActive() external view returns(bool)
+```
+#### isDowngradeActive
+
+Returns the current status of the downgrade functionality. Status MUST return “true” when the upgrade contract is functional and serving downgrades. It MUST return “false” when the upgrade contract is not currently serving downgrades. When the downgrade Optional Ext. is not implemented, this method will always return “false” to signify downgrades are not available. 
+
+``` js
+/// @dev The method will return true when the contract is serving downgrades and otherwise false
+/// @return The status of the downgrade as a boolean
+function isDowngradeActive() external view returns(bool)
+```
+#### ratio
+
+Returns the ratio of destination token to source token that the upgrade will use. E.g. ```(3, 1)``` means the upgrade will provide 3 destination tokens for every 1 source token being upgraded. 
+
+``` js
+/// @dev A getter for the ratio of destination tokens to source tokens received when conducting an upgrade
+/// @return Two uint256, the first represents the numerator while the second represents
+/// the denominator of the ratio of destination tokens to source tokens allotted during the upgrade
+function ratio() external view returns(uint256, uint256)
+```
+
+#### totalUpgraded
+
+Returns the total number of tokens that have been upgraded from source to destination. If the downgrade Optional Ext. is implemented, calls to ```downgrade``` will reduce the ```totalUpgraded``` return value making it possible for the value to decrease between calls. The return value will be strictly increasing if downgrades are not implemented. 
+
+``` js
+/// @dev A getter for the total amount of source tokens that have been upgraded to destination tokens.
+/// The value may not be strictly increasing if the downgrade Optional Ext. is implemented.
+/// @return The number of source tokens that have been upgraded to destination tokens
+function totalUpgraded() external view returns(uint256)
+```
+#### computeUpgrade
+
+Computes the `destinationAmount` of destination tokens that correspond to a given `sourceAmount` of source tokens, according to the predefined conversion ratio, as well as the `sourceRemainder` amount of source tokens that can't be upgraded. For example, let's consider a (3, 2) ratio, which means that 3 destination tokens are provided for every 2 source tokens; then, for a source amount of 5 tokens, `computeUpgrade(5)` should return `(6, 1)`, meaning that 6 destination tokens are expected (in this case, from 4 source tokens) and 1 source token is left as remainder. 
+```js
+/// @dev A method to mock the upgrade call determining the amount of destination tokens received from an upgrade
+/// as well as the amount of source tokens that are left over as remainder
+/// @param sourceAmount The amount of source tokens that will be upgraded
+/// @return destinationAmount A uint256 representing the amount of destination tokens received if upgrade is called
+/// @return sourceRemainder A uint256 representing the amount of source tokens left over as remainder if upgrade is called
+function computeUpgrade(uint256 sourceAmount) external view
+        returns (uint256 destinationAmount, uint256 sourceRemainder)
+```
+
+#### computeDowngrade (Optional Ext.)
+
+Computes the `sourceAmount` of source tokens that correspond to a given `destinationAmount` of destination tokens, according to the predefined conversion ratio, as well as the `destinationRemainder` amount of destination tokens that can't be downgraded. For example, let's consider a (3, 2) ratio, which means that 3 destination tokens are provided for every 2 source tokens; for a destination amount of 13 tokens, `computeDowngrade(13)` should return `(4, 1)`, meaning that 4 source tokens are expected (in this case, from 12 destination tokens) and 1 destination token is left as remainder.
+```js
+/// @dev A method to mock the downgrade call determining the amount of source tokens received from a downgrade
+/// as well as the amount of destination tokens that are left over as remainder
+/// @param destinationAmount The amount of destination tokens that will be downgraded
+/// @return sourceAmount A uint256 representing the amount of source tokens received if downgrade is called
+/// @return destinationRemainder A uint256 representing the amount of destination tokens left over as remainder if upgrade is called
+function computeDowngrade(uint256 destinationAmount) external view
+        returns (uint256 sourceAmount, uint256 destinationRemainder)
+```
+
+
+#### upgrade
+
+Upgrades the `amount` of source token to the destination token in the specified ratio. The destination tokens will be sent to the ```_to``` address. The function should lock the source tokens in the upgrade contract or burn them. If the downgrade Optional Ext. is implemented, the source tokens should be locked instead of burning. The function should `throw` if the caller's address does not have enough source token to upgrade or if ```isUpgradeActive``` is returning ```false```. The function MUST also fire the `Upgrade` event. `approve` Must be called first on the source contract. 
+``` js
+/// @dev A method to conduct an upgrade from source token to destination token.
+/// The call will fail if upgrade status is not true, if approve has not been called
+/// on the source contract, or if sourceAmount is larger than the amount of source tokens at the msg.sender address.
+/// If the ratio would cause an amount of tokens to be destroyed by rounding/truncation, the upgrade call will
+/// only upgrade the nearest whole amount of source tokens returning the excess to the msg.sender address. 
+/// Emits the Upgrade event
+/// @param _to The address the destination tokens will be sent to upon completion of the upgrade
+/// @param sourceAmount The amount of source tokens that will be upgraded 
+function upgrade(address _to, uint256 sourceAmount) external
+```
+
+
+#### downgrade (Optional Ext.)
+Downgrades the `amount` of destination token to the source token in the specified ratio. The source tokens will be sent to the ```_to``` address. The function should unwrap the destination tokens back to the source tokens. The function should `throw` if the caller's address does not have enough destination token to downgrade or if ```isDowngradeActive``` is returning ```false```. The function MUST also fire the `Downgrade` event. `approve` Must be called first on the destination contract. 
+``` js
+/// @dev A method to conduct a downgrade from destination token to source token.
+/// The call will fail if downgrade status is not true, if approve has not been called
+/// on the destination contract, or if destinationAmount is larger than the amount of destination tokens at the msg.sender address.
+/// If the ratio would cause an amount of tokens to be destroyed by rounding/truncation, the downgrade call will only downgrade
+/// the nearest whole amount of destination tokens returning the excess to the msg.sender address. 
+///  Emits the Downgrade event
+/// @param _to The address the source tokens will be sent to upon completion of the downgrade
+/// @param destinationAmount The amount of destination tokens that will be downgraded 
+function downgrade(address _to, uint256 destinationAmount) external
+```
+
+### Events
+
+#### Upgrade
+
+Must trigger when tokens are upgraded using calls to ```upgrade```.
+
+``` js
+/// @param _from Address that called upgrade
+/// @param _to Address that destination tokens were sent to upon completion of the upgrade
+/// @param sourceAmount Amount of source tokens that were upgraded
+/// @param destinationAmount Amount of destination tokens sent to the _to address
+event Upgrade(address indexed _from, address indexed _to, uint256 sourceAmount, uint256 destinationAmount)
+```
+
+#### Downgrade (Optional Ext.)
+
+Must trigger when tokens are downgraded using calls to ```downgrade```.
+
+``` js
+/// @param _from Address that called downgrade
+/// @param _to Address that source tokens were sent to upon completion of the downgrade
+/// @param sourceAmount Amount of source tokens sent to the _to address
+/// @param destinationAmount Amount of destination tokens that were downgraded
+event Downgrade(address indexed _from, address indexed _to, uint256 sourceAmount, uint256 destinationAmount)
+}
+```
+
+## Rationale
+There have been several notable ERC20 upgrades (Ex. Golem: GNT -> GLM) where the upgrade functionality is written directly into the token contracts. We view this as a suboptimal approach to upgrades since it tightly couples the upgrade with the existing tokens. This EIP promotes the use of a third contract to facilitate the token upgrade to decouple the functionality of the upgrade from the functionality of the token contracts. Standardizing the upgrade functionality will allow asset holders and exchanges to write simplified reusable scripts to conduct upgrades which will reduce the overhead of conducting upgrades in the future. The interface aims to be intentionally broad leaving much of the specifics of the upgrade to the implementer, so that the token contract implementations do not interfere with the upgrade process. Finally, we hope to create a greater sense of security and validity for token upgrades by enforcing strict means of disposing of the source tokens during the upgrade. This is achieved by the specification of the  ```upgrade``` method. The agreed upon norm is that burnable tokens shall be burned. Otherwise, tokens shall be effectively burned by being sent to the ```0x00``` address. When downgrade Optional Ext. is implemented, the default is instead to lock source tokens in the upgrade contract to avoid a series of consecutive calls to ```upgrade``` and ```downgrade``` from artificially inflating the supply of either token (source or destination). 
+
+## Backwards Compatibility
+There are no breaking backwards compatibility issues. There are previously implemented token upgrades that likely do not adhere to this standard. In these cases, it may be relevant for the asset issuers to communicate that their upgrade is not EIP-XXXX compliant.
+
+## Test Cases
+Link to test cases: https://github.com/coinbase/eip-token-upgrade 
+
+## Reference Implementation
+Link to reference implementations: https://github.com/coinbase/eip-token-upgrade 
+
+## Security Considerations
+The main security consideration is ensuring the implementation of the interface handles the source tokens during the upgrade in such a way that they are no longer accessible. Without careful handling, the validity of the upgrade may come into question since source tokens could potentially be upgraded multiple times. This is why EIP-XXXX will strictly enforce the use of ```burn``` for source tokens that are burnable. For non-burnable tokens, the accepted method is to send the source tokens to the ```0x00``` address. When the downgrade Optional Ext. is implemented, the constraint will be relaxed, so that the source tokens can be held by the upgrade contract.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
