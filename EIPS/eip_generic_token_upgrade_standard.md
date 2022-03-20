@@ -180,7 +180,7 @@ There have been several notable ERC20 upgrades (Ex. Golem: GNT -> GLM) where the
 There are no breaking backwards compatibility issues. There are previously implemented token upgrades that likely do not adhere to this standard. In these cases, it may be relevant for the asset issuers to communicate that their upgrade is not EIP-XXXX compliant.
 
 ## Test Cases
-Link to test cases: https://github.com/coinbase/eip-token-upgrade 
+WIP
 
 ## Reference Implementation
 ``` solidity
@@ -343,7 +343,7 @@ contract SourceUpgrade is  IEIP4931 {
     }
 }
 ```
-Link to reference implementations: https://github.com/coinbase/eip-token-upgrade 
+
 
 ## Security Considerations
 The main security consideration is ensuring the implementation of the interface handles the source tokens during the upgrade in such a way that they are no longer accessible. Without careful handling, the validity of the upgrade may come into question since source tokens could potentially be upgraded multiple times. This is why EIP-XXXX will strictly enforce the use of ```burn``` for source tokens that are burnable. For non-burnable tokens, the accepted method is to send the source tokens to the ```0x00``` address. When the downgrade Optional Ext. is implemented, the constraint will be relaxed, so that the source tokens can be held by the upgrade contract.
