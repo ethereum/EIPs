@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Generic Token Upgrade Standard
 description: Create a standard interface for upgrading ERC20 token contracts.
 author: John Peterson <john.peterson@coinbase.com>, Roberto Bayardo <roberto.bayardo@coinbase.com>, David Núñez <david@nucypher.com>
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/pull/4931
 status: Draft
 type: Standards Track
 category: ERC
