@@ -23,6 +23,10 @@ contract BlackHole is IDomain, ERC165Storage {
     function getDomain(string memory name) public view returns (address) {
         return this;
     }
+    
+    function listDomains() external view returns (string[]) {
+        return [];
+    }
 
     function createDomain(string memory name, address subdomain) public {
         require(false);

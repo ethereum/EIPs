@@ -11,6 +11,8 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
     //// States
     mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
+    mapping(string => uint) public subdomainIndeces;
+    string[] public subdomainList;
 
     //// Constructor
 
@@ -30,11 +32,19 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
         return subdomains[name];
     }
 
-    function createDomain(string memory name, address subdomain) public {
+    function listDomains() external view returns (string[]) {
+        return subdomainList;
+    }
+
+    function createDomain(string memory name, IDomain subdomain) public {
+        require(!this.hasDomain(name));
         require(this.canCreateDomain(msg.sender, name, subdomain));
         
         subdomainsPresent[name] = true;
         subdomains[name] = subdomain;
+
+        subdomainIndeces[name] = subdomainList.length;
+        subdomainList.push(name);
 
         emit SubdomainCreate(msg.sender, name, subdomain);
     }
@@ -52,6 +62,7 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
         require(this.canDeleteDomain(msg.sender, name));
 
         subdomainsPresent[name] = false; // Only need to mark it as deleted
+        delete subdomainList[subdomainIndeces[name]]; // Remove subdomain from list
 
         emit SubdomainDelete(msg.sender, name, subdomains[name]);
     }
