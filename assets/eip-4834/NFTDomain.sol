@@ -42,7 +42,7 @@ contract NFTDomain is IDomain, ERC165Storage, ERC721Enumerable, ERC165Checker {
         return subdomains[name];
     }
 
-    function listDomains() external view returns (string[]) {
+    function listDomains() external view returns (string[] memory) {
         return subdomainList;
     }
 

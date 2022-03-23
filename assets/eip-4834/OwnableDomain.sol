@@ -34,7 +34,7 @@ contract OwnableDomain is IDomain, ERC165Storage, Ownable, ERC165Checker {
         return subdomains[name];
     }
 
-    function listDomains() external view returns (string[]) {
+    function listDomains() external view returns (string[] memory) {
         return subdomainList;
     }
 

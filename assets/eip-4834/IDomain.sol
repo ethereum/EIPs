@@ -44,7 +44,7 @@ interface IDomain is IERC165 {
 
     /// @notice     Query all subdomains. Must revert if the list of domains is unknown or infinite.
     /// @return     The list of all subdomains.
-    function listDomains() external view returns (string[]);
+    function listDomains() external view returns (string[] memory);
 
     /// @notice     Create a subdomain with a given name
     /// @dev        This should revert if `canCreateDomain(msg.sender, name, pointer)` is `false` or if the domain exists

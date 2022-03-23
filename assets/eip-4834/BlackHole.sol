@@ -24,7 +24,7 @@ contract BlackHole is IDomain, ERC165Storage {
         return this;
     }
     
-    function listDomains() external view returns (string[]) {
+    function listDomains() external view returns (string[] memory) {
         return [];
     }
 
