@@ -59,7 +59,8 @@ void sendEngage(); //This function sends the hash of the shared key to complete 
 //Declaration of the variable to save the state of the SmartNFT
 STATES tokenState;
 
-//Declaration of the variables fot the private/public Keys and the Address associated
+//Declaration of the variables for the private/public Keys and the Address associated
+
 unsigned char privateKey_ethAccount[32];
 unsigned char publicKey_ethAccount[64];
 unsigned char ethAddress[20];
