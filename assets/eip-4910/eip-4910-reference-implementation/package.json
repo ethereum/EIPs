@@ -1,0 +1,29 @@
+{
+  "name": "nft-royalty",
+  "version": "1.0.0",
+  "description": "Royalty Bearing NFTs: Extending the ERC721 Standard to include Royalty Allocations",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eth-gas-reporter": "^0.2.22",
+    "lite-server": "^2.6.1",
+    "prettier": "^2.4.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.18",
+    "solidity-coverage": "^0.7.18"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2",
+    "@truffle/hdwallet-provider": "^2.0.0",
+    "abdk-libraries-solidity": "^3.0.0",
+    "truffle-assertions": "^0.9.2",
+    "truffle-contract-size": "^2.0.1"
+  }
+}
