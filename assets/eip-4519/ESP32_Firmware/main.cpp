@@ -52,7 +52,8 @@ enum STATES{
 void setupWifi(); //This function is the same as the wifi example of the ESP32 Arduino Wifi
 uint8_t HexTo4Bits(uint8_t Hex); //This function is used to change an hexadecimal defined in ASCII character to a uint8_t
 STATES queryTokenStatus(); //This function is used to recover the information of the SmartNFT associated to this device
-void hex2Char(unsigned char *inHex, unsigned char *charH, unsigned char *charL); //This funtion is needed to convert an uint8_t to two ASCII characters
+void hex2Char(unsigned char *inHex, unsigned char *charH, unsigned char *charL); //This function is needed to convert an uint8_t to two ASCII characters
+
 void sendEngage(); //This function sends the hash of the shared key to complete the transaction in Ethereum
 
 //Declaration of the variable to save the state of the SmartNFT
