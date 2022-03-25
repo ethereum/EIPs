@@ -570,7 +570,8 @@ void setupWifi(){
     if (wificounter >= 10)
     {
         printf("Restarting ...\n");
-        ESP.restart(); //Targetting 8266 & ESP32. You may need to replace this
+        ESP.restart(); //Targeting 8266 & ESP32. You may need to replace this
+
     }
 
     delay(10);
