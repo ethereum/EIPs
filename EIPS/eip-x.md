@@ -1,31 +1,33 @@
 ---
 eip: <to be assigned>
-title: Revokable Delegation for Externally Owned Accounts
-description: A simple extension of EIP-3074 that includes two opcodes that enable revokability.
+title: Contract Code for Externally Owned Accounts
+description: An opcode that allows EOAs to publish contract code at their address.
 author: Dan Finlay (@danfinlay), Sam Wilson (@SamWilsn)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
 created: 2022-03-26
-requires: 3074, 3607
+requires: 3607
 ---
 
 ## Abstract
 
-[EIP-3074: AUTH and AUTHCALL opcodes](https://eips.ethereum.org/EIPS/eip-3074) provides op-codes that could enable any externally owned account (EOA) to delegate its signing authority to an arbitrary smart contract. While extremely powerful, the lack of revokability loses some significant possible security benefits. In this proposal, we describe one additional opcode, `AUTH_USURP`, which allows an EOA to publish code at its own address, which combined with [EIP 3607: Reject transactions from senders with deployed code](https://eips.ethereum.org/EIPS/eip-3607) effectively revokes the original signing key's authority.
+This EIP introduces a new opcode, `AUTH_USURP`, which allows an EOA to publish code at its own address, which combined with [EIP 3607: Reject transactions from senders with deployed code](https://eips.ethereum.org/EIPS/eip-3607) effectively revokes the original signing key's authority.
 
 ## Motivation
 
-EOAs currently hold a significant amount of user-controlled value on Ethereum blockchains, but are limited by the protocol in a variety of critical ways. Batching to save gas, MetaTransactions to reduce the need to hold ether yourself, as well as countless other benefits that come from having a contract account or account abstraction, like choosing one's own authorization algorithm, spending limits, social recovery, key rotation, arbitrary transitive capability delegation, and just about anything else we can imagine.
+EOAs currently hold a significant amount of user-controlled value on Ethereum blockchains, but are limited by the protocol in a variety of critical ways. Rotating keys for security, batching to save gas, MetaTransactions to reduce the need to hold ether yourself, as well as countless other benefits that come from having a contract account or account abstraction, like choosing one's own authorization algorithm, spending limits, social recovery, key rotation, arbitrary transitive capability delegation, and just about anything else we can imagine.
 
-These benefits can be achieved with new users using new contract account types, or new contracts adopting new standards to enable app-layer account abstraction (like [EIP 2585: Minimal Native Meta Transaction Forwarder](https://github.com/wighawag/EIPs/blob/eip-2585/EIPS/eip-2585.md) or [EIP 4337: account abstraction without Ethereum protocol changes](https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a)), but these would neglect the vast majority of existing Ethereum users' accounts. Whether we like it or not, those users exist today, and they also need a path to achieving their security goals.
+These benefits can be achieved with new users using new contract accounts, or new contracts adopting new standards to enable app-layer account abstraction (like [EIP 2585: Minimal Native Meta Transaction Forwarder](https://github.com/wighawag/EIPs/blob/eip-2585/EIPS/eip-2585.md) or [EIP 4337: account abstraction without Ethereum protocol changes](https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a)), but these would neglect the vast majority of existing Ethereum users' accounts. Whether we like it or not, those users exist today, and they also need a path to achieving their security goals.
 
 Those added benefits would mostly come along with EIP-3074 itself, but with one significant shortcoming, the presence of the original signing key. This would mean while an EOA could delegate its authority to some _additional_ contract, the key itself would linger, continuing to provide an attack vector, and a constantly horrifying question lingering: Have I been leaked?
 
 Also, today EOAs have no path to key rotation of any sort. A leaked private key (either through phishing, or accidental access) cannot be taken back: The information once shared cannot be proven un-known, you can't put the toothpaste back in the tube. A prudent user concerned about their key security might perform [the current process of migrating to a new secret recovery phrase](https://metamask.zendesk.com/hc/en-us/articles/360015289952-How-to-migrate-to-a-new-Secret-Recovery-Phrase) but this both requires a transaction per asset (making it extremely expensive), and some powers (like hard-coded owners in a smart contract) might not be transferrable at all.
 
 We know that EOAs cannot provide ideal user experience or safety, and [we need to change the norm to contract-based accounts](https://vitalik.ca/general/2021/01/11/recovery.html), but if that transition is designed without regard for the vast majority of users today, for whom Ethereum has always meant EOAs, we will be continually struggling against the need to support both of these userbases. This EIP provides a path not [to enshrine EOAs](https://ethereum-magicians.org/t/we-should-be-moving-beyond-eoas-not-enshrining-them-even-further-eip-3074-related/6538), but to provide a migration path off of them, once and for all.
+
+This proposal combines well with [EIP-3074: AUTH and AUTHCALL opcodes](https://eips.ethereum.org/EIPS/eip-3074), which provides op-codes that could enable any externally owned account (EOA) to delegate its signing authority to an arbitrary smart contract. It allows an EOA to assign a contract account on its behalf _without forgoing its own powers_, while this one provides a final migration path off the EOA's original signing key.
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
