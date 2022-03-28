@@ -5,7 +5,7 @@ description: NFT (ERC721) with only one token minted
 author: Victor Munoz (@victormunoz)
 discussions-to: https://ethereum-magicians.org/t/erc721-minting-only-one-token/8602/2
 status: Draft
-type: Standards
+type: Standards Track
 category (*only required for Standards Track): ERC
 created: 2022-03-25
 requires (*optional): 721
