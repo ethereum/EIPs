@@ -35,7 +35,9 @@ No backwards compatibility issues devised.
 ## Reference Implementation
 Add the variable `_minted` in the contract:
 
+``` solidity
     bool private _minted;
+```a
 
 In the constructor, automint the first token and set the variable to true:
 
