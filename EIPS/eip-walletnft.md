@@ -30,7 +30,7 @@ Also, a `tokenTransfer` function should be added in order to allow the contract 
 The main motivation is to keep the contract compatible with current ERC721 platforms. That's why we maintain all the functions of the ERC721 standard even if they cannot be used (eg. mint) instead of just removing them.
 
 ## Backwards Compatibility
-No backwards compatibility issues devised.
+There are no backwards compatibility issues.
 
 ## Reference Implementation
 Add the variable `_minted` in the contract:
