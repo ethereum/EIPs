@@ -12,7 +12,8 @@ requires: 721
 ---
 
 ## Abstract
-NFT associated uniquely with a single contract address.
+The following describes standard functions for an ERC721 compatible contract that can only only one minted token.
+This allows an NFT to be associated uniquely with a single contract address.
 
 ## Motivation
 If the ERC721 was modified to mint only 1 token (per contract), then the contract address could be identified uniquely with that minted token (instead of the tuple contract address + token id, as ERC721 requires).
