@@ -1,0 +1,79 @@
+---
+eip: <to be assigned>
+title: Entangled Tokens
+description: An ERC721-compatible standard with only two tokens minted that are tied together
+author: Victor Munoz (@victormunoz)
+discussions-to: https://ethereum-magicians.org/t/entangled-tokens/8702
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-03-28
+requires: 721
+---
+
+## Abstract
+We define entangled tokens to A and B to the tokens that share a same wallet, so that any transaction with the wallet could be operated by any of them.
+
+## Motivation
+The functionality is similar to the entanglement of two particles but with tokens, in the sense that whatever changes the state of A it affects B. Changes in the state of a token are actuated on a wallet by means of transfer to and from the wallet of whatever fungible and non-fungible tokens.
+
+Initially both minted tokens belong to the contract creator, but they can be transferred normally as any other NFT, so that they may belong to different users. The two users owning tokens can operate with the contract wallets. Therefore, the contract wallet (which may contain balances in several tokens) is “tangled” with both users. If a user makes some transfer, automatically the other user “sees” it.
+
+## Specification
+A tangled token is an NFT (ERC-721) with a modification such that it does not mint only one token at the contract deployment, but it mints two instead, and the token owners have access to the contract wallet.
+
+The constructor should mint the unique token of the contract, and then the mint function should add a restriction to avoid more minting.
+
+Also, a `tokenTransfer` function should be added in order to allow the contract owner to transact with the ERC20 tokens owned by the contract/NFT itself.
+
+## Rationale
+We advocate the entangled tokens have key utility for the value preservation (vreservation) of digital assets, though other further applications are here explained. In the case of value preservation, its importance arises since we'll see a massive migration of value (in the history of mankind) onto the Blockchain along with a new identity forged on blockchain for this value. This value needs to be preserved. So we see how value migrates (1), tokenises (2) and preserves (3) the value of digital assets as NFT as a means of a totally new identity and wealth management for a private and safe assets scrow for all, and redefining the today’s role of consumers towards a more co-creation and co-ownership of locals.
+
+The entangled tokens have important applications such us keeping permanent contact of two users.
+
+An use case is to keep contact between an artist and an buyer of its NFTs. If an artist T has created a digital piece of art P with an NFT with wallet, then T creates 2 entangled tokens A and B so that he keeps A and transfer B to the wallet of P. By construction of entangled tokens, only one transfer is possible for them, thus the artist proofs he’s been the creator of P by sending a transaction to A that is visible from B. Otherwise, the owner of P might check the authenticity of the artist by sending a transaction to B so that the artist might proof by showing the outcome out of A.
+
+An extension of this first use case is when one user U and its creation in the form of an NFT T with wallet then the user U creates and transfers an entangled token A to T, and U keeps the entangled token B in the U’s wallet.  
+
+In both cases it is advisable that the entangled tokens cannot be re-transferred, that means that only once can be transferred from their supply to the definite wallet, of the NFT or of the user.
+
+These applications of entangled tokens are envisaged to be useful for 
+1.	NFT authorship / art creation
+2.	Distribution of royalties by the creator.
+3.	Authenticity of a work of art: creation limited to the author (e.g. only 1000 copies if there are 1000 1000 entangled tokens in that NFT).
+4.	Usowners
+5.	Reformulation of property rights: the one who owns the property receives it without having to follow in the footsteps of the owners.
+6.	Identity: Only those credentials that have an entangled token with you are related to you.
+7.	Vreservers (value-reservers).
+
+
+## Backwards Compatibility
+No backwards compatibility issues devised.
+
+## Reference Implementation
+Mint two tokens, and only two, at the contract constructor, and set the `minted` property to true:
+
+```solidity
+    bool private _minted;
+
+    constructor(string memory name, string memory symbol, string memory base_uri) ERC721(name, symbol) {
+        baseUri = base_uri;
+        mint(msg.sender,0);
+        mint(msg.sender,1);
+        _minted = true;
+    }
+```
+
+Add additional functions to allow both NFT user owners to operate with other ERC20 tokens owned by the contract:
+
+```solidity
+    function spendTokens(WalletNFT2 wallet, IERC20 token_address, address recipient, uint256 amount) public onlyOwners {
+        wallet.transferTokens(token_address, recipient, amount);
+    }
+```
+
+## Security Considerations
+There are no backwards compatibility issues.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
