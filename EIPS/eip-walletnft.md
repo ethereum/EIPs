@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4944
 title: NFT with wallet
 description: An ERC721-compatible single-token NFT
 author: Victor Munoz (@victormunoz)
