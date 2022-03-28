@@ -41,11 +41,13 @@ Add the variable `_minted` in the contract:
 
 In the constructor, automint the first token and set the variable to true:
 
+``` solidity
     constructor(string memory name, string memory symbol, string memory base_uri) ERC721(name, symbol) {
         baseUri = base_uri;
         mint(msg.sender,0);
         _minted = true;
     }
+```a
 
 Add additional functions to interact with the NFT properties (for instance, ERC20):
 
