@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: NFT with wallet
-description: NFT (ERC721) with only one token minted
+description: An ERC721-compatible single-token NFT
 author: Victor Munoz (@victormunoz)
 discussions-to: https://ethereum-magicians.org/t/erc721-minting-only-one-token/8602/2
 status: Draft
