@@ -51,6 +51,7 @@ In the constructor, automint the first token and set the variable to true:
 
 Add additional functions to interact with the NFT properties (for instance, ERC20):
 
+``` solidity
     modifier onlyOwner() {
         require(balanceOf(msg.sender) > 0, "Caller is not the owner of the NFT");
         _;
@@ -59,6 +60,7 @@ Add additional functions to interact with the NFT properties (for instance, ERC2
     function transferTokens(IERC20 token, address recipient, uint256 amount) public onlyOwner {
         token.transfer(recipient, amount);
     }
+```a
 
 
 ## Security Considerations
