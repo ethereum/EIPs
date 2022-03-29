@@ -1,5 +1,10 @@
+// using ethereumjs-util 7.1.3
 const ethUtil = require('ethereumjs-util');
+
+// using ethereumjs-abi 0.6.9
 const abi = require('ethereumjs-abi');
+
+// using chai 4.3.4
 const chai = require('chai');
 
 const typedData = {
@@ -76,7 +81,7 @@ function encodeType(primaryType) {
 }
 
 function typeHash(primaryType) {
-    return ethUtil.sha3(encodeType(primaryType));
+    return ethUtil.keccakFromString(encodeType(primaryType), 256);
 }
 
 function encodeData(primaryType, data) {
@@ -92,11 +97,11 @@ function encodeData(primaryType, data) {
         let value = data[field.name];
         if (field.type == 'string' || field.type == 'bytes') {
             encTypes.push('bytes32');
-            value = ethUtil.sha3(value);
+            value = ethUtil.keccakFromString(value, 256);
             encValues.push(value);
         } else if (types[field.type] !== undefined) {
             encTypes.push('bytes32');
-            value = ethUtil.sha3(encodeData(field.type, value));
+            value = ethUtil.keccak256(encodeData(field.type, value));
             encValues.push(value);
         } else if (field.type.lastIndexOf(']') === field.type.length - 1) {
             throw 'TODO: Arrays currently unimplemented in encodeData';
@@ -110,11 +115,11 @@ function encodeData(primaryType, data) {
 }
 
 function structHash(primaryType, data) {
-    return ethUtil.sha3(encodeData(primaryType, data));
+    return ethUtil.keccak256(encodeData(primaryType, data));
 }
 
 function signHash() {
-    return ethUtil.sha3(
+    return ethUtil.keccak256(
         Buffer.concat([
             Buffer.from('1901', 'hex'),
             structHash('EIP712Domain', typedData.domain),
@@ -123,7 +128,7 @@ function signHash() {
     );
 }
 
-const privateKey = ethUtil.sha3('cow');
+const privateKey = ethUtil.keccakFromString('cow', 256);
 const address = ethUtil.privateToAddress(privateKey);
 const sig = ethUtil.ecsign(signHash(), privateKey);
 

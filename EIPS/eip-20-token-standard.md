@@ -1,1 +1,1 @@
-Moved to [eip-20.md](./eip-20.md).
+Moved to [EIP-20](./eip-20.md).
