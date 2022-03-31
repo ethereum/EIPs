@@ -46,7 +46,6 @@ These applications of entangled tokens are envisaged to be useful for
 6.	Identity: Only those credentials that have an entangled token with you are related to you.
 7.	Vreservers (value-reservers).
 
-
 ## Backwards Compatibility
 No backwards compatibility issues devised.
 
