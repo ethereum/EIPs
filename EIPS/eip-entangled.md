@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 4950
 title: Entangled Tokens
 description: An ERC721-compatible standard with only two tokens minted that are tied together
 author: Victor Munoz (@victormunoz)
