@@ -1,5 +1,5 @@
 ---
-eip: buy-russia-for-free-gas
+eip: 4961
 title: Buy Russia for free gas
 description: Ethereum Foundation should buy Russia to stop war on Ukraine and obtain virtually unlimited gas
 author: Nikita Kolmogorov (@backmeupplz)
