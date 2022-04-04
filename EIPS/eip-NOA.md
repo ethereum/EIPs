@@ -124,7 +124,7 @@ where the username is the string representation of the username and nameService 
 
 ### Name Derived Address (INameOwnedAccount.addressOfName())
 With the bytes format mentioned above, we can follow the same rule of CREATE2 opcode to compute the NOA address from nameService and hash of the username. By restricting the deployer address as address zero we can ensure it won’t clash with existing smart contract account addresses:
-```address(keccak256(0xff, keccak256(“eipxxxx.addressOfName”), nameService, keccak256(username)))````.
+```address(keccak256(0xff, keccak256(“eipxxxx.addressOfName”), nameService, keccak256(username)))```.
 
 ### Ownership of a Name (INameOwnedAccount.isNameOwner())
 Normally we can get the owner from the name service and compare it with the message sender. We recommend the name service to define an owner function in the same format as [ENS.sol](https://github.com/ensdomains/ens/blob/master/contracts/ENS.sol).
