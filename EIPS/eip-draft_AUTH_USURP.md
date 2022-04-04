@@ -1,38 +1,71 @@
 ---
 eip: <to be assigned>
-title: Contract Code for Externally Owned Accounts
-description: An opcode that allows EOAs to publish contract code at their address.
+title: Replace Externally Owned Accounts with `AUTHUSURP`
+description: Allow migrating away from ECDSA by deploying code in place of an externally owned account.
 author: Dan Finlay (@danfinlay), Sam Wilson (@SamWilsn)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
 created: 2022-03-26
-requires: 3607
+requires: 3074, 3607
 ---
 
 ## Abstract
 
-This EIP introduces a new opcode, `AUTH_USURP`, which allows an EOA to publish code at its own address, which combined with [EIP 3607: Reject transactions from senders with deployed code](https://eips.ethereum.org/EIPS/eip-3607) effectively revokes the original signing key's authority.
+This EIP introduces a new opcode, `AUTHUSURP`, which deploys code at an [EIP-3074](./eip-3074.md) authorized address. For externally owned accounts (EOAs), together with [EIP-3607](./eip-3607.md), this effectively revokes the original signing key's authority.
 
 ## Motivation
 
-EOAs currently hold a significant amount of user-controlled value on Ethereum blockchains, but are limited by the protocol in a variety of critical ways. Rotating keys for security, batching to save gas, MetaTransactions to reduce the need to hold ether yourself, as well as countless other benefits that come from having a contract account or account abstraction, like choosing one's own authorization algorithm, spending limits, social recovery, key rotation, arbitrary transitive capability delegation, and just about anything else we can imagine.
+EOAs currently hold a significant amount of user-controlled value on Ethereum blockchains, but are limited by the protocol in a variety of critical ways. These accounts do not support rotating keys for security, batching to save gas, or sponsored transactions to reduce the need to hold ether yourself. There are countless other benefits that come from having a contract account or account abstraction, like choosing one's own authentication algorithm, setting spending limits, enabling social recovery, allowing key rotation, arbitrarily and transitively delegating capabilities, and just about anything else we can imagine.
 
-These benefits can be achieved with new users using new contract accounts, or new contracts adopting new standards to enable app-layer account abstraction (like [EIP 2585: Minimal Native Meta Transaction Forwarder](https://github.com/wighawag/EIPs/blob/eip-2585/EIPS/eip-2585.md) or [EIP 4337: account abstraction without Ethereum protocol changes](https://medium.com/infinitism/erc-4337-account-abstraction-without-ethereum-protocol-changes-d75c9d94dc4a)), but these would neglect the vast majority of existing Ethereum users' accounts. Whether we like it or not, those users exist today, and they also need a path to achieving their security goals.
+New users have access to these benefits using smart contract wallets, and new contracts can adopt recent standards to enable app-layer account abstraction (like [EIP-4337](./eip-4337.md)), but these would neglect the vast majority of existing Ethereum users' accounts. These users exist today, and they also need a path to achieving their security goals.
 
-Those added benefits would mostly come along with EIP-3074 itself, but with one significant shortcoming, the presence of the original signing key. This would mean while an EOA could delegate its authority to some _additional_ contract, the key itself would linger, continuing to provide an attack vector, and a constantly horrifying question lingering: Have I been leaked?
+Those added benefits would mostly come along with EIP-3074 itself, but with one significant shortcoming: the original signing key has ultimate authority for the account. While an EOA could delegate its authority to some _additional_ contract, the key itself would linger, continuing to provide an attack vector, and a constantly horrifying question lingering: have I been leaked? In other words, EIP-3074 can only grant authority to additional actors, but never revoke it.
 
-Also, today EOAs have no path to key rotation of any sort. A leaked private key (either through phishing, or accidental access) cannot be taken back: The information once shared cannot be proven un-known, you can't put the toothpaste back in the tube. A prudent user concerned about their key security might perform [the current process of migrating to a new secret recovery phrase](https://metamask.zendesk.com/hc/en-us/articles/360015289952-How-to-migrate-to-a-new-Secret-Recovery-Phrase) but this both requires a transaction per asset (making it extremely expensive), and some powers (like hard-coded owners in a smart contract) might not be transferrable at all.
+Today's EOAs have no option to rotate their keys. A leaked private key (either through phishing, or accidental access) cannot be revoked. A prudent user concerned about their key security might migrate to a new secret recovery phrase but at best this requires a transaction per asset (making it extremely expensive), and at worst, some powers (like hard-coded owners in a smart contract) might not be transferable at all.
 
-We know that EOAs cannot provide ideal user experience or safety, and [we need to change the norm to contract-based accounts](https://vitalik.ca/general/2021/01/11/recovery.html), but if that transition is designed without regard for the vast majority of users today, for whom Ethereum has always meant EOAs, we will be continually struggling against the need to support both of these userbases. This EIP provides a path not [to enshrine EOAs](https://ethereum-magicians.org/t/we-should-be-moving-beyond-eoas-not-enshrining-them-even-further-eip-3074-related/6538), but to provide a migration path off of them, once and for all.
+We know that EOAs cannot provide ideal user experience or safety, and there is a desire in the community to change the norm to contract-based accounts, but if that transition is designed without regard for the vast majority of users today—for whom Ethereum has always meant EOAs—we will be continually struggling against the need to support both of these userbases. This EIP provides a path not to enshrine EOAs, but to provide a migration path off of them, once and for all.
 
-This proposal combines well with [EIP-3074: AUTH and AUTHCALL opcodes](https://eips.ethereum.org/EIPS/eip-3074), which provides op-codes that could enable any externally owned account (EOA) to delegate its signing authority to an arbitrary smart contract. It allows an EOA to assign a contract account on its behalf _without forgoing its own powers_, while this one provides a final migration path off the EOA's original signing key. Additionally, this EIP alone requires each account to submit a transaction itself to perform the migration (requiring gas), but if combined with EIP-3074, even accounts with no ether for gas would be able to sign delegation messages capable of deploying contract code at their addresses.
+This proposal combines well with, but is distinct from, [EIP-3074](./eip-3074.md), which provides opcodes that could enable any externally owned account (EOA) to delegate its signing authority to an arbitrary smart contract. It allows an EOA to authorize a contract account to act on its behalf _without forgoing its own powers_, while this EIP provides a final migration path off the EOA's original signing key.
 
 ## Specification
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+### Conventions
+
+  - **`top - N`** - the `N`th most recently pushed value on the EVM stack, where `top - 0` is the most recent.
+  - **invalid execution** - execution that is invalid and must exit the current execution frame immediately, consuming all remaining gas (in the same way as a stack underflow or invalid jump).
+  - **empty account** - account where its balance is 0, its nonce is 0, and it has no code.
+
+### `AUTHUSURP` (`0xf8`)
+
+A new opcode `AUTHUSURP` shall be created at `0xf8`. It shall take two stack elements and return one stack element.
+
+#### Input
+
+| Stack     | Value        |
+| --------- | ------------ |
+| `top - 0` | `offset`     |
+| `top - 1` | `length`     |
+
+#### Output
+
+| Stack      | Value     |
+| ---------- | --------- |
+| `top - 0`  | `address` |
+
+#### Behavior
+
+`AUTHUSURP` behaves identically to `CREATE` (`0xf0`), except as described below:
+
+  - If `authorized` (as defined in EIP-3074) is unset, execution is invalid.
+  - If `authorized` points to an empty account, then `static_gas` remains 32,000. Otherwise, `static_gas` shall be 7,000.
+  - The initcode runs at the address `authorized`.
+  - If the initcode returns no bytes, its execution frame must be reverted, and `AUTHUSURP` returns zero.
+  - After executing the initcode, but before the returned code is deployed, if the account's code is non-empty, the initcode's execution frame must be reverted, and `AUTHUSURP` returns zero.
+  - The code is deployed into the account with the address `authorized`.
 
 ## Rationale
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
