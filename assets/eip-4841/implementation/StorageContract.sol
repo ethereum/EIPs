@@ -4,16 +4,16 @@ import {IStorageContract} from "./IStorageContract.sol";
 
 /**
  * @title StorageContract
- * @notice A contract that stores SVG image tags.
+ * @notice A contract that stores XML tags of SVG image.
  * @dev See {IStorageContract}
  */
 contract StorageContract is IStorageContract {
 
-    // Asset List
+    // Asset list
     mapping(uint256 => string) private _assetList;
 
     /**
-     * @dev Write the values of assets (SVG image tags) to be stored in this `StorageContract`.
+     * @dev Write the values of assets (XML tags of SVG image) to be stored in this `StorageContract`.
      */
     constructor () {
         // Setting Assets such as  _assetList[1234] = "<circle ...";

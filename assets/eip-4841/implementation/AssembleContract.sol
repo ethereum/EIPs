@@ -5,7 +5,7 @@ import {IStorageContract} from "./IStorageContract.sol";
 
 /**
  * @title AssembleContract
- * @notice A contract that assembles SVG images.
+ * @notice A contract that assembles SVG image.
  */
 contract AssembleContract is IAssembleContract {
 
@@ -23,7 +23,7 @@ contract AssembleContract is IAssembleContract {
      * @dev Register address values of `StorageContract`. Pay attention to the order when registering.
      */
     constructor (address[] memory assetStorageAddrList_) {
-        for (uint256 i=0; i < assetStorageAddrList_.length; i++) {
+        for (uint256 i = 0; i < assetStorageAddrList_.length; i++) {
             addStorage(assetStorageAddrList_[i]);
         }
     }
@@ -36,7 +36,7 @@ contract AssembleContract is IAssembleContract {
 
         imageString = string(abi.encodePacked(imageString, "<svg version='1.1' xmlns='http://www.w3.org/2000/svg'>"));
 
-        for (uint256 i=0; i < attrs_.length; i++) {
+        for (uint256 i = 0; i < attrs_.length; i++) {
             imageString = string(
                 abi.encodePacked(
                     imageString,
