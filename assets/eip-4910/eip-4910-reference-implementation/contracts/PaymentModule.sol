@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: Apache 2.0
 pragma solidity 0.8.10;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
