@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.6;
 
-interface IERC1238 {
+interface IERC4973{
   /// @dev This emits when bond of any SBT is established by any mechanism.
   ///  This event emits when SBTs are created (`from` == 0) and destroyed
   ///  (`to` == 0). Exception: during contract creation, any number of SBTs

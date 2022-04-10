@@ -5,10 +5,10 @@ import {ERC165} from "openzeppelin-contracts/utils/introspection/ERC165.sol";
 import {Counters} from "openzeppelin-contracts/utils/Counters.sol";
 
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
-import {IERC1238} from "./interfaces/IERC1238.sol";
+import {IERC4973} from "./interfaces/IERC4973.sol";
 
 
-abstract contract ERC1238 is ERC165, IERC721Metadata, IERC1238 {
+abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
   using Counters for Counters.Counter;
 
   Counters.Counter private _tokenIds;
@@ -29,7 +29,7 @@ abstract contract ERC1238 is ERC165, IERC721Metadata, IERC1238 {
   function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
     return
       interfaceId == type(IERC721Metadata).interfaceId ||
-      interfaceId == type(IERC1238).interfaceId ||
+      interfaceId == type(IERC4973).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 
