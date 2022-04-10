@@ -57,7 +57,7 @@ contract ERC4973Test is DSTest {
     string memory tokenURI = "https://example.com/metadata.json";
     uint256 tokenId = sbt.mint(tokenURI);
     assertEq(sbt.tokenURI(tokenId), tokenURI);
-    assertEq(sbt.boundTo(tokenId), address(this));
+    assertEq(sbt.ownerOf(tokenId), address(this));
     sbt.burn(tokenId);
   }
 
@@ -66,7 +66,7 @@ contract ERC4973Test is DSTest {
   }
 
   function testFailGetBonderOfNonExistentTokenId() public view {
-    sbt.boundTo(1337);
+    sbt.ownerOf(1337);
   }
 }
 

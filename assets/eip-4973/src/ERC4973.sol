@@ -50,9 +50,9 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     return _bonds[tokenId] != address(0);
   }
 
-  function boundTo(uint256 tokenId) public view virtual returns (address) {
+  function ownerOf(uint256 tokenId) public view virtual returns (address) {
     address owner = _bonds[tokenId];
-    require(owner != address(0), "boundTo: token doesn't exist");
+    require(owner != address(0), "ownerOf: token doesn't exist");
     return owner;
   }
 
@@ -63,16 +63,16 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     _bonds[tokenId] = msg.sender;
     _tokenURIs[tokenId] = uri;
     _tokenIds.increment();
-    emit Bond(address(0), msg.sender, tokenId);
+    emit Transfer(address(0), msg.sender, tokenId);
     return tokenId;
   }
 
   function _burn(uint256 tokenId) internal virtual {
-    address owner  = boundTo(tokenId);
+    address owner  = ownerOf(tokenId);
 
     delete _bonds[tokenId];
     delete _tokenURIs[tokenId];
 
-    emit Bond(owner, address(0), tokenId);
+    emit Transfer(owner, address(0), tokenId);
   }
 }
