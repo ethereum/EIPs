@@ -1,45 +1,228 @@
 ---
 eip: <to be assigned>
 title: Held token standard
-description: <Description is one full (short) sentence>
+description: Standard interface to query ownership and balance of held tokens
 author: Devin Conley (@devinaconley)
 discussions-to: https://ethereum-magicians.org/t/erc-standard-for-held-non-fungible-token-nfts-defi/7117
 status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
-created: 2021-11-03
+created: 2021-09-21
 requires (*optional): 20, 165, 721, 1155
 ---
 
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category. 
-
 ## Abstract
-Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+
+The proposed standard defines a lightweight interface to expose functional ownership and balances of held tokens. This standard is implemented by smart contracts which hold ERC20, ERC721, or ERC1155 and is intended to be consumed by both on-chain and off-chain systems that rely on ownership and balance verification.
 
 ## Motivation
-The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
+
+As different areas of crypto (DeFi, NFTs, etc.) converge and composability improves, there will more commonly be a distinction between the actual owner (likely a contract) and the functional owner (likely a user) of a token. Currently, this results in a conflict between mechanisms that require token deposits and systems that rely on those tokens for ownership or balance verification.
+
+This proposal aims to address that conflict by providing a standard interface for token holders to expose ownership and balance information. This will allow users to participate in these DeFi mechanisms without giving up existing token utility. Overall, this would greatly increase interoperability across systems, benefiting both users and protocol developers.
+
+Example implementers of this ERC standard include
+- staking or farming contracts
+- lending pools
+- time lock or vesting vaults
+- fractionalized NFT contracts
+
+Example consumers of this ERC standard include
+- governance systems
+- gaming
+- PFP verification
+- art galleries or showcases
+- token based membership programs
 
 ## Specification
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)).
+
+Smart contracts implementing the held token standard MUST also implement `ERC165` and return true when the corresponding interface ID is passed.
+
+Smart contracts implementing the `ERC20` held token standard MUST implement all of the functions in the `IERC20Holder` interface.
+
+```solidity
+/**
+ * @notice the ERC20 holder standard provides a common interface to query
+ * token balance information
+ */
+interface IERC20Holder is IERC165 {
+  /**
+   * @notice emitted when the token is transferred to the contract
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenAmount held token amount
+   */
+  event Hold(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 tokenAmount
+  );
+
+  /**
+   * @notice emitted when the token is released back to the user
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenAmount held token amount
+   */
+  event Release(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 tokenAmount
+  );
+
+  /**
+   * @notice get the held balance of the token owner
+   * @param tokenAddress held token address
+   * @param owner functional token owner
+   * @return held token balance
+   */
+  function heldBalanceOf(address tokenAddress, address owner)
+    external
+    view
+    returns (uint256);
+}
+
+```
+
+Smart contracts implementing the `ERC721` held token standard MUST implement all of the functions in the `IERC721Holder` interface.
+
+```solidity
+/**
+ * @notice the ERC721 holder standard provides a common interface to query
+ * token ownership and balance information
+ */
+interface IERC721Holder is IERC165 {
+  /**
+   * @notice emitted when the token is transferred to the contract
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenId held token ID
+   */
+  event Hold(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 indexed tokenId
+  );
+
+  /**
+   * @notice emitted when the token is released back to the user
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenId held token ID
+   */
+  event Release(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 indexed tokenId
+  );
+
+  /**
+   * @notice get the functional owner of a held token
+   * @param tokenAddress held token address
+   * @param tokenId held token ID
+   * @return functional token owner
+   */
+  function heldOwnerOf(address tokenAddress, uint256 tokenId)
+    external
+    view
+    returns (address);
+
+  /**
+   * @notice get the held balance of the token owner
+   * @param tokenAddress held token address
+   * @param owner functional token owner
+   * @return held token balance
+   */
+  function heldBalanceOf(address tokenAddress, address owner)
+    external
+    view
+    returns (uint256);
+}
+```
+
+Smart contracts implementing the `ERC1155` held token standard MUST implement all of the functions in the `IERC1155Holder` interface.
+
+```solidity
+/**
+ * @notice the ERC1155 holder standard provides a common interface to query
+ * token balance information
+ */
+interface IERC1155Holder is IERC165 {
+  /**
+   * @notice emitted when the token is transferred to the contract
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenId held token ID
+   * @param tokenAmount held token amount
+   */
+  event Hold(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 indexed tokenId,
+    uint256 tokenAmount
+  );
+
+  /**
+   * @notice emitted when the token is released back to the user
+   * @param owner functional token owner
+   * @param tokenAddress held token address
+   * @param tokenId held token ID
+   * @param tokenAmount held token amount
+   */
+  event Release(
+    address indexed owner,
+    address indexed tokenAddress,
+    uint256 indexed tokenId,
+    uint256 tokenAmount
+  );
+
+  /**
+   * @notice get the held balance of the token owner
+   * @param tokenAddress held token address
+   * @param owner functional token owner
+   * @param tokenId held token ID
+   * @return held token balance
+   */
+  function heldBalanceOf(
+    address tokenAddress,
+    address owner,
+    uint256 tokenId
+  ) external view returns (uint256);
+}
+```
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+
+This interface is designed to be extremely lightweight and compatible with any existing token contract. Any token holder contract likely already stores all relevant information, so this standard is purely adding a common interface to expose that data.
+
+The token address parameter is included to support contracts that can hold multiple token contracts simultaneously. While some contracts may only hold a single token address, this is more general to either scenario.
+
+Separate interfaces are proposed for each token type (ERC20, ERC721, ERC1155) because any contract logic to support holding these different tokens is likely independent. In the scenario where a single contract does hold multiple token types, it can simply implement each appropriate held token interface.
+
 
 ## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
-## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+Importantly, the proposed specification is fully compatible with all existing ERC20, ERC721, and ERC1155 token contracts. 
+
+Token holder contracts will need to be updated to implement this lightweight interface.
+
+Consumer of this standard will need to be updated to respect this interface in any relevant ownership logic.
+
 
 ## Reference Implementation
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+A full example implementation can be found here:
+
+https://github.com/devinaconley/token-hold-example
+
 
 ## Security Considerations
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+
+Consumers of this standard should be cautious when using ownership information from unknown contracts. A bad actor could implement the interface, but report invalid or malicious information with the goal of manipulating a governance system, game, membership program, etc.
+
+Consumers should also verify the overall token balance and ownership of the holder contract as a sanity check.
+
 
 ## Copyright
+
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
