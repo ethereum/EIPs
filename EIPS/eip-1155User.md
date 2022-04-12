@@ -1,9 +1,9 @@
 ---
-eip: 5000
+eip: 
 title: ERC-1155 User
 description: Add a user role with restricted permissions to ERC-1155 tokens.
 author: Anders (@0xanders), Lance (@LanceSnow), Shrug <shrug@emojidao.org>
-discussions-to: https://ethereum-magicians.org/t/idea-erc-721-user-and-expires-extension/8572
+discussions-to: 
 status: Draft
 type: Standards Track
 category: ERC
@@ -13,7 +13,7 @@ requires: 165, 1155
 
 ## Abstract
 
-This standard is an extension of [ERC-721](./eip-721.md). It proposes an additional role (`user`) which can be granted to addresses, and a time where the role is automatically revoked (`expires`). The `user` role represents permission to "use" the NFT, but not be able to transfer it or set operators.
+This standard is an extension of [ERC-1155](./eip-1155.md). It proposes an additional role (`user`) which can be granted to addresses. The `user` role represents permission to "use" the NFT, but not be able to transfer it or set operators.
 
 ## Motivation
 
@@ -23,14 +23,14 @@ Nowadays, many NFTs are managed by adding the role of **controller/operator**. A
 
 It is conceivable that with the further expansion of NFT application, the problem of usage rights management will become more common, so it is necessary to establish a unified standard to facilitate collaboration among all applications.
 
-By adding **user**, it enables multiple protocols to integrate and build on top of usage rights, while **expires** facilitates automatic ending of each usage without second transaction on chain.
+By adding **user**, it enables multiple protocols to integrate and build on top of usage rights.
 
 ## Specification
 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY" and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity ^0.8.0;
 
@@ -83,7 +83,7 @@ interface IERC1155WithUserRole is IERC1155 {
         uint256 id
     ) external view returns (uint256);
 
-    /// @notice set the user and expires of a NFT
+    /// @notice set the user of a NFT
     /// @dev The zero address indicates there is no user
     /// Throws if `tokenId` is not valid NFT
     /// @param user  The new user of the NFT
@@ -113,7 +113,7 @@ NFTs may be used in multiple applications, and adding the user role to NFTs make
 
 Most NFTs do not take into account the expiration time even though the role of the user is added, resulting in the need for the owner to manually submit on-chain transaction to cancel the user rights, which does not allow accurate on-chain management of the use time and will waste gas.
 
-The usage right often corresponds to a specific time, such as deploying scenes on land, renting game props,  etc. Therefore, it can reduce the on-chain transactions and save gas with **expires**.
+The usage right often corresponds to a specific time, such as deploying scenes on land, renting game props,  etc.
 
 ### Easy Third-Party Integration
 
@@ -149,11 +149,13 @@ describe("set_user", function () {
 
         await contract.setUser(alice.address,bob.address,1,50);
 
-        expect(await contract.balanceOfUser(bob.address,1)).equals(50);
+        await contract.setUser(alice.address,bob.address,1,10);
 
-        expect(await contract.balanceOfUserFromOwner(bob.address,alice.address,1)).equals(50);
+        expect(await contract.balanceOfUser(bob.address,1)).equals(10);
 
-        expect(await contract.frozenOfOwner(alice.address,1)).equals(50);
+        expect(await contract.balanceOfUserFromOwner(bob.address,alice.address,1)).equals(10);
+
+        expect(await contract.frozenOfOwner(alice.address,1)).equals(10);
         
     });
 });
@@ -162,7 +164,7 @@ describe("set_user", function () {
 ## Reference Implementation
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity ^0.8.0;
 
@@ -215,6 +217,7 @@ contract ERC1155WithUserRole is ERC1155, IERC1155WithUserRole {
         require(user != address(0), "ERC1155: transfer to the zero address");
         address operator = msg.sender;
         uint256 fromBalance = balanceOf(owner, id);
+        _frozen[id][owner] -= _allowances[id][owner][user];
         uint256 frozen = _frozen[id][owner];
         require(
             fromBalance - frozen >= amount,
@@ -238,11 +241,12 @@ contract ERC1155WithUserRole is ERC1155, IERC1155WithUserRole {
         _mint(to, id, amount, "");
     }
 }
+
 ```
 
 ## Security Considerations
 
-This EIP standard can completely protect the rights of the owner, the owner can change the NFT user and expires at any time.
+This EIP standard can completely protect the rights of the owner, the owner can change the NFT user.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
