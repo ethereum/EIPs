@@ -19,7 +19,7 @@ This standard is an extension of [ERC-1155](./eip-1155.md). It proposes an addit
 
 Some NFTs have certain utilities. For example: in-game NFTs can be "used" to play, virtual land can be "used" to build scenes, and music NFTs can be "used" while listening. In some cases, the owner and user may not be the same account. Someone may purchase an NFT with utility, but they may not have time or ability to use it, so separating the "use" right from ownership makes a lot of sense.
 
-Nowadays, many NFTs are managed by adding the role of **controller/operator**. Accounts in these roles can perform specific usage actions but can’t approve or transfer the NFT like an owner. If an owner plans to set someone as **controller/operator** for a certain period of time, owner needs to submit two on-chain transactions, at the start time and the end time.
+Nowadays, many NFTs are managed by adding the role of **controller/operator**. Accounts in these roles can perform specific usage actions but can’t approve or transfer the NFT like an owner. 
 
 It is conceivable that with the further expansion of NFT application, the problem of usage rights management will become more common, so it is necessary to establish a unified standard to facilitate collaboration among all applications.
 
