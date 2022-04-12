@@ -1,6 +1,6 @@
 ---
 eip: 
-title: ERC-1155 User
+title: ERC-1155 Usage Rights Extension
 description: Add a user role with restricted permissions to ERC-1155 tokens.
 author: Anders (@0xanders), Lance (@LanceSnow), Shrug <shrug@emojidao.org>
 discussions-to: 
