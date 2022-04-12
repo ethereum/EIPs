@@ -62,6 +62,7 @@ A new opcode `AUTHUSURP` shall be created at `0xf8`. It shall take two stack ele
 
   - If `authorized` (as defined in EIP-3074) is unset, execution is invalid.
   - If `authorized` points to an empty account, then `static_gas` remains 32,000. Otherwise, `static_gas` shall be 7,000.
+  - `AUTHUSURP` does not check the nonce of the `authorized` account.
   - The initcode runs at the address `authorized`.
   - If the initcode returns no bytes, its execution frame must be reverted, and `AUTHUSURP` returns zero.
   - After executing the initcode, but before the returned code is deployed, if the account's code is non-empty, the initcode's execution frame must be reverted, and `AUTHUSURP` returns zero.
