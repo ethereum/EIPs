@@ -1,6 +1,6 @@
 ---
 eip: 5000
-title: ERC-1155 User 
+title: ERC-1155 User
 description: Add a user role with restricted permissions to ERC-1155 tokens.
 author: Anders (@0xanders), Lance (@LanceSnow), Shrug <shrug@emojidao.org>
 discussions-to: https://ethereum-magicians.org/t/idea-erc-721-user-and-expires-extension/8572
