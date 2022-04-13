@@ -19,8 +19,6 @@ This standard is an extension of [ERC-1155](./eip-1155.md). It proposes an addit
 
 Some NFTs have certain utilities. For example: in-game NFTs can be "used" to play, virtual land can be "used" to build scenes, and music NFTs can be "used" while listening. In some cases, the owner and user may not be the same account. Someone may purchase an NFT with utility, but they may not have time or ability to use it, so separating the "use" right from ownership makes a lot of sense.
 
-Nowadays, many NFTs are managed by adding the role of **controller/operator**. Accounts in these roles can perform specific usage actions but can’t approve or transfer the NFT like an owner. If an owner plans to set someone as **controller/operator** for a certain period of time, owner needs to submit two on-chain transactions, at the start time and the end time.
-
 It is conceivable that with the further expansion of NFT application, the problem of usage rights management will become more common, so it is necessary to establish a unified standard to facilitate collaboration among all applications.
 
 By adding **user**, it enables multiple protocols to integrate and build on top of usage rights.
@@ -109,21 +107,15 @@ Usage rights are part of ownership, so **owner** can modify **user** at any time
 
 NFTs may be used in multiple applications, and adding the user role to NFTs makes it easier for the application to make special grants of rights.
 
-### Simple On-chain Time Management
-
-Most NFTs do not take into account the expiration time even though the role of the user is added, resulting in the need for the owner to manually submit on-chain transaction to cancel the user rights, which does not allow accurate on-chain management of the use time and will waste gas.
-
-The usage right often corresponds to a specific time, such as deploying scenes on land, renting game props,  etc.
-
 ### Easy Third-Party Integration
 
 The standard makes it easier for third-party protocols to manage NFT usage rights without permission from the NFT issuer or the NFT application.
 
 ## Backwards Compatibility
 
-As mentioned in the specifications section, this standard can be fully ERC721 compatible by adding an extension function set.
+As mentioned in the specifications section, this standard can be fully ERC compatible by adding an extension function set.
 
-In addition, new functions introduced in this standard have many similarities with the existing functions in ERC721. This allows developers to easily adopt the standard quickly.
+In addition, new functions introduced in this standard have many similarities with the existing functions in ERC1155. This allows developers to easily adopt the standard quickly.
 
 ## Test Cases
 run in Terminal:
