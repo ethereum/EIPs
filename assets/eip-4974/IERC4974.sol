@@ -11,15 +11,17 @@ interface IERC4974 /* is ERC165 */ {
 
     /// @dev Emits when operator changes.
     ///  MUST emit when `operator` changes by any mechanism.
+    ///  MUST ONLY emit by `setOperator`.
     event Appointment(address indexed _operator);
 
     /// @dev Emits when an address activates or deactivates its participation.
-    ///  MUST emit when participation status changes by any mechanism.
-    ///  `Transfer` events SHOULD NOT reset participation.
+    ///  MUST emit emit when participation status changes by any mechanism.
+    ///  MUST ONLY emit by `setParticipation`.
     event Participation(address indexed _participant, bool _participation);
 
     /// @dev Emits when operator transfers EXP. 
     ///  MUST emit when EXP is transferred by any mechanism.
+    ///  MUST ONLY emit by `transfer`.
     event Transfer(address indexed _from, address indexed _to, uint256 _amount);
 
     /// @notice Appoint operator authority.
