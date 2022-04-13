@@ -61,24 +61,27 @@ interface ITimeNFT  {
     /// if(startTime <= now <= endTime) {return true;} else {return false;} 
     function isValidNow(uint256 tokenId) external view returns (bool);
 
-    /// @notice Mint a new NFT from an old NFT  
-    /// @dev Throws if `tokenId` is not valid NFT 
-    /// @param originalTokenId  The token id which the new NFT mint from
-    /// @param newNftStartTime  The start time of the new NFT
-    /// @return The the token id of the new NFT
-    function split(uint256 originalTokenId,uint64 newNftStartTime) external returns(uint256);
+    /// @notice Mint a new token from an old token  
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param originalTokenId_  The token id which the new token mint from
+    /// @param newTokenStartTime  The start time of the new token
+    /// @param newTokenOwner  The owner of the new token
+    /// @return newTokenId The the token id of the new token
+    function split(uint256 originalTokenId_, uint64 newTokenStartTime, address newTokenOwner) external returns(uint256);
 
-    /// @notice Merge two NFTs to one NFT  
-    /// @dev Throws if `tokenAId` or `tokenBId` is not valid NFT 
-    /// @param firstTokenId   The token id of the first NFT
-    /// @param secondTokenId  The token id of the second NFT
-    /// @return The the token id of the new NFT
-    function merge(uint256 firstTokenId,uint256 secondTokenId) external returns(uint256);
+    /// @notice Merge two time NFTs into one time NFT  
+    /// @dev Throws if `firstTokenId` or `secondTokenId` is not valid token 
+    /// @param firstTokenId   The id of the first token
+    /// @param secondTokenId  The id of the second token
+    /// @param newTokenOwner  The owner of the new token
+    /// @return newTokenId The id of the new token
+    function merge(uint256 firstTokenId,uint256 secondTokenId, address newTokenOwner) external returns(uint256);
 }
 ```
 
 ## Rationale
 
+todo 
 
 ## Backwards Compatibility
 
@@ -86,14 +89,182 @@ As mentioned in the specifications section, this standard can be fully ERC721 co
 
 
 ## Test Cases
+### Test Contract
+```solidity
+pragma solidity 0.8.10;
+import "./TimeNFT.sol";
 
+contract TimeNFTDemo is TimeNFT{
 
+    constructor(string memory name_, string memory symbol_)TimeNFT(name_, symbol_){        
+    }
+
+    /// @notice mint a new original time NFT  
+    /// @param to_  The owner of the new token
+    /// @param startTime_  The start time of the new token
+    /// @param endTime_  The end time of the new token
+    /// @return newTokenId The id of the new token
+    function mint(address to_, uint64 startTime_, uint64 endTime_) internal virtual returns(uint256 newTokenId) {
+       newTokenId = _mintOriginalToken(to_, startTime_, endTime_);
+    }    
+}
+```
+
+### Test Code
+ 
 
 ## Reference Implementation
+```
+pragma solidity 0.8.10;
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./ITimeNFT.sol";
 
+contract TimeNFT is ERC721, ITimeNFT  {
+
+    struct TimeNftInfo {
+        uint256 originalTokenId;
+        uint64 startTime; 
+        uint64 endTime; 
+    }
+
+    uint256 private _nextTokenId = 1;
+
+    mapping(uint256 /* tokenId */ => TimeNftInfo) internal _timeNftMapping;
+
+
+    constructor(string memory name_, string memory symbol_)ERC721(name_, symbol_){        
+    }
+
+    /// @notice Get the start time of the token 
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param tokenId  The tokenId of the token
+    /// @return The start time of the token
+    function startTime(uint256 tokenId) public view virtual override returns (uint64) {
+        require(_exists(tokenId),"invalid tokenId");
+        return _timeNftMapping[tokenId].startTime;
+    }
+    
+    /// @notice Get the end time of the token  
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param tokenId  The tokenId of the token
+    /// @return The end time of the token
+    function endTime(uint256 tokenId) public view virtual override returns (uint64) {
+        require(_exists(tokenId),"invalid tokenId");
+        return _timeNftMapping[tokenId].endTime;
+    }
+
+    /// @notice Get the token id which this token mint from
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param tokenId  The tokenId of the token
+    /// @return The token id which this token mint from
+    function originalTokenId(uint256 tokenId) public view virtual override  returns (uint256) {
+        require(_exists(tokenId),"invalid tokenId");
+        return _timeNftMapping[tokenId].originalTokenId;
+    }
+
+    /// @notice Check the NFT is valid now 
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param tokenId  The tokenId of the token
+    /// @return The the NFT is valid now
+    /// if(startTime <= now <= endTime) {return true;} else {return false;} 
+    function isValidNow(uint256 tokenId) public view virtual override returns (bool) {
+        require(_exists(tokenId),"invalid tokenId");
+        return uint256(_timeNftMapping[tokenId].startTime) <= block.timestamp  
+               && block.timestamp <= uint256(_timeNftMapping[tokenId].endTime);
+    }
+
+    /// @notice Mint a new token from an old token  
+    /// @dev Throws if `tokenId` is not valid token 
+    /// @param originalTokenId_  The token id which the new token mint from
+    /// @param newTokenStartTime  The start time of the new token
+    /// @param newTokenOwner  The owner of the new token
+    /// @return newTokenId The the token id of the new token
+    function split(uint256 originalTokenId_, uint64 newTokenStartTime, address newTokenOwner) public virtual override returns(uint256 newTokenId){
+        require(_isApprovedOrOwner(_msgSender(), originalTokenId_), "error: caller is not owner nor approved");
+
+        uint64 oldTokenStartTime =  _timeNftMapping[originalTokenId_].startTime;
+        uint64 oldTokenEndTime = _timeNftMapping[originalTokenId_].endTime;
+        require( oldTokenStartTime < newTokenStartTime  && newTokenStartTime < oldTokenEndTime, "invalid newTokenStartTime");
+        
+        _timeNftMapping[originalTokenId_].endTime = newTokenStartTime - 1;          
+        uint64 newTokenEndTime = oldTokenEndTime;
+        emit TimeUpdate(originalTokenId_, oldTokenStartTime ,_timeNftMapping[originalTokenId_].endTime);
+
+        newTokenId = _mintTimeNft(newTokenOwner, originalTokenId_, newTokenStartTime, newTokenEndTime);
+    }
+
+    /// @notice Merge two time NFTs into one time NFT  
+    /// @dev Throws if `firstTokenId` or `secondTokenId` is not valid token 
+    /// @param firstTokenId   The id of the first token
+    /// @param secondTokenId  The id of the second token
+    /// @param newTokenOwner  The owner of the new token
+    /// @return newTokenId The id of the new token
+    function merge(uint256 firstTokenId,uint256 secondTokenId, address newTokenOwner) public virtual override returns(uint256 newTokenId) {
+        require(_isApprovedOrOwner(_msgSender(), firstTokenId) &&  _isApprovedOrOwner(_msgSender(), secondTokenId),
+          "error: caller is not owner nor approved");
+
+        TimeNftInfo memory firstToken = _timeNftMapping[firstTokenId];
+        TimeNftInfo memory secondToken = _timeNftMapping[secondTokenId];
+
+        require(firstToken.originalTokenId == secondToken.originalTokenId 
+                && firstToken.startTime <= firstToken.endTime 
+                && (firstToken.endTime + 1) == secondToken.startTime 
+                && secondToken.startTime <= secondToken.endTime, "invalid tokenId");
+
+        _burnTimeNft(firstTokenId);
+        _burnTimeNft(secondTokenId);
+
+        newTokenId = _mintTimeNft(newTokenOwner, firstToken.originalTokenId, firstToken.startTime, secondToken.endTime);
+    }
+
+    /// @notice mint a new time NFT  
+    /// @param to_  The owner of the new token
+    /// @param originalTokenId_    The token id which the new token mint from
+    /// @param startTime_  The start time of the new token
+    /// @param endTime_  The end time of the new token
+    /// @return newTokenId The id of the new token
+    function _mintTimeNft(address to_, uint256 originalTokenId_, uint64 startTime_, uint64 endTime_) internal virtual returns(uint256 newTokenId)  {
+        newTokenId = _nextTokenId;
+        _nextTokenId++;
+
+        TimeNftInfo storage info = _timeNftMapping[newTokenId];
+        info.originalTokenId = originalTokenId_;
+        info.startTime = startTime_;
+        info.endTime = endTime_;
+
+        _mint(to_, newTokenId);
+    }
+
+    /// @notice mint a new original time NFT  
+    /// @param to_  The owner of the new token
+    /// @param startTime_  The start time of the new token
+    /// @param endTime_  The end time of the new token
+    /// @return newTokenId The id of the new token
+    function _mintOriginalToken(address to_, uint64 startTime_, uint64 endTime_) internal virtual returns(uint256 newTokenId) {
+        newTokenId = _nextTokenId;
+        _nextTokenId++;
+    
+        TimeNftInfo storage info = _timeNftMapping[newTokenId];
+        info.originalTokenId = newTokenId;
+        info.startTime = startTime_;
+        info.endTime = endTime_;
+
+        _mint(to_, newTokenId );
+    }
+
+    /// @notice burn a time NFT  
+    /// @param tokenId  The id of the token
+    function _burnTimeNft(uint256 tokenId) internal virtual {
+        _burn(tokenId);
+        delete _timeNftMapping[tokenId];
+    }
+}
+
+```
 
 ## Security Considerations
 
+todo
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
