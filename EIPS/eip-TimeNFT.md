@@ -211,8 +211,8 @@ contract TimeNFT is ERC721, ITimeNFT  {
                 && (firstToken.endTime + 1) == secondToken.startTime 
                 && secondToken.startTime <= secondToken.endTime, "invalid tokenId");
 
-        _burnTimeNft(firstTokenId);
-        _burnTimeNft(secondTokenId);
+        _burn(firstTokenId);
+        _burn(secondTokenId);
 
         newTokenId = _mintTimeNft(newTokenOwner, firstToken.originalTokenId, firstToken.startTime, secondToken.endTime);
     }
@@ -254,8 +254,8 @@ contract TimeNFT is ERC721, ITimeNFT  {
 
     /// @notice burn a time NFT  
     /// @param tokenId  The id of the token
-    function _burnTimeNft(uint256 tokenId) internal virtual {
-        _burn(tokenId);
+    function _burn(uint256 tokenId) internal  virtual override{
+        super._burn(tokenId);
         delete _timeNftMapping[tokenId];
     }
 }
