@@ -1,19 +1,19 @@
 ---
-eip: <to be assigned>
+eip: 4987
 title: Held token standard
 description: Standard interface to query ownership and balance of held tokens
 author: Devin Conley (@devinaconley)
 discussions-to: https://ethereum-magicians.org/t/erc-standard-for-held-non-fungible-token-nfts-defi/7117
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2021-09-21
-requires (*optional): 20, 165, 721, 1155
+requires: 20,165,721,1155
 ---
 
 ## Abstract
 
-The proposed standard defines a lightweight interface to expose functional ownership and balances of held tokens. This standard is implemented by smart contracts which hold ERC20, ERC721, or ERC1155 and is intended to be consumed by both on-chain and off-chain systems that rely on ownership and balance verification.
+The proposed standard defines a lightweight interface to expose functional ownership and balances of held tokens. A held token is a token owned by a contract. This standard may be implemented by smart contracts which hold [ERC-20](./eip-20.md), [ERC-721](./eip-721.md), or (ERC-1155)[./eip-1155.md] and is intended to be consumed by both on-chain and off-chain systems that rely on ownership and balance verification.
 
 ## Motivation
 
