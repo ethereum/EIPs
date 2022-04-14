@@ -76,7 +76,7 @@ contract ERC721WithNonceDemo is ERC721WithNonce{
 ```
 ### Test Code
 
-run in Terminal: `npm hardhat test`
+run in terminal: `npm hardhat test`
 
 test.ts:
 ```TypeScript
