@@ -98,7 +98,7 @@ import "./TimeNFT.sol";
 
 contract TimeNFTDemo is TimeNFT{
 
-    constructor(string memory name_, string memory symbol_)TimeNFT(name_, symbol_){        
+    constructor(string memory name_, string memory symbol_) TimeNFT(name_, symbol_){
     }
 
     /// @notice mint a new original time NFT  
@@ -106,7 +106,7 @@ contract TimeNFTDemo is TimeNFT{
     /// @param startTime_  The start time of the new token
     /// @param endTime_  The end time of the new token
     /// @return newTokenId The id of the new token
-    function mint(address to_, uint64 startTime_, uint64 endTime_) internal virtual returns(uint256 newTokenId) {
+    function mint(address to_, uint64 startTime_, uint64 endTime_) public returns(uint256 newTokenId) {
        newTokenId = _mintOriginalToken(to_, startTime_, endTime_);
     }    
 }
@@ -114,7 +114,6 @@ contract TimeNFTDemo is TimeNFT{
 
 ### Test Code
 
-test.js
 ```JavaScript
 const { assert } = require("chai");
 
