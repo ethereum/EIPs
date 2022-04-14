@@ -121,7 +121,7 @@ const TimeNFTDemo = artifacts.require("TimeNFTDemo");
 
 contract("test", async accounts => {
 
-    it("should set user to Bob", async () => {
+    it("test TimeNFT", async () => {
         // Get initial balances of first and second account.
         const Alice = accounts[0];
         const Bob = accounts[1];
