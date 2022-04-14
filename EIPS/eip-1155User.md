@@ -130,29 +130,115 @@ npm hardhat test
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("set_user", function () {
-    it("Should set user to bob", async function () {
-        /**alice is the Owner */
-        const [alice, bob] = await ethers.getSigners();
+describe("Test 1155 User Role", function () {
+    let alice, bob, carl;
+    let contract;
 
-        const ERC1155WithUserRole = await ethers.getContractFactory("ERC1155WithUserRole");
+    beforeEach(async function () {
+        [alice, bob, carl] = await ethers.getSigners();
 
-        const contract = await ERC1155WithUserRole.deploy();
+        const ERC1155WithUserRoleDemo = await ethers.getContractFactory("ERC1155WithUserRoleDemo");
 
-        await contract.mint(alice.address, 1,100);
-
-        await contract.setUser(alice.address,bob.address,1,50);
-
-        await contract.setUser(alice.address,bob.address,1,10);
-
-        expect(await contract.balanceOfUser(bob.address,1)).equals(10);
-
-        expect(await contract.balanceOfUserFromOwner(bob.address,alice.address,1)).equals(10);
-
-        expect(await contract.frozenOfOwner(alice.address,1)).equals(10);
-        
+        contract = await ERC1155WithUserRoleDemo.deploy();
     });
+
+    describe("", function () {
+        it("Should set user to bob", async function () {
+
+            await contract.mint(alice.address, 1, 100);
+
+            await contract.setUser(alice.address, bob.address, 1, 10);
+
+            expect(await contract.balanceOfUser(bob.address, 1)).equals(10);
+
+            expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
+
+            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+
+            await contract.setUser(alice.address, bob.address, 1, 80);
+
+            expect(await contract.balanceOfUser(bob.address, 1)).equals(80);
+
+            expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(80);
+
+            expect(await contract.frozenOfOwner(alice.address, 1)).equals(80);
+
+            await contract.setUser(alice.address, bob.address, 1, 0);
+
+            expect(await contract.balanceOfUser(bob.address, 1)).equals(0);
+
+            expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(0);
+
+            expect(await contract.frozenOfOwner(alice.address, 1)).equals(0);
+
+        });
+
+        it("Should transfer success", async function () {
+
+            await contract.mint(alice.address, 1, 100);
+
+            await contract.setUser(alice.address, bob.address, 1, 10);
+
+            await contract.safeTransferFrom(alice.address, carl.address, 1, 90, "0x");
+
+            expect(await contract.balanceOfUser(bob.address, 1)).equals(10);
+
+            expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
+
+            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+
+            expect(await contract.balanceOf(alice.address, 1)).equals(10);
+
+        });
+
+        it("Should burn success", async function () {
+
+            await contract.mint(alice.address, 1, 100);
+
+            await contract.setUser(alice.address, bob.address, 1, 10);
+
+            await contract.burn(alice.address, 1, 90);
+
+            expect(await contract.balanceOfUser(bob.address, 1)).equals(10);
+
+            expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
+
+            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+
+            expect(await contract.balanceOf(alice.address, 1)).equals(10);
+        });
+
+    });
+
 });
+```
+Test contract:
+```solidity
+// SPDX-License-Identifier: CC0-1.0
+
+pragma solidity ^0.8.0;
+
+import "./ERC1155WithUserRole.sol";
+
+contract ERC1155WithUserRoleDemo is ERC1155WithUserRole {
+    function mint(
+        address to,
+        uint256 id,
+        uint256 amount
+    ) public {
+        _mint(to, id, amount, "");
+    }
+
+    function burn(
+        address from,
+        uint256 id,
+        uint256 amount
+    ) public {
+        _burn(from, id, amount);
+    }
+    
+}
+
 ```
 
 ## Reference Implementation
@@ -227,14 +313,28 @@ contract ERC1155WithUserRole is ERC1155, IERC1155WithUserRole {
         emit UpdateUser(operator, owner, user, id, amount);
     }
 
-    function mint(
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
         address to,
-        uint256 id,
-        uint256 amount
-    ) public {
-        _mint(to, id, amount, "");
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        for (uint256 i = 0; i < ids.length; i++) {
+            if (from != address(0)) {
+                uint256 id = ids[i];
+                uint256 fromBalance = balanceOf(from, id);
+                uint256 frozen = _frozen[id][from];
+                require(
+                    fromBalance - frozen >= amounts[i],
+                    "ERC1155: insufficient balance for transfer"
+                );
+            }
+        }
     }
 }
+
 
 ```
 
