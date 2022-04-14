@@ -81,7 +81,9 @@ interface ITimeNFT  {
 
 ## Rationale
 
-todo 
+### Time Data Type
+
+The max value of `uint64` is 18446744073709551615,  timestamp 18446744073709551615 is about year 584942419325. `uint64` is sufficient and saves gas compared to uin256.
 
 ## Backwards Compatibility
 
@@ -111,7 +113,57 @@ contract TimeNFTDemo is TimeNFT{
 ```
 
 ### Test Code
- 
+
+test.js
+```
+const { assert } = require("chai");
+
+const TimeNFTDemo = artifacts.require("TimeNFTDemo");
+
+contract("test", async accounts => {
+
+    it("should set user to Bob", async () => {
+        // Get initial balances of first and second account.
+        const Alice = accounts[0];
+        const Bob = accounts[1];
+
+        const instance = await TimeNFTDemo.deployed("TimeNFTDemo", "TimeNFTDemo");
+        const demo = instance;
+
+        let now = Math.floor(new Date().getTime()/1000);
+        let startTime = now ;
+        let endTime = now + 10000;
+        let newStartTime = startTime + 2000;
+
+        let id1 =  await demo.mint(Alice,start, endTime);
+        let isValidNow =   await demo.isValidNow(id1);
+
+        assert.equal(
+            isValidNow,
+            true,
+            "token id1 should be valid now"
+        );
+
+        let id2 =  await demo.split(id1,newStartTime, Bob);
+
+        let owner2 = await demo.ownerOf(id2);
+        assert.equal(
+            owner2,
+            Bob ,
+            "Owner of NFT 2 should be Bob"
+        );
+
+        let id3 =  await demo.mint(Alice,1, 2);
+        let isValidNow3 = await demo.isValidNow(id3);
+
+        assert.equal(
+            isValidNow3,
+            false,
+            "token id3 should be not valid now"
+        );
+    });
+});
+```
 
 ## Reference Implementation
 ```solidity
@@ -130,7 +182,6 @@ contract TimeNFT is ERC721, ITimeNFT  {
     uint256 private _nextTokenId = 1;
 
     mapping(uint256 /* tokenId */ => TimeNftInfo) internal _timeNftMapping;
-
 
     constructor(string memory name_, string memory symbol_)ERC721(name_, symbol_){        
     }
@@ -264,7 +315,7 @@ contract TimeNFT is ERC721, ITimeNFT  {
 
 ## Security Considerations
 
-todo
+Implementors of the `TimeNFT` standard must consider the condition of `merge` function.  The `originalTokenId` of two NFTs should be same and the time of two NFTs should be adjacent.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
