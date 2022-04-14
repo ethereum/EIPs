@@ -115,7 +115,7 @@ contract TimeNFTDemo is TimeNFT{
 ### Test Code
 
 test.js
-```
+```JavaScript
 const { assert } = require("chai");
 
 const TimeNFTDemo = artifacts.require("TimeNFTDemo");
