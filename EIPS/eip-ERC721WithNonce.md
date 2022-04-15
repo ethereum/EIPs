@@ -13,7 +13,7 @@ requires: 165, 721
 
 ## Abstract
 
-This standard is an extension of [ERC-721](./eip-721.md). It proposes adding an `nonce` property to ERC-721 tokens.
+This standard is an extension of [ERC-721](./eip-721.md). It proposes adding a `nonce` property to ERC-721 tokens.
 
 ## Motivation
 
