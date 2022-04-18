@@ -8,7 +8,7 @@ import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC4973} from "./interfaces/IERC4973.sol";
 import {ERC4973} from "./ERC4973.sol";
 
-contract SoulboundToken is ERC4973 {
+contract AccountboundToken is ERC4973 {
   constructor() ERC4973("Name", "Symbol") {}
 
   function mint(
@@ -23,50 +23,50 @@ contract SoulboundToken is ERC4973 {
 }
 
 contract ERC4973Test is DSTest {
-  SoulboundToken sbt;
+  AccountboundToken abt;
 
   function setUp() public {
-    sbt = new SoulboundToken();
+    abt = new AccountboundToken();
   }
 
   function testIERC165() public {
-    assertTrue(sbt.supportsInterface(type(IERC165).interfaceId));
+    assertTrue(abt.supportsInterface(type(IERC165).interfaceId));
   }
 
   function testIERC721Metadata() public {
-    assertTrue(sbt.supportsInterface(type(IERC721Metadata).interfaceId));
+    assertTrue(abt.supportsInterface(type(IERC721Metadata).interfaceId));
   }
 
   function testIERC4973() public {
-    assertTrue(sbt.supportsInterface(type(IERC4973).interfaceId));
+    assertTrue(abt.supportsInterface(type(IERC4973).interfaceId));
     assertEq(type(IERC4973).interfaceId, 0x0);
   }
 
   function testCheckMetadata() public {
-    assertEq(sbt.name(), "Name");
-    assertEq(sbt.symbol(), "Symbol");
+    assertEq(abt.name(), "Name");
+    assertEq(abt.symbol(), "Symbol");
   }
 
   function testMint() public {
     string memory tokenURI = "https://example.com/metadata.json";
-    uint256 tokenId = sbt.mint(tokenURI);
-    assertEq(sbt.tokenURI(tokenId), tokenURI);
+    uint256 tokenId = abt.mint(tokenURI);
+    assertEq(abt.tokenURI(tokenId), tokenURI);
   }
 
   function testMintAndBurn() public {
     string memory tokenURI = "https://example.com/metadata.json";
-    uint256 tokenId = sbt.mint(tokenURI);
-    assertEq(sbt.tokenURI(tokenId), tokenURI);
-    assertEq(sbt.ownerOf(tokenId), address(this));
-    sbt.burn(tokenId);
+    uint256 tokenId = abt.mint(tokenURI);
+    assertEq(abt.tokenURI(tokenId), tokenURI);
+    assertEq(abt.ownerOf(tokenId), address(this));
+    abt.burn(tokenId);
   }
 
   function testFailRequestingNonExistentTokenURI() public view {
-    sbt.tokenURI(1337);
+    abt.tokenURI(1337);
   }
 
   function testFailGetBonderOfNonExistentTokenId() public view {
-    sbt.ownerOf(1337);
+    abt.ownerOf(1337);
   }
 }
 
