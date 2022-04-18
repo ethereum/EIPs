@@ -12,4 +12,4 @@ An [ERC721Metadata](https://eips.ethereum.org/EIPS/eip-721) (interfaceId:
 
 ## License
 
-See LICENSE file.
+CC0-1.0

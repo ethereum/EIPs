@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.6;
 
 import {DSTest} from "ds-test/test.sol";
