@@ -114,14 +114,11 @@ Removes the chunks of the file `name` in the directory from the given `chunkId` 
 function truncate(bytes memory name, uint256 chunkId) external returns (uint256 numOfChunksRemoved);
 ```
 
-
 ## Rationle
 
 With EIP-4804, we are able to locate a Web3 resource on blockchain using HTTP-style URIs.  One application of Web3 resources are web contents that are referenced within a directory using relative paths such as HTML/SVG.  This standard proposes a contract-based directory to simplify the mapping between local web contents and on-chain web contents.  Further, with relative paths referenced in the web contents and EIP-4804, the users will have a consistent view of the web contents locally and on-chain.
 
 One issue of uploading the web contents to the blockchain is that the web contents may be too large to fit into a single transaction.  As a result, the standard provides a chunk-based operations so that uploading a content can be splitted into several transactions.  Meanwhile, the read operation can be done in a single transaction, i.e., with a single Web3 URL defined in EIP-4804.
-
-
 
 ## Copyright
 
