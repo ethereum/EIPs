@@ -8,15 +8,16 @@ status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
 created: 2022-04-14
+requires (*optional): ERC-165
 ---
 
 ## Abstract
-Zodiac is a philosophy and open standard for composable and interoperable DAO tooling. The key insight is that by separating account (thing that holds tokens, controls systems, and is referenced by others) from the logic that controls it, and making the account agnostic to the logic that controls it, we can create a DAO ecosystem that is much more composable and interoperable, along with being compatible with the vast majority of existing DAO tooling. In short, Zodiac encourages DAOs to use an "avatar" contract (like the Gnosis Safe) as their account, and to then control that avatar with just about any combination of DAO tools and frameworks (Aragon, Colony, Compound/OZ Governor, DAOStack, Moloch, Orca, Tribute, etc).
+[Zodiac](https://github.com/gnosis/zodiac) is a philosophy and open standard for composable and interoperable DAO tooling. The key insight is that by separating account (thing that holds tokens, controls systems, and is referenced by others) from the logic that controls it, and making the account agnostic to the logic that controls it, we can create a DAO ecosystem that is much more composable and interoperable, along with being compatible with the vast majority of existing DAO tooling. In short, [Zodiac](https://github.com/gnosis/zodiac) encourages DAOs to use an "avatar" contract (like the Gnosis Safe) as their account, and to then control that avatar with just about any combination of DAO tools and frameworks (Aragon, Colony, Compound/OZ Governor, DAOStack, Moloch, Orca, Tribute, etc).
 
 ## Motivation
 Currently, most DAO tools and frameworks are built as somewhat monolithic systems. Wherein account and control logic are coupled, either in the same contract or in a tightly bound system of contracts. This needlessly inhibits the future flexibility of organizations using these tools and encourages platform lock-in via extraordinarily high switching costs.
 
-By using the Zodiac standard to decouple account and control logic, organizations are able to:
+By using the [Zodiac](https://github.com/gnosis/zodiac) standard to decouple account and control logic, organizations are able to:
 1. Enable flexible, module-based control of programmable accounts
 2. Easily switch between frameworks without unnecessary overhead.
 3. Enable multiple control mechanism in parallel.
@@ -26,7 +27,7 @@ By using the Zodiac standard to decouple account and control logic, organization
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-The Zodiac standard consists of four key concepts Avatars, Modules, Modifiers, and Guards:
+The [Zodiac](https://github.com/gnosis/zodiac) standard consists of four key concepts Avatars, Modules, Modifiers, and Guards:
 1. **Avatars** are programmable Ethereum accounts, like the [Gnosis Safe](https://gnosis-safe.io). Avatars are the address that holds balances, owns systems, executes transaction, is referenced externally, and ultimately represents your DAO. Avatars MUST expose the `IAvatar` interface.
 2. **Modules** are contracts enabled by an Avatar that implement some control logic.
 3. **Modifiers** are contracts that sit between Modules and Avatars to modify the Module's behavior. For example, they might enforce a delay on all functions a Module attempts to execute or limit the scope of transactions that can be initiated by the module. Modifiers MUST expose the `IAvatar` interface.
@@ -160,16 +161,16 @@ contract Guardable is OwnableUpgradeable {
 ```
 
 ## Rationale
-In designing the Zodiac standard, we inevitably needed to define a standard interface for modular programmable accounts (avatars). Rather than writing this from scratch, we elected to use the existing interfaces from the [Gnosis Safe's Module Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/ModuleManager.sol) and from the [Gnosis Safe's Guard Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/GuardManager.sol), since the Gnosis Safe is by far the most widely used programmable account for DAOs, other organizations, and individuals.
+In designing the [Zodiac](https://github.com/gnosis/zodiac) standard, we inevitably needed to define a standard interface for modular programmable accounts (avatars). Rather than writing this from scratch, we elected to use the existing interfaces from the [Gnosis Safe's Module Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/ModuleManager.sol) and from the [Gnosis Safe's Guard Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/GuardManager.sol), since the Gnosis Safe is by far the most widely used programmable account for DAOs, other organizations, and individuals.
 
 ## Backwards Compatibility
 No backward compatibility issues are introduced by this standard.
 
-## Reference Implementation
-A reference implementation can be found in the [gnosis/zodiac](https://github.com/gnosis/zodiac) repository.
-
 ## Security Considerations
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+Zodiac primarily leverages the existing ModuleManager interface from the Gnosis Safe, which has been in running securely in production for several years. That said, there are some considerations that module developers and users should take into account.
+1. **Modules have unilateral control:** Modules have unilateral control over any avatar on which they are enabled, so any module implementation should be treated as security critical and users should be vary cautious about enabling new modules. ONLY ENABLE MODULES THAT YOU TRUST WITH THE FULL VALUE OF THE AVATAR.
+2. **Race conditions:** A given avatar may have any number of modules enabled, each with unilateral control over the safe. In such cases, there may be race conditions between different modules (and other control mechanisms, like the multisig mechanism on a Gnosis Safe).
+3. **Don't brick your avatar:** Be warned, there are no safe guards to stop you adding or removing modules. If you remove all of the modules that let you control an avatar, the avatar will cease to function and all funds will be stuck.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
