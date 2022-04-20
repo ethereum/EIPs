@@ -1,9 +1,9 @@
 ---
-eip: <to be assigned>
+eip: 5003
 title: Replace Externally Owned Accounts with `AUTHUSURP`
 description: Allow migrating away from ECDSA by deploying code in place of an externally owned account.
 author: Dan Finlay (@danfinlay), Sam Wilson (@SamWilsn)
-discussions-to: <URL>
+discussions-to: [ethereum-magicians](https://ethereum-magicians.org/t/eip-5003-auth-usurp-publishing-code-at-an-eoa-address/8979)
 status: Draft
 type: Standards Track
 category: Core
