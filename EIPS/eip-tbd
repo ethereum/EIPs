@@ -36,7 +36,7 @@ The motivation is to
 | `READ_GAS_PER_UNIT`       | 700              |
 | `CREATE_DATA_GAS`         | 200              |
 
-If `block.number >= FORK_BLKNUM`, the contract creation initialization can returns data with any length, but the contract-related opcodes will take extra gas as defined below:
+If `block.number >= FORK_BLKNUM`, the contract creation initialization can return data with any length, but the contract-related opcodes will take extra gas as defined below:
 
 - For `CODESIZE/CODECOPY/EXTCODESIZE/EXTCODEHASH`, the gas is unchanged.
 
