@@ -4,7 +4,7 @@ title: Standardize Lighthouse panda banner as official banner for "The Merge"
 description: Logging a panda banner once we reach transition to mark the transition to Proof-Of-Stake
 author: Giulio Rebuffo (@Giulio2002)
 status: Draft
-type: Draft
+type: Core
 ---
 
 ## Abstract
