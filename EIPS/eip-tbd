@@ -1,0 +1,84 @@
+---
+eip: TBD
+title: Unlimit contract code size
+author: Qi Zhou https://github.com/qizhou
+discussions-to: TBD
+status: Draft
+type: Standards
+Track category: Core
+created: 2022-04-21
+requires: EIP-170
+---
+
+
+## Abstract
+
+Unlimit the contract code size so that users can deploy a large-code contract without worrying about splitting the contract to several sub-contracts.
+
+
+## Motivation
+
+The motivation is to
+- unlimit the code size, i.e., only limited by block gas limit;
+- minimize changes of existing code; and
+- address the possible attack vectors in multiple contract-code-related opcodes including
+
+`CODESIZE/CODECOPY/EXTCODESIZE/EXTCODECOPY/EXTCODEHASH/DELEGATECALL/CALL/CALLCODE/STATICCALL/CREATE/CREATE2`.
+
+## Specification
+
+### Parameters
+
+| Constant                  | Value            |
+| ------------------------- | ---------------- |
+| `FORK_BLKNUM`             | TBD              |
+| `CODE_SIZE_UNIT`          | 24K              |
+| `READ_GAS_PER_UNIT`       | 700              |
+| `CREATE_DATA_GAS`         | 200              |
+
+If `block.number >= FORK_BLKNUM`, the contract creation initialization can returns data with any length, but the contract-related opcodes will take extra gas as defined below:
+
+- For `CODESIZE/CODECOPY/EXTCODESIZE/EXTCODEHASH`, the gas is unchanged.
+
+- For `EXTCODECOPY/CALL/CALLCODE/DELEGATECALL/STATICCALL`, if the contract code size > `CODE_SIZE_UNIT`, then the opcodes will take extra gas as
+
+```
+(CODE_SIZE - 1) // CODE_SIZE_UNIT * READ_GAS_PER_UNIT
+```
+
+where `//` is the integer divide operator.
+
+- For CREATE/CREATE2, if the newly created contract size > `CODE_SIZE_UNIT`, the opcodes will take extra write gas as
+
+`(CODE_SIZE - CODE_SIZE_UNIT) * CREATE_DATA_GAS`.
+
+## Rationale
+
+With the dramatic growth of dApplications, the functionalities of smart contracts are becoming more and more complicated, and thus, the sizes of newly developed contracts are steadily increasing.  As a result, we are facing more and more issues with 24K contract size limit.  Although several techniques such as splitting a large contract into several sub-contracts can alleviate the issue, these techniques inevitably increase the burden of developing/deploying/maintaining smart contracts.
+
+The proposal implements the second solution proposed in https://ethereum-magicians.org/t/removing-or-increasing-the-contract-size-limit/3045.  Further, the proposal aims to minimize the changes in the client implementation (e.g., Geth) with
+- proper gas metering to avoid abusing the node resources; and
+- no change to the existing structure of the Ethereum state.
+
+### Gas Metering
+The goal is to measure the CPU/IO cost of the contract read/write operations reusing existing gas metering so that the resources will not be abused.
+
+- For code-size-related opcodes (`CODESIZE/EXTCODESIZE`), we would expect the client to implement a mapping from the hash of code to the size, so reading the code size of a large contract should not take extra resources.
+
+- For `CODECOPY`, the data is already loaded in memory (as part of `CALL/CALLCODE/DELEGATECALL/STATICCALL`), so we do not charge extra gas.
+
+- For `EXTCODEHASH`, the value is already in the account, so we do not charge extra gas.
+
+- For `EXTCODECOPY/CALL/CALLCODE/DELEGATECALL/STATICCALL`, since it will read extra data from database, we will additionally charge READ_GAS_PER_UNIT per extra `CODE_SIZE`. Note that `READ_GAS_PER_UNIT = CALLGAS = EXTCODECOPYBASE = 700`.
+
+- For `CREATE/CREATE2`, since it will create extra data to database, we will additionally charge `CREATE_DATA_GAS` per extra bytes.
+
+## Reference Implementation
+
+The reference implementation on Geth is available at https://github.com/QuarkChain/go-ethereum/pull/76.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+
