@@ -3,16 +3,18 @@ eip: <to be assigned>
 title: Subscription Tokens
 description: Tokens with the ability to pay recurring costs
 author: Pandapip1 (@Pandapip1)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-subscription-tokens/9013
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-04-21
-requires: 20, 4524
+requires: 20, 165, 4524
 ---
 
 ## Abstract
-Recurring payments (hereafter referred to as "subscriptions"), are tricky to implement, and bad for user experience. The current standards ([EIP-1337](./eip-1337.md), [EIP-4885](./eip-4885.md)) are implemented by users transferring a certain amount to a contract, which then performs its function for the duration. This has obvious downsides, however: the user has to decide in advance for how long they want to pay for the service, and continally re-pay the contract. This EIP proposes an interface that allows addresses to recieve tokens over time.
+Recurring payments (hereafter referred to as "subscriptions"), are often tricky to implement, and frequently bad for user experience. The current merged standards ([EIP-1337](./eip-1337.md) and [EIP-4885](./eip-4885.md)) are cumbersome for users, because they have to continually remember to transfer an advance amount. The user would rather have to approve a fixed amount of transactions than to approve a linear amount of transactions over time.
+
+This EIP proposes to fix these issues using an extension of [EIP-4524](./eip-4524.md), itself an extension of [EIP-20](./eip-20.md). It adds new functions to allow addresses to "subscribe" to other addresses, and for the recieving address to control the amount recieved so that the user can pay for their usage.
 
 ## Motivation
 A typical type of ICO is where the token amount is paid out over time. This is usually done through a form of pull payment, which is cumbersome for the user. With this system, the user only has to make a single transaction to recieve the funds: `updateSubscription` for the maximum uint256 value. Lottery payouts or pensions could also be paid out in this manner.
@@ -23,9 +25,10 @@ NFTs could require that a maintenance cost be paid. An silly example could be an
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
 ### ERCXXXXToken
+Tokens with subscription functionality MUST implement the following interface:
 
 ```solidity
-interface ERCXXXXToken is ERC20, ERC165, ERC4524 {
+interface ERCXXXXToken is /* ERC20, */ ERC165, ERC4524 {
 
     /////////////////
     //// GETTERS ////
@@ -59,13 +62,13 @@ interface ERCXXXXToken is ERC20, ERC165, ERC4524 {
     function subscribe(address to, uint256 amount) external;
 
 
-    /// @notice             Sets the subscription allowance to `amount`, and calls `onERC20Subscribed` if `to` is a contract
+    /// @notice             Sets the subscription allowance to `amount`, and performs validation
     /// @param  to          The address recieving tokens
     /// @param  amount      The amount to send/approve each block
     function safeSubscribe(address to, uint256 amount) external;
 
 
-    /// @notice             Sets the subscription allowance to `amount`, sets the subscription amount to `amount`, and calls `onERC20Subscribed` if `to` is a contract with the same validation as EIP-4524
+    /// @notice             Sets the subscription allowance to `amount`, and performs validation
     /// @param  to          The address recieving tokens
     /// @param  amount      The amount to send/approve each block
     /// @param  data        Data to provide to `onERC20Subscribed`
@@ -97,28 +100,47 @@ interface ERCXXXXToken is ERC20, ERC165, ERC4524 {
 }
 ```
 
+`ERCXXXXToken`s MUST comply with [EIP-165](./eip-165.md). The identifier for `ERCXXXXToken` is `0xTODO`.
+
+`ERCXXXXToken`s MUST comply with the [EIP-4524](./eip-4524.md) and [EIP-20](./eip-20.md) token standards.
+
+`safeSubscribe` MUST transfer as expected to EOA addresses, and to contracts implementing `ERC20Subsriber` and returning the function selector (`0xTODO`) when called, and MUST revert when transferring to a contract which either does not have `ERC20Subsriber` implemented, or does not return the function selector when called. This wording is taken from [EIP-4524](./eip-4524.md#specification).
+
 ### ERC20Subscriber
+Contracts that accept subscriptions MUST implement the following interface:
+
 ```solidity
 interface ERC20Subscriber is ERC20Receiver {
-    /// @dev                Note: `updateSubscription` can be safely called from this function, because it does not re-call `onERC20Subscribed`. This is the recommended way to automatically accept subscriptions
+    /// @dev                `updateSubscription` MAY be safely called from this function,
+    ///                     because it does not re-call `onERC20Subscribed`. This is the 
+    ///                     RECOMMENDED way to automatically accept subscriptions.
+    ///                     This MUST return the function selector, `0xTODO`.
     function onERC20Subscribed(address from, uint256 amount, bytes data) external returns(bytes4);
 }
 ```
 
+`ERC20Subscriber`s MUST comply with [EIP-165](./eip-165.md). The identifier for `ERC20Subscriber` is `0xTODO`.
+
 ## Rationale
-EIP-4524 was used as a base because of the similarity of use-cases. The reason that `subscribe` and `safeSubscribe` don't directly set the subscription amount is so that contracts can make it so that users only pay for their usage (e.g. an nft doesn't need to pull payments from everyone who ever owned it).
+[EIP-4524](./eip-4524.md) was used as a base because of the similarity in use-cases (automatic recieving of one-off payments vs automatic recieving of ongoing payments).
+
+The reason that `subscribe` and `safeSubscribe` set an "allowance" is so that contracts can recieve payments based on their usage (e.g. an NFT doesn't need to pull payments from everyone who ever owned it, only the current owner).
+
+The reason that `subscribe` and `safeSubscribe` do not set the subscription amount directly is becase it might mess with contract logic that depends on the amount they recieve being a certain amount, and to reduce gas costs for the account sending funds.
+
+The names of `ERC20Subscriber` and `onERC20Subscribed` were chosen because of similar naming in [EIP-4524](./eip-4524.md) (`ERC20Receiver`, `onERC20Recieved`).
 
 ## Backwards Compatibility
-There are no backwards compatibilty issues. All function and event names are unique.
+There are no backwards compatibilty issues. All function and event names are unique and do not conflict.
 
 ## Security Considerations
-`onERC20Subscribed` is a callback function. Callback functions have been exploited in the past as a reentrancy vector, and care should be taken to make sure implementations are not vulnerable. (Taken word-for-word from EIP-4524)
+`onERC20Subscribed` is a callback function. Callback functions have been exploited in the past as a reentrancy vector, and care should be taken to make sure implementations are not vulnerable. This wording is taken from [EIP-4524](./eip-4524.md#security-considerations)).
 
-Subscriptions are not enumerable, and balance changes because of subscriptions do not show up in event logs because there are no associated transactions. Make sure to keep track of what you're subscribed to!
+Subscriptions are not enumerable, and balance changes because of subscriptions do not show up in event logs because there are no associated transactions. Client-side tracking of subscriptions is essential.
 
-If you are implementing an `ERC20Subscriber` contract, make sure that `subscriptionActive(subscriber)` and that the subscription amount is high enough. No callback is called if the subscriber runs out of tokens.
+While implementing an `ERC20Subscriber` contract, make sure that `subscriptionActive(subscriber)` and that the subscription amount is high enough. No callback is called if the subscriber runs out of tokens.
 
-Implementing EIP-XXXX significantly increases the code complexity, because balances change without changes in state. Make sure to have your code **thoroughly** audited. In particular, watch out for edge cases, particularly overflows and underflows.
+Implementing `ERCXXXXToken` significantly increases the code complexity, because balances change without changes in state. In particular, watch out for edge cases, particularly overflows and underflows. Make sure to have your code **thoroughly** audited, or use a commonly-used library.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
