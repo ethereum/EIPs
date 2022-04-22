@@ -14,10 +14,10 @@ requires: 20, 165, 4524
 ## Abstract
 Recurring payments (hereafter referred to as "subscriptions"), are often tricky to implement, and frequently bad for user experience. The current merged standards ([EIP-1337](./eip-1337.md) and [EIP-4885](./eip-4885.md)) are cumbersome for users, because they have to continually remember to transfer an advance amount. The user would rather have to approve a fixed amount of transactions than to approve a linear amount of transactions over time.
 
-This EIP proposes to fix these issues using an extension of [EIP-4524](./eip-4524.md), itself an extension of [EIP-20](./eip-20.md). It adds new functions to allow addresses to "subscribe" to other addresses, and for the recieving address to control the amount recieved so that the user can pay for their usage.
+This EIP proposes to fix these issues using an extension of [EIP-4524](./eip-4524.md), itself an extension of [EIP-20](./eip-20.md). It adds new functions to allow addresses to "subscribe" to other addresses, and for the receiving address to control the amount received so that the user can pay for their usage.
 
 ## Motivation
-A typical type of ICO is where the token amount is paid out over time. This is usually done through a form of pull payment, which is cumbersome for the user. With this system, the user only has to make a single transaction to recieve the funds: `updateSubscription` for the maximum uint256 value. Lottery payouts or pensions could also be paid out in this manner.
+A typical type of ICO is where the token amount is paid out over time. This is usually done through a form of pull payment, which is cumbersome for the user. With this system, the user only has to make a single transaction to receive the funds: `updateSubscription` for the maximum uint256 value. Lottery payouts or pensions could also be paid out in this manner.
 
 NFTs could require that a maintenance cost be paid. An silly example could be an NFT game with virtual chickens that require virtual food to stay alive. These could be combined in interesting manners -- food can be used to "feed" chickens, which "lay" eggs automatically. Eggs could be automatically "exported" to a market, and so on.
 
@@ -36,14 +36,14 @@ interface ERCXXXXToken is /* ERC20, */ ERC165, ERC4524 {
 
     /// @notice             Gets the number of tokens that are sent per block from `from` to `to`
     /// @param  from        The address sending tokens
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @return amount      The amount of tokens being sent
     function subscription(address from, address to) external view returns (uint256 amount);
 
 
     /// @notice             Gets the maximum number of tokens that can be sent per block from `from` to `to`
     /// @param  from        The address sending tokens
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @return allowance   The maximum value of `amount` in `updateSubscription`
     function subscriptionAllowance(address from, address to) external view returns (uint256 allowance);
 
@@ -57,19 +57,19 @@ interface ERCXXXXToken is /* ERC20, */ ERC165, ERC4524 {
     /////////////////
 
     /// @notice             Sets the subscription allowance to `amount`
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @param  amount      The amount to send/approve each block
     function subscribe(address to, uint256 amount) external;
 
 
     /// @notice             Sets the subscription allowance to `amount`, and performs validation
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @param  amount      The amount to send/approve each block
     function safeSubscribe(address to, uint256 amount) external;
 
 
     /// @notice             Sets the subscription allowance to `amount`, and performs validation
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @param  amount      The amount to send/approve each block
     /// @param  data        Data to provide to `onERC20Subscribed`
     function safeSubscribe(address to, uint256 amount, bytes memory data) external;
@@ -87,14 +87,14 @@ interface ERCXXXXToken is /* ERC20, */ ERC165, ERC4524 {
 
     /// @notice             Emitted when the subscription amount is changed
     /// @param  from        The address sending tokens
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @param  amount      The amount sent each block
     event Subscription(address indexed from, address indexed to, uint256 amount);
 
 
     /// @notice             Emitted when the subscription allowance is changed
     /// @param  from        The address sending tokens
-    /// @param  to          The address recieving tokens
+    /// @param  to          The address receiving tokens
     /// @param  amount      The maximum amount sent each block
     event SubscriptionApproval(address indexed from, address indexed to, uint256 amount);
 }
@@ -122,16 +122,16 @@ interface ERC20Subscriber is ERC20Receiver {
 `ERC20Subscriber`s MUST comply with [EIP-165](./eip-165.md). The identifier for `ERC20Subscriber` is `0xTODO`.
 
 ## Rationale
-[EIP-4524](./eip-4524.md) was used as a base because of the similarity in use-cases (automatic recieving of one-off payments vs automatic recieving of ongoing payments).
+[EIP-4524](./eip-4524.md) was used as a base because of the similarity in use-cases (automatic receiving of one-off payments vs automatic receiving of ongoing payments).
 
-The reason that `subscribe` and `safeSubscribe` set an "allowance" is so that contracts can recieve payments based on their usage (e.g. an NFT doesn't need to pull payments from everyone who ever owned it, only the current owner).
+The reason that `subscribe` and `safeSubscribe` set an "allowance" is so that contracts can receive payments based on their usage (e.g. an NFT doesn't need to pull payments from everyone who ever owned it, only the current owner).
 
-The reason that `subscribe` and `safeSubscribe` do not set the subscription amount directly is becase it might mess with contract logic that depends on the amount they recieve being a certain amount, and to reduce gas costs for the account sending funds.
+The reason that `subscribe` and `safeSubscribe` do not set the subscription amount directly is because it might mess with contract logic that depends on the amount they receive being a certain amount, and to reduce gas costs for the account sending funds.
 
-The names of `ERC20Subscriber` and `onERC20Subscribed` were chosen because of similar naming in [EIP-4524](./eip-4524.md) (`ERC20Receiver`, `onERC20Recieved`).
+The names of `ERC20Subscriber` and `onERC20Subscribed` were chosen because of similar naming in [EIP-4524](./eip-4524.md) (`ERC20Receiver`, `onERC20Received`).
 
 ## Backwards Compatibility
-There are no backwards compatibilty issues. All function and event names are unique and do not conflict.
+There are no backwards compatibility issues. All function and event names are unique and do not conflict.
 
 ## Security Considerations
 `onERC20Subscribed` is a callback function. Callback functions have been exploited in the past as a reentrancy vector, and care should be taken to make sure implementations are not vulnerable. This wording is taken from [EIP-4524](./eip-4524.md#security-considerations)).
