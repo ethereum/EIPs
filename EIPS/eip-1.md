@@ -100,7 +100,7 @@ Each EIP should have the following parts:
 - Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 - Motivation (*optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. EIP submissions without sufficient motivation may be rejected outright.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
-- Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale may also provide evidence of consensus within the community, and should discuss important objections or concerns raised during discussion.
+- Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 - Backwards Compatibility - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 - Test Cases - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`.
 - Reference Implementation - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.
@@ -185,6 +185,10 @@ The `created` header records the date that the EIP was assigned a number. Both h
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
 
+## Linking to External Resources
+
+Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
@@ -207,6 +211,7 @@ The current EIP editors are
 - Matt Garnett (@lightclient)
 - Micah Zoltu (@MicahZoltu)
 - Greg Colvin (@gcolvin)
+- Sam Wilson (@SamWilsn)
 
 Emeritus EIP editors are 
 
@@ -230,9 +235,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 Once the EIP is ready for the repository, the EIP editor will:
 
 - Assign an EIP number (generally the PR number, but the decision is with the editors)
-
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
-
 - Send a message back to the EIP author with the next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
