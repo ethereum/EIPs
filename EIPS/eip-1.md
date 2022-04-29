@@ -260,4 +260,4 @@ This document was derived heavily from [Bitcoin's BIP-0001](https://github.com/b
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENCE).
