@@ -4,7 +4,7 @@ layout: default
 
 <script>
   let thePath = window.location.pathname;
-  let theRegex = /^(.*\/EIPS\/eip-\d+)[^\d\s\/][^\/]*$/gm;
+  let theRegex = /^(.*\/EIPS\/eip-\d+)[^\d\s\/][^\/]*\/?$/gm;
   let theNewPath = theRegex.exec(thePath);
   if (theNewPath !== null) {
     window.location.pathname = theNewPath[1];
