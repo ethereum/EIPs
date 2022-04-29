@@ -64,7 +64,4 @@ exclude:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
   - README.md
-
-keep_files:
-  - LICENCE
   
