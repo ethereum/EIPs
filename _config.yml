@@ -21,6 +21,8 @@ description: >-
 url: "https://eips.ethereum.org"
 github_username:  ethereum
 
+incremental: true
+
 header_pages:
  - all.html
  - core.html
