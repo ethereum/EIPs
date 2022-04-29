@@ -65,6 +65,6 @@ exclude:
   - PULL_REQUEST_TEMPLATE.md
   - README.md
 
-include:
+keep_files:
   - LICENCE
   
