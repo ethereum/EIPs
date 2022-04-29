@@ -3,11 +3,11 @@ layout: default
 ---
 
 <script>
-  let theUrl = window.location.href;
-  let theRegex = /^(.+\/EIPS\/eip-\d+)[^\d\s].*$/gm;
-  let theNewUrl = theRegex.exec(theUrl);
-  if (theNewUrl !== null) {
-    window.location.href = theNewUrl[1];
+  let thePath = window.location.pathname;
+  let theRegex = /^(.*\/EIPS\/eip-\d+)[^\d\s\/][^\/]*$/gm;
+  let theNewPath = theRegex.exec(thePath);
+  if (theNewPath !== null) {
+    window.location.pathname = theNewPath[1];
   }
 </script>
 
