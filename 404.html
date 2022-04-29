@@ -4,7 +4,7 @@ layout: default
 
 <script>
   let theUrl = window.location.href;
-  let theRegex = /^([a-zA-z][a-zA-z0-9\-]*:\/\/[a-zA-z][a-zA-z0-9\-.\/]*\/EIPS\/eip-[0-9]+)[^0-9\s].*$/gm;
+  let theRegex = /^(.+\/EIPS\/eip-\d+)[^\d\s].*$/gm;
   let theNewUrl = theRegex.exec(theUrl);
   if (theNewUrl !== null) {
     window.location.href = theNewUrl[1];
