@@ -64,5 +64,4 @@ exclude:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
   - README.md
-  - LICENCE # LICENCE.md will be rendered, but LICENCE would override the generated HTML
   

@@ -190,4 +190,4 @@ Historical links related to this standard:
 
 
 ## Copyright
-Copyright and related rights waived via [CC0](../LICENCE).
+Copyright and related rights waived via [CC0](../CC0.md).

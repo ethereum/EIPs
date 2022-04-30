@@ -385,4 +385,4 @@ ingress-mac("foo") = 0c7ec6340062cc46f5e9f1e3cf86f8c8c403c5a0964f5df0ebd34a75ddc
 
 ### Copyright
 
-Copyright and related rights waived via [CC0](../LICENCE).
+Copyright and related rights waived via [CC0](../CC0.md).
