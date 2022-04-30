@@ -66,4 +66,4 @@ exclude:
   - README.md
   
 include:
-  - LICENCE.md
+  - LICENSE.md
