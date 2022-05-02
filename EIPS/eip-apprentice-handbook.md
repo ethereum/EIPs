@@ -1,0 +1,96 @@
+---
+eip: 
+title: EIP Editor "Apprentice" Handbook
+description: Formalizes the process for becoming an EIP editor
+author: Pooja Ranjan (@poojaranjan), Pandapip1 (@Pandapip1)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-eip-editor-apprentice-handbook/9137
+status: Draft
+type: Meta
+created: 5/2/2022
+requires: 1
+---
+
+<!-- I have put myself as an author tentatively. If @poojaranjan would prefer not to have me as one, I will remove myself from the list. -->
+
+## Abstract
+An Ethereum Improvement Proposal (EIP) is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP standardization process is a mechanism for proposing new features, for collecting community technical input on an issue, and for documenting the design decisions that have gone into Ethereum. Because improvement proposals are key components of Ethereum blockchain, it is important that they are well reviewed before reaching FINAL status. EIPs are stored in text files in a versioned repository which is monitored by the EIP editors.
+
+This Meta-EIP describes the process for becoming an EIP editor.
+
+## Motivation
+The process for becoming an EIP editor is previously undocumented in the EIP repository itself.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### All PRs
+EIP editors MUST do the following for all new PRs submitted to the EIP repository:
+1. Review proposals: All updated proposals MUST pass a readiness check, unless this is unfeasable:
+    * The title describing the content MUST be accurate.
+    * The idea put forth MUST make sense technically.
+    * The content MUST be not contain any language errors (spelling, grammar, and sentence structure).
+    * The proposal MUST use GitHub-flavored Markdown for formatting.
+    * The proposal MUST NOT have any blank sections, TODOs, or placeholders.
+    * The proposal MUST provide all required sections, and MUST NOT contain any sections not listed in [EIP-1][./eip-1.md].
+    * Any code provided MUST use best-practices for that programming language.
+    * The proposal MUST follow all latest [EIP-1][./eip-1.md] guidelines.
+1. Provide feedback: A review MUST be submitted, containing specific instructions to reject or improve the changes.
+1. Approve proposal: When the PR is ready to be merged, a review accepting the changes will result in the PR being merged.
+
+### New Proposals
+EIP editors MUST do the following for all new proposals submitted to the EIP repository:
+1. Ensure relevance: New proposals MUST be related to the Ethereum ecosystem.
+1. Assign EIP numbers: New proposals will have an EIP number assigned, generally the PR number. In some cases, to discourage sqautting, an unused EIP number may be assigned instead.
+1. Perform the [All PRs](#all-prs) checklist
+
+### Other Changes
+Requirements for other PRs (status change, edits to a final EIP) are provided in [EIP-1][./eip-1.md].
+
+### Exceptional Cases / Miscellaneous Notes
+- When updating the status from STAGNANT to DRAFT, it is up to the original author to bring it back to the status as they find appropriate. It MAY contain the same content as when its state was changed to STAGNANT, but MUST pass the readiness check, which may have changed since the EIP was last updated.
+- When a proposal has been in the STAGNANT state for more than 6 months <!-- NOTE: 6 months was arbitrarily chosen. This needs discussion. -->, then STAGNANT MAY be considered its terminal status. However, the original author MAY still update the EIP, changing the status from STAGNANT to DRAFT.
+- If a proposal needs to be moved to FINAL because the LAST CALL deadline was exceeded, but all authors are absent, an EIP champion MAY be added to the author list to deal with resulting comments. There are no requirements to become an EIP champion. Alternatively, the LAST CALL deadline may be extended.
+- EIP Authors MAY choose to ignore any improvement suggestions received during the LAST CALL period. Reviewers MAY submit a competing standard as a new EIP if they are unhappy with any of the authors' decisions.
+- EIP Authors MUST have an EIP editor approval to update the status from LAST CALL to FINAL.
+- FINAL EIPs SHALL NOT accept non-normative changes. New EIPs MAY be submitted.
+- If the correct type or category of an EIP is unclear, the EIP Editor MAY make an educated guess. The type or catagory MAY be changed.
+- The Test Cases section is OPTIONAL, but RECOMMENDED for EIPs in REVIEW or a later state.
+- In the absence of an EIP author, EIP editors or the EIP Bot MAY merge non-normative changes.
+- EIP editors SHALL NOT judge proposals.
+
+### EIP Editor Mentorship Program
+The EIP Editor Mentorship Program is an initiative by the Ethereum Cat Herders to attract potential talent of the community to accelerate and improve the EIP standardization process. The EIP Editor Mentorship Program includes completing editorial tasks under the guidance of more experienced editors for the inital 3 months as EIP editor trainee, to provide support until trainees are confident with the process and ready to work independently.
+
+The EIP Editor Mentorship Program is not REQUIRED, but is RECOMMENDED.
+
+### Application and Onboarding Process
+Any contributor of Ethereum ecosystem having a good understanding of EIP standardization and network upgrade process, intermediate level experties on core and/or application side of the Ethereum blockchain and the willingness to contribute to the process management MAY be an EIP editor. Potential EIP editors SHOULD have the following skills:
+- Good communication skills
+- Ability to handle contentious discourse
+- 1-5 spare hours per week
+
+The best available resource to understand the EIP process is [EIP-1](./eip-1.md). EIP editor apprentices MUST understand this document. Afterwards, participating in the EIP process by commenting on and suggesting improvements to PRs and issues will familliarize apprentices with the procedure, and is RECOMMENDED. Attending EIPIP meetings <!-- is it okay to provide external links for this? --> is also RECOMMENDED, as it rapidly accelerates consensus. The contributions of apprentice editors SHALL be monitored by other EIP editors.
+
+<!-- I'm going to hold off on including this if/until ECH and ETH merge: https://github.com/ethereum-cat-herders/EIPIP/issues/132 -->
+<!-- Following the monthly EIPs Insight page to keep track of upcoming Ethereum Improvement Proposals. Among other resources, ECH produces PEEPanEIP video series for a quick overview of these proposals. -->
+
+When the apprentice feels comfortable with the process, a pull request with a request to be listed as EIP editor MAY to be made. <!-- Add Sam's PR as an external link as an example? --> If the existing EIP editors agree, the apprentice SHALL a full EIP editor. This SHALL notify the editor of relevant new proposals submitted in the EIPs repository, and enable them to review and merge pull requests. Once the first PR is merged, another pull request to update the editor list in SHALL be made.
+
+### Funding
+Ecosystem Support Program provided a grant to ECH to work with present editors and individual applicants to provide a stipend for the purpose of increasing community engagement with the EIP process. Historically, though, EIP editing had been done by volunteers.
+
+### Special Merging Rules for this EIP
+This EIP MUST have the same rules regarding changes as [EIP-1][./eip-1.md].
+
+## Rationale
+- "6 months" was chosen as the cutoff for denoting STAGNANT EIPs terminally-STAGNANT arbitrarily.
+- This EIP requires special merging rules for the same reason [EIP-1][./eip-1.md] does.
+
+## Backwards Compatibility
+No backwards compatibility issues found.
+
+## Security Considerations
+No security considerations found.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
