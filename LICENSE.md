@@ -1,8 +1,3 @@
----
-layout: page
-title: CC0 1.0 Universal
----
-
 Creative Commons Legal Code
 
 CC0 1.0 Universal

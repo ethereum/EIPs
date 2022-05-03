@@ -50,6 +50,12 @@ defaults:
       path: "EIPS"
     values:
       layout: "eip"
+  -
+    scope:
+      path: "LICENCE.md"
+    values:
+      layout: "page"
+      title: "CC0 1.0 Universal"
 
 exclude:
   - .github
