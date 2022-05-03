@@ -1,0 +1,2 @@
+## Reference Implementation
+The reference implementation is in TypeScript and available at [https://github.com/spruceid/siwe](https://github.com/spruceid/siwe). It is also available on [NPM](https://www.npmjs.com/package/siwe).
