@@ -244,8 +244,6 @@ Many EIPs are written and maintained by developers with write access to the Ethe
 
 The editors don't pass judgment on EIPs. We merely do the administrative & editorial part.
 
-
-
 ## Style Guide
 
 ### EIP numbers
