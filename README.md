@@ -9,6 +9,8 @@ This repository tracks ongoing improvements to Ethereum. It contains:
 
 For help *implementing* an EIP, please visit [Ethereum Stack Exchange](https://ethereum.stackexchange.com).
 
+If you would like to become an EIP Editor, please check [EIP-5069](./EIPS/eip-5069.md).
+
 ## Mission
 
 The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high quality and implementable way.
