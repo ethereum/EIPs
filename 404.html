@@ -3,11 +3,11 @@ layout: default
 ---
 
 <script>
-  let thePath = window.location.pathname;
-  let theRegex = /^(.*\/EIPS\/eip-\d+)[^\d\s\/][^\/]*$/gm;
-  let theNewPath = theRegex.exec(thePath);
-  if (theNewPath !== null) {
-    window.location.pathname = theNewPath[1];
+  let thePath = window.location.pathname;                   // Fetches the path (e.g. "/EIPS/eip-20-token-standard" or "/core")
+  let theRegex = /^(.*\/EIPS\/eip-\d+)[^\d\s\/][^\/]*$/gm;  // This regex matches the EIP path (e.g. "/EIPS/EIP-20") if the original path isn't valid
+  let theNewPath = theRegex.exec(thePath);                  // Fetch the EIP path, if there is one
+  if (theNewPath !== null) {                                // Only redirect if there is an EIP path and the existing EIP path is invalid
+    window.location.pathname = theNewPath[1];               // Redirect to the match
   }
 </script>
 
