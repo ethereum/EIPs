@@ -222,7 +222,7 @@ Emeritus EIP editors are
 - Nick Savers (@nicksavers)
 - Martin Becze (@wanderer)
 
-If you would like to become an EIP editor, please check [EIP-5069](./EIPS/eip-5069.md).
+If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md).
 
 ## EIP Editor Responsibilities
 
