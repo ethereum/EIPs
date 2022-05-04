@@ -8,7 +8,7 @@ import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC4973} from "./interfaces/IERC4973.sol";
 import {ERC4973} from "./ERC4973.sol";
 
-contract AccountboundToken is ERC4973 {
+contract AccountBoundToken is ERC4973 {
   constructor() ERC4973("Name", "Symbol") {}
 
   function mint(
@@ -23,10 +23,10 @@ contract AccountboundToken is ERC4973 {
 }
 
 contract ERC4973Test is DSTest {
-  AccountboundToken abt;
+  AccountBoundToken abt;
 
   function setUp() public {
-    abt = new AccountboundToken();
+    abt = new AccountBoundToken();
   }
 
   function testIERC165() public {
