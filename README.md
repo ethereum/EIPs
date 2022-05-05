@@ -1,6 +1,6 @@
 <div align="center">
 
-# ERC721 Consumer Extension
+# ERC721 Consumable Extension
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
