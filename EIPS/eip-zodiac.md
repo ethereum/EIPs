@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2022-04-14
-requires (*optional): ERC-165
+requires: 165
 ---
 
 ## Abstract
