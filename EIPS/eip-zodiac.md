@@ -12,12 +12,12 @@ requires: 165
 ---
 
 ## Abstract
-[Zodiac](https://github.com/gnosis/zodiac) is a philosophy and open standard for composable and interoperable DAO tooling. The key insight is that by separating account (thing that holds tokens, controls systems, and is referenced by others) from the logic that controls it, and making the account agnostic to the logic that controls it, we can create a DAO ecosystem that is much more composable and interoperable, along with being compatible with the vast majority of existing DAO tooling. In short, [Zodiac](https://github.com/gnosis/zodiac) encourages DAOs to use an "avatar" contract (like the Gnosis Safe) as their account, and to then control that avatar with just about any combination of DAO tools and frameworks (Aragon, Colony, Compound/OZ Governor, DAOStack, Moloch, Orca, Tribute, etc).
+Zodiac is a philosophy and open standard for composable and interoperable DAO tooling. The key insight is that by separating account (thing that holds tokens, controls systems, and is referenced by others) from the logic that controls it, and making the account agnostic to the logic that controls it, we can create a DAO ecosystem that is much more composable and interoperable, along with being compatible with the vast majority of existing DAO tooling. In short, Zodiac encourages DAOs to use an "avatar" contract (like the Gnosis Safe) as their account, and to then control that avatar with just about any combination of DAO tools and frameworks (Aragon, Colony, Compound/OZ Governor, DAOStack, Moloch, Orca, Tribute, etc).
 
 ## Motivation
 Currently, most DAO tools and frameworks are built as somewhat monolithic systems. Wherein account and control logic are coupled, either in the same contract or in a tightly bound system of contracts. This needlessly inhibits the future flexibility of organizations using these tools and encourages platform lock-in via extraordinarily high switching costs.
 
-By using the [Zodiac](https://github.com/gnosis/zodiac) standard to decouple account and control logic, organizations are able to:
+By using the Zodiac standard to decouple account and control logic, organizations are able to:
 1. Enable flexible, module-based control of programmable accounts
 2. Easily switch between frameworks without unnecessary overhead.
 3. Enable multiple control mechanism in parallel.
@@ -27,7 +27,7 @@ By using the [Zodiac](https://github.com/gnosis/zodiac) standard to decouple acc
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-The [Zodiac](https://github.com/gnosis/zodiac) standard consists of four key concepts Avatars, Modules, Modifiers, and Guards:
+The Zodiac standard consists of four key concepts Avatars, Modules, Modifiers, and Guards:
 1. **Avatars** are programmable Ethereum accounts, like the [Gnosis Safe](https://gnosis-safe.io). Avatars are the address that holds balances, owns systems, executes transaction, is referenced externally, and ultimately represents your DAO. Avatars MUST expose the `IAvatar` interface.
 2. **Modules** are contracts enabled by an Avatar that implement some control logic.
 3. **Modifiers** are contracts that sit between Modules and Avatars to modify the Module's behavior. For example, they might enforce a delay on all functions a Module attempts to execute or limit the scope of transactions that can be initiated by the module. Modifiers MUST expose the `IAvatar` interface.
@@ -38,7 +38,7 @@ The [Zodiac](https://github.com/gnosis/zodiac) standard consists of four key con
 
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "./Enum.sol";
 
 
 interface IAvatar {
@@ -105,7 +105,7 @@ interface IAvatar {
 ```solidity
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
+import "./Enum.sol";
 
 interface IGuard {
     function checkTransaction(
@@ -130,12 +130,11 @@ interface IGuard {
 ```solidity
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "./Enum.sol";
 import "./BaseGuard.sol";
 
 /// @title Guardable - A contract that manages fallback calls made to this contract
-contract Guardable is OwnableUpgradeable {
+contract Guardable {
     address public guard;
 
     event ChangedGuard(address guard);
@@ -145,7 +144,7 @@ contract Guardable is OwnableUpgradeable {
 
     /// @dev Set a guard that checks transactions before execution.
     /// @param _guard The address of the guard to be used or the 0 address to disable the guard.
-    function setGuard(address _guard) external onlyOwner {
+    function setGuard(address _guard) external {
         if (_guard != address(0)) {
             if (!BaseGuard(_guard).supportsInterface(type(IGuard).interfaceId))
                 revert NotIERC165Compliant(_guard);
@@ -160,8 +159,58 @@ contract Guardable is OwnableUpgradeable {
 }
 ```
 
+```solidity
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity >=0.7.0 <0.9.0;
+
+import "./Enum.sol";
+import "./IERC165.sol";
+import "./IGuard.sol";
+
+abstract contract BaseGuard is IERC165 {
+    function supportsInterface(bytes4 interfaceId)
+        external
+        pure
+        override
+        returns (bool)
+    {
+        return
+            interfaceId == type(IGuard).interfaceId || // 0xe6d7a83a
+            interfaceId == type(IERC165).interfaceId; // 0x01ffc9a7
+    }
+
+    /// @dev Module transactions only use the first four parameters: to, value, data, and operation.
+    /// Module.sol hardcodes the remaining parameters as 0 since they are not used for module transactions.
+    /// @notice This interface is used to maintain compatibilty with Gnosis Safe transaction guards.
+    function checkTransaction(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
+        uint256 gasPrice,
+        address gasToken,
+        address payable refundReceiver,
+        bytes memory signatures,
+        address msgSender
+    ) external virtual;
+
+    function checkAfterExecution(bytes32 txHash, bool success) external virtual;
+}
+```
+
+```solidity
+pragma solidity >=0.7.0 <0.9.0;
+
+/// @title Enum - Collection of enums
+contract Enum {
+    enum Operation {Call, DelegateCall}
+}
+```
+
 ## Rationale
-In designing the [Zodiac](https://github.com/gnosis/zodiac) standard, we inevitably needed to define a standard interface for modular programmable accounts (avatars). Rather than writing this from scratch, we elected to use the existing interfaces from the [Gnosis Safe's Module Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/ModuleManager.sol) and from the [Gnosis Safe's Guard Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/GuardManager.sol), since the Gnosis Safe is by far the most widely used programmable account for DAOs, other organizations, and individuals.
+In designing the Zodiac standard, we inevitably needed to define a standard interface for modular programmable accounts (avatars). Rather than writing this from scratch, we elected to use the existing interfaces from the [Gnosis Safe's Module Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/ModuleManager.sol) and from the [Gnosis Safe's Guard Manager](https://github.com/gnosis/safe-contracts/blob/main/contracts/base/GuardManager.sol), since the Gnosis Safe is by far the most widely used programmable account for DAOs, other organizations, and individuals.
 
 ## Backwards Compatibility
 No backward compatibility issues are introduced by this standard.
