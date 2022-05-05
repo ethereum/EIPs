@@ -244,6 +244,20 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 ## Style Guide
 
+### Titles
+
+The `title` field in the preamble:
+
+ - Should not include the word "standard" or any variation thereof; and
+ - Should not include the EIP's number.
+
+### Descriptions
+
+The `description` field in the preamble:
+
+ - Should not include the word "standard" or any variation thereof; and
+ - Should not include the EIP's number.
+
 ### EIP numbers
 
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
