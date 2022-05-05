@@ -6,7 +6,7 @@ author: Auryn Macmillan (@auryn-macmillan), Kei Kreutler (@keikreutler)
 discussions-to: https://ethereum-magicians.org/t/eip-zodiac-a-composable-design-philosophy-for-daos/8963
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2022-04-14
 requires (*optional): ERC-165
 ---
