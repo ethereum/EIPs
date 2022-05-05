@@ -18,6 +18,6 @@ body:
         > Once the champion has asked the Ethereum community as to whether an idea has any chance of acceptance, a draft EIP should be presented as a Pull Request. This gives the author a chance to flesh out the draft EIP to make properly formatted, of high quality, and to address initial concerns about the proposal.
   - type: textarea
     attributes:
-      label: ""
+      label: "Issue Body:"
     validations:
       required: true
