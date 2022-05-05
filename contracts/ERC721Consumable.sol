@@ -1,28 +1,21 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.11;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "./IERC721Consumable.sol";
 
 contract ERC721Consumable is IERC721Consumable, ERC721 {
-    // Mintable
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
 
     // Mapping from token ID to consumer address
     mapping(uint256 => address) _tokenConsumers;
 
-    constructor() ERC721("ReferenceImpl", "RIMPL") {
-    }
+    constructor (string memory name_, string memory symbol_) ERC721(name_, symbol_) {}
 
-    // @notice Mints new NFT to msg.sender
-    function mint() external returns (uint256) {
-        _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
-
-        return newItemId;
+    /**
+     * @dev Returns true if the `msg.sender` is approved, owner or consumer of the `tokenId`
+     */
+    function _isApprovedOwnerOrConsumer(uint256 tokenId) internal view returns (bool) {
+        return _isApprovedOrOwner(msg.sender, tokenId) || _tokenConsumers[tokenId] == msg.sender;
     }
 
     /**
@@ -38,20 +31,9 @@ contract ERC721Consumable is IERC721Consumable, ERC721 {
      */
     function changeConsumer(address _consumer, uint256 _tokenId) external {
         address owner = this.ownerOf(_tokenId);
-        require(msg.sender == owner ||
-            msg.sender == getApproved(_tokenId) ||
-            isApprovedForAll(owner, msg.sender),
+        require(msg.sender == owner || msg.sender == getApproved(_tokenId) || isApprovedForAll(owner, msg.sender),
             "ERC721Consumable: changeConsumer caller is not owner nor approved");
         _changeConsumer(owner, _consumer, _tokenId);
-    }
-
-    /**
-     * @dev Changes the consumer
-     * Requirement: `tokenId` must exist
-     */
-    function _changeConsumer(address _owner, address _consumer, uint256 _tokenId) internal {
-        _tokenConsumers[_tokenId] = _consumer;
-        emit ConsumerChanged(_owner, _consumer, _tokenId);
     }
 
     /**
@@ -63,8 +45,15 @@ contract ERC721Consumable is IERC721Consumable, ERC721 {
 
     function _beforeTokenTransfer(address _from, address _to, uint256 _tokenId) internal virtual override (ERC721) {
         super._beforeTokenTransfer(_from, _to, _tokenId);
-
         _changeConsumer(_from, address(0), _tokenId);
     }
 
+    /**
+     * @dev Changes the consumer
+     * Requirement: `tokenId` must exist
+     */
+    function _changeConsumer(address _owner, address _consumer, uint256 _tokenId) internal {
+        _tokenConsumers[_tokenId] = _consumer;
+        emit ConsumerChanged(_owner, _consumer, _tokenId);
+    }
 }
