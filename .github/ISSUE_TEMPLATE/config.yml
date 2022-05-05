@@ -1,17 +1,14 @@
-blank_issues_enabled: true
+blank_issues_enabled: false  # Replaced with the issue.yml form
 contact_links:
-  - name: EIP Proposals
+  - name: Ethereum Magicians
     url: https://ethereum-magicians.org/
-    about: Use the Fellowship of Ethereum Magicians forum instead!
-  - name: Discussion Threads
-    url: https://ethereum-magicians.org/
-    about: Use the Fellowship of Ethereum Magicians forum instead!
-  - name: EIP Bot Issues
+    about: Use the Fellowship of Ethereum Magicians for EIP-related discussion!
+  - name: Issue with EIP Bot
     url: https://github.com/ethereum/EIP-Bot/issues
-    about: If you have a problem with the EIP Bot, please submit an issue here!
-  - name: EIP Validation Issues
+    about: If you have a problem with the EIP Bot, report it here!
+  - name: Issue with EIP Validation
     url: https://github.com/ethereum/eipv/issues
-    about: If you have a problem with the EIP Bot, please submit an issue here!
-  - name: EIP Improvement Proposals
+    about: If you have a problem with EIP Validation, report it here!
+  - name: EIP Improvements
     url: https://github.com/ethereum-cat-herders/EIPIP/issues
-    about: If you have a suggestion related to the EIP process, please submit an issue here!
+    about: If you have a suggestion related to the EIP process, submi here!

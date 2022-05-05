@@ -1,0 +1,3 @@
+Please review [EIP-1](../EIPS/eip-1.md) for EIP guidelines.
+
+<!-- RATIONALE FOR THIS FILE: IT IS DISPLAYED WHEN YOU CREATE AN ISSUE OR MAKE A PR -->
