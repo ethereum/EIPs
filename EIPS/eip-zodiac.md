@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5005
 title: Zodiac
 description: A composable design philosophy for DAOs.
 author: Auryn Macmillan (@auryn-macmillan), Kei Kreutler (@keikreutler)
