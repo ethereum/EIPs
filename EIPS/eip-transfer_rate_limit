@@ -132,14 +132,15 @@ contract rateLimit {
         address to,
         uint256 amount,
         address token
-    ) public returnsreturns (bool success) ({
+    ) public returns (bool success) {
         TokenInfo storage info = infoL[token];
 
         if (whitelisted[msg.sender] == 1) {
             if (address(token) == address(0)) {
                 payable(to).transfer(amount);
+                return(true);
             } else {
-                IERC20(token).transfer(to, amount);
+                return(IERC20(token).transfer(to, amount));
             }
         }
         //used if the asset is ETH and not an ERC20 token
@@ -171,6 +172,7 @@ contract rateLimit {
                 info.timestamp = uint32(block.timestamp);
                 //transfers out
                 payable(to).transfer(amount);
+                return(true);
                 //if the token is a ERC20 token
             } else {
                 //used to get around solidity 0.8 reverts
@@ -201,7 +203,7 @@ contract rateLimit {
                     //sets the current time as the last transfer for the token
                     info.timestamp = uint32(block.timestamp);
                     //transfers out
-                    IERC20(token).transfer(to, amount);
+                    return(IERC20(token).transfer(to, amount));
                 }
             }
         }
