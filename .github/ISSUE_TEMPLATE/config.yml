@@ -1,4 +1,4 @@
-blank_issues_enabled: false  # Replaced with the issue.yml form
+blank_issues_enabled: true
 contact_links:
   - name: Ethereum Magicians
     url: https://ethereum-magicians.org/
