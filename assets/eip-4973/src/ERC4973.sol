@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.6;
 
-import {ERC165} from "openzeppelin-contracts/utils/introspection/ERC165.sol";
-import {Counters} from "openzeppelin-contracts/utils/Counters.sol";
+import {ERC165} from "./ERC165.sol";
 
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
 import {IERC4973} from "./interfaces/IERC4973.sol";
 
 
 abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
-  using Counters for Counters.Counter;
-
-  Counters.Counter private _tokenIds;
   string private _name;
   string private _symbol;
 
-  mapping(uint256 => address) private _bonds;
+  mapping(uint256 => address) private _owners;
   mapping(uint256 => string) private _tokenURIs;
 
   constructor(
@@ -47,30 +43,31 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
   }
 
   function _exists(uint256 tokenId) internal view virtual returns (bool) {
-    return _bonds[tokenId] != address(0);
+    return _owners[tokenId] != address(0);
   }
 
   function ownerOf(uint256 tokenId) public view virtual returns (address) {
-    address owner = _bonds[tokenId];
+    address owner = _owners[tokenId];
     require(owner != address(0), "ownerOf: token doesn't exist");
     return owner;
   }
 
   function _mint(
+    address to,
+    uint256 tokenId,
     string calldata uri
   ) internal virtual returns (uint256) {
-    uint256 tokenId = _tokenIds.current();
-    _bonds[tokenId] = msg.sender;
+    require(!_exists(tokenId), "mint: tokenID exists");
+    _owners[tokenId] = to;
     _tokenURIs[tokenId] = uri;
-    _tokenIds.increment();
-    emit Transfer(address(0), msg.sender, tokenId);
+    emit Transfer(address(0), to, tokenId);
     return tokenId;
   }
 
   function _burn(uint256 tokenId) internal virtual {
     address owner  = ownerOf(tokenId);
 
-    delete _bonds[tokenId];
+    delete _owners[tokenId];
     delete _tokenURIs[tokenId];
 
     emit Transfer(owner, address(0), tokenId);
