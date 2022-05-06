@@ -9,6 +9,3 @@ contact_links:
   - name: Do you want to submit a bug report for the validation bot (Travis CI)?
     url: https://github.com/ethereum/eipv/issues
     about: If you have a problem with EIP Validation, report it here!
-  - name: EIP Improvements
-    url: https://github.com/ethereum-cat-herders/EIPIP/issues
-    about: If you have a suggestion related to the EIP process, submit it here!
