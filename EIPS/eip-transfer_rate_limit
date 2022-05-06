@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5075
 title: rateLimit - An outflow limiter for assets
 description: Limits outflows for all contract assets to a given rate in a given timeframe
 author: PR0 (@pr0toshi)
@@ -55,7 +55,7 @@ This will be non backwards compatible with contracts that are NOT whitelisted wh
 ## Reference Implementation
 
 ```
-  // SPDX-License-Identifier: MIT
+  // SPDX-License-Identifier: CC0
 pragma solidity ^0.8;
 
 import"./IERC20.sol";
