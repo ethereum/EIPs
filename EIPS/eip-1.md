@@ -105,7 +105,7 @@ Each EIP should have the following parts:
 - Test Cases - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`.
 - Reference Implementation - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-- Copyright Waiver - All EIPs must be in the public domain. See the bottom of this EIP for an example copyright waiver.
+- Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
 
 ## EIP Formats and Templates
 
@@ -274,4 +274,4 @@ This document was derived heavily from [Bitcoin's BIP-0001](https://github.com/b
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENSE.md).
