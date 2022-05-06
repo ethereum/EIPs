@@ -17,7 +17,7 @@ contract ERC5007Demo is ERC5007{
        _mintTimeNft(to_, id_, startTime_, endTime_);
     }
 
-    function getInterface() public pure  returns (bytes4) {
+    function getInterfaceId() public pure  returns (bytes4) {
         return  type(IERC5007).interfaceId ;
     }   
 }

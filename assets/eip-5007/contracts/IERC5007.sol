@@ -14,11 +14,4 @@ interface IERC5007 /* is IERC721 */ {
     /// @param tokenId  The tokenId of the NFT
     /// @return The end time of the NFT
     function endTime(uint256 tokenId) external view returns (uint64);
-
-    /// @notice Check the NFT is valid now 
-    /// @dev Throws if `tokenId` is not valid NFT
-    /// @param tokenId  The tokenId of the NFT
-    /// @return The the NFT is valid now
-    /// if(startTime <= now <= endTime) {return true;} else {return false;}
-    function isValidNow(uint256 tokenId) external view returns (bool);
 }

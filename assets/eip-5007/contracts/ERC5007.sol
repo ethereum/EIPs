@@ -34,16 +34,6 @@ contract ERC5007 is ERC721, IERC5007  {
         return _timeNftMapping[tokenId].endTime;
     }
 
-    /// @notice Check the NFT is valid now 
-    /// @dev Throws if `tokenId` is not valid token
-    /// @param tokenId  The tokenId of the token
-    /// @return The the NFT is valid now
-    /// if(startTime <= now <= endTime) {return true;} else {return false;}
-    function isValidNow(uint256 tokenId) public view virtual override returns (bool) {
-        require(_exists(tokenId),"invalid tokenId");
-        return uint256(_timeNftMapping[tokenId].startTime) <= block.timestamp
-               && block.timestamp <= uint256(_timeNftMapping[tokenId].endTime);
-    }
 
     /// @notice mint a new time NFT
     /// @param to_  The owner of the new token
