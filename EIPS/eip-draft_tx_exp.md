@@ -51,8 +51,8 @@ As of `FORK_BLOCK_NUMBER` for `CHAIN_ID`, we introduce a new [EIP-2718](./eip-27
 TX_TYPE || rlp([chain_id, expire_by, nonce, gas_price, gas_limit, to, value, data, signature_y_parity, signature_r, signature_s])
 ```
 
-The `expireBy` is a block number the latest possible block to
-execute this transaction. Any block with a block number `block_num > expiredBy` MUST NOT execute this transaction.
+The `expirer_by` is a block number the latest possible block to
+execute this transaction. Any block with a block number `block_num > expired_by` MUST NOT execute this transaction.
 
 ## Rationale
 TODO
@@ -78,6 +78,9 @@ An optional section that contains a reference/example implementation that people
 a tx if `current_block_num + gossip_ttl <= expired_by`. Backward compatibility:
 for nodes that doesn't have `current_block_num` or `gossip_ttl` available,
 they should be presume to be `0`.
+  
+4. It is suggested by not required that any propagating client SHOULD properly deduct the `gossip_ttl` 
+based on the network environment it sees fit.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
