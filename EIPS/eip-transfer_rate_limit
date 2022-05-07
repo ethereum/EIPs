@@ -215,5 +215,5 @@ The above discussion shows why we decided to implement the per token tracking an
   
 Note rateLimit can be set to 1000 (100% in basis points) to allow for the feature to be effectively disabled. Had considered doing a flag and a check but this would create a slight gas inefficiency on all transactions during usual operation.
 
-  ## Copyright
+## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
