@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5081
 title: Expirable Trainsaction 
 description: This EIP adds a new transaction type of that includes expiration with a blocknum 
 author: Zainan Victor Zhou <zzn@zzn.im> (@xinbenlv), Nick Johnson (@Arachnid)
