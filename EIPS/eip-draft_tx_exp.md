@@ -51,8 +51,8 @@ As of `FORK_BLOCK_NUMBER` for `CHAIN_ID`, we introduce a new [EIP-2718](./eip-27
 TX_TYPE || rlp([chain_id, expire_by, nonce, gas_price, gas_limit, to, value, data, signature_y_parity, signature_r, signature_s])
 ```
 
-The `expirer_by` is a block number the latest possible block to
-execute this transaction. Any block with a block number `block_num > expired_by` MUST NOT execute this transaction.
+The `expire_by` is a block number the latest possible block to
+execute this transaction. Any block with a block number `block_num > expire_by` MUST NOT execute this transaction.
 
 ## Rationale
 TODO
@@ -71,11 +71,11 @@ An optional section that contains a reference/example implementation that people
 1. If `current_block_num` is available, client MUST drop and stop propagating/broadcasting any transactions that has a
 `transacton_type == TX_TYPE` AND `current_block_num > expire_by`
 
-2. It is suggested but not required that a `currentBlockNum` SHOULD be made available to client. Any client doing PoW calculation on blocks expired tx or propagating such are essentially penalized for wasting of work, mitigating possible denial of service attack.
+2. It is suggested but not required that a `currentBlockNum` SHOULD be made available to client. Any client doing PoW calculation on blocks expire tx or propagating such are essentially penalized for wasting of work, mitigating possible denial of service attack.
 
 3. It is suggested but not required that client SHOULD introduce a 
 `gossip_ttl` in unit of block_num as a safe net so that it only propagate
-a tx if `current_block_num + gossip_ttl <= expired_by`. Backward compatibility:
+a tx if `current_block_num + gossip_ttl <= expire_by`. Backward compatibility:
 for nodes that doesn't have `current_block_num` or `gossip_ttl` available,
 they should be presume to be `0`.
   
