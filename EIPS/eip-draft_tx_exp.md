@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Expirable Trainsaction 
 description: This EIP adds a new transaction type of that includes expiration with a blocknum 
-author: Zainan Victor Zhou <zzn@zzn.im> (@Xinbenlv)
+author: Zainan Victor Zhou <zzn@zzn.im> (@Xinbenlv), Nick Johnson (@Arachnid)
 discussions-to: <to be assigned></to>
 status: Draft
 type: Standards Track
