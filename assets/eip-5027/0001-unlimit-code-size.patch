@@ -1,0 +1,229 @@
+From 82ce60226a81e6a3acb92525482c16d254f63816 Mon Sep 17 00:00:00 2001
+From: Qi Zhou <qzhou64@gmail.com>
+Date: Thu, 21 Apr 2022 11:35:27 -0700
+Subject: [PATCH] unlimit code size
+
+---
+ core/rawdb/accessors_state.go | 18 ++++++++++++++++++
+ core/rawdb/schema.go          |  6 ++++++
+ core/state/database.go        |  6 ++++++
+ core/vm/evm.go                |  6 +++---
+ core/vm/gas_table.go          | 25 +++++++++++++++++++++++++
+ core/vm/instructions.go       |  7 +++++++
+ params/protocol_params.go     |  2 +-
+ 7 files changed, 66 insertions(+), 4 deletions(-)
+
+diff --git a/core/rawdb/accessors_state.go b/core/rawdb/accessors_state.go
+index 41e21b6ca..ad7fc150d 100644
+--- a/core/rawdb/accessors_state.go
++++ b/core/rawdb/accessors_state.go
+@@ -17,6 +17,8 @@
+ package rawdb
+ 
+ import (
++	"encoding/binary"
++
+ 	"github.com/ethereum/go-ethereum/common"
+ 	"github.com/ethereum/go-ethereum/ethdb"
+ 	"github.com/ethereum/go-ethereum/log"
+@@ -48,6 +50,16 @@ func ReadCodeWithPrefix(db ethdb.KeyValueReader, hash common.Hash) []byte {
+ 	return data
+ }
+ 
++// ReadCodeSize retrieves the contract code size of the provided code hash.
++// Return 0 if not found
++func ReadCodeSize(db ethdb.KeyValueReader, hash common.Hash) int {
++	data, _ := db.Get(codeSizeKey(hash))
++	if len(data) != 4 {
++		return 0
++	}
++	return int(binary.BigEndian.Uint32(data))
++}
++
+ // ReadTrieNode retrieves the trie node of the provided hash.
+ func ReadTrieNode(db ethdb.KeyValueReader, hash common.Hash) []byte {
+ 	data, _ := db.Get(hash.Bytes())
+@@ -96,6 +108,12 @@ func WriteCode(db ethdb.KeyValueWriter, hash common.Hash, code []byte) {
+ 	if err := db.Put(codeKey(hash), code); err != nil {
+ 		log.Crit("Failed to store contract code", "err", err)
+ 	}
++
++	var sizeData [4]byte
++	binary.BigEndian.PutUint32(sizeData[:], uint32(len(code)))
++	if err := db.Put(codeSizeKey(hash), sizeData[:]); err != nil {
++		log.Crit("Failed to store contract code size", "err", err)
++	}
+ }
+ 
+ // WriteTrieNode writes the provided trie node database.
+diff --git a/core/rawdb/schema.go b/core/rawdb/schema.go
+index 08f373488..cbf1dc40f 100644
+--- a/core/rawdb/schema.go
++++ b/core/rawdb/schema.go
+@@ -96,6 +96,7 @@ var (
+ 	SnapshotStoragePrefix = []byte("o") // SnapshotStoragePrefix + account hash + storage hash -> storage trie value
+ 	CodePrefix            = []byte("c") // CodePrefix + code hash -> account code
+ 	skeletonHeaderPrefix  = []byte("S") // skeletonHeaderPrefix + num (uint64 big endian) -> header
++	CodeSizePrefix        = []byte("s") // CodePrefixSize
+ 
+ 	PreimagePrefix = []byte("secure-key-")       // PreimagePrefix + hash -> preimage
+ 	configPrefix   = []byte("ethereum-config-")  // config prefix for the db
+@@ -230,6 +231,11 @@ func codeKey(hash common.Hash) []byte {
+ 	return append(CodePrefix, hash.Bytes()...)
+ }
+ 
++// codeSizekey = CodeSizePreifx + hash
++func codeSizeKey(hash common.Hash) []byte {
++	return append(CodeSizePrefix, hash.Bytes()...)
++}
++
+ // IsCodeKey reports whether the given byte slice is the key of contract code,
+ // if so return the raw code hash as well.
+ func IsCodeKey(key []byte) (bool, []byte) {
+diff --git a/core/state/database.go b/core/state/database.go
+index bbcd2358e..7445e627f 100644
+--- a/core/state/database.go
++++ b/core/state/database.go
+@@ -194,6 +194,12 @@ func (db *cachingDB) ContractCodeSize(addrHash, codeHash common.Hash) (int, erro
+ 	if cached, ok := db.codeSizeCache.Get(codeHash); ok {
+ 		return cached.(int), nil
+ 	}
++
++	size := rawdb.ReadCodeSize(db.db.DiskDB(), codeHash)
++	if size != 0 {
++		return size, nil
++	}
++
+ 	code, err := db.ContractCode(addrHash, codeHash)
+ 	return len(code), err
+ }
+diff --git a/core/vm/evm.go b/core/vm/evm.go
+index dd55618bf..5dc3ed6ca 100644
+--- a/core/vm/evm.go
++++ b/core/vm/evm.go
+@@ -453,9 +453,9 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
+ 	ret, err := evm.interpreter.Run(contract, nil, false)
+ 
+ 	// Check whether the max code size has been exceeded, assign err if the case.
+-	if err == nil && evm.chainRules.IsEIP158 && len(ret) > params.MaxCodeSize {
+-		err = ErrMaxCodeSizeExceeded
+-	}
++	// if err == nil && evm.chainRules.IsEIP158 && len(ret) > params.MaxCodeSize {
++	// 	err = ErrMaxCodeSizeExceeded
++	// }
+ 
+ 	// Reject code starting with 0xEF if EIP-3541 is enabled.
+ 	if err == nil && len(ret) >= 1 && ret[0] == 0xEF && evm.chainRules.IsLondon {
+diff --git a/core/vm/gas_table.go b/core/vm/gas_table.go
+index 4c2cb3e5c..d0118b1ee 100644
+--- a/core/vm/gas_table.go
++++ b/core/vm/gas_table.go
+@@ -325,6 +325,16 @@ func gasExpEIP158(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memor
+ 	return gas, nil
+ }
+ 
++func addGasExtraCodeSize(evm *EVM, address common.Address, gas uint64) (uint64, bool) {
++	codeSize := evm.StateDB.GetCodeSize(address)
++	if codeSize <= params.CodeSizeUnit {
++		return gas, false
++	}
++
++	extraGas := (uint64(codeSize) - 1) / params.CodeSizeUnit * params.CallGasEIP150
++	return math.SafeAdd(gas, extraGas)
++}
++
+ func gasCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
+ 	var (
+ 		gas            uint64
+@@ -357,6 +367,9 @@ func gasCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize
+ 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+ 		return 0, ErrGasUintOverflow
+ 	}
++	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
++		return 0, ErrGasUintOverflow
++	}
+ 	return gas, nil
+ }
+ 
+@@ -368,6 +381,7 @@ func gasCallCode(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
+ 	var (
+ 		gas      uint64
+ 		overflow bool
++		address  = common.Address(stack.Back(1).Bytes20())
+ 	)
+ 	if stack.Back(2).Sign() != 0 {
+ 		gas += params.CallValueTransferGas
+@@ -382,10 +396,14 @@ func gasCallCode(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
+ 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+ 		return 0, ErrGasUintOverflow
+ 	}
++	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
++		return 0, ErrGasUintOverflow
++	}
+ 	return gas, nil
+ }
+ 
+ func gasDelegateCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
++	address := common.Address(stack.Back(1).Bytes20())
+ 	gas, err := memoryGasCost(mem, memorySize)
+ 	if err != nil {
+ 		return 0, err
+@@ -398,10 +416,14 @@ func gasDelegateCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, me
+ 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+ 		return 0, ErrGasUintOverflow
+ 	}
++	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
++		return 0, ErrGasUintOverflow
++	}
+ 	return gas, nil
+ }
+ 
+ func gasStaticCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
++	address := common.Address(stack.Back(1).Bytes20())
+ 	gas, err := memoryGasCost(mem, memorySize)
+ 	if err != nil {
+ 		return 0, err
+@@ -414,6 +436,9 @@ func gasStaticCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memo
+ 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
+ 		return 0, ErrGasUintOverflow
+ 	}
++	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
++		return 0, ErrGasUintOverflow
++	}
+ 	return gas, nil
+ }
+ 
+diff --git a/core/vm/instructions.go b/core/vm/instructions.go
+index db507c481..f1a6112bd 100644
+--- a/core/vm/instructions.go
++++ b/core/vm/instructions.go
+@@ -383,6 +383,13 @@ func opExtCodeCopy(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext)
+ 		uint64CodeOffset = 0xffffffffffffffff
+ 	}
+ 	addr := common.Address(a.Bytes20())
++	codeSize := interpreter.evm.StateDB.GetCodeSize(addr)
++	if codeSize > params.CodeSizeUnit {
++		extraGas := (uint64(codeSize - 1)) / params.CodeSizeUnit * params.ExtcodeSizeGasEIP150
++		if !scope.Contract.UseGas(extraGas) {
++			return nil, ErrOutOfGas
++		}
++	}
+ 	codeCopy := getData(interpreter.evm.StateDB.GetCode(addr), uint64CodeOffset, length.Uint64())
+ 	scope.Memory.Set(memOffset.Uint64(), length.Uint64(), codeCopy)
+ 
+diff --git a/params/protocol_params.go b/params/protocol_params.go
+index 5f154597a..c30b54da8 100644
+--- a/params/protocol_params.go
++++ b/params/protocol_params.go
+@@ -123,7 +123,7 @@ const (
+ 	ElasticityMultiplier     = 2          // Bounds the maximum gas limit an EIP-1559 block may have.
+ 	InitialBaseFee           = 1000000000 // Initial base fee for EIP-1559 blocks.
+ 
+-	MaxCodeSize = 24576 // Maximum bytecode to permit for a contract
++	CodeSizeUnit = 24576 // Code size unit for gas metering.
+ 
+ 	// Precompiled contract gas prices
+ 
+-- 
+2.30.1 (Apple Git-130)
+
