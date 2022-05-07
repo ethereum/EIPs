@@ -45,7 +45,11 @@ could be both unreliable and very costly.
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-As of `FORK_BLOCK_NUMBER` for `CHAIN_ID`, we introduce a new [EIP-2718](./eip-2718.md) transaction type, with the format `TX_TYPE || rlp([chain_id, expire_by, nonce, gas_price, gas_limit, to, value, data, signature_y_parity, signature_r, signature_s])`.
+As of `FORK_BLOCK_NUMBER` for `CHAIN_ID`, we introduce a new [EIP-2718](./eip-2718.md) transaction type, with the format 
+  
+```cpp
+TX_TYPE || rlp([chain_id, expire_by, nonce, gas_price, gas_limit, to, value, data, signature_y_parity, signature_r, signature_s])
+```
 
 The `expireBy` is a block number the latest possible block to
 execute this transaction. Any block with a block number `block_num > expiredBy` MUST NOT execute this transaction.
