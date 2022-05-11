@@ -20,7 +20,7 @@ interface IPreimage {
 }
 
 /**
- * @dev This implements an optional extension of {ERC721Lockable} defined in the EIP.
+ * @dev This implements an optional extension of {ERC5058} defined in the EIP.
  * The bound token is exactly the same as the locked token metadata, the bound token can be transferred,
  * but it is guaranteed that only one bound token and the original token can be traded in the market at
  * the same time. When the original token lock expires, the bound token must be destroyed.

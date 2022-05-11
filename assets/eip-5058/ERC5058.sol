@@ -19,63 +19,63 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     mapping(address => mapping(address => bool)) private _lockOperatorApprovals;
 
     /**
-     * @dev See {IERC721Lockable-lockApprove}.
+     * @dev See {IERC5058-lockApprove}.
      */
     function lockApprove(address to, uint256 tokenId) public virtual override {
-        require(!isLocked(tokenId), "ERC721L: token is locked");
+        require(!isLocked(tokenId), "ERC5058: token is locked");
         address owner = ERC721.ownerOf(tokenId);
-        require(to != owner, "ERC721L: lock approval to current owner");
+        require(to != owner, "ERC5058: lock approval to current owner");
 
         require(
             _msgSender() == owner || isLockApprovedForAll(owner, _msgSender()),
-            "ERC721L: lock approve caller is not owner nor approved for all"
+            "ERC5058: lock approve caller is not owner nor approved for all"
         );
 
         _lockApprove(owner, to, tokenId);
     }
 
     /**
-     * @dev See {IERC721Lockable-getLockApproved}.
+     * @dev See {IERC5058-getLockApproved}.
      */
     function getLockApproved(uint256 tokenId) public view virtual override returns (address) {
-        require(_exists(tokenId), "ERC721L: lock approved query for nonexistent token");
+        require(_exists(tokenId), "ERC5058: lock approved query for nonexistent token");
 
         return _lockApprovals[tokenId];
     }
 
     /**
-     * @dev See {IERC721Lockable-lockerOf}.
+     * @dev See {IERC5058-lockerOf}.
      */
     function lockerOf(uint256 tokenId) public view virtual override returns (address) {
-        require(_exists(tokenId), "ERC721L: locker query for nonexistent token");
-        require(isLocked(tokenId), "ERC721L: locker query for non-locked token");
+        require(_exists(tokenId), "ERC5058: locker query for nonexistent token");
+        require(isLocked(tokenId), "ERC5058: locker query for non-locked token");
 
         return _lockApprovals[tokenId];
     }
 
     /**
-     * @dev See {IERC721Lockable-setLockApprovalForAll}.
+     * @dev See {IERC5058-setLockApprovalForAll}.
      */
     function setLockApprovalForAll(address operator, bool approved) public virtual override {
         _setLockApprovalForAll(_msgSender(), operator, approved);
     }
 
     /**
-     * @dev See {IERC721Lockable-isLockApprovedForAll}.
+     * @dev See {IERC5058-isLockApprovedForAll}.
      */
     function isLockApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
         return _lockOperatorApprovals[owner][operator];
     }
 
     /**
-     * @dev See {IERC721Lockable-isLocked}.
+     * @dev See {IERC5058-isLocked}.
      */
     function isLocked(uint256 tokenId) public view virtual override returns (bool) {
         return lockedTokens[tokenId] > block.number;
     }
 
     /**
-     * @dev See {IERC721Lockable-lockFrom}.
+     * @dev See {IERC5058-lockFrom}.
      */
     function lockFrom(
         address from,
@@ -83,19 +83,19 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         uint256 expired
     ) public virtual override {
         //solhint-disable-next-line max-line-length
-        require(_isLockApprovedOrOwner(_msgSender(), tokenId), "ERC721L: lock caller is not owner nor approved");
-        require(expired > block.number, "ERC721L: expired time must be greater than current block number");
-        require(!isLocked(tokenId), "ERC721L: token is locked");
+        require(_isLockApprovedOrOwner(_msgSender(), tokenId), "ERC5058: lock caller is not owner nor approved");
+        require(expired > block.number, "ERC5058: expired time must be greater than current block number");
+        require(!isLocked(tokenId), "ERC5058: token is locked");
 
         _lock(_msgSender(), from, tokenId, expired);
     }
 
     /**
-     * @dev See {IERC721Lockable-unlockFrom}.
+     * @dev See {IERC5058-unlockFrom}.
      */
     function unlockFrom(address from, uint256 tokenId) public virtual override {
-        require(lockerOf(tokenId) == _msgSender(), "ERC721L: unlock caller is not lock operator");
-        require(ERC721.ownerOf(tokenId) == from, "ERC721L: unlock from incorrect owner");
+        require(lockerOf(tokenId) == _msgSender(), "ERC5058: unlock caller is not lock operator");
+        require(ERC721.ownerOf(tokenId) == from, "ERC5058: unlock from incorrect owner");
 
         _beforeTokenLock(_msgSender(), from, tokenId, 0);
 
@@ -121,7 +121,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         uint256 tokenId,
         uint256 expired
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == from, "ERC721L: lock from incorrect owner");
+        require(ERC721.ownerOf(tokenId) == from, "ERC5058: lock from incorrect owner");
 
         _beforeTokenLock(operator, from, tokenId, expired);
 
@@ -148,7 +148,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         uint256 expired,
         bytes memory _data
     ) internal virtual {
-        require(expired > block.number, "ERC721L: lock mint for invalid lock block number");
+        require(expired > block.number, "ERC5058: lock mint for invalid lock block number");
 
         _safeMint(to, tokenId, _data);
 
@@ -195,7 +195,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         address operator,
         bool approved
     ) internal virtual {
-        require(owner != operator, "ERC721L: lock approve to caller");
+        require(owner != operator, "ERC5058: lock approve to caller");
         _lockOperatorApprovals[owner][operator] = approved;
         emit LockApprovalForAll(owner, operator, approved);
     }
@@ -208,7 +208,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      * - `tokenId` must exist.
      */
     function _isLockApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
-        require(_exists(tokenId), "ERC721L: lock operator query for nonexistent token");
+        require(_exists(tokenId), "ERC5058: lock operator query for nonexistent token");
         address owner = ERC721.ownerOf(tokenId);
         return (spender == owner || isLockApprovedForAll(owner, spender) || getLockApproved(tokenId) == spender);
     }
@@ -227,7 +227,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     ) internal virtual override {
         super._beforeTokenTransfer(from, to, tokenId);
 
-        require(!isLocked(tokenId), "ERC721L: token transfer while locked");
+        require(!isLocked(tokenId), "ERC5058: token transfer while locked");
     }
 
     /**

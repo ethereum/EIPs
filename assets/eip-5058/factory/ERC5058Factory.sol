@@ -17,7 +17,7 @@ contract ERC5058Factory is IERC5058Factory {
     }
 
     function boundByIndex(uint256 index) public view virtual override returns (address) {
-        require(index < _allBounds.length, "EIP5058Factory: index out of bounds");
+        require(index < _allBounds.length, "ERC5058Factory: index out of bounds");
 
         return _allBounds[index];
     }
@@ -27,12 +27,12 @@ contract ERC5058Factory is IERC5058Factory {
     }
 
     function boundOf(address preimage) public view virtual override returns (address) {
-        require(existBound(preimage), "EIP5058Factory: query for nonexistent bound");
+        require(existBound(preimage), "ERC5058Factory: query for nonexistent bound");
         return _bounds[preimage];
     }
 
     function boundDeploy(address preimage) public virtual override returns (address) {
-        require(!existBound(preimage), "EIP5058Factory: bound nft is already deployed");
+        require(!existBound(preimage), "ERC5058Factory: bound nft is already deployed");
 
         return _deploy(preimage, keccak256(abi.encode(preimage)), "Bound");
     }
