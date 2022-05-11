@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: CC0-1.0
-// Creator: tyler@radiocaca.com
 
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERC721Lockable.sol";
+import "./IERC5058.sol";
 
 /**
  * @dev Implementation ERC721 Lockable Token
  */
-abstract contract ERC721Lockable is ERC721, IERC721Lockable {
+abstract contract ERC5058 is ERC721, IERC5058 {
     // Mapping from token ID to unlock time
     mapping(uint256 => uint256) public lockedTokens;
 
@@ -269,6 +268,6 @@ abstract contract ERC721Lockable is ERC721, IERC721Lockable {
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721) returns (bool) {
-        return interfaceId == type(IERC721Lockable).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC5058).interfaceId || super.supportsInterface(interfaceId);
     }
 }

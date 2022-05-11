@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 // Creator: tyler@radiocaca.com
 
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * If the nft lending protocol is compatible with this extension, the trouble caused by the NFT
  * airdrop can be avoided, because the airdrop is still in the user's wallet
  */
-interface IERC721Lockable is IERC721 {
+interface IERC5058 is IERC721 {
     /**
      * @dev Emitted when `tokenId` token is locked by `operator` from `from`.
      */

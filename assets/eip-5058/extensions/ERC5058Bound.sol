@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: CC0-1.0
-// Creator: tyler@radiocaca.com
 
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
-import "../factory/IEIP5058Factory.sol";
+import "../factory/IERC5058Factory.sol";
 import "../factory/IERC721Bound.sol";
-import "../ERC721Lockable.sol";
+import "../ERC5058.sol";
 
-abstract contract EIP5058Bound is ERC721Lockable {
+abstract contract ERC5058Bound is ERC5058 {
     address public bound;
 
     function _setFactory(address _factory) internal {
-        bound = IEIP5058Factory(_factory).boundOf(address(this));
+        bound = IERC5058Factory(_factory).boundOf(address(this));
     }
 
     function _setBoundBaseTokenURI(string memory uri) internal {

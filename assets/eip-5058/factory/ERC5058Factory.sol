@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: CC0-1.0
-// Creator: tyler@radiocaca.com
 
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "./ERC721Bound.sol";
-import "./IEIP5058Factory.sol";
+import "./IERC5058Factory.sol";
 
-contract EIP5058Factory is IEIP5058Factory {
+contract ERC5058Factory is IERC5058Factory {
     address[] private _allBounds;
 
     // Mapping from preimage to bound
