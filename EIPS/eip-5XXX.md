@@ -1,5 +1,5 @@
 ---
-eip: 5070
+eip: 5XXX
 title: Principal Token Standard
 description: A standard for principal tokens (zero-coupon tokens) that are redeemable for a single underlying ERC-20 token at a future timestamp.
 author: Julian Traversa (@JTraversa), Robert Robbins (@robrobbins)
@@ -48,13 +48,11 @@ ERC-5070 tokenized Vaults MAY implement [EIP-2612](./eip-2612.md) to improve the
 
 ### Definitions:
 
-- underlying: The deposited token, redeemable 1:1 with Principal Tokens at maturity.
+- underlying: The token that Principal Tokens are redeemable for at maturity.
   Has units defined by the corresponding ERC-20 contract.
-- maturity: The timestamp (unix) at which a Principal Token matures. Principal Tokens become redeemable for underlying at this timestamp, 
-and in many protocols, begin accruing yield from an underlying money-market.
-- exchangeRate: A variable used within money-markets to modulate the redeemable ratio of underlying <-> cToken. Used to calculate
-yield between user interactions.
-- fee: An amount of underlying or Principal Token charged to the user by the Principal Token. Fees can exists on redemption or post-maturity yield.
+- maturity: The timestamp (unix) at which a Principal Token matures. Principal Tokens become redeemable for underlying at or after this timestamp.
+- exchangeRate: A variable used to modulate the redeemable ratio of underlying <-> Principal Token.
+- fee: An amount of underlying or Principal Token charged to the user by the Principal Token. Fees can exists on redemption or post-maturity yield. _Alberto: I'm not sure we need this in the ERC._
 
 ### Methods
 
@@ -80,7 +78,7 @@ MUST _NOT_ revert.
 
 #### maturity
 
-The uinx timestamp (uint256) after which Principal Tokens can be redeemed at a 1:1 ratio for their underlying deposit. In many protocols, deposits begin accruing yield from an underlying money-market.
+The unix timestamp (uint256) after which Principal Tokens can be redeemed for their underlying deposit according to `exchangeRate`.
 
 MUST _NOT_ revert.
 
@@ -100,7 +98,7 @@ MUST _NOT_ revert.
 
 The exchangeRate during the block that a first user first calls `redeem` or `mature` after maturity.
 
-OPTIONAL - This method can be used to provide needed data for the calculation of interest post-maturity, but interfaces and other contracts MUST NOT expect this method to be present.
+OPTIONAL - This method can be used to provide needed data for the calculation of interest post-maturity, but interfaces and other contracts MUST NOT expect this method to be present. _Alberto: Optionality in ERCs is better avoided. Not everyone will implement it, therefore integrators must assume it might not be there, and leads to a proliferation of `safe*` methods._
 
 MUST _NOT_ revert.
 
@@ -119,8 +117,9 @@ MUST _NOT_ revert.
 #### exchangeRate
 
 The current exchangeRate of the underlying token <-> money market deposit post-maturity. Returns 0 before maturity.
+_Alberto: I wonder if we could make the ERC a bit more compact, and have only `exchangeRate` (renamed to `rate`). Before maturity, it returns the rate that will work at maturity, after maturity, it can return the same, or change._
 
-OPTIONAL - This method can be used to provide needed data for the calculation of interest post-maturity, but interfaces and other contracts MUST NOT expect this method to be present.
+OPTIONAL - This method can be used to provide needed data for the calculation of interest post-maturity, but interfaces and other contracts MUST NOT expect this method to be present. _Alberto: Optionality in ERCs is better avoided. Not everyone will implement it, therefore integrators must assume it might not be there, and leads to a proliferation of `safe*` methods._
 
 MUST _NOT_ revert.
 
@@ -137,6 +136,8 @@ MUST _NOT_ revert.
 ```
 
 #### mint
+
+_Alberto: do we need a `mint` method? I reckon it might be nice for integrators to have a standard function to obtain the PTs, but so far we have been fine without one for ERC20s._
 
 Mints exactly `amount` of Principal Tokens to `to` by depositing that exact same `amount` of underlying tokens. In yield tokenization protocols, also mints `amount` of Yield Tokens in addition to Principal Tokens.
 
@@ -170,10 +171,12 @@ Note that most implementations will require pre-approval of the Principal Token 
 
 #### redeem
 
-After maturity, burns exactly `amount` of Principal Tokens from `from` and sends the same `amount` of underlying tokens to `to`.
+After maturity, burns exactly `amount` of Principal Tokens from `from` and sends the _same_ `amount` of underlying tokens to `to`.
+_Alberto: It sends underlying tokens according to `exchangeRate`._
 
 OPTIONAL - This method can be used to improve the usability and integration difficulty of Principal Tokens, but interfaces and other contracts MUST NOT expect fund custody to be present.
 While custodial redemption of Principal Tokens through the Principal Token contract is extremely useful for integrators, some protocols may find giving the Principal Token itself custody breaks their backwards compatability. 
+_Alberto: Optionality is evil._
 
 MUST emit the `Redeem` event.
 
@@ -203,6 +206,7 @@ Note that some implementations will require pre-requesting to the Principal Toke
 ```
 
 #### mature
+_Alberto: We surely don't need this method in the standard. It is up to each PT creator to decide how they mature it._
 
 Callable once `block.timestamp >= maturity`, stores the current `exchangeRate` as the `maturityRate` and "matures" the Principal Tokens. 
 
@@ -271,6 +275,7 @@ MUST be emitted when Principal Tokens are burnt and underlying is withdrawn from
 ```
 
 #### Mature
+_Alberto: Maybe we need this event, even if we don't have a `mature` function._
 
 The Principal Token has hit maturity, and a user has called `redeem` or `mature` on the Principal Token contract for the first time post-maturity.
 
@@ -323,10 +328,11 @@ Element Principal Tokens: https://github.com/element-fi/elf-contracts/blob/main/
 Security considerations surrounding fees?
 
 Fully permissionless use cases could fall prey to malicious implementations which only conform to an ERC-5070 interface but not the specification, failing to implement proper custodial functionality but offering the ability to purchase Principal Tokens through secondary markets.
+
 It is recommended that all integrators review each implementation for potential ways of losing user deposits before integrating.
 
 The methods `totalAssets`, `convertToShares` and `convertToAssets` are estimates useful for display purposes,
-and do _not_ have to confer the _exact_ amount of underlying assets their context suggests.
+and do _not_ have to confer the _exact_ amount of underlying assets their context suggests. _Alberto: This might be a remnant of ERC4626, which might be useful to explore. Maybe we use the same pattern instead of `exchangeRate`._
 
 As is common across many standards, it is strongly recommended to mirror the underlying token's `decimals` if at all possible, to eliminate possible sources of confusion and simplify integration across front-ends and for other off-chain users.
 
