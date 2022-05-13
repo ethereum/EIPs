@@ -112,25 +112,25 @@ interface IERC3475 {
     function symbol(uint256 classId) external view returns (string memory);
 
     /**
-     * @dev Returns the informations for the class of given classId
-     * @notice Every bond contract can have their own list of class informations
+     * @dev Returns the information for the class of given classId
+     * @notice Every bond contract can have their own list of class information
      */
     function classInfos(uint256 classId) external view returns (uint256[] memory);
 
     /**
      * @dev Returns the information description for a given class info
-     * @notice Every bond contract can have their own list of class informations
+     * @notice Every bond contract can have their own list of class information
      */
     function classInfoDescription(uint256 classInfo) external view returns (string memory);
 
     /**
      * @dev Returns the information description for a given nonce info
-     * @notice Every bond contract can have their own list of nonce informations
+     * @notice Every bond contract can have their own list of nonce information
      */
     function nonceInfoDescription(uint256 nonceInfo) external view returns (string memory);
 
     /**
-     * @dev Returns the informations for the nonce of given classId and nonceId
+     * @dev Returns the information for the nonce of given classId and nonceId
      * @notice Every bond contract can have their own list. But the first uint256 in the list MUST be the UTC time code of the issuing time.
      */
     function nonceInfos(uint256 classId, uint256 nonceId) external view returns (uint256[] memory);
