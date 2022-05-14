@@ -1,0 +1,50 @@
+{
+    "expired message": {
+        "domain": "login.xyz",
+        "address": "0x6Da01670d8fc844e736095918bbE11fE8D564163",
+        "statement": "Sign-In With Ethereum Example Statement",
+        "uri": "https://login.xyz",
+        "version": "1",
+        "nonce": "lx2nx4so",
+        "issuedAt": "2022-01-05T14:27:30.883Z",
+        "chainId": 1,
+        "expirationTime": "2021-01-05T00:00:00Z",
+        "signature": "0x5e6834e82ec12532e3954882610b26ef83c16d25a38caccc6a009a488b6ad1237318ec6cd2fd83c19f49d0cb0848c70e9a5a4bf550ce5d69bc1b023b9f6b7f601b"
+    },
+    "malformed signature": {
+        "domain": "login.xyz",
+        "address": "0x6Da01670d8fc844e736095918bbE11fE8D564163",
+        "statement": "Sign-In With Ethereum Example Statement",
+        "uri": "https://login.xyz",
+        "version": "1",
+        "nonce": "rmplqh1gf",
+        "issuedAt": "2022-01-05T14:31:43.954Z",
+        "chainId": 1,
+        "expirationTime": "2022-01-07T14:31:43.952Z",
+        "signature": "0xf2e8420fc1b722bf4941f5a0464f98172a758ceda5039f622e425fb69fd19b20e444bba7c9a8a8d7e2b5e453553efe7c9460be5d211abe473fc146d51bb04d0cb1b"
+    },
+    "wrong signature": {
+        "domain": "login.xyz",
+        "address": "0x6Da01670d8fc844e736095918bbE11fE8D564163",
+        "statement": "Sign-In With Ethereum Example Statement",
+        "uri": "https://login.xyz",
+        "version": "1",
+        "nonce": "rmplqh1gf",
+        "issuedAt": "2022-01-05T14:31:43.954Z",
+        "chainId": 1,
+        "expirationTime": "2022-01-07T14:31:43.952Z",
+        "signature": "0x31df81dc02344c9156e6f71da46e2db624b38f8f806290d670d46492b834b2e7575cbce9f48169356cfb577b910d8e30732fcf23c1ac0021d08b945ed7ee118e1b"
+    },
+    "invalid expiration time": {
+        "domain": "login.xyz",
+        "address": "0x6Da01670d8fc844e736095918bbE11fE8D564163",
+        "statement": "Sign-In With Ethereum Example Statement",
+        "uri": "https://login.xyz",
+        "version": "1",
+        "nonce": "o8zxjgmp",
+        "issuedAt": "2022-01-05T14:50:55.688Z",
+        "chainId": 1,
+        "expirationTime": "2020-02-32T00:00:00.000Z",
+        "signature": "0x8b457a36dad94cb9c07cfcad08664c988d795b35762f1316438b9590c27f4a5e028e923066a49908c88a1e2fba299c1e6d6d8206181339343e0ef53be01d078f1c"
+    }
+}

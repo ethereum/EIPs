@@ -1,0 +1,106 @@
+{
+    "couple of optional fields": {
+        "message": "service.org wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z\nResources:\n- ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu\n- https://example.com/my-web2-claim.json",
+        "fields": {
+            "domain": "service.org",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z",
+            "resources": ["ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu", "https://example.com/my-web2-claim.json"]
+        }
+    },
+    "no optional field": {
+        "message": "service.org wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "service.org",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    },
+    "timestamp without microseconds": {
+        "message": "service.org wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24Z",
+        "fields": {
+            "domain": "service.org",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24Z"
+        }
+    },
+    "domain is RFC 3986 authority with IP": {
+        "message": "127.0.0.1 wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "127.0.0.1",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    },
+    "domain is RFC 3986 authority with userinfo": {
+        "message": "test@127.0.0.1 wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "test@127.0.0.1",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    },
+    "domain is RFC 3986 authority with port": {
+        "message": "127.0.0.1:8080 wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "127.0.0.1:8080",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    },
+    "domain is RFC 3986 authority with userinfo and port": {
+        "message": "test@127.0.0.1:8080 wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\nI accept the ServiceOrg Terms of Service: https://service.org/tos\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "test@127.0.0.1:8080",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "statement": "I accept the ServiceOrg Terms of Service: https://service.org/tos",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    },
+    "no statement": {
+        "message": "service.org wants you to sign in with your Ethereum account:\n0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\n\n\nURI: https://service.org/login\nVersion: 1\nChain ID: 1\nNonce: 32891757\nIssued At: 2021-09-30T16:25:24.000Z",
+        "fields": {
+            "domain": "service.org",
+            "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "uri": "https://service.org/login",
+            "version": "1",
+            "chainId": 1,
+            "nonce": "32891757",
+            "issuedAt": "2021-09-30T16:25:24.000Z"
+        }
+    }
+}

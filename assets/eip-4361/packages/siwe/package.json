@@ -1,0 +1,38 @@
+{
+  "name": "siwe",
+  "version": "1.1.6",
+  "description": "Sign-In with Ethereum",
+  "main": "dist/siwe.js",
+  "types": "dist/siwe.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "author": "Spruce Systems Inc.",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ethereum",
+    "sign-in",
+    "sign-in-with-ethereum",
+    "siwe"
+  ],
+  "homepage": "https://github.com/spruceid/siwe",
+  "dependencies": {
+    "@spruceid/siwe-parser": "1.1.6",
+    "@stablelib/random": "^1.0.1",
+    "apg-js": "^4.1.1"
+  },
+  "peerDependencies": {
+    "ethers": "5.5.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spruceid/siwe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spruceid/siwe/issues"
+  }
+}

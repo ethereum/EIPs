@@ -1,0 +1,34 @@
+{
+  "name": "@spruceid/siwe-parser",
+  "version": "1.1.6",
+  "description": "Parse Messages that conform to EIP-4361: Sign-In with Ethereum (SIWE)",
+  "main": "dist/parsers.js",
+  "types": "dist/parsers.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "author": "Spruce Systems Inc.",
+  "keywords": [
+    "ethereum",
+    "sign-in",
+    "sign-in-with-ethereum",
+    "siwe",
+    "siwe-parser"
+  ],
+  "homepage": "https://github.com/spruceid/siwe",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "apg-js": "^4.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spruceid/siwe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spruceid/siwe/issues"
+  }
+}
