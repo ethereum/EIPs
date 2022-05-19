@@ -1,0 +1,12 @@
+# Dependency directory
+node_modules
+
+# hardhat
+cache
+artifacts
+
+# macos
+.DS_Store
+
+# IntelliJ IDE
+.idea
