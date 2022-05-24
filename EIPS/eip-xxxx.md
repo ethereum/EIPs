@@ -3,7 +3,7 @@ eip: XXXX
 title: Name-bound Tokens
 description: A standard interface for non-separable non-fungible tokens, also known as "Name-bound" or "soulbound tokens" or "badges"
 author: Tim Daubenschütz (@TimDaub), Tom Cohen (@TheWaler), Enrico Bottazzi (@enricobottazzi)
-discussions-to: https://ethereum-magicians.org/t/xxxx
+discussions-to: https://ethereum-magicians.org/t/name-bound-tokens/9362
 status: Draft
 type: Standards Track
 category: ERC
