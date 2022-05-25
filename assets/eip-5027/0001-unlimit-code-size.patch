@@ -84,7 +84,7 @@ diff --git a/core/state/database.go b/core/state/database.go
 index bbcd2358e..7445e627f 100644
 --- a/core/state/database.go
 +++ b/core/state/database.go
-@@ -194,6 +194,12 @@ func (db *cachingDB) ContractCodeSize(addrHash, codeHash common.Hash) (int, erro
+@@ -194,6 +194,12 @@ func (db *cachingDB) ContractCodeSize(addrHash, codeHash common.Hash) (int, error
  	if cached, ok := db.codeSizeCache.Get(codeHash); ok {
  		return cached.(int), nil
  	}
@@ -118,7 +118,7 @@ diff --git a/core/vm/gas_table.go b/core/vm/gas_table.go
 index 4c2cb3e5c..d0118b1ee 100644
 --- a/core/vm/gas_table.go
 +++ b/core/vm/gas_table.go
-@@ -325,6 +325,16 @@ func gasExpEIP158(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memor
+@@ -325,6 +325,16 @@ func gasExpEIP158(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
  	return gas, nil
  }
  
