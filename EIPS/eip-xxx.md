@@ -1,0 +1,62 @@
+---
+eip: <to be assigned>
+title: Soulbound Token
+description: A token that is attached to a "soul" at mint time and cannot be transferred after that.
+author: Micah Zoltu (@MicahZoltu)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-soulbound-token/9417
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-05-30
+requires: 721
+---
+
+## Abstract
+A soulbound token is a token that is bound to another ERC-721 token when it is minted, and cannot be transferred/moved after that.
+
+## Specification
+```solidity
+interface IERCXXXX {
+	// fired anytime a new instance of this token is minted
+	// this event **MUST NOT** be fired twice for the same `tokenId`
+	event Mint(uint256 indexed tokenId, address indexed erc721Token, uint256 indexed erc721TokenId);
+
+	// returns the ERC-721 token that owns this token.
+	// this function **MUST** throw if the token hasn't been minted yet
+	// this function **MUST** always return the same result every time it is called after it has been minted
+	// this function **MUST** return the same value as found in the original `Mint` event for the token
+	function ownerOf(uint256 index) external view returns (address erc721Token, uint256 erc721TokenId);
+	
+	// returns a censorship resistant URI with details about this token collection
+	// the metadata returned by this is merged with the metata return by `tokenUri(uint256)`
+	// the tokenUri **MUST** be immutable and content addressable (e.g., ipfs://)
+	// the tokenUri **MUST NOT** point at mutable/censorable content (e.g., https://)
+	// data from `tokenUri` takes precedent over data returned by this method
+	// any external links referenced by the content at `tokenUri` also **MUST** follow all of the above rules
+	function collectionUri() external view returns (string tokenUri);
+	
+	// returns a censorship resistant URI with details about this token instance
+	// the tokenUri **MUST** be immutable and content addressable (e.g., ipfs://)
+	// the tokenUri **MUST NOT** point at mutable/censorable content (e.g., https://)
+	// data from this takes precedent over data returned by `collectionUri`
+	// any external links referenced by the content at `tokenUri` also **MUST** follow all of the above rules
+	function tokenUri(uint256 tokenId) external view returns (string tokenUri);
+}
+```
+
+## Rationale
+### Immutability
+By requiring that tokens can never move, we both guarantee non-seperability and non-mergability among collections of soulbound tokens that are bound to a single NFT while simultaneously allowing users to aggressively cache results.
+### Content Addressible URIs Required
+Soulbound tokens are meant to be permanent badges/indicators attached to a persona.  This means that not only can the user not transfer ownership, but the minter also cannot withdraw/transfer/change ownership as well.  This includes mutating or removing any remote content as a means of censoring or manipulating specific users.
+
+## Backwards Compatibility
+This is a new tokene type and is not meant to be backward compatible with any existing tokens other than using ERC-721 as souls.
+
+## Security Considerations
+Users of tokens that claim to implement this EIP must be diligent in verifying they actually do.  A token author can create a token that, upon initial probing of the API surface, may appear to follow the rulse when in reality it doesn't.  For example, the contract could allow transfers via some mechanism and simply not utilize them initially.
+
+It should also be made clear that Soulbound tokens are not bound to a human, they are bound to a persona.  A persona is any actor (which could be a group of humans) that collects multiple soulbound tokens over time to build up a collection of badges.  This persona may transfer to another human, or to another group of humans, and anyone interacting with a persona should not assume that there is a single permanent immutable human behind that persona.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
