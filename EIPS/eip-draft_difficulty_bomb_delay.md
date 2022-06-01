@@ -35,7 +35,7 @@ def predict_diff_bomb_effect(current_blknum, current_difficulty, block_adjustmen
     current_difficulty = 13891609586928851
     block adjustment = 11200000
     months = 2.5 # August 2022
-    months = 4 # November 2022
+    months = 4 # October 2022
     '''
     blocks_per_month = (86400 * 30) // 13.3
     future_blknum = current_blknum + blocks_per_month * months
