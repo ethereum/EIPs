@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
-title: Delaying Difficulty Bomb by 500000 blocks
-description: Delays the difficulty bomb by a further 500000 blocks.
+title: Delaying Difficulty Bomb to mid August 2022
+description: Delays the difficulty bomb by a further 500000 blocks, to the middle of August 2022.
 author: Tomasz Kajetan Stanczak (), Eric Marti Haynes (@ericmartihaynes)
 discussions-to: PLACEHOLDER
 status: Draft
