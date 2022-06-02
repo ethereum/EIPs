@@ -203,6 +203,10 @@ It occasionally becomes necessary to transfer ownership of EIPs to a new champio
 
 If you are interested in assuming ownership of an EIP, send a message asking to take over, addressed to both the original author and the EIP editor. If the original author doesn't respond to the email in a timely manner, the EIP editor will make a unilateral decision (it's not like such decisions can't be reversed :)).
 
+## Changes to the Author List
+
+Changes to the author list of an EIP in Draft require either approval from either an editor or every author listed in either the old or new author list. Changes to EIPs in Review or Last Call require approval from both an editor and authors, unless the authors cannot be contacted. Changes to the author list of a Stagnant EIP follow the rules for the new status. Changes to the author list of a Final EIP are not allowed. Changes to the author list of a Living EIP only require editor approval.
+
 ## EIP Editors
 
 The current EIP editors are
