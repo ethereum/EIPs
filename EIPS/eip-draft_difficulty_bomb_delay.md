@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: Delaying Difficulty Bomb to mid August 2022
+title: Delaying Difficulty Bomb to Mid August 2022
 description: Delays the difficulty bomb by a further 500000 blocks, to the middle of August 2022.
 author: Tomasz Kajetan Stanczak (@tkstanczak), Eric Marti Haynes (@ericmartihaynes), Josh Klopfenstein (@joshklop)
 discussions-to: https://ethresear.ch/t/delaying-difficulty-bomb-to-mid-august-2022/12762
