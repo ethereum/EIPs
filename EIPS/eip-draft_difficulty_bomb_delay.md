@@ -20,7 +20,7 @@ Targeting for The Merge to occur before mid August 2022. If it is not ready by t
 #### Relax Difficulty with Fake Block Number
 For the purposes of `calc_difficulty`, simply replace the use of `block.number`, as used in the exponential ice age component, with the formula:
 ```py
-    fake_block_number = max(0, block.number - 11_200_000) if block.number >= FORK_BLOCK_NUMBER else block.number
+fake_block_number = max(0, block.number - 11_200_000) if block.number >= FORK_BLOCK_NUMBER else block.number
 ```
 ## Rationale
 
