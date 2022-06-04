@@ -10,8 +10,6 @@ category: Core
 created: 2022-06-01
 ---
 
-*Note*: this EIP mirrors [EIP-4345](eip-4345.md) (which itself follows [EIP-649](eip-649.md), [EIP-1234](eip-1234.md), [EIP-2384](eip-2384.md) and [EIP-3554](eip-3554.md)), from which much of the text and code is taken.
-
 ## Abstract
 Starting with `FORK_BLOCK_NUMBER` the client will calculate the difficulty based on a fake block number suggesting to the client that the difficulty bomb is adjusting 11,200,000 blocks later than the actual block number.
 
