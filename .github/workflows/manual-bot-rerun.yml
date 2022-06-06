@@ -16,7 +16,7 @@ on:
       
 jobs:
   rerun-bot:
-    if: github.repository == 'ethereum/eips'
+    if: github.repository == 'JEAlfonsoP/eips'
     runs-on: ubuntu-latest
     name: Manual Bot Rerun
     steps:
@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '14'
       - name: rerun-workflow
-        uses: ethereum/EIP-Bot@90d0591e71314dc1430c6cde91bb787e185e0b4b # manual-bot-rerun
+        uses: JEAlfonsoP/EIP-Bot@90d0591e71314dc1430c6cde91bb787e185e0b4b # my-commit
         id: rerun-workflow
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
