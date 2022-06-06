@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '14'
       - name: rerun-workflow
-        uses: JEAlfonsoP/EIP-Bot@90d0591e71314dc1430c6cde91bb787e185e0b4b # my-commit
+        uses: JEAlfonsoP/EIP-Bot@67247c0463b5d4d47279f907aa0ab318294f6b11 # my-commit
         id: rerun-workflow
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
