@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: JEAlfonsoP/EIP-Bot@1f05ace5691062379bd910aa27402eecb8f295ac # my-commit
+        uses: JEAlfonsoP/EIP-Bot@67247c0463b5d4d47279f907aa0ab318294f6b11 # my-commit
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
