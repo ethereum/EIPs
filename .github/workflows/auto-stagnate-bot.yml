@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-stagnant-bot
-        uses: JEAlfonsoP/EIP-Bot@b3ac0ba3600aea27157fc68d1e36c08cc5a6db77 # my-commit
+        uses: JEAlfonsoP/EIP-Bot@67247c0463b5d4d47279f907aa0ab318294f6b11 # my-commit
         id: auto-stagnant-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
