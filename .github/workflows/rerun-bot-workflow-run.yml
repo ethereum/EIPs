@@ -8,7 +8,7 @@ on:
 
 jobs:
   rerun-bot:
-    if: github.repository == 'ethereum/eips'
+    if: github.repository == 'JEAlfonsoP/eips'
     runs-on: ubuntu-latest
     name: Rerun Bot (workflow_run)
     steps:
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@1f05ace5691062379bd910aa27402eecb8f295ac # rerun-pull-request-target-on-review 
+        uses: JEAlfonsoP/EIP-Bot@1f05ace5691062379bd910aa27402eecb8f295ac # my-commit
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
