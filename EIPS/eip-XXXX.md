@@ -1,5 +1,5 @@
 ---
-eip: XXX
+eip: 5143
 title: Slippage protection for Tokenized Vault
 description: An extension of the ERC-4626 standard for improve EOA interactions.
 author: Hadrien Croubois (@amxx)
@@ -24,7 +24,7 @@ Yes, ERC-4626 does not standardize the corresponding functions signature and beh
 
 ## Specification
 
-ERC-XXX is an extenson of ERC-4626. Any contract implementing it MUST also implement ERC-4626.
+ERC-5143 is an extenson of ERC-4626. Any contract implementing it MUST also implement ERC-4626.
 
 ### Methods
 
@@ -170,7 +170,7 @@ Note that some implementations will require pre-requesting to the Vault before a
 
 ## Rationale
 
-ERC-XXXX's function do not replace ERC-4626's equivalent mechanism. They are additional mechanism designed to protect EOA interracting with the Vault.
+ERC-5143's functions do not replace ERC-4626's equivalent mechanism. They are additional mechanism designed to protect EOA interracting with the Vault.
 
 When smart contract interract with an ERC-4626 vault, they can preview any operation using the dedicated functions and then execute the operation, all
 atomically, with no risk of price change. This is not true of EOA, which will preview their operation on a UI, sign a transaction, and see it mined later.
@@ -180,12 +180,12 @@ make EOA's interracton with an ERC-4626 vault possibly risky.
 Other projects in the DeFi spaces, such as decentralized exchanges, already include similar mechanisms so a user can request its transaction reverts if the
 resulting exchange rate is not considered good enough.
 
-Implementing ERC-XXXX on top of an ERC-4626 contract can be done very easily. It just requires calling the corresponding ERC-4626 function and adding a revert
+Implementing ERC-5143 on top of an ERC-4626 contract can be done very easily. It just requires calling the corresponding ERC-4626 function and adding a revert
 check on the returned value.
 
 ## Backwards Compatibility
 
-ERC-XXXX is fully backward compatible with the ERC-4626 and ERC-20 standards and has no known compatibility issues with other standards.
+ERC-5143 is fully backward compatible with the ERC-4626 and ERC-20 standards and has no known compatibility issues with other standards.
 
 ## Reference Implementations
 
@@ -198,7 +198,7 @@ TODO
 
 ## Security Considerations
 
-This ERC addresses one of the security consideration raised by ERC-4626. Other consideration still apply.
+This ERC addresses one of the security consideration raised by ERC-4626. Other considerations still apply.
 
 ## Copyright
 
