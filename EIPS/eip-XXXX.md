@@ -1,0 +1,205 @@
+---
+eip: XXX
+title: Slippage protection for Tokenized Vault
+description: An extension of the ERC-4626 standard for improve EOA interactions.
+author: Hadrien Croubois (@amxx)
+discussions-to: https://ethereum-magicians.org/t/eip-4626-yield-bearing-vault-standard/7900
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-06-09
+requires: 4626
+---
+
+## Abstract
+
+The following standard extends the ERC-4626 Tokenized Vault standard with functions dedicated to the safe interaction between EOAs and the vault when price is subject to slippage.
+
+## Motivation
+
+[ERC-4626](./eip-4626.md) security considerations section state that:
+> "If implementors intend to support EOA account access directly, they should consider adding an additional function call for deposit/mint/withdraw/redeem with the means to accommodate slippage loss or unexpected deposit/withdrawal limits, since they have no other means to revert the transaction if the exact output amount is not achieved."
+
+Yes, ERC-4626 does not standardize the corresponding functions signature and behavior. For improved interroperability, and better support by wallets, it is essential that this optional functions are also standardized.
+
+## Specification
+
+ERC-XXX is an extenson of ERC-4626. Any contract implementing it MUST also implement ERC-4626.
+
+### Methods
+
+#### deposit
+
+Overloaded version of ERC-4626's `deposit`
+
+Mints `shares` Vault shares to `receiver` by depositing exactly `amount` of underlying tokens.
+
+MUST emit the `Deposit` event.
+
+MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
+MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the `deposit` execution, and are accounted for during `deposit`.
+
+MUST revert if all of `assets` cannot be deposited (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
+MUST revert if depositing `assets` underlying asset mints less then `minShares` shares
+
+Note that most implementations will require pre-approval of the Vault with the Vault's underlying `asset` token.
+
+```yaml
+- name: deposit
+  type: function
+  stateMutability: nonpayable
+
+  inputs:
+    - name: assets
+      type: uint256
+    - name: receiver
+      type: address
+    - name: minShares
+      type: uint256
+
+  outputs:
+    - name: shares
+      type: uint256
+```
+
+#### mint
+
+Overloaded version of ERC-4626's `mint`
+
+Mints exactly `shares` Vault shares to `receiver` by depositing `amount` of underlying tokens.
+
+MUST emit the `Deposit` event.
+
+MUST support ERC-20 `approve` / `transferFrom` on `asset` as a mint flow.
+MAY support an additional flow in which the underlying tokens are owned by the Vault contract before the `mint` execution, and are accounted for during `mint`.
+
+MUST revert if all of `shares` cannot be minted (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
+MUST revert if minting `amount` shares cost more then `maxAssets` shares
+
+Note that most implementations will require pre-approval of the Vault with the Vault's underlying `asset` token.
+
+```yaml
+- name: mint
+  type: function
+  stateMutability: nonpayable
+
+  inputs:
+    - name: shares
+      type: uint256
+    - name: receiver
+      type: address
+    - name: maxAssets
+      type: uint256
+
+  outputs:
+    - name: assets
+      type: uint256
+```
+
+#### withdraw
+
+Overloaded version of ERC-4626's `withdraw`
+
+Burns `shares` from `owner` and sends exactly `assets` of underlying tokens to `receiver`.
+
+MUST emit the `Withdraw` event.
+
+MUST support a withdraw flow where the shares are burned from `owner` directly where `owner` is `msg.sender` or `msg.sender` has ERC-20 approval over the shares of `owner`.
+MAY support an additional flow in which the shares are transferred to the Vault contract before the `withdraw` execution, and are accounted for during `withdraw`.
+
+MUST revert if all of `assets` cannot be withdrawn (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+MUST revert if withdrawing `assets` underlying tokens requires burning more then `maxShares` shares
+
+Note that some implementations will require pre-requesting to the Vault before a withdrawal may be performed. Those methods should be performed separately.
+
+```yaml
+- name: withdraw
+  type: function
+  stateMutability: nonpayable
+
+  inputs:
+    - name: assets
+      type: uint256
+    - name: receiver
+      type: address
+    - name: owner
+      type: address
+    - name: maxShares
+      type: uint256
+
+  outputs:
+    - name: shares
+      type: uint256
+```
+
+#### redeem
+
+Overloaded version of ERC-4626's `redeem`
+
+Burns exactly `shares` from `owner` and sends `assets` of underlying tokens to `receiver`.
+
+MUST emit the `Withdraw` event.
+
+MUST support a redeem flow where the shares are burned from `owner` directly where `owner` is `msg.sender` or `msg.sender` has ERC-20 approval over the shares of `owner`.
+MAY support an additional flow in which the shares are transferred to the Vault contract before the `redeem` execution, and are accounted for during `redeem`.
+
+MUST revert if all of `shares` cannot be redeemed (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+MUST revert if redeeming `shares` shares sends less than `minAssets` shares
+
+Note that some implementations will require pre-requesting to the Vault before a withdrawal may be performed. Those methods should be performed separately.
+
+```yaml
+- name: redeem
+  type: function
+  stateMutability: nonpayable
+
+  inputs:
+    - name: shares
+      type: uint256
+    - name: receiver
+      type: address
+    - name: owner
+      type: address
+    - name: minAssets
+      type: uint256
+
+  outputs:
+    - name: assets
+      type: uint256
+```
+
+## Rationale
+
+ERC-XXXX's function do not replace ERC-4626's equivalent mechanism. They are additional mechanism designed to protect EOA interracting with the Vault.
+
+When smart contract interract with an ERC-4626 vault, they can preview any operation using the dedicated functions and then execute the operation, all
+atomically, with no risk of price change. This is not true of EOA, which will preview their operation on a UI, sign a transaction, and see it mined later.
+Between the preview and the transaction being executed, the blockchain state might change, resulting in unexpected outcomes. In particular, frontrunning
+make EOA's interracton with an ERC-4626 vault possibly risky.
+
+Other projects in the DeFi spaces, such as decentralized exchanges, already include similar mechanisms so a user can request its transaction reverts if the
+resulting exchange rate is not considered good enough.
+
+Implementing ERC-XXXX on top of an ERC-4626 contract can be done very easily. It just requires calling the corresponding ERC-4626 function and adding a revert
+check on the returned value.
+
+## Backwards Compatibility
+
+ERC-XXXX is fully backward compatible with the ERC-4626 and ERC-20 standards and has no known compatibility issues with other standards.
+
+## Reference Implementations
+
+TODO
+<!-- See [Solmate ERC4626](https://github.com/Rari-Capital/solmate/blob/main/src/mixins/ERC4626.sol): -->
+<!-- a minimal and opinionated implementation of the standard with hooks for developers to easily insert custom logic into deposits and withdrawals. -->
+
+<!-- See [Vyper ERC4626](https://github.com/fubuloubu/ERC4626): -->
+<!-- a demo implementation of the standard in Vyper, with hooks for share price manipulation and other testing needs. -->
+
+## Security Considerations
+
+This ERC addresses one of the security consideration raised by ERC-4626. Other consideration still apply.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
