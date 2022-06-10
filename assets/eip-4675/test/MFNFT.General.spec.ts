@@ -139,7 +139,7 @@ describe("Multi-Fractional Non-Fungible Token", async () => {
             await addToken(MFNFT, NFT.address, tokenId, totalSupply, {from: admin});
         });
 
-        it("should revert if non-admin trys to add token", async () => {
+        it("should revert if non-admin tries to add token", async () => {
             const { MFNFT, NFT } = await setupTests()
 
             await mintNFT(NFT, MFNFT.address, tokenId)

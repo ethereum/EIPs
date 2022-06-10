@@ -2,7 +2,7 @@
 Solidity Implementation of Multi-Fractional Non-Fungible Token.
 
 ## Problem Trying to solve
-Before, ERC20 Token contract should be deployed everytime when fractionalizing a specific NFT.
+Before, ERC20 Token contract should be deployed every time when fractionalizing a specific NFT.
 
 To solve this problem, this standard proposes a token standard to cover multiple fractionalized nft in a contract without having to deploy each time.
 
