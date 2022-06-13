@@ -21,4 +21,11 @@ interface IERC4973 /* is ERC165, ERC721Metadata */ {
   /// @param _tokenId The identifier for an ABT
   /// @return The address of the owner bound to the ABT
   function ownerOf(uint256 _tokenId) external view returns (address);
+  /// @notice Destroys `tokenId`. At any time, an ABT receiver must be able to
+  ///  disassociate themselves from an ABT publicly through calling this
+  ///  function.
+  /// @dev Must emit a `event Revoke` with the `address _to` field pointing to
+  ///  the zero address.
+  /// @param _tokenId The identifier for an ABT
+  function burn(uint256 _tokenId) external;
 }
