@@ -212,6 +212,7 @@ The current EIP editors are
 - Micah Zoltu (@MicahZoltu)
 - Greg Colvin (@gcolvin)
 - Sam Wilson (@SamWilsn)
+- Gavin John (@Pandapip1)
 
 Emeritus EIP editors are 
 
