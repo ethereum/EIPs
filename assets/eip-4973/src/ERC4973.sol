@@ -42,8 +42,9 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     return _tokenURIs[tokenId];
   }
 
-  function _exists(uint256 tokenId) internal view virtual returns (bool) {
-    return _owners[tokenId] != address(0);
+  function burn(uint256 _tokenId) public virtual override {
+    require(msg.sender == ownerOf(_tokenId), "burn: sender must be owner");
+    _burn(_tokenId);
   }
 
   function ownerOf(uint256 tokenId) public view virtual returns (address) {
@@ -52,10 +53,14 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     return owner;
   }
 
+  function _exists(uint256 tokenId) internal view virtual returns (bool) {
+    return _owners[tokenId] != address(0);
+  }
+
   function _mint(
     address to,
     uint256 tokenId,
-    string calldata uri
+    string memory uri
   ) internal virtual returns (uint256) {
     require(!_exists(tokenId), "mint: tokenID exists");
     _owners[tokenId] = to;

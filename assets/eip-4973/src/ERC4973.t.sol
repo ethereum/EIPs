@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.6;
 
-import {DSTest} from "ds-test/test.sol";
+import "forge-std/Test.sol";
 import {IERC165} from "./interfaces/IERC165.sol";
 
 import {IERC721Metadata} from "./interfaces/IERC721Metadata.sol";
@@ -18,13 +18,16 @@ contract AccountBoundToken is ERC4973 {
   ) external returns (uint256) {
     return super._mint(to, tokenId, uri);
   }
+}
 
-  function burn(uint256 tokenId) external {
-    super._burn(tokenId);
+contract NonAuthorizedCaller {
+  function burn(address collection, uint256 tokenId) external {
+    AccountBoundToken abt = AccountBoundToken(collection);
+    abt.burn(tokenId);
   }
 }
 
-contract ERC4973Test is DSTest {
+contract ERC4973Test is Test {
   AccountBoundToken abt;
 
   function setUp() public {
@@ -68,10 +71,39 @@ contract ERC4973Test is DSTest {
   function testMintAndBurn() public {
     string memory tokenURI = "https://example.com/metadata.json";
     uint256 tokenId = 0;
-    abt.mint(msg.sender, tokenId, tokenURI);
+    address to = address(this);
+    abt.mint(to, tokenId, tokenURI);
+    assertEq(abt.ownerOf(tokenId), to);
     assertEq(abt.tokenURI(tokenId), tokenURI);
-    assertEq(abt.ownerOf(tokenId), msg.sender);
     abt.burn(tokenId);
+  }
+
+  function testBurnAsNonAuthorizedAccount() public {
+    string memory tokenURI = "https://example.com/metadata.json";
+    uint256 tokenId = 0;
+    address to = address(this);
+    abt.mint(to, tokenId, tokenURI);
+    assertEq(abt.ownerOf(tokenId), to);
+    assertEq(abt.tokenURI(tokenId), tokenURI);
+
+    NonAuthorizedCaller nac = new NonAuthorizedCaller();
+    vm.expectRevert(bytes("burn: sender must be owner"));
+
+    nac.burn(address(abt), tokenId);
+  }
+
+  function testBurnNonExistentTokenId() public {
+    string memory tokenURI = "https://example.com/metadata.json";
+    uint256 tokenId = 0;
+    address to = address(this);
+    abt.mint(to, tokenId, tokenURI);
+    assertEq(abt.ownerOf(tokenId), to);
+    assertEq(abt.tokenURI(tokenId), tokenURI);
+
+    NonAuthorizedCaller nac = new NonAuthorizedCaller();
+    vm.expectRevert(bytes("ownerOf: token doesn't exist"));
+
+    nac.burn(address(abt), 1337);
   }
 
   function testFailToMintTokenToPreexistingTokenId() public {
