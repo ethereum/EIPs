@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0
 pragma solidity ^0.8.0; 
 
 import "./ERC4907.sol";
