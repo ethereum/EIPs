@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Extending ERC1155 with rentable usage rights
 description: This standard adds multiple usage rights to ERC1155 and makes it rentable separately
 author: tech@derivstudio.com
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-draft-extending-erc1155-with-rentable-usage-rights/9553/4
 status: Draft
 type: Standards Track
 created: 2022-04-17
