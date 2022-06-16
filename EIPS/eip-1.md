@@ -208,11 +208,11 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 The current EIP editors are
 
 - Alex Beregszaszi (@axic)
+- Gavin John (@Pandapip1)
+- Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Micah Zoltu (@MicahZoltu)
-- Greg Colvin (@gcolvin)
 - Sam Wilson (@SamWilsn)
-- Gavin John (@Pandapip1)
 
 Emeritus EIP editors are 
 
