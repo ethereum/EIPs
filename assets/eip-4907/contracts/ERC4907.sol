@@ -64,10 +64,9 @@ contract ERC4907 is ERC721, IERC4907 {
     ) internal virtual override{
         super._beforeTokenTransfer(from, to, tokenId);
 
-        if (from != to) {
-            _users[tokenId].user = address(0);
-            _users[tokenId].expires = 0;
-            emit UpdateUser(tokenId,address(0),0);
+        if (from != to && _users[tokenId].user != address(0)) {
+            delete _users[tokenId];
+            emit UpdateUser(tokenId, address(0), 0);
         }
     }
 } 

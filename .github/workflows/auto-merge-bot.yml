@@ -17,8 +17,8 @@ jobs:
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn"
-          ERC_EDITORS: "@lightclient,@axic,@SamWilsn"
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
+          ERC_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
           NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
           INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn"
           META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
