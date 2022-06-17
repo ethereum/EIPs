@@ -46,7 +46,11 @@ where it is identified [as a significant overhead](https://notes.ethereum.org/@p
 
 Starting `BLOCK_NUMBER >= HF`, a new instruction, `MCOPY` (`0x5c`) is introduced.
 
-It takes three arguments off the stack: (top) `length`, (second from top) `dst`, and `src`.
+It takes three arguments off the stack (1. represents the top of the stack):
+1. `dst`
+2. `src`
+3. `length`
+
 It copies `length` bytes from the offset pointed at `src` to the offset pointed at `dst` in memory.
 If `src + length` or `dst + length` is beyond the current memory length, the memory is extended.
 
