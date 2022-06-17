@@ -50,7 +50,7 @@ It takes three arguments off the stack: (top) `length`, (second from top) `dst`,
 It copies `length` bytes from the offset pointed at `src` to the offset pointed at `dst` in memory.
 If `src + length` or `dst + length` is beyond the current memory length, the memory is extended.
 
-The gas cost of this instruction is `Gverylow * ceil(length / 32)`. (*Initial suggestion.*)
+The gas cost of this instruction mirrors that of other `Wcopy` instructions and is `Gverylow + Gcopy * ceil(length / 32)`.
 
 ## Rationale
 
