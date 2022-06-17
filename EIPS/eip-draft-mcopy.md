@@ -36,8 +36,7 @@ As example use case, copying 256 bytes costs:
 - at least 96 gas using unrolled `MLOAD`/`MSTORE` instructions
 - 33 gas using this EIP
 
-Memory copying is used by languages like Solidity, where we expect this improvement to provide efficient means building
-data structures. Including efficient sliced access of memory objects.
+Memory copying is used by languages like Solidity and Vyper, where we expect this improvement to provide efficient means of building data structures, including efficient sliced access and copies of memory objects.
 
 Finally, we expect memory copying to be immensely useful for various computationally heavy operations, such as EVM384,
 where it is identified [as a significant overhead](https://notes.ethereum.org/@poemm/evm384-update5#Memory-Manipulation-Cost).
