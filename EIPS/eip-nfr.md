@@ -2,7 +2,7 @@
 eip: eip-nfr.md
 title: NFT Future Rewards (nFR) Standard
 description: In this EIP, we propose a multigenerational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
-author: Yale ReiSoleil (yale@iob.fi), @dRadiant, D Wang, PhD (david@iob.fi)
+author: Yale ReiSoleil <yale@iob.fi>, dRadiant (@dRadiant), D Wang, PhD <david@iob.fi>
 discussions-to: https://ethereum-magicians.org/t/non-fungible-future-rewards-token-standard/9203
 type: Standards Track
 category: ERC
@@ -51,6 +51,7 @@ ERC721-compliant contracts MAY implement this EIP for rewards to provide a stand
 Implementers of this standard MUST have all of the following functions:
 
 ```solidity
+
 pragma solidity ^0.8.0;
 
 import "./IERC165.sol";
@@ -71,7 +72,7 @@ interface InFR is IERC165 {
 
     function releaseFR(address payable account) external;
 
-    function retrieveFRInfo(uint256 tokenId) external returns(uint8 numGenerations, uint256 percentOfProfit, uint256 successiveRatio, uint256 lastSoldPrice, uint256 ownerAmount, address[] memory);
+    function retrieveFRInfo(uint256 tokenId) external returns(uint8, uint256, uint256, uint256, uint256, address[] memory);
 
     function retrieveAllottedFR(address account) external returns(uint256);
 
@@ -86,11 +87,13 @@ interface IERC165 {
     ///  `interfaceID` is not 0xffffffff, `false` otherwise
     function supportsInterface(bytes4 interfaceID) external view returns (bool);
 }
+
 ```
 
 An nFR contract MUST implement and update for each Token ID. The data in the `FRInfo` struct MAY either be stored wholly in a single mapping, or MAY be broken down into several mappings. The struct MUST either be exposed in a public mapping or mappings, or MUST have public functions that access the private data. This is for client-side data fetching and verification.
 
 ```solidity
+
 struct FRInfo {
         uint8 numGenerations; //  Number of generations corresponding to that Token ID
         uint256 percentOfProfit; // Percent of profit allocated for FR, scaled by 1e18
@@ -99,6 +102,7 @@ struct FRInfo {
         uint256 ownerAmount; // Amount of owners the Token ID has seen
         address[] addressesInFR; // The addresses currently in the FR cycle
 }
+
 ```
  
 An nFR smart contract MUST also store and update the amount of Ether allocated to a specific address using the `_allotedFR` mapping. The `_allottedFR mapping` MUST either be public or have a function to fetch the FR payment allotted to a specific address.
@@ -149,7 +153,7 @@ When an owner loses money during their holding period, they MUST NOT be obligate
 
 ![Figure 1: Geometric sequence distribution](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/Total_FR_Payout_Distribution-geo.png) 
 
-Figure 1: Geometric sequence distribution
+*Figure 1: Geometric sequence distribution*
 
 The buyers/owners receive a portion ( r ) of the realized profit  (P ) from an NFT transaction. The remaining proceeds go to the seller.
 
@@ -163,7 +167,7 @@ In this example, there SHALL be a portion of the proceeds awarded to the Last Ge
 
 ![Figure 2: NFT Owners' Future Rewards (nFR)](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/nFR%20Standard%20Outline%20-%20blue.jpeg) 
 
-Figure 2: NFT Owners' Future Rewards (nFR)
+*Figure 2: NFT Owners' Future Rewards (nFR)*
 
 *Figure 2* illustrates an example of a five-generation Future Rewards Distribution program based on an owner's realized profit.
 
@@ -217,7 +221,7 @@ It is the number of generations of all owners, not just those who are profitable
 
 ![Figure 3: Losing owners](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/Losing_owners.jpeg)
 
-Figure 3: Losing owners
+*Figure 3: Losing owners*
 
 ### Single vs Multigenerations
 
@@ -234,7 +238,7 @@ FR payouts directly derived from the sale proceeds are immediate and final. As p
 
 ![Figure 4: Equal, linear reward distribution](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/Total_FR_Payout_Distribution-flat.png?raw=true)
 
-Figure 4: Equal, linear reward distribution
+*Figure 4: Equal, linear reward distribution*
 
 FR distributions from the realization of profits by later owners are distributed equally to all eligible owners (*Figure 4*). The exponential reward curve, however, may be more desirable, as it gives a slightly larger share to the newest buyer. Additionally, this distribution gives the earliest generations the largest portions as their FR distributions near the end, so they receive higher rewards for their early involvement, but the distribution is not nearly as extreme as one based on arithmetic sequences (*Figure 5*). 
 
@@ -244,7 +248,7 @@ This system does not discriminate against any buyer because each buyer will go t
 
 ![Figure 5: Arithmetic sequence distribution](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/Arithmetic_Sequence_FR_Payout_Distribution.png?raw=true)
 
-Figure 5: Arithmetic sequence distribution
+*Figure 5: Arithmetic sequence distribution*
 
 The profit is distributed according to the arithmetic sequence, which is 1, 2, 3, ... and so on. The first owner will receive 1 portion, the second owner will receive 2 portions, the third owner will receive 3 portions, etc. 
 
@@ -349,7 +353,7 @@ We do not want a large portion of future rewards to go to a small number of wash
 
 ![Figure 6: Same owner using different wallets](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/5%20losing.jpeg?raw=true)
 
-Figure 6: Same owner using different wallets
+*Figure 6: Same owner using different wallets*
 
 #### Wash trading by the marketplace operator
 
