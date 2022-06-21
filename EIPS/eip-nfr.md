@@ -1,9 +1,9 @@
 ---
 eip: 5173
 title: NFT Future Rewards (nFR) Standard
-description: A multi-generational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
+description: A multigenerational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
 author: Yale ReiSoleil <yale@iob.fi>, dRadiant (@dRadiant), D Wang, PhD <david@iob.fi>
-discussions-to: https://github.com/ethereum/EIPs/pull/5173
+discussions-to: https://ethereum-magicians.org/t/non-fungible-future-rewards-token-standard/9203
 type: Standards Track
 category: ERC
 status: Draft
@@ -40,7 +40,7 @@ Additionally, as we will explain later, it discourages any "under-the-table" dea
 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-We are implementing this extension using the [Open Zeppelin ERC721 set of interfaces, contracts, and utilities](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721).
+We are implementing this extension using the  ERC721 standard.
 
 ERC721-compliant contracts MAY implement this EIP for rewards to provide a standard method of rewarding future buyers and previous owners with realized profits in the future.
 
@@ -151,7 +151,7 @@ In this example (*Figure 1*), a seller is REQUIRED to share a portion of their n
 
 When an owner loses money during their holding period, they MUST NOT be obligated to share Future Rewards distributions, since there is no profit to share. However, he SHALL still receive a share of Future Rewards distributions from future generations of owners, if they are profitable.
 
-![Figure 1: Geometric sequence distribution](../assets/eip-5173/Total_FR_Payout_Distribution-geo.png) 
+![Figure 1: Geometric sequence distribution](../assets/5173/Total_FR_Payout_Distribution-geo.png) 
 
 *Figure 1: Geometric sequence distribution*
 
@@ -165,7 +165,7 @@ In this example, there SHALL be a portion of the proceeds awarded to the Last Ge
 
 ### Future Rewards Distribution
 
-![Figure 2: NFT Owners' Future Rewards (nFR)](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/nFR%20Standard%20Outline%20-%20blue.jpeg) 
+![Figure 2: NFT Owners' Future Rewards (nFR)](../assets/5173/nFR%20Standard%20Outline%20-%20blue.jpeg) 
 
 *Figure 2: NFT Owners' Future Rewards (nFR)*
 
@@ -217,13 +217,13 @@ Considering Fixed-Point Arithmetic is to be enforced, it is logical to have 1e18
 
 Since each NFT contract is independent, and while a marketplace contract can emit events when an item is sold, choosing to emit an event for payment is important. As the royalty and FR recipient may not be aware of/watching for a secondary sale of their NFT, they would never know that they received a payment except that their ETH wallet has been increased randomly. 
 
-The recipient can therefore check on the payments received by their secondary sales by calling a function on the parent contract of the NFT that is being sold [1]:.
+The recipient of the secondary sale will therefore be able to verify that the payment has been received by calling the parent contract of the NFT being sold, as implemented in EIP-2981.
 
 ### Number of Generations of All Owners ( n ) vs Number of Generations of Only Profitable Owners
 
 It is the number of generations of all owners, not just those who are profitable, that determines the number of owners from which the subsequent owners' profits will be shared, see *Figure 3*. As part of the effort to discourage "ownership hoarding," Future Rewards distributions will not be made to the current owner/purchaser if all the owners lose money holding the NFT. Further information can be found under Security Considerations.
 
-![Figure 3: Losing owners](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/Losing_owners.jpeg)
+![Figure 3: Losing owners](../assets/5173/Losing_owners.jpeg)
 
 *Figure 3: Losing owners*
 
@@ -240,7 +240,7 @@ FR payouts directly derived from the sale proceeds are immediate and final. As p
 ### Equal vs Linear Reward Distributions
 #### Equal FR Payout
 
-![Figure 4: Equal, linear reward distribution](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/Total_FR_Payout_Distribution-flat.png?raw=true)
+![Figure 4: Equal, linear reward distribution](../assets/5173/Total_FR_Payout_Distribution-flat.png?raw=true)
 
 *Figure 4: Equal, linear reward distribution*
 
@@ -250,7 +250,7 @@ This system does not discriminate against any buyer because each buyer will go t
 
 #### Straight line arithmetic sequence FR payout
 
-![Figure 5: Arithmetic sequence distribution](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/Arithmetic_Sequence_FR_Payout_Distribution.png?raw=true)
+![Figure 5: Arithmetic sequence distribution](../assets/5173/Arithmetic_Sequence_FR_Payout_Distribution.png?raw=true)
 
 *Figure 5: Arithmetic sequence distribution*
 
@@ -266,17 +266,17 @@ This proposal is fully compatible with current ERC721 standards and EIP-2981. It
 
 The repository with the reference implementation contains all the tests.
 
-[Here is an illustration of a test case](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/animate-1920x1080-1750-frames.gif?raw=true). 
+[Here is an illustration of a test case](../assets/5173/animate-1920x1080-1750-frames.gif?raw=true). 
 
 ## Reference Implementations
 
-This implementation uses [OpenZeppelin contracts](https://github.com/OpenZeppelin/openzeppelin-contracts) and the [PRB Math library created by Paul R Berg for fixed-point arithmetic](https://github.com/paulrberg/prb-math/tree/main). It demonstrates the interface for the nFR standard, an nFR standard-compliant extension, and an ERC721 implementation using the extension.
+This implementation uses OpenZeppelin contracts and the PRB Math library created by Paul R Berg for fixed-point arithmetic. It demonstrates the interface for the nFR standard, an nFR standard-compliant extension, and an ERC721 implementation using the extension.
 
 GitHub Link: https://github.com/dRadiant/nfr-reference-implementation
 
 ### Distribution of NFT Royalties to Artists and Creators
 
-We agree that artists’ royalties should be uniform and on-chain. We support both [EIP-4910](https://github.com/ethereum/EIPs/pull/4910/commits/8fd87b4ec3dbfce40e38325f3b8a69f337368661) and [EIP-2981](https://eips.ethereum.org/EIPS/eip-2981) proposals.
+We agree that artists’ royalties should be uniform and on-chain. We support both EIP-4910 and EIP-2981 proposals.
 
 All platforms can support royalty rewards for the same NFT based on on-chain parameters and functions:
 
@@ -293,7 +293,7 @@ Any realized profits (P) when an NFT is sold are distributed among the buyers/ow
 
 We define a sliding window mechanism to decide which previous owners will be involved in the profit distribution. Let's imagine the owners as a queue starting from the first hand owner to the current owner. The profit distribution window starts from the previous owner immediately to the current owner and extends towards the first owner, and the size of the windows is fixed. Only previous owners located inside the window will join the profit distribution.  
 
-![Future Rewards calculation formula](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/nFR_distribution_formula.png?raw=true)
+![Future Rewards calculation formula](../assets/5173/nFR_distribution_formula.png?raw=true)
 
 In this equation:
 
@@ -340,9 +340,7 @@ The complete implementation code can be found [here](https://github.com/dRadiant
 
 ### Payment Attacks
 
-As this EIP introduces royalty and realized profit rewards collection, distribution, and payouts to the ERC721 standard, the attack vectors increase. We recommend reentrancy protection on all payment functions to reduce the most significant attack vector categories for payments and payouts [2].
-
-EIP-4910 proposes some mitigations to phishing attacks by Andreas Freund.
+As this EIP introduces royalty and realized profit rewards collection, distribution, and payouts to the ERC721 standard, the attack vectors increase. As discussed in EIP-4910 and other mitigations to phishing attacks by Andreas Freund, we recommend reentrancy protection for all payment functions to reduce the most significant attack vectors for payments and payouts.
 
 ### Royalty Circumventing
 
@@ -350,20 +348,20 @@ Many methods are being used to avoid paying royalties to creators under the curr
 
 ### FR Hoarding through Wash Sales
 
-All unregulated cryptocurrency trading platforms and NFT marketplaces experience widespread wash trading [3] [4]. In addition to inflating prices and laundering money, dishonest actors may use wash trading to gain an unfair advantage. The validity of the system is undermined when a single entity becomes multiple generations of owners to accumulate more future rewards.
+Quantexa blog and beincrypto articles have reported widespread wash trading on all unregulated cryptocurrency trading platforms and NFT marketplaces. The use of wash trading by dishonest actors can lead to an unfair advantage, as well as inflated prices and money laundering. When a single entity becomes multiple generations of owners to accumulate more rewards in the future, the validity of the system is undermined.
 
 #### Wash trading by users
 Using a different wallet address, an attacker can "sell" the NFT to themselves at a loss. It is possible to repeat this process n times in order to maximize their share of the subsequent FR distributions (*Figure 6*). A wallet ranking score can partially alleviate this problem. It is evident that a brand new wallet is a red flag, and the marketplace may withhold FR distribution from it if it has a short transaction history (i.e. fewer than a certain number of transactions).
 
 We do not want a large portion of future rewards to go to a small number of wash traders. Making such practices less profitable is one way to discourage wash trading and award hoarding. It can be partially mitigated, for example, by implementing a wallet-score and holding period-based incentive system. The rewards for both parties are reduced if a new wallet is used or if a holding period is less than a certain period. 
 
-![Figure 6: Same owner using different wallets](https://github.com/dRadiant/EIPs/blob/master/assets/eip-nfr/5%20losing.jpeg?raw=true)
+![Figure 6: Same owner using different wallets](../assets/5173/5%20losing.jpeg?raw=true)
 
 *Figure 6: Same owner using different wallets*
 
 #### Wash trading by the marketplace operator
 
-But the biggest offender is the marketplace, which engages in wash trading a lot, or simply does not care about it [5]. At a mid-night drinking session in 2018, a top-level executive of a top-5 cryptocurrency exchange boasted how they "brushed" (wash-traded) certain newly listed tokens, which they called "marketmaking." [6]
+However, the biggest offender appears to be the marketplace, which engages heavily in wash trading, or simply does not care about it, according to Decrypt. I have personally experienced this phenomenon. A senior executive of a top-5 cryptocurrency exchange boasted during a mid-night drinking session in 2018, that they had "brushed" (wash-traded) certain newly listed tokens, which they called "marketmaking." The exchange is still ranked among the top five crypto exchanges today.
 
 Many of these companies engage in wash trading on their own or collude with certain users, and royalties and FR payments are reimbursed under the table. It is crucial that all exchanges have robust features to prevent self-trading. Users should be able to observe watchers transparently. Marketplaces should provide their customers with free access to an on-chain transaction monitoring service like Chainalysis Reactor.
 
@@ -374,18 +372,3 @@ In most cases, malicious actors will create excessively long or cyclical Future 
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
-
-## Citation
-
-Please cite this document as:
-
-Yale ReiSoleil, @dRadiant, D Wang, PhD, et al., "EIP-nFR.md: NFT Future Rewards (nFR) Standard," Ethereum Improvement Proposals, no. xxx, May 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-nFR.md.
-
-## Endnotes
-
-1.  Zach Burks, James Morgan, [EIP-2981](https://github.com/VexyCats/EIPs/blob/master/EIPS/eip-2981.md)
-2.  Andreas Freund, [EIP-4910](https://github.com/ethereum/EIPs/pull/4910/commits/8fd87b4ec3dbfce40e38325f3b8a69f337368661): Proposal for a standard for onchain Royalty Bearing NFTs
-3.  Quantexa, https://www.quantexa.com/blog/detect-wash-trades/
-4.  https://beincrypto.com/95-trading-volume-looksrare-linked-wash-trading/
-5.  https://decrypt.co/91847/significant-wash-trading-money-laundering-nft-market-chainalysis
-6.  It is still one of the top-5 crypto exchanges today.
