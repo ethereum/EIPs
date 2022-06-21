@@ -29,6 +29,7 @@ We've got a lot of ways we try to gather the information for confirmations, but 
     - Can be prone to collisions (like At Inversebrah, with trolling increasing)
     - Returns ABIs
       - Has no parameter names, leaving most of the transaction illegible.
+    - Do not exist on all chains
   - Trusting the contract for its own metadata (EIP-719, EIP-4430)
     - Requires an active connection to the blockchain.
     - Is not widespread (no backwards compatibility)
@@ -39,21 +40,13 @@ We've got a lot of ways we try to gather the information for confirmations, but 
 
 Additionally, this method serves to help populate the wallet with trustworthy information about what it holds. It reduces the need to rely on any central services for indexing (enhancing performance and privacy), and eliminates dangers that come from index-based automatic asset detection, like receiving harrassment, or Airdrop scams.
 
+This approach can also work on cold/offline wallets.
+
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 Wallets may integrate the ability to propose names for contracts, methods, and parameters into any method that touches an address, so the wallet can be expanded with this metadata at runtime. These methods include `eth_sendTransaction`, and `eth_signTypedData` (and its variants).
 
-Benefits
-  - No need for any central server
-  - No registry with collisions
-  - Works on all chains
-  - Includes parameter names as well as method and contract names.
-  - Could be easily added to any existing dapp
-  - If every dapp a user touches uses this, then no phishing site could get the user to give up one of those assets without seeing a legible confirmation.
-  - Can even be implemented on a cold/offline or hardware wallet.
-
-### Reference Implementation
 Any method that involves an address MAY include a new OPTIONAL parameter `proposedContracts`, which will include an additional prompt to the user as part of the confirmation flow, asking if they'd like to trust the site for this information.
 
 `contractId` would be some kind of cross chain address format, likely [CAIP-10](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md).
