@@ -44,7 +44,7 @@ Additionally, as we will explain later, it discourages any "under-the-table" dea
 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-We are implementing this extension based on [the Open Zeppelin ERC721 set of interfaces, contracts, and utilities](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721).
+We are implementing this extension using the [Open Zeppelin ERC721 set of interfaces, contracts, and utilities](https://docs.openzeppelin.com/contracts/4.x/api/token/erc721).
 
 ERC721-compliant contracts MAY implement this EIP for rewards to provide a standard method of rewarding future buyers and previous owners with realized profits in the future.
 
@@ -125,14 +125,16 @@ Additionally, the ERC721 `_checkOnERC721Received` function MAY be explicitly cal
 
 If the wallet/broker/auction application will accept safe transfers, then it MUST implement the ERC721 wallet interface.
 
-### FR `transferFrom` Function
+### Future Rewards `transferFrom` Function
 
 The FR `transferFrom` function MUST be called by all nFR-supporting smart contracts, though the accommodations for non-nFR-supporting contracts MAY also be implemented to ensure backwards compatibility.
 
 ```solidity
+
 function transferFrom(address from, address to, uint256 tokenId, uint256 soldPrice) public virtual override payable {
        //...
 }
+
 ```
 
 The FR `transferFrom` function MUST be payable and the amount the NFT sold for MUST match the `msg.value` provided to the function. This is to ensure the values are valid and will also allow for the necessary FR to be held in the contract. Based on the stored `lastSoldPrice`, the smart contract will determine whether the sale was profitable after calling the ERC721 transfer function and transferring the NFT. If it was not profitable, the smart contract SHALL update the last sold price for the corresponding Token ID, increment the owner amount, shift the generations, and return all of the  `msg.value` to the `msg.sender` or `tx.origin` depending on the implementation. Otherwise, if the transaction was profitable, the smart contract SHALL call the `_distributeFR` function, then update the `lastSoldPrice`, increment the owner amount, and finally shift generations. The `_distributeFR` function MUST return the difference between the allocated FR that is to be distributed amongst the `_addressesInFR` and the `msg.value` to the `msg.sender` or `tx.origin`.
@@ -142,9 +144,11 @@ The FR `transferFrom` function MUST be payable and the amount the NFT sold for M
 Marketplaces that support this standard MAY implement various methods of calculating or transferring Future Rewards to the previous owners.
 
 ```solidity
+
 function _calculateFR(uint256 totalProfit, uint256 buyerReward, uint256 successiveRatio, uint256 ownerAmount, uint256 windowSize) pure internal virtual returns(uint256[] memory) {
     //...        
 }
+
 ```
 
 In this example (*Figure 1*), a seller is REQUIRED to share a portion of their net profit with 10 previous holders of the token. Future Rewards will also be paid to the same seller as the value of the token increases from up to 10 subsequent owners. 
@@ -172,11 +176,13 @@ In this example, there SHALL be a portion of the proceeds awarded to the Last Ge
 *Figure 2* illustrates an example of a five-generation Future Rewards Distribution program based on an owner's realized profit.
 
 ```solidity
+
 function _distributeFR(uint256 tokenId, uint256 soldPrice) internal virtual {
        //...
 
         emit FRDistributed(tokenId, soldPrice, allocatedFR);
  }
+ 
 ```
 
 The `_distributeFR` function MUST be called in the FR `transferFrom` function if there is a profitable sale. The function SHALL calculate the difference between the current sale price and the `lastSoldPrice`, then it SHALL call the `_calculateFR` function to receive the proper distribution of FR. Then it SHALL distribute the FR accordingly, making order adjustments as necessary. Then, the contract SHALL calculate the total amount of FR that was distributed (`allocatedFR`), in order to return the difference of the `soldPrice` and `allocatedFR` to the `msg.sender` or `tx.origin`. Finally, it SHALL emit the `FRDistributed` event. 
@@ -186,12 +192,14 @@ The `_distributeFR` function MUST be called in the FR `transferFrom` function if
 The future Rewards payments SHOULD utilize a pull-payment model, similar to that demonstrated by OpenZeppelin with their PaymentSplitter contract. The event  FRClaimed would be triggered after a successful claim has been made. 
 
 ```solidity
+
 function releaseFR(address payable account) public virtual override {
         //...
 }
+
 ```
 
-### Generation Shifting
+### Owner Generation Shifting
 
 The `_shiftGenerations` function MUST be called regardless of whether the sale was profitable or not. As a result, it will be called in the `_transfer` ERC721 override function and the FR `transferFrom` function. The function SHALL remove the oldest account from the corresponding `_addressesInFR` array. This calculation will take into account the current length of the array versus the total number of generations for a given token ID.
 
@@ -301,6 +309,7 @@ In this equation:
 #### Converting into Code
 
 ```solidity
+
 pragma solidity ^0.8.0;
 //...
 
@@ -327,6 +336,7 @@ function _calculateFR(uint256 P, uint256 r, uint256 g, uint256 m, uint256 w) pur
 
         return FR;
 }
+
 ```
 The complete implementation code can be found here (link).
 
@@ -375,9 +385,9 @@ Please cite this document as:
 
 Yale ReiSoleil, @dRadiant, D Wang, PhD, et al., "EIP-nFR.md: NFT Future Rewards (nFR) Standard," Ethereum Improvement Proposals, no. xxx, May 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-nFR.md.
 
-## Footnotes
+## Endnotes
 
-1.  Zach Burks, James Morgan, EIP-2981, https://github.com/VexyCats/EIPs/blob/master/EIPS/eip-2981.md
+1.  Zach Burks, James Morgan, [EIP-2981](https://github.com/VexyCats/EIPs/blob/master/EIPS/eip-2981.md)
 2.  Andreas Freund, [EIP-4910](https://github.com/ethereum/EIPs/pull/4910/commits/8fd87b4ec3dbfce40e38325f3b8a69f337368661): Proposal for a standard for onchain Royalty Bearing NFTs
 3.  Quantexa, https://www.quantexa.com/blog/detect-wash-trades/
 4.  https://beincrypto.com/95-trading-volume-looksrare-linked-wash-trading/
