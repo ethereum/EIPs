@@ -3,7 +3,7 @@ eip: eip-nfr.md
 title: NFT Future Rewards (nFR) Standard
 description: In this EIP, we propose a multigenerational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
 author: Yale ReiSoleil <yale@iob.fi>, dRadiant (@dRadiant), D Wang, PhD <david@iob.fi>
-discussions-to: https://ethereum-magicians.org/t/non-fungible-future-rewards-token-standard/9203
+discussions-to: https://github.com/ethereum/EIPs/pull/5173
 type: Standards Track
 category: ERC
 status: Draft
