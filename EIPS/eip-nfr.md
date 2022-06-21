@@ -155,7 +155,7 @@ In this example (*Figure 1*), a seller is REQUIRED to share a portion of their n
 
 When an owner loses money during their holding period, they MUST NOT be obligated to share Future Rewards distributions, since there is no profit to share. However, he SHALL still receive a share of Future Rewards distributions from future generations of owners, if they are profitable.
 
-![Figure 1: Geometric sequence distribution](https://raw.githubusercontent.com/dRadiant/EIPs/master/assets/eip-nfr/Total_FR_Payout_Distribution-geo.png) 
+![Figure 1: Geometric sequence distribution](../assets/eip-5173/Total_FR_Payout_Distribution-geo.png) 
 
 *Figure 1: Geometric sequence distribution*
 
