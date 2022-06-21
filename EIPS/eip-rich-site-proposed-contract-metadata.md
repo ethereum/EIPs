@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5163
 title: Rich Site-Proposed Contract Metadata
 description: A protocol for dapps to suggest metadata to wallets related to relevant contracts.
 author: Dan Finlay <@danfinlay>
