@@ -53,7 +53,7 @@ Benefits
   - If every dapp a user touches uses this, then no phishing site could get the user to give up one of those assets without seeing a legible confirmation.
   - Can even be implemented on a cold/offline or hardware wallet.
 
-### Implementation
+### Reference Implementation
 Any method that involves an address MAY include a new OPTIONAL parameter `proposedContracts`, which will include an additional prompt to the user as part of the confirmation flow, asking if they'd like to trust the site for this information.
 
 `contractId` would be some kind of cross chain address format, likely [CAIP-10](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md).
