@@ -37,7 +37,7 @@ We've got a lot of ways we try to gather the information for confirmations, but 
     - Is largely centralized today
     - Only works for verified contracts on etherscan (although designed for eventual Sourcify support).
 
-Additionally, this method serves to help populate the wallet with trustworthy information about what it holds. It reduces the need to rely on any central services for indexing (enhancing performance and privacy), and eliminates dangers that come from index-based automatic asset detection, like receiving harrassment, or [Airdrop scams](https://medium.com/metamask/phisher-watch-airdrop-scams-82eea95d9b2a).
+Additionally, this method serves to help populate the wallet with trustworthy information about what it holds. It reduces the need to rely on any central services for indexing (enhancing performance and privacy), and eliminates dangers that come from index-based automatic asset detection, like receiving harrassment, or Airdrop scams.
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
