@@ -11,10 +11,6 @@ created: 2022-05-08
 requires: 165, 721
 ---
 
-## Simple Summary
-
-This proposal outlines the interface of a new ERC721 standard extension. NFTs can then define, process, and distribute rewards based on the realized profit to former owners.
-
 ## Abstract
 
 In this Ethereum Improvement Proposal (EIP), we propose the implementation of a Future Rewards (FR) extension which will enable owners of ERC721 tokens (NFTs) to participate in future price increases after they sell their tokens.
