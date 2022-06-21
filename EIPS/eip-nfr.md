@@ -373,7 +373,7 @@ Many of these companies engage in wash trading on their own or collude with cert
 
 ### Long/Cyclical FR-Entitled Owner Generations
 
-Malicious actors are most likely to create excessively long or cyclical Future Rewards Owner Generations, resulting in applications that attempt to distribute FR or shift generations running out of gas and unable to function 7. As a result, clients are responsible for verifying that the contract they interact with has an appropriate number of generations, which will not deplete the gas by looping over.
+In most cases, malicious actors will create excessively long or cyclical Future Rewards Owner Generations that will result in applications that attempt to distribute FR or shift generations running out of gas and not functioning. Therefore, clients are responsible for verifying that the contract with which they interact has an appropriate number of generations, so that looping over will not deplete the gas.
 
 ## Copyright
 
