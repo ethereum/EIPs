@@ -105,7 +105,7 @@ struct FRInfo {
 
 ```
  
-An nFR smart contract MUST also store and update the amount of Ether allocated to a specific address using the `_allotedFR` mapping. The `_allottedFR mapping` MUST either be public or have a function to fetch the FR payment allotted to a specific address.
+An nFR smart contract MUST also store and update the amount of Ether allocated to a specific address using the `_allotedFR` mapping. The `_allottedFR` mapping MUST either be public or have a function to fetch the FR payment allotted to a specific address.
 
 ### Percent Fixed Point
 
@@ -338,7 +338,7 @@ function _calculateFR(uint256 P, uint256 r, uint256 g, uint256 m, uint256 w) pur
 }
 
 ```
-The complete implementation code can be found [here](GitHub Link: https://github.com/dRadiant/nfr-reference-implementation).
+The complete implementation code can be found [here](https://github.com/dRadiant/nfr-reference-implementation).
 
 ## Security Considerations
 
