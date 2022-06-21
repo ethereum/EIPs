@@ -32,7 +32,7 @@ We've got a lot of ways we try to gather the information for confirmations, but 
   - Trusting the contract for its own metadata (EIP-719, EIP-4430)
     - Requires an active connection to the blockchain.
     - Is not widespread (no backwards compatibility)
-  - [Transaction Insights](https://metamask.zendesk.com/hc/en-us/articles/4412543412123-Transaction-Insight)
+  - Transaction Insights
     - Requires an additional fairly heavy-weight process
     - Is largely centralized today
     - Only works for verified contracts on etherscan (although designed for eventual Sourcify support).
