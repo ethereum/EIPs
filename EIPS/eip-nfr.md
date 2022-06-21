@@ -266,7 +266,7 @@ This proposal is fully compatible with current ERC721 standards and EIP-2981. It
 
 ## Test Cases
 
-Following is a contract that detects which interfaces other contracts implement, from iob.fi DAO by @dRadiant
+[Following](https://github.com/dRadiant/nfr-reference-implementation) is a contract that detects which interfaces other contracts implement, from iob.fi DAO by @dRadiant
 
 The repository with the reference implementation contains all the tests.
 
@@ -274,9 +274,9 @@ The repository with the reference implementation contains all the tests.
 
 ## Reference Implementations
 
-This approach uses [OpenZeppelin contracts](https://github.com/OpenZeppelin/openzeppelin-contracts) and the [PRB Math library created by Paul R Berg for fixed-point arithmetic](https://github.com/paulrberg/prb-math/tree/main). It demonstrates the interface for the nFR standard, an nFR standard-compliant extension, and an ERC721 implementation using the extension.
+This implementation uses [OpenZeppelin contracts](https://github.com/OpenZeppelin/openzeppelin-contracts) and the [PRB Math library created by Paul R Berg for fixed-point arithmetic](https://github.com/paulrberg/prb-math/tree/main). It demonstrates the interface for the nFR standard, an nFR standard-compliant extension, and an ERC721 implementation using the extension.
 
-(GitHub Link)
+GitHub Link: https://github.com/dRadiant/nfr-reference-implementation
 
 ### Distribution of NFT Royalties to Artists and Creators
 
@@ -338,7 +338,7 @@ function _calculateFR(uint256 P, uint256 r, uint256 g, uint256 m, uint256 w) pur
 }
 
 ```
-The complete implementation code can be found here (link).
+The complete implementation code can be found [here](GitHub Link: https://github.com/dRadiant/nfr-reference-implementation).
 
 ## Security Considerations
 
