@@ -1,7 +1,7 @@
 ---
 eip: 5173
 title: NFT Future Rewards (nFR) Standard
-description: In this EIP, we propose a multigenerational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
+description: A multi-generational reward mechanism that rewards‌ all ‌owners of non-fungible tokens (NFT).
 author: Yale ReiSoleil <yale@iob.fi>, dRadiant (@dRadiant), D Wang, PhD <david@iob.fi>
 discussions-to: https://github.com/ethereum/EIPs/pull/5173
 type: Standards Track
