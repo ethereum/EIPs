@@ -49,7 +49,7 @@ Wallets may integrate the ability to propose names for contracts, methods, and p
 
 Any method that involves an address MAY include a new OPTIONAL parameter `proposedContracts`, which will include an additional prompt to the user as part of the confirmation flow, asking if they'd like to trust the site for this information.
 
-`contractId` would be some kind of cross chain address format, likely [CAIP-10](https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md).
+`contractId` would be some kind of cross chain address format.
 `ContractData` would be some kind of type that is enough to render transaction names for methods called.
   - Today TX Insight uses a full Truffle Decoder output to render this, which includes lots of compiler info that we would not need here.
 ```typescript
