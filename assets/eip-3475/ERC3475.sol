@@ -1,19 +1,14 @@
 // SPDX-License-Identifier: MIT
 
+
 pragma solidity ^0.8.0;
 
+
 import "./IERC3475.sol";
-//@Yu The math library imported here support only 0.8.7 and above need to change the version of the library
 import "./utils/MathLibrary.sol";
-
-
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-//@Yu need to add comments to functions and params based on the eip-3475.md file Also we need to fix all the problems related to spaces and lines. 
-//We need use one standard for all the codes.
-
-
-contract ERC3475 is IERC3475, MathLibrary, Ownable {
+contract ERC3475 is IERC3475, Ownable {
     /** 
     * @notice this Struct is representing the NONCE properties as an object
     */
@@ -41,9 +36,7 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
 
         // here for each class we have an array of 2 values: debt token address and period of the bond (6 months or 12 months for example)
         uint256[] _values; 
-        IERC3475.METADATA[] _nonceMetadata;
-
-        mapping(address => mapping(address => bool)) operatorApprovals;
+        IERC3475.METADATA[] _nonceMetadata;        
         mapping(uint256 => NONCE) nonces;
 
         // supplies of this class
@@ -51,7 +44,9 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
         uint256 _burnedSupply;
         uint256 _redeemedSupply;
     }
-    
+
+    mapping(address => mapping(address => bool)) operatorApprovals;
+
     // from classId given
     mapping(uint256 => CLASS) internal classes; 
     IERC3475.METADATA[] _classMetadata;
@@ -65,7 +60,7 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
     }
 
 
-    //@dev  for initializing  classes and bond nonces, i transferred this here in order to avoid the out of bounds  error in constructor 
+    //  to be deployed during the initial deployement cycle
     function init() public onlyOwner  {
         // create class, in other implementation, a create class function can be added
         classes[0].exists = true;
@@ -113,15 +108,46 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
         address _to,
         TRANSACTION[] calldata _transactions
     ) public virtual override {
+        require(
+            _from != address(0),
+            "ERC3475: can't transfer from the zero address"
+        );
+        require(
+            _to != address(0),
+            "ERC3475: can't transfer to the zero address"
+        );
+        require(
+                msg.sender == _from ||
+                isApprovedFor(_from, msg.sender),
+                "ERC3475:caller-not-owner-or-approved"
+            );
+        uint256 len = _transactions.length;
+        for (uint256 i = 0; i < len; i++) {           
+            _transferFrom(_from, _to, _transactions[i]);
+        }
+        emit Transfer(msg.sender, _from, _to, _transactions);
+    }
+
+    function transferAllowanceFrom(
+        address _from,
+        address _to,
+        TRANSACTION[] calldata _transactions
+    ) public virtual override {
+        require(
+            _from != address(0),
+            "ERC3475: can't transfer from the zero address"
+        );
+        require(
+            _to != address(0),
+            "ERC3475: can't transfer to the zero address"
+        );
         uint256 len = _transactions.length;
         for (uint256 i = 0; i < len; i++) {
             require(
-                msg.sender == _from ||
-                isApprovedFor(_from, msg.sender, _transactions[i].classId)||
                 _transactions[i]._amount <= allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId),
                 "ERC3475:caller-not-owner-or-approved"
             );
-            _transferFrom(_from, _to, _transactions[i]);
+            _transferAllowanceFrom(msg.sender, _from, _to, _transactions[i]);
         }
         emit Transfer(msg.sender, _from, _to, _transactions);
     }
@@ -157,6 +183,11 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
             _from != address(0),
             "ERC3475: can't redeem from the zero address"
         );
+        require(
+            msg.sender == _from ||
+            isApprovedFor(_from, msg.sender),
+            "ERC3475: caller-not-owner-or-approved"
+        ); 
         uint256 len = _transactions.length;
         for (uint256 i = 0; i < len; i++) {
             (, uint256 progressRemaining) = getProgress(
@@ -178,14 +209,14 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
             _from != address(0),
             "ERC3475: can't burn from the zero address"
         );
+         require(
+              msg.sender == _from ||
+              isApprovedFor(_from, msg.sender),
+              "ERC3475: caller-not-owner-or-approved"
+          ); 
+        
         uint256 len = _transactions.length;
         for (uint256 i = 0; i < len; i++) {
-            require(
-                msg.sender == _from ||
-                isApprovedFor(_from, msg.sender, _transactions[i].classId)||
-                _transactions[i]._amount <= allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId),
-                "ERC3475: caller-not-owner-or-approved"
-            );
             _transferFrom(_from, address(0), _transactions[i]);
         }      
         emit Burn(msg.sender, _from, _transactions);
@@ -212,12 +243,11 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
 
     function setApprovalFor(
         address operator,
-        uint256 classId,
         bool approved
     ) public virtual override {
         // TODO: implementing internal function for setting approval.
-        classes[classId].operatorApprovals[msg.sender][operator] = approved;
-        emit ApprovalFor(msg.sender, operator, classId, approved);
+        operatorApprovals[msg.sender][operator] = approved;
+        emit ApprovalFor(msg.sender, operator, approved);
     }
 
     // READABLES 
@@ -342,10 +372,10 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
 
     function isApprovedFor(
         address owner,
-        address operator,
-        uint256 classId
+        address operator
     ) public view virtual override returns (bool) {
-        return classes[classId].operatorApprovals[owner][operator];
+        //require(owner == classes[classId].) TODO: generally this is the function implemented by the bank contract for allowing the approval for the whole class.
+        return operatorApprovals[owner][operator];
     }
 
   
@@ -355,14 +385,7 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
         address _to,
         IERC3475.TRANSACTION calldata _transaction
     ) private {
-        require(
-            _from != address(0),
-            "ERC3475: can't transfer from the zero address"
-        );
-        require(
-            _to != address(0),
-            "ERC3475: can't transfer to the zero address"
-        );
+
         require(
             classes[_transaction.classId]
                 .nonces[_transaction.nonceId]
@@ -372,9 +395,35 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
         //transfer balance        
         classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -=
         _transaction._amount;
-
         classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
         _transaction._amount;    
+    }
+
+      function _transferAllowanceFrom(
+        address _operator,
+        address _from,
+        address _to,
+        IERC3475.TRANSACTION calldata _transaction
+    ) private {
+    
+        require(
+            classes[_transaction.classId]
+                .nonces[_transaction.nonceId]
+                .balances[_from] >= _transaction._amount,
+            "ERC3475: not allowed amount"
+        );
+
+        classes[_transaction.classId]
+            .nonces[_transaction.nonceId]
+            .allowances[_from][_operator] -= _transaction._amount;
+
+        //transfer balance        
+        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -=
+        _transaction._amount;
+        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
+        _transaction._amount;    
+
+        
     }
 
     function _issue(
@@ -422,19 +471,5 @@ contract ERC3475 is IERC3475, MathLibrary, Ownable {
         classes[_transaction.classId].nonces[_transaction.nonceId]._burnedSupply += 
         _transaction._amount;
     }
-
-    function setApprovalFor(
-        address operator,
-        uint256 classId,
-        bool approved
-    ) internal {
-
-
-
-        
-    }
-
-
-
 
 }
