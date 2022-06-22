@@ -2,10 +2,10 @@
 eip: 5163
 title: Rich Site-Proposed Contract Metadata
 description: A protocol for dapps to suggest metadata to wallets related to relevant contracts.
-author: Dan Finlay <@danfinlay>
+author: Dan Finlay (@danfinlay)
 discussions-to: https://ethereum-magicians.org/t/eip-rich-site-proposed-contract-metadata/9635
 status: Draft
-type: Standards
+type: Standards Track
 category: Interface
 created: 2022-06-15
 ---
