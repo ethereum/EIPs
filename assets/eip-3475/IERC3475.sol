@@ -7,6 +7,18 @@ pragma solidity ^0.8.0;
 interface IERC3475 {
 
     // STRUCT   
+    /**
+     * @dev structure allows the transfer of any given number of bonds from an address to another.
+     * @title": "defning the title information",
+     * @type": "explaining the type of the title information added",
+    * @description": "little description about the information stored in  the bond",
+     */
+    struct METADATA {
+        string title;
+        string _type;
+        string description;
+        string[] values;
+    }
 
     /**
      * @dev structure allows the transfer of any given number of bonds from an address to another.
@@ -15,8 +27,8 @@ interface IERC3475 {
      * @_amount is the _amount of the bond, that will be transferred from "_from" address to "_to" address.
      */
     struct TRANSACTION {
-        uint256 classIds;
-        uint256 nonceIds;
+        uint256 classId;
+        uint256 nonceId;
         uint256 _amount;
     }
 
@@ -34,28 +46,28 @@ interface IERC3475 {
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _to is the address to which the bond will be issued.
      */
-    function issue(address _to, TRANSACTION[] calldata _transaction) external;
+    function issue(address _to, TRANSACTION[] calldata _transactions) external;
 
     /**
      * @dev allows redemption of any number of bond types from an address.
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _from is the address _from which the bond will be redeemed.
      */
-    function redeem(address _from, TRANSACTION[] calldata _transaction) external;
+    function redeem(address _from, TRANSACTION[] calldata _transactions) external;
 
     /**
      * @dev allows the transfer of any number of bond types from an address to another.
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _from argument is the address of the holder whose balance about to decrees.
      */
-    function burn(address _from, TRANSACTION[] calldata _transaction) external;
+    function burn(address _from, TRANSACTION[] calldata _transactions) external;
 
     /**
      * @dev Allows _spender to withdraw from your account multiple times, up to the _amount.
      * @notice If this function is called again it overwrites the current allowance with _amount.
      * @param _spender is the address the caller approve for his bonds
      */
-    function approve(address _spender, TRANSACTION[] calldata _transaction) external;
+    function approve(address _spender, TRANSACTION[] calldata _transactions) external;
 
     /**
      * @notice Enable or disable approval for a third party ("operator") to manage all of the caller's tokens.
@@ -95,27 +107,27 @@ interface IERC3475 {
 
     /**
     * @dev Returns the values of given classId.
-     * the metadata SHOULD follow a set of structure explained in eip-3475.md
+     * the METADATA SHOULD follow a set of structure explained in eip-3475.md
      */
     function classValues(uint256 classId) external view returns (uint256[] memory);
 
     /**
-    * @dev Returns the JSON metadata of the classes.
-     * The metadata SHOULD follow a set of structure explained later in eip-3475.md
+    * @dev Returns the JSON METADATA of the classes.
+     * The METADATA SHOULD follow a set of structure explained later in eip-3475.md
      */
-    function classMetadata() external view returns (string[] memory);
+    function classMetadata() external view returns (METADATA[] memory);
 
     /**
     * @dev Returns the values of given nonceId.
-     * The metadata SHOULD follow a set of structure explained in eip-3475.md
+     * The METADATA SHOULD follow a set of structure explained in eip-3475.md
      */
     function nonceValues(uint256 classId, uint256 nonceId) external view returns (uint256[] memory);
 
     /**
-     * @dev Returns the JSON metadata of the nonces.
-     * The metadata SHOULD follow a set of structure explained later in eip-3475.md
+     * @dev Returns the JSON METADATA of the nonces.
+     * The METADATA SHOULD follow a set of structure explained later in eip-3475.md
      */
-    function nonceMetadata(uint256 classId) external view returns (string[] memory);
+    function nonceMetadata(uint256 classId) external view returns (METADATA[] memory);
 
     /**
      * @dev Returns the informations about the progress needed to redeem the bond
@@ -139,22 +151,22 @@ interface IERC3475 {
     /**
      * @notice MUST trigger when tokens are transferred, including zero value transfers.
      */
-    event Transfer(address indexed _operator, address indexed _from, address indexed _to, TRANSACTION[] _transaction);
+    event Transfer(address indexed _operator, address indexed _from, address indexed _to, TRANSACTION[] _transactions);
 
     /**
      * @notice MUST trigger when tokens are issued
      */
-    event Issue(address indexed _operator, address indexed _to, TRANSACTION[] _transaction);
+    event Issue(address indexed _operator, address indexed _to, TRANSACTION[] _transactions);
 
     /**
      * @notice MUST trigger when tokens are redeemed
      */
-    event Redeem(address indexed _operator, address indexed _from, TRANSACTION[] _transaction);
+    event Redeem(address indexed _operator, address indexed _from, TRANSACTION[] _transactions);
 
     /**
      * @notice MUST trigger when tokens are burned
      */
-    event Burn(address indexed _operator, address indexed _from, TRANSACTION[] _transaction);
+    event Burn(address indexed _operator, address indexed _from, TRANSACTION[] _transactions);
 
     /**
      * @dev MUST emit when approval for a second party/operator address to manage all bonds from a classId given for an owner address is enabled or disabled (absence of an event assumes disabled).
