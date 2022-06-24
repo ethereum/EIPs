@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 
 interface IERC3475 {
 
+
     // STRUCTURE 
 
     /**
@@ -84,7 +85,6 @@ interface IERC3475 {
      * @param _approved "True" if the operator is approved, "False" to revoke approval
      */
     function setApprovalFor(address _operator, bool _approved) external;
-
     // READABLES 
     /**
      * @dev Returns the total supply of the bond in question.
@@ -126,6 +126,7 @@ interface IERC3475 {
      * The metadata SHOULD follow a set of structure explained in eip-3475.md
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
+
     /**
      * @dev Returns the informations about the progress needed to redeem the bond
      * @notice Every bond contract can have their own logic concerning the progress definition.
@@ -137,10 +138,9 @@ interface IERC3475 {
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**
     * @notice Queries the approval status of an operator for a given owner.
-     * Returns "True" if the operator is approved, "False" if not
+     * Returns "true" if the operator is approved, "false" if not
      */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);
-
 
     // EVENTS
     /**
@@ -163,5 +163,4 @@ interface IERC3475 {
      * @dev MUST emit when approval for a second party/operator address to manage all bonds from a classId given for an owner address is enabled or disabled (absence of an event assumes disabled).
      */
     event ApprovalFor(address indexed _owner, address indexed _operator, bool _approved);
-
 }

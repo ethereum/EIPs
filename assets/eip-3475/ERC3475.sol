@@ -34,30 +34,6 @@ contract ERC3475 is IERC3475, Ownable {
         mapping(uint256 => IERC3475.Metadata) _nonceMetadata;    
         mapping(uint256 => Nonce) nonces;        
 
-        // supplies of this class
-        uint256 _activeSupply;
-        uint256 _burnedSupply;
-        uint256 _redeemedSupply;
-    }
-
-    mapping(address => mapping(address => bool)) operatorApprovals;
-
-    // from classId given
-    mapping(uint256 => Class) internal classes; 
-    mapping(uint256 => IERC3475.Metadata) _classMetadata;
-
-    /**
-     * @notice Here the constructor is just to initialize a class and nonce,
-     * in practice you will have a function to create new class and nonce
-     * to be deployed during the initial deployement cycle
-     */
-    constructor() {
-
-        // define "symbol of the class";
-        _classMetadata[0].title = "symbol";
-        _classMetadata[0].types = "string";
-        _classMetadata[0].description = "symbol of the class";
-        classes[0]._value[0].stringValue = "DBIT Fix 6M";
 
         _classMetadata[1].title = "symbol";
         _classMetadata[1].types = "string";
@@ -164,62 +140,6 @@ contract ERC3475 is IERC3475, Ownable {
                 _to != address(0),
                 "ERC3475: can't transfer to the zero address"
             );
-            _issue(_to, _transactions[i]);
-        }
-
-        emit Issue(msg.sender, _to, _transactions);
-    }
-
-    function redeem(address _from, Transaction[] calldata _transactions)
-        external
-        virtual
-        override
-    {
-        require(
-            _from != address(0),
-            "ERC3475: can't redeem from the zero address"
-        );
-        require(
-            msg.sender == _from ||
-            isApprovedFor(_from, msg.sender),
-            "ERC3475: caller-not-owner-or-approved"
-        ); 
-        uint256 len = _transactions.length;
-        for (uint256 i = 0; i < len; i++) {
-            (, uint256 progressRemaining) = getProgress(
-                _transactions[i].classId,
-                _transactions[i].nonceId
-            );
-            require(progressRemaining == 0, "ERC3475 Error: Not redeemable");
-            _redeem(_from, _transactions[i]);
-        }
-        emit Redeem(msg.sender, _from, _transactions);
-    }
-
-    function burn(address _from, Transaction[] calldata _transactions)
-        external
-        virtual
-        override
-    {
-        require(
-            _from != address(0),
-            "ERC3475: can't burn from the zero address"
-        );
-         require(
-              msg.sender == _from ||
-              isApprovedFor(_from, msg.sender),
-              "ERC3475: caller-not-owner-or-approved"
-          ); 
-        
-        uint256 len = _transactions.length;
-        for (uint256 i = 0; i < len; i++) {
-            _transferFrom(_from, address(0), _transactions[i]);
-        }      
-        emit Burn(msg.sender, _from, _transactions);
-    }
-
-    function approve(address _spender, Transaction[] calldata _transactions)
-        external
         virtual
         override
     {
@@ -398,12 +318,12 @@ contract ERC3475 is IERC3475, Ownable {
         classes[_transaction.classId]
             .nonces[_transaction.nonceId]
             .allowances[_from][_operator] -= _transaction._amount;
-
         //transfer balance        
         classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -=
         _transaction._amount;
         classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
         _transaction._amount;    
+
         
     }
 
@@ -452,4 +372,4 @@ contract ERC3475 is IERC3475, Ownable {
         _transaction._amount;
     }
 }
-
+}
