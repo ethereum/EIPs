@@ -194,7 +194,7 @@ Here is a very simple example of a NFT metadata for an imaginary 'little monster
           "eval": "$ ~> | attributes[trait_type='Level'] | {'value': value + 1} |"
         },
         "updateDescription": {
-          "eval": "$ ~> | $ | {'description': $newDescription} |"          `
+          "eval": "$ ~> | $ | {'description': $newDescription} |"
         }
       }
     }
