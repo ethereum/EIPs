@@ -82,7 +82,7 @@ The original metadata SHOULD conform to the "ERC-???? Updatable Metadata JSON Sc
                     "type": "object",
                     "description": "A catalog of all possibles recipes identified by their keys",
                     "patternProperties": {
-                        ".*: {
+                        ".*": {
                             "type": "object",
                             "description": "The key of this object is used to select which recipe to apply for each update",
                             "required": ["eval"],
