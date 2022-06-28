@@ -4,6 +4,7 @@ on:
 name: Rerun Bot
 jobs:
   rerun_bot_on_review:
+    if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     name: Trigger Bot Rerun workflow_run
     steps:

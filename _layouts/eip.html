@@ -36,8 +36,8 @@ layout: default
       <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
     {% endif %}
     <tr><th>Status</th><td>{{ page.status | xml_escape }}
-    {% if page.review-period-end != undefined %}
-      <tr><th>Review period ends</th><td>{{ page.review-period-end | xml_escape }}</td></tr>
+    {% if page.last-call-deadline != undefined %}
+      <tr><th>Last Call Deadline</th><td>{{ page.last-call-deadline | xml_escape }}</td></tr>
     {% endif %}
     </td></tr>
     <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
