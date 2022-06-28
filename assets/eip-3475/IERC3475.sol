@@ -6,9 +6,7 @@ pragma solidity ^0.8.0;
 
 interface IERC3475 {
 
-
     // STRUCTURE 
-
     /**
      * @dev Values structure of the Metadata
      */
