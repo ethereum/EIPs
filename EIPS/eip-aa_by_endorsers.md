@@ -3,7 +3,7 @@ eip: <to be defined>
 title: Account Abstraction via Endorsed Operations
 description: An account abstraction proposal that avoids consensus-layer protocol changes while maintaining compatibility with existing smart contract wallets.
 author: Agustín Aguilar (@agusx1211), Philippe Castonguay (@phabc).
-discussions-to: <to be defined>
+discussions-to: https://ethereum-magicians.org/t/erc-account-abstraction-via-endorsed-operations/9799
 type: Standards Track
 category: ERC
 status: Draft
