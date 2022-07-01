@@ -57,8 +57,8 @@ interface IERC721Metadata {
 
 /// @title Account-bound tokens
 /// @dev See https://eips.ethereum.org/EIPS/eip-4973
-///  Note: the ERC-165 identifier for this interface is 0x5164cf47.
-interface IERC4973 /* is ERC165, ERC721Metadata */ {
+/// Note: the ERC-165 identifier for this interface is 0x5164cf47
+interface IERC4973 {
   /// @dev This emits when a new token is created and bound to an account by
   /// any mechanism.
   /// Note: For a reliable `from` parameter, retrieve the transaction's
@@ -108,7 +108,7 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     _symbol = symbol_;
   }
 
-  function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+  function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
     return
       interfaceId == type(IERC721Metadata).interfaceId ||
       interfaceId == type(IERC4973).interfaceId ||
@@ -171,4 +171,3 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     emit Revoke(owner, tokenId);
   }
 }
-
