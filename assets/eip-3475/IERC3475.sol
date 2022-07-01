@@ -121,21 +121,31 @@ interface IERC3475 {
     function classValues(uint256 classId, uint256 metadataId) external view returns ( Values memory);
     /**
      * @dev Returns the values of given nonceId.
-     * The metadata SHOULD follow a set of structure explained in eip-3475.md
+     *@param  The metadata SHOULD follow a set of structure explained in eip-3475.md
+     *@param classId is the class of bonds for which you determine the nonce .
+     * @param nonceId is the nonce for which you return the value struct info   
+
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
 
     /**
      * @dev Returns the informations about the progress needed to redeem the bond
      * @notice Every bond contract can have their own logic concerning the progress definition.
+     * @param classId The class of  bonds.
+     * @param nonceId is the nonce of bonds for finding the progress.
      */
     function getProgress(uint256 classId, uint256 nonceId) external view returns (uint256 progressAchieved, uint256 progressRemaining);
     /**
      * @notice Returns the _amount which spender is still allowed to withdraw from _owner.
+     * @param _owner is the address whose owner allocates some amount to the _spender address.
+     * @param classId is the classId of bond .
+     * @param nonceId is the nonce corresponding to the class for which you are approving spending of total amount  of bonds.
      */
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**
     * @notice Queries the approval status of an operator for a given owner.
+    * @param _owner is the current holder of the bonds for  all classes / nonces.
+    * @param _operator is the address which is  having access to the bonds of _owner for transferring 
      * Returns "true" if the operator is approved, "false" if not
      */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);

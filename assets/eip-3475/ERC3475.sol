@@ -12,7 +12,7 @@ contract ERC3475 is IERC3475, Ownable {
     * @notice this Struct is representing the Nonce properties as an object
     */
     struct Nonce {
-        mapping(uint256 => IERC3475.Values) _value;  
+        mapping(uint256 => IERC3475.Values) _value;
 
         // stores the values corresponding to the dates (issuance and maturity date).
         mapping(address => uint256) balances;
@@ -29,11 +29,31 @@ contract ERC3475 is IERC3475, Ownable {
      *         and can be retrieve by the classId
      */
     struct Class {
-        mapping(uint256 => IERC3475.Values) _value;    
+        mapping(uint256 => IERC3475.Values) _value;
 
-        mapping(uint256 => IERC3475.Metadata) _nonceMetadata;    
-        mapping(uint256 => Nonce) nonces;        
+        mapping(uint256 => IERC3475.Metadata) _nonceMetadata;
+        mapping(uint256 => Nonce) nonces;
 
+    }
+
+    mapping(address => mapping(address => bool)) operatorApprovals;
+
+    // from classId given
+    mapping(uint256 => Class) internal classes;
+    mapping(uint256 => IERC3475.Metadata) _classMetadata;
+
+    /**
+     * @notice Here the constructor is just to initialize a class and nonce,
+     * in practice you will have a function to create new class and nonce
+     * to be deployed during the initial deployement cycle
+     */
+    constructor() {
+
+        // define "symbol of the class";
+        _classMetadata[0].title = "symbol";
+        _classMetadata[0].types = "string";
+        _classMetadata[0].description = "symbol of the class";
+        classes[0]._value[0].stringValue = "DBIT Fix 6M";
 
         _classMetadata[1].title = "symbol";
         _classMetadata[1].types = "string";
@@ -59,23 +79,18 @@ contract ERC3475 is IERC3475, Ownable {
         classes[1].nonces[1]._value[0].uintValue = block.timestamp + 2;
         classes[1].nonces[2]._value[0].uintValue = block.timestamp + 3;
 
+        // define "maturity of the nonce";        
+        classes[0]._nonceMetadata[0].title = "maturity";
+        classes[0]._nonceMetadata[0].types = "int";
+        classes[0]._nonceMetadata[0].description = "maturity date in integer";
+        classes[1]._nonceMetadata[0].title = "maturity";
+        classes[0]._nonceMetadata[0].types = "int";
+        classes[1]._nonceMetadata[0].description = "maturity date in integer";
+
         // defining the value status 
         classes[0].nonces[0]._value[0].boolValue = true;
         classes[0].nonces[1]._value[0].boolValue = true;
         classes[0].nonces[2]._value[0].boolValue = true;
-
-
-        // define "maturity of the nonce";        
-        classes[0]._nonceMetadata[0].title = "maturity";
-        classes[0]._nonceMetadata[0].description = "maturity date in integer";
-
-        classes[1]._nonceMetadata[0].title = "maturity";
-        classes[1]._nonceMetadata[0].description = "maturity date in integer";
-
-
-       
-
-
     }
 
     // WRITABLE
@@ -93,12 +108,12 @@ contract ERC3475 is IERC3475, Ownable {
             "ERC3475: can't transfer to the zero address"
         );
         require(
-                msg.sender == _from ||
-                isApprovedFor(_from, msg.sender),
-                "ERC3475:caller-not-owner-or-approved"
-            );
+            msg.sender == _from ||
+            isApprovedFor(_from, msg.sender),
+            "ERC3475:caller-not-owner-or-approved"
+        );
         uint256 len = _transactions.length;
-        for (uint256 i = 0; i < len; i++) {           
+        for (uint256 i = 0; i < len; i++) {
             _transferFrom(_from, _to, _transactions[i]);
         }
         emit Transfer(msg.sender, _from, _to, _transactions);
@@ -129,9 +144,9 @@ contract ERC3475 is IERC3475, Ownable {
     }
 
     function issue(address _to, Transaction[] calldata _transactions)
-        external
-        virtual
-        override
+    external
+    virtual
+    override
     {
         uint256 len = _transactions.length;
 
@@ -140,14 +155,65 @@ contract ERC3475 is IERC3475, Ownable {
                 _to != address(0),
                 "ERC3475: can't transfer to the zero address"
             );
-        virtual
-        override
+            _issue(_to, _transactions[i]);
+        }
+
+        emit Issue(msg.sender, _to, _transactions);
+    }
+
+    function redeem(address _from, Transaction[] calldata _transactions)
+    external
+    virtual
+    override
+    {
+        require(
+            _from != address(0),
+            "ERC3475: can't redeem from the zero address"
+        );
+        uint256 len = _transactions.length;
+        for (uint256 i = 0; i < len; i++) {
+            (, uint256 progressRemaining) = getProgress(
+                _transactions[i].classId,
+                _transactions[i].nonceId
+            );
+            require(progressRemaining == 0, "ERC3475 Error: Not redeemable");
+            _redeem(_from, _transactions[i]);
+        }
+        emit Redeem(msg.sender, _from, _transactions);
+    }
+
+    function burn(address _from, Transaction[] calldata _transactions)
+    external
+    virtual
+    override
+    {
+        require(
+            _from != address(0),
+            "ERC3475: can't burn from the zero address"
+        );
+        require(
+            msg.sender == _from ||
+            isApprovedFor(_from, msg.sender),
+            "ERC3475: caller-not-owner-or-approved"
+        );
+
+        uint256 len = _transactions.length;
+        for (uint256 i = 0; i < len; i++) {
+            _burn(_from, _transactions[i]);
+        }
+        emit Burn(msg.sender, _from, _transactions);
+    }
+
+    function approve(address _spender, Transaction[] calldata _transactions)
+    external
+    virtual
+    override
     {
         for (uint256 i = 0; i < _transactions.length; i++) {
-           
+
             classes[_transactions[i].classId]
-                .nonces[_transactions[i].nonceId]
-                .allowances[msg.sender][_spender] = _transactions[i]._amount;
+            .nonces[_transactions[i].nonceId]
+            .allowances[msg.sender][_spender] = _transactions[i]._amount;
         }
     }
 
@@ -162,40 +228,40 @@ contract ERC3475 is IERC3475, Ownable {
 
     // READABLES 
     function totalSupply(uint256 classId, uint256 nonceId)
-        public
-        view
-        override
-        returns (uint256)
+    public
+    view
+    override
+    returns (uint256)
     {
         return (activeSupply(classId, nonceId) +
-            burnedSupply(classId, nonceId) +
-            redeemedSupply(classId, nonceId)
-            );
+        burnedSupply(classId, nonceId) +
+        redeemedSupply(classId, nonceId)
+        );
     }
 
     function activeSupply(uint256 classId, uint256 nonceId)
-        public
-        view
-        override
-        returns (uint256)
+    public
+    view
+    override
+    returns (uint256)
     {
         return classes[classId].nonces[nonceId]._activeSupply;
     }
 
     function burnedSupply(uint256 classId, uint256 nonceId)
-        public
-        view
-        override
-        returns (uint256)
+    public
+    view
+    override
+    returns (uint256)
     {
         return classes[classId].nonces[nonceId]._burnedSupply;
     }
 
     function redeemedSupply(uint256 classId, uint256 nonceId)
-        public
-        view
-        override
-        returns (uint256)
+    public
+    view
+    override
+    returns (uint256)
     {
         return classes[classId].nonces[nonceId]._redeemedSupply;
     }
@@ -211,57 +277,58 @@ contract ERC3475 is IERC3475, Ownable {
         );
         return classes[classId].nonces[nonceId].balances[account];
     }
- 
-    function classMetadata(uint256 metadataId) 
-    external 
-    view 
-    override 
+
+    function classMetadata(uint256 metadataId)
+    external
+    view
+    override
     returns (Metadata memory) {
         return (_classMetadata[metadataId]);
     }
 
     function nonceMetadata(uint256 classId, uint256 metadataId)
-        external
-        view
-        override
-        returns (Metadata memory) {
+    external
+    view
+    override
+    returns (Metadata memory) {
         return (classes[classId]._nonceMetadata[metadataId]);
     }
 
-    function classValues(uint256 classId, uint256 metadataId) 
-    external 
-    view 
-    override 
+    function classValues(uint256 classId, uint256 metadataId)
+    external
+    view
+    override
     returns (Values memory) {
         return (classes[classId]._value[metadataId]);
     }
 
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId)
-        external
-        view
-        override
-        returns (Values memory) {
+    external
+    view
+    override
+    returns (Values memory) {
         return (classes[classId].nonces[nonceId]._value[metadataId]);
     }
+
 
     /**
      * @notice ProgressAchieved and progressRemaining is abstract, here for the example we are giving time passed and time remaining.
      */
     function getProgress(uint256 classId, uint256 nonceId)
-        public
-        view
-        override
-        returns (uint256 progressAchieved, uint256 progressRemaining)
+    public
+    view
+    override
+    returns (uint256 progressAchieved, uint256 progressRemaining)
     {
 
         uint256 issuanceDate = classes[classId].nonces[nonceId]._value[0].uintValue;
-        uint256 maturityDate = issuanceDate + classes[classId].nonces[nonceId]._value[5].uintValue;   
+        uint256 maturityDate = issuanceDate + classes[classId].nonces[nonceId]._value[5].uintValue;
         // check whether the bond is being already initialized: 
-             
+
         progressAchieved = block.timestamp - issuanceDate;
         progressRemaining = block.timestamp < maturityDate
-            ? maturityDate - block.timestamp
-            : 0;
+        ? maturityDate - block.timestamp
+        : 0;
     }
 
     function allowance(
@@ -280,7 +347,6 @@ contract ERC3475 is IERC3475, Ownable {
         return operatorApprovals[_owner][operator];
     }
 
-  
 
     function _transferFrom(
         address _from,
@@ -288,88 +354,75 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
 
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+
         require(
-            classes[_transaction.classId]
-                .nonces[_transaction.nonceId]
-                .balances[_from] >= _transaction._amount,
+            nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
         );
         //transfer balance        
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -=
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
-        _transaction._amount;    
+        nonce.balances[_from] -= _transaction._amount;
+        nonce.balances[_to] += _transaction._amount;
     }
 
-      function _transferAllowanceFrom(
+    function _transferAllowanceFrom(
         address _operator,
         address _from,
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-    
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+
         require(
-            classes[_transaction.classId]
-                .nonces[_transaction.nonceId]
-                .balances[_from] >= _transaction._amount,
+            nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not allowed amount"
         );
 
-        classes[_transaction.classId]
-            .nonces[_transaction.nonceId]
-            .allowances[_from][_operator] -= _transaction._amount;
-        //transfer balance        
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -=
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
-        _transaction._amount;    
+        nonce.allowances[_from][_operator] -= _transaction._amount;
 
-        
+        //transfer balance
+        nonce.balances[_from] -= _transaction._amount;
+        nonce.balances[_to] += _transaction._amount;
+
+
     }
 
     function _issue(
-        address _to, 
+        address _to,
         IERC3475.Transaction calldata _transaction
-        ) private
-    {
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_to] +=
-        _transaction._amount;
+    ) private {
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
 
-        classes[_transaction.classId].nonces[_transaction.nonceId]._activeSupply +=
-        _transaction._amount;
+        nonce.balances[_to] += _transaction._amount;
+        nonce._activeSupply += _transaction._amount;
     }
 
 
-    function _redeem(address _from, IERC3475.Transaction calldata _transaction)
-        private
-    {
-        require(
-            classes[_transaction.classId].nonces[_transaction.nonceId].balances[
-                _from
-            ] >= _transaction._amount
-        );
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -= 
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId]._activeSupply -= 
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId]._redeemedSupply += 
-        _transaction._amount;
+    function _redeem(
+        address _from,
+        IERC3475.Transaction calldata _transaction
+    ) private {
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+
+        require(nonce.balances[_from] >= _transaction._amount);
+
+        nonce.balances[_from] -= _transaction._amount;
+        nonce._activeSupply -= _transaction._amount;
+        nonce._redeemedSupply += _transaction._amount;
     }
 
-    function _burn(address _from, IERC3475.Transaction calldata _transaction)
-        private
-    {
-        require(
-            classes[_transaction.classId].nonces[_transaction.nonceId].balances[
-                _from
-            ] >= _transaction._amount
-        );
-        classes[_transaction.classId].nonces[_transaction.nonceId].balances[_from] -= 
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId]._activeSupply -= 
-        _transaction._amount;
-        classes[_transaction.classId].nonces[_transaction.nonceId]._burnedSupply += 
-        _transaction._amount;
+
+    function _burn(
+        address _from,
+        IERC3475.Transaction calldata _transaction
+    ) private {
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+
+        require(nonce.balances[_from] >= _transaction._amount);
+
+        nonce.balances[_from] -= _transaction._amount;
+        nonce._activeSupply -= _transaction._amount;
+        nonce._burnedSupply += _transaction._amount;
     }
-}
+
 }
