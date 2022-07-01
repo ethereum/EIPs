@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.8;
 
 // OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
 
@@ -138,7 +138,7 @@ abstract contract ERC4973 is ERC165, IERC721Metadata, IERC4973 {
     return _balances[owner];
   }
 
-  function ownerOf(uint256 tokenId) public view virtual override returns (address) {
+  function ownerOf(uint256 tokenId) public view virtual returns (address) {
     address owner = _owners[tokenId];
     require(owner != address(0), "ownerOf: token doesn't exist");
     return owner;
