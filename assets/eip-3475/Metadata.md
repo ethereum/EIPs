@@ -10,7 +10,7 @@ this documentation consist of various example  JSON schemas (examples or standar
 [
     {
         "title": "defining the title information",
-        "types": "explaining the type of the title information added",
+        "_type": "explaining the type of the title information added",
         "description": "little description about the information stored in  the bond",
     }
 ]
@@ -21,7 +21,7 @@ example: adding details in bonds describing the local jurisdiction of the bonds 
 ```json
 {
 "title": "localisation",
-"types": "string",
+"_type": "string",
 "description": "jurisdiction law codes compatibility "
 "values": ["fr ", "de", "ch"] // can also be ISO codes 
 }
@@ -35,7 +35,7 @@ example: adding details in bonds describing the local jurisdiction of the bonds 
 [	
 	{	
 	"title": "maturity",
-	"types": "uint",
+	"_type": "uint",
 	"description": "Lorem ipsum..."
 	"values": [0, 0, 0]
 	}
@@ -50,42 +50,42 @@ example: adding details in bonds describing the local jurisdiction of the bonds 
 [	
 	{	
 	"title": "symbol",
-	"types": "string",
+	"_type": "string",
 	"description": "Lorem ipsum..."
 	"values": ["Class symbol 1", "Class symbol 2", "Class symbol 3"],
 	},
 
 	{	
 	"title": "issuer",
-	"types": "string",
+	"_type": "string",
 	"description": "Lorem ipsum..."
 	"values": ["Issuer name 1", "Issuer name 2", "Issuer name 3"],
 	},
 
 	{	
 	"title": "issuer_address",
-	"types": "address",
+	"_type": "address",
 	"description": "Lorem ipsum..."
 	"values":["Address 1.", "Address 2", "Address 3"]
 	},
 
 	{	
 	"title": "class_type",
-	"types": "string",
+	"_type": "string",
 	"description": "Lorem ipsum..."
 	"values": ["Class Type 1", "Class Type 2", "Class Type 3"]
 	},
 
 	{	
 	"title": "token_address",
-	"types": "address",
+	"_type": "address",
 	"description": "Lorem ipsum..."
 	"values":["Address 1.", "Address 2", "Address 3"]
 	},
 
 	{	
 	"title": "period",
-	"types": "uint",
+	"_type": "uint",
 	"description": "Lorem ipsum..."
 	"values": [0, 0, 0]
 	}
