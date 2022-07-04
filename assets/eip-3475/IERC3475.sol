@@ -24,7 +24,7 @@ interface IERC3475 {
      */
     struct Metadata {
         string title;
-        string types;
+        string _type;
         string description;
     }
     /**

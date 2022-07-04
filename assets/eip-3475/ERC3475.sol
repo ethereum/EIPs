@@ -51,19 +51,19 @@ contract ERC3475 is IERC3475, Ownable {
 
         // define "symbol of the class";
         _classMetadata[0].title = "symbol";
-        _classMetadata[0].types = "string";
+        _classMetadata[0]._type = "string";
         _classMetadata[0].description = "symbol of the class";
         classes[0]._value[0].stringValue = "DBIT Fix 6M";
 
         _classMetadata[1].title = "symbol";
-        _classMetadata[1].types = "string";
+        _classMetadata[1]._type = "string";
         _classMetadata[1].description = "symbol of the class";
         classes[1]._value[0].stringValue = "DBIT Fix 6M";
 
 
         // define "period of the class";
         _classMetadata[5].title = "period";
-        _classMetadata[5].types = "int";
+        _classMetadata[5]._type = "int";
         _classMetadata[5].description = "details about issuance and redemption time";
         // define the maturity time period  (for the test class).
         classes[0]._value[5].uintValue = 10;
@@ -81,10 +81,10 @@ contract ERC3475 is IERC3475, Ownable {
 
         // define "maturity of the nonce";        
         classes[0]._nonceMetadata[0].title = "maturity";
-        classes[0]._nonceMetadata[0].types = "int";
+        classes[0]._nonceMetadata[0]._type = "int";
         classes[0]._nonceMetadata[0].description = "maturity date in integer";
         classes[1]._nonceMetadata[0].title = "maturity";
-        classes[0]._nonceMetadata[0].types = "int";
+        classes[0]._nonceMetadata[0]._type = "int";
         classes[1]._nonceMetadata[0].description = "maturity date in integer";
 
         // defining the value status 
