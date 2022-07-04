@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: apache 2.0
 /*
-    Copyright 2020 Sigmoid Foundation <info@SGM.finance>
+    Copyright 2022 Debond Protocol <info@debond.org>
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -11,6 +11,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 pragma solidity ^0.8.0;
 
 //@dev install the dependencies 
@@ -24,7 +25,7 @@ import "debond-governance-contracts/utils/GovernanceOwnable.sol";
 contract DebondERC3475 is IDebondBond, GovernanceOwnable {
 
     address bankAddress;
-
+    
     /**
     * @notice this Struct is representing the Nonce properties as an object
     *         and can be retrieve by the nonceId (within a class)
@@ -40,7 +41,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         mapping(address => uint256) balances;
         mapping(address => mapping(address => uint256)) allowances;
     }
-
+    
     /**
     * @notice this Struct is representing the Class properties as an object
     *         and can be retrieve by the classId
@@ -79,9 +80,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         bankAddress = _bankAddress;
     }
 
-
     // WRITE
-
     function issue(address to, Transaction[] calldata transactions) external override onlyBank {
         for (uint i; i < transactions.length; i++) {
             uint classId = transactions[i].classId;
@@ -208,7 +207,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         return IRedeemableBondCalculator(bankAddress).getProgress(classId, nonceId);
     }
 
-
     function redeem(address from, Transaction[] calldata transactions) external override onlyBank {
         for (uint i; i < transactions.length; i++) {
             uint classId = transactions[i].classId;
@@ -223,7 +221,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         emit Redeem(msg.sender, from, transactions);
     }
 
-
     function burn(address from, Transaction[] calldata transactions) external override onlyBank {
         require(from != address(0), "ERC3475: can't transfer to the zero address");
         for (uint i; i < transactions.length; i++) {
@@ -235,7 +232,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         emit Burn(msg.sender, from, transactions);
     }
 
-
     function approve(address spender, Transaction[] calldata transactions) external override {
         for (uint i; i < transactions.length; i++) {
             uint classId = transactions[i].classId;
@@ -245,14 +241,12 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         }
     }
 
-
     function setApprovalFor(address operator, uint256 classId, bool approved) public override {
         classes[classId].operatorApprovals[msg.sender][operator] = approved;
         emit ApprovalFor(msg.sender, operator, classId, approved);
     }
 
     // READS
-
     function classExists(uint256 classId) public view returns (bool) {
         return classes[classId].exists;
     }
@@ -289,7 +283,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         return classes[classId].nonces[nonceId]._burnedSupply;
     }
 
-
     function balanceOf(address account, uint256 classId, uint256 nonceId) public override view returns (uint256) {
         require(account != address(0), "ERC3475: balance query for the zero address");
 
@@ -299,7 +292,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     function classValues(uint256 classId) public view override returns (uint256[] memory) {
         return classes[classId].values;
     }
-
 
     function nonceValues(uint256 classId, uint256 nonceId) public view override returns (uint256[] memory) {
         return classes[classId].nonces[nonceId].values;
