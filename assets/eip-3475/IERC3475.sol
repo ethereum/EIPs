@@ -20,7 +20,7 @@ interface IERC3475 {
      * @dev structure allows the transfer of any given number of bonds from an address to another.
      * @title": "defning the title information",
      * @type": "explaining the type of the title information added",
-    * @description": "little description about the information stored in the bond",
+     * @description": "little description about the information stored in the bond",
      */
     struct Metadata {
         string title;
@@ -46,13 +46,13 @@ interface IERC3475 {
      * @param _to argument is the address of the recipient whose balance is about to increased.
      */
     function transferFrom(address _from, address _to, Transaction[] calldata _transaction) external;
-     /**
+    /**
      * @dev allows the transfer of allowance from an address to another (either single or in batches).
      * @param _from argument is the address of the holder whose balance about to decrease.
      * @param _to argument is the address of the recipient whose balance is about to increased.
      */
     function transferAllowanceFrom(address _from, address _to, Transaction[] calldata _transaction) external;
-   /**
+    /**
      * @dev allows issuing of any number of bond types to an address.
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _to is the address to which the bond will be issued.
@@ -146,7 +146,7 @@ interface IERC3475 {
      * @param _owner is the current holder of the bonds for  all classes / nonces.
      * @param _operator is the address which is  having access to the bonds of _owner for transferring 
      * Returns "true" if the operator is approved, "false" if not
-    */
+     */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);
 
     // EVENTS
