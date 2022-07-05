@@ -44,7 +44,6 @@ contract ERC3475 is IERC3475, Ownable {
      * to be deployed during the initial deployement cycle
      */
     constructor() {
-
         // define "symbol of the class";
         _classMetadata[0].title = "symbol";
         _classMetadata[0]._type = "string";
@@ -60,6 +59,7 @@ contract ERC3475 is IERC3475, Ownable {
         _classMetadata[5].title = "period";
         _classMetadata[5]._type = "int";
         _classMetadata[5].description = "details about issuance and redemption time";
+        
         // define the maturity time period  (for the test class).
         classes[0]._value[5].uintValue = 10;
         classes[1]._value[5].uintValue = 1;
