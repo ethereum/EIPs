@@ -66,7 +66,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     
     constructor(address _governanceAddress) GovernanceOwnable(_governanceAddress) {}
    
-   modifier onlyBank() {
+    modifier onlyBank() {
         require(msg.sender == bankAddress, "DebondERC3475 Error: Not authorized");
         _;
     }
