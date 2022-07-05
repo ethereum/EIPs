@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-
 pragma solidity ^0.8.0;
-
 
 import "./IERC3475.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -30,10 +28,8 @@ contract ERC3475 is IERC3475, Ownable {
      */
     struct Class {
         mapping(uint256 => IERC3475.Values) _value;
-
         mapping(uint256 => IERC3475.Metadata) _nonceMetadata;
         mapping(uint256 => Nonce) nonces;
-
     }
 
     mapping(address => mapping(address => bool)) operatorApprovals;
@@ -59,7 +55,6 @@ contract ERC3475 is IERC3475, Ownable {
         _classMetadata[1]._type = "string";
         _classMetadata[1].description = "symbol of the class";
         classes[1]._value[0].stringValue = "DBIT Fix test Instantaneous";
-
 
         // define "period of the class";
         _classMetadata[5].title = "period";
@@ -93,7 +88,7 @@ contract ERC3475 is IERC3475, Ownable {
         classes[0].nonces[2]._value[0].boolValue = true;
     }
 
-    // WRITABLE
+    // WRITABLES
     function transferFrom(
         address _from,
         address _to,
@@ -310,7 +305,6 @@ contract ERC3475 is IERC3475, Ownable {
         return (classes[classId].nonces[nonceId]._value[metadataId]);
     }
 
-
     /**
      * @notice ProgressAchieved and progressRemaining is abstract, here for the example we are giving time passed and time remaining.
      */
@@ -318,9 +312,8 @@ contract ERC3475 is IERC3475, Ownable {
     public
     view
     override
-    returns (uint256 progressAchieved, uint256 progressRemaining)
-    {
-
+    returns (uint256 progressAchieved, uint256 progressRemaining){
+    
         uint256 issuanceDate = classes[classId].nonces[nonceId]._value[0].uintValue;
         uint256 maturityDate = issuanceDate + classes[classId].nonces[nonceId]._value[5].uintValue;
         // check whether the bond is being already initialized: 
@@ -346,8 +339,8 @@ contract ERC3475 is IERC3475, Ownable {
     ) public view virtual override returns (bool) {
         return operatorApprovals[_owner][operator];
     }
-
-
+    
+    // INTERNALS
     function _transferFrom(
         address _from,
         address _to,
@@ -383,8 +376,6 @@ contract ERC3475 is IERC3475, Ownable {
         //transfer balance
         nonce.balances[_from] -= _transaction._amount;
         nonce.balances[_to] += _transaction._amount;
-
-
     }
 
     function _issue(
@@ -392,7 +383,7 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-
+        
         nonce.balances[_to] += _transaction._amount;
         nonce._activeSupply += _transaction._amount;
     }
