@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Standard factory contract format
 description: A standard format for factory contracts
 author: Charles Cooper (@charles-cooper)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/pull/5202
 status: Draft
 type: Standards Track
 category: ERC
