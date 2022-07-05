@@ -127,7 +127,6 @@ interface IERC3475 {
      * @param nonceId is the nonce for which you return the value struct info   
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
-
     /**
      * @dev Returns the informations about the progress needed to redeem the bond
      * @notice Every bond contract can have their own logic concerning the progress definition.
