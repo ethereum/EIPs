@@ -144,15 +144,13 @@ contract ERC3475 is IERC3475, Ownable {
     override
     {
         uint256 len = _transactions.length;
-
         for (uint256 i = 0; i < len; i++) {
             require(
                 _to != address(0),
                 "ERC3475: can't transfer to the zero address"
             );
             _issue(_to, _transactions[i]);
-        }
-
+        }        
         emit Issue(msg.sender, _to, _transactions);
     }
 
@@ -171,7 +169,10 @@ contract ERC3475 is IERC3475, Ownable {
                 _transactions[i].classId,
                 _transactions[i].nonceId
             );
-            require(progressRemaining == 0, "ERC3475 Error: Not redeemable");
+            require(
+                progressRemaining == 0,
+                "ERC3475 Error: Not redeemable"
+            );
             _redeem(_from, _transactions[i]);
         }
         emit Redeem(msg.sender, _from, _transactions);
@@ -191,7 +192,6 @@ contract ERC3475 is IERC3475, Ownable {
             isApprovedFor(_from, msg.sender),
             "ERC3475: caller-not-owner-or-approved"
         );
-
         uint256 len = _transactions.length;
         for (uint256 i = 0; i < len; i++) {
             _burn(_from, _transactions[i]);
@@ -205,7 +205,6 @@ contract ERC3475 is IERC3475, Ownable {
     override
     {
         for (uint256 i = 0; i < _transactions.length; i++) {
-
             classes[_transactions[i].classId]
             .nonces[_transactions[i].nonceId]
             .allowances[msg.sender][_spender] = _transactions[i]._amount;
@@ -312,12 +311,11 @@ contract ERC3475 is IERC3475, Ownable {
     public
     view
     override
-    returns (uint256 progressAchieved, uint256 progressRemaining){
-    
+    returns (uint256 progressAchieved, uint256 progressRemaining){    
         uint256 issuanceDate = classes[classId].nonces[nonceId]._value[0].uintValue;
         uint256 maturityDate = issuanceDate + classes[classId].nonces[nonceId]._value[5].uintValue;
+        
         // check whether the bond is being already initialized: 
-
         progressAchieved = block.timestamp - issuanceDate;
         progressRemaining = block.timestamp < maturityDate
         ? maturityDate - block.timestamp
@@ -346,13 +344,12 @@ contract ERC3475 is IERC3475, Ownable {
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-
         require(
             nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
         );
+        
         //transfer balance        
         nonce.balances[_from] -= _transaction._amount;
         nonce.balances[_to] += _transaction._amount;
@@ -365,12 +362,10 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-
         require(
             nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not allowed amount"
         );
-
         nonce.allowances[_from][_operator] -= _transaction._amount;
 
         //transfer balance
@@ -382,8 +377,9 @@ contract ERC3475 is IERC3475, Ownable {
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-        
+        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];      
+                
+        //transfer balance
         nonce.balances[_to] += _transaction._amount;
         nonce._activeSupply += _transaction._amount;
     }
@@ -394,9 +390,12 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-
-        require(nonce.balances[_from] >= _transaction._amount);
-
+        require(
+            nonce.balances[_from] >= _transaction._amount,
+            "ERC3475: not enough bond to transfer"
+        );
+        
+        //transfer balance
         nonce.balances[_from] -= _transaction._amount;
         nonce._activeSupply -= _transaction._amount;
         nonce._redeemedSupply += _transaction._amount;
@@ -408,9 +407,12 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
-
-        require(nonce.balances[_from] >= _transaction._amount);
-
+        require(
+            nonce.balances[_from] >= _transaction._amount,
+            "ERC3475: not enough bond to transfer"
+        );
+        
+        //transfer balance
         nonce.balances[_from] -= _transaction._amount;
         nonce._activeSupply -= _transaction._amount;
         nonce._burnedSupply += _transaction._amount;
