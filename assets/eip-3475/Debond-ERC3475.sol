@@ -126,10 +126,8 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     function createNonce(uint256 classId, uint256 nonceId, uint256[] calldata values) external onlyBank {
         require(classExists(classId), "ERC3475: only issue bond that has been created");
         Class storage class = classes[classId];
-
         Nonce storage nonce = class.nonces[nonceId];
         require(!nonce.exists, "Error ERC-3475: nonceId exists!");
-
         nonce.id = nonceId;
         nonce.exists = true;
         nonce.values = values;
