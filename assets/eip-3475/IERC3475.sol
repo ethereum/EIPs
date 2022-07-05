@@ -39,7 +39,7 @@ interface IERC3475 {
         uint256 _amount;
     }
 
-    // WRITABLE
+    // WRITABLES
     /**
      * @dev allows the transfer of a bond from an address to another (either single or in batches).
      * @param _from argument is the address of the holder whose balance about to decrease.
