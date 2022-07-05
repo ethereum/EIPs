@@ -52,7 +52,7 @@ interface IERC3475 {
      * @param _to argument is the address of the recipient whose balance is about to increased.
      */
     function transferAllowanceFrom(address _from, address _to, Transaction[] calldata _transaction) external;
-   /**
+    /**
      * @dev allows issuing of any number of bond types to an address.
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _to is the address to which the bond will be issued.
