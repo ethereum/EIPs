@@ -22,9 +22,7 @@ import "debond-erc3475-contracts/interfaces/IRedeemableBondCalculator.sol";
 import "debond-governance-contracts/utils/GovernanceOwnable.sol";
 
 contract DebondERC3475 is IDebondBond, GovernanceOwnable {
-
-    address bankAddress;
-    
+    address bankAddress;    
     /**
     * @notice this Struct is representing the Nonce properties as an object
     *         and can be retrieve by the nonceId (within a class)
@@ -65,10 +63,10 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     string[] public nonceInfoDescriptions; // mapping with nonce.infos
     mapping(address => mapping(uint256 => bool)) classesPerHolder;
     mapping(address => uint256[]) public classesPerHolderArray;
-
+    
     constructor(address _governanceAddress) GovernanceOwnable(_governanceAddress) {}
-
-    modifier onlyBank() {
+   
+   modifier onlyBank() {
         require(msg.sender == bankAddress, "DebondERC3475 Error: Not authorized");
         _;
     }
