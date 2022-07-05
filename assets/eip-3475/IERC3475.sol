@@ -83,6 +83,7 @@ interface IERC3475 {
      * @param _approved "True" if the operator is approved, "False" to revoke approval
      */
     function setApprovalFor(address _operator, bool _approved) external;
+    
     // READABLES 
     /**
      * @dev Returns the total supply of the bond in question.
@@ -121,13 +122,11 @@ interface IERC3475 {
     function classValues(uint256 classId, uint256 metadataId) external view returns ( Values memory);
     /**
      * @dev Returns the values of given nonceId.
-     *@param  The metadata SHOULD follow a set of structure explained in eip-3475.md
-     *@param classId is the class of bonds for which you determine the nonce .
+     * @param  The metadata SHOULD follow a set of structure explained in eip-3475.md
+     * @param classId is the class of bonds for which you determine the nonce .
      * @param nonceId is the nonce for which you return the value struct info   
-
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
-
     /**
      * @dev Returns the informations about the progress needed to redeem the bond
      * @notice Every bond contract can have their own logic concerning the progress definition.
@@ -143,11 +142,11 @@ interface IERC3475 {
      */
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**
-    * @notice Queries the approval status of an operator for a given owner.
-    * @param _owner is the current holder of the bonds for  all classes / nonces.
-    * @param _operator is the address which is  having access to the bonds of _owner for transferring 
+     * @notice Queries the approval status of an operator for a given owner.
+     * @param _owner is the current holder of the bonds for  all classes / nonces.
+     * @param _operator is the address which is  having access to the bonds of _owner for transferring 
      * Returns "true" if the operator is approved, "false" if not
-     */
+    */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);
 
     // EVENTS
