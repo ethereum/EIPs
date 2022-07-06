@@ -18,13 +18,16 @@ describe("Test ERC5006", function () {
 
             await contract.mint(alice.address, 1, 100);
 
+            const interfaceId = await contract.getInterfaceId();
+            expect(interfaceId).equals('0x208994f8');
+
             await contract.setUser(alice.address, bob.address, 1, 10);
 
             expect(await contract.balanceOfUser(bob.address, 1)).equals(10);
 
             expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
 
-            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+            expect(await contract.frozenAmountOfOwner(alice.address, 1)).equals(10);
 
             await contract.setUser(alice.address, bob.address, 1, 80);
 
@@ -32,7 +35,7 @@ describe("Test ERC5006", function () {
 
             expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(80);
 
-            expect(await contract.frozenOfOwner(alice.address, 1)).equals(80);
+            expect(await contract.frozenAmountOfOwner(alice.address, 1)).equals(80);
 
             await contract.setUser(alice.address, bob.address, 1, 0);
 
@@ -40,7 +43,7 @@ describe("Test ERC5006", function () {
 
             expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(0);
 
-            expect(await contract.frozenOfOwner(alice.address, 1)).equals(0);
+            expect(await contract.frozenAmountOfOwner(alice.address, 1)).equals(0);
 
         });
 
@@ -56,7 +59,7 @@ describe("Test ERC5006", function () {
 
             expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
 
-            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+            expect(await contract.frozenAmountOfOwner(alice.address, 1)).equals(10);
 
             expect(await contract.balanceOf(alice.address, 1)).equals(10);
 
@@ -74,7 +77,7 @@ describe("Test ERC5006", function () {
 
             expect(await contract.balanceOfUserFromOwner(bob.address, alice.address, 1)).equals(10);
 
-            expect(await contract.frozenOfOwner(alice.address, 1)).equals(10);
+            expect(await contract.frozenAmountOfOwner(alice.address, 1)).equals(10);
 
             expect(await contract.balanceOf(alice.address, 1)).equals(10);
         });

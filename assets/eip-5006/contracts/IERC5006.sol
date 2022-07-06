@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-interface IERC5006 is IERC165 {
+interface IERC5006 /* is IERC165 */ {
 
     /**
      * @dev Logged when the user of a NFT is changed 
@@ -36,18 +35,6 @@ interface IERC5006 is IERC165 {
         returns (uint256);
 
     /**
-     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
-     *
-     * Requirements:
-     *
-     * - `owner` cannot be the zero address.
-     */
-    function frozenOfOwner(address owner, uint256 id)
-        external
-        view
-        returns (uint256);
-
-    /**
      * @dev Returns the amount of tokens of token type `id` used by `user`.
      *
      * Requirements:
@@ -60,6 +47,18 @@ interface IERC5006 is IERC165 {
         address owner,
         uint256 id
     ) external view returns (uint256);
+
+    /**
+     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
+     *
+     * Requirements:
+     *
+     * - `owner` cannot be the zero address.
+     */
+    function frozenAmountOfOwner(address owner, uint256 id)
+        external
+        view
+        returns (uint256);
 
     /**
      * @dev set the `user` of a NFT

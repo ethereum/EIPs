@@ -6,18 +6,25 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./IERC5006.sol";
 
 contract ERC5006 is ERC1155, IERC5006 {
-    /**mapping(tokenId=>mapping(user=>amount)) */
+    /** mapping(tokenId => mapping(user=>amount)) */
     mapping(uint256 => mapping(address => uint256)) private _userAllowances;
 
-    /**mapping(tokenId=>mapping(owner=>amount)) */
+    /** mapping(tokenId => mapping(owner=>amount)) */
     mapping(uint256 => mapping(address => uint256)) private _frozen;
 
-    /** mapping(tokenId=>mapping(owner=>mapping(user=>amount))) */
+    /** mapping(tokenId => mapping(owner => mapping(user => amount))) */
     mapping(uint256 => mapping(address => mapping(address => uint256)))
         private _allowances;
 
     constructor() ERC1155("") {}
 
+    /**
+     * @dev Returns the amount of tokens of token type `id` used by `user`.
+     *
+     * Requirements:
+     *
+     * - `user` cannot be the zero address.
+     */
     function balanceOfUser(address user, uint256 id)
         public
         view
@@ -26,6 +33,14 @@ contract ERC5006 is ERC1155, IERC5006 {
         return _userAllowances[id][user];
     }
 
+    /**
+     * @dev Returns the amount of tokens of token type `id` used by `user`.
+     *
+     * Requirements:
+     *
+     * - `user` cannot be the zero address.
+     * - `owner` cannot be the zero address.
+     */ 
     function balanceOfUserFromOwner(
         address user,
         address owner,
@@ -34,14 +49,29 @@ contract ERC5006 is ERC1155, IERC5006 {
         return _allowances[id][owner][user];
     }
 
-    function frozenOfOwner(address owner, uint256 id)
+    /**
+     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
+     *
+     * Requirements:
+     *
+     * - `owner` cannot be the zero address.
+     */
+    function frozenAmountOfOwner(address owner, uint256 id)
         external
         view
         returns (uint256)
     {
         return _frozen[id][owner];
-    }
+    }    
 
+    /**
+     * @dev set the `user` of a NFT
+     *
+     * Requirements:
+     *
+     * - `user` The new user of the NFT, the zero address indicates there is no user
+     * - `amount` The new user could use
+     */ 
     function setUser(
         address owner,
         address user,
@@ -89,7 +119,7 @@ contract ERC5006 is ERC1155, IERC5006 {
     }
 
     /// @dev See {IERC165-supportsInterface}.
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC1155) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC5006).interfaceId || super.supportsInterface(interfaceId);
     }
 }
