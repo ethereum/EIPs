@@ -1,6 +1,6 @@
 ---
-eip: <to be assigned>
-title: Standard factory contract format
+eip: 5202
+title: Factory contract format
 description: A standard format for factory contracts
 author: Charles Cooper (@charles-cooper)
 discussions-to: https://github.com/ethereum/EIPs/pull/5202
@@ -40,7 +40,7 @@ A factory contract MAY insert any bytes (data or code) between the version byte(
 
 - Users may want to include arbitrary data or code in their preamble. To allow indexers to ignore these bytes, a variable length encoding is proposed. To allow the length to be only zero or one bytes (in the presumably common case that `len(data bytes)` is smaller than 256), two bits of the third byte are reserved to specify how many bytes the encoded length takes.
 
-- In case we need an upgrade path, version bits are included. While we do not expect to exhaust the version bits, in case we do, a continuation sequence is reserved. Since only two bytes are required for `<length bytes>` (as [EIP-170](/EIPS/eip-170.md) restricts contract length to 24KB), a `<length encoding bits>` value of 3 would never be required to describe `<length bytes>`. For that reason, the special `<length encoding bits>` value of `0b11` is reserved as a continuation sequence marker.
+- In case we need an upgrade path, version bits are included. While we do not expect to exhaust the version bits, in case we do, a continuation sequence is reserved. Since only two bytes are required for `<length bytes>` (as [EIP-170](./eip-170.md) restricts contract length to 24KB), a `<length encoding bits>` value of 3 would never be required to describe `<length bytes>`. For that reason, the special `<length encoding bits>` value of `0b11` is reserved as a continuation sequence marker.
 
 - The length of the initcode itself is not included by default in the preamble because it takes space, and it can be trivially determined using `EXTCODESIZE`.
 
@@ -48,10 +48,7 @@ A factory contract MAY insert any bytes (data or code) between the version byte(
 
 
 ## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+TBD
 
 ## Reference Implementation
 
