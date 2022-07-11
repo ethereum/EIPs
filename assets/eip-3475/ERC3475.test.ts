@@ -64,7 +64,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.equal(secondaryBuyerBalance, 2000);
         assert.equal(activeSupply, 14000);
     })
-    //
+    
     it('should be able to manipulate bonds after approval', async () => {
         const transactionApproval: _transaction[] = [
             {
