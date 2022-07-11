@@ -41,7 +41,7 @@ contract ERC3475 is IERC3475, Ownable {
     /**
      * @notice Here the constructor is just to initialize a class and nonce,
      * in practice you will have a function to create new class and nonce
-     * to be deployed during the initial deployement cycle
+     * to be deployed during the initial deployment cycle
      */
     constructor() {
         // define "symbol of the class";
