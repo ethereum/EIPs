@@ -148,7 +148,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         uint256 _batchActiveSupply;
         uint256[] memory nonces = classes[classId].nonceIds;   
         // _lastBondNonces can be recovered from the last message of the nonceId
-        // @drisky we can indeed
         for (uint256 i = 0; i <= nonces.length; i++) {
             _batchActiveSupply += activeSupply(classId, nonces[i]);
         }
