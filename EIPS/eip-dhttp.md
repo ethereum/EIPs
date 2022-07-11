@@ -1,0 +1,72 @@
+---
+eip: <to be assigned>
+title: Decentralized HTTP
+description: Allows the sending of HTTP-like requests to smart contracts
+author: Pandapip1 (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-07-10
+requires: 20, 137, 165, 4834
+---
+
+## Abstract
+
+Ethereum is the most-established blockchain for building decentralized applications (referred to as `DApp`s). Due to this, the Ethereum DApp ecosystem is very diverse. However, one issue that plagues DApps is the fact that they are not fully decentralized. Specifically, to interface a "decentralized" application, one first needs to access a *centralized* website containing the DApp's front-end code. This presents a few issues, discussed in the Motivation.
+
+## Motivation
+
+As mentioned in the Abstract, DApps being partially centralized is problematic. The following are some risks associated with using centralized websites to interface with decentralized applications:
+
+- Trust Minimization: An unnecessarily large number of entities need to be trusted
+- Censorship: A centralized website is not resistant to being censored
+- Permanence: The interface may not have a mechanism that permits it to be permanently stored
+- Interoperability: Smart Contracts cannot directly interact with DApp interfaces
+  
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+### Name Resolution
+
+It is RECOMMENDED for Web3 browsers implementing this EIP to recognize the following standards:
+
+| Name                          | Specification                                        |
+| ---                           | ---                                                  |
+| [EIP-137](./eip-137.md) (ENS) | See [EIP-137](./eip-137.md#Resolver-specification)   |
+| [EIP-4834](./eip-4834.md)     | See [EIP-4834](./eip-4834.md#Specification)          |
+
+**Changes to this list:** This list MAY be appended to even when this EIP becomes final. New additions should be made at the bottom of the list.
+
+Web3 browsers MAY also support regular DNS, as defined in RFC 1034 and RFC 1035.
+
+In the case of a naming conflict, it is RECOMMENDED to prefer the standard that appears first in the list. (Regular DNS should be treated as the last item in the list.)
+
+### Separation of Concerns
+
+It is RECOMMENDED to separate the application logic (such as an [EIP-20](./eip-20.md) token) from the front-end logic (the contract implementing the interface defined in [Contract Interface](#contract-interface)).
+
+### Contract Interface
+
+DApp contracts MUST implement the interface defined in the following file: [Contract Interface](../assets/eip-dhttp/IDecentralizedApp.sol).
+
+In addition, DApp contracts MUST implement [EIP-165](./eip-165.md).
+
+## Rationale
+
+The `request` method was chosen to be readonly because all data should be sent to the contract from the parsed DApp. Here are some reasons why:
+- Submitting a transaction to send a request would be costly and would require waiting for the transaction to be mined, resulting in quite possibly the worst user-experience possible.
+- Complicated front-end logic should not be stored in the smart contract, as it would be costly to deploy and would be better ran on the end-user's machine.
+- Separation of Concerns: the front-end contract shouldn't have to worry about interacting with the back-end smart contract.
+
+## Backwards Compatibility
+
+This EIP is backwards compatible with all standards listed in the [Name Resolution](#name-resolution) section.
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
