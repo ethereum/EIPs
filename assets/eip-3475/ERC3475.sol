@@ -215,7 +215,6 @@ contract ERC3475 is IERC3475, Ownable {
         address operator,
         bool approved
     ) public virtual override {
-        // TODO: implementing internal function for setting approval.
         operatorApprovals[msg.sender][operator] = approved;
         emit ApprovalFor(msg.sender, operator, approved);
     }

@@ -90,5 +90,5 @@ example: adding details in bonds describing the local jurisdiction of the bonds 
 	"values": [0, 0, 0]
 	}
 ]
-## TODO, defining example schemas for actual fintech standards : 
+## Examples of other standards: 
 - ISO-20022 standard is the recent adopted standard by banks for communicating the financial operations. 

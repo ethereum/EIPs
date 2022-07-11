@@ -71,7 +71,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         _;
     }
 
-    // TODO onlyGovernance
     function setBankAddress(address _bankAddress) onlyGovernance external {
         require(_bankAddress != address(0), "DebondERC3475 Error: Address given is address(0)");
         bankAddress = _bankAddress;
