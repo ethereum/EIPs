@@ -17,8 +17,8 @@ interface IERC3475 {
         bool boolValue;
     }
     /**
-     * @dev structure allows the transfer of any given number of bonds from an address to another.
-     * @title": "defning the title information",
+     * @dev structure allows the transfer of any given number of bonds from one address to another.
+     * @title": "defining the title information",
      * @type": "explaining the type of the title information added",
      * @description": "little description about the information stored in the bond",
      */
@@ -28,10 +28,10 @@ interface IERC3475 {
         string description;
     }
     /**
-     * @dev structure allows the transfer of any given number of bonds from an address to another.
-     * @classId is the class id of bond.
+     * @dev structure allows the transfer of any given number of bonds from one address to another.
+     * @classId is the class id of the bond.
      * @nonceId is the nonce id of the given bond class. This param is for distinctions of the issuing conditions of the bond.
-     * @_amount is the _amount of the bond, that will be transferred.
+     * @_amount is the _amount of the bond that will be transferred.
      */
     struct Transaction {
         uint256 classId;
@@ -41,15 +41,15 @@ interface IERC3475 {
 
     // WRITABLES
     /**
-     * @dev allows the transfer of a bond from an address to another (either single or in batches).
-     * @param _from argument is the address of the holder whose balance about to decrease.
-     * @param _to argument is the address of the recipient whose balance is about to increased.
+     * @dev allows the transfer of a bond from one address to another (either single or in batches).
+     * @param _from  is the address of the holder whose balance is about to decrease.
+     * @param _to is the address of the recipient whose balance is about to increase.
      */
     function transferFrom(address _from, address _to, Transaction[] calldata _transaction) external;
     /**
-     * @dev allows the transfer of allowance from an address to another (either single or in batches).
-     * @param _from argument is the address of the holder whose balance about to decrease.
-     * @param _to argument is the address of the recipient whose balance is about to increased.
+     * @dev allows the transfer of allowance from one address to another (either single or in batches).
+     * @param _from is the address of the holder whose balance about to decrease.
+     * @param _to is the address of the recipient whose balance is about to increased.
      */
     function transferAllowanceFrom(address _from, address _to, Transaction[] calldata _transaction) external;
     /**
@@ -67,12 +67,12 @@ interface IERC3475 {
     /**
      * @dev allows the transfer of any number of bond types from an address to another.
      * The calling of this function needs to be restricted to bond issuer contract.
-     * @param _from argument is the address of the holder whose balance about to decrees.
+     * @param _from  is the address of the holder whose balance about to decrees.
      */
     function burn(address _from, Transaction[] calldata _transaction) external;
     /**
      * @dev Allows _spender to withdraw from your account multiple times, up to the _amount.
-     * @notice If this function is called again it overwrites the current allowance with _amount.
+     * @notice If this function is called again, it overwrites the current allowance with _amount.
      * @param _spender is the address the caller approve for his bonds
      */
     function approve(address _spender, Transaction[] calldata _transaction) external;
@@ -116,20 +116,20 @@ interface IERC3475 {
      */
     function nonceMetadata(uint256 classId, uint256 metadataId) external view returns ( Metadata memory);
     /**
-     * @dev Returns the values of given classId.
-     * the metadata SHOULD follow a set of structure explained in eip-3475.md
+     * @dev Returns the values of the given classId.
+     * the metadata SHOULD follow a set of structures explained in eip-3475.md
      */
     function classValues(uint256 classId, uint256 metadataId) external view returns ( Values memory);
     /**
      * @dev Returns the values of given nonceId.
-     * @param  The metadata SHOULD follow a set of structure explained in eip-3475.md
+     * @param  The metadata SHOULD follow a set of structures explained in eip-3475.md
      * @param classId is the class of bonds for which you determine the nonce .
      * @param nonceId is the nonce for which you return the value struct info   
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
     /**
-     * @dev Returns the informations about the progress needed to redeem the bond
-     * @notice Every bond contract can have their own logic concerning the progress definition.
+     * @dev Returns the information about the progress needed to redeem the bond
+     * @notice Every bond contract can have its own logic concerning the progress definition.
      * @param classId The class of  bonds.
      * @param nonceId is the nonce of bonds for finding the progress.
      */
@@ -138,7 +138,7 @@ interface IERC3475 {
      * @notice Returns the _amount which spender is still allowed to withdraw from _owner.
      * @param _owner is the address whose owner allocates some amount to the _spender address.
      * @param classId is the classId of bond .
-     * @param nonceId is the nonce corresponding to the class for which you are approving spending of total amount  of bonds.
+     * @param nonceId is the nonce corresponding to the class for which you are approving the spending of total amount of bonds.
      */
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**

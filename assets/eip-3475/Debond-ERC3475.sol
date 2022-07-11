@@ -13,7 +13,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     address bankAddress;    
     /**
     * @notice this Struct is representing the Nonce properties as an object
-    *         and can be retrieve by the nonceId (within a class)
+    *         and can be retrieved by the nonceId (within a class)
     */
     struct Nonce {
         uint256 id;
@@ -29,7 +29,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     
     /**
     * @notice this Struct is representing the Class properties as an object
-    *         and can be retrieve by the classId
+    *         and can be retrieved by the classId
     */
     struct Class {
         uint256 id;

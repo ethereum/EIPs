@@ -24,7 +24,7 @@ contract ERC3475 is IERC3475, Ownable {
 
     /**
      * @notice this Struct is representing the Class properties as an object
-     *         and can be retrieve by the classId
+     *         and can be retrieved by the classId
      */
     struct Class {
         mapping(uint256 => IERC3475.Values) _value;
@@ -40,7 +40,7 @@ contract ERC3475 is IERC3475, Ownable {
 
     /**
      * @notice Here the constructor is just to initialize a class and nonce,
-     * in practice you will have a function to create new class and nonce
+     * in practice, you will have a function to create a new class and nonce
      * to be deployed during the initial deployment cycle
      */
     constructor() {
@@ -304,7 +304,7 @@ contract ERC3475 is IERC3475, Ownable {
     }
 
     /**
-     * @notice ProgressAchieved and progressRemaining is abstract, here for the example we are giving time passed and time remaining.
+     * @notice ProgressAchieved and `progressRemaining` is abstract. For e.g. we are giving time passed and time remaining.
      */
     function getProgress(uint256 classId, uint256 nonceId)
     public
