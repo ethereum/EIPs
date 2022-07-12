@@ -2,9 +2,7 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 jobs:
   htmlproofer:
