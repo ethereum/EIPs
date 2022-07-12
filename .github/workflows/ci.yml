@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       
       - name: Install OpenSSL
-        run: apt-get update && apt-get install -y libcurl4-openssl-dev
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
     
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
@@ -29,6 +29,8 @@ jobs:
       
       - name: HTML Proofer
         run: bundle exec htmlproofer $HTMLPROOFER_OPTIONS --disable-external
+        env:
+          HTMLPROOFER_OPTIONS: ./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
@@ -50,7 +52,7 @@ jobs:
       run: cargo install eipv --version=0.4.0
     
     - name: Run EIP Validator
-      run: eipv EIPS/ --skip=eip-20-token-standard.md
+      run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
   
   codespell:
     name: CodeSpell
