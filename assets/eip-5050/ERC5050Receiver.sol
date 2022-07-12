@@ -1,24 +1,17 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-
-/**********************************************************\
-* Author: alexi <chitch@alxi.nl> (https://twitter.com/0xalxi)
-* EIP-xxxx Token Interaction Standard: [tbd]
-*
-* Implementation of an interactive token protocol.
-/**********************************************************/
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {IERCxxxxSender, IERCxxxxReceiver, Action} from "./IERCxxxx.sol";
+import {IERC5050Sender, IERC5050Receiver, Action} from "./IERC5050.sol";
 import {Controllable} from "./Controllable.sol";
-import {EnumerableBytes4Set} from "./EnumerableBytes4Set.sol";
+import {ActionsSet} from "./ActionsSet.sol";
 
-contract ERCxxxxReceiver is Controllable, IERCxxxxReceiver {
+contract ERC5050Receiver is Controllable, IERC5050Receiver {
     using Address for address;
-    using EnumerableBytes4Set for EnumerableBytes4Set.Set;
+    using ActionsSet for ActionsSet.Set;
 
-    EnumerableBytes4Set.Set _receivableActions;
+    ActionsSet.Set _receivableActions;
 
     modifier onlyReceivableAction(Action calldata action, uint256 nonce) {
         if (_isApprovedController(msg.sender, action.selector)) {
@@ -26,27 +19,27 @@ contract ERCxxxxReceiver is Controllable, IERCxxxxReceiver {
         }
         require(
             action.to._address == address(this),
-            "ERCxxxx: invalid receiver"
+            "ERC5050: invalid receiver"
         );
         require(
             _receivableActions.contains(action.selector),
-            "ERCxxxx: invalid action"
+            "ERC5050: invalid action"
         );
         require(
             action.from._address == address(0) ||
                 action.from._address == msg.sender,
-            "ERCxxxx: invalid sender"
+            "ERC5050: invalid sender"
         );
         require(
             (action.from._address != address(0) && action.user == tx.origin) ||
                 action.user == msg.sender,
-            "ERCxxxx: invalid sender"
+            "ERC5050: invalid sender"
         );
         _;
     }
 
-    function receivableActions() external view returns (bytes4[] memory) {
-        return _receivableActions.values();
+    function receivableActions() external view returns (string[] memory) {
+        return _receivableActions.names();
     }
 
     function onActionReceived(Action calldata action, uint256 nonce)
@@ -65,14 +58,14 @@ contract ERCxxxxReceiver is Controllable, IERCxxxxReceiver {
     {
         if (!_isApprovedController(msg.sender, action.selector)) {
             if (action.state != address(0)) {
-                require(action.state.isContract(), "ERCxxxx: invalid state");
+                require(action.state.isContract(), "ERC5050: invalid state");
                 try
-                    IERCxxxxReceiver(action.state).onActionReceived{
+                    IERC5050Receiver(action.state).onActionReceived{
                         value: msg.value
                     }(action, nonce)
                 {} catch (bytes memory reason) {
                     if (reason.length == 0) {
-                        revert("ERCxxxx: call to non ERCxxxxReceiver");
+                        revert("ERC5050: call to non ERC5050Receiver");
                     } else {
                         assembly {
                             revert(add(32, reason), mload(reason))
@@ -93,7 +86,7 @@ contract ERCxxxxReceiver is Controllable, IERCxxxxReceiver {
         );
     }
 
-    function _registerReceivable(bytes4 action) internal {
+    function _registerReceivable(string memory action) internal {
         _receivableActions.add(action);
     }
 }

@@ -1,24 +1,17 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-
-/**********************************************************\
-* Author: alexi <chitch@alxi.nl> (https://twitter.com/0xalxi)
-* EIP-xxxx Token Interaction Standard: [tbd]
-*
-* Implementation of an interactive token protocol.
-/**********************************************************/
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {IERCxxxxSender, IERCxxxxReceiver, Action} from "./IERCxxxx.sol";
+import {IERC5050Sender, IERC5050Receiver, Action} from "./IERC5050.sol";
 import {Controllable} from "./Controllable.sol";
-import {EnumerableBytes4Set} from "./EnumerableBytes4Set.sol";
+import {ActionsSet} from "./ActionsSet.sol";
 
-contract ERCxxxxSender is Controllable, IERCxxxxSender {
+contract ERC5050Sender is Controllable, IERC5050Sender {
     using Address for address;
-    using EnumerableBytes4Set for EnumerableBytes4Set.Set;
+    using ActionsSet for ActionsSet.Set;
 
-    EnumerableBytes4Set.Set _sendableActions;
+    ActionsSet.Set _sendableActions;
 
     uint256 private _nonce;
     uint256 private _hash;
@@ -43,8 +36,8 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
         return actionHash == _hash && nonce == _nonce;
     }
 
-    function sendableActions() external view returns (bytes4[] memory) {
-        return _sendableActions.values();
+    function sendableActions() external view returns (string[] memory) {
+        return _sendableActions.names();
     }
 
     modifier onlySendableAction(Action memory action) {
@@ -53,11 +46,11 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
         }
         require(
             _sendableActions.contains(action.selector),
-            "ERCxxxx: invalid action"
+            "ERC5050: invalid action"
         );
         require(
             _isApprovedOrSelf(action.user, action.selector),
-            "ERCxxxx: unapproved sender"
+            "ERC5050: unapproved sender"
         );
         _;
     }
@@ -67,12 +60,12 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
         bytes4 _action,
         address _approved
     ) public virtual override returns (bool) {
-        require(_approved != _account, "ERCxxxx: approve to caller");
+        require(_approved != _account, "ERC5050: approve to caller");
 
         require(
             msg.sender == _account ||
                 isApprovedForAllActions(_account, msg.sender),
-            "ERCxxxx: approve caller is not account nor approved for all"
+            "ERC5050: approve caller is not account nor approved for all"
         );
 
         actionApprovals[_account][_action] = _approved;
@@ -86,7 +79,7 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
         virtual
         override
     {
-        require(msg.sender != _operator, "ERCxxxx: approve to caller");
+        require(msg.sender != _operator, "ERC5050: approve to caller");
 
         operatorApprovals[msg.sender][_operator] = _approved;
 
@@ -127,7 +120,7 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
             }
             if (next.isContract()) {
                 try
-                    IERCxxxxReceiver(next).onActionReceived{value: msg.value}(
+                    IERC5050Receiver(next).onActionReceived{value: msg.value}(
                         action,
                         nonce
                     )
@@ -181,7 +174,7 @@ contract ERCxxxxSender is Controllable, IERCxxxxSender {
             getApprovedForAction(account, action) == msg.sender);
     }
 
-    function _registerSendable(bytes4 action) internal {
+    function _registerSendable(string memory action) internal {
         _sendableActions.add(action);
     }
 }

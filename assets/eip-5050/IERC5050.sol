@@ -1,16 +1,9 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-
-/**********************************************************\
-* Author: alexi <chitch@alxi.nl> (https://twitter.com/0xalxi)
-* EIP-xxxx Token Interaction Standard: [tbd]
-*
-* Implementation of an interactive token protocol.
-/**********************************************************/
 
 /// @title ERC-xxxx Token Interaction Standard
 /// @dev See https://eips.ethereum.org/EIPS/eip-xxx
-interface IERCxxxxSender {
+interface IERC5050Sender {
     /// @notice Send an action to the target address
     /// @dev The action's `fromContract` is automatically set to `address(this)`,
     /// and the `from` parameter is set to `msg.sender`.
@@ -104,7 +97,7 @@ interface IERCxxxxSender {
     );
 }
 
-interface IERCxxxxReceiver {
+interface IERC5050Receiver {
     /// @notice Handle an action
     /// @dev Both the `to` contract and `state` contract are called via
     /// `onActionReceived()`.

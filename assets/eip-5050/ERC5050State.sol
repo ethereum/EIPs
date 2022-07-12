@@ -1,24 +1,17 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-
-/**********************************************************\
-* Author: alexi <chitch@alxi.nl> (https://twitter.com/0xalxi)
-* EIP-xxxx Token Interaction Standard: [tbd]
-*
-* Implementation of an interactive token protocol.
-/**********************************************************/
 
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {IERCxxxxSender, IERCxxxxReceiver, Action} from "./IERCxxxx.sol";
+import {IERC5050Sender, IERC5050Receiver, Action} from "./IERC5050.sol";
 import {Controllable} from "./Controllable.sol";
-import {EnumerableBytes4Set} from "./EnumerableBytes4Set.sol";
+import {ActionsSet} from "./ActionsSet.sol";
 
-contract ERCxxxxState is Controllable, IERCxxxxReceiver {
+contract ERC5050State is Controllable, IERC5050Receiver {
     using Address for address;
-    using EnumerableBytes4Set for EnumerableBytes4Set.Set;
+    using ActionsSet for ActionsSet.Set;
 
-    EnumerableBytes4Set.Set private _receivableActions;
+    ActionsSet.Set private _receivableActions;
 
     function onActionReceived(Action calldata action, uint256 nonce)
         external
@@ -40,12 +33,12 @@ contract ERCxxxxState is Controllable, IERCxxxxReceiver {
         }
         require(
             _receivableActions.contains(action.selector),
-            "ERCxxxx: invalid action"
+            "ERC5050: invalid action"
         );
-        require(action.state == address(this), "ERCxxxx: invalid state");
+        require(action.state == address(this), "ERC5050: invalid state");
         require(
             action.user == address(0) || action.user == tx.origin,
-            "ERCxxxx: invalid user"
+            "ERC5050: invalid user"
         );
 
         address expectedSender = action.to._address;
@@ -56,7 +49,7 @@ contract ERCxxxxState is Controllable, IERCxxxxReceiver {
                 expectedSender = action.user;
             }
         }
-        require(msg.sender == expectedSender, "ERCxxxx: invalid sender");
+        require(msg.sender == expectedSender, "ERC5050: invalid sender");
 
         // State contracts must validate the action with the `from` contract in
         // the case of a 3-contract chain (`from`, `to` and `state`) all set to
@@ -80,12 +73,12 @@ contract ERCxxxxState is Controllable, IERCxxxxReceiver {
                 )
             );
             try
-                IERCxxxxSender(action.from._address).isValid(actionHash, nonce)
+                IERC5050Sender(action.from._address).isValid(actionHash, nonce)
             returns (bool ok) {
-                require(ok, "ERCxxxx: action not validated");
+                require(ok, "ERC5050: action not validated");
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert("ERCxxxx: call to non ERCxxxxSender");
+                    revert("ERC5050: call to non ERC5050Sender");
                 } else {
                     assembly {
                         revert(add(32, reason), mload(reason))
@@ -112,7 +105,7 @@ contract ERCxxxxState is Controllable, IERCxxxxReceiver {
         );
     }
 
-    function _registerReceivable(bytes4 action) internal {
+    function _registerReceivable(string memory action) internal {
         _receivableActions.add(action);
     }
 }
