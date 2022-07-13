@@ -30,7 +30,7 @@ jobs:
       - name: HTML Proofer
         run: bundle exec htmlproofer $HTMLPROOFER_OPTIONS --disable-external
         env:
-          HTMLPROOFER_OPTIONS: ./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --url-ignore=/EIPS/eip-1,EIPS/eip-1,/EIPS/eip-107,/EIPS/eip-858
+          HTMLPROOFER_OPTIONS: 
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
