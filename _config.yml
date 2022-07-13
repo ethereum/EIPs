@@ -69,3 +69,6 @@ include:
   - LICENSE
 
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+
+plugins:
+  - jekyll-include-cache
