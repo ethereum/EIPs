@@ -24,11 +24,3 @@ jobs:
           META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           MAINTAINERS: "@alita-moore,@mryalamanchi"
-  enable-auto-merge:
-    if: github.event.pull_request.draft == false && github.repository == 'ethereum/eips'
-    runs-on: ubuntu-latest
-    needs: ["auto_merge_bot"]
-    steps:
-    - uses: alexwilson/enable-github-automerge-action@1.0.0
-      with:
-        github-token: ${{ secrets.TOKEN }}
