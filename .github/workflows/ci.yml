@@ -13,8 +13,16 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@34a865a2b221bd60ec0d4c071f5e7a66ffdac88a
+      
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+      
+      - name: Remove Gemfile.lock
+        if: contains(steps.changed-files.outputs.modified_files, 'Gemfile')
+        run: rm Gemfile.lock
     
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
@@ -32,6 +40,13 @@ jobs:
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
+      
+      - name: Re-Add Updated Gemfile.lock
+        if: contains(steps.changed-files.outputs.modified_files, 'Gemfile') && github.event_name == 'push'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: Gemfile.lock
+          commit_message: Re-Add Updated Gemfile.lock
   
   eip-validator:
     name: EIP Validator
