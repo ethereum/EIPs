@@ -36,7 +36,7 @@ jobs:
           bundle exec jekyll build
       
       - name: HTML Proofer
-        run: bundle exec htmlproofer ./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
+        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
