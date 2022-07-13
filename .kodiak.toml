@@ -16,11 +16,6 @@ include_coauthors = true
 include_pull_request_author = true
 include_pull_request_url = true
 
-# Keep dependencies up-to-date automatically 
-[merge.automerge_dependencies]
-versions = ["minor", "patch"] # do not automerge major version upgrades
-usernames = ["dependabot"]
-
 # Automatically keep PRs ahead of the main branch
 [update]
 always = true
