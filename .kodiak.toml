@@ -16,6 +16,3 @@ include_coauthors = true
 include_pull_request_author = true
 include_pull_request_url = true
 
-# Automatically keep PRs ahead of the main branch
-[update]
-always = true
