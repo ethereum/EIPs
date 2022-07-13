@@ -66,7 +66,19 @@ jobs:
     
     - name: Run EIP Validator
       run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
-  
+
+  eipw-validator:
+    name: EIPW Validator
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout EIP Repository
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+    - uses: SamWilsn/eipw-action@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
   codespell:
     name: CodeSpell
     runs-on: ubuntu-latest
