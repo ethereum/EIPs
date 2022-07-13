@@ -1,0 +1,79 @@
+---
+eip: <to be assigned>
+title: Executable Proposal Standard
+description: A standard for interfaces of executable proposals that can operate smart contract
+author: Zainan Victor Zhou (xinbenlv)<zzn@zzn.im>
+discussions-to: TBC
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): ERC
+created: 2022-07-13
+requires (*optional): 7
+---
+
+## Abstract
+A standrized format for proposals that will be executable. 
+
+## Motivation
+In the case of a Decentralized Autonamous Organization or delegation scenario, when approvals are granted, a proposal shall be able be executed in the format of smart contract call.
+By having a standard for such format, we allow proposals to be created via different client / UI, be shown in a standardized way.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+```solidity
+
+interface IERC_NUMBER_TO_BE_ASSIGNED_Proposal {
+    event ProposalCreated(
+        uint256 proposalId,
+        string proposalUri,
+        uint8[] optionIds,
+        address proposer,
+        address[][] targets,
+        uint256[][] values,
+        string[][] signatures,
+        bytes[][] calldatas,
+        uint256 startBlock,
+        uint256 endBlock
+    );
+    event ProposalExecuted(uint256 proposalId);
+    // TODO: add Proposal Cancel/Edit/Withdraw Event and Functions?
+
+    // TODO: decide whether we require generating ProposalId in the method or not?
+    // TODO: if require generating ProposalId internally, can it be incremental hash-generated?
+    // TODO: what if proposal need to demonstrate sufficient support? How to input quorum?
+    function createProposal(
+        uint256 proposalId,
+        string calldata proposalUri,
+        uint8[] calldata optionIds,
+        address[] calldata targets,
+        uint256[] calldata values,
+        bytes[] calldata calldatas,
+        uint256 startblock,
+        uint256 endblock,
+        bytes calldata extraParams
+    ) external returns (uint256 registeredProposalId);
+
+    // TODO: what's most proper way to update the voting period?
+    // TODO: do we want to include cancel or withdraw?
+    // TODO: what's the best way to include weight scheme?
+}
+```
+
+## Rationale
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+
+## Backwards Compatibility
+All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+## Test Cases
+Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+## Reference Implementation
+An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+## Security Considerations
+All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
