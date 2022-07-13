@@ -1,10 +1,10 @@
-on: [pull_request_target]
+on: [ pull_request_target ]
 name: Auto-Merge Bot
 jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
-    if: github.event.pull_request.draft == false && github.repository == 'ethereum/eips'
+    if: github.repository == 'ethereum/eips'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -17,15 +17,15 @@ jobs:
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn"
-          ERC_EDITORS: "@lightclient,@axic,@SamWilsn"
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
+          ERC_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
           NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
           INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn"
           META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           MAINTAINERS: "@alita-moore,@mryalamanchi"
   enable-auto-merge:
-    if: github.repository == 'ethereum/eips'
+    if: github.event.pull_request.draft == false && github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
     needs: ["auto_merge_bot"]
     steps:

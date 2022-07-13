@@ -1,0 +1,68 @@
+name: Continuous Integration
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  htmlproofer:
+    name: HTMLProofer
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      
+      - name: Install OpenSSL
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+    
+      - name: Install Ruby
+        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
+        with:
+          ruby-version: '2.6.0'
+          bundler-cache: true
+        
+      - name: Build Website
+        run: |
+          bundle exec jekyll doctor
+          bundle exec jekyll build
+      
+      - name: HTML Proofer
+        run: bundle exec htmlproofer ./_site --internal-domains=eips.ethereum.org --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
+      
+      - name: DNS Validator
+        run: bundle exec github-pages health-check
+  
+  eip-validator:
+    name: EIP Validator
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout EIP Repository
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+    
+    - name: Set Up Rust Toolchain
+      uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
+      with:
+        toolchain: stable
+    
+    - name: Install EIP Validator
+      run: cargo install eipv --version=0.4.0
+    
+    - name: Run EIP Validator
+      run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
+  
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      
+      - name: Run CodeSpell
+        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        with:
+          check_filenames: true
+          ignore_words_file: .codespell-whitelist
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+
