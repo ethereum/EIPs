@@ -31,7 +31,7 @@ layout: default
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
   <table>
-    <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
+    <tr><th>Author</th><td>{% include_cached authorlist.html authors=page.author %}</td></tr>
     {% if page["discussions-to"] != undefined %}
       <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
     {% endif %}
@@ -49,7 +49,7 @@ layout: default
     <tr><th>Updated</th><td>{{ page.updated | xml_escape }}</td></tr>
     {% endif %}
     {% if page.requires != undefined %}
-      <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
+      <tr><th>Requires</th><td>{% include_cached eipnums.html eips=page.requires %}</td></tr>
     {% endif %}
     {% if page["withdrawal-reason"] != undefined %}
       <tr><th>Withdrawal reason</th><td>{{ page["withdrawal-reason"] | xml_escape }}</td></tr>
@@ -58,10 +58,10 @@ layout: default
 
   <div class="toc">
     <h2>Table of Contents</h2>
-    {% include toc.html html=content sanitize=true h_max=3 %}
+    {% include_cached toc.html html=content sanitize=true h_max=3 %}
   </div>
 
-  {% include anchor_headings.html html=content anchorClass="anchor-link" beforeHeading=true %}
+  {% include_cached anchor_headings.html html=content anchorClass="anchor-link" beforeHeading=true %}
 
   <h2>Citation</h2>
   <p>Please cite this document as:</p>
@@ -69,7 +69,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
+  <p>{% include_cached authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
