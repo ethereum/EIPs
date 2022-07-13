@@ -4,12 +4,15 @@ version = 1
 [merge]
 
 method = "squash"
-
-notify_on_conflict = false
-
-dont_wait_on_status_checks = ["EIP Auto-Merge Bot", "Travis CI - Pull Request"]
-
+delete_branch_on_merge = true
 require_automerge_label = false
 
 # important
 block_on_neutral_required_check_runs = true
+
+# Add useful information & co-authors to the PR commit body
+[merge.message]
+include_coauthors = true
+include_pull_request_author = true
+include_pull_request_url = true
+
