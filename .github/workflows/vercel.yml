@@ -24,4 +24,5 @@ jobs:
         VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         ALIAS_DOMAINS: eips--pr-{PR}.now.sh
         PR_PREVIEW_DOMAIN: eips--pr-{PR}.now.sh
+        DEPLOY_PR_FROM_FORK: true
         PRODUCTION: false
