@@ -33,6 +33,20 @@ jobs:
       - name: DNS Validator
         run: bundle exec github-pages health-check
   
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        
+      - name: Run CodeSpell
+        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        with:
+          check_filenames: true
+          ignore_words_file: .codespell-whitelist
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+  
   eip-validator:
     name: EIP Validator
     runs-on: ubuntu-latest
@@ -51,11 +65,10 @@ jobs:
     
     - name: Run EIP Validator
       run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
-
+  
   eipw-validator:
     name: EIPW Validator
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout EIP Repository
       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
@@ -63,18 +76,20 @@ jobs:
     - uses: SamWilsn/eipw-action@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-
-  codespell:
-    name: CodeSpell
+  
+  preview:
+    name: Create Preview on Vercel
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
-      - name: Run CodeSpell
-        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
-        with:
-          check_filenames: true
-          ignore_words_file: .codespell-whitelist
-          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
-
+    - name: Checkout EIP Repository
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        
+    - name: Deploy Preview
+      uses: BetaHuhn/deploy-to-vercel-action@f5c4fe753b1c358345ae6794d4dde7df9b37a908
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        ALIAS_DOMAINS: eips--pr-{PR}.now.sh
+        PR_PREVIEW_DOMAIN: eips--pr-{PR}.now.sh
