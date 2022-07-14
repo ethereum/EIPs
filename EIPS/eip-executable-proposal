@@ -3,7 +3,7 @@ eip: 5247
 title: Executable Proposal Standard
 description: A standard for interfaces of executable proposals that can operate smart contract
 authors: Zainan Victor Zhou (@xinbenlv)
-discussions-to: TBC
+discussions-to: https://ethereum-magicians.org/t/erc-5247-executable-proposal-standard/9938
 status: Draft
 type: Standards Track
 category: ERC
@@ -12,7 +12,7 @@ requires: 7
 ---
 
 ## Abstract
-A standrized format for proposals that will be executable. 
+A standrized format for proposals that will be executable as smart contract calls including addresses, ether values, calldatas and other metadata information.
 
 ## Motivation
 In the case of a Decentralized Autonomous Organization or delegation scenario, when approvals are granted, a proposal shall be able to be executed in the format of a smart contract call. By having a standard for such a format, we allow proposals to be created via different clients or UIs, and be shown in a standardized way.
@@ -60,9 +60,10 @@ interface IERC_NUMBER_TO_BE_ASSIGNED_Proposal {
 ```
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
+1. We choose *array* for targets, values, calldatas instead of individual one, allowing a proposal to carry arbitrarily long multiple functional calls.
 
+2. We choose to return `registeredProposalId` in createProposal so the standard can support implementation to decide their format of proposal id.
 
 
 ## Security Considerations
