@@ -2,7 +2,7 @@
 eip: 5247
 title: Executable Proposal Standard
 description: A standard for interfaces of executable proposals that can operate smart contract
-author: Zainan Victor Zhou (xinbenlv)<zzn@zzn.im>
+authors: Zainan Victor Zhou (@xinbenlv)
 discussions-to: TBC
 status: Draft
 type: Standards Track
