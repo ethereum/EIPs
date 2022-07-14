@@ -15,8 +15,7 @@ requires: 7
 A standrized format for proposals that will be executable. 
 
 ## Motivation
-In the case of a Decentralized Autonamous Organization or delegation scenario, when approvals are granted, a proposal shall be able be executed in the format of smart contract call.
-By having a standard for such format, we allow proposals to be created via different client / UI, be shown in a standardized way.
+In the case of a Decentralized Autonomous Organization or delegation scenario, when approvals are granted, a proposal shall be able to be executed in the format of a smart contract call. By having a standard for such a format, we allow proposals to be created via different clients or UIs, and be shown in a standardized way.
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
