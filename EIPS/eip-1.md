@@ -117,9 +117,9 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `eip`: *EIP number* (this is determined by the EIP editor)
 
-`title`: *The EIP title is a few words, not a complete sentence*
+`title`: *The EIP title is a few words, not a complete sentence. It should not contain `standard` (or similar words.)*
 
-`description`: *Description is one full (short) sentence*
+`description`: *Description is one full (short) sentence. It should not contain `standard` (or similar words.)*
 
 `author`: *The list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.*
 
