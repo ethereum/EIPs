@@ -76,20 +76,3 @@ jobs:
     - uses: SamWilsn/eipw-action@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-  
-  preview:
-    name: Create Preview on Vercel
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout EIP Repository
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        
-    - name: Deploy Preview
-      uses: BetaHuhn/deploy-to-vercel-action@f5c4fe753b1c358345ae6794d4dde7df9b37a908
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        ALIAS_DOMAINS: eips--pr-{PR}.now.sh
-        PR_PREVIEW_DOMAIN: eips--pr-{PR}.now.sh
