@@ -80,7 +80,7 @@ function eip712Domain() external view returns (
         block.chainid,
         address(this),
         bytes32(0),
-        new uint[](0)
+        new uint256[](0)
     );
 }
 ```
