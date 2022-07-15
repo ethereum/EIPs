@@ -13,11 +13,11 @@ requires: 712
 
 ## Abstract
 
-This EIP complements EIP-712 by standardizing how contracts should publish the fields and values that describe their domain. This enables user-agents to retrieve this description and generate appropriate domain separators in a general way, and thus integrate EIP-712 signatures securely and scalably.
+This EIP complements [EIP-712] by standardizing how contracts should publish the fields and values that describe their domain. This enables user-agents to retrieve this description and generate appropriate domain separators in a general way, and thus integrate EIP-712 signatures securely and scalably.
 
 ## Motivation
 
-EIP-712 is a signature scheme for complex structured messages. In order to avoid replay attacks and mitigate phishing, the scheme includes a "domain separator" that makes the resulting signature unique to a specific domain (e.g., a specific contract) and allows user-agents to inform end users the details of what is being signed and how it may be used. A domain is defined by a data structure with predefined fields, all of which are optional. Notably, EIP-712 does not specify any way for contracts to publish which of these fields they use or with what values. This has likely limited adoption of EIP-712, as it is not possible to develop general integrations, and instead applications find that they need to build custom support for each EIP-712 domain. A prime example of this is EIP-2612 (ERC20 permits), which has not been widely adopted by applications even though it is understood to be a valuable improvement to the user experience. This EIP defines an interface that can be used by user-agents to retrieve a definition of the domain that a contract uses to verify EIP-712 signatures.
+EIP-712 is a signature scheme for complex structured messages. In order to avoid replay attacks and mitigate phishing, the scheme includes a "domain separator" that makes the resulting signature unique to a specific domain (e.g., a specific contract) and allows user-agents to inform end users the details of what is being signed and how it may be used. A domain is defined by a data structure with predefined fields, all of which are optional. Notably, EIP-712 does not specify any way for contracts to publish which of these fields they use or with what values. This has likely limited adoption of EIP-712, as it is not possible to develop general integrations, and instead applications find that they need to build custom support for each EIP-712 domain. A prime example of this is [EIP-2612] (ERC20 permits), which has not been widely adopted by applications even though it is understood to be a valuable improvement to the user experience. This EIP defines an interface that can be used by user-agents to retrieve a definition of the domain that a contract uses to verify EIP-712 signatures.
 
 ## Specification
 
@@ -84,3 +84,6 @@ While this EIP allows a contract to specify a `verifyingContract` other than its
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
+
+[EIP-712]: https://eips.ethereum.org/EIPS/eip-712
+[EIP-2612]: https://eips.ethereum.org/EIPS/eip-2612
