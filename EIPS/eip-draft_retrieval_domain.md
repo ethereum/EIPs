@@ -57,6 +57,8 @@ User-agents or applications that implement this EIP SHOULD additionally support 
 
 ## Reference Implementation
 
+On the contract side:
+
 ```solidity
 pragma solidity 0.8.0;
 
@@ -80,6 +82,8 @@ function eip712Domain() external view returns (
     );
 }
 ```
+
+On the application side:
 
 ```javascript
 const fieldNames = ['name', 'version', 'chainId', 'verifyingContract', 'salt'];
