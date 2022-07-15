@@ -41,7 +41,7 @@ The return values of this function MUST describe the domain separator that is us
 
 - `fields`: A bit map where bit $$i$$ is set to 1 if and only if field $$i$$ is present ($$i \in [0, 4]$$). Bits are read from least significant to most significant, and fields are indexed in the order that is specified by EIP-712, identical to the order in which they are listed in the function type.
 - `name`, `version`, `chainId`, `verifyingContract`, `salt`: The value of the corresponding field in `EIP712Domain`, if present according to `fields`. If the field is not present, the value is unspecified. The semantics of each field is defined in EIP-712.
-- `extensions`: A list of EIP numbers that specify additional fields in the domain. Their inclusion in this list means they are part of the domain, and the value of `fields` does not change that. The method to obtain the value for each of these additional fields is expected to be specified in the respective EIP.
+- `extensions`: A list of EIP numbers that specify additional fields in the domain. The method to obtain the value for each of these additional fields and any conditions for inclusion are expected to be specified in the respective EIP. The value of `fields` does not affect their inclusion.
 
 ## Rationale
 
