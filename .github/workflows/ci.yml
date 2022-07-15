@@ -45,7 +45,7 @@ jobs:
         with:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
-          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css,assets/eip-1/RFCs/*.txt
   
   eip-validator:
     name: EIP Validator
