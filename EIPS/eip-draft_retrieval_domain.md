@@ -45,7 +45,7 @@ The return values of this function MUST describe the domain separator that is us
 
 ## Rationale
 
-A notable application of EIP-712 signatures is found in EIP-2612 (permit), which specifies a `DOMAIN_SEPARATOR` function that returns a `bytes32` value (the actual domain separator, i.e., the result of `hashStruct(eip712Domain)`). This value does not suffice for the purposes of integrating with EIP-712, as the RPC methods defined there receive an object describing the domain and not just the separator in hash form. Note that this is not a flaw of the RPC methods, it is indeed part of the security proposition that the domain should be validated and informed to the user as part of the signing process. The present EIP fills this gap in both EIP-712 and EIP-2612.
+A notable application of EIP-712 signatures is found in EIP-2612 (permit), which specifies a `DOMAIN_SEPARATOR` function that returns a `bytes32` value (the actual domain separator, i.e., the result of `hashStruct(eip712Domain)`). This value does not suffice for the purposes of integrating with EIP-712, as the RPC methods defined there receive an object describing the domain and not just the separator in hash form. Note that this is not a flaw of the RPC methods, it is indeed part of the security proposition that the domain should be validated and informed to the user as part of the signing process. On its own, a hash does not allow this to be implemented, given it is opaque. The present EIP fills this gap in both EIP-712 and EIP-2612.
 
 ## Backwards Compatibility
 
