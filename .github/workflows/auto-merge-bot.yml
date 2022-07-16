@@ -24,3 +24,14 @@ jobs:
           META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
           MAINTAINERS: "@alita-moore,@mryalamanchi"
+  eipw-validator:
+    name: EIPW Validator
+    runs-on: ubuntu-latest
+    if: github.repository == 'ethereum/eips'
+    steps:
+    - name: Checkout EIP Repository
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+    - uses: SamWilsn/eipw-action@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
