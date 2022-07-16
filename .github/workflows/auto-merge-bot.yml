@@ -35,3 +35,4 @@ jobs:
     - uses: SamWilsn/eipw-action@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        unchecked: '1,5069'
