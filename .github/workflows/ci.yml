@@ -70,10 +70,23 @@ jobs:
     name: EIPW Validator
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout EIP Repository
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-
-    - uses: SamWilsn/eipw-action@master
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        unchecked: '1,5069'
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p ./pr
+          echo $PR_NUMBER > ./pr/pr_number
+          echo $PR_SHA > ./pr/pr_sha
+          echo $MERGE_SHA > ./pr/merge_sha
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pr_number
+          path: pr/
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - uses: SamWilsn/eipw-action@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          unchecked: '1,5069'
