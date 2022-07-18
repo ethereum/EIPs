@@ -86,7 +86,7 @@ jobs:
           path: pr/
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      - uses: SamWilsn/eipw-action@master
+      - uses: ethereum/eipw-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: '1,5069'
