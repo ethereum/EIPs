@@ -1,6 +1,6 @@
-# EIP-5218 Reference Implementations
+# EIP-5222 Reference Implementations
 
-This is the source code for a reference implementation of EIP-5218.
+This is the source code for a reference implementation of EIP-5222.
 
 ## Build and Test
 
