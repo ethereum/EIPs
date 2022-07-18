@@ -1,0 +1,78 @@
+---
+eip: <to be assigned>
+title: Legal Smart Contracts
+description: Allows Smart Contracts to be Legally-Binding Off-Chain
+author: Pandapip1 (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-07-16
+requires: 165
+---
+
+## Abstract
+
+Currently, the real-world applications of smart contracts are limited by the fact that they aren't legally binding. This EIP proposes a standard that allows smart contracts to be legally binding by providing IPFS links to legal documents and ensuring that the users of the smart contract have privity with the relevant legal documents.
+
+(NOTE: None of the authors is a lawyer. If you are a lawyer and would like to contribute to this EIP, please contact Pandapip1 on Discord (Pandapip1#8943). This text will be removed by the time that this EIP goes into last call.)
+
+## Motivation
+
+NFTs have oftentimes been branded as a way to hold and prove copyright of a specific work. However, this, in practice, has almost never been the case. Most of the time, NFTs have no legally-binding meaning, and in the rare cases that do, the NFT simply provides a limited license for the initial holder to use the work (but cannot provide any license for any future holders).
+
+## Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Legal Document Interface
+
+```solidity
+pragma solidity ^0.8.0;
+
+
+struct Multihash {
+    uint8 hashFunction;
+    uint8 size;
+    bytes32 digest;
+}
+
+interface ILegalDocument is IERC165 {
+    /// @notice The IPFS multihash of the legal document. This MUST resolve to a PDF.
+    function legalDocument() public pure returns (string memory);
+    
+    /// @notice The date the legal document was published (in days since January 1, 1970).
+    function datePublished() public pure returns (uint64);
+
+    /// @notice The ECDSA signature of the given user signing the IPFS hash.
+    function documentSignature(address user) public view returns (bytes memory);
+
+    /// @notice Provide an ECDSA signature of the given user signing the IPFS hash.
+    /// @dev This MUST be validated by the smart contract.
+    function signDocument(address user, bytes memory signature) public;
+}
+```
+
+## Rationale
+
+The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+
+## Backwards Compatibility
+
+All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+## Test Cases
+
+Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+## Reference Implementation
+
+An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+## Security Considerations
+
+No security considerations.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
