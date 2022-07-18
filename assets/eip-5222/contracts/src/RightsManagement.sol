@@ -180,7 +180,7 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
   
   function _transfer(address from, address to, uint256 tokenId) internal virtual override(ERC721) {
     require(_licenseIds[tokenId] != 0 && isLicenseActive(_licenseIds[tokenId]), "The token has no active license tethered to it");
-    require(_licenses[_licenseIds[tokenId]].licenseHolder == ownerOf(tokenId), "TThe license holder and the NFT owner are inconsistent");
+    require(_licenses[_licenseIds[tokenId]].licenseHolder == ownerOf(tokenId), "The license holder and the NFT owner are inconsistent");
 
     super._transfer(from, to, tokenId);
     _updateLicenseHolder(_licenseIds[tokenId], to);

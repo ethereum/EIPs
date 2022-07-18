@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-/// @title ERC-5222 NFT Rights Management Standard
+/// @title EIP-5222: NFT Rights Management
 interface IERC5222 is IERC721 {
 
   /// @dev This emits when a new license is created by any mechanism.
