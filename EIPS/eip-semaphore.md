@@ -1,0 +1,109 @@
+---
+eip: <to be assigned>
+title: A Semaphore for Parallelizable Reentrancy Protection
+description: A Precompile-based parallelizable reentrancy protection using the call stack
+author: Sergio Demian Lerner (@sergiodemianlerner)>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-07-17
+requires:
+---
+
+
+## Abstract
+
+This EIP proposes adding a precompiled contract that provides a semaphore function for creating a new type of reentrancy protection guard (RPG). This function aims to replace the typical RPG based on modifying a contract storage cell. The benefit is that the precompile-based RPG does not write to storage, and therefore it enables contracts to be forward-compatible with all designs that provide fine-grained (i.e. cell level) parallelization for the multi-threaded execution of EVM transactions. 
+
+## Motivation
+
+The typical smart contract RPG uses a contract storage cell. The algorithm is simple: the code checks that a storage cell is 0 (or any other predefined constant) on entry, aborting if not, and then sets it to 1. After executing the required code, it resets the cell back to 0 before exiting. This is the algorithm implemented in OpenZeppelin's [ReentrancyGuard](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol). The algorithm results in a read-write pattern on the RPG's storage cell. This pattern prevents the parallelization of the execution of the smart contract for all known designs that try to provide fine-grained parallelization (detecting conflicts at the storage cell level). 
+
+
+## Specification
+
+Starting from an activation block (TBD) a new precompiled contract `Semaphore` is created at address `0x0A`. When `Semaphore` is called, if the caller address is present more than once in the call stack, the contract behaves as if the first instruction had been a `REVERT`, therefore the CALL returns 0. Otherwise, it executes no code and returns 1. The gas cost of the contract execution is set to 100, which is consumed independently of the call result.
+
+
+## Rationale
+
+The only available RPG construction today is based on using a contract storage cell. This construction is clean but it is not forward-compatible with transaction execution parallelization.
+
+Several EVM-based blockchains have succesfully tested designs for the parallelization of the EVM (i.e. see [RSKIP-144](https://github.com/rsksmart/RSKIPs/blob/master/IPs/RSKIP144.md)). The best results have been obtained with fine-grained parallelization where conflicts are detected by tracking writes and reads of individual storage cells. The designs based on tracking the use of accounts or contracts provide only minor benefits, because most transactions use the same ERC20 contracts.
+
+The address `0x0A` is the next one available within the rage defined by [EIP-1352](https://eips.ethereum.org/EIPS/eip-1352).
+
+### Sample usage
+
+```
+pragma solidity ^0.8.0;
+
+abstract contract ReentrancyGuard2 {
+
+    uint8 constant SemaphoreAddress = 0x0A;
+    /**
+     * @dev Prevents a contract from calling itself, directly or indirectly.
+     * Calling a `nonReentrant` function from another `nonReentrant`
+     * function is supported.      
+     */
+    modifier nonReentrant() {
+        _nonReentrantBefore();
+        _;
+    }
+
+    function _nonReentrantBefore() private {
+    	assembly {
+            if iszero(staticcall(1000,SemaphoreAddress,  0, 0, 0, 0)) {
+                revert(0, 0)
+            }
+        }
+    }
+}
+```
+
+
+### Parallellizable storage-based RPGs
+ 
+The only way to paralellize prexistent contracts that are using the storage RPG contruction is that the VM automatically detects that a storage variable is used for the RPG, and proves that is works as required. This requires static code analysys. This is difficult to implement in consensus for two reasons. First, the CPU cost of detection and/or proving may be high. Second, some contract functions may not be protected by the RPG, meaning that some execution paths do not alter the RPG, which may complicate proving. Therefore this proposal aims to protect future contracts and let them be parallelizable, rather than to paralellize already deployed ones.
+
+### Alternatives
+
+There are alternative designs to implement RPGs on the EVM:
+
+1.	[EIP-1153: Transient storage opcodes](https://eips.ethereum.org/EIPS/eip-1153) or [`SSTORE_COUNT`](https://github.com/ethereum/EIPs/issues/119). The first does reduce the cost of an RPG, but does not address the problem of parallelization. The second enables execution parallelization but it is way more complex as it returns the number `SSTORE` opcodes executed, not the number of reentrant calls. Reentrancy must be deducted from this value. Also the `SSTORE` count is not currently tracked by EVM. Also, implementing new opcodes is discuraged if the same functionality can be implemented using precompiles.
+
+2. A new `LOCKCALL` opcode is introduced that works quite similar to `STATICALL` but only blocks storage writes in the caller contract. This results in cheaper RPG, but has two drawbacks: it doesn't allow some contract functions to be free of the RPG, and it intruduces a new opcode which requires modifying compilers, debuggers and static analysys tools.
+
+
+### Gas cost
+A gast cost of 100 represents a worst case resource consumption, which occurs when the stack is almost full (approximately 400 addresses) and it is fully scanned. As the stack is always present in RAM, the scanning is fast.  Note: Once code is implemented in geth, it can be benchmarked and the cost can be re-evaluated, as it may result to be lower in practice. As a precompile call currently costs 700 gas, the cost of stack scanning has a low impact on the total cost of the precompile call (800 gas in totall).
+
+The storage-based RPG currently costs 200 gas (because of the savings introduced in [EIP-1283](https://eips.ethereum.org/EIPS/eip-1283). Using the `Semaphore` precompile as a reentrancy check would currently costs 800 gas (a single call from one of the function modifiers). While this cost is higher than the traditional RPG cost, and therefore discourages its use,  it is still much lower than the pre-EIP1283 cost. If a reduction in precompile call cost (such as [EIP-1109](https://eips.ethereum.org/EIPS/eip-1109) or [EIP-2046](https://eips.ethereum.org/EIPS/eip-2046)) is implemented, then the cost of using the `Semaphore` precompile will be reduced to approximately 140 gas, below the current 200 gas consumed by a storage-based RPG. To encourage to use the precompile-based RPG, it is suggested that this EIP is implemented together with EIP-2046.
+
+
+## Backwards Compatibility
+This change is a hard-fork and therefore all full nodes must be updated.
+
+## Test Cases
+
+```
+contract Test is ReentrancyGuard2 {
+    function second() external nonReentrant {
+    }
+    function first() external nonReentrant {
+        this.second();
+    }
+}
+```
+A call to second() directly from a transaction does not revert, but a call to first() does revert.
+
+## Reference Implementation
+None
+
+## Security Considerations
+
+No security risks have been identified related to this change.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
