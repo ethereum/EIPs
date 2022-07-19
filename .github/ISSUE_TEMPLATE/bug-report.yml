@@ -12,7 +12,7 @@ body:
     id: pull-request
     attributes:
       label: Pull Request
-occurred
+      description: Link to the pull request where the issue occured
     validations:
       required: false
   - type: textarea
