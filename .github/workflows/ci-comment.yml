@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - name: Download Artifact
+      - name: 'Download artifact'
         uses: actions/github-script@v6
         with:
           script: |
@@ -32,17 +32,10 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/pr_number.zip`, Buffer.from(download.data));
 
-      - name: Unzip Artifact
+      - name: 'Unzip artifact'
         run: unzip pr_number.zip
-      
-      - name: Delete Previous Comment
-        uses: izhangzhihao/delete-comment@master
-        with: 
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          delete_user_name: github-actions[bot]
-          issue_number: ${{ github.event.number }}  # remove comments from the current PR
 
-      - name: Comment on PR
+      - name: 'Comment on PR'
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
