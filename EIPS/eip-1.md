@@ -96,7 +96,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 Each EIP should have the following parts:
 
-- Preamble - [RFC 822](../assets/RFCs/rfc822.txt) style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
+- Preamble - [RFC 822](../assets/RFCs/rfc822.html) style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
 - Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 - Motivation _(optional)_ - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
 - Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
@@ -113,7 +113,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 ## EIP Header Preamble
 
-Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
+Each EIP must begin with an [RFC 822](../assets/RFCs/rfc822.html) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
 `eip`: *EIP number* (this is determined by the EIP editor)
 
@@ -267,13 +267,13 @@ When referring to an EIP by number, it should be written in the hyphenated form 
 
 ### IETF RFCs
 
-When referring to an IETF RFC by number, it must be written in the non-hyphenated form `RFC X`, where `X` is the RFC's assigned number. Each RFC that is referenced in an EIP **MUST** be accompanied by a relative markdown link to the RFC (in the `assets/RFCs` directory) the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. If the RFC is not currently in that directory, a separate pull request must be submitted which only includes the RFC in that directory.
+When referring to an IETF RFC by number, it must be written in the non-hyphenated form `RFC X`, where `X` is the RFC's assigned number. Each RFC that is referenced in an EIP **MUST** be accompanied by a relative markdown link to the RFC (in the `assets/RFCs` directory) the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. If the RFC is not currently in that directory, a separate pull request must be submitted which ONLY includes the HTML rendering of that RFC, with all anchors replaced with internal anchors, in that directory.
 
 ### RFC 2119
 
-EIPs are encouraged to follow [RFC 2119](../assets/RFCs/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+EIPs are encouraged to follow [RFC 2119](../assets/RFCs/rfc2119.html) for terminology and to insert the following at the beginning of the Specification section:
 
-> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](../assets/RFCs/rfc2119.txt).
+> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](../assets/RFCs/rfc2119.html).
 
 ## History
 
