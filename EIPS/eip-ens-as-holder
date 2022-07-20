@@ -20,7 +20,7 @@ Currently, if someone wants to receive token, they have to setup a wallet addres
 the minter or transferer will not be able to transfer or mint for that token. 
 
 By creating smart contract that conform to this interface specification, we can decouple
-the transfer of ownership from the existance of wallet addresses.
+the transfer of ownership from the existence of wallet addresses.
 
 ## Specification
 
