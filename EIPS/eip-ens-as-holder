@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: ENS as Token Holder
-description: An interface for holding tokens by ENS
+description: An interface for holding tokens by ENS.
 author: Zainan Victor Zhou (@xinbenlv)
 discussions-to: <URL>
 status: Draft
@@ -13,6 +13,7 @@ requires: 137
 
 ## Abstract
 An interface for smart contract to become a holder of tokens by honoring ENS ownership.
+This specification supports ERC721 and ERC1155 and is expandable to future token standard or other standard.
 
 ## Motivation
 Currently, if someone wants to receive token, they have to setup a wallet address, otherwise,
@@ -31,6 +32,8 @@ the transfer of ownership from the existance of wallet addresses.
 interface IERC_ENS_AS_HOLDER is ERC721Receiver, ERC1155Receiver { 
 }
 ```
+
+2. 
 
 
 
