@@ -3,8 +3,8 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-/// @title EIP-5222: NFT Rights Management
-interface IERC5222 is IERC721 {
+/// @title EIP-5218: NFT Rights Management
+interface IERC5218 is IERC721 {
 
   /// @dev This emits when a new license is created by any mechanism.
   event CreateLicense(uint256 _licenseId, uint256 _tokenId, uint256 _parentLicenseId, address _licenseHolder, string _uri, address _revoker);

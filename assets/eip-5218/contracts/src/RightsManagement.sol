@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./IERC5222.sol";
+import "./IERC5218.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 
-contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
+contract RightsManagement is IERC5218, ERC721URIStorage, Ownable {
   struct License {
     bool active; // whether the current license is active
     uint256 tokenId;
@@ -31,11 +31,11 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
    */
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
     return
-      interfaceId == type(IERC5222).interfaceId ||
+      interfaceId == type(IERC5218).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 
-  function isLicenseActive(uint256 licenseId) public view virtual override(IERC5222) returns (bool) {
+  function isLicenseActive(uint256 licenseId) public view virtual override(IERC5218) returns (bool) {
     if (licenseId == 0) return false;
     while (licenseId != 0) {
       if (!_licenses[licenseId].active) return false;
@@ -49,27 +49,27 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
     _;
   }
 
-  function getLicenseTokenId(uint256 licenseId) public view virtual override(IERC5222) isActiveLicense(licenseId) returns (uint256) {
+  function getLicenseTokenId(uint256 licenseId) public view virtual override(IERC5218) isActiveLicense(licenseId) returns (uint256) {
     return _licenses[licenseId].tokenId;   
   }
 
-  function getParentLicenseId(uint256 licenseId) public view virtual override(IERC5222) isActiveLicense(licenseId) returns (uint256) {        
+  function getParentLicenseId(uint256 licenseId) public view virtual override(IERC5218) isActiveLicense(licenseId) returns (uint256) {        
     return _licenses[licenseId].parentLicenseId;
   }
 
-  function getLicenseHolder(uint256 licenseId) public view virtual override(IERC5222) isActiveLicense(licenseId) returns (address) {
+  function getLicenseHolder(uint256 licenseId) public view virtual override(IERC5218) isActiveLicense(licenseId) returns (address) {
     return _licenses[licenseId].licenseHolder;
   }
 
-  function getLicenseURI(uint256 licenseId) public view virtual override(IERC5222) isActiveLicense(licenseId) returns (string memory) {
+  function getLicenseURI(uint256 licenseId) public view virtual override(IERC5218) isActiveLicense(licenseId) returns (string memory) {
     return _licenses[licenseId].uri;
   }
 
-  function getLicenseRevoker(uint256 licenseId) public view virtual override(IERC5222) isActiveLicense(licenseId) returns (address) {
+  function getLicenseRevoker(uint256 licenseId) public view virtual override(IERC5218) isActiveLicense(licenseId) returns (address) {
     return _licenses[licenseId].revoker;
   }
 
-  function getLicenseIdByTokenId(uint256 tokenId) public view virtual override(IERC5222) returns (uint256) {
+  function getLicenseIdByTokenId(uint256 tokenId) public view virtual override(IERC5218) returns (uint256) {
     require (_exists(tokenId), "The token doesn't exist");
     return _licenseIds[tokenId];
   }
@@ -144,7 +144,7 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
     string memory uri,
     address revoker
   ) 
-    public virtual override(IERC5222)
+    public virtual override(IERC5218)
     returns (uint256)
   {
     require(_exists(tokenId), "The NFT doesn't exists");
@@ -159,7 +159,7 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
     return _createLicense(tokenId, parentLicenseId, licenseHolder, uri, revoker);
   }
 
-  function revokeLicense(uint256 licenseId) public virtual override(IERC5222) {
+  function revokeLicense(uint256 licenseId) public virtual override(IERC5218) {
     require(isLicenseActive(licenseId), "The license is not active");
     require(msg.sender == _licenses[licenseId].revoker, "The msg sender is not an eligible revoker");
 
@@ -170,7 +170,7 @@ contract RightsManagement is IERC5222, ERC721URIStorage, Ownable {
     _revokeLicense(licenseId);
   }
 
-  function transferSublicense(uint256 licenseId, address licenseHolder) public virtual override(IERC5222) {
+  function transferSublicense(uint256 licenseId, address licenseHolder) public virtual override(IERC5218) {
     require(isLicenseActive(licenseId), "The license is not active");
     require(_licenses[licenseId].parentLicenseId != 0, "The license is a root license");
     require(msg.sender == _licenses[licenseId].licenseHolder, "The msg sender is not the license holder");
