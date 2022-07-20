@@ -25,15 +25,13 @@ the transfer of ownership from the existance of wallet addresses.
 
 ## Specification
 
-1. Any conforming smart contract must conform to `ERC721Recever` in [EIP-721](./eip-721.md) and `ERC1155Receiver` in [EIP-1155](./eip-1155.md).
+1. Any conforming smart contract must conform to `ERC721TokenReceiver` defined in [EIP-721](./eip-721.md) and `ERC1155TokenReceiver` defined in [EIP-1155](./eip-1155.md).
 
 
 ```solidity
 interface IERC_ENS_AS_HOLDER is ERC721Receiver, ERC1155Receiver { 
 }
 ```
-
-2. 
 
 
 
@@ -43,13 +41,36 @@ The rationale fleshes out the specification by describing what motivated the des
 ## Backwards Compatibility
 No backward compatibility aware of.
 
-
-## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
-
 ## Reference Implementation
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+```solidity
+contract ENSTokenHolding is ERC721TokenReceiver, Initializable {
+  address ENSRootRegistry _ensRoot;
+  mapping<address /* of ERC721 */ => tokenId=> string /* of owner*/)> _erc721TokenHolders;
 
+function initializer(address ensRoot) {
+_ensRoot = ensRoot;
+}
+
+function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes _data) external returns(bytes4) {
+  _erc721TokenHolders[_operator][_tokenId] = "0x" + msg.sender.toString();
+
+  return /*bytes4 comply to ERC721 onReceived*/
+}
+
+function setOwner(address erc721, uint256 tokenId, string ens) {
+  require(msg.sender.toString == "0x" + _erc721TokenHolders[erc721][tokenId]);
+  _erc721TokenHolders[erc721][tokenId] = newOwnerENS;
+}
+
+function claim(address erc721, uint256 tokenId) {
+
+  require(msg.sender.toString == "0x" + _erc721TokenHolders[erc721][tokenId]
+    || _ensRoot.reverseLookup() == /*stored ens*);
+  ERC721 contract = ERC721(erc721);
+  erc721.safeTransferFrom(this, msg.sender, tokenId);
+);
+}
+```
 ## Security Considerations
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
