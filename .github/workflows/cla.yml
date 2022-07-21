@@ -1,0 +1,27 @@
+name: "CLA Signature Bot"
+on:
+  issue_comment:
+    types: [ created ]
+  pull_request_target:
+    types: [ opened, closed, synchronize ]
+
+jobs:
+  CLABot:
+    if: github.event_name == 'pull_request_target' || contains(github.event.comment.html_url, '/pull/')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - name: "CLA Signature Bot"
+        uses: MetaMask/cla-signature-bot@f779672fbd026ea222bff00ef823751d5b9824a1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: 'cla.json'
+          url-to-cladocument: 'https://eips.ethereum.org/contributor-agreement'
+          # This branch can't have protections, commits are made directly to the specified branch.
+          branch: 'cla-signatures'
+          allowlist: 'dependabot[bot],actions[bot],eth-bot'
+          allow-organization-members: true
+          blockchain-storage-flag: false
