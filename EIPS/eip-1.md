@@ -267,7 +267,7 @@ When referring to an EIP by number, it should be written in the hyphenated form 
 
 ### IETF RFCs
 
-When referring to an IETF RFC by number, it must be written in the non-hyphenated form `RFC X`, where `X` is the RFC's assigned number. Each RFC that is referenced in an EIP **MUST** be accompanied by a relative markdown link to the RFC (in the `assets/RFCs` directory) the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. If the RFC is not currently in that directory, a separate pull request must be submitted which ONLY includes the HTML rendering of that RFC, with all anchors replaced with internal anchors, in that directory.
+When referring to an IETF RFC by number, it must be written in the non-hyphenated form `RFC X`, where `X` is the RFC's assigned number. Each RFC that is referenced in an EIP **MUST** be accompanied by a relative markdown link to the RFC (in the `assets/RFCs` directory) the first time it is referenced, and **MAY** be accompanied by a link on subsequent references. If the RFC is not currently in that directory, a separate pull request must be submitted which ONLY includes the HTML rendering of that RFC.
 
 ### RFC 2119
 
