@@ -32,7 +32,7 @@ interface IERC_ENS_AS_HOLDER is ERC721Receiver, ERC1155Receiver {
 ```
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+TBD
 
 ## Backwards Compatibility
 No backward compatibility aware of.
