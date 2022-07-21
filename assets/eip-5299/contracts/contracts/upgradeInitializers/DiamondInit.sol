@@ -16,7 +16,7 @@ import { IERC165 } from "../interfaces/IERC165.sol";
 
 // It is expected that this contract is customized if you want to deploy your diamond
 // with data from a deployment script. Use the init function to initialize state variables
-// of your diamond. Add parameters to the init funciton if you need to.
+// of your diamond. Add parameters to the init function if you need to.
 
 contract DiamondInit {    
 
