@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5298
 title: ENS as Token Holder
 description: An interface for holding tokens by ENS.
 author: Zainan Victor Zhou (@xinbenlv)
