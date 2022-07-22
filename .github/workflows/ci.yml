@@ -1,8 +1,8 @@
 name: Continuous Integration
 
 on:
-  push:
-  pull_request:
+  pull_request_target:
+    branches: [ master ]
 
 jobs:
   htmlproofer:
@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
@@ -42,6 +44,8 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
@@ -56,19 +60,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout EIP Repository
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
-    - name: Set Up Rust Toolchain
-      uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
-      with:
-        toolchain: stable
+      - name: Set Up Rust Toolchain
+        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
+        with:
+          toolchain: stable
 
-    - name: Install EIP Validator
-      run: cargo install eipv --version=0.4.0
+      - name: Install EIP Validator
+        run: cargo install eipv --version=0.4.0
 
-    - name: Run EIP Validator
-      run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
+      - name: Run EIP Validator
+        run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 
   eipw-validator:
     name: EIPW Validator
@@ -95,6 +101,8 @@ jobs:
 
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Run EIPW
         uses: ethereum/eipw-action@ca327b6089abbb281e4c51eda75c3bdbac0e01f8
