@@ -1,4 +1,5 @@
-name: Workflow run re-run auto-merge-bot on review
+name: Auto Merge Bot (Re-Run)
+
 on:
   workflow_run:
     workflows:
@@ -8,21 +9,25 @@ on:
 
 jobs:
   rerun-bot:
-    if: github.repository == 'ethereum/eips'
+    name: Auto Merge Bot (Re-Run)
+
     runs-on: ubuntu-latest
-    name: Rerun Bot (workflow_run)
+    if: github.repository == 'ethereum/eips'
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
       - name: Setup Node.js Environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93
         with:
-          node-version: '14'
-      - name: auto-merge-bot
+          node-version: 14
+
+      - name: Auto Merge Bot
         uses: ethereum/EIP-Bot@1f05ace5691062379bd910aa27402eecb8f295ac # rerun-pull-request-target-on-review 
         id: rerun-auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
-          WORKFLOW-ID: ${{github.event.workflow_run.id}}
-          ID-TO-RERUN: "6519716"
-          RUN-EVENT-TYPE: "pull_request_target"
+          WORKFLOW-ID: ${{ github.event.workflow_run.id }}
+          ID-TO-RERUN: 6519716
+          RUN-EVENT-TYPE: pull_request_target

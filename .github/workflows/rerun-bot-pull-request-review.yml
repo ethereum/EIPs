@@ -1,12 +1,16 @@
+name: Trigger Auto Merge Bot Re-Run
+
 on: 
   pull_request_review:
-    types: [submitted]
-name: Rerun Bot
+    types: [ submitted ]
+
 jobs:
   rerun_bot_on_review:
-    if: github.repository == 'ethereum/eips'
+    name: Trigger Auto Merge Bot Re-Run
+
     runs-on: ubuntu-latest
-    name: Trigger Bot Rerun workflow_run
+    if: github.repository == 'ethereum/eips'
+
     steps:
       - name: Explanation
-        run: echo "this bot is used to trigger another workflow using the workflow_run github event; this is necessary because without it forked PRs do not have access to repo secret; normally this is circumvented using the pull_request_target event but because github actions.. a hack is required to allow the same behavior on pull_request_review; this work-around will no longer be necessary if github ever implements a pull_request_review_target or something similar"
+        run: echo 'This bot is used to trigger another workflow using the workflow_run github event. This is necessary because forked PRs do not have access to repo secrets. Normally, this is circumvented using the pull_request_target event, but because GitHub actions doesn't trigger that event on review, a hack is required to allow that behavior. This workaround will no longer be necessary if GitHub ever implements a pull_request_review_target or something similar.'
