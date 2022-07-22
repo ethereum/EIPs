@@ -105,7 +105,7 @@ jobs:
           ref: "refs/pull/${{ github.event.number }}/merge"
 
       - name: Run EIPW
-        uses: ethereum/eipw-action@ca327b6089abbb281e4c51eda75c3bdbac0e01f8
+        uses: ethereum/eipw-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1,5069
