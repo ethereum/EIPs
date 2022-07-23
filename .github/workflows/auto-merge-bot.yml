@@ -1,26 +1,34 @@
-on: [ pull_request_target ]
-name: Auto-Merge Bot
+name: Auto Merge Bot
+
+on:
+  pull_request_target:
+    branches: [ master ]
+
 jobs:
   auto_merge_bot:
+    name: EIP Auto Merge Bot
+    
     runs-on: ubuntu-latest
-    name: EIP Auto-Merge Bot
     if: github.repository == 'ethereum/eips'
+    
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
       - name: Setup Node.js Environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93
         with:
-          node-version: '14'
-      - name: auto-merge-bot
+          node-version: 14
+
+      - name: Auto Merge Bot
         uses: ethereum/EIP-Bot@e3dbec627f8c7a5bdc33ca19970e5f9c4af9b626 # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
-          ERC_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
-          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
-          INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
-          META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
-          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
-          MAINTAINERS: "@alita-moore,@mryalamanchi"
+          CORE_EDITORS: '@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1'
+          ERC_EDITORS: '@lightclient,@axic,@SamWilsn,@Pandapip1'
+          NETWORKING_EDITORS: '@MicahZoltu,@lightclient,@axic,@SamWilsn'
+          INTERFACE_EDITORS: '@lightclient,@axic,@SamWilsn,@Pandapip1'
+          META_EDITORS: '@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1'
+          INFORMATIONAL_EDITORS: '@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1'
+          MAINTAINERS: '@alita-moore,@mryalamanchi'
