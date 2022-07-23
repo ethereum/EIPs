@@ -82,23 +82,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Save PR number
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-          PR_SHA: ${{ github.event.pull_request.head.sha }}
-          MERGE_SHA: ${{ github.sha }}
-        run: |
-          mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
-        with:
-          name: pr_number
-          path: pr/
-
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         with:
@@ -109,3 +92,31 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1,5069
+
+  clean-comments:
+    name: Clean PR Comments
+
+    runs-on: ubuntu-latest
+    needs: [ "htmlproofer", "codespell", "eip-validator", "eipw-validator" ]
+
+    steps:
+      - name: Delete Previous Comment
+        uses: izhangzhihao/delete-comment@5cd32b557f51a59d4c2cdf7124df2a0c4b7217c4
+        with: 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_number: ${{ github.event.number }}
+          delete_user_name: github-actions[bot]
+
+  comment:
+    name: Add PR Comment
+
+    runs-on: ubuntu-latest
+    if: needs.htmlproofer.result == 'failure' || needs.codespell.result == 'failure' || needs['eip-validator'].result == 'failure' || needs['eipw-validator'].result == 'failure'
+    needs: [ "htmlproofer", "codespell", "eip-validator", "eipw-validator", "clean-comments" ]
+    
+    steps:
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@686ab1cab89e0f715a44a0d04b9fdfdd4f33d751
+        with:
+          message: The commit ${{ github.event.pull_request.head.sha }} (as a parent of ${{ github.sha }}) contains errors. Please inspect the [Files Tab](https://github.com/ethereum/EIPs/pull/${{ github.event.number }}/files) for actionable items.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
