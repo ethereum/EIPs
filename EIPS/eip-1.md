@@ -251,14 +251,14 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 The `title` field in the preamble:
 
- - Should not include the word "standard" or any variation thereof; and
+ - Should not include the words "standard", "smart", or any variations thereof; and
  - Should not include the EIP's number.
 
 ### Descriptions
 
 The `description` field in the preamble:
 
- - Should not include the word "standard" or any variation thereof; and
+ - Should not include the words "standard", "smart", or any variations thereof; and
  - Should not include the EIP's number.
 
 ### EIP numbers
