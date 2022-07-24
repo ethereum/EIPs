@@ -1,0 +1,158 @@
+---
+eip: XXXX
+title: Harberger Tax NFT
+author: Green (@greenlucid)
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-07-23
+discussions-to: todo
+---
+
+### Simple Summary
+
+A standard interface for Non-Fungible Tokens subject to Harberger Taxes.
+
+## Abstract
+
+The following standard allows for implementation of a standard API for NFTs subject to Harberger Taxes within smart contracts. Harberger Taxes work in the following way, admitting some variants:
+
+1. Alice owns an Item, and values at an amount X. 
+2. Alice pays taxes according to a tax rate R to a collector, depending on this self-assesed value.
+3. Bob offers Alice an amount Y. Because Y is higher than X, Alice is forced to sell the Item to him.
+4. Bob self-asseses the value too at Z, and now pays taxes over it.
+
+This mechanic sets a stage in which actors won't overvalue the item to avoid paying excessive taxes, but won't undervalue the item either, to avoid a third party to force them to sell it.
+
+The main obvious case of Harberger Taxes is to be used as a coordination mechanism for land allocation, but, to give some examples:
+
+- Real-world land allocation.
+- Digital land allocation (videogames, social experiments...).
+- Advertisement Space in websites.
+- Governance mechanisms that use "seats" subject to Harberger.
+- Social media that requires holding a token to interact.
+
+## Motivation
+
+Provide smart contract interoperability to interact with Harberger Taxes, which is a pricing mechanism that can provide utility to many different applications.
+
+## Specification
+
+Every ERC-XXXX compliant contract must implement the ERCXXXX and ERC721 interfaces.
+
+```solidity
+interface ERCXXXX is ERC721 {
+
+  /// @dev emits when a token is forcibly bought through the Harberger mechanism.
+  /// @param _tokenId The identifier of the token that was bought.
+  /// @param _owner The owner of the token after the purchase.
+  /// if equal to address(0), it means the token was revoked.
+  /// @param _amount The amount that was paid in this transaction.
+  event TokenBought(uint256 indexed _tokenId, address indexed _owner, uint256 _amount);
+
+  /// @dev emits when an token is funded with currency to pay the taxes, or when this
+  /// fund was updated.
+  /// @param _tokenId The identifier of the token that had a fund change.
+  /// @param _amount The updated amount of the fund.
+  event TokenFunded(uint256 indexed _tokenId, uint256 _amount);
+
+  /// @dev emits when the valuation of an token changes.
+  /// @param _tokenId The identifier of the token whose valuation changed.
+  /// @param _valuation The new valuation of the token.
+  event ValuationSet(uint256 indexed _tokenId, uint256 _valuation);
+  
+  /// @dev emits when a token has tax paid for them.
+  /// @param _tokenId The identifier of the token that was taxed.
+  /// @param _value The taxes that have been paid.
+  event TaxPaid(uint256 indexed _tokenId, uint256 _value);
+
+  /// @dev buy a token. This function must succeed if 
+  /// @param _tokenId The identifier of the token to buy.
+  /// @param _offer The maximum amount offered to buy this token.
+  /// @param _valuation The valuation the token will have after a successful purchase.
+  /// @param _fund The fund put in to pay for the taxes of the token.
+  function buy(uint256 _tokenId, uint256 _offer, uint256 _valuation, uint256 _fund) external;
+
+  /// @dev call this to fund the item, to pay for the maintenance taxes.
+  /// @param _tokenId The identifier of the token to fund.
+  /// @param _value The amount sent to fund the token.
+  function fund(uint256 _tokenId, uint256 _value) external;
+
+  /// @dev call this to remove excess funding for the token.
+  /// if the resultant fund for the token was zero, it must be revoked.
+  /// @param _tokenId The identifier of the token to defund.
+  /// @param _value The amount to retrieve from the token's fund.
+  function defund(uint256 _tokenId, uint256 _value) external;
+  
+  /// @dev call this to revoke ownership of a token.
+  /// @param _tokenId The identifier of the token to revoke.
+  function revoke(uint256 _tokenId) external;
+
+  /// @dev call this to manually send pending taxes to the collector.
+  /// This function should be callable by any external party.
+  /// @param _tokenId The identifier of the token to pay taxes for.
+  function collect(uint256 _tokenId) external;
+  
+  /// @dev call this to change the percieved valuation of the token.
+  /// @param _tokenId The identifier of the token to change valuation of.
+  /// @param _valuation The new valuation of the token.
+  function changeValuation(uint256 _tokenId, uint256 _valuation) external;
+}
+```
+
+### Caveats
+
+The taxes have to be collected manually, either through `collect`, or by interacting with the Harberger tokens.
+
+The taxes are paid upfront, which is less capital efficient.
+
+The functions of the standard are not passing the buyer or owner as parameter, instead, they use `msg.owner`.
+
+The funds are per token, not per account.
+
+## Rationale
+
+### ERC20 compatibility
+
+ERC20 tokens are a widespread industry standard and using native tokens is limiting.  
+
+### Offer, instead of buying at current valuation
+
+Instead of doing this, `buy` could have simply accepted the valuation of the item as the buy price. This, however, has frontrunning concerns, as the current owner can frontrun and increase the valuation.
+
+### Taxes paid upfront
+
+Taxes could have been paid in two different ways:
+
+- Owner gives an allowance to the Harberger contract, and occasionally call `collect` manually to route the payment through Harberger to the collector.
+- Owner pays taxes upfront, and will be reimbursed the excess when the item is bought, revoked, or manually defunded.
+
+The first option has certain edge cases if no parties collect taxes frequently. The owner could remove the allowance or lose their balance, and become unable to pay. This provides a window for attacks, particularly, griefing attacks if the contract does not charge extra fees for some interactions. Example:
+
+1. Buy token for almost nothing and value it very high.
+2. When someone calls collect, default on the taxes so that it's revoked.
+3. Repeat 1.
+
+### No view for the tax rate
+
+Tax rates could be more complex than a simple flat rate, for example, they could be progressive, or be lower or higher if the address meets some specific conditions. The taxes could have discounts if they are collected more frequently. The possibilities are too high to justify making the tax rate a standard view, globally or per item.
+
+### No commit reveal for buying tokens
+
+Commit reveal would add too much complexity to an ERC. It could be added as an extension, but it should not be part of this standard, since it already has too many functions.
+
+### Taxes and funds are per token, not per account
+
+TODO
+
+## Backwards Compatbility
+
+Previous implementations of Harberger Taxes appear to be niche, or not intended for interoperability.
+
+## Security Considerations
+
+Allowing owner to decrease the valuation or defund the token (bailing) without limits, opens the contract to attacks. A way to solve this is imposing additional costs to bailing. For example, you can set a cooldown period to bail out, or you can revert defunds that leave less than a month's worth of taxes.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
