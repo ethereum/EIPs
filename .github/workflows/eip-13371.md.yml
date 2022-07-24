@@ -1,3 +1,12 @@
+---
+eip: 13371
+title: EIP Purpose and Guidelines
+status: Living
+type: Meta
+author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
+created: 2022-10-27
+---
+
 name: Auto Merge Bot
 
 on:
