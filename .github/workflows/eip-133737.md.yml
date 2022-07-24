@@ -1,3 +1,13 @@
+# ---
+# eip: 133737
+# title: Change difficulty adjustment to target mean block time including uncles
+# author: Vitalik Buterin (@vbuterin)
+# type: Standards Track
+# category: Core
+# status: Final
+# created: 2016-04-28
+# ---
+
 name: Hop
 
 on:
