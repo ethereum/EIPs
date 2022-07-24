@@ -10,13 +10,13 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 interface IERC1155ApprovalByAmount is IERC1155 {
 
     /**
-     * @notice Emmited when `account` grants or revokes permission to `operator` to transfer their tokens, according to
+     * @notice Emitted when `account` grants or revokes permission to `operator` to transfer their tokens, according to
      * `id` and with an amount: `amount`.
      */
     event ApprovalByAmount(address indexed account, address indexed operator, uint256 id, uint256 amount);
 
     /**
-     * @notice Grants permision to `operator` to transfer the caller's tokens, according to `id`, and an amount: `amount`.
+     * @notice Grants permission to `operator` to transfer the caller's tokens, according to `id`, and an amount: `amount`.
      * Emits an {ApprovalByAmount} event.
      *
      * Requirements:
