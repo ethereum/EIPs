@@ -12,5 +12,5 @@ interface IDecentralizedApp {
     /// @return body                The body of the response
     /// @return resultHeaders       A list of header names (e.g. ["Content-Type"])
     /// @return resultHeaderValues  A list of header values (e.g. ["application/json"])
-    function request(string memory method, string[] memory resource, string[] memory parameters, string[] memory values, string[] memory headers, string[] memory headerValues) external view returns (string memory body, string[] memory resultHeaders, string[] memory resultHeaderValues);
+    function request(string memory method, string[] memory resource, string[] memory parameters, string[] memory values, string[] memory headers, string[] memory headerValues) external view returns (uint8 statusCode, string memory body, string[] memory resultHeaders, string[] memory resultHeaderValues);
 }
