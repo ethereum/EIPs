@@ -1,0 +1,42 @@
+Arguments: 
+  /opt/homebrew/Cellar/node@16/16.15.1/bin/node /Users/hyungsukkang/.yarn/bin/yarn.js add @openzeppelin/contracts: ^4.4.2,
+
+PATH: 
+  /opt/homebrew/opt/node@16/bin:/Users/hyungsukkang/.poetry/bin:/Users/hyungsukkang/.yarn/bin:/Users/hyungsukkang/.config/yarn/global/node_modules/.bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/opt/homebrew/opt/node@16/bin:/Users/hyungsukkang/.poetry/bin:/Users/hyungsukkang/.yarn/bin:/Users/hyungsukkang/.config/yarn/global/node_modules/.bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/hyungsukkang/.cargo/bin
+
+Yarn version: 
+  1.22.17
+
+Node version: 
+  16.15.1
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@openzeppelin%2fcontracts:: Not found
+      at Request.params.callback [as _callback] (/Users/hyungsukkang/.yarn/lib/cli.js:67029:18)
+      at Request.self.callback (/Users/hyungsukkang/.yarn/lib/cli.js:140883:22)
+      at Request.emit (node:events:527:28)
+      at Request.<anonymous> (/Users/hyungsukkang/.yarn/lib/cli.js:141855:10)
+      at Request.emit (node:events:527:28)
+      at IncomingMessage.<anonymous> (/Users/hyungsukkang/.yarn/lib/cli.js:141777:12)
+      at Object.onceWrapper (node:events:641:28)
+      at IncomingMessage.emit (node:events:539:35)
+      at endReadableNT (node:internal/streams/readable:1345:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
+
+npm manifest: 
+  {
+    "name": "hardhat-project",
+    "devDependencies": {
+      "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+      "hardhat": "^2.10.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
