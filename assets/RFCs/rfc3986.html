@@ -1,0 +1,3648 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>
+            
+    
+        RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
+    
+
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            @media only screen
+            and (min-width: 992px)
+            and (max-width: 1199px) {
+                body { font-size: 14pt; }
+                div.content { width: 96ex; margin: 0 auto; }
+            }
+            @media only screen
+            and (min-width: 768px)
+            and (max-width: 991px) {
+                body { font-size: 14pt; }
+                div.content { width: 96ex; margin: 0 auto; }
+            }
+            @media only screen
+            and (min-width: 480px)
+            and (max-width: 767px) {
+                body { font-size: 11pt; }
+                div.content { width: 96ex; margin: 0 auto; }
+            }
+            @media only screen
+            and (max-width: 479px) {
+                body { font-size: 8pt; }
+                div.content { width: 96ex; margin: 0 auto; }
+            }
+            @media only screen
+            and (min-width : 375px)
+            and (max-width : 667px) {
+                body { font-size: 9.5pt; }
+                div.content { width: 96ex; margin: 0; }
+            }
+            @media only screen
+            and (min-width: 1200px) {
+                body { font-size: 10pt; margin: 0 4em; }
+                div.content { width: 96ex; margin: 0; }
+            }
+            h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+                font-weight: bold;
+                /* line-height: 0pt; */
+                display: inline;
+                white-space: pre;
+                font-family: monospace;
+                font-size: 1em;
+                font-weight: bold;
+            }
+            pre {
+                font-size: 1em;
+                margin-top: 0px;
+                margin-bottom: 0px;
+            }
+            .pre {
+                white-space: pre;
+                font-family: monospace;
+            }
+            .header{
+                font-weight: bold;
+            }
+            .newpage {
+                page-break-before: always;
+            }
+            .invisible {
+                text-decoration: none;
+                color: white;
+            }
+            @media print {
+                body {
+                    margin-top: 5em;
+                    font-family: monospace;
+                    font-size: 10.5pt;
+                }
+                h1, h2, h3, h4, h5, h6 {
+                    font-size: 1em;
+                }
+
+                a:link, a:visited {
+                    color: inherit;
+                    text-decoration: none;
+                }
+                .noprint {
+                    display: none;
+                }
+            }
+            @media screen {
+                .grey, .grey a:link, .grey a:visited {
+                    color: #777;
+                }
+                .meta-info {
+                    background-color: #EEE;
+                    width: 96ex;
+                }
+                .top {
+                    border-top: 7px solid #EEE;
+                }
+                .pad {
+                    padding-top: 7px;
+                    line-height: 24px;
+                    padding-bottom: 4px;
+                }
+                .bgwhite  { background-color: white; }
+                .bgred    { background-color: #F44; }
+                .bggrey   { background-color: #666; }
+                .bgbrown  { background-color: #840; }
+                .bgorange { background-color: #FA0; }
+                .bgyellow { background-color: #EE0; }
+                .bgmagenta{ background-color: #F4F; }
+                .bgblue   { background-color: #66F; }
+                .bgcyan   { background-color: #4DD; }
+                .bggreen  { background-color: #4F4; }
+
+                .legend   { font-size: 90%; }
+                .cplate   { font-size: 70%; border: solid grey 1px; }
+            }
+
+            
+    .bgwhite  { background-color: white; }
+    .bgred    { background-color: #F44; }
+    .bggrey   { background-color: #666; }
+    .bgbrown  { background-color: #840; }
+    .bgorange { background-color: #FA0; }
+    .bgyellow { background-color: #EE0; }
+    .bgmagenta{ background-color: #F4F; }
+    .bgblue   { background-color: #66F; }
+    .bgcyan   { background-color: #4DD; }
+    .bggreen  { background-color: #4F4; }
+    .draftcontent { margin-top:1em;}
+
+        </style>
+        
+    <link rel="alternate"
+          type="application/atom+xml"
+          title="Document changes"
+          href="/feed/document-changes/draft-fielding-uri-rfc2396bis/">
+    <meta name="description"
+          
+              content="Uniform Resource Identifier (URI): Generic Syntax (RFC 3986)"
+          >
+
+        
+
+<link rel="apple-touch-icon"
+      sizes="180x180"
+      href="https://www.ietf.org/lib/dt/8.10.0/ietf/images/ietf-logo-nor-180.png">
+<link rel="icon"
+      sizes="32x32"
+      href="https://www.ietf.org/lib/dt/8.10.0/ietf/images/ietf-logo-nor-32.png">
+<link rel="icon"
+      sizes="16x16"
+      href="https://www.ietf.org/lib/dt/8.10.0/ietf/images/ietf-logo-nor-16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon"
+      href="https://www.ietf.org/lib/dt/8.10.0/ietf/images/ietf-logo-nor-mask.svg"
+      color="#ffffff">
+<meta name="msapplication-TileColor"
+      content="#ffffff">
+<meta name="theme-color"
+      content="#ffffff">
+    <script async src='/cdn-cgi/bm/cv/669835187/api.js'></script></head>
+    <body >
+        <div class="content" id="content">
+            
+<!-- [html-validate-disable-block no-inline-style, attr-quotes, void-style -- FIXME: it's everywhere in this old code] -->
+    
+    <div class="rfcmarkup">
+        <div class="noprint" style="height: .5em;">
+            <div onmouseover="this.style.cursor='pointer';"
+                 onclick="showLegend();"
+                 onmouseout="hideLegend()"
+                 style="height: .5em; min-height: .5em; width: 96ex; "
+                 class="meta-info bggreen"
+                 title="Click for color legend.">
+            </div>
+            <div id="legend"
+                 class="meta-info noprint pre legend"
+                 style="position:absolute; top: 4px; left: 4ex; visibility:hidden; background-color: white; padding: 4px 9px 5px 7px; border: solid #345 1px; "
+                 onmouseover="showLegend();"
+                 onmouseout="hideLegend();">
+            </div>
+        </div>
+        
+            <div class="noprint">
+                <pre class="pre meta-info">[<a href="https://datatracker.ietf.org" title="Document search and retrieval page">Search</a>] [<a href="https://www.rfc-editor.org/rfc/rfc3986.txt" title="Plaintext version of this document">txt</a>|<a href="https://www.rfc-editor.org/rfc/rfc3986.html" title="HTML version of this document, from XML2RFC">html</a>|<a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc3986.txt.pdf" title="PDF version of this document">pdf</a>|<a href="https://www.rfc-editor.org/rfc/inline-errata/rfc3986.html">with errata</a>|<a href="/doc/rfc3986/bibtex/" title="BibTex entry for this document">bibtex</a>] [<a href="/doc/rfc3986/" title="Datatracker information for this document">Tracker</a>] [<a href="/group/gen/" title="The working group handling this document">WG</a>] [<a href="mailto:draft-fielding-uri-rfc2396bis@ietf.org?subject=draft-fielding-uri-rfc2396bis" title="Send email to the document authors">Email</a>] [<a href="https://www.ietf.org/rfcdiff?difftype=--hwdiff&amp;url2=draft-fielding-uri-rfc2396bis-07.txt" title="Inline diff (wdiff)">Diff1</a>] [<a href="https://www.ietf.org/rfcdiff?url2=draft-fielding-uri-rfc2396bis-07.txt" title="Side-by-side diff">Diff2</a>] [<a href="https://author-tools.ietf.org/api/idnits?url=https://www.ietf.org/archive/id/draft-fielding-uri-rfc2396bis-07.txt" title="Run an idnits check of this document">Nits</a>]
+From: <a href="/doc/html/draft-fielding-uri-rfc2396bis-07">draft-fielding-uri-rfc2396bis-07</a>                 Internet Standard
+Updated by: <a href="/doc/html/rfc6874">6874</a>, <a href="/doc/html/rfc7320">7320</a>, <a href="/doc/html/rfc8820">8820</a>                                <a class="text-warning" href="https://www.rfc-editor.org/errata_search.php?rfc=3986&amp;rec_status=0">Errata exist</a></pre>
+            </div>
+        
+        <div class="draftcontent"><pre>Network Working Group                                     T. Berners-Lee
+Request for Comments: 3986                                       W3C/MIT
+STD: 66                                                      R. Fielding
+Updates: <a href="/doc/html/rfc1738">1738</a>                                               Day Software
+Obsoletes: <a href="/doc/html/rfc2732">2732</a>, <a href="/doc/html/rfc2396">2396</a>, <a href="/doc/html/rfc1808">1808</a>                                  L. Masinter
+Category: Standards Track                                  Adobe Systems
+                                                            January 2005
+
+
+           <span class="h1">Uniform Resource Identifier (URI): Generic Syntax</span>
+
+Status of This Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the &quot;Internet
+   Official Protocol Standards&quot; (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2005).
+
+Abstract
+
+   A Uniform Resource Identifier (URI) is a compact sequence of
+   characters that identifies an abstract or physical resource.  This
+   specification defines the generic URI syntax and a process for
+   resolving URI references that might be in relative form, along with
+   guidelines and security considerations for the use of URIs on the
+   Internet.  The URI syntax defines a grammar that is a superset of all
+   valid URIs, allowing an implementation to parse the common components
+   of a URI reference without knowing the scheme-specific requirements
+   of every possible identifier.  This specification does not define a
+   generative grammar for URIs; that task is performed by the individual
+   specifications of each URI scheme.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 1]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-2" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+Table of Contents
+
+   <a href="#section-1">1</a>.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+       <a href="#section-1.1">1.1</a>.  Overview of URIs . . . . . . . . . . . . . . . . . . . .  <a href="#page-4">4</a>
+             <a href="#section-1.1.1">1.1.1</a>.  Generic Syntax . . . . . . . . . . . . . . . . .  <a href="#page-6">6</a>
+             <a href="#section-1.1.2">1.1.2</a>.  Examples . . . . . . . . . . . . . . . . . . . .  <a href="#page-7">7</a>
+             <a href="#section-1.1.3">1.1.3</a>.  URI, URL, and URN  . . . . . . . . . . . . . . .  <a href="#page-7">7</a>
+       <a href="#section-1.2">1.2</a>.  Design Considerations  . . . . . . . . . . . . . . . . .  <a href="#page-8">8</a>
+             <a href="#section-1.2.1">1.2.1</a>.  Transcription  . . . . . . . . . . . . . . . . .  <a href="#page-8">8</a>
+             <a href="#section-1.2.2">1.2.2</a>.  Separating Identification from Interaction . . .  <a href="#page-9">9</a>
+             <a href="#section-1.2.3">1.2.3</a>.  Hierarchical Identifiers . . . . . . . . . . . . <a href="#page-10">10</a>
+       <a href="#section-1.3">1.3</a>.  Syntax Notation  . . . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+   <a href="#section-2">2</a>.  Characters . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-11">11</a>
+       <a href="#section-2.1">2.1</a>.  Percent-Encoding . . . . . . . . . . . . . . . . . . . . <a href="#page-12">12</a>
+       <a href="#section-2.2">2.2</a>.  Reserved Characters  . . . . . . . . . . . . . . . . . . <a href="#page-12">12</a>
+       <a href="#section-2.3">2.3</a>.  Unreserved Characters  . . . . . . . . . . . . . . . . . <a href="#page-13">13</a>
+       <a href="#section-2.4">2.4</a>.  When to Encode or Decode . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+       <a href="#section-2.5">2.5</a>.  Identifying Data . . . . . . . . . . . . . . . . . . . . <a href="#page-14">14</a>
+   <a href="#section-3">3</a>.  Syntax Components  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-16">16</a>
+       <a href="#section-3.1">3.1</a>.  Scheme . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-17">17</a>
+       <a href="#section-3.2">3.2</a>.  Authority  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-17">17</a>
+             <a href="#section-3.2.1">3.2.1</a>.  User Information . . . . . . . . . . . . . . . . <a href="#page-18">18</a>
+             <a href="#section-3.2.2">3.2.2</a>.  Host . . . . . . . . . . . . . . . . . . . . . . <a href="#page-18">18</a>
+             <a href="#section-3.2.3">3.2.3</a>.  Port . . . . . . . . . . . . . . . . . . . . . . <a href="#page-22">22</a>
+       <a href="#section-3.3">3.3</a>.  Path . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-22">22</a>
+       <a href="#section-3.4">3.4</a>.  Query  . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-23">23</a>
+       <a href="#section-3.5">3.5</a>.  Fragment . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-24">24</a>
+   <a href="#section-4">4</a>.  Usage  . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-25">25</a>
+       <a href="#section-4.1">4.1</a>.  URI Reference  . . . . . . . . . . . . . . . . . . . . . <a href="#page-25">25</a>
+       <a href="#section-4.2">4.2</a>.  Relative Reference . . . . . . . . . . . . . . . . . . . <a href="#page-26">26</a>
+       <a href="#section-4.3">4.3</a>.  Absolute URI . . . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+       <a href="#section-4.4">4.4</a>.  Same-Document Reference  . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+       <a href="#section-4.5">4.5</a>.  Suffix Reference . . . . . . . . . . . . . . . . . . . . <a href="#page-27">27</a>
+   <a href="#section-5">5</a>.  Reference Resolution . . . . . . . . . . . . . . . . . . . . . <a href="#page-28">28</a>
+       <a href="#section-5.1">5.1</a>.  Establishing a Base URI  . . . . . . . . . . . . . . . . <a href="#page-28">28</a>
+             <a href="#section-5.1.1">5.1.1</a>.  Base URI Embedded in Content . . . . . . . . . . <a href="#page-29">29</a>
+             <a href="#section-5.1.2">5.1.2</a>.  Base URI from the Encapsulating Entity . . . . . <a href="#page-29">29</a>
+             <a href="#section-5.1.3">5.1.3</a>.  Base URI from the Retrieval URI  . . . . . . . . <a href="#page-30">30</a>
+             <a href="#section-5.1.4">5.1.4</a>.  Default Base URI . . . . . . . . . . . . . . . . <a href="#page-30">30</a>
+       <a href="#section-5.2">5.2</a>.  Relative Resolution  . . . . . . . . . . . . . . . . . . <a href="#page-30">30</a>
+             <a href="#section-5.2.1">5.2.1</a>.  Pre-parse the Base URI . . . . . . . . . . . . . <a href="#page-31">31</a>
+             <a href="#section-5.2.2">5.2.2</a>.  Transform References . . . . . . . . . . . . . . <a href="#page-31">31</a>
+             <a href="#section-5.2.3">5.2.3</a>.  Merge Paths  . . . . . . . . . . . . . . . . . . <a href="#page-32">32</a>
+             <a href="#section-5.2.4">5.2.4</a>.  Remove Dot Segments  . . . . . . . . . . . . . . <a href="#page-33">33</a>
+       <a href="#section-5.3">5.3</a>.  Component Recomposition  . . . . . . . . . . . . . . . . <a href="#page-35">35</a>
+       <a href="#section-5.4">5.4</a>.  Reference Resolution Examples  . . . . . . . . . . . . . <a href="#page-35">35</a>
+             <a href="#section-5.4.1">5.4.1</a>.  Normal Examples  . . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+             <a href="#section-5.4.2">5.4.2</a>.  Abnormal Examples  . . . . . . . . . . . . . . . <a href="#page-36">36</a>
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 2]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-3" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   <a href="#section-6">6</a>.  Normalization and Comparison . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+       <a href="#section-6.1">6.1</a>.  Equivalence  . . . . . . . . . . . . . . . . . . . . . . <a href="#page-38">38</a>
+       <a href="#section-6.2">6.2</a>.  Comparison Ladder  . . . . . . . . . . . . . . . . . . . <a href="#page-39">39</a>
+             <a href="#section-6.2.1">6.2.1</a>.  Simple String Comparison . . . . . . . . . . . . <a href="#page-39">39</a>
+             <a href="#section-6.2.2">6.2.2</a>.  Syntax-Based Normalization . . . . . . . . . . . <a href="#page-40">40</a>
+             <a href="#section-6.2.3">6.2.3</a>.  Scheme-Based Normalization . . . . . . . . . . . <a href="#page-41">41</a>
+             <a href="#section-6.2.4">6.2.4</a>.  Protocol-Based Normalization . . . . . . . . . . <a href="#page-42">42</a>
+   <a href="#section-7">7</a>.  Security Considerations  . . . . . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.1">7.1</a>.  Reliability and Consistency  . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.2">7.2</a>.  Malicious Construction . . . . . . . . . . . . . . . . . <a href="#page-43">43</a>
+       <a href="#section-7.3">7.3</a>.  Back-End Transcoding . . . . . . . . . . . . . . . . . . <a href="#page-44">44</a>
+       <a href="#section-7.4">7.4</a>.  Rare IP Address Formats  . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.5">7.5</a>.  Sensitive Information  . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+       <a href="#section-7.6">7.6</a>.  Semantic Attacks . . . . . . . . . . . . . . . . . . . . <a href="#page-45">45</a>
+   <a href="#section-8">8</a>.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+   <a href="#section-9">9</a>.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+   <a href="#section-10">10</a>. References . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+       <a href="#section-10.1">10.1</a>. Normative References . . . . . . . . . . . . . . . . . . <a href="#page-46">46</a>
+       <a href="#section-10.2">10.2</a>. Informative References . . . . . . . . . . . . . . . . . <a href="#page-47">47</a>
+   <a href="#appendix-A">A</a>.  Collected ABNF for URI . . . . . . . . . . . . . . . . . . . . <a href="#page-49">49</a>
+   <a href="#appendix-B">B</a>.  Parsing a URI Reference with a Regular Expression  . . . . . . <a href="#page-50">50</a>
+   <a href="#appendix-C">C</a>.  Delimiting a URI in Context  . . . . . . . . . . . . . . . . . <a href="#page-51">51</a>
+   <a href="#appendix-D">D</a>.  Changes from <a href="/doc/html/rfc2396">RFC 2396</a>  . . . . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+       <a href="#appendix-D.1">D.1</a>.  Additions  . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+       <a href="#appendix-D.2">D.2</a>.  Modifications  . . . . . . . . . . . . . . . . . . . . . <a href="#page-53">53</a>
+   Index  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-56">56</a>
+   Authors&#x27; Addresses . . . . . . . . . . . . . . . . . . . . . . . . <a href="#page-60">60</a>
+   Full Copyright Statement . . . . . . . . . . . . . . . . . . . . . <a href="#page-61">61</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 3]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-4" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h2"><a class="selflink" id="section-1" href="#section-1">1</a>.  Introduction</span>
+
+   A Uniform Resource Identifier (URI) provides a simple and extensible
+   means for identifying a resource.  This specification of URI syntax
+   and semantics is derived from concepts introduced by the World Wide
+   Web global information initiative, whose use of these identifiers
+   dates from 1990 and is described in &quot;Universal Resource Identifiers
+   in WWW&quot; [<a href="/doc/html/rfc1630">RFC1630</a>].  The syntax is designed to meet the
+   recommendations laid out in &quot;Functional Recommendations for Internet
+   Resource Locators&quot; [<a href="/doc/html/rfc1736">RFC1736</a>] and &quot;Functional Requirements for Uniform
+   Resource Names&quot; [<a href="/doc/html/rfc1737">RFC1737</a>].
+
+   This document obsoletes [<a href="/doc/html/rfc2396">RFC2396</a>], which merged &quot;Uniform Resource
+   Locators&quot; [<a href="/doc/html/rfc1738">RFC1738</a>] and &quot;Relative Uniform Resource Locators&quot;
+   [<a href="/doc/html/rfc1808">RFC1808</a>] in order to define a single, generic syntax for all URIs.
+   It obsoletes [<a href="/doc/html/rfc2732">RFC2732</a>], which introduced syntax for an IPv6 address.
+   It excludes portions of <a href="/doc/html/rfc1738">RFC 1738</a> that defined the specific syntax of
+   individual URI schemes; those portions will be updated as separate
+   documents.  The process for registration of new URI schemes is
+   defined separately by [<a href="#ref-BCP35">BCP35</a>].  Advice for designers of new URI
+   schemes can be found in [<a href="/doc/html/rfc2718">RFC2718</a>].  All significant changes from <a href="/doc/html/rfc2396">RFC</a>
+   <a href="/doc/html/rfc2396">2396</a> are noted in <a href="#appendix-D">Appendix D</a>.
+
+   This specification uses the terms &quot;character&quot; and &quot;coded character
+   set&quot; in accordance with the definitions provided in [<a href="#ref-BCP19">BCP19</a>], and
+   &quot;character encoding&quot; in place of what [<a href="#ref-BCP19">BCP19</a>] refers to as a
+   &quot;charset&quot;.
+
+<span class="h3"><a class="selflink" id="section-1.1" href="#section-1.1">1.1</a>.  Overview of URIs</span>
+
+   URIs are characterized as follows:
+
+   Uniform
+
+      Uniformity provides several benefits.  It allows different types
+      of resource identifiers to be used in the same context, even when
+      the mechanisms used to access those resources may differ.  It
+      allows uniform semantic interpretation of common syntactic
+      conventions across different types of resource identifiers.  It
+      allows introduction of new types of resource identifiers without
+      interfering with the way that existing identifiers are used.  It
+      allows the identifiers to be reused in many different contexts,
+      thus permitting new applications or protocols to leverage a pre-
+      existing, large, and widely used set of resource identifiers.
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 4]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-5" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   Resource
+
+      This specification does not limit the scope of what might be a
+      resource; rather, the term &quot;resource&quot; is used in a general sense
+      for whatever might be identified by a URI.  Familiar examples
+      include an electronic document, an image, a source of information
+      with a consistent purpose (e.g., &quot;today&#x27;s weather report for Los
+      Angeles&quot;), a service (e.g., an HTTP-to-SMS gateway), and a
+      collection of other resources.  A resource is not necessarily
+      accessible via the Internet; e.g., human beings, corporations, and
+      bound books in a library can also be resources.  Likewise,
+      abstract concepts can be resources, such as the operators and
+      operands of a mathematical equation, the types of a relationship
+      (e.g., &quot;parent&quot; or &quot;employee&quot;), or numeric values (e.g., zero,
+      one, and infinity).
+
+   Identifier
+
+      An identifier embodies the information required to distinguish
+      what is being identified from all other things within its scope of
+      identification.  Our use of the terms &quot;identify&quot; and &quot;identifying&quot;
+      refer to this purpose of distinguishing one resource from all
+      other resources, regardless of how that purpose is accomplished
+      (e.g., by name, address, or context).  These terms should not be
+      mistaken as an assumption that an identifier defines or embodies
+      the identity of what is referenced, though that may be the case
+      for some identifiers.  Nor should it be assumed that a system
+      using URIs will access the resource identified: in many cases,
+      URIs are used to denote resources without any intention that they
+      be accessed.  Likewise, the &quot;one&quot; resource identified might not be
+      singular in nature (e.g., a resource might be a named set or a
+      mapping that varies over time).
+
+   A URI is an identifier consisting of a sequence of characters
+   matching the syntax rule named &lt;URI&gt; in <a href="#section-3">Section 3</a>.  It enables
+   uniform identification of resources via a separately defined
+   extensible set of naming schemes (<a href="#section-3.1">Section 3.1</a>).  How that
+   identification is accomplished, assigned, or enabled is delegated to
+   each scheme specification.
+
+   This specification does not place any limits on the nature of a
+   resource, the reasons why an application might seek to refer to a
+   resource, or the kinds of systems that might use URIs for the sake of
+   identifying resources.  This specification does not require that a
+   URI persists in identifying the same resource over time, though that
+   is a common goal of all URI schemes.  Nevertheless, nothing in this
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 5]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-6" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   specification prevents an application from limiting itself to
+   particular types of resources, or to a subset of URIs that maintains
+   characteristics desired by that application.
+
+   URIs have a global scope and are interpreted consistently regardless
+   of context, though the result of that interpretation may be in
+   relation to the end-user&#x27;s context.  For example, &quot;http://localhost/&quot;
+   has the same interpretation for every user of that reference, even
+   though the network interface corresponding to &quot;localhost&quot; may be
+   different for each end-user: interpretation is independent of access.
+   However, an action made on the basis of that reference will take
+   place in relation to the end-user&#x27;s context, which implies that an
+   action intended to refer to a globally unique thing must use a URI
+   that distinguishes that resource from all other things.  URIs that
+   identify in relation to the end-user&#x27;s local context should only be
+   used when the context itself is a defining aspect of the resource,
+   such as when an on-line help manual refers to a file on the end-
+   user&#x27;s file system (e.g., &quot;file:///etc/hosts&quot;).
+
+<span class="h4"><a class="selflink" id="section-1.1.1" href="#section-1.1.1">1.1.1</a>.  Generic Syntax</span>
+
+   Each URI begins with a scheme name, as defined in <a href="#section-3.1">Section 3.1</a>, that
+   refers to a specification for assigning identifiers within that
+   scheme.  As such, the URI syntax is a federated and extensible naming
+   system wherein each scheme&#x27;s specification may further restrict the
+   syntax and semantics of identifiers using that scheme.
+
+   This specification defines those elements of the URI syntax that are
+   required of all URI schemes or are common to many URI schemes.  It
+   thus defines the syntax and semantics needed to implement a scheme-
+   independent parsing mechanism for URI references, by which the
+   scheme-dependent handling of a URI can be postponed until the
+   scheme-dependent semantics are needed.  Likewise, protocols and data
+   formats that make use of URI references can refer to this
+   specification as a definition for the range of syntax allowed for all
+   URIs, including those schemes that have yet to be defined.  This
+   decouples the evolution of identification schemes from the evolution
+   of protocols, data formats, and implementations that make use of
+   URIs.
+
+   A parser of the generic URI syntax can parse any URI reference into
+   its major components.  Once the scheme is determined, further
+   scheme-specific parsing can be performed on the components.  In other
+   words, the URI generic syntax is a superset of the syntax of all URI
+   schemes.
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 6]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-7" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h4"><a class="selflink" id="section-1.1.2" href="#section-1.1.2">1.1.2</a>.  Examples</span>
+
+   The following example URIs illustrate several URI schemes and
+   variations in their common syntax components:
+
+      <a href="ftp://ftp.is.co.za/rfc/rfc1808.txt">ftp://ftp.is.co.za/rfc/rfc1808.txt</a>
+
+      <a href="https://www.ietf.org/rfc/rfc2396.txt">http://www.ietf.org/rfc/rfc2396.txt</a>
+
+      ldap://[2001:db8::7]/c=GB?objectClass?one
+
+      mailto:John.Doe@example.com
+
+      news:comp.infosystems.www.servers.unix
+
+      tel:+1-816-555-1212
+
+      telnet://192.0.2.16:80/
+
+      urn:oasis:names:specification:docbook:dtd:xml:4.1.2
+
+
+<span class="h4"><a class="selflink" id="section-1.1.3" href="#section-1.1.3">1.1.3</a>.  URI, URL, and URN</span>
+
+   A URI can be further classified as a locator, a name, or both.  The
+   term &quot;Uniform Resource Locator&quot; (URL) refers to the subset of URIs
+   that, in addition to identifying a resource, provide a means of
+   locating the resource by describing its primary access mechanism
+   (e.g., its network &quot;location&quot;).  The term &quot;Uniform Resource Name&quot;
+   (URN) has been used historically to refer to both URIs under the
+   &quot;urn&quot; scheme [<a href="/doc/html/rfc2141">RFC2141</a>], which are required to remain globally unique
+   and persistent even when the resource ceases to exist or becomes
+   unavailable, and to any other URI with the properties of a name.
+
+   An individual scheme does not have to be classified as being just one
+   of &quot;name&quot; or &quot;locator&quot;.  Instances of URIs from any given scheme may
+   have the characteristics of names or locators or both, often
+   depending on the persistence and care in the assignment of
+   identifiers by the naming authority, rather than on any quality of
+   the scheme.  Future specifications and related documentation should
+   use the general term &quot;URI&quot; rather than the more restrictive terms
+   &quot;URL&quot; and &quot;URN&quot; [<a href="/doc/html/rfc3305">RFC3305</a>].
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 7]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-8" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-1.2" href="#section-1.2">1.2</a>.  Design Considerations</span>
+
+<span class="h4"><a class="selflink" id="section-1.2.1" href="#section-1.2.1">1.2.1</a>.  Transcription</span>
+
+   The URI syntax has been designed with global transcription as one of
+   its main considerations.  A URI is a sequence of characters from a
+   very limited set: the letters of the basic Latin alphabet, digits,
+   and a few special characters.  A URI may be represented in a variety
+   of ways; e.g., ink on paper, pixels on a screen, or a sequence of
+   character encoding octets.  The interpretation of a URI depends only
+   on the characters used and not on how those characters are
+   represented in a network protocol.
+
+   The goal of transcription can be described by a simple scenario.
+   Imagine two colleagues, Sam and Kim, sitting in a pub at an
+   international conference and exchanging research ideas.  Sam asks Kim
+   for a location to get more information, so Kim writes the URI for the
+   research site on a napkin.  Upon returning home, Sam takes out the
+   napkin and types the URI into a computer, which then retrieves the
+   information to which Kim referred.
+
+   There are several design considerations revealed by the scenario:
+
+   o  A URI is a sequence of characters that is not always represented
+      as a sequence of octets.
+
+   o  A URI might be transcribed from a non-network source and thus
+      should consist of characters that are most likely able to be
+      entered into a computer, within the constraints imposed by
+      keyboards (and related input devices) across languages and
+      locales.
+
+   o  A URI often has to be remembered by people, and it is easier for
+      people to remember a URI when it consists of meaningful or
+      familiar components.
+
+   These design considerations are not always in alignment.  For
+   example, it is often the case that the most meaningful name for a URI
+   component would require characters that cannot be typed into some
+   systems.  The ability to transcribe a resource identifier from one
+   medium to another has been considered more important than having a
+   URI consist of the most meaningful of components.
+
+   In local or regional contexts and with improving technology, users
+   might benefit from being able to use a wider range of characters;
+   such use is not defined by this specification.  Percent-encoded
+   octets (<a href="#section-2.1">Section 2.1</a>) may be used within a URI to represent characters
+   outside the range of the US-ASCII coded character set if this
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 8]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-9" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   representation is allowed by the scheme or by the protocol element in
+   which the URI is referenced.  Such a definition should specify the
+   character encoding used to map those characters to octets prior to
+   being percent-encoded for the URI.
+
+<span class="h4"><a class="selflink" id="section-1.2.2" href="#section-1.2.2">1.2.2</a>.  Separating Identification from Interaction</span>
+
+   A common misunderstanding of URIs is that they are only used to refer
+   to accessible resources.  The URI itself only provides
+   identification; access to the resource is neither guaranteed nor
+   implied by the presence of a URI.  Instead, any operation associated
+   with a URI reference is defined by the protocol element, data format
+   attribute, or natural language text in which it appears.
+
+   Given a URI, a system may attempt to perform a variety of operations
+   on the resource, as might be characterized by words such as &quot;access&quot;,
+   &quot;update&quot;, &quot;replace&quot;, or &quot;find attributes&quot;.  Such operations are
+   defined by the protocols that make use of URIs, not by this
+   specification.  However, we do use a few general terms for describing
+   common operations on URIs.  URI &quot;resolution&quot; is the process of
+   determining an access mechanism and the appropriate parameters
+   necessary to dereference a URI; this resolution may require several
+   iterations.  To use that access mechanism to perform an action on the
+   URI&#x27;s resource is to &quot;dereference&quot; the URI.
+
+   When URIs are used within information retrieval systems to identify
+   sources of information, the most common form of URI dereference is
+   &quot;retrieval&quot;: making use of a URI in order to retrieve a
+   representation of its associated resource.  A &quot;representation&quot; is a
+   sequence of octets, along with representation metadata describing
+   those octets, that constitutes a record of the state of the resource
+   at the time when the representation is generated.  Retrieval is
+   achieved by a process that might include using the URI as a cache key
+   to check for a locally cached representation, resolution of the URI
+   to determine an appropriate access mechanism (if any), and
+   dereference of the URI for the sake of applying a retrieval
+   operation.  Depending on the protocols used to perform the retrieval,
+   additional information might be supplied about the resource (resource
+   metadata) and its relation to other resources.
+
+   URI references in information retrieval systems are designed to be
+   late-binding: the result of an access is generally determined when it
+   is accessed and may vary over time or due to other aspects of the
+   interaction.  These references are created in order to be used in the
+   future: what is being identified is not some specific result that was
+   obtained in the past, but rather some characteristic that is expected
+   to be true for future results.  In such cases, the resource referred
+   to by the URI is actually a sameness of characteristics as observed
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                     [Page 9]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-10" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   over time, perhaps elucidated by additional comments or assertions
+   made by the resource provider.
+
+   Although many URI schemes are named after protocols, this does not
+   imply that use of these URIs will result in access to the resource
+   via the named protocol.  URIs are often used simply for the sake of
+   identification.  Even when a URI is used to retrieve a representation
+   of a resource, that access might be through gateways, proxies,
+   caches, and name resolution services that are independent of the
+   protocol associated with the scheme name.  The resolution of some
+   URIs may require the use of more than one protocol (e.g., both DNS
+   and HTTP are typically used to access an &quot;http&quot; URI&#x27;s origin server
+   when a representation isn&#x27;t found in a local cache).
+
+<span class="h4"><a class="selflink" id="section-1.2.3" href="#section-1.2.3">1.2.3</a>.  Hierarchical Identifiers</span>
+
+   The URI syntax is organized hierarchically, with components listed in
+   order of decreasing significance from left to right.  For some URI
+   schemes, the visible hierarchy is limited to the scheme itself:
+   everything after the scheme component delimiter (&quot;:&quot;) is considered
+   opaque to URI processing.  Other URI schemes make the hierarchy
+   explicit and visible to generic parsing algorithms.
+
+   The generic syntax uses the slash (&quot;/&quot;), question mark (&quot;?&quot;), and
+   number sign (&quot;#&quot;) characters to delimit components that are
+   significant to the generic parser&#x27;s hierarchical interpretation of an
+   identifier.  In addition to aiding the readability of such
+   identifiers through the consistent use of familiar syntax, this
+   uniform representation of hierarchy across naming schemes allows
+   scheme-independent references to be made relative to that hierarchy.
+
+   It is often the case that a group or &quot;tree&quot; of documents has been
+   constructed to serve a common purpose, wherein the vast majority of
+   URI references in these documents point to resources within the tree
+   rather than outside it.  Similarly, documents located at a particular
+   site are much more likely to refer to other resources at that site
+   than to resources at remote sites.  Relative referencing of URIs
+   allows document trees to be partially independent of their location
+   and access scheme.  For instance, it is possible for a single set of
+   hypertext documents to be simultaneously accessible and traversable
+   via each of the &quot;file&quot;, &quot;http&quot;, and &quot;ftp&quot; schemes if the documents
+   refer to each other with relative references.  Furthermore, such
+   document trees can be moved, as a whole, without changing any of the
+   relative references.
+
+   A relative reference (<a href="#section-4.2">Section 4.2</a>) refers to a resource by describing
+   the difference within a hierarchical name space between the reference
+   context and the target URI.  The reference resolution algorithm,
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 10]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-11" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   presented in <a href="#section-5">Section 5</a>, defines how such a reference is transformed
+   to the target URI.  As relative references can only be used within
+   the context of a hierarchical URI, designers of new URI schemes
+   should use a syntax consistent with the generic syntax&#x27;s hierarchical
+   components unless there are compelling reasons to forbid relative
+   referencing within that scheme.
+
+      NOTE: Previous specifications used the terms &quot;partial URI&quot; and
+      &quot;relative URI&quot; to denote a relative reference to a URI.  As some
+      readers misunderstood those terms to mean that relative URIs are a
+      subset of URIs rather than a method of referencing URIs, this
+      specification simply refers to them as relative references.
+
+   All URI references are parsed by generic syntax parsers when used.
+   However, because hierarchical processing has no effect on an absolute
+   URI used in a reference unless it contains one or more dot-segments
+   (complete path segments of &quot;.&quot; or &quot;..&quot;, as described in <a href="#section-3.3">Section 3.3</a>),
+   URI scheme specifications can define opaque identifiers by
+   disallowing use of slash characters, question mark characters, and
+   the URIs &quot;scheme:.&quot; and &quot;scheme:..&quot;.
+
+<span class="h3"><a class="selflink" id="section-1.3" href="#section-1.3">1.3</a>.  Syntax Notation</span>
+
+   This specification uses the Augmented Backus-Naur Form (ABNF)
+   notation of [<a href="/doc/html/rfc2234">RFC2234</a>], including the following core ABNF syntax rules
+   defined by that specification: ALPHA (letters), CR (carriage return),
+   DIGIT (decimal digits), DQUOTE (double quote), HEXDIG (hexadecimal
+   digits), LF (line feed), and SP (space).  The complete URI syntax is
+   collected in <a href="#appendix-A">Appendix A</a>.
+
+<span class="h2"><a class="selflink" id="section-2" href="#section-2">2</a>.  Characters</span>
+
+   The URI syntax provides a method of encoding data, presumably for the
+   sake of identifying a resource, as a sequence of characters.  The URI
+   characters are, in turn, frequently encoded as octets for transport
+   or presentation.  This specification does not mandate any particular
+   character encoding for mapping between URI characters and the octets
+   used to store or transmit those characters.  When a URI appears in a
+   protocol element, the character encoding is defined by that protocol;
+   without such a definition, a URI is assumed to be in the same
+   character encoding as the surrounding text.
+
+   The ABNF notation defines its terminal values to be non-negative
+   integers (codepoints) based on the US-ASCII coded character set
+   [<a href="#ref-ASCII">ASCII</a>].  Because a URI is a sequence of characters, we must invert
+   that relation in order to understand the URI syntax.  Therefore, the
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 11]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-12" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   integer values used by the ABNF must be mapped back to their
+   corresponding characters via US-ASCII in order to complete the syntax
+   rules.
+
+   A URI is composed from a limited set of characters consisting of
+   digits, letters, and a few graphic symbols.  A reserved subset of
+   those characters may be used to delimit syntax components within a
+   URI while the remaining characters, including both the unreserved set
+   and those reserved characters not acting as delimiters, define each
+   component&#x27;s identifying data.
+
+<span class="h3"><a class="selflink" id="section-2.1" href="#section-2.1">2.1</a>.  Percent-Encoding</span>
+
+   A percent-encoding mechanism is used to represent a data octet in a
+   component when that octet&#x27;s corresponding character is outside the
+   allowed set or is being used as a delimiter of, or within, the
+   component.  A percent-encoded octet is encoded as a character
+   triplet, consisting of the percent character &quot;%&quot; followed by the two
+   hexadecimal digits representing that octet&#x27;s numeric value.  For
+   example, &quot;%20&quot; is the percent-encoding for the binary octet
+   &quot;00100000&quot; (ABNF: %x20), which in US-ASCII corresponds to the space
+   character (SP).  <a href="#section-2.4">Section 2.4</a> describes when percent-encoding and
+   decoding is applied.
+
+      pct-encoded = &quot;%&quot; HEXDIG HEXDIG
+
+   The uppercase hexadecimal digits &#x27;A&#x27; through &#x27;F&#x27; are equivalent to
+   the lowercase digits &#x27;a&#x27; through &#x27;f&#x27;, respectively.  If two URIs
+   differ only in the case of hexadecimal digits used in percent-encoded
+   octets, they are equivalent.  For consistency, URI producers and
+   normalizers should use uppercase hexadecimal digits for all percent-
+   encodings.
+
+<span class="h3"><a class="selflink" id="section-2.2" href="#section-2.2">2.2</a>.  Reserved Characters</span>
+
+   URIs include components and subcomponents that are delimited by
+   characters in the &quot;reserved&quot; set.  These characters are called
+   &quot;reserved&quot; because they may (or may not) be defined as delimiters by
+   the generic syntax, by each scheme-specific syntax, or by the
+   implementation-specific syntax of a URI&#x27;s dereferencing algorithm.
+   If data for a URI component would conflict with a reserved
+   character&#x27;s purpose as a delimiter, then the conflicting data must be
+   percent-encoded before the URI is formed.
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 12]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-13" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      reserved    = gen-delims / sub-delims
+
+      gen-delims  = &quot;:&quot; / &quot;/&quot; / &quot;?&quot; / &quot;#&quot; / &quot;[&quot; / &quot;]&quot; / &quot;@&quot;
+
+      sub-delims  = &quot;!&quot; / &quot;$&quot; / &quot;&amp;&quot; / &quot;&#x27;&quot; / &quot;(&quot; / &quot;)&quot;
+                  / &quot;*&quot; / &quot;+&quot; / &quot;,&quot; / &quot;;&quot; / &quot;=&quot;
+
+   The purpose of reserved characters is to provide a set of delimiting
+   characters that are distinguishable from other data within a URI.
+   URIs that differ in the replacement of a reserved character with its
+   corresponding percent-encoded octet are not equivalent.  Percent-
+   encoding a reserved character, or decoding a percent-encoded octet
+   that corresponds to a reserved character, will change how the URI is
+   interpreted by most applications.  Thus, characters in the reserved
+   set are protected from normalization and are therefore safe to be
+   used by scheme-specific and producer-specific algorithms for
+   delimiting data subcomponents within a URI.
+
+   A subset of the reserved characters (gen-delims) is used as
+   delimiters of the generic URI components described in <a href="#section-3">Section 3</a>.  A
+   component&#x27;s ABNF syntax rule will not use the reserved or gen-delims
+   rule names directly; instead, each syntax rule lists the characters
+   allowed within that component (i.e., not delimiting it), and any of
+   those characters that are also in the reserved set are &quot;reserved&quot; for
+   use as subcomponent delimiters within the component.  Only the most
+   common subcomponents are defined by this specification; other
+   subcomponents may be defined by a URI scheme&#x27;s specification, or by
+   the implementation-specific syntax of a URI&#x27;s dereferencing
+   algorithm, provided that such subcomponents are delimited by
+   characters in the reserved set allowed within that component.
+
+   URI producing applications should percent-encode data octets that
+   correspond to characters in the reserved set unless these characters
+   are specifically allowed by the URI scheme to represent data in that
+   component.  If a reserved character is found in a URI component and
+   no delimiting role is known for that character, then it must be
+   interpreted as representing the data octet corresponding to that
+   character&#x27;s encoding in US-ASCII.
+
+<span class="h3"><a class="selflink" id="section-2.3" href="#section-2.3">2.3</a>.  Unreserved Characters</span>
+
+   Characters that are allowed in a URI but do not have a reserved
+   purpose are called unreserved.  These include uppercase and lowercase
+   letters, decimal digits, hyphen, period, underscore, and tilde.
+
+      unreserved  = ALPHA / DIGIT / &quot;-&quot; / &quot;.&quot; / &quot;_&quot; / &quot;~&quot;
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 13]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-14" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   URIs that differ in the replacement of an unreserved character with
+   its corresponding percent-encoded US-ASCII octet are equivalent: they
+   identify the same resource.  However, URI comparison implementations
+   do not always perform normalization prior to comparison (see <a href="#section-6">Section</a>
+   <a href="#section-6">6</a>).  For consistency, percent-encoded octets in the ranges of ALPHA
+   (%41-%5A and %61-%7A), DIGIT (%30-%39), hyphen (%2D), period (%2E),
+   underscore (%5F), or tilde (%7E) should not be created by URI
+   producers and, when found in a URI, should be decoded to their
+   corresponding unreserved characters by URI normalizers.
+
+<span class="h3"><a class="selflink" id="section-2.4" href="#section-2.4">2.4</a>.  When to Encode or Decode</span>
+
+   Under normal circumstances, the only time when octets within a URI
+   are percent-encoded is during the process of producing the URI from
+   its component parts.  This is when an implementation determines which
+   of the reserved characters are to be used as subcomponent delimiters
+   and which can be safely used as data.  Once produced, a URI is always
+   in its percent-encoded form.
+
+   When a URI is dereferenced, the components and subcomponents
+   significant to the scheme-specific dereferencing process (if any)
+   must be parsed and separated before the percent-encoded octets within
+   those components can be safely decoded, as otherwise the data may be
+   mistaken for component delimiters.  The only exception is for
+   percent-encoded octets corresponding to characters in the unreserved
+   set, which can be decoded at any time.  For example, the octet
+   corresponding to the tilde (&quot;~&quot;) character is often encoded as &quot;%7E&quot;
+   by older URI processing implementations; the &quot;%7E&quot; can be replaced by
+   &quot;~&quot; without changing its interpretation.
+
+   Because the percent (&quot;%&quot;) character serves as the indicator for
+   percent-encoded octets, it must be percent-encoded as &quot;%25&quot; for that
+   octet to be used as data within a URI.  Implementations must not
+   percent-encode or decode the same string more than once, as decoding
+   an already decoded string might lead to misinterpreting a percent
+   data octet as the beginning of a percent-encoding, or vice versa in
+   the case of percent-encoding an already percent-encoded string.
+
+<span class="h3"><a class="selflink" id="section-2.5" href="#section-2.5">2.5</a>.  Identifying Data</span>
+
+   URI characters provide identifying data for each of the URI
+   components, serving as an external interface for identification
+   between systems.  Although the presence and nature of the URI
+   production interface is hidden from clients that use its URIs (and is
+   thus beyond the scope of the interoperability requirements defined by
+   this specification), it is a frequent source of confusion and errors
+   in the interpretation of URI character issues.  Implementers have to
+   be aware that there are multiple character encodings involved in the
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 14]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-15" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   production and transmission of URIs: local name and data encoding,
+   public interface encoding, URI character encoding, data format
+   encoding, and protocol encoding.
+
+   Local names, such as file system names, are stored with a local
+   character encoding.  URI producing applications (e.g., origin
+   servers) will typically use the local encoding as the basis for
+   producing meaningful names.  The URI producer will transform the
+   local encoding to one that is suitable for a public interface and
+   then transform the public interface encoding into the restricted set
+   of URI characters (reserved, unreserved, and percent-encodings).
+   Those characters are, in turn, encoded as octets to be used as a
+   reference within a data format (e.g., a document charset), and such
+   data formats are often subsequently encoded for transmission over
+   Internet protocols.
+
+   For most systems, an unreserved character appearing within a URI
+   component is interpreted as representing the data octet corresponding
+   to that character&#x27;s encoding in US-ASCII.  Consumers of URIs assume
+   that the letter &quot;X&quot; corresponds to the octet &quot;01011000&quot;, and even
+   when that assumption is incorrect, there is no harm in making it.  A
+   system that internally provides identifiers in the form of a
+   different character encoding, such as EBCDIC, will generally perform
+   character translation of textual identifiers to UTF-8 [<a href="#ref-STD63">STD63</a>] (or
+   some other superset of the US-ASCII character encoding) at an
+   internal interface, thereby providing more meaningful identifiers
+   than those resulting from simply percent-encoding the original
+   octets.
+
+   For example, consider an information service that provides data,
+   stored locally using an EBCDIC-based file system, to clients on the
+   Internet through an HTTP server.  When an author creates a file with
+   the name &quot;Laguna Beach&quot; on that file system, the &quot;http&quot; URI
+   corresponding to that resource is expected to contain the meaningful
+   string &quot;Laguna%20Beach&quot;.  If, however, that server produces URIs by
+   using an overly simplistic raw octet mapping, then the result would
+   be a URI containing &quot;%D3%81%87%A4%95%81@%C2%85%81%83%88&quot;.  An
+   internal transcoding interface fixes this problem by transcoding the
+   local name to a superset of US-ASCII prior to producing the URI.
+   Naturally, proper interpretation of an incoming URI on such an
+   interface requires that percent-encoded octets be decoded (e.g.,
+   &quot;%20&quot; to SP) before the reverse transcoding is applied to obtain the
+   local name.
+
+   In some cases, the internal interface between a URI component and the
+   identifying data that it has been crafted to represent is much less
+   direct than a character encoding translation.  For example, portions
+   of a URI might reflect a query on non-ASCII data, or numeric
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 15]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-16" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   coordinates on a map.  Likewise, a URI scheme may define components
+   with additional encoding requirements that are applied prior to
+   forming the component and producing the URI.
+
+   When a new URI scheme defines a component that represents textual
+   data consisting of characters from the Universal Character Set [<a href="#ref-UCS">UCS</a>],
+   the data should first be encoded as octets according to the UTF-8
+   character encoding [<a href="#ref-STD63">STD63</a>]; then only those octets that do not
+   correspond to characters in the unreserved set should be percent-
+   encoded.  For example, the character A would be represented as &quot;A&quot;,
+   the character LATIN CAPITAL LETTER A WITH GRAVE would be represented
+   as &quot;%C3%80&quot;, and the character KATAKANA LETTER A would be represented
+   as &quot;%E3%82%A2&quot;.
+
+<span class="h2"><a class="selflink" id="section-3" href="#section-3">3</a>.  Syntax Components</span>
+
+   The generic URI syntax consists of a hierarchical sequence of
+   components referred to as the scheme, authority, path, query, and
+   fragment.
+
+      URI         = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+
+      hier-part   = &quot;//&quot; authority path-abempty
+                  / path-absolute
+                  / path-rootless
+                  / path-empty
+
+   The scheme and path components are required, though the path may be
+   empty (no characters).  When authority is present, the path must
+   either be empty or begin with a slash (&quot;/&quot;) character.  When
+   authority is not present, the path cannot begin with two slash
+   characters (&quot;//&quot;).  These restrictions result in five different ABNF
+   rules for a path (<a href="#section-3.3">Section 3.3</a>), only one of which will match any
+   given URI reference.
+
+   The following are two example URIs and their component parts:
+
+         foo://example.com:8042/over/there?name=ferret#nose
+         \_/   \______________/\_________/ \_________/ \__/
+          |           |            |            |        |
+       scheme     authority       path        query   fragment
+          |   _____________________|__
+         / \ /                        \
+         urn:example:animal:ferret:nose
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 16]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-17" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-3.1" href="#section-3.1">3.1</a>.  Scheme</span>
+
+   Each URI begins with a scheme name that refers to a specification for
+   assigning identifiers within that scheme.  As such, the URI syntax is
+   a federated and extensible naming system wherein each scheme&#x27;s
+   specification may further restrict the syntax and semantics of
+   identifiers using that scheme.
+
+   Scheme names consist of a sequence of characters beginning with a
+   letter and followed by any combination of letters, digits, plus
+   (&quot;+&quot;), period (&quot;.&quot;), or hyphen (&quot;-&quot;).  Although schemes are case-
+   insensitive, the canonical form is lowercase and documents that
+   specify schemes must do so with lowercase letters.  An implementation
+   should accept uppercase letters as equivalent to lowercase in scheme
+   names (e.g., allow &quot;HTTP&quot; as well as &quot;http&quot;) for the sake of
+   robustness but should only produce lowercase scheme names for
+   consistency.
+
+      scheme      = ALPHA *( ALPHA / DIGIT / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; )
+
+   Individual schemes are not specified by this document.  The process
+   for registration of new URI schemes is defined separately by [<a href="#ref-BCP35">BCP35</a>].
+   The scheme registry maintains the mapping between scheme names and
+   their specifications.  Advice for designers of new URI schemes can be
+   found in [<a href="/doc/html/rfc2718">RFC2718</a>].  URI scheme specifications must define their own
+   syntax so that all strings matching their scheme-specific syntax will
+   also match the &lt;absolute-URI&gt; grammar, as described in <a href="#section-4.3">Section 4.3</a>.
+
+   When presented with a URI that violates one or more scheme-specific
+   restrictions, the scheme-specific resolution process should flag the
+   reference as an error rather than ignore the unused parts; doing so
+   reduces the number of equivalent URIs and helps detect abuses of the
+   generic syntax, which might indicate that the URI has been
+   constructed to mislead the user (<a href="#section-7.6">Section 7.6</a>).
+
+<span class="h3"><a class="selflink" id="section-3.2" href="#section-3.2">3.2</a>.  Authority</span>
+
+   Many URI schemes include a hierarchical element for a naming
+   authority so that governance of the name space defined by the
+   remainder of the URI is delegated to that authority (which may, in
+   turn, delegate it further).  The generic syntax provides a common
+   means for distinguishing an authority based on a registered name or
+   server address, along with optional port and user information.
+
+   The authority component is preceded by a double slash (&quot;//&quot;) and is
+   terminated by the next slash (&quot;/&quot;), question mark (&quot;?&quot;), or number
+   sign (&quot;#&quot;) character, or by the end of the URI.
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 17]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-18" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      authority   = [ userinfo &quot;@&quot; ] host [ &quot;:&quot; port ]
+
+   URI producers and normalizers should omit the &quot;:&quot; delimiter that
+   separates host from port if the port component is empty.  Some
+   schemes do not allow the userinfo and/or port subcomponents.
+
+   If a URI contains an authority component, then the path component
+   must either be empty or begin with a slash (&quot;/&quot;) character.  Non-
+   validating parsers (those that merely separate a URI reference into
+   its major components) will often ignore the subcomponent structure of
+   authority, treating it as an opaque string from the double-slash to
+   the first terminating delimiter, until such time as the URI is
+   dereferenced.
+
+<span class="h4"><a class="selflink" id="section-3.2.1" href="#section-3.2.1">3.2.1</a>.  User Information</span>
+
+   The userinfo subcomponent may consist of a user name and, optionally,
+   scheme-specific information about how to gain authorization to access
+   the resource.  The user information, if present, is followed by a
+   commercial at-sign (&quot;@&quot;) that delimits it from the host.
+
+      userinfo    = *( unreserved / pct-encoded / sub-delims / &quot;:&quot; )
+
+   Use of the format &quot;user:password&quot; in the userinfo field is
+   deprecated.  Applications should not render as clear text any data
+   after the first colon (&quot;:&quot;) character found within a userinfo
+   subcomponent unless the data after the colon is the empty string
+   (indicating no password).  Applications may choose to ignore or
+   reject such data when it is received as part of a reference and
+   should reject the storage of such data in unencrypted form.  The
+   passing of authentication information in clear text has proven to be
+   a security risk in almost every case where it has been used.
+
+   Applications that render a URI for the sake of user feedback, such as
+   in graphical hypertext browsing, should render userinfo in a way that
+   is distinguished from the rest of a URI, when feasible.  Such
+   rendering will assist the user in cases where the userinfo has been
+   misleadingly crafted to look like a trusted domain name
+   (<a href="#section-7.6">Section 7.6</a>).
+
+<span class="h4"><a class="selflink" id="section-3.2.2" href="#section-3.2.2">3.2.2</a>.  Host</span>
+
+   The host subcomponent of authority is identified by an IP literal
+   encapsulated within square brackets, an IPv4 address in dotted-
+   decimal form, or a registered name.  The host subcomponent is case-
+   insensitive.  The presence of a host subcomponent within a URI does
+   not imply that the scheme requires access to the given host on the
+   Internet.  In many cases, the host syntax is used only for the sake
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 18]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-19" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   of reusing the existing registration process created and deployed for
+   DNS, thus obtaining a globally unique name without the cost of
+   deploying another registry.  However, such use comes with its own
+   costs: domain name ownership may change over time for reasons not
+   anticipated by the URI producer.  In other cases, the data within the
+   host component identifies a registered name that has nothing to do
+   with an Internet host.  We use the name &quot;host&quot; for the ABNF rule
+   because that is its most common purpose, not its only purpose.
+
+      host        = IP-literal / IPv4address / reg-name
+
+   The syntax rule for host is ambiguous because it does not completely
+   distinguish between an IPv4address and a reg-name.  In order to
+   disambiguate the syntax, we apply the &quot;first-match-wins&quot; algorithm:
+   If host matches the rule for IPv4address, then it should be
+   considered an IPv4 address literal and not a reg-name.  Although host
+   is case-insensitive, producers and normalizers should use lowercase
+   for registered names and hexadecimal addresses for the sake of
+   uniformity, while only using uppercase letters for percent-encodings.
+
+   A host identified by an Internet Protocol literal address, version 6
+   [<a href="/doc/html/rfc3513">RFC3513</a>] or later, is distinguished by enclosing the IP literal
+   within square brackets (&quot;[&quot; and &quot;]&quot;).  This is the only place where
+   square bracket characters are allowed in the URI syntax.  In
+   anticipation of future, as-yet-undefined IP literal address formats,
+   an implementation may use an optional version flag to indicate such a
+   format explicitly rather than rely on heuristic determination.
+
+      IP-literal = &quot;[&quot; ( IPv6address / IPvFuture  ) &quot;]&quot;
+
+      IPvFuture  = &quot;v&quot; 1*HEXDIG &quot;.&quot; 1*( unreserved / sub-delims / &quot;:&quot; )
+
+   The version flag does not indicate the IP version; rather, it
+   indicates future versions of the literal format.  As such,
+   implementations must not provide the version flag for the existing
+   IPv4 and IPv6 literal address forms described below.  If a URI
+   containing an IP-literal that starts with &quot;v&quot; (case-insensitive),
+   indicating that the version flag is present, is dereferenced by an
+   application that does not know the meaning of that version flag, then
+   the application should return an appropriate error for &quot;address
+   mechanism not supported&quot;.
+
+   A host identified by an IPv6 literal address is represented inside
+   the square brackets without a preceding version flag.  The ABNF
+   provided here is a translation of the text definition of an IPv6
+   literal address provided in [<a href="/doc/html/rfc3513">RFC3513</a>].  This syntax does not support
+   IPv6 scoped addressing zone identifiers.
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 19]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-20" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   A 128-bit IPv6 address is divided into eight 16-bit pieces.  Each
+   piece is represented numerically in case-insensitive hexadecimal,
+   using one to four hexadecimal digits (leading zeroes are permitted).
+   The eight encoded pieces are given most-significant first, separated
+   by colon characters.  Optionally, the least-significant two pieces
+   may instead be represented in IPv4 address textual format.  A
+   sequence of one or more consecutive zero-valued 16-bit pieces within
+   the address may be elided, omitting all their digits and leaving
+   exactly two consecutive colons in their place to mark the elision.
+
+      IPv6address =                            6( h16 &quot;:&quot; ) ls32
+                  /                       &quot;::&quot; 5( h16 &quot;:&quot; ) ls32
+                  / [               h16 ] &quot;::&quot; 4( h16 &quot;:&quot; ) ls32
+                  / [ *1( h16 &quot;:&quot; ) h16 ] &quot;::&quot; 3( h16 &quot;:&quot; ) ls32
+                  / [ *2( h16 &quot;:&quot; ) h16 ] &quot;::&quot; 2( h16 &quot;:&quot; ) ls32
+                  / [ *3( h16 &quot;:&quot; ) h16 ] &quot;::&quot;    h16 &quot;:&quot;   ls32
+                  / [ *4( h16 &quot;:&quot; ) h16 ] &quot;::&quot;              ls32
+                  / [ *5( h16 &quot;:&quot; ) h16 ] &quot;::&quot;              h16
+                  / [ *6( h16 &quot;:&quot; ) h16 ] &quot;::&quot;
+
+      ls32        = ( h16 &quot;:&quot; h16 ) / IPv4address
+                  ; least-significant 32 bits of address
+
+      h16         = 1*4HEXDIG
+                  ; 16 bits of address represented in hexadecimal
+
+   A host identified by an IPv4 literal address is represented in
+   dotted-decimal notation (a sequence of four decimal numbers in the
+   range 0 to 255, separated by &quot;.&quot;), as described in [<a href="/doc/html/rfc1123">RFC1123</a>] by
+   reference to [<a href="/doc/html/rfc0952">RFC0952</a>].  Note that other forms of dotted notation may
+   be interpreted on some platforms, as described in <a href="#section-7.4">Section 7.4</a>, but
+   only the dotted-decimal form of four octets is allowed by this
+   grammar.
+
+      IPv4address = dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet
+
+      dec-octet   = DIGIT                 ; 0-9
+                  / %x31-39 DIGIT         ; 10-99
+                  / &quot;1&quot; 2DIGIT            ; 100-199
+                  / &quot;2&quot; %x30-34 DIGIT     ; 200-249
+                  / &quot;25&quot; %x30-35          ; 250-255
+
+   A host identified by a registered name is a sequence of characters
+   usually intended for lookup within a locally defined host or service
+   name registry, though the URI&#x27;s scheme-specific semantics may require
+   that a specific registry (or fixed name table) be used instead.  The
+   most common name registry mechanism is the Domain Name System (DNS).
+   A registered name intended for lookup in the DNS uses the syntax
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 20]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-21" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   defined in <a href="/doc/html/rfc1034#section-3.5">Section&nbsp;3.5 of [RFC1034]</a> and <a href="/doc/html/rfc1123#section-2.1">Section&nbsp;2.1 of [RFC1123]</a>.
+   Such a name consists of a sequence of domain labels separated by &quot;.&quot;,
+   each domain label starting and ending with an alphanumeric character
+   and possibly also containing &quot;-&quot; characters.  The rightmost domain
+   label of a fully qualified domain name in DNS may be followed by a
+   single &quot;.&quot; and should be if it is necessary to distinguish between
+   the complete domain name and some local domain.
+
+      reg-name    = *( unreserved / pct-encoded / sub-delims )
+
+   If the URI scheme defines a default for host, then that default
+   applies when the host subcomponent is undefined or when the
+   registered name is empty (zero length).  For example, the &quot;file&quot; URI
+   scheme is defined so that no authority, an empty host, and
+   &quot;localhost&quot; all mean the end-user&#x27;s machine, whereas the &quot;http&quot;
+   scheme considers a missing authority or empty host invalid.
+
+   This specification does not mandate a particular registered name
+   lookup technology and therefore does not restrict the syntax of reg-
+   name beyond what is necessary for interoperability.  Instead, it
+   delegates the issue of registered name syntax conformance to the
+   operating system of each application performing URI resolution, and
+   that operating system decides what it will allow for the purpose of
+   host identification.  A URI resolution implementation might use DNS,
+   host tables, yellow pages, NetInfo, WINS, or any other system for
+   lookup of registered names.  However, a globally scoped naming
+   system, such as DNS fully qualified domain names, is necessary for
+   URIs intended to have global scope.  URI producers should use names
+   that conform to the DNS syntax, even when use of DNS is not
+   immediately apparent, and should limit these names to no more than
+   255 characters in length.
+
+   The reg-name syntax allows percent-encoded octets in order to
+   represent non-ASCII registered names in a uniform way that is
+   independent of the underlying name resolution technology.  Non-ASCII
+   characters must first be encoded according to UTF-8 [<a href="#ref-STD63">STD63</a>], and then
+   each octet of the corresponding UTF-8 sequence must be percent-
+   encoded to be represented as URI characters.  URI producing
+   applications must not use percent-encoding in host unless it is used
+   to represent a UTF-8 character sequence.  When a non-ASCII registered
+   name represents an internationalized domain name intended for
+   resolution via the DNS, the name must be transformed to the IDNA
+   encoding [<a href="/doc/html/rfc3490">RFC3490</a>] prior to name lookup.  URI producers should
+   provide these registered names in the IDNA encoding, rather than a
+   percent-encoding, if they wish to maximize interoperability with
+   legacy URI resolvers.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 21]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-22" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h4"><a class="selflink" id="section-3.2.3" href="#section-3.2.3">3.2.3</a>.  Port</span>
+
+   The port subcomponent of authority is designated by an optional port
+   number in decimal following the host and delimited from it by a
+   single colon (&quot;:&quot;) character.
+
+      port        = *DIGIT
+
+   A scheme may define a default port.  For example, the &quot;http&quot; scheme
+   defines a default port of &quot;80&quot;, corresponding to its reserved TCP
+   port number.  The type of port designated by the port number (e.g.,
+   TCP, UDP, SCTP) is defined by the URI scheme.  URI producers and
+   normalizers should omit the port component and its &quot;:&quot; delimiter if
+   port is empty or if its value would be the same as that of the
+   scheme&#x27;s default.
+
+<span class="h3"><a class="selflink" id="section-3.3" href="#section-3.3">3.3</a>.  Path</span>
+
+   The path component contains data, usually organized in hierarchical
+   form, that, along with data in the non-hierarchical query component
+   (<a href="#section-3.4">Section 3.4</a>), serves to identify a resource within the scope of the
+   URI&#x27;s scheme and naming authority (if any).  The path is terminated
+   by the first question mark (&quot;?&quot;) or number sign (&quot;#&quot;) character, or
+   by the end of the URI.
+
+   If a URI contains an authority component, then the path component
+   must either be empty or begin with a slash (&quot;/&quot;) character.  If a URI
+   does not contain an authority component, then the path cannot begin
+   with two slash characters (&quot;//&quot;).  In addition, a URI reference
+   (<a href="#section-4.1">Section 4.1</a>) may be a relative-path reference, in which case the
+   first path segment cannot contain a colon (&quot;:&quot;) character.  The ABNF
+   requires five separate rules to disambiguate these cases, only one of
+   which will match the path substring within a given URI reference.  We
+   use the generic term &quot;path component&quot; to describe the URI substring
+   matched by the parser to one of these rules.
+
+      path          = path-abempty    ; begins with &quot;/&quot; or is empty
+                    / path-absolute   ; begins with &quot;/&quot; but not &quot;//&quot;
+                    / path-noscheme   ; begins with a non-colon segment
+                    / path-rootless   ; begins with a segment
+                    / path-empty      ; zero characters
+
+      path-abempty  = *( &quot;/&quot; segment )
+      path-absolute = &quot;/&quot; [ segment-nz *( &quot;/&quot; segment ) ]
+      path-noscheme = segment-nz-nc *( &quot;/&quot; segment )
+      path-rootless = segment-nz *( &quot;/&quot; segment )
+      path-empty    = 0&lt;pchar&gt;
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 22]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-23" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      segment       = *pchar
+      segment-nz    = 1*pchar
+      segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / &quot;@&quot; )
+                    ; non-zero-length segment without any colon &quot;:&quot;
+
+      pchar         = unreserved / pct-encoded / sub-delims / &quot;:&quot; / &quot;@&quot;
+
+   A path consists of a sequence of path segments separated by a slash
+   (&quot;/&quot;) character.  A path is always defined for a URI, though the
+   defined path may be empty (zero length).  Use of the slash character
+   to indicate hierarchy is only required when a URI will be used as the
+   context for relative references.  For example, the URI
+   &lt;mailto:fred@example.com&gt; has a path of &quot;fred@example.com&quot;, whereas
+   the URI &lt;foo://info.example.com?fred&gt; has an empty path.
+
+   The path segments &quot;.&quot; and &quot;..&quot;, also known as dot-segments, are
+   defined for relative reference within the path name hierarchy.  They
+   are intended for use at the beginning of a relative-path reference
+   (<a href="#section-4.2">Section 4.2</a>) to indicate relative position within the hierarchical
+   tree of names.  This is similar to their role within some operating
+   systems&#x27; file directory structures to indicate the current directory
+   and parent directory, respectively.  However, unlike in a file
+   system, these dot-segments are only interpreted within the URI path
+   hierarchy and are removed as part of the resolution process (<a href="#section-5.2">Section</a>
+   <a href="#section-5.2">5.2</a>).
+
+   Aside from dot-segments in hierarchical paths, a path segment is
+   considered opaque by the generic syntax.  URI producing applications
+   often use the reserved characters allowed in a segment to delimit
+   scheme-specific or dereference-handler-specific subcomponents.  For
+   example, the semicolon (&quot;;&quot;) and equals (&quot;=&quot;) reserved characters are
+   often used to delimit parameters and parameter values applicable to
+   that segment.  The comma (&quot;,&quot;) reserved character is often used for
+   similar purposes.  For example, one URI producer might use a segment
+   such as &quot;name;v=1.1&quot; to indicate a reference to version 1.1 of
+   &quot;name&quot;, whereas another might use a segment such as &quot;name,1.1&quot; to
+   indicate the same.  Parameter types may be defined by scheme-specific
+   semantics, but in most cases the syntax of a parameter is specific to
+   the implementation of the URI&#x27;s dereferencing algorithm.
+
+<span class="h3"><a class="selflink" id="section-3.4" href="#section-3.4">3.4</a>.  Query</span>
+
+   The query component contains non-hierarchical data that, along with
+   data in the path component (<a href="#section-3.3">Section 3.3</a>), serves to identify a
+   resource within the scope of the URI&#x27;s scheme and naming authority
+   (if any).  The query component is indicated by the first question
+   mark (&quot;?&quot;) character and terminated by a number sign (&quot;#&quot;) character
+   or by the end of the URI.
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 23]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-24" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      query       = *( pchar / &quot;/&quot; / &quot;?&quot; )
+
+   The characters slash (&quot;/&quot;) and question mark (&quot;?&quot;) may represent data
+   within the query component.  Beware that some older, erroneous
+   implementations may not handle such data correctly when it is used as
+   the base URI for relative references (<a href="#section-5.1">Section 5.1</a>), apparently
+   because they fail to distinguish query data from path data when
+   looking for hierarchical separators.  However, as query components
+   are often used to carry identifying information in the form of
+   &quot;key=value&quot; pairs and one frequently used value is a reference to
+   another URI, it is sometimes better for usability to avoid percent-
+   encoding those characters.
+
+<span class="h3"><a class="selflink" id="section-3.5" href="#section-3.5">3.5</a>.  Fragment</span>
+
+   The fragment identifier component of a URI allows indirect
+   identification of a secondary resource by reference to a primary
+   resource and additional identifying information.  The identified
+   secondary resource may be some portion or subset of the primary
+   resource, some view on representations of the primary resource, or
+   some other resource defined or described by those representations.  A
+   fragment identifier component is indicated by the presence of a
+   number sign (&quot;#&quot;) character and terminated by the end of the URI.
+
+      fragment    = *( pchar / &quot;/&quot; / &quot;?&quot; )
+
+   The semantics of a fragment identifier are defined by the set of
+   representations that might result from a retrieval action on the
+   primary resource.  The fragment&#x27;s format and resolution is therefore
+   dependent on the media type [<a href="/doc/html/rfc2046">RFC2046</a>] of a potentially retrieved
+   representation, even though such a retrieval is only performed if the
+   URI is dereferenced.  If no such representation exists, then the
+   semantics of the fragment are considered unknown and are effectively
+   unconstrained.  Fragment identifier semantics are independent of the
+   URI scheme and thus cannot be redefined by scheme specifications.
+
+   Individual media types may define their own restrictions on or
+   structures within the fragment identifier syntax for specifying
+   different types of subsets, views, or external references that are
+   identifiable as secondary resources by that media type.  If the
+   primary resource has multiple representations, as is often the case
+   for resources whose representation is selected based on attributes of
+   the retrieval request (a.k.a., content negotiation), then whatever is
+   identified by the fragment should be consistent across all of those
+   representations.  Each representation should either define the
+   fragment so that it corresponds to the same secondary resource,
+   regardless of how it is represented, or should leave the fragment
+   undefined (i.e., not found).
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 24]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-25" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   As with any URI, use of a fragment identifier component does not
+   imply that a retrieval action will take place.  A URI with a fragment
+   identifier may be used to refer to the secondary resource without any
+   implication that the primary resource is accessible or will ever be
+   accessed.
+
+   Fragment identifiers have a special role in information retrieval
+   systems as the primary form of client-side indirect referencing,
+   allowing an author to specifically identify aspects of an existing
+   resource that are only indirectly provided by the resource owner.  As
+   such, the fragment identifier is not used in the scheme-specific
+   processing of a URI; instead, the fragment identifier is separated
+   from the rest of the URI prior to a dereference, and thus the
+   identifying information within the fragment itself is dereferenced
+   solely by the user agent, regardless of the URI scheme.  Although
+   this separate handling is often perceived to be a loss of
+   information, particularly for accurate redirection of references as
+   resources move over time, it also serves to prevent information
+   providers from denying reference authors the right to refer to
+   information within a resource selectively.  Indirect referencing also
+   provides additional flexibility and extensibility to systems that use
+   URIs, as new media types are easier to define and deploy than new
+   schemes of identification.
+
+   The characters slash (&quot;/&quot;) and question mark (&quot;?&quot;) are allowed to
+   represent data within the fragment identifier.  Beware that some
+   older, erroneous implementations may not handle this data correctly
+   when it is used as the base URI for relative references (<a href="#section-5.1">Section</a>
+   <a href="#section-5.1">5.1</a>).
+
+<span class="h2"><a class="selflink" id="section-4" href="#section-4">4</a>.  Usage</span>
+
+   When applications make reference to a URI, they do not always use the
+   full form of reference defined by the &quot;URI&quot; syntax rule.  To save
+   space and take advantage of hierarchical locality, many Internet
+   protocol elements and media type formats allow an abbreviation of a
+   URI, whereas others restrict the syntax to a particular form of URI.
+   We define the most common forms of reference syntax in this
+   specification because they impact and depend upon the design of the
+   generic syntax, requiring a uniform parsing algorithm in order to be
+   interpreted consistently.
+
+<span class="h3"><a class="selflink" id="section-4.1" href="#section-4.1">4.1</a>.  URI Reference</span>
+
+   URI-reference is used to denote the most common usage of a resource
+   identifier.
+
+      URI-reference = URI / relative-ref
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 25]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-26" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   A URI-reference is either a URI or a relative reference.  If the
+   URI-reference&#x27;s prefix does not match the syntax of a scheme followed
+   by its colon separator, then the URI-reference is a relative
+   reference.
+
+   A URI-reference is typically parsed first into the five URI
+   components, in order to determine what components are present and
+   whether the reference is relative.  Then, each component is parsed
+   for its subparts and their validation.  The ABNF of URI-reference,
+   along with the &quot;first-match-wins&quot; disambiguation rule, is sufficient
+   to define a validating parser for the generic syntax.  Readers
+   familiar with regular expressions should see <a href="#appendix-B">Appendix B</a> for an
+   example of a non-validating URI-reference parser that will take any
+   given string and extract the URI components.
+
+<span class="h3"><a class="selflink" id="section-4.2" href="#section-4.2">4.2</a>.  Relative Reference</span>
+
+   A relative reference takes advantage of the hierarchical syntax
+   (<a href="#section-1.2.3">Section 1.2.3</a>) to express a URI reference relative to the name space
+   of another hierarchical URI.
+
+      relative-ref  = relative-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+
+      relative-part = &quot;//&quot; authority path-abempty
+                    / path-absolute
+                    / path-noscheme
+                    / path-empty
+
+   The URI referred to by a relative reference, also known as the target
+   URI, is obtained by applying the reference resolution algorithm of
+   <a href="#section-5">Section 5</a>.
+
+   A relative reference that begins with two slash characters is termed
+   a network-path reference; such references are rarely used.  A
+   relative reference that begins with a single slash character is
+   termed an absolute-path reference.  A relative reference that does
+   not begin with a slash character is termed a relative-path reference.
+
+   A path segment that contains a colon character (e.g., &quot;this:that&quot;)
+   cannot be used as the first segment of a relative-path reference, as
+   it would be mistaken for a scheme name.  Such a segment must be
+   preceded by a dot-segment (e.g., &quot;./this:that&quot;) to make a relative-
+   path reference.
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 26]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-27" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-4.3" href="#section-4.3">4.3</a>.  Absolute URI</span>
+
+   Some protocol elements allow only the absolute form of a URI without
+   a fragment identifier.  For example, defining a base URI for later
+   use by relative references calls for an absolute-URI syntax rule that
+   does not allow a fragment.
+
+      absolute-URI  = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ]
+
+   URI scheme specifications must define their own syntax so that all
+   strings matching their scheme-specific syntax will also match the
+   &lt;absolute-URI&gt; grammar.  Scheme specifications will not define
+   fragment identifier syntax or usage, regardless of its applicability
+   to resources identifiable via that scheme, as fragment identification
+   is orthogonal to scheme definition.  However, scheme specifications
+   are encouraged to include a wide range of examples, including
+   examples that show use of the scheme&#x27;s URIs with fragment identifiers
+   when such usage is appropriate.
+
+<span class="h3"><a class="selflink" id="section-4.4" href="#section-4.4">4.4</a>.  Same-Document Reference</span>
+
+   When a URI reference refers to a URI that is, aside from its fragment
+   component (if any), identical to the base URI (<a href="#section-5.1">Section 5.1</a>), that
+   reference is called a &quot;same-document&quot; reference.  The most frequent
+   examples of same-document references are relative references that are
+   empty or include only the number sign (&quot;#&quot;) separator followed by a
+   fragment identifier.
+
+   When a same-document reference is dereferenced for a retrieval
+   action, the target of that reference is defined to be within the same
+   entity (representation, document, or message) as the reference;
+   therefore, a dereference should not result in a new retrieval action.
+
+   Normalization of the base and target URIs prior to their comparison,
+   as described in Sections <a href="#section-6.2.2">6.2.2</a> and <a href="#section-6.2.3">6.2.3</a>, is allowed but rarely
+   performed in practice.  Normalization may increase the set of same-
+   document references, which may be of benefit to some caching
+   applications.  As such, reference authors should not assume that a
+   slightly different, though equivalent, reference URI will (or will
+   not) be interpreted as a same-document reference by any given
+   application.
+
+<span class="h3"><a class="selflink" id="section-4.5" href="#section-4.5">4.5</a>.  Suffix Reference</span>
+
+   The URI syntax is designed for unambiguous reference to resources and
+   extensibility via the URI scheme.  However, as URI identification and
+   usage have become commonplace, traditional media (television, radio,
+   newspapers, billboards, etc.) have increasingly used a suffix of the
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 27]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-28" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   URI as a reference, consisting of only the authority and path
+   portions of the URI, such as
+
+      www.w3.org/Addressing/
+
+   or simply a DNS registered name on its own.  Such references are
+   primarily intended for human interpretation rather than for machines,
+   with the assumption that context-based heuristics are sufficient to
+   complete the URI (e.g., most registered names beginning with &quot;www&quot;
+   are likely to have a URI prefix of &quot;http://&quot;).  Although there is no
+   standard set of heuristics for disambiguating a URI suffix, many
+   client implementations allow them to be entered by the user and
+   heuristically resolved.
+
+   Although this practice of using suffix references is common, it
+   should be avoided whenever possible and should never be used in
+   situations where long-term references are expected.  The heuristics
+   noted above will change over time, particularly when a new URI scheme
+   becomes popular, and are often incorrect when used out of context.
+   Furthermore, they can lead to security issues along the lines of
+   those described in [<a href="/doc/html/rfc1535">RFC1535</a>].
+
+   As a URI suffix has the same syntax as a relative-path reference, a
+   suffix reference cannot be used in contexts where a relative
+   reference is expected.  As a result, suffix references are limited to
+   places where there is no defined base URI, such as dialog boxes and
+   off-line advertisements.
+
+<span class="h2"><a class="selflink" id="section-5" href="#section-5">5</a>.  Reference Resolution</span>
+
+   This section defines the process of resolving a URI reference within
+   a context that allows relative references so that the result is a
+   string matching the &lt;URI&gt; syntax rule of <a href="#section-3">Section 3</a>.
+
+<span class="h3"><a class="selflink" id="section-5.1" href="#section-5.1">5.1</a>.  Establishing a Base URI</span>
+
+   The term &quot;relative&quot; implies that a &quot;base URI&quot; exists against which
+   the relative reference is applied.  Aside from fragment-only
+   references (<a href="#section-4.4">Section 4.4</a>), relative references are only usable when a
+   base URI is known.  A base URI must be established by the parser
+   prior to parsing URI references that might be relative.  A base URI
+   must conform to the &lt;absolute-URI&gt; syntax rule (<a href="#section-4.3">Section 4.3</a>).  If the
+   base URI is obtained from a URI reference, then that reference must
+   be converted to absolute form and stripped of any fragment component
+   prior to its use as a base URI.
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 28]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-29" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   The base URI of a reference can be established in one of four ways,
+   discussed below in order of precedence.  The order of precedence can
+   be thought of in terms of layers, where the innermost defined base
+   URI has the highest precedence.  This can be visualized graphically
+   as follows:
+
+         .----------------------------------------------------------.
+         |  .----------------------------------------------------.  |
+         |  |  .----------------------------------------------.  |  |
+         |  |  |  .----------------------------------------.  |  |  |
+         |  |  |  |  .----------------------------------.  |  |  |  |
+         |  |  |  |  |       &lt;relative-reference&gt;       |  |  |  |  |
+         |  |  |  |  `----------------------------------&#x27;  |  |  |  |
+         |  |  |  | (5.1.1) Base URI embedded in content   |  |  |  |
+         |  |  |  `----------------------------------------&#x27;  |  |  |
+         |  |  | (5.1.2) Base URI of the encapsulating entity |  |  |
+         |  |  |         (message, representation, or none)   |  |  |
+         |  |  `----------------------------------------------&#x27;  |  |
+         |  | (5.1.3) URI used to retrieve the entity            |  |
+         |  `----------------------------------------------------&#x27;  |
+         | (5.1.4) Default Base URI (application-dependent)         |
+         `----------------------------------------------------------&#x27;
+
+<span class="h4"><a class="selflink" id="section-5.1.1" href="#section-5.1.1">5.1.1</a>.  Base URI Embedded in Content</span>
+
+   Within certain media types, a base URI for relative references can be
+   embedded within the content itself so that it can be readily obtained
+   by a parser.  This can be useful for descriptive documents, such as
+   tables of contents, which may be transmitted to others through
+   protocols other than their usual retrieval context (e.g., email or
+   USENET news).
+
+   It is beyond the scope of this specification to specify how, for each
+   media type, a base URI can be embedded.  The appropriate syntax, when
+   available, is described by the data format specification associated
+   with each media type.
+
+<span class="h4"><a class="selflink" id="section-5.1.2" href="#section-5.1.2">5.1.2</a>.  Base URI from the Encapsulating Entity</span>
+
+   If no base URI is embedded, the base URI is defined by the
+   representation&#x27;s retrieval context.  For a document that is enclosed
+   within another entity, such as a message or archive, the retrieval
+   context is that entity.  Thus, the default base URI of a
+   representation is the base URI of the entity in which the
+   representation is encapsulated.
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 29]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-30" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   A mechanism for embedding a base URI within MIME container types
+   (e.g., the message and multipart types) is defined by MHTML
+   [<a href="/doc/html/rfc2557">RFC2557</a>].  Protocols that do not use the MIME message header syntax,
+   but that do allow some form of tagged metadata to be included within
+   messages, may define their own syntax for defining a base URI as part
+   of a message.
+
+<span class="h4"><a class="selflink" id="section-5.1.3" href="#section-5.1.3">5.1.3</a>.  Base URI from the Retrieval URI</span>
+
+   If no base URI is embedded and the representation is not encapsulated
+   within some other entity, then, if a URI was used to retrieve the
+   representation, that URI shall be considered the base URI.  Note that
+   if the retrieval was the result of a redirected request, the last URI
+   used (i.e., the URI that resulted in the actual retrieval of the
+   representation) is the base URI.
+
+<span class="h4"><a class="selflink" id="section-5.1.4" href="#section-5.1.4">5.1.4</a>.  Default Base URI</span>
+
+   If none of the conditions described above apply, then the base URI is
+   defined by the context of the application.  As this definition is
+   necessarily application-dependent, failing to define a base URI by
+   using one of the other methods may result in the same content being
+   interpreted differently by different types of applications.
+
+   A sender of a representation containing relative references is
+   responsible for ensuring that a base URI for those references can be
+   established.  Aside from fragment-only references, relative
+   references can only be used reliably in situations where the base URI
+   is well defined.
+
+<span class="h3"><a class="selflink" id="section-5.2" href="#section-5.2">5.2</a>.  Relative Resolution</span>
+
+   This section describes an algorithm for converting a URI reference
+   that might be relative to a given base URI into the parsed components
+   of the reference&#x27;s target.  The components can then be recomposed, as
+   described in <a href="#section-5.3">Section 5.3</a>, to form the target URI.  This algorithm
+   provides definitive results that can be used to test the output of
+   other implementations.  Applications may implement relative reference
+   resolution by using some other algorithm, provided that the results
+   match what would be given by this one.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 30]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-31" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h4"><a class="selflink" id="section-5.2.1" href="#section-5.2.1">5.2.1</a>.  Pre-parse the Base URI</span>
+
+   The base URI (Base) is established according to the procedure of
+   <a href="#section-5.1">Section 5.1</a> and parsed into the five main components described in
+   <a href="#section-3">Section 3</a>.  Note that only the scheme component is required to be
+   present in a base URI; the other components may be empty or
+   undefined.  A component is undefined if its associated delimiter does
+   not appear in the URI reference; the path component is never
+   undefined, though it may be empty.
+
+   Normalization of the base URI, as described in Sections <a href="#section-6.2.2">6.2.2</a> and
+   6.2.3, is optional.  A URI reference must be transformed to its
+   target URI before it can be normalized.
+
+<span class="h4"><a class="selflink" id="section-5.2.2" href="#section-5.2.2">5.2.2</a>.  Transform References</span>
+
+   For each URI reference (R), the following pseudocode describes an
+   algorithm for transforming R into its target URI (T):
+
+      -- The URI reference is parsed into the five URI components
+      --
+      (R.scheme, R.authority, R.path, R.query, R.fragment) = parse(R);
+
+      -- A non-strict parser may ignore a scheme in the reference
+      -- if it is identical to the base URI&#x27;s scheme.
+      --
+      if ((not strict) and (R.scheme == Base.scheme)) then
+         undefine(R.scheme);
+      endif;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 31]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-32" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      if defined(R.scheme) then
+         T.scheme    = R.scheme;
+         T.authority = R.authority;
+         T.path      = remove_dot_segments(R.path);
+         T.query     = R.query;
+      else
+         if defined(R.authority) then
+            T.authority = R.authority;
+            T.path      = remove_dot_segments(R.path);
+            T.query     = R.query;
+         else
+            if (R.path == &quot;&quot;) then
+               T.path = Base.path;
+               if defined(R.query) then
+                  T.query = R.query;
+               else
+                  T.query = Base.query;
+               endif;
+            else
+               if (R.path starts-with &quot;/&quot;) then
+                  T.path = remove_dot_segments(R.path);
+               else
+                  T.path = merge(Base.path, R.path);
+                  T.path = remove_dot_segments(T.path);
+               endif;
+               T.query = R.query;
+            endif;
+            T.authority = Base.authority;
+         endif;
+         T.scheme = Base.scheme;
+      endif;
+
+      T.fragment = R.fragment;
+
+<span class="h4"><a class="selflink" id="section-5.2.3" href="#section-5.2.3">5.2.3</a>.  Merge Paths</span>
+
+   The pseudocode above refers to a &quot;merge&quot; routine for merging a
+   relative-path reference with the path of the base URI.  This is
+   accomplished as follows:
+
+   o  If the base URI has a defined authority component and an empty
+      path, then return a string consisting of &quot;/&quot; concatenated with the
+      reference&#x27;s path; otherwise,
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 32]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-33" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   o  return a string consisting of the reference&#x27;s path component
+      appended to all but the last segment of the base URI&#x27;s path (i.e.,
+      excluding any characters after the right-most &quot;/&quot; in the base URI
+      path, or excluding the entire base URI path if it does not contain
+      any &quot;/&quot; characters).
+
+<span class="h4"><a class="selflink" id="section-5.2.4" href="#section-5.2.4">5.2.4</a>.  Remove Dot Segments</span>
+
+   The pseudocode also refers to a &quot;remove_dot_segments&quot; routine for
+   interpreting and removing the special &quot;.&quot; and &quot;..&quot; complete path
+   segments from a referenced path.  This is done after the path is
+   extracted from a reference, whether or not the path was relative, in
+   order to remove any invalid or extraneous dot-segments prior to
+   forming the target URI.  Although there are many ways to accomplish
+   this removal process, we describe a simple method using two string
+   buffers.
+
+   1.  The input buffer is initialized with the now-appended path
+       components and the output buffer is initialized to the empty
+       string.
+
+   2.  While the input buffer is not empty, loop as follows:
+
+       A.  If the input buffer begins with a prefix of &quot;../&quot; or &quot;./&quot;,
+           then remove that prefix from the input buffer; otherwise,
+
+       B.  if the input buffer begins with a prefix of &quot;/./&quot; or &quot;/.&quot;,
+           where &quot;.&quot; is a complete path segment, then replace that
+           prefix with &quot;/&quot; in the input buffer; otherwise,
+
+       C.  if the input buffer begins with a prefix of &quot;/../&quot; or &quot;/..&quot;,
+           where &quot;..&quot; is a complete path segment, then replace that
+           prefix with &quot;/&quot; in the input buffer and remove the last
+           segment and its preceding &quot;/&quot; (if any) from the output
+           buffer; otherwise,
+
+       D.  if the input buffer consists only of &quot;.&quot; or &quot;..&quot;, then remove
+           that from the input buffer; otherwise,
+
+       E.  move the first path segment in the input buffer to the end of
+           the output buffer, including the initial &quot;/&quot; character (if
+           any) and any subsequent characters up to, but not including,
+           the next &quot;/&quot; character or the end of the input buffer.
+
+   3.  Finally, the output buffer is returned as the result of
+       remove_dot_segments.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 33]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-34" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   Note that dot-segments are intended for use in URI references to
+   express an identifier relative to the hierarchy of names in the base
+   URI.  The remove_dot_segments algorithm respects that hierarchy by
+   removing extra dot-segments rather than treat them as an error or
+   leaving them to be misinterpreted by dereference implementations.
+
+   The following illustrates how the above steps are applied for two
+   examples of merged paths, showing the state of the two buffers after
+   each step.
+
+      STEP   OUTPUT BUFFER         INPUT BUFFER
+
+       1 :                         /a/b/c/./../../g
+       2E:   /a                    /b/c/./../../g
+       2E:   /a/b                  /c/./../../g
+       2E:   /a/b/c                /./../../g
+       2B:   /a/b/c                /../../g
+       2C:   /a/b                  /../g
+       2C:   /a                    /g
+       2E:   /a/g
+
+      STEP   OUTPUT BUFFER         INPUT BUFFER
+
+       <a href="#section-1">1</a> :                         mid/content=5/../6
+       2E:   mid                   /content=5/../6
+       2E:   mid/content=5         /../6
+       2C:   mid                   /6
+       2E:   mid/6
+
+   Some applications may find it more efficient to implement the
+   remove_dot_segments algorithm by using two segment stacks rather than
+   strings.
+
+      Note: Beware that some older, erroneous implementations will fail
+      to separate a reference&#x27;s query component from its path component
+      prior to merging the base and reference paths, resulting in an
+      interoperability failure if the query component contains the
+      strings &quot;/../&quot; or &quot;/./&quot;.
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 34]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-35" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-5.3" href="#section-5.3">5.3</a>.  Component Recomposition</span>
+
+   Parsed URI components can be recomposed to obtain the corresponding
+   URI reference string.  Using pseudocode, this would be:
+
+      result = &quot;&quot;
+
+      if defined(scheme) then
+         append scheme to result;
+         append &quot;:&quot; to result;
+      endif;
+
+      if defined(authority) then
+         append &quot;//&quot; to result;
+         append authority to result;
+      endif;
+
+      append path to result;
+
+      if defined(query) then
+         append &quot;?&quot; to result;
+         append query to result;
+      endif;
+
+      if defined(fragment) then
+         append &quot;#&quot; to result;
+         append fragment to result;
+      endif;
+
+      return result;
+
+   Note that we are careful to preserve the distinction between a
+   component that is undefined, meaning that its separator was not
+   present in the reference, and a component that is empty, meaning that
+   the separator was present and was immediately followed by the next
+   component separator or the end of the reference.
+
+<span class="h3"><a class="selflink" id="section-5.4" href="#section-5.4">5.4</a>.  Reference Resolution Examples</span>
+
+   Within a representation with a well defined base URI of
+
+      http://a/b/c/d;p?q
+
+   a relative reference is transformed to its target URI as follows.
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 35]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-36" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h4"><a class="selflink" id="section-5.4.1" href="#section-5.4.1">5.4.1</a>.  Normal Examples</span>
+
+      &quot;g:h&quot;           =  &quot;g:h&quot;
+      &quot;g&quot;             =  &quot;http://a/b/c/g&quot;
+      &quot;./g&quot;           =  &quot;http://a/b/c/g&quot;
+      &quot;g/&quot;            =  &quot;http://a/b/c/g/&quot;
+      &quot;/g&quot;            =  &quot;http://a/g&quot;
+      &quot;//g&quot;           =  &quot;http://g&quot;
+      &quot;?y&quot;            =  &quot;http://a/b/c/d;p?y&quot;
+      &quot;g?y&quot;           =  &quot;http://a/b/c/g?y&quot;
+      &quot;#s&quot;            =  &quot;http://a/b/c/d;p?q#s&quot;
+      &quot;g#s&quot;           =  &quot;http://a/b/c/g#s&quot;
+      &quot;g?y#s&quot;         =  &quot;http://a/b/c/g?y#s&quot;
+      &quot;;x&quot;            =  &quot;http://a/b/c/;x&quot;
+      &quot;g;x&quot;           =  &quot;http://a/b/c/g;x&quot;
+      &quot;g;x?y#s&quot;       =  &quot;http://a/b/c/g;x?y#s&quot;
+      &quot;&quot;              =  &quot;http://a/b/c/d;p?q&quot;
+      &quot;.&quot;             =  &quot;http://a/b/c/&quot;
+      &quot;./&quot;            =  &quot;http://a/b/c/&quot;
+      &quot;..&quot;            =  &quot;http://a/b/&quot;
+      &quot;../&quot;           =  &quot;http://a/b/&quot;
+      &quot;../g&quot;          =  &quot;http://a/b/g&quot;
+      &quot;../..&quot;         =  &quot;http://a/&quot;
+      &quot;../../&quot;        =  &quot;http://a/&quot;
+      &quot;../../g&quot;       =  &quot;http://a/g&quot;
+
+<span class="h4"><a class="selflink" id="section-5.4.2" href="#section-5.4.2">5.4.2</a>.  Abnormal Examples</span>
+
+   Although the following abnormal examples are unlikely to occur in
+   normal practice, all URI parsers should be capable of resolving them
+   consistently.  Each example uses the same base as that above.
+
+   Parsers must be careful in handling cases where there are more &quot;..&quot;
+   segments in a relative-path reference than there are hierarchical
+   levels in the base URI&#x27;s path.  Note that the &quot;..&quot; syntax cannot be
+   used to change the authority component of a URI.
+
+      &quot;../../../g&quot;    =  &quot;http://a/g&quot;
+      &quot;../../../../g&quot; =  &quot;http://a/g&quot;
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 36]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-37" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   Similarly, parsers must remove the dot-segments &quot;.&quot; and &quot;..&quot; when
+   they are complete components of a path, but not when they are only
+   part of a segment.
+
+      &quot;/./g&quot;          =  &quot;http://a/g&quot;
+      &quot;/../g&quot;         =  &quot;http://a/g&quot;
+      &quot;g.&quot;            =  &quot;http://a/b/c/g.&quot;
+      &quot;.g&quot;            =  &quot;http://a/b/c/.g&quot;
+      &quot;g..&quot;           =  &quot;http://a/b/c/g..&quot;
+      &quot;..g&quot;           =  &quot;http://a/b/c/..g&quot;
+
+   Less likely are cases where the relative reference uses unnecessary
+   or nonsensical forms of the &quot;.&quot; and &quot;..&quot; complete path segments.
+
+      &quot;./../g&quot;        =  &quot;http://a/b/g&quot;
+      &quot;./g/.&quot;         =  &quot;http://a/b/c/g/&quot;
+      &quot;g/./h&quot;         =  &quot;http://a/b/c/g/h&quot;
+      &quot;g/../h&quot;        =  &quot;http://a/b/c/h&quot;
+      &quot;g;x=1/./y&quot;     =  &quot;http://a/b/c/g;x=1/y&quot;
+      &quot;g;x=1/../y&quot;    =  &quot;http://a/b/c/y&quot;
+
+   Some applications fail to separate the reference&#x27;s query and/or
+   fragment components from the path component before merging it with
+   the base path and removing dot-segments.  This error is rarely
+   noticed, as typical usage of a fragment never includes the hierarchy
+   (&quot;/&quot;) character and the query component is not normally used within
+   relative references.
+
+      &quot;g?y/./x&quot;       =  &quot;http://a/b/c/g?y/./x&quot;
+      &quot;g?y/../x&quot;      =  &quot;http://a/b/c/g?y/../x&quot;
+      &quot;g#s/./x&quot;       =  &quot;http://a/b/c/g#s/./x&quot;
+      &quot;g#s/../x&quot;      =  &quot;http://a/b/c/g#s/../x&quot;
+
+   Some parsers allow the scheme name to be present in a relative
+   reference if it is the same as the base URI scheme.  This is
+   considered to be a loophole in prior specifications of partial URI
+   [<a href="/doc/html/rfc1630">RFC1630</a>].  Its use should be avoided but is allowed for backward
+   compatibility.
+
+      &quot;http:g&quot;        =  &quot;http:g&quot;         ; for strict parsers
+                      /  &quot;http://a/b/c/g&quot; ; for backward compatibility
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 37]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-38" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h2"><a class="selflink" id="section-6" href="#section-6">6</a>.  Normalization and Comparison</span>
+
+   One of the most common operations on URIs is simple comparison:
+   determining whether two URIs are equivalent without using the URIs to
+   access their respective resource(s).  A comparison is performed every
+   time a response cache is accessed, a browser checks its history to
+   color a link, or an XML parser processes tags within a namespace.
+   Extensive normalization prior to comparison of URIs is often used by
+   spiders and indexing engines to prune a search space or to reduce
+   duplication of request actions and response storage.
+
+   URI comparison is performed for some particular purpose.  Protocols
+   or implementations that compare URIs for different purposes will
+   often be subject to differing design trade-offs in regards to how
+   much effort should be spent in reducing aliased identifiers.  This
+   section describes various methods that may be used to compare URIs,
+   the trade-offs between them, and the types of applications that might
+   use them.
+
+<span class="h3"><a class="selflink" id="section-6.1" href="#section-6.1">6.1</a>.  Equivalence</span>
+
+   Because URIs exist to identify resources, presumably they should be
+   considered equivalent when they identify the same resource.  However,
+   this definition of equivalence is not of much practical use, as there
+   is no way for an implementation to compare two resources unless it
+   has full knowledge or control of them.  For this reason,
+   determination of equivalence or difference of URIs is based on string
+   comparison, perhaps augmented by reference to additional rules
+   provided by URI scheme definitions.  We use the terms &quot;different&quot; and
+   &quot;equivalent&quot; to describe the possible outcomes of such comparisons,
+   but there are many application-dependent versions of equivalence.
+
+   Even though it is possible to determine that two URIs are equivalent,
+   URI comparison is not sufficient to determine whether two URIs
+   identify different resources.  For example, an owner of two different
+   domain names could decide to serve the same resource from both,
+   resulting in two different URIs.  Therefore, comparison methods are
+   designed to minimize false negatives while strictly avoiding false
+   positives.
+
+   In testing for equivalence, applications should not directly compare
+   relative references; the references should be converted to their
+   respective target URIs before comparison.  When URIs are compared to
+   select (or avoid) a network action, such as retrieval of a
+   representation, fragment components (if any) should be excluded from
+   the comparison.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 38]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-39" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-6.2" href="#section-6.2">6.2</a>.  Comparison Ladder</span>
+
+   A variety of methods are used in practice to test URI equivalence.
+   These methods fall into a range, distinguished by the amount of
+   processing required and the degree to which the probability of false
+   negatives is reduced.  As noted above, false negatives cannot be
+   eliminated.  In practice, their probability can be reduced, but this
+   reduction requires more processing and is not cost-effective for all
+   applications.
+
+   If this range of comparison practices is considered as a ladder, the
+   following discussion will climb the ladder, starting with practices
+   that are cheap but have a relatively higher chance of producing false
+   negatives, and proceeding to those that have higher computational
+   cost and lower risk of false negatives.
+
+<span class="h4"><a class="selflink" id="section-6.2.1" href="#section-6.2.1">6.2.1</a>.  Simple String Comparison</span>
+
+   If two URIs, when considered as character strings, are identical,
+   then it is safe to conclude that they are equivalent.  This type of
+   equivalence test has very low computational cost and is in wide use
+   in a variety of applications, particularly in the domain of parsing.
+
+   Testing strings for equivalence requires some basic precautions.
+   This procedure is often referred to as &quot;bit-for-bit&quot; or
+   &quot;byte-for-byte&quot; comparison, which is potentially misleading.  Testing
+   strings for equality is normally based on pair comparison of the
+   characters that make up the strings, starting from the first and
+   proceeding until both strings are exhausted and all characters are
+   found to be equal, until a pair of characters compares unequal, or
+   until one of the strings is exhausted before the other.
+
+   This character comparison requires that each pair of characters be
+   put in comparable form.  For example, should one URI be stored in a
+   byte array in EBCDIC encoding and the second in a Java String object
+   (UTF-16), bit-for-bit comparisons applied naively will produce
+   errors.  It is better to speak of equality on a character-for-
+   character basis rather than on a byte-for-byte or bit-for-bit basis.
+   In practical terms, character-by-character comparisons should be done
+   codepoint-by-codepoint after conversion to a common character
+   encoding.
+
+   False negatives are caused by the production and use of URI aliases.
+   Unnecessary aliases can be reduced, regardless of the comparison
+   method, by consistently providing URI references in an already-
+   normalized form (i.e., a form identical to what would be produced
+   after normalization is applied, as described below).
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 39]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-40" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   Protocols and data formats often limit some URI comparisons to simple
+   string comparison, based on the theory that people and
+   implementations will, in their own best interest, be consistent in
+   providing URI references, or at least consistent enough to negate any
+   efficiency that might be obtained from further normalization.
+
+<span class="h4"><a class="selflink" id="section-6.2.2" href="#section-6.2.2">6.2.2</a>.  Syntax-Based Normalization</span>
+
+   Implementations may use logic based on the definitions provided by
+   this specification to reduce the probability of false negatives.
+   This processing is moderately higher in cost than character-for-
+   character string comparison.  For example, an application using this
+   approach could reasonably consider the following two URIs equivalent:
+
+      example://a/b/c/%7Bfoo%7D
+      eXAMPLE://a/./b/../b/%63/%7bfoo%7d
+
+   Web user agents, such as browsers, typically apply this type of URI
+   normalization when determining whether a cached response is
+   available.  Syntax-based normalization includes such techniques as
+   case normalization, percent-encoding normalization, and removal of
+   dot-segments.
+
+<span class="h5"><a class="selflink" id="section-6.2.2.1" href="#section-6.2.2.1">6.2.2.1</a>.  Case Normalization</span>
+
+   For all URIs, the hexadecimal digits within a percent-encoding
+   triplet (e.g., &quot;%3a&quot; versus &quot;%3A&quot;) are case-insensitive and therefore
+   should be normalized to use uppercase letters for the digits A-F.
+
+   When a URI uses components of the generic syntax, the component
+   syntax equivalence rules always apply; namely, that the scheme and
+   host are case-insensitive and therefore should be normalized to
+   lowercase.  For example, the URI &lt;HTTP://www.EXAMPLE.com/&gt; is
+   equivalent to &lt;http://www.example.com/&gt;.  The other generic syntax
+   components are assumed to be case-sensitive unless specifically
+   defined otherwise by the scheme (see <a href="#section-6.2.3">Section 6.2.3</a>).
+
+<span class="h5"><a class="selflink" id="section-6.2.2.2" href="#section-6.2.2.2">6.2.2.2</a>.  Percent-Encoding Normalization</span>
+
+   The percent-encoding mechanism (<a href="#section-2.1">Section 2.1</a>) is a frequent source of
+   variance among otherwise identical URIs.  In addition to the case
+   normalization issue noted above, some URI producers percent-encode
+   octets that do not require percent-encoding, resulting in URIs that
+   are equivalent to their non-encoded counterparts.  These URIs should
+   be normalized by decoding any percent-encoded octet that corresponds
+   to an unreserved character, as described in <a href="#section-2.3">Section 2.3</a>.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 40]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-41" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h5"><a class="selflink" id="section-6.2.2.3" href="#section-6.2.2.3">6.2.2.3</a>.  Path Segment Normalization</span>
+
+   The complete path segments &quot;.&quot; and &quot;..&quot; are intended only for use
+   within relative references (<a href="#section-4.1">Section 4.1</a>) and are removed as part of
+   the reference resolution process (<a href="#section-5.2">Section 5.2</a>).  However, some
+   deployed implementations incorrectly assume that reference resolution
+   is not necessary when the reference is already a URI and thus fail to
+   remove dot-segments when they occur in non-relative paths.  URI
+   normalizers should remove dot-segments by applying the
+   remove_dot_segments algorithm to the path, as described in
+   <a href="#section-5.2.4">Section 5.2.4</a>.
+
+<span class="h4"><a class="selflink" id="section-6.2.3" href="#section-6.2.3">6.2.3</a>.  Scheme-Based Normalization</span>
+
+   The syntax and semantics of URIs vary from scheme to scheme, as
+   described by the defining specification for each scheme.
+   Implementations may use scheme-specific rules, at further processing
+   cost, to reduce the probability of false negatives.  For example,
+   because the &quot;http&quot; scheme makes use of an authority component, has a
+   default port of &quot;80&quot;, and defines an empty path to be equivalent to
+   &quot;/&quot;, the following four URIs are equivalent:
+
+      http://example.com
+      http://example.com/
+      <a href="http://example.com:/">http://example.com:/</a>
+      <a href="http://example.com:80/">http://example.com:80/</a>
+
+   In general, a URI that uses the generic syntax for authority with an
+   empty path should be normalized to a path of &quot;/&quot;.  Likewise, an
+   explicit &quot;:port&quot;, for which the port is empty or the default for the
+   scheme, is equivalent to one where the port and its &quot;:&quot; delimiter are
+   elided and thus should be removed by scheme-based normalization.  For
+   example, the second URI above is the normal form for the &quot;http&quot;
+   scheme.
+
+   Another case where normalization varies by scheme is in the handling
+   of an empty authority component or empty host subcomponent.  For many
+   scheme specifications, an empty authority or host is considered an
+   error; for others, it is considered equivalent to &quot;localhost&quot; or the
+   end-user&#x27;s host.  When a scheme defines a default for authority and a
+   URI reference to that default is desired, the reference should be
+   normalized to an empty authority for the sake of uniformity, brevity,
+   and internationalization.  If, however, either the userinfo or port
+   subcomponents are non-empty, then the host should be given explicitly
+   even if it matches the default.
+
+   Normalization should not remove delimiters when their associated
+   component is empty unless licensed to do so by the scheme
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 41]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-42" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   specification.  For example, the URI &quot;http://example.com/?&quot; cannot be
+   assumed to be equivalent to any of the examples above.  Likewise, the
+   presence or absence of delimiters within a userinfo subcomponent is
+   usually significant to its interpretation.  The fragment component is
+   not subject to any scheme-based normalization; thus, two URIs that
+   differ only by the suffix &quot;#&quot; are considered different regardless of
+   the scheme.
+
+   Some schemes define additional subcomponents that consist of case-
+   insensitive data, giving an implicit license to normalizers to
+   convert this data to a common case (e.g., all lowercase).  For
+   example, URI schemes that define a subcomponent of path to contain an
+   Internet hostname, such as the &quot;mailto&quot; URI scheme, cause that
+   subcomponent to be case-insensitive and thus subject to case
+   normalization (e.g., &quot;mailto:Joe@Example.COM&quot; is equivalent to
+   &quot;mailto:Joe@example.com&quot;, even though the generic syntax considers
+   the path component to be case-sensitive).
+
+   Other scheme-specific normalizations are possible.
+
+<span class="h4"><a class="selflink" id="section-6.2.4" href="#section-6.2.4">6.2.4</a>.  Protocol-Based Normalization</span>
+
+   Substantial effort to reduce the incidence of false negatives is
+   often cost-effective for web spiders.  Therefore, they implement even
+   more aggressive techniques in URI comparison.  For example, if they
+   observe that a URI such as
+
+      http://example.com/data
+
+   redirects to a URI differing only in the trailing slash
+
+      http://example.com/data/
+
+   they will likely regard the two as equivalent in the future.  This
+   kind of technique is only appropriate when equivalence is clearly
+   indicated by both the result of accessing the resources and the
+   common conventions of their scheme&#x27;s dereference algorithm (in this
+   case, use of redirection by HTTP origin servers to avoid problems
+   with relative references).
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 42]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-43" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h2"><a class="selflink" id="section-7" href="#section-7">7</a>.  Security Considerations</span>
+
+   A URI does not in itself pose a security threat.  However, as URIs
+   are often used to provide a compact set of instructions for access to
+   network resources, care must be taken to properly interpret the data
+   within a URI, to prevent that data from causing unintended access,
+   and to avoid including data that should not be revealed in plain
+   text.
+
+<span class="h3"><a class="selflink" id="section-7.1" href="#section-7.1">7.1</a>.  Reliability and Consistency</span>
+
+   There is no guarantee that once a URI has been used to retrieve
+   information, the same information will be retrievable by that URI in
+   the future.  Nor is there any guarantee that the information
+   retrievable via that URI in the future will be observably similar to
+   that retrieved in the past.  The URI syntax does not constrain how a
+   given scheme or authority apportions its namespace or maintains it
+   over time.  Such guarantees can only be obtained from the person(s)
+   controlling that namespace and the resource in question.  A specific
+   URI scheme may define additional semantics, such as name persistence,
+   if those semantics are required of all naming authorities for that
+   scheme.
+
+<span class="h3"><a class="selflink" id="section-7.2" href="#section-7.2">7.2</a>.  Malicious Construction</span>
+
+   It is sometimes possible to construct a URI so that an attempt to
+   perform a seemingly harmless, idempotent operation, such as the
+   retrieval of a representation, will in fact cause a possibly damaging
+   remote operation.  The unsafe URI is typically constructed by
+   specifying a port number other than that reserved for the network
+   protocol in question.  The client unwittingly contacts a site running
+   a different protocol service, and data within the URI contains
+   instructions that, when interpreted according to this other protocol,
+   cause an unexpected operation.  A frequent example of such abuse has
+   been the use of a protocol-based scheme with a port component of
+   &quot;25&quot;, thereby fooling user agent software into sending an unintended
+   or impersonating message via an SMTP server.
+
+   Applications should prevent dereference of a URI that specifies a TCP
+   port number within the &quot;well-known port&quot; range (0 - 1023) unless the
+   protocol being used to dereference that URI is compatible with the
+   protocol expected on that well-known port.  Although IANA maintains a
+   registry of well-known ports, applications should make such
+   restrictions user-configurable to avoid preventing the deployment of
+   new services.
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 43]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-44" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   When a URI contains percent-encoded octets that match the delimiters
+   for a given resolution or dereference protocol (for example, CR and
+   LF characters for the TELNET protocol), these percent-encodings must
+   not be decoded before transmission across that protocol.  Transfer of
+   the percent-encoding, which might violate the protocol, is less
+   harmful than allowing decoded octets to be interpreted as additional
+   operations or parameters, perhaps triggering an unexpected and
+   possibly harmful remote operation.
+
+<span class="h3"><a class="selflink" id="section-7.3" href="#section-7.3">7.3</a>.  Back-End Transcoding</span>
+
+   When a URI is dereferenced, the data within it is often parsed by
+   both the user agent and one or more servers.  In HTTP, for example, a
+   typical user agent will parse a URI into its five major components,
+   access the authority&#x27;s server, and send it the data within the
+   authority, path, and query components.  A typical server will take
+   that information, parse the path into segments and the query into
+   key/value pairs, and then invoke implementation-specific handlers to
+   respond to the request.  As a result, a common security concern for
+   server implementations that handle a URI, either as a whole or split
+   into separate components, is proper interpretation of the octet data
+   represented by the characters and percent-encodings within that URI.
+
+   Percent-encoded octets must be decoded at some point during the
+   dereference process.  Applications must split the URI into its
+   components and subcomponents prior to decoding the octets, as
+   otherwise the decoded octets might be mistaken for delimiters.
+   Security checks of the data within a URI should be applied after
+   decoding the octets.  Note, however, that the &quot;%00&quot; percent-encoding
+   (NUL) may require special handling and should be rejected if the
+   application is not expecting to receive raw data within a component.
+
+   Special care should be taken when the URI path interpretation process
+   involves the use of a back-end file system or related system
+   functions.  File systems typically assign an operational meaning to
+   special characters, such as the &quot;/&quot;, &quot;\&quot;, &quot;:&quot;, &quot;[&quot;, and &quot;]&quot;
+   characters, and to special device names like &quot;.&quot;, &quot;..&quot;, &quot;...&quot;, &quot;aux&quot;,
+   &quot;lpt&quot;, etc.  In some cases, merely testing for the existence of such
+   a name will cause the operating system to pause or invoke unrelated
+   system calls, leading to significant security concerns regarding
+   denial of service and unintended data transfer.  It would be
+   impossible for this specification to list all such significant
+   characters and device names.  Implementers should research the
+   reserved names and characters for the types of storage device that
+   may be attached to their applications and restrict the use of data
+   obtained from URI components accordingly.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 44]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-45" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h3"><a class="selflink" id="section-7.4" href="#section-7.4">7.4</a>.  Rare IP Address Formats</span>
+
+   Although the URI syntax for IPv4address only allows the common
+   dotted-decimal form of IPv4 address literal, many implementations
+   that process URIs make use of platform-dependent system routines,
+   such as gethostbyname() and inet_aton(), to translate the string
+   literal to an actual IP address.  Unfortunately, such system routines
+   often allow and process a much larger set of formats than those
+   described in <a href="#section-3.2.2">Section 3.2.2</a>.
+
+   For example, many implementations allow dotted forms of three
+   numbers, wherein the last part is interpreted as a 16-bit quantity
+   and placed in the right-most two bytes of the network address (e.g.,
+   a Class B network).  Likewise, a dotted form of two numbers means
+   that the last part is interpreted as a 24-bit quantity and placed in
+   the right-most three bytes of the network address (Class A), and a
+   single number (without dots) is interpreted as a 32-bit quantity and
+   stored directly in the network address.  Adding further to the
+   confusion, some implementations allow each dotted part to be
+   interpreted as decimal, octal, or hexadecimal, as specified in the C
+   language (i.e., a leading 0x or 0X implies hexadecimal; a leading 0
+   implies octal; otherwise, the number is interpreted as decimal).
+
+   These additional IP address formats are not allowed in the URI syntax
+   due to differences between platform implementations.  However, they
+   can become a security concern if an application attempts to filter
+   access to resources based on the IP address in string literal format.
+   If this filtering is performed, literals should be converted to
+   numeric form and filtered based on the numeric value, and not on a
+   prefix or suffix of the string form.
+
+<span class="h3"><a class="selflink" id="section-7.5" href="#section-7.5">7.5</a>.  Sensitive Information</span>
+
+   URI producers should not provide a URI that contains a username or
+   password that is intended to be secret.  URIs are frequently
+   displayed by browsers, stored in clear text bookmarks, and logged by
+   user agent history and intermediary applications (proxies).  A
+   password appearing within the userinfo component is deprecated and
+   should be considered an error (or simply ignored) except in those
+   rare cases where the &#x27;password&#x27; parameter is intended to be public.
+
+<span class="h3"><a class="selflink" id="section-7.6" href="#section-7.6">7.6</a>.  Semantic Attacks</span>
+
+   Because the userinfo subcomponent is rarely used and appears before
+   the host in the authority component, it can be used to construct a
+   URI intended to mislead a human user by appearing to identify one
+   (trusted) naming authority while actually identifying a different
+   authority hidden behind the noise.  For example
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 45]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-46" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      ftp://cnn.example.com&amp;story=breaking_news@10.0.0.1/top_story.htm
+
+   might lead a human user to assume that the host is &#x27;cnn.example.com&#x27;,
+   whereas it is actually &#x27;10.0.0.1&#x27;.  Note that a misleading userinfo
+   subcomponent could be much longer than the example above.
+
+   A misleading URI, such as that above, is an attack on the user&#x27;s
+   preconceived notions about the meaning of a URI rather than an attack
+   on the software itself.  User agents may be able to reduce the impact
+   of such attacks by distinguishing the various components of the URI
+   when they are rendered, such as by using a different color or tone to
+   render userinfo if any is present, though there is no panacea.  More
+   information on URI-based semantic attacks can be found in [<a href="#ref-Siedzik">Siedzik</a>].
+
+<span class="h2"><a class="selflink" id="section-8" href="#section-8">8</a>.  IANA Considerations</span>
+
+   URI scheme names, as defined by &lt;scheme&gt; in <a href="#section-3.1">Section 3.1</a>, form a
+   registered namespace that is managed by IANA according to the
+   procedures defined in [<a href="#ref-BCP35">BCP35</a>].  No IANA actions are required by this
+   document.
+
+<span class="h2"><a class="selflink" id="section-9" href="#section-9">9</a>.  Acknowledgements</span>
+
+   This specification is derived from <a href="/doc/html/rfc2396">RFC 2396</a> [<a href="/doc/html/rfc2396">RFC2396</a>], <a href="/doc/html/rfc1808">RFC 1808</a>
+   [<a href="/doc/html/rfc1808">RFC1808</a>], and <a href="/doc/html/rfc1738">RFC 1738</a> [<a href="/doc/html/rfc1738">RFC1738</a>]; the acknowledgements in those
+   documents still apply.  It also incorporates the update (with
+   corrections) for IPv6 literals in the host syntax, as defined by
+   Robert M. Hinden, Brian E. Carpenter, and Larry Masinter in
+   [<a href="/doc/html/rfc2732">RFC2732</a>].  In addition, contributions by Gisle Aas, Reese Anschultz,
+   Daniel Barclay, Tim Bray, Mike Brown, Rob Cameron, Jeremy Carroll,
+   Dan Connolly, Adam M. Costello, John Cowan, Jason Diamond, Martin
+   Duerst, Stefan Eissing, Clive D.W. Feather, Al Gilman, Tony Hammond,
+   Elliotte Harold, Pat Hayes, Henry Holtzman, Ian B. Jacobs, Michael
+   Kay, John C. Klensin, Graham Klyne, Dan Kohn, Bruce Lilly, Andrew
+   Main, Dave McAlpin, Ira McDonald, Michael Mealling, Ray Merkert,
+   Stephen Pollei, Julian Reschke, Tomas Rokicki, Miles Sabin, Kai
+   Schaetzl, Mark Thomson, Ronald Tschalaer, Norm Walsh, Marc Warne,
+   Stuart Williams, and Henry Zongaro are gratefully acknowledged.
+
+<span class="h2"><a class="selflink" id="section-10" href="#section-10">10</a>.  References</span>
+
+<span class="h3"><a class="selflink" id="section-10.1" href="#section-10.1">10.1</a>.  Normative References</span>
+
+   [<a id="ref-ASCII">ASCII</a>]    American National Standards Institute, &quot;Coded Character
+              Set -- 7-bit American Standard Code for Information
+              Interchange&quot;, ANSI X3.4, 1986.
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 46]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-47" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   [<a id="ref-RFC2234">RFC2234</a>]  Crocker, D. and P. Overell, &quot;Augmented BNF for Syntax
+              Specifications: ABNF&quot;, <a href="/doc/html/rfc2234">RFC 2234</a>, November 1997.
+
+   [<a id="ref-STD63">STD63</a>]    Yergeau, F., &quot;UTF-8, a transformation format of
+              ISO 10646&quot;, STD 63, <a href="/doc/html/rfc3629">RFC 3629</a>, November 2003.
+
+   [<a id="ref-UCS">UCS</a>]      International Organization for Standardization,
+              &quot;Information Technology - Universal Multiple-Octet Coded
+              Character Set (UCS)&quot;, ISO/IEC 10646:2003, December 2003.
+
+<span class="h3"><a class="selflink" id="section-10.2" href="#section-10.2">10.2</a>.  Informative References</span>
+
+   [<a id="ref-BCP19">BCP19</a>]    Freed, N. and J. Postel, &quot;IANA Charset Registration
+              Procedures&quot;, <a href="/doc/html/bcp19">BCP 19</a>, <a href="/doc/html/rfc2978">RFC 2978</a>, October 2000.
+
+   [<a id="ref-BCP35">BCP35</a>]    Petke, R. and I. King, &quot;Registration Procedures for URL
+              Scheme Names&quot;, <a href="/doc/html/bcp35">BCP 35</a>, <a href="/doc/html/rfc2717">RFC 2717</a>, November 1999.
+
+   [<a id="ref-RFC0952">RFC0952</a>]  Harrenstien, K., Stahl, M., and E. Feinler, &quot;DoD Internet
+              host table specification&quot;, <a href="/doc/html/rfc952">RFC 952</a>, October 1985.
+
+   [<a id="ref-RFC1034">RFC1034</a>]  Mockapetris, P., &quot;Domain names - concepts and facilities&quot;,
+              STD 13, <a href="/doc/html/rfc1034">RFC 1034</a>, November 1987.
+
+   [<a id="ref-RFC1123">RFC1123</a>]  Braden, R., &quot;Requirements for Internet Hosts - Application
+              and Support&quot;, STD 3, <a href="/doc/html/rfc1123">RFC 1123</a>, October 1989.
+
+   [<a id="ref-RFC1535">RFC1535</a>]  Gavron, E., &quot;A Security Problem and Proposed Correction
+              With Widely Deployed DNS Software&quot;, <a href="/doc/html/rfc1535">RFC 1535</a>,
+              October 1993.
+
+   [<a id="ref-RFC1630">RFC1630</a>]  Berners-Lee, T., &quot;Universal Resource Identifiers in WWW: A
+              Unifying Syntax for the Expression of Names and Addresses
+              of Objects on the Network as used in the World-Wide Web&quot;,
+              <a href="/doc/html/rfc1630">RFC 1630</a>, June 1994.
+
+   [<a id="ref-RFC1736">RFC1736</a>]  Kunze, J., &quot;Functional Recommendations for Internet
+              Resource Locators&quot;, <a href="/doc/html/rfc1736">RFC 1736</a>, February 1995.
+
+   [<a id="ref-RFC1737">RFC1737</a>]  Sollins, K. and L. Masinter, &quot;Functional Requirements for
+              Uniform Resource Names&quot;, <a href="/doc/html/rfc1737">RFC 1737</a>, December 1994.
+
+   [<a id="ref-RFC1738">RFC1738</a>]  Berners-Lee, T., Masinter, L., and M. McCahill, &quot;Uniform
+              Resource Locators (URL)&quot;, <a href="/doc/html/rfc1738">RFC 1738</a>, December 1994.
+
+   [<a id="ref-RFC1808">RFC1808</a>]  Fielding, R., &quot;Relative Uniform Resource Locators&quot;,
+              <a href="/doc/html/rfc1808">RFC 1808</a>, June 1995.
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 47]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-48" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   [<a id="ref-RFC2046">RFC2046</a>]  Freed, N. and N. Borenstein, &quot;Multipurpose Internet Mail
+              Extensions (MIME) Part Two: Media Types&quot;, <a href="/doc/html/rfc2046">RFC 2046</a>,
+              November 1996.
+
+   [<a id="ref-RFC2141">RFC2141</a>]  Moats, R., &quot;URN Syntax&quot;, <a href="/doc/html/rfc2141">RFC 2141</a>, May 1997.
+
+   [<a id="ref-RFC2396">RFC2396</a>]  Berners-Lee, T., Fielding, R., and L. Masinter, &quot;Uniform
+              Resource Identifiers (URI): Generic Syntax&quot;, <a href="/doc/html/rfc2396">RFC 2396</a>,
+              August 1998.
+
+   [<a id="ref-RFC2518">RFC2518</a>]  Goland, Y., Whitehead, E., Faizi, A., Carter, S., and D.
+              Jensen, &quot;HTTP Extensions for Distributed Authoring --
+              WEBDAV&quot;, <a href="/doc/html/rfc2518">RFC 2518</a>, February 1999.
+
+   [<a id="ref-RFC2557">RFC2557</a>]  Palme, J., Hopmann, A., and N. Shelness, &quot;MIME
+              Encapsulation of Aggregate Documents, such as HTML
+              (MHTML)&quot;, <a href="/doc/html/rfc2557">RFC 2557</a>, March 1999.
+
+   [<a id="ref-RFC2718">RFC2718</a>]  Masinter, L., Alvestrand, H., Zigmond, D., and R. Petke,
+              &quot;Guidelines for new URL Schemes&quot;, <a href="/doc/html/rfc2718">RFC 2718</a>, November 1999.
+
+   [<a id="ref-RFC2732">RFC2732</a>]  Hinden, R., Carpenter, B., and L. Masinter, &quot;Format for
+              Literal IPv6 Addresses in URL&#x27;s&quot;, <a href="/doc/html/rfc2732">RFC 2732</a>, December 1999.
+
+   [<a id="ref-RFC3305">RFC3305</a>]  Mealling, M. and R. Denenberg, &quot;Report from the Joint
+              W3C/IETF URI Planning Interest Group: Uniform Resource
+              Identifiers (URIs), URLs, and Uniform Resource Names
+              (URNs): Clarifications and Recommendations&quot;, <a href="/doc/html/rfc3305">RFC 3305</a>,
+              August 2002.
+
+   [<a id="ref-RFC3490">RFC3490</a>]  Faltstrom, P., Hoffman, P., and A. Costello,
+              &quot;Internationalizing Domain Names in Applications (IDNA)&quot;,
+              <a href="/doc/html/rfc3490">RFC 3490</a>, March 2003.
+
+   [<a id="ref-RFC3513">RFC3513</a>]  Hinden, R. and S. Deering, &quot;Internet Protocol Version 6
+              (IPv6) Addressing Architecture&quot;, <a href="/doc/html/rfc3513">RFC 3513</a>, April 2003.
+
+   [<a id="ref-Siedzik">Siedzik</a>]  Siedzik, R., &quot;Semantic Attacks: What&#x27;s in a URL?&quot;,
+              April 2001, &lt;<a href="https://www.giac.org/practical/gsec/Richard_Siedzik_GSEC.pdf">http://www.giac.org/practical/gsec/</a>
+              <a href="https://www.giac.org/practical/gsec/Richard_Siedzik_GSEC.pdf">Richard_Siedzik_GSEC.pdf</a>&gt;.
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 48]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-49" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-A" href="#appendix-A">Appendix A</a>.  Collected ABNF for URI</span>
+
+   URI           = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+
+   hier-part     = &quot;//&quot; authority path-abempty
+                 / path-absolute
+                 / path-rootless
+                 / path-empty
+
+   URI-reference = URI / relative-ref
+
+   absolute-URI  = scheme &quot;:&quot; hier-part [ &quot;?&quot; query ]
+
+   relative-ref  = relative-part [ &quot;?&quot; query ] [ &quot;#&quot; fragment ]
+
+   relative-part = &quot;//&quot; authority path-abempty
+                 / path-absolute
+                 / path-noscheme
+                 / path-empty
+
+   scheme        = ALPHA *( ALPHA / DIGIT / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; )
+
+   authority     = [ userinfo &quot;@&quot; ] host [ &quot;:&quot; port ]
+   userinfo      = *( unreserved / pct-encoded / sub-delims / &quot;:&quot; )
+   host          = IP-literal / IPv4address / reg-name
+   port          = *DIGIT
+
+   IP-literal    = &quot;[&quot; ( IPv6address / IPvFuture  ) &quot;]&quot;
+
+   IPvFuture     = &quot;v&quot; 1*HEXDIG &quot;.&quot; 1*( unreserved / sub-delims / &quot;:&quot; )
+
+   IPv6address   =                            6( h16 &quot;:&quot; ) ls32
+                 /                       &quot;::&quot; 5( h16 &quot;:&quot; ) ls32
+                 / [               h16 ] &quot;::&quot; 4( h16 &quot;:&quot; ) ls32
+                 / [ *1( h16 &quot;:&quot; ) h16 ] &quot;::&quot; 3( h16 &quot;:&quot; ) ls32
+                 / [ *2( h16 &quot;:&quot; ) h16 ] &quot;::&quot; 2( h16 &quot;:&quot; ) ls32
+                 / [ *3( h16 &quot;:&quot; ) h16 ] &quot;::&quot;    h16 &quot;:&quot;   ls32
+                 / [ *4( h16 &quot;:&quot; ) h16 ] &quot;::&quot;              ls32
+                 / [ *5( h16 &quot;:&quot; ) h16 ] &quot;::&quot;              h16
+                 / [ *6( h16 &quot;:&quot; ) h16 ] &quot;::&quot;
+
+   h16           = 1*4HEXDIG
+   ls32          = ( h16 &quot;:&quot; h16 ) / IPv4address
+   IPv4address   = dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet &quot;.&quot; dec-octet
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 49]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-50" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   dec-octet     = DIGIT                 ; 0-9
+                 / %x31-39 DIGIT         ; 10-99
+                 / &quot;1&quot; 2DIGIT            ; 100-199
+                 / &quot;2&quot; %x30-34 DIGIT     ; 200-249
+                 / &quot;25&quot; %x30-35          ; 250-255
+
+   reg-name      = *( unreserved / pct-encoded / sub-delims )
+
+   path          = path-abempty    ; begins with &quot;/&quot; or is empty
+                 / path-absolute   ; begins with &quot;/&quot; but not &quot;//&quot;
+                 / path-noscheme   ; begins with a non-colon segment
+                 / path-rootless   ; begins with a segment
+                 / path-empty      ; zero characters
+
+   path-abempty  = *( &quot;/&quot; segment )
+   path-absolute = &quot;/&quot; [ segment-nz *( &quot;/&quot; segment ) ]
+   path-noscheme = segment-nz-nc *( &quot;/&quot; segment )
+   path-rootless = segment-nz *( &quot;/&quot; segment )
+   path-empty    = 0&lt;pchar&gt;
+
+   segment       = *pchar
+   segment-nz    = 1*pchar
+   segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / &quot;@&quot; )
+                 ; non-zero-length segment without any colon &quot;:&quot;
+
+   pchar         = unreserved / pct-encoded / sub-delims / &quot;:&quot; / &quot;@&quot;
+
+   query         = *( pchar / &quot;/&quot; / &quot;?&quot; )
+
+   fragment      = *( pchar / &quot;/&quot; / &quot;?&quot; )
+
+   pct-encoded   = &quot;%&quot; HEXDIG HEXDIG
+
+   unreserved    = ALPHA / DIGIT / &quot;-&quot; / &quot;.&quot; / &quot;_&quot; / &quot;~&quot;
+   reserved      = gen-delims / sub-delims
+   gen-delims    = &quot;:&quot; / &quot;/&quot; / &quot;?&quot; / &quot;#&quot; / &quot;[&quot; / &quot;]&quot; / &quot;@&quot;
+   sub-delims    = &quot;!&quot; / &quot;$&quot; / &quot;&amp;&quot; / &quot;&#x27;&quot; / &quot;(&quot; / &quot;)&quot;
+                 / &quot;*&quot; / &quot;+&quot; / &quot;,&quot; / &quot;;&quot; / &quot;=&quot;
+
+<span class="h2"><a class="selflink" id="appendix-B" href="#appendix-B">Appendix B</a>.  Parsing a URI Reference with a Regular Expression</span>
+
+   As the &quot;first-match-wins&quot; algorithm is identical to the &quot;greedy&quot;
+   disambiguation method used by POSIX regular expressions, it is
+   natural and commonplace to use a regular expression for parsing the
+   potential five components of a URI reference.
+
+   The following line is the regular expression for breaking-down a
+   well-formed URI reference into its components.
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 50]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-51" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+       12            3  4          5       6  7        8 9
+
+   The numbers in the second line above are only to assist readability;
+   they indicate the reference points for each subexpression (i.e., each
+   paired parenthesis).  We refer to the value matched for subexpression
+   &lt;n&gt; as $&lt;n&gt;.  For example, matching the above expression to
+
+      <a href="https://www.ics.uci.edu/pub/ietf/uri/#Related">http://www.ics.uci.edu/pub/ietf/uri/#Related</a>
+
+   results in the following subexpression matches:
+
+      $1 = http:
+      $2 = http
+      $3 = //www.ics.uci.edu
+      $4 = www.ics.uci.edu
+      $5 = /pub/ietf/uri/
+      $6 = &lt;undefined&gt;
+      $7 = &lt;undefined&gt;
+      $8 = #Related
+      $9 = Related
+
+   where &lt;undefined&gt; indicates that the component is not present, as is
+   the case for the query component in the above example.  Therefore, we
+   can determine the value of the five components as
+
+      scheme    = $2
+      authority = $4
+      path      = $5
+      query     = $7
+      fragment  = $9
+
+   Going in the opposite direction, we can recreate a URI reference from
+   its components by using the algorithm of <a href="#section-5.3">Section 5.3</a>.
+
+<span class="h2"><a class="selflink" id="appendix-C" href="#appendix-C">Appendix C</a>.  Delimiting a URI in Context</span>
+
+   URIs are often transmitted through formats that do not provide a
+   clear context for their interpretation.  For example, there are many
+   occasions when a URI is included in plain text; examples include text
+   sent in email, USENET news, and on printed paper.  In such cases, it
+   is important to be able to delimit the URI from the rest of the text,
+   and in particular from punctuation marks that might be mistaken for
+   part of the URI.
+
+   In practice, URIs are delimited in a variety of ways, but usually
+   within double-quotes &quot;http://example.com/&quot;, angle brackets
+   &lt;http://example.com/&gt;, or just by using whitespace:
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 51]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-52" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      http://example.com/
+
+   These wrappers do not form part of the URI.
+
+   In some cases, extra whitespace (spaces, line-breaks, tabs, etc.) may
+   have to be added to break a long URI across lines.  The whitespace
+   should be ignored when the URI is extracted.
+
+   No whitespace should be introduced after a hyphen (&quot;-&quot;) character.
+   Because some typesetters and printers may (erroneously) introduce a
+   hyphen at the end of line when breaking it, the interpreter of a URI
+   containing a line break immediately after a hyphen should ignore all
+   whitespace around the line break and should be aware that the hyphen
+   may or may not actually be part of the URI.
+
+   Using &lt;&gt; angle brackets around each URI is especially recommended as
+   a delimiting style for a reference that contains embedded whitespace.
+
+   The prefix &quot;URL:&quot; (with or without a trailing space) was formerly
+   recommended as a way to help distinguish a URI from other bracketed
+   designators, though it is not commonly used in practice and is no
+   longer recommended.
+
+   For robustness, software that accepts user-typed URI should attempt
+   to recognize and strip both delimiters and embedded whitespace.
+
+   For example, the text
+
+      Yes, Jim, I found it under &quot;http://www.w3.org/Addressing/&quot;,
+      but you can probably pick it up from &lt;ftp://foo.example.
+      com/rfc/&gt;.  Note the warning in &lt;<a href="https://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">http://www.ics.uci.edu/pub/</a>
+      <a href="https://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">ietf/uri/historical.html#WARNING</a>&gt;.
+
+   contains the URI references
+
+      <a href="https://www.w3.org/Addressing/">http://www.w3.org/Addressing/</a>
+      ftp://foo.example.com/rfc/
+      <a href="https://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING">http://www.ics.uci.edu/pub/ietf/uri/historical.html#WARNING</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 52]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-53" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+<span class="h2"><a class="selflink" id="appendix-D" href="#appendix-D">Appendix D</a>.  Changes from <a href="/doc/html/rfc2396">RFC 2396</a></span>
+
+<span class="h3"><a class="selflink" id="appendix-D.1" href="#appendix-D.1">D.1</a>.  Additions</span>
+
+   An ABNF rule for URI has been introduced to correspond to one common
+   usage of the term: an absolute URI with optional fragment.
+
+   IPv6 (and later) literals have been added to the list of possible
+   identifiers for the host portion of an authority component, as
+   described by [<a href="/doc/html/rfc2732">RFC2732</a>], with the addition of &quot;[&quot; and &quot;]&quot; to the
+   reserved set and a version flag to anticipate future versions of IP
+   literals.  Square brackets are now specified as reserved within the
+   authority component and are not allowed outside their use as
+   delimiters for an IP literal within host.  In order to make this
+   change without changing the technical definition of the path, query,
+   and fragment components, those rules were redefined to directly
+   specify the characters allowed.
+
+   As [<a href="/doc/html/rfc2732">RFC2732</a>] defers to [<a href="/doc/html/rfc3513">RFC3513</a>] for definition of an IPv6 literal
+   address, which, unfortunately, lacks an ABNF description of
+   IPv6address, we created a new ABNF rule for IPv6address that matches
+   the text representations defined by <a href="/doc/html/rfc3513#section-2.2">Section&nbsp;2.2 of [RFC3513]</a>.
+   Likewise, the definition of IPv4address has been improved in order to
+   limit each decimal octet to the range 0-255.
+
+   <a href="#section-6">Section 6</a>, on URI normalization and comparison, has been completely
+   rewritten and extended by using input from Tim Bray and discussion
+   within the W3C Technical Architecture Group.
+
+<span class="h3"><a class="selflink" id="appendix-D.2" href="#appendix-D.2">D.2</a>.  Modifications</span>
+
+   The ad-hoc BNF syntax of <a href="/doc/html/rfc2396">RFC 2396</a> has been replaced with the ABNF of
+   [<a href="/doc/html/rfc2234">RFC2234</a>].  This change required all rule names that formerly
+   included underscore characters to be renamed with a dash instead.  In
+   addition, a number of syntax rules have been eliminated or simplified
+   to make the overall grammar more comprehensible.  Specifications that
+   refer to the obsolete grammar rules may be understood by replacing
+   those rules according to the following table:
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 53]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-54" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   +----------------+--------------------------------------------------+
+   | obsolete rule  | translation                                      |
+   +----------------+--------------------------------------------------+
+   | absoluteURI    | absolute-URI                                     |
+   | relativeURI    | relative-part [ &quot;?&quot; query ]                      |
+   | hier_part      | ( &quot;//&quot; authority path-abempty /                  |
+   |                | path-absolute ) [ &quot;?&quot; query ]                    |
+   |                |                                                  |
+   | opaque_part    | path-rootless [ &quot;?&quot; query ]                      |
+   | net_path       | &quot;//&quot; authority path-abempty                      |
+   | abs_path       | path-absolute                                    |
+   | rel_path       | path-rootless                                    |
+   | rel_segment    | segment-nz-nc                                    |
+   | reg_name       | reg-name                                         |
+   | server         | authority                                        |
+   | hostport       | host [ &quot;:&quot; port ]                                |
+   | hostname       | reg-name                                         |
+   | path_segments  | path-abempty                                     |
+   | param          | *&lt;pchar excluding &quot;;&quot;&gt;                           |
+   |                |                                                  |
+   | uric           | unreserved / pct-encoded / &quot;;&quot; / &quot;?&quot; / &quot;:&quot;       |
+   |                |  / &quot;@&quot; / &quot;&amp;&quot; / &quot;=&quot; / &quot;+&quot; / &quot;$&quot; / &quot;,&quot; / &quot;/&quot;       |
+   |                |                                                  |
+   | uric_no_slash  | unreserved / pct-encoded / &quot;;&quot; / &quot;?&quot; / &quot;:&quot;       |
+   |                |  / &quot;@&quot; / &quot;&amp;&quot; / &quot;=&quot; / &quot;+&quot; / &quot;$&quot; / &quot;,&quot;             |
+   |                |                                                  |
+   | mark           | &quot;-&quot; / &quot;_&quot; / &quot;.&quot; / &quot;!&quot; / &quot;~&quot; / &quot;*&quot; / &quot;&#x27;&quot;          |
+   |                |  / &quot;(&quot; / &quot;)&quot;                                     |
+   |                |                                                  |
+   | escaped        | pct-encoded                                      |
+   | hex            | HEXDIG                                           |
+   | alphanum       | ALPHA / DIGIT                                    |
+   +----------------+--------------------------------------------------+
+
+   Use of the above obsolete rules for the definition of scheme-specific
+   syntax is deprecated.
+
+   <a href="#section-2">Section 2</a>, on characters, has been rewritten to explain what
+   characters are reserved, when they are reserved, and why they are
+   reserved, even when they are not used as delimiters by the generic
+   syntax.  The mark characters that are typically unsafe to decode,
+   including the exclamation mark (&quot;!&quot;), asterisk (&quot;*&quot;), single-quote
+   (&quot;&#x27;&quot;), and open and close parentheses (&quot;(&quot; and &quot;)&quot;), have been moved
+   to the reserved set in order to clarify the distinction between
+   reserved and unreserved and, hopefully, to answer the most common
+   question of scheme designers.  Likewise, the section on
+   percent-encoded characters has been rewritten, and URI normalizers
+   are now given license to decode any percent-encoded octets
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 54]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-55" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   corresponding to unreserved characters.  In general, the terms
+   &quot;escaped&quot; and &quot;unescaped&quot; have been replaced with &quot;percent-encoded&quot;
+   and &quot;decoded&quot;, respectively, to reduce confusion with other forms of
+   escape mechanisms.
+
+   The ABNF for URI and URI-reference has been redesigned to make them
+   more friendly to LALR parsers and to reduce complexity.  As a result,
+   the layout form of syntax description has been removed, along with
+   the uric, uric_no_slash, opaque_part, net_path, abs_path, rel_path,
+   path_segments, rel_segment, and mark rules.  All references to
+   &quot;opaque&quot; URIs have been replaced with a better description of how the
+   path component may be opaque to hierarchy.  The relativeURI rule has
+   been replaced with relative-ref to avoid unnecessary confusion over
+   whether they are a subset of URI.  The ambiguity regarding the
+   parsing of URI-reference as a URI or a relative-ref with a colon in
+   the first segment has been eliminated through the use of five
+   separate path matching rules.
+
+   The fragment identifier has been moved back into the section on
+   generic syntax components and within the URI and relative-ref rules,
+   though it remains excluded from absolute-URI.  The number sign (&quot;#&quot;)
+   character has been moved back to the reserved set as a result of
+   reintegrating the fragment syntax.
+
+   The ABNF has been corrected to allow the path component to be empty.
+   This also allows an absolute-URI to consist of nothing after the
+   &quot;scheme:&quot;, as is present in practice with the &quot;dav:&quot; namespace
+   [<a href="/doc/html/rfc2518">RFC2518</a>] and with the &quot;about:&quot; scheme used internally by many WWW
+   browser implementations.  The ambiguity regarding the boundary
+   between authority and path has been eliminated through the use of
+   five separate path matching rules.
+
+   Registry-based naming authorities that use the generic syntax are now
+   defined within the host rule.  This change allows current
+   implementations, where whatever name provided is simply fed to the
+   local name resolution mechanism, to be consistent with the
+   specification.  It also removes the need to re-specify DNS name
+   formats here.  Furthermore, it allows the host component to contain
+   percent-encoded octets, which is necessary to enable
+   internationalized domain names to be provided in URIs, processed in
+   their native character encodings at the application layers above URI
+   processing, and passed to an IDNA library as a registered name in the
+   UTF-8 character encoding.  The server, hostport, hostname,
+   domainlabel, toplabel, and alphanum rules have been removed.
+
+   The resolving relative references algorithm of [<a href="/doc/html/rfc2396">RFC2396</a>] has been
+   rewritten with pseudocode for this revision to improve clarity and
+   fix the following issues:
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 55]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-56" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   o  <a href="/doc/html/rfc2396#section-5.2">[RFC2396] section&nbsp;5.2</a>, step 6a, failed to account for a base URI
+      with no path.
+
+   o  Restored the behavior of [<a href="/doc/html/rfc1808">RFC1808</a>] where, if the reference
+      contains an empty path and a defined query component, the target
+      URI inherits the base URI&#x27;s path component.
+
+   o  The determination of whether a URI reference is a same-document
+      reference has been decoupled from the URI parser, simplifying the
+      URI processing interface within applications in a way consistent
+      with the internal architecture of deployed URI processing
+      implementations.  The determination is now based on comparison to
+      the base URI after transforming a reference to absolute form,
+      rather than on the format of the reference itself.  This change
+      may result in more references being considered &quot;same-document&quot;
+      under this specification than there would be under the rules given
+      in <a href="/doc/html/rfc2396">RFC 2396</a>, especially when normalization is used to reduce
+      aliases.  However, it does not change the status of existing
+      same-document references.
+
+   o  Separated the path merge routine into two routines: merge, for
+      describing combination of the base URI path with a relative-path
+      reference, and remove_dot_segments, for describing how to remove
+      the special &quot;.&quot; and &quot;..&quot; segments from a composed path.  The
+      remove_dot_segments algorithm is now applied to all URI reference
+      paths in order to match common implementations and to improve the
+      normalization of URIs in practice.  This change only impacts the
+      parsing of abnormal references and same-scheme references wherein
+      the base URI has a non-hierarchical path.
+
+Index
+
+   A
+      ABNF  11
+      absolute  27
+      absolute-path  26
+      absolute-URI  27
+      access  9
+      authority  17, 18
+
+   B
+      base URI  28
+
+   C
+      character encoding  4
+      character  4
+      characters  8, 11
+      coded character set  4
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 56]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-57" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+   D
+      dec-octet  20
+      dereference  9
+      dot-segments  23
+
+   F
+      fragment  16, 24
+
+   G
+      gen-delims  13
+      generic syntax  6
+
+   H
+      h16  20
+      hier-part  16
+      hierarchical  10
+      host  18
+
+   I
+      identifier  5
+      IP-literal  19
+      IPv4  20
+      IPv4address  19, 20
+      IPv6  19
+      IPv6address  19, 20
+      IPvFuture  19
+
+   L
+      locator  7
+      ls32  20
+
+   M
+      merge  32
+
+   N
+      name  7
+      network-path  26
+
+   P
+      path  16, 22, 26
+         path-abempty  22
+         path-absolute  22
+         path-empty  22
+         path-noscheme  22
+         path-rootless  22
+      path-abempty  16, 22, 26
+      path-absolute  16, 22, 26
+      path-empty  16, 22, 26
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 57]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-58" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+      path-rootless  16, 22
+      pchar  23
+      pct-encoded  12
+      percent-encoding  12
+      port  22
+
+   Q
+      query  16, 23
+
+   R
+      reg-name  21
+      registered name  20
+      relative  10, 28
+      relative-path  26
+      relative-ref  26
+      remove_dot_segments  33
+      representation  9
+      reserved  12
+      resolution  9, 28
+      resource  5
+      retrieval  9
+
+   S
+      same-document  27
+      sameness  9
+      scheme  16, 17
+      segment  22, 23
+         segment-nz  23
+         segment-nz-nc  23
+      sub-delims  13
+      suffix  27
+
+   T
+      transcription  8
+
+   U
+      uniform  4
+      unreserved  13
+      URI grammar
+         absolute-URI  27
+         ALPHA  11
+         authority  18
+         CR  11
+         dec-octet  20
+         DIGIT  11
+         DQUOTE  11
+         fragment  24
+         gen-delims  13
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 58]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-59" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+         h16  20
+         HEXDIG  11
+         hier-part  16
+         host  19
+         IP-literal  19
+         IPv4address  20
+         IPv6address  20
+         IPvFuture  19
+         LF  11
+         ls32  20
+         OCTET  11
+         path  22
+         path-abempty  22
+         path-absolute  22
+         path-empty  22
+         path-noscheme  22
+         path-rootless  22
+         pchar  23
+         pct-encoded  12
+         port  22
+         query  24
+         reg-name  21
+         relative-ref  26
+         reserved  13
+         scheme  17
+         segment  23
+         segment-nz  23
+         segment-nz-nc  23
+         SP  11
+         sub-delims  13
+         unreserved  13
+         URI  16
+         URI-reference  25
+         userinfo  18
+      URI  16
+      URI-reference  25
+      URL  7
+      URN  7
+      userinfo  18
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 59]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-60" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+Authors&#x27; Addresses
+
+   Tim Berners-Lee
+   World Wide Web Consortium
+   Massachusetts Institute of Technology
+   77 Massachusetts Avenue
+   Cambridge, MA  02139
+   USA
+
+   Phone: +1-617-253-5702
+   Fax:   +1-617-258-5999
+   EMail: timbl@w3.org
+   URI:   <a href="https://www.w3.org/People/Berners-Lee/">http://www.w3.org/People/Berners-Lee/</a>
+
+
+   Roy T. Fielding
+   Day Software
+   5251 California Ave., Suite 110
+   Irvine, CA  92617
+   USA
+
+   Phone: +1-949-679-2960
+   Fax:   +1-949-679-2972
+   EMail: fielding@gbiv.com
+   URI:   <a href="http://roy.gbiv.com/">http://roy.gbiv.com/</a>
+
+
+   Larry Masinter
+   Adobe Systems Incorporated
+   345 Park Ave
+   San Jose, CA  95110
+   USA
+
+   Phone: +1-408-536-3024
+   EMail: LMM@acm.org
+   URI:   <a href="http://larry.masinter.net/">http://larry.masinter.net/</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="grey">Berners-Lee, et al.         Standards Track                    [Page 60]</span></pre>
+<hr class='noprint'/><!--NewPage--><pre class='newpage'><span id="page-61" ></span>
+<span class="grey"><a href="/doc/html/rfc3986">RFC 3986</a>                   URI Generic Syntax               January 2005</span>
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2005).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in <a href="/doc/html/bcp78">BCP 78</a>, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   &quot;AS IS&quot; basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the IETF&#x27;s procedures with respect to rights in IETF Documents can
+   be found in <a href="/doc/html/bcp78">BCP 78</a> and <a href="/doc/html/bcp79">BCP 79</a>.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   <a href="https://www.ietf.org/ipr">http://www.ietf.org/ipr</a>.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at ietf-
+   ipr@ietf.org.
+
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+Berners-Lee, et al.         Standards Track                    [Page 61]
+</pre></div>
+    </div>
+
+            
+        </div>
+        
+    
+    <script>
+        var legend_html = 'Color legend:<br> \
+        <table> \
+        <tr><td>Unknown:</td>                   <td><span class="bgwhite">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Draft:</td>                     <td><span class="bgred">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Informational:</td>             <td><span class="bgorange">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Experimental:</td>              <td><span class="bgyellow">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Best Common Practice:</td>      <td><span class="bgmagenta">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Proposed Standard:</td>         <td><span class="bgblue">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Draft Standard (old designation):</td> <td><span class="bgcyan">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Internet Standard:</td>         <td><span class="bggreen">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Historic:</td>                  <td><span class="bggrey">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        <tr><td>Obsolete:</td>                  <td><span class="bgbrown">&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr> \
+        </table>';
+        function showLegend() {
+            var elem = document.getElementById('legend');
+            elem.innerHTML = legend_html
+            elem.style.visibility='visible';
+        }
+        function hideLegend() {
+            var elem = document.getElementById('legend');
+            elem.style.visibility='hidden';
+            elem.innerHTML = "";
+        }
+    </script>
+
+<script>(function(){window['__CF$cv$params']={r:'72fa9a56cc91945e',m:'mEV0p1ig_EGRvw9Lsl1y1ultnv0PHPJt6TUXqHs5Q38-1658644181-0-ASEgoW4f96rI3lo3bMJ+XBgLeSMW9Yc0XO0QMyyzKL5VktMnt6++18vnHVns1U823A2ThiDAbzMNezmdYmJQi6Q7vo2ykHgszrIsBFgb0hqTegeWzm0hYpec6lq/cfZszTKOdbkhJHutMwsmzszenQ0=',s:[0x0c5a7fb32e,0xc867fef88b],}})();</script></body>
+</html>
