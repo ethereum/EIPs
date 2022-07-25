@@ -1,31 +1,35 @@
-name: Mark stale PRs & Issues
+name: "Mark stale PRs & Issues"
 
 on:
   schedule:
-    - cron: 0 0 * * * # Run this every day
+  # Run this every hour, so we are not spammed with changes at once. Later we could consider changing this to once a day.
+  - cron: "0 * * * *"
 
 jobs:
-  stale:
-    name: Mark stale PRs & Issues
-
-    runs-on: ubuntu-latest
+  stale-pr:
     if: github.repository == 'ethereum/eips'
-
+    runs-on: ubuntu-latest
+    name: "Mark stale PRs"
     steps:
-    - uses: actions/stale@532554b8a8498a0e006fbcde824b048728c4178f
+    - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-        days-before-pr-stale: 60
-        days-before-issue-stale: 180
-        days-before-pr-close: 7
-        days-before-issue-close: 14
-        
-        exempt-issue-labels: discussions-to
-        stale-pr-label: stale
-        
-        stale-pr-message: There has been no activity on this pull request for two months. It will be closed in a week if no further activity occurs.
-        stale-issue-message: There has been no activity on this issue for six months. It will be closed in two weeks if no further activity occurs.
-
-        close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
-        close-issue-message: This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
+        days-before-stale: 60
+        days-before-close: 7
+        stale-pr-label: 'stale'
+        stale-pr-message: 'There has been no activity on this pull request for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.'
+        close-pr-message: 'This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.'
+  stale-issue:
+    if: github.repository == 'ethereum/eips'
+    runs-on: ubuntu-latest
+    name: "Mark stale issues"
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 180
+        days-before-close: 14
+        exempt-issue-labels: 'discussions-to'
+        stale-issue-label: 'stale'
+        stale-issue-message: 'There has been no activity on this issue for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.'
+        close-issue-message: 'This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.'
