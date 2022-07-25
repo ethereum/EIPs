@@ -2,7 +2,7 @@
 eip: 67
 title: URI Scheme with Metadata, Value and Bytecode
 description: Format for encoding transactions into a URI
-author: Alex Van de Sande (@alexvandesande)
+author: Alex Van de Sande (@alexvansande)
 discussions-to: https://github.com/ethereum/EIPs/issues/67
 status: Withdrawn
 type: Standards Track
