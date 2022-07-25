@@ -7,13 +7,10 @@ struct KeyValue {
 }
 
 interface IDecentralizedApp {
-    /// @notice                     Send an HTTP-like request to this contract
-    /// @param  method              The HTTP method to use (e.g. GET, POST, PUT, DELETE)
-    /// @param  resource            The resource to request (e.g. "/asdf/1234" turns in to ["asdf", "1234"], and "/demo?qwerty=uiop" turns in to ["demo"])
-    /// @param  parameters          The parameters to send with the request (e.g. "querty=uiop&1234=5678" would be [{ key: "qwerty", value: "uiop"}, { key: "1234", value: "5678"}])
-    /// @param  headers             A list of header names (e.g. [{ key: "X-Foo-Bar", value: "asdf" }])
+    /// @notice                     Send an HTTP GET-like request to this contract
+    /// @param  resource            The resource to request (e.g. "/asdf/1234" turns in to ["asdf", "1234"])
     /// @return statusCode          The HTTP status code (e.g. 200)
     /// @return body                The body of the response
-    /// @return resultHeaders       A list of header names (e.g. [{ key: "Content-Type", value: "application/json" }])
-    function request(string memory method, string[] memory resource, KeyValue[] memory parameters, KeyValue[] memory headers) external view returns (uint8 statusCode, string memory body, KeyValue[] resultHeaders);
+    /// @return headers             A list of header names (e.g. [{ key: "Content-Type", value: "application/json" }])
+    function request(string[] memory resource) external view returns (uint8 statusCode, string memory body, KeyValue[] headers);
 }
