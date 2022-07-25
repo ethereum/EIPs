@@ -1,52 +1,45 @@
 name: Continuous Integration
 
 on:
-  pull_request_target:
-    branches: [ master ]
+  push:
+  pull_request:
 
 jobs:
   htmlproofer:
     name: HTMLProofer
-
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
+      
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-
+    
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
-          ruby-version: 2.6.0
+          ruby-version: '2.6.0'
           bundler-cache: true
-
+        
       - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
-
+      
       - name: HTML Proofer
         run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
-
+      
       - name: DNS Validator
         run: bundle exec github-pages health-check
   
   codespell:
     name: CodeSpell
-
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
+        
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
         with:
@@ -56,31 +49,26 @@ jobs:
   
   eip-validator:
     name: EIP Validator
-
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
-      - name: Set Up Rust Toolchain
-        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
-        with:
-          toolchain: stable
-
-      - name: Install EIP Validator
-        run: cargo install eipv --version=0.4.0
-
-      - name: Run EIP Validator
-        run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
+    - name: Checkout EIP Repository
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+    
+    - name: Set Up Rust Toolchain
+      uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
+      with:
+        toolchain: stable
+    
+    - name: Install EIP Validator
+      run: cargo install eipv --version=0.4.0
+    
+    - name: Run EIP Validator
+      run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 
   eipw-validator:
     name: EIPW Validator
-    
     runs-on: ubuntu-latest
-
     steps:
       - name: Save PR number
         env:
@@ -92,20 +80,13 @@ jobs:
           echo $PR_NUMBER > ./pr/pr_number
           echo $PR_SHA > ./pr/pr_sha
           echo $MERGE_SHA > ./pr/merge_sha
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+      - uses: actions/upload-artifact@v3
         with:
           name: pr_number
           path: pr/
-
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-
-      - name: Run EIPW
-        uses: ethereum/eipw-action@master
+      - uses: ethereum/eipw-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          unchecked: 1,5069
+          unchecked: '1,5069'
