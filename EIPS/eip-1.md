@@ -167,7 +167,7 @@ At least one author must use a GitHub username, in order to get notified on chan
 
 While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
-A preferred discussion URL is a that URL shall not point to any URL which is ephemeral, and any URL which can get locked over time. The following is a list of recommended choices: 
+A preferred discussion URL is one that is NOT ephemeral, or could get locked in a forseable future. The following is a list of recommended choices: 
 - A post on [Ethereum Magicians](https://ethereum-magicians.org/) that does not intend to be locked.
 - An issue or pull request on [Ethereum/EIPs Github repository](https://github.com/ethereum/EIPs).
 - A post on [ETH Research](https://ethresear.ch)
