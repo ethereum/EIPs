@@ -1,0 +1,24 @@
+name: Automerge
+
+on:
+  # Try enabling auto-merge for a pull request when a draft is marked as “ready for review”, when
+  # a required label is applied or when a “do not merge” label is removed, or when a pull request
+  # is updated in any way (opened, synchronized, reopened, edited).
+  pull_request_target:
+    types:
+      - opened
+      - synchronized
+      - reopened
+      - edited
+      - labeled
+      - unlabeled
+      - ready_for_review
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: reitermarkus/automerge@a25ea0de41019ad13380d22e01db8f5638f1bcdc
+        with:
+          token: ${{ secrets.TOKEN }}
+          pull-request: ${{ github.event.number }}
