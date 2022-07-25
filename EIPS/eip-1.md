@@ -172,7 +172,6 @@ A preferred discussion URL is one that is NOT ephemeral, or could get locked in 
 - An issue or pull request on [Ethereum/EIPs Github repository](https://github.com/ethereum/EIPs).
 - A post on [ETH Research](https://ethresear.ch)
 
-
 #### `type` header
 
 The `type` header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
