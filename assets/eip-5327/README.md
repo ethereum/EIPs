@@ -1,5 +1,5 @@
 # EIP-5327
-EIP-5327 is an extension of ERC-721. It proposes an additional role **user** and a valid duration indicator **expires** adn **level**. It allows users and developers manage the use right more simple and efficient.
+EIP-5327 is an extension of ERC-721. It proposes an additional role **user** and a valid duration indicator **expires** and **level**. It allows users and developers manage the use right more simple and efficient.
 
 ### Tools
 * [Visual Studio Code](https://code.visualstudio.com/)
