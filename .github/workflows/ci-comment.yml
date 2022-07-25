@@ -1,9 +1,6 @@
-name: Comment on Failed Checks
-
 on:
   workflow_run:
-    workflows:
-      - Continuous Integration
+    workflows: ['Continuous Integration']
     types:
       - completed
 
@@ -11,14 +8,11 @@ on:
 
 jobs:
   on-failure:
-    name: Comment on Failed Checks
-
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-
     steps:
-      - name: Download Artifact
-        uses: actions/github-script@7a5c598405937d486b0331594b5da2b14db670da
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
         with:
           script: |
             let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
@@ -27,7 +21,7 @@ jobs:
                run_id: context.payload.workflow_run.id,
             });
             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == 'pr_number'
+              return artifact.name == "pr_number"
             })[0];
             let download = await github.rest.actions.downloadArtifact({
                owner: context.repo.owner,
@@ -38,11 +32,11 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/pr_number.zip`, Buffer.from(download.data));
 
-      - name: Unzip Artifact
+      - name: 'Unzip artifact'
         run: unzip pr_number.zip
 
-      - name: Comment on PR
-        uses: actions/github-script@7a5c598405937d486b0331594b5da2b14db670da
+      - name: 'Comment on PR'
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -61,3 +55,4 @@ jobs:
               issue_number: issue_number,
               body: `The commit ${pr_sha} (as a parent of ${merge_sha}) contains errors. Please inspect the [Run Summary](${context.payload.workflow_run.html_url}) for details.`
             });
+
