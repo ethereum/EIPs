@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IERC5327 {
+interface IERC5334 {
     // Logged when the user of a token assigns a new user or updates expires
     /// @notice Emitted when the `user` of an NFT or the `expires` of the `user` is changed or the `level` of the `user` is changed
     /// The zero address for user indicates that there is no user address

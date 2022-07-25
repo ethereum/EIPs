@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0; 
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERC5327.sol";
+import "./IERC5334.sol";
 
-contract ERC5327 is ERC721, IERC5327 {
+contract ERC5334 is ERC721, IERC5334 {
     struct UserInfo 
     {
         address user;   // address of user role
@@ -65,7 +65,7 @@ contract ERC5327 is ERC721, IERC5327 {
 
     /// @dev See {IERC165-supportsInterface}.
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IERC5327).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC5334).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function _beforeTokenTransfer(

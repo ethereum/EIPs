@@ -1,6 +1,6 @@
 const { assert } = require("chai");
 
-const ERC5327Demo = artifacts.require("ERC5327Demo");
+const ERC5334Demo = artifacts.require("ERC5334Demo");
 
 contract("test", async accounts => {
 
@@ -9,7 +9,7 @@ contract("test", async accounts => {
         const Alice = accounts[0];
         const Bob = accounts[1];
 
-        const instance = await ERC5327Demo.deployed("T", "T");
+        const instance = await ERC5334Demo.deployed("T", "T");
         const demo = instance;
 
         await demo.mint(1, Alice);

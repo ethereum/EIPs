@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0; 
 
-import "./ERC5327.sol";
+import "./ERC5334.sol";
 
-contract ERC5327Demo is ERC5327 {
+contract ERC5334Demo is ERC5334 {
 
     constructor(string memory name_, string memory symbol_)
      ERC4907(name_,symbol_)
