@@ -12,7 +12,7 @@ jobs:
   stale:
     if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
-    name: "Mark stale PRs"
+    name: Mark stale PRs
     steps:
     - uses: actions/stale@v3
       with:
