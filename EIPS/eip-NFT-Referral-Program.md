@@ -1,0 +1,117 @@
+---
+eip: <to be assigned>
+title: NFT Referral Program
+description: An interface for defining NFT referral program from which referrers share referral code and earn rebates.
+author: Yuchen Jiang (@cdpiano), Charlie Chen (@chcharcharlie), Yuzhang Wu (@wuyuzhang)
+discussions-to: "TBA"
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): ERC
+created: 2022-07-25
+requires (*optional): 721
+---
+
+## Abstract
+An standard interface for defining NFT referral program from which referrers share referral code and earn a percentage of mint cost from referees who mint by using the referral code.
+
+## Motivation
+In real world we all need to rent or buy a house. The goal of renting or buying a house is not always to trade or invest, but to utilize it as a living space as well. Existing residents get bonus after they invite a new tenant to join, before which they spent time introducing the apartment to potential new tenants and answering their questions from different angles. These existing residents significantly contribute to the success of an apartment rental, building a large and interactive community.
+
+It's likewise for NFT space. Not only team members of a project, it's the influencers and the strong believers of a project who introduce the project to more people and help new people onboard. They are like ambassadors of the project and contribute a lot toe the project, but currently there isn't a good way to incentivize them besides their true passion for the project and community. We would like to propose a standard interface for NFT projects to give referral bonus to these ambassadors.
+
+Enabling more NFT projects to unify on a referral program standard will benefit the entire NFT ecosystem and we can see this makes a larger impact on non-transferrable NFTs. Currently NFT is stil considered something money-oriented and some people who mint are just to flip and take profit. However for non-transferrable NFTs the utility attribute will be enhanced and the financial attribute weakened, just like apartment rental where you don't usually flip the apartment but live inside it. Referral program may contribute to the success more in the space of non-transferrable NFTs.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Contract Interface
+
+```solidity
+interface INFTReferralProgram {
+    /// @notice Get the referrer address of a tokenId
+    /// @param tokenId The tokend id of the NFT
+    function referrerOf(uint256 tokenId) external view returns (address);
+
+    /// @notice Get the referral fee for a sales price
+    /// @param salesPrice The sales price of a NFT
+    function referralFee(uint256 salesPrice) external view returns (uint256);
+}
+```
+
+## Rationale
+This interface is intended to facilitate easy implementation. Here are some of the problems that are solved by this standard:
+
+### Optional referral bonus
+Owner can optionally set the referral bonus for referrer once a referee mints. We don't enforce a standard for referral code as there are multiple ways to do it and the easiest way is to use the referrer's address as referral code. 
+
+### Record the referrer of each NFT
+This EIP records the referrer of each NFT, which helps developers write payment sent logic as well as this data can be used for numerious scenarios after the sales. Referral information can be considered as part of social elements that can be utilized by NFT projects in the long term. 
+
+### Simple payment to a single address
+This EIP does not specify the method of sending payment to referrers as there can be various ways of doing it. Attempting to do this as part of this standard would increase the implementation complexity and increase gas costs. This ERC should be considered a minimal, gas-efficient building block for further innovation in referral program.
+
+## Backwards Compatibility
+This standard is fully ERC-721 compatible by adding an extension function set.
+
+Besides, new functions introduced in this standard have many similarities with the existing functions in ERC-721, which helps developers to easily adopt the standard quickly.
+
+## Reference Implementation
+```solidity
+contract NFTReferralProgram is ERC721, INFTReferralProgram {
+    // The percentage of sale price referrer obtains
+    uint96 private _referralFraction;
+
+    // Mapping from tokenId to the referrer address
+    mapping(uint256 => address) internal _referrers;
+
+    /// @notice Set the referrer of a NFT
+    /// @param tokenId The tokend id of the NFT
+    /// @param referrer The referrer address of the token
+    function _setReferrer(uint256 tokenId, address referrer) internal virtual {
+        _referrers[tokenId] = referrer;
+    }
+
+    /// @notice Set the referral fraction of the NFT
+    /// @param referralFeeNumerator The referral fee as a percentage of sale price
+    function _setReferralFraction(uint96 referralFeeNumerator)
+        internal
+        virtual
+    {
+        require(
+            referralFeeNumerator <= _feeDenominator(),
+            "Referral fee will exceed salePrice"
+        );
+
+        _referralFraction = referralFeeNumerator;
+    }
+
+    /// @notice Get the referrer address of a tokenId
+    /// @param tokenId The tokend id of the NFT
+    function referrerOf(uint256 tokenId) public view virtual returns (address) {
+        return _referrers[tokenId];
+    }
+
+    /// @notice Get the referral fee for a sales price
+    /// @param salesPrice The sales price of a NFT
+    function referralFee(uint256 salesPrice)
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
+        return (salesPrice * _referralFraction) / _referralFeeDenominator();
+    }
+
+    /// @notice The denominator with which to interpret the fee set in {_setReferralFraction} as a fraction of the sale price.
+    /// Defaults to 10000 so fees are expressed in basis points, but may be customized by an override.
+    function _referralFeeDenominator() internal pure virtual returns (uint96) {
+        return 10000;
+    }
+```
+
+## Security Considerations
+The EIP sets the referral fraction and the token to referrer mapping. The owner can use them to transfer referral bonus to referrer when referee mints.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
