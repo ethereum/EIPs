@@ -236,19 +236,19 @@ describe("ERC3525", function () {
       const erc3525 = await deploy();
       const [minter, receiver] = await ethers.getSigners();
 
-      const tokenDatas = [];
+      const tokenDataArray = [];
 
       for (let i = 1; i < 11; i++) {
         const tokenData = await mintWithOutDeploy(erc3525, minter, "3525");
-        tokenDatas.push(tokenData);
+        tokenDataArray.push(tokenData);
       }
       expect(await erc3525["balanceOf(address)"](minter.address)).to.eq(10);
-      for (let t of tokenDatas.slice(0, 4)) {
+      for (let t of tokenDataArray.slice(0, 4)) {
         await erc3525.burn(t.id);
       }
       expect(await erc3525["balanceOf(address)"](minter.address)).to.eq(6);
 
-      for (let t of tokenDatas.slice(5, 7)) {
+      for (let t of tokenDataArray.slice(5, 7)) {
         await erc3525["transferFrom(address,address,uint256)"](
           minter.address,
           receiver.address,
@@ -331,7 +331,7 @@ describe("ERC3525", function () {
       );
     });
 
-    it("transfer value to id should sucess after setApprovalForAll", async () => {
+    it("transfer value to id should success after setApprovalForAll", async () => {
       const erc3525 = await deploy();
       const [from, to, spender] = await ethers.getSigners();
 
@@ -351,7 +351,7 @@ describe("ERC3525", function () {
       );
     });
 
-    it("transfer value to id should sucess after id approved", async () => {
+    it("transfer value to id should success after id approved", async () => {
       const erc3525 = await deploy();
       const [from, to, spender] = await ethers.getSigners();
 
