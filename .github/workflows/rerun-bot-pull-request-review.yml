@@ -13,4 +13,4 @@ jobs:
 
     steps:
       - name: Explanation
-        run: echo 'This bot is used to trigger another workflow using the workflow_run github event. This is necessary because forked PRs do not have access to repo secrets. Normally, this is circumvented using the pull_request_target event, but because GitHub actions doesn't trigger that event on review, a hack is required to allow that behavior. This workaround will no longer be necessary if GitHub ever implements a pull_request_review_target or something similar.'
+        run: echo 'This bot is used to trigger another workflow using the workflow_run github event. This is necessary because forked PRs do not have access to repo secrets. Normally, this is circumvented using the pull_request_target event, but because GitHub actions does not trigger that event on review, a hack is required to allow that behavior. This workaround will no longer be necessary if GitHub ever implements a pull_request_review_target or something similar.'
