@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: NFT Referral Program
 description: An interface for defining NFT referral program from which referrers share referral code and earn rebates.
 author: Yuchen Jiang (@cdpiano), Charlie Chen (@chcharcharlie), Yuzhang Wu (@wuyuzhang)
-discussions-to: "TBA"
+discussions-to: "https://ethereum-magicians.org/t/new-proposal-nft-referral-program/10121"
 status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
