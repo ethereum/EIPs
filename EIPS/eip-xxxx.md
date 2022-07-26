@@ -13,7 +13,7 @@ requires: 137, 165, 721
 
 ## Abstract
 
-Proposes a standard API for Name-bound Tokens (NBT) within smart contracts. A NBT is a non-fungible token bound to a single ENS hashnode, and cannot be transferred between ENS names. This EIP defines basic functionality to gift, mint, and track NBT.
+Proposes a standard API for Name-bound Tokens (NBT) within smart contracts. A NBT is a non-fungible token bound to a single ENS hashnode, and cannot be transferred between ENS names. This EIP defines basic functionality to gift, mint, and track NBTs.
 
 ## Motivation
 
