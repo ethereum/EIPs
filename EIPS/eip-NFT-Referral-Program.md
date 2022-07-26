@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5341
 title: NFT Referral Program
 description: An interface for defining NFT referral program from which referrers share referral code and earn rebates.
 author: Yuchen Jiang (@cdpiano), Charlie Chen (@chcharcharlie), Yuzhang Wu (@wuyuzhang)
@@ -19,7 +19,7 @@ In real world we all need to rent or buy a house. The goal of renting or buying 
 
 It's likewise for NFT space. Not only team members of a project, it's the influencers and the strong believers of a project who introduce the project to more people and help new people onboard. They are like ambassadors of the project and contribute a lot toe the project, but currently there isn't a good way to incentivize them besides their true passion for the project and community. We would like to propose a standard interface for NFT projects to give referral bonus to these ambassadors.
 
-Enabling more NFT projects to unify on a referral program standard will benefit the entire NFT ecosystem and we can see this makes a larger impact on non-transferrable NFTs. Currently NFT is stil considered something money-oriented and some people who mint are just to flip and take profit. However for non-transferrable NFTs the utility attribute will be enhanced and the financial attribute weakened, just like apartment rental where you don't usually flip the apartment but live inside it. Referral program may contribute to the success more in the space of non-transferrable NFTs.
+Enabling more NFT projects to unify on a referral program standard will benefit the entire NFT ecosystem and we can see this makes a larger impact on non-transferrable NFTs. Currently NFT is still considered something money-oriented and some people who mint are just to flip and take profit. However for non-transferrable NFTs the utility attribute will be enhanced and the financial attribute weakened, just like apartment rental where you don't usually flip the apartment but live inside it. Referral program may contribute to the success more in the space of non-transferrable NFTs.
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -51,9 +51,9 @@ This EIP records the referrer of each NFT, which helps developers write payment 
 This EIP does not specify the method of sending payment to referrers as there can be various ways of doing it. Attempting to do this as part of this standard would increase the implementation complexity and increase gas costs. This ERC should be considered a minimal, gas-efficient building block for further innovation in referral program.
 
 ## Backwards Compatibility
-This standard is fully ERC-721 compatible by adding an extension function set.
+This standard is fully EIP-721 compatible by adding an extension function set.
 
-Besides, new functions introduced in this standard have many similarities with the existing functions in ERC-721, which helps developers to easily adopt the standard quickly.
+Besides, new functions introduced in this standard have many similarities with the existing functions in EIP-721, which helps developers to easily adopt the standard quickly.
 
 ## Reference Implementation
 ```solidity
