@@ -1,7 +1,8 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.15;
 
 import "IERC1155.sol";
+import "ERC1155.sol";
 
 /**
  * @title ERC-1155 Approval By Amount Extension
@@ -30,8 +31,6 @@ interface IERC1155ApprovalByAmount is IERC1155 {
     function allowance(address account, address operator, uint256 id) external view returns (uint256);
     
 }
-
-import "ERC1155.sol";
 
 /**
  * @dev Extension of {ERC1155} that allows you to approve your tokens by amount and id.
