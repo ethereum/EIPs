@@ -3,17 +3,15 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./Vault.sol";
+import "./Finance.sol";
 import "./libraries/CloneFactory.sol";
-import "./interfaces/IVaultFactory.sol";
+import "./interfaces/IFactory.sol";
 
-contract VaultFactory is AccessControl, IVaultFactory {
+contract Factory is AccessControl, IVaultFactory {
   // Vaults
-  address[] public allVaults;
-  /// Address of uniswapv2 factory
-  address public override v2Factory;
+  address[] public allFinances;
   /// Address of cdp nft registry
-  address public override v1;
+  address public override abt;
   /// Address of Wrapped Ether
   address public override WETH;
   /// Address of manager
@@ -29,16 +27,16 @@ contract VaultFactory is AccessControl, IVaultFactory {
   }
 
   /// Vault can issue stablecoin, it just manages the position
-  function createVault(
+  function createFinance(
     address collateral_,
     address debt_,
     uint256 amount_,
     address recipient
   ) external override returns (address vault, uint256 id) {
-    require(msg.sender == manager, "VaultFactory: IA");
+    require(msg.sender == manager, "Factory: IA");
     uint256 gIndex = allVaultsLength();
     address proxy = CloneFactory._createClone(impl);
-    IVault(proxy).initialize(
+    IFinance(proxy).initialize(
       manager,
       gIndex,
       collateral_,
@@ -49,15 +47,15 @@ contract VaultFactory is AccessControl, IVaultFactory {
       WETH
     );
     allVaults.push(proxy);
-    IV1(v1).mint(recipient);
+    IABT(v1).mint(recipient);
     return (proxy, gIndex);
   }
 
   // Set immutable, consistent, one rule for vault implementation
   function _createImpl() internal {
     address addr;
-    bytes memory bytecode = type(Vault).creationCode;
-    bytes32 salt = keccak256(abi.encodePacked("vault", version));
+    bytes memory bytecode = type(Finance).creationCode;
+    bytes32 salt = keccak256(abi.encodePacked("finance", version));
     assembly {
       addr := create2(0, add(bytecode, 0x20), mload(bytecode), salt)
       if iszero(extcodesize(addr)) {
@@ -72,28 +70,28 @@ contract VaultFactory is AccessControl, IVaultFactory {
   }
 
   function initialize(
-    address v1_,
-    address v2Factory_,
+    address abt_,
     address weth_,
-    address manager_
+    address manager_,
+    uint version_
   ) public {
     require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "IA"); // Invalid Access
-    v1 = v1_;
-    v2Factory = v2Factory_;
+    abt = abt_;
     WETH = weth_;
     manager = manager_;
+    version = version_;
   } 
 
-  function getVault(uint256 vaultId_) external view override returns (address) {
-    return allVaults[vaultId_];
+  function getFinance(uint256 financeId_) external view override returns (address) {
+    return allFinances[financeId_];
   }
 
-  function vaultCodeHash() external pure override returns (bytes32 vaultCode) {
+  function financeCodeHash() external pure override returns (bytes32 vaultCode) {
     return
       keccak256(hex"3d602d80600a3d3981f3");
   }
 
-  function allVaultsLength() public view returns (uint256) {
-    return allVaults.length;
+  function allFinancesLength() public view returns (uint256) {
+    return allFinances.length;
   }
 }
