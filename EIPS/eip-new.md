@@ -1,0 +1,124 @@
+---
+eip: XXXX
+title: Walletconnect Silent-Signing Extension
+description: Capability of transaction signing without user interaction for a period of time for walletconnect
+author: Stanley Wu (@fruit37), Mücahit Büyükyılmaz (@anndro), Muhammed Emin Aydın (@muhammedea)
+discussions-to: https://ethereum-magicians.org/t/walletconnect-silent-signing-extension/10137
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-07-26
+---
+
+## Abstract
+
+For mobile applications that do a lot of transactions, switching between wallet and application is a bad user experience, so in this proposal, we propose a way of signing and sending transactions by wallet without r intervention. This should be done for a period of time with user consent. We call this feature, Silent Signing.
+
+## Motivation
+
+Some blockchain-related applications need more blockchain interactions than the traditional ones. Specifically, applications that have their own sidechains like some games. If we think about games and some metaverse applications, there are a lot of user interactions that need wallet interaction. In these cases, the user switches to the wallet and approves the transaction. If the user does that a lot, this will create a bad user experience.
+
+For this kind of application, wallets can support a silent signing feature to allow wallets to sign transactions without user interaction.
+
+
+## Specification
+
+For this reason, we propose new RPC commands for the WalletConnect protocol. This will enable WalletConnect supported wallets to implement this silent signing feature.
+
+### Ethereum RPC And WalletConnect
+
+In order for a software application to interact with the blockchain (by reading blockchain data and/or sending transactions to the network), it must connect to a node[1]. For this purpose, every Ethereum client implements a JSON-RPC specification, so there are a uniform set of methods that applications can rely on. JSON-RPC is a stateless, lightweight remote procedure call (RPC) protocol[1]. It defines several data structures and the rules around their processing. All EVM compatible blockchains like BSC, Celo, etc use the same RPC commands with required extended commands.
+
+WalletConnect is a protocol that allows web3 apps to connect blockchain wallets. The protocol is built on top of a WebSocket connection, between app-bridge and bridge-wallet. The protocol establishes a remote connection between two apps and/or devices. These payloads are symmetrically encrypted through a shared key between the two peers[2]. Payload exchange between app and wallet goes over through Bridge server. As the payload is encrypted, the Bridge server redirects packages between app-wallet by topic id, without checking package details.
+
+Decrypted package contains standard RPC commands and parameters. WalletConnect client support set of RPC commands and only that commands are usable with official clients. Please note that these RPC commands are different from Ethereum RPC commands. These commands only define wallet actions.
+
+***Supported WalletConnect client commands***
+* personal_sign
+* eth_sign
+* eth_signTypedData
+* eth_sendTransaction
+* eth_signTransaction
+* eth_sendRawTransaction
+
+As a nature of the Bridge server, it redirects payload packages directly without knowing which RPC call has been made. For that reason, we don't need to change anything on the Bridge server, but WalletConnect clients.
+
+### Silent Signing User Flow
+
+Silent Signing process is like the following:
+
+* First, the application sends a silent signing request to the wallet. The RPC method for this is “**wallet_requestSilentSign**”.
+* Then wallet prompts the user with a question like “XXX application wants to enable silent signing for XXX minutes/hours. Do you confirm?”
+* If the user does not accept this or the RPC method is not allowed, then the application should fall back to the regular methods.
+* If the user accepts, then every transaction that happens after that for the specified period will be sent by using the “**wallet_silentSendTransaction**” method.
+
+## Implementation
+
+There will be no change on the WalletConnect Bridge server but the client libraries and wallet should implement new RPC methods.
+
+### New RPC Methods
+
+#### wallet_requestSilentSign
+This RPC command will open the wallet and show a popup to the user to allow automatic signing for a given period. By calling this function the application will get a grant to call the following Commands until the timestamp expires. Standard commands like eth_signTrancaction etc will remain as now.
+```
+Parameters
+  until: NUMBER - unix timesptamp data 
+
+Returns
+  clientSecret: DATA, 20 Bytes - a secret key for auto-signing requests
+```
+
+#### wallet_silenSignTransaction
+This command will create a transaction and send data for sing to the wallet. The wallet will sign data in the background without asking the user. After this, the application can send the signed transaction to the blockchain by using Nethereum or ethers, with sendRawTransaction command.
+```
+Parameters
+  clientSecret: DATA, 20 Bytes - secret key obtained from game_requestAutoSign method
+  Object - The transaction object
+    from: DATA, 20 Bytes - The address the transaction is sent from.
+    to: DATA, 20 Bytes - (optional when creating new contract) The address the transaction is directed to.
+    gas: QUANTITY - (optional, default: 90000) Integer of the gas provided for the transaction execution. It will return unused gas.
+    gasPrice: QUANTITY - (optional, default: To-Be-Determined) Integer of the gasPrice used for each paid gas, in Wei.
+    value: QUANTITY - (optional) Integer of the value sent with this transaction, in Wei.
+    data: DATA - The compiled code of a contract OR the hash of the invoked method signature and encoded parameters.
+    nonce: QUANTITY - (optional) Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
+  
+Returns
+  DATA, The signed transaction object.
+```
+
+#### wallet_silentSendTransaction
+This command will create a transaction without asking the user and send it to the blockchain.
+```
+Parameters
+  clientSecret: DATA, 20 Bytes - secret key obtained from game_requestAutoSign method
+  Object - The transaction object
+    from: DATA, 20 Bytes - The address the transaction is sent from.
+    to: DATA, 20 Bytes - (optional when creating new contract) The address the transaction is directed to.
+    gas: QUANTITY - (optional, default: 90000) Integer of the gas provided for the transaction execution. It will return unused gas.
+    gasPrice: QUANTITY - (optional, default: To-Be-Determined) Integer of the gasPrice used for each paid gas.
+    value: QUANTITY - (optional) Integer of the value sent with this transaction.
+    data: DATA - The compiled code of a contract OR the hash of the invoked method signature and encoded parameters.
+    nonce: QUANTITY - (optional) Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
+
+Returns
+  DATA, 32 Bytes - the transaction hash, or the zero hash if the transaction is not yet available.
+```
+
+### Application and Wallet Communication
+When the wallet application is closed or in the background, it cannot connect to the bridge server via WebSocket. So that we have to trigger the wallet to connect to the bridge and get waiting for requests. For this reason, the Push Notification method should be used. So only the wallets that have push notification support can implement this feature.[3] [4]
+
+![](https://docs.walletconnect.com/assets/images/call-request-af4f9f2385303a6cd381c35f3b13b665.png)
+
+Whenever the wallet receives a push message. It connects to the bridge server and gets the pending requests. If there is a silent signing request like “**wallet_silenSignTransaction**” or “**wallet_silentSendTransaction**” and the requesting client is allowed at that time, then the wallet will execute the request without any UI message or prompt.
+
+## Backwards Compatibility
+These new RPC methods are not changing the current ones and the push notification API is currently part of the WalletConnect specification. Everything in this proposal does not change anything for other applications and wallets.
+
+## Security Considerations
+This feature should only be used with user consent. So the responsibility of allowing this is on the user. Users can decide to use the application as usual.
+
+## References
+1- [JSON RPC-API](https://ethereum.org/en/developers/docs/apis/json-rpc/)
+2- [Walletconnect](https://walletconnect.com/)
+3- [Walletconnect Technical Specification](https://docs.walletconnect.com/tech-spec)
+4- [Push server API](https://docs.walletconnect.com/push-server)
