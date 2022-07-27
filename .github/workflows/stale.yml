@@ -12,7 +12,7 @@ jobs:
   stale:
     if: github.repository == 'ethereum/eips'
     runs-on: ubuntu-latest
-    name: Mark stale PRs
+    name: Mark Stale Issues
     steps:
     - uses: actions/stale@532554b8a8498a0e006fbcde824b048728c4178f
       with:
@@ -32,4 +32,5 @@ jobs:
         days-before-pr-stale: 30
         days-before-pr-close: 7
         exempt-pr-labels: long-term
+        only-pr-labels: newEIPFile,updateEIP,statusChange
         stale-pr-label: stale
