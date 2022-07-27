@@ -1,0 +1,12 @@
+on:
+  pull_request_target:
+
+jobs:
+  jekyll-label-action:
+    name: Automatic Label Bot
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: Pandapip1/jekyll-label-action@458cfc90bb2e192f5d624dac7624d7837c5e8443
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
