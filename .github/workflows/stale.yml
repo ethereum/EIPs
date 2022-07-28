@@ -27,9 +27,9 @@ jobs:
         exempt-issue-labels: discussions-to,long-term
         stale-issue-label: stale
         # PR config
-        stale-pr-message: There has been no activity on this pull request in a week. It will be closed in two weeks if no further activity occurs. If you are still pursuing it, feel free to respond to any feedback or request a review in a comment.
+        stale-pr-message: There has been no activity on this pull request in two weeks. It will be closed in two weeks if no further activity occurs. If you are still pursuing it, feel free to respond to any feedback or request a review in a comment.
         close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
-        days-before-pr-stale: 7
+        days-before-pr-stale: 14
         days-before-pr-close: 14
         exempt-pr-labels: long-term
         only-pr-labels: newEIPFile,updateEIP,statusChange
