@@ -9,4 +9,4 @@ jobs:
     steps:
       - uses: Pandapip1/jekyll-label-action@main
         with:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
