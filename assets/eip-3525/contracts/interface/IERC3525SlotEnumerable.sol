@@ -1,18 +1,17 @@
 //SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "../IERC3525.sol";
-import "../openzeppelin/IERC721Enumerable.sol";
+import "./IERC3525.sol";
+import "IERC721Enumerable.sol";
 
 /**
  * @title ERC-3525 Semi-Fungible Token Standard, optional extension for slot enumeration
- * @dev Interfaces for any contract that wants to support enumeration of slots as well as tokens 
+ * @dev Interfaces for any contract that wants to support enumeration of slots as well as tokens
  *  with the same slot.
  *  See https://eips.ethereum.org/EIPS/eip-3525
  * Note: the ERC-165 identifier for this interface is 0x3b741b9e.
  */
 interface IERC3525SlotEnumerable is IERC3525, IERC721Enumerable {
-
     /**
      * @notice Get the total amount of slots stored by the contract.
      * @return The total amount of slots

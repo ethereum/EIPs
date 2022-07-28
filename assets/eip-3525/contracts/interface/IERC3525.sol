@@ -18,7 +18,7 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _toTokenId The token id to transfer value to
      * @param _value The transferred value
      */
-    event TransferValue(uint256 indexed _fromTokenId, uint256 indexed _toTokenId, uint256 _value);
+    event TransferValue( uint256 indexed _fromTokenId, uint256 indexed _toTokenId, uint256 _value);
 
     /**
      * @dev MUST emits when the approval value of a token is set or changed.
@@ -26,15 +26,15 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _operator The operator to approve for
      * @param _value The maximum value that `_operator` is allowed to manage
      */
-    event ApprovalValue(uint256 indexed _tokenId, address indexed _operator, uint256 _value);
+    event ApprovalValue( uint256 indexed _tokenId, address indexed _operator, uint256 _value);
 
     /**
      * @dev MUST emit when the slot of a token is set or changed.
      * @param _tokenId The token of which slot is set or changed
      * @param _oldSlot The previous slot of the token
      * @param _newSlot The updated slot of the token
-     */ 
-    event SlotChanged(uint256 indexed _tokenId, uint256 indexed _oldSlot, uint256 indexed _newSlot);
+     */
+    event SlotChanged( uint256 indexed _tokenId, uint256 indexed _oldSlot, uint256 indexed _newSlot);
 
     /**
      * @notice Get the number of decimals the token uses for value - e.g. 6, means the user
@@ -68,11 +68,7 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _operator The operator to be approved
      * @param _value The maximum value of `_toTokenId` that `_operator` is allowed to manage
      */
-    function approve(
-        uint256 _tokenId,
-        address _operator,
-        uint256 _value
-    ) external payable;
+    function approve( uint256 _tokenId, address _operator, uint256 _value) external payable;
 
     /**
      * @notice Get the maximum value of a token that an operator is allowed to manage.
@@ -95,11 +91,7 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _toTokenId The token to transfer value to
      * @param _value The transferred value
      */
-    function transferFrom(
-        uint256 _fromTokenId,
-        uint256 _toTokenId,
-        uint256 _value
-    ) external payable;
+    function transferFrom( uint256 _fromTokenId, uint256 _toTokenId, uint256 _value) external payable;
 
     /**
      * @notice Transfer value from a token to another token with the same slot.
@@ -116,12 +108,7 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _value The transferred value
      * @param _data Additional data with no specified format
      */
-    function safeTransferFrom(
-        uint256 _fromTokenId,
-        uint256 _toTokenId,
-        uint256 _value,
-        bytes calldata _data
-    ) external payable;
+    function safeTransferFrom( uint256 _fromTokenId, uint256 _toTokenId, uint256 _value, bytes calldata _data) external payable;
 
     /**
      * @notice Transfer value from a specified token to an address. The caller should confirm that
@@ -138,11 +125,7 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _value The transferred value
      * @return ID of the new token created for `_to` which receives the transferred value
      */
-    function transferFrom(
-        uint256 _fromTokenId,
-        address _to,
-        uint256 _value
-    ) external payable returns (uint256);
+    function transferFrom( uint256 _fromTokenId, address _to, uint256 _value) external payable returns (uint256);
 
     /**
      * @notice Transfer value from a specified token to an address.
@@ -162,10 +145,5 @@ interface IERC3525 is IERC165, IERC721 {
      * @param _data Additional data with no specified format
      * @return ID of the new token created for `_to` which receives the transferred value
      */
-    function safeTransferFrom(
-        uint256 _fromTokenId,
-        address _to,
-        uint256 _value,
-        bytes calldata _data
-    ) external payable returns (uint256);
+    function safeTransferFrom( uint256 _fromTokenId, address _to, uint256 _value, bytes calldata _data) external payable returns (uint256);
 }
