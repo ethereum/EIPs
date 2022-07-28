@@ -32,5 +32,4 @@ jobs:
         days-before-pr-stale: 14
         days-before-pr-close: 14
         exempt-pr-labels: long-term
-        only-pr-labels: newEIPFile,updateEIP,statusChange
         stale-pr-label: "waiting: response from author"
