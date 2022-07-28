@@ -23,7 +23,7 @@ jobs:
         stale-issue-message: There has been no activity on this issue in six months. It will be closed in a week if no further activity occurs. If you are still pursuing it, feel free to respond to any feedback.
         close-issue-message: This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback.
         days-before-issue-stale: 180
-        days-before-issue-close: 7
+        days-before-issue-close: 14
         exempt-issue-labels: discussions-to,long-term
         stale-issue-label: stale
         # PR config
