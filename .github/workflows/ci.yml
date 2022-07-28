@@ -92,3 +92,15 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1, 5069
+
+  markdownlint:
+    name: Markdown Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Lint
+        uses: DavidAnson/markdownlint-cli2-action@d199b6e1b89360c71e0c21eac02f7965faf07ba6
+        with:
+          globs: '**/*.md'
