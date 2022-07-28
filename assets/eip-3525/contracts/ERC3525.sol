@@ -208,8 +208,8 @@ contract ERC3525 is IERC3525, IERC3525Metadata, ERC721Enumerable {
         //clear approve data
         uint256 length = _approvedValues[tokenId].approvals.length;
         for (uint256 i = 0; i < length; i++) {
-            address aproval = _approvedValues[tokenId].approvals[i];
-            delete _approvedValues[tokenId].allowances[aproval];
+            address approval = _approvedValues[tokenId].approvals[i];
+            delete _approvedValues[tokenId].allowances[approval];
         }
         delete _approvedValues[tokenId].approvals;
     }
