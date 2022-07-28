@@ -11,12 +11,9 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
-      - name: Disable File Ownership Checks
-        run: git config --global --add safe.directory '*'
         
       - name: Link Checker
-        uses: gaurav-nelson/github-action-markdown-link-check@9710f0fec812ce0a3b98bef4c9d842fc1f39d976
+        uses: Pandapip1/github-action-markdown-link-check@b36c1679e855535e05e56038813289331f095f3f
         with:
           use-quiet-mode: "no"
           use-verbose-mode: "yes"
