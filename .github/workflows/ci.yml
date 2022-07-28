@@ -11,16 +11,13 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
-      - name: Fix Dubious Ownership
-        run: git config --global --add safe.directory /github/workspace
         
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@9710f0fec812ce0a3b98bef4c9d842fc1f39d976
         with:
-          use-quiet-mode: yes
-          use-verbose-mode: yes
-          check-modified-files-only: yes
+          use-quiet-mode: "no"
+          use-verbose-mode: "yes"
+          check-modified-files-only: "yes"
   
   codespell:
     name: CodeSpell
