@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../IERC3525.sol";
-import "../openzeppelin/IERC721Metadata.sol";
+import "IERC721Metadata.sol";
 
 /**
  * @title ERC-3525 Semi-Fungible Token Standard, optional extension for metadata
