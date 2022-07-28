@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: Pandapip1/jekyll-label-action@bfc2f4c2e738017a20b4822c229f02d1db79c59b
+      - uses: Pandapip1/jekyll-label-action@b5fe10dda78ac1cd09f60b30008509932c40ac9f
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
