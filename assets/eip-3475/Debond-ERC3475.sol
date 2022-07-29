@@ -256,9 +256,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         emit Transfer(msg.sender, from, to, transactions);
     }
 
-
-
-
     /**
     * @notice redeem bonds
     * @param from address to redeem bonds from

@@ -100,7 +100,7 @@ contract ERC3475 is IERC3475, Ownable {
         );
         require(
             _to != address(0),
-            "ERC3475: can't transfer to the zero address"
+            "ERC3475:use burn() instead"
         );
         require(
             msg.sender == _from ||
@@ -121,11 +121,11 @@ contract ERC3475 is IERC3475, Ownable {
     ) public virtual override {
         require(
             _from != address(0),
-            "ERC3475: can't transfer from the zero address"
+            "ERC3475: can't transfer allowed amt from zero address"
         );
         require(
             _to != address(0),
-            "ERC3475: can't transfer to the zero address"
+            "ERC3475: use burn() instead"
         );
         uint256 len = _transactions.length;
         for (uint256 i = 0; i < len; i++) {
@@ -147,7 +147,7 @@ contract ERC3475 is IERC3475, Ownable {
         for (uint256 i = 0; i < len; i++) {
             require(
                 _to != address(0),
-                "ERC3475: can't transfer to the zero address"
+                "ERC3475: can't issue to the zero address"
             );
             _issue(_to, _transactions[i]);
         }        
