@@ -24,12 +24,11 @@ jobs:
         close-issue-message: This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback.
         days-before-issue-stale: 180
         days-before-issue-close: 14
-        exempt-issue-labels: discussions-to,long-term
+        exempt-issue-labels: discussions-to
         stale-issue-label: stale
         # PR config
         stale-pr-message: There has been no activity on this pull request for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.
         close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
         days-before-pr-stale: 60
         days-before-pr-close: 7
-        exempt-pr-labels: long-term
         stale-pr-label: stale
