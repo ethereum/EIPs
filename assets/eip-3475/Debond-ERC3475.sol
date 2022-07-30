@@ -1,22 +1,32 @@
-// SPDX-License-Identifier: CC0-1.0
+// SPDX-License-Identifier: apache 2.0
+/*
+    Copyright 2022 Debond Protocol <info@debond.org>
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 
 pragma solidity ^0.8.0;
 
-// @dev install the dependencies 
-// npm i debond-erc3475-contracts.
 
-import "debond-erc3475-contracts/interfaces/IDebondBond.sol";
-// for fetching the bond progress from the bank, check the logic in  getProgress(uint256 classId, uint256 nonceId) in order to calculate bond maturrity progress.
-import "debond-erc3475-contracts/interfaces/IProgressCalculator.sol";
-// for setting up of the governance  access role on the bonds.
-import "debond-governance-contracts/utils/GovernanceOwnable.sol";
+import "./interfaces/IDebondBond.sol";
+import "./interfaces/IProgressCalculator.sol";
+import "@debond-protocol/debond-governance-contracts/utils/GovernanceOwnable.sol";
+
 
 contract DebondERC3475 is IDebondBond, GovernanceOwnable {
-    address bankAddress;    
+
+    address bankAddress;
+
     /**
     * @notice this Struct is representing the Nonce properties as an object
-    *         and can be retrieved by the nonceId (within a class)
-    * 
+    *         and can be retrieve by the nonceId (within a class)
     */
     struct Nonce {
         uint256 id;
@@ -29,9 +39,10 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         mapping(address => uint256) balances;
         mapping(address => mapping(address => uint256)) allowances;
     }
+
     /**
     * @notice this Struct is representing the Class properties as an object
-    *         and can be retrieved by the classId
+    *         and can be retrieve by the classId
     */
     struct Class {
         uint256 id;
@@ -45,27 +56,18 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         uint256 lastNonceIdCreatedTimestamp;
     }
 
-
-    /**
-    storage of class metadata and approvals for the bonds.
-     */
-
     mapping(uint256 => Class) internal classes; // from classId given
     mapping(uint256 => IERC3475.Metadata) classMetadatas;
     mapping(address => mapping(address => bool)) operatorApprovals;
 
-    
+
+
     constructor(address _governanceAddress) GovernanceOwnable(_governanceAddress) {}
-   
+
     modifier onlyBank() {
         require(msg.sender == bankAddress, "DebondERC3475 Error: Not authorized");
         _;
     }
-
-
-
-
-    // SETTER functions.
 
     /**
     * @notice change the Bank Address
@@ -75,8 +77,9 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         require(_bankAddress != address(0), "DebondERC3475 Error: Address given is address(0)");
         bankAddress = _bankAddress;
     }
-    
-    // WRITEABLES
+
+
+    // WRITE
 
     /**
     * @notice create a new metadata for classes on the actual bond contract
@@ -86,7 +89,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     function createClassMetadata(uint metadataId, IERC3475.Metadata memory metadata) external onlyBank {
         classMetadatas[metadataId] = metadata;
     }
-
 
     /**
     * @notice create a new metadata for classes on the actual bond contract
@@ -129,8 +131,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
 
 
-
-
     /**
     * @notice issuance of bonds
     * @dev this method is a batch, if any error will revert and will not issue any bonds
@@ -155,7 +155,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         }
         emit Issue(msg.sender, to, transactions);
     }
-    
+
     /**
     * @notice creation of a new class
     * @dev metadatas and values length MUST match
@@ -173,21 +173,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
             class.values[metadataIds[i]] = values[i];
         }
     }
-  
-    /**
-    * @notice update the last nonce informations
-    * @param classId id of the class
-    * @param newNonceId new last nonce id created
-    * @param createdAt timestamp of the creation
-    */
-
-    function updateLastNonce(uint classId, uint nonceId, uint createdAt) external onlyBank {
-        Class storage class = classes[classId];
-        require(class.exists, "DebondERC3475: class id given not found");
-        class.lastNonceIdCreated = nonceId;
-        class.lastNonceIdCreatedTimestamp = createdAt;
-    }
-
 
     /**
     * @notice creation of a new nonce for a given class
@@ -197,7 +182,6 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     * @param metadataIds identifiers of the metadatas (keys for values)
     * @param values value collection
     */
-
     function createNonce(uint256 classId, uint256 nonceId, uint256[] calldata metadataIds, IERC3475.Values[] calldata values) external onlyBank {
         require(metadataIds.length == values.length, "ERC3475: inputs error");
         require(classExists(classId), "DebondERC3475: class Id not found");
@@ -212,6 +196,39 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         for (uint256 i; i < metadataIds.length; i++) {
             class.nonces[nonceId].values[metadataIds[i]] = values[i];
         }
+    }
+
+    /**
+    * @notice update the last nonce informations
+    * @param classId id of the class
+    * @param newNonceId new last nonce id created
+    * @param createdAt timestamp of the creation
+    */
+    function updateLastNonce(uint classId, uint newNonceId, uint createdAt) external onlyBank {
+        Class storage class = classes[classId];
+        require(class.exists, "DebondERC3475: class id given not found");
+        class.lastNonceIdCreated = newNonceId;
+        class.lastNonceIdCreatedTimestamp = createdAt;
+    }
+
+    /**
+    * @notice transfer bonds (if u want to transfer via an approved spender with allowance, use "transferAllowanceFrom")
+    * @param from address we transferring bonds from
+    * @param to address we transferring bonds to
+    * @param transactions classIds, nonceIds and amounts of transfers
+    */
+    function transferFrom(address from, address to, Transaction[] calldata transactions) external override {
+        for (uint i; i < transactions.length; i++) {
+            uint classId = transactions[i].classId;
+            require(classExists(classId), "DebondERC3475: class Id not found");
+            require(msg.sender == from || isApprovedFor(from, msg.sender), "DebondERC3475: caller is not owner nor approved");
+            uint nonceId = transactions[i].nonceId;
+            uint amount = transactions[i].amount;
+
+            _transferFrom(from, to, classId, nonceId, amount);
+        }
+
+        emit Transfer(msg.sender, from, to, transactions);
     }
 
     /**
@@ -235,39 +252,16 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         emit Transfer(msg.sender, from, to, transactions);
     }
 
-
-    /**
-    * @notice transfer bonds (if u want to transfer via an approved spender with allowance, use "transferAllowanceFrom")
-    * @param from address we transferring bonds from
-    * @param to address we transferring bonds to
-    * @param transactions classIds, nonceIds and amounts of transfers
-    */
-    function transferFrom(address from, address to, Transaction[] calldata transactions) external override {
-        for (uint i; i < transactions.length; i++) {
-            uint classId = transactions[i].classId;
-            require(classExists(classId), "DebondERC3475: class Id not found");
-            require(msg.sender == from || isApprovedFor(from, msg.sender), "DebondERC3475: caller is not owner nor approved");
-            uint nonceId = transactions[i].nonceId;
-            uint amount = transactions[i].amount;
-
-            _transferFrom(from, to, classId, nonceId, amount);
-        }
-
-        emit Transfer(msg.sender, from, to, transactions);
-    }
-
     /**
     * @notice redeem bonds
     * @param from address to redeem bonds from
     * @param transactions classIds, nonceIds and amounts
     */
-
-
     function redeem(address from, Transaction[] calldata transactions) external override onlyBank {
         for (uint i; i < transactions.length; i++) {
             uint classId = transactions[i].classId;
             uint nonceId = transactions[i].nonceId;
-            uint amount = transactions[i]._amount;
+            uint amount = transactions[i].amount;
             require(classes[classId].nonces[nonceId].exists, "ERC3475: given Nonce doesn't exist");
             require(from != address(0), "ERC3475: can't transfer to the zero address");
             (, uint256 progressRemaining) = getProgress(classId, nonceId);
@@ -276,204 +270,40 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         }
         emit Redeem(msg.sender, from, transactions);
     }
+
     /**
-    * @notice fetches the details about the last nonce created, used for calculating the maturity time of the floating rate bond. 
-    * @param classId is the classId of which you want to determine the last nonce. 
-    * @returns nonceId the nonceId of the last nonce created. 
-    * @returns createdAt is the timestamp of the last nonce.
-     */
-
-    function getLastNonceCreated(uint classId) external view returns (uint nonceId, uint createdAt) {
-        Class storage class = classes[classId];
-        require(class.exists, "Debond Data: class id given not found");
-        nonceId = class.lastNonceIdCreated;
-        createdAt = class.lastNonceIdCreatedTimestamp;
-        return (nonceId, createdAt);
-    }
-
-    function getNoncesPerAddress(address addr, uint256 classId) public view returns (uint256[] memory) {
-        return classes[classId].noncesPerAddressArray[addr];
-    }
-
-    function batchActiveSupply(uint256 classId) public view returns (uint256) {
-        uint256 _batchActiveSupply;
-        uint256[] memory nonces = classes[classId].nonceIds;   
-        // _lastBondNonces can be recovered from the last message of the nonceId
-        for (uint256 i = 0; i <= nonces.length; i++) {
-            _batchActiveSupply += activeSupply(classId, nonces[i]);
-        }
-        return _batchActiveSupply;
-    }
-
-    function batchBurnedSupply(uint256 classId) public view returns (uint256) {
-        uint256 _batchBurnedSupply;
-        uint256[] memory nonces = classes[classId].nonceIds;
-        for (uint256 i = 0; i <= nonces.length; i++) {
-            _batchBurnedSupply += burnedSupply(classId, nonces[i]);
-        }
-        return _batchBurnedSupply;
-    }
-
-    function batchRedeemedSupply(uint256 classId) public view returns (uint256) {
-        uint256 _batchRedeemedSupply;
-        uint256[] memory nonces = classes[classId].nonceIds;
-        for (uint256 i = 0; i <= nonces.length; i++) {
-            _batchRedeemedSupply += redeemedSupply(classId, nonces[i]);
-        }
-        return _batchRedeemedSupply;
-    }
-
-    function batchTotalSupply(uint256 classId) public view returns (uint256) {
-        uint256 _batchTotalSupply;
-        uint256[] memory nonces = classes[classId].nonceIds;
-        for (uint256 i = 0; i <= nonces.length; i++) {
-            _batchTotalSupply += totalSupply(classId, nonces[i]);
-        }
-        return _batchTotalSupply;
-    }
-
-   /**
-   determines the progress of the bond time till maturity date based on the input parameters.
+    * @notice burn bonds
+    * @param from address to burn bonds from
+    * @param transactions classIds, nonceIds and amounts
     */
-    function getProgress(uint256 classId, uint256 nonceId) public view returns (uint256 progressAchieved, uint256 progressRemaining) {
-        return IRedeemableBondCalculator(bankAddress).getProgress(classId, nonceId);
-    }
-
-
     function burn(address from, Transaction[] calldata transactions) external override onlyBank {
         require(from != address(0), "ERC3475: can't transfer to the zero address");
         for (uint i; i < transactions.length; i++) {
-            uint classId = transactions[i].classId;
-            uint nonceId = transactions[i].nonceId;
-            uint amount = transactions[i]._amount;
-            _burn(from, classId, nonceId, amount);
+            require(msg.sender == from || isApprovedFor(from, msg.sender), "ERC3475: caller is not owner nor approved");
+            _burn(from, transactions[i].classId, transactions[i].nonceId, transactions[i].amount);
         }
         emit Burn(msg.sender, from, transactions);
     }
 
+    /**
+    * @param spender address to approve
+    * @param transactions classIds, nonceIds and amounts
+    */
     function approve(address spender, Transaction[] calldata transactions) external override {
         for (uint i; i < transactions.length; i++) {
-            uint classId = transactions[i].classId;
-            uint nonceId = transactions[i].nonceId;
-            uint amount = transactions[i]._amount;
-            classes[classId].nonces[nonceId].allowances[msg.sender][spender] = amount;
+            classes[transactions[i].classId].nonces[transactions[i].nonceId].allowances[msg.sender][spender] = transactions[i].amount;
         }
     }
 
-    function setApprovalFor(address operator, uint256 classId, bool approved) public override {
-        classes[classId].operatorApprovals[msg.sender][operator] = approved;
-        emit ApprovalFor(msg.sender, operator, classId, approved);
-    }  
-    
-    // READABLES
-    function classExists(uint256 classId) public view returns (bool) {
-        return classes[classId].exists;
-    }
-
-    function nonceExists(uint256 classId, uint256 nonceId) public view returns (bool) {
-        return classes[classId].nonces[nonceId].exists;
-    }
-
-    function classLiquidity(uint256 classId) external view returns (uint256) {
-        return classes[classId].liquidity;
-    }
-
     /**
-    determines the liquidity of the class from the starting nonce to the given nonce . this determines the total flow of the liquidity.
-
-     */
-    function classLiquidityAtNonce(uint256 classId, uint256 nonceId) external view returns (uint256) {
-        require(nonceExists(classId, nonceId), "DebondERC3475 Error: nonce not found");
-        return classes[classId].nonces[nonceId].classLiquidity;
+    * @param operator address to set approval for
+    * @param approved true => approved, false => unapproved
+    */
+    function setApprovalFor(address operator, bool approved) external override {
+        operatorApprovals[msg.sender][operator] = approved;
+        emit ApprovalFor(msg.sender, operator, approved);
     }
 
-    function totalSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
-        return classes[classId].nonces[nonceId]._activeSupply +
-        classes[classId].nonces[nonceId]._redeemedSupply +
-        classes[classId].nonces[nonceId]._burnedSupply;
-
-    }
-
-    function activeSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
-        return classes[classId].nonces[nonceId]._activeSupply;
-    }
-
-    function burnedSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
-        return classes[classId].nonces[nonceId]._burnedSupply;
-    }
-
-    function redeemedSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
-        return classes[classId].nonces[nonceId]._redeemedSupply;
-    }
-
-    function balanceOf(address account, uint256 classId, uint256 nonceId) public override view returns (uint256) {
-        require(account != address(0), "ERC3475: balance query for the zero address");
-        return classes[classId].nonces[nonceId].balances[account];
-    }
-
-    /**
-    fetches the actual values based on the described metadata by the other functions / frontend.
-     */
-
-    function classValues(uint256 classId, uint256 metadataId) public view override returns (IERC3475.Values memory) {
-        return classes[classId].values[metadataId];
-    }
-
-    function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) public view override returns (IERC3475.Values memory) {
-        return classes[classId].nonces[nonceId].values[metadataId];
-    }
-
-
-
-
-     /**
-    @notice fetches the information of the classId  for given  metadataId.
-    @param metadataId is the id of the indexed information .
-    @param nonceId is the index information for the given id. 
-    @returns the object JSON information representing the metadata. 
-     */
-
-    function classMetadata(uint256 metadataId) external view returns (Metadata memory) {
-        return classMetadatas[metadataId];
-    }
-
-
-    
-    
-    /**
-    @notice fetches the information of the nonce  for given classId and metadataId.
-    @param classId is the classId which has indexed the information.
-    @param nonceId is the index information for the given id. 
-    @returns the object JSON information representing the metadata. 
-     */
-    
-    function nonceMetadata(uint256 classId, uint256 metadataId) external view returns (Metadata memory) {
-        return classes[classId].nonceMetadatas[metadataId];
-    }
-
-
-    /**
-    @notice returns the allowance of the spender address on the bonds held by user identified by (classId,nonceId).
-    @param classId the class of the bonds on which allowance is present. 
-    @param nonceId nonceId of the given bond allowance.  
-    @param  spender is the address which has the allowance on the bonds (classId,nonceId) of the nonce bonds.
-     */
-
-    function allowance(address owner, address spender, uint256 classId, uint256 nonceId) external view returns (uint256) {
-        return classes[classId].nonces[nonceId].allowances[owner][spender];
-    }
-
-    /**
-    * @notice returns whether the bond owner has allowed the delegation of all the bonds from owner to operator.
-    * @param owner is the  current holder of bond
-    * @param operator is the address that needs to be checked as the delegator of the bonds
-    * @return true if the bonds are delegated between the operator and owner address.     
-     */
-    function isApprovedFor(address owner, address operator) public view override returns (bool) {
-        return operatorApprovals[owner][operator];
-    }
-
-    // INTERNALS
     function _transferFrom(address from, address to, uint256 classId, uint256 nonceId, uint256 amount) internal {
         require(from != address(0), "ERC3475: can't transfer from the zero address");
         require(to != address(0), "ERC3475: can't transfer to the zero address");
@@ -504,5 +334,169 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         classes[classId].nonces[nonceId].balances[from] -= amount;
         classes[classId].nonces[nonceId]._activeSupply -= amount;
         classes[classId].nonces[nonceId]._burnedSupply += amount;
-    }    
+    }
+
+    // READS
+
+    function getProgress(uint256 classId, uint256 nonceId) public view returns (uint256 progressAchieved, uint256 progressRemaining) {
+        return IProgressCalculator(bankAddress).getProgress(classId, nonceId);
+    }
+
+    function getLastNonceCreated(uint classId) external view returns (uint nonceId, uint createdAt) {
+        Class storage class = classes[classId];
+        require(class.exists, "Debond Data: class id given not found");
+        nonceId = class.lastNonceIdCreated;
+        createdAt = class.lastNonceIdCreatedTimestamp;
+        return (nonceId, createdAt);
+    }
+
+    function batchActiveSupply(uint256 classId) public view returns (uint256) {
+        uint256 _batchActiveSupply;
+        uint256[] memory nonces = classes[classId].nonceIds;
+        // _lastBondNonces can be recovered from the last message of the nonceId
+        // @drisky we can indeed
+        for (uint256 i = 0; i <= nonces.length; i++) {
+            _batchActiveSupply += activeSupply(classId, nonces[i]);
+        }
+        return _batchActiveSupply;
+    }
+
+    function batchBurnedSupply(uint256 classId) public view returns (uint256) {
+        uint256 _batchBurnedSupply;
+        uint256[] memory nonces = classes[classId].nonceIds;
+
+        for (uint256 i = 0; i <= nonces.length; i++) {
+            _batchBurnedSupply += burnedSupply(classId, nonces[i]);
+        }
+        return _batchBurnedSupply;
+    }
+
+    function batchRedeemedSupply(uint256 classId) public view returns (uint256) {
+        uint256 _batchRedeemedSupply;
+        uint256[] memory nonces = classes[classId].nonceIds;
+
+        for (uint256 i = 0; i <= nonces.length; i++) {
+            _batchRedeemedSupply += redeemedSupply(classId, nonces[i]);
+        }
+        return _batchRedeemedSupply;
+    }
+
+    function batchTotalSupply(uint256 classId) public view returns (uint256) {
+        uint256 _batchTotalSupply;
+        uint256[] memory nonces = classes[classId].nonceIds;
+
+        for (uint256 i = 0; i <= nonces.length; i++) {
+            _batchTotalSupply += totalSupply(classId, nonces[i]);
+        }
+        return _batchTotalSupply;
+    }
+
+    function classExists(uint256 classId) public view returns (bool) {
+        return classes[classId].exists;
+    }
+
+    function nonceExists(uint256 classId, uint256 nonceId) public view returns (bool) {
+        return classes[classId].nonces[nonceId].exists;
+    }
+
+    function classLiquidity(uint256 classId) public view returns (uint256) {
+        return classes[classId].liquidity;
+    }
+
+    function classLiquidityBatch(uint256[] calldata classIds) external view returns (uint256[] memory) {
+        uint256[] memory liquidities = new uint[](classIds.length);
+        for(uint i; i < classIds.length; i++) {
+            liquidities[i] = classLiquidity(classIds[i]);
+        }
+        return liquidities;
+    }
+
+    function classLiquidityAtNonce(uint256 classId, uint256 nonceId) external view returns (uint256) {
+        // if class has no liquidity it means no liquidity on any nonce
+        if(classes[classId].liquidity == 0) {
+            return 0;
+        }
+        // we check if the nonceId given is greater than the last nonce Issued
+        uint lastNonce = classes[classId].lastNonceIdCreated;
+        if(nonceId > lastNonce) {
+            return classes[classId].nonces[lastNonce].classLiquidity;
+        }
+
+        if(!nonceExists(classId, nonceId)) {
+            while(!nonceExists(classId, nonceId) && nonceId > 0) {
+                --nonceId;
+            }
+        }
+        return classes[classId].nonces[nonceId].classLiquidity;
+    }
+
+    function totalSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
+        return
+        classes[classId].nonces[nonceId]._activeSupply +
+        classes[classId].nonces[nonceId]._redeemedSupply +
+        classes[classId].nonces[nonceId]._burnedSupply;
+
+    }
+
+    function activeSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
+        return classes[classId].nonces[nonceId]._activeSupply;
+    }
+
+    function burnedSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
+        return classes[classId].nonces[nonceId]._burnedSupply;
+    }
+
+    function redeemedSupply(uint256 classId, uint256 nonceId) public override view returns (uint256) {
+        return classes[classId].nonces[nonceId]._redeemedSupply;
+    }
+
+    function balanceOf(address account, uint256 classId, uint256 nonceId) public override view returns (uint256) {
+        require(account != address(0), "ERC3475: balance query for the zero address");
+
+        return classes[classId].nonces[nonceId].balances[account];
+    }
+      /**
+    * @notice returns the values struct info corresponding to the given nonce bond (classId,nonceId) along with the metadataId
+     */
+
+    function classValues(uint256 classId, uint256 metadataId) public view override returns (IERC3475.Values memory) {
+        return classes[classId].values[metadataId];
+    }
+    /**
+    * @notice returns the values struct info corresponding to the given nonce bond (classId,nonceId) along with the metadataId
+     */
+    function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) public view override returns (IERC3475.Values memory) {
+        return classes[classId].nonces[nonceId].values[metadataId];
+    }
+
+    /**
+    * @notice getter function to return the metadata of the given class .
+    * @notice classId and metadataId  can be similar only in sepecific cases, and thus we need to see timestamp of creation  and class Issuance / priority in order to store the class metadataId info.
+    * 
+     */
+    function classMetadata(uint256 metadataId) external view returns (Metadata memory) {
+        return classMetadatas[metadataId];
+    }
+    /**
+    @notice getter function for fetching the bond metadata of given class and indexed by corresponding metadataId
+    @dev generally for serial counting of the nonceId , both the nonceId and metadataId will be same else metadataId will represent the  indexed information based on the pinstantiation time. 
+     */
+    function nonceMetadata(uint256 classId, uint256 metadataId) external view returns (Metadata memory) {
+        return classes[classId].nonceMetadatas[metadataId];
+    }
+    /**
+    @notice determines the allowance of bonds  (of classId,nonceId)  for address  spender , and  are owned by  address owner  
+     */
+    function allowance(address owner, address spender, uint256 classId, uint256 nonceId) public view returns (uint256) {
+        return classes[classId].nonces[nonceId].allowances[owner][spender];
+    }
+    /**
+    @notice is used for  returning whether the  owner has approved  the operator to handle all the bonds.
+    @param owner is the address of owner.
+    @param operator is  the address of third party that wants to control the bond ownership.
+    @returns true if its the case else false.
+     */
+    function isApprovedFor(address owner, address operator) public view override returns (bool) {
+        return operatorApprovals[owner][operator];
+    }
 }
