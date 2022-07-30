@@ -1,7 +1,6 @@
 /*
 IERC20Holder
 
-https://github.com/devinaconley/token-hold-example
 
 SPDX-License-Identifier: CC0-1.0
 */
