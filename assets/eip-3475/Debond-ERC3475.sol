@@ -199,7 +199,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
 
     /**
-    * @notice update the last nonce informations
+    * @notice update the last nonce information
     * @param classId id of the class
     * @param newNonceId new last nonce id created
     * @param createdAt timestamp of the creation
@@ -471,7 +471,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
 
     /**
     * @notice getter function to return the metadata of the given class .
-    * @notice classId and metadataId  can be similar only in sepecific cases, and thus we need to see timestamp of creation  and class Issuance / priority in order to store the class metadataId info.
+    * @notice classId and metadataId can be similar only in specific cases, and thus we need to see timestamp of creation and class Issuance / priority in order to store the class metadataId info.
     * 
      */
     function classMetadata(uint256 metadataId) external view returns (Metadata memory) {
@@ -479,13 +479,13 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
     /**
     @notice getter function for fetching the bond metadata of given class and indexed by corresponding metadataId
-    @dev generally for serial counting of the nonceId , both the nonceId and metadataId will be same else metadataId will represent the  indexed information based on the pinstantiation time. 
+    @dev generally for serial counting of the nonceId , both the nonceId and metadataId will be same else metadataId will represent the indexed information based on the pinstantiation time. 
      */
     function nonceMetadata(uint256 classId, uint256 metadataId) external view returns (Metadata memory) {
         return classes[classId].nonceMetadatas[metadataId];
     }
     /**
-    @notice determines the allowance of bonds  (of classId,nonceId)  for address  spender , and  are owned by  address owner  
+    @notice determines the allowance of bonds (of classId,nonceId) for address spender , and are owned by address owner.
      */
     function allowance(address owner, address spender, uint256 classId, uint256 nonceId) public view returns (uint256) {
         return classes[classId].nonces[nonceId].allowances[owner][spender];
