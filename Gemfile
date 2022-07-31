@@ -10,9 +10,6 @@ source "https://rubygems.org"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.0"
 
-# Use latest jekyll
-gem "jekyll", github: "jekyll/jekyll"
-
 # Use better liquid gem
 gem "liquid-c"
 
