@@ -295,6 +295,7 @@ contract ERC3475 is IERC3475, Ownable {
         return (classes[classId]._value[metadataId]);
     }
 
+    
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId)
     external
     view
@@ -303,8 +304,9 @@ contract ERC3475 is IERC3475, Ownable {
         return (classes[classId].nonces[nonceId]._value[metadataId]);
     }
 
-    /**
-     * @notice ProgressAchieved and `progressRemaining` is abstract. For e.g. we are giving time passed and time remaining.
+    /** determines the progress till the  redemption of the bonds is valid  (based on the type of bonds class).
+     * @notice ProgressAchieved and `progressRemaining` is abstract.
+      For e.g. we are giving time passed and time remaining.
      */
     function getProgress(uint256 classId, uint256 nonceId)
     public
@@ -320,7 +322,9 @@ contract ERC3475 is IERC3475, Ownable {
         ? maturityDate - block.timestamp
         : 0;
     }
-
+    /**
+    gets the allowance of the bonds identified by (classId,nonceId) held by _owner to be spend by spender.
+     */
     function allowance(
         address _owner,
         address spender,
@@ -330,6 +334,9 @@ contract ERC3475 is IERC3475, Ownable {
         return classes[classId].nonces[nonceId].allowances[_owner][spender];
     }
 
+    /**
+    checks the status of approval to transfer the ownership of bonds by _owner  to operator.
+     */
     function isApprovedFor(
         address _owner,
         address operator
@@ -365,6 +372,7 @@ contract ERC3475 is IERC3475, Ownable {
             nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not allowed amount"
         );
+        // reducing the allowance and decreasing accordingly.
         nonce.allowances[_from][_operator] -= _transaction._amount;
 
         //transfer balance
@@ -389,6 +397,8 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        // verify whether _amount of bonds to be redeemed  are sufficient available  for the given nonce of the bonds
+
         require(
             nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
@@ -406,6 +416,7 @@ contract ERC3475 is IERC3475, Ownable {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        // verify whether _amount of bonds to be burned are sfficient available for the given nonce of the bonds
         require(
             nonce.balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
