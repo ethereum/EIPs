@@ -3,6 +3,6 @@
   "ignore": [
     "assets/eip-3267",
     "assets/eip-4675",
-    "assets/eip-4886",
+    "assets/eip-4886"
   ]
 }
