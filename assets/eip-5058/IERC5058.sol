@@ -68,13 +68,12 @@ interface IERC5058 is IERC721 {
      *
      * Requirements:
      *
-     * - `from` cannot be the zero address.
      * - `tokenId` token must be owned by `from`.
      * - the caller must be the operator who locks the token by {lockFrom}
      *
      * Emits a {Unlocked} event.
      */
-    function unlockFrom(address from, uint256 tokenId) external;
+    function unlock(uint256 tokenId) external;
 
     /**
      * @dev Gives permission to `to` to lock `tokenId` token.
@@ -120,4 +119,9 @@ interface IERC5058 is IERC721 {
      * @dev Returns if the `tokenId` token is locked.
      */
     function isLocked(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @dev Returns the `tokenId` token lock expired time.
+     */
+    function lockExpiredTime(uint256 tokenId) external view returns (uint256);
 }

@@ -75,6 +75,13 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     }
 
     /**
+     * @dev See {IERC5058-lockExpiredTime}.
+     */
+    function lockExpiredTime(uint256 tokenId) public view virtual override returns (uint256) {
+        return lockedTokens[tokenId];
+    }
+
+    /**
      * @dev See {IERC5058-lockFrom}.
      */
     function lockFrom(
@@ -91,11 +98,12 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     }
 
     /**
-     * @dev See {IERC5058-unlockFrom}.
+     * @dev See {IERC5058-unlock}.
      */
-    function unlockFrom(address from, uint256 tokenId) public virtual override {
+    function unlock(uint256 tokenId) public virtual override {
         require(lockerOf(tokenId) == _msgSender(), "ERC5058: unlock caller is not lock operator");
-        require(ERC721.ownerOf(tokenId) == from, "ERC5058: unlock from incorrect owner");
+
+        address from = ERC721.ownerOf(tokenId);
 
         _beforeTokenLock(_msgSender(), from, tokenId, 0);
 
