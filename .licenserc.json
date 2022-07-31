@@ -1,8 +1,18 @@
 {
   "**/*.{js,ts,sol}": "// SPDX-License-Identifier: CC0-1.0",
   "ignore": [
+    "assets/eip-712",
     "assets/eip-3267",
+    "assets/eip-3475",
+    "assets/eip-3525",
+    "assets/eip-4361",
+    "assets/eip-4400",
+    "assets/eip-4519",
     "assets/eip-4675",
-    "assets/eip-4886"
+    "assets/eip-4886",
+    "assets/eip-4907",
+    "assets/eip-4987",
+    "assets/eip-5006",
+    "assets/eip-5007"
   ]
 }
