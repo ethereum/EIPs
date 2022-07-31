@@ -28,7 +28,7 @@
             <td class="date">{{ page.last-call-deadline | xml_escape }}</td>
           {% endif %}
           <td class="title">{{page.title|xml_escape}}</td>
-          <td class="author">{% include authorlist.html authors=page.author %}</td>
+          <td class="author">{% include_cached authorlist.html authors=page.author %}</td>
         </tr>
       {% endfor %}
     </table>

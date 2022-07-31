@@ -10,10 +10,19 @@ source "https://rubygems.org"
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima", "~> 2.0"
 
+# Use latest jekyll
+gem "jekyll", github: "jekyll/jekyll"
+
+# Use better liquid gem
+gem "liquid-c"
+
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.11"
   gem "github-pages", "206"
+  gem "jekyll-commonmark-ghpages"  # Additional performance improvements
+  gem "jekyll-include-cache"
+  gem "jekyll-remote-theme"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
