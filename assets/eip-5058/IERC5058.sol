@@ -16,14 +16,14 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  */
 interface IERC5058 is IERC721 {
     /**
-     * @dev Emitted when `tokenId` token is locked by `operator` from `from`.
+     * @dev Emitted when `tokenId` token is locked by `operator` from `owner`.
      */
-    event Locked(address indexed operator, address indexed from, uint256 indexed tokenId, uint256 expired);
+    event Locked(address indexed operator, address indexed owner, uint256 indexed tokenId, uint256 expired);
 
     /**
-     * @dev Emitted when `tokenId` token is unlocked by `operator` from `from`.
+     * @dev Emitted when `tokenId` token is unlocked by `operator` from `owner`.
      */
-    event Unlocked(address indexed operator, address indexed from, uint256 indexed tokenId);
+    event Unlocked(address indexed operator, address indexed owner, uint256 indexed tokenId);
 
     /**
      * @dev Emitted when `owner` enables `approved` to lock the `tokenId` token.
@@ -49,8 +49,8 @@ interface IERC5058 is IERC721 {
      *
      * Requirements:
      *
-     * - `from` cannot be the zero address.
-     * - `tokenId` token must be owned by `from`.
+     * - `owner` cannot be the zero address.
+     * - `tokenId` token must be owned by `owner`.
      * - `expired` must be greater than block.number
      * - If the caller is not `from`, it must be approved to lock this token
      * by either {lockApprove} or {setLockApprovalForAll}.
@@ -58,7 +58,7 @@ interface IERC5058 is IERC721 {
      * Emits a {Locked} event.
      */
     function lockFrom(
-        address from,
+        address owner,
         uint256 tokenId,
         uint256 expired
     ) external;

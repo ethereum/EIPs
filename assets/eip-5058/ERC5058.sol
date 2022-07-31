@@ -85,7 +85,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      * @dev See {IERC5058-lockFrom}.
      */
     function lockFrom(
-        address from,
+        address owner,
         uint256 tokenId,
         uint256 expired
     ) public virtual override {
@@ -94,7 +94,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         require(expired > block.number, "ERC5058: expired time must be greater than current block number");
         require(!isLocked(tokenId), "ERC5058: token is locked");
 
-        _lock(_msgSender(), from, tokenId, expired);
+        _lock(_msgSender(), owner, tokenId, expired);
     }
 
     /**
@@ -125,20 +125,20 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      */
     function _lock(
         address operator,
-        address from,
+        address owner,
         uint256 tokenId,
         uint256 expired
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == from, "ERC5058: lock from incorrect owner");
+        require(ERC721.ownerOf(tokenId) == owner, "ERC5058: lock from incorrect owner");
 
-        _beforeTokenLock(operator, from, tokenId, expired);
+        _beforeTokenLock(operator, owner, tokenId, expired);
 
         lockedTokens[tokenId] = expired;
         _lockApprovals[tokenId] = _msgSender();
 
-        emit Locked(operator, from, tokenId, expired);
+        emit Locked(operator, owner, tokenId, expired);
 
-        _afterTokenLock(operator, from, tokenId, expired);
+        _afterTokenLock(operator, owner, tokenId, expired);
     }
 
     /**
@@ -243,14 +243,14 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      *
      * Calling conditions:
      *
-     * - `from` is non-zero.
+     * - `owner` is non-zero.
      * - When `expired` is zero, `tokenId` will be unlock for `from`.
      * - When `expired` is non-zero, ``from``'s `tokenId` will be locked.
      *
      */
     function _beforeTokenLock(
         address operator,
-        address from,
+        address owner,
         uint256 tokenId,
         uint256 expired
     ) internal virtual {}
@@ -260,14 +260,14 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      *
      * Calling conditions:
      *
-     * - `from` is non-zero.
+     * - `owner` is non-zero.
      * - When `expired` is zero, `tokenId` will be unlock for `from`.
      * - When `expired` is non-zero, ``from``'s `tokenId` will be locked.
      *
      */
     function _afterTokenLock(
         address operator,
-        address from,
+        address owner,
         uint256 tokenId,
         uint256 expired
     ) internal virtual {}
