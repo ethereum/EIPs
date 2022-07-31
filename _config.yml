@@ -34,20 +34,16 @@ header_pages:
 # Build settings
 highlighter: rouge
 markdown: CommonMarkGhPages
-remote_theme: Pandapip1/moonwalk  # More performant theme (See https://github.com/abhinavs/moonwalk/blob/master/github_pages.md for why a fork was made)
+theme: minima
 incremental: true
 commonmark:
-  options: ["UNSAFE", "FOOTNOTES"]
+  options:
+    - SMART
+    - STRIKETHROUGH_DOUBLE_TILDE
+    - HARDBREAKS
   extensions:
-    - auto_identifiers_ascii  # Automatically generates IDs for headings
-    - hard_line_breaks  # Newlines become new paragraphs (expected behavior)
-    - math  # LaTeX math syntax is supported
-    - raw_attribute  # Allow raw attributes
     - table  # Some EIPs use this syntax for tables
-    - smart  # Automatically replaces certain punctuation with the unicode variants
     - strikethrough  # Strikethroughs are supported like ~~so~~.
-    - superscript  # LaTeX-like superscripts
-    - subscript  # LaTeX-like subscripts 
 
 permalink: /:slug
 

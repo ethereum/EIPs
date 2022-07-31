@@ -19,7 +19,6 @@ group :jekyll_plugins do
   gem "github-pages", "206"
   gem "jekyll-commonmark-ghpages"  # Additional performance improvements
   gem "jekyll-include-cache"
-  gem "jekyll-remote-theme"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

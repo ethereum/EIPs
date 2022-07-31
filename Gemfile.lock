@@ -280,7 +280,6 @@ DEPENDENCIES
   jekyll-commonmark-ghpages
   jekyll-feed (~> 0.11)
   jekyll-include-cache
-  jekyll-remote-theme
   liquid-c
   minima (~> 2.0)
   tzinfo-data
