@@ -1,12 +1,12 @@
 ---
-eip: XXXX
+eip: 5345
 title: Walletconnect Silent-Signing Extension
 description: Capability of transaction signing without user interaction for a period of time for walletconnect
 author: Stanley Wu (@fruit37), Mücahit Büyükyılmaz (@anndro), Muhammed Emin Aydın (@muhammedea)
 discussions-to: https://ethereum-magicians.org/t/walletconnect-silent-signing-extension/10137
 status: Draft
 type: Standards Track
-category: ERC
+category: Interface
 created: 2022-07-26
 ---
 
@@ -34,12 +34,12 @@ WalletConnect is a protocol that allows web3 apps to connect blockchain wallets.
 Decrypted package contains standard RPC commands and parameters. WalletConnect client support set of RPC commands and only that commands are usable with official clients. Please note that these RPC commands are different from Ethereum RPC commands. These commands only define wallet actions.
 
 ***Supported WalletConnect client commands***
-* personal_sign
-* eth_sign
-* eth_signTypedData
-* eth_sendTransaction
-* eth_signTransaction
-* eth_sendRawTransaction
+* `personal_sign`
+* `eth_sign`
+* `eth_signTypedData`
+* `eth_sendTransaction`
+* `eth_signTransaction`
+* `eth_sendRawTransaction`
 
 As a nature of the Bridge server, it redirects payload packages directly without knowing which RPC call has been made. For that reason, we don't need to change anything on the Bridge server, but WalletConnect clients.
 
@@ -60,6 +60,7 @@ There will be no change on the WalletConnect Bridge server but the client librar
 
 #### wallet_requestSilentSign
 This RPC command will open the wallet and show a popup to the user to allow automatic signing for a given period. By calling this function the application will get a grant to call the following Commands until the timestamp expires. Standard commands like eth_signTrancaction etc will remain as now.
+
 ```
 Parameters
   until: NUMBER - unix timesptamp data 
@@ -68,8 +69,9 @@ Returns
   clientSecret: DATA, 20 Bytes - a secret key for auto-signing requests
 ```
 
-#### wallet_silenSignTransaction
+#### `wallet_silenSignTransaction`
 This command will create a transaction and send data for sing to the wallet. The wallet will sign data in the background without asking the user. After this, the application can send the signed transaction to the blockchain by using Nethereum or ethers, with sendRawTransaction command.
+
 ```
 Parameters
   clientSecret: DATA, 20 Bytes - secret key obtained from game_requestAutoSign method
@@ -86,8 +88,9 @@ Returns
   DATA, The signed transaction object.
 ```
 
-#### wallet_silentSendTransaction
+#### `wallet_silentSendTransaction`
 This command will create a transaction without asking the user and send it to the blockchain.
+
 ```
 Parameters
   clientSecret: DATA, 20 Bytes - secret key obtained from game_requestAutoSign method
@@ -110,15 +113,14 @@ When the wallet application is closed or in the background, it cannot connect to
 ![](https://docs.walletconnect.com/assets/images/call-request-af4f9f2385303a6cd381c35f3b13b665.png)
 
 Whenever the wallet receives a push message. It connects to the bridge server and gets the pending requests. If there is a silent signing request like “**wallet_silenSignTransaction**” or “**wallet_silentSendTransaction**” and the requesting client is allowed at that time, then the wallet will execute the request without any UI message or prompt.
+## Rationale
 
+TBD
 ## Backwards Compatibility
 These new RPC methods are not changing the current ones and the push notification API is currently part of the WalletConnect specification. Everything in this proposal does not change anything for other applications and wallets.
 
 ## Security Considerations
 This feature should only be used with user consent. So the responsibility of allowing this is on the user. Users can decide to use the application as usual.
+## Copyright
 
-## References
-1- [JSON RPC-API](https://ethereum.org/en/developers/docs/apis/json-rpc/)
-2- [Walletconnect](https://walletconnect.com/)
-3- [Walletconnect Technical Specification](https://docs.walletconnect.com/tech-spec)
-4- [Push server API](https://docs.walletconnect.com/push-server)
+Copyright and related rights waived via [CC0](../LICENSE.md).
