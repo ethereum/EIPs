@@ -25,7 +25,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     address bankAddress;
 
     /**
-    * @notice this Struct is representing the Nonce properties as an object
+    * @notice  Here struct is representing the Nonce properties as an object
     *         and can be retrieve by the nonceId (within a class)
     */
     struct Nonce {
@@ -41,7 +41,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
 
     /**
-    * @notice this Struct is representing the Class properties as an object
+    * @notice This struct is representing the Class properties as an object
     *         and can be retrieve by the classId
     */
     struct Class {
@@ -303,7 +303,10 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         operatorApprovals[msg.sender][operator] = approved;
         emit ApprovalFor(msg.sender, operator, approved);
     }
-
+    // internal functions.
+    /**
+    they implement only core conditions and thus users have to create higher level functions to fullfill other criterias (redemption time, issuing/redeeming entity).
+     */
     function _transferFrom(address from, address to, uint256 classId, uint256 nonceId, uint256 amount) internal {
         require(from != address(0), "ERC3475: can't transfer from the zero address");
         require(to != address(0), "ERC3475: can't transfer to the zero address");
@@ -337,11 +340,16 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
 
     // READS
-
+    /**
+    fetches the progress from the external implementation (from the issuer contract as bank), to determine the status of the bond redemption 
+     */
     function getProgress(uint256 classId, uint256 nonceId) public view returns (uint256 progressAchieved, uint256 progressRemaining) {
         return IProgressCalculator(bankAddress).getProgress(classId, nonceId);
     }
-
+    /**
+    function used for the utility of finding the overall change in the liquidity 
+    ref: https://github.com/Debond-Protocol/Docs/blob/main/Debond_Whitepaper_V2_WIP.pdf.
+     */
     function getLastNonceCreated(uint classId) external view returns (uint nonceId, uint createdAt) {
         Class storage class = classes[classId];
         require(class.exists, "Debond Data: class id given not found");
@@ -349,12 +357,12 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         createdAt = class.lastNonceIdCreatedTimestamp;
         return (nonceId, createdAt);
     }
-
+    /**
+    supply getter functions  for all type of supplies.
+     */
     function batchActiveSupply(uint256 classId) public view returns (uint256) {
         uint256 _batchActiveSupply;
         uint256[] memory nonces = classes[classId].nonceIds;
-        // _lastBondNonces can be recovered from the last message of the nonceId
-        // @drisky we can indeed
         for (uint256 i = 0; i <= nonces.length; i++) {
             _batchActiveSupply += activeSupply(classId, nonces[i]);
         }
@@ -391,6 +399,9 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         return _batchTotalSupply;
     }
 
+    /**
+    used for calculation of liquidity (for redemption condition for floating bond).
+     */
     function classExists(uint256 classId) public view returns (bool) {
         return classes[classId].exists;
     }
@@ -398,6 +409,8 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     function nonceExists(uint256 classId, uint256 nonceId) public view returns (bool) {
         return classes[classId].nonces[nonceId].exists;
     }
+
+    /** determining  liquidity of all nonces in the given class (for redemption condition) */
 
     function classLiquidity(uint256 classId) public view returns (uint256) {
         return classes[classId].liquidity;
@@ -410,7 +423,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
         }
         return liquidities;
     }
-
+    
     function classLiquidityAtNonce(uint256 classId, uint256 nonceId) external view returns (uint256) {
         // if class has no liquidity it means no liquidity on any nonce
         if(classes[classId].liquidity == 0) {

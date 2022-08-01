@@ -1,7 +1,7 @@
 # Metadata  standards 
 
 
-This documentation consist of various JSON schemas (examples or standards) that can be referenced by the reader of this EIP for implementing EIP-3475 bonds storage.
+This documentation consists of various JSON schemas (examples or standards) that can be referenced by the reader of this EIP for implementing EIP-3475 bonds storage.
 
 ## 1. Description metadata: 
 
@@ -15,13 +15,13 @@ This documentation consist of various JSON schemas (examples or standards) that 
 ]
 ```
 
-Example: adding details in bonds describing the local jurisdiction of the bonds where its issued:
+Example: adding details in bonds describing the local jurisdiction of the bonds where it's issued:
 
 ```json
 {
 "title": "localisation",
 "_type": "string",
-"description": "jurisdiction law codes compatibility "
+"description": "jurisdiction law codes compatibility"
 "values": ["fr ", "de", "ch"] // can also be ISO codes 
 }
 ```
@@ -90,4 +90,4 @@ Example: adding details in bonds describing the local jurisdiction of the bonds 
 	}
 ]
 ## Examples of other standards: 
-    - ISO-20022 standard is the recent adopted standard by banks for communicating the financial operations. 
+    - ISO-20022 standard is the recently adopted standard by banks for communicating  financial operators (Banks, trading intermediaries, underwriters) that also include bond operations. 
