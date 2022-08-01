@@ -1,0 +1,151 @@
+---
+eip: XXXX
+title: Datatokens as Token-Gated HTTPS Endpoints
+description: Composable RESTful and Solidity interface to implement token-gated HTTPS endpoints usind data tokens.
+author: Tim Daubenschütz (@TimDaub)
+discussions-to: https://tobedone
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-08-01
+requires: 712
+---
+
+## Abstract
+
+This standard introduces composable RESTful HTTPS and Solidity interfaces that e.g. enable paying to access HTTPS endpoints using [EIP-20](./eip-20.md) tokens.
+
+## Motivation
+
+According to RFC 7231, HTTPS status `402 Payment Required` is reserved for future use. But the future is now as Ethereum enables users to verify their identity with a server using public key infrastructure.
+
+The Ethereum community has expressed the need for a composable method of token-gating HTTPS endpoints. In this document, we outline a protocol implementable by HTTPS-providing servers to accept [EIP-20](./eip-20.md) payments prior to allow access to an authorized endpoint.
+
+## Specification
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY" and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+Upon the user's initial request, a HTTPS server implementing token-gating via EIP-XXXX responds with a `402 Payment Required` status code:
+
+- Its body must include a valid JSON string that complies with the Solidity Contract ABI Specification for calling contracts.
+- It must include a custom header `X-EIP-XXXX-CONTRACT-ADDRESS` that suggests the contract's address a call must be directed to.
+- It must include a custom header `X-EIP-XXXX-ABI-ENCODED-INPUT` that suggests the call signature the user must invoke at `X-EIP-XXXX-CONTRACT-ADDRESS` to gain access to the endpoint.
+
+### Example Response
+
+```
+HTTP/1.1 402 Payment Required
+Date: Mon, 01 Aug 2022 13:37:00 GMT
+Content-Type: application/json
+X-EIP-XXXX-CONTRACT-ADDRESS: 0x005241438cAF3eaCb05bB6543151f7AF894C5B58
+X-ABI-ENCODED-INPUT: 23b872dd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000007b
+
+"{\"constant\":false,\"inputs\":[{\"name\":\"_from\",\"type\":\"address\"},{\"name\":\"_to\",\"type\":\"address\"},{\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"type\":\"function\"}"
+```
+
+### Authorization via EIP-712 Signature
+
+After successfully calling the suggested Ethereum contract with the appropriate inputs, for a user request that containing a validly signed message for endpoint authorization, the server must allow access to the bespoke endpoint.
+
+The signature is complaint with [EIP-712](./eip-712.md):
+
+```js
+keccak256(abi.encodePacked(
+  hex"1901",
+  DOMAIN_SEPARATOR,
+  keccak256(abi.encode(
+    keccak256("Invocation(address contract,string input"),
+    contract,
+		keccak256(bytes(input)),
+  ))
+))
+```
+
+where `DOMAIN_SEPARATOR` must be unique to the chain to prevent replay attacks from other domains, and satisfy the requirements of [EIP-712](./eip-712.md):
+
+```js
+DOMAIN_SEPARATOR = keccak256(
+	abi.encode(
+		keccak256(
+			"EIP712Domain(string version,uint256 chainId,string endpoint,string method)"
+		),
+		keccak256(bytes(version)),
+		chainid,
+		keccak256(bytes(endpoint)),
+		keccak256(bytes(method))
+	)
+);
+```
+
+where `endpoint` must represent the full URL, e.g. `https://ethereum.org/api/v1/cutedoge` and `method` an existing HTTP method.
+
+```js
+{
+  "types": {
+    "EIP712Domain": [
+      {
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "name": "chainId",
+        "type": "uint256"
+      },
+      {
+        "name": "endpoint",
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "type": "string"
+      }
+    ],
+    "Invocation": [
+      {
+        "name": "contract",
+        "type": "address"
+      },
+      {
+        "name": "input",
+        "type": "string"
+      }
+    ],
+    "primaryType": "Invocation",
+    "domain": {
+      "version": version,
+      "chainId": chainid,
+      "endpoint": endpoint,
+      "method": method
+    },
+    "message": {
+      "contract": contract,
+      "input": input
+    }
+  }
+}
+```
+
+The resulting hexadecimal-encoded signature must be included in a user's request to the endpoint as the `Bearer` value of the `Authorization` header. An example:
+
+```
+GET /index.html
+Authorization: Bearer 0xabc...
+```
+
+Upon validating the signature and cross-checking it with the mandated on-chain interaction, a server must allow access to the appointed endpoint's resource.
+
+## Rationale
+
+There is no rationale related this standard.
+
+## Backwards Compatibility
+
+There are no considerations related to the backwardd compatability of this standard.
+
+## Security Considerations
+
+There are no security considerations related directly to the implementation of this standard.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
