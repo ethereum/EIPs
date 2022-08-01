@@ -272,7 +272,6 @@ GEM
 
 PLATFORMS
   ruby
-  x86_64-linux
 
 DEPENDENCIES
   eip_validator (>= 0.8.2)
@@ -284,7 +283,6 @@ DEPENDENCIES
   liquid-c
   minima (~> 2.0)
   tzinfo-data
-  wdm (~> 0.1.0)
 
 BUNDLED WITH
    2.3.7
