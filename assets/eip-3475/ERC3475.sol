@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./IERC3475.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IERC3475.sol";
+import "./utils/Ownable.sol";
 
 contract ERC3475 is IERC3475, Ownable {
     /** 
