@@ -195,7 +195,7 @@ References to other EIPs should follow the format `EIP-N` where `N` is the EIP n
 
 ## Auxiliary Files
 
-Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
+Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`. These files must be in the public domain (`CC0`). Solidity files must use the SPDX Identifier `CC0-1.0`.
 
 ## Transferring EIP Ownership
 
