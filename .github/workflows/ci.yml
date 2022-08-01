@@ -100,6 +100,30 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@6c44eb8294bb9c93d6118427f4ff8404b695e1d7
+
+      - name: Delete Unmodified Files
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir all
+          shopt -s extglob dotglob
+          mv !(all) all
+          shopt -u dotglob
+          mkdir unchanged
+          cd all
+          for FILE in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            [ -f ${FILE} ] && mkdir -p $(dirname "../unchanged/${FILE}")
+            [ -f ${FILE} ] && cp ${FILE} ../unchanged/${FILE}
+          done
+          cd ..
+          rm -rf all
+          cd unchanged
+          cp -r unchanged/* .
+          cd ..
+          rm -rf unchanged
+
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@d199b6e1b89360c71e0c21eac02f7965faf07ba6
         with:
