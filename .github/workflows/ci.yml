@@ -119,7 +119,6 @@ jobs:
           done
           cd ..
           rm -rf all
-          cd unchanged
           cp -r unchanged/* .
           cd ..
           rm -rf unchanged
