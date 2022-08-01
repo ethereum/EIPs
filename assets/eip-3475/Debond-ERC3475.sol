@@ -26,7 +26,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
 
     /**
     * @notice  Here struct is representing the Nonce properties as an object
-    *         and can be retrieve by the nonceId (within a class)
+    *         and can be retrieved by the nonceId (within a class)
     */
     struct Nonce {
         uint256 id;
@@ -92,8 +92,8 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
 
     /**
     * @notice create a new metadata for classes on the actual bond contract
-    * @param metadataIds the identifiers of the metadatas being created
-    * @param metadatas the metadatas to create
+    * @param metadataIds the identifiers of the metadata being created corresponding to each class.
+    * @param metadatas the array storage of struct metadata to be assigned to each class.
     */
     function createClassMetadataBatch(uint[] memory metadataIds, IERC3475.Metadata[] memory metadatas) external onlyBank {
         require(metadataIds.length == metadatas.length, "DebondERC3475: Incorrect inputs");
@@ -232,7 +232,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
 
     /**
-    * @notice transfer bonds with allowance from spender
+    * @notice transfer bonds with the allowance from spender
     * @param from address we transferring bonds from
     * @param to address we transferring bonds to
     * @param transactions classIds, nonceIds and amounts of transfers
@@ -305,7 +305,7 @@ contract DebondERC3475 is IDebondBond, GovernanceOwnable {
     }
     // internal functions.
     /**
-    they implement only core conditions and thus users have to create higher level functions to fullfill other criterias (redemption time, issuing/redeeming entity).
+    they implement only core conditions and thus users have to create higher level functions for validation of  criteria like (redemption time, issuing/redeeming entity).
      */
     function _transferFrom(address from, address to, uint256 classId, uint256 nonceId, uint256 amount) internal {
         require(from != address(0), "ERC3475: can't transfer from the zero address");
