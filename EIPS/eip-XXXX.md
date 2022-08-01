@@ -1,6 +1,6 @@
 ---
 eip: XXXX
-title: Datatokens as Token-Gated HTTPS Endpoints
+title: Token-Gated HTTPS Endpoints
 description: Composable RESTful and Solidity interface to implement token-gated HTTPS endpoints using data tokens.
 author: Tim Daubenschütz (@TimDaub)
 discussions-to: https://tobedone
