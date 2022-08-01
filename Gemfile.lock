@@ -227,6 +227,8 @@ GEM
     nokogiri (1.13.8)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-linux)
+      racc (~> 1.4)
     octokit (4.25.1)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
@@ -272,6 +274,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-linux
 
 DEPENDENCIES
   eip_validator (>= 0.8.2)
@@ -283,6 +286,7 @@ DEPENDENCIES
   liquid-c
   minima (~> 2.0)
   tzinfo-data
+  wdm (~> 0.1.0)
 
 BUNDLED WITH
    2.3.7
