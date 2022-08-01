@@ -272,6 +272,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-linux
 
 DEPENDENCIES
   eip_validator (>= 0.8.2)
