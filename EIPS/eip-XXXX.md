@@ -3,7 +3,7 @@ eip: XXXX
 title: Token-Gated HTTPS Endpoints
 description: Composable RESTful and Solidity interface to implement token-gated HTTPS endpoints using data tokens.
 author: Tim Daubenschütz (@TimDaub)
-discussions-to: https://tobedone
+discussions-to: https://ethereum-magicians.org/t/token-gated-https-endpoints/10205
 status: Draft
 type: Standards Track
 category: ERC
