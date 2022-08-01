@@ -1,23 +1,33 @@
-// SPDX-License-Identifier: CC0
-pragma solidity ^0.8.0; 
+// SPDX-License-Identifier: CC0-1.0
+pragma solidity ^0.8.0;
 
 import "./ERC5007.sol";
 
-contract ERC5007Demo is ERC5007{
+contract ERC5007Demo is ERC5007 {
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_){}
 
-    constructor(string memory name_, string memory symbol_) ERC5007(name_, symbol_){
+    /**
+     * @dev  mint a new  time NFT
+     *
+     * Requirements:
+     *
+     * - `to_` cannot be the zero address.
+     * - `tokenId_` must not exist.
+     * - `endTime_` should be equal or greater than `startTime_`
+     */
+    function mint(
+        address to_,
+        uint256 tokenId_,
+        uint64 startTime_,
+        uint64 endTime_
+    ) public {
+        _mintTimeNft(to_, tokenId_, startTime_, endTime_);
     }
 
-    /// @notice mint a new original time NFT
-    /// @param to_  The owner of the new token
-    /// @param id_  The id of the new token
-    /// @param startTime_  The start time of the new token
-    /// @param endTime_  The end time of the new token
-    function mint(address to_, uint256 id_,  uint64 startTime_, uint64 endTime_) public {
-       _mintTimeNft(to_, id_, startTime_, endTime_);
+    /**
+     * @dev Returns the interfaceId of IERC5007.
+     */
+    function getInterfaceId() public pure returns (bytes4) {
+        return type(IERC5007).interfaceId;
     }
-
-    function getInterfaceId() public pure  returns (bytes4) {
-        return  type(IERC5007).interfaceId ;
-    }   
 }

@@ -1,15 +1,5 @@
 {
   "name": "ERC5007",
-  "version": "1.0.0",
-  "description": "",
-  "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.3",
     "@types/chai": "^4.3.0",
