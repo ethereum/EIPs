@@ -9,9 +9,8 @@ on:
 jobs:
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - name: 'Download artifact'
+      - name: Download Artifact
         uses: actions/github-script@v6
         with:
           script: |
@@ -32,11 +31,12 @@ jobs:
             let fs = require('fs');
             fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/pr_number.zip`, Buffer.from(download.data));
 
-      - name: 'Unzip artifact'
+      - name: Unzip Artifact
         run: unzip pr_number.zip
 
-      - name: 'Comment on PR'
+      - name: On Failure
         uses: actions/github-script@v6
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -55,4 +55,25 @@ jobs:
               issue_number: issue_number,
               body: `The commit ${pr_sha} (as a parent of ${merge_sha}) contains errors. Please inspect the [Run Summary](${context.payload.workflow_run.html_url}) for details.`
             });
+            await octokit.request(`POST /repos/{owner}/{repo}/issues/{issue_number}/labels`, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              labels: [ 'waiting: response from author' ]
+            })
+
+      - name: On Success
+        uses: actions/github-script@v6
+        if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let fs = require('fs');
+            let issue_number = Number(fs.readFileSync('./pr_number', 'utf8').trim());
+            await octokit.request(`DELETE /repos/{owner}/{repo}/issues/{issue_number}/labels/{name}`, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              name: 'waiting: response from author'
+            })
 
