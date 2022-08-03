@@ -36,7 +36,7 @@ jobs:
   pr-review:
     runs-on: ubuntu-latest
     name: Review
-    if: github.event_name == 'pull_request_review' && (github.event.review.sender != 'eth-bot' && github.event.review.sender != "Pandapip1-bot") && (github.event.review.state == 'approved' || github.event.review.state == 'dismissed')
+    if: github.event_name == 'pull_request_review' && (github.event.review.sender != 'eth-bot' && github.event.review.sender != 'Pandapip1-bot') && (github.event.review.state == 'approved' || github.event.review.state == 'dismissed')
     steps:
       - name: Write PR Number
         run: echo $PR_NUMBER > pr-number.txt
