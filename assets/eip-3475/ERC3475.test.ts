@@ -112,7 +112,7 @@ contract('Bond', async (accounts: string[]) => {
     })
 
 
-    it('should not redeem bonds when conditions are met', async () => {
+    it('should not redeem bonds when conditions are not met', async () => {
         const redemptionTransaction: _transaction[] = [
            
             {
@@ -123,7 +123,6 @@ contract('Bond', async (accounts: string[]) => {
             },
 
         ];
-
 
         await bondContract.issue(accounts[2],redemptionTransaction, {from: accounts[2]});
         assert.equal((await bondContract.balanceOf(accounts[2], 0, 0)).toNumber(), 2000);
@@ -204,7 +203,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(tx);
     })
 
-    it('should approve spender to manage a given amount of bonds from the caller address', async () => {
+    it('approve (called by bond owner) should be able to give  spender permissions for  managing  a given amount of bonds', async () => {
         const transactionApprove: _transaction[] = [
             {
                 classId: DBITClassId,
@@ -217,7 +216,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(tx);
     })
 
-    it('should setApprovalFor operator to manage bonds from classId given from the caller address', async () => {
+    it('setApprovalFor (called by bond owner) should be able to give operator  permissions to manage bonds for given  classId', async () => {
         const tx = (await bondContract.setApprovalFor(operator, true, { from: lender })).tx;
         console.log(tx)
         assert.isString(tx);
@@ -289,7 +288,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(symbol.stringValue);
     })
 
-    it('should return the Values of a bond class given', async () => {
+    it('should return the Values for given bond class', async () => {
         const metadataId = 0;
         
         let _transactionIssuer: _transaction[]
@@ -307,7 +306,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(valuesClass.toString());
     })
 
-    it('should return the infos of a nonce of bond class given', async () => {
+    it('should return the infos of a nonce for given bond class', async () => {
         const metadataId = 0;
 
         const infos = (await bondContract.nonceValues(DBITClassId, firstNonceId, metadataId));
@@ -323,7 +322,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isBoolean(isApproved);
     })
 
-    it('should return if is redeemable', async () => {
+    it('should return if its redeemable', async () => {
         let _transactionIssuer: _transaction[]
         =
         [{
