@@ -32,7 +32,7 @@ jobs:
         with:
           name: pr-number
           path: pr-number.txt
-  
+
   pr-review:
     runs-on: ubuntu-latest
     name: Review
@@ -48,7 +48,7 @@ jobs:
         with:
           name: pr-number
           path: pr-number.txt
-  
+
   dispatch:
     runs-on: ubuntu-latest
     name: Dispatch
