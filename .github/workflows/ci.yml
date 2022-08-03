@@ -12,9 +12,20 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
-      - name: Install OpenSSL
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+
+      - uses: actions/cache@v2
+        id: cache-id
+        with:
+          path: ${{ runner.temp }}/cache-apt-get
+          key: ${{ runner.os }}-cache-apt-get-v1.0
+
+      - uses: airvzxf/cache-anything-new-action@v1.0.1
+        with:
+          script: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev  # Whenever this is updated, update the key on the previous step
+          is_cached: ${{ steps.cache-id.outputs.cache-hit }}
+          cache: ${{ runner.temp }}/cache-apt-get
+          snapshot: /
+          exclude: /boot /data /dev /mnt /proc /run /sys
     
       - name: Install Ruby
         uses: Pandapip1/setup-ruby@54109a457ade8cf444f989ab8a7abcf288feaf30
