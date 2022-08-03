@@ -67,7 +67,7 @@ jobs:
       run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 
   eipw-validator:
-    name: EIPW Validator
+    name: EIP Walidator
     runs-on: ubuntu-latest
     steps:
       - name: Save PR number
