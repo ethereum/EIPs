@@ -144,7 +144,7 @@ MD035:
 MD036: false
 
 # MD037/no-space-in-emphasis - Spaces inside emphasis markers
-MD037: true
+MD037: false
 
 # MD038/no-space-in-code - Spaces inside code span elements
 MD038: true
