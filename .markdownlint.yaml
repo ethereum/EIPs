@@ -54,7 +54,7 @@ MD012:
 MD013: false
 
 # MD014/commands-show-output - Dollar signs used before commands without showing output
-MD014: true
+MD014: false
 
 # MD018/no-missing-space-atx - No space after hash on atx style heading
 MD018: true
