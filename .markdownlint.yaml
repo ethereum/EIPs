@@ -9,7 +9,7 @@ MD002:
 # MD003/heading-style/header-style - Heading style
 MD003:
   # Heading style
-  style: "consistent"
+  style: "atx"
 
 # MD004/ul-style - Unordered list style
 MD004:
