@@ -51,7 +51,7 @@ jobs:
         if: always() && steps.auto-review-bot.status == 'success'
         with:
           token: ${{ secrets.TOKEN }}
-          pull-request: ${{ github.event.number }}
+          pull-request: ${{ steps.save-pr-number.outputs.pr }}
       
       - name: Submit Approval
         if: always() && steps.auto-review-bot.status == 'success'
