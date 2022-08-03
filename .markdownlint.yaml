@@ -157,7 +157,7 @@ MD037: true
 MD038: true
 
 # MD039/no-space-in-links - Spaces inside link text
-MD039: true
+MD039: false
 
 # MD040/fenced-code-language - Fenced code blocks should have a language specified
 MD040: true
