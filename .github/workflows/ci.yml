@@ -20,7 +20,7 @@ jobs:
           deployment: false
 
       - name: Add Jekyll Website Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             _site
@@ -29,7 +29,7 @@ jobs:
           key: build-jekyll-${{ github.event.pull_request.number }}-${{ github.run_id }}
 
       - name: Fetch Jekyll Website Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             _site
