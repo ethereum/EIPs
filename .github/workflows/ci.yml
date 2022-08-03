@@ -19,16 +19,7 @@ jobs:
           bundler-cache: true
           deployment: false
 
-      - name: Add Jekyll Website Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            _site
-            .jekyll-metadata
-            tmp/.htmlproofer
-          key: build-jekyll-${{ github.event.pull_request.number }}-${{ github.run_id }}
-
-      - name: Fetch Jekyll Website Cache
+      - name: Jekyll Website Cache
         uses: actions/cache@v3
         with:
           path: |
@@ -38,6 +29,14 @@ jobs:
           key: build-jekyll-${{ github.event.pull_request.number }}-${{ github.run_id }}
           restore-keys: |
             build-jekyll-${{ github.event.pull_request.number }}-
+      
+      - name: Debug
+        run: |
+          ls -la .
+          ls -la _site
+          [ -e .jekyll-metadata ] && echo "Jekyll Metadata Exists"
+          [ -e tmp/.htmlproofer ] && ls -la tmp/.htmlproofer
+
 
       - name: Build Website
         run: |
