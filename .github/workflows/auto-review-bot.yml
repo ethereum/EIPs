@@ -15,6 +15,7 @@ jobs:
         uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
         with:
           name: pr-number
+          workflow: auto-review-trigger.yml
           run_id: ${{ github.event.workflow_run.id }}
 
       - name: Save PR Number
