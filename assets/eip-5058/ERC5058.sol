@@ -84,17 +84,13 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     /**
      * @dev See {IERC5058-lockFrom}.
      */
-    function lockFrom(
-        address owner,
-        uint256 tokenId,
-        uint256 expired
-    ) public virtual override {
+    function lock(uint256 tokenId, uint256 expired) public virtual override {
         //solhint-disable-next-line max-line-length
         require(_isLockApprovedOrOwner(_msgSender(), tokenId), "ERC5058: lock caller is not owner nor approved");
         require(expired > block.number, "ERC5058: expired time must be greater than current block number");
         require(!isLocked(tokenId), "ERC5058: token is locked");
 
-        _lock(_msgSender(), owner, tokenId, expired);
+        _lock(_msgSender(), tokenId, expired);
     }
 
     /**
@@ -125,11 +121,10 @@ abstract contract ERC5058 is ERC721, IERC5058 {
      */
     function _lock(
         address operator,
-        address owner,
         uint256 tokenId,
         uint256 expired
     ) internal virtual {
-        require(ERC721.ownerOf(tokenId) == owner, "ERC5058: lock from incorrect owner");
+        address owner = ERC721.ownerOf(tokenId);
 
         _beforeTokenLock(operator, owner, tokenId, expired);
 
@@ -160,7 +155,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
 
         _safeMint(to, tokenId, _data);
 
-        _lock(address(0), to, tokenId, expired);
+        _lock(address(0), tokenId, expired);
     }
 
     /**

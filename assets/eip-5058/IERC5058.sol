@@ -3,7 +3,6 @@
 
 pragma solidity ^0.8.0;
 
-
 /**
  * @dev ERC-721 Non-Fungible Token Standard, optional lockable extension
  * ERC721 Token that can be locked for a certain period and cannot be transferred.
@@ -13,7 +12,7 @@ pragma solidity ^0.8.0;
  * If the nft lending protocol is compatible with this extension, the trouble caused by the NFT
  * airdrop can be avoided, because the airdrop is still in the user's wallet
  */
-interface IERC5058 is IERC721 {
+interface IERC5058 {
     /**
      * @dev Emitted when `tokenId` token is locked by `operator` from `owner`.
      */
@@ -48,7 +47,6 @@ interface IERC5058 is IERC721 {
      *
      * Requirements:
      *
-     * - `owner` cannot be the zero address.
      * - `tokenId` token must be owned by `owner`.
      * - `expired` must be greater than block.number
      * - If the caller is not `from`, it must be approved to lock this token
@@ -56,11 +54,7 @@ interface IERC5058 is IERC721 {
      *
      * Emits a {Locked} event.
      */
-    function lockFrom(
-        address owner,
-        uint256 tokenId,
-        uint256 expired
-    ) external;
+    function lock(uint256 tokenId, uint256 expired) external;
 
     /**
      * @dev Unlock `tokenId` token.
