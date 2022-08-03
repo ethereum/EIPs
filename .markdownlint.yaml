@@ -4,10 +4,8 @@ default: false
 
 # MD001/heading-increment/header-increment - Heading levels should only increment by one level at a time
 MD001: true
-# MD002/first-heading-h1/first-header-h1 - First heading should be a top-level heading
-MD002:
-  # Heading level
-  level: 1
+# MD002/first-heading-h1/first-header-h1 - First heading should be a top-level heading (deprecated)
+MD002: false
 
 # MD003/heading-style/header-style - Heading style
 MD003:
