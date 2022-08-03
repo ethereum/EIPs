@@ -17,21 +17,19 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
     
       - name: Install Ruby
-        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
+        uses: Pandapip1/setup-ruby@135c3230b3eb0563ebee31026e7b5d4f4465c6a3
         with:
           ruby-version: 2.6.0
-          bundler-cache: false
+          bundler-cache: true
+          deployment: false
       
-      - name: Install Dependencies
-        run: bundle config --local deployment false && bundle install
-        
       - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
       
       - name: HTML Proofer
-        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
+        run: bundle exec htmlproofer ./_site --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
