@@ -59,3 +59,4 @@ jobs:
         uses: hmarr/auto-approve-action@24ec4c8cc344fe1cdde70ff37e55ace9e848a1d8
         with:
           github-token: ${{ secrets.TOKEN }}
+          pull-request-number: ${{ steps.save-pr-number.outputs.pr }}
