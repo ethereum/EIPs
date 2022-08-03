@@ -17,7 +17,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
     
       - name: Install Ruby
-        uses: Pandapip1/setup-ruby@dc3a886b8ab5044cf72ff2a9cb26704862b3a6a5
+        uses: Pandapip1/setup-ruby@377d64a90c7769dd9c6186274c96b61db0d981e2
         with:
           ruby-version: 2.6.0
           bundler-cache: true
