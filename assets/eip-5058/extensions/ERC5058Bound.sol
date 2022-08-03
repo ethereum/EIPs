@@ -27,7 +27,7 @@ abstract contract ERC5058Bound is ERC5058 {
 
     // NOTE:
     //
-    // this will be called when `lockFrom` or `unlock`
+    // this will be called when `lock` or `unlock`
     function _afterTokenLock(
         address operator,
         address from,

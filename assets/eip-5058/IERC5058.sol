@@ -62,7 +62,7 @@ interface IERC5058 {
      * Requirements:
      *
      * - `tokenId` token must be owned by `from`.
-     * - the caller must be the operator who locks the token by {lockFrom}
+     * - the caller must be the operator who locks the token by {lock}
      *
      * Emits a {Unlocked} event.
      */
@@ -82,7 +82,7 @@ interface IERC5058 {
 
     /**
      * @dev Approve or remove `operator` as an lock operator for the caller.
-     * Operators can call {lockFrom} for any token owned by the caller.
+     * Operators can call {lock} for any token owned by the caller.
      *
      * Requirements:
      *

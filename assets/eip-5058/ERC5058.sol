@@ -82,7 +82,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
     }
 
     /**
-     * @dev See {IERC5058-lockFrom}.
+     * @dev See {IERC5058-lock}.
      */
     function lock(uint256 tokenId, uint256 expired) public virtual override {
         //solhint-disable-next-line max-line-length

@@ -64,19 +64,19 @@ describe("EIP5058 contract", function() {
     expect(await EIP5058.isLocked(NFTId)).eq(false);
   });
   
-  it("lockFrom works", async function() {
+  it("lock works", async function() {
     const NFTId = 0;
     let block = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(block);
     const timestamp = blockBefore.timestamp;
     await EIP5058.lockMint(owner.address, NFTId, timestamp + 3);
     
-    await expect(EIP5058.lockFrom(owner.address, NFTId, timestamp + 5)).to.be.revertedWith(
+    await expect(EIP5058.lock(NFTId, timestamp + 5)).to.be.revertedWith(
       "EIP5058: token is locked",
     );
     
     await ethers.provider.send("evm_mine", []);
-    await EIP5058.lockFrom(owner.address, NFTId, timestamp + 5);
+    await EIP5058.lock(NFTId, timestamp + 5);
   });
   
   it("unlock works with lockMint", async function() {
@@ -104,7 +104,7 @@ describe("EIP5058 contract", function() {
     const block = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(block);
     const timestamp = blockBefore.timestamp;
-    await EIP5058.lockFrom(owner.address, NFTId, timestamp + 3);
+    await EIP5058.lock(NFTId, timestamp + 3);
     expect(await EIP5058.isLocked(NFTId)).eq(true);
     await EIP5058.unlock(NFTId);
     expect(await EIP5058.isLocked(NFTId)).eq(false);
@@ -117,17 +117,17 @@ describe("EIP5058 contract", function() {
     let block = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(block);
     const timestamp = blockBefore.timestamp;
-    await expect(EIP5058.lockFrom(owner.address, NFTId, timestamp + 2)).to.be.revertedWith(
+    await expect(EIP5058.lock(NFTId, timestamp + 2)).to.be.revertedWith(
       "EIP5058: lock caller is not owner nor approved",
     );
     
     await EIP5058.connect(alice).lockApprove(owner.address, NFTId);
     expect(await EIP5058.getLockApproved(NFTId)).eq(owner.address);
     
-    await expect(EIP5058.lockFrom(owner.address, NFTId, timestamp + 4)).to.be.revertedWith(
+    await expect(EIP5058.lock(NFTId, timestamp + 4)).to.be.revertedWith(
       "EIP5058: lock from incorrect owner",
     );
-    await EIP5058.lockFrom(alice.address, NFTId, timestamp + 6);
+    await EIP5058.lock(NFTId, timestamp + 6);
     expect(await EIP5058.isLocked(NFTId)).eq(true);
     
     await expect(EIP5058.lockApprove(alice.address, NFTId)).to.be.revertedWith(
@@ -142,14 +142,14 @@ describe("EIP5058 contract", function() {
     const block = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(block);
     const timestamp = blockBefore.timestamp;
-    await expect(EIP5058.lockFrom(alice.address, NFTId, timestamp + 2)).to.be.revertedWith(
+    await expect(EIP5058.lock(NFTId, timestamp + 2)).to.be.revertedWith(
       "EIP5058: lock caller is not owner nor approved",
     );
     
     await EIP5058.connect(alice).setLockApprovalForAll(owner.address, true);
     expect(await EIP5058.isLockApprovedForAll(alice.address, owner.address)).eq(true);
     
-    await EIP5058.lockFrom(alice.address, NFTId, timestamp + 6);
+    await EIP5058.lock(NFTId, timestamp + 6);
     
     await EIP5058.connect(alice).setLockApprovalForAll(owner.address, false);
     expect(await EIP5058.isLockApprovedForAll(alice.address, owner.address)).eq(false);
