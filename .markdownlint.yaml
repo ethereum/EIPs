@@ -175,11 +175,7 @@ MD042: true
 
 # MD043/required-headings/required-headers - Required heading structure
 # Handled by EIP Walidator
-MD043:
-  # List of headings
-  headings: []
-  # List of headings
-  headers: []
+MD043: false
 
 # MD044/proper-names - Proper names should have the correct capitalization
 MD044:
