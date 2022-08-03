@@ -98,7 +98,7 @@ MD026:
   punctuation: ".,;:!。，；：！"
 
 # MD027/no-multiple-space-blockquote - Multiple spaces after blockquote symbol
-MD027: true
+MD027: false
 
 # MD028/no-blanks-blockquote - Blank line inside blockquote
 MD028: true
