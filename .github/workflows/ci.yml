@@ -19,8 +19,11 @@ jobs:
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
-          ruby-version: '2.6.0'
-          bundler-cache: true
+          ruby-version: 2.6.0
+          bundler-cache: false
+      
+      - name: Install Dependencies
+        run: bundle config --local deployment false && bundle install
         
       - name: Build Website
         run: |
