@@ -12,22 +12,30 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-    
+
       - name: Install Ruby
         uses: Pandapip1/setup-ruby@54109a457ade8cf444f989ab8a7abcf288feaf30
         with:
           ruby-version: 2.6.0
           bundler-cache: true
           deployment: false
-      
+
+      - name: Cache Jekyll Website
+        uses: actions/cache@v3
+        with:
+          path: |
+            _site
+            .jekyll-metadata
+          key: build-jekyll
+
       - name: Build Website
         run: |
           bundle exec jekyll doctor
           bundle exec jekyll build
-      
+
       - name: HTML Proofer
-        run: bundle exec htmlproofer ./_site --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
-      
+        run: bundle exec htmlproofer ./_site --log-level=:error --ignore_missing_alt --disable-external
+
       - name: DNS Validator
         run: bundle exec github-pages health-check
   
