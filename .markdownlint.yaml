@@ -19,9 +19,8 @@ MD004:
 # MD005/list-indent - Inconsistent indentation for list items at the same level
 MD005: true
 
-# MD006/ul-start-left - Consider starting bulleted lists at the beginning of the line
-MD006: true
-
+# MD006/ul-start-left - Consider starting bulleted lists at the beginning of the line (deprecated)
+MD006: false
 # MD007/ul-indent - Unordered list indentation
 MD007:
   # Spaces for indent
