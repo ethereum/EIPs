@@ -1,0 +1,32 @@
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  pull_request_review:
+    types:
+      - submitted
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull Request Number
+        type: string
+        required: true
+
+name: Auto Review Bot Trigger
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    name: Trigger
+    steps:
+      - name: Write PR Number
+        run: echo $PR_NUMBER > pr-number.txt
+        env:
+          PR_NUMBER: ${{ github.event.number || inputs.pr_number }}
+
+      - name: Save PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        with:
+          name: pr-number
+          path: pr-number.txt

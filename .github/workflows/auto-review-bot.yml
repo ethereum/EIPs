@@ -1,53 +1,21 @@
 on:
-  # Trigger on the following events
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-  pull_request_review:
-    types:
-      - submitted
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: Pull Request Number
-        type: string
-        required: true
-  # Run merge bot with secrets once the trigger has populated the necessary data
   workflow_run:
     workflows:
-      - Auto Review Bot
+      - Auto Review Bot Trigger
     types:
       - completed
 
 name: Auto Review Bot
 jobs:
-  trigger:
-    runs-on: ubuntu-latest
-    name: Trigger
-    if: github.event_name != 'workflow_run'
-    steps:
-      - name: Write PR Number
-        run: echo $PR_NUMBER > pr-number.txt
-        env:
-          PR_NUMBER: ${{ github.event.number || inputs.pr_number }}
-
-      - name: Save PR Number
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
-        with:
-          name: pr-number
-          path: pr-number.txt
-  
   auto-review-bot:
     runs-on: ubuntu-latest
     name: Run
-    if: github.event_name == 'workflow_run'
     steps:
       - name: Fetch PR Number
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741
+        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
         with:
           name: pr-number
+          run_id: github.event.workflow_run.id
       
       - name: Save PR Number
         id: save-pr-number
