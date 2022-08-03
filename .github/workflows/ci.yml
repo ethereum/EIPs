@@ -46,7 +46,7 @@ jobs:
 
       - name: HTML Proofer
         run: |
-          bundle exec htmlproofer ./_site --log-level=:error --ignore_missing_alt=true --disable-external=true --cache="{ \"cache\": { \"timeframe\": { \"external\": \"2w\", \"internal\": \"1w\" } } }" --parallel="{\"in_threads\": 8 }"
+          bundle exec htmlproofer ./_site --log-level=:error --ignore_missing_alt=true --disable-external=true --cache=\{\"timeframe\":\{\"external\":\"2w\",\"internal\":\"1w\"\}\} --parallel=\{\"in_threads\":8\}
         continue-on-error: true
 
       - name: DNS Validator
