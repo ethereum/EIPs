@@ -26,7 +26,7 @@ jobs:
           path: |
             _site
             .jekyll-metadata
-          key: build-jekyll
+          key: build-jekyll-${{ github.event.number }}
 
       - name: Build Website
         run: |
