@@ -1,7 +1,6 @@
 name: Continuous Integration
 
 on:
-  push:
   pull_request:
 
 jobs:
@@ -27,7 +26,7 @@ jobs:
             _site
             .jekyll-metadata
             tmp/.htmlproofer
-          key: build-jekyll-${{ github.event.number }}
+          key: build-jekyll-${{ github.event.pull_request.number }}
 
       - name: Build Website
         run: |
@@ -47,7 +46,7 @@ jobs:
       - name: DNS Validator
         run: bundle exec github-pages health-check
         continue-on-error: true
-  
+
   codespell:
     name: CodeSpell
     runs-on: ubuntu-latest
