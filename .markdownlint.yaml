@@ -148,9 +148,7 @@ MD035:
   style: "consistent"
 
 # MD036/no-emphasis-as-heading/no-emphasis-as-header - Emphasis used instead of a heading
-MD036:
-  # Punctuation characters
-  punctuation: ".,;:!?。，；：！？"
+MD036: false
 
 # MD037/no-space-in-emphasis - Spaces inside emphasis markers
 MD037: true
