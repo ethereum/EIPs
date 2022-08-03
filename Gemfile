@@ -11,14 +11,14 @@ source "https://rubygems.org"
 gem "minima", "~> 2.0"
 
 # Use better liquid gem
-gem "liquid-c"
+gem "liquid-c", "~> 4.0.0"
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.11"
-  gem "github-pages", "206"
-  gem "jekyll-commonmark-ghpages"  # Additional performance improvements
-  gem "jekyll-include-cache"
+  gem "github-pages", "~> 227"
+  gem "jekyll-commonmark-ghpages", "~> 0.2.0"  # Additional performance improvements
+  gem "jekyll-include-cache", "~> 0.2.1"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
