@@ -1,10 +1,10 @@
-on: [pull_request_target]
+on: [ pull_request_target ]
 name: Auto-Merge Bot
 jobs:
   auto_merge_bot:
     runs-on: ubuntu-latest
     name: EIP Auto-Merge Bot
-    if: github.event.pull_request.draft == false
+    if: github.repository == 'ethereum/eips'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -13,21 +13,14 @@ jobs:
         with:
           node-version: '14'
       - name: auto-merge-bot
-        uses: ethereum/EIP-Bot@db360cbd0741a3810a0ed7f496c058c9f3f4fd0f # master
+        uses: ethereum/EIP-Bot@16ab13b9d6ce0ba7404afc4a75f2da9e3db69dbb # master
         id: auto-merge-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }} 
-          MERGE_ENABLED: false
-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic"
-          ERC_EDITORS: "@lightclient,@axic"
-          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
-          INTERFACE_EDITORS: "@lightclient,@axic"
-          META_EDITORS: "@lightclient,@axic"
-          INFORMATIONAL_EDITORS: "@lightclient,@axic"
-  enable-auto-merge:
-    runs-on: ubuntu-latest
-    needs: ["auto_merge_bot"]
-    steps:
-    - uses: alexwilson/enable-github-automerge-action@1.0.0
-      with:
-        github-token: ${{ secrets.TOKEN }}
+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
+          ERC_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
+          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
+          INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn,@Pandapip1"
+          META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
+          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1"
+          MAINTAINERS: "@alita-moore,@mryalamanchi"
