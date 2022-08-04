@@ -126,4 +126,8 @@ jobs:
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@d199b6e1b89360c71e0c21eac02f7965faf07ba6
         with:
-          globs: '**/*.md'
+          command: config
+          globs: |
+            config/.markdownlint.yaml
+            EIPS/*.md
+            *.md

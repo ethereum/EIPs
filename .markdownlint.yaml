@@ -34,21 +34,13 @@ MD009:
   strict: false
 
 # MD010/no-hard-tabs - Hard tabs
-MD010:
-  # Include code blocks
-  code_blocks: true
-  # Fenced code languages to ignore
-  ignore_code_languages: []
-  # Number of spaces for each hard tab
-  spaces_per_tab: 1
+MD010: false
 
 # MD011/no-reversed-links - Reversed link syntax
 MD011: true
 
 # MD012/no-multiple-blanks - Multiple consecutive blank lines
-MD012:
-  # Consecutive blank lines
-  maximum: 1
+MD012: false
 
 # MD013/line-length - Line length
 # Changed from default due to the fact that paragraphs should be on a single line.
@@ -70,11 +62,7 @@ MD020: true
 MD021: true
 
 # MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines
-MD022:
-  # Blank lines above heading
-  lines_above: 1
-  # Blank lines below heading
-  lines_below: 1
+MD022: false
 
 # MD023/heading-start-left/header-start-left - Headings must start at the beginning of the line
 MD023: true
@@ -94,9 +82,7 @@ MD025:
   front_matter_title: "^\\s*title\\s*[:=]"
 
 # MD026/no-trailing-punctuation - Trailing punctuation in heading
-MD026:
-  # Punctuation characters
-  punctuation: ".,;:!。，；：！"
+MD026: false
 
 # MD027/no-multiple-space-blockquote - Multiple spaces after blockquote symbol
 MD027: false
@@ -105,9 +91,7 @@ MD027: false
 MD028: true
 
 # MD029/ol-prefix - Ordered list item prefix
-MD029:
-  # List style
-  style: "one_or_ordered"
+MD029: false
 
 # MD030/list-marker-space - Spaces after list markers
 MD030:
@@ -154,7 +138,7 @@ MD038: true
 MD039: false
 
 # MD040/fenced-code-language - Fenced code blocks should have a language specified
-MD040: true
+MD040: false
 
 # MD041/first-line-heading/first-line-h1 - First line in a file should be a top-level heading
 # NOTE: Since this uses Jekyll, this setting only applies to freestanding markdown files, such as those in the assets folder
