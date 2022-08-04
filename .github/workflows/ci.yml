@@ -98,28 +98,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       
-      - name: Get Changed Files
+      - name: Delete Unchanged Files
         id: changed-files
-        uses: tj-actions/changed-files@6c44eb8294bb9c93d6118427f4ff8404b695e1d7
-
-      - name: Delete Unmodified Files
-        run: |
-          cd $GITHUB_WORKSPACE
-          mkdir all
-          shopt -s extglob dotglob
-          mv !(all) all
-          shopt -u dotglob
-          mkdir unchanged
-          cd all
-          for FILE in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            [ -f ${FILE} ] && mkdir -p $(dirname "../unchanged/${FILE}")
-            [ -f ${FILE} ] && cp ${FILE} ../unchanged/${FILE}
-          done
-          cd ..
-          rm -rf all
-          cp -r unchanged/* .
-          cd ..
-          rm -rf unchanged
+        uses: Pandapip1/delete-unchanged-files@0937c94da2e9f9f262bbf2035e75065a1fd04bcf
           
       - name: Check License Lines
         uses: kt3k/license_checker@d12a6d90c58e30fefed09f2c4d03ba57f4c673a8
