@@ -5,3 +5,4 @@
 "type: Informational": this?.new?.type == "Informational"
 "type: Meta": this?.new?.type == "Meta" && this?.old?.eip != "1"
 "type: EIP1 (Process)": this?.old?.eip == "1"
+"waiting: EIP number": !isNaN(this?.new?.eip)
