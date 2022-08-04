@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 5409
 title: EIP-1155 Non-Fungible Token extension
 description: Allow EIP-1155 to represent Non-Fungible Tokens (tokens who have a unique owner)
 author: Ronan Sandford (@wighawag)
@@ -48,15 +48,17 @@ The `supportsInterface` method MUST return `true` when called with `0x6352211e`.
 
 Having the ability to fetch the owner for EIP-1155 tokens that have one, allows us to use them in most of the EIP-721 ecosystem, without the need to implement the whole EIP-721 spec which comes with inefficiencies.
 
-`ownerOf` do not throw when a token does not exist (or does not have an owner). This simplifies the handling of such a case. And since it would be a security risk to assume all ERC721 implementation would throw, it should not break compatibility with contract handling ERC721 when dealing with this ERC1155 extension.
+`ownerOf` do not throw when a token does not exist (or does not have an owner). This simplifies the handling of such a case. And since it would be a security risk to assume all EIP-721 implementation would throw, it should not break compatibility with contract handling EIP-721 when dealing with this EIP-1155 extension.
 
 ## Backwards Compatibility
 
-It is fully backwards compatible with ERC1155.
+It is fully backwards compatible with EIP-1155.
 
-As for ERC721, There is no intention to support ERC721 here, but the use of the same function `ownerOf` should allow many applications tied to ERC721 to be compatible with ERC1155. Not all though.
+As for EIP-721, There is no intention to support EIP-721 here, but the use of the same function `ownerOf` should allow many applications tied to EIP-721 to be compatible with EIP-1155. Not all though.
 
 ## Reference Implementation
+
+## Security Considerations
 
 ## Copyright
 
