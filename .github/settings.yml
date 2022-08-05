@@ -1,0 +1,104 @@
+# These settings are synced to GitHub by https://probot.github.io/apps/settings/
+
+repository:
+  # Repository Sidebar
+  name: EIPs
+  description: The Ethereum Improvement Proposal repository
+  homepage: https://eips.ethereum.org/
+  topics: ethereum
+  
+  # Features
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: true
+
+  # Git Settings
+  default_branch: master
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  delete_branch_on_merge: true
+
+  # Dependabot Stuff
+  enable_automated_security_fixes: true
+  enable_vulnerability_alerts: true
+
+labels:
+  # Dependabot Labels
+  - name: dependencies
+    description: Pull requests that update a dependency file
+  - name: javascript
+    description: Pull requests that update Javascript code
+  - name: ruby
+    description: Pull requests that update Ruby code
+
+  # EIP-Bot labels
+  - name: statusChange
+  - name: ambiguous
+  - name: newEIPFile
+  - name: updateEIP
+  - name: stagnant
+  - name: created-by-bot
+
+  # EIP Types
+  - name: type: Core
+  - name: type: EIP1 (Process)
+  - name: type: ERC
+  - name: type: Informational
+  - name: type: Interface
+  - name: type: Meta
+  - name: type: Networking
+
+  # CI Error Labels
+  - name: "waiting: codespell to pass"
+    color: CC0000
+    description: This Pull Request is currently not passing the automated checks of codespell.
+  - name: "waiting: htmlproofer to pass"
+    color: CC0000
+    description: This Pull Request is currently not passing the automated checks of HTML Proofer.
+  - name: "waiting: walidator to pass"
+    color: CC0000
+
+  # Stale Bot
+  - name: "waiting: no recent activity"
+    color: CC0000
+    description: This PR hasn't received activity in a while, and will eventually be closed if nothing happens.
+  - name: discussions-to
+  - name: stale
+
+  # Review Labels
+  - name: waiting: review needs attention
+    color: CC0000
+    description: This PR has received feedback from an EIP Editor/Author and is awaiting the PR Author to update.
+  - name: waiting: author to review
+    color: CC0000
+    description: This Pull Request changese an EIP and requires review by an author of that EIP.
+  - name: waiting: editor to review
+    color: CC0000
+    description: This Pull Request requires review by an EIP Editor.
+
+collaborators:
+  - username: MicahZoltu
+    permission: admin
+  - username: axic
+    permission: admin
+
+branches:
+  - name: master
+    protection:
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+        require_code_owner_reviews: true
+        dismissal_restrictions:
+          users:
+            - MicahZoltu
+            - axic
+          teams:
+      required_status_checks:
+        strict: true
+        contexts: []
+      enforce_admins: null
+      required_linear_history: true
+      restrictions: null
