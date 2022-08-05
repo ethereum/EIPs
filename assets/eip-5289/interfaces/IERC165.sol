@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
-// Copied from EIP-165
-pragma solidity ^0.4.20;
+pragma solidity ^0.8.0;
 
 interface IERC165 {
     /// @notice Query if a contract implements an interface

@@ -1,8 +1,8 @@
 /// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./ERC5289Library.sol";
-import "./IERC165.sol";
+import "./interfaces/ERC5289Library.sol";
+import "./interfaces/IERC165.sol";
 
 contract ERC5289Library is IERC5289Library, IERC165 {
     uint16 private counter = 0;
@@ -12,8 +12,7 @@ contract ERC5289Library is IERC5289Library, IERC165 {
     constructor() { }
 
     function registerDocument(bytes memory multihash) public {
-        uint16 documentId = counter++;
-        multihashes[documentId] = multihash;
+        multihashes[counter++] = multihash;
     }
 
     function legalDocument(uint16 documentId) public view returns (bytes memory) {
