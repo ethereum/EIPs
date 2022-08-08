@@ -3,5 +3,5 @@
 "type: Interface": this?.new?.category == "Interface"
 "type: ERC": this?.new?.category == "ERC"
 "type: Informational": this?.new?.type == "Informational"
-"type: Meta": this?.new?.type == "Meta" && this?.old?.eip != "1"
-"type: EIP1 (Process)": this?.old?.eip == "1"
+"type: Meta": this?.new?.type == "Meta"
+"type: EIP1 (Process)": this?.old?.status == "Living" || this?.old?.eip == "<to be assigned>"
