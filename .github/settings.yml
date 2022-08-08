@@ -79,7 +79,7 @@ labels:
     description: This Pull Request requires review by an EIP Editor.
 
 collaborators:
-  - username: MicahZoltu
+  - username: SamWilsn
     permission: admin
   - username: axic
     permission: admin
