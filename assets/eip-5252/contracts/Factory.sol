@@ -7,7 +7,7 @@ import "./Finance.sol";
 import "./libraries/CloneFactory.sol";
 import "./interfaces/IFactory.sol";
 
-contract Factory is AccessControl, IVaultFactory {
+contract Factory is AccessControl, IFactory {
   // Vaults
   address[] public allFinances;
   /// Address of cdp nft registry

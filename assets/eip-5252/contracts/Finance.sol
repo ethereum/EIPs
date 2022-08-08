@@ -14,20 +14,18 @@ contract Finance is IFinance, Initializable {
   address public override manager;
   /// Address of a factory
   address public override factory;
-  /// Address of debt;
-  address public override debt;
-  /// Address of vault ownership registry
+  /// Address of account bound token
   address public override abt;
-  /// Vault global identifier
+  /// Finance global identifier
   uint256 public override financeId;
   /// Address of wrapped eth
   address public override WETH;
-  /// Vault Creation Date
+  /// Finance Creation Date
   uint256 public override createdAt;
-  /// Vault Last Updated Date
+  /// Finance Last Updated Date
   uint256 public override lastUpdated;
 
-  modifier onlyVaultOwner() {
+  modifier onlyFinanceOwner() {
     require(
       IABT(abt).ownerOf(financeId) == msg.sender,
       "Finance: Finance is not owned by you"
@@ -42,7 +40,7 @@ contract Finance is IFinance, Initializable {
     address abt_,
     uint256 amount_,
     address weth_
-  ) external initializer {
+  ) external override initializer {
     financeId = financeId_;
     abt = abt_;
     WETH = weth_;
@@ -52,24 +50,23 @@ contract Finance is IFinance, Initializable {
     createdAt = block.timestamp;
   }
   
-  function depositNative() external payable onlyVaultOwner {
+  function depositNative() external payable onlyFinanceOwner {
     // wrap deposit
     IWETH(WETH).deposit{ value: msg.value }();
-    emit DepositCollateral(financeId, msg.value);
+    emit DepositFundNative(financeId, msg.value);
   }
 
   /// Withdraw collateral as native currency
   function withdrawNative(uint256 amount_)
     external
     virtual
-    override
-    onlyVaultOwner
+    onlyFinanceOwner
   {
     // unwrap collateral
     IWETH(WETH).withdraw(amount_);
     // send withdrawn native currency
     TransferHelper.safeTransferETH(msg.sender, address(this).balance);
-    emit WithdrawCollateral(financeId, amount_);
+    emit WithdrawFundNative(financeId, amount_);
   }
 
   receive() external payable {
