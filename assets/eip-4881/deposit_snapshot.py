@@ -5,11 +5,27 @@ from dataclasses import dataclass
 from abc import ABC,abstractmethod
 from eip4881 import DEPOSIT_CONTRACT_DEPTH,Hash32,sha256,to_le_bytes,zerohashes
 
+
 @dataclass
 class DepositTreeSnapshot:
-    finalized: List[Hash32]
+    finalized: List[Hash32, DEPOSIT_CONTRACT_DEPTH]
     deposits: uint64
+    deposit_tree_root: Hash32
     execution_block_hash: Hash32
+    execution_block_height: uint64
+    def calculate_root(self): -> Hash32
+        size = self.deposits
+        index = len(self.finalized)
+        root = zerohashes[0]
+        for height in range(0, DEPOSIT_CONTRACT_DEPTH):
+            if (size & 1) == 1:
+                index -= 1
+                root = sha256(self.finalized[index], root)
+            else:
+                root = sha256(root, zerohashes[height])
+            size = int(size / 2)
+        return sha256(root, to_le_bytes(self.deposits))
+
 
 @dataclass
 class DepositTree:
