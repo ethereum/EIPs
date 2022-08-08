@@ -1,3 +1,2 @@
 # Require a review from these people in order to merge potentially dangerous changes
-.github     @SamWilsn
-.github     @axic
+.github     @SamWilsn @axic
