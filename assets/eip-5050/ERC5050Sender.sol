@@ -1,20 +1,16 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC5050Sender, IERC5050Receiver, Action} from "./IERC5050.sol";
-import {Controllable} from "./Controllable.sol";
 import {ActionsSet} from "./ActionsSet.sol";
 
-contract ERC5050Sender is Controllable, IERC5050Sender {
-    using Address for address;
+contract ERC5050Sender is IERC5050Sender {
     using ActionsSet for ActionsSet.Set;
 
     ActionsSet.Set _sendableActions;
 
     uint256 private _nonce;
-    uint256 private _hash;
+    bytes32 private _hash;
 
     mapping(address => mapping(bytes4 => address)) actionApprovals;
     mapping(address => mapping(address => bool)) operatorApprovals;
@@ -28,7 +24,7 @@ contract ERC5050Sender is Controllable, IERC5050Sender {
         _sendAction(action);
     }
 
-    function isValid(uint256 actionHash, uint256 nonce)
+    function isValid(bytes32 actionHash, uint256 nonce)
         external
         view
         returns (bool)
@@ -41,9 +37,6 @@ contract ERC5050Sender is Controllable, IERC5050Sender {
     }
 
     modifier onlySendableAction(Action memory action) {
-        if (_isApprovedController(msg.sender, action.selector)) {
-            return;
-        }
         require(
             _sendableActions.contains(action.selector),
             "ERC5050: invalid action"
@@ -102,34 +95,32 @@ contract ERC5050Sender is Controllable, IERC5050Sender {
         return operatorApprovals[_account][_operator];
     }
 
-    function _sendAction(Action memory action) internal {
-        if (!_isApprovedController(msg.sender, action.selector)) {
-            action.from._address = address(this);
-            bool toIsContract = action.to._address.isContract();
-            bool stateIsContract = action.state.isContract();
-            address next;
-            if (toIsContract) {
-                next = action.to._address;
-            } else if (stateIsContract) {
-                next = action.state;
-            }
-            uint256 nonce;
-            if (toIsContract && stateIsContract) {
-                _validate(action);
-                nonce = _nonce;
-            }
-            if (next.isContract()) {
-                try
-                    IERC5050Receiver(next).onActionReceived{value: msg.value}(
-                        action,
-                        nonce
-                    )
-                {} catch Error(string memory err) {
-                    revert(err);
-                } catch (bytes memory returnData) {
-                    if (returnData.length > 0) {
-                        revert(string(returnData));
-                    }
+    function _sendAction(Action memory action) internal {   
+        action.from._address = address(this);
+        bool toIsContract = action.to._address.isContract();
+        bool stateIsContract = action.state.isContract();
+        address next;
+        if (toIsContract) {
+            next = action.to._address;
+        } else if (stateIsContract) {
+            next = action.state;
+        }
+        uint256 nonce;
+        if (toIsContract && stateIsContract) {
+            _validate(action);
+            nonce = _nonce;
+        }
+        if (next.isContract()) {
+            try
+                IERC5050Receiver(next).onActionReceived{value: msg.value}(
+                    action,
+                    nonce
+                )
+            {} catch Error(string memory err) {
+                revert(err);
+            } catch (bytes memory returnData) {
+                if (returnData.length > 0) {
+                    revert(string(returnData));
                 }
             }
         }
@@ -147,7 +138,7 @@ contract ERC5050Sender is Controllable, IERC5050Sender {
 
     function _validate(Action memory action) internal {
         ++_nonce;
-        _hash = uint256(
+        _hash = bytes32(
             keccak256(
                 abi.encodePacked(
                     action.selector,

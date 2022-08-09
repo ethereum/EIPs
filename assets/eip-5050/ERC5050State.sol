@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {IERC5050Sender, IERC5050Receiver, Action} from "./IERC5050.sol";
-import {Controllable} from "./Controllable.sol";
 import {ActionsSet} from "./ActionsSet.sol";
 
-contract ERC5050State is Controllable, IERC5050Receiver {
-    using Address for address;
+contract ERC5050State is IERC5050Receiver {
     using ActionsSet for ActionsSet.Set;
 
     ActionsSet.Set private _receivableActions;
@@ -23,14 +19,11 @@ contract ERC5050State is Controllable, IERC5050Receiver {
         _onActionReceived(action, nonce);
     }
 
-    function receivableActions() external view returns (bytes4[] memory) {
-        return _receivableActions.values();
+    function receivableActions() external view returns (string[] memory) {
+        return _receivableActions.names();
     }
 
     modifier onlyReceivableAction(Action calldata action, uint256 nonce) {
-        if (_isApprovedController(msg.sender, action.selector)) {
-            return;
-        }
         require(
             _receivableActions.contains(action.selector),
             "ERC5050: invalid action"
