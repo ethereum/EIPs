@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
 
-// Creator: Chiru Labs
-
 pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
