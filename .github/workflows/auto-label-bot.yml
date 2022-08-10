@@ -1,9 +1,10 @@
 on:
   pull_request_target:
 
+name: Auto Label Bot
 jobs:
   jekyll-label-action:
-    name: Automatic Label Bot
+    name: Label
     runs-on: ubuntu-latest
     
     steps:
