@@ -27,7 +27,7 @@ jobs:
         with:
           repository: ethereum/EIPs # Default, but best to be explicit here
           ref: master
-      
+
       - name: Setup Node.js Environment
         uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93
         with:
