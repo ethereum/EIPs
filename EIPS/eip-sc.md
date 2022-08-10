@@ -1,0 +1,172 @@
+---
+eip: <to be assigned>
+title: Interface for Security Contact of Smart Contract
+description: An interface for security notice using asymmetric encryption
+author: Zainan Zhou (@xinbenlv)
+discussions-to: https://ethereum-magicians.org/t/erc-interface-for-security-contract/10303
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-08-09
+requires: 165
+---
+
+An interface for smart contract developer to specify to communicate to them in secured way.
+A typical use case is for security researcher to report to developer the
+security vulnerability.
+
+## Abstract
+An interface for security notice using asymmetric encryption. The interface exposes a asymmetric encryption key
+and a destination of delivery.
+
+## Motivation
+When security researchers identify security risk of a smart contract, currently there is no official way to
+report the problem to the smart contract maintainer, such as MakerDAO's issue.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+```solidity
+interface ERC_Security_Contact {
+
+    /// REQUIRED
+    function getSecurityContact(bytes memory data) public view
+    returns (
+        uint8 type,
+        bytes memory publicKey,
+        bytes memory extraData
+    );
+
+    /// OPTIONAL
+    function setSecurityContact(
+        uint8 type,
+        bytes memory publicKey,
+        bytes memory extraData) public;
+    event OnSetSecurityContact(uint8 type, bytes memory publicKeyForEncryption, bytes memory extraData);
+
+    /// OPTIONAL
+    function securityNotify(uint8 type, bytes memory data) public payable;
+    /// OPTIONAL
+    event OnSecurityNotification(uint8 type, bytes memory sourceData, uint256 value);
+
+    /// OPTIONAL
+    function bountyPolicy(uint id) public view returns(string);
+}
+```
+
+1. Complying interface MUST implement the method of `getSecurityContact`.
+
+The `type` is a one byte data with valid range of `[0x10, 0x7f]`. The ranges of `[0x00, 0x0f]` and `[0x80, 0xff]` are preserved for future extension.
+
+The `type` indicates the format of the `publicKey` and `extraData` in the following way
+
+------------------------------------------------------------------------------------------------
+| Type | Encryption scheme                   | extraData                                       |
+-------|-------------------------------------|--------------------------------------------------
+| 0x10 | GnuPG - RSA/3072                    | Email address(es) encoded in format of RFC 2822 |
+------------------------------------------------------------------------------------------------
+
+This table can be extended by future EIPs.
+
+2. The `publicKey` returned from `getSecurityContact` MUST follow the encryption scheme specified
+in the table above.
+
+An example of `publicKey` using `RSA/3072` generated via [GnuPG](https://gnupg.org/),
+in a bytes which is ASCII(as in RFC 20) encoding of the public key string. Such as
+
+```text
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+MOA+HDqgA3a9kWbQKSloORq4unft1eu/FCra
+=O6Bf
+-----END PGP PUBLIC KEY BLOCK-----
+```
+
+3. IF `setSecurityContact` is implemented and a call to it has succeeded in setting a new security
+contact, an event `OnSetSecurityContact` MUST be emitted
+with the identical passed-in-parameters of `setSecurityContact`
+
+4. It's also RECOMMENDED that an on-chain security notify method `securityNotify`
+to implemented to receive security notice onchain. If it's implemented and a call
+has succeeded, it MUST emit an `OnSecurityNotification` with identical pass-in-parameter data.
+
+5. Compliant interface MUST implement EIP-165. TODO: add EIP-165 interfaces.
+
+6. It's recommended to set a bounty policy via `bountyPolicy` method. The `id = 0` is preserved for a full overview, while other digits are used for different individual bounty policies. The returned
+string will be URI to content of bounty policies.
+No particular format of bounty policy is specified.
+
+## Rationale
+1. For simplicity we specify a simple GPG scheme with a given encryption scheme and assume email
+addresses to contact. It's possible in the future EIPs will introduce flexibility of specifying
+encyrption scheme or delivery methods.
+
+2. We choose to also include optional method `setSecurityContact` to set security contact,
+anticipating it might change such as due to expiration of encryption keys or change of
+security contact. It's RECOMMENDED to implement such method.
+
+3. We choose to explicitly make `securityNotify` as `payable` which allow implementers to
+set a bar of ethers to be pay/staked when reporting a security issue. It is RECOMMENDED for
+a bounty policy
+
+<!-- TODO also consider requiring/recommending implementing EIP-5629 ERC-interface detection. -->
+
+## Backwards Compatibility
+Currently, existing solutions such as OpenZeppelin use PlainText in source code
+
+```solidity
+/// @custom:security-contact some-user@some-domain.com
+```
+
+It's recommend that new version of smart contract to also adopt this EIP in-addition to
+this `@custom:security-contact` approach.
+
+## Security Considerations
+
+Implementors should properly follow security practice required for the asymmetric schema
+to ensure a secured communication channel to be established when in need, such practices including but
+not limit too:
+
+1. Keep security contact information up-to-date;
+2. Rotate encryption keys in the period recommended by best practice;
+3. Regularly monitor the incoming notification via the security contact information
+such as email inbox to ensure receiving the notice in a timely manner.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
