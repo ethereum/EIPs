@@ -30,7 +30,7 @@ jobs:
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/EIP-Bot@2fdcd2c8f79c90281e6f43f7c0df21211d692c27
+        uses: ethereum/EIP-Bot@363773d8cc20fed3565617a29e531ec7e2f4119d
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
           PR_NUMBER: ${{ steps.save-pr-number.outputs.pr }}
