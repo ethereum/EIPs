@@ -15,7 +15,7 @@ on:
         type: string
         required: true
 
-name: Auto Review Bot
+name: Auto Review Bot Trigger
 jobs:
   trigger:
     runs-on: ubuntu-latest
