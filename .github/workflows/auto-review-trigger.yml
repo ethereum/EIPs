@@ -29,7 +29,7 @@ jobs:
 
       - name: Write PR Number - PR Review
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && !github.event.review.sender.endsWith('-bot') && !github.event.review.sender.endsWith('[bot]')
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && endsWith(github.event.review.sender, '-bot') && endsWith(github.event.review.sender, '[bot]')
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
 
