@@ -28,14 +28,9 @@ jobs:
           repository: ethereum/EIPs # Default, but best to be explicit here
           ref: master
 
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93
-        with:
-          node-version: 14
-
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/EIP-Bot@252101922c71d76a422d9b2c04875f88cd6494d9
+        uses: ethereum/EIP-Bot@2fdcd2c8f79c90281e6f43f7c0df21211d692c27
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
           PR_NUMBER: ${{ steps.save-pr-number.outputs.pr }}
