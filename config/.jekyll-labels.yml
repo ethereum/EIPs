@@ -6,3 +6,6 @@
 "type: Meta": this?.new?.type == "Meta"
 "type: EIP1 (Process)": this?.old?.status == "Living" || this?.old?.eip == "<to be assigned>"
 "waiting: EIP number": "!(this?.new?.eip > 0)"
+"classification: new EIP": this?.new?.eip && !this?.old?.eip
+"classification: update EIP": this?.new?.eip && this?.old?.eip && this?.new?.status == this?.old?.status
+"classification: EIP status change": this?.new?.eip && this?.old?.eip && this?.new?.status != this?.old?.status
