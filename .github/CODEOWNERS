@@ -1,3 +1,4 @@
+# For all default changes, require the auto merge bot
+* @eth-bot
 # Require a review from these people in order to merge potentially dangerous changes
-.github     @SamWilsn
-.github     @axic
+.github     @SamWilsn @axic
