@@ -3,11 +3,11 @@ eip: eip-n
 title: ERC-721 zk-Provable Token Extension
 description: An extension to ERC-721 to introduce private stealth addresses
 author: Anton Wahrstätter (@Nerolation)
-discussions-to: [https://ethresear.ch/t/erc721-extension-for-zk-snarks/13237](https://ethereum-magicians.org/t/stealth-addresses-for-erc721s/10330)
+discussions-to: https://ethereum-magicians.org/t/stealth-addresses-for-erc721s/10330
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-08-10
+created: 2022-08-11
 requires: 165, 721
 ---
 
