@@ -1,6 +1,6 @@
-# Sample Hardhat Project
+# EIP 5252 implementation
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This project is a reference implementation of EIP-5252.
 
 Try running some of the following tasks:
 

@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
-
-// Creator: Chiru Labs
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity ^0.8.4;
 
