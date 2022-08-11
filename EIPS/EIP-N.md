@@ -1,14 +1,14 @@
 ---
-eip: <to be assigned>
+eip: eip-n
 title: ERC-721 zk-Provable Token Extension
-description:  An extension to the ERC-721 standard to introduce private stealth addresses
+description: An extension to ERC-721 to introduce private stealth addresses
 author: Anton Wahrstätter (@Nerolation)
-discussions-to: https://ethresear.ch/t/erc721-extension-for-zk-snarks/13237
+discussions-to: [https://ethresear.ch/t/erc721-extension-for-zk-snarks/13237](https://ethereum-magicians.org/t/stealth-addresses-for-erc721s/10330)
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-08-10
-requires: EIP 165, 721
+requires: 165, 721
 ---
 
 ## Abstract
@@ -45,10 +45,11 @@ interface ERC0001 /* is ERC721, ERC165 */ {
 Stealth Address Generation
     
 
-```
- Sender Keypair    --> (s,S) | S = s * G // s represents a sender-generated secret
- Recipient Keypair --> (p,P) | P = p * G
- 
+
+ Sender Keypair    --> $(s,S) \mid S = s * G.$ The value `s` represents a sender-generated secret.
+    
+ Recipient Keypair --> $(p,P) \mid P = p * G$
+ ```
     
  For transfering:
     sharedSecret    = s*P
@@ -72,10 +73,10 @@ This extension standardizes the method to create and look-up Stealth Addresses. 
 Introducing a private `transfer` function requires no changes to the original ERC-721 standard, while optionally offering a standardized way for users to interact with NFTs more privately.
 
 ## Backwards Compatibility
-EIP--- is fully backwards compatibly with basic `ERC-721` contracts. `EIP---` implements the [`EIP-165`](./eip-165.md) standard.
+EIP--- is fully backwards compatibly with basic `ERC-721` contracts. `EIP---` implements the EIP-165standard.
 
 ## Reference Implementation
-You can find an implementation of this standard in [eip.sol](https://github.com/Nerolation/EIP-ERC-721-Stealth-Addresses/blob/main/eip.sol).
+You can find an implementation of this standard in eip.sol.
 
 ## Security Considerations
 TBD
