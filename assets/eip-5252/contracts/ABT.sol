@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/IABT.sol";
 import "./interfaces/IFinance.sol";
-import "./interfaces/IDesriptor.sol";
+import "./interfaces/IDescriptor.sol";
 
 contract ABT is ERC721A, AccessControl, IABT  {
     // Create a new role identifier for the minter role
@@ -15,7 +15,7 @@ contract ABT is ERC721A, AccessControl, IABT  {
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     // factory address
     address public factory;
-    // SVG for V1
+    // SVG for ABT
     address public descriptor;
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721A, AccessControl) returns (bool) {
@@ -23,13 +23,13 @@ contract ABT is ERC721A, AccessControl, IABT  {
     }
 
     function setDescriptor(address descriptor_) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "V1: Caller is not a default admin");
-        descriptor = desriptor_;
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "ABT: Caller is not a default admin");
+        descriptor = descriptor_;
     }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory tokenURI) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-        tokenURI = INFTSVG(descriptor).tokenURI(tokenId);
+        tokenURI = IDescriptor(descriptor).tokenURI(tokenId);
     }
 
     constructor(address factory_)
@@ -42,24 +42,19 @@ contract ABT is ERC721A, AccessControl, IABT  {
     }
     
     function setFactory(address factory_) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "V1: Caller is not a default admin");
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "ABT: Caller is not a default admin");
         factory = factory_;
     }
 
     function mint(address to) external override {
         // Check that the calling account has the minter role
-        require(_msgSender() == factory, "V1: Caller is not factory");
+        require(_msgSender() == factory, "ABT: Caller is not factory");
         _safeMint(to, 1); 
     }
 
     function burn(uint256 tokenId_) external override {
-        require(hasRole(BURNER_ROLE, _msgSender()), "V1: must have burner role to burn");
+        require(hasRole(BURNER_ROLE, _msgSender()), "ABT: must have burner role to burn");
         _burn(tokenId_);
-    }
-
-    function burnFromVault(uint vaultId_) external override {
-        require(IVaultFactory(factory).getVault(vaultId_)  == _msgSender(), "V1: Caller is not vault");
-        _burn(vaultId_);
     }
 
     function exists(uint256 tokenId_) external view override returns (bool) {
