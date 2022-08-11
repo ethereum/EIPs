@@ -1,0 +1,66 @@
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull Request Number
+        type: string
+        required: true
+
+name: Auto Review Bot Trigger
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    name: Pull Request
+    if: github.event_name == 'pull_request_target'
+    steps:
+      - name: Write PR Number
+        run: echo $PR_NUMBER > pr-number.txt
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Save PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        with:
+          name: pr-number
+          path: pr-number.txt
+
+  pr-review:
+    runs-on: ubuntu-latest
+    name: Review
+    if: github.event_name == 'pull_request_review' && github.event.review.sender != 'eth-bot' && github.event.review.state == 'approved'
+    steps:
+      - name: Write PR Number
+        run: echo $PR_NUMBER > pr-number.txt
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - name: Save PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        with:
+          name: pr-number
+          path: pr-number.txt
+
+  dispatch:
+    runs-on: ubuntu-latest
+    name: Dispatch
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Write PR Number
+        run: echo $PR_NUMBER > pr-number.txt
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+
+      - name: Save PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        with:
+          name: pr-number
+          path: pr-number.txt
