@@ -22,10 +22,10 @@ Example: adding details in bonds describing the local jurisdiction of the bonds 
 "title": "localisation",
 "_type": "string",
 "description": "jurisdiction law codes compatibility"
-"values": ["fr ", "de", "ch"] // can also be ISO codes 
+"values": ["fr ", "de", "ch"]
 }
 ```
-
+The 'values' field defined above  can also be ISO codes or other hex standard representation.
 ## 2. Nonce metadata:
 
 - **Information defining the state of the bond** 
@@ -44,9 +44,9 @@ Example: adding details in bonds describing the local jurisdiction of the bonds 
 
 ## 3. Class metadata:
 
-
 ```json
-[	
+
+[ 
 	{	
 	"title": "symbol",
 	"_type": "string",
@@ -89,5 +89,6 @@ Example: adding details in bonds describing the local jurisdiction of the bonds 
 	"values": [0, 0, 0]
 	}
 ]
+```
 ## Examples of other standards: 
     - ISO-20022 standard is the recently adopted standard by banks for communicating  financial operators (Banks, trading intermediaries, underwriters) that also include bond operations. 
