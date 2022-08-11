@@ -15,7 +15,7 @@ requires: 165, 721
 This specification defines an extension to the [ERC-721](https://eips.ethereum.org/EIPS/eip-721) standard. The extension adds standardized stealth addresses to the ERC-721 standard to enable users private token ownership.
 
 ## Motivation
-A standard interface for private ERC-721 tokens that enables users to recieve tokens without letting other users know. 
+A standard interface for private ERC-721 tokens that enables users to receive tokens without letting other users know. 
 
 Using Stealth Addresses that are generated from a shared secret between the sender and the receiver, the recipients of transfers are obfuscated. 
 
@@ -45,11 +45,11 @@ interface ERC-N /* is ERC721, ERC165 */ {
     
 
 
- Sender Keypair    --> $(s,S) \mid S = s * G.$ The value `s` represents a sender-generated secret.
+ Sender Key pair    --> $(s,S) \mid S = s * G.$ The value `s` represents a sender-generated secret.
     
- Recipient Keypair --> $(p,P) \mid P = p * G$
+ Recipient Key pair --> $(p,P) \mid P = p * G$
  
-  For transfering:
+  For transferring:
  ```console
 sharedSecret    = s*P
 stealthAddress  = pubtoaddr(P + (G * keccak(sharedSecret)))  // ``to`` value
