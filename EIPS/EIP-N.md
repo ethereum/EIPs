@@ -22,13 +22,13 @@ Using Stealth Addresses that are generated from a shared secret between the send
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
-Every `ERC0000` compliant contract MUST implement the `ERC-721` (`0x80ac58cd`) and `ERC165` (`0x01ffc9a7`) interfaces:
+Every `ERC-N` compliant contract MUST implement the `ERC-721` (`0x80ac58cd`) and `ERC165` (`0x01ffc9a7`) interfaces:
 
 ```solidity
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.6;
 ...
-interface ERC0001 /* is ERC721, ERC165 */ {
+interface ERC-N /* is ERC721, ERC165 */ {
 
     /// @notice Broadcasts event with a ``Shared Secret`` whenever a privateTransfer occurs.
     /// @dev Emits event with private transfer information `S`. 
@@ -41,32 +41,32 @@ interface ERC0001 /* is ERC721, ERC165 */ {
 }
     
 ```
-    
-Stealth Address Generation
+#### Stealth Address Generation
     
 
 
  Sender Keypair    --> $(s,S) \mid S = s * G.$ The value `s` represents a sender-generated secret.
     
  Recipient Keypair --> $(p,P) \mid P = p * G$
+ 
+  For transfering:
+ ```console
+sharedSecret    = s*P
+stealthAddress  = pubtoaddr(P + (G * keccak(sharedSecret)))  // ``to`` value
+publishableData = G * s = S                                  // ``publishableData`` value
  ```
     
- For transfering:
-    sharedSecret    = s*P
-    stealthAddress  = pubtoaddr(P + (G * keccak(sharedSecret))) # // ``to`` value
-    publishableData = G * s = S                                   // ``publishableData`` value
-
-    
  For receiving:
-    forall publishableData `S` do:
-        if pubtoaddr(P + (G * keccak(S * p))) has token:
-            store_key(p + keccak(S * p))
+ ```console
+forall publishableData `S` do:
+    if pubtoaddr(P + (G * keccak(S * p))) has token:
+        store_key(p + keccak(S * p))
     
 ```
 
 
 ## Rationale
-`EIP-` emerged from the need of having privacy-preserving ways for interacting with non-fungible tokens (NFTs). NFTs can reveal sensitive private information about the owner. While users might want to prove the ownership of a NFT-concert ticket, they might not want to reveal personal account-related information at the same time. The standardization of stealth address generation for NFTs represents a significant step for privacy. Privacy-preserving solutions require standards to gain adoption, therefore it is critical to focus on generalisable ways of implement ownership-proofs into related contracts.
+`EIP-N` emerged from the need of having privacy-preserving ways for interacting with non-fungible tokens (NFTs). NFTs can reveal sensitive private information about the owner. While users might want to prove the ownership of a NFT-concert ticket, they might not want to reveal personal account-related information at the same time. The standardization of stealth address generation for NFTs represents a significant step for privacy. Privacy-preserving solutions require standards to gain adoption, therefore it is critical to focus on generalisable ways of implement ownership-proofs into related contracts.
     
 This extension standardizes the method to create and look-up Stealth Addresses. Users can send NFTs without having to interact with the recipient before. Stealth addresses allow only the recipients of token transfers to see that they were the recipients. 
     
