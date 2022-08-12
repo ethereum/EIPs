@@ -53,19 +53,6 @@ jobs:
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
-      
-      - name: Add Label
-        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
-        if: failure()
-        with:
-          labels: "waiting: htmlproofer to pass"
-      
-      - name: Remove Label
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
-        if: "!failure()"
-        with:
-          labels: "waiting: htmlproofer to pass"
-          fail_on_error: false
 
   codespell:
     name: CodeSpell
@@ -81,19 +68,6 @@ jobs:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
-      
-      - name: Add Label
-        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
-        if: failure()
-        with:
-          labels: "waiting: codespell to pass"
-      
-      - name: Remove Label
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
-        if: "!failure()"
-        with:
-          labels: "waiting: codespell to pass"
-          fail_on_error: false
 
   eipw-validator:
     name: EIP Walidator
@@ -108,16 +82,3 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1, 5069
-      
-      - name: Add Label
-        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
-        if: failure()
-        with:
-          labels: "waiting: walidator to pass"
-      
-      - name: Remove Label
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
-        if: "!failure()"
-        with:
-          labels: "waiting: walidator to pass"
-          fail_on_error: false
