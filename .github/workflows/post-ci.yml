@@ -1,6 +1,7 @@
 on:
   workflow_run:
-    workflows: ['Continuous Integration']
+    workflows:
+      - Continuous Integration
     types:
       - completed
 
@@ -13,48 +14,65 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
-      - name: 'Download artifact'
+      - name: Fetch PR Data
+        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        with:
+          name: pr_number
+          workflow: ci.yml
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Save PR Data
+        id: save-pr-data
+        run: |
+          echo "::set-output name=pr_number::$(cat pr_number)"
+          echo "::set-output name=pr_sha::$(cat pr_sha)"
+          echo "::set-output name=merge_sha::$(cat merge_sha)"
+      
+      - name: Add Comment
+        uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+        with:
+          recreate: true
+          message: |
+            The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
+            Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
+      
+      - name: Get Job Data
+        uses: fjogeleit/http-request-action@v1
+        id: fetch-jobs
+        with:
+          method: GET
+          url: ${{ github.event.workflow_run.jobs_url }}
+          bearerToken: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Process Labels  # TODO: Turn this into a fully-featured github action
         uses: actions/github-script@v6
         with:
           script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: context.payload.workflow_run.id,
-            });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "pr_number"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-            });
-            let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/pr_number.zip`, Buffer.from(download.data));
-
-      - name: 'Unzip artifact'
-        run: unzip pr_number.zip
-
-      - name: 'Comment on PR'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            let fs = require('fs');
-            let issue_number = Number(fs.readFileSync('./pr_number', 'utf8').trim());
-            let pr_sha = fs.readFileSync('./pr_sha', 'utf8').trim();
-            let merge_sha = fs.readFileSync('./merge_sha', 'utf8').trim();
-            let pull = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: issue_number
-            });
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue_number,
-              body: `The commit ${pr_sha} (as a parent of ${merge_sha}) contains errors. Please inspect the [Run Summary](${context.payload.workflow_run.html_url}) for details.`
-            });
-
+            const labels = JSON.parse(process.env.LABELS);
+            const data = JSON.parse(process.env.JOB_DATA);
+            for (let job in labels) {
+              if (data.find(jobData => jobData.name == job)?.conclusion != "success") {
+                octokit.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: process.env.NUMBER,
+                  labels: [ labels[job] ]
+                }).catch(() => {});
+              } else {
+                octokit.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: process.env.NUMBER,
+                  name: labels[job]
+                }).catch(() => {});
+              }
+            }
+        env:
+          NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
+          JOB_DATA: ${{ fromJson(steps.fetch-jobs.outputs.response).jobs }}
+          LABELS: |
+            {
+              "HTMLProofer": "waiting: htmlproofer to pass",
+              "CodeSpell": "waiting: codespell to pass",
+              "EIP Walidator": "waiting: walidator to pass"
+            }
