@@ -27,7 +27,7 @@ jobs:
           echo "::set-output name=pr_number::$(cat pr_number)"
           echo "::set-output name=pr_sha::$(cat pr_sha)"
           echo "::set-output name=merge_sha::$(cat merge_sha)"
-      
+
       - name: Add Comment
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
         with:
@@ -35,7 +35,7 @@ jobs:
           message: |
             The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
             Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
-      
+
       - name: Get Job Data
         uses: fjogeleit/http-request-action@v1
         id: fetch-jobs
@@ -43,7 +43,7 @@ jobs:
           method: GET
           url: ${{ github.event.workflow_run.jobs_url }}
           bearerToken: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Process Labels  # TODO: Turn this into a fully-featured github action
         uses: actions/github-script@v6
         with:
