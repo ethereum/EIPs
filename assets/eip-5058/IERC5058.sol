@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: CC0-1.0
-// Creator: tyler@radiocaca.com
 
 pragma solidity ^0.8.0;
 
@@ -12,7 +11,7 @@ pragma solidity ^0.8.0;
  * If the nft lending protocol is compatible with this extension, the trouble caused by the NFT
  * airdrop can be avoided, because the airdrop is still in the user's wallet
  */
-interface IERC5058 {
+interface IERC5058 is IERC721 {
     /**
      * @dev Emitted when `tokenId` token is locked by `operator` from `owner`.
      */

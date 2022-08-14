@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity ^0.8.8;
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "../ERC5058.sol";
 
 contract EIP5058Mock is ERC721Enumerable, ERC5058 {

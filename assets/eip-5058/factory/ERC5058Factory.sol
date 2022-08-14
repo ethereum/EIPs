@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "./ERC721Bound.sol";
 import "./IERC5058Factory.sol";
 
