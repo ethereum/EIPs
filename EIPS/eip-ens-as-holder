@@ -16,11 +16,7 @@ An interface for smart contract to become a holder of tokens by honoring ENS own
 This specification supports [EIP-721](./eip-721.md) and [EIP-1155](./eip-1155.md) tokens and is expandable to future token standard or other standard.
 
 ## Motivation
-Currently, if someone wants to receive token, they have to setup a wallet address, otherwise,
-the minter or transferer will not be able to transfer or mint for that token. 
-
-By creating smart contract that conform to this interface specification, we can decouple
-the transfer of ownership from the existence of wallet addresses.
+Currently, if someone wants to receive a token, they have to set up a wallet address. By creating a smart contract that conforms to this interface specification, it is possible to decouple the transfer of ownership from the existence of wallet addresses.
 
 ## Specification
 
