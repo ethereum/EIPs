@@ -1,8 +1,7 @@
 # Metadata  standards 
 
 
-This documentation consist of various example  JSON schemas (examples or standards) that can be referenced by the reader of EIP for implementing EIP-3475 bonds storage.
-
+This documentation consist of various JSON schemas (examples or standards) that can be referenced by the reader of this EIP for implementing EIP-3475 bonds storage.
 
 ## 1. Description metadata: 
 

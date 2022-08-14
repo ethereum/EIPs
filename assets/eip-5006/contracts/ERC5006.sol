@@ -80,6 +80,7 @@ contract ERC5006 is ERC1155, IERC5006 {
     ) public virtual {
         require(user != address(0), "ERROR: transfer to the zero address");
         address operator = msg.sender;
+        require(operator == owner || isApprovedForAll(owner, operator), "ERROR: caller is not owner nor approved");
         uint256 fromBalance = balanceOf(owner, id);
         _frozen[id][owner] -= _allowances[id][owner][user];
         uint256 frozen = _frozen[id][owner];
