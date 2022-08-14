@@ -36,7 +36,7 @@ contract('Bond', async (accounts: string[]) => {
 
     })
 
-    it('lender should be able to issue bonds', async () => {
+    it('should issue bonds to a lender', async () => {
         let _transactionIssuer: _transaction[]
             =
             [{
@@ -49,7 +49,6 @@ contract('Bond', async (accounts: string[]) => {
         await bondContract.issue(lender, _transactionIssuer, { from: accounts[0] })
         const balance = (await bondContract.balanceOf(lender, DBITClassId, firstNonceId)).toNumber()
         const activeSupply = (await bondContract.activeSupply(DBITClassId, firstNonceId)).toNumber()
-        
         assert.equal(balance, 14000);
         assert.equal(activeSupply, 14000);
     })
@@ -71,7 +70,6 @@ contract('Bond', async (accounts: string[]) => {
         assert.equal(secondaryBuyerBalance, 2000);
         assert.equal(activeSupply, 14000);
     })
-    //
     it('operator should be able to manipulate bonds after approval', async () => {
         const transactionApproval: _transaction[] = [
             {
@@ -193,7 +191,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(tx);
     })
 
-    it('approve (called by bond owner) should be able to give  spender permissions for  managing  a given amount of bonds', async () => {
+    it('should approve spender to manage a given amount of bonds from the caller address', async () => {
         const transactionApprove: _transaction[] = [
             {
                 classId: DBITClassId,

@@ -1,7 +1,0 @@
-"type: Core": this?.new?.category == "Core"
-"type: Networking": this?.new?.category == "Networking"
-"type: Interface": this?.new?.category == "Interface"
-"type: ERC": this?.new?.category == "ERC"
-"type: Informational": this?.new?.type == "Informational"
-"type: Meta": this?.new?.type == "Meta" && this?.old?.eip != "1"
-"type: EIP1 (Process)": this?.old?.eip == "1"
