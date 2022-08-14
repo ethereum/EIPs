@@ -35,7 +35,7 @@ interface IERC_ENS_AS_HOLDER is ERC721Receiver, ERC1155Receiver {
 TBD
 
 ## Backwards Compatibility
-No backward compatibility aware of.
+No backward compatibility issues were found.
 
 ## Reference Implementation
 ```solidity
