@@ -139,6 +139,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
+`resuscitatable`: *One of `true` or `false`.* (Optional field, but highly recommended)
+
 Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
@@ -184,6 +186,10 @@ The `created` header records the date that the EIP was assigned a number. Both h
 #### `requires` header
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
+
+#### `resuscitatable` header
+
+EIPs may have a `resuscitatable` header. If this is `true`, then any PR that changes the `status` from `Stagnant` to any other state only requires editor approval.
 
 ## Linking to External Resources
 
