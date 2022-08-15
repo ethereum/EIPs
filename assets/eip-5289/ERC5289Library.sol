@@ -1,8 +1,8 @@
 /// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./interfaces/IERC5289Library.sol";
 import "./interfaces/IERC165.sol";
+import "./interfaces/IERC5289Library.sol";
 
 contract ERC5289Library is IERC165, IERC5289Library {
     uint16 private counter = 0;
@@ -30,7 +30,6 @@ contract ERC5289Library is IERC165, IERC5289Library {
     }
 
     function signDocument(address signer, uint16 documentId, bytes memory signature) public {
-
         require(signer == msg.sender, "invalid user");
 
         signedAt[documentId][msg.sender] = uint64(block.timestamp);
@@ -39,7 +38,7 @@ contract ERC5289Library is IERC165, IERC5289Library {
         emit DocumentSigned(msg.sender, documentId);
     }
 
-    function supportsInterface(bytes4 _interfaceId) public pure returns (bool) {
+    function supportsInterface(bytes4 _interfaceId) public view returns (bool) {
         return _interfaceId == type(IERC5289Library).interfaceId;
     }
 }
