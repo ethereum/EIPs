@@ -32,14 +32,13 @@ main.page-content {
 
 a {
   color: #726E97;
-  text-decoration: underline;
-  text-decoration-color: transparent;
+  text-decoration: none;
   transition: 0.5s;
 }
 
 a:hover: {
   color: #7F557D;
-  text-decoration-color: #7F557D;
+  box-shadow: 0 3px 0 #7F557D;
 }
 
 .status {
