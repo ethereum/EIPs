@@ -30,6 +30,18 @@ main.page-content {
   }
 }
 
+a {
+  color: #726E97;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: 0.5s;
+}
+
+a:hover: {
+  color: #7F557D;
+  text-decoration-color: #7F557D;
+}
+
 .status {
   border-radius: 6px;
   line-height: 18px;
