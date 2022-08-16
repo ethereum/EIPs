@@ -11,8 +11,6 @@ interface IERC5006 {
         uint64 expiry;
     }
 
-    event DeleteUserRecord(uint256 recordId);
-
     event CreateUserRecord(
         uint256 recordId,
         uint256 tokenId,
@@ -21,6 +19,8 @@ interface IERC5006 {
         address user,
         uint64 expiry
     );
+
+    event DeleteUserRecord(uint256 recordId);
 
     /**
      * @dev Returns the amount of tokens of token type `id` used by `user`.
@@ -74,7 +74,7 @@ interface IERC5006 {
     ) external returns (uint256);
 
     /**
-     * @dev Atomically delte `record` by the caller.
+     * @dev Atomically delete `record` by the caller.
      *
      * Emits an {DeleteUserRecord} event.
      *
