@@ -11,21 +11,21 @@ interface IERC5006 {
         uint64 expiry;
     }
     /**
-     * @dev Emitted when permission for `user` to use `amount` of `tokenId` token owned by `owner`
-     * untill `expiry` are given.
+     * @dev Emitted when permission (for `user` to use `amount` of `tokenId` token owned by `owner`
+     * until `expiry`) is given.
      */
     event CreateUserRecord(
-        uint256 indexed recordId,
+        uint256 recordId,
         uint256 tokenId,
-        uint256 amount,
+        uint64 amount,
         address owner,
         address user,
         uint64 expiry
     );
     /**
-     * @dev Emitted when record of `recordId` are deleted. 
+     * @dev Emitted when record of `recordId` is deleted. 
      */
-    event DeleteUserRecord(uint256 indexed recordId);
+    event DeleteUserRecord(uint256 recordId);
 
     /**
      * @dev Returns the usable amount of `tokenId` tokens  by `account`.

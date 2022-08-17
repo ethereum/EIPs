@@ -14,7 +14,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
     mapping(uint256 => mapping(address => EnumerableSet.UintSet))
         private _userRecordIds;
     uint256 _curRecordId;
-    uint8 recordLimit = 10;
+    uint8 recordLimit;
 
     constructor(string memory uri_, uint8 recordLimit_) ERC1155(uri_) {
         recordLimit = recordLimit_;

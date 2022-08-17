@@ -29,6 +29,11 @@ describe("Test 1155 User Role", function () {
     
 
     describe("", function () {
+        
+        it("InterfaceId should equals 0xc26d96cc", async function () {
+            expect(await contract.getInterfaceId()).equals("0xc26d96cc");
+        });
+
         it("Should set user to bob success", async function () {
 
             await contract.mint(alice.address, 1, 100);
@@ -60,7 +65,7 @@ describe("Test 1155 User Role", function () {
 
             await contract.mint(alice.address, 1, 100);
 
-            await expect(contract.createUserRecord(alice.address, bob.address, 1, 101, expiry)).to.be.revertedWith('balance is not enough');
+            await expect(contract.createUserRecord(alice.address, bob.address, 1, 101, expiry)).to.be.revertedWith('ERC1155: insufficient balance for transfer');
 
         });
 

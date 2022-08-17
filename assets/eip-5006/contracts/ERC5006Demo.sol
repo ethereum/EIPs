@@ -24,4 +24,8 @@ contract ERC5006Demo is ERC5006 {
     ) public {
         _burn(from, id, amount);
     }
+
+    function getInterfaceId() public view returns (bytes4) {
+        return type(IERC5006).interfaceId;
+    }
 }
