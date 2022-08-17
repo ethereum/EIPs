@@ -20,6 +20,7 @@ description: >-
   standards.
 url: "https://eips.ethereum.org"
 github_username:  ethereum
+repository: ethereum/EIPs
 
 header_pages:
  - all.html
