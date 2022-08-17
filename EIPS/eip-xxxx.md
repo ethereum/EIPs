@@ -54,6 +54,10 @@ TBA
 
 ### Clean stack upon termination
 
+## Backwards Compatibility
+
+This change poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).
+
 ## Reference Implementation
 
 ```python
@@ -135,10 +139,6 @@ def validate_function(func_id: int, code: bytes, types: list[FunctionType] = [Fu
 
     return max_stack_height
 ```
-
-## Backwards Compatibility
-
-This change poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).
 
 ## Security Considerations
 
