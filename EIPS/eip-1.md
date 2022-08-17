@@ -189,7 +189,7 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 #### `resuscitatable` header
 
-EIPs may have a `resuscitatable` header. If this is `true`, then any PR that changes the `status` from `Stagnant` to any other state only requires editor approval.
+EIPs may have a `resuscitatable` header. If this is `true`, then any PR changing `status` from `Stagnant` to a non-final state no longer requires author approval (instead only requiring editor approval.) Marking a proposal as `resuscitatable` allows _anyone_ to edit the author list and take over the proposal should it be abandoned.
 
 ## Linking to External Resources
 
