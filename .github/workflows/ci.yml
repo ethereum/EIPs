@@ -40,6 +40,7 @@ jobs:
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@0a51127e9955b855a9bbfa1ff5577f1d1338c9a5
         with:
+          config-file: config/mlc_config.json
           use-quiet-mode: no
           use-verbose-mode: yes
           check-modified-files-only: yes
@@ -57,7 +58,6 @@ jobs:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
-          config-file: config/mlc_config.json
 
   eip-validator:
     name: EIP Validator
