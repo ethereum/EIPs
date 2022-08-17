@@ -25,7 +25,7 @@ Example: adding details in bonds describing the local jurisdiction of the bonds 
 "values": ["fr ", "de", "ch"]
 }
 ```
-The 'values' field defined above  can also be ISO codes or other hex standard representation.
+The 'values' field defined above can also be ISO codes or other hex standard representation.
 ## 2. Nonce metadata:
 
 - **Information defining the state of the bond** 
@@ -45,7 +45,6 @@ The 'values' field defined above  can also be ISO codes or other hex standard re
 ## 3. Class metadata:
 
 ```json
-
 [ 
 	{	
 	"title": "symbol",
@@ -53,7 +52,6 @@ The 'values' field defined above  can also be ISO codes or other hex standard re
 	"description": "Lorem ipsum..."
 	"values": ["Class symbol 1", "Class symbol 2", "Class symbol 3"],
 	},
-
 	{	
 	"title": "issuer",
 	"_type": "string",

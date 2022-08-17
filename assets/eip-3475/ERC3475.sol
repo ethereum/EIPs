@@ -9,11 +9,11 @@ contract ERC3475 is IERC3475 {
      * @notice this Struct is representing the Nonce properties as an object
      */
     struct Nonce {
-        mapping(uint256 => IERC3475.Values) _value;
+        mapping(uint256 => IERC3475.Values) _values;
 
         // stores the values corresponding to the dates (issuance and maturity date).
-        mapping(address => uint256) balances;
-        mapping(address => mapping(address => uint256)) allowances;
+        mapping(address => uint256) _balances;
+        mapping(address => mapping(address => uint256)) _allowances;
 
         // supplies of this nonce
         uint256 _activeSupply;
@@ -26,7 +26,7 @@ contract ERC3475 is IERC3475 {
      *         and can be retrieved by the classId
      */
     struct Class {
-        mapping(uint256 => IERC3475.Values) _value;
+        mapping(uint256 => IERC3475.Values) _values;
         mapping(uint256 => IERC3475.Metadata) _nonceMetadata;
         mapping(uint256 => Nonce) nonces;
     }
@@ -34,7 +34,7 @@ contract ERC3475 is IERC3475 {
     mapping(address => mapping(address => bool)) operatorApprovals;
 
     // from classId given
-    mapping(uint256 => Class) internal classes;
+    mapping(uint256 => Class) internal _classes;
     mapping(uint256 => IERC3475.Metadata) _classMetadata;
 
     /**
@@ -47,12 +47,12 @@ contract ERC3475 is IERC3475 {
         _classMetadata[0].title = "symbol";
         _classMetadata[0]._type = "string";
         _classMetadata[0].description = "symbol of the class";
-        classes[0]._value[0].stringValue = "DBIT Fix 6M";
+        _classes[0]._values[0].stringValue = "DBIT Fix 6M";
 
         _classMetadata[1].title = "symbol";
         _classMetadata[1]._type = "string";
         _classMetadata[1].description = "symbol of the class";
-        classes[1]._value[0].stringValue = "DBIT Fix test Instantaneous";
+        _classes[1]._values[0].stringValue = "DBIT Fix test Instantaneous";
 
         // define "period of the class";
         _classMetadata[5].title = "period";
@@ -60,31 +60,31 @@ contract ERC3475 is IERC3475 {
         _classMetadata[5].description = "details about issuance and redemption time";
         
         // define the maturity time period  (for the test class).
-        classes[0]._value[5].uintValue = 10;
-        classes[1]._value[5].uintValue = 1;
+        _classes[0]._values[5].uintValue = 10;
+        _classes[1]._values[5].uintValue = 1;
 
         // write the time of maturity to nonce values, in other implementation, a create nonce function can be added
-        classes[0].nonces[0]._value[0].uintValue = block.timestamp + 180 days;
-        classes[0].nonces[1]._value[0].uintValue = block.timestamp + 181 days;
-        classes[0].nonces[2]._value[0].uintValue = block.timestamp + 182 days;
+        _classes[0].nonces[0]._values[0].uintValue = block.timestamp + 180 days;
+        _classes[0].nonces[1]._values[0].uintValue = block.timestamp + 181 days;
+        _classes[0].nonces[2]._values[0].uintValue = block.timestamp + 182 days;
 
         // test for review the instantaneous class
-        classes[1].nonces[0]._value[0].uintValue = block.timestamp + 1;
-        classes[1].nonces[1]._value[0].uintValue = block.timestamp + 2;
-        classes[1].nonces[2]._value[0].uintValue = block.timestamp + 3;
+        _classes[1].nonces[0]._values[0].uintValue = block.timestamp + 1;
+        _classes[1].nonces[1]._values[0].uintValue = block.timestamp + 2;
+        _classes[1].nonces[2]._values[0].uintValue = block.timestamp + 3;
 
         // define "maturity of the nonce";        
-        classes[0]._nonceMetadata[0].title = "maturity";
-        classes[0]._nonceMetadata[0]._type = "int";
-        classes[0]._nonceMetadata[0].description = "maturity date in integer";
-        classes[1]._nonceMetadata[0].title = "maturity";
-        classes[0]._nonceMetadata[0]._type = "int";
-        classes[1]._nonceMetadata[0].description = "maturity date in integer";
+        _classes[0]._nonceMetadata[0].title = "maturity";
+        _classes[0]._nonceMetadata[0]._type = "int";
+        _classes[0]._nonceMetadata[0].description = "maturity date in integer";
+        _classes[1]._nonceMetadata[0].title = "maturity";
+        _classes[0]._nonceMetadata[0]._type = "int";
+        _classes[1]._nonceMetadata[0].description = "maturity date in integer";
 
         // defining the value status 
-        classes[0].nonces[0]._value[0].boolValue = true;
-        classes[0].nonces[1]._value[0].boolValue = true;
-        classes[0].nonces[2]._value[0].boolValue = true;
+        _classes[0].nonces[0]._values[0].boolValue = true;
+        _classes[0].nonces[1]._values[0].boolValue = true;
+        _classes[0].nonces[2]._values[0].boolValue = true;
     }
 
     // WRITABLES
@@ -204,9 +204,9 @@ contract ERC3475 is IERC3475 {
     override
     {
         for (uint256 i = 0; i < _transactions.length; i++) {
-            classes[_transactions[i].classId]
+            _classes[_transactions[i].classId]
             .nonces[_transactions[i].nonceId]
-            .allowances[msg.sender][_spender] = _transactions[i]._amount;
+            ._allowances[msg.sender][_spender] = _transactions[i]._amount;
         }
     }
 
@@ -237,7 +237,7 @@ contract ERC3475 is IERC3475 {
     override
     returns (uint256)
     {
-        return classes[classId].nonces[nonceId]._activeSupply;
+        return _classes[classId].nonces[nonceId]._activeSupply;
     }
 
     function burnedSupply(uint256 classId, uint256 nonceId)
@@ -246,7 +246,7 @@ contract ERC3475 is IERC3475 {
     override
     returns (uint256)
     {
-        return classes[classId].nonces[nonceId]._burnedSupply;
+        return _classes[classId].nonces[nonceId]._burnedSupply;
     }
 
     function redeemedSupply(uint256 classId, uint256 nonceId)
@@ -255,7 +255,7 @@ contract ERC3475 is IERC3475 {
     override
     returns (uint256)
     {
-        return classes[classId].nonces[nonceId]._redeemedSupply;
+        return _classes[classId].nonces[nonceId]._redeemedSupply;
     }
 
     function balanceOf(
@@ -267,7 +267,7 @@ contract ERC3475 is IERC3475 {
             account != address(0),
             "ERC3475: balance query for the zero address"
         );
-        return classes[classId].nonces[nonceId].balances[account];
+        return _classes[classId].nonces[nonceId]._balances[account];
     }
 
     function classMetadata(uint256 metadataId)
@@ -283,7 +283,7 @@ contract ERC3475 is IERC3475 {
     view
     override
     returns (Metadata memory) {
-        return (classes[classId]._nonceMetadata[metadataId]);
+        return (_classes[classId]._nonceMetadata[metadataId]);
     }
 
     function classValues(uint256 classId, uint256 metadataId)
@@ -291,7 +291,7 @@ contract ERC3475 is IERC3475 {
     view
     override
     returns (Values memory) {
-        return (classes[classId]._value[metadataId]);
+        return (_classes[classId]._values[metadataId]);
     }
 
     
@@ -300,7 +300,7 @@ contract ERC3475 is IERC3475 {
     view
     override
     returns (Values memory) {
-        return (classes[classId].nonces[nonceId]._value[metadataId]);
+        return (_classes[classId].nonces[nonceId]._values[metadataId]);
     }
 
     /** determines the progress till the  redemption of the bonds is valid  (based on the type of bonds class).
@@ -312,8 +312,8 @@ contract ERC3475 is IERC3475 {
     view
     override
     returns (uint256 progressAchieved, uint256 progressRemaining){    
-        uint256 issuanceDate = classes[classId].nonces[nonceId]._value[0].uintValue;
-        uint256 maturityDate = issuanceDate + classes[classId].nonces[nonceId]._value[5].uintValue;
+        uint256 issuanceDate = _classes[classId].nonces[nonceId]._values[0].uintValue;
+        uint256 maturityDate = issuanceDate + _classes[classId].nonces[nonceId]._values[5].uintValue;
         
         // check whether the bond is being already initialized: 
         progressAchieved = block.timestamp - issuanceDate;
@@ -330,7 +330,7 @@ contract ERC3475 is IERC3475 {
         uint256 classId,
         uint256 nonceId
     ) public view virtual override returns (uint256) {
-        return classes[classId].nonces[nonceId].allowances[_owner][spender];
+        return _classes[classId].nonces[nonceId]._allowances[_owner][spender];
     }
 
     /**
@@ -349,15 +349,15 @@ contract ERC3475 is IERC3475 {
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
         require(
-            nonce.balances[_from] >= _transaction._amount,
+            nonce._balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
         );
         
         //transfer balance        
-        nonce.balances[_from] -= _transaction._amount;
-        nonce.balances[_to] += _transaction._amount;
+        nonce._balances[_from] -= _transaction._amount;
+        nonce._balances[_to] += _transaction._amount;
     }
 
     function _transferAllowanceFrom(
@@ -366,27 +366,27 @@ contract ERC3475 is IERC3475 {
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
         require(
-            nonce.balances[_from] >= _transaction._amount,
+            nonce._balances[_from] >= _transaction._amount,
             "ERC3475: not allowed amount"
         );
         // reducing the allowance and decreasing accordingly.
-        nonce.allowances[_from][_operator] -= _transaction._amount;
+        nonce._allowances[_from][_operator] -= _transaction._amount;
 
         //transfer balance
-        nonce.balances[_from] -= _transaction._amount;
-        nonce.balances[_to] += _transaction._amount;
+        nonce._balances[_from] -= _transaction._amount;
+        nonce._balances[_to] += _transaction._amount;
     }
 
     function _issue(
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];      
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];      
                 
         //transfer balance
-        nonce.balances[_to] += _transaction._amount;
+        nonce._balances[_to] += _transaction._amount;
         nonce._activeSupply += _transaction._amount;
     }
 
@@ -395,16 +395,16 @@ contract ERC3475 is IERC3475 {
         address _from,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
         // verify whether _amount of bonds to be redeemed  are sufficient available  for the given nonce of the bonds
 
         require(
-            nonce.balances[_from] >= _transaction._amount,
+            nonce._balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
         );
         
         //transfer balance
-        nonce.balances[_from] -= _transaction._amount;
+        nonce._balances[_from] -= _transaction._amount;
         nonce._activeSupply -= _transaction._amount;
         nonce._redeemedSupply += _transaction._amount;
     }
@@ -414,15 +414,15 @@ contract ERC3475 is IERC3475 {
         address _from,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = classes[_transaction.classId].nonces[_transaction.nonceId];
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
         // verify whether _amount of bonds to be burned are sfficient available for the given nonce of the bonds
         require(
-            nonce.balances[_from] >= _transaction._amount,
+            nonce._balances[_from] >= _transaction._amount,
             "ERC3475: not enough bond to transfer"
         );
         
         //transfer balance
-        nonce.balances[_from] -= _transaction._amount;
+        nonce._balances[_from] -= _transaction._amount;
         nonce._activeSupply -= _transaction._amount;
         nonce._burnedSupply += _transaction._amount;
     }
