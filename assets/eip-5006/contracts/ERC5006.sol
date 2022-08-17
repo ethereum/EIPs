@@ -69,8 +69,8 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
     ) public override returns (uint256) {
         require(isOwnerOrApproved(owner));
         require(user != address(0), "user cannot be the zero address");
-        require(amount > 0, "invalid amount");
-        require(expiry > block.timestamp, "invalid expiry");
+        require(amount > 0, "amount must be greater than 0");
+        require(expiry > block.timestamp, "expiry must after the block timestamp");
         require(
             _userRecordIds[tokenId][user].length() < recordLimit,
             "user cannot have more records"

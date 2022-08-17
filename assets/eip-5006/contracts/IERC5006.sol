@@ -11,7 +11,8 @@ interface IERC5006 {
         uint64 expiry;
     }
     /**
-     * @dev Emitted when {createUserRecord} are called.
+     * @dev Emitted when permission for `user` to use `amount` of `tokenId` token owned by `owner`
+     * untill `expiry` are given.
      */
     event CreateUserRecord(
         uint256 indexed recordId,
@@ -22,16 +23,12 @@ interface IERC5006 {
         uint64 expiry
     );
     /**
-     * @dev Emitted when {deleteUserRecord} are called.
+     * @dev Emitted when record of `recordId` are deleted. 
      */
     event DeleteUserRecord(uint256 indexed recordId);
 
     /**
      * @dev Returns the usable amount of `tokenId` tokens  by `account`.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the zero address.
      */
     function usableBalanceOf(address account, uint256 tokenId)
         external
@@ -40,10 +37,6 @@ interface IERC5006 {
 
     /**
      * @dev Returns the amount of frozen tokens of token type `id` by `account`.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the zero address.
      */
     function frozenBalanceOf(address account, uint256 tokenId)
         external
@@ -51,9 +44,7 @@ interface IERC5006 {
         returns (uint256);
 
     /**
-     * @dev Returns the `UserRecord` of the `recordId` record..
-     *
-     * This record changes when {createUserRecord} or {deleteUserRecord} are called.
+     * @dev Returns the `UserRecord` of `recordId`.
      */
     function userRecordOf(uint256 recordId)
         external
@@ -63,13 +54,16 @@ interface IERC5006 {
     /**
      * @dev Gives permission to `user` to use `amount` of `tokenId` token owned by `owner` until `expiry`.
      *
-     * Emits a {CreateUserRecord} event indicating the updated record.
+     * Emits a {CreateUserRecord} event.
      *
      * Requirements:
      *
-     * - `user` cannot be the zero address.
-     * - If the caller is not `owner`, it must be have been approved to spend ``owner``'s tokens via {setApprovalForAll}.
+     * - If the caller is not `owner`, it must be have been approved to spend ``owner``'s tokens
+     * via {setApprovalForAll}.
      * - `owner` must have a balance of tokens of type `id` of at least `amount`.
+     * - `user` cannot be the zero address.
+     * - `amount` must be greater than 0.
+     * - `expiry` must after the block timestamp.
      */
     function createUserRecord(
         address owner,
@@ -80,9 +74,9 @@ interface IERC5006 {
     ) external returns (uint256);
 
     /**
-     * @dev Atomically delete `record` by the caller.
+     * @dev Atomically delete `record` of `recordId` by the caller.
      *
-     * Emits a {DeleteUserRecord} event indicating delete the record.
+     * Emits a {DeleteUserRecord} event.
      *
      * Requirements:
      *
