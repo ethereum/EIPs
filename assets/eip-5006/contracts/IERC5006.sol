@@ -10,38 +10,42 @@ interface IERC5006 {
         address user;
         uint64 expiry;
     }
-
+    /**
+     * @dev Emitted when {createUserRecord} are called.
+     */
     event CreateUserRecord(
-        uint256 recordId,
+        uint256 indexed recordId,
         uint256 tokenId,
         uint256 amount,
         address owner,
         address user,
         uint64 expiry
     );
-
-    event DeleteUserRecord(uint256 recordId);
+    /**
+     * @dev Emitted when {deleteUserRecord} are called.
+     */
+    event DeleteUserRecord(uint256 indexed recordId);
 
     /**
-     * @dev Returns the amount of tokens of token type `id` used by `user`.
+     * @dev Returns the amount of tokens of token type `id` can used by `account`.
      *
      * Requirements:
      *
-     * - `user` cannot be the zero address.
+     * - `account` cannot be the zero address.
      */
-    function usableBalanceOf(address user, uint256 id)
+    function usableBalanceOf(address account, uint256 id)
         external
         view
         returns (uint256);
 
     /**
-     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
+     * @dev Returns the amount of frozen tokens of token type `id` by `account`.
      *
      * Requirements:
      *
-     * - `owner` cannot be the zero address.
+     * - `account` cannot be the zero address.
      */
-    function frozenBalanceOf(address owner, uint256 id)
+    function frozenBalanceOf(address account, uint256 id)
         external
         view
         returns (uint256);
@@ -59,7 +63,7 @@ interface IERC5006 {
     /**
      * @dev Authorizes the user can use specific id NFTs * amount till expiry.
      *
-     * Emits an {CreateUserRecord} event indicating the updated allowance.
+     * Emits an {CreateUserRecord} event indicating the updated record.
      *
      * Requirements:
      *
@@ -76,7 +80,7 @@ interface IERC5006 {
     /**
      * @dev Atomically delete `record` by the caller.
      *
-     * Emits an {DeleteUserRecord} event.
+     * Emits an {DeleteUserRecord} event indicating delete the record.
      *
      * Requirements:
      *

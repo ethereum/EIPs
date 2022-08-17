@@ -25,26 +25,26 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         );
         return true;
     }
-    function usableBalanceOf(address user, uint256 tokenId)
+    function usableBalanceOf(address account, uint256 tokenId)
         public
         view
         override
         returns (uint256 amount)
     {
-        uint256[] memory recordIds = _userRecordIds[tokenId][user].values();
+        uint256[] memory recordIds = _userRecordIds[tokenId][account].values();
         for (uint256 i = 0; i < recordIds.length; i++) {
             if (block.timestamp <= _records[recordIds[i]].expiry) {
                 amount += _records[recordIds[i]].amount;
             }
         }
     }
-    function frozenBalanceOf(address owner, uint256 tokenId)
+    function frozenBalanceOf(address account, uint256 tokenId)
         public
         view
         override
         returns (uint256)
     {
-        return _frozens[tokenId][owner];
+        return _frozens[tokenId][account];
     }
     function userRecordOf(uint256 recordId)
         public
