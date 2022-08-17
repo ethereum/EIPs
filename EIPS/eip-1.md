@@ -189,12 +189,12 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 External resources are resources that are hosted outside of the EIPs repository. Links to external resources **MUST NOT** be included, except in `Living`, `Meta`, or `Informational` EIPs. External resources may disappear, move, or change unexpectedly. 
 
-The following **MAY** be allowed at editor discretion:
+Here are some exceptions:
 
-- Links to `ethereum/go-ethereum` commits
-- Links to `ethereum/execution-specs` commits
-- Links to `ethereum/consensus-specs` commits
-- Resources with an appropriate backup in the assets folder
+- Links to `ethereum/go-ethereum` commits hosted on GitHub **MUST** be allowed
+- Links to `ethereum/execution-specs` commits **MUST** be allowed
+- Links to `ethereum/consensus-specs` commits **MUST** be allowed
+- Resources with an appropriate backup in the assets folder **MAY** be allowed (at editor discretion)
 
 ## Linking to other EIPs
 
