@@ -27,13 +27,13 @@ interface IERC5006 {
     event DeleteUserRecord(uint256 indexed recordId);
 
     /**
-     * @dev Returns the amount of tokens of token type `id` can used by `account`.
+     * @dev Returns the usable amount of `tokenId` tokens  by `account`.
      *
      * Requirements:
      *
      * - `account` cannot be the zero address.
      */
-    function usableBalanceOf(address account, uint256 id)
+    function usableBalanceOf(address account, uint256 tokenId)
         external
         view
         returns (uint256);
@@ -45,13 +45,13 @@ interface IERC5006 {
      *
      * - `account` cannot be the zero address.
      */
-    function frozenBalanceOf(address account, uint256 id)
+    function frozenBalanceOf(address account, uint256 tokenId)
         external
         view
         returns (uint256);
 
     /**
-     * @dev Returns the record.
+     * @dev Returns the `UserRecord` of the `recordId` record..
      *
      * This record changes when {createUserRecord} or {deleteUserRecord} are called.
      */
@@ -61,18 +61,20 @@ interface IERC5006 {
         returns (UserRecord memory);
 
     /**
-     * @dev Authorizes the user can use specific id NFTs * amount till expiry.
+     * @dev Gives permission to `user` to use `amount` of `tokenId` token owned by `owner` until `expiry`.
      *
-     * Emits an {CreateUserRecord} event indicating the updated record.
+     * Emits a {CreateUserRecord} event indicating the updated record.
      *
      * Requirements:
      *
-     * - the caller must have allowance.
+     * - `user` cannot be the zero address.
+     * - If the caller is not `owner`, it must be have been approved to spend ``owner``'s tokens via {setApprovalForAll}.
+     * - `owner` must have a balance of tokens of type `id` of at least `amount`.
      */
     function createUserRecord(
         address owner,
         address user,
-        uint256 id,
+        uint256 tokenId,
         uint64 amount,
         uint64 expiry
     ) external returns (uint256);
@@ -80,7 +82,7 @@ interface IERC5006 {
     /**
      * @dev Atomically delete `record` by the caller.
      *
-     * Emits an {DeleteUserRecord} event indicating delete the record.
+     * Emits a {DeleteUserRecord} event indicating delete the record.
      *
      * Requirements:
      *

@@ -15,9 +15,11 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         private _userRecordIds;
     uint256 _curRecordId;
     uint8 recordLimit = 10;
+
     constructor(string memory uri_, uint8 recordLimit_) ERC1155(uri_) {
         recordLimit = recordLimit_;
     }
+
     function isOwnerOrApproved(address owner) public view returns (bool) {
         require(
             owner == msg.sender || isApprovedForAll(owner, msg.sender),
@@ -25,6 +27,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         );
         return true;
     }
+
     function usableBalanceOf(address account, uint256 tokenId)
         public
         view
@@ -38,6 +41,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
             }
         }
     }
+
     function frozenBalanceOf(address account, uint256 tokenId)
         public
         view
@@ -46,6 +50,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
     {
         return _frozens[tokenId][account];
     }
+
     function userRecordOf(uint256 recordId)
         public
         view
@@ -54,6 +59,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
     {
         return _records[recordId];
     }
+
     function createUserRecord(
         address owner,
         address user,
@@ -62,9 +68,9 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         uint64 expiry
     ) public override returns (uint256) {
         require(isOwnerOrApproved(owner));
+        require(user != address(0), "user cannot be the zero address");
         require(amount > 0, "invalid amount");
         require(expiry > block.timestamp, "invalid expiry");
-        require(amount <= balanceOf(owner, tokenId), "balance is not enough");
         require(
             _userRecordIds[tokenId][user].length() < recordLimit,
             "user cannot have more records"
@@ -90,6 +96,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         );
         return _curRecordId;
     }
+
     function deleteUserRecord(uint256 recordId) public override {
         UserRecord storage _record = _records[recordId];
         require(isOwnerOrApproved(_record.owner));
@@ -105,6 +112,7 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
         delete _records[recordId];
         emit DeleteUserRecord(recordId);
     }
+
     function supportsInterface(bytes4 interfaceId)
         public
         view
@@ -116,15 +124,17 @@ contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
             ERC1155.supportsInterface(interfaceId) ||
             ERC1155Receiver.supportsInterface(interfaceId);
     }
+
     function onERC1155Received(
         address operator,
         address from,
-        uint256 id,
+        uint256 tokenId,
         uint256 value,
         bytes calldata data
     ) external pure override returns (bytes4) {
         return IERC1155Receiver.onERC1155Received.selector;
     }
+
     function onERC1155BatchReceived(
         address operator,
         address from,
