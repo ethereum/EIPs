@@ -3,9 +3,8 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IERC3475.sol";
-import "./utils/Ownable.sol";
 
-contract ERC3475 is IERC3475, Ownable {
+contract ERC3475 is IERC3475 {
     /** 
      * @notice this Struct is representing the Nonce properties as an object
      */
