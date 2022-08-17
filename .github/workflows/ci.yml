@@ -1,10 +1,31 @@
 name: Continuous Integration
 
 on:
-  push:
   pull_request:
 
 jobs:
+  save-pr:
+    name: Save PR Number
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p ./pr
+          echo $PR_NUMBER > ./pr/pr_number
+          echo $PR_SHA > ./pr/pr_sha
+          echo $MERGE_SHA > ./pr/merge_sha
+
+      - name: Upload PR Number
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr_number
+          path: pr/
+
   htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-latest
@@ -19,7 +40,7 @@ jobs:
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
-          ruby-version: '2.6.0'
+          ruby-version: 2.6.0
           bundler-cache: true
         
       - name: Build Website
@@ -32,61 +53,32 @@ jobs:
       
       - name: DNS Validator
         run: bundle exec github-pages health-check
-  
+
   codespell:
     name: CodeSpell
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        
+
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
         with:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
-  
-  eip-validator:
-    name: EIP Validator
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout EIP Repository
-      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-    
-    - name: Set Up Rust Toolchain
-      uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f
-      with:
-        toolchain: stable
-    
-    - name: Install EIP Validator
-      run: cargo install eipv --version=0.4.0
-    
-    - name: Run EIP Validator
-      run: eipv EIPS/ --ignore=title_max_length,missing_discussions_to --skip=eip-20-token-standard.md
 
   eipw-validator:
     name: EIP Walidator
     runs-on: ubuntu-latest
+
     steps:
-      - name: Save PR number
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-          PR_SHA: ${{ github.event.pull_request.head.sha }}
-          MERGE_SHA: ${{ github.sha }}
-        run: |
-          mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr_number
-          echo $PR_SHA > ./pr/pr_sha
-          echo $MERGE_SHA > ./pr/merge_sha
-      - uses: actions/upload-artifact@v3
-        with:
-          name: pr_number
-          path: pr/
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
       - uses: ethereum/eipw-action@master
+        id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          unchecked: '1,5069'
+          unchecked: 1, 5069

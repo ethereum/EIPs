@@ -1,0 +1,78 @@
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
+
+name: Post CI
+
+# This is adapted from https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run (2022-07-17)
+
+jobs:
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - name: Fetch PR Data
+        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        with:
+          name: pr_number
+          workflow: ci.yml
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Save PR Data
+        id: save-pr-data
+        run: |
+          echo "::set-output name=pr_number::$(cat pr_number)"
+          echo "::set-output name=pr_sha::$(cat pr_sha)"
+          echo "::set-output name=merge_sha::$(cat merge_sha)"
+
+      - name: Add Comment
+        uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+        with:
+          recreate: true
+          message: |
+            The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
+            Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
+
+      - name: Get Job Data
+        uses: fjogeleit/http-request-action@v1
+        id: fetch-jobs
+        with:
+          method: GET
+          url: ${{ github.event.workflow_run.jobs_url }}
+          bearerToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Process Labels  # TODO: Turn this into a fully-featured github action
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const labels = JSON.parse(process.env.LABELS);
+            const data = JSON.parse(process.env.JOB_DATA);
+            for (let job in labels) {
+              if (data.find(jobData => jobData.name == job)?.conclusion != "success") {
+                octokit.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: process.env.NUMBER,
+                  labels: [ labels[job] ]
+                }).catch(() => {});
+              } else {
+                octokit.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: process.env.NUMBER,
+                  name: labels[job]
+                }).catch(() => {});
+              }
+            }
+        env:
+          NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
+          JOB_DATA: ${{ fromJson(steps.fetch-jobs.outputs.response).jobs }}
+          LABELS: |
+            {
+              "HTMLProofer": "waiting: htmlproofer to pass",
+              "CodeSpell": "waiting: codespell to pass",
+              "EIP Walidator": "waiting: walidator to pass"
+            }
