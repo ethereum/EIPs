@@ -128,7 +128,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
         _beforeTokenLock(operator, owner, tokenId, expired);
 
         lockedTokens[tokenId] = expired;
-        _lockApprovals[tokenId] = _msgSender();
+        _lockApprovals[tokenId] = operator;
 
         emit Locked(operator, owner, tokenId, expired);
 
@@ -154,7 +154,7 @@ abstract contract ERC5058 is ERC721, IERC5058 {
 
         _safeMint(to, tokenId, _data);
 
-        _lock(address(0), tokenId, expired);
+        _lock(_msgSender(), tokenId, expired);
     }
 
     /**
