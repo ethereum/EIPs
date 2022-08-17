@@ -50,10 +50,6 @@ Stack overflow check, on the other hand, is still required at run-time, because 
 
 TBA
 
-### Unreachable code
-
-### Clean stack upon termination
-
 ## Backwards Compatibility
 
 This change poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).
