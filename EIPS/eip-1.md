@@ -187,7 +187,13 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 ## Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Links to external resources **MUST NOT** be included, except in `Living`, `Meta`, or `Informational` EIPs. External resources may disappear, move, or change unexpectedly.
+
+The following **MAY** be allowed at editor discretion:
+
+- Links to `ethereum/go-ethereum` commits
+- Links to `ethereum/execution-specs` commits
+- Links to `ethereum/consensus-specs` commits
 
 ## Linking to other EIPs
 
