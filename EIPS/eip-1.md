@@ -187,7 +187,7 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 ## Linking to External Resources
 
-Links to external resources **MUST NOT** be included, except in `Living`, `Meta`, or `Informational` EIPs. External resources may disappear, move, or change unexpectedly.
+External resources are resources that are hosted outside of the EIPs repository. Links to external resources **MUST NOT** be included, except in `Living`, `Meta`, or `Informational` EIPs. External resources may disappear, move, or change unexpectedly.
 
 The following **MAY** be allowed at editor discretion:
 
