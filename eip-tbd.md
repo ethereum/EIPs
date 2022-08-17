@@ -1,0 +1,49 @@
+---
+eip: tbd
+title: Reducing the gas cost of contract creation with existing code
+author: Qi Zhou (@qizhou)
+discussions-to: tbd
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-08-17
+requires: 1014, 2929
+---
+
+## Abstract
+
+Adding a new opcode (CREAET3) that is identical to CREATE2 with potentially much lower gas cost by accepting an additional argument `existing_contract_address` that already stored the code of the new contract.
+
+## Motivation
+
+The EIP aims to reduce the smart contract creation cost of account abstraction (AA) contracts that have identical code.
+
+## Specification
+
+### Parameters
+
+| Constant                  | Value            |
+| ------------------------- | ---------------- |
+| `FORK_BLKNUM`             | TBD              |
+| `CREATE_DATA_GAS_PER_BYTE`          | 200            |
+| `COLD_ACCOUNT_ACCESS_COST` | 2600 |
+| `WARM_ACCOUNT_ACCESS_COST` | 100 |
+
+Adds a new opcode (CREATE3) at 0xf6, which takes 5 stack arguments: `endowment`, `memory_start`, `memory_length`, `salt`, `existing_contract_address`. CREATE3 behaves identically to CREATE2 (0xf5), except that the code hash of the creating contract MUST be the same as that of `existing_contract_address`.
+
+The CREATE3 has the same gas schema as CREATE2, but replacing the data gas from `CREATE_DATA_GAS_PER_BYTE` * `CONTRACT_BYTES` to the gas cost of `EXTCODEHASH` opcode, which is `COLD_ACCOUNT_ACCESS_COST` if the `existing_contract_address` is first-time accessed in the transaction or `WARM_ACCOUNT_ACCESS_COST` if `existing_contract_address` is already in the access list according to EIP-2929.
+
+If the code of the contract returned from the init code differs from that of `existing_contract_address`, we will fail the creation with the error "mismatched contract creation code with existing code", and will burn all gas for contract creation.
+
+## Rationle
+
+The major cost of creating an AA contract is the contract creation cost, especially data gas. For example, creating an AA contract with 10,000 bytes will consume 2,000,000 data gas.  Considering the code for each user's AA contract is the same, CREATE3 can reduce the data gas cost to 2600 (cold account) or even 100 (warm account) if the contract code already exists in the local storage.
+
+## Security Considerations
+
+No security considerations were found.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+
