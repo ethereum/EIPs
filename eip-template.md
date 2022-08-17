@@ -9,7 +9,7 @@ type: <Standards Track, Meta, or Informational>
 category (*only required for Standards Track): <Core, Networking, Interface, or ERC>
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires (*optional): <EIP number(s)>
-resuscitatable (*optional): true
+adoptable (*optional): true
 ---
 
 This is the suggested template for new EIPs.
