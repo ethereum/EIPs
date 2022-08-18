@@ -161,9 +161,9 @@ The following processes are recommended.
 By design ERC-### is fully backward compatible with ERC-20.
 
 ## Test Cases
-1. [Seller/Buyer Token example](../assets/eip-###/ERC20Mockup.sol).
-2. [Escrow contract example](../assets/eip-###/EscrowContractAccount.sol).
-3. [Unit test example with truffle](../assets/eip-###/truffule-test.js).
+1. [Seller/Buyer Token example](../assets/eip-%23%23%23/ERC20Mockup.sol).
+2. [Escrow contract example](../assets/eip-%23%23%23/EscrowContractAccount.sol).
+3. [Unit test example with truffle](../assets/eip-%23%23%23/truffule-test.js).
 
 The above 3 files demonstrate following conditions to exchange seller / buyer tokens.
  - exchange rate is 1:1
