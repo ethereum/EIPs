@@ -118,7 +118,7 @@ MD033:
   allowed_elements: []
 
 # MD034/no-bare-urls - Bare URL used
-MD034: true
+MD034: false
 
 # MD035/hr-style - Horizontal rule style
 MD035:
