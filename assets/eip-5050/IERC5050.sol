@@ -13,7 +13,7 @@ interface IERC5050Sender {
     /// @notice Check if an action is valid based on its hash and nonce
     /// @dev When an action passes through all three possible contracts
     /// (`fromContract`, `to`, and `state`) the `state` contract validates the
-    /// action with the initating `fromContract` using a nonced action hash.
+    /// action with the initiating `fromContract` using a nonced action hash.
     /// This hash is calculated and saved to storage on the `fromContract` before
     /// action handling is initiated. The `state` contract calculates the hash
     /// and verifies it and nonce with the `fromContract`.
