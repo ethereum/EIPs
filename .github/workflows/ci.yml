@@ -62,6 +62,9 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
+      - name: Delete Unchanged Files
+        uses: Pandapip1/delete-unchanged-files@0937c94da2e9f9f262bbf2035e75065a1fd04bcf
+
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
         with:
