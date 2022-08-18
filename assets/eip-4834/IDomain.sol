@@ -42,10 +42,6 @@ interface IDomain is IERC165 {
     /// @return     The subdomain with the given name
     function getDomain(string memory name) external view returns (address);
 
-    /// @notice     Query all subdomains. Must revert if the list of domains is unknown or infinite.
-    /// @return     The list of all subdomains.
-    function listDomains() external view returns (string[] memory);
-
     /// @notice     Create a subdomain with a given name
     /// @dev        This should revert if `canCreateDomain(msg.sender, name, pointer)` is `false` or if the domain exists
     /// @param      name The subdomain name to be created
@@ -93,24 +89,4 @@ interface IDomain is IERC165 {
     /// @param      name The subdomain to delete
     /// @return     Whether an account can delete the subdomain
     function canDeleteDomain(address updater, string memory name) external view returns (bool);
-
-
-    //// Subdomain Access Control
-
-    /// @notice     Get if an account can move the subdomain away from the current domain
-    /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
-    /// @param      updater The account that may be moving the subdomain
-    /// @param      name The subdomain name
-    /// @param      parent The parent domain
-    /// @param      newSubdomain The domain that will be set next
-    /// @return     Whether an account can update the subdomain
-    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) external view returns (bool);
-
-    /// @notice     Get if an account can unset this domain as a subdomain
-    /// @dev        May be called by `canDeleteDomain` of the parent domain - implement access control here!!!
-    /// @param      updater The account that may or may not be able to delete a subdomain
-    /// @param      name The subdomain to delete
-    /// @param      parent The parent domain
-    /// @return     Whether an account can delete the subdomain
-    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external view returns (bool);
 }
