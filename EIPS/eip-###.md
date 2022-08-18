@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5503
 title: Refundable Token Standard
 author: <admin@startfund.io>
 status: Draft
@@ -38,13 +38,13 @@ There are 3 contracts for the escrow process: `Buyer Contract`, `Seller Contract
  - Seller Contract: The seller will pay to the escrow account to exchange with `Buyer Token`.
  - Escrow Contract: Will be created by the seller. Agent to co-operate between buyers and sellers based on constraint rules. Instead of a simple address mapped balance variable in ERC20 tokens, this balance should have (Seller, Buyer).
 
-**Every ERC-### compliant contract must implement the `ERC###` interfaces**
+**Every ERC-5503 compliant contract must implement the `ERC5503` interfaces**
 
 ```solidity
 pragma solidity ^0.4.20;
 
 
-interface ERC### {
+interface ERC5503 {
 
     /// @notice escrow balance of owner
     /// @dev assigned to the zero address are considered invalid, and this
@@ -158,12 +158,12 @@ The following processes are recommended.
 - In the case of escrow-failed, the seller only gets a refund seller token.
 
 ## Backwards Compatibility
-By design ERC-### is fully backward compatible with ERC-20.
+By design ERC-5503 is fully backward compatible with ERC-20.
 
 ## Test Cases
-1. [Seller/Buyer Token example](../assets/eip-%23%23%23/ERC20Mockup.sol).
-2. [Escrow contract example](../assets/eip-%23%23%23/EscrowContractAccount.sol).
-3. [Unit test example with truffle](../assets/eip-%23%23%23/truffule-test.js).
+1. [Seller/Buyer Token example](../assets/eip-5503/ERC20Mockup.sol).
+2. [Escrow contract example](../assets/eip-5503/EscrowContractAccount.sol).
+3. [Unit test example with truffle](../assets/eip-5503/truffule-test.js).
 
 The above 3 files demonstrate following conditions to exchange seller / buyer tokens.
  - exchange rate is 1:1
