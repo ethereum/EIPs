@@ -69,7 +69,7 @@ jobs:
             }
         env:
           NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
-          JOB_DATA: ${{ fromJson(steps.fetch-jobs.outputs.response).jobs }}
+          JOB_DATA: ${{ toJson(fromJson(steps.fetch-jobs.outputs.response).jobs) }}
           LABELS: |
             {
               "HTMLProofer": "waiting: htmlproofer to pass",
