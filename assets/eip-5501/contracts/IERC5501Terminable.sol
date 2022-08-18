@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
  * @title IERC5501Terminable
  * @dev See https://eips.ethereum.org/EIPS/eip-5501
  * This extension for ERC5501 adds the option to terminate borrowing if both parties agree.
- * @notice the ERC-165 identifier for this interface is 0x6a26417e.
+ * @notice the EIP-165 identifier for this interface is 0x6a26417e.
  */
 interface IERC5501Terminable /* is IERC5501 */ {
     /**

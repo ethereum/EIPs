@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
  * @title IERC5501Balance
  * @dev See https://eips.ethereum.org/EIPS/eip-5501
  * Extension for ERC5501 which adds userBalanceOf to query how many tokens address is userOf.
- * @notice the ERC-165 identifier for this interface is 0x0cb22289.
+ * @notice the EIP-165 identifier for this interface is 0x0cb22289.
  */
 interface IERC5501Balance /* is IERC5501 */{
     /**

@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
  * @title IERC5501Enumerable
  * @dev See https://eips.ethereum.org/EIPS/eip-5501
  * This extension for ERC5501 adds the option to iterate over user tokens.
- * @notice the ERC-165 identifier for this interface is 0x1d350ef8.
+ * @notice the EIP-165 identifier for this interface is 0x1d350ef8.
  */
 interface IERC5501Enumerable /* is IERC5501Balance, IERC5501 */ {
     /**

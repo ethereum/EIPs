@@ -3,9 +3,9 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IERC5501: Rental & Delegation NFT - ERC-721 Extension
+ * @title IERC5501: Rental & Delegation NFT - EIP-721 Extension
  * @dev See https://eips.ethereum.org/EIPS/eip-5501
- * @notice the ERC-165 identifier for this interface is 0xf808ec37.
+ * @notice the EIP-165 identifier for this interface is 0xf808ec37.
  */
 interface IERC5501 /* is IERC721 */ {
     /**
