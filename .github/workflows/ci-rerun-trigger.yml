@@ -10,22 +10,22 @@ jobs:
     name: Trigger
     steps:
       - name: Trigger
-        use: actions/github-script@v6
+        uses: actions/github-script@v6
         if: github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
         with:
           script: |
-            let pr = await octokit.rest.pulls.get({
+            let pr = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.issue_comment.issue.number
             });
-            await octokit.rest.pulls.update({
+            await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.issue_comment.issue.number,
               body: '[RETRIGGER]\n' + pr.data.body
             });
-            await octokit.rest.pulls.update({
+            await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.issue_comment.issue.number,
