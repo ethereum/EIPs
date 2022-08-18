@@ -38,13 +38,13 @@ There are 3 contracts for the escrow process: `Buyer Contract`, `Seller Contract
  - Seller Contract: The seller will pay to the escrow account to exchange with `Buyer Token`.
  - Escrow Contract: Will be created by the seller. Agent to co-operate between buyers and sellers based on constraint rules. Instead of a simple address mapped balance variable in ERC20 tokens, this balance should have (Seller, Buyer).
 
-**Every ERC-XXXX compliant contract must implement the `ERCXXXX` interfaces**
+**Every ERC-### compliant contract must implement the `ERC###` interfaces**
 
 ```solidity
 pragma solidity ^0.4.20;
 
 
-interface ERCXXXX {
+interface ERC### {
 
     /// @notice escrow balance of owner
     /// @dev assigned to the zero address are considered invalid, and this
@@ -158,12 +158,12 @@ The following processes are recommended.
 - In the case of escrow-failed, the seller only gets a refund seller token.
 
 ## Backwards Compatibility
-By design ERC-XXXX is fully backward compatible with ERC-20.
+By design ERC-### is fully backward compatible with ERC-20.
 
 ## Test Cases
-1. [Seller/Buyer Token example](../assets/eip-xxxx/ERC20Mockup.sol).
-2. [Escrow contract example](../assets/eip-xxxx/EscrowContractAccount.sol).
-3. [Unit test example with truffle](../assets/eip-xxxx/truffule-test.js).
+1. [Seller/Buyer Token example](../assets/eip-###/ERC20Mockup.sol).
+2. [Escrow contract example](../assets/eip-###/EscrowContractAccount.sol).
+3. [Unit test example with truffle](../assets/eip-###/truffule-test.js).
 
 The above 3 files demonstrate following conditions to exchange seller / buyer tokens.
  - exchange rate is 1:1
