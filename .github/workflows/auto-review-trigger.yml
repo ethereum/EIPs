@@ -44,7 +44,7 @@ jobs:
 
       - name: Write PR Number - Comment Retrigger
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && startsWith(github.event.issue.comment.body, '@eth-bot retrigger')
+        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.issue.comment.body, '@eth-bot rerun')
         env:
           PR_NUMBER: ${{ github.event.issue.number }}
       
