@@ -68,6 +68,7 @@ jobs:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          only_warn: 1
 
   eipw-validator:
     name: EIP Walidator
