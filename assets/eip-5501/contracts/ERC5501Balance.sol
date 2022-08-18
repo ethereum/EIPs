@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "./ERCX.sol";
-import "./IERCXBalance.sol";
+import "./ERC5501.sol";
+import "./IERC5501Balance.sol";
 
 /**
- * @dev Implementation of Balance extension of ---proposal_link--- with OpenZeppelin ERC721 version.
+ * @dev Implementation of Balance extension of https://eips.ethereum.org/EIPS/eip-5501 with OpenZeppelin ERC721 version.
  */
-contract ERCXBalance is IERCXBalance, ERCX {
+contract ERC5501Balance is IERC5501Balance, ERC5501 {
     // Mapping from address to userOf tokens
     mapping(address => uint256[]) internal _userBalances;
 
@@ -16,11 +16,11 @@ contract ERCXBalance is IERCXBalance, ERCX {
      * @dev Initializes the contract by setting a name and a symbol to the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-        ERCX(name_, symbol_)
+        ERC5501(name_, symbol_)
     {}
 
     /**
-     * @dev See {IERCX-setUser}.
+     * @dev See {IERC5501-setUser}.
      */
     function setUser(
         uint256 tokenId,
@@ -34,7 +34,7 @@ contract ERCXBalance is IERCXBalance, ERCX {
     }
 
     /**
-     * @dev See {IERCX-userBalanceOf}.
+     * @dev See {IERC5501-userBalanceOf}.
      */
     function userBalanceOf(address user)
         public
@@ -45,7 +45,7 @@ contract ERCXBalance is IERCXBalance, ERCX {
     {
         require(
             user != address(0),
-            "ERCXBalance: address zero is not a valid owner"
+            "ERC5501Balance: address zero is not a valid owner"
         );
         uint256 balance;
         uint256[] memory candidates = _userBalances[user];
@@ -96,7 +96,7 @@ contract ERCXBalance is IERCXBalance, ERCX {
         returns (bool)
     {
         return
-            interfaceId == type(IERCXBalance).interfaceId ||
+            interfaceId == type(IERC5501Balance).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 }

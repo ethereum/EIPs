@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
 
-describe("ERCXTerminableTest", function () {
+describe("ERC5501TerminableTest", function () {
   async function initialize() {
     // 365 * 24 * 60 * 60
     const fastForwardYear = 31536000;
@@ -15,7 +15,7 @@ describe("ERCXTerminableTest", function () {
     const [owner, delegatee, borrower] = await ethers.getSigners();
 
     const contractFactory = await ethers.getContractFactory(
-      "ERCXTerminableTestCollection"
+      "ERC5501TerminableTestCollection"
     );
     const contract = await contractFactory.deploy("Test Collection", "TEST");
 
@@ -41,7 +41,7 @@ describe("ERCXTerminableTest", function () {
       .to.emit(contract, "UpdateUser")
       .withArgs(1, borrower.address, uint64MaxValue, true);
     await expect(contract.terminateBorrow(1)).to.be.revertedWith(
-      "ERCXTerminable: not agreed"
+      "ERC5501Terminable: not agreed"
     );
   });
 
@@ -54,7 +54,7 @@ describe("ERCXTerminableTest", function () {
       .to.emit(contract, "UpdateUser")
       .withArgs(1, delegatee.address, uint64MaxValue, false);
     await expect(contract.setBorrowTermination(1)).to.be.revertedWith(
-      "ERCXTerminable: borrow not active"
+      "ERC5501Terminable: borrow not active"
     );
   });
 

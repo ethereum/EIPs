@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
 
-describe("ERCXBalanceTest", function () {
+describe("ERC5501BalanceTest", function () {
   async function initialize() {
     // 365 * 24 * 60 * 60
     const fastForwardYear = 31536000;
@@ -15,7 +15,7 @@ describe("ERCXBalanceTest", function () {
     const [owner, delegatee] = await ethers.getSigners();
 
     const contractFactory = await ethers.getContractFactory(
-      "ERCXBalanceTestCollection"
+      "ERC5501BalanceTestCollection"
     );
     const contract = await contractFactory.deploy("Test Collection", "TEST");
 
@@ -77,7 +77,7 @@ describe("ERCXBalanceTest", function () {
 
     await expect(
       contract.userBalanceOf(ethers.constants.AddressZero)
-    ).to.be.revertedWith("ERCXBalance: address zero is not a valid owner");
+    ).to.be.revertedWith("ERC5501Balance: address zero is not a valid owner");
   });
 
   it("Supports interface", async function () {

@@ -2,22 +2,22 @@
 
 pragma solidity ^0.8.0;
 
-import "./ERCXBalance.sol";
-import "./IERCXEnumerable.sol";
+import "./ERC5501Balance.sol";
+import "./IERC5501Enumerable.sol";
 
 /**
- * @dev Implementation of Enumerable extension of ---proposal_link--- with OpenZeppelin ERC721 version.
+ * @dev Implementation of Enumerable extension of https://eips.ethereum.org/EIPS/eip-5501 with OpenZeppelin ERC721 version.
  */
-contract ERCXEnumerable is IERCXEnumerable, ERCXBalance {
+contract ERC5501Enumerable is IERC5501Enumerable, ERC5501Balance {
     /**
      * @dev Initializes the contract by setting a name and a symbol to the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-        ERCXBalance(name_, symbol_)
+        ERC5501Balance(name_, symbol_)
     {}
 
     /**
-     * @dev See {IERCX-tokenOfUserByIndex}.
+     * @dev See {IERC5501-tokenOfUserByIndex}.
      */
     function tokenOfUserByIndex(address user, uint256 index)
         public
@@ -28,12 +28,12 @@ contract ERCXEnumerable is IERCXEnumerable, ERCXBalance {
     {
         require(
             user != address(0),
-            "ERCXEnumerable: address zero is not a valid owner"
+            "ERC5501Enumerable: address zero is not a valid owner"
         );
         uint256[] memory balance = _userBalances[user];
         require(
             balance.length > 0 && index < balance.length,
-            "ERCXEnumerable: owner index out of bounds"
+            "ERC5501Enumerable: owner index out of bounds"
         );
         uint256 counter;
         unchecked {
@@ -49,7 +49,7 @@ contract ERCXEnumerable is IERCXEnumerable, ERCXBalance {
                 }
             }
         }
-        revert("ERCXEnumerable: owner index out of bounds");
+        revert("ERC5501Enumerable: owner index out of bounds");
     }
 
     /**
@@ -64,7 +64,7 @@ contract ERCXEnumerable is IERCXEnumerable, ERCXBalance {
         returns (bool)
     {
         return
-            interfaceId == type(IERCXEnumerable).interfaceId ||
+            interfaceId == type(IERC5501Enumerable).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 }

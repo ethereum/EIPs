@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "./ERCX.sol";
-import "./IERCXTerminable.sol";
+import "./ERC5501.sol";
+import "./IERC5501Terminable.sol";
 
 /**
- * @dev Implementation of Terminable extension of ---proposal_link--- with OpenZeppelin ERC721 version.
+ * @dev Implementation of Terminable extension of https://eips.ethereum.org/EIPS/eip-5501 with OpenZeppelin ERC721 version.
  */
-contract ERCXTerminable is IERCXTerminable, ERCX {
+contract ERC5501Terminable is IERC5501Terminable, ERC5501 {
     /**
      * @dev Structure to hold agreements from both parties to terminate a borrow.
      * @notice If both parties agree, it is possible to modify UserInfo even before it expires.
@@ -26,11 +26,11 @@ contract ERCXTerminable is IERCXTerminable, ERCX {
      * @dev Initializes the contract by setting a name and a symbol to the token collection.
      */
     constructor(string memory name_, string memory symbol_)
-        ERCX(name_, symbol_)
+        ERC5501(name_, symbol_)
     {}
 
     /**
-     * @dev See {IERCX-setUser}.
+     * @dev See {IERC5501-setUser}.
      */
     function setUser(
         uint256 tokenId,
@@ -44,13 +44,13 @@ contract ERCXTerminable is IERCXTerminable, ERCX {
     }
 
     /**
-     * @dev See {IERCXTerminable-setBorrowTermination}.
+     * @dev See {IERC5501Terminable-setBorrowTermination}.
      */
     function setBorrowTermination(uint256 tokenId) public virtual override {
         UserInfo storage userInfo = _users[tokenId];
         require(
             userInfo.expires >= block.timestamp && userInfo.isBorrowed,
-            "ERCXTerminable: borrow not active"
+            "ERC5501Terminable: borrow not active"
         );
 
         BorrowTerminationInfo storage terminationInfo = _borrowTerminations[
@@ -67,7 +67,7 @@ contract ERCXTerminable is IERCXTerminable, ERCX {
     }
 
     /**
-     * @dev See {IERCXTerminable-getBorrowTermination}.
+     * @dev See {IERC5501Terminable-getBorrowTermination}.
      */
     function getBorrowTermination(uint256 tokenId)
         public
@@ -83,13 +83,13 @@ contract ERCXTerminable is IERCXTerminable, ERCX {
     }
 
     /**
-     * @dev See {IERCXTerminable-terminateBorrow}.
+     * @dev See {IERC5501Terminable-terminateBorrow}.
      */
     function terminateBorrow(uint256 tokenId) public virtual override {
         BorrowTerminationInfo storage info = _borrowTerminations[tokenId];
         require(
             info.lenderAgreement && info.borrowerAgreement,
-            "ERCXTerminable: not agreed"
+            "ERC5501Terminable: not agreed"
         );
         _users[tokenId].isBorrowed = false;
         delete _borrowTerminations[tokenId];
@@ -114,7 +114,7 @@ contract ERCXTerminable is IERCXTerminable, ERCX {
         returns (bool)
     {
         return
-            interfaceId == type(IERCXTerminable).interfaceId ||
+            interfaceId == type(IERC5501Terminable).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

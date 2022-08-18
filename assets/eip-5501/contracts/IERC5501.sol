@@ -3,11 +3,11 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IERCX: Rental & Delegation NFT - ERC-721 Extension
- * @dev See ---proposal_link---
+ * @title IERC5501: Rental & Delegation NFT - ERC-721 Extension
+ * @dev See https://eips.ethereum.org/EIPS/eip-5501
  * @notice the ERC-165 identifier for this interface is 0xf808ec37.
  */
-interface IERCX /* is IERC721 */ {
+interface IERC5501 /* is IERC721 */ {
     /**
      * @dev Emitted when the user of an NFT is modified.
      */

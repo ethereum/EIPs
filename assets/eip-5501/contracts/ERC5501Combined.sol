@@ -3,19 +3,19 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERCX.sol";
-import "./IERCXBalance.sol";
-import "./IERCXEnumerable.sol";
-import "./IERCXTerminable.sol";
+import "./IERC5501.sol";
+import "./IERC5501Balance.sol";
+import "./IERC5501Enumerable.sol";
+import "./IERC5501Terminable.sol";
 
 /**
- * @dev Implementation of ERCX contract with all extensions ---proposal_link--- with OpenZeppelin ERC721 version.
+ * @dev Implementation of ERC5501 contract with all extensions https://eips.ethereum.org/EIPS/eip-5501 with OpenZeppelin ERC721 version.
  */
-contract ERCXCombined is
-    IERCX,
-    IERCXBalance,
-    IERCXTerminable,
-    IERCXEnumerable,
+contract ERC5501Combined is
+    IERC5501,
+    IERC5501Balance,
+    IERC5501Terminable,
+    IERC5501Enumerable,
     ERC721
 {
     /**
@@ -55,7 +55,7 @@ contract ERCXCombined is
     {}
 
     /**
-     * @dev See {IERCX-setUser}.
+     * @dev See {IERC5501-setUser}.
      */
     function setUser(
         uint256 tokenId,
@@ -68,14 +68,14 @@ contract ERCXCombined is
 
         require(
             _isApprovedOrOwner(msg.sender, tokenId),
-            "ERCX: set user caller is not token owner or approved"
+            "ERC5501: set user caller is not token owner or approved"
         );
-        require(user != address(0), "ERCX: set user to zero address");
+        require(user != address(0), "ERC5501: set user to zero address");
 
         UserInfo storage info = _users[tokenId];
         require(
             !info.isBorrowed || info.expires < block.timestamp,
-            "ERCX: token is borrowed"
+            "ERC5501: token is borrowed"
         );
         info.user = user;
         info.expires = expires;
@@ -90,7 +90,7 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCX-userOf}.
+     * @dev See {IERC5501-userOf}.
      */
     function userOf(uint256 tokenId)
         public
@@ -101,13 +101,13 @@ contract ERCXCombined is
     {
         require(
             uint256(_users[tokenId].expires) >= block.timestamp,
-            "ERCX: user does not exist for this token"
+            "ERC5501: user does not exist for this token"
         );
         return _users[tokenId].user;
     }
 
     /**
-     * @dev See {IERCX-userBalanceOf}.
+     * @dev See {IERC5501-userBalanceOf}.
      */
     function userBalanceOf(address user)
         public
@@ -118,7 +118,7 @@ contract ERCXCombined is
     {
         require(
             user != address(0),
-            "ERCXBalance: address zero is not a valid owner"
+            "ERC5501Balance: address zero is not a valid owner"
         );
         uint256 balance;
         uint256[] memory candidates = _userBalances[user];
@@ -136,7 +136,7 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCX-tokenOfUserByIndex}.
+     * @dev See {IERC5501-tokenOfUserByIndex}.
      */
     function tokenOfUserByIndex(address user, uint256 index)
         public
@@ -147,12 +147,12 @@ contract ERCXCombined is
     {
         require(
             user != address(0),
-            "ERCXEnumerable: address zero is not a valid owner"
+            "ERC5501Enumerable: address zero is not a valid owner"
         );
         uint256[] memory balance = _userBalances[user];
         require(
             balance.length > 0 && index < balance.length,
-            "ERCXEnumerable: owner index out of bounds"
+            "ERC5501Enumerable: owner index out of bounds"
         );
         uint256 counter;
         unchecked {
@@ -168,11 +168,11 @@ contract ERCXCombined is
                 }
             }
         }
-        revert("ERCXEnumerable: owner index out of bounds");
+        revert("ERC5501Enumerable: owner index out of bounds");
     }
 
     /**
-     * @dev See {IERCX-userExpires}.
+     * @dev See {IERC5501-userExpires}.
      */
     function userExpires(uint256 tokenId)
         public
@@ -185,7 +185,7 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCX-isBorrowed}.
+     * @dev See {IERC5501-isBorrowed}.
      */
     function userIsBorrowed(uint256 tokenId)
         public
@@ -198,7 +198,7 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCXTerminable-getBorrowTermination}.
+     * @dev See {IERC5501Terminable-getBorrowTermination}.
      */
     function getBorrowTermination(uint256 tokenId)
         public
@@ -214,13 +214,13 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCXTerminable-setBorrowTermination}.
+     * @dev See {IERC5501Terminable-setBorrowTermination}.
      */
     function setBorrowTermination(uint256 tokenId) public virtual override {
         UserInfo storage userInfo = _users[tokenId];
         require(
             userInfo.expires >= block.timestamp && userInfo.isBorrowed,
-            "ERCXTerminable: borrow not active"
+            "ERC5501Terminable: borrow not active"
         );
 
         BorrowTerminationInfo storage terminationInfo = _borrowTerminations[
@@ -237,13 +237,13 @@ contract ERCXCombined is
     }
 
     /**
-     * @dev See {IERCXTerminable-terminateBorrow}.
+     * @dev See {IERC5501Terminable-terminateBorrow}.
      */
     function terminateBorrow(uint256 tokenId) public virtual override {
         BorrowTerminationInfo storage info = _borrowTerminations[tokenId];
         require(
             info.lenderAgreement && info.borrowerAgreement,
-            "ERCXTerminable: not agreed"
+            "ERC5501Terminable: not agreed"
         );
         _users[tokenId].isBorrowed = false;
         delete _borrowTerminations[tokenId];
@@ -290,10 +290,10 @@ contract ERCXCombined is
         returns (bool)
     {
         return
-            interfaceId == type(IERCX).interfaceId ||
-            interfaceId == type(IERCXBalance).interfaceId ||
-            interfaceId == type(IERCXEnumerable).interfaceId ||
-            interfaceId == type(IERCXTerminable).interfaceId ||
+            interfaceId == type(IERC5501).interfaceId ||
+            interfaceId == type(IERC5501Balance).interfaceId ||
+            interfaceId == type(IERC5501Enumerable).interfaceId ||
+            interfaceId == type(IERC5501Terminable).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

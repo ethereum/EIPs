@@ -3,12 +3,12 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IERCXEnumerable
- * @dev See ---proposal_link---
- * This extension for ERCX adds the option to iterate over user tokens.
+ * @title IERC5501Enumerable
+ * @dev See https://eips.ethereum.org/EIPS/eip-5501
+ * This extension for ERC5501 adds the option to iterate over user tokens.
  * @notice the ERC-165 identifier for this interface is 0x1d350ef8.
  */
-interface IERCXEnumerable /* is IERCXBalance, IERCX */ {
+interface IERC5501Enumerable /* is IERC5501Balance, IERC5501 */ {
     /**
      * @notice Enumerate NFTs assigned to a user.
      * @dev Reverts if user is zero address or _index >= userBalanceOf(_owner).

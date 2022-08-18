@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
 
-describe("ERCXCombinedTest", function () {
+describe("ERC5501CombinedTest", function () {
   async function initialize() {
     // 7 * 24 * 60 * 60
     const week = 604800;
@@ -14,7 +14,7 @@ describe("ERCXCombinedTest", function () {
       await ethers.getSigners();
 
     const contractFactory = await ethers.getContractFactory(
-      "ERCXCombinedTestCollection"
+      "ERC5501CombinedTestCollection"
     );
     const contract = await contractFactory.deploy("Test Collection", "TEST");
 

@@ -2,7 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("ERCXEnumerableTest", function () {
+describe("ERC5501EnumerableTest", function () {
   async function initialize() {
     // 365 * 24 * 60 * 60
     const fastForwardYear = 31536000;
@@ -14,7 +14,7 @@ describe("ERCXEnumerableTest", function () {
     const [owner, delegatee] = await ethers.getSigners();
 
     const contractFactory = await ethers.getContractFactory(
-      "ERCXEnumerableTestCollection"
+      "ERC5501EnumerableTestCollection"
     );
     const contract = await contractFactory.deploy("Test Collection", "TEST");
 
@@ -59,7 +59,7 @@ describe("ERCXEnumerableTest", function () {
     expect(await contract.tokenOfUserByIndex(delegatee.address, 3)).to.equal(7);
     await expect(
       contract.tokenOfUserByIndex(delegatee.address, 4)
-    ).to.be.revertedWith("ERCXEnumerable: owner index out of bounds");
+    ).to.be.revertedWith("ERC5501Enumerable: owner index out of bounds");
   });
 
   it("Revert user token id by index query for zero address", async function () {
@@ -67,7 +67,7 @@ describe("ERCXEnumerableTest", function () {
 
     await expect(
       contract.tokenOfUserByIndex(ethers.constants.AddressZero, 0)
-    ).to.be.revertedWith("ERCXEnumerable: address zero is not a valid owner");
+    ).to.be.revertedWith("ERC5501Enumerable: address zero is not a valid owner");
   });
 
   it("Revert user token id by index query for out of bounds index", async function () {
@@ -75,7 +75,7 @@ describe("ERCXEnumerableTest", function () {
 
     await expect(
       contract.tokenOfUserByIndex(delegatee.address, 0)
-    ).to.be.revertedWith("ERCXEnumerable: owner index out of bounds");
+    ).to.be.revertedWith("ERC5501Enumerable: owner index out of bounds");
   });
 
   it("Supports interface", async function () {

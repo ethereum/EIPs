@@ -3,12 +3,12 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IERCXBalance
- * @dev See ---proposal_link---
- * Extension for ERCX which adds userBalanceOf to query how many tokens address is userOf.
+ * @title IERC5501Balance
+ * @dev See https://eips.ethereum.org/EIPS/eip-5501
+ * Extension for ERC5501 which adds userBalanceOf to query how many tokens address is userOf.
  * @notice the ERC-165 identifier for this interface is 0x0cb22289.
  */
-interface IERCXBalance /* is IERCX */{
+interface IERC5501Balance /* is IERC5501 */{
     /**
      * @notice Count of all NFTs assigned to a user.
      * @dev Reverts if user is zero address.

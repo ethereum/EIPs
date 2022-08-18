@@ -3,12 +3,12 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERCX.sol";
+import "./IERC5501.sol";
 
 /**
- * @dev Implementation of ---proposal_link--- with OpenZeppelin ERC721 version.
+ * @dev Implementation of https://eips.ethereum.org/EIPS/eip-5501 with OpenZeppelin ERC721 version.
  */
-contract ERCX is IERCX, ERC721 {
+contract ERC5501 is IERC5501, ERC721 {
     /**
      * @dev Structure to hold user information.
      * @notice If isBorrowed is true, UserInfo cannot be modified before it expires.
@@ -30,7 +30,7 @@ contract ERCX is IERCX, ERC721 {
     {}
 
     /**
-     * @dev See {IERCX-setUser}.
+     * @dev See {IERC5501-setUser}.
      */
     function setUser(
         uint256 tokenId,
@@ -40,14 +40,14 @@ contract ERCX is IERCX, ERC721 {
     ) public virtual override {
         require(
             _isApprovedOrOwner(msg.sender, tokenId),
-            "ERCX: set user caller is not token owner or approved"
+            "ERC5501: set user caller is not token owner or approved"
         );
-        require(user != address(0), "ERCX: set user to zero address");
+        require(user != address(0), "ERC5501: set user to zero address");
 
         UserInfo storage info = _users[tokenId];
         require(
             !info.isBorrowed || info.expires < block.timestamp,
-            "ERCX: token is borrowed"
+            "ERC5501: token is borrowed"
         );
         info.user = user;
         info.expires = expires;
@@ -56,7 +56,7 @@ contract ERCX is IERCX, ERC721 {
     }
 
     /**
-     * @dev See {IERCX-userOf}.
+     * @dev See {IERC5501-userOf}.
      */
     function userOf(uint256 tokenId)
         public
@@ -67,13 +67,13 @@ contract ERCX is IERCX, ERC721 {
     {
         require(
             uint256(_users[tokenId].expires) >= block.timestamp,
-            "ERCX: user does not exist for this token"
+            "ERC5501: user does not exist for this token"
         );
         return _users[tokenId].user;
     }
 
     /**
-     * @dev See {IERCX-userExpires}.
+     * @dev See {IERC5501-userExpires}.
      */
     function userExpires(uint256 tokenId)
         public
@@ -86,7 +86,7 @@ contract ERCX is IERCX, ERC721 {
     }
 
     /**
-     * @dev See {IERCX-isBorrowed}.
+     * @dev See {IERC5501-isBorrowed}.
      */
     function userIsBorrowed(uint256 tokenId)
         public
@@ -110,7 +110,7 @@ contract ERCX is IERCX, ERC721 {
         returns (bool)
     {
         return
-            interfaceId == type(IERCX).interfaceId ||
+            interfaceId == type(IERC5501).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 

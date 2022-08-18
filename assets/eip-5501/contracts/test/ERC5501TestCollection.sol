@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.0; 
 
-import "../ERCX.sol";
+import "../ERC5501.sol";
 
-contract ERCXTestCollection is ERCX {
+contract ERC5501TestCollection is ERC5501 {
 
-    constructor(string memory name_, string memory symbol_) ERCX(name_,symbol_) {}
+    constructor(string memory name_, string memory symbol_) ERC5501(name_,symbol_) {}
 
     function mint(address to, uint256 tokenId) public {
         _mint(to, tokenId);

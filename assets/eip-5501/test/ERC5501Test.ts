@@ -2,7 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
-describe("ERCXTest", function () {
+describe("ERC5501Test", function () {
   async function initialize() {
     // 365 * 24 * 60 * 60
     const fastForwardYear = 31536000;
@@ -13,7 +13,7 @@ describe("ERCXTest", function () {
       await ethers.getSigners();
 
     const contractFactory = await ethers.getContractFactory(
-      "ERCXTestCollection"
+      "ERC5501TestCollection"
     );
     const contract = await contractFactory.deploy("Test Collection", "TEST");
 
@@ -36,7 +36,7 @@ describe("ERCXTest", function () {
     await expect(
       contract.connect(borrower).setUser(1, borrower.address, 0, false)
     ).to.be.revertedWith(
-      "ERCX: set user caller is not token owner or approved"
+      "ERC5501: set user caller is not token owner or approved"
     );
   });
 
@@ -45,14 +45,14 @@ describe("ERCXTest", function () {
 
     await expect(
       contract.setUser(1, ethers.constants.AddressZero, 0, false)
-    ).to.be.revertedWith("ERCX: set user to zero address");
+    ).to.be.revertedWith("ERC5501: set user to zero address");
   });
 
   it("Revert userOf if not set or expired", async function () {
     const { contract } = await loadFixture(initialize);
 
     await expect(contract.userOf(1)).to.be.revertedWith(
-      "ERCX: user does not exist for this token"
+      "ERC5501: user does not exist for this token"
     );
   });
 
@@ -70,7 +70,7 @@ describe("ERCXTest", function () {
       .withArgs(1, borrower.address, expires, true);
     await expect(
       contract.setUser(1, delegatee.address, 0, false)
-    ).to.be.revertedWith("ERCX: token is borrowed");
+    ).to.be.revertedWith("ERC5501: token is borrowed");
   });
 
   it("Can delegate and redelegate user", async function () {
@@ -99,7 +99,7 @@ describe("ERCXTest", function () {
       .withArgs(1, delegatee.address, 0, false);
   });
 
-  it("User is reset if NFT is not borrowed and transfered", async function () {
+  it("User is reset if NFT is not borrowed and transferred", async function () {
     const { contract, owner, delegatee, expires } = await loadFixture(
       initialize
     );
@@ -118,13 +118,13 @@ describe("ERCXTest", function () {
       .withArgs(1, ethers.constants.AddressZero, 0, false);
 
     await expect(contract.userOf(1)).to.be.revertedWith(
-      "ERCX: user does not exist for this token"
+      "ERC5501: user does not exist for this token"
     );
     expect(await contract.userExpires(1)).to.equal(0);
     expect(await contract.userIsBorrowed(1)).to.equal(false);
   });
 
-  it("User is not reset if NFT is borrowed and transfered", async function () {
+  it("User is not reset if NFT is borrowed and transferred", async function () {
     const { contract, owner, delegatee, borrower, expires } = await loadFixture(
       initialize
     );
