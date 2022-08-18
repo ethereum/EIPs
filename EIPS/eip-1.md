@@ -82,7 +82,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 If this period results in necessary normative changes it will revert the EIP to `Review`.
 
-**Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
+**Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata, add non-normative clarifications, or make backward compatible changes.
 
 **Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status. 
 
