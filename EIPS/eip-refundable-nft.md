@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 5507
 title: Refundable NFTs
 description: Adds refund functionality to EIP-721 and EIP-1155 NFTs
 author: elie222 (@elie222), Pandapip1 (@Pandapip1)
