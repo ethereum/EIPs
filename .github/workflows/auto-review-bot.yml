@@ -22,11 +22,6 @@ jobs:
         id: save-pr-number
         run: echo "::set-output name=pr::$(cat pr-number.txt)"
 
-      - name: Setup Node.js Environment
-        uses: actions/setup-node@2fddd8803e2f5c9604345a0b591c3020ee971a93
-        with:
-          node-version: 16
-
       - name: Auto Review Bot
         id: auto-review-bot
         uses: Pandapip1/eipm@dist
