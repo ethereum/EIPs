@@ -97,7 +97,6 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP2,
             true,
-<<<<<<< HEAD
             "privilege 2 available after NFT owner update the privilege total"
         );
     });
@@ -112,33 +111,18 @@ contract("ERC5496Cloneable", async accounts => {
     });
     
     it("ERC5496 cloneable", async () => {
-=======
-            "privilage 2 available after NFT owner update the privilege total"
-        );
-    });
-
-    it("ERC721P cloneable", async () => {
->>>>>>> edd7a646 (upload source code)
         let owner_1 = await demoContract.ownerOf(4);
         let cloneable_P2 = await demoContract.cloneable(2);
         assert.equal(
             cloneable_P2,
             false,
-<<<<<<< HEAD
             "privilege 2 should not be cloneable"
-=======
-            "privilage 2 should not be cloneable"
->>>>>>> edd7a646 (upload source code)
         );
         let cloneable_P3 = await demoContract.cloneable(3);
         assert.equal(
             cloneable_P3,
             true,
-<<<<<<< HEAD
             "privilege 3 should be cloneable"
-=======
-            "privilage 3 should be cloneable"
->>>>>>> edd7a646 (upload source code)
         );
         let expires = Math.floor(new Date().getTime()/1000) + 5000;
         await demoContract.setPrivilege(4, 3, Bob, BigInt(expires), { from: Alice });
@@ -156,7 +140,6 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP3,
             true,
-<<<<<<< HEAD
             "privilege 3 available after Bob cloned"
         );
     });
@@ -173,11 +156,3 @@ contract("ERC5496Cloneable", async accounts => {
         }
     })
 });
-=======
-            "privilage 3 available after Bob cloned"
-        );
-    });
-});
-
-
->>>>>>> edd7a646 (upload source code)
