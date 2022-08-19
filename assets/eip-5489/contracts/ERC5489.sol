@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./IERC5438.sol";
+import "./IERC5489.sol";
 
-contract ERC5438 is IERC5438, ERC721Enumerable, Ownable {
+contract ERC5489 is IERC5489, ERC721Enumerable, Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     mapping(uint256 => EnumerableSet.AddressSet) tokenId2AuthroizedAddresses;

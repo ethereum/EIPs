@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-interface IERC5438 {
+interface IERC5489 {
     /**
      * @dev this event emits when the slot on `tokenId` is authorzized to `slotManagerAddr`
      */
