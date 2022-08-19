@@ -52,14 +52,14 @@ jobs:
             const data = JSON.parse(process.env.JOB_DATA);
             for (let job in labels) {
               if (data.find(jobData => jobData.name == job)?.conclusion != "success") {
-                octokit.rest.issues.addLabels({
+                github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: process.env.NUMBER,
                   labels: [ labels[job] ]
                 }).catch(() => {});
               } else {
-                octokit.rest.issues.removeLabel({
+                github.rest.issues.removeLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: process.env.NUMBER,
