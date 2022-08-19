@@ -1,0 +1,121 @@
+---
+eip: <to be assigned>
+title: Refundable NFTs
+description: Adds refund functionality to EIP-721 and EIP-1155 NFTs
+author: elie222 (@elie222), Pandapip1 (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-08-19
+requires: 165, 721, 1155
+---
+
+## Abstract
+
+This EIP adds refund functionality to the [EIP-721](./eip-721.md) and [EIP-1155](./eip-1155.md) standards.
+
+## Motivation
+
+The NFT space lacks much accountability. For the health of the NFT ecosystem as a whole, better mechanisms to prevent rugpulls from happening are needed. Offering refunds provides greater protection for buyers and increases legitimacy for creators.
+
+## Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### EIP-721 Refund Extension
+  
+```solidity
+// SPDX-License-Identifier: CC0-1.0
+
+pragma solidity ^0.8.4;
+
+import "IERC721.sol";
+import "IERC165.sol";
+
+/// @notice Refundable EIP-721 tokens
+/// @dev    The EIP-165 identifier of this interface is `0xTODO`
+interface IERC721Refund is IERC721, IERC165 {
+    /// @notice           Emitted when a token is refunded
+    /// @dev              Emitted by `refund`
+    /// @param  _sender   The person that requested a refund
+    /// @param  _tokenId  The `tokenId` that was refunded
+    event Refund(
+        address indexed _sender,
+        uint256 indexed _tokenId
+    );
+
+    /// @notice         As long as the refund is active for the given `tokenId`, refunds the user
+    /// @dev            Make sure to check that the user has the token, and be aware of potential re-entrancy vectors
+    /// @param  tokenId The `tokenId` to refund
+    function refund(uint256 calldata tokenId) external;
+
+    /// @notice         Gets the refund price of the specific `tokenId`
+    /// @param  tokenId The `tokenId` to query
+    /// @return wei     The amount of ether (in wei) that would be refunded
+    function getRefundPrice(uint256 tokenId) external view returns (uint256 wei);
+ 
+    /// @notice         Gets the first block for which the refund is not active for a given `tokenId`
+    /// @param  tokenId The `tokenId` to query
+    /// @return block   The block beyond which the token cannot be refunded
+    function getRefundGuaranteeEnd(uint256 tokenId) external view returns (uint256 block);
+}
+```
+
+### EIP-1155 Refund Extension
+  
+```solidity
+// SPDX-License-Identifier: CC0-1.0
+
+pragma solidity ^0.8.4;
+
+import "IERC1155.sol";
+import "IERC165.sol";
+
+/// @notice Refundable EIP-1155 tokens
+/// @dev    The EIP-165 identifier of this interface is `0xTODO`
+interface IERC1155Refund is IERC1155, IERC165 {
+    /// @notice           Emitted when a token is refunded
+    /// @dev              Emitted by `refund`
+    /// @param  _sender   The person that requested a refund
+    /// @param  _tokenId  The `tokenId` that was refunded
+    /// @param  _amount   The amount of `tokenId` that was refunded
+    event Refund(
+        address indexed _sender,
+        uint256 indexed _tokenId,
+        uint256 _amount
+    );
+
+    /// @notice         As long as the refund is active for the given `tokenId`, refunds the user
+    /// @dev            Make sure to check that the user has enough tokens, and be aware of potential re-entrancy vectors
+    /// @param  tokenId The `tokenId` to refund
+    /// @param  amount  The amount of `tokenId` to refund
+    function refund(uint256 calldata tokenId, uint256 amount) external;
+
+    /// @notice         Gets the refund price of the specific `tokenId`
+    /// @param  tokenId The `tokenId` to query
+    /// @return wei     The amount of ether (in wei) that would be refunded
+    function getRefundPrice(uint256 tokenId) external view returns (uint256 wei);
+
+    /// @notice         Gets the first block for which the refund is not active for a given `tokenId`
+    /// @param  tokenId The `tokenId` to query
+    /// @return block   The block beyond which the token cannot be refunded
+    function getRefundDeadline(uint256 tokenId) external view returns (uint256 block);
+}
+```
+
+## Rationale
+
+TODO
+
+## Backwards Compatibility
+
+No backward compatibility issues were found.
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
