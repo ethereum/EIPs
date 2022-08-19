@@ -1,0 +1,38 @@
+all:
+  - lightclient
+  - axic
+  - gcolvin
+  - SamWilsn
+  - Pandapip1
+core:
+  - lightclient
+  - axic
+  - gcolvin
+  - SamWilsn
+  - Pandapip1
+erc:
+  - lightclient
+  - axic
+  - SamWilsn
+  - Pandapip1
+networking:
+  - lightclient
+  - axic
+  - SamWilsn
+interface:
+  - lightclient
+  - axic
+  - SamWilsn
+  - Pandapip1
+meta:
+  - lightclient
+  - axic
+  - gcolvin
+  - SamWilsn
+  - Pandapip1
+informational:
+  - lightclient
+  - axic
+  - gcolvin
+  - SamWilsn
+  - Pandapip1
