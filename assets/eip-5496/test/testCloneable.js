@@ -1,16 +1,16 @@
 const { assert } = require("chai");
 const { expectRevert } = require('@openzeppelin/test-helpers');
 
-const ERC721PDemo = artifacts.require("ERC721PCloneableDemo");
+const ERC5496Demo = artifacts.require("ERC5496CloneableDemo");
 
-contract("ERC721PCloneable", async accounts => {
+contract("ERC5496Cloneable", async accounts => {
     const Alice = accounts[0];
     const Bob = accounts[1];
     const Tom = accounts[2];
     let demoContract;
 
     before(async function() {
-        const instance = await ERC721PDemo.deployed("ERC721PCDemo", "EPCD");
+        const instance = await ERC5496Demo.deployed("ERC5496CDemo", "EPCD");
         demoContract = instance;
         await demoContract.mint(1, Alice);
         await demoContract.mint(2, Alice);
@@ -101,7 +101,7 @@ contract("ERC721PCloneable", async accounts => {
         );
     });
 
-    it("ERC721P cloneable", async () => {
+    it("ERC5496 cloneable", async () => {
         let owner_1 = await demoContract.ownerOf(4);
         let cloneable_P2 = await demoContract.cloneable(2);
         assert.equal(
@@ -135,5 +135,3 @@ contract("ERC721PCloneable", async accounts => {
         );
     });
 });
-
-
