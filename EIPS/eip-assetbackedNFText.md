@@ -4,7 +4,7 @@ title: ERC1155 asset backed NFT extension
 description: Extends ERC1155 to support crucial operations for asset backed NFTs.
 author: liszechung (@liszechung)
 discussions-to: https://ethereum-magicians.org/t/eip-draft-erc1155-asset-backed-nft-extension/10437
-status: DRAFT 
+status: Draft 
 type: Standards Track
 category: ERC
 created: 2022-08-18
