@@ -1,7 +1,7 @@
 ---
 eip: 5505
 title: EIP-1155 asset backed NFT extension
-description: Extends ERC1155 to support crucial operations for asset backed NFTs.
+description: Extends EIP-1155 to support crucial operations for asset backed NFTs.
 author: liszechung (@liszechung)
 discussions-to: https://ethereum-magicians.org/t/eip-draft-erc1155-asset-backed-nft-extension/10437
 status: Draft
@@ -12,7 +12,7 @@ requires: 1155
 ---
 
 ## Abstract
-To propose an extension of smart contract interfaces for asset-backed, fractionalized projects using EIP-1155 standard such that total acquisition will become possible. This EIP focuses on In-Real-Life asset, where total acquisition should be able to happen.
+To propose an extension of smart contract interfaces for asset-backed, fractionalized projects using EIP-1155 standard such that total acquisition will become possible. This proposal focuses on In-Real-Life asset, where total acquisition should be able to happen.
 
 ## Motivation
 Fractionalized, physical asset projects face difficulty when someone wants to acquire 100% of the asset. For example, if someone wants to acquire the whole asset, he needs to buy all NFT pieces so he will become the 100% owner. However he could not do so as it is publicly visible that someone is trying to perform a total acquisition in an open environment like Ethereum, seller will take advantage to set unreasonable high price which hinders the acquisition. Or in other cases, NFTs are owned by wallets with lost keys, such that the ownership will never be at whole. We need a way to enable potential total acquisition.
