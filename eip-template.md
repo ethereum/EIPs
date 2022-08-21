@@ -8,6 +8,7 @@ status: Draft
 type: <Standards Track, Meta, or Informational>
 category (*only required for Standards Track): <Core, Networking, Interface, or ERC>
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+finalized (*optional): <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires (*optional): <EIP number(s)>
 ---
 
