@@ -135,6 +135,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `created`: *Date the EIP was created on*
 
+`finalized`: *Date the EIP's status turns FINAL*
+
 `requires`: *EIP number(s)* (Optional field)
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
