@@ -6,9 +6,9 @@ author: Lucas Martín Grasso Ramos(@LucasGrasso), Matias Arazi(@MatiArazi)
 discussions-to: https://github.com/ethereum/EIPs/pull/5516
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2022-08-19
-requires (*optional): 165, 1155
+requires: 165, 1155
 ---
 
 ## Abstract
