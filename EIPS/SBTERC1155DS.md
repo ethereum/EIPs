@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Soulbound, Multi Token Standard.
 description: An interface for non-transferrable NFTs binding to an Ethereum account for standardized blockchain-based academic certification.
 author: Lucas Martín Grasso Ramos(@LucasGrasso), Matias Arazi(@MatiArazi)
-discussions-to: <URL>
+discussions-to: https://github.com/ethereum/EIPs/pull/5515
 status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
