@@ -35,7 +35,7 @@ The 'values' field defined above can also be ISO codes or other hex standard rep
 	{	
 	"title": "maturity",
 	"_type": "uint",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values": [0, 0, 0]
 	}
 ]
@@ -49,41 +49,41 @@ The 'values' field defined above can also be ISO codes or other hex standard rep
 	{	
 	"title": "symbol",
 	"_type": "string",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values": ["Class symbol 1", "Class symbol 2", "Class symbol 3"],
 	},
 	{	
 	"title": "issuer",
 	"_type": "string",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values": ["Issuer name 1", "Issuer name 2", "Issuer name 3"],
 	},
 
 	{	
 	"title": "issuer_address",
 	"_type": "address",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values":["Address 1.", "Address 2", "Address 3"]
 	},
 
 	{	
 	"title": "class_type",
 	"_type": "string",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values": ["Class Type 1", "Class Type 2", "Class Type 3"]
 	},
 
 	{	
 	"title": "token_address",
 	"_type": "address",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values":["Address 1.", "Address 2", "Address 3"]
 	},
 
 	{	
 	"title": "period",
 	"_type": "uint",
-	"description": "Lorem ipsum..."
+	"description": "Lorem ipsum...",
 	"values": [0, 0, 0]
 	}
 ]
