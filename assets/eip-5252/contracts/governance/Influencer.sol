@@ -12,11 +12,11 @@ contract Influencer {
     mapping(string => Weight) weights;
 
     struct Weight {
+        uint256 percentage;
         uint256 decimal;
-        uint256 value;
     }
 
-    function getInfluence(address abt_, uint256 id_) public {
+    function getInfluence(address abt_, uint256 id_) public returns (uint multiplier) {
         return _getInfluence(abt_, id_);
     }
 
@@ -26,16 +26,18 @@ contract Influencer {
         address factory = IABT(abt_).factory();
         address finance = IFactory(factory).getFinance(id_);
         address WETH = IFinance(finance).WETH();
-        // normalize finance value  
-        uint256 norm_finance = IERC20Minimal(WETH).balanceOf(finance) / totalContributionValue * 100;
-        uint256 norm_time = block.timestamp - IFinance(finance).createdAt() / block.timestamp * 100;
-        uint256 influence = weights["alpha"].value * norm_finance + weights["beta"] * norm_time;
-        return influence / weights["alpha"].decimal / weights["beta"].decimal;
+        // normalize finance value   
+        uint256 norm_alpha = IERC20Minimal(WETH).balanceOf(finance) / totalContributionValue * 100;
+        uint256 norm_beta = block.timestamp - IFinance(finance).createdAt() / block.timestamp * 100;
+
+        // Divide with each decimal 
+        uint256 influence_dec = weights["alpha"].percentage * norm_alpha + weights["beta"].percentage * norm_beta;
+        return influence_dec / weights["alpha"].decimal / weights["beta"].decimal;
     }
 
-    function setWeight(string memory key, uint256 value, uint256 decimal) public {
+    function setWeight(string memory key, uint256 percentage, uint256 decimal) public {
         weights[key] = Weight({
-            value: value,
+            percentage: percentage,
             decimal: decimal
         });
     }
