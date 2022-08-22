@@ -1,8 +1,8 @@
 ---
 eip: <to be assigned>
-title: ERC-721 Referable NFT
-description: Standard interface extension for ERC-721 referable NFT (rNFT)
-author: Saber Yu (@OniReimu), Qin Wang (qin.wang@data61.csiro.au), Shange Fu (shange.fu@monash.edu), Shiping Chen (shiping.chen@data61.csiso.au), Sherry Xu (xiwei.xu@data61.csiro.au), Jiangshan Yu (jiangshan.yu@monash.edu)
+title: EIP-XXX Referable NFT
+description: Interface extension for 721, a referable version of NFT (rNFT)
+author: Saber Yu (@OniReimu), Qin Wang <qin.wang@data61.csiro.au>, Shange Fu <shange.fu@monash.edu>, Shiping Chen <shiping.chen@data61.csiso.au>, Sherry Xu <xiwei.xu@data61.csiro.au>, Jiangshan Yu <jiangshan.yu@monash.edu>
 discussions-to: https://ethereum-magicians.org/t/eip-x-erc-721-referable-nft/10310
 status: Draft
 type: Standards Track
