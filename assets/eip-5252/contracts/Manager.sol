@@ -31,12 +31,12 @@ contract Manager is AccessControl, IManager {
         factory = factory_;
     }
 
-    function createFinanceNative(uint dAmount_) payable public returns(bool success) {
+    function createFinanceNative(uint amount_) payable public returns(bool success) {
         address WETH = IFactory(factory).WETH();
         // check validity
 
         // create vault
-        (address vlt, uint256 id) = IFactory(factory).createVault(WETH, stablecoin, dAmount_, _msgSender());
+        (address vlt, uint256 id) = IFactory(factory).createFinance(WETH, amount_, _msgSender());
         require(vlt != address(0), "VAULTMANAGER: FE"); // Factory error
         // wrap native currency
         IWETH(WETH).deposit{value: address(this).balance}();
@@ -48,7 +48,7 @@ contract Manager is AccessControl, IManager {
     }
     
 
-    function getExampleConfig(address something) external view override returns (uint MCR, uint LFR, uint SFR, uint cDecimals, bool isOpen) {
+    function getExampleConfig(address something) external view override returns (uint) {
         return ExampleConfig[something];
     }
 }
