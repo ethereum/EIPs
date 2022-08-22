@@ -1,0 +1,192 @@
+---
+eip: <to be assigned>
+title: ERC-721 Referable NFT
+description: Standard interface extension for ERC-721 referable NFT (rNFT)
+author: Saber Yu (@OniReimu), Qin Wang (qin.wang@data61.csiro.au), Shange Fu (shange.fu@monash.edu), Shiping Chen (shiping.chen@data61.csiso.au), Sherry Xu (xiwei.xu@data61.csiro.au), Jiangshan Yu (jiangshan.yu@monash.edu)
+discussions-to: https://ethereum-magicians.org/t/eip-x-erc-721-referable-nft/10310
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): ERC
+created: 2022-08-10
+requires (*optional): <EIP 165 721>
+---
+
+This standard proposes an extension to ERC-721 Non-Fungible Tokens (NFTs) to construct reference relationships among NFTs.
+
+## Abstract
+This standard is an extension of ERC-721. It proposes two referrable indicators, referring and referred, and a time-based indicator createdTimestamp. The relationship between each NFT forms a Directed acyclic graph (DAG). The standard allows users to query, track and anlayse their relationships.
+
+## Motivation
+Many scenarios require inheritance, reference, and extension of NFTs. For instance, an artist may develop his NFT work based on a previous NFT, or a DJ may remix his record by referring to two pop songs, etc. Proposing a referable solution for existing NFTs and enabling efficient queries on cross-references make much sense.
+
+By adding the *referring* indicator, users can mint new NFTs (e.g., C, D, E) by referring to existing NFTs (e.g., A, B), while *referred* enables the referred NFTs (A, B) to be aware that who has quoted it (e.g., A &larr; D; C &larr; E; B &larr; E, and A &larr; E). The *createdTimestamp* is an indicator used to show the creation time of NFTs (A, B, C, D, E).
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+## Indicator
+
+* *referring*: an out-degree indicator, used to show the users this NFT refers to;
+* *referred*: an in-degree indicator, used to show the users who have refereed this NFT;
+* *createdTimestamp*: a time-based indicator, used to compare the timestamp of mint.
+
+## Function
+
+* *safeMint*: mint a new rNFT;
+* *setNode*: set the referring list of an rNFT and update the referred list of each one in the referring list;
+* *setNodeReferring*: set the referring list of an rNFT;
+* *setNodeReferred*: set the referred list of the given rNFTs;
+* *referringOf*:  Get the referring list of an rNFT;
+* *referredOf*: Get the referred list of an rNFT.
+
+## Interface
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+interface IERC_rNFT {
+
+    // Logged when a node in the rNFT gets referred and changed
+    /// @notice Emitted when the `node` (i.e., an rNFT) is changed
+    event UpdateNode(uint256 indexed tokenId, address indexed owner, uint256[] _referringList, uint256[] _referredList);
+
+    /// @notice Set the referred and referring relationship of an rNFT
+    /// Throws if `tokenId` is not valid rNFT
+    /// @param _tokenIds The list of the rNFTs that `tokenId` refers to
+    function setNode(uint256 tokenId, uint256[] memory _tokenIds) external;
+
+    /// @notice Get the list of the rNFTs that `tokenId` refers to
+    /// Throws if `tokenId` is not valid rNFT
+    /// @param tokenId The rNFT of the referring list
+    function referringOf(uint256 tokenId) external view returns(uint256[] memory);
+
+    /// @notice Get the list of the rNFT that refers to `tokenId`
+    /// Throws if `tokenId` is not valid rNFT
+    /// @param tokenId The rNFT of the referred list
+    function referredOf(uint256 tokenId) external view returns(uint256[] memory);
+}
+```
+
+## Rationale
+This standard is intended to establish the referable DAG for queries on cross-relationship and accordingly provide the simplest functions. It provides advantages as follows.
+
+* *Clear ownership inheritance*: This standard extends the static NFT into a virtually extensible NFT network. Artists do not have to create work isolated from others. The ownership inheritance avoids reinventing the same wheel.
+
+* *Incentive Compatibility*: This standard clarifies the referable relationship across different NFTs, helping to integrate multiple up-layer incentive models for both original NFT owners and new creators.
+
+* *Easy Integration*: This standard makes it easier for the existing token standards or third-party protocols. For instance, the referable NFT can be applied to rentable scenarios (cf. EIP-5006 to build a hierarchical rental market: where multiple users can rent the same NFT during the same time or one user can rent multiple NFTs during the same duration. 
+
+## Backwards Compatibility
+This standard can be fully ERC-721 compatible by adding an extension function set.
+
+## Test Cases
+Truffle and Openzeppelin are required to run the following in a test network.
+```
+truffle develop
+rNFT = await ERC_rNFT.new("ERC_rNFT","ERC_rNFT")
+rNFT.safeMint(1,[])
+rNFT.referredOf(1)
+rNFT.referringOf(1)
+
+rNFT.safeMint(2,[1])
+rNFT.referredOf(2)
+rNFT.referringOf(2)
+
+rNFT.safeMint(3,[1,2])
+rNFT.referredOf(2)
+rNFT.referredOf(3)
+rNFT.referringOf(3)
+
+```
+
+## Reference Implementation
+```
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./IERC_rNFT.sol";
+
+contract ERC_rNFT is ERC721, IERC_rNFT {
+
+    struct Relationship {
+        uint256[] referring;   // referring list
+        uint256[] referred; // referred list
+        uint256 createdTimestamp; // unix timestamp when the rNFT is being created
+    }
+
+    mapping (uint256 => Relationship) internal _relationship;
+    address contractOwner = address(0);
+
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
+        contractOwner = msg.sender;
+    }
+
+    function safeMint(uint256 tokenId, uint256[] memory _tokenIds) public {
+        _safeMint(msg.sender, tokenId);
+        setNode(tokenId, _tokenIds);
+    }
+
+    /// @notice set the referring list of an rNFT
+    /// Throws if `tokenId` is not a valid rNFT
+    /// @param _tokenIds array of rNFTs
+    function setNodeReferring(uint256 tokenId, uint256[] memory _tokenIds) private {
+        require(_isApprovedOrOwner(msg.sender, tokenId), "ERC_rNFT: transfer caller is not owner nor approved");
+        if (contractOwner != msg.sender && _tokenIds.length == 0) { revert("ERC_rNFT: the referring list cannot be empty"); }
+
+        Relationship storage relationship = _relationship[tokenId];
+        relationship.referring = _tokenIds;
+        relationship.createdTimestamp = block.timestamp;
+        emit UpdateNode(tokenId, msg.sender, relationship.referring, relationship.referred);
+    }
+
+    /// @notice set the referred list of an rNFT
+    /// Throws if `tokenId` is not a valid rNFT
+    /// @param _tokenIds array of rNFTs
+    function setNodeReferred(uint256 tokenId, uint256[] memory _tokenIds) private {
+        for (uint i = 0; i < _tokenIds.length; i++) {
+            Relationship storage relationship = _relationship[_tokenIds[i]];
+
+            if (relationship.createdTimestamp >= block.timestamp) { revert("ERC_rNFT: the referred rNFT needs to be a predecessor"); } // Make sure the reference complies with the timing sequence
+
+            relationship.referred.push(tokenId);
+            emit UpdateNode(_tokenIds[i], ownerOf(_tokenIds[i]), relationship.referring, relationship.referred);
+        }
+    }
+
+    /// @notice set the referred list of an rNFT and update the referring list of each one in the referred list
+    /// Throws if `tokenId` is not a valid rNFT
+    /// @param _tokenIds array of rNFTs
+    function setNode(uint256 tokenId, uint256[] memory _tokenIds) public virtual override {
+        setNodeReferring(tokenId, _tokenIds);
+        setNodeReferred(tokenId, _tokenIds);
+    }
+
+    /// @notice Get the referring list of an rNFT
+    /// @param tokenId The considered rNFT
+    /// @return The referring list of an rNFT
+    function referringOf(uint256 tokenId) external view virtual override returns(uint256[] memory) {
+        require(_exists(tokenId), "ERC_rNFT: token ID not existed");
+        return _relationship[tokenId].referring;
+    }
+
+    /// @notice Get the referred list of an rNFT
+    /// @param tokenId The considered rNFT
+    /// @return The referred list of an rNFT
+    function referredOf(uint256 tokenId) external view virtual override returns(uint256[] memory) {
+        require(_exists(tokenId), "ERC_rNFT: token ID not existed");
+        return _relationship[tokenId].referred;
+    }
+
+    /// @dev See {IERC165-supportsInterface}.
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IERC_rNFT).interfaceId || super.supportsInterface(interfaceId);
+    }
+}
+```
+
+## Security Considerations
+The *createdTimestamp* only covers the block-level timestamp (based on block headers), which does not support fine-grained comparison such as transaction-level.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
