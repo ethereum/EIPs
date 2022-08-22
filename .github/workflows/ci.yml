@@ -2,6 +2,12 @@ name: Continuous Integration
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
 
 jobs:
   save-pr:
