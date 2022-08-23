@@ -470,7 +470,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     {
         require(
             ids.length == actions.length,
-            "EIP5516: Array lenghts mismatch"
+            "EIP5516: Array lengths mismatch"
         );
 
         address operator = _msgSender();
