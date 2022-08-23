@@ -1,3 +1,4 @@
+// @notice : run the typechain generate commance into the smrt contract repository (truffle in our case), after the contracts are compiled.
 import { ERC3475Instance } from "../types/truffle-contracts";
 
 function sleep(ms: any) {
@@ -6,6 +7,10 @@ function sleep(ms: any) {
     });
   
 }
+
+
+
+
 const Bond = artifacts.require("ERC3475");
 
 contract('Bond', async (accounts: string[]) => {
@@ -47,7 +52,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.equal(balance, 14000);
         assert.equal(activeSupply, 14000);
     })
-    it('should be able the lender to transfer bonds to another address', async () => {
+    it('lender should be able to transfer bonds to another address', async () => {
 
         const transferBonds: _transaction[] = [
             {
@@ -55,17 +60,17 @@ contract('Bond', async (accounts: string[]) => {
                 nonceId: firstNonceId,
                 amount: 2000
             }];
-
         await bondContract.transferFrom(lender, secondaryMarketBuyer, transferBonds, { from: lender })
+        
         const lenderBalance = (await bondContract.balanceOf(lender, DBITClassId, firstNonceId)).toNumber()
         const secondaryBuyerBalance = (await bondContract.balanceOf(secondaryMarketBuyer, DBITClassId, firstNonceId)).toNumber()
         const activeSupply = (await bondContract.activeSupply(DBITClassId, firstNonceId)).toNumber()
+        
         assert.equal(lenderBalance, 12000);
         assert.equal(secondaryBuyerBalance, 2000);
         assert.equal(activeSupply, 14000);
     })
-    //
-    it('should be able to manipulate bonds after approval', async () => {
+    it('operator should be able to manipulate bonds after approval', async () => {
         const transactionApproval: _transaction[] = [
             {
                 classId: DBITClassId,
@@ -82,23 +87,18 @@ contract('Bond', async (accounts: string[]) => {
 
     })
    
-    it('should redeem bonds when conditions are met', async () => {
-        const redemptionTransaction: _transaction[] = [
-           
+    it('lender should redeem bonds when conditions are met', async () => {
+        const redemptionTransaction: _transaction[] = [ 
             {
                 classId:  1,
                 nonceId: 1,
                 amount: 2000
 
-            },
-        
-        
+            },           
         ];
-
-
         await bondContract.issue(accounts[2],redemptionTransaction, {from: accounts[2]});
         assert.equal((await bondContract.balanceOf(accounts[2], 1, 1)).toNumber(), 2000);
-        
+        // adding delay for passing the redemption time period.
         await sleep(7000);    
         
         await bondContract.redeem(accounts[2], redemptionTransaction, {from:accounts[2]});
@@ -107,7 +107,7 @@ contract('Bond', async (accounts: string[]) => {
     })
 
 
-    it('should not redeem bonds when conditions are met', async () => {
+    it('lender should not be able to redeem bonds when conditions are not met', async () => {
         const redemptionTransaction: _transaction[] = [
            
             {
@@ -118,7 +118,6 @@ contract('Bond', async (accounts: string[]) => {
             },
 
         ];
-
 
         await bondContract.issue(accounts[2],redemptionTransaction, {from: accounts[2]});
         assert.equal((await bondContract.balanceOf(accounts[2], 0, 0)).toNumber(), 2000);
@@ -132,18 +131,14 @@ contract('Bond', async (accounts: string[]) => {
     })
     //////////////////// UNIT TESTS //////////////////////////////
 
-
     it('should transfer bonds from an caller address to another', async () => {
-
         const transactionTransfer: _transaction[] = [
             {
                 classId: DBITClassId,
                 nonceId: firstNonceId,
                 amount: 500
-
             }];
-            await bondContract.issue(lender, transactionTransfer, { from: lender });
-
+        await bondContract.issue(lender, transactionTransfer, { from: lender });
         const tx = (await bondContract.transferFrom(lender, secondaryMarketBuyer, transactionTransfer, {from:lender})).tx;
         console.log(tx)
         assert.isString(tx);
@@ -157,11 +152,8 @@ contract('Bond', async (accounts: string[]) => {
                 nonceId: firstNonceId,
                 amount: 500
 
-            }
-        
+            } 
         ];
-
-
         const tx = (await bondContract.issue(lender, transactionIssue)).tx;
         console.log(tx)
         assert.isString(tx);
@@ -175,7 +167,7 @@ contract('Bond', async (accounts: string[]) => {
                 amount: 500
 
             }];
-            await bondContract.issue(lender, transactionRedeem, {from: lender});
+        await bondContract.issue(lender, transactionRedeem, {from: lender});
         sleep(7000);    
 
         const tx = (await bondContract.redeem(lender, transactionRedeem, {from:lender})).tx;
@@ -192,7 +184,7 @@ contract('Bond', async (accounts: string[]) => {
                 amount: 500
             }];
 
-            await bondContract.issue(lender, transactionRedeem, {from: lender});
+        await bondContract.issue(lender, transactionRedeem, {from: lender});
             
         const tx = (await bondContract.burn(lender, transactionRedeem, {from:lender})).tx;
         console.log(tx)
@@ -206,13 +198,14 @@ contract('Bond', async (accounts: string[]) => {
                 nonceId: firstNonceId,
                 amount: 500
             }];
+        
             await bondContract.issue(lender, transactionApprove, {from: lender});   
         const tx = (await bondContract.approve(spender, transactionApprove)).tx;
         console.log(tx)
         assert.isString(tx);
     })
 
-    it('should setApprovalFor operator to manage bonds from classId given from the caller address', async () => {
+    it('setApprovalFor (called by bond owner) should be able to give operator  permissions to manage bonds for given  classId', async () => {
         const tx = (await bondContract.setApprovalFor(operator, true, { from: lender })).tx;
         console.log(tx)
         assert.isString(tx);
@@ -232,15 +225,10 @@ contract('Bond', async (accounts: string[]) => {
 
 
         await await bondContract.issue(spender,transactionApprove, {from:spender});
-
         const tx = (await bondContract.approve(spender, transactionApprove, {from:spender})).tx;
         console.log(tx)
         assert.isString(tx);
     })
-
-
-
-
 
     it('should return the active supply', async () => {
         const activeSupply = (await bondContract.activeSupply(DBITClassId, firstNonceId)).toNumber();
@@ -284,7 +272,7 @@ contract('Bond', async (accounts: string[]) => {
         assert.isString(symbol.stringValue);
     })
 
-    it('should return the Values of a bond class given', async () => {
+    it('should return the Values for given bond class', async () => {
         const metadataId = 0;
         
         let _transactionIssuer: _transaction[]
@@ -296,29 +284,25 @@ contract('Bond', async (accounts: string[]) => {
         }];
         
         await bondContract.issue(lender, _transactionIssuer, { from: accounts[0] })
-
         const valuesClass = (await bondContract.classValues(DBITClassId, metadataId));
         console.log("class infos: ", JSON.stringify(valuesClass));
         assert.isString(valuesClass.toString());
     })
 
-    it('should return the infos of a nonce of bond class given', async () => {
+    it('should return the infos of a nonce for given bond class', async () => {
         const metadataId = 0;
-
         const infos = (await bondContract.nonceValues(DBITClassId, firstNonceId, metadataId));
         console.log("nonce infos: ", JSON.stringify(infos))
         assert.isString(infos.toString());
     })
 
     it('should return if an operator is approved on a class and nonce given for an address', async () => {
-
-
         const isApproved = (await bondContract.isApprovedFor(lender, operator));
         console.log("operator is Approved? : ", isApproved)
         assert.isBoolean(isApproved);
     })
 
-    it('should return if is redeemable', async () => {
+    it('should return if its redeemable', async () => {
         let _transactionIssuer: _transaction[]
         =
         [{
@@ -328,11 +312,8 @@ contract('Bond', async (accounts: string[]) => {
         }];
         
         await bondContract.issue(accounts[1], _transactionIssuer, { from: accounts[1] })       
-       
         const getProgress = await bondContract.getProgress(1,1);
-
         console.log("is Redeemable? : ", getProgress[1].toNumber() >= 0)
-
         assert.isNumber(getProgress[1].toNumber());   
 
     })

@@ -22,7 +22,7 @@ import "./IERC5516.sol";
 contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     using Address for address;
 
-    // Used for making each token unique, Mantains ID registry and quantity of tokens minted.
+    // Used for making each token unique, Maintains ID registry and quantity of tokens minted.
     uint256 private nonce;
 
     // Used as the URI for all token types by relying on ID substitution, e.g. https://ipfs.io/ipfs/token.data
@@ -347,11 +347,8 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         uint256 amount,
         bytes memory data
     ) internal virtual {
-        require(from != address(0), "EIP5516: Address zero error");
-        require(
-            _pendings[to][id] == false && _balances[to][id] == false,
-            "EIP5516: Already Asignee"
-        );
+        require (from != address(0),"EIP5516: Address zero error");
+        require(_pendings[to][id] == false && _balances[to][id] == false,"EIP5516: Already Assignee");
 
         address operator = _msgSender();
 
@@ -389,11 +386,8 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         for (uint256 i = 0; i < to.length; ) {
             address _to = to[i];
 
-            require(_to != address(0), "EIP5516: Address zero error");
-            require(
-                _pendings[_to][id] == false && _balances[_to][id] == false,
-                "EIP5516: Already Asignee"
-            );
+            require (_to != address(0),"EIP5516: Address zero error");
+            require(_pendings[_to][id] == false && _balances[_to][id] == false,"EIP5516: Already Assignee");
 
             _pendings[_to][id] = true;
 
@@ -443,7 +437,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     ) external virtual override {
         require(
             ids.length == actions.length,
-            "EIP5516: Array lenghts mismatch"
+            "EIP5516: Array lengths mismatch"
         );
 
         require(
