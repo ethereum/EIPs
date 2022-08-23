@@ -433,7 +433,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
             address _to = to[i];
 
             require (_to != address(0),"EIP5516: Address zero error");
-            require(_pendings[_to][id] == false && _balances[_to][id] == false,"EIP5516: Already Asignee");
+            require(_pendings[_to][id] == false && _balances[_to][id] == false,"EIP5516: Already Assignee");
 
             _pendings[_to][id] = true;
 
