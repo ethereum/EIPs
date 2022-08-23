@@ -22,7 +22,7 @@ import "./IERC5516.sol";
 contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     using Address for address;
 
-    // Used for making each token unique, Mantains ID registry and quantity of tokens minted.
+    // Used for making each token unique, Maintains ID registry and quantity of tokens minted.
     uint256 private nonce;
 
     // Used as the URI for all token types by relying on ID substitution, e.g. https://ipfs.io/ipfs/token.data
