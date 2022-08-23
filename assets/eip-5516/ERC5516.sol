@@ -392,7 +392,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         bytes memory data
     ) internal virtual {
         require (from != address(0),"EIP5516: Address zero error");
-        require(_pendings[to][id] == false && _balances[to][id] == false,"EIP5516: Already Asignee");
+        require(_pendings[to][id] == false && _balances[to][id] == false,"EIP5516: Already Assignee");
 
 
         address operator = _msgSender();
