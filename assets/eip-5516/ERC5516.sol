@@ -3,7 +3,7 @@
 /**
  * @notice Reference implementation of the eip-5516 interface.
  * Note: this implementation only allows for each user to own only 1 token type for each `id`.
- * @author Matias Arazi<matiasarazi@gmail.com> , Lucas Martín Grasso Ramos <lucasgrassoramos@gmail.com>
+ * @author Matias Arazi <matiasarazi@gmail.com> , Lucas Martín Grasso Ramos <lucasgrassoramos@gmail.com>
  * See https://github.com/ethereum/EIPs/pull/5516
  *
  */
@@ -37,10 +37,10 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     // Mapping from account to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    // Mapping from ID to token type `id` minter address.
+    // Mapping from ID to minter address.
     mapping(uint256 => address) private _tokenMinters;
 
-    // Mapping from ID to token type URI.
+    // Mapping from ID to URI.
     mapping(uint256 => string) private _tokenURIs;
 
     /**
@@ -86,6 +86,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * Requirements:
      *
      * - `account` cannot be the zero address.
+     *
      */
     function balanceOf(address account, uint256 id)
         public
@@ -94,7 +95,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         override
         returns (uint256)
     {
-        require (account != address(0),"EIP5516: Address zero error");
+        require(account != address(0), "EIP5516: Address zero error");
         if (_balances[account][id]) {
             return 1;
         } else {
@@ -108,6 +109,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * Requirements:
      *
      * - `accounts` and `ids` must have the same length.
+     *
      */
     function balanceOfBatch(address[] memory accounts, uint256[] memory ids)
         public
@@ -116,7 +118,10 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         override
         returns (uint256[] memory)
     {
-        require(accounts.length == ids.length, "EIP5516: Array lengths mismatch");
+        require(
+            accounts.length == ids.length,
+            "EIP5516: Array lengths mismatch"
+        );
 
         uint256[] memory batchBalances = new uint256[](accounts.length);
 
@@ -142,7 +147,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         override
         returns (uint256[] memory)
     {
-        require (account != address(0),"EIP5516: Address zero error");
+        require(account != address(0), "EIP5516: Address zero error");
 
         uint256 _tokenCount = 0;
         for (uint256 i = 1; i <= nonce; ) {
@@ -155,7 +160,9 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
                 ++i;
             }
         }
+
         uint256[] memory _ownedTokens = new uint256[](_tokenCount);
+
         for (uint256 i = 1; i <= nonce; ) {
             if (_balances[account][i]) {
                 _ownedTokens[--_tokenCount] = i;
@@ -164,6 +171,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
                 ++i;
             }
         }
+
         return _ownedTokens;
     }
 
@@ -182,9 +190,10 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         override
         returns (uint256[] memory)
     {
-        require (account != address(0),"EIP5516: Address zero error");
+        require(account != address(0), "EIP5516: Address zero error");
 
         uint256 _tokenCount = 0;
+
         for (uint256 i = 1; i <= nonce; ) {
             if (_pendings[account][i]) {
                 ++_tokenCount;
@@ -193,80 +202,19 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
                 ++i;
             }
         }
-        uint256[] memory __pendingsTokens = new uint256[](_tokenCount);
+
+        uint256[] memory _pendingTokens = new uint256[](_tokenCount);
+
         for (uint256 i = 1; i <= nonce; ) {
             if (_pendings[account][i]) {
-                __pendingsTokens[--_tokenCount] = i;
+                _pendingTokens[--_tokenCount] = i;
             }
             unchecked {
                 ++i;
             }
         }
-        return __pendingsTokens;
-    }
 
-    /**
-     * @dev Get the URI of the tokens marked as _pendings of a given address.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the zero address.
-     *
-     */
-    function tokensURIFrom(address account)
-        external
-        view
-        virtual
-        returns (string[] memory)
-    {
-        require (account != address(0),"EIP5516: Address zero error");
-
-        uint256[] memory ownedTokens = tokensFrom(account);
-        uint256 _nTokens = ownedTokens.length;
-        string[] memory tokenURIS = new string[](_nTokens);
-
-        for (uint256 i = 0; i < _nTokens; ) {
-            tokenURIS[i] = string(
-                abi.encodePacked(_uri, _tokenURIs[ownedTokens[i]])
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-        return tokenURIS;
-    }
-
-    /**
-     * @dev Get the URI of the tokens owned by a given address.
-     *
-     * Requirements:
-     *
-     * - `account` cannot be the zero address.
-     *
-     */
-    function pendingURIFrom(address account)
-        external
-        view
-        virtual
-        returns (string[] memory)
-    {
-        require (account != address(0),"EIP5516: Address zero error");
-
-        uint256[] memory _pendingsTokens = pendingFrom(account);
-        uint256 _nTokens = _pendingsTokens.length;
-        string[] memory tokenURIS = new string[](_nTokens);
-
-        for (uint256 i = 0; i < _nTokens; ) {
-            tokenURIS[i] = string(
-                abi.encodePacked(_uri, _tokenURIs[_pendingsTokens[i]])
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
-        return tokenURIS;
+        return _pendingTokens;
     }
 
     /**
@@ -294,11 +242,9 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     }
 
     /**
-     *@dev mints(creates) a token
-     *@param _account address who will mint the token
-     *@param _data the uri of the token
+     * @dev mints(creates) a token
      */
-    function _mint(address _account, string memory _data) internal virtual {
+    function _mint(address account, string memory data) internal virtual {
         unchecked {
             ++nonce;
         }
@@ -306,7 +252,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         address operator = _msgSender();
         uint256[] memory ids = _asSingletonArray(nonce);
         uint256[] memory amounts = _asSingletonArray(1);
-        bytes memory _bData = bytes(_data);
+        bytes memory _bData = bytes(data);
 
         _beforeTokenTransfer(
             operator,
@@ -316,8 +262,8 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
             amounts,
             _bData
         );
-        _tokenURIs[nonce] = _data;
-        _tokenMinters[nonce] = _account;
+        _tokenURIs[nonce] = data;
+        _tokenMinters[nonce] = account;
         emit TransferSingle(operator, address(0), operator, nonce, 1);
         _afterTokenTransfer(
             operator,
@@ -333,7 +279,8 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * @dev See {IERC1155-safeTransferFrom}.
      *
      * Requirements:
-     * - 'from' must be the creator(minter) of `id` or must have allowed _msgSender() as an operator.
+     *
+     * - `from` must be the creator(minter) of `id` or must have allowed _msgSender() as an operator.
      *
      */
     function safeTransferFrom(
@@ -343,8 +290,12 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         uint256 amount,
         bytes memory data
     ) public virtual override {
-        require (amount == 1, "EIP5516: Can only transfer one token");
-        require(_msgSender() == _tokenMinters[id] || isApprovedForAll(_tokenMinters[id], _msgSender()), "EIP5516: Unauthorized");
+        require(amount == 1, "EIP5516: Can only transfer one token");
+        require(
+            _msgSender() == _tokenMinters[id] ||
+                isApprovedForAll(_tokenMinters[id], _msgSender()),
+            "EIP5516: Unauthorized"
+        );
 
         _safeTransferFrom(from, to, id, amount, data);
     }
@@ -353,6 +304,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * @dev See {eip-5516-batchTransfer}
      *
      * Requirements:
+     *
      * - 'from' must be the creator(minter) of `id` or must have allowed _msgSender() as an operator.
      *
      */
@@ -363,8 +315,12 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         uint256 amount,
         bytes memory data
     ) external virtual override {
-        require(amount == 1,"EIP5516: Can only transfer one token");
-        require(_msgSender() == _tokenMinters[id] || isApprovedForAll(_tokenMinters[id], _msgSender()), "EIP5516: Unauthorized");
+        require(amount == 1, "EIP5516: Can only transfer one token");
+        require(
+            _msgSender() == _tokenMinters[id] ||
+                isApprovedForAll(_tokenMinters[id], _msgSender()),
+            "EIP5516: Unauthorized"
+        );
 
         _batchTransfer(from, to, id, amount, data);
     }
@@ -381,7 +337,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * - `to` must have the token `id` marked as _pendings.
      * - `to` must must not own a token type under `id`.
      * - If `to` refers to a smart contract, it must implement {IERC1155Receiver-onERC1155Received} and return the
-     * acceptance magic value.
+     *   acceptance magic value.
      *
      */
     function _safeTransferFrom(
@@ -391,9 +347,11 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         uint256 amount,
         bytes memory data
     ) internal virtual {
-        require (from != address(0),"EIP5516: Address zero error");
-        require(_pendings[to][id] == false && _balances[to][id] == false,"EIP5516: Already Asignee");
-
+        require(from != address(0), "EIP5516: Address zero error");
+        require(
+            _pendings[to][id] == false && _balances[to][id] == false,
+            "EIP5516: Already Asignee"
+        );
 
         address operator = _msgSender();
 
@@ -424,7 +382,6 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         uint256 amount,
         bytes memory data
     ) internal virtual {
-
         address operator = _msgSender();
 
         _beforeBatchedTokenTransfer(operator, from, to, id, data);
@@ -432,8 +389,11 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         for (uint256 i = 0; i < to.length; ) {
             address _to = to[i];
 
-            require (_to != address(0),"EIP5516: Address zero error");
-            require(_pendings[_to][id] == false && _balances[_to][id] == false,"EIP5516: Already Asignee");
+            require(_to != address(0), "EIP5516: Address zero error");
+            require(
+                _pendings[_to][id] == false && _balances[_to][id] == false,
+                "EIP5516: Already Asignee"
+            );
 
             _pendings[_to][id] = true;
 
@@ -442,46 +402,63 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
             }
         }
 
-        emit TransferMulti(from, to, amount, id);
+        emit TransferMulti(operator, from, to, amount, id);
 
         _beforeBatchedTokenTransfer(operator, from, to, id, data);
     }
 
     /**
-     * See {eip-5516-_claimOrReject}
-     * If action == 1-Claim _pendings token
-     * If action == 0-Reject _pendings token
+     * @dev See {eip-5516-claimOrReject}
+     *
+     * If action == true: Claims pending token under `id`.
+     * Else, rejects pending token under `id`.
+     *
      */
-    function claimOrReject(uint256 id, bool _action) external virtual override {
-        address operator = _msgSender();
-        _claimOrReject(operator, id, _action);
+    function claimOrReject(
+        address account,
+        uint256 id,
+        bool action
+    ) external virtual override {
+        require(
+            _msgSender() == account || isApprovedForAll(account, _msgSender()),
+            "EIP5516: Unauthorized"
+        );
+
+        _claimOrReject(account, id, action);
     }
 
     /**
-     * For each `id`-`action` pair
-     *  See {eip-5516-_claimOrReject}
-     *  If action == 1-Claim _pendings token
-     *  If action == 0-Reject _pendings token
+     * @dev See {eip-5516-claimOrReject}
+     *
+     * For each `id` - `action` pair:
+     *
+     * If action == true: Claims pending token under `id`.
+     * Else, rejects pending token under `id`.
+     *
      */
-    function claimOrRejectBatch(uint256[] memory ids, bool[] memory actions)
-        external
-        virtual
-        override
-    {
+    function claimOrRejectBatch(
+        address account,
+        uint256[] memory ids,
+        bool[] memory actions
+    ) external virtual override {
         require(
             ids.length == actions.length,
             "EIP5516: Array lenghts mismatch"
         );
 
-        address operator = _msgSender();
+        require(
+            _msgSender() == account || isApprovedForAll(account, _msgSender()),
+            "EIP5516: Unauthorized"
+        );
 
-        _claimOrRejectBatch(operator, ids, actions);
+        _claimOrRejectBatch(account, ids, actions);
     }
 
     /**
-     * @dev Claims or Reject _pendings `_id` from address `_account`.
+     * @dev Claims or Reject pending token under `_id` from address `_account`.
      *
      * Requirements:
+     *
      * - `account` cannot be the zero address.
      * - `account` must have a _pendings token under `id` at the moment of call.
      * - `account` mUST not own a token under `id` at the moment of call.
@@ -495,35 +472,37 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         bool action
     ) internal virtual {
         require(
-                _pendings[account][id] == true &&
-                    _balances[account][id] == false,
-                "EIP5516: Not claimable"
-            );
+            _pendings[account][id] == true && _balances[account][id] == false,
+            "EIP5516: Not claimable"
+        );
+
+        address operator = _msgSender();
 
         bool[] memory actions = new bool[](1);
         actions[0] = action;
         uint256[] memory ids = _asSingletonArray(id);
 
-        _beforeTokenClaim(account, actions, ids);
+        _beforeTokenClaim(operator, account, actions, ids);
 
         _balances[account][id] = action;
         _pendings[account][id] = false;
 
         delete _pendings[account][id];
 
-        emit TokenClaimed(account, actions, ids);
+        emit TokenClaimed(operator, account, actions, ids);
 
-        _afterTokenClaim(account, actions, ids);
+        _afterTokenClaim(operator, account, actions, ids);
     }
 
     /**
-     * For each `id`-`action`
-     *  @dev Claims or Reject _pendings `_id` from address `_account`.
+     * @dev Claims or Reject _pendings `_id` from address `_account`.
      *
-     *  Requirements:
-     *  - `account` cannot be the zero address.
-     *  - `account` must have a _pendings token under `id` at the moment of call.
-     *  - `account` mUST not own a token under `id` at the moment of call.
+     * For each `id`-`action` pair:
+     *
+     * Requirements:
+     * - `account` cannot be the zero address.
+     * - `account` must have a pending token under `id` at the moment of call.
+     * - `account` must not own a token under `id` at the moment of call.
      *
      *  Emits a {TokenClaimed} event.
      *
@@ -534,8 +513,9 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
         bool[] memory actions
     ) internal virtual {
         uint256 totalIds = ids.length;
+        address operator = _msgSender();
 
-        _beforeTokenClaim(account, actions, ids);
+        _beforeTokenClaim(operator, account, actions, ids);
 
         for (uint256 i = 0; i < totalIds; ) {
             uint256 id = ids[i];
@@ -556,9 +536,9 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
             }
         }
 
-        emit TokenClaimed(account, actions, ids);
+        emit TokenClaimed(operator, account, actions, ids);
 
-        _afterTokenClaim(account, actions, ids);
+        _afterTokenClaim(operator, account, actions, ids);
     }
 
     /**
@@ -567,7 +547,9 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * Emits a {TransferSingle} event with `to` set to the zero address.
      *
      * Requirements:
-     * - `account` must own `_id` token.
+     *
+     * - `account` must own a token under `id`.
+     *
      */
     function _burn(address account, uint256 id) internal virtual {
         require(_balances[account][id] == true, "EIP5516: Unauthorized");
@@ -590,9 +572,14 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      * Emits a {TransferBatch} event with `to` set to the zero address.
      *
      * Requirements:
+     *
      * - `account` must own all tokens under `ids`.
+     *
      */
-    function _burnBatch(address account, uint256[] memory ids) internal virtual {
+    function _burnBatch(address account, uint256[] memory ids)
+        internal
+        virtual
+    {
         uint256 totalIds = ids.length;
         address operator = _msgSender();
         uint256[] memory amounts = _asSingletonArray(totalIds);
@@ -600,28 +587,28 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
 
         _beforeTokenTransfer(operator, account, address(0), ids, amounts, "");
 
-        for(uint256 i = 0; i < totalIds;){
+        for (uint256 i = 0; i < totalIds; ) {
             uint256 id = ids[i];
 
             require(_balances[account][id] == true, "EIP5516: Unauthorized");
 
             delete _balances[account][id];
 
-            unchecked{
+            unchecked {
                 ++i;
             }
         }
 
         emit TransferBatch(operator, account, address(0), ids, values);
 
-       _afterTokenTransfer(operator, account, address(0), ids, amounts, "");
-
+        _afterTokenTransfer(operator, account, address(0), ids, amounts, "");
     }
 
     /**
      * @dev Approve `operator` to operate on all of `owner` tokens
      *
      * Emits a {ApprovalForAll} event.
+     *
      */
     function _setApprovalForAll(
         address owner,
@@ -759,6 +746,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      */
     function _beforeTokenClaim(
         address operator,
+        address account,
         bool[] memory actions,
         uint256[] memory ids
     ) internal virtual {}
@@ -775,6 +763,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
      */
     function _afterTokenClaim(
         address operator,
+        address account,
         bool[] memory actions,
         uint256[] memory ids
     ) internal virtual {}

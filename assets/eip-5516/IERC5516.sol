@@ -4,60 +4,55 @@ pragma solidity ^0.8.4;
 
 /**
     @title Soulbound, Multi-Token standard.
-    @notice Interface of the eip-5516 
-    Note: The ERC-165 identifier for this interface is 0xa60dce19.
+    @notice Interface of the EIP-5516 
+    Note: The ERC-165 identifier for this interface is 0x8314f22b.
  */
 
 interface IERC5516 {
     
     /**
-     * @dev Emitted when `newOwner` claims or rejects pending tokens under `ids.
+     * @dev Emitted when `account` claims or rejects pending tokens under `ids[]`.
      */
-    event TokenClaimed(address indexed operator, bool[] indexed actions, uint256[] indexed ids);
+    event TokenClaimed(address indexed operator, address indexed account, bool[] actions, uint256[] indexed ids);
 
     /**
      * @dev Emitted when `from` transfers token under `id` to every address at `to[]`.
      */
-    event TransferMulti(address indexed from, address[] indexed to, uint256 amount, uint256 indexed id);
+    event TransferMulti(address indexed operator, address indexed from, address[] indexed to, uint256 amount, uint256 id);
 
     /**
-     * @dev Get tokens owned by a given address
+     * @dev Get tokens owned by a given address.
      */
     function tokensFrom(address from) external view returns (uint256[] memory);
 
     /**
-     * @dev Get tokens marked as pending of a given address
+     * @dev Get tokens pending to be claimed by a given address.
      */
     function pendingFrom(address from) external view returns (uint256[] memory);
     
     /**
-     * @dev Claims or Reject pending `_id` from address `_account`.
+     * @dev Claims or Reject pending `id`.
      *
      * Requirements:
-     * - `account` cannot be the zero address.
-     * - `account` MUST have a pending token under `id` at the moment of call.
-     * - `account` MUST not own a token under `id` at the moment of call.
+     * - `account` must have a pending token under `id` at the moment of call.
+     * - `account` must not own a token under `id` at the moment of call.
      *
      * Emits a {TokenClaimed} event.
      *
      */
-    function claimOrReject(uint256 id, bool actions) external;
+    function claimOrReject(address account, uint256 id, bool action) external;
 
     /**
-     * For each `id` `action` pair
-     *  @dev Claims or Reject pending `_id` from address `_account`.
+     * @dev Claims or Reject pending tokens under `ids[]`.
      *
-     *  Requirements:
-     *  - `account` cannot be the zero address.
-     *  - `account` MUST have a pending token under `id` at the moment of call.
-     *  - `account` MUST not own a token under `id` at the moment of call.
+     * Requirements for each `id` `action` pair:
+     * - `account` must have a pending token under `id` at the moment of call.
+     * - `account` must not own a token under `id` at the moment of call.
      *
      * Emits a {TokenClaimed} event.
      *
      */
-    function claimOrRejectBatch(uint256[] memory ids, bool[] memory actions) external;
-
-
+    function claimOrRejectBatch(address account, uint256[] memory ids, bool[] memory actions) external;
 
     /**
      * @dev Transfers `_id` token from `_from` to every address at `_to[]`.
