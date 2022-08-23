@@ -20,15 +20,15 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         ascending: true # Since we have so many issues, the stale bot finds it hard to keep track. This makes sure that at least the oldest are removed.
         # Issue config
-        stale-issue-message: There has been no activity on this issue for six months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.
+        stale-issue-message: There has been no activity on this issue for 1 week. It will be closed after 3 months of inactivity.
         close-issue-message: This issue was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback.
-        days-before-issue-stale: 180
-        days-before-issue-close: 14
+        days-before-issue-stale: 7
+        days-before-issue-close: 49 # 49 + 7 weeks = 3 months
         exempt-issue-labels: discussions-to
-        stale-issue-label: stale
+        stale-issue-label: "waiting: no recent activity"
         # PR config
-        stale-pr-message: There has been no activity on this pull request for two months. It will be closed in a week if no further activity occurs. If you would like to move this EIP forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.
+        stale-pr-message: There has been no activity on this pull request for 2 weeks. It will be closed after 3 months of inactivity. If you would like to move this PR forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.
         close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
-        days-before-pr-stale: 60
-        days-before-pr-close: 7
-        stale-pr-label: stale
+        days-before-pr-stale: 14
+        days-before-pr-close: 42 # 42 + 14 weeks = 3 months
+        stale-pr-label: "waiting: no recent activity"
