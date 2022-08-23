@@ -189,7 +189,7 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 #### `adoptable` header
 
-EIPs may have a `adoptable` header. If this is `true`, then any PR changing `status` from `Stagnant` to a non-final state no longer requires author approval (instead only requiring editor approval.) Marking a proposal as `adoptable` allows _anyone_ to edit the author list and take over the proposal should it be abandoned, and is recommended.
+EIPs may have a `adoptable` header. If this is `true`, then any PR changing `status` from `Stagnant` to a non-final state no longer requires author approval (instead only requiring editor approval.) Marking a proposal as `adoptable` allows _anyone_ to edit the author list and take over the proposal should it become stagnant. Marking proposals as `adoptable` is recommended.
 
 ## Linking to External Resources
 
