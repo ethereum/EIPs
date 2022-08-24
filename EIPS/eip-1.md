@@ -139,8 +139,6 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
-`adoptable`: *One of `true` or `false`.* (Optional field, but highly recommended)
-
 Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
@@ -186,10 +184,6 @@ The `created` header records the date that the EIP was assigned a number. Both h
 #### `requires` header
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
-
-#### `adoptable` header
-
-EIPs may have a `adoptable` header. If this is `true`, then any PR changing `status` from `Stagnant` to a non-final state no longer requires author approval (instead only requiring editor approval.) Marking a proposal as `adoptable` allows _anyone_ to edit the author list and take over the proposal should it become stagnant. Marking proposals as `adoptable` is recommended.
 
 ## Linking to External Resources
 
