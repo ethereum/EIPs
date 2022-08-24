@@ -4,21 +4,31 @@ pragma solidity ^0.8.4;
 
 /**
     @title Soulbound, Multi-Token standard.
-    @notice Interface of the EIP-5516 
+    @notice Interface of the EIP-5516
     Note: The ERC-165 identifier for this interface is 0x8314f22b.
  */
 
 interface IERC5516 {
-    
     /**
      * @dev Emitted when `account` claims or rejects pending tokens under `ids[]`.
      */
-    event TokenClaimed(address indexed operator, address indexed account, bool[] actions, uint256[] indexed ids);
+    event TokenClaimed(
+        address indexed operator,
+        address indexed account,
+        bool[] actions,
+        uint256[] indexed ids
+    );
 
     /**
      * @dev Emitted when `from` transfers token under `id` to every address at `to[]`.
      */
-    event TransferMulti(address indexed operator, address indexed from, address[] indexed to, uint256 amount, uint256 id);
+    event TransferMulti(
+        address indexed operator,
+        address indexed from,
+        address[] indexed to,
+        uint256 amount,
+        uint256 id
+    );
 
     /**
      * @dev Get tokens owned by a given address.
@@ -26,10 +36,10 @@ interface IERC5516 {
     function tokensFrom(address from) external view returns (uint256[] memory);
 
     /**
-     * @dev Get tokens pending to be claimed by a given address.
+     * @dev Get tokens awaiting to be claimed by a given address.
      */
     function pendingFrom(address from) external view returns (uint256[] memory);
-    
+
     /**
      * @dev Claims or Reject pending `id`.
      *
@@ -40,7 +50,11 @@ interface IERC5516 {
      * Emits a {TokenClaimed} event.
      *
      */
-    function claimOrReject(address account, uint256 id, bool action) external;
+    function claimOrReject(
+        address account,
+        uint256 id,
+        bool action
+    ) external;
 
     /**
      * @dev Claims or Reject pending tokens under `ids[]`.
@@ -52,7 +66,11 @@ interface IERC5516 {
      * Emits a {TokenClaimed} event.
      *
      */
-    function claimOrRejectBatch(address account, uint256[] memory ids, bool[] memory actions) external;
+    function claimOrRejectBatch(
+        address account,
+        uint256[] memory ids,
+        bool[] memory actions
+    ) external;
 
     /**
      * @dev Transfers `_id` token from `_from` to every address at `_to[]`.
@@ -67,6 +85,12 @@ interface IERC5516 {
      * Emits a {TransfersMulti} event.
      *
      */
-    function batchTransfer (address from, address[] memory to, uint256 id, uint256 amount, bytes memory data) external;
-
+    function batchTransfer(
+        address from,
+        address[] memory to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) external;
+    
 }
