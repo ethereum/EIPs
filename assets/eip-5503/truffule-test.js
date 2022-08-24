@@ -80,13 +80,13 @@ contract('ERCEscrowMockup', accounts => {
     })
     it('check balance of seller and buyer', async () => {
         const balance = {
-            seller: {
-                seller: await contracts.seller.balanceOf(userSeller),
+            sellerToken: {
+                issuer: await contracts.seller.balanceOf(userSeller),
                 b01: await contracts.seller.balanceOf(userBuyer01),
                 b02: await contracts.seller.balanceOf(userBuyer02),
             },
-            buyer: {
-                seller: await contracts.buyer.balanceOf(userSeller),
+            buyerToken: {
+                issuer: await contracts.buyer.balanceOf(userSeller),
                 b01: await contracts.buyer.balanceOf(userBuyer01),
                 b02: await contracts.buyer.balanceOf(userBuyer02),
             },
@@ -99,13 +99,13 @@ contract('ERCEscrowMockup', accounts => {
         await contracts.escrow.escrowWithdraw({from: userBuyer01})
         await contracts.escrow.escrowWithdraw({from: userBuyer02})
         const balance = {
-            seller: {
-                seller: await contracts.seller.balanceOf(userSeller),
+            sellerToken: {
+                issuer: await contracts.seller.balanceOf(userSeller),
                 b01: await contracts.seller.balanceOf(userBuyer01),
                 b02: await contracts.seller.balanceOf(userBuyer02),
             },
-            buyer: {
-                seller: await contracts.buyer.balanceOf(userSeller),
+            buyerToken: {
+                issuer: await contracts.buyer.balanceOf(userSeller),
                 b01: await contracts.buyer.balanceOf(userBuyer01),
                 b02: await contracts.buyer.balanceOf(userBuyer02),
             },
