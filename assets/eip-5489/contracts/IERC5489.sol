@@ -5,18 +5,18 @@ interface IERC5489 {
     /**
      * @dev this event emits when the slot on `tokenId` is authorzized to `slotManagerAddr`
      */
-    event SlotAuthorizationCreated(uint256 tokenId, address slotManagerAddr);
+    event SlotAuthorizationCreated(uint256 indexed tokenId, address indexed slotManagerAddr);
 
     /**
      * @dev this event emits when the authorization on slot `slotManagerAddr` of token `tokenId` is revoked.
      * So, the corresponding DApp can handle this to stop on-going incentives or rights
      */
-    event SlotAuthorizationRevoked(uint256 tokenId, address slotManagerAddr);
+    event SlotAuthorizationRevoked(uint256 indexed tokenId, address indexed slotManagerAddr);
 
     /**
      * @dev this event emits when the uri on slot `slotManagerAddr` of token `tokenId` has been updated to `uri`.
      */
-    event SlotUriUpdated(uint256 tokenId, address slotManagerAddr, string uri);
+    event SlotUriUpdated(uint256 indexed tokenId, address indexed slotManagerAddr, string uri);
 
     /**
      * @dev
