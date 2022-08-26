@@ -1,11 +1,29 @@
-"type: Core": this?.new?.category == "Core"
-"type: Networking": this?.new?.category == "Networking"
-"type: Interface": this?.new?.category == "Interface"
-"type: ERC": this?.new?.category == "ERC"
-"type: Informational": this?.new?.type == "Informational"
-"type: Meta": this?.new?.type == "Meta"
-"type: EIP1 (Process)": this?.old?.status == "Living" || this?.old?.eip == "<to be assigned>"
-"waiting: EIP number": isNaN(this?.new?.eip) && this?.new?.eip
-"classification: new EIP": this?.new?.eip && !this?.old?.eip
-"classification: update EIP": this?.new?.eip && this?.old?.eip && this?.new?.status == this?.old?.status
-"classification: EIP status change": this?.new?.eip && this?.old?.eip && this?.new?.status != this?.old?.status
+#### EIP Type / Category ####
+
+# Type
+t-informational: this?.new?.type == "Informational" && this?.old?.status != "Living"
+t-meta: this?.new?.type == "Meta" && this?.old?.status != "Living"
+
+# Categories
+t-core": this?.new?.category == "Core" && this?.old?.status != "Living"
+t-networking": this?.new?.category == "Networking" && this?.old?.status != "Living"
+t-interface": this?.new?.category == "Interface" && this?.old?.status != "Living"
+t-erc": this?.new?.category == "ERC" && this?.old?.status != "Living"
+
+# Living EIPs & EIP Template
+t-process": this?.old?.status == "Living" || this?.old?.title == "<The EIP title is a few words, not a complete sentence>"
+
+#### PR Classification ####
+
+c-new: this?.new?.eip && !this?.old?.eip
+c-update: this?.new?.eip && this?.old?.eip && this?.new?.status == this?.old?.status
+c-status: this?.new?.eip && this?.old?.eip && this?.new?.status != this?.old?.status
+
+#### Waiting Labels ###
+
+# Generic
+
+# EIP Author
+
+# EIP Editor
+e-number: isNaN(this?.new?.eip) && this?.new?.eip
