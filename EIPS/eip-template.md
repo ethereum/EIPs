@@ -6,7 +6,7 @@ author: Philipp Bolte (@strumswell), Lauritz Leifermann (@lleifermann), Dennis v
 discussions-to: <URL>
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2022-08-26
 requires (*optional): EIP-712
 ---
@@ -25,17 +25,17 @@ Ideally, issuers should be able to focus on their area of expertise, including o
 
 We see value in a future of the Internet where anyone can be an issuer of verifiable information. This proposal lays the groundwork for anyone to also own the lifecycle of this information to build trust in ecosystems.
 
-## Definitions
-- `namespace`: A namespace is a representation of an Ethereum address inside the registry. The address of the namespace initially has owner rights to all revocation lists beneath it. 
-- `owner`: An Ethereum address that has modifying rights to many revocation lists. Initially, the owner of a revocation list corresponds to the address of the namespace.
-- `delegate`: An Ethereum address that is allowed to change the revocation statuses in a revocation list of a foreign namespace. Access has to be granted by the current owner of the revocation list.
-
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 This EIP specifies a contract called `EthereumRevocationRegistry` that is deployed once and may then be commonly used by everyone. By default, an Ethereum address **MAY** own and manage a multitude of revocation lists in a namespace that **MUST** contain the revocation states for a set of revocation keys. 
 
 An owner of a namespace **MAY** allow delegates to manage one or more of its revocation lists. Delegates **MUST** be removable by the respective list's owner. In certain situations, an owner **MAY** also want to transfer a revocation list in a namespace and its management rights to a new owner.
+
+### Definitions
+- `namespace`: A namespace is a representation of an Ethereum address inside the registry. The address of the namespace initially has owner rights to all revocation lists beneath it. 
+- `owner`: An Ethereum address that has modifying rights to many revocation lists. Initially, the owner of a revocation list corresponds to the address of the namespace.
+- `delegate`: An Ethereum address that is allowed to change the revocation statuses in a revocation list of a foreign namespace. Access has to be granted by the current owner of the revocation list.
 
 ### Revocation management
 
