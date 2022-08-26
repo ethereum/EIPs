@@ -13,6 +13,14 @@ t-erc: this?.new?.category == "ERC" && this?.old?.status != "Living"
 # Living EIPs & EIP Template
 t-process: this?.old?.status == "Living" || this?.old?.title == "<The EIP title is a few words, not a complete sentence>"
 
+# Status
+s-draft: this?.new?.status == "Draft"
+s-final: this?.new?.status == "Final"
+s-lastcall: this?.new?.status == "Lastcall"
+s-review: this?.new?.status == "Review"
+s-stagnant: this?.new?.status == "Stagnant"
+s-withdrawn: this?.new?.status == "Withdrawn"
+
 #### PR Classification ####
 
 c-new: this?.new?.eip && !this?.old?.eip
