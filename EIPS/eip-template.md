@@ -1,0 +1,235 @@
+---
+eip: <to be assigned>
+title: Revocation List Registry
+description: Registry of revocation lists for revoking arbitrary data.
+author: Philipp Bolte (@strumswell), Lauritz Leifermann (@lleifermann), Dennis von der Bey (@DennisVonDerBey)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): ERC
+created: 2022-08-26
+requires (*optional): EIP-712
+---
+
+## Abstract
+This EIP proposes a set of methods and standards for an RBAC-enabled registry of indicators aimed for usage in revocations.
+
+## Motivation
+Revocation is a universally needed construct both in the traditional centralized and decentralized credential attestation. This EIP aims to provide an interface to standardize a decentralized approach to managing and resolving revocation states in a contract registry.
+
+The largest problem with traditional revocation lists is the centralized aspect of them. Most of the world's CRLs rely on HTTP servers as well as caching and are therefore vulnerable to known attack vectors in the traditional web space. This aspect severely weakens the underlying strong asymmetric key architecture in current PKI systems.
+
+In addition, issuers in existing CRL approaches are required to host an own instance of their public revocation list, as shared or centralized instances run the risk of misusage by the controlling entity. 
+This incentivizes issuers to shift this responsibility to a third party, imposing the risk of even more centralization of the ecosystem (see Cloudflare, AWS). 
+Ideally, issuers should be able to focus on their area of expertise, including ownership of their revocable material, instead of worrying about infrastructure.
+
+We see value in a future of the Internet where anyone can be an issuer of verifiable information. This proposal lays the groundwork for anyone to also own the lifecycle of this information to build trust in ecosystems.
+
+## Definitions
+- `namespace`: A namespace is a representation of an Ethereum address inside the registry. The address of the namespace initially has owner rights to all revocation lists beneath it. 
+- `owner`: An Ethereum address that has modifying rights to many revocation lists. Initially, the owner of a revocation list corresponds to the address of the namespace.
+- `delegate`: An Ethereum address that is allowed to change the revocation statuses in a revocation list of a foreign namespace. Access has to be granted by the current owner of the revocation list.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+This EIP specifies a contract called `EthereumRevocationRegistry` that is deployed once and may then be commonly used by everyone. By default, an Ethereum address **MAY** own and manage a multitude of revocation lists in a namespace that **MUST** contain the revocation states for a set of revocation keys. 
+
+An owner of a namespace **MAY** allow delegates to manage one or more of its revocation lists. Delegates **MUST** be removable by the respective list's owner. In certain situations, an owner **MAY** also want to transfer a revocation list in a namespace and its management rights to a new owner.
+
+### Revocation management
+
+**isRevoked**
+**MUST** implement a function that returns the revocation status of a particular revocation key in a namespace's revocation list.
+```solidity
+function isRevoked(address namespace, bytes32 list, bytes32 key) public view returns (bool);
+```
+
+**changeStatus**
+**MUST** implement a function to change the revocation status of a particular revocation key in a namespace's revocation list
+```solidity
+function changeStatus(bool revoked, address namespace, bytes32 list, bytes32 key) public;
+```
+
+**changeStatusSigned** ([see meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to change the revocation status of a particular revocation key in a namespace's revocation list with a raw signature.
+```solidity
+function changeStatusSigned(bool revoked, address namespace, bytes32 list, bytes32 key, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+**changeStatusDelegate**
+**OPTIONAL** implements a function to change the revocation status of a particular revocation key in a namespace's revocation list with a raw signature.
+```solidity
+function changeStatusDelegate(bool revoked, address namespace, bytes32 list, bytes32 key) public;
+```
+
+**changeStatusDelegateSigned** ([see meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to change the revocation status of a particular revocation key in a namespace's revocation list with a raw signature.
+```solidity
+function changeStatusDelegateSigned(bool revoked, address namespace, bytes32 list, bytes32 key, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+**batchChangeStatuses**
+**OPTIONAL** implements a function to change multiple revocation statuses in different revocation lists and namespaces at once.
+```solidity
+function batchChangeStatuses(bool[] revokedStatuses, address[] namespaces, bytes32[] lists, bytes32[] keys) public;
+```
+
+**batchChangeStatusesSigned** ([see meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to change multiple revocation statuses in different revocation lists and namespaces at once with a raw signature.
+```solidity
+function batchChangeStatusesSigned(bool[] revokedStatuses, address[] namespaces, bytes32[] lists, bytes32[] keys, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+**batchChangeListStatuses**
+**OPTIONAL** implements a function to change multiple revocation statuses in a specific namespace's revocation list.
+```solidity
+function batchChangeListStatuses(bool[] revokedStatuses, address namespace, bytes32 list, bytes32[] keys) public;
+```
+
+**batchChangeListStatusesSigned** ([see meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to change multiple revocation statuses in a specific namespace's revocation list with a raw signature.
+```solidity
+function batchChangeListStatusesSigned(bool[] revokedStatuses, address namespace, bytes32 list, bytes32[] keys, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+### Owner managment
+
+**changeListOwner**
+**OPTIONAL** implement a function to change the owner of a revocation list in a namespace to a new address.
+```solidity
+function changeListOwner(address owner, address newOwner, bytes32 list) public;
+```
+
+**changeListOwnerSigned** ([see Meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to change the owner of a revocation list in a namespace to a new address.
+```solidity
+function changeListOwnerSigned(address owner, address newOwner, bytes32 list, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+### Delegation management
+
+#### addListDelegate
+**OPTIONAL** implements a function to add a delegate to an owner's revocation in a namespace list.
+```solidity
+function addListDelegate(address owner, address delegate, bytes32 list) public;
+```
+
+#### addListDelegateSigned ([see Meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to add a delegate to an owner's revocation list in a namespace with a raw signature.
+```solidity
+function addListDelegateSigned(address owner, address delegate, bytes32 list, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+#### removeListDelegate
+**OPTIONAL** implements a function to remove a delegate from an owner's revocation list in a namespace.
+```solidity
+function removeListDelegate(address owner, address delegate, bytes32 list) public;
+```
+
+#### removeListDelegateSigned ([see Meta transactions](#Meta-transactions))
+**OPTIONAL** implements a function to remove a delegate from an owner's revocation list in a namespace with a raw signature.
+```solidity
+function removeListDelegateSigned(address owner, address delegate, bytes32 list, uint8 sigV, bytes32 sigR, bytes32 sigS) public;
+```
+
+### Events
+
+**RevocationStatusChanged**
+**MUST** be emitted when `changeStatus`, `changeStatusSigned`, `changeStatusDelegate`, or `changeStatusDelegateSigned` was successfully executed.
+
+```solidity
+event RevocationStatusChanged(
+    address indexed namespace,
+    bytes32 indexed list,
+    bytes32 indexed key,
+    bool revoked
+);
+```
+
+**RevocationStatusesChanged**
+**MUST** be emitted when `batchChangeStatuses`, `batchChangeStatusesSigned`, `batchChangeListStatuses`, or `batchChangeListStatusesSigned` was successfully executed.
+
+```solidity
+event RevocationStatusesChanged(
+    address[] indexed namespaces,
+    bytes32[] indexed lists,
+    bytes32[] indexed keys,
+    bool[] revoked
+);
+```
+
+**ListOwnerChanged**
+**MUST** be emitted when `changeListOwner` or `changeListOwnerSigned` was successfully executed.
+
+```solidity
+event ListOwnerChanged(
+    address indexed namespace,
+    address indexed newOwner,
+    bytes32 indexed list
+);
+```
+
+**DelegateAdded**
+**MUST** be emitted when `addListDelegate` or `addListDelegateSigned` was successfully executed.
+
+```solidity
+event ListDelegateAdded(
+    address indexed namespace,
+    address indexed delegate,
+    bytes32 indexed list
+);
+```
+
+**DelegateRemoved**
+**MUST** be emitted when `removeListDelegate` or `removeListDelegateSigned` was successfully executed.
+
+```solidity
+event ListDelegateRemoved(
+    address indexed namespace,
+    address indexed delegate,
+    bytes32 indexed list
+);
+```
+
+### Meta transactions
+
+This section uses the following terms: 
+
+**`transaction signer`:** An Ethereum address that signs arbitrary data for the contract to execute **BUT** does not commit the transaction. 
+**`transaction sender`**: An Ethereum address that takes signed data from a **transaction signer** and commits it wrapped with its own signature to the smart contract.
+
+An address (**transaction signer**) **MAY** be able to deliver a signed payload off-band to another address (**transaction sender**) that initiates the Ethereum interaction with the smart contract. The signed payload **MUST** be limited to be used only once ([Signed Hash](#Signed-Hash) + [nonces](#Nonce)).
+
+#### Signed Hash
+
+The signature of the **transaction signer** **MUST** conform [EIP-712](/EIPS/eip-712), in its state that is proposed in [`ethereum/EIPs/issues/5475`](https://github.com/ethereum/EIPs/issues/5475). This helps users understand what the payload they're signing consists of & it improves the protection against replay attacks.
+
+#### Nonce
+
+This EIP **RECOMMENDS** the use of a **dedicated nonce mapping** for meta transactions. If the signature of the **transaction sender** and its meta contents are verified, the contract increases a nonce for this **transaction signer**. This effectively removes the possibility for any other sender to execute the same transaction again with another wallet. 
+
+## Rationale
+
+### Why the concept of namespaces?
+> This provides every Ethereum address a reserved space, without the need to actively claim it in the contract. Initially addresses only have owner access in their own namespace.
+
+### Why does a namespace always represent the initial owner address? 
+> The change of an owner of a list shouldn't break the link to a revocation key in it, as already existing off-chain data may depend on it. 
+
+## Backwards Compatibility
+Not applicable
+
+## Reference Implementation
+tba
+
+## Security Considerations
+
+### Meta Transactions
+The signature of signed transactions could potentially be replayed on different chains or deployed versions of the registry implementing this ERC. This security consideration is addressed by the usage of [EIP-712](/EIPS/eip-712
+
+### Rights Management
+The different roles and their inherent permissions are meant to prevent changes from unauthorized entities. The revocation list owner should always be in complete control over its revocation list and who has writing access to it.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
