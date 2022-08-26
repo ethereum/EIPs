@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "./ERC5006.sol";
 
 contract ERC5006Demo is ERC5006 {
-    constructor(string memory uri_, uint8 recordLimit_)
+    constructor(string memory uri_, uint256 recordLimit_)
         ERC5006(uri_, recordLimit_)
     {}
 
