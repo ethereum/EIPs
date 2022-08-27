@@ -12,7 +12,6 @@ name: Post CI
 jobs:
   on-failure:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - name: Fetch PR Data
         uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
@@ -30,49 +29,25 @@ jobs:
 
       - name: Add Comment
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
           recreate: true
           message: |
             The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
             Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
 
-      - name: Get Job Data
-        uses: fjogeleit/http-request-action@v1
-        id: fetch-jobs
+      - name: Add Waiting Label
+        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
-          method: GET
-          url: ${{ github.event.workflow_run.jobs_url }}
-          bearerToken: ${{ secrets.GITHUB_TOKEN }}
+          labels: w-ci
+          number: ${{ steps.save-pr-data.outputs.pr_number }}'
+          repo: ${{ github.repository }}
 
-      - name: Process Labels  # TODO: Turn this into a fully-featured github action
-        uses: actions/github-script@v6
+      - name: Remove Waiting Label
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
+        if: ${{ github.event.workflow_run.conclusion != 'failure' }}
         with:
-          script: |
-            const labels = JSON.parse(process.env.LABELS);
-            const data = JSON.parse(process.env.JOB_DATA);
-            for (let job in labels) {
-              if (data.find(jobData => jobData.name == job)?.conclusion != "success") {
-                github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: process.env.NUMBER,
-                  labels: [ labels[job] ]
-                }).catch(() => {});
-              } else {
-                github.rest.issues.removeLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: process.env.NUMBER,
-                  name: labels[job]
-                }).catch(() => {});
-              }
-            }
-        env:
-          NUMBER: ${{ steps.save-pr-data.outputs.pr_number }}
-          JOB_DATA: ${{ toJson(fromJson(steps.fetch-jobs.outputs.response).jobs) }}
-          LABELS: |
-            {
-              "HTMLProofer": "waiting: htmlproofer to pass",
-              "CodeSpell": "waiting: codespell to pass",
-              "EIP Walidator": "waiting: walidator to pass"
-            }
+          labels: w-ci
+          number: ${{ steps.save-pr-data.outputs.pr_number }}
+          repo: ${{ github.repository }}

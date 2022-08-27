@@ -17,17 +17,17 @@ jobs:
             let pr = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.issue_comment.issue.number
+              pull_number: context.payload.issue.number
             });
             await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.issue_comment.issue.number,
+              pull_number: context.payload.issue.number,
               body: '[RETRIGGER]\n' + pr.data.body
             });
             await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.issue_comment.issue.number,
+              pull_number: context.payload.issue.number,
               body: pr.data.body
             });

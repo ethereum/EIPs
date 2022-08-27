@@ -25,10 +25,10 @@ jobs:
         days-before-issue-stale: 7
         days-before-issue-close: 49 # 49 + 7 weeks = 3 months
         exempt-issue-labels: discussions-to
-        stale-issue-label: "waiting: no recent activity"
+        stale-issue-label: w-stale
         # PR config
         stale-pr-message: There has been no activity on this pull request for 2 weeks. It will be closed after 3 months of inactivity. If you would like to move this PR forward, please respond to any outstanding feedback or add a comment indicating that you have addressed all required feedback and are ready for a review.
         close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
         days-before-pr-stale: 14
         days-before-pr-close: 42 # 42 + 14 weeks = 3 months
-        stale-pr-label: "waiting: no recent activity"
+        stale-pr-label: w-stale
