@@ -10,7 +10,7 @@ interface IERC3475 {
     /**
      * @dev Values structure of the Metadata
      */
-    struct Values{        
+    struct Values {        
         string stringValue;
         uint uintValue;
         address addressValue;
@@ -36,7 +36,7 @@ interface IERC3475 {
     struct Transaction {
         uint256 classId;
         uint256 nonceId;
-        uint256 amount;
+        uint256 _amount;
     }
 
     // WRITABLES
