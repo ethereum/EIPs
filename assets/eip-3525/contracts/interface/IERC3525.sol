@@ -94,23 +94,6 @@ interface IERC3525 is IERC165, IERC721 {
     function transferFrom( uint256 _fromTokenId, uint256 _toTokenId, uint256 _value) external payable;
 
     /**
-     * @notice Transfer value from a token to another token with the same slot.
-     * @dev This function MUST check if the recipient address is a smart contract. If so, it MUST
-     *  call `onERC3525Received` on the recipient contract and verify the return value.
-     *  MUST revert if `_fromTokenId` or `_toTokenId` is zero token id or does not exist.
-     *  MUST revert if slots of `_fromTokenId` and `_toTokenId` do not match.
-     *  MUST revert if `_value` exceeds the balance of `_fromTokenId` or its allowance to the
-     *  operator.
-     *  MUST revert if the recipient contract rejects the transfer.
-     *  MUST emit `TransferValue` event.
-     * @param _fromTokenId The token to transfer value from
-     * @param _toTokenId The token to transfer value to
-     * @param _value The transferred value
-     * @param _data Additional data with no specified format
-     */
-    function safeTransferFrom( uint256 _fromTokenId, uint256 _toTokenId, uint256 _value, bytes calldata _data) external payable;
-
-    /**
      * @notice Transfer value from a specified token to an address. The caller should confirm that
      *  `_to` is capable of receiving ERC3525 tokens.
      * @dev This function MUST create a new ERC3525 token with the same slot for `_to` to receive
@@ -126,24 +109,4 @@ interface IERC3525 is IERC165, IERC721 {
      * @return ID of the new token created for `_to` which receives the transferred value
      */
     function transferFrom( uint256 _fromTokenId, address _to, uint256 _value) external payable returns (uint256);
-
-    /**
-     * @notice Transfer value from a specified token to an address.
-     * @dev This function MUST create a new ERC3525 token with the same slot for `_to` to receive
-     *  the transferred value.
-     *  This function MUST check if the recipient address is a smart contract. If so, it MUST call
-     *  `onERC721Received` on the recipient contract and verify the return value.
-     *  MUST revert if `_fromTokenId` is zero token id or does not exist.
-     *  MUST revert if `_to` is zero address.
-     *  MUST revert if `_value` exceeds the balance of `_fromTokenId` or its allowance to the
-     *  operator.
-     *  MUST revert if the recipient contract rejects the transfer.
-     *  MUST emit `Transfer` and `TransferValue` events.
-     * @param _fromTokenId The token to transfer value from
-     * @param _to The address to transfer value to
-     * @param _value The transferred value
-     * @param _data Additional data with no specified format
-     * @return ID of the new token created for `_to` which receives the transferred value
-     */
-    function safeTransferFrom( uint256 _fromTokenId, address _to, uint256 _value, bytes calldata _data) external payable returns (uint256);
 }
