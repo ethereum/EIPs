@@ -1,9 +1,9 @@
 {
-    "name": "EIP-5006",
-    "devDependencies": {
+    "name": "EIP-5008",
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.7.3",
         "@nomiclabs/hardhat-ethers": "^2.0.5",
         "@nomiclabs/hardhat-waffle": "^2.0.3",
-        "@openzeppelin/contracts": "^4.5.0",
         "@typechain/ethers-v5": "^7.2.0",
         "@typechain/hardhat": "^2.3.1",
         "@types/chai": "^4.3.0",
