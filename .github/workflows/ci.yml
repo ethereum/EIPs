@@ -2,6 +2,12 @@ name: Continuous Integration
 
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
 
 jobs:
   save-pr:
@@ -68,6 +74,7 @@ jobs:
           check_filenames: true
           ignore_words_file: .codespell-whitelist
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          only_warn: 1
 
   eipw-validator:
     name: EIP Walidator
@@ -77,7 +84,7 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: ethereum/eipw-action@master
+      - uses: ethereum/eipw-action@dist
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
