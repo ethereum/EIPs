@@ -1,0 +1,14 @@
+on:
+  pull_request_target:
+
+name: Auto Label Bot
+jobs:
+  jekyll-label-action:
+    name: Label
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: Pandapip1/jekyll-label-action@28a89dbbef321fceaf3cff17f4d29c7a033c3d56
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-path: config/.jekyll-labels.yml
