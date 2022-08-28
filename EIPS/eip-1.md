@@ -211,17 +211,17 @@ The current EIP editors are
 - Gavin John (@Pandapip1)
 - Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
-- Micah Zoltu (@MicahZoltu)
 - Sam Wilson (@SamWilsn)
 
 Emeritus EIP editors are 
 
 - Casey Detrio (@cdetrio)
-- Nick Johnson (@arachnid)
-- Vitalik Buterin (@vbuterin)
 - Hudson Jameson (@Souptacular)
-- Nick Savers (@nicksavers)
 - Martin Becze (@wanderer)
+- Micah Zoltu (@MicahZoltu)
+- Nick Johnson (@arachnid)
+- Nick Savers (@nicksavers)
+- Vitalik Buterin (@vbuterin)
 
 If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md).
 

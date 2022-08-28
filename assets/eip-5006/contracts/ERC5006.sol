@@ -3,124 +3,145 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./IERC5006.sol";
 
-contract ERC5006 is ERC1155, IERC5006 {
-    /** mapping(tokenId => mapping(user=>amount)) */
-    mapping(uint256 => mapping(address => uint256)) private _userAllowances;
+contract ERC5006 is ERC1155, ERC1155Receiver, IERC5006 {
+    using EnumerableSet for EnumerableSet.UintSet;
+    mapping(uint256 => mapping(address => uint256)) private _frozens;
+    mapping(uint256 => UserRecord) private _records;
+    mapping(uint256 => mapping(address => EnumerableSet.UintSet))
+        private _userRecordIds;
+    uint256 _curRecordId;
+    uint256 recordLimit;
 
-    /** mapping(tokenId => mapping(owner=>amount)) */
-    mapping(uint256 => mapping(address => uint256)) private _frozen;
+    constructor(string memory uri_, uint256 recordLimit_) ERC1155(uri_) {
+        recordLimit = recordLimit_;
+    }
 
-    /** mapping(tokenId => mapping(owner => mapping(user => amount))) */
-    mapping(uint256 => mapping(address => mapping(address => uint256)))
-        private _allowances;
+    function isOwnerOrApproved(address owner) public view returns (bool) {
+        require(
+            owner == msg.sender || isApprovedForAll(owner, msg.sender),
+            "only owner or approved"
+        );
+        return true;
+    }
 
-    constructor() ERC1155("") {}
-
-    /**
-     * @dev Returns the amount of tokens of token type `id` used by `user`.
-     *
-     * Requirements:
-     *
-     * - `user` cannot be the zero address.
-     */
-    function balanceOfUser(address user, uint256 id)
+    function usableBalanceOf(address account, uint256 tokenId)
         public
         view
-        returns (uint256)
+        override
+        returns (uint256 amount)
     {
-        return _userAllowances[id][user];
-    }
-
-    /**
-     * @dev Returns the amount of tokens of token type `id` used by `user`.
-     *
-     * Requirements:
-     *
-     * - `user` cannot be the zero address.
-     * - `owner` cannot be the zero address.
-     */ 
-    function balanceOfUserFromOwner(
-        address user,
-        address owner,
-        uint256 id
-    ) public view returns (uint256) {
-        return _allowances[id][owner][user];
-    }
-
-    /**
-     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
-     *
-     * Requirements:
-     *
-     * - `owner` cannot be the zero address.
-     */
-    function frozenAmountOfOwner(address owner, uint256 id)
-        external
-        view
-        returns (uint256)
-    {
-        return _frozen[id][owner];
-    }    
-
-    /**
-     * @dev set the `user` of a NFT
-     *
-     * Requirements:
-     *
-     * - `user` The new user of the NFT, the zero address indicates there is no user
-     * - `amount` The new user could use
-     */ 
-    function setUser(
-        address owner,
-        address user,
-        uint256 id,
-        uint256 amount
-    ) public virtual {
-        require(user != address(0), "ERROR: transfer to the zero address");
-        address operator = msg.sender;
-        require(operator == owner || isApprovedForAll(owner, operator), "ERROR: caller is not owner nor approved");
-        uint256 fromBalance = balanceOf(owner, id);
-        _frozen[id][owner] -= _allowances[id][owner][user];
-        uint256 frozen = _frozen[id][owner];
-        require(
-            fromBalance - frozen >= amount,
-            "ERROR: insufficient balance for setUser"
-        );
-        unchecked {
-            _frozen[id][owner] = frozen + amount;
-        }
-        _userAllowances[id][user] -= _allowances[id][owner][user];
-        _userAllowances[id][user] += amount;
-        _allowances[id][owner][user] = amount;
-
-        emit UpdateUser(operator, owner, user, id, amount);
-    }
-
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override {
-        for (uint256 i = 0; i < ids.length; i++) {
-            if (from != address(0)) {
-                uint256 id = ids[i];
-                uint256 fromBalance = balanceOf(from, id);
-                uint256 frozen = _frozen[id][from];
-                require(
-                    fromBalance - frozen >= amounts[i],
-                    "ERROR: insufficient balance for transfer"
-                );
+        uint256[] memory recordIds = _userRecordIds[tokenId][account].values();
+        for (uint256 i = 0; i < recordIds.length; i++) {
+            if (block.timestamp <= _records[recordIds[i]].expiry) {
+                amount += _records[recordIds[i]].amount;
             }
         }
     }
 
-    /// @dev See {IERC165-supportsInterface}.
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IERC5006).interfaceId || super.supportsInterface(interfaceId);
+    function frozenBalanceOf(address account, uint256 tokenId)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return _frozens[tokenId][account];
+    }
+
+    function userRecordOf(uint256 recordId)
+        public
+        view
+        override
+        returns (UserRecord memory)
+    {
+        return _records[recordId];
+    }
+
+    function createUserRecord(
+        address owner,
+        address user,
+        uint256 tokenId,
+        uint64 amount,
+        uint64 expiry
+    ) public override returns (uint256) {
+        require(isOwnerOrApproved(owner));
+        require(user != address(0), "user cannot be the zero address");
+        require(amount > 0, "amount must be greater than 0");
+        require(expiry > block.timestamp, "expiry must after the block timestamp");
+        require(
+            _userRecordIds[tokenId][user].length() < recordLimit,
+            "user cannot have more records"
+        );
+        _safeTransferFrom(owner, address(this), tokenId, amount, "");
+        _frozens[tokenId][owner] += amount;
+        _curRecordId++;
+        _records[_curRecordId] = UserRecord(
+            tokenId,
+            owner,
+            amount,
+            user,
+            expiry
+        );
+        _userRecordIds[tokenId][user].add(_curRecordId);
+        emit CreateUserRecord(
+            _curRecordId,
+            tokenId,
+            amount,
+            owner,
+            user,
+            expiry
+        );
+        return _curRecordId;
+    }
+
+    function deleteUserRecord(uint256 recordId) public override {
+        UserRecord storage _record = _records[recordId];
+        require(isOwnerOrApproved(_record.owner));
+        _safeTransferFrom(
+            address(this),
+            _record.owner,
+            _record.tokenId,
+            _record.amount,
+            ""
+        );
+        _frozens[_record.tokenId][_record.owner] -= _record.amount;
+        _userRecordIds[_record.tokenId][_record.user].remove(recordId);
+        delete _records[recordId];
+        emit DeleteUserRecord(recordId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC1155, ERC1155Receiver)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC5006).interfaceId ||
+            ERC1155.supportsInterface(interfaceId) ||
+            ERC1155Receiver.supportsInterface(interfaceId);
+    }
+
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        uint256 value,
+        bytes calldata data
+    ) external pure override returns (bytes4) {
+        return IERC1155Receiver.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external pure override returns (bytes4) {
+        return IERC1155Receiver.onERC1155BatchReceived.selector;
     }
 }
