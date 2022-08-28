@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: NFT Legal Use, Sharing, Repurposing, and Remixing Standard
 description: A standard interface and licensing scheme for describing and enforcing the use, sharing, repurposing, and remixing rights associated with an NFT. Establishing an on-chain registry of IP rights associated with NFTs, and the corresponding attribution and derivative links.
 author: Isaac Patka (isaac@logos.xyz) & COALA Licensing Taskforce (info@coala.org)
-discussions-to: https://docs.google.com/document/d/113Si5-DoYab_QLP56xqVfx7JeSrsrcw0gJmujK0m4-4/edit
+discussions-to: https://ethereum-magicians.org/t/eip-5999-legal-use-sharing-repurposing-and-remixing-standard-compatible-with-creative-commons/10553
 status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
