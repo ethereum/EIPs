@@ -1,6 +1,5 @@
 name: Do you want to propose a change to the EIP process itself?
 description: Use this if you want to propose changes to the EIP process
-title: Title
 labels: ['enhancement']
 
 body:
