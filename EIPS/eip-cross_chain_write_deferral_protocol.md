@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: "Cross Chain Write Deferral Protocol"
-description: The cross chain write deferral protocol provides a mechanism in which a contract can defer the storage and handling of mutations to off-chain handlers
+description: The cross chain write deferral protocol provides a mechanism to defer the storage & resolution of mutations to off-chain handlers
 author: Paul Gauvreau (@0xpaulio), Nick Johnson (@arachnid)
 discussions-to: https://ethereum-magicians.org/t/eip-cross-chain-write-deferral-protocol/10576
 status: Draft
