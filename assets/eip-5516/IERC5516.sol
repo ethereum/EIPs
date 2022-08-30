@@ -73,11 +73,11 @@ interface IERC5516 {
     ) external;
 
     /**
-     * @dev Transfers `_id` token from `_from` to every address at `_to[]`.
+     * @dev Transfers `id` token from `from` to every address at `to[]`.
      *
      * Requirements:
      *
-     * - `_from` MUST be the creator(minter) of `id`.
+     * - `from` MUST be the creator(minter) of `id`.
      * - All addresses in `to[]` MUST be non-zero.
      * - All addresses in `to[]` MUST have the token `id` under `_pendings`.
      * - All addresses in `to[]` MUST not own a token type under `id`.

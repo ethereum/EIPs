@@ -221,7 +221,7 @@ contract ProxyRegister is EPS, Ownable {
   }
 
   /**
-  * @dev The nominator initiaties a proxy entry
+  * @dev The nominator initiates a proxy entry
   */
   function makeNomination(address _proxy, uint256 _provider) external payable isNotCurrentNominator(msg.sender) isNotCurrentProxy(_proxy) isNotCurrentProxy(msg.sender) {
     require (_proxy != address(0), "Proxy address must be provided");
