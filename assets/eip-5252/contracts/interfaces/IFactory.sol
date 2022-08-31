@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity ^0.8.0;
 
@@ -6,7 +6,7 @@ interface IFactory {
 
     /// View funcs
     /// NFT token address
-    function v1() external view returns (address);
+    function abt() external view returns (address);
     /// Address of wrapped eth
     function WETH() external view returns (address);
     /// Address of a manager
@@ -15,8 +15,8 @@ interface IFactory {
     /// Getters
     /// Get Config of CDP
     function financeCodeHash() external pure returns (bytes32);
-    function createFinance(address collateral_, address debt_, uint256 amount_, address recipient) external returns (address vault, uint256 id);
-    function getFinance(uint vaultId_) external view returns (address);
+    function createFinance(address weth, uint256 amount_, address recipient) external returns (address vault, uint256 id);
+    function getFinance(uint financeId_) external view returns (address);
     
     /// Event
     event FinanceCreated(uint256 vaultId, address collateral, address debt, address creator, address vault, uint256 cAmount, uint256 dAmount);

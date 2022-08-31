@@ -5,11 +5,10 @@ pragma solidity ^0.8.0;
 import "./ERC721A.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/IABT.sol";
 import "./interfaces/IFinance.sol";
 import "./interfaces/IDescriptor.sol";
 
-contract ABT is ERC721A, AccessControl, IABT  {
+contract ABT is ERC721A, AccessControl  {
     // Create a new role identifier for the minter role
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -46,18 +45,18 @@ contract ABT is ERC721A, AccessControl, IABT  {
         factory = factory_;
     }
 
-    function mint(address to) external override {
+    function mint(address to) external {
         // Check that the calling account has the minter role
         require(_msgSender() == factory, "ABT: Caller is not factory");
         _safeMint(to, 1); 
     }
 
-    function burn(uint256 tokenId_) external override {
+    function burn(uint256 tokenId_) external {
         require(hasRole(BURNER_ROLE, _msgSender()), "ABT: must have burner role to burn");
         _burn(tokenId_);
     }
 
-    function exists(uint256 tokenId_) external view override returns (bool) {
+    function exists(uint256 tokenId_) external view returns (bool) {
         return _exists(tokenId_);
     }
 
