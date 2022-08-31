@@ -1,0 +1,53 @@
+---
+eip: <to be assigned>
+title: Revert Signals
+description: Signal to wallets that an action is needed by returning a custom revert code
+author: Pandapip1 (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Interface
+created: 2022-08-31
+requires: 140
+---
+
+## Abstract
+
+This EIP introduces a machine-readable format for reverts to signal to wallets that an action needs to be taken.
+
+## Motivation
+
+Oftentimes, a smart contract needs to signal to a wallet that an action needs to be taken, such as to sign a transaction or send an HTTP request to a URL. Traditionally, this has been done by hard-coding the logic into the frontend, but this EIP allows the smart contract itself to request the action.
+
+This means that, for example, an exchange or a market can directly tell the wallet to approve the smart contract to spend the token, vastly simplifying the front-end code.
+
+## Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Custom Revert Reason
+
+To send a signal to a wallet, a smart contract MUST revert with the following [EIP-140](./eip-140.md) revert data:
+  
+```solidity
+abi.encodePacked(uint8(EIP_NUMBER), uint8(NUMBER_INSTRUCTIONS), uint24(INSTRUCTION_ID1), bytes(INSTRUCTION_DATA1), uint24(INSTRUCTION_ID2), bytes(INSTRUCTION_DATA2), ...)
+```
+
+`EIP_NUMBER` MUST be `<to be assigned>`.
+
+The `INSTRUCTION_ID` of an instruction defined by an EIP MUST be its EIP number. An EIP MUST define exactly zero or one `INSTRUCTION_ID`. The structure of the instruction data for any `INSTRUCTION_ID` MUST be defined by the EIP that defines the `INSTRUCTION_ID`.
+
+## Rationale
+
+This EIP was explicitly optimized for deployment gas cost. It is expected that libraries will eventually be developed that makes sending and receiving signals more developer-friendly.
+
+## Backwards Compatibility
+
+Needs discussion.
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
