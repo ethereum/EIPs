@@ -30,6 +30,25 @@ main.page-content {
   }
 }
 
+.footer-col-wrapper {
+  color: #111;
+}
+
+a, a:link {
+  color: #726E97;
+  text-decoration: none;
+  transition: 0.5s;
+}
+
+a:visited {
+  color: #8E6680;
+}
+
+a:hover, a:active {
+  color: #7F557D;
+  box-shadow: 0 3px 0 #7F557D;
+}
+
 .status {
   border-radius: 6px;
   line-height: 18px;
