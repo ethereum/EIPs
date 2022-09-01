@@ -6,3 +6,6 @@ vendor
 
 # Editor files
 .gitpod.yml
+
+# Secrets
+.vercel
