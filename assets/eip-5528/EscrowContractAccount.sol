@@ -83,18 +83,7 @@ contract ErcEscrowAccount {
         o_seller = _balances[account].seller;
     }
 
-    function escrowComplainaceDescription() external view returns (string)
-    {
-        return 'totalNumberOfInvestor:2';
-    }
-    function escrowErrorCodeDescription(uint32 _code) external view returns (string)
-    {
-        if(_code == 0){
-            return 'success';
-        }
-        return 'Unknown code';
-    }
-    function escrowFund(address to, uint256 amount) public returns (uint32) {
+    function escrowFund(address to, uint256 amount) public returns (bool) {
         require(amount > 0, "amount is too small");
         if(msg.sender == _addrSeller){
 
@@ -133,10 +122,10 @@ contract ErcEscrowAccount {
 
 
 
-        return 0;
+        return true;
     }
 
-    function escrowRefund(address to, uint256 amount) public returns (uint32) {
+    function escrowRefund(address to, uint256 amount) public returns (bool) {
         require(amount > 0, "amount is too small");
         require(_status.state == State.Running || _status.state == State.Failed, "must be running state to refund");
         require(msg.sender == _addrBuyer, "must be buyer contract to refund");
@@ -154,10 +143,10 @@ contract ErcEscrowAccount {
         }
 
         _updateRunningState();
-        return 0;
+        return true;
     }
 
-    function escrowWithdraw() public returns (uint32) {
+    function escrowWithdraw() public returns (bool) {
         address from = msg.sender;
 
         if(from == _addrCreator){
@@ -176,12 +165,7 @@ contract ErcEscrowAccount {
         }
 
         delete _balances[from];
-        return 0;
+        return true;
     }
-
-
-
-
-
-
+    
 }

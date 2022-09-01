@@ -1,6 +1,5 @@
 pragma solidity ^0.4.24;
 
-import "./EscrowContractAccount.sol";
 
 
 
@@ -40,22 +39,17 @@ contract ERC20Mockup {
     /*
       From there, escrow related function
     */
-    function escrowFund(address to, uint256 amount) public returns (uint32) {
-        uint32 result = ErcEscrowAccount(to).escrowFund(msg.sender, amount);
-        if(result != 0){
-            return result;
-        }
+    function escrowFund(address to, uint256 amount) public returns (bool) {
+        bool res = ERC20Mockup(to).escrowFund(msg.sender, amount);
+        require(res, "Fund Failed");
         _transfer(msg.sender, to, amount);
 
-        return 0;
+        return true;
     }
-    function escrowRefund(address to, uint256 amount) public returns (uint32) {
-        uint32 result = ErcEscrowAccount(to).escrowRefund(msg.sender, amount);
+    function escrowRefund(address to, uint256 amount) public returns (bool) {
+        bool res = ERC20Mockup(to).escrowRefund(msg.sender, amount);
+        require(res, "Refund Failed");
         _transfer(to, msg.sender, amount);
-        if(result != 0){
-            return result;
-        }
-
-        return 0;
+        return true;
     }
 }
