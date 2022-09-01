@@ -4,10 +4,12 @@ pragma solidity ^0.8.9;
 // NOTE: This is very untested, and very insecure. Do not use!
 
 import "./IDomain.sol";
+import "./IDomainAccessControl.sol";
+import "./IDomainEnumerable.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 
-contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
+contract NaiveDomain is IDomain, IDomainAccessControl, IDomainEnumerable, ERC165Storage, ERC165Checker {
     //// States
     mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
@@ -18,6 +20,8 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
 
     constructor() {
         _registerInterface(type(IDomain).interfaceId);
+        _registerInterface(type(IDomainAccessControl).interfaceId);
+        _registerInterface(type(IDomainEnumerable).interfaceId);
     }
 
 
@@ -87,7 +91,7 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
         }
 
         // Auth Check
-        bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
+        bool isMovable = this.supportsInterface(this.getDomain(name), type(IDomainAccessControl).interfaceId) && IDomainAccessControl(this.getDomain(name)).canMoveSubdomain(updater, name, this, subdomain);
 
         // Return
         return isMovable;
@@ -100,7 +104,7 @@ contract NaiveDomain is IDomain, ERC165Storage, ERC165Checker {
         }
 
         // Auth Check
-        bool isDeletable = this.supportsInterface(this.getDomain(name), type(IDomain).interfaceId) && IDomain(this.getDomain(name)).canDeleteDomain(updater, name, this);
+        bool isDeletable = this.supportsInterface(this.getDomain(name), type(IDomainAccessControl).interfaceId) && IDomainAccessControl(this.getDomain(name)).canDeleteSubdomain(updater, name, this);
 
         // Return
         return isDeletable;

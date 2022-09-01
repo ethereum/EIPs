@@ -1,5 +1,5 @@
 {
-  "name": "ERC721_DualRoles",
+  "name": "ERC-4907",
   "version": "1.0.0",
   "description": "",
   "main": "truffle-config.js",
@@ -9,7 +9,7 @@
   "scripts": {},
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "CC0-1.0",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.3",
     "@types/chai": "^4.3.0",
