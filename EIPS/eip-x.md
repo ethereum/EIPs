@@ -90,6 +90,8 @@ As a reminder, this document serves to define a set of conceptual primitives and
 
 ## Specification
 
+The core specification contains the main primitive generalisations of the Extendable pattern's building blocks. Any reference implementations or utilities that enhance the framework for developers is included in the [appendix](#appendix).
+
 ### Terminology
 
 Extendable - Refers to the
@@ -212,7 +214,7 @@ Submit a transaction with a call to the `deploy(bytes _initCode, bytes32 _salt)`
 
 A successful deployment will result in an ERC165 Singleton contract deployed at `0x16c940672fa7820c36b2123e657029d982629070`.
 
-### Extension Contract
+### Extension Contracts
 
 A custom Extension MUST inherit `Extension`.
 
@@ -354,6 +356,10 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
 }
 ```
 
+See [here for all default Extensions](#default-extensions) that are the reference implementation of the core features.
+
+#### Custom Extensions
+
 By inheriting `Extension` a custom Extension MUST also define and implement a custom interface.
 
 A custom Extension MUST implement `getSolidityInterface` and `getInterface` functions. These are introspection functions that allow other contracts or users to inspect what interface is implemented by the Extension. Crucially, it is used by Extendable during extending to determine what interface it will inherit and which contract implements it.
@@ -475,6 +481,267 @@ contract YourExtensionImplementation is YourExtension {
 
 ### Extendable Contract
 
+The Extendable contract is the core artifact of building Extendable smart contracts.
+
+A contract MUST inherit `Extendable` to be extendable by Extensions.
+
+`ExtendLogic` MUST be deployed prior to the deployment of any Extendable contract.
+
+```solidity
+pragma solidity ^0.8.4;
+
+/**
+ * @dev  ExtensionNotImplemented error is emitted by Extendable and Extensions
+ *       where no implementation for a specified function signature exists
+ *       in the contract
+*/
+error ExtensionNotImplemented();
+
+/**
+ * @dev  Utility library for contracts to catch custom errors
+ *       Pass in a return `result` from a call, and the selector for your error message
+ *       and the `catchCustomError` function will return `true` if the error was found
+ *       or `false` otherwise
+*/
+library Errors {
+    function catchCustomError(bytes memory result, bytes4 errorSelector) internal pure returns(bool) {
+        bytes4 caught;
+        assembly {
+            caught := mload(add(result, 0x20))
+        }
+
+        return caught == errorSelector;
+    }
+}
+
+/**
+ * @dev Storage struct used to hold state for Extendable contracts
+ */
+struct ExtendableState {
+    // Array of full interfaceIds extended by the Extendable contract instance
+    bytes4[] implementedInterfaceIds;
+
+    // Array of function selectors extended by the Extendable contract instance
+    mapping(bytes4 => bytes4[]) implementedFunctionsByInterfaceId;
+
+    // Mapping of interfaceId/functionSelector to the extension address that implements it
+    mapping(bytes4 => address) extensionContracts;
+}
+
+/**
+ * @dev Storage library to access storage slot for the state struct
+ */
+library ExtendableStorage {
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:extendable-state");
+
+    function _getState()
+        internal 
+        view
+        returns (ExtendableState storage extendableState) 
+    {
+        bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
+        assembly {
+            extendableState.slot := position
+        }
+    }
+}
+
+/**
+ * @dev Storage struct used to hold state for CallerContext
+ */
+struct CallerState {
+    // Stores a list of callers in the order they are received
+    // The current caller context is always the last-most address
+    address[] callerStack;
+}
+
+/**
+ * @dev Storage library to access storage slot for the CallerState struct
+ */
+library CallerContextStorage {
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:caller-state");
+
+    function _getState()
+        internal 
+        view
+        returns (CallerState storage callerState) 
+    {
+        bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
+        assembly {
+            callerState.slot := position
+        }
+    }
+}
+
+/**
+ *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
+ * /\  ___\/\_\_\_\/\__  _\/\  ___\/\ "-.\ \/\  __-./\  __ \/\  == \/\ \    /\  ___\
+ * \ \  __\\/_/\_\/\/_/\ \/\ \  __\\ \ \-.  \ \ \/\ \ \  __ \ \  __<\ \ \___\ \  __\
+ *  \ \_____\/\_\/\_\ \ \_\ \ \_____\ \_\\"\_\ \____-\ \_\ \_\ \_____\ \_____\ \_____\
+ *   \/_____/\/_/\/_/  \/_/  \/_____/\/_/ \/_/\/____/ \/_/\/_/\/_____/\/_____/\/_____/
+ *
+ *  @title Core module for the Extendable framework
+ *  
+ *  Inherit this contract to make your contracts Extendable!
+ *
+ *  Your contract can perform ad-hoc addition or removal of functions
+ *  which allows modularity, re-use, upgrade, and extension of your
+ *  deployed contracts. You can make your contract immutable by removing
+ *  the ability for it to be extended.
+ *
+ *  Constructor initialises owner-based permissioning to manage
+ *  extending, where only the `owner` can extend the contract.
+ *  
+ *  You may change this constructor or use extension replacement to
+ *  use a different permissioning pattern for your contract.
+ *
+ *  Requirements:
+ *      - ExtendLogic contract must already be deployed
+ */
+contract Extendable {
+    /**
+     * @dev Contract constructor initialising the first extension `ExtendLogic`
+     *      to allow the contract to be extended.
+     *
+     * This implementation assumes that the `ExtendLogic` being used also uses
+     * an ownership pattern that only allows `owner` to extend the contract.
+     * 
+     * This constructor sets the owner of the contract and extends itself
+     * using the ExtendLogic extension.
+     *
+     * To change owner or ownership mode, your contract must be extended with the
+     * PermissioningLogic extension, giving it access to permissioning management.
+     */
+    constructor(address extendLogic) {
+        // wrap main constructor logic in pre/post fallback hooks for callstack registration
+        _beforeFallback();
+
+        // extend extendable contract with the first extension: extend, using itself in low-level call
+        (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
+
+        // check that initialisation tasks were successful
+        require(extendSuccess, "failed to initialise extension");
+
+        _afterFallback();
+    }
+    
+    /**
+     * @dev Delegates function calls to the specified `delegatee`.
+     *
+     * Performs a delegatecall to the `delegatee` with the incoming transaction data
+     * as the input and returns the result. The transaction data passed also includes 
+     * the function signature which determines what function is attempted to be called.
+     * 
+     * If the `delegatee` returns a ExtensionNotImplemented error, the `delegatee` is
+     * an extension that does not implement the function to be called.
+     *
+     * Otherwise, the function execution fails/succeeds as determined by the function 
+     * logic and returns as such.
+     */
+    function _delegate(address delegatee) internal virtual returns(bool) {
+        _beforeFallback();
+        
+        bytes memory out;
+        (bool success, bytes memory result) = delegatee.delegatecall(msg.data);
+
+        _afterFallback();
+
+        // copy all returndata to `out` once instead of duplicating copy for each conditional branch
+        assembly {
+            returndatacopy(out, 0, returndatasize())
+        }
+
+        // if the delegatecall execution did not succeed
+        if (!success) {
+            // check if failure was due to an ExtensionNotImplemented error
+            if (Errors.catchCustomError(result, ExtensionNotImplemented.selector)) {
+                // cleanly return false if error is caught
+                return false;
+            } else {
+                // otherwise revert, passing in copied full returndata
+                assembly {
+                    revert(out, returndatasize())
+                }
+            }
+        } else {
+            // otherwise end execution and return the copied full returndata
+            assembly {
+                return(out, returndatasize())
+            }
+        }
+    }
+    
+    /**
+     * @dev Internal fallback function logic that attempts to delegate execution
+     *      to extension contracts
+     *
+     * Initially attempts to locate an interfaceId match with a function selector
+     * which are extensions that house single functions (singleton extensions)
+     *
+     * If no implementations are found that match the requested function signature,
+     * returns ExtensionNotImplemented error
+     */
+    function _fallback() internal virtual {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // if an extension exists that matches in the functionsig
+        if (state.extensionContracts[msg.sig] != address(0x0)) {
+            // call it
+            _delegate(state.extensionContracts[msg.sig]);
+        } else {                                                 
+            revert ExtensionNotImplemented();
+        }
+    }
+
+    /**
+     * @dev Default fallback function to catch unrecognised selectors.
+     *
+     * Used in order to perform extension lookups by _fallback().
+     *
+     * Core fallback logic sandwiched between caller context work.
+     */
+    fallback() external payable virtual {
+        _fallback();
+    }
+    
+    /**
+     * @dev Payable fallback function to catch unrecognised selectors with ETH payments.
+     *
+     * Used in order to perform extension lookups by _fallback().
+     */
+    receive() external payable virtual {
+        _fallback();
+    }
+    
+    /**
+     * @dev Virtual hook that is called before _fallback().
+     */
+    function _beforeFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getState();
+        state.callerStack.push(msg.sender);
+    }
+    
+    /**
+     * @dev Virtual hook that is called after _fallback().
+     */
+    function _afterFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getState();
+        state.callerStack.pop();
+    }
+}
+```
+
+#### Usage
+
+To use `Extendable`:
+
+```solidity
+contract YourExtendableContract is Extendable {}
+```
+
+Deploy it using the default `Extendable` constructor `constructor(address extendLogic)` by passing it the address of the `ExtendLogic` contract.
+
+Then to extend it, call the `extend(address extension)` function on your deployed Extendable contract, passing it the address of any Extension logic contract.
 
 
 
@@ -486,20 +753,833 @@ The technical specification should describe the syntax and semantics of any new 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
 ## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
-## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+All resulting Extendable contracts behave identically to 'normal' smart contracts. Interacting with an Extendable contract is no different to interacting with other smart contracts. To aid such an interaction, using the introspection function `getSolidityInterface` on an Extension or the `getFullInterface` function provided by `ExtendLogic` will return the interface of the contract to be used as a contract ABI. These introspection routines and interface implementations have been crafted to ensure that the contracts behave exactly the same to avoid any functional difference.
 
 ## Reference Implementation
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+The reference implementation can be found [here](https://github.com/violetprotocol/extendable).
 
 ## Security Considerations
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
 ## Appendix
 
-### CallerContext
+### Default Extensions
+
+The default extensions that SHOULD be used as is defined are:
+
+* [ExtendLogic](#extendlogic-extension)
+* [RetractLogic](#retractlogic-extension)
+* [ReplaceLogic](#replacelogic-extension)
+
+An additional extension that MAY be used as is defined is:
+
+* PermissioningLogic
+
+This is because of a specific ownership pattern that may not be desirable to be used in all cases but is a default that we apply to our reference implementation.
+
+#### ExtendLogic Extension
+
+ExtendLogic is the primary function of all Extendable contracts.
+
+It is deployed first and used by Extendables to extend itself with the ability to extend, which allows it to extend itself with other Extensions.
+
+`ExtendLogic` MUST implement `Extension`.
+
+`ExtendLogic` MUST use `ExtendableStorage`.
+`ExtendLogic` MAY use `PermissioningStorage`.
+
+The `extend` function body MUST be used as is, but if a different permissioning model is used, the modifier `onlyOwnerOrSelf` can be changed.
+
+```solidity
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Interface for ExtendLogic extension
+*/
+interface IExtendLogic {
+    /**
+     * @dev Emitted when `extension` is successfully extended
+     */
+    event Extended(address extension);
+    
+    /**
+     * @dev Emitted when extend() is called and contract owner has not been set
+     */
+    event OwnerInitialised(address newOwner);
+
+    /**
+     * @dev Extend function to extend your extendable contract with new logic
+     *
+     * Integrate with ExtendableStorage to persist state
+     *
+     * Sets the known implementor of each function of `extension` as the current call context
+     * contract.
+     *
+     * Emits `Extended` event upon successful extending.
+     *
+     * Requirements:
+     *  - `extension` contract must implement EIP-165.
+     *  - `extension` must inherit IExtension
+     *  - Must record the `extension` by both its interfaceId and address
+     *  - The functions of `extension` must not already be extended by another attached extension
+    */
+    function extend(address extension) external;
+
+    /**
+     * @dev Returns a string-formatted representation of the full interface of the current
+     *      Extendable contract as an interface named IExtended
+     *
+     * Expects `extension.getSolidityInterface` to return interface-compatible syntax with line-separated
+     * function declarations including visibility, mutability and returns.
+    */
+    function getFullInterface() external view returns(string memory fullInterface);
+
+    /**
+     * @dev Returns an array of interfaceIds that are currently implemented by the current
+     *      Extendable contract
+    */
+    function getExtensionsInterfaceIds() external view returns(bytes4[] memory);
+    /**
+     * @dev Returns an array of function selectors that are currently implemented by the current
+     *      Extendable contract
+    */
+    function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);
+
+    /**
+     * @dev Returns an array of all extension addresses that are currently attached to the
+     *      current Extendable contract
+    */
+    function getExtensionAddresses() external view returns(address[] memory);
+}
+
+/**
+ * @dev Abstract Extension for ExtendLogic
+*/
+abstract contract ExtendExtension is IExtendLogic, Extension {
+    /**
+     * @dev see {IExtension-getSolidityInterface}
+    */
+    function getSolidityInterface() override virtual public pure returns(string memory) {
+        return  "function extend(address extension) external;\n"
+                "function getFullInterface() external view returns(string memory);\n"
+                "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n"
+                "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n"
+                "function getExtensionAddresses() external view returns(address[] memory);\n";
+    }
+
+    /**
+     * @dev see {IExtension-getInterface}
+    */
+    function getInterface() override virtual public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](5);
+        functions[0] = IExtendLogic.extend.selector;
+        functions[1] = IExtendLogic.getFullInterface.selector;
+        functions[2] = IExtendLogic.getExtensionsInterfaceIds.selector;
+        functions[3] = IExtendLogic.getExtensionsFunctionSelectors.selector;
+        functions[4] = IExtendLogic.getExtensionAddresses.selector;
+
+        interfaces[0] = Interface(
+            type(IExtendLogic).interfaceId,
+            functions
+        );
+    }
+}
+
+/**
+ * @dev Reference implementation for ExtendLogic which defines the logic to extend
+ *      Extendable contracts
+ *
+ * Uses PermissioningLogic owner pattern to control extensibility. Only the `owner`
+ * can extend using this logic.
+ *
+ * Modify this ExtendLogic extension to change the way that your contract can be
+ * extended: public extendability; DAO-based extendability; governance-vote-based etc.
+*/
+contract ExtendLogic is ExtendExtension {
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
+    /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner` or the current contract
+    */
+    modifier onlyOwnerOrSelf {
+        initialise();
+    
+        address owner = Permissions._getState().owner;
+        require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
+        _;
+    }
+
+    /**
+     * @dev see {IExtendLogic-extend}
+     *
+     * Uses PermissioningLogic implementation with `owner` checks.
+     *
+     * Restricts extend to `onlyOwnerOrSelf`.
+     *
+     * If `owner` has not been initialised, assume that this is the initial extend call
+     * during constructor of Extendable and instantiate `owner` as the caller.
+     *
+     * If any single function in the extension has already been extended by another extension,
+     * revert the transaction.
+    */
+    function extend(address extension) override public virtual onlyOwnerOrSelf {
+        require(extension.code.length > 0, "Extend: address is not a contract");
+
+        IERC165 erc165Extension = IERC165(extension);
+        try erc165Extension.supportsInterface(bytes4(0x01ffc9a7)) returns(bool erc165supported) {
+            require(erc165supported, "Extend: extension does not implement eip-165");
+            require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
+        } catch (bytes memory) {
+            revert("Extend: extension does not implement eip-165");
+        }
+
+        IExtension ext = IExtension(payable(extension));
+
+        Interface[] memory interfaces = ext.getInterface();
+        registerInterfaces(interfaces, extension);
+
+        emit Extended(extension);
+    }
+
+    /**
+     * @dev see {IExtendLogic-getFullInterface}
+    */
+    function getFullInterface() override public view returns(string memory fullInterface) {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
+            IExtension logic = IExtension(state.extensionContracts[interfaceId]);
+            fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
+        }
+
+        // TO-DO optimise this return to a standardised format with comments for developers
+        return string(abi.encodePacked("interface IExtended {\n", fullInterface, "}"));
+    }
+
+    /**
+     * @dev see {IExtendLogic-getExtensionsInterfaceIds}
+    */
+    function getExtensionsInterfaceIds() override public view returns(bytes4[] memory) {
+        ExtendableState storage state = ExtendableStorage._getState();
+        return state.implementedInterfaceIds;
+    }
+
+    /**
+     * @dev see {IExtendLogic-getExtensionsFunctionSelectors}
+    */
+    function getExtensionsFunctionSelectors() override public view returns(bytes4[] memory functionSelectors) {
+        ExtendableState storage state = ExtendableStorage._getState();
+        bytes4[] storage implementedInterfaces = state.implementedInterfaceIds;
+        
+        uint256 numberOfFunctions = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+                numberOfFunctions += state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+        }
+
+        functionSelectors = new bytes4[](numberOfFunctions);
+        uint256 counter = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+            uint256 functionNumber = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+            for (uint256 j = 0; j < functionNumber; j++) {
+                functionSelectors[counter] = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]][j];
+                counter++;
+            }
+        }
+    }
+
+    /**
+     * @dev see {IExtendLogic-getExtensionAddresses}
+    */
+    function getExtensionAddresses() override public view returns(address[] memory) {
+        ExtendableState storage state = ExtendableStorage._getState();
+        address[] memory addresses = new address[](state.implementedInterfaceIds.length);
+        
+        for (uint i = 0; i < state.implementedInterfaceIds.length; i++) {
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
+            addresses[i] = state.extensionContracts[interfaceId];
+        }
+        return addresses;
+    }
+
+    /**
+     * @dev Sets the owner of the contract to the tx origin if unset
+     *
+     * Used by Extendable during first extend to set deployer as the owner that can
+     * extend the contract
+    */
+    function initialise() internal {
+        RoleState storage state = Permissions._getState();
+
+        // Set the owner to the transaction sender if owner has not been initialised
+        if (state.owner == address(0x0)) {
+            state.owner = _lastCaller();
+            emit OwnerInitialised(_lastCaller());
+        }
+    }
+
+    function registerInterfaces(Interface[] memory interfaces, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each interface as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfInterfacesImplemented = interfaces.length;
+        for (uint256 i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = interfaces[i].interfaceId;
+            address implementer = state.extensionContracts[interfaceId];
+
+            require(
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaceId)), 4)," is already implemented by ", Strings.toHexString(implementer)))
+            );
+
+            registerFunctions(interfaceId, interfaces[i].functions, extension);
+            state.extensionContracts[interfaceId] = extension;
+            state.implementedInterfaceIds.push(interfaceId);
+        }
+    }
+
+    function registerFunctions(bytes4 interfaceId, bytes4[] memory functionSelectors, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each function as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfFunctions = functionSelectors.length;
+        for (uint256 i = 0; i < numberOfFunctions; i++) {
+            address implementer = state.extensionContracts[functionSelectors[i]];
+
+            require(
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functionSelectors[i])), 4)," is already implemented by ", Strings.toHexString(implementer)))
+            );
+
+            state.extensionContracts[functionSelectors[i]] = extension;
+            state.implementedFunctionsByInterfaceId[interfaceId].push(functionSelectors[i]);
+        }
+    }
+}
+```
+
+#### RetractLogic Extension
+
+RetractLogic is an Extension that _removes_ an Extension from an Extendable.
+
+`RetractLogic` MUST implement `Extension`.
+
+`RetractLogic` MUST use `ExtendableStorage`.
+`RetractLogic` MAY use `PermissioningStorage`.
+`RetractLogic` SHOULD emit a `Retracted(address extension)` event upon successful `retract` call.
+
+The `retract` function body MUST be used as is, but if a different permissioning model is used, the modifier `onlyOwnerOrSelf` can be changed.
+
+```solidity
+
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Interface for RetractLogic extension
+*/
+interface IRetractLogic {
+    /**
+     * @dev Emitted when `extension` is successfully removed
+     */
+    event Retracted(address extension);
+
+    /**
+     * @dev Removes an extension from your Extendable contract
+     *
+     * Requirements:
+     * - `extension` must be an attached extension
+    */
+    function retract(address extension) external;
+}
+
+/**
+ * @dev Abstract Extension for RetractLogic
+*/
+abstract contract RetractExtension is IRetractLogic, Extension {
+    /**
+     * @dev see {IExtension-getSolidityInterface}
+    */
+    function getSolidityInterface() override virtual public pure returns(string memory) {
+        return  "function retract(address extension) external;\n";
+    }
+
+    /**
+     * @dev see {IExtension-getImplementedInterfaces}
+    */
+    function getInterface() override virtual public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](1);
+        functions[0] = IRetractLogic.retract.selector;
+
+        interfaces[0] = Interface(
+            type(IRetractLogic).interfaceId,
+            functions
+        );
+    }
+}
+
+/**
+ * @dev Reference implementation for RetractLogic which defines the logic to remove Extensions from
+ *      Extendable contracts
+*/
+contract RetractLogic is RetractExtension {
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
+    /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwnerOrSelf {
+        address owner = Permissions._getState().owner;
+        require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
+        _;
+    }
+
+    /**
+     * @dev see {IRetractLogic-retract}
+    */
+    function retract(address extension) override external virtual onlyOwnerOrSelf {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Search for extension in interfaceIds
+        uint256 numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+        bool hasMatch;
+
+        // we start with index 1 and reduce by one due to line 43 shortening the array
+        // we need to decrement the counter if we shorten the array, but uint cannot be < 0
+        for (uint i = 1; i < numberOfInterfacesImplemented + 1; i++) {
+            uint256 decrementedIndex = i - 1;
+            bytes4 interfaceId = state.implementedInterfaceIds[decrementedIndex];
+            address currentExtension = state.extensionContracts[interfaceId];
+
+            // Check if extension matches the one we are looking for
+            if (currentExtension == extension) {
+                hasMatch = true;
+                // Remove interface implementor
+                delete state.extensionContracts[interfaceId];
+                state.implementedInterfaceIds[decrementedIndex] = state.implementedInterfaceIds[numberOfInterfacesImplemented - 1];
+                state.implementedInterfaceIds.pop();
+
+                // Remove function selector implementor
+                uint256 numberOfFunctionsImplemented = state.implementedFunctionsByInterfaceId[interfaceId].length;
+                for (uint j = 0; j < numberOfFunctionsImplemented; j++) {
+                    bytes4 functionSelector = state.implementedFunctionsByInterfaceId[interfaceId][j];
+                    delete state.extensionContracts[functionSelector];
+                }
+                delete state.implementedFunctionsByInterfaceId[interfaceId];
+
+                numberOfInterfacesImplemented--;
+                i--;
+            }
+        }
+
+        if (!hasMatch) {
+            revert("Retract: specified extension is not an extension of this contract, cannot retract");
+        }
+
+        emit Retracted(extension);
+    }
+}
+```
+
+#### ReplaceLogic Extension
+
+ReplaceLogic is an Extension that _removes_ an Extension and _extends_ another to an Extendable.
+
+`ReplaceLogic` MUST implement `Extension`.
+
+`ReplaceLogic` MUST use `RetractLogic`.
+`ReplaceLogic` MUST use `ExtendLogic`.
+`ReplaceLogic` SHOULD emit a `Replaced(address oldExtension, address newExtension)` event upon successful `replace` call.
+
+The `replace` function body MUST be used as is, but if a different permissioning model is used, the modifier `onlyOwner` can be changed.
+
+The `replace` function uses a combination of the retract and extend extensions, re-using their logic for removing and adding extensions to avoid replicating code, and also avoiding potential issues introduced with new code. If used to replace the `ExtendLogic` extension, the below implementation ensures that the replacement implements an identical interface to ensure that the extend functionality is not mistakenly lost. The reference implementation repository also includes a `StrictReplaceLogic` which restricts all replacements to identical interfaces in the case where you want to strictly enforce an implementation change, but not an interface change.
+
+```solidity
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Interface for ReplaceLogic extension
+*/
+interface IReplaceLogic {
+    /**
+     * @dev Emitted when `extension` is successfully extended
+     */
+    event Replaced(address oldExtension, address newExtension);
+
+    /**
+     * @dev Replaces `oldExtension` with `newExtension`
+     *
+     * Performs consecutive execution of retract and extend.
+     * First the old extension is retracted using RetractLogic.
+     * Second the new extension is attached using ExtendLogic.
+     *
+     * Since replace does not add any unique functionality aside from a
+     * composition of two existing functionalities, it is best to make use
+     * of those functionalities, hence the re-use of RetractLogic and 
+     * ExtendLogic.
+     * 
+     * However, if custom logic is desired, exercise caution during 
+     * implementation to avoid conflicting methods for add/removing extensions
+     *
+     * Requirements:
+     * - `oldExtension` must be an already attached extension
+     * - `newExtension` must be a contract that implements IExtension
+    */
+    function replace(address oldExtension, address newExtension) external;
+}
+
+/**
+ * @dev Abstract Extension for RetractLogic
+*/
+abstract contract ReplaceExtension is IReplaceLogic, Extension {
+    /**
+     * @dev see {IExtension-getSolidityInterface}
+    */
+    function getSolidityInterface() override virtual public pure returns(string memory) {
+        return  "function replace(address oldExtension, address newExtension) external;\n";
+    }
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
+    function getInterface() override virtual public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](1);
+        functions[0] = IReplaceLogic.replace.selector;
+
+        interfaces[0] = Interface(
+            type(IReplaceLogic).interfaceId,
+            functions
+        );
+    }
+}
+
+/**
+ * @dev Reference implementation for ReplaceLogic which defines a basic extension
+ *      replacement algorithm.
+*/
+contract ReplaceLogic is ReplaceExtension {
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
+    /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwner {
+        address owner = Permissions._getState().owner;
+        require(_lastCaller() == owner, "unauthorised");
+        _;
+    }
+
+    /**
+     * @dev see {IReplaceLogic-replace} Replaces any old extension with any new extension.
+     *
+     * Uses RetractLogic to remove old and ExtendLogic to add new.
+     *
+     * If ExtendLogic is being replaced, ensure that the new extension implements IExtendLogic
+     * and use low-level calls to extend.
+    */
+    function replace(address oldExtension, address newExtension) public override virtual onlyOwner {
+        // Initialise both prior to state change for safety
+        IRetractLogic retractLogic = IRetractLogic(payable(address(this)));
+        IExtendLogic extendLogic = IExtendLogic(payable(address(this)));
+
+        // Remove old extension by using current retract logic instead of implementing conflicting logic
+        retractLogic.retract(oldExtension);
+
+        // Attempt to extend with new extension
+        try extendLogic.extend(newExtension) {
+            // success
+        } catch Error(string memory reason) {
+            revert(reason);
+        } catch (bytes memory err) { // if it fails, check if this is due to extend being replaced
+            if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
+                require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
+
+                IExtension old = IExtension(payable(oldExtension));
+                IExtension newEx = IExtension(payable(newExtension));
+
+                Interface[] memory oldInterfaces = old.getInterface();
+                Interface[] memory newInterfaces = newEx.getInterface();
+
+                // require the interfaceIds implemented by the old extension is equal to the new one
+                bytes4 oldFullInterface = oldInterfaces[0].interfaceId;
+                bytes4 newFullInterface = newInterfaces[0].interfaceId;
+
+                for (uint256 i = 1; i < oldInterfaces.length; i++) {
+                    oldFullInterface = oldFullInterface ^ oldInterfaces[i].interfaceId;
+                }
+
+                for (uint256 i = 1; i < newInterfaces.length; i++) {
+                    newFullInterface = newFullInterface ^ newInterfaces[i].interfaceId;
+                }
+                
+                require(
+                    newFullInterface == oldFullInterface, 
+                    "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces"
+                );
+                
+                // use raw delegate call to re-extend the extension because we have just removed the Extend function
+                (bool extendSuccess, ) = newExtension.delegatecall(abi.encodeWithSignature("extend(address)", newExtension));
+                require(extendSuccess, "Replace: failed to replace extend");
+            } else {
+                uint errLen = err.length;
+                assembly {
+                    revert(err, errLen)
+                }
+            }
+        }
+
+        emit Replaced(oldExtension, newExtension);
+    }
+}
+```
+
+#### PermissioningLogic Extension
+
+PermissioningLogic is an OPTIONAL Extension that provides an ownership pattern for Extendable contracts. It is the default permissioning model used by Extendable.
+
+`PermissioningLogic` MUST implement `Extension`.
+
+`PermissioningLogic` MUST use `PermissioningStorage`.
+
+To implement a different permissioning model, define a new `PermissioningStorage` variable structure to add different roles.
+
+```solidity
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Interface for PermissioningLogic extension
+*/
+interface IPermissioningLogic {
+    /**
+     * @dev Emitted when `owner` is updated in any way
+     */
+    event OwnerUpdated(address newOwner);
+
+    /**
+     * @dev Initialises the `owner` of the contract as `msg.sender`
+     *
+     * Requirements:
+     * - `owner` cannot already be assigned
+    */
+    function init() external;
+
+    /**
+     * @notice Updates the `owner` to `newOwner`
+    */
+    function updateOwner(address newOwner) external;
+
+    /**
+     * @notice Give up ownership of the contract.
+     * Proceed with extreme caution as this action is irreversible!!
+     *
+     * Requirements:
+     * - can only be called by the current `owner`
+    */
+    function renounceOwnership() external;
+
+    /**
+     * @notice Returns the current `owner`
+    */
+    function getOwner() external view returns(address);
+}
+
+/**
+ * @dev Abstract Extension for PermissioningLogic
+*/
+abstract contract PermissioningExtension is IPermissioningLogic, Extension {
+    /**
+     * @dev see {IExtension-getSolidityInterface}
+    */
+    function getSolidityInterface() override virtual public pure returns(string memory) {
+        return  "function init() external;\n"
+                "function updateOwner(address newOwner) external;\n"
+                "function renounceOwnership() external;\n"
+                "function getOwner() external view returns(address);\n";
+    }
+
+    /**
+     * @dev see {IExtension-getInterface}
+    */
+    function getInterface() override virtual public returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](4);
+        functions[0] = IPermissioningLogic.init.selector;
+        functions[1] = IPermissioningLogic.updateOwner.selector;
+        functions[2] = IPermissioningLogic.renounceOwnership.selector;
+        functions[3] = IPermissioningLogic.getOwner.selector;
+
+        interfaces[0] = Interface(
+            type(IPermissioningLogic).interfaceId,
+            functions
+        );
+    }
+}
+
+/**
+ * @dev Reference implementation for PermissioningLogic which defines the logic to control
+ *      and define ownership of contracts
+ *
+ * Records address as `owner` in the PermissionStorage module. Modifications and access to 
+ * the module affect the state wherever it is accessed by Extensions and can be read/written
+ * from/to by other attached extensions.
+ *
+ * Currently used by the ExtendLogic reference implementation to restrict extend permissions
+ * to only `owner`. Uses a common function from the storage library `_onlyOwner()` as a
+ * modifier replacement. Can be wrapped in a modifier if preferred.
+*/
+contract PermissioningLogic is PermissioningExtension {
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
+    /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwner {
+        address owner = Permissions._getState().owner;
+        require(_lastCaller() == owner, "unauthorised");
+        _;
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-init}
+    */
+    function init() override public {
+        RoleState storage state = Permissions._getState();
+        require(state.owner == address(0x0), "PermissioningLogic: already initialised"); // make sure owner has yet to be set for delegator
+        state.owner = _lastCaller();
+
+        emit OwnerUpdated(_lastCaller());
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-updateOwner}
+    */
+    function updateOwner(address newOwner) override public onlyOwner {
+        require(newOwner != address(0x0), "new owner cannot be the zero address");
+        RoleState storage state = Permissions._getState();
+        state.owner = newOwner;
+
+        emit OwnerUpdated(newOwner);
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-renounceOwnership}
+    */
+    function renounceOwnership() override public onlyOwner {
+        address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+        RoleState storage state = Permissions._getState();
+        state.owner = NULL_ADDRESS;
+
+        emit OwnerUpdated(NULL_ADDRESS);
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-getOwner}
+    */
+    function getOwner() override public view returns(address) {
+        RoleState storage state = Permissions._getState();
+        return(state.owner);
+    }
+}
+```
+
+### Default Storage Modules
+
+#### ExtendableStorage
+
+This is the reference implementation of `ExtendableStorage` that MUST be used by `Extendable`, `ExtendLogic` and `RetractLogic`.
+
+```solidity
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Storage struct used to hold state for Extendable contracts
+ */
+struct ExtendableState {
+    // Array of full interfaceIds extended by the Extendable contract instance
+    bytes4[] implementedInterfaceIds;
+
+    // Array of function selectors extended by the Extendable contract instance
+    mapping(bytes4 => bytes4[]) implementedFunctionsByInterfaceId;
+
+    // Mapping of interfaceId/functionSelector to the extension address that implements it
+    mapping(bytes4 => address) extensionContracts;
+}
+
+/**
+ * @dev Storage library to access storage slot for the state struct
+ */
+library ExtendableStorage {
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:extendable-state");
+
+    function _getState()
+        internal 
+        view
+        returns (ExtendableState storage extendableState) 
+    {
+        bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
+        assembly {
+            extendableState.slot := position
+        }
+    }
+}
+```
+
+#### PermissioningStorage
+
+This is the reference implementation of `ExtendableStorage` that MUST be used by `Extendable`, `ExtendLogic` and `RetractLogic`.
+
+```solidity
+pragma solidity ^0.8.4;
+
+/**
+ * @dev Storage struct used to hold state for Permissioning roles
+ */
+struct RoleState {
+    address owner;
+    // Can add more for DAOs/multisigs or more complex role capture for example:
+    // address admin;
+    // address manager:
+}
+
+/**
+ * @dev Storage library to access storage slot for the state struct
+ */
+library Permissions {
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:permissions-state");
+
+    function _getState()
+        internal 
+        view
+        returns (RoleState storage roleState) 
+    {
+        bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
+        assembly {
+            roleState.slot := position
+        }
+    }
+}
+```
+
+### Utilities
+
+#### CallerContext
 
 Usage of `msg.sender` MUST NOT be used in Extension contracts. This is replaced by more expressive `_lastExternalCaller` and `_lastCaller` functions made available by the `CallerContext` contract.
 
