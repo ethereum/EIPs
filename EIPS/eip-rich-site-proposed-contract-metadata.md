@@ -6,7 +6,7 @@ author: Dan Finlay (@danfinlay)
 discussions-to: https://ethereum-magicians.org/t/eip-rich-site-proposed-contract-metadata/9635
 status: Draft
 type: Standards Track
-category: Interface
+category: ERC
 created: 2022-06-15
 ---
 
@@ -52,6 +52,7 @@ Any method that involves an address MAY include a new OPTIONAL parameter `propos
 `contractId` would be some kind of cross chain address format.
 `ContractData` would be some kind of type that is enough to render transaction names for methods called.
   - Today TX Insight uses a full Truffle Decoder output to render this, which includes lots of compiler info that we would not need here.
+
 ```typescript
 type TxOptionsEnhancement = {
   proposedContracts: {
@@ -62,7 +63,8 @@ type TxOptionsEnhancement = {
     }
   }
 }
-```
+e```
+
 Wallets MUST store the recommending site & time along with this data for forensic purposes.
 The user SHOULD be able to adjust the proposed names in the confirmation, to avoid collisions, and help personalize their local context.
 Any subsequent confirmations that are displaying the proposed contracts' names SHOULD show the proposed names.
