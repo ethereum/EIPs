@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity >=0.7.0 <0.9.0;
 
@@ -22,7 +22,7 @@ interface GnosisSafe {
 ///      part and compare it to the stealthRecipient address. If machting, the respective users can be sure
 ///      to have the corresponding private key to access the funds. 
 /// @notice PubStealthInfoContract MUST be a immutable implementation, shared accross every type of asset that 
-///         may be transfered using the stealth address mech
+///         may be transferred using the stealth address mech
 contract PubStealthInfoContract {
 
     event PrivateTransferInfo(address indexed stealthRecipient, bytes publishableData);
