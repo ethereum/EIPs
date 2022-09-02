@@ -192,10 +192,9 @@ External resources are resources that are hosted outside of the EIPs repository.
 - Links in `Living`, `Meta`, or `Informational` EIPs are allowed
 - Links to exact commits hosted on GitHub **MUST** be allowed if they are from one of the following repositories:
   - `ethereum/EIPs`
-  - `ethereum/go-ethereum`
   - `ethereum/execution-specs`
   - `ethereum/consensus-specs`
-- Links to Ethereum Magicians **MUST** be allowed
+- Links to Ethereum Magicians **MUST** be allowed in the `discussions-to` preamble
 - Links with an appropriate backup in the assets folder **MAY** be allowed
 - Links to external resources **SHOULD NOT** be included if one of the above rules does not apply
 
