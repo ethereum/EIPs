@@ -21,7 +21,7 @@ interface GnosisSafe {
 ///      if they were the recipient of a transfer. Users can derive a key pair from the publishableData
 ///      part and compare it to the stealthRecipient address. If machting, the respective users can be sure
 ///      to have the corresponding private key to access the funds. 
-/// @notice PubStealthInfoContract MUST be a immutable implementation, shared accross every type of asset that 
+/// @notice PubStealthInfoContract MUST be an immutable implementation, shared across every type of asset that 
 ///         may be transferred using the stealth address mech
 contract PubStealthInfoContract {
 
