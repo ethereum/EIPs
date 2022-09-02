@@ -139,7 +139,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
-`adoptable`: *One of `true` or `false`.* (Optional field, but highly recommended)
+`adoptable`: *One of `true` or `false`.* (Optional field, but highly recommended to be set to `true`. Defaults to `false`)
 
 Headers that permit lists must separate elements with commas.
 
