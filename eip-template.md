@@ -11,7 +11,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 ---
 
 <!--
-  READ EIP-1 BEFORE USING THIS TEMPLATE!
+  READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
 
   This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
 
