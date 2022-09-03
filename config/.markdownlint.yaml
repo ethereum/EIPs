@@ -62,7 +62,7 @@ MD020: true
 MD021: true
 
 # MD022/blanks-around-headings/blanks-around-headers - Headings should be surrounded by blank lines
-MD022: false
+MD022: true
 
 # MD023/heading-start-left/header-start-left - Headings must start at the beginning of the line
 MD023: true
