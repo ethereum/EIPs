@@ -196,7 +196,8 @@ External resources are resources that are hosted outside of the EIPs repository.
   - `ethereum/consensus-specs`
 - Links to Ethereum Magicians **MUST** be allowed in the `discussions-to` preamble
 - Links with an appropriate backup in the assets folder **MAY** be allowed
-- Links to external resources **SHOULD NOT** be included if one of the above rules does not apply
+- Links to external resources **MUST** be included if they are normative.  They **MAY** be included otherwise, subject to editorial and peer review.
+- Links to external resources **MUST** include a full citation.  E.g. [Welch, T., "A Technique for High-Performance Data Compression", IEEE Computer 17(6), DOI 10.1109/MC.1984.1659158, June 1984](https://ieeexplore.ieee.org/document/1659158.)
 
 If you feel that a link you wish to include shouldn't violate the above rules, please submit a Pull Request to change them. Remember that the smaller and more specific the change, the more likely it will be accepted.
 
