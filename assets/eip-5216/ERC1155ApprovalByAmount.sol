@@ -26,7 +26,7 @@ interface IERC1155ApprovalByAmount is IERC1155 {
     function approve(address operator, uint256 id, uint256 amount) external;
 
     /**
-     * @notice Returns the amount allocated to `operator` approved to transfer ``account``'s tokens, according to `id`.
+     * @notice Returns the amount allocated to `operator` approved to transfer `account`'s tokens, according to `id`.
      */
     function allowance(address account, address operator, uint256 id) external view returns (uint256);
     
