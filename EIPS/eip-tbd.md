@@ -1,0 +1,76 @@
+---
+eip: <to be assigned>
+title: Restrict Web3 Provider Object API Injection
+description: Wallet guidance for restricting web3 provider object API access to secure contexts for improved privacy and security for wallet users.
+author: Yan Zhu (@diracdeltas), Brian R. Bondy (@bbondy), Kyle Den Hartog (@kdenhartog)
+discussions-to:  https://ethereum-magicians.org/t/rfc-limiting-provider-object-injection-to-secure-contexts/10670
+status: Draft
+type: Standards Track
+category (*only required for Standards Track): Interface
+created: 2022-09-05
+requires (*optional): <EIP number(s)>
+---
+
+## Abstract
+
+Historically the web platform has had a notion of “powerful” APIs like [geolocation](https://www.w3.org/TR/geolocation/) and [camera/microphone](https://www.w3.org/TR/mediacapture-streams/), which are subject to additional security restrictions such as those defined by [secure contexts](https://www.w3.org/TR/secure-contexts/). Since the web3 provider object APIs allow dApp websites to request access to sensitive user data and to request use of user funds, new web3 provider object APIs generally should align to the security considerations of other powerful APIs like geolocation.
+
+## Motivation
+
+Wallets are oftentimes maintaining security and safety of users' funds that can be equivalent to large portions of money. For this reason, it's a good idea to restrict access to the APIs that grant this access in certain contexts to align it more closely with the principles followed for web platform APIs given web3 provider object APIs are often extending this platform via extensions. By adding in restrictions to where extensions inject their APIs, we're reducing the surface area that malicious web pages could fingerprint or falsely request access to the web3 provider object APIs to harm users by accessing their data or stealing their web3 assets.
+
+## Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Restrictions for providers
+
+The provider objects, e.g. `window.ethereum`, are not provided in all contexts. The following restrictions are REQUIRED for conformant wallets:
+
+- Provider objects SHOULD NOT be accessible in private (incognito) windows.
+- The origin MUST be a [secure origin](https://www.chromium.org/Home/chromium-security/prefer-secure-origins-for-powerful-new-features/#definitions) to have access to `window.ethereum`. This can be checked using `window.isSecureContext`, including inside iframes.
+    - Secure contexts include sites that are served from HTTPS but also HTTP `localhost`.
+- By default the web3 provider object APIs MUST NOT be exposed to 3p iframes.
+- `window.ethereum` MUST be `undefined` in an iframe where `window.isSecureContext` returns `false` in that iframe.
+- If the iframe is first-party to the top-level origin AND the `sandbox` attribute is set on the iframe, the provider object MUST be left `undefined`. If `sandbox="allow-same-origin"` attribute is set the provider object MAY be injected. 
+    - Note "allow-same-origin"` does nothing if the iframe is third-party.
+
+## Rationale
+
+By limiting the capabilities of where the web3 provider object APIs are being injected we can reduce the surface area of where attacks can be executed.Given the sensitivity of data that's passed to the web3 provider object APIs some basic levels of authentication and confidentiality should be met in order to ensure that request data is not being intercepted or tampered with. While there has been attempts to [limit request access via the wallet](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2255.md) interface itself there's not been limitations that have been set to where these web3 provider object APIs are expected to be or not be injected. Since the secure contexts web platform API is a well developed boundary that's been recommended by W3C and the fact that the web3 provider object APIs are extending the traditional web platform APIs, no other alternative solutions have been considered in order to extend current established prior art.
+
+
+## Backwards Compatibility
+
+Wallet extensions SHOULD consider adding a "developer mode" toggle via a UX so that dApp developers have the capability to disable the insecure context (http) check for the http://localhost:<any-port> origin only in the event that [localhost does not return `true` for secure context](https://www.w3.org/TR/secure-contexts/#localhost). This will allow dApp developers to be able to continue to host dApps on the localhost origin if a browser environment has chosen to not already consider localhost a secure context. Most major browser providers do consider localhost a secure context already. This toggle MUST be set to disabled by default.
+
+## Test Cases
+
+- Top level `http://a.com` -> blocked (insecure)
+- Top level `https://a.com` -> allowed
+- Top level `https://a.com` with `<iframe src="http://a.com/">` -> blocked (insecure/3p)
+- Top level `http://a.com` with `<iframe src="https://a.com/">` -> blocked (insecure/3p)
+- Top level `https://a.com` with `<iframe src="https://a.com">` -> allowed
+- Top level `https://a.com` with `<iframe src="https://b.com">` -> blocked (3p)
+- Top level `https://b.com` with `<iframe src="http://a.com/">` with `<iframe src="https://b.com">` -> blocked (insecure)
+- Top level `https://b.com` with `<iframe src="https://a.com">` with `<iframe src="https://b.com">` -> blocked (3p)
+- Top level `https://a.com` with `<iframe src="https://b.a.com">` -> blocked (3p)
+- Top level `https://a.com` with `<iframe src="https://a.com" sandbox>` -> blocked (sandbox)
+- Top level `https://a.com` with `<iframe src="https://a.com" sandbox="allow-same-origin allow-scripts">` -> allowed (but note this case is discouraged in https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox because it’d allow the iframe to remove its own sandbox attribute)
+- Top level `data://foo with <iframe src="data://bar">` -> blocked (insecure)
+- Top level `file://foo with <iframe src="file://bar">` -> blocked (3p)
+- Top level `https://a.com` with `<iframe src="https://b.com" sandbox="allow-same-origin allow-scripts">` -> blocked (3p)
+
+## Reference Implementation
+
+Test suite link needs to be created and linked here still.
+
+## Security Considerations
+
+### User Enables Developer Mode 
+
+Oftentimes developers require the ability to develop dApps locally in order to test their website and develop while hosting their dApp on http://localhost. In this case localhost would be blocked and compatibility issues would arise when developing a dApp locally. In order to increase compatibility for dApp developers a toggle to disable the check for the localhost can be considered. If this were to be extended beyond the localhost origin it could be used as a means to convince users to enable developer mode in order to subvert the guards put in place by this EIP. Therefore, implementations should be cautious when extending this developer toggle beyond the scope of the localhost origin.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
