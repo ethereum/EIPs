@@ -1,9 +1,7 @@
 /*
 Vault
 
-https://github.com/devinaconley/token-hold-example
-
-SPDX-License-Identifier: MIT
+SPDX-License-Identifier: CC0-1.0
 */
 
 pragma solidity ^0.8.0;
@@ -12,10 +10,6 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 import "./IERC721Holder.sol";
-
-import "hardhat/console.sol";
-import "./IERC1155Holder.sol";
-import "./IERC20Holder.sol";
 
 /**
  * @title Vault
@@ -41,11 +35,6 @@ contract Vault is ERC165, IERC721Holder {
   constructor(address token_, uint256 timelock_) {
     token = IERC721(token_);
     timelock = timelock_;
-    //  console.log("IERC20Holder id: %d", uint256());
-  }
-
-  function debug() public view returns (bytes4) {
-    return type(IERC1155Holder).interfaceId;
   }
 
   /**
