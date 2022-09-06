@@ -16,7 +16,7 @@ interface IERC5516 {
         address indexed operator,
         address indexed account,
         bool[] actions,
-        uint256[] indexed ids
+        uint256[] ids
     );
 
     /**
