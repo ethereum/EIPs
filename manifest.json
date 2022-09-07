@@ -1,0 +1,9 @@
+{
+  "name": "Ethereum Improvement Proposals",
+  "short_name": "0",
+  "theme_color": "#2196f3",
+  "background_color": "#ffffff",
+  "display": "browser",
+  "scope": "{{ site.baseurl }}",
+  "start_url": "{{ site.baseurl }}"
+}
