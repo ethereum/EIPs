@@ -1,0 +1,12 @@
+---
+layout: default
+---
+
+{{ content }}
+
+<link href="{{ site.baseurl }}/manifest.json" rel="manifest">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('{{ site.baseurl }}/service-worker.js');
+}
+</script>
