@@ -43,7 +43,7 @@ MD011: true
 MD012: false
 
 # MD013/line-length - Line length
-# Changed from default due to the fact that paragraphs should be on a single line.
+# Changed from default so we can allow the paragraphs to be a single line
 MD013: false
 
 # MD014/commands-show-output - Dollar signs used before commands without showing output
