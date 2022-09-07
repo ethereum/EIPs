@@ -369,7 +369,7 @@ contract ERC5516 is Context, ERC165, IERC1155, IERC1155MetadataURI, IERC5516 {
     }
 
     /**
-     * Transfers `_id` token from `_from` to every address at `_to[]`.
+     * Transfers `id` token from `from` to every address at `to[]`.
      *
      * Requirements:
      * - See {eip-5516-safeMultiTransfer}.

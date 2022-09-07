@@ -1,0 +1,13 @@
+name: Do you want to propose a change to the EIP process itself?
+description: Use this if you want to propose changes to the EIP process
+labels: ['enhancement']
+
+body:
+  - type: textarea
+    id: proposed-change
+    attributes:
+      label: Proposed Change
+      description: What do you think should be different?
+      placeholder: Describe your proposed change here
+    validations:
+      required: true
