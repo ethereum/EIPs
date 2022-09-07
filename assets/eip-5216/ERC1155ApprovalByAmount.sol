@@ -26,7 +26,7 @@ interface IERC1155ApprovalByAmount is IERC1155 {
     function approve(address operator, uint256 id, uint256 amount) external;
 
     /**
-     * @notice Returns the amount allocated to `operator` approved to transfer ``account``'s tokens, according to `id`.
+     * @notice Returns the amount allocated to `operator` approved to transfer `account`'s tokens, according to `id`.
      */
     function allowance(address account, address operator, uint256 id) external view returns (uint256);
     
@@ -44,7 +44,7 @@ abstract contract ERC1155ApprovalByAmount is ERC1155, IERC1155ApprovalByAmount {
      * @dev See {IERC1155ApprovalByAmount}
      */
     function approve(address operator, uint256 id, uint256 amount) public virtual {
-        _approve(_msgSender(), operator, id, amount);
+        _approve(msg.sender, operator, id, amount);
     }
 
     /**
@@ -65,11 +65,11 @@ abstract contract ERC1155ApprovalByAmount is ERC1155, IERC1155ApprovalByAmount {
         bytes memory data
     ) public override(IERC1155, ERC1155) {
         require(
-            from == _msgSender() || isApprovedForAll(from, _msgSender()) || allowance(from, _msgSender(), id) >= amount,
+            from == msg.sender || isApprovedForAll(from, msg.sender) || allowance(from, msg.sender, id) >= amount,
             "ERC1155: caller is not owner nor approved nor approved for amount"
         );
         unchecked {
-            _allowances[from][_msgSender()][id] -= amount;
+            _allowances[from][msg.sender][id] -= amount;
         }
         _safeTransferFrom(from, to, id, amount, data);
     }
@@ -85,7 +85,7 @@ abstract contract ERC1155ApprovalByAmount is ERC1155, IERC1155ApprovalByAmount {
         bytes memory data
     ) public virtual override(IERC1155, ERC1155) {
         require(
-            from == _msgSender() || isApprovedForAll(from, _msgSender()) || _checkApprovalForBatch(from, _msgSender(), ids, amounts),
+            from == msg.sender || isApprovedForAll(from, msg.sender) || _checkApprovalForBatch(from, msg.sender, ids, amounts),
             "ERC1155: transfer caller is not owner nor approved nor approved for some amount"
         );
         _safeBatchTransferFrom(from, to, ids, amounts, data);
