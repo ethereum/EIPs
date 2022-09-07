@@ -48,6 +48,11 @@ permalink: /:slug
 defaults:
   -
     scope:
+      path: ""
+    values:
+      layout: "base"
+  -
+    scope:
       path: "EIPS"
     values:
       layout: "eip"
