@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Composable Soulbound NFT, EIP-1155 Extension
 description: Add composable soulbound property to EIP-1155 tokens
 author: HonorLabs (@honorworldio)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/composable-soulbound-nft-eip-1155-extension/10773
 status: Draft
 type: Standards Track
 category: ERC
