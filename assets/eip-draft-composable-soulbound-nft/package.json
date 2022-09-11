@@ -1,8 +1,0 @@
-{
-  "name": "eip-multi-soulbound-token",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
-    "@openzeppelin/contracts": "^4.7.3",
-    "hardhat": "^2.11.0"
-  }
-}
