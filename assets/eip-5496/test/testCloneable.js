@@ -97,7 +97,7 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP2,
             true,
-            "privilage 2 available after NFT owner update the privilege total"
+            "privilege 2 available after NFT owner update the privilege total"
         );
     });
 
@@ -107,13 +107,13 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             cloneable_P2,
             false,
-            "privilage 2 should not be cloneable"
+            "privilege 2 should not be cloneable"
         );
         let cloneable_P3 = await demoContract.cloneable(3);
         assert.equal(
             cloneable_P3,
             true,
-            "privilage 3 should be cloneable"
+            "privilege 3 should be cloneable"
         );
         let expires = Math.floor(new Date().getTime()/1000) + 5000;
         await demoContract.setPrivilege(4, 3, Bob, BigInt(expires), { from: Alice });
@@ -131,7 +131,7 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP3,
             true,
-            "privilage 3 available after Bob cloned"
+            "privilege 3 available after Bob cloned"
         );
     });
 });
