@@ -16,7 +16,7 @@ interface IERC5516 {
         address indexed operator,
         address indexed account,
         bool[] actions,
-        uint256[] indexed ids
+        uint256[] ids
     );
 
     /**
@@ -25,7 +25,7 @@ interface IERC5516 {
     event TransferMulti(
         address indexed operator,
         address indexed from,
-        address[] indexed to,
+        address[] to,
         uint256 amount,
         uint256 id
     );
@@ -73,11 +73,11 @@ interface IERC5516 {
     ) external;
 
     /**
-     * @dev Transfers `_id` token from `_from` to every address at `_to[]`.
+     * @dev Transfers `id` token from `from` to every address at `to[]`.
      *
      * Requirements:
      *
-     * - `_from` MUST be the creator(minter) of `id`.
+     * - `from` MUST be the creator(minter) of `id`.
      * - All addresses in `to[]` MUST be non-zero.
      * - All addresses in `to[]` MUST have the token `id` under `_pendings`.
      * - All addresses in `to[]` MUST not own a token type under `id`.
