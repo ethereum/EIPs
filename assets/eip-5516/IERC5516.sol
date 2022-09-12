@@ -25,7 +25,7 @@ interface IERC5516 {
     event TransferMulti(
         address indexed operator,
         address indexed from,
-        address[] indexed to,
+        address[] to,
         uint256 amount,
         uint256 id
     );
