@@ -4,6 +4,7 @@ on:
       - opened
       - reopened
       - synchronize
+      - ready_for_review
   pull_request_review:
     types:
       - submitted
@@ -44,7 +45,7 @@ jobs:
 
       - name: Write PR Number - Comment Retrigger
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.issue.comment.body, '@eth-bot rerun')
+        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
         env:
           PR_NUMBER: ${{ github.event.issue.number }}
       
