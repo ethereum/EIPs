@@ -20,7 +20,8 @@ Memory copying is a basic operation, yet implementing it on the EVM comes with o
 
 This was recognised and alleviated early on with the introduction of the "identity" precompile, which accomplishes
 memory copying by the use of `CALL`'s input and output memory offsets. Its cost is `15 + 3 * (length / 32)` gas, plus
-the call overhead. The identity precompile was rendered ineffective by the raise of the cost of `CALL` to 700.
+the call overhead. The identity precompile was rendered ineffective by the raise of the cost of `CALL` to 700, but subsequently
+the reduction by EIP-2929 made it slightly more economical.
 
 Copying exact words can be accomplished with `<offset> MLOAD <offset> MSTORE` or `<offset> DUP1 MLOAD DUP2 MSTORE`,
 at a cost of at least 12 gas per word. This is fairly efficient if the offsets are known upfront and the copying can be unrolled.
@@ -69,7 +70,7 @@ Production implementation of [exact-word memory copying](https://github.com/ethe
 [partial-word memory copying](https://github.com/ethereum/solidity/blob/v0.8.0/libsolidity/codegen/CompilerUtils.cpp#L665) can be found in
 the Solidity compiler. 
 
-With [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929) the call overhead using the identity precompile will be reduced from 700 to 100 gas.
+With [EIP-2929](https://eips.ethereum.org/EIPS/eip-2929) the call overhead using the identity precompile was reduced from 700 to 100 gas.
 This is still prohibitive for making the precompile a reasonable alternative again.
 
 ## Backwards Compatibility
