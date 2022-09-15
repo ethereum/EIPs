@@ -1,9 +1,9 @@
 ---
 eip: unassigned
 title: Social Media URI Propagation Event
-description: A minimal standard to emit URI events for social media.
+description: A minimal primitive to emit URI events for social media.
 author: Tim Daubenschütz (@TimDaub), Auryn Macmillan (@auryn-macmillan)
-discussions-to: TBC
+discussions-to: https://ethereum-magicians.org/t/social-media-uri-propagation-event/10893
 status: Draft
 type: Standards Track
 category: ERC
