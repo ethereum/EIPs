@@ -1,6 +1,7 @@
 ---
 eip: <to be assigned>
 title: Memory copying instruction
+description: An efficient EVM instruction for copying memory areas
 author: Alex Beregszaszi (@axic), Paul Dworzanski (@poemm), Jared Wasinger (@jwasinger), Casey Detrio (@cdetrio), Pawel Bylica (@chfast)
 discussions-to: <tba>
 status: Draft
