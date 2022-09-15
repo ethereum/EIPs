@@ -38,11 +38,17 @@ As example use case, copying 256 bytes costs:
 - at least 96 gas using unrolled `MLOAD`/`MSTORE` instructions
 - 27 gas using this EIP
 
-According to [an analysis done by ipsilon](https://notes.ethereum.org/@ipsilon/evm-mcopy-analysis), roughly 10.5% of memory copies from blocks 10537502 to 10538702 would have had improved performance with the availability of an `MCOPY` instruction.
+According to [an analysis done by ipsilon](https://notes.ethereum.org/@ipsilon/evm-mcopy-analysis), roughly 10.5% of memory copies from
+blocks 10537502 to 10538702 would have had improved performance with the availability of an `MCOPY` instruction.
 
-Memory copying is used by languages like Solidity and Vyper, where we expect this improvement to provide efficient means of building data structures, including efficient sliced access and copies of memory objects. Having a dedicated `MCOPY` instruction would also add forward protection against future gas cost changes to `CALL` instructions in general.
+Memory copying is used by languages like Solidity and Vyper, where we expect this improvement to provide efficient means of building
+data structures, including efficient sliced access and copies of memory objects. Having a dedicated `MCOPY` instruction would also add
+forward protection against future gas cost changes to `CALL` instructions in general.
 
-Having a special `MCOPY` instruction makes the job of static analyzers and optimizers easier, since the effects of a `CALL` in general have to be fenced, whereas an `MCOPY` instruction would be known to only have memory effects. Even if special effects cases are added for precompiles, a future hard fork could change `CALL` effects, and so any analysis of code using the identity precompile would only be valid for a certain range of blocks(!).
+Having a special `MCOPY` instruction makes the job of static analyzers and optimizers easier, since the effects of a `CALL` in general
+have to be fenced, whereas an `MCOPY` instruction would be known to only have memory effects. Even if special effects cases are added
+for precompiles, a future hard fork could change `CALL` effects, and so any analysis of code using the identity precompile would only
+be valid for a certain range of blocks(!).
 
 Finally, we expect memory copying to be immensely useful for various computationally heavy operations, such as EVM384,
 where it is identified [as a significant overhead](https://notes.ethereum.org/@poemm/evm384-update5#Memory-Manipulation-Cost).
