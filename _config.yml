@@ -19,8 +19,9 @@ description: >-
   platform, including core protocol specifications, client APIs, and contract
   standards.
 url: "https://eips.ethereum.org"
-twitter_username: ethereum
 github_username:  ethereum
+repository: ethereum/EIPs
+
 header_pages:
  - all.html
  - core.html
@@ -29,9 +30,6 @@ header_pages:
  - erc.html
  - meta.html
  - informational.html
-twitter:
-  card: summary
-  username: ethereum
 
 # Build settings
 highlighter: rouge
@@ -67,3 +65,8 @@ exclude:
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
   - README.md
+  
+include:
+  - LICENSE
+
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"

@@ -4,6 +4,14 @@
 
 @import 'minima';
 
+.site-header {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .page-content {
   a.anchor-link {
     width: 16px;
@@ -18,6 +26,64 @@
 
 main.page-content {
   div.wrapper {
-    max-width: calc(1280px - (30px * 2));
+    max-width: unset;
   }
+}
+
+.footer-col-wrapper {
+  color: #111;
+}
+
+a, a:link {
+  color: #726E97;
+  text-decoration: none;
+  transition: 0.5s;
+}
+
+a:visited {
+  color: #8E6680;
+}
+
+a:hover, a:active {
+  color: #7F557D;
+  box-shadow: 0 3px 0 #7F557D;
+}
+
+.status {
+  border-radius: 6px;
+  line-height: 18px;
+  overflow: hidden;
+  padding: 12px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.draft {
+  @extend .status;
+  background-color: #fffbea;
+  border: solid 1px #f1c40f;
+}
+
+.review {
+  @extend .status;
+  background-color: #f0f7fb;
+  border: solid 1px #3498db;
+}
+
+.lastcall {
+  @extend .status;
+  background-color: #e7f6f0;
+  border: solid 1px #27ae60;
+}
+
+.stagnant {
+  @extend .status;
+  background-color: #ffdead;
+  border: solid 1px #ff6700;
+}
+
+.withdrawn {
+  @extend .status;
+  background-color: #f9e7e5;
+  border: solid 1px #c0392b;
 }
