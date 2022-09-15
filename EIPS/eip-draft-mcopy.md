@@ -57,12 +57,11 @@ It takes three arguments off the stack (1. represents the top of the stack):
 3. `length`
 
 It copies `length` bytes from the offset pointed at `src` to the offset pointed at `dst` in memory.
+Copying takes place as if an intermediate buffer were used, allowing the destination and source to overlap.
 
 If `length > 0` and (`src + length` or `dst + length`) is beyond the current memory length, the memory is extended with respective gas cost applied.
 
 The gas cost of this instruction mirrors that of other `Wcopy` instructions and is `Gverylow + Gcopy * ceil(length / 32)`.
-
-The memory effects of `<length> <src> <dst> MCOPY` should match `<length> <dst> DUP2 <src> PUSH1 0 PUSH1 4 GAS CALL` exactly. To clarify a particular ambiguity - if the source and destination buffers overlap, the semantics are more similar to libc's `memmove` than `memcpy` - that is, copying takes place as if the bytes were copied to a temporary buffer `buf`, and then the bytes were copied from the temporary buffer to dst.
 
 ## Rationale
 
