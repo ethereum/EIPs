@@ -36,7 +36,7 @@ As example use case, copying 256 bytes costs:
 - at least 757 gas pre-EIP-2929 using the identity precompile
 - at least 157 gas post-EIP-2929 using the identity precompile
 - at least 96 gas using unrolled `MLOAD`/`MSTORE` instructions
-- 33 gas using this EIP
+- 27 gas using this EIP
 
 According to [an analysis done by ipsilon](https://notes.ethereum.org/@ipsilon/evm-mcopy-analysis), roughly 10.5% of memory copies from blocks 10537502 to 10538702 would have had improved performance with the availability of an `MCOPY` instruction.
 
