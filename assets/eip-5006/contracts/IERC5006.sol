@@ -1,77 +1,86 @@
 // SPDX-License-Identifier: CC0-1.0
+
 pragma solidity ^0.8.0;
 
-interface IERC5006 /* is IERC165 */ {
-
+interface IERC5006 {
+    struct UserRecord {
+        uint256 tokenId;
+        address owner;
+        uint64 amount;
+        address user;
+        uint64 expiry;
+    }
     /**
-     * @dev Logged when the user of a NFT is changed 
-     *
-     * Requirements:
-     *
-     * - `operator` msg.sender
-     * - `from` the address that change usage rights from 
-     * - `to`  the address that change usage rights to 
-     * - `id`  token id
-     * - `value` token amount
+     * @dev Emitted when permission (for `user` to use `amount` of `tokenId` token owned by `owner`
+     * until `expiry`) is given.
      */
-    event UpdateUser(
-        address indexed operator,
-        address indexed from,
-        address indexed to,
-        uint256 id,
-        uint256 value
+    event CreateUserRecord(
+        uint256 recordId,
+        uint256 tokenId,
+        uint64 amount,
+        address owner,
+        address user,
+        uint64 expiry
     );
+    /**
+     * @dev Emitted when record of `recordId` is deleted. 
+     */
+    event DeleteUserRecord(uint256 recordId);
 
     /**
-     * @dev Returns the amount of tokens of token type `id` used by `user`.
-     *
-     * Requirements:
-     *
-     * - `user` cannot be the zero address.
+     * @dev Returns the usable amount of `tokenId` tokens  by `account`.
      */
-    function balanceOfUser(address user, uint256 id)
+    function usableBalanceOf(address account, uint256 tokenId)
         external
         view
         returns (uint256);
 
     /**
-     * @dev Returns the amount of tokens of token type `id` used by `user`.
-     *
-     * Requirements:
-     *
-     * - `user` cannot be the zero address.
-     * - `owner` cannot be the zero address.
-     */ 
-    function balanceOfUserFromOwner(
-        address user,
-        address owner,
-        uint256 id
-    ) external view returns (uint256);
-
-    /**
-     * @dev Returns the amount of frozen tokens of token type `id` by `owner`.
-     *
-     * Requirements:
-     *
-     * - `owner` cannot be the zero address.
+     * @dev Returns the amount of frozen tokens of token type `id` by `account`.
      */
-    function frozenAmountOfOwner(address owner, uint256 id)
+    function frozenBalanceOf(address account, uint256 tokenId)
         external
         view
         returns (uint256);
 
     /**
-     * @dev set the `user` of a NFT
+     * @dev Returns the `UserRecord` of `recordId`.
+     */
+    function userRecordOf(uint256 recordId)
+        external
+        view
+        returns (UserRecord memory);
+
+    /**
+     * @dev Gives permission to `user` to use `amount` of `tokenId` token owned by `owner` until `expiry`.
+     *
+     * Emits a {CreateUserRecord} event.
      *
      * Requirements:
      *
-     * - `user` The new user of the NFT, the zero address indicates there is no user
-     * - `amount` The new user could use
-     */ 
-    function setUser(
+     * - If the caller is not `owner`, it must be have been approved to spend ``owner``'s tokens
+     * via {setApprovalForAll}.
+     * - `owner` must have a balance of tokens of type `id` of at least `amount`.
+     * - `user` cannot be the zero address.
+     * - `amount` must be greater than 0.
+     * - `expiry` must after the block timestamp.
+     */
+    function createUserRecord(
         address owner,
         address user,
-        uint256 id,
-        uint256 amount
-    ) external;
+        uint256 tokenId,
+        uint64 amount,
+        uint64 expiry
+    ) external returns (uint256);
+
+    /**
+     * @dev Atomically delete `record` of `recordId` by the caller.
+     *
+     * Emits a {DeleteUserRecord} event.
+     *
+     * Requirements:
+     *
+     * - the caller must have allowance.
+     */
+    function deleteUserRecord(uint256 recordId) external;
 }
