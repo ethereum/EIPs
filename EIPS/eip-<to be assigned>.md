@@ -13,7 +13,7 @@ requires (*optional): <EIP number(s)>
 
 
 ## Abstract
-EIP-1617 is a subscribeable NFT standard that allows more platforms to directly use the interface to determine whether a user is still within the enjoyment time of a certain benefit
+721sub is a subscribeable NFT standard that allows more platforms to directly use the interface to determine whether a user is still within the enjoyment time of a certain benefit
 
 ## Motivation
 Web2 subscriptions are leased, not proprietary. You don't own a membership to your streaming audio subscription site Spotify, so you can't sell that membership. Since Apple takes a 30% commission from content providers, you're actually paying Apple's "platform tax." But this is just a preliminary idea, the following functions are what subscription NFTs can really do.
@@ -21,7 +21,7 @@ Web2 subscriptions are leased, not proprietary. You don't own a membership to yo
 
 ## Specification
 ```
-interface IERC1617 {
+interface IERC721sub {
     event TokenIsExpire(uint indexed tokenId);
 
     function tokenSubscribeExtend(uint _tokenID, uint _time) external payable;
@@ -58,7 +58,41 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 
 ## Reference Implementation
 ```
-code
+contract SubNFT is ERC721URIStorage, ERC1617, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIds;
+
+    constructor() ERC721("ERC1617", "1617") ERC1617(0.01 ether, 7 days) {}
+
+    /* Minting tokens for subscribable functionality */
+    function mintAndSubscribe(address player, string memory tokenURI)
+        public
+        payable
+        returns (uint256)
+    {
+        uint256 newItemId = _tokenIds.current();
+
+        _mint(player, newItemId);
+        _setTokenURI(newItemId, tokenURI);
+        _tokenSubscribeExtend(player, newItemId, 7 days);
+
+        _tokenIds.increment();
+        return newItemId;
+    }
+
+    /* Modify subscription configuration */
+    function changeSubscribeConfig(uint _time, uint _subscribePrice)
+        public
+        onlyOwner
+    {
+        _changeSubscribeConfig(_time, _subscribePrice);
+    }
+
+    /* User-based, subscription-as-a-service */
+    function someFunctionNeedSubscribeToService2() public onlySubscribeByUser {
+        // some service module
+    }
+}
 ```
 
 ## Security Considerations
