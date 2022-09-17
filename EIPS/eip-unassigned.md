@@ -1,5 +1,5 @@
 ---
-eip: unassigned
+eip: 5659
 title: Social Media URI Propagation Event
 description: A minimal primitive to emit URI events for social media.
 author: Tim Daubenschütz (@TimDaub), Auryn Macmillan (@auryn-macmillan)
