@@ -31,8 +31,8 @@ This repository contains an "auto merge" feature to ease the workload for EIP ed
 
 Pull requests in this repository must pass automated validation checks:
 
-* HTML formatting and broken links are [checked](https://github.com/ethereum/EIPs/blob/master/.travis-ci.sh) using [html-proofer](https://rubygems.org/gems/html-proofer).
-* EIP front matter and formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-merge-bot.yml) using [EIP Validator](https://github.com/ethereum/eipv).
+* HTML formatting and broken links are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml) using [html-proofer](https://rubygems.org/gems/html-proofer).
+* EIP front matter and formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml) using [EIP Validator](https://github.com/ethereum/eipv).
 
 It is possible to run the EIP validator locally:
 ```sh
