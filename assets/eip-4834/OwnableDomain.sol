@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OwnableDomain is IDomain, IDomainAccessControl, IDomainEnumerable, ERC165Storage, Ownable, ERC165Checker {
+contract OwnableDomain is IDomain, IDomainAccessControl, ERC165Storage, Ownable, ERC165Checker {
     //// States
     mapping(string => address) public subdomains;
     mapping(string => bool) public subdomainsPresent;
@@ -23,7 +23,6 @@ contract OwnableDomain is IDomain, IDomainAccessControl, IDomainEnumerable, ERC1
     constructor() {
         _registerInterface(type(IDomain).interfaceId);
         _registerInterface(type(IDomainAccessControl).interfaceId);
-        _registerInterface(type(IDomainEnumerable).interfaceId);
     }
 
 
@@ -36,10 +35,6 @@ contract OwnableDomain is IDomain, IDomainAccessControl, IDomainEnumerable, ERC1
     function getDomain(string memory name) public view returns (address) {
         require(this.hasDomain(name));
         return subdomains[name];
-    }
-
-    function listDomains() external view returns (string[] memory) {
-        return subdomainList;
     }
 
     function createDomain(string memory name, IDomain subdomain) public {
