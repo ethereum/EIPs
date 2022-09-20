@@ -44,4 +44,7 @@ An optional section that contains a reference/example implementation that people
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
 ## Copyright
-Copyright and related rights waived via [CC0](../LICENSE.md). Trademark and patent rights waived via the [EIP Patent Waiver](../PATENTS.md).
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+### Patent Waiver
+The authors hereby grant, and agree to grant, to any person or entity obtaining a copy of this EIP or any of its related assets, a non-exclusive, perpetual, irrevocable, worldwide, fully-paid, royalty-free, transferable patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer your Contributions, where such license applies only to those patent claims licensable by you that are necessarily infringed by your Contributions alone or by combination of your Contributions with the Project to which such Contributions were submitted, with the right to sublicense the foregoing rights through multiple tiers of sublicensees.
