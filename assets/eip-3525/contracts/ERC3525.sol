@@ -91,7 +91,7 @@ contract ERC3525 is IERC3525, IERC3525Metadata, ERC721Enumerable {
     function transferFrom( uint256 fromTokenId_, address to_, uint256 value_) public payable virtual override returns (uint256) {
         _spendAllowance(_msgSender(), fromTokenId_, value_);
 
-        uint256 newTokenId = _getNewTokenId();
+        uint256 newTokenId = _getNewTokenId(fromTokenId_);
         _mint(to_, newTokenId, _slots[fromTokenId_]);
         _transfer(fromTokenId_, newTokenId, value_);
 
@@ -178,7 +178,7 @@ contract ERC3525 is IERC3525, IERC3525Metadata, ERC721Enumerable {
         emit ApprovalValue(tokenId_, to_, value_);
     }
 
-    function _getNewTokenId() internal virtual returns (uint256)
+    function _getNewTokenId(uint256 fromTokenId_) internal virtual returns (uint256)
     {
         return ERC721Enumerable.totalSupply() + 1;
     }
