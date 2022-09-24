@@ -1,47 +1,18 @@
 ---
-eip: 3
-title: Addition of CALLDEPTH opcode
-author: Martin Holst Swende <martin@swende.se>
-status: Withdrawn
-type: Standards Track
-category: Core
-created: 2015-11-19
+eip: 2
+title: “Extitutional Scholars” Qualification Token
+description: An extitutional scholar is a person that understands the dynamics between institutions and extitutions; one that is acquainted with the basic notions of extitutional theory; but also one that has experienced extitutional dynamics in first person, and can therefore apply inductive knowledge into the more theoretical exploration of the principles of extitutionalisation.
+author: Primavera De Filippi <pdefilippi@cyber.harvard.edu>, Isaac Patka <@ipatka>
+status: Draft
+type: Qualification
+category: Interface
+created: 2022-09-22
 ---
 
-# Abstract
+## Minimum Requirements: 
 
-This is a proposal to add a new opcode, `CALLDEPTH`. The `CALLDEPTH` opcode would return the remaining available call stack depth.
+- **Qualification token**: There are no minimum requirements to become an extitutional scholar, except for having attended at least one extitutional workshop. The definition of extitutional workshop is to be left intentionally undefined. The only requirement for a person to qualify as an extitutional scholars is that the person be recognized as such by at least one qualified issuer of “extitutional scholar” tokens.
 
-# Motivation
-
-There is a limit specifying how deep contracts can call other contracts; the call stack. The limit is currently `256`. If a contract invokes another contract (either via `CALL` or `CALLCODE`), the operation will fail if the call stack depth limit has been reached.
-
-This behaviour makes it possible to subject a contract to a "call stack attack" [1]. In such an attack, an attacker first creates a suitable depth of the stack, e.g. by recursive calls. After this step, the attacker invokes the targeted contract. If the targeted calls another contract, that call will fail. If the return value is not properly checked to see if the call was successful, the consequences could be damaging.
-
-Example:
-
-1. Contract `A` wants to be invoked regularly, and pays Ether to the invoker in every block.
-2. When contract `A` is invoked, it calls contracts `B` and `C`, which consumes a lot of gas. After invocation, contract `A` pays Ether to the caller.
-3. Malicious user `X` ensures that the stack depth is shallow before invoking A. Both calls to `B` and `C` fail, but `X` can still collect the reward.
-
-It is possible to defend against this in two ways:
-
-1. Check return value after invocation.
-2. Check call stack depth experimentally. A library [2] by Piper Merriam exists for this purpose. This method is quite costly in gas.
+- **Qualified issuer token**: There are no minimum requirements to qualify as an issuer of extitutional scholar qualifications, except for having organized at least one extitutional workshop. The definition of extitutional workshop is to be left intentionally undefined. The only requirement for a person to qualify as a qualified issuer of extitutional scholars is that the person be recognized as qualified issuer or extitutional scholar tokens is that the person be recognized as such by at least two qualified issuer of “extitutional scholar” tokens.
 
 
-[1] a.k.a "shallow stack attack" and "stack attack". However, to be precise, the word ''stack'' has a different meaning within the EVM, and is not to be confused with the ''call stack''.
-
-[2] https://github.com/pipermerriam/ethereum-stack-depth-lib
-
-# Specification
-
-The opcode `CALLDEPTH` should return the remaining call stack depth. A value of `0` means that the call stack is exhausted, and no further calls can be made.
-
-# Rationale
-
-The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.
-
-# Implementation
-
-Not implemented.

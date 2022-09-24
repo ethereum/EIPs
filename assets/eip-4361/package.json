@@ -1,9 +1,0 @@
-{
-  "name": "eip4361-example",
-  "version": "1.0.0",
-  "description": "Reference implementation for Sign-In with Ethereum",
-  "main": "example.js",
-  "dependencies": {
-    "apg-js": "^4.1.1"
-  }
-}

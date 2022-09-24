@@ -13,23 +13,19 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Ethereum Improvement Proposals
-description: >-
-  Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum
-  platform, including core protocol specifications, client APIs, and contract
-  standards.
+title: Extitute Improvement Proposals
+description: ExtIP stands for Extitute Improvement Proposal. An ExtIP is a design document providing information to the Extitute or describing a new feature for the Extitute or its processes or environment.
 url: "https://eips.ethereum.org"
-github_username:  ethereum
-repository: ethereum/EIPs
+github_username:  extitute
+repository: extitute/ExtIPs
 
 header_pages:
  - all.html
- - core.html
- - networking.html
- - interface.html
- - erc.html
  - meta.html
  - informational.html
+ - operational.html
+ - governance.html
+ - qualification.html
 
 # Build settings
 highlighter: rouge
