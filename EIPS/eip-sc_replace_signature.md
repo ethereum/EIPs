@@ -1,0 +1,87 @@
+
+---
+eip: <to be assigned>
+title: Signature replacing for smart contract wallets
+description: A standard for non-interactive replacing of smart contract wallet signatures that became stale due to configuration changes.
+author: Agustin Aguilar (@Agusx1211)
+discussions-to: <to be defined>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-09-26
+requires: [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271)
+---
+
+## Abstract
+
+A proposal for a standard method to re-encode or replace smart contract wallet signatures at any point after the signature was produced. Wallets implementing this EIP can expose a URI that clients can use to replace an invalid signature with a valid one.
+
+## Motivation
+
+In contrast to EOA signatures, smart contract wallet signatures can become invalid at any point in time; this poses a challenge to protocols that rely on signatures remaining valid for extended periods of time.
+
+A signature may need to be mutated due to one of the following scenarios:
+
+1) The wallet removes a signer that contributed to signing the initial message.
+2) The wallet uses a Merkle tree to store signers, adding a new signer.
+3) The wallet uses a Merkle tree to store signatures, adding new signatures.
+4) The wallet is updated to a new implementation, and the signature schema changes.
+
+## Specification
+
+The wallet contract must implement the following interface:
+
+```solidity=
+function getAlternativeSignature(bytes32 _digest) external view returns (string);
+```
+
+The returned string MUST be a URI pointing to a JSON object with the following schema:
+
+```json
+{
+    "title": "Signature alternative",
+    "type": "object",
+    "properties": {
+        "blockHash": {
+            "type": "string",
+            "description": "A block.hash on which the signature should be valid."
+        },
+        "signature": {
+            "type": "string",
+            "description": "The alternative signature for the given digest."
+        }
+    }
+}
+```
+
+### Client process for replacing a signature
+
+A client is an entity that holds a signature and intends to validate it, either for off-chain or on-chain use. To use the smart contract wallet signature, the client must perform the following actions:
+
+1) Try validating the signature using `EIP-1271`; if the signature is valid, then the signature can be used as-is.
+2) If the signature is not valid, call `getAlternativeSignature(_digest)`, passing the `digest` corresponding to the old signature.
+3) If the call fails, no URI is returned, or the content of the URI is not valid, then the signature must be considered invalid.
+4) Try validating the new signature using `EIP-1271`; if the signature is valid, it can be used as a drop-in replacement of the original signature.
+5) If the validation fails, repeat the process from step (2) (notice: if the URI returns the same signature, the signature must be considered invalid).
+
+> Notice: Clients MUST implement a retry limit when fetching alternative signatures. This limit is up to the client to define.
+
+## Rationale
+
+The EIP presents a non-interactive mechanism to replace signatures without requiring the user to reconnect the wallet to the client that holds the stale signature.
+
+This makes the EIP useful in scenarios where the wallet may not be available to re-sign a transaction, for example, when a 3rd party executes a trade on an NFT marketplace.
+
+A URI is chosen because it can accommodate centralized and decentralized solutions. For example, a server can implement live re-encoding for Merkle proofs, or an IPFS link could point to a directory with all the pre-computed signature mutations.
+
+## Backwards Compatibility
+
+Existing wallets that do not implement the `getAlternativeSignature` method can still sign messages without any changes; if any signatures become invalidated, clients will drop them on step (3).
+
+## Security Considerations
+
+Some applications use signatures as secrets; these applications would risk leaking such secrets if the EIP exposes the signatures.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
