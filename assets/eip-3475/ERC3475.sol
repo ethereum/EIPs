@@ -7,15 +7,17 @@ import "./interfaces/IERC3475.sol";
 contract ERC3475 is IERC3475 {
     /** 
      * @notice this Struct is representing the Nonce properties as an object
+     *  
      */
     struct Nonce {
-        mapping(uint256 => IERC3475.Values) _values;
-
         // stores the values corresponding to the dates (issuance and maturity date).
+        mapping(uint256 => IERC3475.Values) _values;
+        // storing the issuance of the issued bonds with their balances. 
         mapping(address => uint256) _balances;
+        // defines the mapping for amount of bonds that can be delegated by Owner => operator address.
         mapping(address => mapping(address => uint256)) _allowances;
 
-        // supplies of this nonce
+        // Overall supplies of this nonce
         uint256 _activeSupply;
         uint256 _burnedSupply;
         uint256 _redeemedSupply;
@@ -43,12 +45,12 @@ contract ERC3475 is IERC3475 {
      * to be deployed during the initial deployment cycle
      */
     constructor() {
-        // define "symbol of the class";
+        // define "symbol of the given class";
         _classMetadata[0].title = "symbol";
         _classMetadata[0]._type = "string";
         _classMetadata[0].description = "symbol of the class";
         _classes[0]._values[0].stringValue = "DBIT Fix 6M";
-
+        
         _classMetadata[1].title = "symbol";
         _classMetadata[1]._type = "string";
         _classMetadata[1].description = "symbol of the class";
@@ -87,7 +89,7 @@ contract ERC3475 is IERC3475 {
         _classes[0].nonces[2]._values[0].boolValue = true;
     }
 
-    // WRITABLES
+    // execute/ writable functions.
     function transferFrom(
         address _from,
         address _to,
