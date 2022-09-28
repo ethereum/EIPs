@@ -1,9 +1,9 @@
 ---
-eip: <to be assigned>
-title: Semi-Fungible Soulbound Token Standard
-description: A standard interface for soulbound tokens, also known as badges or account-bound tokens.
+eip: 5727
+title: Semi-Fungible Soulbound Token
+description: An interface for soulbound tokens, also known as badges or account-bound tokens.
 author: Austin Zhu <https://github.com/AustinZhu>, Terry Chen <terry.chen@phaneroz.io>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-5727-semi-fungible-soulbound-token/11086
 status: Draft
 type: Standards Track
 category: ERC
@@ -12,18 +12,18 @@ requires: 165
 ---
 
 ## Abstract
-A standard for soulbound tokens (SBT), which are non-transferable tokens representing a person's identity, credentials, affiliations, reputation, and private assets.
+An interface for soulbound tokens (SBT), which are non-transferable tokens representing a person's identity, credentials, affiliations, reputation, and private assets.
 
-Our standard can handle a combination of fungible and non-fungible tokens in an organized way. It provides a set of core methods that can be used to manage the lifecycle of soulbound tokens, as well as a rich set of extensions that enables DAO governance, privacy protection, token expiration, and account recovery.
+Our interface can handle a combination of fungible and non-fungible tokens in an organized way. It provides a set of core methods that can be used to manage the lifecycle of soulbound tokens, as well as a rich set of extensions that enables DAO governance, privacy protection, token expiration, and account recovery.
 
-This standard aims to provide a flexible and extensible framework for the development of soulbound token systems.
+This interface aims to provide a flexible and extensible framework for the development of soulbound token systems.
 
 ## Motivation
 The Web3 ecosystem nowadays is largely dominated by highly-financialized tokens, which are designed to be freely transferable and interchangeable. However, there are many use cases in our society that requires non-transferablity. For example, a membership card guarantees one's proprietary rights in a community, and such rights should not be transferable to others.
 
-We have already seen many attempts to create such non-transferable tokens in the Ethereum community. However, most of them rely heavily on NFT standards like [EIP-721](https://eips.ethereum.org/EIPS/eip-721), which are not designed for non-transferability. Others lack the flexibility to support both fungible and non-fungible tokens and do not provide extensible features for critical use cases.
+We have already seen many attempts to create such non-transferable tokens in the Ethereum community. However, most of them rely heavily on NFT standards like [EIP-721](./eip-721.md), which are not designed for non-transferability. Others lack the flexibility to support both fungible and non-fungible tokens and do not provide extensible features for critical use cases.
 
-Our standard can be used to represent non-transferable ownerships, and provides features for common use cases including but not limited to:
+Our interface can be used to represent non-transferable ownerships, and provides features for common use cases including but not limited to:
 
 - granular lifecycle management of SBTs (e.g. minting, revocation, expiration)
 - management of SBTs via community voting and delegation (e.g. DAO governance, operators)
@@ -44,10 +44,10 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Interface
- * @dev The core interface of the standard. It allows basic query of information about tokens and slots.
+ * @title ERC5727 Soulbound Token Interface
+ * @dev The core interface. It allows basic query of information about tokens and slots.
  */
-interface IERCXXXX is IERC165 {
+interface IERC5727 is IERC165 {
     /**
      * @dev MUST emit when a token is minted.
      * @param soul The address that the token is minted to
@@ -143,13 +143,13 @@ interface IERCXXXX is IERC165 {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Enumerable Interface
+ * @title ERC5727 Soulbound Token Enumerable Interface
  * @dev This extension allows querying the tokens of a soul.
  */
-interface IERCXXXXEnumerable is IERCXXXX {
+interface IERC5727Enumerable is IERC5727 {
     /**
      * @notice Get the total number of tokens emitted.
      * @return The total number of tokens emitted
@@ -203,13 +203,13 @@ interface IERCXXXXEnumerable is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Metadata Interface
+ * @title ERC5727 Soulbound Token Metadata Interface
  * @dev This extension allows querying the metadata of soulbound tokens.
  */
-interface IERCXXXXMetadata is IERCXXXX {
+interface IERC5727Metadata is IERC5727 {
     /**
      * @notice Get the name of the contract.
      * @return The name of the contract
@@ -250,13 +250,13 @@ interface IERCXXXXMetadata is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Governance Interface
+ * @title ERC5727 Soulbound Token Governance Interface
  * @dev This extension allows minting and revocation of tokens by community voting.
  */
-interface IERCXXXXGovernance is IERCXXXX {
+interface IERC5727Governance is IERC5727 {
     /**
      * @notice Get the voters of the contract.
      * @return The array of the voters
@@ -314,13 +314,13 @@ interface IERCXXXXGovernance is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Delegate Interface
+ * @title ERC5727 Soulbound Token Delegate Interface
  * @dev This extension allows delegation of (batch) minting and revocation of tokens to operator(s).
  */
-interface IERCXXXXDelegate is IERCXXXX {
+interface IERC5727Delegate is IERC5727 {
     /**
      * @notice Delegate a one-time minting right to `operator` for `delegateRequestId` delegate request.
      * @dev MUST revert if the caller does not have the right to delegate.
@@ -416,13 +416,13 @@ interface IERCXXXXDelegate is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Recovery Interface
+ * @title ERC5727 Soulbound Token Recovery Interface
  * @dev This extension allows recovering soulbound tokens from an address provided its signature.
  */
-interface IERCXXXXRecovery is IERCXXXX {
+interface IERC5727Recovery is IERC5727 {
     /**
      * @notice Recover the tokens of `soul` with `signature`.
      * @dev MUST revert if the signature is invalid.
@@ -436,13 +436,13 @@ interface IERCXXXXRecovery is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Expirable Interface
+ * @title ERC5727 Soulbound Token Expirable Interface
  * @dev This extension allows soulbound tokens to be expired.
  */
-interface IERCXXXXExpirable is IERCXXXX {
+interface IERC5727Expirable is IERC5727 {
     /**
      * @notice Get the expire date of a token.
      * @dev MUST revert if the `tokenId` token does not exist.
@@ -487,13 +487,13 @@ interface IERCXXXXExpirable is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
+import "./IERC5727.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Shadow Interface
+ * @title ERC5727 Soulbound Token Shadow Interface
  * @dev This extension allows restricting the visibility of specific soulbound tokens.
  */
-interface IERCXXXXShadow is IERCXXXX {
+interface IERC5727Shadow is IERC5727 {
     /**
      * @notice Shadow a token.
      * @dev MUST revert if the `tokenId` token does not exists.
@@ -514,14 +514,14 @@ interface IERCXXXXShadow is IERCXXXX {
 ```solidity
 pragma solidity ^0.8.0;
 
-import "./IERCXXXX.sol";
-import "./IERCXXXXEnumerable.sol";
+import "./IERC5727.sol";
+import "./IERC5727Enumerable.sol";
 
 /**
- * @title ERCXXXX Soulbound Token Slot Enumerable Interface
+ * @title ERC5727 Soulbound Token Slot Enumerable Interface
  * @dev This extension allows querying information about slots.
  */
-interface IERCXXXXSlotEnumerable is IERCXXXX, IERCXXXXEnumerable {
+interface IERC5727SlotEnumerable is IERC5727, IERC5727Enumerable {
     /**
      * @notice Get the total number of slots.
      * @return The total number of slots.
@@ -560,24 +560,24 @@ interface IERCXXXXSlotEnumerable is IERCXXXX, IERCXXXXEnumerable {
 
 ## Rationale
 ### Token storage model
-We adopt semi-fungible token storage models designed to support both fungible and non-fungible tokens, inspired by [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525). We found that such a model is better suited to the representation of SBT than the model used in [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155).
+We adopt semi-fungible token storage models designed to support both fungible and non-fungible tokens, inspired by [EIP-3525](./eip-3525.md). We found that such a model is better suited to the representation of SBT than the model used in [EIP-1155](./eip-1155.md).
 
 Firstly, each slot can be used to represent different categories of SBTs. For instance, a DAO can have membership SBTs, role badges, scores, etc. in one SBT collection.
 
-Secondly, unlike [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155), in which each unit of fungible tokens is exactly the same, our standard can help differentiate between similar tokens. This is justified by that credential scores obtained from different entities differ not only in value but also in their effects, validity periods, origins, etc. However, they still share the same slot as they all contribute to a person's credibility.
+Secondly, unlike [EIP-1155](./eip-1155.md), in which each unit of fungible tokens is exactly the same, our interface can help differentiate between similar tokens. This is justified by that credential scores obtained from different entities differ not only in value but also in their effects, validity periods, origins, etc. However, they still share the same slot as they all contribute to a person's credibility.
 
 ### Recovery mechanism
-To prevent the loss of SBTs, we propose a recovery mechanism that allows users to recover their tokens by providing a signature signed by their soul address. This mechanism is inspired by [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271).
+To prevent the loss of SBTs, we propose a recovery mechanism that allows users to recover their tokens by providing a signature signed by their soul address. This mechanism is inspired by [EIP-1271](./eip-1271.md).
 
 Since SBTs are bound to an address and are meant to represent the identity of the address, which cannot be split into fractions. Therefore, each recovery should be considered as a transfer of all the tokens of the owner. This is why we use the `recover` function instead of `transferFrom` or `safeTransferFrom`.
 
 ### Token visibility control
-Our standard allows users to control the visibility of their tokens (shadowing and revealing). This is useful when a user wants to hide some of their tokens from the public, for example, when they want to keep their membership secret. Generally, the issuer and the owner of the token have access to the token by default and can control the visibility of the token. After the token is shadowed, information about the token (e.g. token URI, owner of the token) cannot be queried by the public.
+Our interface allows users to control the visibility of their tokens (shadowing and revealing). This is useful when a user wants to hide some of their tokens from the public, for example, when they want to keep their membership secret. Generally, the issuer and the owner of the token have access to the token by default and can control the visibility of the token. After the token is shadowed, information about the token (e.g. token URI, owner of the token) cannot be queried by the public.
 
 ## Backwards Compatibility
-This EIP proposes a new token standard which is meant to be used standalone, and is not backwards compatible with [EIP-721](https://eips.ethereum.org/EIPS/eip-721), [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155), [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525) or any other token standards. However, the naming style of functions and arguments follows the convention of [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525), so that developers can understand the intentions easily.
+This EIP proposes a new token interface which is meant to be used standalone, and is not backwards compatible with [EIP-721](./eip-721.md), [EIP-1155](./eip-1155.md), [EIP-3525](./eip-3525.md) or any other token standards. However, the naming style of functions and arguments follows the convention of [EIP-721](./eip-721.md) and [EIP-3525](./eip-3525.md), so that developers can understand the intentions easily.
 
-This EIP is backwards compatible with [EIP-165](https://eips.ethereum.org/EIPS/eip-165).
+This EIP is backwards compatible with [EIP-165](./eip-165.md).
 
 ## Test Cases
 Our sample implementation includes test cases written using Hardhat.
