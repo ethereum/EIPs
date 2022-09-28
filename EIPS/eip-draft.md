@@ -1,0 +1,596 @@
+---
+eip: <to be assigned>
+title: Semi-Fungible Soulbound Token Standard
+description: A standard interface for soulbound tokens, also known as badges or account-bound tokens.
+author: Austin Zhu <https://github.com/AustinZhu>, Terry Chen <terry.chen@phaneroz.io>
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-09-28
+requires: 165
+---
+
+## Abstract
+A standard for soulbound tokens (SBT), which are non-transferable tokens representing a person's identity, credentials, affiliations, reputation, and private assets.
+
+Our standard can handle a combination of fungible and non-fungible tokens in an organized way. It provides a set of core methods that can be used to manage the lifecycle of soulbound tokens, as well as a rich set of extensions that enables DAO governance, privacy protection, token expiration, and account recovery.
+
+This standard aims to provide a flexible and extensible framework for the development of soulbound token systems.
+
+## Motivation
+The Web3 ecosystem nowadays is largely dominated by highly-financialized tokens, which are designed to be freely transferable and interchangeable. However, there are many use cases in our society that requires non-transferablity. For example, a membership card guarantees one's proprietary rights in a community, and such rights should not be transferable to others.
+
+We have already seen many attempts to create such non-transferable tokens in the Ethereum community. However, most of them rely heavily on NFT standards like [EIP-721](https://eips.ethereum.org/EIPS/eip-721), which are not designed for non-transferability. Others lack the flexibility to support both fungible and non-fungible tokens and do not provide extensible features for critical use cases.
+
+Our standard can be used to represent non-transferable ownerships, and provides features for common use cases including but not limited to:
+
+- granular lifecycle management of SBTs (e.g. minting, revocation, expiration)
+- management of SBTs via community voting and delegation (e.g. DAO governance, operators)
+- recovery of SBTs (e.g. switching to a new wallet)
+- token visibility control (e.g. private SBTs, hiding negative tokens)
+- fungible and non-fungible SBTs (e.g. membership card and loyalty points)
+- the grouping of SBTs using slots (e.g. complex reward schemes with a combination of vouchers, points, and badges)
+
+A common interface for soulbound tokens will not only help enrich the Web3 ecosystem but also facilitates the growth of a decentralized society.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+### Core
+```solidity
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Interface
+ * @dev The core interface of the standard. It allows basic query of information about tokens and slots.
+ */
+interface IERCXXXX is IERC165 {
+    /**
+     * @dev MUST emit when a token is minted.
+     * @param soul The address that the token is minted to
+     * @param tokenId The token minted
+     * @param value The value of the token minted
+     */
+    event Minted(address indexed soul, uint256 indexed tokenId, uint256 value);
+
+    /**
+     * @dev MUST emit when a token is revoked.
+     * @param soul The owner soul of the revoked token
+     * @param tokenId The revoked token
+     */
+    event Revoked(address indexed soul, uint256 indexed tokenId);
+
+    /**
+     * @dev MUST emit when a token is charged.
+     * @param tokenId The token to charge
+     * @param value The value to charge
+     */
+    event Charged(uint256 indexed tokenId, uint256 value);
+
+    /**
+     * @dev MUST emit when a token is consumed.
+     * @param tokenId The token to consume
+     * @param value The value to consume
+     */
+    event Consumed(uint256 indexed tokenId, uint256 value);
+
+    /**
+     * @dev MUST emit when a token is destroyed.
+     * @param soul The owner soul of the destroyed token
+     * @param tokenId The token to destroy.
+     */
+    event Destroyed(address indexed soul, uint256 indexed tokenId);
+
+    /**
+     * @dev MUST emit when the slot of a token is set or changed.
+     * @param tokenId The token of which slot is set or changed
+     * @param oldSlot The previous slot of the token
+     * @param newSlot The updated slot of the token
+     */
+    event SlotChanged(
+        uint256 indexed tokenId,
+        uint256 indexed oldSlot,
+        uint256 indexed newSlot
+    );
+
+    /**
+     * @notice Get the value of a token.
+     * @dev MUST revert if the `tokenId` does not exist
+     * @param tokenId the token for which to query the balance
+     * @return The value of `tokenId`
+     */
+    function valueOf(uint256 tokenId) external view returns (uint256);
+
+    /**
+     * @notice Get the slot of a token.
+     * @dev MUST revert if the `tokenId` does not exist
+     * @param tokenId the token for which to query the slot
+     * @return The slot of `tokenId`
+     */
+    function slotOf(uint256 tokenId) external view returns (uint256);
+
+    /**
+     * @notice Get the owner soul of a token.
+     * @dev MUST revert if the `tokenId` does not exist
+     * @param tokenId the token for which to query the owner soul
+     * @return The address of the owner soul of `tokenId`
+     */
+    function soulOf(uint256 tokenId) external view returns (address);
+
+    /**
+     * @notice Get the validity of a token.
+     * @dev MUST revert if the `tokenId` does not exist
+     * @param tokenId the token for which to query the validity
+     * @return If the token is valid
+     */
+    function isValid(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @notice Get the issuer of a token.
+     * @dev MUST revert if the `tokenId` does not exist
+     * @param tokenId the token for which to query the issuer
+     * @return The address of the issuer of `tokenId`
+     */
+    function issuerOf(uint256 tokenId) external view returns (address);
+}
+```
+
+### Extensions
+#### Enumerable
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Enumerable Interface
+ * @dev This extension allows querying the tokens of a soul.
+ */
+interface IERCXXXXEnumerable is IERCXXXX {
+    /**
+     * @notice Get the total number of tokens emitted.
+     * @return The total number of tokens emitted
+     */
+    function emittedCount() external view returns (uint256);
+
+    /**
+     * @notice Get the total number of souls.
+     * @return The total number of souls
+     */
+    function soulsCount() external view returns (uint256);
+
+    /**
+     * @notice Get the tokenId with `index` of the `soul`.
+     * @dev MUST revert if the `index` exceed the number of tokens owned by the `soul`.
+     * @param soul The soul whose token is queried for.
+     * @param index The index of the token queried for
+     * @return The token is queried for
+     */
+    function tokenOfSoulByIndex(address soul, uint256 index)
+        external
+        view
+        returns (uint256);
+
+    /**
+     * @notice Get the tokenId with `index` of all the tokens.
+     * @dev MUST revert if the `index` exceed the total number of tokens.
+     * @param index The index of the token queried for
+     * @return The token is queried for
+     */
+    function tokenByIndex(uint256 index) external view returns (uint256);
+
+    /**
+     * @notice Get the number of tokens owned by the `soul`.
+     * @dev MUST revert if the `soul` does not have any token.
+     * @param soul The soul whose balance is queried for
+     * @return The number of tokens of the `soul`
+     */
+    function balanceOf(address soul) external view returns (uint256);
+
+    /**
+     * @notice Get if the `soul` owns any valid tokens.
+     * @param soul The soul whose valid token infomation is queried for
+     * @return if the `soul` owns any valid tokens
+     */
+    function hasValid(address soul) external view returns (bool);
+}
+```
+
+#### Metadata
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Metadata Interface
+ * @dev This extension allows querying the metadata of soulbound tokens.
+ */
+interface IERCXXXXMetadata is IERCXXXX {
+    /**
+     * @notice Get the name of the contract.
+     * @return The name of the contract
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @notice Get the symbol of the contract.
+     * @return The symbol of the contract
+     */
+    function symbol() external view returns (string memory);
+
+    /**
+     * @notice Get the URI of a token.
+     * @dev MUST revert if the `tokenId` token does not exist.
+     * @param tokenId The token whose URI is queried for
+     * @return The URI of the `tokenId` token
+     */
+    function tokenURI(uint256 tokenId) external view returns (string memory);
+
+    /**
+     * @notice Get the URI of the contract.
+     * @return The URI of the contract
+     */
+    function contractURI() external view returns (string memory);
+
+    /**
+     * @notice Get the URI of a slot.
+     * @dev MUST revert if the `slot` does not exist.
+     * @param slot The slot whose URI is queried for
+     * @return The URI of the `slot`
+     */
+    function slotURI(uint256 slot) external view returns (string memory);
+}
+```
+
+#### Governance
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Governance Interface
+ * @dev This extension allows minting and revocation of tokens by community voting.
+ */
+interface IERCXXXXGovernance is IERCXXXX {
+    /**
+     * @notice Get the voters of the contract.
+     * @return The array of the voters
+     */
+    function voters() external view returns (address[] memory);
+
+    /**
+     * @notice Approve to mint the token described by the `approvalRequestId` to `soul`.
+     * @dev MUST revert if the caller is not a voter.
+     * @param soul The soul which the token to mint to
+     * @param approvalRequestId The approval request describing the value and slot of the token to mint
+     */
+    function approveMint(address soul, uint256 approvalRequestId) external;
+
+    /**
+     * @notice Approve to revoke the `tokenId`.
+     * @dev MUST revert if the `tokenId` does not exist.
+     * @param tokenId The token to revert
+     */
+    function approveRevoke(uint256 tokenId) external;
+
+    /**
+     * @notice Create an approval request describing the `value` and `slot` of a token.
+     * @dev MUST revert when `value` is zero.
+     * @param value The value of the approval request to create
+     */
+    function createApprovalRequest(uint256 value, uint256 slot) external;
+
+    /**
+     * @notice Remove `approvalRequestId` approval request.
+     * @dev MUST revert if the caller is not the creator of the approval request.
+     * @param approvalRequestId The approval request to remove
+     */
+    function removeApprovalRequest(uint256 approvalRequestId) external;
+
+    /**
+     * @notice Add a new voter `newVoter`.
+     * @dev MUST revert if the caller is not an administrator.
+     *  MUST revert if `newVoter` is already a voter.
+     * @param newVoter the new voter to add
+     */
+    function addVoter(address newVoter) external;
+
+    /**
+     * @notice Remove the `voter` from the contract.
+     * @dev MUST revert if the caller is not an administrator.
+     *  MUST revert if `voter` is not a voter.
+     * @param voter the voter to remove
+     */
+    function removeVoter(address voter) external;
+}
+```
+
+#### Delegate
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Delegate Interface
+ * @dev This extension allows delegation of (batch) minting and revocation of tokens to operator(s).
+ */
+interface IERCXXXXDelegate is IERCXXXX {
+    /**
+     * @notice Delegate a one-time minting right to `operator` for `delegateRequestId` delegate request.
+     * @dev MUST revert if the caller does not have the right to delegate.
+     * @param operator The soul to which the minting right is delegated
+     * @param delegateRequestId The delegate request describing the soul, value and slot of the token to mint
+     */
+    function mintDelegate(address operator, uint256 delegateRequestId) external;
+
+    /**
+     * @notice Delegate one-time minting rights to `operators` for corresponding delegate request in `delegateRequestIds`.
+     * @dev MUST revert if the caller does not have the right to delegate.
+     *   MUST revert if the length of `operators` and `delegateRequestIds` do not match.
+     * @param operators The souls to which the minting right is delegated
+     * @param delegateRequestIds The delegate requests describing the soul, value and slot of the tokens to mint
+     */
+    function mintDelegateBatch(
+        address[] memory operators,
+        uint256[] memory delegateRequestIds
+    ) external;
+
+    /**
+     * @notice Delegate a one-time revoking right to `operator` for `tokenId` token.
+     * @dev MUST revert if the caller does not have the right to delegate.
+     * @param operator The soul to which the revoking right is delegated
+     * @param tokenId The token to revoke
+     */
+    function revokeDelegate(address operator, uint256 tokenId) external;
+
+    /**
+     * @notice Delegate one-time minting rights to `operators` for corresponding token in `tokenIds`.
+     * @dev MUST revert if the caller does not have the right to delegate.
+     *   MUST revert if the length of `operators` and `tokenIds` do not match.
+     * @param operators The souls to which the revoking right is delegated
+     * @param tokenIds The tokens to revoke
+     */
+    function revokeDelegateBatch(
+        address[] memory operators,
+        uint256[] memory tokenIds
+    ) external;
+
+    /**
+     * @notice Mint a token described by `delegateRequestId` delegate request as a delegate.
+     * @dev MUST revert if the caller is not delegated.
+     * @param delegateRequestId The delegate requests describing the soul, value and slot of the token to mint.
+     */
+    function delegateMint(uint256 delegateRequestId) external;
+
+    /**
+     * @notice Mint tokens described by `delegateRequestIds` delegate request as a delegate.
+     * @dev MUST revert if the caller is not delegated.
+     * @param delegateRequestIds The delegate requests describing the soul, value and slot of the tokens to mint.
+     */
+    function delegateMintBatch(uint256[] memory delegateRequestIds) external;
+
+    /**
+     * @notice Revoke a token as a delegate.
+     * @dev MUST revert if the caller is not delegated.
+     * @param tokenId The token to revoke.
+     */
+    function delegateRevoke(uint256 tokenId) external;
+
+    /**
+     * @notice Revoke multiple tokens as a delegate.
+     * @dev MUST revert if the caller is not delegated.
+     * @param tokenIds The tokens to revoke.
+     */
+    function delegateRevokeBatch(uint256[] memory tokenIds) external;
+
+    /**
+     * @notice Create a delegate request describing the `soul`, `value` and `slot` of a token.
+     * @param soul The soul of the delegate request.
+     * @param value The value of the delegate request.
+     * @param slot The slot of the delegate request.
+     * @return delegateRequestId The id of the delegate request
+     */
+    function createDelegateRequest(
+        address soul,
+        uint256 value,
+        uint256 slot
+    ) external returns (uint256 delegateRequestId);
+
+    /**
+     * @notice Remove a delegate request.
+     * @dev MUST revert if the delegate request does not exists.
+     *   MUST revert if the caller is not the creator of the delegate request.
+     * @param delegateRequestId The delegate request to remove.
+     */
+    function removeDelegateRequest(uint256 delegateRequestId) external;
+}
+```
+
+#### Recovery
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Recovery Interface
+ * @dev This extension allows recovering soulbound tokens from an address provided its signature.
+ */
+interface IERCXXXXRecovery is IERCXXXX {
+    /**
+     * @notice Recover the tokens of `soul` with `signature`.
+     * @dev MUST revert if the signature is invalid.
+     * @param soul The soul whose tokens are recovered
+     * @param signature The signature signed by the `soul`
+     */
+    function recover(address soul, bytes memory signature) external;
+}
+```
+#### Expirable
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Expirable Interface
+ * @dev This extension allows soulbound tokens to be expired.
+ */
+interface IERCXXXXExpirable is IERCXXXX {
+    /**
+     * @notice Get the expire date of a token.
+     * @dev MUST revert if the `tokenId` token does not exist.
+     * @param tokenId The token for which the expiry date is queried
+     * @return The expiry date of the token
+     */
+    function expiryDate(uint256 tokenId) external view returns (uint256);
+
+    /**
+     * @notice Get if a token is expired.
+     * @dev MUST revert if the `tokenId` token does not exist.
+     * @param tokenId The token for which the expired status is queried
+     * @return If the token is expired
+     */
+    function isExpired(uint256 tokenId) external view returns (bool);
+
+    /**
+     * @notice Set the expiry date of a token.
+     * @dev MUST revert if the `tokenId` token does not exist.
+     *   MUST revert if the `date` is in the past.
+     * @param tokenId The token whose expiry date is set
+     * @param date The expire date to set
+     */
+    function setExpiryDate(uint256 tokenId, uint256 date) external;
+
+    /**
+     * @notice Set the expiry date of multiple tokens.
+     * @dev MUST revert if the `tokenIds` tokens does not exist.
+     *   MUST revert if the `dates` is in the past.
+     *   MUST revert if the length of `tokenIds` and `dates` do not match.
+     * @param tokenIds The tokens whose expiry dates are set
+     * @param dates The expire dates to set
+     */
+    function setBatchExpiryDates(
+        uint256[] memory tokenIds,
+        uint256[] memory dates
+    ) external;
+}
+```
+
+#### Shadow
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Shadow Interface
+ * @dev This extension allows restricting the visibility of specific soulbound tokens.
+ */
+interface IERCXXXXShadow is IERCXXXX {
+    /**
+     * @notice Shadow a token.
+     * @dev MUST revert if the `tokenId` token does not exists.
+     * @param tokenId The token to shadow
+     */
+    function shadow(uint256 tokenId) external;
+
+    /**
+     * @notice Reveal a token.
+     * @dev MUST revert if the `tokenId` token does not exists.
+     * @param tokenId The token to reveal
+     */
+    function reveal(uint256 tokenId) external;
+}
+```
+
+#### SlotEnumerable
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IERCXXXX.sol";
+import "./IERCXXXXEnumerable.sol";
+
+/**
+ * @title ERCXXXX Soulbound Token Slot Enumerable Interface
+ * @dev This extension allows querying information about slots.
+ */
+interface IERCXXXXSlotEnumerable is IERCXXXX, IERCXXXXEnumerable {
+    /**
+     * @notice Get the total number of slots.
+     * @return The total number of slots.
+     */
+    function slotCount() external view returns (uint256);
+
+    /**
+     * @notice Get the slot with `index` among all the slots.
+     * @dev MUST revert if the `index` exceed the total number of slots.
+     * @param index The index of the slot queried for
+     * @return The slot is queried for
+     */
+    function slotByIndex(uint256 index) external view returns (uint256);
+
+    /**
+     * @notice Get the number of tokens in a slot.
+     * @dev MUST revert if the slot does not exist.
+     * @param slot The slot whose number of tokens is queried for
+     * @return The number of tokens in the `slot`
+     */
+    function tokenSupplyInSlot(uint256 slot) external view returns (uint256);
+
+    /**
+     * @notice Get the tokenId with `index` of the `slot`.
+     * @dev MUST revert if the `index` exceed the number of tokens in the `slot`.
+     * @param slot The slot whose token is queried for.
+     * @param index The index of the token queried for
+     * @return The token is queried for
+     */
+    function tokenInSlotByIndex(uint256 slot, uint256 index)
+        external
+        view
+        returns (uint256);
+}
+```
+
+## Rationale
+### Token storage model
+We adopt semi-fungible token storage models designed to support both fungible and non-fungible tokens, inspired by [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525). We found that such a model is better suited to the representation of SBT than the model used in [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155).
+
+Firstly, each slot can be used to represent different categories of SBTs. For instance, a DAO can have membership SBTs, role badges, scores, etc. in one SBT collection.
+
+Secondly, unlike [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155), in which each unit of fungible tokens is exactly the same, our standard can help differentiate between similar tokens. This is justified by that credential scores obtained from different entities differ not only in value but also in their effects, validity periods, origins, etc. However, they still share the same slot as they all contribute to a person's credibility.
+
+### Recovery mechanism
+To prevent the loss of SBTs, we propose a recovery mechanism that allows users to recover their tokens by providing a signature signed by their soul address. This mechanism is inspired by [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271).
+
+Since SBTs are bound to an address and are meant to represent the identity of the address, which cannot be split into fractions. Therefore, each recovery should be considered as a transfer of all the tokens of the owner. This is why we use the `recover` function instead of `transferFrom` or `safeTransferFrom`.
+
+### Token visibility control
+Our standard allows users to control the visibility of their tokens (shadowing and revealing). This is useful when a user wants to hide some of their tokens from the public, for example, when they want to keep their membership secret. Generally, the issuer and the owner of the token have access to the token by default and can control the visibility of the token. After the token is shadowed, information about the token (e.g. token URI, owner of the token) cannot be queried by the public.
+
+## Backwards Compatibility
+This EIP proposes a new token standard which is meant to be used standalone, and is not backwards compatible with [EIP-721](https://eips.ethereum.org/EIPS/eip-721), [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155), [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525) or any other token standards. However, the naming style of functions and arguments follows the convention of [EIP-721](https://eips.ethereum.org/EIPS/eip-721) and [EIP-3525](https://eips.ethereum.org/EIPS/eip-3525), so that developers can understand the intentions easily.
+
+This EIP is backwards compatible with [EIP-165](https://eips.ethereum.org/EIPS/eip-165).
+
+## Test Cases
+Our sample implementation includes test cases written using Hardhat.
+
+## Reference Implementation
+You can find our sample implementation [here](https://github.com/soularis-protocol/contracts/tree/dev/contracts).
+
+## Security Considerations
+This EIP does not involve the general transfer of tokens, and thus there will be no security issues related to token transfer generally.
+
+However, users should be aware of the security risks of using the recovery mechanism. If a user loses his/her private key, all his/her soulbound tokens will be exposed to potential theft. The attacker can create a signature and restore all SBTs of the victim. Therefore, users should always keep their private keys safe. We recommend developers implement a recovery mechanism that requires multiple signatures to restore SBTs.
+
+In addition, please consider incorporating technologies such as zero-knowledge proofs, off-chain identity verification, and encryption of metadata to protect the privacy of users.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
