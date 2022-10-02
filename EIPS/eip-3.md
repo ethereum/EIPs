@@ -5,7 +5,6 @@ description: An extitutional scholar is a person that understands the dynamics b
 author: Primavera De Filippi <pdefilippi@cyber.harvard.edu>, Isaac Patka <@ipatka>
 status: Draft
 type: Operational
-category: Interface
 created: 2022-09-22
 ---
 

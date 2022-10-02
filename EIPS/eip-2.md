@@ -5,7 +5,6 @@ description: A standard interface for assigning non-transferable qualification t
 author: Primavera De Filippi <pdefilippi@cyber.harvard.edu>, Isaac Patka <@ipatka>
 status: Draft
 type: Governance
-category: Interface
 created: 2022-09-22
 ---
 

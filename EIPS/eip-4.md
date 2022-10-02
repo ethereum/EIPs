@@ -5,7 +5,6 @@ description: An Albany Extitute Visitor is a person who attends an extitutional 
 author: Michael Zargham <@mzargham>, Isaac Patka <@ipatka>
 status: Draft
 type: Operational
-category: Interface
 created: 2022-10-02
 ---
 
