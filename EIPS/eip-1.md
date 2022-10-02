@@ -1,5 +1,5 @@
 ---
-eip: 1
+extip: 1
 title: ExtIP Purpose and Guidelines
 status: Draft
 type: Meta

@@ -1,5 +1,5 @@
 ---
-eip: 3
+extip: 3
 title: “Extitutional Scholars” Qualification Token
 description: An extitutional scholar is a person that understands the dynamics between institutions and extitutions; one that is acquainted with the basic notions of extitutional theory; but also one that has experienced extitutional dynamics in first person, and can therefore apply inductive knowledge into the more theoretical exploration of the principles of extitutionalisation.
 author: Primavera De Filippi <pdefilippi@cyber.harvard.edu>, Isaac Patka <@ipatka>

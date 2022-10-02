@@ -1,5 +1,5 @@
 ---
-eip: 2
+extip: 2
 title: Token Certifications & Attestations Standard
 description: A standard interface for assigning non-transferable qualification tokens, acting as certificates and attestations for particular capabilities, expertise or skills. Establishing an on-chain registry of capabilities, expertises and skills associated with a token, and the corresponding attribution of who has assigned the token to whom. 
 author: Primavera De Filippi <pdefilippi@cyber.harvard.edu>, Isaac Patka <@ipatka>
