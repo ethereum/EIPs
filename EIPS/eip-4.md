@@ -2,7 +2,7 @@
 extip: 4
 title: “Albany Extitute Visitor” Qualification Token
 description: An Albany Extitute Visitor is a person who attends an extitutional experience in Albany New York, hosted by one of the Extitutional Scholars in Residence at the Albany Extitute. An extitutional experience is an unstructured in person intellectual exchange. Extitutional experiences may involve exploratory co-creation in any medium. 
-author: Michael Zargham <michael.zargham@gmail.com>, Isaac Patka <@ipatka>
+author: Michael Zargham <@mzargham>, Isaac Patka <@ipatka>
 status: Draft
 type: Operational
 category: Interface
