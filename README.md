@@ -1,4 +1,4 @@
-# Ethereum Improvement Proposals (EIPs)
+# Extitute Improvement Proposals (ExtIPs)
 
 **Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document. Ideas should be thoroughly discussed on [Ethereum Research](https://ethresear.ch/t/read-this-before-posting/8) or [Ethereum Magicians](https://ethereum-magicians.org/) first.
 
