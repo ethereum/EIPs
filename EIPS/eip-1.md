@@ -15,6 +15,8 @@ ExtIP stands for Extitute Improvement Proposal. An ExtIP is a design document pr
 
 We intend ExtIPs to be the primary mechanisms for proposing new features, for collecting community technical input on an issue, and for documenting the design decisions that have gone into the Extitute. Because the ExtIPs are maintained as text files in a versioned repository, their revision history is the historical record of the feature proposal.
 
+## ExtIP Schema
+![image](assets/extip-schema.png "ExtIP Schema")
 ## ExtIP Types
 
 There are three types of ExtIP:
@@ -26,6 +28,12 @@ There are three types of ExtIP:
   - **Informational** ExtIP describes an extitutional design issue, or provides general guidelines or information to the Extitute, but does not propose a new feature.
 
 It is highly recommended that a single ExtIP contain a single key proposal or new idea. The more focused the ExtIP, the more successful it tends to be. An ExtIP must be a clear and complete description of the proposed enhancement, which must be solid and must not complicate the governance or operations of the Extitute unduly.
+
+## ExtIP Status
+
+ - **Draft** status indicates that  the ExtIP is under active development by its authors. It can be expected to evolve. Draft Status ExtIPs may be transitioned to Provisional Status.
+ - **Provisional** status indicates that the ExtIP has been frozen for provisional adoption and community feedback. Provisional ExtIPs may be refined based on feedback or advanced to Accepted Status.
+ - **Accepted** status indicates that the ExtIP has been adopted by the Extitute.
 
 ## What belongs in a successful ExtIP?
 
