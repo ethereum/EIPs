@@ -173,7 +173,7 @@ interface IERC3475 {
     /**
      * @notice Queries the approval status of an operator for bonds (for all classes and nonce issuances of owner).
      * @param _owner is the current holder of the bonds for all classes/nonces.
-     * @param _operator is the address which is  having access to the bonds of _owner for transferring. 
+     * @param _operator is the address with access to the bonds of _owner for transferring. 
      * Returns "true" if the operator is approved, "false" if not.
      */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);
