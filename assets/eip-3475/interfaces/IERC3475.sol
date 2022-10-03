@@ -164,7 +164,7 @@ interface IERC3475 {
     function getProgress(uint256 classId, uint256 nonceId) external view returns (uint256 progressAchieved, uint256 progressRemaining);
    
     /**
-     * @notice Returns the amount which spender is still allowed to withdraw from _owner (for given classId and NonceId issuance)
+     * @notice Returns the amount that spender is still allowed to withdraw from _owner (for given classId and nonceId issuance)
      * @param _owner is the address whose owner allocates some amount to the _spender address.
      * @param classId is the classId of bond .
      * @param nonceId is the nonce corresponding to the class for which you are approving the spending of total amount of bonds.
