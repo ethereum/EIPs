@@ -172,7 +172,7 @@ interface IERC3475 {
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**
      * @notice Queries the approval status of an operator for bonds (for all classes and nonce issuances of owner).
-     * @param _owner is the current holder of the bonds for  all classes/nonces.
+     * @param _owner is the current holder of the bonds for all classes/nonces.
      * @param _operator is the address which is  having access to the bonds of _owner for transferring. 
      * Returns "true" if the operator is approved, "false" if not.
      */
