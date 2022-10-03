@@ -166,7 +166,7 @@ interface IERC3475 {
     /**
      * @notice Returns the amount that spender is still allowed to withdraw from _owner (for given classId and nonceId issuance)
      * @param _owner is the address whose owner allocates some amount to the _spender address.
-     * @param classId is the classId of bond .
+     * @param classId is the classId of the bond.
      * @param nonceId is the nonce corresponding to the class for which you are approving the spending of total amount of bonds.
      */
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
