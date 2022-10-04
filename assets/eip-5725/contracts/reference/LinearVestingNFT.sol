@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.17;
 
-import "../BaseVestingNFT.sol";
+import "../ERC5725.sol";
 
-contract LinearVestingNFT is BaseVestingNFT {
+contract LinearVestingNFT is ERC5725 {
     using SafeERC20 for IERC20;
 
     struct VestDetails {
@@ -19,7 +19,7 @@ contract LinearVestingNFT is BaseVestingNFT {
     uint256 private _tokenIdTracker;
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
@@ -61,12 +61,12 @@ contract LinearVestingNFT is BaseVestingNFT {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
         public
         view
-        override(BaseVestingNFT)
+        override(ERC5725)
         validToken(tokenId)
         returns (uint256 payout)
     {
@@ -80,28 +80,28 @@ contract LinearVestingNFT is BaseVestingNFT {
     }
 
     /**
-     * @dev See {BaseVestingNFT}.
+     * @dev See {ERC5725}.
      */
     function _payoutToken(uint256 tokenId) internal view override returns (address) {
         return address(vestDetails[tokenId].payoutToken);
     }
 
     /**
-     * @dev See {BaseVestingNFT}.
+     * @dev See {ERC5725}.
      */
     function _payout(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].payout;
     }
 
     /**
-     * @dev See {BaseVestingNFT}.
+     * @dev See {ERC5725}.
      */
     function _startTime(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].startTime;
     }
 
     /**
-     * @dev See {BaseVestingNFT}.
+     * @dev See {ERC5725}.
      */
     function _endTime(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].endTime;

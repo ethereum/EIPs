@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./IVestingNFT.sol";
+import "./IERC5725.sol";
 
-abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
+abstract contract ERC5725 is IERC5725, ERC721 {
     using SafeERC20 for IERC20;
 
     /// @dev mapping for claimed payouts
@@ -25,9 +25,9 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
-    function claim(uint256 tokenId) external override(IVestingNFT) validToken(tokenId) returns (uint256 amountClaimed) {
+    function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) returns (uint256 amountClaimed) {
         require(ownerOf(tokenId) == msg.sender, "Not owner of NFT");
         amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "VestingNFT: No pending payout");
@@ -39,29 +39,29 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
-    function vestedPayout(uint256 tokenId) public view override(IVestingNFT) returns (uint256 payout) {
+    function vestedPayout(uint256 tokenId) public view override(IERC5725) returns (uint256 payout) {
         return vestedPayoutAtTime(tokenId, block.timestamp);
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
         public
         view
         virtual
-        override(IVestingNFT)
+        override(IERC5725)
         returns (uint256 payout);
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function vestingPayout(uint256 tokenId)
         public
         view
-        override(IVestingNFT)
+        override(IERC5725)
         validToken(tokenId)
         returns (uint256 payout)
     {
@@ -69,12 +69,12 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function claimablePayout(uint256 tokenId)
         public
         view
-        override(IVestingNFT)
+        override(IERC5725)
         validToken(tokenId)
         returns (uint256 payout)
     {
@@ -82,12 +82,12 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function vestingPeriod(uint256 tokenId)
         public
         view
-        override(IVestingNFT)
+        override(IERC5725)
         validToken(tokenId)
         returns (uint256 vestingStart, uint256 vestingEnd)
     {
@@ -95,12 +95,12 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     }
 
     /**
-     * @dev See {IVestingNFT}.
+     * @dev See {IERC5725}.
      */
     function payoutToken(uint256 tokenId)
         public
         view
-        override(IVestingNFT)
+        override(IERC5725)
         validToken(tokenId)
         returns (address token)
     {
@@ -109,7 +109,7 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * IVestingNFT interfaceId = 0xf8600f8b
+     * IERC5725 interfaceId = 0xf8600f8b
      */
     function supportsInterface(bytes4 interfaceId)
         public
@@ -118,7 +118,7 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
         override(ERC721, IERC165)
         returns (bool supported)
     {
-        return interfaceId == type(IVestingNFT).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC5725).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
