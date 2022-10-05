@@ -14,14 +14,14 @@ requires (*optional):
 This EIP introduces a standard way for users to set expiration limits on ERC-20 token approvals to prevent the loss of assets due to contractrual vulnerabilities or authorization attacks.
 
 ## Abstract
-The standard adds a customizable expiration date as a limit to the _approve() function of token contracts, such as that of the ERC-20 interface, so that all allownces that exceed the expiration date will expire. In this way, the user's approvals for assets will be automatically recalled within a certain period. When an attacker exploits a spender contract vulnerability or spender identity to steal assets, it will fail due to the expiration of approvals.
+This EIP adds an expiration time to the `_approve()` function of token contracts to automatically recall approvals within a certain time period. This functionality as a standard will prevent vulnerabilty exploits due to outstanding token approvals.
 
 ## Motivation
-The approval attack is the most common attack method in the industry as of the writing of this EIP, with nearly all phishing attacks and asset theft related to it. Although developing good usage habits and having basic knowledge of on-chain security basics can help users avoid phishing, scams, DNS hijacking, JS injection, and other common approval attack methods, this still can't stop the attacks caused by the spender's own security problems.
+As of the writing of this EIP, the approval attack is the most common attack method in the industry with nearly all phishing attacks and asset theft related to it. Although good usage habits and basic knowledge of on-chain security can help users avoid a multitiude of exploits such as phishing, scams, DNS hijacking, JS injection, and other common approval attack methods, the spender's own security (or lack thereof) still needs to be fortified by strong code.
 
 In the Transit Swap attack of October 1st, 2022, hackers used a vulnerability in the Transit Swap contract to steal $200 million in assets. Due in part to professional security audits and the strong brand recognition of Transit Swap, many users were given a false sense of security and trusted the platform's service. Transit Swaps's contract had been running smoothly for over a year and had accumulated a large amount of user allownces, making the contract a high-reward target for malicious actors.
 
-There have been many similar incidents to the Transit Swap attack. Security audits cannot gurantee that a contract is 100% devoid of vulnerability. Some vulnerabilities are intentionally left by malicious developers themselves. In line with good trust practices and general security hygeine, unconditional trust is risky, and modifying approvals into limited trusts in spender with automatic recovery will be a key tool to natively prevent attacks.
+There have been many similar incidents to the Transit Swap attack. Security audits cannot gurantee that a contract is 100% free from vulnerabilities. Some vulnerabilities are intentionally left by malicious developers themselves. In line with good trust practices and general security hygeine, unconditional trust is risky, and modifying approvals into limited trusts with automatic recovery will be a key tool to natively prevent attacks.
 
 ## Specification
 
@@ -115,7 +115,7 @@ Transactions using the `transferFrom()` method will be checked against `_expirat
     }
 ```
 
-The `allowance()`, `increaseAllowance()`, and `decreaseAllowance()` method has been modified to accommodate the new features. `allowanceExpiration()` has been added to query the expiry date.
+The `allowance()`, `increaseAllowance()`, and `decreaseAllowance()` methods have been modified to accommodate the new features. `allowanceExpiration()` has been added to query the live period of the contract.
 
 ```solidity
         function allowanceExpiration(address owner, address spender) public view returns (uint256) {
@@ -175,13 +175,13 @@ The internal method `_spendAllowance()` is introduced for code cleanliness with 
 The `allowance()` method has been modified to accommodate the functionality described  in this EIP. `allowanceExpiration()` has been added query the allowance expiration date.
 
 ## Backwards Compatibility
-This standard is compatible with the ERC-20, ERC-721 and ERC-1155 standards. Tokens deployed in the form of proxy contracts can be updated to comply with this EIP.
+This standard is compatible with the ERC-20, ERC-721 and ERC-1155 standards. Tokens issued in the form of proxy contracts can be updated to comply with this EIP.
 
 ## Reference Implementation
 Implementation can be referenced in `../assets/eip-####/`.
 
 ## Security Considerations
-When upgrading a standard ERC20-based proxy contract to this standard, attention should be paid to the storage slots location.
+When upgrading a standard ERC20-based proxy contract to this standard, attention should be paid to the location of assets.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
