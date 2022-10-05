@@ -187,31 +187,31 @@ EIPs may have a `requires` header, indicating the EIP numbers that this EIP depe
 
 ## Linking to External Resources
 
-External resources are resources that are hosted outside of the EIPs repository. External resources may disappear, move, or change unexpectedly. The following rules apply in order. Any potential reference that does not satisfy any of the below **MUST NOT** be included.
+External resources are resources that are hosted outside of the EIPs repository. External resources may disappear, move, or change unexpectedly. The following rules apply in order.
 
 If you feel that a link you wish to include shouldn't violate the below rules, please submit a Pull Request to change them. Remember that the smaller and more specific the change, the more likely it will be accepted.
 
 ### Access Rules
 
-- All external references **MUST** be free to both access and distribute.
-- All external links **MUST** use one of the following whitelisted URI schemes:
+- All external resources **MUST** be free to both access and distribute.
+- All external resources **MUST** use one of the following whitelisted URI schemes:
   - `https`
   - `ipfs`
 
 ### Reference Rules
 
-- External resources **MUST** be non-normative.
-- Links to external resources **MUST** include a full citation.
+- All external resources **MUST** be non-normative.
+- All external resources **MUST** be cited.
   - For example, [Welch, T., "A Technique for High-Performance Data Compression", IEEE Computer 17(6), DOI 10.1109/MC.1984.1659158, June 1984](https://ieeexplore.ieee.org/document/1659158).
 
 ### Permanence Rules
 
-- Links to Ethereum Magicians **MUST** be allowed in the `discussions-to` preamble entry.
-- Links hosted on any of these domains **MUST** be allowed:
+- Ethereum Magicians **MUST** be allowed in the `discussions-to` preamble entry.
+- All links whose hostname is included in the following list and whose URI scheme is `https` **MUST** be allowed:
   - `doi.org`
   - `chainagnostic.org`
-  - `[www.]rfc-editor.org`
-- Links to exact commits hosted on GitHub **MUST** be allowed if they are from one of the following repositories:
+  - `rfc-editor.org` or `www.rfc-editor.org`
+- All links to exact commits hosted on GitHub (of the format `https://github.com/<username>/<repo>/blob/<commit_hash>/<path>`) **MUST** be allowed if they are from one of the following repositories:
   - `bitcoin/bips`
   - `ethereum/EIPs`
   - `ethereum/execution-specs`
@@ -219,6 +219,10 @@ If you feel that a link you wish to include shouldn't violate the below rules, p
 - Links with an appropriate backup in the assets folder **MAY** be allowed.
 - All links in `Living`, `Meta`, or `Informational` EIPs **MUST** be allowed.
   - It is still **RECOMMENDED** to add a backup.
+  
+### Fallback
+
+- All other external resources **MUST NOT** be included.
 
 ## Linking to other EIPs
 
