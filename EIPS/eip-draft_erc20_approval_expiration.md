@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Approval Expirations for ERC20 Tokens
-description: This EIP introduces a standardized way for users to set expiration limits on ERC-20 token approvals.
+description: This standard introduces a standardized way for users to set expiration limits on ERC-20 token approvals.
 author: Go+ Security <@GoPlusSecurity>, Jeff Hall <@JeffHal25193696>, Xavi <@XaaaaavitheFool>, Turan Vural <@turanzv>
 discussions-to: <URL>
 status: Draft
@@ -11,13 +11,13 @@ created: 2022-10-02) format
 requires (*optional):
 ---
 
-This EIP introduces a standard way for users to set expiration limits on ERC-20 token approvals to prevent the loss of assets due to contractrual vulnerabilities or authorization attacks.
+This standard introduces a standard way for users to set expiration limits on ERC-20 token approvals to prevent the loss of assets due to contractrual vulnerabilities or authorization attacks.
 
 ## Abstract
-This EIP adds an expiration time to the `_approve()` function of token contracts to automatically recall approvals within a certain time period. This functionality as a standard will prevent vulnerabilty exploits due to outstanding token approvals.
+This standard adds an expiration time to the `_approve()` function of token contracts to automatically recall approvals within a certain time period. This functionality as a standard will prevent vulnerabilty exploits due to outstanding token approvals.
 
 ## Motivation
-As of the writing of this EIP, the approval attack is the most common attack method in the industry with nearly all phishing attacks and asset theft related to it. Although good usage habits and basic knowledge of on-chain security can help users avoid a multitiude of exploits such as phishing, scams, DNS hijacking, JS injection, and other common approval attack methods, the spender's own security (or lack thereof) still needs to be fortified by strong code.
+As of the writing of this standard, the approval attack is the most common attack method in the industry with nearly all phishing attacks and asset theft related to it. Although good usage habits and basic knowledge of on-chain security can help users avoid a multitiude of exploits such as phishing, scams, DNS hijacking, JS injection, and other common approval attack methods, the spender's own security (or lack thereof) still needs to be fortified by strong code.
 
 In the Transit Swap attack of October 1st, 2022, hackers used a vulnerability in the Transit Swap contract to steal $200 million in assets. Due in part to professional security audits and the strong brand recognition of Transit Swap, many users were given a false sense of security and trusted the platform's service. Transit Swaps's contract had been running smoothly for over a year and had accumulated a large amount of user allownces, making the contract a high-reward target for malicious actors.
 
@@ -164,7 +164,7 @@ The above modifications adds a validity period to ERC20 token approvals. Users c
 ## Rationale
 `_expiration` is implemented as a mapping to improve the compatibility of the code.
 
-So that existing event statistics are not perturbed by the implementation of this EIP, `_approve()` is triggered by the new event `AllowanceExpireTimeUpdated()`.
+So that existing event statistics are not perturbed by the implementation of this standard, `_approve()` is triggered by the new event `AllowanceExpireTimeUpdated()`.
 
 This standard is absolutely compatible with the traditional ERC20 standard.  `DEFAULT_PERIOD` is added so that the original `approve(address spender, uint256 amount)` method header can remain for backwards compatibility and ease of programming. `DEFAULT_PERIOD` can be set to a constant or variable according to the developer's needs.
 
@@ -172,10 +172,10 @@ A separate approval method with the header `approve(address spender, uint256 amo
 
 The internal method `_spendAllowance()` is introduced for code cleanliness with the function of checking the allowance amount and expiration.
 
-The `allowance()` method has been modified to accommodate the functionality described  in this EIP. `allowanceExpiration()` has been added query the allowance expiration date.
+The `allowance()` method has been modified to accommodate the functionality described  in this standard. `allowanceExpiration()` has been added query the allowance expiration date.
 
 ## Backwards Compatibility
-This standard is compatible with the ERC-20, ERC-721 and ERC-1155 standards. Tokens issued in the form of proxy contracts can be updated to comply with this EIP.
+This standard is compatible with the ERC-20, ERC-721 and ERC-1155 standards. Tokens issued in the form of proxy contracts can be updated to comply with this standard.
 
 ## Reference Implementation
 Implementation can be referenced in `../assets/eip-####/`.
