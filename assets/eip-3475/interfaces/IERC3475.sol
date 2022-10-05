@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 
 
 interface IERC3475 {
-
     // STRUCTURE 
     /**
      * @dev Values structure of the Metadata
@@ -18,9 +17,9 @@ interface IERC3475 {
     }
     /**
      * @dev structure allows to define particular bond metadata (ie the values in the class as well as nonce inputs). 
-     * @title": "defining the title information",
-     * @type": "explaining the data type of the title information added (eg int, bool, address)",
-     * @description": "little description about the information stored in the bond",
+     * @notice 'title' defining the title information,
+     * @notice '_type' explaining the data type of the title information added (eg int, bool, address),
+     * @notice 'description' explains little description about the information stored in the bond",
      */
     struct Metadata {
         string title;
@@ -29,7 +28,7 @@ interface IERC3475 {
     }
     /**
      * @dev structure that defines the parameters for specific issuance of bonds and amount which are to be transferred/issued/given allowance, etc.
-     * @notice : this structure is used to streamline the input parameters for functions of this standard with that of other Token standards like ERC20.
+     * @notice this structure is used to streamline the input parameters for functions of this standard with that of other Token standards like ERC20.
      * @classId is the class id of the bond.
      * @nonceId is the nonce id of the given bond class. This param is for distinctions of the issuing conditions of the bond.
      * @amount is the amount of the bond that will be transferred.

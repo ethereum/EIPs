@@ -7,7 +7,7 @@ import "./interfaces/IERC3475.sol";
 contract ERC3475 is IERC3475 {
     /** 
      * @notice this Struct is representing the Nonce properties as an object
-     *  
+     *
      */
     struct Nonce {
         // stores the values corresponding to the dates (issuance and maturity date).
@@ -25,7 +25,7 @@ contract ERC3475 is IERC3475 {
 
     /**
      * @notice this Struct is representing the Class properties as an object
-     *         and can be retrieved by the classId
+     * and can be retrieved by the classId
      */
     struct Class {
         mapping(uint256 => IERC3475.Values) _values;
@@ -60,7 +60,7 @@ contract ERC3475 is IERC3475 {
         _classMetadata[5]._type = "int";
         _classMetadata[5].description = "details about issuance and redemption time";
         
-        // define the maturity time period  (for the test class).
+        // define the maturity time period (for the test class).
         _classes[0]._values[5].uintValue = 10;
         _classes[1]._values[5].uintValue = 1;
 
@@ -74,7 +74,7 @@ contract ERC3475 is IERC3475 {
         _classes[1].nonces[1]._values[0].uintValue = block.timestamp + 2;
         _classes[1].nonces[2]._values[0].uintValue = block.timestamp + 3;
 
-        // define "maturity of the nonce";        
+        // define "maturity of the nonce";
         _classes[0]._nonceMetadata[0].title = "maturity";
         _classes[0]._nonceMetadata[0]._type = "int";
         _classes[0]._nonceMetadata[0].description = "maturity date in integer";
@@ -88,7 +88,7 @@ contract ERC3475 is IERC3475 {
         _classes[0].nonces[2]._values[0].boolValue = true;
     }
 
-    // writable functions.
+    // Writable functions.
     function transferFrom(
         address _from,
         address _to,
@@ -295,7 +295,6 @@ contract ERC3475 is IERC3475 {
         return (_classes[classId]._values[metadataId]);
     }
 
-    
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId)
     external
     view
@@ -304,7 +303,7 @@ contract ERC3475 is IERC3475 {
         return (_classes[classId].nonces[nonceId]._values[metadataId]);
     }
 
-    /** determines the progress till the  redemption of the bonds is valid  (based on the type of bonds class).
+    /** determines the progress till the redemption of the bonds is valid (based on the type of bonds class).
      * @notice ProgressAchieved and `progressRemaining` is abstract.
       For e.g. we are giving time passed and time remaining.
      */
@@ -312,7 +311,7 @@ contract ERC3475 is IERC3475 {
     public
     view
     override
-    returns (uint256 progressAchieved, uint256 progressRemaining){    
+    returns (uint256 progressAchieved, uint256 progressRemaining){
         uint256 issuanceDate = _classes[classId].nonces[nonceId]._values[0].uintValue;
         uint256 maturityDate = issuanceDate + _classes[classId].nonces[nonceId]._values[5].uintValue;
         
@@ -335,7 +334,7 @@ contract ERC3475 is IERC3475 {
     }
 
     /**
-    checks the status of approval to transfer the ownership of bonds by _owner  to operator.
+    checks the status of approval to transfer the ownership of bonds by _owner to operator.
      */
     function isApprovedFor(
         address _owner,
@@ -356,7 +355,7 @@ contract ERC3475 is IERC3475 {
             "ERC3475: not enough bond to transfer"
         );
         
-        //transfer balance        
+        //transfer balance
         nonce._balances[_from] -= _transaction._amount;
         nonce._balances[_to] += _transaction._amount;
     }
@@ -384,7 +383,7 @@ contract ERC3475 is IERC3475 {
         address _to,
         IERC3475.Transaction calldata _transaction
     ) private {
-        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];      
+        Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
                 
         //transfer balance
         nonce._balances[_to] += _transaction._amount;
@@ -397,7 +396,7 @@ contract ERC3475 is IERC3475 {
         IERC3475.Transaction calldata _transaction
     ) private {
         Nonce storage nonce = _classes[_transaction.classId].nonces[_transaction.nonceId];
-        // verify whether _amount of bonds to be redeemed  are sufficient available  for the given nonce of the bonds
+        // verify whether _amount of bonds to be redeemed are sufficient available for the given nonce of the bonds
 
         require(
             nonce._balances[_from] >= _transaction._amount,
