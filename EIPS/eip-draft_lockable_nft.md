@@ -15,9 +15,9 @@ requires: 165, 721
 This standard is an extension of [EIP-721](./eip-721.md). It introduces lockable NFTs. The locked asset can be used in any way except selling and/or transferring it. Owner or operator can lock the token. When a token is being locked, the unlocker address (an EOA or a contract) is set. Only unlocker is able to `unlock` the token. 
 
 ## Motivation
-With NFTs, digital objects become digital goods. Verifiably ownable, easily tradable, immutably stored on the blockchain. However, the usability of NFT presently is quite limited. Existing use cases often have poor UX as they are inherited from ERC20 (fungible tokens) world.
+With NFTs, digital objects become digital goods. Verifiably ownable, easily tradable, immutably stored on the blockchain. However, the usability of NFT presently is quite limited. Existing use cases often have poor UX as they are inherited from fungible tokens world.
 
-In DeFi you mostly deal with ERC20 tokens. There is a UX pattern when you lock your tokens on a service smart contract. For example, if you want to borrow some $DAI, you have to provide some $ETH as collateral for a loan. During the loan period $ETH is being locked into the lending service contract. And it's ok for $ETH and other fungible tokens.
+In DeFi you mostly deal with fungible tokens. There is a UX pattern when you lock your tokens on a service smart contract. For example, if you want to borrow some $DAI, you have to provide some $ETH as collateral for a loan. During the loan period $ETH is being locked into the lending service contract. And it's ok for $ETH and other fungible tokens.
 
 It's different for NFTs. NFTs have plenty of use cases, that require for the NFT to stay on the holder's wallet even when it is used as collateral for a loan. You may want to keep using your NFT as a verified PFP on Twitter. You may want to use it to authorize on Discord server through Collab.land. You may want to use your NFT in a P2E game. And you should be able to do all of this even during the lending period like you are able to live in your house even it is mortgaged.
 
@@ -91,16 +91,16 @@ Following use cases are available by just implementing the proposed specificatio
 - **No collateral rentals of NFTs** Borrow NFT for a fee, without a need for huge collateral. You can use NFT, but not transfer it, so the lender is safe. The borrowing service contract automatically transfers NFT back to the lender as soon as the borrowing period expires.
 - **Primary sales** Mint NFT for only the part of the price and pay the rest when you are satisfied with how the collection evolves.
 - **Secondary sales** Buy and sell your NFT by installments. Buyer gets locked NFT and immediately starts using it. At the same time he/she is not able to sell the NFT until all the installments are paid. If full payment is not received, NFT goes back to the seller together with a fee.
-- **S is for Safety** Use your exclusive blue chip NFTs safely and conveniently. The most convenient way to use NFT is together with MetaMask. However, MetaMask is vulnerable to various bugs and attacks. With `Lockable` extension you can lock your NFT and declare your safe cold wallet as an unlocker. Thus, you can still keep your NFT on MetaMask and use it conveniently. Even if a hacker gets access to your MetaMask, they won’t be able to transfer your NFT without access to the cold wallet. That’s what makes `Lockable` NFTs safe. This use case is also [described](https://github.com/OwlOfMoistness/erc721-lock-registry) by OwlOfMoistness.
+- **S is for Safety** Use your exclusive blue chip NFTs safely and conveniently. The most convenient way to use NFT is together with MetaMask. However, MetaMask is vulnerable to various bugs and attacks. With `Lockable` extension you can lock your NFT and declare your safe cold wallet as an unlocker. Thus, you can still keep your NFT on MetaMask and use it conveniently. Even if a hacker gets access to your MetaMask, they won’t be able to transfer your NFT without access to the cold wallet. That’s what makes `Lockable` NFTs safe. 
 - **Metaverse ready** Locking NFT tickets can be useful during huge Metaverse events. That will prevent users, who already logged in with an NFT, from selling it or transferring it to another user. Thus we avoid double usage of one ticket.
-- **Non-custodial staking** Using locking of NFTs for the staking protocols that do not transfer your NFT from your wallet to the staking contract is thoroughly described [here](https://github.com/OwlOfMoistness/erc721-lock-registry) and [here](https://github.com/samurisenft/erc721nes-contracts). However, my approach to this is a little bit different. I think staking should be done in one place only like you can not deposit money in two bank accounts simultaneously. 
-Another approach to the same concept is using locking to provide proof of HODL. You can lock your NFTs from selling as a manifestation of loyalty to the community and start earning rewards for that. It is better version of the rewards mechanism, that was originally introduced by [The Hashmasks](https://www.thehashmasks.com/nct) and their $NCT token. 
+- **Non-custodial staking** Using locking of NFTs for the staking protocols that do not transfer your NFT from your wallet to the staking contract is thoroughly described [here](../../../../../OwlOfMoistness/erc721-lock-registry) and [here](../../../../../samurisenft/erc721nes-contracts). Approach suggested in this impementation supposes that the token can only be staked in one place, not several palces at a time. It is like you can not deposit money in two bank accounts simultaneously. 
+Another approach to the same concept is using locking to provide proof of HODL. You can lock your NFTs from selling as a manifestation of loyalty to the community and start earning rewards for that. It is better version of the rewards mechanism, that was originally introduced by The Hashmasks and their $NCT token. 
 - **Safe and convenient co-ownership and co-usage** Extension of safe co-ownership and co-usage. For example, you want to purchase an expensive NFT asset together with friends, but it is not handy to use it with multisig, so you can safely rotate and use it between wallets. The NFT will be stored on one of the co-owners' wallet and he will be able to use it in any way (except transfers) without requiring multi-approval. Transfers will require multi-approval.
 
 More of use cases may be introduced as soon as the community starts to explore `Lockable` NFTs.
 
 ## Backwards Compatibility
-This standard is compatible with current ERC-721 standards.
+This standard is compatible with current [EIP-721](./eip-721.md) standards.
 
 ## Reference Implementation
 Implementation:
@@ -223,7 +223,7 @@ abstract contract ERC721Lockable is ERC721, ILockable {
 }
 ```
 
-More implementations can be found [here](https://github.com/filmakarov/erc721-lockable).
+More implementations of the EIP as well as smart contracts that demonstrate how marketplaces can work with Lockable tokens can be found [here](../../../../../filmakarov/erc721-lockable).
 
 ## Security Considerations
 The callers of `lock` function should always consider if there's an unlocking function in the contract, that is stated as an unlocker, unless they want to lock the NFT from transfers forever.
