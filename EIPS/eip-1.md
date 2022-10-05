@@ -265,7 +265,7 @@ The `description` field in the preamble:
 
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
 
-### RFC 2119
+### RFC 8174
 
 EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.html), [RFC 8174](https://www.ietf.org/rfc/rfc8174.html) for terminology and to insert the following at the beginning of the Specification section:
 
