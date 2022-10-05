@@ -221,7 +221,8 @@ If you feel that a link you wish to include shouldn't violate the below rules, p
   - It is still **RECOMMENDED** to add a backup.
   
 ### Fallback
-
+- Links should be the most stable (i.e., unlikely to change and expected to be continuously available) and direct reference possible.
+- The International DOI Foundation maintains the [Digital Object Identifier Service](https://www.doi.org) as an online registry of stable, indirect links.  DOI numbers should be included in citations when available.
 - All other external resources **MUST NOT** be included.
 
 ## Linking to other EIPs
