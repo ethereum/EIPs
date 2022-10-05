@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Lockable Extension for EIP-721
 description: Interface for locking and unlocking EIP-721 tokens.
-author: Fil Makarov (@filmakarov)
+author: Filipp Makarov (@filmakarov)
 discussions-to: https://ethereum-magicians.org/t/lockable-nfts-extension/8800
 status: Draft
 type: Standards Track
