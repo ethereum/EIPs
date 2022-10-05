@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
  */
-interface IVestingNFT is IERC721 {
+interface IERC5725 is IERC721 {
     event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 _claimAmount);
 
     /**

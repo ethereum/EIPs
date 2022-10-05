@@ -37,13 +37,13 @@ describe('VestingNFT', function () {
     unlockTime = await createVestingNft(vestingNFT, receiverAccount, mockToken)
   })
 
-  it('Supports ERC721 and IVestingNFT interfaces', async function () {
+  it('Supports ERC721 and IERC5725 interfaces', async function () {
     expect(await vestingNFT.supportsInterface('0x80ac58cd')).to.equal(true)
 
     /**
      * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified
      * // Solidity export interface id:
-     * bytes4 public constant IID_ITEST = type(IVestingNFT).interfaceId;
+     * bytes4 public constant IID_ITEST = type(IERC5725).interfaceId;
      * // Pull out the interfaceId in tests
      * const interfaceId = await vestingNFT.IID_ITEST();
      */
