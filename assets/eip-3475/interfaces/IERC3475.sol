@@ -5,22 +5,21 @@ pragma solidity ^0.8.0;
 
 
 interface IERC3475 {
-
     // STRUCTURE 
     /**
      * @dev Values structure of the Metadata
      */
-    struct Values {        
+    struct Values { 
         string stringValue;
         uint uintValue;
         address addressValue;
         bool boolValue;
     }
     /**
-     * @dev structure allows the transfer of any given number of bonds from one address to another.
-     * @title": "defining the title information",
-     * @type": "explaining the type of the title information added",
-     * @description": "little description about the information stored in the bond",
+     * @dev structure allows to define particular bond metadata (ie the values in the class as well as nonce inputs). 
+     * @notice 'title' defining the title information,
+     * @notice '_type' explaining the data type of the title information added (eg int, bool, address),
+     * @notice 'description' explains little description about the information stored in the bond",
      */
     struct Metadata {
         string title;
@@ -28,7 +27,8 @@ interface IERC3475 {
         string description;
     }
     /**
-     * @dev structure allows the transfer of any given number of bonds from one address to another.
+     * @dev structure that defines the parameters for specific issuance of bonds and amount which are to be transferred/issued/given allowance, etc.
+     * @notice this structure is used to streamline the input parameters for functions of this standard with that of other Token standards like ERC20.
      * @classId is the class id of the bond.
      * @nonceId is the nonce id of the given bond class. This param is for distinctions of the issuing conditions of the bond.
      * @amount is the amount of the bond that will be transferred.
@@ -42,7 +42,7 @@ interface IERC3475 {
     // WRITABLES
     /**
      * @dev allows the transfer of a bond from one address to another (either single or in batches).
-     * @param _from  is the address of the holder whose balance is about to decrease.
+     * @param _from is the address of the holder whose balance is about to decrease.
      * @param _to is the address of the recipient whose balance is about to increase.
      * @param _transactions is the object defining {class,nonce and amount of the bonds to be transferred}.
      */
@@ -55,13 +55,12 @@ interface IERC3475 {
      */
     function transferAllowanceFrom(address _from, address _to, Transaction[] calldata _transactions) external;
     /**
-     * @dev allows issuing of any number of bond types to an address.
+     * @dev allows issuing of any number of bond types to an address(either single/batched issuance).
      * The calling of this function needs to be restricted to bond issuer contract.
      * @param _to is the address to which the bond will be issued.
      * @param _transactions is the object defining {class,nonce and amount of the bonds to be issued for given whitelisted bond}.
      */
     function issue(address _to, Transaction[] calldata _transactions) external;
-    
     /**
      * @dev allows redemption of any number of bond types from an address.
      * The calling of this function needs to be restricted to bond issuer contract.
@@ -73,7 +72,7 @@ interface IERC3475 {
     /**
      * @dev allows the transfer of any number of bond types from an address to another.
      * The calling of this function needs to be restricted to bond issuer contract.
-     * @param _from  is the address of the holder whose balance about to decrees.
+     * @param _from is the address of the holder whose balance about to decrees.
      * @param _transactions is the object defining {class,nonce and amount of the bonds to be redeemed for given whitelisted bond}.
      */
     function burn(address _from, Transaction[] calldata _transactions) external;
@@ -124,34 +123,39 @@ interface IERC3475 {
     /**
      * @dev Returns the JSON metadata of the classes.
      * The metadata SHOULD follow a set of structure explained later in eip-3475.md
+     * @param metadataId is the index corresponding to the class parameter that you want to return from mapping.
      */
     function classMetadata(uint256 metadataId) external view returns ( Metadata memory);
     
     /**
-     * @dev Returns the JSON metadata of the nonces.
-     * The metadata SHOULD follow a set of structure explained later in eip-3475.md
+     * @dev Returns the JSON metadata of the Values of the nonces in the corresponding class.
+     * @param classId is the specific classId of which you want to find the metadata of the corresponding nonce.
+     * @param metadataId is the index corresponding to the class parameter that you want to return from mapping.
+     * @notice The metadata SHOULD follow a set of structure explained later in metadata section.
      */
     function nonceMetadata(uint256 classId, uint256 metadataId) external view returns ( Metadata memory);
     
     /**
      * @dev Returns the values of the given classId.
+     * @param classId is the specific classId of which we want to return the parameter.
+     * @param metadataId is the index corresponding to the class parameter that you want to return from mapping.
      * the metadata SHOULD follow a set of structures explained in eip-3475.md
      */
     function classValues(uint256 classId, uint256 metadataId) external view returns ( Values memory);
    
     /**
      * @dev Returns the values of given nonceId.
-     * @param  metadataId index number of structure as  explained in the metadata section in eip-3475.md
+     * @param metadataId index number of structure as explained in the metadata section in EIP-3475.
      * @param classId is the class of bonds for which you determine the nonce.
      * @param nonceId is the nonce for which you return the value struct info.
-     * Returns the values object corresponding to the given value.   
+     * Returns the values object corresponding to the given value.
      */
     function nonceValues(uint256 classId, uint256 nonceId, uint256 metadataId) external view returns ( Values memory);
     
     /**
-     * @dev Returns the information about the progress needed to redeem the bond
+     * @dev Returns the information about the progress needed to redeem the bond identified by classId and nonceId.
      * @notice Every bond contract can have its own logic concerning the progress definition.
-     * @param classId The class of  bonds.
+     * @param classId The class of bonds.
      * @param nonceId is the nonce of bonds for finding the progress.
      * Returns progressAchieved is the current progress achieved.
      * Returns progressRemaining is the remaining progress.
@@ -159,17 +163,17 @@ interface IERC3475 {
     function getProgress(uint256 classId, uint256 nonceId) external view returns (uint256 progressAchieved, uint256 progressRemaining);
    
     /**
-     * @notice Returns the amount which spender is still allowed to withdraw from _owner.
+     * @notice Returns the amount that spender is still allowed to withdraw from _owner (for given classId and nonceId issuance)
      * @param _owner is the address whose owner allocates some amount to the _spender address.
-     * @param classId is the classId of bond .
+     * @param classId is the classId of the bond.
      * @param nonceId is the nonce corresponding to the class for which you are approving the spending of total amount of bonds.
      */
     function allowance(address _owner, address _spender, uint256 classId, uint256 nonceId) external view returns (uint256);
     /**
-     * @notice Queries the approval status of an operator for a given owner.
-     * @param _owner is the current holder of the bonds for  all classes / nonces.
-     * @param _operator is the address which is  having access to the bonds of _owner for transferring 
-     * Returns "true" if the operator is approved, "false" if not
+     * @notice Queries the approval status of an operator for bonds (for all classes and nonce issuances of owner).
+     * @param _owner is the current holder of the bonds for all classes/nonces.
+     * @param _operator is the address with access to the bonds of _owner for transferring. 
+     * Returns "true" if the operator is approved, "false" if not.
      */
     function isApprovedFor(address _owner, address _operator) external view returns (bool);
 
