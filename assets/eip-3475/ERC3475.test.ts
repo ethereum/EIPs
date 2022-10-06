@@ -90,7 +90,7 @@ contract('Bond', async (accounts: string[]) => {
     it('lender should redeem bonds when conditions are met', async () => {
         const redemptionTransaction: _transaction[] = [ 
             {
-                classId:  1,
+                classId: 1,
                 nonceId: 1,
                 amount: 2000
 
@@ -111,7 +111,7 @@ contract('Bond', async (accounts: string[]) => {
         const redemptionTransaction: _transaction[] = [
            
             {
-                classId:  0,
+                classId: 0,
                 nonceId: 0,
                 amount: 2000
 
@@ -168,7 +168,7 @@ contract('Bond', async (accounts: string[]) => {
 
             }];
         await bondContract.issue(lender, transactionRedeem, {from: lender});
-        sleep(7000);    
+        sleep(7000);
 
         const tx = (await bondContract.redeem(lender, transactionRedeem, {from:lender})).tx;
         
@@ -185,7 +185,6 @@ contract('Bond', async (accounts: string[]) => {
             }];
 
         await bondContract.issue(lender, transactionRedeem, {from: lender});
-            
         const tx = (await bondContract.burn(lender, transactionRedeem, {from:lender})).tx;
         console.log(tx)
         assert.isString(tx);
