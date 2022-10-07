@@ -18,9 +18,8 @@ interface IERC5725 is IERC721 {
      * MUST revert if not called by the token owner or approved users
      * SHOULD revert if there is nothing to claim
      * @param tokenId The NFT token id
-     * @return amountClaimed The amount of tokens claimed in this call
      */
-    function claim(uint256 tokenId) external returns (uint256 amountClaimed);
+    function claim(uint256 tokenId) external;
 
     /**
      * @notice Total amount of tokens which have been vested at the current timestamp.

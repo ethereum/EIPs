@@ -27,9 +27,9 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) returns (uint256 amountClaimed) {
+    function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) {
         require(ownerOf(tokenId) == msg.sender, "Not owner of NFT");
-        amountClaimed = claimablePayout(tokenId);
+        uint256 amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "VestingNFT: No pending payout");
 
         emit PayoutClaimed(tokenId, msg.sender, amountClaimed);
