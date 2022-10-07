@@ -9,13 +9,15 @@ This repository tracks ongoing improvements to Ethereum. It contains:
 
 For help *implementing* an EIP, please visit [Ethereum Stack Exchange](https://ethereum.stackexchange.com).
 
+If you would like to become an EIP Editor, please check [EIP-5069](./EIPS/eip-5069.md).
+
 ## Mission
 
-The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high quality and implementable way.
+The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high-quality and implementable way.
 
 ## Preferred Citation Format
 
-The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+The canonical URL for an EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
 
 Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
 
@@ -23,7 +25,7 @@ And please consider anything published at https://eips.ethereum.org/ with a stat
 
 ## Automerger
 
-This repository contains an "auto merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if the EIP's authors approve the PR on GitHub. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
+This repository contains an "auto-merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if the EIP's authors approve the PR on GitHub. This is handled by [EIP-Bot](https://github.com/ethereum/EIP-Bot).
 
 ## Validation
 

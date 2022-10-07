@@ -1,9 +1,7 @@
 /*
 Consumer
 
-https://github.com/devinaconley/token-hold-example
-
-SPDX-License-Identifier: MIT
+SPDX-License-Identifier: CC0-1.0
 */
 
 pragma solidity ^0.8.0;

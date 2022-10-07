@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity >=0.7.6;
 
 import './MetaProxyFactory.sol';

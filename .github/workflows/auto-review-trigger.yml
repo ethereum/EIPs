@@ -1,0 +1,63 @@
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull Request Number
+        type: string
+        required: true
+  issue_comment:
+    types:
+      - created
+
+name: Auto Review Bot Trigger
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    name: Trigger
+    steps:
+      - name: Write PR Number - PR Target
+        run: echo $PR_NUMBER > pr-number.txt
+        if: github.event_name == 'pull_request_target'
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Write PR Number - PR Review
+        run: echo $PR_NUMBER > pr-number.txt
+        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && !endsWith(github.event.sender, '-bot') && !endsWith(github.event.sender, '[bot]')
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
+      - name: Write PR Number - Workflow Dispatch
+        run: echo $PR_NUMBER > pr-number.txt
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+
+      - name: Write PR Number - Comment Retrigger
+        run: echo $PR_NUMBER > pr-number.txt
+        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+      
+      - name: Check File Existence
+        uses: andstor/file-existence-action@f02338908d150e00a4b8bebc2dad18bd9e5229b0
+        id: check_pr_number_exists
+        with:
+          files: pr-number.txt
+
+      - name: Save PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        if: steps.check_pr_number_exists.outputs.files_exists == 'true'
+        with:
+          name: pr-number
+          path: pr-number.txt
