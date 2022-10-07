@@ -22,7 +22,7 @@ contract("ERC5496Cloneable", async accounts => {
         await demoContract.increasePrivileges(true);
     })
 
-    it("should set privilege 0 to Bob", async () => {
+    it("Should set privilege 0 to Bob", async () => {
         let expires = Math.floor(new Date().getTime()/1000) + 5000;
         await demoContract.setPrivilege(1, 0, Bob, BigInt(expires));
 
@@ -34,7 +34,7 @@ contract("ERC5496Cloneable", async accounts => {
         );
     });
 
-    it("privilege should belongs to owner by default", async () => {
+    it("Privilege should belong to the owner by default", async () => {
         let owner_1 = await demoContract.ownerOf(1);
         assert.equal(
             owner_1,
@@ -49,7 +49,7 @@ contract("ERC5496Cloneable", async accounts => {
         );
     });
 
-    it("privilege holder allowed to transfer privilege to others", async () => {
+    it("The privilege holder is allowed to transfer the privilege to others", async () => {
         let expires = Math.floor(new Date().getTime()/1000) + 5000;
         await demoContract.setPrivilege(2, 0, Bob, BigInt(expires));
         let user_hasP0 = await demoContract.hasPrivilege(2, 0, Bob);
@@ -69,11 +69,11 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             privilege_info.expiresAt,
             expires,
-            "user should not change the expiresAt property if not owner"
+            "Only owner can set the expiresAt"
         )
     });
 
-    it("user allowed to transfer nft while privileges in renting", async () => {
+    it("User is allowed to transfer NFT while privileges on renting", async () => {
         await demoContract.transferFrom(Alice, Bob, 1);
         let owner_1 = await demoContract.ownerOf(1);
         assert.equal(
@@ -87,7 +87,7 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP1,
             true,
-            "Bob should allowed to set unassigned privilege to Tom"
+            "Bob should be allowed to set unassigned privilege to Tom"
         );
     });
 
@@ -97,7 +97,16 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP2,
             true,
-            "privilege 2 available after NFT owner update the privilege total"
+            "privilage 2 available after NFT owner update the privileges total"
+        );
+    });
+
+    it("NFT owner should not change the privilege if it has been assigned", async () => {
+        let expires = Math.floor(new Date().getTime()/1000) + 5000;
+        await demoContract.setPrivilege(3, 0, Bob, BigInt(expires));
+        await expectRevert(
+            demoContract.setPrivilege(3, 0, Tom, BigInt(expires)),
+            "ERC721: transfer caller is not owner nor approved",
         );
     });
 
@@ -107,13 +116,13 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             cloneable_P2,
             false,
-            "privilege 2 should not be cloneable"
+            "privilage 2 should not be cloneable"
         );
         let cloneable_P3 = await demoContract.cloneable(3);
         assert.equal(
             cloneable_P3,
             true,
-            "privilege 3 should be cloneable"
+            "privilage 3 should be cloneable"
         );
         let expires = Math.floor(new Date().getTime()/1000) + 5000;
         await demoContract.setPrivilege(4, 3, Bob, BigInt(expires), { from: Alice });
@@ -131,7 +140,7 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP3,
             true,
-            "privilege 3 available after Bob cloned"
+            "privilage 3 available after Bob cloned"
         );
     });
 });
