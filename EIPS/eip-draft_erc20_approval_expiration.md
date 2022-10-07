@@ -1,6 +1,6 @@
 ---
 eip: <to be assigned>
-title: Approval Expirations for ERC20 Tokens
+title: Approval Expiration for ERC-20 Tokens
 description: This standard introduces a standardized way for users to set expiration limits on ERC-20 token approvals.
 author: Go+ Security <@GoPlusSecurity>, Jeff Hall <@JeffHal25193696>, Xavi <@XaaaaavitheFool>, Turan Vural <@turanzv>
 discussions-to: <URL>
