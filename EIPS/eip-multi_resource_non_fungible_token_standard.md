@@ -1,14 +1,14 @@
 ---
 eip: <to be assigned>
-title: Multi-Resource Token standard
-description: A standard interface for Multi-Resource tokens.
+title: Multi-Resource Token
+description: An interface for Multi-Resource tokens.
 author: Bruno Škvorc (@Swader), Cicada (@CicadaNCR), Steven Pineda (@steven2308), Stevan Bogosavljevic (@stevyhacker), Jan Turk (@ThunderDeliverer)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-10-10
-requires: [165](./eip-165.md), [721](./eip-721.md)
+requires: 165, 721
 ---
 
 ## Abstract
