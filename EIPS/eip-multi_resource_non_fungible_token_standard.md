@@ -251,7 +251,7 @@ Adding resources to an existing token MUST be done in the form of a propose-comm
 
 Several functions for resource management are included. In addition to permissioned migration from "Pending" to "Active", the owner of a token MAY also drop resources from both the active and the pending array -- an emergency function to clear all entries from the pending array MUST also be included.
 
-## Backward compatibility
+## Backwards compatibility
 
 The MultiResource token standard has been made compatible with [EIP-721](./eip-721.md) in order to take advantage of the robust tooling available for implementations of EIP-721 and to ensure compatibility with existing EIP-721 infrastructure.
 
@@ -261,15 +261,15 @@ The RMRK MultiResource lego block implementation includes test cases written usi
 
 ## Reference implementations
 
-[RMRK MultiResource lego block](https://github.com/rmrk-team/MultiResourceEIP) and [documentation](https://docs.rmrk.app/lego2-multi-resource)
+RMRK MultiResource lego block and documentation
 
 - Compatible with the original version of the standard
 
-Neon Crisis, by [CicadaNCR](https://github.com/CicadaNCR)
+Neon Crisis, by CicadaNCR
 
 - A NFT game utilizing RMRK MultiResource lego block
 
-Snake Soldiers, by [Steven Pineda](https://github.com/steven2308)
+Snake Soldiers, by Steven Pineda
 
 - A NFT game utilizing RMRK MultiResource lego block
 
@@ -353,7 +353,7 @@ interface IRenderUtils {
 }
 ````
 
-Example implementation of such utility can be found in the [RMRK's MultiResource lego block implementation](https://github.com/rmrk-team/MultiResourceEIP/blob/master/contracts/MultiResource_EIP/utils/RenderUtils.sol).
+Example implementation of such utility can be found in the RMRK's MultiResource lego block implementation.
 
 ## Security considerations
 
