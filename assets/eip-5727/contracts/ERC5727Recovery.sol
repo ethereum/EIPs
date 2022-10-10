@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "./ERC5727.sol";
-import "./IERC5727Recovery.sol";
+import "./interfaces/IERC5727Recovery.sol";
 import "./ERC5727Enumerable.sol";
 
 abstract contract ERC5727Recovery is ERC5727Enumerable, IERC5727Recovery {
@@ -15,7 +15,7 @@ abstract contract ERC5727Recovery is ERC5727Enumerable, IERC5727Recovery {
         virtual
         override
     {
-        address recipient = msg.sender;
+        address recipient = _msgSender();
         bytes32 messageHash = keccak256(abi.encodePacked(soul, recipient));
         bytes32 signedHash = messageHash.toEthSignedMessageHash();
         require(signedHash.recover(signature) == soul, "Invalid signature");
@@ -27,7 +27,7 @@ abstract contract ERC5727Recovery is ERC5727Enumerable, IERC5727Recovery {
             uint256 slot = token.slot;
             bool valid = token.valid;
             _destroy(tokenIds[i]);
-            _mintUnsafe(issuer, soul, tokenIds[i], value, slot, valid);
+            _mintUnsafe(issuer, recipient, tokenIds[i], value, slot, valid);
         }
     }
 

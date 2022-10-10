@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./ERC5727.sol";
-import "./IERC5727SlotEnumerable.sol";
+import "./interfaces/IERC5727SlotEnumerable.sol";
 
 abstract contract ERC5727SlotEnumerable is ERC5727, IERC5727SlotEnumerable {
     using EnumerableSet for EnumerableSet.UintSet;
@@ -45,7 +45,7 @@ abstract contract ERC5727SlotEnumerable is ERC5727, IERC5727SlotEnumerable {
         if (!_slotExists(slot)) {
             return 0;
         }
-        return EnumerableSet.length(_allSlots[_allSlotsIndex[slot]].slotTokens);
+        return _allSlots[_allSlotsIndex[slot]].slotTokens.length();
     }
 
     function tokenInSlotByIndex(uint256 slot, uint256 index)
@@ -58,8 +58,7 @@ abstract contract ERC5727SlotEnumerable is ERC5727, IERC5727SlotEnumerable {
             index < ERC5727SlotEnumerable.tokenSupplyInSlot(slot),
             "ERC5727SlotEnumerable: slot token index out of bounds"
         );
-        return
-            EnumerableSet.at(_allSlots[_allSlotsIndex[slot]].slotTokens, index);
+        return _allSlots[_allSlotsIndex[slot]].slotTokens.at(index);
     }
 
     function supportsInterface(bytes4 interfaceId)

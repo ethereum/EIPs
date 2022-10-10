@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./ERC5727.sol";
-import "./IERC5727Governance.sol";
+import "./interfaces/IERC5727Governance.sol";
 import "./ERC5727Enumerable.sol";
 
 abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
@@ -41,13 +41,13 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
     ) ERC5727(name_, symbol_) {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
         for (uint256 i = 0; i < voters_.length; i++) {
-            EnumerableSet.add(_votersArray, voters_[i]);
+            _votersArray.add(voters_[i]);
             _setupRole(VOTER_ROLE, voters_[i]);
         }
     }
 
     function voters() public view virtual override returns (address[] memory) {
-        return EnumerableSet.values(_votersArray);
+        return _votersArray.values();
     }
 
     function approveMint(address soul, uint256 approvalRequestId)
@@ -64,7 +64,7 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
         _mintApprovalCounts[approvalRequestId][soul] += 1;
         if (
             _mintApprovalCounts[approvalRequestId][soul] ==
-            EnumerableSet.length(_votersArray)
+            _votersArray.length()
         ) {
             _resetMintApprovals(approvalRequestId, soul);
             _mint(
@@ -88,9 +88,7 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
         );
         _revokeApprovals[_msgSender()][tokenId] = true;
         _revokeApprovalCounts[tokenId] += 1;
-        if (
-            _revokeApprovalCounts[tokenId] == EnumerableSet.length(_votersArray)
-        ) {
+        if (_revokeApprovalCounts[tokenId] == _votersArray.length()) {
             _resetRevokeApprovals(tokenId);
             _revoke(tokenId);
         }
@@ -111,19 +109,15 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
     function _resetMintApprovals(uint256 approvalRequestId, address soul)
         private
     {
-        for (uint256 i = 0; i < EnumerableSet.length(_votersArray); i++) {
-            _mintApprovals[EnumerableSet.at(_votersArray, i)][
-                approvalRequestId
-            ][soul] = false;
+        for (uint256 i = 0; i < _votersArray.length(); i++) {
+            _mintApprovals[_votersArray.at(i)][approvalRequestId][soul] = false;
         }
         _mintApprovalCounts[approvalRequestId][soul] = 0;
     }
 
     function _resetRevokeApprovals(uint256 tokenId) private {
-        for (uint256 i = 0; i < EnumerableSet.length(_votersArray); i++) {
-            _revokeApprovals[EnumerableSet.at(_votersArray, i)][
-                tokenId
-            ] = false;
+        for (uint256 i = 0; i < _votersArray.length(); i++) {
+            _revokeApprovals[_votersArray.at(i)][tokenId] = false;
         }
         _revokeApprovalCounts[tokenId] = 0;
     }
@@ -162,16 +156,16 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
             !hasRole(VOTER_ROLE, newVoter),
             "ERC5727Governance: newVoter is already a voter"
         );
-        EnumerableSet.add(_votersArray, newVoter);
+        _votersArray.add(newVoter);
         _setupRole(VOTER_ROLE, newVoter);
     }
 
     function removeVoter(address voter) public onlyOwner {
         require(
-            EnumerableSet.contains(_votersArray, voter),
+            _votersArray.contains(voter),
             "ERC5727Governance: Voter does not exist"
         );
         _revokeRole(VOTER_ROLE, voter);
-        EnumerableSet.remove(_votersArray, voter);
+        _votersArray.remove(voter);
     }
 }

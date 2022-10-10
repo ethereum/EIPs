@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "./ERC5727.sol";
-import "./IERC5727Expirable.sol";
+import "./interfaces/IERC5727Expirable.sol";
 
 abstract contract ERC5727Expirable is IERC5727Expirable, ERC5727 {
     mapping(uint256 => uint256) private _expiryDate;

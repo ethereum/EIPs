@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./ERC5727.sol";
-import "./IERC5727Enumerable.sol";
+import "./interfaces/IERC5727Enumerable.sol";
 
 abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
     using Counters for Counters.Counter;
@@ -37,9 +37,15 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         uint256 slot,
         bool valid
     ) internal virtual override {
-        if (EnumerableSet.length(_indexedTokenIds[soul]) == 0) {
-            Counters.increment(_soulsCount);
+        if (_indexedTokenIds[soul].length() == 0) {
+            _soulsCount.increment();
         }
+        //unused variables
+        issuer;
+        tokenId;
+        value;
+        slot;
+        valid;
     }
 
     function _afterTokenMint(
@@ -50,10 +56,15 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         uint256 slot,
         bool valid
     ) internal virtual override {
-        EnumerableSet.add(_indexedTokenIds[soul], tokenId);
+        _indexedTokenIds[soul].add(tokenId);
         if (valid) {
             _numberOfValidTokens[soul] += 1;
         }
+        //unused variables
+        issuer;
+        value;
+        slot;
+        valid;
     }
 
     function _mint(
@@ -61,10 +72,10 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256 tokenId) {
-        tokenId = Counters.current(_emittedCount);
+        tokenId = _emittedCount.current();
         _mintUnsafe(soul, tokenId, value, slot, true);
         emit Minted(soul, tokenId, value);
-        Counters.increment(_emittedCount);
+        _emittedCount.increment();
     }
 
     function _mint(
@@ -73,10 +84,10 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256 tokenId) {
-        tokenId = Counters.current(_emittedCount);
+        tokenId = _emittedCount.current();
         _mintUnsafe(issuer, soul, tokenId, value, slot, true);
         emit Minted(soul, tokenId, value);
-        Counters.increment(_emittedCount);
+        _emittedCount.increment();
     }
 
     function _mintBatch(
@@ -84,6 +95,7 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256[] memory tokenIds) {
+        tokenIds = new uint256[](souls.length);
         for (uint256 i = 0; i < souls.length; i++) {
             tokenIds[i] = _mint(souls[i], value, slot);
         }
@@ -103,13 +115,13 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         }
         EnumerableSet.remove(_indexedTokenIds[soul], tokenId);
         if (EnumerableSet.length(_indexedTokenIds[soul]) == 0) {
-            assert(Counters.current(_soulsCount) > 0);
-            Counters.decrement(_soulsCount);
+            assert(_soulsCount.current() > 0);
+            _soulsCount.decrement();
         }
     }
 
     function _increaseEmittedCount() internal {
-        Counters.increment(_emittedCount);
+        _emittedCount.increment();
     }
 
     function _tokensOfSoul(address soul)
@@ -117,16 +129,16 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         view
         returns (uint256[] memory tokenIds)
     {
-        tokenIds = EnumerableSet.values(_indexedTokenIds[soul]);
+        tokenIds = _indexedTokenIds[soul].values();
         require(tokenIds.length != 0, "ERC5727: the soul has no token");
     }
 
     function emittedCount() public view virtual override returns (uint256) {
-        return Counters.current(_emittedCount);
+        return _emittedCount.current();
     }
 
     function soulsCount() public view virtual override returns (uint256) {
-        return Counters.current(_soulsCount);
+        return _soulsCount.current();
     }
 
     function balanceOf(address soul)
@@ -136,7 +148,7 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         override
         returns (uint256)
     {
-        return EnumerableSet.length(_indexedTokenIds[soul]);
+        return _indexedTokenIds[soul].length();
     }
 
     function hasValid(address soul)
@@ -161,7 +173,7 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
             index < EnumerableSet.length(ids),
             "ERC5727: Token does not exist"
         );
-        return EnumerableSet.at(ids, index);
+        return ids.at(index);
     }
 
     function tokenByIndex(uint256 index)

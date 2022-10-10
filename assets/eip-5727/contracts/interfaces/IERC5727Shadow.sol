@@ -21,4 +21,11 @@ interface IERC5727Shadow is IERC5727 {
      * @param tokenId The token to reveal
      */
     function reveal(uint256 tokenId) external;
+
+    /**
+     * @notice Get if a token is shadowed.
+     * @dev MUST revert if the `tokenId` token does not exists.
+     * @param tokenId The token to query
+     */
+    function isShadowed(uint256 tokenId) external returns (bool);
 }

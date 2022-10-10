@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: CC0-1.0
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+
 import "./ERC5727.sol";
-import "./IERC5727Delegate.sol";
+import "./interfaces/IERC5727Delegate.sol";
 import "./ERC5727Enumerable.sol";
 
 abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
@@ -13,6 +15,8 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
         uint256 slot;
     }
 
+    using EnumerableSet for EnumerableSet.UintSet;
+
     uint256 private _delegateRequestCount;
 
     mapping(uint256 => DelegateRequest) private _delegateRequests;
@@ -20,6 +24,10 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
     mapping(address => mapping(uint256 => bool)) private _mintAllowed;
 
     mapping(address => mapping(uint256 => bool)) private _revokeAllowed;
+
+    mapping(address => EnumerableSet.UintSet) private _delegatedRequests;
+
+    mapping(address => EnumerableSet.UintSet) private _delegatedTokens;
 
     function supportsInterface(bytes4 interfaceId)
         public
@@ -44,8 +52,10 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
         );
         if (!isCreator) {
             _mintAllowed[_msgSender()][delegateRequestId] = false;
+            _delegatedRequests[_msgSender()].remove(delegateRequestId);
         }
         _mintAllowed[operator][delegateRequestId] = true;
+        _delegatedRequests[operator].add(delegateRequestId);
     }
 
     function _revokeDelegateAsDelegateOrCreator(
@@ -59,8 +69,10 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
         );
         if (!isCreator) {
             _revokeAllowed[_msgSender()][tokenId] = false;
+            _delegatedTokens[_msgSender()].remove(tokenId);
         }
         _revokeAllowed[operator][tokenId] = true;
+        _delegatedTokens[operator].add(tokenId);
     }
 
     function _mintAsDelegateOrCreator(uint256 delegateRequestId, bool isCreator)
@@ -203,5 +215,62 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
     {
         require(_isCreator(), "ERC5727Delegate: You are not the creator");
         delete _delegateRequests[delegateRequestId];
+    }
+
+    function delegatedRequestsOf(address operator)
+        public
+        view
+        virtual
+        returns (uint256[] memory)
+    {
+        return _delegatedRequests[operator].values();
+    }
+
+    function delegatedTokensOf(address operator)
+        public
+        view
+        virtual
+        returns (uint256[] memory)
+    {
+        return _delegatedTokens[operator].values();
+    }
+
+    function soulOfDelegateRequest(uint256 delegateRequestId)
+        public
+        view
+        virtual
+        returns (address)
+    {
+        require(
+            delegateRequestId < _delegateRequestCount,
+            "ERC5727Delegate: Delegate request does not exist"
+        );
+        return _delegateRequests[delegateRequestId].soul;
+    }
+
+    function valueOfDelegateRequest(uint256 delegateRequestId)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
+        require(
+            delegateRequestId < _delegateRequestCount,
+            "ERC5727Delegate: Delegate request does not exist"
+        );
+        return _delegateRequests[delegateRequestId].value;
+    }
+
+    function slotOfDelegateRequest(uint256 delegateRequestId)
+        public
+        view
+        virtual
+        returns (uint256)
+    {
+        require(
+            delegateRequestId < _delegateRequestCount,
+            "ERC5727Delegate: Delegate request does not exist"
+        );
+        return _delegateRequests[delegateRequestId].slot;
     }
 }

@@ -10,8 +10,8 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-import "./IERC5727.sol";
-import "./IERC5727Metadata.sol";
+import "./interfaces/IERC5727.sol";
+import "./interfaces/IERC5727Metadata.sol";
 
 abstract contract ERC5727 is
     IERC5727Metadata,
@@ -90,6 +90,7 @@ abstract contract ERC5727 is
         _beforeTokenMint(issuer, soul, tokenId, value, slot, valid);
         _tokens[tokenId] = Token(issuer, soul, valid, value, slot);
         _afterTokenMint(issuer, soul, tokenId, value, slot, valid);
+        emit Minted(soul, tokenId, value);
         emit SlotChanged(tokenId, 0, slot);
     }
 
@@ -236,7 +237,6 @@ abstract contract ERC5727 is
         override
         returns (address)
     {
-        _beforeView(tokenId);
         return _getTokenOrRevert(tokenId).issuer;
     }
 
