@@ -251,15 +251,15 @@ Adding resources to an existing token MUST be done in the form of a propose-comm
 
 Several functions for resource management are included. In addition to permissioned migration from "Pending" to "Active", the owner of a token MAY also drop resources from both the active and the pending array -- an emergency function to clear all entries from the pending array MUST also be included.
 
-## Backwards compatibility
+## Backwards Compatibility
 
 The MultiResource token standard has been made compatible with [EIP-721](./eip-721.md) in order to take advantage of the robust tooling available for implementations of EIP-721 and to ensure compatibility with existing EIP-721 infrastructure.
 
-## Test cases
+## Test Cases
 
 The RMRK MultiResource lego block implementation includes test cases written using Hardhat.
 
-## Reference implementations
+## Reference Implementation
 
 RMRK MultiResource lego block and documentation
 
@@ -355,7 +355,7 @@ interface IRenderUtils {
 
 Example implementation of such utility can be found in the RMRK's MultiResource lego block implementation.
 
-## Security considerations
+## Security Considerations
 
 The same security considerations as with [EIP-721](./eip-721.md) apply: hidden logic may be present in any of the functions, including burn, add resource, accept resource, and more.
 
