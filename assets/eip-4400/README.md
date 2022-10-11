@@ -2,7 +2,7 @@
 
 # ERC721 Consumable Extension
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: CC0-1.0](https://img.shields.io/badge/License-CC0-yellow.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 
 </div>
 

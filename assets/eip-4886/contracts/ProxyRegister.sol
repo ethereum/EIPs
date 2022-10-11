@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: CC0-1.0
 // EPSProxy Contracts v1.7.0 (epsproxy/contracts/ProxyRegister.sol)
 
 pragma solidity ^0.8.9;
@@ -221,7 +221,7 @@ contract ProxyRegister is EPS, Ownable {
   }
 
   /**
-  * @dev The nominator initiaties a proxy entry
+  * @dev The nominator initiates a proxy entry
   */
   function makeNomination(address _proxy, uint256 _provider) external payable isNotCurrentNominator(msg.sender) isNotCurrentProxy(_proxy) isNotCurrentProxy(msg.sender) {
     require (_proxy != address(0), "Proxy address must be provided");

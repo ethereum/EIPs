@@ -81,7 +81,7 @@ contract MetaProxyFactory {
         }
       }
       ptr := add(ptr, length)
-      // store the siz of the metadata at the end of the bytecode
+      // store the size of the metadata at the end of the bytecode
       mstore(ptr, length)
       ptr := add(ptr, 32)
 
