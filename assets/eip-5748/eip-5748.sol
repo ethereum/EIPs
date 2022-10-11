@@ -169,7 +169,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     string private _name;
     string private _symbol;
 
-    uint256 private constant DEFAULT_PERIOD = 86400 * 30;
+    uint256 private constant DEFAULT_EXPIRATION = 86400 * 30;
     mapping(address => mapping(address => uint256)) private _expiration;
 
     event AllowanceExpirationUpdated(address indexed owner, address indexed spender, uint256 value, uint256 expiration);
@@ -186,6 +186,13 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
+    }
+
+    /**
+     * @dev Returns the defaultPeriod of the token.
+     */
+    function defaultExpiration() public pure returns (uint256) {
+        return DEFAULT_EXPIRATION;
     }
 
     /**
@@ -271,7 +278,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
      */
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
         address owner = _msgSender();
-        _approve(owner, spender, amount, DEFAULT_PERIOD);
+        _approve(owner, spender, amount, DEFAULT_EXPIRATION);
         return true;
     }
 
@@ -323,7 +330,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
      */
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         address owner = _msgSender();
-        _approve(owner, spender, allowance(owner, spender) + addedValue, DEFAULT_PERIOD);
+        _approve(owner, spender, allowance(owner, spender) + addedValue, DEFAULT_EXPIRATION);
         return true;
     }
 
@@ -352,7 +359,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         uint256 currentAllowance = allowance(owner, spender);
         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
         unchecked {
-            _approve(owner, spender, currentAllowance - subtractedValue, DEFAULT_PERIOD);
+            _approve(owner, spender, currentAllowance - subtractedValue, DEFAULT_EXPIRATION);
         }
 
         return true;
