@@ -138,6 +138,19 @@ describe('ERC5727Test', function () {
       const { ERC5727ExampleContract } = await loadFixture(deployTokenFixture)
       await expect(ERC5727ExampleContract.revoke(100)).be.reverted
     })
+
+    it('Support Interface', async function () {
+      const { ERC5727ExampleContract } = await loadFixture(deployTokenFixture)
+      expect(await ERC5727ExampleContract.supportsInterface('0x35f61d8a')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x3da384b4')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x211ec300')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x2a8cf5aa')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x3ba738d1')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0xba3e1a9d')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x379f4e66')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x3475cd68')).to.equal(true)
+      expect(await ERC5727ExampleContract.supportsInterface('0x3b741b9e')).to.equal(true)
+    })
   })
 
   describe('ERC5727', function () {
@@ -540,7 +553,7 @@ describe('ERC5727Test', function () {
   })
 
   describe('ERC5727Recovery', function () {
-    it('Recover', async function () {
+    it('Successful recovery', async function () {
       const { ERC5727ExampleContract, tokenOwnerSoul1, tokenOwnerSoul2 } = await loadFixture(
         deployTokenFixture,
       )
@@ -575,13 +588,92 @@ describe('ERC5727Test', function () {
       )
 
       expect(await ERC5727ExampleContract.balanceOf(tokenOwnerSoul2.address)).to.equal(4)
+    })
+
+    it('Revert when the signature is invalid', async function () {
+      const { ERC5727ExampleContract, tokenOwnerSoul1, tokenOwnerSoul2 } = await loadFixture(
+        deployTokenFixture,
+      )
+
+      await ERC5727ExampleContract.mintBatch(
+        [
+          tokenOwnerSoul1.address,
+          tokenOwnerSoul1.address,
+          tokenOwnerSoul1.address,
+          tokenOwnerSoul2.address,
+        ],
+        1,
+        1,
+        2664539263,
+        false,
+      )
+
+      const signature = await tokenOwnerSoul1.signMessage(
+        ethers.utils.arrayify(
+          ethers.utils.keccak256(
+            ethers.utils.solidityPack(
+              ['address', 'address'],
+              [tokenOwnerSoul1.address, tokenOwnerSoul2.address],
+            ),
+          ),
+        ),
+      )
+
+      await expect(ERC5727ExampleContract.recover(tokenOwnerSoul1.address, signature)).to.be
+        .reverted
+    })
+
+    it('Revert when no token can be recover', async function () {
+      const { ERC5727ExampleContract, tokenOwnerSoul1, tokenOwnerSoul2 } = await loadFixture(
+        deployTokenFixture,
+      )
+
+      const signature = await tokenOwnerSoul1.signMessage(
+        ethers.utils.arrayify(
+          ethers.utils.keccak256(
+            ethers.utils.solidityPack(
+              ['address', 'address'],
+              [tokenOwnerSoul1.address, tokenOwnerSoul2.address],
+            ),
+          ),
+        ),
+      )
 
       await expect(
         ERC5727ExampleContract.connect(tokenOwnerSoul2).recover(tokenOwnerSoul1.address, signature),
       ).to.be.reverted
+    })
+  })
 
-      await expect(ERC5727ExampleContract.recover(tokenOwnerSoul1.address, signature)).to.be
-        .reverted
+  describe('ERC5727SlotEnumerable', function () {
+    it('Query for slot information', async function () {
+      const { ERC5727ExampleContract, tokenOwnerSoul1, tokenOwnerSoul2 } = await loadFixture(
+        deployTokenFixture,
+      )
+      await ERC5727ExampleContract.mintBatch(
+        [tokenOwnerSoul1.address, tokenOwnerSoul2.address],
+        1,
+        1,
+        2664539263,
+        false,
+      )
+      await ERC5727ExampleContract.mintBatch(
+        [tokenOwnerSoul1.address, tokenOwnerSoul1.address, tokenOwnerSoul2.address],
+        1,
+        2,
+        2664539263,
+        false,
+      )
+      expect(await ERC5727ExampleContract.tokenSupplyInSlot(1)).to.equal(2)
+      expect(await ERC5727ExampleContract.slotCount()).to.equal(2)
+      expect(await ERC5727ExampleContract.slotByIndex(1)).to.equal(2)
+      expect(await ERC5727ExampleContract.tokenInSlotByIndex(2, 2)).to.equal(4)
+    })
+
+    it('Revert when index overflows', async function () {
+      const { ERC5727ExampleContract } = await loadFixture(deployTokenFixture)
+      await expect(ERC5727ExampleContract.tokenInSlotByIndex(2, 3)).to.be.reverted
+      await expect(ERC5727ExampleContract.slotByIndex(2)).to.be.reverted
     })
   })
 
