@@ -107,4 +107,16 @@ contract("ERC5496", async accounts => {
             "ERC721: transfer caller is not owner nor approved",
         );
     });
+    
+    it("NFT should support interface IERC5496", async () => {
+        const interfaceIds = {
+            IERC165: "0x01ffc9a7",
+            IERC721: "0x80ac58cd",
+            IERC5496: "0x076e1bbb",
+        }
+        for(let interfaceName in interfaceIds) {
+            let isSupport = await demoContract.supportsInterface(interfaceIds[interfaceName]);
+            assert.equal(isSupport, true, "NFT should support interface "+interfaceName);
+        }
+    })
 });

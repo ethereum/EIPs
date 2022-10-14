@@ -143,4 +143,16 @@ contract("ERC5496Cloneable", async accounts => {
             "privilege 3 available after Bob cloned"
         );
     });
+
+    it("NFT should support interface IERC5496", async () => {
+        const interfaceIds = {
+            IERC165: "0x01ffc9a7",
+            IERC721: "0x80ac58cd",
+            IERC5496: "0x076e1bbb",
+        }
+        for(let interfaceName in interfaceIds) {
+            let isSupport = await demoContract.supportsInterface(interfaceIds[interfaceName]);
+            assert.equal(isSupport, true, "NFT should support interface "+interfaceName);
+        }
+    })
 });
