@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Multi-Resource Token
 description: An interface for Multi-Resource tokens.
 author: Bruno Škvorc (@Swader), Cicada (@CicadaNCR), Steven Pineda (@steven2308), Stevan Bogosavljevic (@stevyhacker), Jan Turk (@ThunderDeliverer)
-discussions-to: [https://ethereum-magicians.org/t/multiresource-tokens/11326](https://ethereum-magicians.org/t/multiresource-tokens/11326)
+discussions-to: https://ethereum-magicians.org/t/multiresource-tokens/11326
 status: Draft
 type: Standards Track
 category: ERC
