@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Digital identity Standard
 description: How to find own soul within digital address space.
 author: Tim Pechersky (@Peersky)
-discussions-to: <URL>
+discussions-to: <https://ethereum-magicians.org/t/digital-identity-standard-proposal>
 status: Draft
 type: Standards Track
 category: ERC
