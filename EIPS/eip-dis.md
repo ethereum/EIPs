@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2022-06-28
-requires: EIP165, ERC20, eip-2535
+requires: 165, 20, 2535
 ---
 
 ## Abstract
@@ -71,11 +71,11 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 ### Overview
 
-Smart contract of registry and factory are deployed on pre-determined address. Anyone interacting with this smart contract is able to create own identitiy instance that consists of a: 1) Soul token: an asset holding which is a proof of identity for any public address that holds it and embedds social recovery mechanisms; 2) digital identity proxy (EIP2535 diamond) that is controlled by soul token holders majority and can act as identities gateway or oracle in to the blockchain; 3) entry in the registry pointing their lookup name to that diamond, allowing human readible name
+Smart contract of registry and factory are deployed on pre-determined address. Anyone interacting with this smart contract is able to create own identitiy instance that consists of a: 1) Soul token: an asset holding which is a proof of identity for any public address that holds it and embedds social recovery mechanisms; 2) digital identity proxy (EIP-2535 diamond) that is controlled by soul token holders majority and can act as identities gateway or oracle in to the blockchain; 3) entry in the registry pointing their lookup name to that diamond, allowing human readible name
 
 ### Soul Token
 
-Soul token is a fungable token that is very similar to conventional ERC20 with three four new properties:
+Soul token is a fungable token that is very similar to conventional EIP-20 with three four new properties:
 
 1. Anyone can burn anyones tokens by burning same amount of own tokens.
 2. Methods exist that allow to read amount of tokens particular address has rights to act on behalf of.
@@ -137,7 +137,7 @@ TODO
 
 ## Backwards Compatibility
 
-This standard will be backwards compatible with commonly used ERC20 as well as diamon proxy.
+This standard will be backwards compatible with commonly used EIP-20 as well as diamon proxy.
 
 ## Test Cases
 
