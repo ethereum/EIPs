@@ -11,8 +11,6 @@ created: 2022-06-28
 requires: EIP165, ERC20, eip-2535
 ---
 
-## Simple Summary
-
 ## Abstract
 
 Digital identity in an abstraction layer beyond public address, that is required in order to cryptographic based blockchain technology gain wider adoption.
