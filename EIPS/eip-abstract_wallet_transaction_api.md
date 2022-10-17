@@ -13,7 +13,7 @@ created: 2022-10-17
 
 Defines new JSON RPC methods for dapps to send transactions from the user's wallet, as well as check on the status
 of said transactions. These methods are more abstract to handle the differences between different kinds of wallets, e.g.
-smart contract wallets utilizing EIP-4337 or wallets that support bundled transactions via EIP-3074.
+smart contract wallets utilizing [EIP-4337](./eip-4337.md) or wallets that support bundled transactions via [EIP-3074](./eip-3074.md).
 
 ## Motivation
 
@@ -21,13 +21,13 @@ The current APIs to send transactions and check their status, `eth_sendTransacti
 do not work well in many cases for regular EOA accounts. In particular, they do not allow sending or checking the status
 of bundles of transactions, or querying the status of a replaced-by-fee (sped up) transaction.
 
-The case is significantly exacerbated with account abstracted wallets (e.g. EIP-4337 or EIP-3074), where the transaction
+The case is significantly exacerbated with account abstracted wallets (e.g. [EIP-4337](./eip-4337.md) or [EIP-3074](./eip-3074.md)), where the transaction
 hash may not be known at
 the time of submission.
 
 A new more abstract wallet transaction API is thus required, so the wallet can handle differences between wallet
-implementations. Some wallets may use EIP-3074 to deliver batches, whereas others will use smart contract accounts
-via EIP-4337.
+implementations. Some wallets may use [EIP-3074](./eip-3074.md) to deliver batches, whereas others will use smart contract accounts
+via [EIP-4337](./eip-4337.md).
 
 ## Specification
 
@@ -173,7 +173,7 @@ were submitted as part of a single transaction.
 
 ## Rationale
 
-Account abstracted wallets, either via EIP-3074 or EIP-4337 or other specifications, have more capabilities than regular
+Account abstracted wallets, either via [EIP-3074](./eip-3074.md) or [EIP-4337](./eip-4337.md) or other specifications, have more capabilities than regular
 EOA accounts.
 The antiquated `eth_sendTransaction` and `eth_getTransactionReceipt` methods limit the quality of in-dapp transaction
 status. It's possible for dapps to stop tracking transactions altogether, but it is a better user experience for dapps
