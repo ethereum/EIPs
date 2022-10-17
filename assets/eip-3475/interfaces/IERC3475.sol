@@ -145,7 +145,7 @@ interface IERC3475 {
    
     /**
      * @dev Returns the values of given nonceId.
-     * @param metadataId index number of structure as explained in the metadata section in eip-3475.md
+     * @param metadataId index number of structure as explained in the metadata section in EIP-3475.
      * @param classId is the class of bonds for which you determine the nonce.
      * @param nonceId is the nonce for which you return the value struct info.
      * Returns the values object corresponding to the given value.
