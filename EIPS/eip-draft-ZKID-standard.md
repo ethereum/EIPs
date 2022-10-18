@@ -43,14 +43,23 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 **Definition**
 
-SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users.
+SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users. they are defined by standard [eip-5192](./eip-5192.md).
 
 **Functions**
 
 ```solidity
 pragma solidity ^0.8.0;
-
+    // getter function 
+    /// @notice getter function to validate if the address `verifying` is the holder of the SBT defined by the tokenId `SBTID`
+    /// @dev it MUST be defining the logic corresponding to all the current possible requirements definition.
+    /// @param verifying is the  EOA address that wants to validate the SBT issued to it by the KYC. 
+    /// @param SBTID is the Id of the SBT that user is the claimer.
+    /// @return true if the assertion is valid, else false
     function ifVerified(address verifying, uint256 SBFID) external view returns (bool);
+
+
+
+
     function standardRequirement(uint256 SBFID) external view returns (Requirement[] memory);
     function changeStandardRequirement(uint256 SBFID, Requirement[] memory requirements) external returns (bool);
     function certify(address certifying, uint256 SBFID) external returns (bool);
