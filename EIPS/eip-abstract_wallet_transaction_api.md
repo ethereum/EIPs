@@ -1,11 +1,11 @@
 ---
-eip: <to be assigned>
+eip: 5792
 title: Abstract Wallet Transaction API
 description: JSON RPC methods for dealing with transactions that are more suitable for different kinds of wallets
 author: Moody Salem (@moodysalem)
 discussions-to: <URL>
 status: Draft
-type: Meta
+type: Interface
 created: 2022-10-17
 ---
 
@@ -100,7 +100,7 @@ The method takes an array containing one object element, with the following keys
 #### Return value
 
 DATA, 32 Bytes - an identifier that the wallet uses to represent the bundle of messages. This identifier MUST persist
-between connections of the same Dapp and wallet.
+between connections of the same Dapp and account.
 
 The dapp may track this identifier to check the status of the transaction in the future.
 The returned identifier value MUST be unique for the given `from` address.
