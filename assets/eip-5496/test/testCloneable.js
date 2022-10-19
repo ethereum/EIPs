@@ -97,16 +97,7 @@ contract("ERC5496Cloneable", async accounts => {
         assert.equal(
             user_hasP2,
             true,
-            "privilege 2 available after NFT owner update the privileges total"
-        );
-    });
-
-    it("NFT owner should not change the privilege if it has been assigned", async () => {
-        let expires = Math.floor(new Date().getTime()/1000) + 5000;
-        await demoContract.setPrivilege(3, 0, Bob, BigInt(expires));
-        await expectRevert(
-            demoContract.setPrivilege(3, 0, Tom, BigInt(expires)),
-            "ERC721: transfer caller is not owner nor approved",
+            "privilege 2 available after NFT owner update the privilege total"
         );
     });
 

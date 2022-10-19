@@ -95,7 +95,7 @@ contract("ERC5496", async accounts => {
         assert.equal(
             user_hasP2,
             true,
-            "Privilege 2 is available after NFT owner update the privilege total"
+            "privilege 2 available after NFT owner update the privilege total"
         );
     });
 

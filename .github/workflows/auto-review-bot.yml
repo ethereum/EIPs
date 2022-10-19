@@ -40,7 +40,7 @@ jobs:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
           PR_NUMBER: ${{ steps.save-pr-number.outputs.pr }}
           CORE_EDITORS: '@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1'
-          ERC_EDITORS: '@lightclient,@axic,@SamWilsn,@Pandapip1'
+          ERC_EDITORS: '@axic,@SamWilsn,@Pandapip1'
           NETWORKING_EDITORS: '@lightclient,@axic,@SamWilsn'
           INTERFACE_EDITORS: '@lightclient,@axic,@SamWilsn,@Pandapip1'
           META_EDITORS: '@lightclient,@axic,@gcolvin,@SamWilsn,@Pandapip1'
