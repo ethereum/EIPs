@@ -103,3 +103,4 @@ jobs:
           
       - name: Check License Lines
         uses: kt3k/license_checker@d12a6d90c58e30fefed09f2c4d03ba57f4c673a8
+        continue-on-error: true
