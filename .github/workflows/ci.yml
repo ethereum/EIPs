@@ -27,7 +27,7 @@ jobs:
           echo $MERGE_SHA > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
         with:
           name: pr_number
           path: pr/
@@ -87,7 +87,7 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: ethereum/eipw-action@dist
+      - uses: ethereum/eipw-action@965202a8042097a457d8269ef1f4cc050d713060
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
