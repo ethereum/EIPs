@@ -1,5 +1,5 @@
 ---
-eip: <todo>
+eip: 5805
 title: Voting with delegation
 description: An interface for voting weight tracking, with delegation support
 author: Hadrien Croubois (@Amxx)
