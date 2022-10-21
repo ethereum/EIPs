@@ -35,15 +35,14 @@ current standards in the space, like [ERC-3643](./eip-3643.md) are insufficient 
 
 thus in order to address the two above major challanges: there needs to be creation of the identity verifier standard that will be validating the 
 
-
-   
-
-## Specification
+## Specification: 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 **Definition**
 
 SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users. they are defined by standard [eip-5192](./eip-5192.md).
+
+
 
 **Functions**
 
@@ -55,14 +54,64 @@ pragma solidity ^0.8.0;
     /// @param verifying is the  EOA address that wants to validate the SBT issued to it by the KYC. 
     /// @param SBTID is the Id of the SBT that user is the claimer.
     /// @return true if the assertion is valid, else false
+    /**
+    example ifVerified(0xfoo, 1) --> true will mean that 0xfoo is the holder of the SBF identity token defined by tokenId of the given collection. 
+    */
     function ifVerified(address verifying, uint256 SBFID) external view returns (bool);
 
-
-
-
+    /// @notice getter function to fetch the onchain identification logic for the given identity holder.
+    /// @dev it MUST not be defined for address(0). 
+    /// @param SBTID is the Id of the SBT that user is the claimer.
+    /// @return the struct array of all the descriptions of condition metadata that is defined by the administrator.
+    /**
+    ex: standardRequirement(1) --> {
+    { "title":"DepositRequirement",
+        "type": "number",
+        "description": "defines the minimum deposit in USDC for the investor along with the credit score",
+        },
+       "logic": "and",
+    "values":{"30000", "5"}    
+}
+Defines the condition encoded for the identity index 1, defining the identity condition that holder must have 30000 USDC along with credit score of  atleast 5.
+    */
     function standardRequirement(uint256 SBFID) external view returns (Requirement[] memory);
+
+    // setter functions
+    /// @notice function for setting the requirement logic (defined by Requirements metadata) details for the given identity token defined by SBTID.
+    /// @dev it should only be called by the admin address.
+    /// @param SBFID is the Id of the SBT based identity certificate for which admin wants to define the Requirements.
+    /// @param `requirements` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
+
+/**
+
+example: changeStandardRequirement(1, { "title":"DepositRequirement",
+        "type": "number",
+        "description": "defines the minimum deposit in USDC for the investor along with the credit score",
+        },
+       "logic": "and",
+    "values":{"30000", "5"}    
+}); 
+
+will correspond to the the functionality that admin needs to adjust the standard requirement for the identification SBT with tokenId = 1, based on the conditions described in the Requirements array struct details.
+*/
+
     function changeStandardRequirement(uint256 SBFID, Requirement[] memory requirements) external returns (bool);
+    
+    /// @notice function which uses the ZKProof protocol in order to validate the identity based on the given 
+    /// @dev it should only be called by the admin address.
+    /// @param SBFID is the Id of the SBT based identity certificate for which admin wants to define the Requirements.
+    /// @param certifying is the address that needs to be proven as the owner of the SBT defined by the tokenID.
+    /// @param `requirements` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
     function certify(address certifying, uint256 SBFID) external returns (bool);
+
+    /// @notice function which uses the ZKProof protocol in order to validate the identity based on the given 
+    /// @dev it should only be called by the admin address.
+    /// @param SBFID is the Id of the SBT based identity certificate for which admin wants to define the Requirements.
+    /// @param certifying is the address that needs to be proven as the owner of the SBT defined by the tokenID.
+    /// @param `requirements` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
+
+
+
     function revoke(address certifying, uint256 SBFID) external returns (bool);
 ```
 
@@ -71,13 +120,15 @@ pragma solidity ^0.8.0;
 ```solidity
 pragma solidity ^0.8.0;
 
+    
+
     event standardChanged(uint256 SBFID, Requirement[]);   
     event certified(address certifying, uint256 SBFID);
     event revoked(address certifying, uint256 SBFID);
 ```
 
 **Metadata**:
-The metadata of 
+here metadata
 
 
 
@@ -86,8 +137,7 @@ The metadata of
 
 
 ## Rationale
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-
+currently the 
 ## Backwards Compatibility
 All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
