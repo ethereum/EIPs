@@ -92,3 +92,23 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1, 5069
+
+  markdownlint:
+    name: Markdown Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Delete Unchanged Files
+        id: changed-files
+        uses: Pandapip1/delete-unchanged-files@0937c94da2e9f9f262bbf2035e75065a1fd04bcf
+
+      - name: Lint
+        uses: DavidAnson/markdownlint-cli2-action@16d9da45919c958a8d1ddccb4bd7028e8848e4f1
+        with:
+          command: config
+          globs: |
+            config/.markdownlint.yaml
+            EIPS/*.md
+            *.md

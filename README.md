@@ -17,11 +17,11 @@ The goal of the EIP project is to document standardized protocols for Ethereum c
 
 ## Preferred Citation Format
 
-The canonical URL for an EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+The canonical URL for an EIP that has achieved draft status at any point is at <https://eips.ethereum.org/>. For example, the canonical URL for EIP-1 is <https://eips.ethereum.org/EIPS/eip-1>.
 
-Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+Please consider anything which is not published on <https://eips.ethereum.org/> as a working paper.
 
-And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
+And please consider anything published at <https://eips.ethereum.org/> with a status of "draft" as an incomplete draft.
 
 ## Automerger
 
@@ -31,10 +31,11 @@ This repository contains an "auto-merge" feature to ease the workload for EIP ed
 
 Pull requests in this repository must pass automated validation checks:
 
-* HTML formatting, broken links, and EIP front matter/formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml) using [html-proofer](https://rubygems.org/gems/html-proofer) and [`eipw`](https://github.com/ethereum/eipw).
-* Required pull request reviews are [enforced](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml) using [EIP-Bot](https://github.com/ethereum/EIP-Bot/).
+- HTML formatting, broken links, and EIP front matter/formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml) using [html-proofer](https://rubygems.org/gems/html-proofer) and [`eipw`](https://github.com/ethereum/eipw).
+- Required pull request reviews are [enforced](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml) using [EIP-Bot](https://github.com/ethereum/EIP-Bot/).
 
 It is possible to run the EIP validator locally:
+
 ```sh
 cargo install eipv
 eipv <INPUT FILE / DIRECTORY>
@@ -74,6 +75,6 @@ eipv <INPUT FILE / DIRECTORY>
    bundle exec jekyll serve
    ```
 
-2. Preview your local Jekyll site in your web browser at http://localhost:4000.
+2. Preview your local Jekyll site in your web browser at <http://localhost:4000>.
 
 More information on Jekyll and GitHub Pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
