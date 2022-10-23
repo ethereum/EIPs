@@ -85,7 +85,6 @@ jobs:
           ignore_words_file: config/.codespell-whitelist
           path: ${{ steps.changed-files.outputs.all_changed_files }}
           skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
-          only_warn: 1
 
   eipw-validator:
     name: EIP Walidator
