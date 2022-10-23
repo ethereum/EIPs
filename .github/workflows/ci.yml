@@ -111,7 +111,7 @@ jobs:
           separator: ","
       
       - name: Replace Commas with Newlines # Hack needed due to limitation of GitHub actions
-        run:
+        run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
           echo "$RAW_CHANGED_FILES" | tr , "\n" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
