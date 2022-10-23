@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
+
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
     
@@ -67,7 +67,7 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        
+
       - name: Get Changed Files
         uses: tj-actions/changed-files@1d6e210c970d01a876fbc6155212d068e79ca584
         id: changed-files
@@ -103,6 +103,8 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        with:
+          fetch-depth: 0
         
       - name: Get Changed Files
         uses: tj-actions/changed-files@1d6e210c970d01a876fbc6155212d068e79ca584
