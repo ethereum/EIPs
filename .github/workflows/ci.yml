@@ -109,6 +109,9 @@ jobs:
         id: changed-files
         with:
           separator: ","
+          files: |
+            EIPS/*.md
+            *.md
       
       - name: Replace Commas with Newlines # Hack needed due to limitation of GitHub actions
         run: |
