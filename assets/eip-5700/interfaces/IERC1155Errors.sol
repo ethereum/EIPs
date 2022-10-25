@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.16;
 
 /// @title ERC-1155 Errors Interface
