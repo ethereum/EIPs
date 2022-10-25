@@ -94,7 +94,7 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: ethereum/eipw-action@965202a8042097a457d8269ef1f4cc050d713060
+      - uses: ethereum/eipw-action@3b4a2599d62433ef0c99766ab9836b0accf80edd
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         with:
           fetch-depth: 0
-        
+
       - name: Get Changed Files
         uses: tj-actions/changed-files@1d6e210c970d01a876fbc6155212d068e79ca584
         id: changed-files
@@ -117,7 +117,7 @@ jobs:
           files: |
             EIPS/*.md
             *.md
-      
+
       - name: Replace Commas with Newlines # Hack needed due to limitation of GitHub actions
         run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
