@@ -43,7 +43,7 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-      
+
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
     
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-        
+
       - name: Get Changed Files
         uses: tj-actions/changed-files@1d6e210c970d01a876fbc6155212d068e79ca584
         id: changed-files
@@ -106,16 +106,31 @@ jobs:
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-
-      - name: Delete Unchanged Files
+        with:
+          fetch-depth: 0
+        
+      - name: Get Changed Files
+        uses: tj-actions/changed-files@1d6e210c970d01a876fbc6155212d068e79ca584
         id: changed-files
-        uses: Pandapip1/delete-unchanged-files@0937c94da2e9f9f262bbf2035e75065a1fd04bcf
+        with:
+          separator: ","
+          files: |
+            EIPS/*.md
+            *.md
+      
+      - name: Replace Commas with Newlines # Hack needed due to limitation of GitHub actions
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          echo "$RAW_CHANGED_FILES" | tr , "\n" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env: 
+          RAW_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@16d9da45919c958a8d1ddccb4bd7028e8848e4f1
+        if: steps.changed-files.outputs.any_changed == 'true'
         with:
           command: config
           globs: |
             config/.markdownlint.yaml
-            EIPS/*.md
-            *.md
+            ${{ env.CHANGED_FILES }}
