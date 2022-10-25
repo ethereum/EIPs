@@ -200,7 +200,7 @@ If you feel that a link you wish to include shouldn't violate the below rules, p
 
 ### Reference Rules
 
-- All external resources **MUST** be non-normative.
+- All external resources are **RECOMMENDED** to be non-normative.
 - All external resources **MUST** be cited.
   - For example, [Welch, T., "A Technique for High-Performance Data Compression", IEEE Computer 17(6), DOI 10.1109/MC.1984.1659158, June 1984](https://ieeexplore.ieee.org/document/1659158).
 
