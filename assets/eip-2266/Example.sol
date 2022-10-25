@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0-1.0
 // Copyright (c) 2019 Chris Haoyu LIN, Runchao HAN, Jiangshan YU
 // ERC2266 is compatible with ERC20 standard: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
 // naming style follows the guide: https://solidity.readthedocs.io/en/v0.5.11/style-guide.html#naming-styles
