@@ -73,6 +73,8 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Get Changed Files
+        id: changed
+        continue-on-error: true
         run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
           gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
@@ -82,6 +84,7 @@ jobs:
 
       - name: Run CodeSpell
         uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        if: steps.changed.outcome != 'success'
         with:
           check_filenames: true
           ignore_words_file: config/.codespell-whitelist
@@ -110,16 +113,18 @@ jobs:
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Get Changed Files
+        id: changed
+        continue-on-error: true
         run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '.*\.md|EIPS/.*\.md' >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
         uses: DavidAnson/markdownlint-cli2-action@16d9da45919c958a8d1ddccb4bd7028e8848e4f1
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed.outcome != 'success'
         with:
           command: config
           globs: |
