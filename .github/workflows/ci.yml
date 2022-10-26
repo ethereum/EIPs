@@ -75,7 +75,7 @@ jobs:
       - name: Get Changed Files
         run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -112,7 +112,7 @@ jobs:
       - name: Get Changed Files
         run: |
           echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          gh pr diff --name-only | grep -E -x '.*\.md|EIPS/.*\.md' >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '.*\.md|EIPS/.*\.md' >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
