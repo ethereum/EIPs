@@ -1,7 +1,7 @@
 ---
 eip: 7
 title: DELEGATECALL
-author: Vitalik Buterin <v@buterin.com>
+author: Vitalik Buterin (@vbuterin)
 status: Final
 type: Standards Track
 category: Core
