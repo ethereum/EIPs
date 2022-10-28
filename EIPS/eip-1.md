@@ -17,6 +17,8 @@ We intend EIPs to be the primary mechanisms for proposing new features, for coll
 
 For Ethereum implementers, EIPs are a convenient way to track the progress of their implementation. Ideally each implementation maintainer would list the EIPs that they have implemented. This will give end users a convenient way to know the current status of a given implementation or library.
 
+Not sure if you should be writing an EIP? See an [opinion piece describing useful standards](../assets/eip-1/useful-submissions.md).
+
 ## EIP Types
 
 There are three types of EIP:
