@@ -1,47 +1,61 @@
 ---
 eip: <to be assigned>
 title:  ZK based KYC verifier standard. 
-description: Standard Interface for validating identities using Zero knowledge proofs
+description: Interface for assigning/validating identities using Zero Knowledge Proofs
 author: Yu Liu (@yuliu-debond)
 discussions-to: TBD
 status: Draft
 type: Standards Track
 category (*only required for Standards Track):  ERC
 created: 2022-10-18
-requires (*optional): 721, 5114.
+requires (*optional): 721, 1155, 5114, 3643.
 ---
 
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category. 
 
 ## Abstract
 
 - This EIP Provides defined interface for KYC verification with abstract onchain conditions.
 
-- This EIP defines the necessary interface functions to verify the identity of the wallet, based on the conditions descrivbed by the user onchain.
+- This EIP defines the necessary interface for orchestrator to assign identity certificates (as Soulbound tokens) to the wallets, which can be verified by ZK schemes.
 
 ## Motivation
-Onchain verification is becoming indispensable across DeFI as well as other web3 protocols (DAO, governance) as needed by the government, but also by different DeFI protocols to whitelist the users which fullfill the certain criteria. this created the necessity of building onchain verification of the addresses for token transfers (like stablecoin providers check for the blacklisted entities for the destination address, limited utility tokens for a DAO community , etc). 
+
+Onchain verification is becoming indispensable across DeFI as well as other web3 protocols (DAO, governance) as its needed not only by the government for regulatory purposes, but also by different DeFI protocols to whitelist the users which fullfill the certain criterias.
+
+This created the necessity of building onchain verification of the addresses for token transfers (like stablecoin providers check for the blacklisted entities for the destination address, limited utility tokens for a DAO community , etc). Along with the concern that current whitelisting process of the proposals  are based on the addition of the whitelisted addresses (via onchain/offchain signatures) and thus its not trustless for truly decentralised protocols. 
 
 
-current standards in the space, like [ERC-3643](./eip-3643.md) are insufficient to handle the complex usecases where: 
+Also Current standards in the space, like [ERC-3643](./eip-3643.md) are insufficient to handle the complex usecases where: 
 
     -  The validation logic needs to be more complex than verification of the user identity wrt the blacklisted address that is defined offchain, and is very gas inefficient. 
 
     - also privacy enhanced/anonymous verification is important need by the crypto users in order to insure censorship/trustless networks. ZK based verification schemes are currently the only way to validate the assertion of the identity by the user, while keeping certain aspects of the providers identity completely private.
 
-thus in order to address the two above major challanges: there needs to be creation of the identity verifier standard that will be validating the 
+thus in order to address the above major challenges: there is need of standard that defines the interface of contract which can issue an immutable identity for the identifier (except by the user) along with verifying the identity of the user based on the ownership of the given identity token.
+
 
 ## Specification: 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 **Definition**
 
-SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users. they are defined by standard [eip-5192](./eip-5192.md).
+- SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users. they are defined by standard [eip-5192](./eip-5192.md).
 
+- SBT Certificates: SBT that represent the  ownerships of ID signatures corresponding to the requirements defined in `function standardRequirement()`.
+
+- KYC standard: Know your customer standard are the set of minimum viable conditions that financial services providers (banks, investment providers and other intermediate financial intermediateries) have to satisfy in order to access the services. this in web3 consideration concerns not about the details about the user itself, but about its status (onchain usage, total balance by the anon wallet, etc) that can be used for whitelisting.
+
+**diagram**
+
+[](../assets/eip-zkID/architecture-diagram.png)
+
+
+example workflow using preimage verification: 
+
+- here the KYC contract is an oracle that assigns the user identity with the SBT certificate.
+- During issuance stage, the process to generate the offchain compute of the merkle root from the  various primairly details are calculated and then assigned onchain to the given wallet address with the identity (as SBT type of smart contract certificate).
+- on the other hand, the verifier is shared part of the nodes and the merkle root, in order to verify the merkle leaf information.
+- thus during the verification stage, the verifier will be provided with the preimage 
 
 
 **Functions**
@@ -118,26 +132,324 @@ will correspond to the the functionality that admin needs to adjust the standard
 **Events**
 
 ```solidity
-pragma solidity ^0.8.0;
-
+pragma solidity ^0.8.0;   
+/** 
+    * standardChanged
+    * @notice standardChanged MUST be triggered when requirements are changed by the admin. 
+    * @dev standardChanged MUST also be triggered for the creation of a new SBTID.
+    */
+    event standardChanged(uint256 SBTID, Requirement[]);   
     
+    /** 
+    * certified
+    * @notice certified MUST be triggered when SBT certificate is given to the certifiying address. 
+    */
+    event certified(address certifying, uint256 SBTID);
+    
+    /** 
+    * revoked
+    * @notice revoked MUST be triggered when SBT certificate is revoked. 
+    */
+    event revoked(address certifying, uint256 SBTID);
+```
+## Rationale
+We follow the structure of onchain metadata storage similar to that of [eip-3475](./eip-3475.md), except the fact that whole KYC requirement description is defined like the class from the eip-3475 standard but with only single condition. 
 
-    event standardChanged(uint256 SBFID, Requirement[]);   
-    event certified(address certifying, uint256 SBFID);
-    event revoked(address certifying, uint256 SBFID);
+following are the descriptions of the structures: 
+
+**1.Metadata structure**: 
+
+```solidity
+    /**
+     * @dev metadata that describes the Values structure on the given requirement, cited from [EIP-3475](./eip-3475.md) 
+    example: 
+    {    "title": "jurisdiction",
+        "_type": "string",
+        "description": "two word code defining legal jurisdiction"
+        }
+    * @notice it can be further optimise by using efficient encoding schemes (like TLV etc) and there can be tradeoff in the gas costs of storing large strings vs encoding/decoding costs while describing the standard.
+     */     
+    struct Metadata {
+        string title;
+        string _type;
+        string description;
+    }
+    
+    /**
+     * @dev Values here can be read and wrote by smartcontract and front-end, cited from [EIP-3475](./eip-3475.md).
+     example : 
+{
+string jurisdiction = IERC6595.Values.StringValue("CH");
+}
+     */   
+    struct Values { 
+        string stringValue;
+        uint uintValue;
+        address addressValue;
+        bool boolValue;
+    }
 ```
 
-**Metadata**:
-here metadata
+**2.Requirement structure**:
+
+this will be stored in each of the SBT certificate that will define the conditions that needs to be satisfied by the arbitrary address calling the `verify()` function, in order to be be validated as owner of the given certificate(ie following the regulations), this will be defined for each onchain Values separately. 
+
+
+```solidity
+
+    /**
+     * @dev structure that DeFines the parameters for specific requirement of the SBT certificate
+     * @notice this structure is used for the verification process, it contains the metadata, logic and expectation
+     * @logic given here MUST be one of ("⊄", "⊂", "<", "<=", "==", "!=", ">=",">")
+     ex: standardRequirement => {
+    { "title":"adult",
+        "type": "uint",
+        "description": "client holders age to be gt 18 yrs.",
+        },
+       "logic": ">=",
+    "value":"18"  
+	}
+	Defines the condition encoded for the identity index 1, DeFining the identity condition that holder must be more than 18 years old.
+    */
+	
+    struct Requirement {
+        Metadata metadata;
+        string logic;
+        Values expectation;
+    }
+
+```
+ 
+
+**example implementation:** 
+An example for the KYC of the investment grade bonds: 
+```json
+{
+"Issuer": "ABC LLC",
+"Issuer location": "US",
+"Issuer url":"abc.ai",
+"Issuer address": "0xfoo",
+"Issuer contact information": "+1 234 565787",
+"lssuer logo url": "./ABC.svg",
+"pitch-deck url": "bit.ly/pitch-deck.pptx",
+"Type": "Non-callable",
+"Industry": "RWA",
+"ISIN code":"XS0356705219",
+"Registered authority":"SEC",
+"Registered code": "",
+"Date Position": "",
+"Manager name": "",
+"Manager’s code": "",
+"Custodian Name": "",
+"Custodian’s Code": "",
+"Share Value": "",
+"Total balance": "",
+"Amounts Payable": "",
+"Collateral":[],
+"Callable": "",
+"Zero-coupon": "",
+"Fixed rate":"",
+"Maturity period":"",
+"Maturity calculation rule":"",
+"Interest period":"",
+"Interest calculation rule": " ",
+"Accept Asset":[],
+"Interest Payment Asset":[],
+"Repayment Asset":[],
+"ANBID code":"",
+"Fund Type": "",
+"Risk level":"",
+"Risk level rated by": "",
+"Preferred creditor":"",
+"Liquidation rule": "",
+"Qualified investor requirement":"",
+"Interest rate":"",
+"The amount": "",
+"PL of the Fund": "",
+"Asset Value":"",
+"Amounts Receivable": "",
+"Amounts Payable":"",
+"Quotas to Issue":"",
+"Quotas to be Redeemed": "",
+"Number of Shareholders": "",
+
+}
+```
+
+and their description of the requirements metadata will be as follows:
+
+```json
+{
+ {
+    { "title":"issuer",
+        "type": "string",
+        "description": "defines the issuer entity for given cat of bonds",
+        },
+    "value.stringValue":"ABC-LLC"  
+	},
+
+ {
+    { "title":"Location",
+        "type": "string",
+        "description": "defines the jurisdiction of the issuance.",
+        },
+    "value":"USA"  
+	},
+
+{  
+    { "title":"URL",
+        "type": "string",
+        "description": "URL of the website",
+        },
+    "value": "www.ABC-LLC.com"
+},
+{
+    { "title":"address",
+        "type": "string",
+        "description": "EOA address of the owner of the SBT certificate of the bonds",
+        },
+    "value": "0xfoo..."
+},
+
+{
+    { "title":"Contact information",
+        "type": "string",
+        "description": "Phone number/email of the responsible for the handling of bonds management (can be modified on behalf of issuing entity)",
+        },
+    "value": ""
+},
+
+{
+    { "title":"Issuer Contact information",
+        "type": "string",
+        "description": "Phone number/email of the responsible for the handling of bonds management (can be modified on behalf of issuing entity)",
+        },
+    "value": "+1 234 567 9876"
+},
+
+{
+    { "title":"issuer logo url",
+        "type": "string",
+        "description": "URI address of the logo of the issuing entity/ company handling the bonds",
+        },
+    "value": "ipfs://fooEOPIPOSIPO123/ABC_logo.png"
+},
+
+
+{
+    { "title":"pitch deck URL",
+        "type": "string",
+        "description": "URI storage of pitch deck describing the bonds",
+        },
+    "value": "ipfs://fooEOPIPOSIPO123/ABC_Bond_description.pdf"
+},
+
+
+{
+    { "title":"type",
+        "type": "string",
+        "description": "Defines the category of the bond",
+        },
+    "value": "Callable"
+},
 
 
 
+{
+    { "title":"Industry",
+        "type": "string",
+        "description": "Defines the type of industry(agriculture, real-estate, etc)",
+        },
+    "value": "Callable"
+},
 
 
 
+{
+    { "title":"Industry",
+        "type": "string",
+        "description": "Defines the type of industry(agriculture, real-estate, etc)",
+        },
+    "value": "RWA"
+},
 
-## Rationale
-currently the 
+{
+    { "title":"ISIN code",
+        "type": "string",
+        "description": "Hexadecimal code identifying the bond instrument",
+        },
+    "value": "XS0356705219..",
+},
+
+{
+    { "title":"ISIN code",
+        "type": "string",
+        "description": "Hexadecimal code identifying the bond instrument",
+        },
+    "value": "XS0356705219..",
+}
+
+
+
+{
+    { "title":"Registering authority",
+        "type": "string",
+        "description": "registeration financial authorities, based on the jurisdiction",
+        },
+    "value": "SEC",
+}
+
+{
+    { "title":"Registering authority",
+        "type": "string",
+        "description": "registeration financial authorities, based on the jurisdiction",
+        },
+    "logic": "==",
+    "value": "SEC",
+}
+
+
+{
+    { "title":"Date position",
+        "type": "string",
+        "description": "Date for which issuer listed the proposition (ISO standard, UTC time)",
+        },
+    "value": "10:10:2010::7:05",
+}
+
+{
+    { "title":"Manager-name",
+        "type": "string",
+        "description": "Person responsible for the management of the admin wallet for bonds, can be adapted only by main team",
+        },
+    "value": "Mr Joe",
+},
+
+{
+    { "title":"Custodian name",
+        "type": "string",
+        "description": "Name of Entity that is managing the custody of the underlying collateral",
+        },
+    "value": "Joe Law firm",
+}
+
+//TBD
+// "Custodian Name": "",
+// "Custodian’s Code": "",
+// "Share Value": "",
+// "Total balance": "",
+// "Amounts Payable": "",
+// "Collateral":[],
+// "Callable": "",
+// "Zero-coupon": "",
+// "Fixed rate":"",
+// "Maturity period":"",
+
+}
+
+```
+
+
 ## Backwards Compatibility
 All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
