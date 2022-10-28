@@ -219,248 +219,31 @@ this will be stored in each of the SBT certificate that will define the conditio
     }
 
 ```
- 
-
-**example implementation:** 
-An example for the KYC of the investment grade bonds: 
-```json
-{
-"Issuer": "ABC LLC",
-"Issuer location": "US",
-"Issuer url":"abc.ai",
-"Issuer address": "0xfoo",
-"Issuer contact information": "+1 234 565787",
-"lssuer logo url": "./ABC.svg",
-"pitch-deck url": "bit.ly/pitch-deck.pptx",
-"Type": "Non-callable",
-"Industry": "RWA",
-"ISIN code":"XS0356705219",
-"Registered authority":"SEC",
-"Registered code": "",
-"Date Position": "",
-"Manager name": "",
-"Manager’s code": "",
-"Custodian Name": "",
-"Custodian’s Code": "",
-"Share Value": "",
-"Total balance": "",
-"Amounts Payable": "",
-"Collateral":[],
-"Callable": "",
-"Zero-coupon": "",
-"Fixed rate":"",
-"Maturity period":"",
-"Maturity calculation rule":"",
-"Interest period":"",
-"Interest calculation rule": " ",
-"Accept Asset":[],
-"Interest Payment Asset":[],
-"Repayment Asset":[],
-"ANBID code":"",
-"Fund Type": "",
-"Risk level":"",
-"Risk level rated by": "",
-"Preferred creditor":"",
-"Liquidation rule": "",
-"Qualified investor requirement":"",
-"Interest rate":"",
-"The amount": "",
-"PL of the Fund": "",
-"Asset Value":"",
-"Amounts Receivable": "",
-"Amounts Payable":"",
-"Quotas to Issue":"",
-"Quotas to be Redeemed": "",
-"Number of Shareholders": "",
-
-}
-```
-
-and their description of the requirements metadata will be as follows:
-
-```json
-{
- {
-    { "title":"issuer",
-        "type": "string",
-        "description": "defines the issuer entity for given cat of bonds",
-        },
-    "value.stringValue":"ABC-LLC"  
-	},
-
- {
-    { "title":"Location",
-        "type": "string",
-        "description": "defines the jurisdiction of the issuance.",
-        },
-    "value":"USA"  
-	},
-
-{  
-    { "title":"URL",
-        "type": "string",
-        "description": "URL of the website",
-        },
-    "value": "www.ABC-LLC.com"
-},
-{
-    { "title":"address",
-        "type": "string",
-        "description": "EOA address of the owner of the SBT certificate of the bonds",
-        },
-    "value": "0xfoo..."
-},
-
-{
-    { "title":"Contact information",
-        "type": "string",
-        "description": "Phone number/email of the responsible for the handling of bonds management (can be modified on behalf of issuing entity)",
-        },
-    "value": ""
-},
-
-{
-    { "title":"Issuer Contact information",
-        "type": "string",
-        "description": "Phone number/email of the responsible for the handling of bonds management (can be modified on behalf of issuing entity)",
-        },
-    "value": "+1 234 567 9876"
-},
-
-{
-    { "title":"issuer logo url",
-        "type": "string",
-        "description": "URI address of the logo of the issuing entity/ company handling the bonds",
-        },
-    "value": "ipfs://fooEOPIPOSIPO123/ABC_logo.png"
-},
-
-
-{
-    { "title":"pitch deck URL",
-        "type": "string",
-        "description": "URI storage of pitch deck describing the bonds",
-        },
-    "value": "ipfs://fooEOPIPOSIPO123/ABC_Bond_description.pdf"
-},
-
-
-{
-    { "title":"type",
-        "type": "string",
-        "description": "Defines the category of the bond",
-        },
-    "value": "Callable"
-},
-
-
-
-{
-    { "title":"Industry",
-        "type": "string",
-        "description": "Defines the type of industry(agriculture, real-estate, etc)",
-        },
-    "value": "Callable"
-},
-
-
-
-{
-    { "title":"Industry",
-        "type": "string",
-        "description": "Defines the type of industry(agriculture, real-estate, etc)",
-        },
-    "value": "RWA"
-},
-
-{
-    { "title":"ISIN code",
-        "type": "string",
-        "description": "Hexadecimal code identifying the bond instrument",
-        },
-    "value": "XS0356705219..",
-},
-
-{
-    { "title":"ISIN code",
-        "type": "string",
-        "description": "Hexadecimal code identifying the bond instrument",
-        },
-    "value": "XS0356705219..",
-}
-
-
-
-{
-    { "title":"Registering authority",
-        "type": "string",
-        "description": "registeration financial authorities, based on the jurisdiction",
-        },
-    "value": "SEC",
-}
-
-{
-    { "title":"Registering authority",
-        "type": "string",
-        "description": "registeration financial authorities, based on the jurisdiction",
-        },
-    "logic": "==",
-    "value": "SEC",
-}
-
-
-{
-    { "title":"Date position",
-        "type": "string",
-        "description": "Date for which issuer listed the proposition (ISO standard, UTC time)",
-        },
-    "value": "10:10:2010::7:05",
-}
-
-{
-    { "title":"Manager-name",
-        "type": "string",
-        "description": "Person responsible for the management of the admin wallet for bonds, can be adapted only by main team",
-        },
-    "value": "Mr Joe",
-},
-
-{
-    { "title":"Custodian name",
-        "type": "string",
-        "description": "Name of Entity that is managing the custody of the underlying collateral",
-        },
-    "value": "Joe Law firm",
-}
-
-//TBD
-// "Custodian Name": "",
-// "Custodian’s Code": "",
-// "Share Value": "",
-// "Total balance": "",
-// "Amounts Payable": "",
-// "Collateral":[],
-// "Callable": "",
-// "Zero-coupon": "",
-// "Fixed rate":"",
-// "Maturity period":"",
-
-}
-
-```
 
 
 ## Backwards Compatibility
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+
+ An update is needed to amend the KYC modifier in case of updation either in the logic of verifier or the the certificate.
+
 
 ## Test Cases
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+
+Test-case for the minimal reference implementation is here. Use the Truffle box to compile and test the contracts.
+
 
 ## Reference Implementation
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+The interface standard is divided into two separated implementations.
+
+- [verification_contract](../assets/eip-zkID/contracts/verification_modifier.sol) is the simple modifier that needs to be imported by the functions which needs to check the caller should be having the SBT certificate.
+- [SBT_certification](../assets/eip-zkID/contracts/SBT_) 
+
+
 
 ## Security Considerations
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+1. Writing functions interfaces (i.e changeStandardRequirement(), certify() and revoke()) SHOULD be executed by admin roles in the SBT certificate contract as the getter functions (verify()) depends on the availablity of the necessary metadata to be immutable by any other non-admin entity.
+
+2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles (usually by admin) in order to insure that modifier logic doesnt get corrupted or creates the unintended backdoor.
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
