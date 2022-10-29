@@ -2,11 +2,11 @@
 eip: <to be assigned>
 title:  ZK based KYC verifier standard. 
 description: Interface for assigning/validating identities using Zero Knowledge Proofs
-author: Yu Liu (@yuliu-debond)
+author: Yu Liu (@yuliu-debond), Dhruv Malik(@dhruvmalik007)
 discussions-to: TBD
 status: Draft
 type: Standards Track
-category (*only required for Standards Track):  ERC
+category (*only required for Standards Track): ERC
 created: 2022-10-18
 requires (*optional): 721, 1155, 5114, 3643.
 ---
@@ -22,12 +22,12 @@ requires (*optional): 721, 1155, 5114, 3643.
 
 Onchain verification is becoming indispensable across DeFI as well as other web3 protocols (DAO, governance) as its needed not only by the government for regulatory purposes, but also by different DeFI protocols to whitelist the users which fullfill the certain criterias.
 
-This created the necessity of building onchain verification of the addresses for token transfers (like stablecoin providers check for the blacklisted entities for the destination address, limited utility tokens for a DAO community , etc). Along with the concern that current whitelisting process of the proposals  are based on the addition of the whitelisted addresses (via onchain/offchain signatures) and thus its not trustless for truly decentralised protocols. 
+This created the necessity of building onchain verification of the addresses for token transfers (like stablecoin providers check for the blacklisted entities for the destination address, limited utility tokens for a DAO community , etc). Along with the concern that current whitelisting process of the proposals are based on the addition of the whitelisted addresses (via onchain/offchain signatures) and thus its not trustless for truly decentralised protocols. 
 
 
 Also Current standards in the space, like [ERC-3643](./eip-3643.md) are insufficient to handle the complex usecases where: 
 
-    -  The validation logic needs to be more complex than verification of the user identity wrt the blacklisted address that is defined offchain, and is very gas inefficient. 
+    - The validation logic needs to be more complex than verification of the user identity wrt the blacklisted address that is defined offchain, and is very gas inefficient. 
 
     - Also privacy enhanced/anonymous verification is important need by the crypto users in order to insure censorship/trustless networks. ZK based verification schemes are currently the only way to validate the assertion of the identity by the user, while keeping certain aspects of the providers identity completely private.
 
@@ -41,7 +41,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 
 - SBT: Soulbound tokens, these are non-fungible and non transferrable tokens that is used for defining the identity of the users. they are defined by standard [eip-5192](./eip-5192.md).
 
-- SBT Certificates: SBT that represent the  ownerships of ID signatures corresponding to the requirements defined in `function standardRequirement()`.
+- SBT Certificates: SBT that represent the ownerships of ID signatures corresponding to the requirements defined in `function standardRequirement()`.
 
 - KYC standard: Know your customer standard are the set of minimum viable conditions that financial services providers (banks, investment providers and other intermediate financial intermediateries) have to satisfy in order to access the services. this in web3 consideration concerns not about the details about the user itself, but about its status (onchain usage, total balance by the anon wallet, etc) that can be used for whitelisting.
 
@@ -65,7 +65,7 @@ pragma solidity ^0.8.0;
     // getter function 
     /// @notice getter function to validate if the address `verifying` is the holder of the SBT defined by the tokenId `SBTID`
     /// @dev it MUST be defining the logic corresponding to all the current possible requirements definition.
-    /// @param verifying is the  EOA address that wants to validate the SBT issued to it by the KYC. 
+    /// @param verifying is the EOA address that wants to validate the SBT issued to it by the KYC. 
     /// @param SBTID is the Id of the SBT that user is the claimer.
     /// @return true if the assertion is valid, else false
     /**
@@ -84,9 +84,9 @@ pragma solidity ^0.8.0;
         "description": "defines the minimum deposit in USDC for the investor along with the credit score",
         },
        "logic": "and",
-    "values":{"30000", "5"}    
+    "values":{"30000", "5"}
 }
-Defines the condition encoded for the identity index 1, defining the identity condition that holder must have 30000 USDC along with credit score of  atleast 5.
+Defines the condition encoded for the identity index 1, defining the identity condition that holder must have 30000 USDC along with credit score of atleast 5.
     */
     function standardRequirement(uint256 SBFID) external view returns (Requirement[] memory);
 
@@ -103,7 +103,7 @@ example: changeStandardRequirement(1, { "title":"DepositRequirement",
         "description": "defines the minimum deposit in USDC for the investor along with the credit score",
         },
        "logic": "and",
-    "values":{"30000", "5"}    
+    "values":{"30000", "5"}
 }); 
 
 will correspond to the the functionality that admin needs to adjust the standard requirement for the identification SBT with tokenId = 1, based on the conditions described in the Requirements array struct details.
@@ -131,7 +131,7 @@ will correspond to the the functionality that admin needs to adjust the standard
 **Events**
 
 ```solidity
-pragma solidity ^0.8.0;   
+pragma solidity ^0.8.0;
 /** 
     * standardChanged
     * @notice standardChanged MUST be triggered when requirements are changed by the admin. 
@@ -140,7 +140,7 @@ pragma solidity ^0.8.0;
 
     defined that holder of the identifier has been changed to the condition which allows the certificate holder to call the functions with modifier , only after the deposit in the address is not greater than 30000 USDC.
     */
-    event standardChanged(uint256 SBTID, Requirement[] _requirement);   
+    event standardChanged(uint256 SBTID, Requirement[] _requirement);
     
     /** 
     * certified
@@ -167,12 +167,12 @@ following are the descriptions of the structures:
     /**
      * @dev metadata that describes the Values structure on the given requirement, cited from [EIP-3475](./eip-3475.md) 
     example: 
-    {    "title": "jurisdiction",
+    {   "title": "jurisdiction",
         "_type": "string",
         "description": "two word code defining legal jurisdiction"
         }
     * @notice it can be further optimise by using efficient encoding schemes (like TLV etc) and there can be tradeoff in the gas costs of storing large strings vs encoding/decoding costs while describing the standard.
-     */     
+     */
     struct Metadata {
         string title;
         string _type;
@@ -185,7 +185,7 @@ following are the descriptions of the structures:
 {
  jurisdiction = Values.StringValue("CH");
 }
-     */   
+     */
     struct Values { 
         string stringValue;
         uint uintValue;
@@ -211,7 +211,7 @@ This will be stored in each of the SBT certificate that will define the conditio
         "description": "client holders age to be gt 18 yrs.",
         },
        "logic": ">=",
-    "value":"18"  
+    "value":"18" 
 	}
 	Defines the condition encoded for the identity index 1, DeFining the identity condition that holder must be more than 18 years old.
     */
@@ -238,7 +238,7 @@ The interface standard is divided into two separated implementations.
 
 - [verifier_modifier](../assets/eip-zkID/contracts/verification_modifier.sol) is the simple modifier that needs to be imported by the functions that are to be only called by holders of the SBT certificates. this essentially is wrapper contract of the eip `verify()`method and can also be implemented for arbitrary types of contract.
 
-- [SBT_certification](../assets/eip-zkID/contracts/SBT_certification.sol) is the  example of identity certificate that can be assigned by the KYC controller contract. this implements all th functions and events in the standard interface.
+- [SBT_certification](../assets/eip-zkID/contracts/SBT_certification.sol) is the example of identity certificate that can be assigned by the KYC controller contract. this implements all th functions and events in the standard interface.
 
 
 apart from that there is [example script](../assets/eip-zkID/script/createProof.js) that allows the creation of proofs offchain and publish the proofs and specific public signatures onchain for the verification process.
@@ -248,7 +248,7 @@ apart from that there is [example script](../assets/eip-zkID/script/createProof.
 
 1. Writing functions interfaces (i.e `changeStandardRequirement()`, `certify()` and `revoke()`) SHOULD be executed by admin roles in the SBT certificate contract as the getter functions (verify()) depends on the availablity of the necessary metadata to be immutable by any other non-admin entity.
 
-2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles (usually by admin) in order to insure that verification logic doesnt get updated without the admin permission.
+2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles(usually by admin) in order to insure that verification logic doesnt get updated without the admin permission.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
