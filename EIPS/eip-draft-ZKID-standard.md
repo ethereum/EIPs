@@ -29,7 +29,7 @@ Also Current standards in the space, like [ERC-3643](./eip-3643.md) are insuffic
 
     -  The validation logic needs to be more complex than verification of the user identity wrt the blacklisted address that is defined offchain, and is very gas inefficient. 
 
-    - also privacy enhanced/anonymous verification is important need by the crypto users in order to insure censorship/trustless networks. ZK based verification schemes are currently the only way to validate the assertion of the identity by the user, while keeping certain aspects of the providers identity completely private.
+    - Also privacy enhanced/anonymous verification is important need by the crypto users in order to insure censorship/trustless networks. ZK based verification schemes are currently the only way to validate the assertion of the identity by the user, while keeping certain aspects of the providers identity completely private.
 
 thus in order to address the above major challenges: there is need of standard that defines the interface of contract which can issue an immutable identity for the identifier (except by the user) along with verifying the identity of the user based on the ownership of the given identity token.
 
@@ -123,8 +123,7 @@ will correspond to the the functionality that admin needs to adjust the standard
     /// @param SBFID is the Id of the SBT based identity certificate for which admin wants to define the Requirements.
     /// @param certifying is the address that needs to be proven as the owner of the SBT defined by the tokenID.
     /// @param `requirements` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
-
-
+    // eg: revoke(0xfoo,1): means that KYC admin revokes the SBT certificate number 1 for the address '0xfoo'.
 
     function revoke(address certifying, uint256 SBFID) external returns (bool);
 ```
@@ -137,18 +136,23 @@ pragma solidity ^0.8.0;
     * standardChanged
     * @notice standardChanged MUST be triggered when requirements are changed by the admin. 
     * @dev standardChanged MUST also be triggered for the creation of a new SBTID.
+    e.g : emit standardChanged(1,Requirement(Metadata('depositRequirement','number', 'defines the max deposited that user can have in denomination of USDC' ), "<=", "30000");
+
+    defined that holder of the identifier has been changed to the condition which allows the certificate holder to call the functions with modifier , only after the deposit in the address is not greater than 30000 USDC.
     */
-    event standardChanged(uint256 SBTID, Requirement[]);   
+    event standardChanged(uint256 SBTID, Requirement[] _requirement);   
     
     /** 
     * certified
     * @notice certified MUST be triggered when SBT certificate is given to the certifiying address. 
+    * eg: certified( 0xfoo,2); means that wallet holder address 0xfoo is certified to hold certificate issued with id 2 , and thus can satisfy all the confitions defined by the required interface.
     */
     event certified(address certifying, uint256 SBTID);
     
     /** 
     * revoked
     * @notice revoked MUST be triggered when SBT certificate is revoked. 
+    * eg : revoked( 0xfoo,1); means that entity user 0xfoo has been revoked to all the function access defined by the  the SBT ID 1.
     */
     event revoked(address certifying, uint256 SBTID);
 ```
@@ -220,15 +224,14 @@ This will be stored in each of the SBT certificate that will define the conditio
 
 ```
 
-
 ## Backwards Compatibility
 
-An update is needed to amend the KYC modifier in case of updation either in the logic of verifier or in the SBT certificate  contract based on the nature of updation.
+The ERC standard remains backwards compliant for previous versions for cases that only do the changes in the requirements structure.
 
+In case of the changes in the function logic, developers can use proxy contract patterns like [eip-1967](./eip-1967.md) which will route the validation condition based on the version of the contract.
 ## Test Cases
 
-Test-case for the minimal reference implementation is [here](../assets/eip-zkID/contracts/test.sol). Use the Truffle box to compile and test the contracts.
-
+Test-case for the minimal reference implementation is [here](../assets/eip-zkID/contracts/test.sol) for using transaction verification regarding whether the users hold the tokens ort not. Use the remix to compile and test the contracts.
 
 ## Reference Implementation
 The interface standard is divided into two separated implementations.
@@ -237,6 +240,8 @@ The interface standard is divided into two separated implementations.
 
 - [SBT_certification](../assets/eip-zkID/contracts/SBT_certification.sol) is the  example of identity certificate that can be assigned by the KYC controller contract. this implements all th functions and events in the standard interface.
 
+
+apart from that there is [example script](../assets/eip-zkID/script/createProof.js) that allows the creation of proofs offchain and publish the proofs and specific public signatures onchain for the verification process.
 
 
 ## Security Considerations
