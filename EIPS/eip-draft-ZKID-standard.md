@@ -1,14 +1,14 @@
 ---
-eip: <to be assigned>
-title:  ZK based KYC verifier standard. 
+eip: 5185
+title: issuer and verifier of KYC certificates. 
 description: Interface for assigning/validating identities using Zero Knowledge Proofs
-author: Yu Liu (@yuliu-debond), Dhruv Malik(@dhruvmalik007)
-discussions-to: TBD
+author: Yu Liu (@yuliu-debond), Dhruv Malik (@dhruvmalik007)
+discussions-to: https://ethereum-magicians.org/t/eip-5185-kyc-certification-issuer-and-verifier-standard/11513
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category : ERC
 created: 2022-10-18
-requires (*optional): 721, 1155, 5114, 3643.
+requires: 721, 1155, 5114, 3643
 ---
 
 
@@ -25,7 +25,7 @@ Onchain verification is becoming indispensable across DeFI as well as other web3
 This created the necessity of building onchain verification of the addresses for token transfers (like stablecoin providers check for the blacklisted entities for the destination address, limited utility tokens for a DAO community , etc). Along with the concern that current whitelisting process of the proposals are based on the addition of the whitelisted addresses (via onchain/offchain signatures) and thus its not trustless for truly decentralised protocols. 
 
 
-Also Current standards in the space, like [ERC-3643](./eip-3643.md) are insufficient to handle the complex usecases where: 
+Also Current standards in the space, like [eip-3643](./eip-3643.md) are insufficient to handle the complex usecases where: 
 
     - The validation logic needs to be more complex than verification of the user identity wrt the blacklisted address that is defined offchain, and is very gas inefficient. 
 
@@ -33,8 +33,8 @@ Also Current standards in the space, like [ERC-3643](./eip-3643.md) are insuffic
 
 thus in order to address the above major challenges: there is need of standard that defines the interface of contract which can issue an immutable identity for the identifier (except by the user) along with verifying the identity of the user based on the ownership of the given identity token.
 
+## Specification:
 
-## Specification: 
 The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 **Definition**
@@ -44,20 +44,14 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 - SBT Certificates: SBT that represent the ownerships of ID signatures corresponding to the requirements defined in `function standardRequirement()`.
 
 - KYC standard: Know your customer standard are the set of minimum viable conditions that financial services providers (banks, investment providers and other intermediate financial intermediateries) have to satisfy in order to access the services. this in web3 consideration concerns not about the details about the user itself, but about its status (onchain usage, total balance by the anon wallet, etc) that can be used for whitelisting.
-
 **diagram**
-
-[](../assets/eip-zkID/architecture-diagram.png)
-
-
+[diagram](../assets/eip-zkID/architecture-diagram.png)
 example workflow using preimage verification: 
-
 - here the KYC contract is an oracle that assigns the user identity with the SBT certificate.
-- During issuance stage, the process to generate the offchain compute of the merkle root from the  various primairly details are calculated and then assigned onchain to the given wallet address with the identity (as SBT type of smart contract certificate).
+- During issuance stage, the process to generate the offchain compute of the merkle root from the various primairly details are calculated and then assigned onchain to the given wallet address with the identity (as SBT type of smart contract certificate).
 - on the other hand, the verifier is shared part of the nodes and the merkle root, in order to verify the merkle leaf information.
-- thus during the verification stage, the verifier will be provided with the preimage 
-
-
+- thus during the verification stage, the verifier will be provided with the preimage of the proofs along with the public information. then via offchain, the admin will compute the merkleroot of the given information and then assign the SBT certificate to the user
+- once having the certificate, the functions that allow the SBTID as assigned by the given user, they will be whitelisted to do the function calls.
 **Functions**
 
 ```solidity
@@ -95,20 +89,16 @@ Defines the condition encoded for the identity index 1, defining the identity co
     /// @dev it should only be called by the admin address.
     /// @param SBFID is the Id of the SBT based identity certificate for which admin wants to define the Requirements.
     /// @param `requirements` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
-
 /**
-
 example: changeStandardRequirement(1, { "title":"DepositRequirement",
-        "type": "number",
-        "description": "defines the minimum deposit in USDC for the investor along with the credit score",
-        },
-       "logic": "and",
+    "type": "number",
+    "description": "defines the minimum deposit in USDC for the investor along with the credit score",
+    },
+    "logic": "and",
     "values":{"30000", "5"}
 }); 
-
 will correspond to the the functionality that admin needs to adjust the standard requirement for the identification SBT with tokenId = 1, based on the conditions described in the Requirements array struct details.
-*/
-
+**/
     function changeStandardRequirement(uint256 SBFID, Requirement[] memory requirements) external returns (bool);
     
     /// @notice function which uses the ZKProof protocol in order to validate the identity based on the given 
@@ -137,35 +127,32 @@ pragma solidity ^0.8.0;
     * @notice standardChanged MUST be triggered when requirements are changed by the admin. 
     * @dev standardChanged MUST also be triggered for the creation of a new SBTID.
     e.g : emit standardChanged(1,Requirement(Metadata('depositRequirement','number', 'defines the max deposited that user can have in denomination of USDC' ), "<=", "30000");
-
-    defined that holder of the identifier has been changed to the condition which allows the certificate holder to call the functions with modifier , only after the deposit in the address is not greater than 30000 USDC.
+    defines that holder of the identifier has been changed to the condition which allows the certificate holder to call the functions with modifier , only after the deposit in the address is not greater than 30000 USDC.
     */
     event standardChanged(uint256 SBTID, Requirement[] _requirement);
-    
     /** 
     * certified
     * @notice certified MUST be triggered when SBT certificate is given to the certifiying address. 
     * eg: certified( 0xfoo,2); means that wallet holder address 0xfoo is certified to hold certificate issued with id 2 , and thus can satisfy all the confitions defined by the required interface.
     */
     event certified(address certifying, uint256 SBTID);
-    
     /** 
     * revoked
     * @notice revoked MUST be triggered when SBT certificate is revoked. 
-    * eg : revoked( 0xfoo,1); means that entity user 0xfoo has been revoked to all the function access defined by the  the SBT ID 1.
+    * eg : revoked( 0xfoo,1); means that entity user 0xfoo has been revoked to all the function access defined by the the SBT ID 1.
     */
     event revoked(address certifying, uint256 SBTID);
 ```
 ## Rationale
 We follow the structure of onchain metadata storage similar to that of [eip-3475](./eip-3475.md), except the fact that whole KYC requirement description is defined like the class from the eip-3475 standard but with only single condition. 
 
-following are the descriptions of the structures: 
+Following are the descriptions of the structures: 
 
 **1.Metadata structure**: 
 
 ```solidity
     /**
-     * @dev metadata that describes the Values structure on the given requirement, cited from [EIP-3475](./eip-3475.md) 
+     * @dev metadata that describes the Values structure on the given requirement. 
     example: 
     {   "title": "jurisdiction",
         "_type": "string",
@@ -180,7 +167,7 @@ following are the descriptions of the structures:
     }
     
     /**
-     * @dev Values here can be read and wrote by smartcontract and front-end, cited from [EIP-3475](./eip-3475.md).
+     * @dev Values here can be read and wrote by smartcontract and front-end, cited from [EIP-3475].
      example : 
 {
  jurisdiction = Values.StringValue("CH");
@@ -196,8 +183,7 @@ following are the descriptions of the structures:
 
 **2.Requirement structure**:
 
-This will be stored in each of the SBT certificate that will define the conditions that needs to be satisfied by the arbitrary address calling the `verify()` function, in order to be be validated as owner of the given certificate(ie following the regulations), this will be defined for each onchain Values separately. 
-
+This will be stored in each of the SBT certificate that will define the conditions that needs to be satisfied by the arbitrary address calling the `verify()` function, in order to be be validated as owner of the given certificate(ie following the regulations), this will be defined for each onchain Values separately.
 
 ```solidity
 
@@ -212,10 +198,9 @@ This will be stored in each of the SBT certificate that will define the conditio
         },
        "logic": ">=",
     "value":"18" 
-	}
-	Defines the condition encoded for the identity index 1, DeFining the identity condition that holder must be more than 18 years old.
+}
+Defines the condition encoded for the identity index 1, DeFining the identity condition that holder must be more than 18 years old.
     */
-	
     struct Requirement {
         Metadata metadata;
         string logic;
@@ -231,7 +216,7 @@ The ERC standard remains backwards compliant for previous versions for cases tha
 In case of the changes in the function logic, developers can use proxy contract patterns like [eip-1967](./eip-1967.md) which will route the validation condition based on the version of the contract.
 ## Test Cases
 
-Test-case for the minimal reference implementation is [here](../assets/eip-zkID/contracts/test.sol) for using transaction verification regarding whether the users hold the tokens ort not. Use the remix to compile and test the contracts.
+Test-case for the minimal reference implementation is [here](../assets/eip-zkID/contracts/test.sol) for using transaction verification regarding whether the users hold the tokens or not. Use the remix to compile and test the contracts.
 
 ## Reference Implementation
 The interface standard is divided into two separated implementations.
@@ -241,14 +226,13 @@ The interface standard is divided into two separated implementations.
 - [SBT_certification](../assets/eip-zkID/contracts/SBT_certification.sol) is the example of identity certificate that can be assigned by the KYC controller contract. this implements all th functions and events in the standard interface.
 
 
-apart from that there is [example script](../assets/eip-zkID/script/createProof.js) that allows the creation of proofs offchain and publish the proofs and specific public signatures onchain for the verification process.
-
+apart from that there is [example script](../assets/eip-zkID/script/createProof.js) that allows the creation of proofs off-chain and publish the proofs and specific public signatures onchain for the verification process.
 
 ## Security Considerations
 
 1. Writing functions interfaces (i.e `changeStandardRequirement()`, `certify()` and `revoke()`) SHOULD be executed by admin roles in the SBT certificate contract as the getter functions (verify()) depends on the availablity of the necessary metadata to be immutable by any other non-admin entity.
 
-2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles(usually by admin) in order to insure that verification logic doesnt get updated without the admin permission.
+2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by [eip-1167](./eip-1167.md), [eip-1967](./eip-1967.md)). if the requirement is deemed important, there needs to be appropriate roles(usually by admin) in order to insure that verification logic doesn't get updated without the admin permission.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
