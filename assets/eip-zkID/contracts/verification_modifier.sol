@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-import "./interfaces/IERC6595.sol";
+import "./interfaces/IERC.sol";
 
 abstract contract ERC6595 is IERC6595 {
     address private _authenticator;

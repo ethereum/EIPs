@@ -35,7 +35,7 @@ thus in order to address the above major challenges: there is need of standard t
 
 
 ## Specification: 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 **Definition**
 
@@ -179,7 +179,7 @@ following are the descriptions of the structures:
      * @dev Values here can be read and wrote by smartcontract and front-end, cited from [EIP-3475](./eip-3475.md).
      example : 
 {
-string jurisdiction = IERC6595.Values.StringValue("CH");
+ jurisdiction = Values.StringValue("CH");
 }
      */   
     struct Values { 
@@ -192,7 +192,7 @@ string jurisdiction = IERC6595.Values.StringValue("CH");
 
 **2.Requirement structure**:
 
-this will be stored in each of the SBT certificate that will define the conditions that needs to be satisfied by the arbitrary address calling the `verify()` function, in order to be be validated as owner of the given certificate(ie following the regulations), this will be defined for each onchain Values separately. 
+This will be stored in each of the SBT certificate that will define the conditions that needs to be satisfied by the arbitrary address calling the `verify()` function, in order to be be validated as owner of the given certificate(ie following the regulations), this will be defined for each onchain Values separately. 
 
 
 ```solidity
@@ -223,27 +223,27 @@ this will be stored in each of the SBT certificate that will define the conditio
 
 ## Backwards Compatibility
 
- An update is needed to amend the KYC modifier in case of updation either in the logic of verifier or the the certificate.
-
+An update is needed to amend the KYC modifier in case of updation either in the logic of verifier or in the SBT certificate  contract based on the nature of updation.
 
 ## Test Cases
 
-Test-case for the minimal reference implementation is here. Use the Truffle box to compile and test the contracts.
+Test-case for the minimal reference implementation is [here](../assets/eip-zkID/contracts/test.sol). Use the Truffle box to compile and test the contracts.
 
 
 ## Reference Implementation
 The interface standard is divided into two separated implementations.
 
-- [verification_contract](../assets/eip-zkID/contracts/verification_modifier.sol) is the simple modifier that needs to be imported by the functions which needs to check the caller should be having the SBT certificate.
-- [SBT_certification](../assets/eip-zkID/contracts/SBT_) 
+- [verifier_modifier](../assets/eip-zkID/contracts/verification_modifier.sol) is the simple modifier that needs to be imported by the functions that are to be only called by holders of the SBT certificates. this essentially is wrapper contract of the eip `verify()`method and can also be implemented for arbitrary types of contract.
+
+- [SBT_certification](../assets/eip-zkID/contracts/SBT_certification.sol) is the  example of identity certificate that can be assigned by the KYC controller contract. this implements all th functions and events in the standard interface.
 
 
 
 ## Security Considerations
-1. Writing functions interfaces (i.e changeStandardRequirement(), certify() and revoke()) SHOULD be executed by admin roles in the SBT certificate contract as the getter functions (verify()) depends on the availablity of the necessary metadata to be immutable by any other non-admin entity.
 
-2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles (usually by admin) in order to insure that modifier logic doesnt get corrupted or creates the unintended backdoor.
+1. Writing functions interfaces (i.e `changeStandardRequirement()`, `certify()` and `revoke()`) SHOULD be executed by admin roles in the SBT certificate contract as the getter functions (verify()) depends on the availablity of the necessary metadata to be immutable by any other non-admin entity.
 
+2. The modifiers SHOULD not be deployed for the verifier contract that is upgradable (either via proxy patterns defined by EIP-1167, EIP-1967). if the requirement is deemed important, there needs to be appropriate roles (usually by admin) in order to insure that verification logic doesnt get updated without the admin permission.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
