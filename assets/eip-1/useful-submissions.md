@@ -1,10 +1,10 @@
 # Useful submissions
 
-A <dfn>standard</dfn>, in technical settings, is an established specification which allows any compliant thing to work with any compliant user of that thing, also known as cross-connect. It is a set of restrictions, or marketing claims, incumbent upon the standardized product.
+A *standard*, in technical settings, is an established specification that allows any compliant thing to work with any compliant user of that thing, also known as cross-connect. It is a set of restrictions or marketing claims, incumbent upon the standardized product.
 
-We call the compliant thing a <dfn>producer</dfn>. And the thing that is relying on those specifications is the <dfn>consumer</dfn>.
+We call the compliant thing a *producer*. And the thing that is relying on those specifications is the *consumer*.
 
-And in technical circles, we call the specific parts that are standardized as its <dfn>surface area</dfn>.
+And in technical circles, we call the specific parts that are standardized as its *surface area*.
 
 As always, to understand the tech world, we should also compare with the rest of the world. Then we'll apply it to blockchain standards processes.
 
@@ -32,7 +32,7 @@ We have looked at a few example of things that have been standardized, different
 
 Some of these behaviors might be important. Maybe you don't like skipping, you can adopt that behavior. But as a standard these are useless, I hope you understand. But let's articulate why.
 
-<mark>A standard only deserves to be written if multiple people adhere to it and people depend on its surface area.</mark>
+**A standard only deserves to be written if multiple people adhere to it and people depend on its surface area.**
 
 FYI, in the United States, the post office has their own police. Watch out for that.
 
@@ -52,4 +52,4 @@ But if you really WANT to make something and standardize it, here's how.
 
 Remember, CryptoKitties and CryptoPunks came first, the blockchain NFT standard come afterwards. Don't think that having some standard will make your product successful, that causality is backwards.
 
-William Entriken / 2022-09-30 / this article is cross-posted with [phor.net](https://blog.phor.net/2022/09/30/What-kinds-of-things-should-be-standardized.html).
+William Entriken / 2022-09-30 / Derived from a [phor.net](https://blog.phor.net/2022/09/30/What-kinds-of-things-should-be-standardized.html) article
