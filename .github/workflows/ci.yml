@@ -103,7 +103,7 @@ jobs:
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          unchecked: 1, 5069
+          unchecked: 1, 5069, 5757
 
   markdownlint:
     name: Markdown Linter
