@@ -204,7 +204,7 @@ Which renders to:
 
 [Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
 
-Permitted Consensus Layer Specifications URLs must match this regular expression:
+Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
 ^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
