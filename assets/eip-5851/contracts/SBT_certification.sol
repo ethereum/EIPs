@@ -35,7 +35,7 @@ abstract contract KYCABST is IERC6595, MerkleProofs{
 
 
     function setProofInformation(address verifier, bytes32[] proofDetails) public view returns(bool) {
-        require(msg.sender == admin, "only admin sets the leaf info");
+        require(msg.sender == admin, "only admin sets the proof info");
         proofInformation[verifier] = proofDetails;
         return(true);
     }
