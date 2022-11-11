@@ -1,0 +1,49 @@
+---
+title: PAY opcode
+description: Introduces a new opcode, PAY, to send ether to an address without calling it
+author: Pandapip1 (@Pandapip1)
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-03-14
+---
+
+## Abstract
+
+This EIP adds a new opcode, `PAY(addr, val)`, that transfers `val` wei to the address `addr` without calling it.
+
+## Motivation
+
+Currently, to send ether to an address requires you to call a function of that address, which has a few issues. First of all, it opens a reentrancy attack vector, as the recipient can call back into the sender. Secondly, it opens a DoS vector, so parent functions must be cognizant of the possibility that the recipient will run out of gas or revert. Finally, the `CALL` opcode is needlessly expensive for simple ether transfers, as it requires the memory and stack to be expanded, the recipient's full data including code and memory to be loaded, and finally needs to execute a call, which might do other unintentional operations. Having a dedicated opcode for ether transfers solves all of these issues, and would be a useful addition to the EVM.
+
+## Specification
+
+| Parameter | Value |
+| - | - |
+| `FORK_BLKNUM` | TBD |
+| `PAY_OPCODE` | TBD |
+| `HOT_GAS_COST` | `500` |
+| `COLD_GAS_COST` | `3000` |
+
+A new opcode is introduced: `PAY` (`PAY_OPCODE`), which:
+
+- Pops two values from the stack: `addr` then `val`.
+- Transfers `val` wei to the address `addr`.
+
+The cost of this opcode is `HOT_GAS_COST` if `addr` is a warm account, and `COLD_GAS_COST` if it is a cold account.
+
+## Rationale
+
+The order of arguments is similar to that of the `CALL` family, which have `addr` before `val`. Beyond consistency, though, this ordering aid validators in pattern-matching MEV opportunities, so that the `PAY` always appears immediately after `COINBASE` in the order of execution.
+
+## Backwards Compatibility
+
+Needs discussion.
+
+## Security Considerations
+
+Existing contracts should not rely on their balance being under their control, since it is already possible to send ether to an address without calling it, by creating a temporary contract and immediately `SELFDESTRUCT`ing it, sending the ether to an arbitrary address. However, this opcode does make this process cheaper for already-vulnerable contracts.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
