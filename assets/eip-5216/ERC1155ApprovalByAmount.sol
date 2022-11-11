@@ -127,7 +127,8 @@ abstract contract ERC1155ApprovalByAmount is ERC1155, IERC1155ApprovalByAmount {
         uint256 id,
         uint256 amount
     ) internal virtual {
-        require(owner != operator, "ERC1155ApprovalByAmount: setting approval status for self");
+        require(owner != address(0), "ERC1155ApprovalByAmount: approve from the zero address");
+        require(operator != address(0), "ERC1155ApprovalByAmount: approve to the zero address");
         _allowances[owner][operator][id] = amount;
         emit ApprovalByAmount(owner, operator, id, amount);
     }
