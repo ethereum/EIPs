@@ -20,7 +20,7 @@ layout: null
           <p>Please visit the [ethereum/EIPs issues to comment](https://github.com/ethereum/EIPs/issues/{{eip.eip}}).</p>
         {% endif %}
         <hr />
-        {{ eip.content }}        
+        {{ eip.content }}
       {% endcapture %}
       <item>
         <title>{{ eip.title | xml_escape }}</title>
