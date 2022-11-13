@@ -1,19 +1,19 @@
 # Ethereum Improvement Proposals (EIPs)
 
-**Before you initiate a pull request**, please read the [EIP-1](https://eips.ethereum.org/EIPS/eip-1) process document. Ideas should be thoroughly discussed on [Ethereum Research](https://ethresear.ch/t/read-this-before-posting/8) or [Ethereum Magicians](https://ethereum-magicians.org/) first.
+The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum client and application protocols. This repository tracks ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.
 
-This repository tracks ongoing improvements to Ethereum. It contains:
+The [EIP status page](https://eips.ethereum.org/) tracks and lists Ethereum client and application protocols:
 
-- The [EIP status page](https://eips.ethereum.org), tracking protocols for Ethereum clients and applications
-- The [process document](https://eips.ethereum.org/EIPS/eip-1) that governs how protocols are published here
+- [Core EIPs](https://eips.ethereum.org/core) are improvements to the Ethereum execution layer, data layer, or consensus layer. These often requie a fork.
+- [Networking EIPs](https://eips.ethereum.org/networking) are improvements to the Networking layer, which determines how the Ethereum peer to peer network functions.
+- [Interface EIPs](https://eips.ethereum.org/interface) are improvements to the Communication layer, which determines how conventional applications can interact with applications running on Ethereum.
+- [ERCs](https://eips.ethereum.org/erc) are improvements to the Application layer, which determines how applications running on Ethereum can interact with each other. These generally detail one or more application-specific interfaces.
+- [Meta EIPs](https://eips.ethereum.org/meta) are miscellaneous improvements that nonetheless require some sort of consensus. 
+- [Informational EIPs](https://eips.ethereum.org/informational) are non-standard improvements that do not require any form of consensus.
 
-For help *implementing* an EIP, please visit [Ethereum Stack Exchange](https://ethereum.stackexchange.com).
+**Before you write an EIP, ideas MUST be thoroughly discussed on [Ethereum Research](https://ethresear.ch/t/read-this-before-posting/8) or [Ethereum Magicians](https://ethereum-magicians.org/). Once consensus is reached, thouroughly read and review [EIP-1](https://eips.ethereum.org/EIPS/eip-1), which describes the EIP proess.**
 
-If you would like to become an EIP Editor, please check [EIP-5069](./EIPS/eip-5069.md).
-
-## Mission
-
-The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high-quality and implementable way.
+This repository is not for help implementing an EIP. For that, please visit the [Ethereum Stack Exchange](https://ethereum.stackexchange.com). This repository is also not for discussing EIPs. If you have a question or comment about a non-final EIP, visit its discussion page and voice your thoughts. If you have a question or comment about a final EIP, please post a new thread on [Ethereum Magicians](https://ethereum-magicians.org/).
 
 ## Preferred Citation Format
 
