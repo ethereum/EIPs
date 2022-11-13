@@ -4,16 +4,16 @@ The goal of the EIP project is to standardize and provide high-quality documenta
 
 The [EIP status page](https://eips.ethereum.org/) tracks and lists Ethereum client and application protocols:
 
-- [Core EIPs](https://eips.ethereum.org/core) are improvements to the Ethereum execution layer, data layer, or consensus layer. These often requie a fork.
-- [Networking EIPs](https://eips.ethereum.org/networking) are improvements to the Networking layer, which determines how the Ethereum peer to peer network functions.
-- [Interface EIPs](https://eips.ethereum.org/interface) are improvements to the Communication layer, which determines how conventional applications can interact with applications running on Ethereum.
-- [ERCs](https://eips.ethereum.org/erc) are improvements to the Application layer, which determines how applications running on Ethereum can interact with each other. These generally detail one or more application-specific interfaces.
+- [Core EIPs](https://eips.ethereum.org/core) are improvements to the Ethereum consensus protocol.
+- [Networking EIPs](https://eips.ethereum.org/networking) specify the peer-to-peer networking layer of Ethereum.
+- [Interface EIPs](https://eips.ethereum.org/interface) standardize interfaces to Ethereum, which determine how users and applications interact with the blockchain.
+- [ERCs](https://eips.ethereum.org/erc) specify application layer standards, which determine how applications running on Ethereum can interact with each other.
 - [Meta EIPs](https://eips.ethereum.org/meta) are miscellaneous improvements that nonetheless require some sort of consensus. 
 - [Informational EIPs](https://eips.ethereum.org/informational) are non-standard improvements that do not require any form of consensus.
 
-**Before you write an EIP, ideas MUST be thoroughly discussed on [Ethereum Research](https://ethresear.ch/t/read-this-before-posting/8) or [Ethereum Magicians](https://ethereum-magicians.org/). Once consensus is reached, thouroughly read and review [EIP-1](https://eips.ethereum.org/EIPS/eip-1), which describes the EIP proess.**
+**Before you write an EIP, ideas MUST be thoroughly discussed on [Ethereum Magicians](https://ethereum-magicians.org/) or [Ethereum Research](https://ethresear.ch/t/read-this-before-posting/8). Once consensus is reached, thoroughly read and review [EIP-1](https://eips.ethereum.org/EIPS/eip-1), which describes the EIP process.**
 
-This repository is not for help implementing an EIP. For that, please visit the [Ethereum Stack Exchange](https://ethereum.stackexchange.com). This repository is also not for discussing EIPs. If you have a question or comment about a non-final EIP, visit its discussion page and voice your thoughts. If you have a question or comment about a final EIP, please post a new thread on [Ethereum Magicians](https://ethereum-magicians.org/).
+Please note that this repository is for documenting standards and not for help implementing them. These types of inquiries should be directed to the [Ethereum Stack Exchange](https://ethereum.stackexchange.com). For specific questions and concerns regarding EIPs, it's best to comment on the relevant discussion thread of the EIP denoted by the `discussions-to` tag in the EIP's preamble.
 
 ## Preferred Citation Format
 
