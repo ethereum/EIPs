@@ -19,9 +19,7 @@ The goal of the EIP project is to document standardized protocols for Ethereum c
 
 The canonical URL for an EIP that has achieved draft status at any point is at <https://eips.ethereum.org/>. For example, the canonical URL for EIP-1 is <https://eips.ethereum.org/EIPS/eip-1>.
 
-Please consider anything which is not published on <https://eips.ethereum.org/> as a working paper.
-
-And please consider anything published at <https://eips.ethereum.org/> with a status of "draft" as an incomplete draft.
+Consider any document not published at <https://eips.ethereum.org/> as a working paper. Additionally, consider published EIPs with a status of "draft", "review", or "last call" to be incomplete drafts, and note that their specification is likely to be subject to change.
 
 ## Automerger
 
