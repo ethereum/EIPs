@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: CC0
 
 pragma solidity ^0.8.0;
 
-library MultiResourceLib {
+library MultiAssetLib {
     function removeItemByValue(uint64[] storage array, uint64 value)
         internal
         returns (bool)

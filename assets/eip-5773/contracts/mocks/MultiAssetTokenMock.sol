@@ -1,14 +1,14 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: CC0
 
 pragma solidity ^0.8.15;
 
-import "../MultiResourceToken.sol";
+import "../MultiAssetToken.sol";
 
-contract MultiResourceTokenMock is MultiResourceToken {
+contract MultiAssetTokenMock is MultiAssetToken {
     address private _issuer;
 
     constructor(string memory name, string memory symbol)
-        MultiResourceToken(name, symbol)
+        MultiAssetToken(name, symbol)
     {
         _setIssuer(_msgSender());
     }
@@ -38,19 +38,19 @@ contract MultiResourceTokenMock is MultiResourceToken {
         _burn(tokenId);
     }
 
-    function addResourceToToken(
+    function addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) external onlyIssuer {
-        _addResourceToToken(tokenId, resourceId, overwrites);
+        _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addResourceEntry(uint64 id, string memory metadataURI)
+    function addAssetEntry(uint64 id, string memory metadataURI)
         external
         onlyIssuer
     {
-        _addResourceEntry(id, metadataURI);
+        _addAssetEntry(id, metadataURI);
     }
 
     function _setIssuer(address issuer) private {

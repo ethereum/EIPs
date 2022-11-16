@@ -1,19 +1,19 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: CC0
 
 pragma solidity ^0.8.15;
 
-import "./IMultiResource.sol";
-import "./library/MultiResourceLib.sol";
+import "./IMultiAsset.sol";
+import "./library/MultiAssetLib.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-contract MultiResourceToken is Context, IERC721, IMultiResource {
-    using MultiResourceLib for uint256;
-    using MultiResourceLib for uint64[];
-    using MultiResourceLib for uint128[];
+contract MultiAssetToken is Context, IERC721, IMultiAsset {
+    using MultiAssetLib for uint256;
+    using MultiAssetLib for uint64[];
+    using MultiAssetLib for uint128[];
     using Address for address;
     using Strings for uint256;
 
@@ -35,30 +35,30 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    // Mapping from token ID to approved address for resources
-    mapping(uint256 => address) internal _tokenApprovalsForResources;
+    // Mapping from token ID to approved address for assets
+    mapping(uint256 => address) internal _tokenApprovalsForAssets;
 
-    // Mapping from owner to operator approvals for resources
+    // Mapping from owner to operator approvals for assets
     mapping(address => mapping(address => bool))
-        internal _operatorApprovalsForResources;
+        internal _operatorApprovalsForAssets;
 
-    //mapping of uint64 Ids to resource object
-    mapping(uint64 => string) internal _resources;
+    //mapping of uint64 Ids to asset object
+    mapping(uint64 => string) internal _assets;
 
-    //mapping of tokenId to new resource, to resource to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) private _resourceOverwrites;
+    //mapping of tokenId to new asset, to asset to be replaced
+    mapping(uint256 => mapping(uint64 => uint64)) private _assetOverwrites;
 
-    //mapping of tokenId to all resources
-    mapping(uint256 => uint64[]) internal _activeResources;
+    //mapping of tokenId to all assets
+    mapping(uint256 => uint64[]) internal _activeAssets;
 
-    //mapping of tokenId to an array of resource priorities
-    mapping(uint256 => uint16[]) internal _activeResourcePriorities;
+    //mapping of tokenId to an array of asset priorities
+    mapping(uint256 => uint16[]) internal _activeAssetPriorities;
 
-    //Double mapping of tokenId to active resources
-    mapping(uint256 => mapping(uint64 => bool)) private _tokenResources;
+    //Double mapping of tokenId to active assets
+    mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
 
-    //mapping of tokenId to all resources by priority
-    mapping(uint256 => uint64[]) internal _pendingResources;
+    //mapping of tokenId to all assets by priority
+    mapping(uint256 => uint64[]) internal _pendingAssets;
 
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
@@ -69,9 +69,9 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     //        ERC-721 COMPLIANCE
     ////////////////////////////////////////
 
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         return
-            interfaceId == type(IMultiResource).interfaceId ||
+            interfaceId == type(IMultiAsset).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
@@ -115,24 +115,24 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
 
     function approve(address to, uint256 tokenId) public virtual {
         address owner = ownerOf(tokenId);
-        require(to != owner, "MultiResource: approval to current owner");
+        require(to != owner, "MultiAsset: approval to current owner");
         require(
             _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-            "MultiResource: approve caller is not owner nor approved for all"
+            "MultiAsset: approve caller is not owner nor approved for all"
         );
 
         _approve(to, tokenId);
     }
 
-    function approveForResources(address to, uint256 tokenId) external virtual {
+    function approveForAssets(address to, uint256 tokenId) external virtual {
         address owner = ownerOf(tokenId);
-        require(to != owner, "MultiResource: approval to current owner");
+        require(to != owner, "MultiAsset: approval to current owner");
         require(
             _msgSender() == owner ||
-                isApprovedForAllForResources(owner, _msgSender()),
-            "MultiResource: approve caller is not owner nor approved for all"
+                isApprovedForAllForAssets(owner, _msgSender()),
+            "MultiAsset: approve caller is not owner nor approved for all"
         );
-        _approveForResources(to, tokenId);
+        _approveForAssets(to, tokenId);
     }
 
     function getApproved(uint256 tokenId)
@@ -144,13 +144,13 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     {
         require(
             _exists(tokenId),
-            "MultiResource: approved query for nonexistent token"
+            "MultiAsset: approved query for nonexistent token"
         );
 
         return _tokenApprovals[tokenId];
     }
 
-    function getApprovedForResources(uint256 tokenId)
+    function getApprovedForAssets(uint256 tokenId)
         public
         view
         virtual
@@ -158,9 +158,9 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     {
         require(
             _exists(tokenId),
-            "MultiResource: approved query for nonexistent token"
+            "MultiAsset: approved query for nonexistent token"
         );
-        return _tokenApprovalsForResources[tokenId];
+        return _tokenApprovalsForAssets[tokenId];
     }
 
     function setApprovalForAll(address operator, bool approved)
@@ -181,21 +181,21 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         return _operatorApprovals[owner][operator];
     }
 
-    function setApprovalForAllForResources(address operator, bool approved)
+    function setApprovalForAllForAssets(address operator, bool approved)
         public
         virtual
         override
     {
-        _setApprovalForAllForResources(_msgSender(), operator, approved);
+        _setApprovalForAllForAssets(_msgSender(), operator, approved);
     }
 
-    function isApprovedForAllForResources(address owner, address operator)
+    function isApprovedForAllForAssets(address owner, address operator)
         public
         view
         virtual
         returns (bool)
     {
-        return _operatorApprovalsForResources[owner][operator];
+        return _operatorApprovalsForAssets[owner][operator];
     }
 
     function transferFrom(
@@ -206,7 +206,7 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         //solhint-disable-next-line max-line-length
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
+            "MultiAsset: transfer caller is not owner nor approved"
         );
 
         _transfer(from, to, tokenId);
@@ -228,7 +228,7 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     ) public virtual override {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "MultiResource: transfer caller is not owner nor approved"
+            "MultiAsset: transfer caller is not owner nor approved"
         );
         _safeTransfer(from, to, tokenId, data);
     }
@@ -242,7 +242,7 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         _transfer(from, to, tokenId);
         require(
             _checkOnERC721Received(from, to, tokenId, data),
-            "MultiResource: transfer to non ERC721 Receiver implementer"
+            "MultiAsset: transfer to non ERC721 Receiver implementer"
         );
     }
 
@@ -258,7 +258,7 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     {
         require(
             _exists(tokenId),
-            "MultiResource: approved query for nonexistent token"
+            "MultiAsset: approved query for nonexistent token"
         );
         address owner = ownerOf(tokenId);
         return (spender == owner ||
@@ -266,7 +266,7 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
             getApproved(tokenId) == spender);
     }
 
-    function _isApprovedForResourcesOrOwner(address user, uint256 tokenId)
+    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
         internal
         view
         virtual
@@ -274,12 +274,12 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     {
         require(
             _exists(tokenId),
-            "MultiResource: approved query for nonexistent token"
+            "MultiAsset: approved query for nonexistent token"
         );
         address owner = ownerOf(tokenId);
         return (user == owner ||
-            isApprovedForAllForResources(owner, user) ||
-            getApprovedForResources(tokenId) == user);
+            isApprovedForAllForAssets(owner, user) ||
+            getApprovedForAssets(tokenId) == user);
     }
 
     function _safeMint(address to, uint256 tokenId) internal virtual {
@@ -294,13 +294,13 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         _mint(to, tokenId);
         require(
             _checkOnERC721Received(address(0), to, tokenId, data),
-            "MultiResource: transfer to non ERC721 Receiver implementer"
+            "MultiAsset: transfer to non ERC721 Receiver implementer"
         );
     }
 
     function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "MultiResource: mint to the zero address");
-        require(!_exists(tokenId), "MultiResource: token already minted");
+        require(to != address(0), "MultiAsset: mint to the zero address");
+        require(!_exists(tokenId), "MultiAsset: token already minted");
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -314,16 +314,16 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
 
     function _burn(uint256 tokenId) internal virtual {
         // WARNING: If you intend to allow the reminting of a burned token, you
-        // might want to clean the resources for the token, that is:
-        // _pendingResources, _activeResources, _resourceOverwrites
-        // _activeResourcePriorities and _tokenResources.
+        // might want to clean the assets for the token, that is:
+        // _pendingAssets, _activeAssets, _assetOverwrites
+        // _activeAssetPriorities and _tokenAssets.
         address owner = ownerOf(tokenId);
 
         _beforeTokenTransfer(owner, address(0), tokenId);
 
         // Clear approvals
         _approve(address(0), tokenId);
-        _approveForResources(address(0), tokenId);
+        _approveForAssets(address(0), tokenId);
 
         _balances[owner] -= 1;
         delete _owners[tokenId];
@@ -340,18 +340,15 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     ) internal virtual {
         require(
             ownerOf(tokenId) == from,
-            "MultiResource: transfer from incorrect owner"
+            "MultiAsset: transfer from incorrect owner"
         );
-        require(
-            to != address(0),
-            "MultiResource: transfer to the zero address"
-        );
+        require(to != address(0), "MultiAsset: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, tokenId);
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
-        _approveForResources(address(0), tokenId);
+        _approveForAssets(address(0), tokenId);
 
         _balances[from] -= 1;
         _balances[to] += 1;
@@ -367,12 +364,9 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         emit Approval(ownerOf(tokenId), to, tokenId);
     }
 
-    function _approveForResources(address to, uint256 tokenId)
-        internal
-        virtual
-    {
-        _tokenApprovalsForResources[tokenId] = to;
-        emit ApprovalForResources(ownerOf(tokenId), to, tokenId);
+    function _approveForAssets(address to, uint256 tokenId) internal virtual {
+        _tokenApprovalsForAssets[tokenId] = to;
+        emit ApprovalForAssets(ownerOf(tokenId), to, tokenId);
     }
 
     function _setApprovalForAll(
@@ -380,19 +374,19 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
         address operator,
         bool approved
     ) internal virtual {
-        require(owner != operator, "MultiResource: approve to caller");
+        require(owner != operator, "MultiAsset: approve to caller");
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
 
-    function _setApprovalForAllForResources(
+    function _setApprovalForAllForAssets(
         address owner,
         address operator,
         bool approved
     ) internal virtual {
-        require(owner != operator, "MultiResource: approve to caller");
-        _operatorApprovalsForResources[owner][operator] = approved;
-        emit ApprovalForAllForResources(owner, operator, approved);
+        require(owner != operator, "MultiAsset: approve to caller");
+        _operatorApprovalsForAssets[owner][operator] = approved;
+        emit ApprovalForAllForAssets(owner, operator, approved);
     }
 
     function _checkOnERC721Received(
@@ -410,13 +404,11 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
                     data
                 )
             returns (bytes4 retval) {
-                return
-                    retval ==
-                    IERC721Receiver.onERC721Received.selector;
+                return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
                     revert(
-                        "MultiResource: transfer to non ERC721 Receiver implementer"
+                        "MultiAsset: transfer to non ERC721 Receiver implementer"
                     );
                 } else {
                     /// @solidity memory-safe-assembly
@@ -443,94 +435,97 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     ) internal virtual {}
 
     ////////////////////////////////////////
-    //                RESOURCES
+    //                ASSETS
     ////////////////////////////////////////
 
-    function acceptResource(
+    function acceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 resourceId
+        uint64 assetId
     ) external virtual {
         require(
-            index < _pendingResources[tokenId].length,
-            "MultiResource: index out of bounds"
+            index < _pendingAssets[tokenId].length,
+            "MultiAsset: index out of bounds"
         );
         require(
-            _isApprovedForResourcesOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner or approved"
+            _isApprovedForAssetsOrOwner(_msgSender(), tokenId),
+            "MultiAsset: not owner or approved"
         );
         require(
-            resourceId == _pendingResources[tokenId][index],
-            "MultiResource: Unexpected resource"
+            assetId == _pendingAssets[tokenId][index],
+            "MultiAsset: Unexpected asset"
         );
 
-        _beforeAcceptResource(tokenId, index, resourceId);
-        _pendingResources[tokenId].removeItemByIndex(index);
+        _beforeAcceptAsset(tokenId, index, assetId);
+        _pendingAssets[tokenId].removeItemByIndex(index);
 
-        uint64 overwrite = _resourceOverwrites[tokenId][resourceId];
+        uint64 overwrite = _assetOverwrites[tokenId][assetId];
         if (overwrite != uint64(0)) {
             // It could have been overwritten previously so it's fine if it's not found.
             // If it's not deleted (not found), we don't want to send it on the event
-            if (!_activeResources[tokenId].removeItemByValue(overwrite))
+            if (!_activeAssets[tokenId].removeItemByValue(overwrite))
                 overwrite = uint64(0);
-            else delete _tokenResources[tokenId][overwrite];
-            delete (_resourceOverwrites[tokenId][resourceId]);
+            else delete _tokenAssets[tokenId][overwrite];
+            delete (_assetOverwrites[tokenId][assetId]);
         }
-        _activeResources[tokenId].push(resourceId);
+        _activeAssets[tokenId].push(assetId);
         //Push 0 value of uint16 to array, e.g., uninitialized
-        _activeResourcePriorities[tokenId].push(uint16(0));
-        emit ResourceAccepted(tokenId, resourceId, overwrite);
-        _afterAcceptResource(tokenId, index, resourceId);
+        _activeAssetPriorities[tokenId].push(uint16(0));
+        emit AssetAccepted(tokenId, assetId, overwrite);
+        _afterAcceptAsset(tokenId, index, assetId);
     }
 
-    function rejectResource(
+    function rejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint64 resourceId
+        uint64 assetId
     ) external virtual {
         require(
-            index < _pendingResources[tokenId].length,
-            "MultiResource: index out of bounds"
+            index < _pendingAssets[tokenId].length,
+            "MultiAsset: index out of bounds"
         );
         require(
-            _pendingResources[tokenId].length > index,
-            "MultiResource: Pending resource index out of range"
+            _pendingAssets[tokenId].length > index,
+            "MultiAsset: Pending asset index out of range"
         );
         require(
-            _isApprovedForResourcesOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner or approved"
+            _isApprovedForAssetsOrOwner(_msgSender(), tokenId),
+            "MultiAsset: not owner or approved"
         );
 
-        _beforeRejectResource(tokenId, index, resourceId);
-        _pendingResources[tokenId].removeItemByValue(resourceId);
-        delete _tokenResources[tokenId][resourceId];
-        delete _resourceOverwrites[tokenId][resourceId];
+        _beforeRejectAsset(tokenId, index, assetId);
+        _pendingAssets[tokenId].removeItemByValue(assetId);
+        delete _tokenAssets[tokenId][assetId];
+        delete _assetOverwrites[tokenId][assetId];
 
-        emit ResourceRejected(tokenId, resourceId);
-        _afterRejectResource(tokenId, index, resourceId);
+        emit AssetRejected(tokenId, assetId);
+        _afterRejectAsset(tokenId, index, assetId);
     }
 
-    function rejectAllResources(uint256 tokenId, uint256 maxRejections) external virtual {
+    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
+        external
+        virtual
+    {
         require(
-            _isApprovedForResourcesOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner or approved"
+            _isApprovedForAssetsOrOwner(_msgSender(), tokenId),
+            "MultiAsset: not owner or approved"
         );
 
-        uint256 len = _pendingResources[tokenId].length;
-        if (len > maxRejections) revert ("Unexpected number of resources");
+        uint256 len = _pendingAssets[tokenId].length;
+        if (len > maxRejections) revert("Unexpected number of assets");
 
-        _beforeRejectAllResources(tokenId);
+        _beforeRejectAllAssets(tokenId);
         for (uint256 i; i < len; ) {
-            uint64 resourceId = _pendingResources[tokenId][i];
-            delete _resourceOverwrites[tokenId][resourceId];
+            uint64 assetId = _pendingAssets[tokenId][i];
+            delete _assetOverwrites[tokenId][assetId];
             unchecked {
                 ++i;
             }
         }
-        delete (_pendingResources[tokenId]);
+        delete (_pendingAssets[tokenId]);
 
-        emit ResourceRejected(tokenId, uint64(0));
-        _afterRejectAllResources(tokenId);
+        emit AssetRejected(tokenId, uint64(0));
+        _afterRejectAllAssets(tokenId);
     }
 
     function setPriority(uint256 tokenId, uint16[] memory priorities)
@@ -539,66 +534,66 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
     {
         uint256 length = priorities.length;
         require(
-            length == _activeResources[tokenId].length,
-            "MultiResource: Bad priority list length"
+            length == _activeAssets[tokenId].length,
+            "MultiAsset: Bad priority list length"
         );
         require(
-            _isApprovedForResourcesOrOwner(_msgSender(), tokenId),
-            "MultiResource: not owner or approved"
+            _isApprovedForAssetsOrOwner(_msgSender(), tokenId),
+            "MultiAsset: not owner or approved"
         );
 
         _beforeSetPriority(tokenId, priorities);
-        _activeResourcePriorities[tokenId] = priorities;
+        _activeAssetPriorities[tokenId] = priorities;
 
-        emit ResourcePrioritySet(tokenId);
+        emit AssetPrioritySet(tokenId);
         _afterSetPriority(tokenId, priorities);
     }
 
-    function getActiveResources(uint256 tokenId)
+    function getActiveAssets(uint256 tokenId)
         public
         view
         virtual
         returns (uint64[] memory)
     {
-        return _activeResources[tokenId];
+        return _activeAssets[tokenId];
     }
 
-    function getPendingResources(uint256 tokenId)
+    function getPendingAssets(uint256 tokenId)
         public
         view
         virtual
         returns (uint64[] memory)
     {
-        return _pendingResources[tokenId];
+        return _pendingAssets[tokenId];
     }
 
-    function getActiveResourcePriorities(uint256 tokenId)
+    function getActiveAssetPriorities(uint256 tokenId)
         public
         view
         virtual
         returns (uint16[] memory)
     {
-        return _activeResourcePriorities[tokenId];
+        return _activeAssetPriorities[tokenId];
     }
 
-    function getResourceOverwrites(uint256 tokenId, uint64 newResourceId)
+    function getAssetOverwrites(uint256 tokenId, uint64 newAssetId)
         public
         view
         virtual
         returns (uint64)
     {
-        return _resourceOverwrites[tokenId][newResourceId];
+        return _assetOverwrites[tokenId][newAssetId];
     }
 
-    function getResourceMetadata(uint256 tokenId, uint64 resourceId)
+    function getAssetMetadata(uint256 tokenId, uint64 assetId)
         public
         view
         virtual
         returns (string memory)
     {
-        if (!_tokenResources[tokenId][resourceId])
-            revert("MultiResource: Token does not have resource");
-        return _resources[resourceId];
+        if (!_tokenAssets[tokenId][assetId])
+            revert("MultiAsset: Token does not have asset");
+        return _assets[assetId];
     }
 
     function tokenURI(uint256 tokenId)
@@ -612,103 +607,100 @@ contract MultiResourceToken is Context, IERC721, IMultiResource {
 
     // To be implemented with custom guards
 
-    function _addResourceEntry(uint64 id, string memory metadataURI) internal {
+    function _addAssetEntry(uint64 id, string memory metadataURI) internal {
         require(id != uint64(0), "RMRK: Write to zero");
-        require(
-            bytes(_resources[id]).length == 0,
-            "RMRK: resource already exists"
-        );
+        require(bytes(_assets[id]).length == 0, "RMRK: asset already exists");
 
-        _beforeAddResource(id, metadataURI);
-        _resources[id] = metadataURI;
+        _beforeAddAsset(id, metadataURI);
+        _assets[id] = metadataURI;
 
-        emit ResourceSet(id);
-        _afterAddResource(id, metadataURI);
+        emit AssetSet(id);
+        _afterAddAsset(id, metadataURI);
     }
 
-    function _addResourceToToken(
+    function _addAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) internal {
         require(
-            !_tokenResources[tokenId][resourceId],
-            "MultiResource: Resource already exists on token"
+            !_tokenAssets[tokenId][assetId],
+            "MultiAsset: Asset already exists on token"
         );
 
         require(
-            bytes(_resources[resourceId]).length != 0,
-            "MultiResource: Resource not found in storage"
+            bytes(_assets[assetId]).length != 0,
+            "MultiAsset: Asset not found in storage"
         );
 
         require(
-            _pendingResources[tokenId].length < 128,
-            "MultiResource: Max pending resources reached"
+            _pendingAssets[tokenId].length < 128,
+            "MultiAsset: Max pending assets reached"
         );
 
-        _beforeAddResourceToToken(tokenId, resourceId, overwrites);
-        _tokenResources[tokenId][resourceId] = true;
-        _pendingResources[tokenId].push(resourceId);
+        _beforeAddAssetToToken(tokenId, assetId, overwrites);
+        _tokenAssets[tokenId][assetId] = true;
+        _pendingAssets[tokenId].push(assetId);
 
         if (overwrites != uint64(0)) {
-            _resourceOverwrites[tokenId][resourceId] = overwrites;
+            _assetOverwrites[tokenId][assetId] = overwrites;
         }
 
-        emit ResourceAddedToToken(tokenId, resourceId, overwrites);
-        _afterAddResourceToToken(tokenId, resourceId, overwrites);
+        emit AssetAddedToToken(tokenId, assetId, overwrites);
+        _afterAddAssetToToken(tokenId, assetId, overwrites);
     }
 
     // HOOKS
 
-    function _beforeAddResource(uint64 id, string memory metadataURI)
+    function _beforeAddAsset(uint64 id, string memory metadataURI)
         internal
         virtual
     {}
 
-    function _afterAddResource(uint64 id, string memory metadataURI)
+    function _afterAddAsset(uint64 id, string memory metadataURI)
         internal
         virtual
     {}
 
-    function _beforeAddResourceToToken(
+    function _beforeAddAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) internal virtual {}
 
-    function _afterAddResourceToToken(
+    function _afterAddAssetToToken(
         uint256 tokenId,
-        uint64 resourceId,
+        uint64 assetId,
         uint64 overwrites
     ) internal virtual {}
 
-    function _beforeAcceptResource(
+    function _beforeAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 resourceId
+        uint256 assetId
     ) internal virtual {}
 
-    function _afterAcceptResource(
+    function _afterAcceptAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 resourceId
+        uint256 assetId
     ) internal virtual {}
 
-    function _beforeRejectResource(
+    function _beforeRejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 resourceId
+        uint256 assetId
     ) internal virtual {}
 
-    function _afterRejectResource(
+    function _afterRejectAsset(
         uint256 tokenId,
         uint256 index,
-        uint256 resourceId
+        uint256 assetId
     ) internal virtual {}
 
-    function _beforeRejectAllResources(uint256 tokenId) internal virtual {}
+    function _beforeRejectAllAssets(uint256 tokenId) internal virtual {}
 
-    function _afterRejectAllResources(uint256 tokenId) internal virtual {}
+    function _afterRejectAllAssets(uint256 tokenId) internal virtual {}
 
     function _beforeSetPriority(uint256 tokenId, uint16[] memory priorities)
         internal
