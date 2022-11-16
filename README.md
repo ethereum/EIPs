@@ -9,30 +9,34 @@ This repository tracks ongoing improvements to Ethereum. It contains:
 
 For help *implementing* an EIP, please visit [Ethereum Stack Exchange](https://ethereum.stackexchange.com).
 
+If you would like to become an EIP Editor, please check [EIP-5069](./EIPS/eip-5069.md).
+
 ## Mission
 
-The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high quality and implementable way.
+The goal of the EIP project is to document standardized protocols for Ethereum clients and applications and to document them in a high-quality and implementable way.
 
 ## Preferred Citation Format
 
-The canonical URL for a EIP that has achieved draft status at any point is at https://eips.ethereum.org/. For example, the canonical URL for EIP-1 is https://eips.ethereum.org/EIPS/eip-1.
+The canonical URL for an EIP that has achieved draft status at any point is at <https://eips.ethereum.org/>. For example, the canonical URL for EIP-1 is <https://eips.ethereum.org/EIPS/eip-1>.
 
-Please consider anything which is not published on https://eips.ethereum.org/ as a working paper.
+Consider any document not published at <https://eips.ethereum.org/> as a working paper. Additionally, consider published EIPs with a status of "draft", "review", or "last call" to be incomplete drafts, and note that their specification is likely to be subject to change.
 
-And please consider anything published at https://eips.ethereum.org/ with a status of "draft" as an incomplete draft.
+## Validation and Automerging
 
-## Automerger
+All pull requests in this repository must pass automated checks before they can be automatically merged:
 
-This repository contains an "auto merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if the EIP's authors approve the PR on GitHub. This is handled by the [EIP-Bot](https://github.com/ethereum/EIP-Bot).
+- [EIP-Bot](https://github.com/ethereum/EIP-Bot/) determines when PRs can be automatically merged [^1]
+- EIP-1 rules are enforced using [`eipw`](https://github.com/ethereum/eipw)[^2]
+- HTML formatting and broken links are enforced using [HTMLProofer](https://github.com/gjtorikian/html-proofer)[^2]
+- Spelling is enforced with [CodeSpell](https://github.com/codespell-project/codespell)[^2]
+- False positives sometimes occur. When this happens, please submit a PR editing [.codespell-whitelist](https://github.com/ethereum/EIPs/blob/master/config/.codespell-whitelist).
+- Markdown best practices are checked using [markdownlint](https://github.com/DavidAnson/markdownlint)[^2]
 
-## Validation
-
-Pull requests in this repository must pass automated validation checks:
-
-* HTML formatting and broken links are [checked](https://github.com/ethereum/EIPs/blob/master/.travis-ci.sh) using [html-proofer](https://rubygems.org/gems/html-proofer).
-* EIP front matter and formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-merge-bot.yml) using [EIP Validator](https://github.com/ethereum/eipv).
+[^1]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml
+[^2]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml
 
 It is possible to run the EIP validator locally:
+
 ```sh
 cargo install eipv
 eipv <INPUT FILE / DIRECTORY>
@@ -72,6 +76,6 @@ eipv <INPUT FILE / DIRECTORY>
    bundle exec jekyll serve
    ```
 
-2. Preview your local Jekyll site in your web browser at http://localhost:4000.
+2. Preview your local Jekyll site in your web browser at <http://localhost:4000>.
 
-More information on Jekyll and GitHub pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+More information on Jekyll and GitHub Pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
