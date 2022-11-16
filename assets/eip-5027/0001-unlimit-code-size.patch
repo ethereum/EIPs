@@ -1,17 +1,21 @@
-From 82ce60226a81e6a3acb92525482c16d254f63816 Mon Sep 17 00:00:00 2001
+From 7b8d4d1b8e00c0515ead0abb3f556e2b5a0617a7 Mon Sep 17 00:00:00 2001
 From: Qi Zhou <qzhou64@gmail.com>
 Date: Thu, 21 Apr 2022 11:35:27 -0700
-Subject: [PATCH] unlimit code size
+Subject: [PATCH] unlimit code size with cold/warm storage
 
 ---
- core/rawdb/accessors_state.go | 18 ++++++++++++++++++
- core/rawdb/schema.go          |  6 ++++++
- core/state/database.go        |  6 ++++++
- core/vm/evm.go                |  6 +++---
- core/vm/gas_table.go          | 25 +++++++++++++++++++++++++
- core/vm/instructions.go       |  7 +++++++
- params/protocol_params.go     |  2 +-
- 7 files changed, 66 insertions(+), 4 deletions(-)
+ core/rawdb/accessors_state.go | 18 +++++++
+ core/rawdb/schema.go          |  6 +++
+ core/state/access_list.go     | 32 +++++++++++-
+ core/state/database.go        |  6 +++
+ core/state/journal.go         | 11 ++++
+ core/state/statedb.go         | 23 ++++++--
+ core/vm/eips.go               | 20 +++++++
+ core/vm/evm.go                |  8 +--
+ core/vm/interface.go          |  2 +
+ core/vm/operations_acl.go     | 98 +++++++++++++++++++++++++++++++++++
+ params/protocol_params.go     | 10 ++--
+ 11 files changed, 221 insertions(+), 13 deletions(-)
 
 diff --git a/core/rawdb/accessors_state.go b/core/rawdb/accessors_state.go
 index 41e21b6ca..ad7fc150d 100644
@@ -80,11 +84,79 @@ index 08f373488..cbf1dc40f 100644
  // IsCodeKey reports whether the given byte slice is the key of contract code,
  // if so return the raw code hash as well.
  func IsCodeKey(key []byte) (bool, []byte) {
+diff --git a/core/state/access_list.go b/core/state/access_list.go
+index 419469134..22812a936 100644
+--- a/core/state/access_list.go
++++ b/core/state/access_list.go
+@@ -21,8 +21,9 @@ import (
+ )
+ 
+ type accessList struct {
+-	addresses map[common.Address]int
+-	slots     []map[common.Hash]struct{}
++	addresses       map[common.Address]int
++	codeInAddresses map[common.Address]bool
++	slots           []map[common.Hash]struct{}
+ }
+ 
+ // ContainsAddress returns true if the address is in the access list.
+@@ -31,6 +32,12 @@ func (al *accessList) ContainsAddress(address common.Address) bool {
+ 	return ok
+ }
+ 
++// ContainsAddress returns true if the address is in the access list.
++func (al *accessList) ContainsAddressCode(address common.Address) bool {
++	_, ok := al.codeInAddresses[address]
++	return ok
++}
++
+ // Contains checks if a slot within an account is present in the access list, returning
+ // separate flags for the presence of the account and the slot respectively.
+ func (al *accessList) Contains(address common.Address, slot common.Hash) (addressPresent bool, slotPresent bool) {
+@@ -60,6 +67,9 @@ func (a *accessList) Copy() *accessList {
+ 	for k, v := range a.addresses {
+ 		cp.addresses[k] = v
+ 	}
++	for k, v := range a.codeInAddresses {
++		cp.codeInAddresses[k] = v
++	}
+ 	cp.slots = make([]map[common.Hash]struct{}, len(a.slots))
+ 	for i, slotMap := range a.slots {
+ 		newSlotmap := make(map[common.Hash]struct{}, len(slotMap))
+@@ -81,6 +91,16 @@ func (al *accessList) AddAddress(address common.Address) bool {
+ 	return true
+ }
+ 
++// AddAddressCode adds the code of an address to the access list, and returns 'true' if the operation
++// caused a change (addr was not previously in the list).
++func (al *accessList) AddAddressCode(address common.Address) bool {
++	if _, present := al.codeInAddresses[address]; present {
++		return false
++	}
++	al.codeInAddresses[address] = true
++	return true
++}
++
+ // AddSlot adds the specified (addr, slot) combo to the access list.
+ // Return values are:
+ // - address added
+@@ -134,3 +154,11 @@ func (al *accessList) DeleteSlot(address common.Address, slot common.Hash) {
+ func (al *accessList) DeleteAddress(address common.Address) {
+ 	delete(al.addresses, address)
+ }
++
++// DeleteAddressCode removes the code of an address from the access list. This operation
++// needs to be performed in the same order as the addition happened.
++// This method is meant to be used  by the journal, which maintains ordering of
++// operations.
++func (al *accessList) DeleteAddressCode(address common.Address) {
++	delete(al.codeInAddresses, address)
++}
 diff --git a/core/state/database.go b/core/state/database.go
 index bbcd2358e..7445e627f 100644
 --- a/core/state/database.go
 +++ b/core/state/database.go
-@@ -194,6 +194,12 @@ func (db *cachingDB) ContractCodeSize(addrHash, codeHash common.Hash) (int, error
+@@ -194,6 +194,12 @@ func (db *cachingDB) ContractCodeSize(addrHash, codeHash common.Hash) (int, erro
  	if cached, ok := db.codeSizeCache.Get(codeHash); ok {
  		return cached.(int), nil
  	}
@@ -97,11 +169,149 @@ index bbcd2358e..7445e627f 100644
  	code, err := db.ContractCode(addrHash, codeHash)
  	return len(code), err
  }
+diff --git a/core/state/journal.go b/core/state/journal.go
+index 57a692dc7..8e2250dde 100644
+--- a/core/state/journal.go
++++ b/core/state/journal.go
+@@ -134,6 +134,9 @@ type (
+ 	accessListAddAccountChange struct {
+ 		address *common.Address
+ 	}
++	accessListAddAccountCodeChange struct {
++		address *common.Address
++	}
+ 	accessListAddSlotChange struct {
+ 		address *common.Address
+ 		slot    *common.Hash
+@@ -260,6 +263,14 @@ func (ch accessListAddAccountChange) dirtied() *common.Address {
+ 	return nil
+ }
+ 
++func (ch accessListAddAccountCodeChange) revert(s *StateDB) {
++	s.accessList.DeleteAddressCode(*ch.address)
++}
++
++func (ch accessListAddAccountCodeChange) dirtied() *common.Address {
++	return nil
++}
++
+ func (ch accessListAddSlotChange) revert(s *StateDB) {
+ 	s.accessList.DeleteSlot(*ch.address, *ch.slot)
+ }
+diff --git a/core/state/statedb.go b/core/state/statedb.go
+index 1d31cf470..d95dd79aa 100644
+--- a/core/state/statedb.go
++++ b/core/state/statedb.go
+@@ -984,11 +984,11 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
+ }
+ 
+ // PrepareAccessList handles the preparatory steps for executing a state transition with
+-// regards to both EIP-2929 and EIP-2930:
++// regards to both EIP-2929, EIP-2930, and EIP-5027:
+ //
+-// - Add sender to access list (2929)
+-// - Add destination to access list (2929)
+-// - Add precompiles to access list (2929)
++// - Add sender to access list (2929, 5027)
++// - Add destination to access list (2929, 5027)
++// - Add precompiles to access list (2929, 5027)
+ // - Add the contents of the optional tx access list (2930)
+ //
+ // This method should only be called if Berlin/2929+2930 is applicable at the current number.
+@@ -997,12 +997,15 @@ func (s *StateDB) PrepareAccessList(sender common.Address, dst *common.Address,
+ 	s.accessList = newAccessList()
+ 
+ 	s.AddAddressToAccessList(sender)
++	s.AddAddressCodeToAccessList(sender)
+ 	if dst != nil {
+ 		s.AddAddressToAccessList(*dst)
++		s.AddAddressCodeToAccessList(*dst)
+ 		// If it's a create-tx, the destination will be added inside evm.create
+ 	}
+ 	for _, addr := range precompiles {
+ 		s.AddAddressToAccessList(addr)
++		s.AddAddressCodeToAccessList(addr)
+ 	}
+ 	for _, el := range list {
+ 		s.AddAddressToAccessList(el.Address)
+@@ -1019,6 +1022,13 @@ func (s *StateDB) AddAddressToAccessList(addr common.Address) {
+ 	}
+ }
+ 
++// AddAddressCodeToAccessList adds the given address to the access list
++func (s *StateDB) AddAddressCodeToAccessList(addr common.Address) {
++	if s.accessList.AddAddressCode(addr) {
++		s.journal.append(accessListAddAccountCodeChange{&addr})
++	}
++}
++
+ // AddSlotToAccessList adds the given (address, slot)-tuple to the access list
+ func (s *StateDB) AddSlotToAccessList(addr common.Address, slot common.Hash) {
+ 	addrMod, slotMod := s.accessList.AddSlot(addr, slot)
+@@ -1042,6 +1052,11 @@ func (s *StateDB) AddressInAccessList(addr common.Address) bool {
+ 	return s.accessList.ContainsAddress(addr)
+ }
+ 
++// AddressCodeInAccessList returns true if the given address's code is in the access list.
++func (s *StateDB) AddressCodeInAccessList(addr common.Address) bool {
++	return s.accessList.ContainsAddressCode(addr)
++}
++
+ // SlotInAccessList returns true if the given (address, slot)-tuple is in the access list.
+ func (s *StateDB) SlotInAccessList(addr common.Address, slot common.Hash) (addressPresent bool, slotPresent bool) {
+ 	return s.accessList.Contains(addr, slot)
+diff --git a/core/vm/eips.go b/core/vm/eips.go
+index 4070a2db5..e9a8ee78c 100644
+--- a/core/vm/eips.go
++++ b/core/vm/eips.go
+@@ -31,6 +31,7 @@ var activators = map[int]func(*JumpTable){
+ 	2200: enable2200,
+ 	1884: enable1884,
+ 	1344: enable1344,
++	5027: enable5027,
+ }
+ 
+ // EnableEIP enables the given EIP on the config.
+@@ -147,6 +148,25 @@ func enable2929(jt *JumpTable) {
+ 	jt[SELFDESTRUCT].dynamicGas = gasSelfdestructEIP2929
+ }
+ 
++// enable2929 enables "EIP-2929: Gas cost increases for state access opcodes"
++// https://eips.ethereum.org/EIPS/eip-2929
++func enable5027(jt *JumpTable) {
++	jt[EXTCODECOPY].constantGas = params.WarmStorageReadCostEIP2929
++	jt[EXTCODECOPY].dynamicGas = gasExtCodeCopyEIP5027
++
++	jt[CALL].constantGas = params.WarmStorageReadCostEIP2929
++	jt[CALL].dynamicGas = gasCallEIP5027
++
++	jt[CALLCODE].constantGas = params.WarmStorageReadCostEIP2929
++	jt[CALLCODE].dynamicGas = gasCallCodeEIP5027
++
++	jt[STATICCALL].constantGas = params.WarmStorageReadCostEIP2929
++	jt[STATICCALL].dynamicGas = gasStaticCallEIP5027
++
++	jt[DELEGATECALL].constantGas = params.WarmStorageReadCostEIP2929
++	jt[DELEGATECALL].dynamicGas = gasDelegateCallEIP5027
++}
++
+ // enable3529 enabled "EIP-3529: Reduction in refunds":
+ // - Removes refunds for selfdestructs
+ // - Reduces refunds for SSTORE
 diff --git a/core/vm/evm.go b/core/vm/evm.go
-index dd55618bf..5dc3ed6ca 100644
+index dd55618bf..99e57c28e 100644
 --- a/core/vm/evm.go
 +++ b/core/vm/evm.go
-@@ -453,9 +453,9 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
+@@ -421,6 +421,8 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
+ 	// the access-list change should not be rolled back
+ 	if evm.chainRules.IsBerlin {
+ 		evm.StateDB.AddAddressToAccessList(address)
++		// TODO: check shanghai
++		evm.StateDB.AddAddressCodeToAccessList(address)
+ 	}
+ 	// Ensure there's no existing contract already at the designated address
+ 	contractHash := evm.StateDB.GetCodeHash(address)
+@@ -453,9 +455,9 @@ func (evm *EVM) create(caller ContractRef, codeAndHash *codeAndHash, gas uint64,
  	ret, err := evm.interpreter.Run(contract, nil, false)
  
  	// Check whether the max code size has been exceeded, assign err if the case.
@@ -114,108 +324,169 @@ index dd55618bf..5dc3ed6ca 100644
  
  	// Reject code starting with 0xEF if EIP-3541 is enabled.
  	if err == nil && len(ret) >= 1 && ret[0] == 0xEF && evm.chainRules.IsLondon {
-diff --git a/core/vm/gas_table.go b/core/vm/gas_table.go
-index 4c2cb3e5c..d0118b1ee 100644
---- a/core/vm/gas_table.go
-+++ b/core/vm/gas_table.go
-@@ -325,6 +325,16 @@ func gasExpEIP158(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
+diff --git a/core/vm/interface.go b/core/vm/interface.go
+index ad9b05d66..12660dd08 100644
+--- a/core/vm/interface.go
++++ b/core/vm/interface.go
+@@ -59,6 +59,7 @@ type StateDB interface {
+ 
+ 	PrepareAccessList(sender common.Address, dest *common.Address, precompiles []common.Address, txAccesses types.AccessList)
+ 	AddressInAccessList(addr common.Address) bool
++	AddressCodeInAccessList(addr common.Address) bool
+ 	SlotInAccessList(addr common.Address, slot common.Hash) (addressOk bool, slotOk bool)
+ 	// AddAddressToAccessList adds the given address to the access list. This operation is safe to perform
+ 	// even if the feature/fork is not active yet
+@@ -66,6 +67,7 @@ type StateDB interface {
+ 	// AddSlotToAccessList adds the given (address,slot) to the access list. This operation is safe to perform
+ 	// even if the feature/fork is not active yet
+ 	AddSlotToAccessList(addr common.Address, slot common.Hash)
++	AddAddressCodeToAccessList(addr common.Address)
+ 
+ 	RevertToSnapshot(int)
+ 	Snapshot() int
+diff --git a/core/vm/operations_acl.go b/core/vm/operations_acl.go
+index 551e1f5f1..cb76a4390 100644
+--- a/core/vm/operations_acl.go
++++ b/core/vm/operations_acl.go
+@@ -138,6 +138,41 @@ func gasExtCodeCopyEIP2929(evm *EVM, contract *Contract, stack *Stack, mem *Memo
  	return gas, nil
  }
  
-+func addGasExtraCodeSize(evm *EVM, address common.Address, gas uint64) (uint64, bool) {
-+	codeSize := evm.StateDB.GetCodeSize(address)
-+	if codeSize <= params.CodeSizeUnit {
-+		return gas, false
++// gasExtCodeCopyEIP5027 implements extcodecopy according to EIP-5027
++// EIP spec:
++// > If the target is not in accessed_addresses,
++// > charge COLD_ACCOUNT_ACCESS_COST * N_CODE_UNIT gas, and add the address to accessed_addresses and accessed_code_in_addresses.
++// > Else if the target is not in accessed_code_in_addresses,
++// > charge COLD_ACCOUNT_ACCESS_COST * (N_CODE_UNIT - 1) gas, and add the address to accessed_code_in_addresses.
++// > Otherwise, charge WARM_STORAGE_READ_COST gas.
++func gasExtCodeCopyEIP5027(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
++	// memory expansion first (dynamic part of pre-5027 implementation)
++	gas, err := gasExtCodeCopy(evm, contract, stack, mem, memorySize)
++	if err != nil {
++		return 0, err
 +	}
-+
-+	extraGas := (uint64(codeSize) - 1) / params.CodeSizeUnit * params.CallGasEIP150
-+	return math.SafeAdd(gas, extraGas)
-+}
-+
- func gasCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
- 	var (
- 		gas            uint64
-@@ -357,6 +367,9 @@ func gasCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize
- 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
- 		return 0, ErrGasUintOverflow
- 	}
-+	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
-+		return 0, ErrGasUintOverflow
-+	}
- 	return gas, nil
- }
- 
-@@ -368,6 +381,7 @@ func gasCallCode(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
- 	var (
- 		gas      uint64
- 		overflow bool
-+		address  = common.Address(stack.Back(1).Bytes20())
- 	)
- 	if stack.Back(2).Sign() != 0 {
- 		gas += params.CallValueTransferGas
-@@ -382,10 +396,14 @@ func gasCallCode(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memory
- 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
- 		return 0, ErrGasUintOverflow
- 	}
-+	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
-+		return 0, ErrGasUintOverflow
-+	}
- 	return gas, nil
- }
- 
- func gasDelegateCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
-+	address := common.Address(stack.Back(1).Bytes20())
- 	gas, err := memoryGasCost(mem, memorySize)
- 	if err != nil {
- 		return 0, err
-@@ -398,10 +416,14 @@ func gasDelegateCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, me
- 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
- 		return 0, ErrGasUintOverflow
- 	}
-+	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
-+		return 0, ErrGasUintOverflow
-+	}
- 	return gas, nil
- }
- 
- func gasStaticCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
-+	address := common.Address(stack.Back(1).Bytes20())
- 	gas, err := memoryGasCost(mem, memorySize)
- 	if err != nil {
- 		return 0, err
-@@ -414,6 +436,9 @@ func gasStaticCall(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memo
- 	if gas, overflow = math.SafeAdd(gas, evm.callGasTemp); overflow {
- 		return 0, ErrGasUintOverflow
- 	}
-+	if gas, overflow = addGasExtraCodeSize(evm, address, gas); overflow {
-+		return 0, ErrGasUintOverflow
-+	}
- 	return gas, nil
- }
- 
-diff --git a/core/vm/instructions.go b/core/vm/instructions.go
-index db507c481..f1a6112bd 100644
---- a/core/vm/instructions.go
-+++ b/core/vm/instructions.go
-@@ -383,6 +383,13 @@ func opExtCodeCopy(pc *uint64, interpreter *EVMInterpreter, scope *ScopeContext)
- 		uint64CodeOffset = 0xffffffffffffffff
- 	}
- 	addr := common.Address(a.Bytes20())
-+	codeSize := interpreter.evm.StateDB.GetCodeSize(addr)
-+	if codeSize > params.CodeSizeUnit {
-+		extraGas := (uint64(codeSize - 1)) / params.CodeSizeUnit * params.ExtcodeSizeGasEIP150
-+		if !scope.Contract.UseGas(extraGas) {
-+			return nil, ErrOutOfGas
++	addr := common.Address(stack.peek().Bytes20())
++	// Check slot presence in the access list
++	if !evm.StateDB.AddressInAccessList(addr) {
++		evm.StateDB.AddAddressToAccessList(addr)
++		var overflow bool
++		// We charge (cold-warm), since 'warm' is already charged as constantGas
++		if gas, overflow = math.SafeAdd(gas, params.ColdAccountAccessCostEIP2929-params.WarmStorageReadCostEIP2929); overflow {
++			return 0, ErrGasUintOverflow
 +		}
 +	}
- 	codeCopy := getData(interpreter.evm.StateDB.GetCode(addr), uint64CodeOffset, length.Uint64())
- 	scope.Memory.Set(memOffset.Uint64(), length.Uint64(), codeCopy)
++	if !evm.StateDB.AddressCodeInAccessList(addr) {
++		evm.StateDB.AddAddressCodeToAccessList(addr)
++		var overflow bool
++
++		// We charge cold for extra code
++		if gas, overflow = math.SafeAdd(gas, params.ColdAccountAccessCostEIP2929*getExtraCodeUnit(evm, addr)); overflow {
++			return 0, ErrGasUintOverflow
++		}
++	}
++	return gas, nil
++}
++
+ // gasEip2929AccountCheck checks whether the first stack item (as address) is present in the access list.
+ // If it is, this method returns '0', otherwise 'cold-warm' gas, presuming that the opcode using it
+ // is also using 'warm' as constant factor.
+@@ -191,6 +226,64 @@ func makeCallVariantGasCallEIP2929(oldCalculator gasFunc) gasFunc {
+ 	}
+ }
  
++func getExtraCodeUnit(evm *EVM, addr common.Address) uint64 {
++	codeSize := evm.StateDB.GetCodeSize(addr)
++	extraCodeUnit := uint64(0)
++	if codeSize > params.CodeSizeUnit {
++		extraCodeUnit = (uint64(codeSize - 1)) / params.CodeSizeUnit
++	}
++	return extraCodeUnit
++}
++
++func makeCallVariantGasCallEIP5027(oldCalculator gasFunc) gasFunc {
++	return func(evm *EVM, contract *Contract, stack *Stack, mem *Memory, memorySize uint64) (uint64, error) {
++		addr := common.Address(stack.Back(1).Bytes20())
++		// Check slot presence in the access list
++		warmAccess := evm.StateDB.AddressInAccessList(addr)
++		warmCodeAccess := evm.StateDB.AddressCodeInAccessList(addr)
++		// The WarmStorageReadCostEIP2929 (100) is already deducted in the form of a constant cost, so
++		// the cost to charge for cold access, if any, is n * Cold - Warm
++		coldCost := params.ColdAccountAccessCostEIP2929 - params.WarmStorageReadCostEIP2929
++
++		if !warmAccess {
++			evm.StateDB.AddAddressToAccessList(addr)
++			evm.StateDB.AddAddressCodeToAccessList(addr)
++
++			coldCost += getExtraCodeUnit(evm, addr) * params.ColdAccountCodeAccessCostEIP5027
++
++			// Charge the remaining difference here already, to correctly calculate available
++			// gas for call
++			if !contract.UseGas(coldCost) {
++				return 0, ErrOutOfGas
++			}
++		} else if !warmCodeAccess {
++			evm.StateDB.AddAddressCodeToAccessList(addr)
++
++			coldCost = getExtraCodeUnit(evm, addr) * params.ColdAccountCodeAccessCostEIP5027
++			// Charge the remaining difference here already, to correctly calculate available
++			// gas for call
++			if !contract.UseGas(coldCost) {
++				return 0, ErrOutOfGas
++			}
++		}
++		// Now call the old calculator, which takes into account
++		// - create new account
++		// - transfer value
++		// - memory expansion
++		// - 63/64ths rule
++		gas, err := oldCalculator(evm, contract, stack, mem, memorySize)
++		if (warmAccess && warmCodeAccess) || err != nil {
++			return gas, err
++		}
++		// In case of a cold access, we temporarily add the cold charge back, and also
++		// add it to the returned gas. By adding it to the return, it will be charged
++		// outside of this function, as part of the dynamic gas, and that will make it
++		// also become correctly reported to tracers.
++		contract.Gas += coldCost
++		return gas + coldCost, nil
++	}
++}
++
+ var (
+ 	gasCallEIP2929         = makeCallVariantGasCallEIP2929(gasCall)
+ 	gasDelegateCallEIP2929 = makeCallVariantGasCallEIP2929(gasDelegateCall)
+@@ -200,6 +293,11 @@ var (
+ 	// gasSelfdestructEIP3529 implements the changes in EIP-2539 (no refunds)
+ 	gasSelfdestructEIP3529 = makeSelfdestructGasFn(false)
+ 
++	gasCallEIP5027         = makeCallVariantGasCallEIP5027(gasCall)
++	gasDelegateCallEIP5027 = makeCallVariantGasCallEIP5027(gasDelegateCall)
++	gasStaticCallEIP5027   = makeCallVariantGasCallEIP5027(gasStaticCall)
++	gasCallCodeEIP5027     = makeCallVariantGasCallEIP5027(gasCallCode)
++
+ 	// gasSStoreEIP2929 implements gas cost for SSTORE according to EIP-2929
+ 	//
+ 	// When calling SSTORE, check if the (address, storage_key) pair is in accessed_storage_keys.
 diff --git a/params/protocol_params.go b/params/protocol_params.go
-index 5f154597a..c30b54da8 100644
+index 5f154597a..c3d5c66ce 100644
 --- a/params/protocol_params.go
 +++ b/params/protocol_params.go
-@@ -123,7 +123,7 @@ const (
+@@ -58,9 +58,11 @@ const (
+ 	SstoreResetGasEIP2200             uint64 = 5000  // Once per SSTORE operation from clean non-zero to something else
+ 	SstoreClearsScheduleRefundEIP2200 uint64 = 15000 // Once per SSTORE operation for clearing an originally existing storage slot
+ 
+-	ColdAccountAccessCostEIP2929 = uint64(2600) // COLD_ACCOUNT_ACCESS_COST
+-	ColdSloadCostEIP2929         = uint64(2100) // COLD_SLOAD_COST
+-	WarmStorageReadCostEIP2929   = uint64(100)  // WARM_STORAGE_READ_COST
++	ColdAccountAccessCostEIP2929     = uint64(2600) // COLD_ACCOUNT_ACCESS_COST
++	ColdSloadCostEIP2929             = uint64(2100) // COLD_SLOAD_COST
++	WarmStorageReadCostEIP2929       = uint64(100)  // WARM_STORAGE_READ_COST
++	ColdAccountCodeAccessCostEIP5027 = uint64(2600) // COLD_ACCOUNT_CODE_ACCESS_COST_PER_UNIT
++	WarmAccountCodeAccessCostEIP5027 = uint64(2600) // WARM_ACCOUNT_CODE_ACCESS_COST_PER_UNIT
+ 
+ 	// In EIP-2200: SstoreResetGas was 5000.
+ 	// In EIP-2929: SstoreResetGas was changed to '5000 - COLD_SLOAD_COST'.
+@@ -123,7 +125,7 @@ const (
  	ElasticityMultiplier     = 2          // Bounds the maximum gas limit an EIP-1559 block may have.
  	InitialBaseFee           = 1000000000 // Initial base fee for EIP-1559 blocks.
  
