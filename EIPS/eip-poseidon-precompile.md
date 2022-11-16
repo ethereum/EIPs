@@ -105,6 +105,13 @@ Moreover, the impact of a potential vulnerability in the Poseidon hash function 
 
 We can see the same rationale for the KZG ceremony in the [EIP-4844](https://eips.ethereum.org/EIPS/eip-4844), arguing that the risk of a vulnerability in the KZG ceremony is limited to the rollups that use it.
 
+### Papers and research related to Poseidon security
+
+- [Poseidon: A New Hash Function for Zero-Knowledge Proof Systems](https://eprint.iacr.org/2019/458.pdf)
+- [Security of the Poseidon Hash Function Against Non-Binary Differential and Linear Attacks](https://link.springer.com/content/pdf/10.1007/s10559-021-00352-y.pdf)
+- [Report on the Security of STARK-friendly Hash Functions](https://hal.inria.fr/hal-02883253/document)
+- [Practical Algebraic Attacks against some Arithmetization-oriented Hash Functions](https://hal.archives-ouvertes.fr/hal-03518757/document)
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
