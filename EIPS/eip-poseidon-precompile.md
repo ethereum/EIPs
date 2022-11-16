@@ -51,6 +51,23 @@ Here are the Poseidon parameters that the precompile will support:
 - `full_round`: the number of full rounds. Denoted as `R_F` in the Poseidon paper.
 - `partial_round`: the number of partial rounds. Denoted as `R_P` in the Poseidon paper.
 
+The input to the precompile MUST be encoded as follows:
+
+- `p`: 32 bytes
+- `security_level`: 2 bytes
+- `alpha`: 1 byte
+- `input_rate`: 2 bytes
+- `t`: 1 byte
+- `full_round`: 1 byte
+- `partial_round`: 1 byte
+- `input`: `input_rate` \* 32 bytes
+
+```
+[32 bytes for p][2 bytes for security_level][1 byte for alpha][2 bytes for input_rate][1 byte for t][1 byte for full_round][1 byte for partial_round][input_rate * 32 bytes for input]
+```
+
+The precompile should compute the hash function as [specified in the Poseidon paper](https://eprint.iacr.org/2019/458.pdf) and return hash output.
+
 ## Rationale
 
 TODO: Add rationale
