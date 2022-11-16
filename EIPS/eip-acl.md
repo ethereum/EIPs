@@ -1,0 +1,83 @@
+---
+eip: <to be assigned>
+title: Role-based Access Control Interface
+description: Interface for Access Control
+author: Zainan Victor Zhou (@xinbenlv)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-11-15
+requires (*optional): 165
+---
+
+## Abstract
+
+An interface standardizing role-based access control.
+
+## Motivation
+
+There are multiple ways to establish access control for actions requiring different privileges and powers. This EIP standardizes such
+interface so smart contracts, accounts and DAOs could establish access control based on given interface.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Interfaces of reference is described as followed:
+
+```solidity
+interface IERC_ACL_CORE {
+    function hasRole(bytes32 role, address account) external view returns (bool);
+    function grantRole(bytes32 role, address account) external;
+    function revokeRole(bytes32 role, address account) external;
+}
+```
+
+```solidity
+interface IERC_ACL_GENERAL {
+    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender, bytes _data);
+    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender, bytes _data);
+
+    function grantRole(bytes32 role, address account, bytes calldata _data) external;
+    function revokeRole(bytes32 role, address account, bytes calldata _data) external;
+
+    function createRole(bytes32 role, bytes32 adminOfRole, string name, string desc, string uri, bytes32 calldata _data) external;
+    function destroyRole(bytes32 role, bytes32 calldata _data) external;
+    function setRolePower(bytes32 executor, bytes4 methods, bytes calldata _data) view external returns(bool);
+
+    function hasRole(bytes32 role, address account, bytes calldata _data) external view returns (bool);
+    function canGrantRole(bytes32 grantor, bytes32 grantee, bytes calldata _data) view external returns(bool);
+    function canRevokeRole(bytes32 revoker, bytes32 revokee, address account, bytes calldata _data) view external returns(bool);
+    function canExecute(bytes32 executor, bytes4 methods, bytes32 calldata payload, bytes calldata _data) view external returns(bool);
+}
+```
+
+```solidity
+interface IERC_ACL_METADATA {
+    function roleName(bytes32) external view returns(string);
+    function roleDescription(bytes32) external view returns(string);
+    function roleURI(bytes32) external view returns(string);
+}
+```
+
+1. Any compliant contract MUST implement `IERC_ACL_CORE`, SHOULD implement `IERC_ACL_GENERAL` and MAY implement the `IERC_ACL_METADATA`.
+2.
+
+## Rationale
+
+1. The names and parameters of methods in `IERC_ACL_CORE` are chosen to allow backward compatibility with OpenZeppelin's implementation.
+2. The methods in `IERC_ACL_GENERAL` conform to [EIP-5750](./eip-5750.md) to allow extension.
+3. The method of `renounceRole` was not adopted, consolidating with `revokeRole` to simplify interface.
+
+## Backwards Compatibility
+
+Needs discussion.
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
