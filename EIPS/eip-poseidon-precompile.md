@@ -18,13 +18,39 @@ This EIP introduces a new precompiled contract which implements the hash functio
 
 [Poseidon](https://eprint.iacr.org/2019/458.pdf) is an arithmetic hash function that is designed to be efficient for Zero-Knowledge Proof Systems.
 Ethereum adopts a rollup centric roadmap and hence must adopt facilities for L2s to be able to communicate with the EVM in an optimal manner.
+
 ZK-Rollups have particular needs for cryptographic hash functions that can allow for efficient verification of proofs.
+
+The Poseidon hash function is a set of permutations over a prime field, which makes it particularly well-suited for the purpose of building efficient ZK / Validity rollups on Ethereum.
+
 Poseidon is one of the most efficient hashing algorithms that can be used in this context.
 Moreover it is compatible with all major proof systems (SNARKs, STARKs, Bulletproofs, etc...).
+This makes it a good candidate for a precompile that can be used by many different ZK-Rollups.
+
+An important point to note is that ZK rollups using Poseidon have chosen different sets of parameters, which makes it harder to build a single precompile for all of them.
+
+However, we can still build a generic precompile that supports arbitrary parameters, and allow the ZK rollups to choose the parameters they want to use.
+
+This is the approach that we have taken in this EIP.
 
 ## Specification
 
-TODO: Add specification
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+The `POSEIDON` precompile MUST be available at address `0xPOSEIDON_PRECOMPILE_ADDRESS`.
+
+The precompile MUST be activated at `FORK_BLOCK_NUMBER`.
+
+### Parameters
+
+Here are the parameters that the precompile will support:
+
+- `p`: the prime field modulus.
+- `alpha`: the power of S-box.
+- `input_rate`: the size of input.
+- `t`: the size of the state.
+- `full_round`: the number of full rounds. Denoted as `R_F` in the Poseidon paper.
+- `partial_round`: the number of partial rounds. Denoted as `R_P` in the Poseidon paper.
 
 ## Rationale
 
@@ -57,7 +83,7 @@ There are layer-2 systems live on the Ethereum network and other systems that al
 ```
 
 It is true that arithmetic hash functions are relatively untested compared to traditional hash functions.
-However, Poseidon has been thoroughly tested and is considered secure by multiple independent research groups and layers 2 systems are already using it in production (StarkWare, Polygon, Loopring).
+However, Poseidon has been thoroughly tested and is considered secure by multiple independent research groups and layers 2 systems are already using it in production (StarkWare, Polygon, Loopring) and also by other projects (e.g. Filecoin).
 
 Moreover, the impact of a potential vulnerability in the Poseidon hash function would be limited to the rollups that use it.
 
