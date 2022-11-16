@@ -41,11 +41,10 @@ The `POSEIDON` precompile MUST be available at address `0xPOSEIDON_PRECOMPILE_AD
 
 The precompile MUST be activated at `FORK_BLOCK_NUMBER`.
 
-### Parameters
-
-Here are the parameters that the precompile will support:
+Here are the Poseidon parameters that the precompile will support:
 
 - `p`: the prime field modulus.
+- `security_level`: the security level measured in bits. Denoted `M` in the Poseidon paper.
 - `alpha`: the power of S-box.
 - `input_rate`: the size of input.
 - `t`: the size of the state.
