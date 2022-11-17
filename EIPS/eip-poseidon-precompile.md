@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Add Poseidon hash function precompile
 description: Add a precompiled contract which implements the hash function used in the Poseidon cryptographic hashing algorithm
-author: Abdelhamid Bakhta (@abdelhamidbakhta)
+author: Abdelhamid Bakhta (@abdelhamidbakhta), Avihu Levy (@avihu28)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -67,6 +67,20 @@ The input to the precompile MUST be encoded as follows:
 ```
 
 The precompile should compute the hash function as [specified in the Poseidon paper](https://eprint.iacr.org/2019/458.pdf) and return hash output.
+
+### Example Usage in Solidity
+
+The precompile can be wrapped easily in Solidity to provide a more development-friendly interface to `poseidon_hash` function.
+
+```solidity
+// TODO: Add solidity example
+```
+
+### Gas Costs
+
+```
+TODO: Fill gas costs section and add benchmarks
+```
 
 ## Rationale
 
