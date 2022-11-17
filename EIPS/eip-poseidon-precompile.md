@@ -115,6 +115,30 @@ List of projects (non exhaustive) using Poseidon:
 - Loopring uses POSEIDON for private trading on Ethereum.
 - Polygon uses Poseidon for Hermez ZK-EVM.
 
+In terms of security, the choice of parameters is important.
+
+### Security of the Poseidon parameters
+
+#### Choice of the MDS matrix
+
+The MDS matrix is a square matrix of size `t` \* `t` that is used to mix the state.
+
+The MDS matrix is chosen to be invertible and to have a large determinant.
+
+This matrix is used during the `MixLayer` phase of the Poseidon hash function.
+
+The matrix must be chosen s.t. no subspace trail with inactive/active S-boxes can be set up for more than `t -1` rounds.
+
+There are some efficient algorithms to detect weak MDS matrices.
+
+Those algorithms are described in the [Proving Resistance Against Infinitely Long Subspace Trails: How to Choose the Linear Layer](https://eprint.iacr.org/2020/500.pdf) paper.
+
+The process of the generation of the matrix should look like this, as recommended in the Poseidon paper:
+
+1. Generate a random matrix.
+2. Check if the matrix is secure using Algorithm 1, Algorithm 2, and Algorithm 3 provided [Proving Resistance Against Infinitely Long Subspace Trails: How to Choose the Linear Layer](https://eprint.iacr.org/2020/500.pdf) paper.
+3. If the matrix is not secure, go back to step 1.
+
 ### Papers and research related to Poseidon security
 
 - [Poseidon: A New Hash Function for Zero-Knowledge Proof Systems](https://eprint.iacr.org/2019/458.pdf)
