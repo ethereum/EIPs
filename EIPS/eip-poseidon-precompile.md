@@ -105,6 +105,16 @@ Moreover, the impact of a potential vulnerability in the Poseidon hash function 
 
 We can see the same rationale for the KZG ceremony in the [EIP-4844](https://eips.ethereum.org/EIPS/eip-4844), arguing that the risk of a vulnerability in the KZG ceremony is limited to the rollups that use it.
 
+List of projects (non exhaustive) using Poseidon:
+
+- StarkWare plans to use Poseidon as the main hash function for StarkNet, and to add a Poseidon built-in in Cairo.
+- Filecoin employs POSEIDON for Merkle tree proofs with different arities and for two-value commitments.
+- Dusk Network uses POSEIDON to build a Zcash-like protocol for securities trading.11 It also uses POSEIDON
+  for encryption as described above.
+- Sovrin uses POSEIDON for Merkle-tree based revocation.
+- Loopring uses POSEIDON for private trading on Ethereum.
+- Polygon uses Poseidon for Hermez ZK-EVM.
+
 ### Papers and research related to Poseidon security
 
 - [Poseidon: A New Hash Function for Zero-Knowledge Proof Systems](https://eprint.iacr.org/2019/458.pdf)
