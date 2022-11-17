@@ -21,16 +21,19 @@ The canonical URL for an EIP that has achieved draft status at any point is at <
 
 Consider any document not published at <https://eips.ethereum.org/> as a working paper. Additionally, consider published EIPs with a status of "draft", "review", or "last call" to be incomplete drafts, and note that their specification is likely to be subject to change.
 
-## Automerger
+## Validation and Automerging
 
-This repository contains an "auto-merge" feature to ease the workload for EIP editors. Pull requests to any EIP will be auto-merged if the EIP's authors approve the PR on GitHub. This is handled by [EIP-Bot](https://github.com/ethereum/EIP-Bot).
+All pull requests in this repository must pass automated checks before they can be automatically merged:
 
-## Validation
+- [EIP-Bot](https://github.com/ethereum/EIP-Bot/) determines when PRs can be automatically merged [^1]
+- EIP-1 rules are enforced using [`eipw`](https://github.com/ethereum/eipw)[^2]
+- HTML formatting and broken links are enforced using [HTMLProofer](https://github.com/gjtorikian/html-proofer)[^2]
+- Spelling is enforced with [CodeSpell](https://github.com/codespell-project/codespell)[^2]
+- False positives sometimes occur. When this happens, please submit a PR editing [.codespell-whitelist](https://github.com/ethereum/EIPs/blob/master/config/.codespell-whitelist).
+- Markdown best practices are checked using [markdownlint](https://github.com/DavidAnson/markdownlint)[^2]
 
-Pull requests in this repository must pass automated validation checks:
-
-- HTML formatting, broken links, and EIP front matter/formatting are [checked](https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml) using [html-proofer](https://rubygems.org/gems/html-proofer) and [`eipw`](https://github.com/ethereum/eipw).
-- Required pull request reviews are [enforced](https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml) using [EIP-Bot](https://github.com/ethereum/EIP-Bot/).
+[^1]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml
+[^2]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/ci.yml
 
 It is possible to run the EIP validator locally:
 
