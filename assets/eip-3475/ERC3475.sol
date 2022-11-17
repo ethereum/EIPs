@@ -49,16 +49,18 @@ contract ERC3475 is IERC3475 {
         _classMetadata[0].title = "symbol";
         _classMetadata[0]._type = "string";
         _classMetadata[0].description = "symbol of the class";
-        _classes[0]._values[0].stringValue = "DBIT Fix 6M";
-        _classMetadata[1].title = "symbol";
-        _classMetadata[1]._type = "string";
-        _classMetadata[1].description = "symbol of the class";
-        _classes[1]._values[0].stringValue = "DBIT Fix test Instantaneous";
-
         // define "period of the class";
         _classMetadata[5].title = "period";
         _classMetadata[5]._type = "int";
         _classMetadata[5].description = "details about issuance and redemption time";
+
+
+
+
+        // describing the symbol of the different class
+        _classes[0]._values[0].stringValue = "DBIT Fix 6M";
+        _classes[1]._values[0].stringValue = "DBIT Fix test Instantaneous";
+
         
         // define the maturity time period (for the test class).
         _classes[0]._values[5].uintValue = 10;
