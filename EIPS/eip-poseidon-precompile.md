@@ -123,8 +123,6 @@ In terms of security, the choice of parameters is important.
 
 The MDS matrix is a square matrix of size `t` \* `t` that is used to mix the state.
 
-The MDS matrix is chosen to be invertible and to have a large determinant.
-
 This matrix is used during the `MixLayer` phase of the Poseidon hash function.
 
 The matrix must be chosen s.t. no subspace trail with inactive/active S-boxes can be set up for more than `t -1` rounds.
