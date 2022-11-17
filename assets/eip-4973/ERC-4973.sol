@@ -783,7 +783,7 @@ interface IERC721Metadata {
 
 /// @title Account-bound tokens
 /// @dev See https://eips.ethereum.org/EIPS/eip-4973
-/// Note: the ERC-165 identifier for this interface is 0x5164cf47
+/// Note: the ERC-165 identifier for this interface is 0x8d7bac72
 interface IERC4973 {
   /// @dev This emits when ownership of any ABT changes by any mechanism.
   ///  This event emits when ABTs are given or equipped and unequipped
