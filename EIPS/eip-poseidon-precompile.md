@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Add Poseidon hash function precompile
 description: Add a precompiled contract which implements the hash function used in the Poseidon cryptographic hashing algorithm
-author: Abdelhamid Bakhta (@abdelhamidbakhta), Avihu Levy (@avihu28)
+author: Abdelhamid Bakhta (@abdelhamidbakhta), Eli Ben Sasson (@Elistark), Avihu Levy (@avihu28)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
