@@ -184,7 +184,9 @@ The `created` header records the date that the EIP was assigned a number. Both h
 
 ### `requires` header
 
-EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
+EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on. If such a dependency exists, this field is required.
+
+A `requires` dependency is created when the current EIP cannot be understood or implemented without a concept or technical element from another EIP. Merely mentioning another EIP does not necessarily create such a dependency.
 
 ## Linking to External Resources
 
