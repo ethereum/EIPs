@@ -28,6 +28,7 @@ There are three types of EIP:
   - **ERC**: application-level standards and conventions, including contract standards such as token standards ([EIP-20](./eip-20.md)), name registries ([EIP-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
 
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
+  - **Source**: adds an allowed external link origin, see [EIP-5757](./eip-5757.md).
 
 - An **Informational EIP** describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice.
 
@@ -132,7 +133,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `type`: *One of `Standards Track`, `Meta`, or `Informational`*
 
-`category`: *One of `Core`, `Networking`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
+`category`: *One of `Core`, `Networking`, `Interface`, `ERC`, or `Source` * (Optional field, only needed for `Standards Track` or `Source` EIPs)
 
 `created`: *Date the EIP was created on*
 
@@ -176,7 +177,7 @@ The `type` header specifies the type of EIP: Standards Track, Meta, or Informati
 
 ### `category` header
 
-The `category` header specifies the EIP's category. This is required for standards-track EIPs only.
+The `category` header specifies the EIP's category. `Standards Track` EIPs must have a `category` of either `Core`, `Networking`, `Interface`, `ERC`, and [EIP-5757](./eip-5757.md) EIPs must hae a `category` of `Source`.
 
 ### `created` header
 
