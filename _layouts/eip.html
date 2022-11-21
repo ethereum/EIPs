@@ -31,7 +31,7 @@ layout: default
   </div>
 {% endif %}
 
-{% if (page.status == "Draft" or page.status == "Review" or page.status == "Last Call") and page["discussions-to"] != undefined %}
+{% if page.status == "Draft" or page.status == "Review" or page.status == "Last Call" %}
   <div class="review">
     💬 This EIP is in the process of being peer-reviewed. If you are interested in this EIP, you should participate using the following discussion link: <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
   </div>
