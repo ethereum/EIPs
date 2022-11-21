@@ -46,9 +46,9 @@ layout: default
     ({{ page.status | xml_escape }})
     ; Created {{ page.created | xml_escape }};
     {% if page.updated != undefined %}
-      ; Last Updated {{ page.updated | xml_escape }
+      ; Last Updated {{ page.updated | xml_escape }}
     {% endif %}
-    {{ page.status | xml_escape }}
+    ; {{ page.status | xml_escape }}
   </p>
   <h1 class="page-heading">
     {% if page.category == "ERC" %}
