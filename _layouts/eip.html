@@ -2,59 +2,67 @@
 layout: default
 ---
 
-{% if page.status == "Draft" %}
-  <div class="draft">
-    ⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
-  </div>
-{% elsif page.status == "Review" %}
-  <div class="review">
-    📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
-  </div>
-{% elsif page.status == "Last Call" %}
-  <div class="lastcall">
-    📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
-  </div>
-{% elsif page.status == "Stagnant" %}
+{% if page.status == "Stagnant" %}
   <div class="stagnant">
-    🚧 This EIP had no activity for at least 6 months.
+    🚧 This EIP had no activity for at least 6 months. This EIP should not be used.
   </div>
-{% elsif page.status == "Withdrawn" %}
+{% endif %}
+
+{% if page.status == "Withdrawn" %}
   <div class="withdrawn">
-    🛑 This EIP has been withdrawn.
+    🛑 This EIP has been withdrawn, and should not be used.
+    {% if page["withdrawal-reason"] != undefined %}
+      The authors have provided the following reason for withdrawing this EIP:
+      <hl/>
+      {{ page["withdrawal-reason"] | xml_escape }}
+    {% endif %}
+  </div>
+{% endif %}
+
+{% if page.status == "Draft" or	page.status == "Review" %}
+  <div class="draft">
+    ⚠️ This EIP is not yet recommended for general use or implementation, as it is subject to normative (breaking) changes. 🐉
+  </div>
+{% endif %}
+
+{% if page.status == "Last Call" and page.last-call-deadline != undefined %}
+  <div class="lastcall">
+    📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP on {{ page.last-call-deadline | xml_escape }} and ask you to provide feedback.
+  </div>
+{% endif %}
+
+{% if (page.status == "Draft" or page.status == "Review" or page.status == "Last Call") and page["discussions-to"] != undefined %}
+  <div class="review">
+    💬 This EIP is in the process of being peer-reviewed. If you are interested in this EIP, you should participate using the following discussion link: <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
   </div>
 {% endif %}
 
 <div class="home">
+  <p>
+    {{ page.type | xml_escape }}
+    {% if page.category != undefined %}
+      - {{ page.category | xml_escape }}
+    {% endif %}
+    ({{ page.status | xml_escape }})
+    ; Created {{ page.created | xml_escape }};
+    {% if page.updated != undefined %}
+      ; Last Updated {{ page.updated | xml_escape }
+    {% endif %}
+    {{ page.status | xml_escape }}
+  </p>
   <h1 class="page-heading">
-    EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% if page.category == "ERC" %}
+      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% elsif page.category != "ERC %}
+      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% endif %}
     <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
-  <table>
-    <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
-    {% if page["discussions-to"] != undefined %}
-      <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
-    {% endif %}
-    <tr><th>Status</th><td>{{ page.status | xml_escape }}
-    {% if page.last-call-deadline != undefined %}
-      <tr><th>Last Call Deadline</th><td>{{ page.last-call-deadline | xml_escape }}</td></tr>
-    {% endif %}
-    </td></tr>
-    <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
-    {% if page.category != undefined %}
-      <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
-    {% endif %}
-    <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
-    {% if page.updated != undefined %}
-    <tr><th>Updated</th><td>{{ page.updated | xml_escape }}</td></tr>
-    {% endif %}
-    {% if page.requires != undefined %}
-      <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
-    {% endif %}
-    {% if page["withdrawal-reason"] != undefined %}
-      <tr><th>Withdrawal reason</th><td>{{ page["withdrawal-reason"] | xml_escape }}</td></tr>
-    {% endif %}
-  </table>
+  {% include authorlist.html authors=page.author %}
+  {% if page.requires != undefined %}
+    <p>Requires: {% include eipnums.html eips=page.requires %}</p>
+  {% endif %}
 
   <div class="toc">
     <h2>Table of Contents</h2>
@@ -91,4 +99,12 @@ https://schema.org/TechArticle
     "license": "#copyright",
     "copyrightYear": "{{ page.created | date: "%Y" }}"
   }
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha512-bzXk9PaBIjgXcM+0Z7wbOE4AAMnmMoecyB8zX3irP4IRUDNGMmWXoLiRvEDeeq0RfhLA0eOFvB3wPFzBvWcVdw==" crossorigin="anonymous">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [["$", "$"], ["\\(", "\\)"]],
+      processEscapes: true
+    }
+  });
 </script>
