@@ -12,7 +12,7 @@ layout: default
   <div class="withdrawn">
     🛑 This EIP has been withdrawn, and should not be used.
     {% if page["withdrawal-reason"] != undefined %}
-      The authors have provided the following reason for withdrawing this EIP:<br/>
+      The authors have provided the following reason for withdrawing this EIP:<br/><br/>
       <blockquote>
         {{ page["withdrawal-reason"] | xml_escape }}
       </blockquote>
