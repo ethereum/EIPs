@@ -87,3 +87,13 @@ a:hover, a:active {
   background-color: #f9e7e5;
   border: solid 1px #c0392b;
 }
+
+
+.badge:hover {
+  -webkit-filter: brightness(70%);
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  -o-transition: all 1s ease;
+  -ms-transition: all 1s ease;
+  transition: all 1s ease;
+}
