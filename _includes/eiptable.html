@@ -7,7 +7,7 @@
     width: 33%;
   }
 </style>
-{% for status in site.data.statuses %}
+{% for status in site.data.visiblestatuses %}
   {% assign eips = include.eips|where:"status",status|sort:"eip" %}
   {% assign count = eips|size %}
   {% if count > 0 %}
