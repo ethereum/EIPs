@@ -13,7 +13,7 @@ layout: default
 </svg>
 
 <div class="home">
-  <h1 class="page-heading">
+  <span>
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
     {% endif %}
@@ -39,6 +39,8 @@ layout: default
     {% elsif page.type == "Meta" %}
       <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Meta Description" href="../meta">Meta</a>
     {% endif %}
+  </span>
+  <h1 class="page-heading">
     {% if page.category == "ERC" %}
       ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% elsif page.category != "ERC" %}
