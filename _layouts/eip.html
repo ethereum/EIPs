@@ -13,14 +13,6 @@ layout: default
 </svg>
 
 <div class="home">
-  <p>
-    {{ page.type | xml_escape }}
-    {% if page.category != undefined %}
-      - {{ page.category | xml_escape }}
-    {% endif %}
-    ({{ page.status | xml_escape }});
-    Created {{ page.created | xml_escape }}
-  </p>
   <h1 class="page-heading">
     {% if page.status == "Stagnant" %}
       <span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
@@ -35,11 +27,24 @@ layout: default
       <span class="badge text-bg-primary" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
     {% endif %}
     {% if page.category == "ERC" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="ERC Description">Standards Track - ERC</span>
+    {% elsif page.category == "Interface" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Interface Description">Standards Track - Interface</span>
+    {% elsif page.category == "Networking" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Networking Description">Standards Track - Networking</span>
+    {% elsif page.category == "Core" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Core Description">Standards Track - Core</span>
+    {% elsif page.type == "Informational" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Informational Description">Informational</span>
+    {% elsif page.type == "Meta" %}
+      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Meta Description">Meta</span>
+    {% endif %}
+    {% if page.category == "ERC" %}
       ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% elsif page.category != "ERC" %}
       EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% endif %}
-    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><use xlink:href="#bi-code"/></svg></a>
+    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" class="bi flex-shrink-0 me-2" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><use xlink:href="#bi-code"/></svg></a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
   <p><b>Authors:</b> {% include authorlist.html authors=page.author %}</p>
@@ -51,9 +56,7 @@ layout: default
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#bi-megaphone-fill"/></svg>
       <div>
-        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, you should participate using the following discussion link:
-        <hr>
-        <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
+        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using the following discussion link: <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
       </div>
     </div>
   {% endif %}
