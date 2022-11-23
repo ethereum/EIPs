@@ -54,7 +54,7 @@ layout: default
     <b>Requires:</b> {% include eipnums.html eips=page.requires %}<br/>
   {% endif %}
   {% if page.status != "Review" and page.status != "Last Call" %}
-    <b>Discussion Link:</b> <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
+    <b>Discussion Link:</b> <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a>
     {% if page.status == "Final" %}
       (Archive)
     {% endif %}
@@ -65,7 +65,7 @@ layout: default
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#bi-megaphone-fill"/></svg>
       <div>
-        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using the following discussion link: <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
+        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using the following discussion link: <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a>
       </div>
     </div>
   {% endif %}
