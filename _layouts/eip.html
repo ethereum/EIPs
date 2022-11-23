@@ -49,9 +49,16 @@ layout: default
     <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" class="bi flex-shrink-0 me-2" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><use xlink:href="#bi-code"/></svg></a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
-  <p><b>Authors:</b> {% include authorlist.html authors=page.author %}</p>
+  <b>Authors:</b> {% include authorlist.html authors=page.author %}<br/>
   {% if page.requires != undefined %}
-    <p>Requires: {% include eipnums.html eips=page.requires %}</p>
+    <b>Requires:</b> {% include eipnums.html eips=page.requires %}<br/>
+  {% endif %}
+  {% if page.status != "Review" and page.status != "Last Call" %}
+    <b>Discussion Link:</b> <a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a>
+    {% if page.status == "Final" %}
+      (Archive)
+    {% endif %}
+    <br/>
   {% endif %}
 
   {% if page.status == "Review" or page.status == "Last Call" %}
