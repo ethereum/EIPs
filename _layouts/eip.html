@@ -15,29 +15,29 @@ layout: default
 <div class="home">
   <h1 class="page-heading">
     {% if page.status == "Stagnant" %}
-      <span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
+      <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
     {% endif %}
     {% if page.status == "Withdrawn" %}
-      <span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP has been withdrawn, and should not be used.">🛑 Withdrawn</span>
+      <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP has been withdrawn, and should not be used.">🛑 Withdrawn</span>
     {% endif %}
     {% if page.status == "Draft" or	page.status == "Review" %}
-      <span class="badge text-bg-warning" data-bs-toggle="tooltip" data-bs-title="This EIP is not yet recommended for general use or implementation, as it is subject to normative (breaking) changes.">⚠️ {{ page.status }}</span>
+      <span class="badge text-light bg-warning" data-bs-toggle="tooltip" data-bs-title="This EIP is not yet recommended for general use or implementation, as it is subject to normative (breaking) changes.">⚠️ {{ page.status }}</span>
     {% endif %}
     {% if page.status == "Last Call" %}
-      <span class="badge text-bg-primary" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
     {% endif %}
     {% if page.category == "ERC" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="ERC Description">Standards Track - ERC</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="ERC Description" href="../erc">Standards Track: ERC</a>
     {% elsif page.category == "Interface" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Interface Description">Standards Track - Interface</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Interface Description" href="../interface">Standards Track: Interface</a>
     {% elsif page.category == "Networking" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Networking Description">Standards Track - Networking</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Networking Description" href="../networking">Standards Track: Networking</a>
     {% elsif page.category == "Core" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Core Description">Standards Track - Core</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Core Description" href="../core">Standards Track: Core</a>
     {% elsif page.type == "Informational" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Informational Description">Informational</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Informational Description" href="../informational">Informational</a>
     {% elsif page.type == "Meta" %}
-      <span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="Meta Description">Meta</span>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Meta Description" href="../meta">Meta</a>
     {% endif %}
     {% if page.category == "ERC" %}
       ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
@@ -52,7 +52,7 @@ layout: default
     <p>Requires: {% include eipnums.html eips=page.requires %}</p>
   {% endif %}
 
-  {% if page.status == "Draft" or page.status == "Review" or page.status == "Last Call" %}
+  {% if page.status == "Review" or page.status == "Last Call" %}
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#bi-megaphone-fill"/></svg>
       <div>
