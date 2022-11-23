@@ -1,5 +1,3 @@
-
-
 ---
 eip: KEM
 title: Private Key Encapsulation
@@ -178,7 +176,7 @@ Through out the test cases, we fix values for below data:
 
 ### Case 1
 
-Use `version` as: `secp256k1-AES-128-GCM`
+Use `version` as: `secp256k1-AES-128-GCM`. No signature verification.
 
 **R1** is provided as:
 ```
@@ -191,10 +189,10 @@ request({
 })
 ```
 Suppose the implementation generates an ephemeral key pair `(r, R)` as:
-```
-r: 0x83816953554b4c8e33f340cc4d0f5995229ec2c88a2c1aaf5a9f52606ea2de13
-R: 0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac
-```
+
+`r`: `0x83816953554b4c8e33f340cc4d0f5995229ec2c88a2c1aaf5a9f52606ea2de13`
+`R`: `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac`
+
 Then `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac` should be returned. Note that `R` is compressed.
 
 Therefore **R2** is provided as:
@@ -212,10 +210,10 @@ request({
 })
 ```
 Suppose the implementation generates an ephemeral key pair `(s, S)` as:
-```
-s: 0xea1843f0e8b498be263f358cf8ceaeef9eac28cf0a6be8f5f774a3d9a39b8439
-S: 0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915f
-```
+
+`s`: `0xea1843f0e8b498be263f358cf8ceaeef9eac28cf0a6be8f5f774a3d9a39b8439`
+`S`: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915f`
+
 Then the return value should be: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915fdd00e421f6b62bcb78b772669d937ac2edbf378d8534d39fec43cf9bab7fd437b4a890da1faa734c8fba0663b3840b7a`
 
 Then **R3** is provided as:
