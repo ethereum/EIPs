@@ -2,7 +2,7 @@
 eip: KEM
 title: Private Key Encapsulation
 description: defines a specification for encapsulating private keys.
-author: Base Labs (@Base-Labs)
+author: Base Labs (@Base-Labs), Weiji Guo (Base Labs)
 discussions-to: https://ethereum-magicians.org/t/private-key-encapsulation-to-move-around-securely-without-entering-seed/11604
 status: Draft
 type: Standards Track
@@ -118,7 +118,7 @@ This time  `recipientPublicKey`  is only the ephemeral public key `R` generated 
 
 When the encapsulated private key `sk` is decrypted successfully, the implementation can process it further according to the designated purposes. Some general security guidelines SHALL be followed, for example, do  *not*  log the value, do securely wipe it after use, etc. The implementation COULD derive the corresponding public key or address for user’s verification.
 
-The return value of this function SHOULD be empty if success, or any error message. NEVER return the decrypted private key.
+The return value is the corresponding Ethereum address for `sk`, or empty if any error.
 
 ### Options and Parameters
 
@@ -170,7 +170,7 @@ Recipient application is assumed to be powerful enough. Sender application could
 TODO
 
 ## Reference Implementation
-TODO
+Contributions are welcome.
 
 ## Security Considerations
 
@@ -186,8 +186,10 @@ R <-- signerPubKey <-- trusted public key
 
 This allows various strategies to mange the trust. For example:
 
--   A hardware wallet vendor which takes it very serious about the brand reputation and the fund safety for its customers, could choose to trust only its own public key(s). These public keys only sign `signerPubKey` from selected partners.
+-   A hardware wallet vendor which takes it very serious about the brand reputation and the fund safety for its customers, could choose to trust only its own public keys. These public keys only sign `signerPubKey` from selected partners.
 -   A MPC service could publish its `signerPubKey` online so that users won't verify the signature against a wrong or fake public key.
+
+Note that it is advised that a separate key pair should be used for signing on each curve.
 
 **Security Level**:
 
