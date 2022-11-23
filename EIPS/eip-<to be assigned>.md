@@ -6,8 +6,8 @@ author: Diven ([@aboutmydreams](https://github.com/aboutmydreams)), Kaso ([@kaso
 discussions-to: <URL>
 status: Draft
 type: Informational
-created: <date created on, in ISO 8601 (2022-10-10) format>
-requires (*optional): <EIP number(s)>
+created: 2022-10-10
+requires (*optional): ERC721
 ---
 
 
@@ -25,11 +25,11 @@ interface IERC721sub {
 
     function tokenSubscribeExtend(uint _tokenID, uint _time) external payable;
 
-    function tokenSubscribeRevoke(uint _tokenID) public;
+    function tokenSubscribeRevoke(uint _tokenID) external;
 
-    function isTokenExpire(uint _tokenID) public returns (bool);
+    function isTokenExpire(uint _tokenID) external returns (bool);
 
-    function queryTokenExpire(uint _tokenID) public returns(uint);
+    function queryTokenExpire(uint _tokenID) external returns(uint);
 } 
 ```
 
