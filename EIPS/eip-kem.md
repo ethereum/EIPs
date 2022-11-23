@@ -1,3 +1,5 @@
+
+
 ---
 eip: KEM
 title: Private Key Encapsulation
@@ -167,7 +169,70 @@ Version could be decided by user or negotiated by both sides. When there is no u
 Recipient application is assumed to be powerful enough. Sender application could have very limited computing power and user interaction capabilities.
 
 ## Test Cases
-TODO
+
+Through out the test cases, we fix values for below data:
+
+-   `sk`, the private key to be encapsulated, fixed to: `0xf8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315`. The corresponding address is `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. Note that these values come from [Mastering Ethereum](https://github.com/ethereumbook/ethereumbook/blob/develop/04keys-addresses.asciidoc)
+-   `oob`, fixed to `0x313233343536` (string value "123456")
+-   `salt`, fixed to `0x6569703a2070726976617465206b657920656e63617073756c6174696f6e` (string value "eip: private key encapsulation")
+
+### Case 1
+
+Use `version` as: `secp256k1-AES-128-GCM`
+
+**R1** is provided as:
+```
+request({
+	method: 'eth_generateEphemeralKeyPair',
+	params: [
+		version: 'secp256k1-AES-128-GCM',
+		signerPubKey: ''
+	],
+})
+```
+Suppose the implementation generates an ephemeral key pair `(r, R)` as:
+
+`r`: `0x83816953554b4c8e33f340cc4d0f5995229ec2c88a2c1aaf5a9f52606ea2de13`
+`R`: `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac`
+
+Then `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac` should be returned. Note that `R` is compressed.
+
+Therefore **R2** is provided as:
+```
+request({
+	method: 'eth_encapsulatePrivateKey',
+	params: [
+		version: 'secp256k1-AES-128-GCM',
+		recipient: '0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac',
+		signerPubKey: '',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
+	],
+})
+```
+Suppose the implementation generates an ephemeral key pair `(s, S)` as:
+
+`s`: `0xea1843f0e8b498be263f358cf8ceaeef9eac28cf0a6be8f5f774a3d9a39b8439`
+`S`: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915f`
+
+Then the return value should be: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915fdd00e421f6b62bcb78b772669d937ac2edbf378d8534d39fec43cf9bab7fd437b4a890da1faa734c8fba0663b3840b7a`
+
+Then **R3** is provided as:
+```
+request({
+	method: 'eth_intakePrivateKey',
+	params: [
+		version: 'secp256k1-AES-128-GCM',
+		recipientPublicKey: '0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		data: '0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915fdd00e421f6b62bcb78b772669d937ac2edbf378d8534d39fec43cf9bab7fd437b4a890da1faa734c8fba0663b3840b7a'
+	],
+})
+```
+
+The return value should be `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. This matches the `account` parameter in **R2**.
 
 ## Reference Implementation
 Contributions are welcome.
