@@ -220,7 +220,7 @@ Links to the Ethereum Networking Specifications may be included using normal mar
 [Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
 ```
 
-Which renders to:
+Which renders as:
 
 [Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
 
