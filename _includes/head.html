@@ -3,8 +3,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   {% if page.layout == "eip" %}
-    <title>EIP-{{ page.eip }}: {{ page.title | escape }}</title>
-    <meta property="og:title" content="EIP-{{ page.eip }}: {{ page.title | escape }}" />
+    {% if page.category == "ERC" %}
+      <title>EIP-{{ page.eip }}: {{ page.title | escape }}</title>
+      <meta property="og:title" content="EIP-{{ page.eip }}: {{ page.title | escape }}" />
+    {% elsif page.category != "ERC" %}
+      <title>ERC-{{ page.eip }}: {{ page.title | escape }}</title>
+      <meta property="og:title" content="ERC-{{ page.eip }}: {{ page.title | escape }}" />
+    {% endif %}
     <meta name="description" content="{{page.description | escape }}" />
     <meta property="og:description" content="{{page.description | escape }}" />
     <meta name="twitter:description" content="{{page.description | escape }}" />
