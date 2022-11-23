@@ -50,16 +50,20 @@ layout: default
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
   <b>Authors:</b> {% include authorlist.html authors=page.author %}<br/>
-  {% if page.requires != undefined %}
-    <b>Requires:</b> {% include eipnums.html eips=page.requires %}<br/>
+  {% if page.created != undefined %}
+    <b>Created:</b> {{ page.created }}<br/>
   {% endif %}
-  {% if page.status != "Review" and page.status != "Last Call" %}
+  {% if page.status != "Review" and page.status != "Last Call" and page["discussions-to"] != undefined %}
     <b>Discussion Link:</b> <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a>
     {% if page.status == "Final" %}
       (Archive)
     {% endif %}
     <br/>
   {% endif %}
+  {% if page.requires != undefined %}
+    <b>Requires:</b> {% include eipnums.html eips=page.requires %}<br/>
+  {% endif %}
+  <br/>
 
   {% if page.status == "Review" or page.status == "Last Call" %}
     <div class="alert alert-primary d-flex align-items-center" role="alert">
