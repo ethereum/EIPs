@@ -1,6 +1,10 @@
 on:
   pull_request_target:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 name: Auto Label Bot
 jobs:
   jekyll-label-action:
@@ -8,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: Pandapip1/jekyll-label-action@5fcfb7bef793a76df290f8b491a5529accb7ae46
+      - uses: Pandapip1/jekyll-label-action@28a89dbbef321fceaf3cff17f4d29c7a033c3d56
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-path: config/.jekyll-labels.yml
