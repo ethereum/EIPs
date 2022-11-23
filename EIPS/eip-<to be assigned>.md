@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Subscribeable NFT(ERC721)
 description: 721sub is a subscribable nft protocol that allows users to enjoy their benefits for a certain period of time.
-author: Diven (![@aboutmydreams](https://github.com/aboutmydreams)), Kaso (![@kasoqian](https://github.com/kasoqian)), Jason (![@350306878](https://github.com/350306878))
+author: Diven ([@aboutmydreams](https://github.com/aboutmydreams)), Kaso ([@kasoqian](https://github.com/kasoqian)), Jason ([@350306878](https://github.com/350306878))
 discussions-to: <URL>
 status: Draft
 type: Informational
