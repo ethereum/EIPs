@@ -110,7 +110,7 @@ abstract contract ERC1155ApprovalByAmount is ERC1155, IERC1155ApprovalByAmount {
 
         require(idsLength == amountsLength, "ERC1155ApprovalByAmount: ids and amounts length mismatch");
         for (uint256 i = 0; i < idsLength;) {
-            if(allowance(from, to, ids[i] < amounts[i])) {
+            if(_allowances[from][to][ids[i]] < amounts[i]) {
                 return false;
             }
             unchecked { 
