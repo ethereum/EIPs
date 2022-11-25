@@ -27,17 +27,17 @@ layout: default
       <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
     {% endif %}
     {% if page.category == "ERC" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="ERC Description" href="../erc">Standards Track: ERC</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Application-level standards and conventions, including contract standards such as token standards, name registries, URI schemes, library/package formats, and wallet formats." href="../erc">Standards Track: ERC</a>
     {% elsif page.category == "Interface" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Interface Description" href="../interface">Standards Track: Interface</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements around client API/RPC specifications and standards, and also certain language-level standards like method names and contract ABIs." href="../interface">Standards Track: Interface</a>
     {% elsif page.category == "Networking" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Networking Description" href="../networking">Standards Track: Networking</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements around devp2p and Light Ethereum Subprotocol, as well as proposed improvements to network protocol specifications of whisper and swarm." href="../networking">Standards Track: Networking</a>
     {% elsif page.category == "Core" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Core Description" href="../core">Standards Track: Core</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements requiring a consensus fork, as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions." href="../core">Standards Track: Core</a>
     {% elsif page.type == "Informational" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Informational Description" href="../informational">Informational</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice." href="../informational">Informational</a>
     {% elsif page.type == "Meta" %}
-      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Meta Description" href="../meta">Meta</a>
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. " href="../meta">Meta</a>
     {% endif %}
   </span>
   <h1 class="page-heading">
