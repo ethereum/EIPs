@@ -46,7 +46,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
     mapping(uint64 => string) internal _assets;
 
     //mapping of tokenId to new asset, to asset to be replaced
-    mapping(uint256 => mapping(uint64 => uint64)) private _assetOverwrites;
+    mapping(uint256 => mapping(uint64 => uint64)) private _assetReplacements;
 
     //mapping of tokenId to all assets
     mapping(uint256 => uint64[]) internal _activeAssets;
@@ -315,7 +315,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
     function _burn(uint256 tokenId) internal virtual {
         // WARNING: If you intend to allow the reminting of a burned token, you
         // might want to clean the assets for the token, that is:
-        // _pendingAssets, _activeAssets, _assetOverwrites
+        // _pendingAssets, _activeAssets, _assetReplacements
         // _activeAssetPriorities and _tokenAssets.
         address owner = ownerOf(tokenId);
 
@@ -457,21 +457,31 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         );
 
         _beforeAcceptAsset(tokenId, index, assetId);
-        _pendingAssets[tokenId].removeItemByIndex(index);
+        uint64 replacesId = _assetReplacements[tokenId][assetId];
+        uint256 replaceIndex;
+        bool replacefound;
+        if (replacesId != uint64(0))
+            (replaceIndex, replacefound) = _activeAssets[tokenId].indexOf(
+                replacesId
+            );
 
-        uint64 overwrite = _assetOverwrites[tokenId][assetId];
-        if (overwrite != uint64(0)) {
-            // It could have been overwritten previously so it's fine if it's not found.
-            // If it's not deleted (not found), we don't want to send it on the event
-            if (!_activeAssets[tokenId].removeItemByValue(overwrite))
-                overwrite = uint64(0);
-            else delete _tokenAssets[tokenId][overwrite];
-            delete (_assetOverwrites[tokenId][assetId]);
+        if (replacefound) {
+            // We don't want to remove and then push a new asset.
+            // This way we also keep the priority of the original resource
+            _activeAssets[tokenId][index] = assetId;
+            delete _tokenAssets[tokenId][replacesId];
+        } else {
+            // We use the current size as next priority, by default priorities would be [0,1,2...]
+            _activeAssetPriorities[tokenId].push(
+                uint16(_activeAssets[tokenId].length)
+            );
+            _activeAssets[tokenId].push(assetId);
+            replacesId = uint64(0);
         }
-        _activeAssets[tokenId].push(assetId);
-        //Push 0 value of uint16 to array, e.g., uninitialized
-        _activeAssetPriorities[tokenId].push(uint16(0));
-        emit AssetAccepted(tokenId, assetId, overwrite);
+        _pendingAssets[tokenId].removeItemByIndex(index);
+        delete _assetReplacements[tokenId][assetId];
+
+        emit AssetAccepted(tokenId, assetId, replacesId);
         _afterAcceptAsset(tokenId, index, assetId);
     }
 
@@ -494,9 +504,9 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         );
 
         _beforeRejectAsset(tokenId, index, assetId);
-        _pendingAssets[tokenId].removeItemByValue(assetId);
+        _pendingAssets[tokenId].removeItemByIndex(index);
         delete _tokenAssets[tokenId][assetId];
-        delete _assetOverwrites[tokenId][assetId];
+        delete _assetReplacements[tokenId][assetId];
 
         emit AssetRejected(tokenId, assetId);
         _afterRejectAsset(tokenId, index, assetId);
@@ -517,7 +527,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         _beforeRejectAllAssets(tokenId);
         for (uint256 i; i < len; ) {
             uint64 assetId = _pendingAssets[tokenId][i];
-            delete _assetOverwrites[tokenId][assetId];
+            delete _assetReplacements[tokenId][assetId];
             unchecked {
                 ++i;
             }
@@ -576,13 +586,13 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         return _activeAssetPriorities[tokenId];
     }
 
-    function getAssetOverwrites(uint256 tokenId, uint64 newAssetId)
+    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
         public
         view
         virtual
         returns (uint64)
     {
-        return _assetOverwrites[tokenId][newAssetId];
+        return _assetReplacements[tokenId][newAssetId];
     }
 
     function getAssetMetadata(uint256 tokenId, uint64 assetId)
@@ -621,7 +631,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
     function _addAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal {
         require(
             !_tokenAssets[tokenId][assetId],
@@ -638,16 +648,16 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
             "MultiAsset: Max pending assets reached"
         );
 
-        _beforeAddAssetToToken(tokenId, assetId, overwrites);
+        _beforeAddAssetToToken(tokenId, assetId, replacesAssetWithId);
         _tokenAssets[tokenId][assetId] = true;
         _pendingAssets[tokenId].push(assetId);
 
-        if (overwrites != uint64(0)) {
-            _assetOverwrites[tokenId][assetId] = overwrites;
+        if (replacesAssetWithId != uint64(0)) {
+            _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, overwrites);
-        _afterAddAssetToToken(tokenId, assetId, overwrites);
+        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     // HOOKS
@@ -665,13 +675,13 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
     function _beforeAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal virtual {}
 
     function _afterAddAssetToToken(
         uint256 tokenId,
         uint64 assetId,
-        uint64 overwrites
+        uint64 replacesAssetWithId
     ) internal virtual {}
 
     function _beforeAcceptAsset(

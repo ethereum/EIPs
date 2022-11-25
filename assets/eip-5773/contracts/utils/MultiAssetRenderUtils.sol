@@ -33,9 +33,7 @@ contract MultiAssetRenderUtils {
         IMultiAsset target_ = IMultiAsset(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(
-            tokenId
-        );
+        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint256 len = assets.length;
         if (len == 0) {
             revert("Token has no assets");
@@ -76,7 +74,7 @@ contract MultiAssetRenderUtils {
         uint64 overwritesAssetWithId;
         for (uint256 i; i < len; ) {
             metadata = target_.getAssetMetadata(tokenId, assets[i]);
-            overwritesAssetWithId = target_.getAssetOverwrites(
+            overwritesAssetWithId = target_.getAssetReplacements(
                 tokenId,
                 assets[i]
             );
@@ -126,9 +124,7 @@ contract MultiAssetRenderUtils {
         returns (string memory)
     {
         IMultiAsset target_ = IMultiAsset(target);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(
-            tokenId
-        );
+        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint256 len = priorities.length;
         if (len == 0) {

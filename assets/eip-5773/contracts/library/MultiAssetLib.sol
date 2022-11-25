@@ -3,22 +3,21 @@
 pragma solidity ^0.8.0;
 
 library MultiAssetLib {
-    function removeItemByValue(uint64[] storage array, uint64 value)
+    function indexOf(uint64[] memory A, uint64 a)
         internal
-        returns (bool)
+        pure
+        returns (uint256, bool)
     {
-        uint64[] memory memArr = array; //Copy array to memory, check for gas savings here
-        uint256 length = memArr.length; //gas savings
+        uint256 length = A.length;
         for (uint256 i; i < length; ) {
-            if (memArr[i] == value) {
-                removeItemByIndex(array, i);
-                return true;
+            if (A[i] == a) {
+                return (i, true);
             }
             unchecked {
                 ++i;
             }
         }
-        return false;
+        return (0, false);
     }
 
     //For reasource storage array

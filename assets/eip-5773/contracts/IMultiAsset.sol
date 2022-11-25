@@ -8,13 +8,13 @@ interface IMultiAsset {
     event AssetAddedToToken(
         uint256 indexed tokenId,
         uint64 indexed assetId,
-        uint64 indexed overwritesId
+        uint64 indexed replacesId
     );
 
     event AssetAccepted(
         uint256 indexed tokenId,
         uint64 indexed assetId,
-        uint64 indexed overwritesId
+        uint64 indexed replacesId
     );
 
     event AssetRejected(uint256 indexed tokenId, uint64 indexed assetId);
@@ -45,8 +45,7 @@ interface IMultiAsset {
         uint64 assetId
     ) external;
 
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        external;
+    function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
 
     function setPriority(uint256 tokenId, uint16[] calldata priorities)
         external;
@@ -66,7 +65,7 @@ interface IMultiAsset {
         view
         returns (uint16[] memory);
 
-    function getAssetOverwrites(uint256 tokenId, uint64 newAssetId)
+    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
         external
         view
         returns (uint64);
@@ -76,7 +75,6 @@ interface IMultiAsset {
         view
         returns (string memory);
 
-    // Approvals
     function approveForAssets(address to, uint256 tokenId) external;
 
     function getApprovedForAssets(uint256 tokenId)

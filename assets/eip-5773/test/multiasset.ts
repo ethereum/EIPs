@@ -57,7 +57,7 @@ describe('MultiAsset', async () => {
     });
 
     it('can support IMultiAsset', async function () {
-      expect(await token.supportsInterface('0xfa73a1e2')).to.equal(true);
+      expect(await token.supportsInterface('0xd1526708')).to.equal(true);
     });
 
     it('cannot support other interfaceId', async function () {
@@ -341,7 +341,7 @@ describe('MultiAsset', async () => {
         .withArgs(tokenId, resId2, resId);
       const pendingAssets = await token.getPendingAssets(tokenId);
 
-      expect(await token.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(activeAssets[0]);
+      expect(await token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(activeAssets[0]);
       await expect(token.acceptAsset(tokenId, 0, resId2))
         .to.emit(token, 'AssetAccepted')
         .withArgs(tokenId, resId2, resId);
@@ -351,7 +351,7 @@ describe('MultiAsset', async () => {
         metaURIDefault,
       ]);
       // Overwrite should be gone
-      expect(await token.getAssetOverwrites(tokenId, pendingAssets[0])).to.eql(
+      expect(await token.getAssetReplacements(tokenId, pendingAssets[0])).to.eql(
         ethers.BigNumber.from(0),
       );
     });
@@ -433,7 +433,7 @@ describe('MultiAsset', async () => {
       await token.addAssetToToken(tokenId, resId2, resId);
       await token.rejectAsset(tokenId, 0, resId2);
 
-      expect(await token.getAssetOverwrites(tokenId, resId2)).to.eql(ethers.BigNumber.from(0));
+      expect(await token.getAssetReplacements(tokenId, resId2)).to.eql(ethers.BigNumber.from(0));
     });
 
     it('can reject all assets and overwrites are cleared', async function () {
@@ -450,7 +450,7 @@ describe('MultiAsset', async () => {
       await token.addAssetToToken(tokenId, resId2, resId);
       await token.rejectAllAssets(tokenId, 1);
 
-      expect(await token.getAssetOverwrites(tokenId, resId2)).to.eql(ethers.BigNumber.from(0));
+      expect(await token.getAssetReplacements(tokenId, resId2)).to.eql(ethers.BigNumber.from(0));
     });
 
     it('can reject all pending assets at max capacity', async function () {
@@ -469,7 +469,7 @@ describe('MultiAsset', async () => {
       }
       await token.rejectAllAssets(tokenId, 128);
 
-      expect(await token.getAssetOverwrites(1, 2)).to.eql(ethers.BigNumber.from(0));
+      expect(await token.getAssetReplacements(1, 2)).to.eql(ethers.BigNumber.from(0));
     });
 
     it('cannot reject asset twice', async function () {
@@ -513,7 +513,7 @@ describe('MultiAsset', async () => {
       const tokenId = 1;
       await addAssetsToToken(tokenId);
 
-      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([0, 0]);
+      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
       await expect(token.setPriority(tokenId, [2, 1]))
         .to.emit(token, 'AssetPrioritySet')
         .withArgs(tokenId);
