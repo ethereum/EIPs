@@ -66,6 +66,24 @@ TBD
 
 No backward compatibility issues found.
 
+## Test Cases
+
+<!--
+  This section is optional. If this is your first time drafting an EIP, it is recommended not to include test cases until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the test suite is too large to reasonably be included inline, then it is probably too big.
+
+  The test cases do not need to be executable. Expected input/output pairs are sufficient, and are less likely to block your EIP.
+
+  TODO: Remove this comment before submitting
+-->
+  
+## Reference Implementation
+
+<!--
+  This section is optional. If this is your first time drafting an EIP, it is recommended not to include a reference implementation until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the reference implementation is too large to reasonably be included inline, then it is probably too big.
+
+  TODO: Remove this comment before submitting
+-->
+
 ## Security Considerations
 
 <!--
@@ -77,7 +95,6 @@ No backward compatibility issues found.
 -->
 
 Needs discussion.
-
 
 ## Copyright
 
