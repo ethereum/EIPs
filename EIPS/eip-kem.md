@@ -2,7 +2,7 @@
 eip: KEM
 title: Private Key Encapsulation
 description: defines a specification for encapsulating private keys.
-author: Base Labs (@Base-Labs), Weiji Guo (Base Labs)
+author: Base Labs (@Base-Labs), Weiji Guo (@weijiguo)
 discussions-to: https://ethereum-magicians.org/t/private-key-encapsulation-to-move-around-securely-without-entering-seed/11604
 status: Draft
 type: Standards Track
@@ -28,52 +28,60 @@ This EIP aims to enable such use cases.
 
 ## Specification
 
+### Sender and Recipient
+
+Sender is the party who has the private key to be encapsulated. Sender application is what Sender uses.
+
+Recipient is the party who accepts the encapsulated private key, unwrap and then use it. Recipient application is what Recipient uses.
+
+### Core Algorithms
+
 The basic idea is to encapsulate the private key with ECIES. To ensure that the ephemeral public key to encapsulate the private key to is indeed generated from a trusted party and has not been tampered with, an option is provided to sign that ephemeral public key.
 
 There should be a mandatory  `version`  parameter. This allows various kinds of Key Encapsulation Mechanisms to be adopted depending on the security considerations or preference. The list shall be short to minimize compatibility issues among different vendors.
 
-### Core Algorithms
-
 In addition to `version` string, parameters, involved keys and functions include:
 
 1.  Sender private key  `sk`, to be encapsulated to recipient.
-2.  Ephemeral recipient key pair  `(r, R)`  such that `R = [r]G`. `G` denotes the base point of the elliptic curve, and `[r]G` denotes the scalar multiplication. Optionally, `R` could be signed and `signerPubKey` and `signature` are then provided for sender to verify if `R`  could be trusted or not.
+2.  Ephemeral recipient key pair  `(r, R)`  such that `R = [r]G`. `G` denotes the base point of the elliptic curve, and `[r]G` denotes the scalar multiplication. Optionally, `R` could be signed, and `signerPubKey` and `signature` are then provided for sender to verify if `R`  could be trusted or not.
 3.  Ephemeral sender key pair  `(s, S)`  such that `S = [s]G`.
-4.  Share secret  `ss  := [s]R = [r]S` according to ECDH.
+4.  Share secret  `ss := [s]R = [r]S` according to ECDH. Note that for secp256k1 this EIP follows RFC5903 and uses compact representation, which means to use *only* the `x` coordinate as the shared secret. For Curve25519 this EIP follows RFC7748.
 5.  `oob`, out of band data, optional. This could be digits or an alpha-numeric string entered by user.
 6.  Let  `derivedKey  :=  HKDF(hash=SHA256, ikm=ss, info=oob,  salt,  length)`. HKDF is defined in RFC5869. The  `length`  should be determined by  `skey`  and  `IV`  requirements such that the symmetric key  `skey  = derivedKey[0:keySize]`, and  `IV  = derivedKey[keySize:length]`.  `keySize`  denotes the key size of underlying symmetric algorithm, for example, 16 (bytes) for AES-128, and 32 (bytes) for Chacha20. See **Security Considerations** for the use of  `salt`.
-7.  `cipher  := authenticated_cncryption(symAlg,  skey,  IV, data=sk)`. The symmetric cipher algorithm (`symAlg`) and authentication scheme are decided by the version parameter.
+7.  `cipher  := authenticated_cncryption(symAlg,  skey,  IV, data=sk)`. The symmetric cipher algorithm `symAlg` and authentication scheme are decided by the version parameter. No additional authentication data `aad` is used.
 
 A much simplified example flow without signature and verification is:
 
 1.  Recipient application generates  `(r, R)`.
 2.  User inputs  `R`  to Sender application, along with a six-digit code “123456” as  `oob`.
-3.  Sender application generates  `(s, S)`, and computes  `cipher`.
+3.  Sender application generates  `(s, S)`, and computes  `cipher`, then returns `S || cipher`
 4.  Recipient application scans to read  `S`  and  `cipher`. User enters “123456” as  `oob`  to Recipient application.
 5.  Recipient application decrypts  `cipher`  to get  `sk`.
-6.  Optionally Recipient application could derive the address corresponding to  `sk`  so that user can confirm the correctness.
+6.  Recipient application derives the address corresponding to  `sk`  so that user can confirm the correctness.
+
+With signature and verification, the signature to `R` by `singerPubKey` is appended to `R`. `signerPubKey` itself could have been already signed by `trustedPubKey`, and that signature is appended to `signerPubKey`. See **Requests** and **Test Cases** for further clarification and examples.
 
 ### Requests
 #### R1. Request for Recipient to generate ephemeral key pair
 
-```
+```javascript
 request({
 	method: 'eth_generateEphemeralKeyPair',
 	params: [version, signerPubKey],
 })
 ```
 
-`signerPubKey`  is optional. If provided, it is assumed that the implementation has the corresponding private key and the implementation MUST sign the ephemeral public key (in the form of what is to be returned). The signature algorithm is determined by the curve part of the  `version`  parameter, that is, ECDSA for secp256k1, and EdDSA for Ed25519. And in this situation, it should be the case that the sender trusts  `signerPubKey`, no matter how this trust is maintained. If not, next request WILL be rejected by Sender application. Also see **Security Considerations**.
+`signerPubKey`  is optional. If provided, it is assumed that the implementation has the corresponding private key and the implementation MUST sign the ephemeral public key (in the form of what is to be returned). The signature algorithm is determined by the curve part of the  `version`  parameter, that is, ECDSA for secp256k1, and Ed25519 for Curve25519. And in this situation, it should be the case that the sender trusts  `signerPubKey`, no matter how this trust is maintained. If not, next request WILL be rejected by Sender application. Also see **Security Considerations**.
 
 Implementation then MUST generate random private key `r` with cryptographic secure random number generator (CSRNG), and derives ephemeral public key `R = [r]G`. Implementation SHOULD safe keep the generated key pair `(r, R)` in a secure manner in accordance with the circumstances, and SHOULD keep it only for limited duration, but the specific duration is left to individual implementations. Implementation SHOULD be able to retrieve `r` when given back the corresponding public key `R` if within said duration.
 
-Returned value is `R`, compressed if applicable. Also see ****Encoding of data and messages****. If  `signerPubKey`  is provided, then `R` is followed by the `signature`, also hex-encoded.
+Returned value is `R`, compressed if applicable. Also see **Encoding of data and messages**. If  `signerPubKey`  is provided, then the `signature` is appended to `R`, also hex-encoded.
 
 Alternatively, `signature` could be calculated separately, and then appended to the returned data.
 
 #### R2. Request for Sender to encapsulate the private key
 
-```
+```javascript
 request({
 	method: 'eth_encapsulatePrivateKey',
 	params: [
@@ -91,17 +99,19 @@ request({
 
 `oob`  and  `salt`  are just byte arrays.
 
-`account`  is used to identify which private key to be encapsulated. With Ethereum it is an address. Also see ****Encoding of data and messages****.
+`account`  is used to identify which private key to be encapsulated. With Ethereum it is an address. Also see **Encoding of data and messages**.
 
-If  `signerPubKey`  is provided or  `recipient`  contains signature, the implementation MUST perform signature verification. Missing data or incorrect format etc. SHALL result in empty return and optional error logs.
+If  `signerPubKey`  is provided or  `recipient`  contains `signature` data, the implementation MUST perform signature verification. Missing data or incorrect format etc. SHALL fail the call and result in empty return and optional error logs.
 
-The implementation shall then proceed to retrieve the private key corresponding to  `account`, and follow the ****Core Algorithms**** to encrypt it.
+`signerPubKey` could have been further signed by another key pair `(trusted, trustedPubKey)`, which is trusted by the Sender application. In that case, `signerPubKey` is appended with the corresponding signature data, which SHOULD be verified against `trustedPubKey`. See **Test Cases** for further clarification.
 
-The return data is a byte array which contains first the ephemeral sender public key (compressed if applicable), then cipher including any authentication tag.
+The implementation shall then proceed to retrieve the private key `sk` corresponding to  `account`, and follow the **Core Algorithms** to encrypt it.
+
+The return data is a byte array which contains first the ephemeral sender public key `S` (compressed if applicable), then `cipher` including any authentication tag, that is, `S || cipher`.
 
 #### R3. Request for Recipient to unwrap and intake the private key
 
-```
+```javascript
 request({
 	method: 'eth_intakePrivateKey',
 	params: [
@@ -114,9 +124,9 @@ request({
 })
 ```
 
-This time  `recipientPublicKey`  is only the ephemeral public key `R` generated earlier in the recipient side, just for the implementation to retrieve the corresponding private key `r`.  `data`  is the return value from the call to encapsulate private key, which includes `S` and `cipher`.
+This time  `recipientPublicKey`  is only the ephemeral public key `R` generated earlier in the recipient side, just for the implementation to retrieve the corresponding private key `r`.  `data`  is the return value from the call to encapsulate private key, which is `S || cipher`.
 
-When the encapsulated private key `sk` is decrypted successfully, the implementation can process it further according to the designated purposes. Some general security guidelines SHALL be followed, for example, do  *not*  log the value, do securely wipe it after use, etc. The implementation COULD derive the corresponding public key or address for user’s verification.
+When the encapsulated private key `sk` is decrypted successfully, the implementation can process it further according to the designated purposes. Some general security guidelines SHALL be followed, for example, do  *not*  log the value, do securely wipe it after use, etc.
 
 The return value is the corresponding Ethereum address for `sk`, or empty if any error.
 
@@ -125,7 +135,7 @@ The return value is the corresponding Ethereum address for `sk`, or empty if any
 Available elliptic curves are:
 
 -   secp256k1 (mandatory)
--   Ed25519
+-   Curve25519
 
 Available authenticated encryption schemes are:
 
@@ -133,19 +143,19 @@ Available authenticated encryption schemes are:
 -   AES-256-GCM
 -   Chacha20-Poly1305
 
-Version string is simply concatenation of elliptic curve and AE scheme, for example, secp256k1-AES-128-GCM.
+Version string is simply concatenation of elliptic curve and AE scheme, for example, secp256k1-AES-128-GCM. Above lists allows a combination of six different concrete schemes. Implementations are encouraged to implement curve related logic separately from authenticated encryption scheme to avoid duplication and to promote interoperability.
 
 Signature algorithms for each curve is:
 
 -   secp256k1 --> ECDSA
--   Ed25519 --> EdDSA
+-   Curve25519 --> Ed25519
 
 ### Encoding of data and messages
 
 - Raw bytes are encoded in hex and prefixed with '0x'.
-- `cipher`  is encoded into single byte buffer as: (`IV  || encrypted_sk || tag`).
-- `R`, `S` and `signerPubKey` are compressed if applicable.
-- `R` or `signerPubKey` could be followed by a signature to it.
+- `cipher`  is encoded into single byte buffer as: `[IV  || encrypted_sk || tag]`.
+- `R`, `S`, `signerPubKey` and `trustedPubKey` are compressed if applicable.
+- `R` or `signerPubKey` could be followed by a signature to it: `[pub || sig]`. Note that for the secp256k1 curve, the signature is just 64 bytes without the `v` indicator as found in a typical Ethereum signature.
 
 ## Rationale
 
@@ -157,79 +167,254 @@ There is security implication to this difference, including perfect forward secr
 
 No backward compatibility issues for this new proposal.
 
+### Interoperability
+
 To minimize potential compatibility issues among applications (including hardware wallets), this EIP requires that version secp256k1-AES-128-GCM MUST be supported.
 
 Version could be decided by user or negotiated by both sides. When there is no user input or negotiation, secp256k1-AES-128-GCM is assumed.
 
+It is expected that implementations cover curve supports separately from encryption support, that is, all the versions that could be derived from supported curve and supported encryption scheme, should work.
+
 ### UX Recommendations
-`salt` and/or `oob` data: both are inputs to the HKDF function (`oob` as “info” parameter). For better UX we suggest to require from users only one of them but this is up to the implementation.
+`salt` and/or `oob` data: both are inputs to the HKDF function (`oob` as “info” parameter). For better user experiences we suggest to require from users only one of them but this is up to the implementation.
 
 Recipient application is assumed to be powerful enough. Sender application could have very limited computing power and user interaction capabilities.
 
 ## Test Cases
 
+### Data Fixation
+
 Through out the test cases, we fix values for below data:
 
--   `sk`, the private key to be encapsulated, fixed to: `0xf8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315`. The corresponding address is `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. Note that these values come from [Mastering Ethereum](https://github.com/ethereumbook/ethereumbook/blob/develop/04keys-addresses.asciidoc)
+-   `sk`, the private key to be encapsulated, fixed to: `0xf8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315`. The corresponding address is `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`, called `account`. Note that these values come from [Mastering Ethereum](https://github.com/ethereumbook/ethereumbook/blob/develop/04keys-addresses.asciidoc)
+-   `r`, the recipient private key, fixed to `0x6f2dd2a7804705d2d536bee92221051865a639efa23f5ca7c810e77048253a79`
+-   `s`, the sender private key, fixed to `0x28fa2db9f916e44fcc88370bedaf5eb3ec45632f040f4c1450c0f101e1e8bac8`
+-   `signer`, the private key to sign the ephemeral public key, fixed to `0xac304db075d1685284ba5e10c343f2324ee32df3394fc093c98932517d36e344`. When used for Ed25519 signing, however, this values acts as `seed`, while the actual private key is calculated as `SHA512(seed)[:32]`. Or put it another way, the public key is the scalar multiplication of hashed private key to the base point. Same for `trusted`.
+-   `trusted`, the private key to sign `signerPubKey`, fixed to `0xda6649d68fc03b807e444e0034b3b59ec60716212007d72c9ddbfd33e25d38d1`
 -   `oob`, fixed to `0x313233343536` (string value "123456")
 -   `salt`, fixed to `0x6569703a2070726976617465206b657920656e63617073756c6174696f6e` (string value "eip: private key encapsulation")
 
 ### Case 1
 
-Use `version` as: `secp256k1-AES-128-GCM`. No signature verification.
-
-**R1** is provided as:
-```
+Use `version` as: `secp256k1-AES-128-GCM`. **R1** is provided as:
+```javascript
 request({
 	method: 'eth_generateEphemeralKeyPair',
 	params: [
 		version: 'secp256k1-AES-128-GCM',
-		signerPubKey: ''
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b'
 	],
 })
 ```
-Suppose the implementation generates an ephemeral key pair `(r, R)` as:
-
-`r`: `0x83816953554b4c8e33f340cc4d0f5995229ec2c88a2c1aaf5a9f52606ea2de13`
-`R`: `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac`
-
-Then `0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac` should be returned. Note that `R` is compressed.
-
-Therefore **R2** is provided as:
+Suppose the implementation generates an ephemeral key pair `(r, R)`:
+```javascript
+r: '0x6f2dd2a7804705d2d536bee92221051865a639efa23f5ca7c810e77048253a79',
+R: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09'
 ```
+The return value could be:
+```javascript
+'0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b'
+```
+Note that `R` is compressed and R leads the return value.
+
+Therefore **R2** could be provided as:
+```javascript
 request({
 	method: 'eth_encapsulatePrivateKey',
 	params: [
 		version: 'secp256k1-AES-128-GCM',
-		recipient: '0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac',
-		signerPubKey: '',
+		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0bae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
 		oob: '0x313233343536',
 		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
 		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
 	],
 })
 ```
-Suppose the implementation generates an ephemeral key pair `(s, S)` as:
-
-`s`: `0xea1843f0e8b498be263f358cf8ceaeef9eac28cf0a6be8f5f774a3d9a39b8439`
-`S`: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915f`
-
-Then the return value should be: `0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915fdd00e421f6b62bcb78b772669d937ac2edbf378d8534d39fec43cf9bab7fd437b4a890da1faa734c8fba0663b3840b7a`
-
-Then **R3** is provided as:
+The Sender implementation first verifies first layer signature as ECDSA over secp256k1:
+```javascript
+//string representation of R as message
+msg: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09',
+sig: '27778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
+//signerPubKey
+pub: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b'
 ```
+Then it proceeds to verify second layer signature, also as ECDSA over secp256k1:
+```javascript
+//string representation of signerPubKey as message
+msg: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b',
+sig: '0xae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
+//trustedPubKey
+pub: '0x027fb72176f1f9852ce7dd9dc3aa4711675d3d8dc5102b86d758d853002137e839'
+```
+Since Sender application trusts `trustedPubKey`, the signature verification succeeds.
+
+Suppose the implementation generates an ephemeral key pair `(s, S)` as:
+```javascript
+s: '0x28fa2db9f916e44fcc88370bedaf5eb3ec45632f040f4c1450c0f101e1e8bac8',
+S: '0x02ced2278d9ebb193f166d4ee5bbbc5ab8ca4b9ddf23c4172ad11185c079944c02'
+```
+The shared secret, symmetric key and IV should be:
+```javascript
+ss: '0x8e83bc5a9c77b11afc12c9a8262b16e899678d1720459e3b73ca2abcfed1fca3',
+skey: '0x6ccc02a61aa16d6c66a1277e5e2434b8',
+IV: '0x9c7a0f870d17ced2d2c3d1cf'
+```
+Then the return value should be:
+```javascript
+'0x02ced2278d9ebb193f166d4ee5bbbc5ab8ca4b9ddf23c4172ad11185c079944c02abff407e8901bb37d13d724a2e3a8a1a5af300adc286aa2ec65ef2a38c10c5cec68a949d0a20dbad2a8e5dfd7a14bbcb'
+```
+With compressed public key `S` leading `cipher`, which in turn is (added prefix '0x'):
+```javascript
+'0xabff407e8901bb37d13d724a2e3a8a1a5af300adc286aa2ec65ef2a38c10c5cec68a949d0a20dbad2a8e5dfd7a14bbcb'
+```
+Then **R3** is provided as:
+```javascript
 request({
 	method: 'eth_intakePrivateKey',
 	params: [
 		version: 'secp256k1-AES-128-GCM',
-		recipientPublicKey: '0x0246189d2fd030e2ac32c8d0e6ba5f12b3aac25c6a17225145deb88bd9c93755ac',
+		recipientPublicKey: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09',
 		oob: '0x313233343536',
 		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
-		data: '0x027edefb3bfe6675a520da1878f176862b4cf9c134563ecda0d6d0bc81376f915fdd00e421f6b62bcb78b772669d937ac2edbf378d8534d39fec43cf9bab7fd437b4a890da1faa734c8fba0663b3840b7a'
+		data: '0x02ced2278d9ebb193f166d4ee5bbbc5ab8ca4b9ddf23c4172ad11185c079944c02abff407e8901bb37d13d724a2e3a8a1a5af300adc286aa2ec65ef2a38c10c5cec68a949d0a20dbad2a8e5dfd7a14bbcb'
+	],
+})
+```
+The return value should be `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. This matches the `account` parameter in **R2**.
+
+### Case 2
+
+Use `version` as: `secp256k1-AES-256-GCM`. The calculated symmetric key `skey`, `IV`, and `cipher` will be different. **R1** is provided as:
+```javascript
+request({
+	method: 'eth_generateEphemeralKeyPair',
+	params: [
+		version: 'secp256k1-AES-256-GCM',
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b'
+	],
+})
+```
+Note that only `version` is different (AES key size). We keep using the same `(r, R)` (this is just a test vector).
+
+Therefore **R2** is provided as:
+```javascript
+request({
+	method: 'eth_encapsulatePrivateKey',
+	params: [
+		version: 'secp256k1-AES-256-GCM',
+		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0bae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
+	],
+})
+```
+Suppose the implementation generates the same `(s, S)` as **Case 1**. The shared secret, symmetric key and IV should be:
+```javascript
+ss: '0x8e83bc5a9c77b11afc12c9a8262b16e899678d1720459e3b73ca2abcfed1fca3',
+skey: '0x6ccc02a61aa16d6c66a1277e5e2434b89c7a0f870d17ced2d2c3d1cfd0e6f199',
+IV: '0x3369b9570b9d207a0a8ebe27'
+```
+With shared secret `ss` remains the same as **Case 1**, symmetric key `skey` contains both the `skey` and `IV` from **Case 1**. IV is changed.
+
+Then the return value should be the follows, with `S` part the same as **Case 1** and `cipher` part different:
+```javascript
+'0x02ced2278d9ebb193f166d4ee5bbbc5ab8ca4b9ddf23c4172ad11185c079944c0293910a91270b5deb0a645cc33604ed91668daf72328739d52a5af5a4760c4f3a9592b8f6d9b3ebe25127e7bf1c43b839'
+```
+
+Then **R3** is provided as:
+```javascript
+request({
+	method: 'eth_intakePrivateKey',
+	params: [
+		version: 'secp256k1-AES-256-GCM',
+		recipientPublicKey: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		data: '0x02ced2278d9ebb193f166d4ee5bbbc5ab8ca4b9ddf23c4172ad11185c079944c0293910a91270b5deb0a645cc33604ed91668daf72328739d52a5af5a4760c4f3a9592b8f6d9b3ebe25127e7bf1c43b839'
 	],
 })
 ```
 
+The return value should be `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. This matches the `account` parameter in **R2**.
+
+### Case 3
+
+Use `version` as: `Curve-25519-Chacha20-Poly1305`. **R1** is provided as:
+```javascript
+request({
+	method: 'eth_generateEphemeralKeyPair',
+	params: [
+		version: 'Curve25519-Chacha20-Poly1305',
+		signerPubKey: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba69938'
+	],
+})
+```
+Note that with Curve25519 the size of either public key or private key is 32 (bytes). And there is no compression for public key. `signerPubKey` is calculated as:
+```
+//signer is '0xac304db075d1685284ba5e10c343f2324ee32df3394fc093c98932517d36e344'
+s := SHA512(signer)[:32]
+signerPubKey := Curve25519.ScalarBaseMult(s).ToHex()
+```
+Same technique for `trustedPubKey`. With `r` value same as in **Case 1** and **Case 2** and the curve being changed, the return value is `R = [r]G || sig`:
+```javascript
+R = '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79cac06de279ec7f65f6b75f6bee740496df0650a6de61da5e691d7c5da1c7cb1ece61c669dd588a1029c38f11ad1714c1c9742232f9562ca6bbc7bad57882da04'
+```
+**R2** is provided as:
+
+```javascript
+request({
+	method: 'eth_encapsulatePrivateKey',
+	params: [
+		version: 'Curve25519-Chacha20-Poly1305',
+		recipient: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79cac06de279ec7f65f6b75f6bee740496df0650a6de61da5e691d7c5da1c7cb1ece61c669dd588a1029c38f11ad1714c1c9742232f9562ca6bbc7bad57882da04',
+		signerPubKey: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba6993839c873ae4486413053fddff55ad9846f7c5492a7f0b7a60cd2f909aedc68b5343f61766b13def512a2acf053c0a9890a535e16767910890e5b15985b86d22f04',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
+	],
+})
+```
+Both `recipient` and `signerPubKey` have been signed in Ed25519. Verifying signature to `R` is carried out as:
+```javascript
+//string representation of R as message
+msg: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79',
+sig: '0xcac06de279ec7f65f6b75f6bee740496df0650a6de61da5e691d7c5da1c7cb1ece61c669dd588a1029c38f11ad1714c1c9742232f9562ca6bbc7bad57882da04',
+//signerPubKey
+pub: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba69938'
+```
+After successfully verifies the signature, the implementation then generates ephemeral key pair `(s, S)` in Curve25519:
+```javascript
+// s same as Case 1 and Case 2
+s = '0x28fa2db9f916e44fcc88370bedaf5eb3ec45632f040f4c1450c0f101e1e8bac8',
+S = '0xd2fd6fcaac231d08363e736e61edb7e7696b13a727e3d2a239415cb8dc6ee278'
+```
+The shared secret, symmetric key and IV should be:
+```javascript
+ss: '0xe0b36f56cdb63c27e933a5a67a5e97db4b566c9276a36aeee5dc6e87da118867',
+skey: '0x7c6fa749e6df13c8578dc44cb24cdf46a44cb163e1e570c2e590c720aed5783f',
+IV: '0x3c98ef6fc34b0d6e7e16bd78'
+```
+Then the return value should be `S || cipher`:
+```javascript
+'0xd2fd6fcaac231d08363e736e61edb7e7696b13a727e3d2a239415cb8dc6ee2786a7e2e40efb86dc68f44f3e032bbedb1259fa820e548ac5adbf191784c568d4f642ca5b60c0b2142189dff6ee464b95c'
+```
+
+Then **R3** is provided as:
+```javascript
+request({
+	method: 'eth_intakePrivateKey',
+	params: [
+		version: 'Curve25519-Chacha20-Poly1305',
+		recipientPublicKey: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79',
+		oob: '0x313233343536',
+		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
+		data: '0xd2fd6fcaac231d08363e736e61edb7e7696b13a727e3d2a239415cb8dc6ee2786a7e2e40efb86dc68f44f3e032bbedb1259fa820e548ac5adbf191784c568d4f642ca5b60c0b2142189dff6ee464b95c'
+	],
+})
+```
 The return value should be `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. This matches the `account` parameter in **R2**.
 
 ## Reference Implementation
@@ -244,13 +429,13 @@ Contributions are welcome.
 `R` could be signed so that Sender application can verify if `R` could be trusted or not. This involves both signature verification and if the signer could be trusted or not. While signature verification is quite straightforward in itself, the latter should be managed with care. To facilitate this trust management issue, `signerPubKey` could be further signed, creating a dual-layer trust structure:
 
 ```
-R <-- signerPubKey <-- trusted public key
+R <-- signerPubKey <-- trustedPubKey
 ```
 
 This allows various strategies to mange the trust. For example:
 
--   A hardware wallet vendor which takes it very serious about the brand reputation and the fund safety for its customers, could choose to trust only its own public keys. These public keys only sign `signerPubKey` from selected partners.
--   A MPC service could publish its `signerPubKey` online so that users won't verify the signature against a wrong or fake public key.
+-   A hardware wallet vendor which takes it very serious about the brand reputation and the fund safety for its customers, could choose to trust only its own public keys, all instances of `trustedPubKey`. These public keys only sign `signerPubKey` from selected partners.
+-   A MPC service could publish its `signerPubKey` online so that Sender application won't verify the signature against a wrong or fake public key.
 
 Note that it is advised that a separate key pair should be used for signing on each curve.
 
@@ -264,13 +449,9 @@ AES-128, AES-256 and ChaCha20 are provided.
 
 **Randomness**. `r` and `s` must be generated with a cryptographic secure random number generator (CSRNG).
 
-`salt`  could be random bytes generated the same way as  `r`  or  `s`.  `salt`  could be in any length but the general suggestion is 12 or 16, which could be displayed as QR code by the screen of some hardware wallet (so that another application could scan to read). If  `salt`  is not provided, this EIP uses default value as “EIP-xxxx” (to be determined).
+`salt`  could be random bytes generated the same way as  `r`  or  `s`.  `salt`  could be in any length but the general suggestion is 12 or 16, which could be displayed as QR code by the screen of some hardware wallet (so that another application could scan to read). If  `salt`  is not provided, this EIP uses default value as “EIP-xxxx” (TODO).
 
 **Out of Band Data**: `oob`  data is optional. When non-empty, its content is digits or an alpha-numeric string from user. Sender application may mandate  `oob`  from user.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
-
-## Citation
-Please cite this document as:
-TODO
