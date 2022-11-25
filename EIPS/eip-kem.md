@@ -59,7 +59,7 @@ A much simplified example flow without signature and verification is:
 5.  Recipient application decrypts  `cipher`  to get  `sk`.
 6.  Recipient application derives the address corresponding to  `sk`  so that user can confirm the correctness.
 
-With signature and verification, the signature to `R` by `singerPubKey` is appended to `R`. `signerPubKey` itself could have been already signed by `trustedPubKey`, and that signature is appended to `signerPubKey`. See **Requests** and **Test Cases** for further clarification and examples.
+With signature and verification, the signature to `R` by `singerPubKey` is appended to `R`. `signerPubKey` itself could have been already signed by `trustedPubKey`, and that signature is appended to `signerPubKey`. Note that the signature is applied to the byte array data instead of its string representation, which might lead to confusion and interoperability issues (such as hex or base64, lower case v.s. upper case, etc.). See **Requests** and **Test Cases** for further clarification and examples.
 
 ### Requests
 #### R1. Request for Recipient to generate ephemeral key pair
@@ -175,6 +175,8 @@ Version could be decided by user or negotiated by both sides. When there is no u
 
 It is expected that implementations cover curve supports separately from encryption support, that is, all the versions that could be derived from supported curve and supported encryption scheme, should work.
 
+Signatures to `R` and `signerPubKey` are applied to byte array values instead of the encoded string.
+
 ### UX Recommendations
 `salt` and/or `oob` data: both are inputs to the HKDF function (`oob` as “info” parameter). For better user experiences we suggest to require from users only one of them but this is up to the implementation.
 
@@ -213,9 +215,9 @@ R: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09'
 ```
 The return value could be:
 ```javascript
-'0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b'
+'0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09536da06b8d9207040ada179dc2c38f701a1a21c9ab5a7d52f5da50ea438e8ccf47dac77547fbdde194f71db52860b9e10ca2b089646f133d172124504ac1996a'
 ```
-Note that `R` is compressed and R leads the return value.
+Note that `R` is compressed and `R` leads the return value: `R || sig`.
 
 Therefore **R2** could be provided as:
 ```javascript
@@ -223,8 +225,8 @@ request({
 	method: 'eth_encapsulatePrivateKey',
 	params: [
 		version: 'secp256k1-AES-128-GCM',
-		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
-		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0bae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
+		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09536da06b8d9207040ada179dc2c38f701a1a21c9ab5a7d52f5da50ea438e8ccf47dac77547fbdde194f71db52860b9e10ca2b089646f133d172124504ac1996a',
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b5bd427c527b7f1012b8edfd179b9002a7f2d7fc326bb6ae9aaf38b44eb93c397631fd8bb05fd78fa16ecca1eb19652b200f9048611265bc81f485cf60f29d6de',
 		oob: '0x313233343536',
 		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
 		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
@@ -233,17 +235,17 @@ request({
 ```
 The Sender implementation first verifies first layer signature as ECDSA over secp256k1:
 ```javascript
-//string representation of R as message
+// actual message to be signed should be the decoded byte array
 msg: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09',
-sig: '27778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
+sig: '0x536da06b8d9207040ada179dc2c38f701a1a21c9ab5a7d52f5da50ea438e8ccf47dac77547fbdde194f71db52860b9e10ca2b089646f133d172124504ac1996aaf4a811661741a43587dd458858b75c582ca7db82fa77b',
 //signerPubKey
 pub: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b'
 ```
 Then it proceeds to verify second layer signature, also as ECDSA over secp256k1:
 ```javascript
-//string representation of signerPubKey as message
+// actual message to be signed should be the decoded byte array
 msg: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b',
-sig: '0xae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
+sig: '0x5bd427c527b7f1012b8edfd179b9002a7f2d7fc326bb6ae9aaf38b44eb93c397631fd8bb05fd78fa16ecca1eb19652b200f9048611265bc81f485cf60f29d6de',
 //trustedPubKey
 pub: '0x027fb72176f1f9852ce7dd9dc3aa4711675d3d8dc5102b86d758d853002137e839'
 ```
@@ -303,8 +305,8 @@ request({
 	method: 'eth_encapsulatePrivateKey',
 	params: [
 		version: 'secp256k1-AES-256-GCM',
-		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d0927778652f08952d93014db52375bddc5a687724fff339e4ed908e640b54ffa1c6f893666a34a06b36eaf4a811661741a43587dd458858b75c582ca7db82fa77b',
-		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0bae1b131cfb4c4ad3b7117285480cf8cf7964c7099b0f5d91a0a61bd403447dfb35b2b0e979b7d8eefe4df5415b09aa4ffcdb591c72868fff475460526a353f1b',
+		recipient: '0x039ef98feddb39664450c3876878093c70652caba7e3fd04333c0558ffdf798d09536da06b8d9207040ada179dc2c38f701a1a21c9ab5a7d52f5da50ea438e8ccf47dac77547fbdde194f71db52860b9e10ca2b089646f133d172124504ac1996a',
+		signerPubKey: '0x035a5ca16997f9b9ead9572c9bde36c5dab584b17bc965cdd7c2945c776e981b0b5bd427c527b7f1012b8edfd179b9002a7f2d7fc326bb6ae9aaf38b44eb93c397631fd8bb05fd78fa16ecca1eb19652b200f9048611265bc81f485cf60f29d6de',
 		oob: '0x313233343536',
 		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
 		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
@@ -369,8 +371,8 @@ request({
 	method: 'eth_encapsulatePrivateKey',
 	params: [
 		version: 'Curve25519-Chacha20-Poly1305',
-		recipient: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79cac06de279ec7f65f6b75f6bee740496df0650a6de61da5e691d7c5da1c7cb1ece61c669dd588a1029c38f11ad1714c1c9742232f9562ca6bbc7bad57882da04',
-		signerPubKey: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba6993839c873ae4486413053fddff55ad9846f7c5492a7f0b7a60cd2f909aedc68b5343f61766b13def512a2acf053c0a9890a535e16767910890e5b15985b86d22f04',
+		recipient: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79879d900f04a955078ff6ae86f1d1b69b3e1265370e64bf064adaecb895c51effa3bdae7964bf8f9a6bfaef3b66306c1bc36afa5607a51b9768aa42ac2c961f02',
+		signerPubKey: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba69938d43e06a0f32c9e5ddb39fce34fac2b6f5314a1b1583134f27426d50af7094b0c101e848737e7f717da8c8497be06bab2a9536856c56eee194e89e94fd1bba509',
 		oob: '0x313233343536',
 		salt: '0x6569703a2070726976617465206b657920656e63617073756c6174696f6e',
 		account: '0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9'
@@ -379,13 +381,13 @@ request({
 ```
 Both `recipient` and `signerPubKey` have been signed in Ed25519. Verifying signature to `R` is carried out as:
 ```javascript
-//string representation of R as message
+// actual message to be signed should be the decoded byte array
 msg: '0xc0ea3514b0ab83b2fe4f4ef96159cda8fa836ce549ef09569b901eef0723bf79',
-sig: '0xcac06de279ec7f65f6b75f6bee740496df0650a6de61da5e691d7c5da1c7cb1ece61c669dd588a1029c38f11ad1714c1c9742232f9562ca6bbc7bad57882da04',
+sig: '0x879d900f04a955078ff6ae86f1d1b69b3e1265370e64bf064adaecb895c51effa3bdae7964bf8f9a6bfaef3b66306c1bc36afa5607a51b9768aa42ac2c961f02',
 //signerPubKey
 pub: '0xe509fb840f6d5a69333ef68d69b86de55b9b905e45b16e3591912c097ba69938'
 ```
-After successfully verifies the signature, the implementation then generates ephemeral key pair `(s, S)` in Curve25519:
+After successfully verifies the signature (and the one by `trustedPubKey`), the implementation then generates ephemeral key pair `(s, S)` in Curve25519:
 ```javascript
 // s same as Case 1 and Case 2
 s = '0x28fa2db9f916e44fcc88370bedaf5eb3ec45632f040f4c1450c0f101e1e8bac8',
