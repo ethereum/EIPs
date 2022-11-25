@@ -30,6 +30,18 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
   TODO: Remove this comment before submitting
 -->
 
+## Motivation
+
+<!--
+  This section is optional. If this is your first time drafting an EIP, it is recommended not to include a motivation until you are familiar with EIP-1, as mistakes will delay your draft being merged.
+  
+  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
+  
+  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
+  
+  TODO: Remove this comment before submitting
+-->
+
 ## Specification
 
 <!--
@@ -72,6 +84,8 @@ No backward compatibility issues found.
   This section is optional. If this is your first time drafting an EIP, it is recommended not to include test cases until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the test suite is too large to reasonably be included inline, then it is probably too big.
 
   The test cases do not need to be executable. Expected input/output pairs are sufficient, and are less likely to block your EIP.
+  
+  With a few exceptions, external links are not allowed.
 
   TODO: Remove this comment before submitting
 -->
@@ -80,6 +94,8 @@ No backward compatibility issues found.
 
 <!--
   This section is optional. If this is your first time drafting an EIP, it is recommended not to include a reference implementation until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the reference implementation is too large to reasonably be included inline, then it is probably too big.
+  
+  With a few exceptions, external links are not allowed.
 
   TODO: Remove this comment before submitting
 -->
