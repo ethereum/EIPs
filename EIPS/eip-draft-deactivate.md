@@ -1,0 +1,59 @@
+---
+eip: 
+title: Replace SELFDESTRUCT with DEACTIVATE
+description: Change SELFDESTRUCT to not delete storage keys and use a special value in the account nonce to signal deactivation
+author: Alex Beregszaszi (@axic)
+discussions-to: https://ethereum-magicians.org/t/almost-self-destructing-selfdestruct-deactivate/11886
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-11-25
+dependencies: 2681
+---
+
+## Abstract
+
+Change `SELFDESTRUCT` to not delete all storage keys, and to use a special value in the account nonce to signal *decativated* accounts. Because the semantics of revival change (storage keys may exists), we also rename the instruction to `DEACTIVATE`.
+
+## Motivation
+
+The `SELFDESTRUCT` instruction currently has a fixed price, but is unbounded in terms of how many storage/account changes it performs (it needs to delete all keys). This is an outstanding concern for long.
+
+Furthermore with *Verkle trees* accounts will be organised differently: account properties, including storage, will have individual keys, and it will not be possible to traverse and find all used keys. This makes `SELFDESTRUCT` very challenging to support in Verkle trees.
+
+## Specification
+
+1. Change the rules introduced by [EIP-2681](./eip-2681.md) such that regular nonce increase is bound by `2^64-2` instead of `2^64-1`.
+
+2. The behaviour of `SELFDESTRUCT` is changed:
+  - Do not delete any storage keys and also leave the account in place.
+  - Transfer all value and set account balance to `0.`
+  - Set the account nonce to `2^64-1`.
+
+2. Modify account execution (triggered both via external transactions or CALL*), such that execution succeeds and returns an empty buffer if the nonce equals `2^64-1`.
+  - Note that the account can still receive non-executable value transfers (such as coinbase transactions or other `SELFDESTRUCT`s).
+
+3. Modify `CREATE2` such that it allows account creation if the nonce equals `2^64-1`.
+  - Note that a successful `CREATE2` will change the account code, nonce and potentially balance.
+
+4. Rename the `SELFDESTRUCT` instruction to `DEACTIVATE`, because the semantics of "account revival" are changed: the old storage items will remain, and newly deployed code must be aware of this.
+
+## Rationale
+
+There have been various proposals of removing `SELFDESTRUCT` and many would just outright remove the deletion capability. This breaks certain usage patterns, which the *deactivation* option leaves intact, albeit with minor changes. This only affects *newly* deployed code, and not existing one.
+
+All the proposals would leave data in the state, but at least this one has the potential to have that data reusable/removable one-by-one should the revived contract choose to do so.
+
+## Backward Compatibility
+
+This EIP requires a protocol upgrade, since it modifies consensus rules. The further restriction of nonce should not have an effect on accounts, as `2^64-2` is an unfeasibly high limit.
+
+Contracts using the revival pattern will still work, but the code deployed during revival may need to be made aware that storage keys can already exist in the account.
+
+## Security Considerations
+
+The authors are not currently aware of new risks.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
