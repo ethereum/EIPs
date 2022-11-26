@@ -1,0 +1,45 @@
+---
+eip: <to be assigned>
+title: Require ERC721 Transfer on Creation
+description: Require ERC721 NFTs to Emit Transfer upon Creation
+author: Zainan Victor Zhou <zzn@zzn.im>
+discussions-to: https://ethereum-magicians.org/t/eip-xxx-require-erc721-to-always-emit-transfer/11894
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-11-26
+requires: 721
+---
+
+## Abstract
+
+[EIP-721](./eip-721.md) requires `Transfer` event to be emitted whenever a transfer or mint(i.e. transfer from `0x0`) or burn (i.g. transfer to `0x0`) occurs, except for when during Contract creation.
+
+This EIP requires compliant contract to ALWAYS emit `Transfer` event regardless whether such transfer occurs in or outside of contract creation.
+
+## Motivation
+
+This allows a indexing service or any off-chain service to reliably capture and account for token creation.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+1. Compliant contract MUST implement [EIP-721](./eip-721.md)
+2. Compliant contract MUST emit `Transfer` event to be emitted whenever a token transfer or mint(i.e. a token transfer from `0x0`) or burn (i.g. transfer to `0x0`) occurs, except for when during Contract creation, regardless of whether such transfer, mint or burn occurs during or outside of contract creation.
+
+## Rationale
+
+1. To allow accounting for minting during contract creation, there is also option to just create and emit new event type such as, `Creation`, instead of emitting the same `Transfer`. We choose not to go with such option, but instead just strengthening the EIP-721 requirement, which maximize the backwards compatibility.
+
+## Backwards Compatibility
+
+This EIP is designed to be fully backward compatible with EIP-721.
+
+## Security Considerations
+
+No new security concern is introduced.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
