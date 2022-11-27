@@ -95,8 +95,12 @@ https://schema.org/TechArticle
 <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha512-bzXk9PaBIjgXcM+0Z7wbOE4AAMnmMoecyB8zX3irP4IRUDNGMmWXoLiRvEDeeq0RfhLA0eOFvB3wPFzBvWcVdw==" crossorigin="anonymous">
   MathJax.Hub.Config({
     tex2jax: {
-      inlineMath: [["$", "$"], ["\\(", "\\)"]],
+      inlineMath: [["$", "$"]],
+      displayMath: [["$$", "$$"]],
       processEscapes: true
+    },
+    asciimath2jax: {
+      delimiters: [] // Disable asciimath
     }
   });
 </script>
