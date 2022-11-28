@@ -1,3 +1,4 @@
+
 ---
 eip: KEM
 title: Private Key Encapsulation
@@ -183,6 +184,8 @@ Signatures to `R` and `signerPubKey` are applied to byte array values instead of
 Recipient application is assumed to be powerful enough. Sender application could have very limited computing power and user interaction capabilities.
 
 ## Test Cases
+
+For review purposes, the program to generate the test vectors is open-sourced [here](https://github.com/Base-Labs/encapsulation-sample).
 
 ### Data Fixation
 
@@ -420,7 +423,10 @@ request({
 The return value should be `0x001d3f1ef827552ae1114027bd3ecf1f086ba0f9`. This matches the `account` parameter in **R2**.
 
 ## Reference Implementation
+
 Contributions are welcome.
+
+Test vector generator is provided earlier in the **Test Cases** section.
 
 ## Security Considerations
 
