@@ -1,5 +1,3 @@
-# EIP-TBD: Real Estate Token Standard
-
 ---
 eip: <to be assigned>
 title: ERC721 extension - Real Estate Token Standard
@@ -12,6 +10,8 @@ category (*only required for Standards Track): ERC
 created: 2022-11-29
 requires (*optional): [EIP721](./eip-721.md)
 ---
+
+# EIP-TBD: Real Estate Token Standard
 
 ## Simple Summary
 
