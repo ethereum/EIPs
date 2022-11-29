@@ -11,7 +11,7 @@ type: Standards Track
 category (*only required for Standards Track): ERC
 created: 2022-11-29
 requires (*optional): [EIP721](./eip-721.md)
-—
+---
 
 ## Simple Summary
 
