@@ -2,10 +2,10 @@
 {%- for author in authors -%}
   {%- if author contains "<" -%}
     {%- assign authorparts=author|split:"<" -%}
-    {{authorparts[0]|strip}} &lt;<a href="mailto:{{authorparts[1]|remove:">"}}">{{authorparts[1]|remove:">"}}</a>&gt;
+    {{authorparts[0]|strip}}&nbsp;&lt;<a href="mailto:{{authorparts[1]|remove:">"}}">{{authorparts[1]|remove:">"}}</a>&gt;
   {%- elsif author contains "(@" -%}
     {%- assign authorparts=author|split:"(@" -%}
-    {{authorparts[0]|strip}} (@<a href="https://github.com/{{authorparts[1]|remove:")"}}">{{authorparts[1]|remove:")"}}</a>)
+    {{authorparts[0]|strip}}&nbsp;(@<a href="https://github.com/{{authorparts[1]|remove:")"}}">{{authorparts[1]|remove:")"}}</a>)
   {%- else -%}
     {{author}}
   {%- endif -%}
