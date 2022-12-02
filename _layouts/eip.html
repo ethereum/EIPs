@@ -49,32 +49,30 @@ layout: default
     <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" class="bi flex-shrink-0 me-2" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><use xlink:href="#bi-code"/></svg></a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
-  <table class="table table-borderless">
-    <tbody>
-      <tr>
-        <td scope="row">Authors</td>
-        <td>{% include authorlist.html authors=page.author %}</td>
-      </tr>
-      {% if page.created != undefined %}
-        <tr>
-          <td scope="row">Created</td>
-          <td>{{ page.created }}</td>
-        </tr>
-      {% endif %}
-      {% if page.status != "Review" and page.status != "Last Call" and page["discussions-to"] != undefined %}
-        <tr>
-          <td scope="row">Discussion Link</td>
-          <td><a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a></td>
-        </tr>
-      {% endif %}
-      {% if page.requires != undefined %}
-        <tr>
-          <td scope="row">Requires</td>
-          <td>{% include eipnums.html eips=page.requires %}</td>
-        </tr>
-      {% endif %}
-    </tbody>
-  </table>
+  <div class="container text-center">
+    <div class="row">
+      <div class="col-md-auto">Authors</div>
+      <div class="col">{% include authorlist.html authors=page.author %}</div>
+    </div>
+    {% if page.created != undefined %}
+      <div class="row">
+        <div class="col-md-auto">Created</div>
+        <div class="col">{{ page.created }}</div>
+      </div>
+    {% endif %}
+    {% if page.status != "Review" and page.status != "Last Call" and page["discussions-to"] != undefined %}
+      <div class="row">
+        <div class="col-md-auto">Discussion Link</div>
+        <div class="col"><a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a></div>
+      </div>
+    {% endif %}
+    {% if page.requires != undefined %}
+      <div class="row">
+        <div class="col-md-auto">Requires</div>
+        <div class="col">{% include eipnums.html eips=page.requires %}</div>
+      </div>
+    {% endif %}
+  </div>
   <br/>
 
   {% if page.status == "Review" or page.status == "Last Call" %}
