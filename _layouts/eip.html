@@ -49,26 +49,38 @@ layout: default
     <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" class="bi flex-shrink-0 me-2" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><use xlink:href="#bi-code"/></svg></a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
-  <b>Authors:</b> {% include authorlist.html authors=page.author %}<br/>
-  {% if page.created != undefined %}
-    <b>Created:</b> {{ page.created }}<br/>
-  {% endif %}
-  {% if page.status != "Review" and page.status != "Last Call" and page["discussions-to"] != undefined %}
-    <b>Discussion Link:</b> <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a>
-    {% if page.status == "Final" %}
-      (Archive)
-    {% endif %}
-    <br/>
-  {% endif %}
-  {% if page.requires != undefined %}
-    <b>Requires:</b> {% include eipnums.html eips=page.requires %}<br/>
-  {% endif %}
+  <table class="table table-borderless">
+    <tbody>
+      <tr>
+        <td scope="row">Authors</td>
+        <td>{% include authorlist.html authors=page.author %}</td>
+      </tr>
+      {% if page.created != undefined %}
+        <tr>
+          <td scope="row">Created</td>
+          <td>{{ page.created }}</td>
+        </tr>
+      {% endif %}
+      {% if page.status != "Review" and page.status != "Last Call" and page["discussions-to"] != undefined %}
+        <tr>
+          <td scope="row">Discussion Link</td>
+          <td><a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a></td>
+        </tr>
+      {% endif %}
+      {% if page.requires != undefined %}
+        <tr>
+          <td scope="row">Requires</td>
+          <td>{% include eipnums.html eips=page.requires %}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
   <br/>
 
   {% if page.status == "Review" or page.status == "Last Call" %}
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" style="width:2.5em;height:2.5em;"><use xlink:href="#bi-megaphone-fill"/></svg>
-      <div>
+      <div class="text-center">
         <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
       </div>
     </div>
