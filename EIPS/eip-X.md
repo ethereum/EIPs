@@ -23,17 +23,32 @@ Multiple EIPs define operations that can be executed in behalf of signer and som
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-- Smart contract implementing EIP-712 MUST also implement the folllowing interface:
+- Smart contract implementing EIP-712 MUST also implement the following interface:
     ```solidity
-    interface EIP_TBD {
+    interface ISequentialOperations {
         /// @dev Returns next nonce for the signer in the context of the operation typehash
-        /// @param signer The signer address
         /// @param typehash The operation typehash
-        function operationNonces(address signer, bytes32 typehash) external view returns (uint256);
+        /// @param signer The signer address
+        function operationNonces(bytes32 typehash, address signer) external view returns (uint256);
 
         /// @dev Increments nonce for the caller in the context of the operation typehash
         /// @param typehash The operation typehash
-        function useOperationNonce(bytes32 typehash) external returns (uint256);
+        /// @return success True if nonce has not been invalidated previously
+        function useOperationNonce(bytes32 typehash, uint256 nonce) external;
+    }
+
+    interface IParallelOperations {
+        /// @dev Returns true if the operation id was not invalidated previously
+        /// @param typehash The operation typehash
+        /// @param signer The signer address
+        /// @param operationId The operation id
+        function isOperationIdAvailable(bytes32 typehash, address signer, uint256 operationId) external view returns (bool);
+
+        /// @dev Invalidates operation id for the caller in the context of the operation typehash
+        /// @param typehash The operation typehash
+        /// @param operationId The operation id
+        /// @return success True if nonce has not been invalidated previously
+        function useOperationId(bytes32 typehash, uint256 operationId) external;
     }
     ```
 
