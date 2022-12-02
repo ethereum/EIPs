@@ -34,6 +34,11 @@ main.page-content {
   color: #111;
 }
 
+.table-borderless, .table-borderless *, .table-borderless * * {
+  border-style : hidden !important;
+  background-color: rgba(0,0,0,0) !important;
+}
+
 a, a:link {
   color: #726E97;
   text-decoration: none;
