@@ -1,6 +1,6 @@
 ---
 eip: TBD
-title: Nonce management for signature-based operations powered by EIP-712
+title: Invalidation abstraction for signature-based operations powered by EIP-712
 description: Extends EIP-712 and unifies EIP-2612 with many others
 author: Anton Bukov (@k06a), Mikhail Melnik (@zumzoom)
 discussions-to: TBD
