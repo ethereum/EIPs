@@ -212,6 +212,24 @@ Permitted Consensus Layer Specifications URLs must anchor to a specific commit, 
 ^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
 ```
 
+### Networking Specifications
+
+Links to the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+```
+
+Which renders as:
+
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+```
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
