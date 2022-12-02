@@ -29,12 +29,12 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
         /// @dev Returns next nonce for the signer in the context of the operation typehash
         /// @param signer The signer address
         /// @param typehash The operation typehash
-        function nonces(address signer, bytes32 typehash) external view returns (uint256);
+        function operationNonces(address signer, bytes32 typehash) external view returns (uint256);
 
         /// @dev Increments nonce for the signer in the context of the operation typehash
         /// @param signer The signer address
         /// @param typehash The operation typehash
-        function useNonce(address owner, bytes32 typehash) external returns (uint256);
+        function useOperationNonce(address owner, bytes32 typehash) external returns (uint256);
     }
     ```
 
