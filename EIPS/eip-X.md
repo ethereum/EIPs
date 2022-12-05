@@ -13,11 +13,15 @@ requires: 712
 
 ## Abstract
 
-This EIP defines interface allowing multiple other EIPs. This interface is designed to be used in the context of [EIP-712](./eip-712.md) and allows to define abstract operations that can be executed in behalf of signer.
+This EIP extends [EIP-712](./eip-712.md) and defines two ways to validate and invalidate signature-based operations. Such operations as [EIP-20](./eip-20.md) permit operation defined in [EIP-2612](./eip-2612.md). This EIP provides two ways to track such operations and invalidate them:
+- main sequnce of incremental nonces per signer
+- sequence of incremental ids per signer per beneficiary
 
 ## Motivation
 
-Multiple EIPs define operations that can be executed in behalf of signer and sometime introduce method naming collision and other. For example, [EIP-2612](./eip-2612.md) defines both `permit` and `nonces` methods, but gives no clue that `nonces` is related to permit operation. In case of multiple same-level EIPs implemented within one smart contract (for example: permit, delegate, vote) it's obvious that they should use different nonces.
+Same abstraction could be utilized by mutilple signature-based operations, moreover existing EIPs like [EIP-2612](./eip-2612.md) could be considered as fully compatible with the EIP.
+
+Multiple EIPs define operations that can be executed in behalf of signer and sometime introduce method naming collisions and other. For example, [EIP-2612](./eip-2612.md) defines both `permit` and `nonces` methods, but gives no clue that `nonces` is related to permit operation. In case of multiple same-level EIPs implemented within one smart contract (for example: permit, delegate, vote) it's obvious that they should use different nonces.
 
 ## Specification
 
@@ -25,32 +29,32 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - Smart contract implementing EIP-712 MUST also implement the following interface:
     ```solidity
-    interface ISequentialOperations {
-        /// @dev Returns next nonce for the signer in the context of the operation typehash
+    interface ISignatureOperations {
+        /// @dev Returns next nonce for the signer in the context of the operation typehash and operation beneficiary
         /// @param typehash The operation typehash
         /// @param signer The signer address
         function operationNonces(bytes32 typehash, address signer) external view returns (uint256);
 
-        /// @dev Increments nonce for the caller in the context of the operation typehash
-        /// @param typehash The operation typehash
-        /// @return success True if nonce has not been invalidated previously
-        function useOperationNonce(bytes32 typehash, uint256 nonce) external;
-    }
-
-    interface IParallelOperations {
-        /// @dev Returns true if the operation id was not invalidated previously
+        /// @dev Returns next id for the signer in the context of the operation typehash and operation beneficiary
         /// @param typehash The operation typehash
         /// @param signer The signer address
-        /// @param operationId The operation id
-        function isOperationIdAvailable(bytes32 typehash, address signer, uint256 operationId) external view returns (bool);
+        /// @param beneficiary The address of the spender, delegate, or other beneficiary of the transaction
+        function operationIds(bytes32 typehash, address signer, address beneficiary) external view returns (uint256);
 
-        /// @dev Invalidates operation id for the caller in the context of the operation typehash
+        /// @dev Increments nonce for the caller in the context of the operation typehash and operation beneficiary
         /// @param typehash The operation typehash
-        /// @param operationId The operation id
-        /// @return success True if nonce has not been invalidated previously
-        function useOperationId(bytes32 typehash, uint256 operationId) external;
+        /// @param nonce The operation nonce
+        function useOperationNonce(bytes32 typehash, uint256 nonce) external;
+
+        /// @dev Increments id for the caller in the context of the operation typehash and operation beneficiary
+        /// @param typehash The operation typehash
+        /// @param beneficiary The address of the spender, delegate, or other beneficiary of the transaction
+        /// @param id The operation nonce
+        function useOperationIds(bytes32 typehash, address beneficiary, uint256 id) external;
     }
     ```
+
+- Operation EIPs SHOULD use at leat one of the nonces or ids sequences per signer defined by this EIP or both.
 
 ## Rationale
 
