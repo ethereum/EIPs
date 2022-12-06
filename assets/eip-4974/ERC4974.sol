@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC0
+// SPDX-License-Identifier: CC0-1.0
 
 pragma solidity ^0.8.0;
 import "./IERC4974.sol";
