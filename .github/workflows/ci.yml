@@ -42,15 +42,15 @@ jobs:
     
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-    
+
       - name: Install Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
-          ruby-version: 3.1.2
+          ruby-version: 2.6.0
           bundler-cache: true
         
       - name: Build Website
