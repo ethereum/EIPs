@@ -38,7 +38,7 @@ jobs:
 
   htmlproofer:
     name: HTMLProofer
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
       - name: Checkout EIP Repository
@@ -46,7 +46,7 @@ jobs:
 
       - name: Install OpenSSL
         run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-    
+
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
