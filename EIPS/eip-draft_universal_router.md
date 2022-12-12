@@ -31,6 +31,27 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://ethereum.org/en/developers/docs/nodes-and-clients/)).
 
+```
+struct Action {
+    bool output;    // true for output action, false for input action
+    uint eip;       // token type: 0 for ETH, # for ERC#
+    address token;  // token contract address
+    uint id;        // token id for ERC-721 and ERC-1155
+    uint amount;    // amountInMax for input action, amountOutMin for output action
+    address recipient;
+    address code;   // contract address
+    bytes data;     // contract data
+}
+```
+
+```
+interface IUniversalRouter {
+    function exec(Action[] calldata actions) external payable returns (uint[] memory results);
+}
+```
+
+### Action Types
+
 ## Rationale
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
