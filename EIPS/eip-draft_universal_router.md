@@ -1,29 +1,29 @@
 ---
 eip: <to be assigned>
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: Universal Router Contract
+description: Universal router contract designed for token allowance that eliminates all `approve`` transactions in the future.
+author: Zergity (zergity@gmail.com)
 discussions-to: <URL>
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category (*only required for Standards Track): <Core, Networking, Interface, or ERC>
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires (*optional): <EIP number(s)>
+type: Standards Track
+category: ERC
+created: 2022-12-12
+requires: EIP20, EIP721, EIP1155
 ---
-
-This is the suggested template for new EIPs.
-
-Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category.
 
 ## Abstract
 
-Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+A universal router contract that executes transactions with a sequence of the following steps:
+  * (optional) call a calculation contract to get the `amountIn` value, and ensure that this `amountIn` is no larger than an input `amountInMax`
+  * transfer `amountIn` of a token from `msg.sender` to a `recipient`
+  * call a contract to execute an action
+  * (optional) verify the returning amount of a token must be no less than an input `amountOutMin`
 
 ## Motivation
 
-The motivation section should describe the "why" of this EIP. What problem does it solve? Why should someone want to implement this standard? What benefit does it provide to the Ethereum ecosystem? What use cases does this EIP address?
+Most of the Dapp router contract has the following pattern: Approve, (optional) calculation, transferFrom, action, and (optionally) verify the token output. This requires `n*m*k` `allow` (or `permit`) transactions, for `n` Dapps, `m` tokens and `k` user addresses. Even though user approves a contract to spend their tokens, it's the front-end code that they trust, not the contract itself. Anyone can create a front-end code and trick the users to sign a transaction to interact with the Uniswap Router contract and steal all their tokens that have been approved.
+
+Universal Router separates token allowance logic from Dapp logic. Saves `(n-1)*m*k` approval transactions for old tokens and **ALL** approval transactions for new tokens. The Universal Router contract is designed to be simple and easy to verify and audit. It's counter-factually created using `CREATE2` so any new tokens can hardcode and skip the allowance check.
 
 ## Specification
 
