@@ -5,6 +5,11 @@ import "./interfaces/IERC.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProofs.sol";
 
 
+/**
+
+
+ */
+
 
 abstract contract KYCABST is IERC5851 {
     using MerkleProof for *;
@@ -16,6 +21,8 @@ abstract contract KYCABST is IERC5851 {
     mapping(address => bytes32) private leafInformation; 
     bytes32 private root;
     address public admin;
+    
+    uint requirementCounter;
 
     constructor() {
         admin = msg.sender;
@@ -75,5 +82,43 @@ abstract contract KYCABST is IERC5851 {
         emit revoked(certifying, SBTID);
         return(true);     
     }
+
+    // internal function for verification of the merkle root containing the ownership of the given holder.
+    // @param hash is the 
+
+    function _checkProof(bytes32[] proof, uint SBTID) view internal returns(bool) {
+    bytes32 el;
+    bytes[] hash;
+    bytes leafHash;
+
+    IERC5851.Requirements leafInfo = standardRequirement(SBTID);
+
+    for(uint i = 0; i < requirementCounter - 1; i++) {
+
+        hash[i] = keccak256(leafInfo[i])
+   }        
+
+
+
+    bytes32 h = hash;
+
+    for (uint i = 0; i <= proof.length - 1; i += 1) {
+        el = proof[i];
+
+        if (h < el) {
+            h = keccak256(h, el);
+        } else {
+            h = keccak256(el, h);
+        }
+    }
+
+    return h == merkleRoot;
+
+
+
+    }
+
+
+
 
 }
