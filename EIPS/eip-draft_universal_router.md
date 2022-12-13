@@ -83,6 +83,7 @@ UniswapV2Helper01.swapExactTokensForTokens(
     uint deadline
 )
 
+// this transaction is signed by user to execute the swap instead of the legacy function
 UniversalRouter.exec([{
     output: false,
     eip: 20,
@@ -128,6 +129,7 @@ UniswapV2Helper01.getAmountIn(uint amountOut, address[] memory path) returns (ui
     return UniswapV2Library.getAmountsIn(factory, amountOut, path)[0];
 }
 
+// this transaction is signed by user to execute the swap instead of the legacy function
 UniversalRouter.exec([{
     output: false,
     eip: 20,
@@ -150,8 +152,6 @@ UniversalRouter.exec([{
 ```
 
 ## Rationale
-
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
 The `Permit` type signature is not supported since the purpose of Universal Router is to eliminate all `approve` signatures for new tokens, and *most* for old tokens.
 
@@ -187,7 +187,7 @@ contract UniversalRouter is IUniversalRouter {
                 continue;
             }
             if (action.amount > 0) {
-                // track the balances before
+                // track the balances before actions are taken placed
                 results[i] = _balanceOf(action.recipient, action.token, action.eip, action.id);
             }
             // output action
