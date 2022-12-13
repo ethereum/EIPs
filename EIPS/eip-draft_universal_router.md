@@ -13,10 +13,10 @@ requires: EIP20, EIP721, EIP1155
 
 ## Abstract
 
-A universal router contract that executes transactions with a sequence of the following steps:
-  * (optional) call a calculation contract to get the `amountIn` value, and ensure that this `amountIn` is no larger than an input `amountInMax`
-  * transfer `amountIn` of a token from `msg.sender` to a `recipient`
-  * call a contract to execute an action
+A universal router contract that executes transactions with the following steps:
+  * (optional) call a calculation contract to get the `amountIn` value, and ensure that this `amountIn` is not greater than an input `amountInMax`
+  * transfer `amountIn` of a token from `msg.sender` to a `recipient` address
+  * call a contract function to execute an action
   * (optional) verify the returning amount of a token must be no less than an input `amountOutMin`
 
 ## Motivation
