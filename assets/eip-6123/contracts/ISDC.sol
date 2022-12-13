@@ -65,11 +65,10 @@ pragma solidity >=0.7.0 <0.9.0;
 interface ISDC {
     /*------------------------------------------- EVENTS ---------------------------------------------------------------------------------------*/
     /**
-     * @dev Emitted  when a new trade is incepted from a counterparty
+     * @dev Emitted  when a new trade is incepted from a eligible counterparty
      * @param initiator is the address from which trade was incepted
      * @param tradeID is the tradeID (e.g. generated internally)
      * @param tradeData holding the trade parameters
-     * If initiating counterparty has checked tradeId from TradeInceptionEvent succesfully, it is other counterparty who needs to call confirmTrade
      */
     event TradeIncepted(address initiator, string tradeId, string tradeData);
 
@@ -134,7 +133,7 @@ interface ISDC {
 
     /**
      * @notice Handles trade inception, stores trade data
-     * @dev emits a {TradeInceptionEvent}
+     * @dev emits a {TradeIncepted} event
      * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
      * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
      */
@@ -142,7 +141,7 @@ interface ISDC {
 
     /**
      * @notice Performs a matching of provided trade data and settlement data
-     * @dev emits a {TradeConfirmEvent} if trade data match
+     * @dev emits a {TradeConfirmed} event if trade data match
      * @param _tradeData a description of the trade in sdc.xml, e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
      * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
      */
@@ -159,16 +158,16 @@ interface ISDC {
     /// Settlement Cycle: Settlement
 
     /**
-     * @dev Called to trigger a (maybe external) valuation of the underlying contract and afterwards the according settlement process
-     * emits a {ValuationRequestEvent}
+     * @notice Called to trigger a (maybe external) valuation of the underlying contract and afterwards the according settlement process
+     * @dev emits a {ProcessSettlementRequest}
      */
     function initiateSettlement() external;
 
     /**
      * @notice Called from outside to trigger according settlement on chain-balances callback for initiateSettlement() event handler
      * @dev emits a {ProcessSettled} if settlement is successful or {TradeTerminated} if settlement fails
-     * @param settlementAmount The settlement amount. If settlementAmount > 0 then receivingParty receives this amount from other party. If settlementAmount < 0 then other party receives -settlementAmount from receivingParty.
-     * @param settlementData. The tripple (product, previousSettlementData, settlementData) determines the settlementAmount.
+     * @param settlementAmount the settlement amount. If settlementAmount > 0 then receivingParty receives this amount from other party. If settlementAmount < 0 then other party receives -settlementAmount from receivingParty.
+     * @param settlementData. the tripple (product, previousSettlementData, settlementData) determines the settlementAmount.
      */
     function performSettlement(int256 settlementAmount, string memory settlementData) external;
 
@@ -184,7 +183,7 @@ interface ISDC {
     /**
      * @notice Called from a counterparty to confirm a termination, which will triggers a final settlement before trade gets inactive
      * @dev emits a {TradeTerminationConfirmed}
-     * @param tradeID the trade identifier which is supposed to be terminated
+     * @param tradeID the trade identifier of the trade which is supposed to be terminated
      */
     function confirmTradeTermination(string memory tradeId) external;
 }
