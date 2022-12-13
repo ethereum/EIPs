@@ -1,12 +1,12 @@
 ---
-eip: tbd
+eip: 6122
 title: Forkid checks based on timestamps
 author: Marius van der Wijden (@MariusVanDerWijden)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/eip-6122-forkid-checks-based-on-timestamps/12130
 status: Draft
 type: Standards Track
 category: Networking
-created: 2022-12-09
+created: 2022-12-13
 requires: 2124
 ---
 
