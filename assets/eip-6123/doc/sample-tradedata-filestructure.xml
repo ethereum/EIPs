@@ -56,7 +56,7 @@
     </receiverPartyID>
     <underlyings> <!-- Section for trade specification of the underlying OTC derivative contract-->
         <underlying>
-            <dataDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.fpml.org/FpML-5/confirmation" fpmlVersion="5-9" xsi:schemaLocation="http://www.fpml.org/FpML-5/confirmation ../../fpml-main-5-9.xsd http://www.w3.org/2000/09/xmldsig# ../../xmldsig-core-schema.xsd">
+            <dataDocument>
                 <trade>
                     <tradeHeader>
                         <partyTradeIdentifier>
