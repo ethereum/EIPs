@@ -21,15 +21,11 @@ A universal router contract that executes transactions with a sequence of the fo
 
 ## Motivation
 
-Most of the Dapp router contract has the following pattern: Approve, (optional) calculation, transferFrom, action, and (optionally) verify the token output. This requires `n*m*k` `allow` (or `permit`) transactions, for `n` Dapps, `m` tokens and `k` user addresses. Even though user approves a contract to spend their tokens, it's the front-end code that they trust, not the contract itself. Anyone can create a front-end code and trick the users to sign a transaction to interact with the Uniswap Router contract and steal all their tokens that have been approved.
+Most Dapp router contracts have the following pattern: approve/permit, (optional) calculation, transferFrom, action, and (optionally) verify the token output. This requires `n*m*k` `allow` (or `permit`) transactions, for `n` Dapps, `m` tokens and `k` user addresses. Even though user approves a contract to spend their tokens, it's the front-end code that they trust, not the contract itself. Anyone can create a front-end code and trick the users to sign a transaction to interact with the Uniswap Router contract and steal all their tokens that have been approved.
 
-Universal Router separates token allowance logic from Dapp logic. Saves `(n-1)*m*k` approval transactions for old tokens and **ALL** approval transactions for new tokens. The Universal Router contract is designed to be simple and easy to verify and audit. It's counter-factually created using `CREATE2` so any new tokens can hardcode and skip the allowance check.
+Universal Router separates token allowance logic from application logic, acts as a manifest for users when signing a transaction. It saves `(n-1)*m*k` approval transactions for old tokens and **ALL** approval transactions for new tokens. The Universal Router contract is designed to be simple and easy to verify and audit. It's counter-factually `CREATE2`'ed so any new token contracts can hardcode and skip the allowance check entirely.
 
 ## Specification
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
-
-The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://ethereum.org/en/developers/docs/nodes-and-clients/)).
 
 ```
 struct Action {
@@ -50,15 +46,35 @@ interface IUniversalRouter {
 }
 ```
 
-### Action Types
+Universal Router contract is counter-factually `CREATE2`'ed at address <TBD> across all Ethererum networks.
+
+### Input Action
+Actions with `action.output == false` declare which and how many tokens are transferred from `msg.sender` to `action.recipient`.
+1. If the `action.code` address is not `0x0`, the `amountIn` is returned by the contract call `action.code.call(action.data)`. This contract function must return a single `uint256` value. If this `amountIn` is greater than `action.amount`, reverts with "EXCESSIVE_INPUT_AMOUNT". If the `action.code` is `0x0`, `amountIn` is set to `action.amount`.
+2. `action.eip` specifies the token standard, or `ETH` if it's `0`. If the token is `ETH` and the `recipient` is `0x0`, step #3 is skipped and no transfer is taken, the `amountIn` will be passed to the next output action as the transaction value.
+3. Transfer `amountIn` of tokens from `msg.sender` to `action.recipient`.
+
+### Output Action
+Actions with `action.output == true` declare the main application action to call, and optionally verify the output token after all is done.
+1. If the `action.amount` is not zero, the current token balance of `action.recipient` is recorded for later comparison.
+2. Execute the `action.code.call{value: value}(action.data)`, where `value` can be zero or the `amountIn` of the last `ETH` input with an empty `recipient` (see Input Action #2).
+
+### Output Token Verification
+After all the actions are handled as above, every token balance tracked in Output Action #2 is queried again for comparison. The balance change must not be less than `action.amount` of each output action, otherwise reverts with "INSUFFICIENT_OUTPUT_AMOUNT".
 
 ## Rationale
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
+The `Permit` type signature is not supported since the purpose of Universal Router is to eliminate all `approve` signatures for new tokens, and *most* for old tokens.
+
+Flashloan transactions are out of scope since it requires support from the application contracts themself.
+
 ## Backwards Compatibility
 
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
+Old token contracts (ERC20, ERC721 and ERC1155) require approval for Universal Router once for each account.
+
+New token contracts can pre-configure the Universal Router as a trusted spender, and no approval transaction is required.
 
 ## Test Cases
 
