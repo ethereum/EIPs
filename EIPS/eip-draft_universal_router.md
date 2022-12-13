@@ -62,6 +62,93 @@ Actions with `action.output == true` declare the main application action to call
 ### Output Token Verification
 After all the actions are handled as above, every token balance tracked in Output Action #2 is queried again for comparison. The balance change must not be less than `action.amount` of each output action, otherwise reverts with "INSUFFICIENT_OUTPUT_AMOUNT".
 
+### Usage Samples
+#### UniswapRouter.swapExactTokensForTokens
+```
+// legacy function
+UniswapV2Router01.swapExactTokensForTokens(
+    uint amountIn,
+    uint amountOutMin,
+    address[] calldata path,
+    address to,
+    uint deadline
+)
+
+// this function does what UniswapV2Router01.swapExactTokensForTokens does, without the token transferFrom part
+UniswapV2Helper01.swapExactTokensForTokens(
+    uint amountIn,
+    uint amountOutMin,
+    address[] calldata path,
+    address to,
+    uint deadline
+)
+
+UniversalRouter.exec([{
+    output: false,
+    eip: 20,
+    token: path[0],
+    id: 0,
+    amount: amountIn,
+    recipient: UniswapV2Library.pairFor(factory, path[0], path[1]),
+    code: address(0x0),
+    data: "",
+}, {
+    output: true,
+    eip: 20,
+    token: path[path.length-1],
+    id: 0,
+    amount: amountOutMin,
+    recipient: to,
+    code: UniswapV2Helper01.address,
+    data: iface.encodeFunctionData("swapExactTokensForTokens", [amountIn, amountOutMin, path, to, deadline]),
+}])
+```
+#### UniswapRouter.swapTokensForExactTokens
+```
+// legacy function
+UniswapV2Router01.swapTokensForExactTokens(
+    uint amountOut,
+    uint amountInMax,
+    address[] calldata path,
+    address to,
+    uint deadline
+)
+
+// this function does what UniswapV2Router01.swapTokensForExactTokens does, without the token transferFrom part
+UniswapV2Helper01.swapTokensForExactTokens(
+    uint amountOut,
+    uint amountInMax,
+    address[] calldata path,
+    address to,
+    uint deadline
+)
+
+// this function extract only the first amountIn of UniswapV2Library.getAmountsIn
+UniswapV2Helper01.getAmountIn(uint amountOut, address[] memory path) returns (uint amountIn) {
+    return UniswapV2Library.getAmountsIn(factory, amountOut, path)[0];
+}
+
+UniversalRouter.exec([{
+    output: false,
+    eip: 20,
+    token: path[0],
+    id: 0,
+    amount: amountInMax,
+    recipient: UniswapV2Library.pairFor(factory, path[0], path[1]),
+    code: UniswapV2Helper01.address,
+    data: encodeFunctionData("getAmountIn", [amountOut, path]),
+}, {
+    output: true,
+    eip: 20,
+    token: path[path.length-1],
+    id: 0,
+    amount: amountOut,
+    recipient: to,
+    code: UniswapV2Helper01.address,
+    data: encodeFunctionData("swapTokensForExactTokens", [amountOut, amountInMax, path, to, deadline]),
+}])
+```
+
 ## Rationale
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
@@ -82,7 +169,109 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 
 ## Reference Implementation
 
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+```
+contract UniversalRouter is IUniversalRouter {
+    function exec(
+        Action[] calldata actions
+    ) override external payable returns (uint[] memory results) {
+        results = new uint[](actions.length);
+        uint value;
+        for (uint i = 0; i < actions.length; ++i) {
+            Action memory action = actions[i];
+            if (!action.output) {
+                // input action
+                results[i] = _transfer(action);
+                if (action.eip == 0 && action.recipient == address(0x0)) {
+                    value = results[i]; // save the ETH value to pass to the next output call
+                }
+                continue;
+            }
+            if (action.amount > 0) {
+                // track the balances before
+                results[i] = _balanceOf(action.recipient, action.token, action.eip, action.id);
+            }
+            // output action
+            if (action.code != address(0x0)) {
+                (bool success, bytes memory result) = action.code.call{value: value}(action.data);
+                if (!success) {
+                    assembly {
+                        revert(add(result,32),mload(result))
+                    }
+                }
+                delete value; // clear the ETH value after transfer
+            }
+        }
+        // verify the balance change
+        for (uint i = 0; i < actions.length; ++i) {
+            if (actions[i].amount > 0) {
+                uint balance = _balanceOf(actions[i].recipient, actions[i].token, actions[i].eip, actions[i].id);
+                uint change = balance - results[i];
+                require(change >= actions[i].amount, 'UniversalRouter: INSUFFICIENT_OUTPUT_AMOUNT');
+                results[i] = change;
+            }
+        }
+        // refund any left-over ETH
+        uint leftOver = address(this).balance;
+        if (leftOver > 0) {
+            TransferHelper.safeTransferETH(msg.sender, leftOver);
+        }
+    }
+
+    function _transfer(Action memory action) internal returns (uint amount) {
+        if (action.eip == 721) {
+            IERC721(action.token).safeTransferFrom(msg.sender, action.recipient, action.id);
+            return 1;
+        }
+
+        if (action.code != address(0x0)) {
+            (bool success, bytes memory result) = action.code.call(action.data);
+            if (!success) {
+                assembly {
+                    revert(add(result,32),mload(result))
+                }
+            }
+            amount = abi.decode(result, (uint));
+            require(amount <= action.amount, "UniversalRouter::_input: EXCESSIVE_INPUT_AMOUNT");
+        } else {
+            amount = action.amount;
+        }
+
+        if (action.eip == 20) {
+            TransferHelper.safeTransferFrom(action.token, msg.sender, action.recipient, amount);
+            return amount;
+        }
+        if (action.eip == 1155) {
+            IERC1155(action.token).safeTransferFrom(msg.sender, action.recipient, action.id, amount, "");
+            return amount;
+        }
+        if (action.eip == 0) {
+            if (action.recipient != address(0x0)) {
+                TransferHelper.safeTransferETH(action.recipient, amount);
+            // } else {
+            //     reserved for the next output call value
+            }
+            return amount;
+        }
+        revert("UniversalRouter::_input: INVALID_EIP");
+    }
+
+    function _balanceOf(address owner, address token, uint eip, uint id) internal view returns (uint balance) {
+        if (eip == 20) {
+            return IERC20(token).balanceOf(owner);
+        }
+        if (eip == 1155) {
+            return IERC1155(token).balanceOf(owner, id);
+        }
+        if (eip == 721) {
+            return IERC721(token).ownerOf(id) == owner ? 1 : 0;
+        }
+        if (eip == 0) {
+            return owner.balance;
+        }
+        revert("UniversalRouter::_balanceOf: INVALID_EIP");
+    }
+}
+```
 
 ## Security Considerations
 
