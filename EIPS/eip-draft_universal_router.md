@@ -46,7 +46,7 @@ interface IUniversalRouter {
 }
 ```
 
-Universal Router contract is counter-factually `CREATE2`'ed at address <TBD> across all Ethererum networks.
+Universal Router contract is counter-factually `CREATE2`'ed at address \<TBD\> across all Ethererum networks.
 
 ### Input Action
 Actions with `action.output == false` declare which and how many tokens are transferred from `msg.sender` to `action.recipient`.
