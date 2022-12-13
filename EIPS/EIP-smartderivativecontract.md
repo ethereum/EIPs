@@ -1,12 +1,12 @@
 ---
-eip: <to be assigned>
+eip: 0
 title: Smart Derivative Contract
 description: A deterministic protocol for frictionless post-trade processing of OTC financial contracts
 author: Christian Fries (@cfries), Peter Kohl-Landgraf (@pekola), Alexandros Korpis
 discussions-to: https://ethereum-magicians.org/
 status: Draft
-type: Standard Track
-category (*only required for Standards Track): ERC
+type: Standards Track
+category: ERC
 created: 2022-12-13
 ---
 
@@ -31,7 +31,7 @@ A Smart Derivative Contract (SDC) settles outstanding net present value of the u
 exchanged and the value of the contract is reset to zero. Pre-Agreed margin buffers are locked at the beginning of each settlement cycle such that settlement will be guaranteed up to a certain amount. 
 In case a counterparty fails to obey contract rules, e.g. not provide sufficient prefunding, SDC will terminate automatically with the guaranteed transfer of a termination fee by the causing party.
 These features enable two counterparties to process their financial contract fully decentralized without relying on a third central intermediary agent.
-Process logic of SDC can be implemented as a finite state machine on solidity. ERC20 token standard can be used for frictionless decentralized settlement - see reference implementation.
+Process logic of SDC can be implemented as a finite state machine on solidity. ERC20 token standard can be used for frictionless decentralized settlement, see reference implementation.
 Combined with an appropriate external market data and valuation oracle which calculates net present values, each known OTC derivative contract is able to be processed using this standard protocol.
 
 
@@ -176,11 +176,14 @@ External Valuation Oracle functionality (java) is available on github:
 
 
 ## Literature
-- [Rethinking financial derivatives inspired by smart contracts (2018)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3249430)
-- [Smart Derivative Contracts (2018)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3163074)
-- [Constructing a digital financial derivative (2018)](https://blogs.law.ox.ac.uk/business-law-blog/blog/2018/12/smart-derivative-contract-constructing-digital-financial-derivative)
-- [Implementing a financial derivative as smart contract (2019)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3342785)
-- [Outsmarting counterparty credit risk (2020)](https://www.risk.net/cutting-edge/views/7494071/outsmarting-counterparty-risk-with-smart-contracts)
+- https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3249430
+- https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3163074
+- https://blogs.law.ox.ac.uk/business-law-blog/blog/2018/12/smart-derivative-contract-constructing-digital-financial-derivative
+- https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3342785
+- https://www.risk.net/cutting-edge/views/7494071/outsmarting-counterparty-risk-with-smart-contracts
+
+## Security Considerations
+No known security issues up to now.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
