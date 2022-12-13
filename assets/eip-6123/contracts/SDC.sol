@@ -5,6 +5,21 @@ import "./ISDC.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+
+/**
+ * @title Reference Implementation of ERC6123 - Smart Derivative Contract
+ * @notice This reference implementation is based on a finite state machine with predefined trade and process states (see enums below)
+ * Some comments on the implementation:
+ * - trade and process states are used in modifiers to check which function is able to be called at which state
+ * - trade data are stored in the contract
+ * - trade data matching is done in incept and confirm routine (comparing the hash of the provided data)
+ * - erc20 token is used for three participants: counterparty1 and counterparty2 and sdc
+ * - when prefunding is done sdc contract will hold agreed amounts and perform settlement on those
+ * - sdc also keeps track on internal balances for each counterparty
+ * - during prefunding sdc will transfer required amounts to its own balance - therefore sufficient approval is needed
+ * - upon termination all remaining 'locked' amounts will be transferred back to the counterparties
+*/
+
 contract SDC is ISDC {
     /*
      * Trade States

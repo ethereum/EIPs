@@ -4,6 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 /*------------------------------------------- DESCRIPTION ---------------------------------------------------------------------------------------*/
 
 /**
+ * @title ERC6123 Smart Derivative Contract
  * @dev Interface specification for a Smart Derivative Contract, which specifies the post-trade live cycle of an OTC financial derivative in a completely deterministic way.
  * Counterparty Risk is removed by construction.
  *
@@ -64,53 +65,66 @@ pragma solidity >=0.7.0 <0.9.0;
 interface ISDC {
     /*------------------------------------------- EVENTS ---------------------------------------------------------------------------------------*/
     /**
-     * @dev Event Emitted when a new trade is incepted from a counterparty
+     * @dev Emitted  when a new trade is incepted from a counterparty
+     * @param initiator is the address from which trade was incepted
+     * @param tradeID is the tradeID (e.g. generated internally)
+     * @param tradeData holding the trade parameters
      * If initiating counterparty has checked tradeId from TradeInceptionEvent succesfully, it is other counterparty who needs to call confirmTrade
      */
     event TradeIncepted(address initiator, string tradeId, string tradeData);
 
     /**
      * @dev Emitted when an incepted trade is confirmed by the opposite counterparty
+     * @param confirmer the confirming party
+     * @param tradeId the trade identifier
      */
     event TradeConfirmed(address confirmer, string tradeId);
 
     /**
-     * @dev Emitted when a confirmed trade is set to active - e.g. when sufficient prefunding is provided by both counterparties
+     * @dev Emitted when a confirmed trade is set to active - e.g. when termination fee amounts are provided
+     * @param tradeId the trade identifier of the activated trade
      */
     event TradeActivated(string tradeId);
 
     /**
      * @dev Emitted when an active trade is terminated
+     * @param cause string holding the cause of the termination
      */
     event TradeTerminated(string cause);
 
     /**
-     * @dev Emitted awaiting funding
+     * @dev Emitted when funding phase is initiated
      */
     event ProcessAwaitingFunding();
 
     /**
-     * @dev Emitted when margin balance was updated
+     * @dev Emitted when margin balance was updated and sufficient funding is provided
      */
     event ProcessFunded();
 
     /**
-     * @dev Emitted when a valuation is requested
+     * @dev Emitted when a valuation and settlement is requested
+     * @param tradeData holding the stored trade data
+     * @param lastSettlementData holding the settlementdata from previous settlement (next settlement will be the increment of next valuation compared to former valuation)
      */
     event ProcessSettlementRequest(string tradeData, string lastSettlementData);
 
     /**
-     * @dev Emitted when a settlent was processed succesfully
+     * @dev Emitted when a settlement was processed succesfully
      */
     event ProcessSettled();
 
     /**
-     * @dev Emitted when a counterparty proactively requests an early termination
+     * @dev Emitted when a counterparty proactively requests an early termination of the underlying trade
+     * @param cpAddress the address of the requesting party
+     * @param tradeID the trade identifier which is supposed to be terminated
      */
     event TradeTerminationRequest(address cpAddress, string tradeId);
 
     /**
-     * @dev Emitted when early termination request is confirmet
+     * @dev Emitted when early termination request is confirmed by the opposite party
+     * @param cpAddress the party which confirms the trade termination
+     * @param tradeID the trade identifier which is supposed to be terminated
      */
     event TradeTerminationConfirmed(address cpAddress, string tradeId);
 
@@ -119,40 +133,40 @@ interface ISDC {
     /// Trade Inception
 
     /**
-     * @dev Handles trade inception, stores trade data
-     * @notice emits a {TradeInceptionEvent}
-     * @param _tradeData a description of the trade in sdc.xml, see https://github.com/finmath/finmath-smart-derivative-contract/tree/main/src/main/resources/net.finmath.smartcontract.product.xml
+     * @notice Handles trade inception, stores trade data
+     * @dev emits a {TradeInceptionEvent}
+     * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
+     * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
      */
     function inceptTrade(string memory _tradeData, string memory _initialSettlementData) external;
 
     /**
-     * @dev Performs a matching of provided trade data, puts the state to trade confirmed if trade data match
-     * @notice emits a {TradeConfirmEvent}
-     * @param _tradeData a description of the trade in sdc.xml, see https://github.com/finmath/finmath-smart-derivative-contract/tree/main/src/main/resources/net.finmath.smartcontract.product.xml
+     * @notice Performs a matching of provided trade data and settlement data
+     * @dev emits a {TradeConfirmEvent} if trade data match
+     * @param _tradeData a description of the trade in sdc.xml, e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
+     * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
      */
     function confirmTrade(string memory _tradeData, string memory _initialSettlementData) external;
 
     /// Settlement Cycle: Prefunding
 
     /**
-     * @dev Called from outside to secure pre-funding. Terminate the trade if prefunding fails.
-     * emits a {MarginAccountLockedEvent} followed by a {TradeActivatedEvent} or
-     * emits a {TradeTerminated}
+     * @notice Called from outside to check and secure pre-funding. Terminate the trade if prefunding fails.
+     * @dev emits a {ProcessFunded} event if prefunding check is successful or a {TradeTerminated} event if prefunding check fails
      */
     function initiatePrefunding() external;
 
     /// Settlement Cycle: Settlement
 
     /**
-     * @dev Called from outside to trigger an external valuation and according settlement process
+     * @dev Called to trigger a (maybe external) valuation of the underlying contract and afterwards the according settlement process
      * emits a {ValuationRequestEvent}
      */
     function initiateSettlement() external;
 
-
     /**
-     * @dev Called from outside to trigger according settlement on chain-balances callback for initiateSettlement() event handler
-     * emits a {MarginAccountUnlockRequestEvent} and ({SettlementCompletedEvent} or {Termination Event}
+     * @notice Called from outside to trigger according settlement on chain-balances callback for initiateSettlement() event handler
+     * @dev emits a {ProcessSettled} if settlement is successful or {TradeTerminated} if settlement fails
      * @param settlementAmount The settlement amount. If settlementAmount > 0 then receivingParty receives this amount from other party. If settlementAmount < 0 then other party receives -settlementAmount from receivingParty.
      * @param settlementData. The tripple (product, previousSettlementData, settlementData) determines the settlementAmount.
      */
@@ -161,13 +175,16 @@ interface ISDC {
     /// Trade termination
 
     /**
-     * @dev Called from a counterparty to request a mutual termination
+     * @notice Called from a counterparty to request a mutual termination
+     * @dev emits a {TradeTerminationRequest}
+     * @param tradeID the trade identifier which is supposed to be terminated
      */
     function requestTradeTermination(string memory tradeId) external;
 
     /**
-     * @dev Called from a counterparty to confirm a mutual termination, which will triggers a final settlement before trade gets inactive
-     *
+     * @notice Called from a counterparty to confirm a termination, which will triggers a final settlement before trade gets inactive
+     * @dev emits a {TradeTerminationConfirmed}
+     * @param tradeID the trade identifier which is supposed to be terminated
      */
     function confirmTradeTermination(string memory tradeId) external;
 }
