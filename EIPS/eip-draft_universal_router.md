@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
 title: Universal Router Contract
-description: Universal router contract designed for token allowance that eliminates all `approve`` transactions in the future.
+description: Universal router contract designed for token allowance that eliminates all `approve` transactions in the future.
 author: Zergity <zergity@gmail.com>
 discussions-to: <URL>
 status: Draft
