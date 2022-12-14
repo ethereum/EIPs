@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 6077
 title: Invalidation abstraction for signature-based operations powered by EIP-712
 description: Extends EIP-712 and unifies EIP-2612 with many others
 author: Anton Bukov (@k06a), Mikhail Melnik (@zumzoom)
