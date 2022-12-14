@@ -15,6 +15,10 @@ created: 2015-11-19
 This EIP standardizes an interface for fungible tokens within smart contracts.
 The interface has basic transfer functionality, and allows tokens to be approved so they can be spent by another on-chain third party.
 
+## Motivation
+
+A standard interface allows any tokens on Ethereum to be re-used by other applications: from wallets to decentralized exchanges.
+
 ## Specification
 
 All compliant tokens MUST implement the following interface:
