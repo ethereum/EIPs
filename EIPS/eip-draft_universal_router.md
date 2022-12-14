@@ -1,14 +1,14 @@
 ---
-eip: <to be assigned>
+eip: 6120
 title: Universal Router Contract
 description: Universal router contract designed for token allowance that eliminates all `approve` transactions in the future.
-author: Zergity <zergity@gmail.com>
+author: Zergity (@Zergity), Zergity <zergity@gmail.com>
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-12-12
-requires: EIP20, EIP721, EIP1155
+requires: 20, 721, 1155
 ---
 
 ## Abstract
@@ -27,7 +27,7 @@ Universal Router separates token allowance logic from application logic, acts as
 
 ## Specification
 
-```
+```solidity
 struct Action {
     bool output;    // true for output action, false for input action
     uint eip;       // token type: 0 for ETH, # for ERC#
@@ -40,7 +40,7 @@ struct Action {
 }
 ```
 
-```
+```solidity
 interface IUniversalRouter {
     function exec(Action[] calldata actions) external payable returns (uint[] memory results);
 }
@@ -64,7 +64,7 @@ After all the actions are handled as above, every token balance tracked in Outpu
 
 ### Usage Samples
 #### UniswapRouter.swapExactTokensForTokens
-```
+```solidity
 // legacy function
 UniswapV2Router01.swapExactTokensForTokens(
     uint amountIn,
@@ -159,7 +159,7 @@ Flashloan transactions are out of scope since it requires support from the appli
 
 ## Backwards Compatibility
 
-Old token contracts (ERC20, ERC721 and ERC1155) require approval for Universal Router once for each account.
+Old token contracts (EIP-20, EIP-721 and EIP-1155) require approval for Universal Router once for each account.
 
 New token contracts can pre-configure the Universal Router as a trusted spender, and no approval transaction is required.
 
@@ -169,7 +169,7 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 
 ## Reference Implementation
 
-```
+```solidity
 contract UniversalRouter is IUniversalRouter {
     function exec(
         Action[] calldata actions
@@ -275,7 +275,7 @@ contract UniversalRouter is IUniversalRouter {
 
 ## Security Considerations
 
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+TODO
 
 ## Copyright
 
