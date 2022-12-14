@@ -180,6 +180,9 @@ interface IERC3475 {
     // EVENTS
     /**
      * @notice MUST trigger when tokens are transferred, including zero value transfers.
+     * e.g: 
+     emit Transfer(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, 0x492Af743654549b12b1B807a9E0e8F397E44236E,0x3d03B6C79B75eE7aB35298878D05fe36DC1fEf, [IERC3475.Transaction(1,14,500)])
+    means that operator 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef wants to transfer 500 bonds of class 1 , Nonce 14 of owner 0x492Af743654549b12b1B807a9E0e8F397E44236E to address  0x3d03B6C79B75eE7aB35298878D05fe36DC1fEf.
      */
     event Transfer(address indexed _operator, address indexed _from, address indexed _to, Transaction[] _transactions);
     /**
