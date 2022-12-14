@@ -188,7 +188,7 @@ interface IERC3475 {
     * @dev This SHOULD not include zero value issuing.
     * @dev Issue MUST be triggered when the operator (i.e Bank address) contract issues bonds to the given entity.
     eg: emit Issue(_operator, 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef,[IERC3475.Transaction(1,14,500)]); 
-    issue by address(operator) 500 DBIT-USD Bond(nonce14,class 0) to address 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
+    issue by address(operator) 500 Bonds(nonce14,class 0) to address 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
      */
     event Issue(address indexed _operator, address indexed _to, Transaction[] _transactions);
     /**

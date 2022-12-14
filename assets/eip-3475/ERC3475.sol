@@ -76,15 +76,16 @@ contract ERC3475 is IERC3475 {
         _classes[1].nonces[1]._values[0].uintValue = block.timestamp + 2;
         _classes[1].nonces[2]._values[0].uintValue = block.timestamp + 3;
 
-        // define "maturity of the nonce";
+        // define metadata explaining "maturity of the nonce";
         _classes[0]._nonceMetadata[0].title = "maturity";
         _classes[0]._nonceMetadata[0]._type = "int";
         _classes[0]._nonceMetadata[0].description = "maturity date in integer";
+        
         _classes[1]._nonceMetadata[0].title = "maturity";
-        _classes[0]._nonceMetadata[0]._type = "int";
+        _classes[1]._nonceMetadata[0]._type = "int";
         _classes[1]._nonceMetadata[0].description = "maturity date in integer";
 
-        // defining the value status 
+        // initializing all of the nonces for issued bonds
         _classes[0].nonces[0]._values[0].boolValue = true;
         _classes[0].nonces[1]._values[0].boolValue = true;
         _classes[0].nonces[2]._values[0].boolValue = true;
