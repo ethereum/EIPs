@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
  * - trade and process states are used in modifiers to check which function is able to be called at which state
  * - trade data are stored in the contract
  * - trade data matching is done in incept and confirm routine (comparing the hash of the provided data)
- * - erc20 token is used for three participants: counterparty1 and counterparty2 and sdc
+ * - ERC-20 token is used for three participants: counterparty1 and counterparty2 and sdc
  * - when prefunding is done sdc contract will hold agreed amounts and perform settlement on those
  * - sdc also keeps track on internal balances for each counterparty
  * - during prefunding sdc will transfer required amounts to its own balance - therefore sufficient approval is needed
