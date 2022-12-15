@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
-import "./verification_modifier.sol";
+import "./ERC5851Verifier.sol";
 
-abstract contract Token is verification_modifier {
+abstract contract Token is ERC5851Verifier {
     uint public test;
     function mint(address to, uint256 amount) public KYCApproved(to){
         _mint(to, amount);
