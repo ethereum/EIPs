@@ -1,17 +1,14 @@
 ---
-eip: <to be assigned>
+eip: royalty-treasury-proposal
 title: Hashtag NFT Collective Royalty Treasury
 description: A standard to deposit and retrieve royalties from an Ethereum Address
 author: Ashley Turing (@livetreetech)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-proposal-hashtag-nft-collective-royalty-treasury/12152/5
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-12-15
 ---
-
-## Simple Summary
-A standardized way to deposit, withdraw and retrieve creator fee (“royalty”) information associated with a human readable name - this standard enables universal support for royalty payments across social networks, NFT marketplaces and ecosystem participants, its generic design can be implemented on any EVM compatible blockchain and its specific implementation is intended to associate royalties with a hashtag (#) name, however, it is highly versatile and can be used to attribute royalties for any Ethereum address, for example, an NFT.
 
 ## Abstract
 This standard allows social media networks, NFT marketplaces and other websites to deposit royalties associated with an Ethereum address. The Ethereum address may be associated with a human readable name (e.g. a hashtag), to pay-out royalties and retrieve royalty payment information. The standard is loosely coupled and generic to maximise the potential use cases.  Unlike other EIP proposals ([EIP-2981](https://github.com/ethereum/EIPs/blob/9e393a79d9937f579acbdcb234a67869259d5a96/EIPS/eip-2981.md) or [EIP-4910](https://github.com/ethereum/EIPs/blob/7bba1e7b146ed74b0c5884e60dec815fd56a07e3/EIPS/eip-4910.md)) which embody mechanisms for calculating royalties, this standard sets out the mechanism for depositing and paying out royalties. The goal is to increase the earning potential for creators rather than defining the business logic for royalty payments.
@@ -19,6 +16,15 @@ Royalties derived from a human readable name could be associated with NFTs, ERC2
 
 ## Motivation
 The #Hashtag NFT Collective Royalty Treasury standard comes about as a result of many years of work to help realise the overarching ambition of Web 3.0 decentralisation, namely, to empower people to collectively address some of the world’s most challenging problems such as climate change, global inequality to domestic abuse.  Hash-tagging (#) media has become a defacto standard across Web 2.0 social networks for not only garnering support (e.g. #BLM, etc). The introduction of a decentralised hashtag standard aims to harness the power of social media in a decentralised fashion to bring about the change Web 3.0 promises, fundamentally giving creators the potential to earn income (“royalties”) from content they post and are tagged from a variety of social networks. The first implementation of this standard can be downloaded via [www.livetree.com](http://www.livetree.com). The generic design facilitates additional royalties to be attributed to NFTs or any smart contract or wallet address.
+
+## Rationale
+A standardized way to deposit, withdraw and retrieve creator fee (“royalty”) information associated with a human readable name - this standard enables universal support for royalty payments across social networks, NFT marketplaces and ecosystem participants, its generic design can be implemented on any EVM compatible blockchain and its specific implementation is intended to associate royalties with a hashtag (#) name, however, it is highly versatile and can be used to attribute royalties for any Ethereum address, for example, an NFT.
+
+## Backwards Compatibility
+The standard contracts in implementation may be made upgradable to help ensure backward compatibliity
+
+## Security Considerations
+Important for security discussions, surfaces risks and could be the use of a whitelist described in the HashtagNFTCollectiveResolver DepositRoyalty method
 
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -43,7 +49,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 | 2 | ResolveURI | **Inputs**<br/>_string calldata nftURI_ - human readable name<br/>**Outputs**<br/>address - Ethereum address. | Returns the Ethereum address associated with a human readable name. |
 | 3 | ResolveAddress | **Inputs**<br/>_address ethereumAddr_ - Ethereum address<br/>**Outputs**<br/>string calldata - Human readable name | Returns the human readable name associated with the Ethereum address. |
 
-## Implementation Addresses
+## Reference Implementation
 We have implemented this proposed standard on the following blockchains.
 
 | # | Contract Name | Blockchain | Address |
@@ -62,3 +68,6 @@ We have implemented this proposed standard on the following blockchains.
 |   |                              | Quartz    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 
 Further implementation details may be found in the Livetree repository [here](https://github.com/livetreetech/LivetreeCollective).
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
