@@ -4,7 +4,8 @@ import "./ERC5851Verifier.sol";
 
 abstract contract Token is ERC5851Verifier {
     uint public test;
-    function mint(address to, uint256 amount) public KYCApproved(to){
+    uint public SBTID;
+    function mint(address to, uint256 amount) public KYCApproved(to, SBTID){
         _mint(to, amount);
     }
 
@@ -12,6 +13,5 @@ abstract contract Token is ERC5851Verifier {
         require(account != address(0), "ERC20: mint to the zero address");
         test = amount;
     }
-
 
 }
