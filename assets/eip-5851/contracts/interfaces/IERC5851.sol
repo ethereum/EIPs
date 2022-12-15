@@ -91,11 +91,11 @@ interface IERC5851{
     /// @notice function which uses the ZKProof protocol to validate the identity based on the given 
     /// @dev it should only be called by the admin address.
     /// @param SBTID is the Id of the SBT-based identity certificate for which admin wants to define the Claims.
-    /// @param certifying is the address that needs to be proven as the owner of the SBT defined by the tokenID.
+    /// @param claimer is the address that needs to be proven as the owner of the SBT defined by the tokenID.
     /**
     example: certify(0xA....., 10) means that admin assigns the DID badge with id 10 to the address defined by the `0xA....` wallet.
     */
-    function certify(address certifying, uint256 SBTID) external returns (bool);
+    function certify(address claimer, uint256 SBTID) external returns (bool);
 
     /// @notice function which uses the ZKProof protocol to validate the identity based on the given 
     /// @dev it should only be called by the admin address.
