@@ -1,7 +1,7 @@
 ---
 eip: royalty-treasury-proposal
 title: Hashtag NFT Collective Royalty Treasury
-description: A standard to deposit and retrieve royalties from an Ethereum Address
+description: A method to deposit and retrieve royalties from an Ethereum Address
 author: Ashley Turing (@livetreetech)
 discussions-to: https://ethereum-magicians.org/t/eip-proposal-hashtag-nft-collective-royalty-treasury/12152/5
 status: Draft
@@ -17,17 +17,14 @@ Royalties derived from a human readable name could be associated with NFTs, ERC2
 ## Motivation
 The #Hashtag NFT Collective Royalty Treasury standard comes about as a result of many years of work to help realise the overarching ambition of Web 3.0 decentralisation, namely, to empower people to collectively address some of the world’s most challenging problems such as climate change, global inequality to domestic abuse.  Hash-tagging (#) media has become a defacto standard across Web 2.0 social networks for not only garnering support (e.g. #BLM, etc). The introduction of a decentralised hashtag standard aims to harness the power of social media in a decentralised fashion to bring about the change Web 3.0 promises, fundamentally giving creators the potential to earn income (“royalties”) from content they post and are tagged from a variety of social networks. The first implementation of this standard can be downloaded via [www.livetree.com](http://www.livetree.com). The generic design facilitates additional royalties to be attributed to NFTs or any smart contract or wallet address.
 
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
 ## Rationale
 A standardized way to deposit, withdraw and retrieve creator fee (“royalty”) information associated with a human readable name - this standard enables universal support for royalty payments across social networks, NFT marketplaces and ecosystem participants, its generic design can be implemented on any EVM compatible blockchain and its specific implementation is intended to associate royalties with a hashtag (#) name, however, it is highly versatile and can be used to attribute royalties for any Ethereum address, for example, an NFT.
 
 ## Backwards Compatibility
 The standard contracts in implementation may be made upgradable to help ensure backward compatibliity
-
-## Security Considerations
-Important for security discussions, surfaces risks and could be the use of a whitelist described in the HashtagNFTCollectiveResolver DepositRoyalty method
-
-## Specification
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ### Overview
 | # | Smart Contract | Description |
@@ -68,6 +65,9 @@ We have implemented this proposed standard on the following blockchains.
 |   |                              | Quartz    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 
 Further implementation details may be found in the Livetree repository [here](https://github.com/livetreetech/LivetreeCollective).
+
+## Security Considerations
+Important for security discussions, surfaces risks and could be the use of a whitelist described in the HashtagNFTCollectiveResolver DepositRoyalty method
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
