@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./interfaces/IERC-5851.sol";
 
 
-abstract contract Issuer is IERC6595{
+abstract contract ERC5851Issuer is IERC-5851{
     mapping(uint256 => IERC6595.Claim[]) private _requiredClaim;
     mapping(address => mapping(uint256 => bool)) private _SBTVerified;
     address public admin;
