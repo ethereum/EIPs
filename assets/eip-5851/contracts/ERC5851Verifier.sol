@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 import "./interfaces/IERC5851.sol";
 
-abstract contract ERC5851 is IERC5851 {
+abstract contract ERC5851Verifier is IERC5851 {
     address private _authenticator;
     Verification[] private _KYCClaim;
 
