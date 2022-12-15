@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
+
 pragma solidity ^0.8.0;
 
 interface IERC5851{
@@ -71,7 +72,6 @@ interface IERC5851{
     }
     Defines the condition encoded for the identity index 1, DeFining the identity condition that holder must be equal or more than 18 years old.
     **/
-
     function standardClaim(uint256 SBTID) external view returns (Claims[] memory);
     
     // setter functions
