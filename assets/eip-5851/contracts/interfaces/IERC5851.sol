@@ -38,8 +38,7 @@ interface IERC5851{
     struct Claim {
         Metadata metadata;
         string logic;
-        Values expectation;
-   
+        Values expectation;   
     }
 
     //Verifier
@@ -110,7 +109,7 @@ interface IERC5851{
     * standardChanged
     * @notice standardChanged MUST be triggered when claims are changed by the admin. 
     * @dev standardChanged MUST also be triggered for the creation of a new SBTID.
-    e.g : emit StandardChanged(1, Claims(Metadata('age', 'uint', 'age of the person based on the birth date on the legal document' ), ">=", "18");
+    e.g : emit StandardChanged(1, Claims(Metadata('age', 'uint', 'age of the person based on the birth date on the legal document'), ">=", "18");
     is emitted when the Claim condition is changed which allows the certificate holder to call the functions with the modifier, claims that the holder must be equal or more than 18 years old.
     */
     event StandardChanged(uint256 SBTID, Claim[] _claims);
