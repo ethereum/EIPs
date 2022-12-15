@@ -120,12 +120,12 @@ interface IERC5851{
     * @notice certified MUST be triggered when the SBT certificate is given to the certifying address. 
     * eg: Certified(0xfoo,2); means that wallet holder address 0xfoo is certified to hold a certificate issued with id 2, and thus can satisfy all the conditions defined by the required interface.
     */
-    event Certified(address certifying, uint256 SBTID);
+    event Certified(address claimer, uint256 SBTID);
     
     /** 
     * revoked
     * @notice revoked MUST be triggered when the SBT certificate is revoked. 
     * eg: Revoked( 0xfoo,1); means that entity user 0xfoo has been revoked to all the function access defined by the SBT ID 1.
     */
-    event Revoked(address certifying, uint256 SBTID);
+    event Revoked(address claimer, uint256 SBTID);
 }
