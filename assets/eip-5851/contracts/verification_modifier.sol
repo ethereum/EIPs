@@ -2,17 +2,17 @@
 pragma solidity ^0.8.0;
 import "./interfaces/IERC5851.sol";
 
-abstract contract verification_modifier {
+abstract contract ERC5851 is IERC5851 {
     address private _authenticator;
-    IERC5851.Requirement[] private _KYCRequirement;
+    Verification[] private _KYCClaim;
 
-    constructor(address authenticatorAddress, IERC5851.Requirement[] memory KYCStandards) {
-        _KYCRequirement = KYCStandards;
-        _authenticator = authenticatorAddress;
+    constructor(address issuer, Verification[] memory KYCStandards) {
+        _KYCClaim = KYCStandards;
+        _issuer = issuer;
     }
 
-    modifier KYCApproved(address verifying, uint256 SBTID) {
-        IERC5851(_authenticator).ifVerified(verifying, SBTID);
+    modifier KYCApproved(address claimer) {
+        IERC5851(_issuer).ifVerified(claimer, uint256 SBTID);
         _;
     }
 }
