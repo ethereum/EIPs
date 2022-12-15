@@ -52,7 +52,7 @@ contract ERC3475 is IERC3475 {
         // define "period of the class";
         _classMetadata[5].title = "period";
         _classMetadata[5]._type = "int";
-        _classMetadata[5].description = "details about issuance and redemption time";
+        _classMetadata[5].description = "value (in months) about maturity time";
 
 
 
