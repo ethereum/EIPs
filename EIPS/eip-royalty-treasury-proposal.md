@@ -3,12 +3,12 @@
 |                |                                           |
 |----------------|-------------------------------------------|
 | EIP Title      | #Hashtag NFT Collective Royalty Treasury  |
-| Author         | Ashley Turing                             |
+| Author         | <livetreetech>                            |
 | Discussion To  |                                           |
 | Status         | Draft                                     |
 | Type           | Standards Track                           |
 | Category       | ERC                                       |
-| Created        | 2021-12-27                                |
+| Created        | 2022-12-15                                |
 | Requires       |                                           |
 
 
