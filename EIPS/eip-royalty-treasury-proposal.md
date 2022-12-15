@@ -11,7 +11,7 @@ created: 2022-12-15
 ---
 
 ## Abstract
-This standard allows social media networks, NFT marketplaces and other websites to deposit royalties associated with an Ethereum address. The Ethereum address may be associated with a human readable name (e.g. a hashtag), to pay-out royalties and retrieve royalty payment information. The standard is loosely coupled and generic to maximise the potential use cases.  Unlike other EIP proposals ([EIP-2981](/ethereum/EIPs/blob/9e393a79d9937f579acbdcb234a67869259d5a96/EIPS/eip-2981.md) or [EIP-4910](/ethereum/EIPs/blob/7bba1e7b146ed74b0c5884e60dec815fd56a07e3/EIPS/eip-4910.md)) which embody mechanisms for calculating royalties, this standard sets out the mechanism for depositing and paying out royalties. The goal is to increase the earning potential for creators rather than defining the business logic for royalty payments.
+This standard allows social media networks, NFT marketplaces and other websites to deposit royalties associated with an Ethereum address. The Ethereum address may be associated with a human readable name (e.g. a hashtag), to pay-out royalties and retrieve royalty payment information. The standard is loosely coupled and generic to maximise the potential use cases.  Unlike other EIP proposals ([EIP-2981](eip-2981.md) or [EIP-4910](/eip-4910.md)) which embody mechanisms for calculating royalties, this standard sets out the mechanism for depositing and paying out royalties. The goal is to increase the earning potential for creators rather than defining the business logic for royalty payments.
 Royalties derived from a human readable name could be associated with NFTs, token contracts or any number of different sources; this standard does not dictate or define how the royalties are generated or how much the royalty amount should be.  Its purpose is to provide a simple mechanism for creators to receive royalties associated with a particular Ethereum address. The standard facilitates that Ethereum address can be associated with a human readable name, if the social network or platform so facilitates creators to register and associate a name. Its usage therefore can be expanded and built upon to encompass a variety of highly complex royalty or payment attribution systems. The standard defines an interface to deposit royalties en mass which is intended to optimise gas costs. The Ethereum Address could, of course, be another smart contract such as a governor contract, NFT or simple wallet. The standard does not define what the payout should be, or the mechanism for payout, this would be the responsibility of the caller such as the social network or NFT marketplace to implement.
 
 ## Motivation
@@ -64,7 +64,7 @@ We have implemented this proposed standard on the following blockchains.
 |   |                              | Unique    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 |   |                              | Quartz    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 
-Further implementation details may be found in the Livetree repository [here](/livetreetech/LivetreeCollective).
+Further implementation details may be found in the Livetree repository [here](../../livetreetech/LivetreeCollective).
 
 ## Security Considerations
 Important for security discussions, surfaces risks and could be the use of a whitelist described in the HashtagNFTCollectiveResolver DepositRoyalty method
