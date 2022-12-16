@@ -1,6 +1,6 @@
 pragma solidity ^0.8.0;
 
-abstract contract ERCXXXX is ERC721, IERCXXXXX {
+abstract contract ERC6150 is ERC721, IERC6150 {
     mapping(uint256 => uint256) private _parentOf;
     mapping(uint256 => uint256[]) private _childrenOf;
 
@@ -16,7 +16,7 @@ abstract contract ERCXXXX is ERC721, IERCXXXXX {
         bytes4 interfaceId
     ) public view virtual override(IERC165, ERC721) returns (bool) {
         return
-            interfaceId == type(IERCXXXX).interfaceId ||
+            interfaceId == type(IERC6150).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 
@@ -69,7 +69,7 @@ abstract contract ERCXXXX is ERC721, IERCXXXXX {
     ) internal virtual {
         require(
             tokenIds.length == datas.length,
-            "ERCXXXX: tokenIds.length != datas.length"
+            "ERC6150: tokenIds.length != datas.length"
         );
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _safeMintWithParent(to, parentId, tokenIds[i], datas[i]);
@@ -90,9 +90,9 @@ abstract contract ERCXXXX is ERC721, IERCXXXXX {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        require(tokenId > 0, "ERCXXXX: tokenId is zero");
+        require(tokenId > 0, "ERC6150: tokenId is zero");
         if (parentId != 0)
-            require(_exists(parentId), "ERCXXXX: parentId doesn't exists");
+            require(_exists(parentId), "ERC6150: parentId doesn't exists");
 
         _beforeMintWithParent(to, parentId, tokenId);
 
