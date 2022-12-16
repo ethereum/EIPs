@@ -1,8 +1,8 @@
 ---
-eip: <to be assigned>
+eip: 6147
 title: Guard of NFT/SBT, an Extension of EIP-721
 description: A new management role of NFT/SBT is defined, which realizes the separation of transfer right and holding right of NFT/SBT.
-author: 5660.eth<@5660-eth>,Wizard Wang
+author: 5660.eth(@5660-eth), Wizard Wang
 discussions-to: https://ethereum-magicians.org/t/guard-of-nft-sbt-an-extension-of-eip-721/12052
 status: Draft
 type: Standards Track
@@ -13,7 +13,7 @@ requirements: 165, 721
 
 ## Abstract
 
-This standard is an extension of ERC721. It separates the holding right and transfer right of NFT/SBT and defines a new role, `guard`. The flexibility of the `guard` setting enables the design of NFT anti-theft, NFT lending, NFT leasing, SBT, etc.
+This standard is an extension of [EIP-721](./eip-721.md). It separates the holding right and transfer right of NFT/SBT and defines a new role, `guard`. The flexibility of the `guard` setting enables the design of NFT anti-theft, NFT lending, NFT leasing, SBT, etc.
 
 ## Motivation
 
@@ -78,7 +78,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 
 The `supportsInterface` method MUST return `true` when called with `0xc0655ef1`.
 
-### Rationale 
+## Rationale 
 
 ### Specification Management for Separation of Permissions
 
@@ -118,7 +118,7 @@ The alternative names are `guardian` and `guard`, both of which basically match 
 
 This standard can be fully EIP-721 compatible by adding an extension function set.
 
-If the NFT issued based on the above standard does not have a `guard` role, then it is no different from the current NFT issued based on the eip721 standard.
+If the NFT issued based on the above standard does not have a `guard` role, then it is no different from the current NFT issued based on the EIP-721 standard.
 
 
 ## Reference Implementation
@@ -267,6 +267,6 @@ When an NFT has a `guard`, even if an address is authorized as an operator throu
 
 For NFT trading platforms that trade through `setApprovalForAll` + holder's signature, when NFT has `guard`, it cannot be traded. It is recommended to prevent such pending orders by checking the interface beforehand.
 
-## Copyright (copyright)
+## Copyright
 
 Copyright and related rights waived via CC0.
