@@ -34,7 +34,7 @@ main.page-content {
   color: #111;
 }
 
-.table-borderless, .table-borderless *, .table-borderless * * {
+.table-borderless, .table-borderless * {
   border-style : hidden !important;
   background-color: rgba(0,0,0,0) !important;
 }
@@ -65,7 +65,13 @@ a:hover, a:active {
   transition: all 0.25s ease;
 }
 
+h1 {
+  vertical-align: middle;
+}
+
 .inline-svg {
+  display: inline-block;
+  vertical-align: middle;
   fill: currentColor;
   line-height: 1;
   height: 1em;
