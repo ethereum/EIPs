@@ -77,3 +77,7 @@ h1 {
   height: 1em;
   width: 1em;
 }
+
+.no-underline {
+  text-decoration: none !important; // To override previous styling
+}
