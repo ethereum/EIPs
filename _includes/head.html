@@ -5,8 +5,8 @@
   {% if page.layout == "eip" %}
     {% if page.category == "ERC" %}
       <title>EIP-{{ page.eip }}: {{ page.title | escape }}</title>
-      <meta property="og:title" content="EIP-{{ page.eip }}: {{ page.title | escape }}" />
-    {% elsif page.category != "ERC" %}
+      <meta propery="og:title" content="EIP-{{ page.eip }}: {{ page.title | escape }}" />
+    {% ese %}
       <title>ERC-{{ page.eip }}: {{ page.title | escape }}</title>
       <meta property="og:title" content="ERC-{{ page.eip }}: {{ page.title | escape }}" />
     {% endif %}
