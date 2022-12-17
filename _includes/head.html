@@ -37,4 +37,30 @@
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
   {%- feed_meta -%}
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/citation-js/0.6.4/citation.min.js" integrity="sha512-7mRYgXTf8uFTLaIrSME+aVBmaZ9ykyvgsOpGLZafWZzdmHlTOBeKrUiTiR1sNpSJLmK68IdhN3+7FbhbJfNLsg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    addEventListener('DOMContentLoaded', async () => {
+      const Cite = window.require('citation-js');
+      const citationElements = document.querySelectorAll('.language-csl-json');
+      for (let citationElement of citationElements) {
+        try {
+          const citation = await Cite.async(citationElement);
+          const template = document.createElement('template');
+          template.innerHTML = citation.format('bibliography', {
+            format: 'html',
+            template: 'apa',
+            lang: 'en-US'
+          });
+
+          if (citationElement.parentElement && citationElement.parentElement.matches('pre')) {
+            citationElement.parentElement.replaceWith(template.content);
+          } else {
+            citationElement.replaceWith(template.content);
+          }
+        } catch (e) {
+          console.error("unable to render citation", e);
+        }
+      }
+    });
+  </script>
 </head>
