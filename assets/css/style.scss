@@ -62,8 +62,7 @@ a:hover, a:active {
 }
 
 .footer-col {
-  padding-right: 5em !important; // !important To override Jekyll styling
-  padding-left: 5em !important;
+  box-sizing: content-box !important; // !important To override bootstrap styling
 }
 
 .no-underline {
