@@ -39,6 +39,13 @@ main.page-content {
   background-color: rgba(0,0,0,0) !important;
 }
 
+table.preamble > tbody > tr > :not(:first-child) {
+  width: 100%;
+}
+
+table.preamble > tbody > tr > :first-child {
+  white-space: nowrap;
+}
 a, a:link {
   color: #726E97;
   text-decoration: none;
