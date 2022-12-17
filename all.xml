@@ -14,10 +14,9 @@ layout: null
       <item>
         <title>{{ eip.title | xml_escape }}</title>
         <category>{{ eip.type }}/{{ eip.category }}</category>
-        <author>{{ eip.author | xml_escape }}</author>
         {% if eip.discussions-to %}
           <comments>{{ eip.discussions-to | xml_escape }}</comments>
-        {% else %}
+        {% endif %}
         <description>{{ eip.content | xml_escape }}</description>
         <pubDate>{{ eip.created | date_to_rfc822 }}</pubDate>
         <link>{{ site.url }}{{ eip.url }}</link>
