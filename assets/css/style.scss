@@ -35,7 +35,7 @@ main.page-content {
 }
 
 .table-borderless, .table-borderless * {
-  border-style : hidden !important;
+  border-style : hidden !important; // !important To override Jekyll styling
   background-color: rgba(0,0,0,0) !important;
 }
 
@@ -46,6 +46,7 @@ table.preamble > tbody > tr > :not(:first-child) {
 table.preamble > tbody > tr > :first-child {
   white-space: nowrap;
 }
+
 a, a:link {
   color: #726E97;
   text-decoration: none;
@@ -58,6 +59,15 @@ a:visited {
 a:hover, a:active {
   color: #7F557D;
   text-decoration: underline;
+}
+
+.footer-col-wrapper {
+  padding-right: 5em !important; // !important To override Jekyll styling
+  padding-left: 5em !important;
+}
+
+.no-underline {
+  text-decoration: none !important; // !important To override previous <a> styling
 }
 
 .badge:hover {
@@ -76,8 +86,4 @@ h1 {
   line-height: 1;
   height: 1em;
   width: 1em;
-}
-
-.no-underline {
-  text-decoration: none !important; // To override previous styling
 }
