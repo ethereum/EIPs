@@ -64,3 +64,10 @@ a:hover, a:active {
   filter: brightness(75%);
   transition: all 0.25s ease;
 }
+
+.inline-svg {
+  fill: currentColor;
+  line-height: 1;
+  height: 1em;
+  width: 1em;
+}
