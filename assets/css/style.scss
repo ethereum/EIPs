@@ -61,7 +61,7 @@ a:hover, a:active {
   text-decoration: underline;
 }
 
-.site-footer {
+.site-footer, .site-footer * {
   box-sizing: content-box !important; // !important To override bootstrap styling
 }
 
