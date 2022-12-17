@@ -7,12 +7,12 @@ interface IERC5851{
     /** Metadata
     * 
     * @param title defines the name of the claim field
-    * @param _type is the nature of the data (bool,string,address,bytes,..)
+    * @param kind is the nature of the data (bool,string,address,bytes,..)
     * @param description additional information about claim details.
     */
     struct Metadata {
         string title;
-        string _type;
+        string kind;
         string description;
     }
     
@@ -61,7 +61,7 @@ interface IERC5851{
     /**
     ex: standardClaim(1) --> {
     { "title":"age",
-        "type": "uint",
+        "kind": "uint",
         "description": "age of the person based on the birth date on the legal document",
         },
        "logic": ">=",
@@ -77,7 +77,7 @@ interface IERC5851{
     /// @param `claims` is the struct array of all the descriptions of condition metadata that is defined by the administrator. check metadata section for more information.
     /**
     example: changeStandardClaim(1, { "title":"age",
-            "type": "uint",
+            "kind": "uint",
             "description": "age of the person based on the birth date on the legal document",
             },
         "logic": ">=",
