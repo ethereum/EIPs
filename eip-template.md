@@ -33,8 +33,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 ## Motivation
 
 <!--
-  This section is optional. If this is your first time drafting an EIP, it is recommended not to include a motivation until you are familiar with EIP-1, as mistakes will delay your draft being merged.
-  
+  This section is optional.
   The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
   
   With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
@@ -45,7 +44,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 ## Specification
 
 <!--
-  The Specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and others).
+  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
   
   It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
   
@@ -69,6 +68,8 @@ TBD
 ## Backwards Compatibility
 
 <!--
+
+  This section is optional.
   All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
 
   The current placeholder is acceptable for a draft.
@@ -81,11 +82,9 @@ No backward compatibility issues found.
 ## Test Cases
 
 <!--
-  This section is optional. If this is your first time drafting an EIP, it is recommended not to include test cases until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the test suite is too large to reasonably be included inline, then it is probably too big.
-
-  The test cases do not need to be executable. Expected input/output pairs are sufficient, and are less likely to block your EIP.
-  
-  With a few exceptions, external links are not allowed.
+  This section is optional for non-Core EIPs.
+  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
+  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
 
   TODO: Remove this comment before submitting
 -->
@@ -93,9 +92,9 @@ No backward compatibility issues found.
 ## Reference Implementation
 
 <!--
-  This section is optional. If this is your first time drafting an EIP, it is recommended not to include a reference implementation until you are familiar with EIP-1, as mistakes will delay your draft being merged. If the reference implementation is too large to reasonably be included inline, then it is probably too big.
-  
-  With a few exceptions, external links are not allowed.
+  This section is optional.
+  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
+  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
 
   TODO: Remove this comment before submitting
 -->
@@ -103,7 +102,7 @@ No backward compatibility issues found.
 ## Security Considerations
 
 <!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
   The current placeholder is acceptable for a draft.
   
