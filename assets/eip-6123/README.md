@@ -7,7 +7,7 @@ This sdc implementation aims to implement process logic in a very lean way using
 - `contracts/ISDC.sol` - Interface contract
 - `contracts/SDC.sol` - SDC reference implementation contract
 - `contracts/SDCToken.sol` - Mintable token contract for unit tests
-- `scripts/SDC.js` - Unit tests for livecycle of sdc implementation 
+- `test/SDC.js` - Unit tests for livecycle of sdc implementation 
 
 ### Used javascript based testing libraries for solidity
 - `ethereum-waffle`: Waffle is a Solidity testing library. It allows you to write tests for your contracts with JavaScript.
