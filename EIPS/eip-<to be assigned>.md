@@ -1,9 +1,9 @@
 ---
 eip: <to be assigned>
-title: Cross Chain Messaging Standard
+title: Cross Chain Messaging Interface
 description: A common smart contract interface for interacting with messaging protocols.
 author: Sujith Somraaj (@sujithsomraaj)
-discussions-to: https://ethresear.ch/t/standardisation-of-cross-chain-messaging-interface/13770, https://ethereum-magicians.org/t/cross-chain-messaging-standard/12197
+discussions-to: https://ethereum-magicians.org/t/cross-chain-messaging-standard/12197, https://ethresear.ch/t/standardisation-of-cross-chain-messaging-interface/13770
 status: Draft
 type: Standards Track
 category: ERC
