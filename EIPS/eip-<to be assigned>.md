@@ -72,4 +72,4 @@ The Cross-Chain interface is designed to be optimized for messaging layer integr
 Fully permissionless messaging could be a security threat to the protocol. It is recommended that all the integrators review the implementation of messaging tunnels before integrating.
 
 ## Copyright
-Copyright and related rights waived via [CC0]("https://eips.ethereum.org/LICENSE")
+Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
