@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 6189
 title: Alias Contracts
 description: Allows the creation of contracts that forward calls to other contracts
 author: Pandapip1 (@Pandapip1)
@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2022-12-20
-requires: 2929, <to be assigned>
+requires: 2929, 6188
 ---
 
 ## Abstract
