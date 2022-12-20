@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 6190
 title: Functional SELFDESTRUCT
 description: Changes SELFDESTRUCT to only cause a finite number of state changes
 author: Pandapip1 (@Pandapip1), Alex Beregszaszi (@axic)
@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2022-12-20
-requires: <to be assigned>
+requires: 6189
 ---
 
 ## Abstract
