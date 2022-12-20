@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 6188
 title: Nonce Cap
 description: Caps the nonce at 2^64-2
 author: Pandapip1 (@Pandapip1)
