@@ -55,6 +55,10 @@ If there is more than one alias contract in the chain, the original accessed acc
 
 If an infinite loop occurs, the transaction runs out of gas and reverts.
 
+### `CREATE` and `CREATE2`
+
+If `CREATE` or `CREATE2` would fail because there is already a an account at the address, and that contract's code is `0x1`, and its nonce is `2^64-1`, then instead of failing, an attempt should be made to create a contract at the address stored in the `0`th storage slot of the existing contract. This repeats until a non-alias contract is reached, at which point either the creation succeeds, or it fails because there is already an account at the address.
+
 ## Rationale
 
 The additional gas cost of `25` represents the cost of fetching the nonce and comparing it to the given value.
