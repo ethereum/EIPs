@@ -1,5 +1,8 @@
 pragma solidity ^0.8.0;
 
+import "./IERC-6150.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
 abstract contract ERC6150 is ERC721, IERC6150 {
     mapping(uint256 => uint256) private _parentOf;
     mapping(uint256 => uint256[]) private _childrenOf;
@@ -69,7 +72,7 @@ abstract contract ERC6150 is ERC721, IERC6150 {
     ) internal virtual {
         require(
             tokenIds.length == datas.length,
-            "ERC6150: tokenIds.length != datas.length"
+            "EIP6150: tokenIds.length != datas.length"
         );
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _safeMintWithParent(to, parentId, tokenIds[i], datas[i]);
@@ -90,9 +93,9 @@ abstract contract ERC6150 is ERC721, IERC6150 {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        require(tokenId > 0, "ERC6150: tokenId is zero");
+        require(tokenId > 0, "EIP6150: tokenId is zero");
         if (parentId != 0)
-            require(_exists(parentId), "ERC6150: parentId doesn't exists");
+            require(_exists(parentId), "EIP6150: parentId doesn't exists");
 
         _beforeMintWithParent(to, parentId, tokenId);
 
