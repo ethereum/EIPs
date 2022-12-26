@@ -104,7 +104,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           unchecked: 1, 5069, 5757
-          warn-checks: "markdown-rel-links,markdown-order-section"
+          warn-checks: "markdown-order-section"
 
   markdownlint:
     name: Markdown Linter
