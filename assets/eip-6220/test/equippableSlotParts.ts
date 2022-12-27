@@ -329,6 +329,10 @@ describe('EquippableTokenMock with Slots', async () => {
     ({ catalog, soldier, weapon, weaponGem, background, view } = await loadFixture(slotsFixture));
   });
 
+  it('can support IEquippable', async function () {
+    expect(await soldier.supportsInterface('0x28bc9ae4')).to.equal(true);
+  });
+
   describe('Validations', async function () {
     it('can validate equips of weapons into snakeSoldiers', async function () {
       // This asset is not equippable

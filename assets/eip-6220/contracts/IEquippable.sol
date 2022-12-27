@@ -94,6 +94,36 @@ interface IEquippable is IERC5773 {
     );
 
     /**
+     * @notice Used to equip a child into a token.
+     * @dev The `IntakeEquip` stuct contains the following data:
+     *  [
+     *      tokenId,
+     *      childIndex,
+     *      assetId,
+     *      slotPartId,
+     *      childAssetId
+     *  ]
+     * @param data An `IntakeEquip` struct specifying the equip data
+     */
+    function equip(
+        IntakeEquip memory data
+    ) external;
+
+    /**
+     * @notice Used to unequip child from parent token.
+     * @dev This can only be called by the owner of the token or by an account that has been granted permission to
+     *  manage the given token by the current owner.
+     * @param tokenId ID of the parent from which the child is being unequipped
+     * @param assetId ID of the parent's asset that contains the `Slot` into which the child is equipped
+     * @param slotPartId ID of the `Slot` from which to unequip the child
+     */
+    function unequip(
+        uint256 tokenId,
+        uint64 assetId,
+        uint64 slotPartId
+    ) external;
+
+    /**
      * @notice Used to check whether the token has a given child equipped.
      * @dev This is used to prevent from transferring a child that is equipped.
      * @param tokenId ID of the parent token for which we are querying for
