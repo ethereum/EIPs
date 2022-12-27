@@ -23,32 +23,32 @@ Equipping a part into an NFT doesn't generate a new token, but rather adds anoth
 
 ## Motivation
 
-With NFTs being a widespread form of tokens in the Ethereum ecosystem and being used for a variety of use cases, it is time to standardize additional utility for them. Having the ability for tokens to own other tokens allows for greater utility, usability and forward compatibility.
+With NFTs being a widespread form of tokens in the Ethereum ecosystem and being used for a variety of use cases, it is time to standardize additional utility for them. Having the ability for tokens to equip other tokens and be composed from a set of available parts allows for greater utility, usability and forward compatibility.
 
 In the four years since [EIP-721](./eip-721.md) was published, the need for additional functionality has resulted in countless extensions. This EIP improves upon EIP-721 in the following areas:
 
 - [Composing](#composing)
 - [Token progression](#token-progression)
 - [Merit tracking](#merit-tracking)
-- [Portfolio organization](#portfolio-organization)
+- [Provable Digital Scarcity](#provable-digital-scarcity)
 
 ### Composing
 
-NFTs can work together to create a greater construct. Prior to this proposal, multiple NFTs could be composed into a single construct either by checking all of the compatible NFTs associated with a given account and used indiscriminately (which could result in unexpected result if there was more than one NFT intended to be used in the same slot), or by keeping a custom ledger of parts to compose together (either in a smart contract or an off-chain database). This proposal establishes a standardized framework for composable NFTs, where a single NFT can select which parts should be a part of the whole. Composing NFTs in such a way allows for virtually unbounded customization of the base NFT. An example of this could be a movie NFT. Some parts, like credits, should be fixed. Other parts, like scenes, should be interchangeable, so that various releases (base version, extended cuts, anniversary editions,...) can be replaced.
+NFTs can work together to create a greater construct. Prior to this proposal, multiple NFTs could be composed into a single construct either by checking all of the compatible NFTs associated with a given account and used indiscriminately (which could result in unexpected result if there was more than one NFT intended to be used in the same slot), or by keeping a custom ledger of parts to compose together (either in a smart contract or an off-chain database). This proposal establishes a standardized framework for composable NFTs, where a single NFT can select which parts should be a part of the whole, with the information being on chain. Composing NFTs in such a way allows for virtually unbounded customization of the base NFT. An example of this could be a movie NFT. Some parts, like credits, should be fixed. Other parts, like scenes, should be interchangeable, so that various releases (base version, extended cuts, anniversary editions,...) can be replaced.
 
 ### Token progression
 
-As the token progresses through various stages of its existence, it can attain or be awarded various parts. This can be explained in terms of gaming. A character could be represented by an NFT utilizing this proposal and would be able to equip gear acquired through the gameplay activities and as it progresses further in the game, better items would be available. In stead of having numerous NFTs representing the items collected through its progression, equippable parts can be unlocked and the NFT owner would be able to decide which items to equip and which to keep in the inventory (not equipped).
+As the token progresses through various stages of its existence, it can attain or be awarded various parts. This can be explained in terms of gaming. A character could be represented by an NFT utilizing this proposal and would be able to equip gear acquired through the gameplay activities and as it progresses further in the game, better items would be available. In stead of having numerous NFTs representing the items collected through its progression, equippable parts can be unlocked and the NFT owner would be able to decide which items to equip and which to keep in the inventory (not equipped) without need of a centralized party.
 
 ### Merit tracking
 
 An equippable NFT can also be used to track merit. An example of this is academic merit. The equippable NFT in this case would represent a sort of digital portfolio of academic achievements, where the owner would be able to equip their diplomas, published articles and awards for all to see.
 
-### Portfolio organization
+### Provable Digital Scarcity
 
-Many use cases that use utility NFTs eventually award holders of the tokens with additional tokens that provide additional utility. Gaming NFTs often use other NFTs to represent items owned by the base NFT. Both of the examples can mean that, in a long term scenario, the NFT owner's wallet could contain hundredths NFTs for a single use case. Not only does this mean that the wallet is cluttered, but the interface may soon become virtually unusable and NFTs might get buried within the wallet. By supporting NFTs outlined in this proposal use cases can only use a single NFT to track virtually unbounded utility and in turn allow the owner of the token to easily traverse owned NFTs.
+The majority of current NFT projects are only mock-scarce. Even with a limited supply of tokens, the utility of these (if any) is uncapped. As an example, you can log into 500 different instances of the same game using the same wallet and the same NFT. You can then equip the same hat onto 500 different in-game avatars at the same time, because its visual representation is just a client-side mechanic. 
 
-A great example of this is a DAO membership NFT. As a DAO grows, it could grow into multiple factions and sub-factions which would each require its own access NFT in order to access them. An equippable base NFT would allow the access NFTs to be replaced by equippable access passes, thus reducing clutter of one's NFT inventory. These access passes could be in a form of fixed parts. Fixed parts have their own metadata, while they are not NFTs in their own right. This means that the owner's wallet wouldn't need to hold them, but they would appear when the membership NFT is rendered and would function when trying to access the desired gated part of the DAO.
+This proposal adds the ability to enforce that, if a hat is equipped on one avatar (by being sent into it and then equipped), it cannot be equipped on another. This provides real digital scarcity.
 
 ## Specification
 
@@ -424,7 +424,7 @@ Designing the proposal, we considered the following questions:
 
 1. **Why are we using a Catalog in stead of supporting direct NFT equipping?**
 
-If NFTs could be directly equipped into other NFTs without any oversight, the resulting composite would be unpredictable. Catalog allows for parts to be pre-verified in order to result in a composite that composes as expected.
+If NFTs could be directly equipped into other NFTs without any oversight, the resulting composite would be unpredictable. Catalog allows for parts to be pre-verified in order to result in a composite that composes as expected. Another benefit of Catalog is the ability of defining reusable fixed parts.
 
 2. **Why do we propose two types of parts?**
 
@@ -440,7 +440,7 @@ Getting all parts might not be an operation necessary for all implementers. Addi
 
 4. **Should Catalog be limited to support one NFT collection at a time or be able to support any nunmber of collections?**
 
-As the Catalog is designed in a way that is agnostic to the use case using it, it makes sense to support as wide reusability as possible. Having one Catalog supporting multiple collections allows for optimized operation and reduced gas prices when deploying it and setting fixed as well as slot parts.
+As the Catalog is designed in a way that is agnostic to the use case using it. It makes sense to support as wide reusability as possible. Having one Catalog supporting multiple collections allows for optimized operation and reduced gas prices when deploying it and setting fixed as well as slot parts.
 
 ### Fixed parts
 
