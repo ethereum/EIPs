@@ -422,24 +422,15 @@ interface ICatalog is IERC165 {
 
 Designing the proposal, we considered the following questions:
 
-1. **Why are we using a Catalog in stead of supporting direct NFT equipping?**
-
+1. **Why are we using a Catalog in stead of supporting direct NFT equipping?**\
 If NFTs could be directly equipped into other NFTs without any oversight, the resulting composite would be unpredictable. Catalog allows for parts to be pre-verified in order to result in a composite that composes as expected. Another benefit of Catalog is the ability of defining reusable fixed parts.
-
-2. **Why do we propose two types of parts?**
-
-Some parts, that are the same for all of the tokens, don't make sense to be represented by individual NFTs, so they can be represented by fixed parts. This reduces the clutter of the owner's wallet as well as introduces an efficient way of disseminating repetitive assets tied to NFTs.
-
-The slot parts allow for equipping NFTs into them. This provides the ability to equip unrelated NFT collections into the base NFT after the unrelated collection has been verified to compose properly.
-
+2. **Why do we propose two types of parts?**\
+Some parts, that are the same for all of the tokens, don't make sense to be represented by individual NFTs, so they can be represented by fixed parts. This reduces the clutter of the owner's wallet as well as introduces an efficient way of disseminating repetitive assets tied to NFTs.\
+The slot parts allow for equipping NFTs into them. This provides the ability to equip unrelated NFT collections into the base NFT after the unrelated collection has been verified to compose properly.\
 Having two parts allows for support of numerous use cases and, since the proposal doesn't enforce the use of both it can be applied in any configuration needed.
-
-3. **Why is a method to get all of the equipped parts not included?**
-
+3. **Why is a method to get all of the equipped parts not included?**\
 Getting all parts might not be an operation necessary for all implementers. Additionally, it can be added either as an extension, doable with hooks, or can be emulated using an indexer.
-
-4. **Should Catalog be limited to support one NFT collection at a time or be able to support any nunmber of collections?**
-
+4. **Should Catalog be limited to support one NFT collection at a time or be able to support any nunmber of collections?**\
 As the Catalog is designed in a way that is agnostic to the use case using it. It makes sense to support as wide reusability as possible. Having one Catalog supporting multiple collections allows for optimized operation and reduced gas prices when deploying it and setting fixed as well as slot parts.
 
 ### Fixed parts
