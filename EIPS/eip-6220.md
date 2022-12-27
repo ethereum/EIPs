@@ -15,7 +15,7 @@ requires: 165, 721, 5773, 6059
 
 The Composable NFTs utilizing equippable parts standard extends [EIP-721](./eip-721.md) by allowing the NFTs to selectively add parts to themselves via equipping.
 
-Tokens are able to equip the parts by cherry picking the list of parts from a Catalog for that NFT instance. Catalogs contain parts from which NFTs can be composed.
+Tokens can be composed by cherry picking the list of parts from a Catalog for each NFT instance, and are able to equip other NFTs into slots, which are also defined within the Catalog. Catalogs contain parts from which NFTs can be composed.
 
 This proposal introduces two types of parts; slot type of parts and fixed type of parts. The slot type of parts allow for other NFT collections to be equipped into them, while fixed parts are full components with their own metadata.
 
