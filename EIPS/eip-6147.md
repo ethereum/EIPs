@@ -13,17 +13,17 @@ requires: 165, 721
 
 ## Abstract
 
-This standard is an extension of [EIP-721](./eip-721.md). It separates the holding right and transfer right of NFT/SBT and defines a new role, `guard`. The flexibility of the `guard` setting enables the design of NFT anti-theft, NFT lending, NFT leasing, SBT, etc.
+This standard is an extension of [EIP-721](./eip-721.md). It separates the holding right and transfer right of non-fungible tokens (NFTs) and Soulbound Tokens (SBTs) and defines a new role, `guard`. The flexibility of the `guard` setting enables the design of NFT anti-theft, NFT lending, NFT leasing, SBT, etc.
 
 ## Motivation
 
-NFT is an asset that has both use and financial value.
+NFTs are assets that have both use and financial value.
 
 Many cases of NFT theft currently exist, and current NFT anti-theft schemes, such as transferring NFT to cold wallets, make NFT inconvenient to be used.
 
 In current NFT lending, the NFT owner needs to transfer the NFT to the NFT lending contract, and the NFT owner no longer has the right to use the NFT while he or she has obtained the loan. In the real world, for example, if a person takes out a mortgage on his own house, he still has the right to use that house.
 
-For SBT. The current mainstream view is that SBT is not transferable, which makes SBT bound to an Ether address. However, when the private key of the user address is leaked or lost, retrieving SBT will become a complicated task and there is no corresponding specification. The SBTs essentially realizes the separation of NFT holding rights and transfer rights. When the wallet where SBT is located is stolen or unavailable, SBT should be able to be recoverable. 
+For SBT, the current mainstream view is that an SBT is not transferable, which makes an SBT bound to an Ether address. However, when the private key of the user address is leaked or lost, retrieving SBT will become a complicated task and there is no corresponding specification. The SBTs essentially realizes the separation of NFT holding rights and transfer rights. When the wallet where SBT is located is stolen or unavailable, SBT should be able to be recoverable. 
 
 In addition, SBTs still need to be managed in use. For example, if a university issues a diploma SBT to its graduates, and if the university later finds that a graduate has committed academic misconduct or jeopardized the reputation of the university, it should have the ability to retrieve the diploma SBT. 
 
@@ -35,7 +35,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 ### Contract Interface
   
 ```solidity
- interface IERC721QS {
+ interface IERC6147 {
 
     /// Logged when the guard of an NFT is changed 
     /// @notice Emitted when  the `guard` is changed
@@ -75,24 +75,21 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 }
   
   ```
+The standard defines a new role `guard` and regulates the permissions of `owner` and `guard` as follows
+
+`owner`（Including authorised operators or approved addresses, which will not be described in detail below）: when the guard of the NFT is empty, `owner` can transfer the NFT, and also set `guard`. However, when `guard` already exists for the NFT, `owner` cannot modify `guard`, and cannot transfer the NFT.
+
+`guard`: The `guard` can remove its own `guard` identity or transfer the NFT to a specified address. For example, the `guard` can be set as the cold wallet address of the NFT holder, or an address trusted by the NFT holder. After the `owner` address of the NFT is abnormal, the `guard` can call the contract to transfer the NFT to the specified address.
 
 The `supportsInterface` method MUST return `true` when called with `0xc0655ef1`.
 
 ## Rationale 
 
-### Specification Management for Separation of Permissions
-
-The standard defines a new role `guard` and regulates the permissions of `owner` and `guard` as follows
-
-`owner`（Including authorized operators, which will not be described in detail below）: when the guard of the NFT is empty, `owner` can transfer the NFT, and also set `guard`. However, when `guard` already exists for the NFT, `owner` cannot modify `guard`, and cannot transfer the NFT.
-
-`guard`: The `guard` can remove its own `guard` identity or transfer the NFT to a specified address. For example, the `guard` can be set as the cold wallet address of the NFT holder, or an address trusted by the NFT holder. After the `owner` address of the NFT is abnormal, the `guard` can call the contract to transfer the NFT to the specified address.
-
 ### The design idea of the standard is as follows
 
 #### Universality
 
-There are many application scenarios for NFT/SBT, and there is no need to propose a dedicated eip for each specific application scenario, which would make the overall number of eips inevitably increase and add to the burden of developers. The standard is based on the analysis of the right attached to assets in the real world, and abstracts the right attached to NFT/SBT into holding right and transfer right making the standard more universal.
+There are many application scenarios for NFT/SBT, and there is no need to propose a dedicated EIP for each one, which would make the overall number of EIPS inevitably increase and add to the burden of developers. The standard is based on the analysis of the right attached to assets in the real world, and abstracts the right attached to NFT/SBT into holding right and transfer right making the standard more universal.
 
 For example, the standard has and has more than the following use cases.
 
@@ -128,9 +125,9 @@ If the NFT issued based on the above standard does not have a `guard` role, then
 pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERC721QS.sol";
+import "./IERC6147.sol";
 
-abstract contract ERC721QS is ERC721, IERC721QS {
+abstract contract ERC721QS is ERC721, IERC6147 {
     
     mapping(uint256 => address) internal token_guard_map;
 
@@ -269,4 +266,4 @@ For NFT trading platforms that trade through `setApprovalForAll` + holder's sign
 
 ## Copyright
 
-Copyright and related rights waived via CC0.
+Copyright and related rights waived via [CC0](../LICENSE.md).
