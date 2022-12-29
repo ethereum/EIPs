@@ -1,0 +1,475 @@
+---
+eip: 4844
+title: Shard Blob Transactions
+description: Shard Blob Transactions scale data-availability of Ethereum in a simple, forwards-compatible manner.
+author: Vitalik Buterin (@vbuterin), Dankrad Feist (@dankrad), Diederik Loerakker (@protolambda), George Kadianakis (@asn-d6), Matt Garnett (@lightclient), Mofi Taiwo (@Inphi), Ansgar Dietrichs (@adietrichs)
+discussions-to: https://ethereum-magicians.org/t/eip-4844-shard-blob-transactions/8430
+status: Draft
+type: Standards Track
+category: Core
+created: 2022-02-25
+requires: 1559, 2718, 2930, 4895
+---
+
+## Abstract
+
+Introduce a new transaction format for "blob-carrying transactions" which contain a large amount of data that cannot be
+accessed by EVM execution, but whose commitment can be accessed.
+The format is intended to be fully compatible with the format that will be used in full sharding.
+
+## Motivation
+
+Rollups are in the short and medium term, and possibly in the long term, the only trustless scaling solution for Ethereum.
+Transaction fees on L1 have been very high for months and there is greater urgency in doing anything required to help facilitate an ecosystem-wide move to rollups.
+Rollups are significantly reducing fees for many Ethereum users: Optimism and Arbitrum frequently provide fees that are ~3-8x lower than the Ethereum base layer itself,
+and ZK rollups, which have better data compression and can avoid including signatures, have fees ~40-100x lower than the base layer.
+
+However, even these fees are too expensive for many users. The long-term solution to the long-term inadequacy of rollups
+by themselves has always been data sharding, which would add ~16 MB per block of dedicated data space to the chain that rollups could use.
+However, data sharding will still take a considerable amount of time to finish implementing and deploying.
+
+This EIP provides a stop-gap solution until that point by implementing the _transaction format_ that would be used in sharding,
+but not actually sharding those transactions. Instead, the data from this transaction format is simply part of the beacon chain and is fully downloaded
+by all consensus nodes (but can be deleted after only a relatively short delay).
+Compared to full data sharding, this EIP has a reduced cap on the number of these transactions that can be included, corresponding to a target of ~0.25 MB per block and a limit of ~0.5 MB.
+
+## Specification
+
+### Parameters
+
+| Constant | Value |
+| - | - |
+| `BLOB_TX_TYPE` | `Bytes1(0x05)` |
+| `FIELD_ELEMENTS_PER_BLOB` | `4096` |
+| `BLS_MODULUS` | `52435875175126190479447740508185965837690552500527637822603658699938581184513` |
+| `BLOB_COMMITMENT_VERSION_KZG` | `Bytes1(0x01)` |
+| `POINT_EVALUATION_PRECOMPILE_ADDRESS` | `Bytes20(0x14)` |
+| `POINT_EVALUATION_PRECOMPILE_GAS` | `50000` |
+| `MAX_DATA_GAS_PER_BLOCK` | `2**19` |
+| `TARGET_DATA_GAS_PER_BLOCK` | `2**18` |
+| `MIN_DATA_GASPRICE` | `1` |
+| `DATA_GASPRICE_UPDATE_FRACTION` | `2225652` |
+| `MAX_VERSIONED_HASHES_LIST_SIZE` | `2**24` |
+| `MAX_CALLDATA_SIZE` | `2**24` |
+| `MAX_ACCESS_LIST_SIZE` | `2**24` |
+| `MAX_ACCESS_LIST_STORAGE_KEYS` | `2**24` |
+| `MAX_TX_WRAP_KZG_COMMITMENTS` | `2**24` |
+| `LIMIT_BLOBS_PER_TX` | `2**24` |
+| `DATA_GAS_PER_BLOB` | `2**17` |
+| `HASH_OPCODE_BYTE` | `Bytes1(0x49)` |
+| `HASH_OPCODE_GAS` | `3` |
+
+### Type aliases
+
+| Type | Base type | Additional checks |
+| - | - | - |
+| `BLSFieldElement` | `uint256` | `x < BLS_MODULUS` |
+| `Blob` | `Vector[BLSFieldElement, FIELD_ELEMENTS_PER_BLOB]` | |
+| `VersionedHash` | `Bytes32` | |
+| `KZGCommitment` | `Bytes48` | Same as BLS standard "is valid pubkey" check but also allows `0x00..00` for point-at-infinity |
+| `KZGProof` | `Bytes48` | Same as for `KZGCommitment` |
+
+### Cryptographic Helpers
+
+Throughout this proposal we use cryptographic methods and classes defined in the corresponding [consensus 4844 specs](https://github.com/ethereum/consensus-specs/blob/23d3aeebba3b5da0df4bd25108461b442199f406/specs/eip4844).
+
+Specifically, we use the following methods from [`polynomial-commitments.md`](https://github.com/ethereum/consensus-specs/blob/23d3aeebba3b5da0df4bd25108461b442199f406/specs/eip4844/polynomial-commitments.md):
+
+- [`verify_kzg_proof()`](https://github.com/ethereum/consensus-specs/blob/23d3aeebba3b5da0df4bd25108461b442199f406/specs/eip4844/polynomial-commitments.md#verify_kzg_proof)
+- [`verify_aggregate_kzg_proof()`](https://github.com/ethereum/consensus-specs/blob/23d3aeebba3b5da0df4bd25108461b442199f406/specs/eip4844/polynomial-commitments.md#verify_aggregate_kzg_proof)
+
+### Helpers
+
+```python
+def kzg_to_versioned_hash(kzg: KZGCommitment) -> VersionedHash:
+    return BLOB_COMMITMENT_VERSION_KZG + hash(kzg)[1:]
+```
+
+Approximates `factor * e ** (numerator / denominator)` using Taylor expansion:
+
+```python
+def fake_exponential(factor: int, numerator: int, denominator: int) -> int:
+    i = 1
+    output = 0
+    numerator_accum = factor * denominator
+    while numerator_accum > 0:
+        output += numerator_accum
+        numerator_accum = (numerator_accum * numerator) // (denominator * i)
+        i += 1
+    return output // denominator
+```
+
+### New transaction type
+
+We introduce a new [EIP-2718](./eip-2718.md) transaction type,
+with the format being the single byte `BLOB_TX_TYPE` followed by an SSZ encoding of the
+`SignedBlobTransaction` container comprising the transaction contents:
+
+```python
+class SignedBlobTransaction(Container):
+    message: BlobTransaction
+    signature: ECDSASignature
+
+class BlobTransaction(Container):
+    chain_id: uint256
+    nonce: uint64
+    max_priority_fee_per_gas: uint256
+    max_fee_per_gas: uint256
+    gas: uint64
+    to: Union[None, Address] # Address = Bytes20
+    value: uint256
+    data: ByteList[MAX_CALLDATA_SIZE]
+    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
+    max_fee_per_data_gas: uint256
+    blob_versioned_hashes: List[VersionedHash, MAX_VERSIONED_HASHES_LIST_SIZE]
+
+class AccessTuple(Container):
+    address: Address # Bytes20
+    storage_keys: List[Hash, MAX_ACCESS_LIST_STORAGE_KEYS]
+
+class ECDSASignature(Container):
+    y_parity: boolean
+    r: uint256
+    s: uint256
+```
+
+The `max_priority_fee_per_gas` and `max_fee_per_gas` fields follow [EIP-1559](./eip-1559.md) semantics,
+and `access_list` as in [`EIP-2930`](./eip-2930.md).
+
+[`EIP-2718`](./eip-2718.md) is extended with a "wrapper data", the typed transaction can be encoded in two forms, dependent on the context:
+
+- Network (default): `TransactionType || TransactionNetworkPayload`, or `LegacyTransaction`
+- Minimal (as in execution payload): `TransactionType || TransactionPayload`, or `LegacyTransaction`
+
+Execution-payloads / blocks use the minimal encoding of transactions.
+In the transaction-pool and local transaction-journal the network encoding is used.
+
+For previous types of transactions the network encoding is no different, i.e. `TransactionNetworkPayload == TransactionPayload`.
+
+The `TransactionNetworkPayload` wraps a `TransactionPayload` with additional data:
+this wrapping data SHOULD be verified directly before or after signature verification.
+
+When a blob transaction is passed through the network (see the [Networking](#networking) section below),
+the `TransactionNetworkPayload` version of the transaction also includes `blobs` and `kzgs` (commitments list).
+The execution layer verifies the wrapper validity against the inner `TransactionPayload` after signature verification as:
+
+- All hashes in `blob_versioned_hashes` must start with the byte `BLOB_COMMITMENT_VERSION_KZG`
+- There may be at most `MAX_DATA_GAS_PER_BLOCK // DATA_GAS_PER_BLOB` total blob commitments in a valid block.
+- There is an equal amount of versioned hashes, kzg commitments and blobs.
+- The KZG commitments hash to the versioned hashes, i.e. `kzg_to_versioned_hash(kzg[i]) == versioned_hash[i]`
+- The KZG commitments match the blob contents. (Note: this can be optimized with additional data, using a proof for a
+  random evaluation at two points derived from the commitment and blob data)
+
+
+The signature is verified and `tx.origin` is calculated as follows:
+
+```python
+def tx_hash(tx: SignedBlobTransaction) -> Bytes32:
+    # The pre-image is prefixed with the transaction-type to avoid hash collisions with other tx hashers and types
+    return keccak256(BLOB_TX_TYPE + ssz.hash_tree_root(tx.message))
+
+def get_origin(tx: SignedBlobTransaction) -> Address:
+    sig = tx.signature
+    # v = int(y_parity) + 27, same as EIP-1559
+    return ecrecover(tx_hash(tx), int(sig.y_parity)+27, sig.r, sig.s)
+```
+
+### Header extension
+
+The current header encoding is extended with a new 256-bit unsigned integer field `excess_data_gas`. This is the running
+total of excess data gas consumed on chain since this EIP was activated. If the total amount of data gas is below the
+target, `excess_data_gas` is capped at zero.
+
+The resulting RLP encoding of the header is therefore:
+
+```
+rlp([
+    parent_hash,
+    0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347, # ommers hash
+    coinbase,
+    state_root,
+    txs_root,
+    receipts_root,
+    logs_bloom,
+    0, # difficulty
+    number,
+    gas_limit,
+    gas_used,
+    timestamp,
+    extradata,
+    prev_randao,
+    0x0000000000000000, # nonce
+    base_fee_per_gas,
+    withdrawals_root,
+    excess_data_gas
+])
+```
+
+The value of `excess_data_gas` can be calculated using the parent header and number of blobs in the block.
+
+```python
+def calc_excess_data_gas(parent: Header, new_blobs: int) -> int:
+    consumed_data_gas = new_blobs * DATA_GAS_PER_BLOB
+    if parent.excess_data_gas + consumed_data_gas < TARGET_DATA_GAS_PER_BLOCK:
+        return 0
+    else:
+        return parent.excess_data_gas + consumed_data_gas - TARGET_DATA_GAS_PER_BLOCK
+```
+
+For the first post-fork block, `parent.excess_data_gas` is evaluated as `0`.
+
+### Beacon chain validation
+
+On the consensus-layer the blobs are now referenced, but not fully encoded, in the beacon block body.
+Instead of embedding the full contents in the body, the contents of the blobs are propagated separately, as a "sidecar".
+
+This "sidecar" design provides forward compatibility for further data increases by black-boxing `is_data_available()`:
+with full sharding `is_data_available()` can be replaced by data-availability-sampling (DAS) thus avoiding all blobs being downloaded by all beacon nodes on the network.
+
+Note that the consensus-layer is tasked with persisting the blobs for data availability, the execution-layer is not.
+
+The `ethereum/consensus-specs` repository defines the following beacon-node changes involved in this EIP:
+
+- Beacon chain: process updated beacon blocks and ensure blobs are available.
+- P2P network: gossip and sync updated beacon block types and new blobs sidecars.
+- Honest validator: produce beacon blocks with blobs, publish the blobs sidecars.
+
+### Opcode to get versioned hashes
+
+We add an opcode `DATAHASH` (with byte value `HASH_OPCODE_BYTE`) which takes as input one stack argument `index`,
+and returns `tx.message.blob_versioned_hashes[index]` if `index < len(tx.message.blob_versioned_hashes)`,
+and otherwise zero.
+The opcode has a gas cost of `HASH_OPCODE_GAS`.
+
+### Point evaluation precompile
+
+Add a precompile at `POINT_EVALUATION_PRECOMPILE_ADDRESS` that verifies a KZG proof which claims that a blob
+(represented by a commitment) evaluates to a given value at a given point.
+
+The precompile costs `POINT_EVALUATION_PRECOMPILE_GAS` and executes the following logic:
+
+```python
+def point_evaluation_precompile(input: Bytes) -> Bytes:
+    """
+    Verify p(z) = y given commitment that corresponds to the polynomial p(x) and a KZG proof.
+    Also verify that the provided commitment matches the provided versioned_hash.
+    """
+    # The data is encoded as follows: versioned_hash | z | y | commitment | proof |
+    versioned_hash = input[:32]
+    z = input[32:64]
+    y = input[64:96]
+    commitment = input[96:144]
+    kzg_proof = input[144:192]
+
+    # Verify commitment matches versioned_hash
+    assert kzg_to_versioned_hash(commitment) == versioned_hash
+
+    # Verify KZG proof
+    assert verify_kzg_proof(commitment, z, y, kzg_proof)
+
+    # Return FIELD_ELEMENTS_PER_BLOB and BLS_MODULUS as padded 32 byte big endian values
+    return Bytes(U256(FIELD_ELEMENTS_PER_BLOB).to_be_bytes32() + U256(BLS_MODULUS).to_be_bytes32())
+```
+
+The precompile MUST reject non-canonical field elements (i.e. provided field elements MUST be strictly less than `BLS_MODULUS`).
+
+### Gas accounting
+
+We introduce data gas as a new type of gas. It is independent of normal gas and follows its own targeting rule, similar to EIP-1559.
+We use the `excess_data_gas` header field to store persistent data needed to compute the data gas price. For now, only blobs are priced in data gas.
+
+```python
+def calc_data_fee(tx: SignedBlobTransaction, parent: Header) -> int:
+    return get_total_data_gas(tx) * get_data_gasprice(header)
+
+def get_total_data_gas(tx: SignedBlobTransaction) -> int:
+    return DATA_GAS_PER_BLOB * len(tx.message.blob_versioned_hashes)
+
+def get_data_gasprice(header: Header) -> int:
+    return fake_exponential(
+        MIN_DATA_GASPRICE,
+        header.excess_data_gas,
+        DATA_GASPRICE_UPDATE_FRACTION
+    )
+```
+
+The block validity conditions are modified to include data gas checks:
+
+```python
+def validate_block(block: Block) -> None:
+    ...
+
+    for tx in block.transactions:
+        ...
+
+        # the signer must be able to afford the transaction
+        assert signer(tx).balance >= tx.message.gas * tx.message.max_fee_per_gas + get_total_data_gas(tx) * tx.message.max_fee_per_data_gas
+
+        # ensure that the user was willing to at least pay the current data gasprice
+        assert tx.message.max_fee_per_data_gas >= get_data_gasprice(parent(block).header)
+```
+
+The actual `data_fee` as calculated via `calc_data_fee` is deducted from the sender balance before transaction execution and burned, and is not refunded in case of transaction failure.
+
+### Networking
+
+Nodes must not automatically broadcast blob transactions to their peers.
+Instead, those transactions are only announced using `NewPooledTransactionHashes` messages, and can then be manually requested via `GetPooledTransactions`.
+
+Transactions are presented as `TransactionType || TransactionNetworkPayload` on the execution layer network,
+the payload is a SSZ encoded container:
+
+```python
+class BlobTransactionNetworkWrapper(Container):
+    tx: SignedBlobTransaction
+    # KZGCommitment = Bytes48
+    blob_kzgs: List[KZGCommitment, MAX_TX_WRAP_KZG_COMMITMENTS]
+    # BLSFieldElement = uint256
+    blobs: List[Vector[BLSFieldElement, FIELD_ELEMENTS_PER_BLOB], LIMIT_BLOBS_PER_TX]
+    # KZGProof = Bytes48
+    kzg_aggregated_proof: KZGProof
+```
+
+We do network-level validation of `BlobTransactionNetworkWrapper` objects as follows:
+
+```python
+def validate_blob_transaction_wrapper(wrapper: BlobTransactionNetworkWrapper):
+    versioned_hashes = wrapper.tx.message.blob_versioned_hashes
+    commitments = wrapper.blob_kzgs
+    blobs = wrapper.blobs
+    # note: assert blobs are not malformatted
+    assert len(versioned_hashes) == len(commitments) == len(blobs)
+
+    # Verify that commitments match the blobs by checking the KZG proof
+    assert verify_aggregate_kzg_proof(blobs, commitments, wrapper.kzg_aggregated_proof)
+
+    # Now that all commitments have been verified, check that versioned_hashes matches the commitments
+    for versioned_hash, commitment in zip(versioned_hashes, commitments):
+        assert versioned_hash == kzg_to_versioned_hash(commitment)
+```
+
+## Rationale
+
+### On the path to sharding
+
+This EIP introduces blob transactions in the same format in which they are expected to exist in the final sharding specification.
+This provides a temporary but significant scaling relief for rollups by allowing them to initially scale to 0.25 MB per slot,
+with a separate fee market allowing fees to be very low while usage of this system is limited.
+
+The core goal of rollup scaling stopgaps is to provide temporary scaling relief,
+without imposing extra development burdens on rollups to take advantage of this relief.
+Today, rollups use calldata. In the future, rollups will have no choice but to use sharded data (also called "blobs")
+because sharded data will be much cheaper.
+Hence, rollups cannot avoid making a large upgrade to how they process data at least once along the way.
+But what we _can_ do is ensure that rollups need to _only_ upgrade once.
+This immediately implies that there are exactly two possibilities for a stopgap: (i) reducing the gas costs of existing calldata,
+and (ii) bringing forward the format that will be used for sharded data, but not yet actually sharding it.
+Previous EIPs were all a solution of category (i); this EIP is a solution of category (ii).
+
+The main tradeoff in designing this EIP is that of implementing more now versus having to implement more later:
+do we implement 25% of the work on the way to full sharding, or 50%, or 75%?
+
+The work that is already done in this EIP includes:
+
+- A new transaction type, of the exact same format that will need to exist in "full sharding"
+- _All_ of the execution-layer logic required for full sharding
+- _All_ of the execution / consensus cross-verification logic required for full sharding
+- Layer separation between `BeaconBlock` verification and data availability sampling blobs
+- Most of the `BeaconBlock` logic required for full sharding
+- A self-adjusting independent gasprice for blobs
+
+The work that remains to be done to get to full sharding includes:
+
+- A low-degree extension of the `blob_kzgs` in the consensus layer to allow 2D sampling
+- An actual implementation of data availability sampling
+- PBS (proposer/builder separation), to avoid requiring individual validators to process 32 MB of data in one slot
+- Proof of custody or similar in-protocol requirement for each validator to verify a particular part of the sharded data in each block
+
+This EIP also sets the stage for longer-term protocol cleanups:
+
+- It adds an SSZ transaction type, and paves the precedent that all new transaction types should be SSZ
+- It defines `TransactionNetworkPayload` to separate network and block encodings of a transaction type
+- Its (cleaner) gas price update rule could be applied to the primary basefee
+
+### How rollups would function
+
+Instead of putting rollup block data in transaction calldata, rollups would expect rollup block submitters
+to put the data into blobs. This guarantees availability (which is what rollups need) but would be much cheaper than calldata.
+Rollups need data to be available once, long enough to ensure honest actors can construct the rollup state, but not forever.
+
+Optimistic rollups only need to actually provide the underlying data when fraud proofs are being submitted.
+The fraud proof can verify the transition in smaller steps, loading at most a few values of the blob at a time through calldata.
+For each value it would provide a KZG proof and use the point evaluation precompile to verify the value against the versioned hash that was submitted before,
+and then perform the fraud proof verification on that data as is done today.
+
+ZK rollups would provide two commitments to their transaction or state delta data:
+the kzg in the blob and some commitment using whatever proof system the ZK rollup uses internally.
+They would use a commitment proof of equivalence protocol, using the point evaluation precompile,
+to prove that the kzg (which the protocol ensures points to available data) and the ZK rollup's own commitment refer to the same data.
+
+### Versioned hashes & precompile return data
+
+We use versioned hashes (rather than kzgs) as references to blobs in the execution layer to ensure forward compatibility with future changes.
+For example, if we need to switch to Merkle trees + STARKs for quantum-safety reasons, then we would add a new version,
+allowing the point evaluation precompile to work with the new format.
+Rollups would not have to make any EVM-level changes to how they work;
+sequencers would simply have to switch over to using a new transaction type at the appropriate time.
+
+However, the point evaluation happens inside a finite field, and it is only well defined if the field modulus is known. Smart contracts could contain a table mapping the commitment version to a modulus, but this would not allow smart contract to take into account future upgrades to a modulus that is not known yet. By allowing access to the modulus inside the EVM, the smart contract can be built so that it can use future commitments and proofs, without ever needing an upgrade.
+
+In the interest of not adding another precompile, we return the modulus and the polynomial degree directly from the point evaluation precompile. It can then be used by the caller. It is also "free" in that the caller can just ignore this part of the return value without incurring an extra cost -- systems that remain upgradable for the foreseeable future will likely use this route for now.
+
+### Data gasprice update rule
+
+The data gasprice update rule is intended to approximate the formula `data_gasprice = MIN_DATA_GASPRICE * e**(excess_data_gas / DATA_GASPRICE_UPDATE_FRACTION)`,
+where `excess_data_gas` is the total "extra" amount of data gas that the chain has consumed relative to the "targeted" number (`TARGET_DATA_GAS_PER_BLOCK` per block).
+Like EIP-1559, it's a self-correcting formula: as the excess goes higher, the `data_gasprice` increases exponentially, reducing usage and eventually forcing the excess back down.
+
+The block-by-block behavior is roughly as follows.
+If block `N` consumes `X` data gas, then in block `N+1` `excess_data_gas` increases by `X - TARGET_DATA_GAS_PER_BLOCK`,
+and so the `data_gasprice` of block `N+1` increases by a factor of `e**((X - TARGET_DATA_GAS_PER_BLOCK) / DATA_GASPRICE_UPDATE_FRACTION)`.
+Hence, it has a similar effect to the existing EIP-1559, but is more "stable" in the sense that it responds in the same way to the same total usage regardless of how it's distributed.
+
+The parameter `DATA_GASPRICE_UPDATE_FRACTION` controls the maximum rate of change of the blob gas price. It is chosen to target a maximum change rate of `e(TARGET_DATA_GAS_PER_BLOCK / DATA_GASPRICE_UPDATE_FRACTION) ≈ 1.125` per block.
+
+### Throughput
+
+The values for `TARGET_DATA_GAS_PER_BLOCK` and `MAX_DATA_GAS_PER_BLOCK` are chosen to correspond to a target of 2 blobs (0.25 MB) and maximum of 4 blobs (0.5 MB) per block. These small initial limits are intended to minimize the strain on the network created by this EIP and are expected to be increased in future upgrades as the network demonstrates reliability under larger blocks.
+
+## Backwards Compatibility
+
+### Blob non-accessibility
+
+This EIP introduces a transaction type that has a distinct mempool version (`BlobTransactionNetworkWrapper`) and execution-payload version (`SignedBlobTransaction`),
+with only one-way convertibility between the two. The blobs are in the `BlobTransactionNetworkWrapper` and not in the `SignedBlobTransaction`;
+instead, they go into the `BeaconBlockBody`. This means that there is now a part of a transaction that will not be accessible from the web3 API.
+
+### Mempool issues
+
+Blob transactions have a large data size at the mempool layer, which poses a mempool DoS risk,
+though not an unprecedented one as this also applies to transactions with large amounts of calldata.
+
+By only broadcasting announcements for blob transactions, receiving nodes will have control over which and how many transactions to receive,
+allowing them to throttle throughput to an acceptable level.
+[EIP-5793](./eip-5793.md) will give further fine-grained control to nodes by extending the `NewPooledTransactionHashes` announcement messages to include the transaction type and size.
+
+In addition, we recommend including a 1.1x data gasprice bump requirement to the mempool transaction replacement rules.
+
+## Test Cases
+
+TBD
+
+## Security Considerations
+
+This EIP increases the storage requirements per Beacon block by a maximum of ~0.5 MB.
+This is 4x larger than the theoretical maximum size of a block today (30M gas / 16 gas per calldata byte = 1.875M bytes), and so it will not greatly increase worst-case bandwidth.
+Post-merge, block times are expected to be static rather than an unpredictable Poisson distribution, giving a guaranteed period of time for large blocks to propagate.
+
+The _sustained_ load of this EIP is much lower than alternatives that reduce calldata costs, even if the calldata is limited,
+because there is no existing software that stores the blobs indefinitely and there is no expectation that they need to be stored for as long as an execution payload.
+This makes it easier to implement a policy that these blobs should be deleted after e.g. 30-60 days,
+a much shorter delay compared to proposed (but yet to be implemented) one-year rotation times for execution payload history.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).

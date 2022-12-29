@@ -1,7 +1,7 @@
 ---
 eip: 7
 title: DELEGATECALL
-author: Vitalik Buterin <v@buterin.com>
+author: Vitalik Buterin (@vbuterin)
 status: Final
 type: Standards Track
 category: Core
@@ -9,7 +9,7 @@ created: 2015-11-15
 ---
 
 ### Hard Fork
-[Homestead](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-606.md)
+[Homestead](./eip-606.md)
 
 ### Parameters
 - Activation:

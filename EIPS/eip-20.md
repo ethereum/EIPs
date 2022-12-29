@@ -1,6 +1,6 @@
 ---
 eip: 20
-title: ERC-20 Token Standard
+title: Token Standard
 author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.buterin@ethereum.org>
 type: Standards Track
 category: ERC
@@ -95,7 +95,7 @@ function balanceOf(address _owner) public view returns (uint256 balance)
 #### transfer
 
 Transfers `_value` amount of tokens to address `_to`, and MUST fire the `Transfer` event.
-The function SHOULD `throw` if the `_from` account balance does not have enough tokens to spend.
+The function SHOULD `throw` if the message caller's account balance does not have enough tokens to spend.
 
 *Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
 
@@ -190,4 +190,4 @@ Historical links related to this standard:
 
 
 ## Copyright
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENSE.md).

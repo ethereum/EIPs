@@ -1,7 +1,8 @@
 ---
 eip: 55
 title: Mixed-case checksum address encoding
-author: Vitalik Buterin
+author: Vitalik Buterin <vitalik.buterin@ethereum.org>, Alex Van de Sande <avsa@ethereum.org>
+discussions-to: https://github.com/ethereum/eips/issues/55
 type: Standards Track
 category: ERC
 status: Final
@@ -13,25 +14,47 @@ created: 2016-01-14
 Code:
 
 ``` python
-from ethereum import utils
+import eth_utils
+
 
 def checksum_encode(addr): # Takes a 20-byte binary address as input
-    o = ''
-    v = utils.big_endian_to_int(utils.sha3(addr.hex()))
-    for i, c in enumerate(addr.hex()):
-        if c in '0123456789':
-            o += c
+    hex_addr = addr.hex()
+    checksummed_buffer = ""
+
+    # Treat the hex address as ascii/utf-8 for keccak256 hashing
+    hashed_address = eth_utils.keccak(text=hex_addr).hex()
+
+    # Iterate over each character in the hex address
+    for nibble_index, character in enumerate(hex_addr):
+
+        if character in "0123456789":
+            # We can't upper-case the decimal digits
+            checksummed_buffer += character
+        elif character in "abcdef":
+            # Check if the corresponding hex digit (nibble) in the hash is 8 or higher
+            hashed_address_nibble = int(hashed_address[nibble_index], 16)
+            if hashed_address_nibble > 7:
+                checksummed_buffer += character.upper()
+            else:
+                checksummed_buffer += character
         else:
-            o += c.upper() if (v & (2**(255 - 4*i))) else c.lower()
-    return '0x'+o
+            raise eth_utils.ValidationError(
+                f"Unrecognized hex character {character!r} at position {nibble_index}"
+            )
 
-def test(addrstr):
-    assert(addrstr == checksum_encode(bytes.fromhex(addrstr[2:])))
+    return "0x" + checksummed_buffer
 
-test('0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed')
-test('0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359')
-test('0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB')
-test('0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb')
+
+def test(addr_str):
+    addr_bytes = eth_utils.to_bytes(hexstr=addr_str)
+    checksum_encoded = checksum_encode(addr_bytes)
+    assert checksum_encoded == addr_str, f"{checksum_encoded} != expected {addr_str}"
+
+
+test("0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed")
+test("0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359")
+test("0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB")
+test("0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb")
 
 ```
 
@@ -94,37 +117,3 @@ Note that the input to the Keccak256 hash is the lowercase hexadecimal string (i
 0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB
 0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb
 ```
-
-# Adoption
-
-| Wallet                   | displays checksummed addresses | rejects invalid mixed-case | rejects too short | rejects too long |
-|--------------------------|--------------------------------|----------------------------|-------------------|------------------|
-| Etherwall 2.0.1          | Yes                            | Yes                        | Yes               | Yes              |
-| Jaxx 1.2.17              | No                             | Yes                        | Yes               | Yes              |
-| MetaMask 3.7.8           | Yes                            | Yes                        | Yes               | Yes              |
-| Mist 0.8.10              | Yes                            | Yes                        | Yes               | Yes              |
-| MyEtherWallet v3.9.4     | Yes                            | Yes                        | Yes               | Yes              |
-| Parity 1.6.6-beta (UI)   | Yes                            | Yes                        | Yes               | Yes              |
-| Jaxx Liberty 2.0.0       | Yes                            | Yes                        | Yes               | Yes              |
-| Coinomi 1.10             | Yes                            | Yes                        | Yes               | Yes              |
-| Trust Wallet             | Yes                            | Yes                        | Yes               | Yes              |
-
-### Exchange support for mixed-case address checksums, as of 2017-05-27:
-
-| Exchange     | displays checksummed deposit addresses | rejects invalid mixed-case | rejects too short | rejects too long |
-|--------------|----------------------------------------|----------------------------|-------------------|------------------|
-| Bitfinex     | No                                     | Yes                        | Yes               | Yes              |
-| Coinbase     | Yes                                    | No                         | Yes               | Yes              |
-| GDAX         | Yes                                    | Yes                        | Yes               | Yes              |
-| Kraken       | No                                     | No                         | Yes               | Yes              |
-| Poloniex     | No                                     | No                         | Yes               | Yes              |
-| Shapeshift   | No                                     | No                         | Yes               | Yes              |
-
-# References
-
-1. EIP 55 issue and discussion https://github.com/ethereum/eips/issues/55
-2. Python example by @Recmo https://github.com/ethereum/eips/issues/55#issuecomment-261521584
-3. Python implementation in [`ethereum-utils`](https://github.com/pipermerriam/ethereum-utils#to_checksum_addressvalue---text)
-4. Ethereumjs-util implementation https://github.com/ethereumjs/ethereumjs-util/blob/75f529458bc7dc84f85fd0446d0fac92d991c262/index.js#L452-L466
-5. Swift implementation in [`EthereumKit`](https://github.com/yuzushioh/EthereumKit/blob/master/EthereumKit/Helper/EIP55.swift)
-6. Kotlin implementation in [`KEthereum`](https://github.com/walleth/kethereum/tree/master/erc55)

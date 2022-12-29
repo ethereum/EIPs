@@ -1,7 +1,7 @@
 | Variable           | Symbol       | Value         | Unit          | Source |
 | -------------------|--------------|---------------|---------------|--------|
 | Network Hashrate   |H<sub>N</sub> | 296000        | GH/s          | https://etherscan.io/chart/hashrate |
-| GPU Hashrate       |H<sub>M</sub> | 31.2          | MH/s          | http://www.legitreviews.com/geforce-gtx-1070-ethereum-mining-small-tweaks-great-hashrate-low-power_195451 |
+| GPU Hashrate       |H<sub>M</sub> | 31.2          | MH/s          | https://www.legitreviews.com/geforce-gtx-1070-ethereum-mining-small-tweaks-great-hashrate-low-power_195451 |
 | GPU Power          |P<sub>M</sub> | 110.6         | W             | https://www.reddit.com/r/ethereum/comments/7vewys/10000_tons_co2_per_day_and_climbing_eip_858/dtrswyz/ |
 
 
