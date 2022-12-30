@@ -1,0 +1,153 @@
+---
+eip:
+title: Semantic Soulbound Tokens
+description: Adding RDF triples to EIP721 and EIP5192 metadata to capture the social meaning of the Token.
+author: Jessica Chang <j.chang@relationlabs.ai>
+discussions-to:  https://ethereum-magicians.org/t/eip-semantic-soulbound-tokens/12334
+
+status: Draft
+type: Standards Track
+category: ERC
+created: 2022-12-30
+requires: 165, 721, 5192
+---
+
+## Abstract
+This proposal extends [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md) by introducing a standard for adding RDF triples to Soulbound Tokens `SBTs` metadata.
+
+Soulbound Token represents the commitments, credentials, and affiliations of accounts. Resource Description Framework (‘RDF’) is a standard data model developed by the World Wide Web Consortium (‘W3C’) and is used to represent information in a structured, machine-readable format in triples consisting of a subject, a predicate, and an object (the ‘RDF triple’). These triples can be combined and linked together to represent more complex information and relationships. Semantic SBTs are built on existing [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md) standards to include RDF triples in metadata to capture and store the meaning of social metadata as a network of accounts and attributes.
+
+Semantic SBT provides a foundation for publishing, linking, and integrating data from multiple sources, and enables the ability to query and retrieve information across these sources, using inference to uncover new insights from existing social relations. For example, form the on-chain united social graph, assign trusted contacts for social recovery, and supports fair governance.
+
+## Motivation
+While the existence of SBTs can create a decentralized social framework, there still needs to be a way to create the connectedness of SBTs through relationships on-chain. Current NFTs and SBTs are hosting data off-chain, some even on centralized servers, let alone the linking of social data.  And to further fuel the boom of the SBTs ecosystem, we need a bottom-up and decentralized way to maintain people’s social identity related information.
+
+Semantic SBTs address this by storing social metadata, attestations, and access permissions on-chain to bootstrap the social identity layer and a linked data layer natively on Ethereum, and bring semantic meanings to the tons of bits of on-chain data.
+
+### Connectedness
+Semantic SBTs store social data as RDF triples in the Subject-Predicate-Object format, making it easy to create relationships between accounts and attributes.  RDF is a standard for data interchange used to represent highly interconnected data. Representing data in RDF triples makes it simpler for AI systems to identify, clarify, and connect information.
+
+### Linked Data
+Semantic SBTs allow the huge amount of social data on-chain available in a standard format (RDF) and be reachable and manageable. The interrelated datasets on-chain can create the linked data layer that allows social data to be mixed, exposed, and shared across different applications, providing a convenient, cheap, and reliable way to retrieve data, regardless of the number of users.
+
+### Social Identity
+Semantic SBTs allow people to publish or attest their own identity-related data in the bottom-up and decentralized way, without reliance on any centralized intermediaries while setting every party free. The data is fragmentary in each Semantic SBT and socially interrelated. RDF triples enable various community detection algorithms to be built on top.
+
+This proposal outlines the Semantic data modeling of SBTs standard that allows implementers to model the social relations among Semantic SBTs, especially in the social sector.
+
+## Specification
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+- The token **MUST** implement the following interfaces:
+    1. [EIP-165](./eip-165.md)’s `ERC165` (`0x01ffc9a7`)
+    1. [EIP-721](./eip-721.md)’s `ERC721` (`0x80ac58cd`)
+    1. [EIP-721](./eip-721.md)’s `ERC721Metadata` (`0x5b5e139f`)
+    1. [EIP-5192](./eip-5192.md)’s `ERC5192` (`0xb45a3c0e`)
+
+### Contract Interface
+```Solidity
+/**
+ * @title Semantic Soulbound Token
+ * Note: the EIP-165 identifier for this interface is 0xfbafb698
+ */
+interface ISemanticSBT{
+    /**
+     * @dev This emits when minting a Semantic Soulbound Token.
+     * @param tokenId The identifier for the Semantic Soulbound Token.
+     * @param rdfStatements The RDF statements for the Semantic Soulbound Token. An RDF statement is the statement made by an RDF triple.
+     */
+    event CreateRDF (
+        uint256 indexed tokenId,
+        string  rdfStatements
+    );
+
+
+    /**
+     * @dev This emits when updating the RDF data of Semantic Soulbound Token. RDF data is a collection of RDF statements that are used to represent information about resources.
+     * @param tokenId The identifier for the Semantic Soulbound Token.
+     * @param rdfStatements The RDF statements for the semantic soulbound token. An RDF statement is the statement made by an RDF triple.
+     */
+    event UpdateRDF (
+        uint256 indexed tokenId,
+        string  rdfStatements
+    );
+
+
+/**
+     * @dev This emits when burning or revoking Semantic Soulbound Token.
+     * @param tokenId The identifier for the Semantic Soulbound Token.
+     * @param rdfStatements The RDF statements for the Semantic Soulbound Token. An RDF statement is the statement made by an RDF triple.
+     */
+    event RemoveRDF (
+        uint256 indexed tokenId,
+        string  rdfStatements
+    );
+
+    /**
+     * @dev Returns the RDF statements of the Semantic Soulbound Token. An RDF statement is the statement made by an RDF triple.
+     * @param tokenId The identifier for the Semantic Soulbound Token.
+
+     */
+    function rdfOf(uint256 tokenId) external view returns (string memory);
+
+}
+```
+ISemanticRDFSchema, an extension of ERC721 Metadata, is **OPTIONAL** for this standard, it is used to get the Schema URI for the RDF data.
+```Solidity
+interface ISemanticRDFSchema{
+
+    /**
+     * @notice Get the URI of schema for this contract.
+     * @return The URI of the contract which point to a configuration profile.
+     */
+    function schemaURI() external view returns (string memory);
+}
+```
+ISemanticSBTUpdate is an extension interface, that is **OPTIONAL** for this standard, used to update the RDF data for the Semantic Soulbound Token.
+```Solidity
+interface ISemanticSBTUpdate{
+    /**
+     * @notice Update the RDF data for Semantic Soulbound Token. Implementors can assign updaters as needed, for example, the token issuer.
+     * @dev Emits the `UpdateRDF` event.
+     * @param tokenId The identifier for the Semantic Soulbound Token.
+     * @param rdfData RDF data is a collection of RDF statements that are used to represent information about resources.
+     */
+    function updateRDF(uint256 tokenId, RDFData memory rdfData) external;
+
+}
+```
+
+## Rationale
+### Method Specification
+rdfOf (uint256 tokenId): Query the RDF data for the Semantic Soulbound Token by tokenId. The returned RDF data format conforms to the W3C RDF standard. RDF data is a collection of RDF statements that are used to represent information about resources. An RDF statement, also known as a triple, is a unit of information in the RDF data model. It consists of three parts: a subject, a predicate, and an object. The data format reference can be found [here](https://www.w3.org/2011/rdf-wg/wiki/Main_Page).
+
+updateRDF (uint256 tokenId, RDFData rdfData): This **OPTIONAL** method is used when it needs to update the RDF data for Semantic SBT. Use this method to find the RDF data for Semantic SBT by tokenId and perform the update. The input RDF data **MUST** conform to W3C RDF standards. When implementing this method, **SHALL** assign updaters as needed, for example, the token issuer can be assigned as an updater. When calling this method, the UpdateRDF event **MUST** be triggered to notify the listener for performing relevant business update.
+
+schemaURI(): This **OPTIONAL** method is used to query the URIs of the schema for the RDF data. RDF Schema is an extension of the basic RDF vocabulary and provides a data-modelling vocabulary for RDF data. It is **RECOMMENDED** to store the RDF Schema in decentralized storage such as Arweave or IPFS. The URIs are then stored in the contract and can be queried by this method.
+
+### Event Specification
+CreateRDF: When minting a Semantic Soulbound Token, this event **MUST** be triggered to notify the listener to perform operations with the created RDF data. When calling the event, the input RDF data **MUST** be RDF statements, which are units of information consisting of three parts: a subject, a predicate, and an object. The data model reference can be found [here](https://www.w3.org/2011/rdf-wg/wiki/Main_Page).
+
+UpdateRDF: When updating RDF data for a Semantic Soulbound Token, this event **MUST** be triggered to notify the listener to perform update operations accordingly with the updated RDF data. When calling the event, the input RDF data **MUST** be RDF statements, which are units of information consisting of three parts: a subject, a predicate, and an object. The data model reference can be found [here](https://www.w3.org/2011/rdf-wg/wiki/Main_Page).
+
+RemoveRDF: When burning or revoking a Semantic Soulbound Token, this event **MUST** be triggered to notify the listener to perform operations with the removed RDF data for the Semantic SBT. When calling the event, the input RDF data **MUST** be RDF statements, which are units of information consisting of three parts: a subject, a predicate, and an object. The data model reference can be found [here](https://www.w3.org/2011/rdf-wg/wiki/Main_Page).
+
+## Backwards Compatibility
+This proposal is fully backward compatible with [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md).
+
+## Test Cases
+Our sample implementation includes [test cases](https://github.com/JessicaChg/semanticSBT/blob/main/test/SemanticSBT.test.js) written using Hardhat.
+
+## Reference Implementation
+A reference implementation can be found [here](https://github.com/JessicaChg/semanticSBT/blob/main/README.md).
+
+## References
+1. Resource Description Framework (RDF) https://www.w3.org/RDF/
+2. RDF Schema https://www.w3.org/TR/rdf-schema/
+3. W3C RDF recommendation https://www.w3.org/2011/rdf-wg/wiki/Main_Page
+
+## Security Considerations
+There are no security considerations related directly to the implementation of this standard.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
