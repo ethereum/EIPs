@@ -13,7 +13,7 @@ requires: 165, 721, 5192
 ---
 
 ## Abstract
-This proposal extends [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md) by introducing a standard for adding RDF triples to Soulbound Tokens `SBTs` metadata.
+This proposal extends [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md) by introducing a standard for adding RDF triples to Soulbound Tokens (‘SBTs‘) metadata.
 
 Soulbound Token represents the commitments, credentials, and affiliations of accounts. Resource Description Framework (‘RDF’) is a standard data model developed by the World Wide Web Consortium (‘W3C’) and is used to represent information in a structured, machine-readable format in triples consisting of a subject, a predicate, and an object (the ‘RDF triple’). These triples can be combined and linked together to represent more complex information and relationships. Semantic SBTs are built on existing [EIP-721](./eip-721.md) and [EIP-5192](./eip-5192.md) standards to include RDF triples in metadata to capture and store the meaning of social metadata as a network of accounts and attributes.
 
