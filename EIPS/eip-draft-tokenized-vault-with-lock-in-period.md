@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Tokenized Vaults with Lock-in Period
 description: EIP-4626 Tokenized Vaults with Lock-in Period.
-author: Anderson Chen (twan0817@gmail.com), Martinet Lee (martinetlee@gmail.com), Anton Cheng (antonassocareer@gmail.com)
+author: Anderson Chen <twan0817@gmail.com>, Martinet Lee <martinetlee@gmail.com>, Anton Cheng <antonassocareer@gmail.com>
 discussions-to: https://ethereum-magicians.org/t/eip-tokenized-vaults-with-lock-in-period/12298
 status: Draft
 type: Standards Track
@@ -13,19 +13,19 @@ requires: 4626
 
 ## Abstract
 
-This standard is an extension of the EIP-4626 Tokenized Vaults that provides functions to support the lock-in period.
+This standard is an extension of the [EIP-4626](./eip-4626.md) Tokenized Vaults that provides functions to support the lock-in period.
 
 ## Motivation
 
-The EIP-4626 standard defines a tokenized vault standard that fits the use cases for users (contracts or EOAs) to deposit and withdraw underlying tokens at any time. However, in many cases, the vault needs to lock the underlying tokens to execute certain strategies, and during the lock-in period, withdrawal or deposit of underlying tokens should not be allowed. This standard extends the EIP-4616 to support the lock-in period and handle scheduled deposits and withdrawals during the lock-in period.
+The [EIP-4626](./eip-4626.md) standard defines a tokenized vault standard that fits the use cases for users (contracts or EOAs) to deposit and withdraw underlying tokens at any time. However, in many cases, the vault needs to lock the underlying tokens to execute certain strategies, and during the lock-in period, withdrawal or deposit of underlying tokens should not be allowed. This standard extends the EIP-4626 to support the lock-in period and handle scheduled deposits and withdrawals during the lock-in period.
 
 ## Specification
 
-All vaults that follow this EIP MUST implement EIP-4626 to provide basic vault functions and EIP-20 to represent shares.
+All vaults that follow this EIP MUST implement [EIP-4626](./eip-4626.md) to provide basic vault functions and EIP-20 to represent shares.
 
 ### Definitions
 
-- asset: The underlying EIP-20 token that the vault accepts and manages.
+- asset: The underlying [EIP-20](./eip-20.md) token that the vault accepts and manages.
 - share: The EIP-20 token that the vault issued.
 - locked: A status of the vault. When the vault is locked, user can’t withdraw or deposit assets from the vault.
 - unlocked: A status of the vault. When the vault is unlocked, user can withdraw or deposit assets from the vault.
@@ -320,11 +320,7 @@ There is no function for scheduling a withdrawal, since during the lock-in perio
 
 ## Backwards Compatibility
 
-The `deposit`, `mint`, `withdraw`, `redeem` methods for EIP-4626 should be reverted when vault is in `LOCKED` state to prevent issuing or burning shares with an undefined share price.
-
-## Reference Implementation (WIP)
-
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+The `deposit`, `mint`, `withdraw`, `redeem` methods for [EIP-4626](./eip-4626.md) should be reverted when vault is in `LOCKED` state to prevent issuing or burning shares with an undefined share price.
 
 ## Security Considerations
 
