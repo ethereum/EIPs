@@ -2,11 +2,11 @@
 eip: <to be assigned>
 title: Tokenized Vaults with Lock-in Period
 description: EIP-4626 Tokenized Vaults with Lock-in Period.
-author: Anderson Chen <twan0817@gmail.com>, Martinet Lee <martinetlee@gmail.com>, Anton Cheng <antonassocareer@gmail.com>
+author: Anderson Chen (@Ankarrr), Martinet Lee <martinetlee@gmail.com>, Anton Cheng <antonassocareer@gmail.com>
 discussions-to: https://ethereum-magicians.org/t/eip-tokenized-vaults-with-lock-in-period/12298
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2022-12-21
 requires: 4626
 ---
@@ -21,7 +21,7 @@ The [EIP-4626](./eip-4626.md) standard defines a tokenized vault standard that f
 
 ## Specification
 
-All vaults that follow this EIP MUST implement [EIP-4626](./eip-4626.md) to provide basic vault functions and EIP-20 to represent shares.
+All vaults that follow this EIP MUST implement [EIP-4626](./eip-4626.md) to provide basic vault functions and [EIP-20](./eip-20.md) to represent shares.
 
 ### Definitions
 
