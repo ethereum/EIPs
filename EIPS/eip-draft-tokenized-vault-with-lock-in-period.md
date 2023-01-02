@@ -3,7 +3,7 @@ eip: <to be assigned>
 title: Tokenized Vaults with Lock-in Period
 description: EIP-4626 Tokenized Vaults with Lock-in Period.
 author: Anderson Chen (twan0817@gmail.com), Martinet Lee (martinetlee@gmail.com), Anton Cheng (antonassocareer@gmail.com)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-tokenized-vaults-with-lock-in-period/12298
 status: Draft
 type: Standards Track
 category (*only required for Standards Track): ERC
