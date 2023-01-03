@@ -25,6 +25,10 @@
 }
 
 main.page-content {
+  max-width: 960px;
+  display: flex;
+  align-self: center;
+
   div.wrapper {
     max-width: unset;
   }
