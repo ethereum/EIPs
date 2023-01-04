@@ -78,16 +78,17 @@ h1 {
   vertical-align: middle;
 }
 
+h1 a {
+  height: 1ex;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
 .inline-svg {
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: baseline;
   fill: currentColor;
-  width: 1ex;
-  height: 1ex;
+  width: 1em;
+  height: 100%;
   object-fit: cover;
-  & {
-    height: 1ex;
-    display: inline-block;
-    vertical-align: baseline;
-  }
 }
