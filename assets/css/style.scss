@@ -82,7 +82,12 @@ h1 {
   display: inline-block;
   vertical-align: middle;
   fill: currentColor;
-  line-height: 1;
-  height: 1em;
-  width: 1em;
+  width: 1ex;
+  height: 1ex;
+  object-fit: cover;
+  & {
+    height: 1ex;
+    display: inline-block;
+    vertical-align: baseline;
+  }
 }
