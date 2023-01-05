@@ -1,7 +1,0 @@
-node_modules
-artifacts
-docs
-typechain-types
-cache
-coverage*
-gasReporterOutput.json

@@ -1,13 +1,5 @@
 {
   "name": "equippable-tokens",
-  "scripts": {
-    "test": "yarn typechain && hardhat test",
-    "typechain": "hardhat typechain",
-    "prettier": "prettier --write ."
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.6.0"
   },
