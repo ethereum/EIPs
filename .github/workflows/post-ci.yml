@@ -1,0 +1,53 @@
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
+
+name: Post CI
+
+# This is adapted from https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run (2022-07-17)
+
+jobs:
+  on-failure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch PR Data
+        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        with:
+          name: pr_number
+          workflow: ci.yml
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Save PR Data
+        id: save-pr-data
+        run: |
+          echo "::set-output name=pr_number::$(cat pr_number)"
+          echo "::set-output name=pr_sha::$(cat pr_sha)"
+          echo "::set-output name=merge_sha::$(cat merge_sha)"
+
+      - name: Add Comment
+        uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        with:
+          recreate: true
+          message: |
+            The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
+            Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
+
+      - name: Add Waiting Label
+        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        with:
+          labels: w-ci
+          number: ${{ steps.save-pr-data.outputs.pr_number }}'
+          repo: ${{ github.repository }}
+
+      - name: Remove Waiting Label
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
+        if: ${{ github.event.workflow_run.conclusion != 'failure' }}
+        with:
+          labels: w-ci
+          number: ${{ steps.save-pr-data.outputs.pr_number }}
+          repo: ${{ github.repository }}

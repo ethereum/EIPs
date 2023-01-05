@@ -2,6 +2,8 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+$content-width: 960px;
+
 @import 'minima';
 
 .site-header {
@@ -24,10 +26,23 @@
   }
 }
 
-main.page-content {
-  div.wrapper {
-    max-width: unset;
-  }
+.footer-col-wrapper {
+  color: #111;
+}
+
+a, a:link {
+  color: #726E97;
+  text-decoration: none;
+  transition: 0.5s;
+}
+
+a:visited {
+  color: #8E6680;
+}
+
+a:hover, a:active {
+  color: #7F557D;
+  box-shadow: 0 3px 0 #7F557D;
 }
 
 .status {

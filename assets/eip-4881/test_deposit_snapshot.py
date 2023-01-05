@@ -3,13 +3,14 @@ import pytest
 import yaml
 from dataclasses import dataclass
 from deposit_snapshot import DepositTree,DepositTreeSnapshot
-from eip4881 import DepositData,DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,zerohashes
+from eip_4881 import DepositData,DEPOSIT_CONTRACT_DEPTH,Eth1Data,Hash32,sha256,uint64,zerohashes
 
 @dataclass
 class DepositTestCase:
     deposit_data: DepositData
     deposit_data_root: Hash32
     eth1_data: Eth1Data
+    block_height: uint64
     snapshot: DepositTreeSnapshot
 
 def get_hex(some_bytes) -> str:
@@ -40,13 +41,16 @@ def read_test_cases(filename):
                     finalized.append(get_bytes(block_hash))
                 snapshot = DepositTreeSnapshot(
                     finalized,
-                    int(test_case['snapshot']['deposits']),
-                    get_bytes(test_case['snapshot']['execution_block_hash'])
+                    get_bytes(test_case['snapshot']['deposit_root']),
+                    int(test_case['snapshot']['deposit_count']),
+                    get_bytes(test_case['snapshot']['execution_block_hash']),
+                    int(test_case['snapshot']['execution_block_height'])
                 )
                 result.append(DepositTestCase(
                     deposit_data,
                     get_bytes(test_case['deposit_data_root']),
                     eth1_data,
+                    int(test_case['block_height']),
                     snapshot
                 ))
             return result
@@ -80,8 +84,6 @@ def clone_from_snapshot(snapshot, test_cases):
         copy.push_leaf(case.deposit_data_root)
     return copy
 
-
-
 def test_instantiate():
     DepositTree.new()
 
@@ -100,6 +102,7 @@ def test_deposit_cases():
     for case in test_cases:
         tree.push_leaf(case.deposit_data_root)
         expected = case.eth1_data.deposit_root
+        assert(case.snapshot.calculate_root() == expected)
         assert(tree.get_root() == expected)
 
 def test_finalization():
@@ -109,7 +112,7 @@ def test_finalization():
         tree.push_leaf(case.deposit_data_root)
     original_root = tree.get_root()
     assert(original_root == test_cases[127].eth1_data.deposit_root)
-    tree.finalize(test_cases[100].eth1_data)
+    tree.finalize(test_cases[100].eth1_data, test_cases[100].block_height)
     # ensure finalization doesn't change root
     assert(tree.get_root() == original_root)
     snapshot = tree.get_snapshot()
@@ -120,7 +123,7 @@ def test_finalization():
     # ensure original and copy have the same root
     assert(tree.get_root() == copy.get_root())
     # finalize original again to check double finalization
-    tree.finalize(test_cases[105].eth1_data)
+    tree.finalize(test_cases[105].eth1_data, test_cases[105].block_height)
     # root should still be the same
     assert(tree.get_root() == original_root)
     # create a copy of the tree by taking a snapshot again
@@ -141,7 +144,17 @@ def test_snapshot_cases():
         tree.push_leaf(case.deposit_data_root)
 
     for case in test_cases:
-        tree.finalize(case.eth1_data)
+        tree.finalize(case.eth1_data, case.block_height)
         assert(tree.get_snapshot() == case.snapshot)
 
+def test_empty_tree_snapshot():
+    with pytest.raises(AssertionError):
+        # can't get snapshot from tree that hasn't been finalized
+        snapshot = DepositTree.new().get_snapshot()
+
+def test_invalid_snapshot():
+    with pytest.raises(AssertionError):
+        # invalid snapshot (deposit root doesn't match)
+        invalid_snapshot = DepositTreeSnapshot([], zerohashes[0], 0, zerohashes[0], 0)
+        tree = DepositTree.from_snapshot(invalid_snapshot)
 

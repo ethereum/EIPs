@@ -1,0 +1,145 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  save-pr:
+    name: Save PR Number
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p ./pr
+          echo $PR_NUMBER > ./pr/pr_number
+          echo $PR_SHA > ./pr/pr_sha
+          echo $MERGE_SHA > ./pr/merge_sha
+
+      - name: Upload PR Number
+        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        with:
+          name: pr_number
+          path: pr/
+
+  htmlproofer:
+    name: HTMLProofer
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
+        with:
+          ruby-version: 2.6.0
+          bundler-cache: true
+
+      - name: Build Website
+        run: |
+          bundle exec jekyll doctor
+          bundle exec jekyll build
+
+      - name: HTML Proofer
+        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
+
+      - name: DNS Validator
+        run: bundle exec github-pages health-check
+
+  link-check:
+    name: Link Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        
+      - name: Link Checker
+        uses: gaurav-nelson/github-action-markdown-link-check@0a51127e9955b855a9bbfa1ff5577f1d1338c9a5
+        with:
+          config-file: config/mlc_config.json
+          use-quiet-mode: no
+          use-verbose-mode: yes
+          check-modified-files-only: yes
+
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Get Changed Files
+        id: changed
+        continue-on-error: true
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run CodeSpell
+        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        if: steps.changed.outcome == 'success'
+        with:
+          check_filenames: true
+          ignore_words_file: config/.codespell-whitelist
+          path: ${{ env.CHANGED_FILES }}
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+
+  eipw-validator:
+    name: EIP Walidator
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: ethereum/eipw-action@451d4e314183dd83401171908ca784e047122d70
+        id: eipw
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          unchecked: 1, 5069, 5757
+
+  markdownlint:
+    name: Markdown Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - name: Get Changed Files
+        id: changed
+        continue-on-error: true
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        uses: DavidAnson/markdownlint-cli2-action@16d9da45919c958a8d1ddccb4bd7028e8848e4f1
+        if: steps.changed.outcome == 'success'
+        with:
+          command: config
+          globs: |
+            config/.markdownlint.yaml
+            ${{ env.CHANGED_FILES }}

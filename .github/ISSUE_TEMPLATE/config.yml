@@ -3,9 +3,3 @@ contact_links:
   - name: Do you want to discuss EIP ideas or ask questions about the process?
     url: https://ethereum-magicians.org/
     about: Use the Fellowship of Ethereum Magicians for EIP-related discussion!
-  - name: Do you want to submit a bug report for one of the GitHub action bots (not Travis CI)?
-    url: https://github.com/ethereum/EIP-Bot/issues
-    about: If you have a problem with the EIP Bot, report it here!
-  - name: Do you want to submit a bug report for the validation bot (Travis CI)?
-    url: https://github.com/ethereum/eipv/issues
-    about: If you have a problem with EIP Validation, report it here!
