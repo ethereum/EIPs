@@ -1,0 +1,353 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="626pt" height="988pt" viewBox="0.00 0.00 626.20 988.00">
+<g id="graph0" class="graph" transform="translate(4.000000000000028,984) scale(1)" data-name="G">
+
+<polygon fill="#2e3e56" stroke="transparent" points="-4,4 -4,-984 622.2,-984 622.2,4 -4,4" style=""/>
+<g id="clust1" class="cluster" data-name="clusterERC721Buyable">
+
+<path fill="#445773" stroke="#445773" d="M20,-232C20,-232 598.2,-232 598.2,-232 604.2,-232 610.2,-238 610.2,-244 610.2,-244 610.2,-823 610.2,-823 610.2,-829 604.2,-835 598.2,-835 598.2,-835 20,-835 20,-835 14,-835 8,-829 8,-823 8,-823 8,-244 8,-244 8,-238 14,-232 20,-232" style=""/>
+<text text-anchor="middle" x="309.1" y="-818.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ERC721Buyable</text>
+</g>
+<g id="clust2" class="cluster" data-name="clusterOwnable">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M251.45,-147C251.45,-147 399.59,-147 399.59,-147 405.59,-147 411.59,-153 411.59,-159 411.59,-159 411.59,-212 411.59,-212 411.59,-218 405.59,-224 399.59,-224 399.59,-224 251.45,-224 251.45,-224 245.45,-224 239.45,-218 239.45,-212 239.45,-212 239.45,-159 239.45,-159 239.45,-153 245.45,-147 251.45,-147" style=""/>
+<text text-anchor="middle" x="325.52" y="-207.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">Ownable</text>
+</g>
+<g id="clust3" class="cluster" data-name="clusterERC721">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M284.17,-8C284.17,-8 366.88,-8 366.88,-8 372.88,-8 378.88,-14 378.88,-20 378.88,-20 378.88,-127 378.88,-127 378.88,-133 372.88,-139 366.88,-139 366.88,-139 284.17,-139 284.17,-139 278.17,-139 272.17,-133 272.17,-127 272.17,-127 272.17,-20 272.17,-20 272.17,-14 278.17,-8 284.17,-8" style=""/>
+<text text-anchor="middle" x="325.52" y="-122.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ERC721</text>
+</g>
+<g id="clust4" class="cluster" data-name="cluster_01">
+
+<polygon fill="#2e3e56" stroke="black" points="32.68,-843 32.68,-972 360.52,-972 360.52,-843 32.68,-843" style=""/>
+<text text-anchor="middle" x="196.6" y="-955.4" font-family="Times,serif" font-size="14.00" style="">Legend</text>
+</g>
+<!-- ERC721Buyable.supportsInterface -->
+<g id="node1" class="node" pointer-events="visible" data-name="ERC721Buyable.supportsInterface">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="105.68" cy="-366" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-361.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- ERC721Buyable.type -->
+<g id="node14" class="node" pointer-events="visible" data-name="ERC721Buyable.type">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-258" rx="27.83" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-253.8" font-family="Times,serif" font-size="14.00" style="">type</text>
+</g>
+<!-- ERC721Buyable.supportsInterface&#45;&gt;ERC721Buyable.type -->
+<g id="edge1" class="edge" data-name="ERC721Buyable.supportsInterface-&gt;ERC721Buyable.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M165.69,-354.26C176.19,-350.49 186.57,-345.53 195.35,-339 218.5,-321.79 208.09,-302.05 231.35,-285 247.78,-272.96 269.48,-266.27 287.8,-262.56" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="288.64,-265.97 297.86,-260.75 287.4,-259.08 288.64,-265.97" style=""/>
+</g>
+<!-- Ownable.supportsInterface -->
+<g id="node23" class="node" pointer-events="visible" data-name="Ownable.supportsInterface">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-173" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-168.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- ERC721Buyable.supportsInterface&#45;&gt;Ownable.supportsInterface -->
+<g id="edge2" class="edge" data-name="ERC721Buyable.supportsInterface-&gt;Ownable.supportsInterface">
+
+<path fill="none" stroke="white" stroke-width="2" d="M169.1,-355.4C178.79,-351.51 188,-346.22 195.35,-339 232.35,-302.66 198.92,-268.47 231.35,-228 243.04,-213.42 259.71,-201.86 275.73,-193.19" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="277.74,-196.09 285.04,-188.41 274.55,-189.86 277.74,-196.09" style=""/>
+</g>
+<!-- ERC721Buyable.setPrice -->
+<g id="node2" class="node" pointer-events="visible" data-name="ERC721Buyable.setPrice">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="105.68" cy="-784" rx="41.71" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-779.8" font-family="Times,serif" font-size="14.00" style="">setPrice</text>
+</g>
+<!-- ERC721Buyable.UpdatePrice -->
+<g id="node15" class="node" pointer-events="visible" data-name="ERC721Buyable.UpdatePrice">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-784" rx="58.53" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-779.8" font-family="Times,serif" font-size="14.00" style="">UpdatePrice</text>
+</g>
+<!-- ERC721Buyable.setPrice&#45;&gt;ERC721Buyable.UpdatePrice -->
+<g id="edge3" class="edge" data-name="ERC721Buyable.setPrice-&gt;ERC721Buyable.UpdatePrice">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M147.4,-784C177.99,-784 220.61,-784 256.37,-784" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="256.75,-787.5 266.75,-784 256.75,-780.5 256.75,-787.5" style=""/>
+</g>
+<!-- ERC721Buyable.removeTokenSale -->
+<g id="node3" class="node" pointer-events="visible" data-name="ERC721Buyable.removeTokenSale">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="105.68" cy="-730" rx="81.08" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-725.8" font-family="Times,serif" font-size="14.00" style="">removeTokenSale</text>
+</g>
+<!-- ERC721Buyable.RemoveFromSale -->
+<g id="node16" class="node" pointer-events="visible" data-name="ERC721Buyable.RemoveFromSale">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-730" rx="80.54" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-725.8" font-family="Times,serif" font-size="14.00" style="">RemoveFromSale</text>
+</g>
+<!-- ERC721Buyable.removeTokenSale&#45;&gt;ERC721Buyable.RemoveFromSale -->
+<g id="edge4" class="edge" data-name="ERC721Buyable.removeTokenSale-&gt;ERC721Buyable.RemoveFromSale">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M187.17,-730C202.59,-730 218.81,-730 234.5,-730" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="234.72,-733.5 244.72,-730 234.72,-726.5 234.72,-733.5" style=""/>
+</g>
+<!-- ERC721Buyable.buyToken -->
+<g id="node4" class="node" pointer-events="visible" data-name="ERC721Buyable.buyToken">
+
+<ellipse fill="#ff9797" stroke="brown" stroke-width="3" cx="105.68" cy="-590" rx="50.39" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-585.8" font-family="Times,serif" font-size="14.00" style="">buyToken</text>
+</g>
+<!-- ERC721Buyable._royaltyDenominator -->
+<g id="node5" class="node" pointer-events="visible" data-name="ERC721Buyable._royaltyDenominator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-420" rx="94.34" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-415.8" font-family="Times,serif" font-size="14.00" style="">_royaltyDenominator</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable._royaltyDenominator -->
+<g id="edge7" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable._royaltyDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M153.54,-584.55C168.55,-580.69 184.17,-574.12 195.35,-563 233.62,-524.93 192.82,-484.81 231.35,-447 235.41,-443.02 240.01,-439.62 244.96,-436.71" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="246.85,-439.67 254.16,-432.01 243.67,-433.44 246.85,-439.67" style=""/>
+</g>
+<!-- ERC721Buyable._royalty -->
+<g id="node7" class="node" pointer-events="visible" data-name="ERC721Buyable._royalty">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-474" rx="43.44" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-469.8" font-family="Times,serif" font-size="14.00" style="">_royalty</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable._royalty -->
+<g id="edge6" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable._royalty">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M152.19,-583.03C167.1,-579.05 182.99,-572.8 195.35,-563 220.32,-543.21 206.25,-520.62 231.35,-501 243.53,-491.48 258.96,-485.31 273.74,-481.32" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="274.92,-484.64 283.82,-478.89 273.28,-477.83 274.92,-484.64" style=""/>
+</g>
+<!-- ERC721Buyable._payRoyalties -->
+<g id="node10" class="node" pointer-events="visible" data-name="ERC721Buyable._payRoyalties">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-656" rx="66.07" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-651.8" font-family="Times,serif" font-size="14.00" style="">_payRoyalties</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable._payRoyalties -->
+<g id="edge10" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable._payRoyalties">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M144.62,-601.5C179.57,-612.08 231.79,-627.91 270.98,-639.78" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="270.06,-643.16 280.64,-642.71 272.09,-636.46 270.06,-643.16" style=""/>
+</g>
+<!-- ERC721Buyable.ownerOf -->
+<g id="node17" class="node" pointer-events="visible" data-name="ERC721Buyable.ownerOf">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-366" rx="45.22" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-361.8" font-family="Times,serif" font-size="14.00" style="">ownerOf</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable.ownerOf -->
+<g id="edge5" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable.ownerOf">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M154.14,-585.13C169.2,-581.31 184.69,-574.63 195.35,-563 247.54,-506.07 178.78,-449.58 231.35,-393 241.6,-381.97 256.04,-375.36 270.51,-371.41" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="271.54,-374.77 280.48,-369.09 269.95,-367.95 271.54,-374.77" style=""/>
+</g>
+<!-- ERC721Buyable.owner -->
+<g id="node18" class="node" pointer-events="visible" data-name="ERC721Buyable.owner">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="528.95" cy="-629" rx="35.34" ry="18" style=""/>
+<text text-anchor="middle" x="528.95" y="-624.8" font-family="Times,serif" font-size="14.00" style="">owner</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable.owner -->
+<g id="edge8" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable.owner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M151.28,-597.73C175,-601.6 204.69,-606.07 231.35,-609 320.46,-618.78 425.18,-624.49 483.32,-627.16" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="483.47,-630.67 493.61,-627.62 483.78,-623.68 483.47,-630.67" style=""/>
+</g>
+<!-- ERC721Buyable.payable -->
+<g id="node19" class="node" pointer-events="visible" data-name="ERC721Buyable.payable">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="528.95" cy="-693" rx="41.13" ry="18" style=""/>
+<text text-anchor="middle" x="528.95" y="-688.8" font-family="Times,serif" font-size="14.00" style="">payable</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable.payable -->
+<g id="edge9" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable.payable">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M128.49,-606.21C151.59,-626.54 190.32,-659.61 231.35,-674 275.49,-689.48 406.22,-688.03 478.51,-689.09" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="478.67,-692.6 488.73,-689.27 478.79,-685.6 478.67,-692.6" style=""/>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable.payable -->
+<g id="edge11" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable.payable">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M117.93,-607.68C138.19,-632.47 183.19,-675.11 231.35,-692 275.9,-707.62 408.63,-706 480.48,-700.52" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="480.95,-704 490.63,-699.69 480.37,-697.02 480.95,-704" style=""/>
+</g>
+<!-- ERC721Buyable.Purchase -->
+<g id="node20" class="node" pointer-events="visible" data-name="ERC721Buyable.Purchase">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-528" rx="45.79" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-523.8" font-family="Times,serif" font-size="14.00" style="">Purchase</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable.Purchase -->
+<g id="edge12" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable.Purchase">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M145.62,-578.92C182.74,-568.35 238.66,-552.44 278.08,-541.22" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="279.07,-544.58 287.73,-538.47 277.15,-537.84 279.07,-544.58" style=""/>
+</g>
+<!-- ERC721Buyable._safeTransfer -->
+<g id="node21" class="node" pointer-events="visible" data-name="ERC721Buyable._safeTransfer">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-582" rx="64.23" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-577.8" font-family="Times,serif" font-size="14.00" style="">_safeTransfer</text>
+</g>
+<!-- ERC721Buyable.buyToken&#45;&gt;ERC721Buyable._safeTransfer -->
+<g id="edge13" class="edge" data-name="ERC721Buyable.buyToken-&gt;ERC721Buyable._safeTransfer">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M155.84,-588.19C184.15,-587.16 220.26,-585.83 251.8,-584.67" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="252,-588.17 261.86,-584.3 251.74,-581.17 252,-588.17" style=""/>
+</g>
+<!-- ERC721Buyable._defaultRoyalty -->
+<g id="node6" class="node" pointer-events="visible" data-name="ERC721Buyable._defaultRoyalty">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="528.95" cy="-474" rx="73.01" ry="18" style=""/>
+<text text-anchor="middle" x="528.95" y="-469.8" font-family="Times,serif" font-size="14.00" style="">_defaultRoyalty</text>
+</g>
+<!-- ERC721Buyable._royalty&#45;&gt;ERC721Buyable._defaultRoyalty -->
+<g id="edge14" class="edge" data-name="ERC721Buyable._royalty-&gt;ERC721Buyable._defaultRoyalty">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M368.75,-474C391.05,-474 419.2,-474 445.61,-474" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="445.63,-477.5 455.63,-474 445.63,-470.5 445.63,-477.5" style=""/>
+</g>
+<!-- ERC721Buyable.royaltyInfo -->
+<g id="node8" class="node" pointer-events="visible" data-name="ERC721Buyable.royaltyInfo">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="105.68" cy="-536" rx="54.46" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-531.8" font-family="Times,serif" font-size="14.00" style="">royaltyInfo</text>
+</g>
+<!-- ERC721Buyable.royaltyInfo&#45;&gt;ERC721Buyable._royaltyDenominator -->
+<g id="edge16" class="edge" data-name="ERC721Buyable.royaltyInfo-&gt;ERC721Buyable._royaltyDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M154.94,-528.28C169.03,-524.27 183.75,-518.2 195.35,-509 220.32,-489.21 206.25,-466.62 231.35,-447 236.4,-443.05 242.01,-439.68 247.9,-436.8" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="249.58,-439.89 257.34,-432.68 246.78,-433.47 249.58,-439.89" style=""/>
+</g>
+<!-- ERC721Buyable.royaltyInfo&#45;&gt;ERC721Buyable._royalty -->
+<g id="edge15" class="edge" data-name="ERC721Buyable.royaltyInfo-&gt;ERC721Buyable._royalty">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M147.4,-524.41C184.93,-513.73 240.54,-497.9 279.41,-486.84" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="280.74,-490.1 289.4,-484 278.82,-483.37 280.74,-490.1" style=""/>
+</g>
+<!-- ERC721Buyable.setRoyalty -->
+<g id="node9" class="node" pointer-events="visible" data-name="ERC721Buyable.setRoyalty">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="105.68" cy="-482" rx="52.19" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-477.8" font-family="Times,serif" font-size="14.00" style="">setRoyalty</text>
+</g>
+<!-- ERC721Buyable.setRoyalty&#45;&gt;ERC721Buyable._royaltyDenominator -->
+<g id="edge17" class="edge" data-name="ERC721Buyable.setRoyalty-&gt;ERC721Buyable._royaltyDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M146.63,-470.63C178.99,-461.42 225.15,-448.28 262.34,-437.7" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="263.42,-441.03 272.08,-434.93 261.5,-434.3 263.42,-441.03" style=""/>
+</g>
+<!-- ERC721Buyable.setRoyalty&#45;&gt;ERC721Buyable._royalty -->
+<g id="edge18" class="edge" data-name="ERC721Buyable.setRoyalty-&gt;ERC721Buyable._royalty">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M157.75,-480.12C192.06,-478.86 237.15,-477.21 271.79,-475.94" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="272.32,-479.42 282.18,-475.55 272.06,-472.42 272.32,-479.42" style=""/>
+</g>
+<!-- ERC721Buyable.UpdateRoyalty -->
+<g id="node22" class="node" pointer-events="visible" data-name="ERC721Buyable.UpdateRoyalty">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-312" rx="69.5" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-307.8" font-family="Times,serif" font-size="14.00" style="">UpdateRoyalty</text>
+</g>
+<!-- ERC721Buyable.setRoyalty&#45;&gt;ERC721Buyable.UpdateRoyalty -->
+<g id="edge19" class="edge" data-name="ERC721Buyable.setRoyalty-&gt;ERC721Buyable.UpdateRoyalty">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M155.38,-476.06C169.82,-472.14 184.63,-465.67 195.35,-455 233.62,-416.93 192.82,-376.81 231.35,-339 237.88,-332.59 245.84,-327.68 254.32,-323.93" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="255.64,-327.18 263.69,-320.3 253.1,-320.65 255.64,-327.18" style=""/>
+</g>
+<!-- ERC721Buyable._payRoyalties&#45;&gt;ERC721Buyable.owner -->
+<g id="edge21" class="edge" data-name="ERC721Buyable._payRoyalties-&gt;ERC721Buyable.owner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M385.33,-648.12C417.08,-643.86 455.59,-638.7 484.59,-634.81" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="485.36,-638.24 494.81,-633.44 484.43,-631.3 485.36,-638.24" style=""/>
+</g>
+<!-- ERC721Buyable._payRoyalties&#45;&gt;ERC721Buyable.payable -->
+<g id="edge20" class="edge" data-name="ERC721Buyable._payRoyalties-&gt;ERC721Buyable.payable">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M380.77,-665.96C411.93,-671.69 450.7,-678.81 480.63,-684.31" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="480.35,-687.81 490.81,-686.18 481.61,-680.93 480.35,-687.81" style=""/>
+</g>
+<!-- ERC721Buyable._transfer -->
+<g id="node11" class="node" pointer-events="visible" data-name="ERC721Buyable._transfer">
+
+<ellipse fill="#f2c383" stroke="#f2c383" stroke-width="3" cx="105.68" cy="-258" rx="45.21" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-253.8" font-family="Times,serif" font-size="14.00" style="">_transfer</text>
+</g>
+<!-- ERC721._transfer -->
+<g id="node24" class="node" pointer-events="visible" data-name="ERC721._transfer">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-34" rx="45.21" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-29.8" font-family="Times,serif" font-size="14.00" style="">_transfer</text>
+</g>
+<!-- ERC721Buyable._transfer&#45;&gt;ERC721._transfer -->
+<g id="edge22" class="edge" data-name="ERC721Buyable._transfer-&gt;ERC721._transfer">
+
+<path fill="none" stroke="white" stroke-width="2" d="M113,-239.95C127.54,-201.12 167.12,-109.26 231.35,-61 243.28,-52.04 258.1,-46.05 272.39,-42.04" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="273.32,-45.42 282.16,-39.58 271.61,-38.63 273.32,-45.42" style=""/>
+</g>
+<!-- ERC721Buyable._burn -->
+<g id="node12" class="node" pointer-events="visible" data-name="ERC721Buyable._burn">
+
+<ellipse fill="#f2c383" stroke="#f2c383" stroke-width="3" cx="105.68" cy="-312" rx="33.63" ry="18" style=""/>
+<text text-anchor="middle" x="105.68" y="-307.8" font-family="Times,serif" font-size="14.00" style="">_burn</text>
+</g>
+<!-- ERC721._burn -->
+<g id="node25" class="node" pointer-events="visible" data-name="ERC721._burn">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="325.52" cy="-88" rx="33.63" ry="18" style=""/>
+<text text-anchor="middle" x="325.52" y="-83.8" font-family="Times,serif" font-size="14.00" style="">_burn</text>
+</g>
+<!-- ERC721Buyable._burn&#45;&gt;ERC721._burn -->
+<g id="edge23" class="edge" data-name="ERC721Buyable._burn-&gt;ERC721._burn">
+
+<path fill="none" stroke="white" stroke-width="2" d="M139.05,-309.89C157.92,-306.97 180.8,-300.26 195.35,-285 240.29,-237.89 192.32,-195.11 231.35,-143 245.48,-124.14 268.14,-110.55 287.58,-101.6" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="289.04,-104.78 296.81,-97.58 286.24,-98.37 289.04,-104.78" style=""/>
+</g>
+<!-- ERC721Buyable.onlyTokenOwner -->
+<g id="node13" class="node" pointer-events="visible" data-name="ERC721Buyable.onlyTokenOwner">
+
+<polygon fill="#edad56" stroke="#1bc6a6" stroke-width="3" points="191.52,-416.54 191.52,-431.46 141.23,-442 70.12,-442 19.83,-431.46 19.83,-416.54 70.12,-406 141.23,-406 191.52,-416.54" style=""/>
+<polygon fill="none" stroke="#1bc6a6" stroke-width="3" points="195.53,-413.3 195.53,-434.7 141.65,-446 69.7,-446 15.82,-434.7 15.82,-413.3 69.7,-402 141.65,-402 195.53,-413.3" style=""/>
+<text text-anchor="middle" x="105.68" y="-419.8" font-family="Times,serif" font-size="14.00" style="">onlyTokenOwner</text>
+</g>
+<!-- ERC721Buyable.onlyTokenOwner&#45;&gt;ERC721Buyable.ownerOf -->
+<g id="edge24" class="edge" data-name="ERC721Buyable.onlyTokenOwner-&gt;ERC721Buyable.ownerOf">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M168.52,-407.53C203.14,-398.32 245.62,-387.01 277.5,-378.52" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="278.69,-381.82 287.46,-375.87 276.89,-375.06 278.69,-381.82" style=""/>
+</g>
+<!-- key -->
+<g id="node26" class="node" pointer-events="visible" data-name="key">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="170.68,-939 40.68,-939 40.68,-851 170.68,-851 170.68,-939" style=""/>
+<text text-anchor="start" x="90.31" y="-920.4" font-family="Times,serif" font-size="14.00" style="">Internal Call</text>
+<text text-anchor="start" x="86.42" y="-900.4" font-family="Times,serif" font-size="14.00" style="">External Call</text>
+<text text-anchor="start" x="63.88" y="-880.4" font-family="Times,serif" font-size="14.00" style="">Defined Contract</text>
+<text text-anchor="start" x="50.28" y="-860.4" font-family="Times,serif" font-size="14.00" style="">Undefined Contract</text>
+</g>
+<!-- key2 -->
+<g id="node27" class="node" pointer-events="visible" data-name="key2">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="352.52,-939 298.52,-939 298.52,-851 352.52,-851 352.52,-939" style=""/>
+<text text-anchor="start" x="315.52" y="-920.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<text text-anchor="start" x="315.52" y="-900.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="#445773" stroke="transparent" points="313.52,-875 313.52,-895 338.52,-895 338.52,-875 313.52,-875" style=""/>
+<text text-anchor="start" x="315.52" y="-880.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="none" stroke="#e8726d" points="315.52,-857 315.52,-873 336.52,-873 336.52,-857 315.52,-857" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge25" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M163.68,-925C226.34,-925 244.49,-925 302.46,-925" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="302.52,-928.5 312.52,-925 302.52,-921.5 302.52,-928.5" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge26" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="white" stroke-width="2" d="M163.68,-905C226.34,-905 244.49,-905 302.46,-905" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="302.52,-908.5 312.52,-905 302.52,-901.5 302.52,-908.5" style=""/>
+</g>
+</g>
+</svg>

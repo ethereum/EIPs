@@ -1,0 +1,119 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="310pt" height="485pt" viewBox="0.00 0.00 310.34 485.00">
+<g id="graph0" class="graph" transform="translate(30.7167748512976,445.6135774633949) scale(0.8705505632961241)" data-name="G">
+
+<polygon fill="#2e3e56" stroke="transparent" points="-4,4 -4,-481 306.34,-481 306.34,4 -4,4" style=""/>
+<g id="clust1" class="cluster" data-name="clusterNFTContract">
+
+<path fill="#445773" stroke="#445773" d="M20,-147C20,-147 266.27,-147 266.27,-147 272.27,-147 278.27,-153 278.27,-159 278.27,-159 278.27,-320 278.27,-320 278.27,-326 272.27,-332 266.27,-332 266.27,-332 20,-332 20,-332 14,-332 8,-326 8,-320 8,-320 8,-159 8,-159 8,-153 14,-147 20,-147" style=""/>
+<text text-anchor="middle" x="143.13" y="-315.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">NFTContract</text>
+</g>
+<g id="clust2" class="cluster" data-name="clusterCounters.Counter">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M191.05,-8C191.05,-8 282.34,-8 282.34,-8 288.34,-8 294.34,-14 294.34,-20 294.34,-20 294.34,-127 294.34,-127 294.34,-133 288.34,-139 282.34,-139 282.34,-139 191.05,-139 191.05,-139 185.05,-139 179.05,-133 179.05,-127 179.05,-127 179.05,-20 179.05,-20 179.05,-14 185.05,-8 191.05,-8" style=""/>
+<text text-anchor="middle" x="236.7" y="-122.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">Counters.Counter</text>
+</g>
+<g id="clust3" class="cluster" data-name="cluster_01">
+
+<polygon fill="#2e3e56" stroke="black" points="10.53,-340 10.53,-469 271.7,-469 271.7,-340 10.53,-340" style=""/>
+<text text-anchor="middle" x="141.11" y="-452.4" font-family="Times,serif" font-size="14.00" style="">Legend</text>
+</g>
+<!-- NFTContract.&lt;Constructor&gt; -->
+<g id="node1" class="node" pointer-events="visible" data-name="NFTContract.&lt;Constructor&gt;">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="83.53" cy="-281" rx="67.55" ry="18" style=""/>
+<text text-anchor="middle" x="83.53" y="-276.8" font-family="Times,serif" font-size="14.00" style="">&lt;Constructor&gt;</text>
+</g>
+<!-- NFTContract.mint -->
+<g id="node2" class="node" pointer-events="visible" data-name="NFTContract.mint">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="83.53" cy="-173" rx="28.99" ry="18" style=""/>
+<text text-anchor="middle" x="83.53" y="-168.8" font-family="Times,serif" font-size="14.00" style="">mint</text>
+</g>
+<!-- NFTContract._mint -->
+<g id="node4" class="node" pointer-events="visible" data-name="NFTContract._mint">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="236.7" cy="-173" rx="33.64" ry="18" style=""/>
+<text text-anchor="middle" x="236.7" y="-168.8" font-family="Times,serif" font-size="14.00" style="">_mint</text>
+</g>
+<!-- NFTContract.mint&#45;&gt;NFTContract._mint -->
+<g id="edge3" class="edge" data-name="NFTContract.mint-&gt;NFTContract._mint">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M112.61,-173C135.12,-173 167.09,-173 192.81,-173" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="193.04,-176.5 203.04,-173 193.04,-169.5 193.04,-176.5" style=""/>
+</g>
+<!-- Counters.Counter.increment -->
+<g id="node6" class="node" pointer-events="visible" data-name="Counters.Counter.increment">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="236.7" cy="-88" rx="49.79" ry="18" style=""/>
+<text text-anchor="middle" x="236.7" y="-83.8" font-family="Times,serif" font-size="14.00" style="">increment</text>
+</g>
+<!-- NFTContract.mint&#45;&gt;Counters.Counter.increment -->
+<g id="edge1" class="edge" data-name="NFTContract.mint-&gt;Counters.Counter.increment">
+
+<path fill="none" stroke="white" stroke-width="2" d="M105.55,-161.18C130.03,-147.41 170.87,-124.45 200.27,-107.92" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="202,-110.96 209,-103.01 198.57,-104.86 202,-110.96" style=""/>
+</g>
+<!-- Counters.Counter.current -->
+<g id="node7" class="node" pointer-events="visible" data-name="Counters.Counter.current">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="236.7" cy="-34" rx="38.26" ry="18" style=""/>
+<text text-anchor="middle" x="236.7" y="-29.8" font-family="Times,serif" font-size="14.00" style="">current</text>
+</g>
+<!-- NFTContract.mint&#45;&gt;Counters.Counter.current -->
+<g id="edge2" class="edge" data-name="NFTContract.mint-&gt;Counters.Counter.current">
+
+<path fill="none" stroke="white" stroke-width="2" d="M95.25,-156.25C111.15,-132.5 143,-88.83 179.05,-61 184.56,-56.75 190.84,-52.94 197.17,-49.62" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="198.95,-52.64 206.39,-45.1 195.87,-46.36 198.95,-52.64" style=""/>
+</g>
+<!-- NFTContract.burn -->
+<g id="node3" class="node" pointer-events="visible" data-name="NFTContract.burn">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="83.53" cy="-227" rx="28.98" ry="18" style=""/>
+<text text-anchor="middle" x="83.53" y="-222.8" font-family="Times,serif" font-size="14.00" style="">burn</text>
+</g>
+<!-- NFTContract._burn -->
+<g id="node5" class="node" pointer-events="visible" data-name="NFTContract._burn">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="236.7" cy="-227" rx="33.63" ry="18" style=""/>
+<text text-anchor="middle" x="236.7" y="-222.8" font-family="Times,serif" font-size="14.00" style="">_burn</text>
+</g>
+<!-- NFTContract.burn&#45;&gt;NFTContract._burn -->
+<g id="edge4" class="edge" data-name="NFTContract.burn-&gt;NFTContract._burn">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M112.61,-227C135.12,-227 167.09,-227 192.81,-227" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="193.04,-230.5 203.04,-227 193.04,-223.5 193.04,-230.5" style=""/>
+</g>
+<!-- key -->
+<g id="node8" class="node" pointer-events="visible" data-name="key">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="148.53,-436 18.53,-436 18.53,-348 148.53,-348 148.53,-436" style=""/>
+<text text-anchor="start" x="68.16" y="-417.4" font-family="Times,serif" font-size="14.00" style="">Internal Call</text>
+<text text-anchor="start" x="64.27" y="-397.4" font-family="Times,serif" font-size="14.00" style="">External Call</text>
+<text text-anchor="start" x="41.73" y="-377.4" font-family="Times,serif" font-size="14.00" style="">Defined Contract</text>
+<text text-anchor="start" x="28.13" y="-357.4" font-family="Times,serif" font-size="14.00" style="">Undefined Contract</text>
+</g>
+<!-- key2 -->
+<g id="node9" class="node" pointer-events="visible" data-name="key2">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="263.7,-436 209.7,-436 209.7,-348 263.7,-348 263.7,-436" style=""/>
+<text text-anchor="start" x="226.7" y="-417.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<text text-anchor="start" x="226.7" y="-397.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="#445773" stroke="transparent" points="224.7,-372 224.7,-392 249.7,-392 249.7,-372 224.7,-372" style=""/>
+<text text-anchor="start" x="226.7" y="-377.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="none" stroke="#e8726d" points="226.7,-354 226.7,-370 247.7,-370 247.7,-354 226.7,-354" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge5" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M141.53,-422C174.34,-422 185.04,-422 213.36,-422" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="213.7,-425.5 223.7,-422 213.7,-418.5 213.7,-425.5" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge6" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="white" stroke-width="2" d="M141.53,-402C174.34,-402 185.04,-402 213.36,-402" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="213.7,-405.5 223.7,-402 213.7,-398.5 213.7,-405.5" style=""/>
+</g>
+</g>
+</svg>
