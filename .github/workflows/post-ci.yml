@@ -23,9 +23,9 @@ jobs:
       - name: Save PR Data
         id: save-pr-data
         run: |
-          echo "::set-output name=pr_number::$(cat pr_number)"
-          echo "::set-output name=pr_sha::$(cat pr_sha)"
-          echo "::set-output name=merge_sha::$(cat merge_sha)"
+          echo "pr_number=$(cat pr_number)" >> $GITHUB_OUTPUT
+          echo "pr_sha=$(cat pr_sha)" >> $GITHUB_OUTPUT
+          echo "merge_sha=$(cat merge_sha)" >> $GITHUB_OUTPUT
 
       - name: Add Comment
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
