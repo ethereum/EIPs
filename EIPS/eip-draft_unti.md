@@ -1,14 +1,14 @@
 ---
-eip: <to be assigned>
-title: UNTransferability Indicator for ERC-1155
+eip: 6268
+title: Untransferability Indicator for EIP-1155
 description: An extension of ERC-1155 for indicating the transferability of the token.
 author: Yuki Aoki (@yuki-js)
 discussions-to: https://ethereum-magicians.org/t/sbt-implemented-in-erc1155/12182
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2022-01-06
-requires (*optional): 1155
+requires: 1155
 ---
 
 ## Abstract
@@ -27,11 +27,11 @@ Therefore, we propose the introduction of a universal indicator that demonstrate
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-Smart contracts implementing the ERC-tba standard MUST comform to the ERC-1155 specification.
+Smart contracts implementing the EIP-6268 standard MUST comform to the ERC-1155 specification.
 
-Smart contracts implementing the ERC-tba standard MUST implement all of the functions in the UNTI interface.
+Smart contracts implementing the EIP-6268 standard MUST implement all of the functions in the UNTI interface.
 
-Smart contracts implementing the ERC-tba standard MUST implement the ERC-165 supportsInterface function and MUST return the constant value true if `0xd87116f3` is passed through the interfaceID argument.
+Smart contracts implementing the EIP-6268 standard MUST implement the [EIP-165](./eip-165.md) supportsInterface function and MUST return the constant value true if `0xd87116f3` is passed through the interfaceID argument.
 
 For the token identifier `_id` that is marked as `locked`, `locked(_id)` MUST return the constant value true and any functions that try transferring the token, including `safeTransferFrom` and `safeBatchTransferFrom` function MUST throw.
 
