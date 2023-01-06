@@ -82,9 +82,9 @@ h1 a {
 
 .inline-svg {
   display: inline-block;
-  vertical-align: baseline;
+  vertical-align: bottom;
   fill: currentColor;
-  width: 1em;
+  width: 1.5ex;
   height: 100%;
   object-fit: cover;
 }
