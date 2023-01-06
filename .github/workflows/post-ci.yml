@@ -46,6 +46,15 @@ jobs:
           repo: ${{ github.repository }}
           github_token: ${{ github.token }}
 
+      - name: Remove Review Label
+        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        with:
+          labels: e-review
+          number: ${{ steps.save-pr-data.outputs.pr_number }}
+          repo: ${{ github.repository }}
+          github_token: ${{ github.token }}
+
       - name: Remove Waiting Label
         uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
         if: ${{ github.event.workflow_run.conclusion != 'failure' }}
