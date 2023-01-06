@@ -19,7 +19,7 @@ In light of the recent zkEVM announcements by various projects and the ongoing d
 
 ## Specification
 
-Any protocol, network, smart contract system, or similar that claims at time `t` full EVM equivalence "MUST" fully (=100%) comply with the latest [Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper) version at time `t`.
+Any protocol, network, smart contract system, or similar that claims at time `t` full EVM equivalence MUST fully (=100%) comply with the latest [Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper) version at time `t`.
 
 ## Rationale
 
