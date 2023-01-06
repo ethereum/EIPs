@@ -10,16 +10,16 @@ import "./ERC5727Enumerable.sol";
 abstract contract ERC5727Recovery is ERC5727Enumerable, IERC5727Recovery {
     using ECDSA for bytes32;
 
-    function recover(address soul, bytes memory signature)
+    function recover(address owner, bytes memory signature)
         public
         virtual
         override
     {
         address recipient = _msgSender();
-        bytes32 messageHash = keccak256(abi.encodePacked(soul, recipient));
+        bytes32 messageHash = keccak256(abi.encodePacked(owner, recipient));
         bytes32 signedHash = messageHash.toEthSignedMessageHash();
-        require(signedHash.recover(signature) == soul, "Invalid signature");
-        uint256[] memory tokenIds = _tokensOfSoul(soul);
+        require(signedHash.recover(signature) == owner, "Invalid signature");
+        uint256[] memory tokenIds = _tokensOfOwner(owner);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             Token storage token = _getTokenOrRevert(tokenIds[i]);
             address issuer = token.issuer;
