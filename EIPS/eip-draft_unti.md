@@ -15,15 +15,15 @@ requires (*optional): 1155
 
 ## Abstract
 
-The following standard is an extension of EIP-1155. It introduces the interface for indicating whether the token is transferable or not, without regard to non-fungibility, using the feature detection functionality of EIP-165.
+The following standard is an extension of [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155). It introduces the interface for indicating whether the token is transferable or not, without regard to non-fungibility, using the feature detection functionality of [EIP-165](https://eips.ethereum.org/EIPS/eip-165).
 
 ## Motivation
 
-We propose the introduction of the UNTransferability Indicator, a universal indicator that demonstrates untransferability without regard to non-fungibility. This will enable the use of Soulbound Tokens (SBT), which are untransferable and fungible/non-fungible entities, to associate items with an account, user-related information, memories, and event attendance records, in a universal manner. The EIP-5192 specification was invented for this purpose, but SBT in EIP-5192 is non-fungible and has a tokenId, allowing them to be distinguished from each other using the tokenId. However, for example, in the case of event attendance records, it is not necessary to distinguish between those who attended the same event using the tokenId, and all participants should have the same indistinguishable entity. Rather, the existence of the tokenId creates discriminability.
+We propose the introduction of the UNTransferability Indicator, a universal indicator that demonstrates untransferability without regard to non-fungibility. This will enable the use of Soulbound Tokens (SBT), which are untransferable and fungible/non-fungible entities, to associate items with an account, user-related information, memories, and event attendance records, in a universal manner. The [EIP-5192](https://eips.ethereum.org/EIPS/eip-5192) specification was invented for this purpose, but SBT in [EIP-5192](https://eips.ethereum.org/EIPS/eip-5192) is non-fungible and has a tokenId, allowing them to be distinguished from each other using the tokenId. However, for example, in the case of event attendance records, it is not necessary to distinguish between those who attended the same event using the tokenId, and all participants should have the same indistinguishable entity. Rather, the existence of the tokenId creates discriminability.
 
-Additionally, there is currently no mechanism to indicate untransferability in EIP-20 or EIP-1155. Therefore, a universal specification with the same functionality as EIP-5192, which can be applied to more than just EIP-721, is required.
+Additionally, there is currently no mechanism to indicate untransferability in [EIP-20](https://eips.ethereum.org/EIPS/eip-20) or [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155). Therefore, a universal specification with the same functionality as [EIP-5192](https://eips.ethereum.org/EIPS/eip-5192), which can be applied to more than just [EIP-721](https://eips.ethereum.org/EIPS/eip-721), is required.
 
-Therefore, we propose the introduction of a universal indicator that demonstrates untransferability without regard to non-fungibility, inspired by EIP-5192. This will make it impossible to identify individuals when using SBT to associate information, protecting the privacy of personal information. It will also make it possible to choose a method other than EIP-721 when implementing SBT. Then tokens with UNTransferability Indicator become something like account-bound attributes rather than assets.
+Therefore, we propose the introduction of a universal indicator that demonstrates untransferability without regard to non-fungibility, inspired by [EIP-5192](https://eips.ethereum.org/EIPS/eip-5192). This will make it impossible to identify individuals when using SBT to associate information, protecting the privacy of personal information. It will also make it possible to choose a method other than [EIP-721](https://eips.ethereum.org/EIPS/eip-721) when implementing SBT. Then tokens with UNTransferability Indicator become something like account-bound attributes rather than assets.
 
 ## Specification
 
@@ -79,13 +79,13 @@ interface UNTI {
 
 ## Rationale
 
-There are some proposed uses of UNTransferability Indicator for EIP-1155. One example is the "Resident Bound Tokens", which indicates that he or she lives in the country or prefecture, and helps creating the local community or providing the government services. Another example is the lecture credit which doesn't need to distinguish the attendees.
+There are some proposed uses of UNTransferability Indicator for [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155). One example is the "Resident Bound Tokens", which indicates that he or she lives in the country or prefecture, and helps creating the local community or providing the government services. Another example is the lecture credit which doesn't need to distinguish the attendees.
 
 This standard will introduce the fungible but non-transferable token, and also introduce the account-bound attributes, and then redefine the definition of SBTs.
 
 ## Backwards Compatibility
 
-This proposal is fully backward compatible with EIP-1155.
+This proposal is fully backward compatible with [EIP-1155](https://eips.ethereum.org/EIPS/eip-1155).
 
 ## Security Considerations
 
