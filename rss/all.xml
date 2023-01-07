@@ -13,7 +13,7 @@ layout: null
     {% for eip in eips %}
       <item>
         <title>{{ eip.title | xml_escape }}</title>
-        <category>{{ eip.type }}/{{ eip.category }}</category>
+        <category>{{ eip.type | xml_escape }}/{{ eip.category | xml_escape }}</category>
         {% if eip.discussions-to %}
           <comments>{{ eip.discussions-to | xml_escape }}</comments>
         {% endif %}
