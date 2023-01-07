@@ -24,7 +24,7 @@ abstract contract ERC5727 is
 
     struct Token {
         address issuer;
-        address soul;
+        address owner;
         bool valid;
         uint256 value;
         uint256 slot;
@@ -60,37 +60,37 @@ abstract contract ERC5727 is
         returns (Token storage)
     {
         Token storage token = _tokens[tokenId];
-        require(token.soul != address(0), "ERC5727: Token does not exist");
+        require(token.owner != address(0), "ERC5727: Token does not exist");
         return token;
     }
 
     function _mintUnsafe(
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
         bool valid
     ) internal {
-        _mintUnsafe(_msgSender(), soul, tokenId, value, slot, valid);
+        _mintUnsafe(_msgSender(), owner, tokenId, value, slot, valid);
     }
 
     function _mintUnsafe(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
         bool valid
     ) internal {
         require(
-            _tokens[tokenId].soul == address(0),
+            _tokens[tokenId].owner == address(0),
             "ERC5727: Cannot mint an assigned token"
         );
         require(value != 0, "ERC5727: Cannot mint zero value");
-        _beforeTokenMint(issuer, soul, tokenId, value, slot, valid);
-        _tokens[tokenId] = Token(issuer, soul, valid, value, slot);
-        _afterTokenMint(issuer, soul, tokenId, value, slot, valid);
-        emit Minted(soul, tokenId, value);
+        _beforeTokenMint(issuer, owner, tokenId, value, slot, valid);
+        _tokens[tokenId] = Token(issuer, owner, valid, value, slot);
+        _afterTokenMint(issuer, owner, tokenId, value, slot, valid);
+        emit Minted(owner, tokenId, value);
         emit SlotChanged(tokenId, 0, slot);
     }
 
@@ -142,7 +142,7 @@ abstract contract ERC5727 is
         _beforeTokenRevoke(tokenId);
         _tokens[tokenId].valid = false;
         _afterTokenRevoke(tokenId);
-        emit Revoked(_tokens[tokenId].soul, tokenId);
+        emit Revoked(_tokens[tokenId].owner, tokenId);
     }
 
     function _revokeBatch(uint256[] memory tokenIds) internal virtual {
@@ -152,7 +152,7 @@ abstract contract ERC5727 is
     }
 
     function _destroy(uint256 tokenId) internal virtual {
-        address soul = soulOf(tokenId);
+        address owner = ownerOf(tokenId);
         uint256 slot = slotOf(tokenId);
         uint256 value = valueOf(tokenId);
 
@@ -161,7 +161,7 @@ abstract contract ERC5727 is
         _afterTokenDestroy(tokenId);
 
         emit Consumed(tokenId, value);
-        emit Destroyed(soul, tokenId);
+        emit Destroyed(owner, tokenId);
         emit SlotChanged(tokenId, slot, 0);
     }
 
@@ -173,7 +173,7 @@ abstract contract ERC5727 is
 
     function _beforeTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
@@ -182,7 +182,7 @@ abstract contract ERC5727 is
 
     function _afterTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
@@ -197,7 +197,7 @@ abstract contract ERC5727 is
 
     function _afterTokenDestroy(uint256 tokenId) internal virtual {}
 
-    function soulOf(uint256 tokenId)
+    function ownerOf(uint256 tokenId)
         public
         view
         virtual
@@ -205,7 +205,7 @@ abstract contract ERC5727 is
         returns (address)
     {
         _beforeView(tokenId);
-        return _getTokenOrRevert(tokenId).soul;
+        return _getTokenOrRevert(tokenId).owner;
     }
 
     function valueOf(uint256 tokenId)

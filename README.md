@@ -78,4 +78,4 @@ eipv <INPUT FILE / DIRECTORY>
 
 2. Preview your local Jekyll site in your web browser at <http://localhost:4000>.
 
-More information on Jekyll and GitHub Pages [here](https://help.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).
+More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).

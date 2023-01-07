@@ -5,29 +5,29 @@ import "./IERC5727.sol";
 
 /**
  * @title ERC5727 Soulbound Token Enumerable Interface
- * @dev This extension allows querying the tokens of a soul.
+ * @dev This extension allows querying the tokens of a owner.
  */
 interface IERC5727Enumerable is IERC5727 {
     /**
-     * @notice Get the total number of tokens emitted.
-     * @return The total number of tokens emitted
+     * @notice Get the total number of tokens tracked by this contract.
+     * @return The total number of tokens tracked by this contract
      */
-    function emittedCount() external view returns (uint256);
+    function totalSupply() external view returns (uint256);
 
     /**
-     * @notice Get the total number of souls.
-     * @return The total number of souls
+     * @notice Get the total number of owners.
+     * @return The total number of owners
      */
-    function soulsCount() external view returns (uint256);
+    function ownersCount() external view returns (uint256);
 
     /**
-     * @notice Get the tokenId with `index` of the `soul`.
-     * @dev MUST revert if the `index` exceed the number of tokens owned by the `soul`.
-     * @param soul The soul whose token is queried for.
+     * @notice Get the tokenId with `index` of the `owner`.
+     * @dev MUST revert if the `index` exceed the number of tokens owned by the `owner`.
+     * @param owner The owner whose token is queried for.
      * @param index The index of the token queried for
      * @return The token is queried for
      */
-    function tokenOfSoulByIndex(address soul, uint256 index)
+    function tokenOfOwnerByIndex(address owner, uint256 index)
         external
         view
         returns (uint256);
@@ -41,17 +41,17 @@ interface IERC5727Enumerable is IERC5727 {
     function tokenByIndex(uint256 index) external view returns (uint256);
 
     /**
-     * @notice Get the number of tokens owned by the `soul`.
-     * @dev MUST revert if the `soul` does not have any token.
-     * @param soul The soul whose balance is queried for
-     * @return The number of tokens of the `soul`
+     * @notice Get the number of tokens owned by the `owner`.
+     * @dev MUST revert if the `owner` does not have any token.
+     * @param owner The owner whose balance is queried for
+     * @return The number of tokens of the `owner`
      */
-    function balanceOf(address soul) external view returns (uint256);
+    function balanceOf(address owner) external view returns (uint256);
 
     /**
-     * @notice Get if the `soul` owns any valid tokens.
-     * @param soul The soul whose valid token infomation is queried for
-     * @return if the `soul` owns any valid tokens
+     * @notice Get if the `owner` owns any valid tokens.
+     * @param owner The owner whose valid token infomation is queried for
+     * @return if the `owner` owns any valid tokens
      */
-    function hasValid(address soul) external view returns (bool);
+    function hasValid(address owner) external view returns (bool);
 }

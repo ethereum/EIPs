@@ -7,6 +7,7 @@ vendor
 # Editor files
 .gitpod.yml
 .DS_Store
+/.idea
 
 # Secrets
 .vercel
