@@ -263,7 +263,7 @@ Which renders to:
 Permitted Ethereum Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/.*$
+^(https://github.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/.*|https://github.com/ethereum/yellowpaper/tree/[0-9a-f]{40}/.*)$
 ```
 
 ### Digital Object Identifier System
