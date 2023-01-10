@@ -194,6 +194,24 @@ Other than the specific exceptions listed below, links to external resources **S
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
+### Execution Client Specifications
+
+Links to the Ethereum Execution Client Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specifications](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specifications](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+
+Permitted Execution Client Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/execution-specs/blob/[0-9a-f]{40}/.*$
+```
+
 ### Consensus Layer Specifications
 
 Links to the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
@@ -228,6 +246,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 
 ```regex
 ^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+```
+
+### Ethereum Yellow Paper
+
+Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
+```
+
+Which renders to:
+
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
+
+Permitted Ethereum Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/.*$
 ```
 
 ### Digital Object Identifier System
