@@ -64,7 +64,7 @@ We have implemented this proposed standard on the following blockchains.
 |   |                              | Unique    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 |   |                              | Quartz    | 0x9a6Cba29cc0cA4f18990F32De15aae08819F4cD0 |
 
-Further implementation details may be found in the Livetree repository [here](../../livetreetech/LivetreeCollective).
+Further implementation details may be found in the Livetree repository found at the [livetreetech/LivetreeCollective](https://github.com/livetreetech/LivetreeCollective) github repo.
 
 ## Security Considerations
 Important for security discussions, surfaces risks and could be the use of a whitelist described in the HashtagNFTCollectiveResolver DepositRoyalty method
