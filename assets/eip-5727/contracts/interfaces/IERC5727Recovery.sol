@@ -9,10 +9,10 @@ import "./IERC5727.sol";
  */
 interface IERC5727Recovery is IERC5727 {
     /**
-     * @notice Recover the tokens of `soul` with `signature`.
+     * @notice Recover the tokens of `owner` with `signature`.
      * @dev MUST revert if the signature is invalid.
-     * @param soul The soul whose tokens are recovered
-     * @param signature The signature signed by the `soul`
+     * @param owner The owner whose tokens are recovered
+     * @param signature The signature signed by the `owner`
      */
-    function recover(address soul, bytes memory signature) external;
+    function recover(address owner, bytes memory signature) external;
 }

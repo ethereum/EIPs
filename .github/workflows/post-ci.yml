@@ -31,6 +31,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
+          number: ${{ steps.save-pr-data.outputs.pr_number }}
           recreate: true
           message: |
             The commit ${{ steps.save-pr-data.outputs.pr_sha }} (as a parent of ${{ steps.save-pr-data.outputs.merge_sha }}) contains errors.
@@ -41,8 +42,9 @@ jobs:
         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
           labels: w-ci
-          number: ${{ steps.save-pr-data.outputs.pr_number }}'
+          number: ${{ steps.save-pr-data.outputs.pr_number }}
           repo: ${{ github.repository }}
+          github_token: ${{ github.token }}
 
       - name: Remove Waiting Label
         uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
@@ -51,3 +53,4 @@ jobs:
           labels: w-ci
           number: ${{ steps.save-pr-data.outputs.pr_number }}
           repo: ${{ github.repository }}
+          github_token: ${{ github.token }}
