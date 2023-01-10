@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.8;
 
-// OpenZeppelin Contracts (last updated v4.5.0) (utils/cryptography/SignatureChecker.sol)
+// OpenZeppelin Contracts (last updated v4.7.1) (utils/cryptography/SignatureChecker.sol)
 
-// OpenZeppelin Contracts (last updated v4.5.0) (utils/cryptography/ECDSA.sol)
+// OpenZeppelin Contracts (last updated v4.7.3) (utils/cryptography/ECDSA.sol)
 
-// OpenZeppelin Contracts v4.4.1 (utils/Strings.sol)
+// OpenZeppelin Contracts (last updated v4.7.0) (utils/Strings.sol)
 
 /**
  * @dev String operations.
@@ -128,9 +128,6 @@ library ECDSA {
      * _Available since v4.3._
      */
     function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError) {
-        // Check the signature length
-        // - case 65: r,s,v signature (standard)
-        // - case 64: r,vs signature (cf https://eips.ethereum.org/EIPS/eip-2098) _Available since v4.1._
         if (signature.length == 65) {
             bytes32 r;
             bytes32 s;
@@ -144,17 +141,6 @@ library ECDSA {
                 v := byte(0, mload(add(signature, 0x60)))
             }
             return tryRecover(hash, v, r, s);
-        } else if (signature.length == 64) {
-            bytes32 r;
-            bytes32 vs;
-            // ecrecover takes the signature parameters, and the only way to get them
-            // currently is to use assembly.
-            /// @solidity memory-safe-assembly
-            assembly {
-                r := mload(add(signature, 0x20))
-                vs := mload(add(signature, 0x40))
-            }
-            return tryRecover(hash, r, vs);
         } else {
             return (address(0), RecoverError.InvalidSignatureLength);
         }
@@ -304,7 +290,7 @@ library ECDSA {
     }
 }
 
-// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)
+// OpenZeppelin Contracts (last updated v4.7.0) (utils/Address.sol)
 
 /**
  * @dev Collection of functions related to the address type
@@ -386,7 +372,7 @@ library Address {
      * _Available since v3.1._
      */
     function functionCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, 0, "Address: low-level call failed");
+        return functionCall(target, data, "Address: low-level call failed");
     }
 
     /**
@@ -569,7 +555,9 @@ library SignatureChecker {
         (bool success, bytes memory result) = signer.staticcall(
             abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, signature)
         );
-        return (success && result.length == 32 && abi.decode(result, (bytes4)) == IERC1271.isValidSignature.selector);
+        return (success &&
+            result.length == 32 &&
+            abi.decode(result, (bytes32)) == bytes32(IERC1271.isValidSignature.selector));
     }
 }
 
@@ -673,6 +661,54 @@ abstract contract EIP712 {
     }
 }
 
+// OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
+
+// OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
+
+/**
+ * @dev Interface of the ERC165 standard, as defined in the
+ * https://eips.ethereum.org/EIPS/eip-165[EIP].
+ *
+ * Implementers can declare support of contract interfaces, which can then be
+ * queried by others ({ERC165Checker}).
+ *
+ * For an implementation, see {ERC165}.
+ */
+interface IERC165 {
+    /**
+     * @dev Returns true if this contract implements the interface defined by
+     * `interfaceId`. See the corresponding
+     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
+     * to learn more about how these ids are created.
+     *
+     * This function call must use less than 30 000 gas.
+     */
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
+}
+
+/**
+ * @dev Implementation of the {IERC165} interface.
+ *
+ * Contracts that want to implement ERC165 should inherit from this contract and override {supportsInterface} to check
+ * for the additional interface id that will be supported. For example:
+ *
+ * ```solidity
+ * function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+ *     return interfaceId == type(MyInterface).interfaceId || super.supportsInterface(interfaceId);
+ * }
+ * ```
+ *
+ * Alternatively, {ERC165Storage} provides an easier to use but more expensive implementation.
+ */
+abstract contract ERC165 is IERC165 {
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IERC165).interfaceId;
+    }
+}
+
 // OpenZeppelin Contracts v4.4.1 (utils/structs/BitMaps.sol)
 
 /**
@@ -727,54 +763,6 @@ library BitMaps {
     }
 }
 
-// OpenZeppelin Contracts v4.4.1 (utils/introspection/ERC165.sol)
-
-// OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)
-
-/**
- * @dev Interface of the ERC165 standard, as defined in the
- * https://eips.ethereum.org/EIPS/eip-165[EIP].
- *
- * Implementers can declare support of contract interfaces, which can then be
- * queried by others ({ERC165Checker}).
- *
- * For an implementation, see {ERC165}.
- */
-interface IERC165 {
-  /**
-   * @dev Returns true if this contract implements the interface defined by
-   * `interfaceId`. See the corresponding
-   * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]
-   * to learn more about how these ids are created.
-   *
-   * This function call must use less than 30 000 gas.
-   */
-  function supportsInterface(bytes4 interfaceId) external view returns (bool);
-}
-
-/**
- * @dev Implementation of the {IERC165} interface.
- *
- * Contracts that want to implement ERC165 should inherit from this contract and override {supportsInterface} to check
- * for the additional interface id that will be supported. For example:
- *
- * ```solidity
- * function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
- *     return interfaceId == type(MyInterface).interfaceId || super.supportsInterface(interfaceId);
- * }
- * ```
- *
- * Alternatively, {ERC165Storage} provides an easier to use but more expensive implementation.
- */
-abstract contract ERC165 is IERC165 {
-  /**
-   * @dev See {IERC165-supportsInterface}.
-   */
-  function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-      return interfaceId == type(IERC165).interfaceId;
-  }
-}
-
 interface IERC721Metadata {
   function name() external view returns (string memory);
   function symbol() external view returns (string memory);
@@ -783,21 +771,20 @@ interface IERC721Metadata {
 
 /// @title Account-bound tokens
 /// @dev See https://eips.ethereum.org/EIPS/eip-4973
-/// Note: the ERC-165 identifier for this interface is 0x8d7bac72
+/// Note: the ERC-165 identifier for this interface is 0xeb72bb7c
 interface IERC4973 {
   /// @dev This emits when ownership of any ABT changes by any mechanism.
   ///  This event emits when ABTs are given or equipped and unequipped
   ///  (`to` == 0).
   event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 indexed tokenId
+    address indexed from, address indexed to, uint256 indexed tokenId
   );
   /// @notice Count all ABTs assigned to an owner
   /// @dev ABTs assigned to the zero address are considered invalid, and this
   ///  function throws for queries about the zero address.
   /// @param owner An address for whom to query the balance
   /// @return The number of ABTs owned by `address owner`, possibly zero
+
   function balanceOf(address owner) external view returns (uint256);
   /// @notice Find the address bound to an ERC4973 account-bound token
   /// @dev ABTs assigned to zero address are considered invalid, and queries
@@ -816,11 +803,11 @@ interface IERC4973 {
   function unequip(uint256 tokenId) external;
   /// @notice Creates and transfers the ownership of an ABT from the
   ///  transaction's `msg.sender` to `address to`.
-  /// @dev Throws unless `bytes signature` represents an EIP-2098 Compact
-  ///  Signature of the EIP-712 structured data hash
-  ///  `Agreement(address active,address passive,string tokenURI)` expressing
+  /// @dev Throws unless `bytes signature` represents a signature of the
+  //   EIP-712 structured data hash
+  ///  `Agreement(address active,address passive,bytes metadata)` expressing
   ///  `address to`'s explicit agreement to be publicly associated with
-  ///  `msg.sender` and `string tokenURI`. A unique `uint256 tokenId` must be
+  ///  `msg.sender` and `bytes metadata`. A unique `uint256 tokenId` must be
   ///  generated by type-casting the `bytes32` EIP-712 structured data hash to a
   ///  `uint256`. If `bytes signature` is empty or `address to` is a contract,
   ///  an EIP-1271-compatible call to `function isValidSignatureNow(...)` must
@@ -828,25 +815,22 @@ interface IERC4973 {
   ///  `event Transfer(msg.sender, to, tokenId)`. Once an ABT exists as an
   ///  `uint256 tokenId` in the contract, `function give(...)` must throw.
   /// @param to The receiver of the ABT.
-  /// @param uri A distinct Uniform Resource Identifier (URI) for a given ABT.
-  /// @param signature A EIP-2098-compatible Compact Signature of the EIP-712
-  ///  structured data hash
-  ///  `Agreement(address active,address passive,string tokenURI)` signed by
+  /// @param metadata The metadata that will be associated to the ABT.
+  /// @param signature A signature of the EIP-712 structured data hash
+  ///  `Agreement(address active,address passive,bytes metadata)` signed by
   ///  `address to`.
   /// @return A unique `uint256 tokenId` generated by type-casting the `bytes32`
   ///  EIP-712 structured data hash to a `uint256`.
-  function give(
-    address to,
-    string calldata uri,
-    bytes calldata signature
-  ) external returns (uint256);
+  function give(address to, bytes calldata metadata, bytes calldata signature)
+    external
+    returns (uint256);
   /// @notice Creates and transfers the ownership of an ABT from an
   /// `address from` to the transaction's `msg.sender`.
-  /// @dev Throws unless `bytes signature` represents an EIP-2098 Compact
-  ///  Signature of the EIP-712 structured data hash
-  ///  `Agreement(address active,address passive,string tokenURI)` expressing
+  /// @dev Throws unless `bytes signature` represents a signature of the
+  ///  EIP-712 structured data hash
+  ///  `Agreement(address active,address passive,bytes metadata)` expressing
   ///  `address from`'s explicit agreement to be publicly associated with
-  ///  `msg.sender` and `string tokenURI`. A unique `uint256 tokenId` must be
+  ///  `msg.sender` and `bytes metadata`. A unique `uint256 tokenId` must be
   ///  generated by type-casting the `bytes32` EIP-712 structured data hash to a
   ///  `uint256`. If `bytes signature` is empty or `address from` is a contract,
   ///  an EIP-1271-compatible call to `function isValidSignatureNow(...)` must
@@ -855,29 +839,30 @@ interface IERC4973 {
   ///  exists as an `uint256 tokenId` in the contract, `function take(...)` must
   ///  throw.
   /// @param from The origin of the ABT.
-  /// @param uri A distinct Uniform Resource Identifier (URI) for a given ABT.
-  /// @param signature A EIP-2098-compatible Compact Signature of the EIP-712
-  ///  structured data hash
-  ///  `Agreement(address active,address passive,string tokenURI)` signed by
+  /// @param metadata The metadata that will be associated to the ABT.
+  /// @param signature A signature of the EIP-712 structured data hash
+  ///  `Agreement(address active,address passive,bytes metadata)` signed by
   ///  `address from`.
   /// @return A unique `uint256 tokenId` generated by type-casting the `bytes32`
   ///  EIP-712 structured data hash to a `uint256`.
-  function take(
-    address from,
-    string calldata uri,
-    bytes calldata signature
-  ) external returns (uint256);
+  function take(address from, bytes calldata metadata, bytes calldata signature)
+    external
+    returns (uint256);
+  /// @notice Decodes the opaque metadata bytestring of an ABT into the token
+  ///  URI that will be associated with it once it is created on chain.
+  /// @param metadata The metadata that will be associated to an ABT.
+  /// @return A URI that represents the metadata.
+  function decodeURI(bytes calldata metadata) external returns (string memory);
 }
 
 bytes32 constant AGREEMENT_HASH =
-  keccak256(
-    "Agreement(address active,address passive,string tokenURI)"
-);
+  keccak256("Agreement(address active,address passive,bytes metadata)");
 
 /// @notice Reference implementation of EIP-4973 tokens.
 /// @author Tim Daubenschütz, Rahul Rumalla (https://github.com/rugpullindex/ERC4973/blob/master/src/ERC4973.sol)
 abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
   using BitMaps for BitMaps.BitMap;
+
   BitMaps.BitMap private _usedHashes;
 
   string private _name;
@@ -887,20 +872,23 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
   mapping(uint256 => string) private _tokenURIs;
   mapping(address => uint256) private _balances;
 
-  constructor(
-    string memory name_,
-    string memory symbol_,
-    string memory version
-  ) EIP712(name_, version) {
+  constructor(string memory name_, string memory symbol_, string memory version)
+    EIP712(name_, version)
+  {
     _name = name_;
     _symbol = symbol_;
   }
 
-  function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-    return
-      interfaceId == type(IERC721Metadata).interfaceId ||
-      interfaceId == type(IERC4973).interfaceId ||
-      super.supportsInterface(interfaceId);
+  function supportsInterface(bytes4 interfaceId)
+    public
+    view
+    virtual
+    override
+    returns (bool)
+  {
+    return interfaceId == type(IERC721Metadata).interfaceId
+      || interfaceId == type(IERC4973).interfaceId
+      || super.supportsInterface(interfaceId);
   }
 
   function name() public view virtual override returns (string memory) {
@@ -911,7 +899,13 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
     return _symbol;
   }
 
-  function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+  function tokenURI(uint256 tokenId)
+    public
+    view
+    virtual
+    override
+    returns (string memory)
+  {
     require(_exists(tokenId), "tokenURI: token doesn't exist");
     return _tokenURIs[tokenId];
   }
@@ -922,7 +916,13 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
     _burn(tokenId);
   }
 
-  function balanceOf(address owner) public view virtual override returns (uint256) {
+  function balanceOf(address owner)
+    public
+    view
+    virtual
+    override
+    returns (uint256)
+  {
     require(owner != address(0), "balanceOf: address zero is not a valid owner");
     return _balances[owner];
   }
@@ -933,37 +933,51 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
     return owner;
   }
 
-  function give(
-    address to,
-    string calldata uri,
-    bytes calldata signature
-  ) external virtual returns (uint256) {
+  function give(address to, bytes calldata metadata, bytes calldata signature)
+    external
+    virtual
+    returns (uint256)
+  {
     require(msg.sender != to, "give: cannot give from self");
-    uint256 tokenId = _safeCheckAgreement(msg.sender, to, uri, signature);
+    uint256 tokenId = _safeCheckAgreement(msg.sender, to, metadata, signature);
+    string memory uri = decodeURI(metadata);
     _mint(msg.sender, to, tokenId, uri);
     _usedHashes.set(tokenId);
     return tokenId;
   }
 
-  function take(
-    address from,
-    string calldata uri,
-    bytes calldata signature
-  ) external virtual returns (uint256) {
+  function take(address from, bytes calldata metadata, bytes calldata signature)
+    external
+    virtual
+    returns (uint256)
+  {
     require(msg.sender != from, "take: cannot take from self");
-    uint256 tokenId = _safeCheckAgreement(msg.sender, from, uri, signature);
+    uint256 tokenId = _safeCheckAgreement(msg.sender, from, metadata, signature);
+    string memory uri = decodeURI(metadata);
     _mint(from, msg.sender, tokenId, uri);
     _usedHashes.set(tokenId);
     return tokenId;
   }
 
+  function decodeURI(bytes calldata metadata)
+    public
+    virtual
+    returns (string memory)
+  {
+    return string(metadata);
+  }
+
   function _safeCheckAgreement(
     address active,
     address passive,
-    string calldata uri,
+    bytes calldata metadata,
     bytes calldata signature
-  ) internal virtual returns (uint256) {
-    bytes32 hash = _getHash(active, passive, uri);
+  )
+    internal
+    virtual
+    returns (uint256)
+  {
+    bytes32 hash = _getHash(active, passive, metadata);
     uint256 tokenId = uint256(hash);
 
     require(
@@ -974,19 +988,13 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
     return tokenId;
   }
 
-  function _getHash(
-    address active,
-    address passive,
-    string calldata uri
-  ) internal view returns (bytes32) {
-    bytes32 structHash = keccak256(
-      abi.encode(
-        AGREEMENT_HASH,
-        active,
-        passive,
-        keccak256(bytes(uri))
-      )
-    );
+  function _getHash(address active, address passive, bytes calldata metadata)
+    internal
+    view
+    returns (bytes32)
+  {
+    bytes32 structHash =
+      keccak256(abi.encode(AGREEMENT_HASH, active, passive, keccak256(metadata)));
     return _hashTypedDataV4(structHash);
   }
 
@@ -994,12 +1002,11 @@ abstract contract ERC4973 is EIP712, ERC165, IERC721Metadata, IERC4973 {
     return _owners[tokenId] != address(0);
   }
 
-  function _mint(
-    address from,
-    address to,
-    uint256 tokenId,
-    string memory uri
-  ) internal virtual returns (uint256) {
+  function _mint(address from, address to, uint256 tokenId, string memory uri)
+    internal
+    virtual
+    returns (uint256)
+  {
     require(!_exists(tokenId), "mint: tokenID exists");
     _balances[to] += 1;
     _owners[tokenId] = to;
