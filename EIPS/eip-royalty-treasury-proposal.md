@@ -1,5 +1,5 @@
 ---
-eip: royalty-treasury-proposal
+eip: 6145
 title: Hashtag NFT Collective Royalty Treasury
 description: A method to deposit and retrieve royalties from an Ethereum Address
 author: Ashley Turing (@livetreetech)
