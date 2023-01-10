@@ -209,7 +209,7 @@ Which renders to:
 Permitted Execution Client Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/execution-specs/blob/[0-9a-f]{40}/.*$
+^(https://github.com/ethereum/execution-specs/blob/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
 ### Consensus Layer Specifications
