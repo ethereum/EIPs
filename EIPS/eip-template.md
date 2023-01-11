@@ -39,32 +39,25 @@ When a function of a Recipient is called, the Recipient MUST staticcall the `isF
 
 When a Recipient contract takes, as a parameter of a function, an address, the Recipient should include an overload of that function that takes two addresses there instead. The first address represents the Forwarder, and the second address represents the address under the control of that Forwarder. If more than one address parameter is taken (for example, [EIP-20](./eip-20.md)'s `transferFrom`), only the overload that takes two addresses for each address parameter is needed. The original function should have the same effect as the overloaded function with the forwarder addresses set to the zero address.
 
-For example, [EIP-20](./eip-20.md) would be extended as follows:
+For example, [EIP-20](./eip-20.md) would be extended with the following functions:
 
 ```solidity
 function transfer(address toForwarder, address toAddress, uint256 amount);
 function approve(address spenderForwarder, address spenderAddress, uint256 amount);
+function transferFrom(address fromForwarder, address fromAddress, address toForwarder, address toAddress, uint256 amount);
 ```
 
 ## Rationale
 
-The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+TODO
 
 ## Backwards Compatibility
 
-All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-## Test Cases
-
-Test cases for an implementation are mandatory for EIPs that are affecting consensus changes.  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
-
-## Reference Implementation
-
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`.
+Existing contracts will not be able to take advantage of this EIP. This is also true of EIP-2771.
 
 ## Security Considerations
 
-All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+A tradeoff is made: Forwarders do not need to be trusted by Recipients, but do need to be trusted by the users that use them with one or more accounts.
 
 ## Copyright
 
