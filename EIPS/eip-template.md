@@ -21,11 +21,30 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The key words "Trusted Forwarder", and "Recipient" in this document are to be interpreted as described in [EIP-2771](./eip-2771.md).
 
-### Extracting The Transaction Signer address
+### Forwarder Interface
+
+```solidity
+pragma solidity ^0.8.0;
+
+interface IForwarder {
+    function isForwardedTransaction() external view returns (bool)
+}
+```
+
+### Extracting the Sender and Forwarder
 
 When a function of a Recipient is called, the Recipient MUST staticcall the `isForwardedTransaction()` function of the caller. If this either reverts or returns the boolean value false, the transaction MUST be treated normally, with the sender being the caller, and the Forwarder set to the zero address. If this returns the boolean value true, the transaction MUST be considered a forwarded transaction with the sender being extracted as defined in [EIP-2771](./eip-2771.md), and the Forwarder set to the caller.
 
-### 
+### Recipient Extensions
+
+When a Recipient contract takes, as a parameter of a function, an address, the Recipient should include an overload of that function that takes two addresses there instead. The first address represents the Forwarder, and the second address represents the address under the control of that Forwarder. If more than one address parameter is taken (for example, [EIP-20](./eip-20.md)'s `transferFrom`), only the overload that takes two addresses for each address parameter is needed. The original function should have the same effect as the overloaded function with the forwarder addresses set to the zero address.
+
+For example, [EIP-20](./eip-20.md) would be extended as follows:
+
+```solidity
+function transfer(address toForwarder, address toAddress, uint256 amount);
+function approve(address spenderForwarder, address spenderAddress, uint256 amount);
+```
 
 ## Rationale
 
