@@ -94,7 +94,11 @@ interface IERC5269 {
 }
 ```
 
+<<<<<<< HEAD
 In the following description, `EIP_5269_STATUS` is set to be `keccak256("DRAFTv1")`.
+=======
+See [`IERC5269.sol`](../assets/eip-5269/contracts/IERC5269.sol).
+>>>>>>> main
 
 In addition to the behavior specified in the comments of `IERC5269`:
 
@@ -104,10 +108,10 @@ In addition to the behavior specified in the comments of `IERC5269`:
 
 *Note*: at the current snapshot, `supportEIP((any caller), 5269, 0, [])` MUST return `EIP_5269_STATUS`.
 
-4. Any compliant contract SHOULD emit a `OnSupportEIP(address(0), 5269, 0, EIP_5269_STATUS, [])` event upon construction or upgrade.
-5. Any compliant contract MAY declare for easy discovery any EIP main behavior or sub-behaviors by emitting event of `OnSupportEIP` with relevant values and when compliant contract changes whether the support an EIP or certain behavior for certain caller or all callers.
-6. For any `EIP-XXX` that is NOT in `Final` status, when querying `supportEIP((any caller), xxx, (any minor identifier), [])`, it MUST NOT return `keccak256("FINAL")`. It is RECOMMENDED to return `0` in this case but other value of `eipStatus` is allowed. Caller MUST treat any returned value other than `keccak256("FINAL")` as non-final, and MUST treat 0 as strictly "not supported".
-7. The `supportEIP` MUST be `view`, i.e. it MUST NOT mutate any global state of EVM.
+1. Any compliant contract SHOULD emit a `OnSupportEIP(address(0), 5269, 0, EIP_5269_STATUS, [])` event upon construction or upgrade.
+2. Any compliant contract MAY declare for easy discovery any EIP main behavior or sub-behaviors by emitting event of `OnSupportEIP` with relevant values and when compliant contract changes whether the support an EIP or certain behavior for certain caller or all callers.
+3. For any `EIP-XXX` that is NOT in `Final` status, when querying `supportEIP((any caller), xxx, (any minor identifier), [])`, it MUST NOT return `keccak256("FINAL")`. It is RECOMMENDED to return `0` in this case but other value of `eipStatus` is allowed. Caller MUST treat any returned value other than `keccak256("FINAL")` as non-final, and MUST treat 0 as strictly "not supported".
+4. The `supportEIP` MUST be `view`, i.e. it MUST NOT mutate any global state of EVM.
 
 ## Rationale
 
