@@ -7,7 +7,7 @@ discussions-to:
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-12-30
+created: 2023-01-13
 ---
 
 
@@ -143,19 +143,19 @@ interface IElasticSignature {
 The contract will store everyone's `pwdhash`.
 
 <br>
-<div align="center"><img src="../images/zkpass-1.png"></div>
+<div align="center"><img src="../assets/eip-es/zkpass-1.png"></div>
 <br>
 
 The chart below shows ZK circuit logic.
 
 <br>
-<div align="center"><img src="../images/zkpass-2.png"></div>
+<div align="center"><img src="../assets/eip-es/zkpass-2.png"></div>
 <br>
 
 To verify the signature, it needs `proof`, `allhash`, `pwdhash` and `fullhash`.
 
 <br>
-<div align="center"><img src="../images/zkpass-3.png"></div>
+<div align="center"><img src="../assets/eip-es/zkpass-3.png"></div>
 <br>
 
 The prover generates `proof` along with the public outputs. They will send all of them to a third-party requester contract. The requester will generate the `datahash`. It sends `datahash`, `proof`, `allhash`, `expiration` and prover's address to the verifier contract. The contract verifies that the `datahash` is from the prover, which means the withdrawal operation is signed by the prover's password.
