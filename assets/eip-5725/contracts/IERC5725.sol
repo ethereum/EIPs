@@ -16,7 +16,7 @@ interface IERC5725 is IERC721 {
     *  @param recipient The address which is receiving the payout.
     *  @param _claimAmount The amount of tokens being claimed.
     */
-    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 _claimAmount);
+    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 claimAmount);
 
     /**
      * @notice Claim the pending payout for the NFT
