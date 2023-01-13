@@ -100,7 +100,7 @@ Each EIP should have the following parts:
 - Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
 - Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 - Motivation *(optional)* - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
-- Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://ethereum.org/en/developers/docs/nodes-and-clients).
+- Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 - Backwards Compatibility *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
 - Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
@@ -184,11 +184,121 @@ The `created` header records the date that the EIP was assigned a number. Both h
 
 ### `requires` header
 
-EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
+EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on. If such a dependency exists, this field is required.
+
+A `requires` dependency is created when the current EIP cannot be understood or implemented without a concept or technical element from another EIP. Merely mentioning another EIP does not necessarily create such a dependency.
 
 ## Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Other than the specific exceptions listed below, links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+
+The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
+
+### Consensus Layer Specifications
+
+Links to the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
+```
+
+Which renders to:
+
+[Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
+
+Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
+```
+
+### Networking Specifications
+
+Links to the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+```
+
+Which renders as:
+
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+```
+
+### Digital Object Identifier System
+
+Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
+
+````markdown
+This is a sentence with a footnote.[^1]
+
+[^1]:
+    ```csl-json
+    {
+      "type": "article",
+      "id": 1,
+      "author": [
+        {
+          "family": "Jameson",
+          "given": "Hudson"
+        }
+      ],
+      "DOI": "00.0000/a00000-000-0000-y",
+      "title": "An Interesting Article",
+      "original-date": {
+        "date-parts": [
+          [2022, 12, 31]
+        ]
+      },
+      "URL": "https://sly-hub.invalid/00.0000/a00000-000-0000-y",
+      "custom": {
+        "additional-urls": [
+          "https://example.com/an-interesting-article.pdf"
+        ]
+      }
+    }
+    ```
+````
+
+Which renders to:
+
+This is a sentence with a footnote.[^1]
+
+[^1]:
+    ```csl-json
+    {
+      "type": "article",
+      "id": 1,
+      "author": [
+        {
+          "family": "Jameson",
+          "given": "Hudson"
+        }
+      ],
+      "DOI": "00.0000/a00000-000-0000-y",
+      "title": "An Interesting Article",
+      "original-date": {
+        "date-parts": [
+          [2022, 12, 31]
+        ]
+      },
+      "URL": "https://sly-hub.invalid/00.0000/a00000-000-0000-y",
+      "custom": {
+        "additional-urls": [
+          "https://example.com/an-interesting-article.pdf"
+        ]
+      }
+    }
+    ```
+
+See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
+
+The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
 ## Linking to other EIPs
 
