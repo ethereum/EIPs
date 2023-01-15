@@ -1,0 +1,61 @@
+syntax_version: "2021-08-02"
+meta:
+  labels:
+  - "cleanthat"
+  refs:
+    branches:
+    - "refs/heads/develop"
+    - "refs/heads/main"
+    - "refs/heads/master"
+source_code:
+  excludes: []
+  includes: []
+  encoding: "UTF-8"
+  line_ending: "UNKNOWN"
+languages:
+- language: "json"
+  language_version: "0"
+  skip: false
+  source_code:
+    excludes: []
+    includes: []
+    encoding: "UTF-8"
+    line_ending: "UNKNOWN"
+  processors:
+  - engine: "jackson"
+    parameters:
+      indent: -1
+      indentation: "    "
+      space_before_separator: true
+      alphabetical_order: false
+      eol_at_eof: false
+- language: "xml"
+  language_version: "0"
+  skip: false
+  source_code:
+    excludes: []
+    includes: []
+    encoding: "UTF-8"
+    line_ending: "UNKNOWN"
+  processors:
+  - engine: "revelc"
+    parameters:
+      indentation_as_string: "    "
+      indentation_as_whitespaces: 4
+      space_before_separator: true
+      alphabetical_order: false
+      eol_at_eof: false
+  - engine: "ecryd_sortpom"
+    parameters:
+      indentation_as_string: "    "
+      indentation_as_whitespaces: 4
+      space_before_separator: true
+      alphabetical_order: false
+      eol_at_eof: false
+      expand_empty_elements: true
+    source_code:
+      excludes: []
+      includes:
+      - "pom.xml"
+      encoding: "UTF-8"
+      line_ending: "UNKNOWN"
