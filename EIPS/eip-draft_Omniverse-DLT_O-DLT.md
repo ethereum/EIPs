@@ -112,7 +112,8 @@ struct OmniverseTransactionData {
 
 ## Rationale
 ### Architecture
-[picture]  
+![image](https://user-images.githubusercontent.com/83746881/212859732-8dbc3e0c-57e3-4629-bb30-8c5d4d9a23de.png)
+  
 - The implementation of the Omniverse Account is not very hard, and we temporarily choose a common elliptic curve secp256k1 to make it out, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, we can adapt them with a simple mapping mechanism ([Flow for example](https://github.com/Omniverse-Web3-Labs/omniverse-flow)).  
 - The Omniverse Transaction guarantees the ultimate consistency of omniverse transactions(o-transaction for short) across all chains. The related data structure is `OmniverseTransactionData` mentioned [above](#data-structure).
     - The `nonce` is very important, which is the key point to synchronize the states globally.
@@ -134,7 +135,8 @@ The O-DLT has the following features:
 - The state of the tokens based on O-DLT is synchronous on different chains. If someone sends/receives one token on Ethereum, he will send/receive one token on other chains at the same time.
 
 ### Workflow
-[picture]  
+![image](https://user-images.githubusercontent.com/83746881/212859794-13a0ba68-f89f-45cf-8fb4-e5fd09970166.png)
+
 - Suppose a common user `A` and the related operation `account nonce` is $k$.
 - `A` initiate an omniverse transfer operation on Ethereum by calling `omniverse_transfer`. The current `account nonce` of `A` in the O-DLT smart contracts deployed on Ethereum is $k$ so the valid value of `nonce in o-transaction` needs to be $k+1$.  
 - The O-DLT smart contracts on Ethereum verify the signature of the o-transaction data at an **application level**. If the verification for the signature and data succeeds, the o-transaction data will be published on the O-DLT smart contracts of the Ethereum side. The verification for the data includes:
