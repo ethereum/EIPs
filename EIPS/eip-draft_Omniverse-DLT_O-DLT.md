@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
-title: Omniverse-DLT(O-DLT for short)
-description: The Omniverse DLT is a new application-level token features built over multiple existing L1 public chains, enabling asset-related operations such as transfers and receptions running over different consensus spaces synchronously and equivalently.
+title: Omniverse Distributed Ledger Technology(O-DLT for short)
+description: The O-DLT is a new application-level token features built over multiple existing L1 public chains, enabling asset-related operations such as transfers and receptions running over different consensus spaces synchronously and equivalently.
 author: Shawn Zheng(@xiyu1984), Jason Cheng(chengjingxx@gmail.com), George Huang(@virgil2019), Kay Lin(@kay404)
 discussions-to: <URL>
 status: Draft
@@ -879,20 +879,20 @@ The two roles might be where the attack happens:
 
 #### **Will the *common user* cheat?**
 - Simply speaking, **maybe they will**, but fortunately, **they can't succeed**.  
-- Suppose current `account nonce` of a **common user** `A` is $k$ on all chains.  
-- Common user `A` initiates an o-transaction on a Parachain of Polkadot first, in which `A` transfer `10` o-tokens to an o-account of a **common user** `B`. The `nonce in o-transaction` needs to be $k+1$. After signature and data verification, the o-transaction data(`ot-P-ab` for short) will be published on Polkadot.
-- At the same time, `A` initiates an o-transaction with the same nonce $k+1$ but different data(transfer `10` o-tokens to another o-account `C`) on Ethereum. This o-transaction(named as `ot-E-ac`) will pass the verification on Ethereum first, and be published.  
+- Suppose the current `account nonce` of a **common user** `A` is $k$ on all chains.  
+- Common user `A` initiates an o-transaction on a Parachain of Polkadot first, in which `A` transfers `10` o-tokens to an o-account of a **common user** `B`. The `nonce in o-transaction` needs to be $k+1$. After signature and data verification, the o-transaction data(`ot-P-ab` for short) will be published on Polkadot.
+- At the same time, `A` initiates an o-transaction with the same nonce $k+1$ but different data(transfer `10` o-tokens to another o-account `C`) on Ethereum. This o-transaction(named `ot-E-ac`) will pass the verification on Ethereum first, and be published.  
 - At this point, it seems `A` finished a ***double spend attack*** and the O-DLT states on Polkadot and Ethereum are different.  
 - **Response strategy**:
     - As we mentioned above, the synchronizers will deliver `ot-P-ab` to the O-DLT on Ethereum and deliver `ot-E-ac` to the O-DLT on Polkadot because they are different although with the same nonce. The synchronizer who submits the o-transaction first will be rewarded as the signature is valid.
     - Both the O-DLTs on Polkadot and Ethereum will find that `A` did cheating after they received `ot-E-ac` and `ot-P-ab` respectively as the signature of `A` is non-deniable.  
-    - We mentioned above that the execution of an o-transaction will not be done immediately and instead there needs to be an fixed waiting time. So the `double spend attack` caused by `A` won't succeed.
+    - We mentioned above that the execution of an o-transaction will not be done immediately and instead there needs to be a fixed waiting time. So the `double spend attack` caused by `A` won't succeed.
     - There will be many synchronizers waiting for delivering o-transactions to get rewards. So although it's almost impossible that a **common user** can submit two o-transactions to two chains, none of the synchronizers deliver the o-transactions successfully because of a network problem or something else, we still provide a solution:  
         - The synchronizers will connect to several native nodes of every public chain to avoid the malicious native nodes.
         - If it indeed happened that all synchronizers' network break, the o-transaction will be synchronized when the network recovered. If the waiting time is up and the cheating o-transaction has been executed, we will revert it from where the cheating happens according to the `nonce in o-transaction` and `account nonce`.
-- `A` will be punished(lock his account or something else, and this is about the user-defined tokenomics).  
+- `A` will be punished(lock his account or something else, and this is about the certain tokenomics determined by developers accroding to their own situation).  
 
-- **Conclusion: The *common user* will cheat but won't succeed.**
+- **Conclusion: The *common user* maybe cheat but won't succeed.**
 
 ## Copyright
 
