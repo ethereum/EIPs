@@ -890,7 +890,7 @@ The two roles might be where the attack happens:
     - There will be many synchronizers waiting for delivering o-transactions to get rewards. So although it's almost impossible that a **common user** can submit two o-transactions to two chains, none of the synchronizers deliver the o-transactions successfully because of a network problem or something else, we still provide a solution:  
         - The synchronizers will connect to several native nodes of every public chain to avoid the malicious native nodes.
         - If it indeed happened that all synchronizers' network break, the o-transaction will be synchronized when the network recovered. If the waiting time is up and the cheating o-transaction has been executed, we will revert it from where the cheating happens according to the `nonce in o-transaction` and `account nonce`.
-- `A` will be punished(lock his account or something else, and this is about the certain tokenomics determined by developers accroding to their own situation).  
+- `A` will be punished(lock his account or something else, and this is about the certain tokenomics determined by developers according to their own situation).  
 
 - **Conclusion: The *common user* maybe cheat but won't succeed.**
 
