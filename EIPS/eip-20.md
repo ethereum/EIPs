@@ -161,8 +161,8 @@ Many existing tokens deployed on the Ethereum network already support this EIP.
 
 #### Description of re-approval attack
 
-1. Alice approves Bob to transfer $N$ of Alice's tokens (where $N>0$) by calling the `approve(Bob, N)`
-2. Later, Alice decides to set the approval from $N$ to $M$ ( $M>0$ ), so she calls the `approve(Bob, M)`
+1. Alice approves Bob to transfer $N$ of Alice's tokens (where $N>0$) by calling `approve(Bob, N)`
+2. Later, Alice decides to set the approval from $N$ to $M$ ( $M>0$ ), so she calls `approve(Bob, M)`
 3. Bob notices Alice's second transaction when it is submitted to the mempool
 4. Before Alice's `approve(Bob, M)` transaction is included in a block, Bob sends a transaction calling `transferFrom(Alice, Bob, N)` with a higer priority fee than Alice's transaction, and a transaction calling `transferFrom(Alice, Bob, M)` with a lower priority fee than Alice's transaction
 5. Bob's `transferFrom(Alice, Bob, N)` will be executed first, transfering $N$ tokens from Alice to Bob
