@@ -191,7 +191,7 @@ struct OmniverseTransactionData {
 
 ## Rationale
 ### Architecture
-![image](https://user-images.githubusercontent.com/83746881/212859732-8dbc3e0c-57e3-4629-bb30-8c5d4d9a23de.png)
+![image](https://user-images.githubusercontent.com/83746881/213079540-2159e0f1-d74c-495f-87b1-fa3334193069.png)
   
 - The implementation of the Omniverse Account is not very hard, and we temporarily choose a common elliptic curve secp256k1 to make it out, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, we can adapt them with a simple mapping mechanism ([Flow for example](https://github.com/Omniverse-Web3-Labs/omniverse-flow)).  
 - The Omniverse Transaction guarantees the ultimate consistency of omniverse transactions(o-transaction for short) across all chains. The related data structure is `OmniverseTransactionData` mentioned [above](#data-structure).
