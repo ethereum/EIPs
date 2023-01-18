@@ -1,0 +1,72 @@
+---
+eip: <to be assigned>
+title: Single-contract Multicall
+description: Allows an EOA to call multiple functions of a smart contract in a single transaction
+author: Pandapip1 (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-01-18
+---
+
+## Abstract
+
+This EIP standardizes an interface containing a single function, `multicall`, allowing EOAs to call multiple functions of a smart contract in a single transaction, and revert all calls if any call fails. 
+
+## Motivation
+
+Currently, in order to transfer several NFTs or SFTs, one needs to submit a number of transactions equal to the number of NFTs being tranferred. This wastes users' funds by requiring them to pay an [EIP-1559](./eip-1559.md) priority fee for every NFT they transfer.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Contracts implementing this EIP must implement the following interface:
+  
+```solidity
+pragma solidity ^0.8.0;
+
+interface IMulticall {
+    /// @notice           Takes an array of abi-encoded call data, delegatecalls itself with each calldata, and returns the abi-encoded result
+    /// @dev              Reverts if any delegatecall reverts
+    /// @param    data    The abi-encoded data
+    /// @returns  results The abi-encoded return values
+    function multicall(bytes[] calldata data) external virtual returns (bytes[] memory results);
+}
+```
+
+## Rationale
+
+Needs discussion.
+
+## Backwards Compatibility
+
+This is compatible with most existing multicall functions.
+
+## Reference Implementation
+
+```solidity
+pragma solidity ^0.8.0;
+
+/// Derived from OpenZeppelin's implementation
+abstract contract Multicall is IMulticall {
+    function multicall(bytes[] calldata data) external virtual returns (bytes[] memory results) {
+        results = new bytes[](data.length);
+        for (uint256 i = 0; i < data.length; i++) {
+            (bool success, bytes memory returndata) = address(this).delegatecall(data);
+            require(success);
+            results[i] = returndata;
+        }
+        return results;
+    }
+}
+```
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
