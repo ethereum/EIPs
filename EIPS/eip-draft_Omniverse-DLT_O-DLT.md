@@ -36,13 +36,13 @@ The Omniverse account is expressed as a public key created by the elliptic curve
 The definations of omniverse transaction data MUST be defined as follows:  
 ```solidity
 /**
- * @dev Omniverse transaction data structure
- * @Member nonce: The serial number of an o-transactions sent from an Omniverse Account. If the current nonce of an o-account is k, the valid nonce in the next o-transaction is k+1. 
- * @Member chainId: The chain where the o-transaction is initiated
- * @Member initiateSC: The contract address from which the o-transaction is first initiated
- * @Member from: The Omniverse account which signs the o-transaction
- * @Member payload: The encoded bussiness logic data, which is maintained by the developer
- * @Member signature: The signature of the above informations. 
+ * @notice Omniverse transaction data structure
+ * @member nonce: The serial number of an o-transactions sent from an Omniverse Account. If the current nonce of an o-account is k, the valid nonce in the next o-transaction is k+1. 
+ * @member chainId: The chain where the o-transaction is initiated
+ * @member initiateSC: The contract address from which the o-transaction is first initiated
+ * @member from: The Omniverse account which signs the o-transaction
+ * @member payload: The encoded bussiness logic data, which is maintained by the developer
+ * @member signature: The signature of the above informations. 
  */
 struct OmniverseTransactionData {
     uint128 nonce;
@@ -62,16 +62,15 @@ struct OmniverseTransactionData {
     - For fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
-        * @dev Fungible token data structure, which will be encoded to or decoded from
-        * the field `payload` of `OmniverseTransactionData`
+        * @notice Fungible token data structure, which will be encoded to or decoded from the field `payload` of `OmniverseTransactionData`
         *
-        * op: The operation type
+        * @member op: The operation type
         * NOTE op: 0-31 are reserved values, 32-255 are custom values
         *             op: 0 Transfers omniverse token `amount` from user `from` to user `exData`, `from` MUST have at least `amount` token
         *             op: 1 User `from` mints token `amount` to user `exData`
         *             op: 2 User `from` burns token `amount` from user `exData`
-        * exData: The operation data. This sector could be empty and is determined by `op`
-        * amount: The amount of token which is operated
+        * @member exData: The operation data. This sector could be empty and is determined by `op`
+        * @member amount: The amount of token which is operated
         */
         struct Fungible {
             uint8 op;
@@ -83,16 +82,15 @@ struct OmniverseTransactionData {
     - For non-fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
-        * @dev Non-Fungible token data structure, which will be encoded to or decoded from
-        * the field `payload` of `OmniverseTransactionData`
+        * @notice Non-Fungible token data structure, which will be encoded to or decoded from the field `payload` of `OmniverseTransactionData`
         *
-        * op: The operation type
+        * @member op: The operation type
         * NOTE op: 0-31 are reserved values, 32-255 are custom values
         *             op: 0 Transfers omniverse token `tokenId` from user `from` to user `exData`, `from` MUST have the token with `tokenId`
         *             op: 1 User `from` mints token with `tokenId` to user `exData`
         *             op: 2 User `from` burns token with `tokenId` from user `exData`
-        * exData: The operation data. This sector could be empty and is determined by `op`
-        * tokenId: The tokenId of the non-fungible token which is operated
+        * @member exData: The operation data. This sector could be empty and is determined by `op`
+        * @member tokenId: The tokenId of the non-fungible token which is operated
         */
         struct NonFungible {
             uint8 op;
@@ -116,82 +114,104 @@ struct OmniverseTransactionData {
 ### Smart Contract Interface
 - Every ERC-Omniverse Token MUST implement the `IERCOmniverseTransaction`  
     ```solidity
-    import "../OmniverseTransactionData.sol";
+    // import "{OmniverseTransactionData.sol}";
 
     /**
-    * @dev Interface of the omniverse DLT
+    * @notice Interface of the ERC Omniverse-DLT
     */
     interface IERCOmniverse {
         /**
-        * @dev Emitted when a transaction which has nonce `nonce` and was signed by user `pk` is executed
+        * @notice Emitted when a o-transaction which has nonce `nonce` and was signed by user `pk` is sent by calling {sendOmniverseTransaction}
         */
         event TransactionSent(bytes pk, uint256 nonce);
 
         /**
-        * @dev Sends an omniverse transaction with omniverse transaction data `_data`
-        * NOTE The transaction MUST be deferred executed, and the developer should implement a trigger mechanism
-        * @param _data Omniverse transaction data
-        * See more information in OmniverseTransactionData.sol
+        * @notice Sends an omniverse transaction 
+        * @dev 
+        * Note: MUST implement the validation of the signature in `_data.signature`
+        * Note: A map maintaining the omniverse accounts and their transaction nonces is RECOMMENDED 
+        * Note: MUST implement the validation of the nonce in `_data.nonce` according to the current account nonce
+        * Note: MUST implement the validation of the payload data
+        * Note: This interface is just for sending of an omniverse transaction, and the execution MUST NOT be within this interface 
+        * Note: The actual execution of an omniverse transaction is RECOMMENDED to be in another function and MAY be delayed for a time,
+        * which is determined all by who publishes an O-DLT token
+        * @param _data: the omniverse transaction data with type {OmniverseTransactionData}
+        * See more information in the defination of {OmniverseTransactionData}
         *
         * Emit a {TransactionSent} event
         */
         function sendOmniverseTransaction(OmniverseTransactionData calldata _data) external;
 
         /**
-        * @dev Returns the count of transactions sent by user `_pk`
-        * @param _pk Omniverse account to be queried
+        * @notice Get the number of omniverse transactions sent by user `_pk`, 
+        * which is also the valid `nonce` of a new omniverse transactions of user `_pk` 
+        * @param _pk: Omniverse account to be queried
+        * @return The number of omniverse transactions sent by user `_pk`
         */
         function getTransactionCount(bytes memory _pk) external view returns (uint256);
 
         /**
-        * @dev Returns the transaction data `txData` and timestamp `timestamp` of the user `_use` at a specified nonce `_nonce`
+        * @notice Get the transaction data `txData` and timestamp `timestamp` of the user `_use` at a specified nonce `_nonce`
         * @param _user Omniverse account to be queried
         * @param _nonce The nonce to be queried
+        * @return Returns the transaction data `txData` and timestamp `timestamp` of the user `_use` at a specified nonce `_nonce`
         */
         function getTransactionData(bytes calldata _user, uint256 _nonce) external view returns (OmniverseTransactionData memory, uint256);
 
         /**
-        * @dev Returns the chain ID
+        * @notice Get the chain ID
+        * @return Returns the chain ID
         */
         function getChainId() external view returns (uint32);
     }
     ```
+    - The `sendOmniverseTransaction` function MAY be implemented as `public` or `external`
+    - The `getTransactionCount` function MAY be implemented as `public` or `external`
+    - The `getTransactionData` function MAY be implemented as `public` or `external`
+    - The `getChainId` function MAY be implemented as `pure` or `view`
+    - The `TransactionSent` event MUST be emitted when `sendOmniverseTransaction` function is called
 - Optional Extension: Fungible  
     ```solidity
-    import "./IOmniverseTransaction.sol";
+    // import "{IERCOmniverse.sol}";
 
     /**
-    * @dev Interface of the omniverse fungible token, which inherits {IOmniverseTransaction}
+    * @notice Interface of the omniverse fungible token, which inherits {IERCOmniverse}
     */
     interface IERCOmniverseFungible is IERCOmniverse {
         /**
-        * @dev Returns the omniverse balance of a user `_pk`
+        * @notice Get the omniverse balance of a user `_pk`
         * @param _pk Omniverse account to be queried
+        * @return Returns the omniverse balance of a user `_pk`
         */
         function omniverseBalanceOf(bytes calldata _pk) external view returns (uint256);
     }
     ```
+    - The `omniverseBalanceOf` function MAY be implemented as `public` or `external`
 - Optional Extension: NonFungible
     ```solidity
-    import "./IOmniverseTransaction.sol";
+    import "{IERCOmniverse.sol}";
 
     /**
-    * @dev Interface of the omniverse non fungible token, which inherits {IOmniverseTransaction}
+    * @notice Interface of the omniverse non fungible token, which inherits {IERCOmniverse}
     */
     interface IERCOmniverseNonFungible is IERCOmniverse {
         /**
-        * @dev Returns the omniverse balance of a user `_pk`
+        * @notice Get the number of tokens in account `_pk`
         * @param _pk Omniverse account to be queried
+        * @return Returns the number of tokens in account `_pk`
         */
         function omniverseBalanceOf(bytes calldata _pk) external view returns (uint256);
 
         /**
-        * @dev Returns the owner of a token `tokenId`
+        * @notice Get the owner of a token `tokenId`
         * @param _tokenId Omniverse token id to be queried
+        * @return Returns the owner of a token `tokenId`
         */
         function omniverseOwnerOf(uint256 _tokenId) external view returns (bytes memory);
     }
     ```
+    - The `omniverseBalanceOf` function MAY be implemented as `public` or `external`
+    - The `omniverseOwnerOf` function MAY be implemented as `public` or `external`
 
 ## Rationale
 ### Architecture
@@ -233,6 +253,10 @@ The O-DLT has the following features:
 We have provided an intuitive but non-rigorous [proof for the **ultimate consistency**](https://github.com/Omniverse-Web3-Labs/o-amm/blob/main/docs/Proof-of-ultimate-consistency.md) for a better understanding of the **synchronization** mechanisms.
 
 ## Reference Implementation
+- An Omniverse Account example: `3092860212ceb90a13e4a288e444b685ae86c63232bcb50a064cb3d25aa2c88a24cd710ea2d553a20b4f2f18d2706b8cc5a9d4ae4a50d475980c2ba83414a796`
+    - The Omniverse Account is a public key of the elliptic curve `secp256k1`
+    - The related private key of the example is:  `cdfa0e50d672eb73bc5de00cc0799c70f15c5be6b6fca4a1c82c35c7471125b6`
+
 - [Omniverse Fungible Token](https://github.com/Omniverse-Web3-Labs/omniverse-evm/tree/main/contracts/contracts)
     - Common Tools
         ```solidity
@@ -242,7 +266,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         import "../OmniverseTransactionData.sol";
 
         /**
-        * @dev Fungible token data structure, which will be encoded from or decoded from
+        * @notice Fungible token data structure, which will be encoded from or decoded from
         * the field `payload` of `OmniverseTransactionData`
         *
         * op: The operation type
@@ -260,7 +284,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         }
 
         /**
-        * @dev Used to record one omniverse transaction data
+        * @notice Used to record one omniverse transaction data
         * txData: The original omniverse transaction data committed to the contract
         * timestamp: When the omniverse transaction data is committed
         */
@@ -270,7 +294,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         }
 
         /**
-        * @dev An malicious omniverse transaction data
+        * @notice An malicious omniverse transaction data
         * oData: The recorded omniverse transaction data
         * hisNonce: The nonce of the historical transaction which it conflicts with
         */
@@ -280,7 +304,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         }
 
         /**
-        * @dev Used to record the historical omniverse transactions of a user
+        * @notice Used to record the historical omniverse transactions of a user
         * txList: Successful historical omniverse transaction list
         * evilTxList: Malicious historical omniverse transaction list
         */
@@ -296,21 +320,21 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         }
 
         /**
-        * @dev The library is mainly responsible for omniverse transaction verification and
+        * @notice The library is mainly responsible for omniverse transaction verification and
         * provides some basic methods.
         * NOTE The verification method is for reference only, and developers can design appropriate
         * verification mechanism based on their bussiness logic.
         */
         library SkywalkerFungibleHelper {
             /**
-            * @dev Encode `_fungible` into bytes
+            * @notice Encode `_fungible` into bytes
             */
             function encodeData(Fungible memory _fungible) internal pure returns (bytes memory) {
                 return abi.encode(_fungible.op, _fungible.exData, _fungible.amount);
             }
 
             /**
-            * @dev Decode `_data` from bytes to Fungible
+            * @notice Decode `_data` from bytes to Fungible
             */
             function decodeData(bytes memory _data) internal pure returns (Fungible memory) {
                 (uint8 op, bytes memory exData, uint256 amount) = abi.decode(_data, (uint8, bytes, uint256));
@@ -318,7 +342,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
             
             /**
-            * @dev Get the hash of a transaction
+            * @notice Get the hash of a transaction
             */
             function getTransactionHash(OmniverseTransactionData memory _data) public pure returns (bytes32) {
                 Fungible memory fungible = decodeData(_data.payload);
@@ -328,7 +352,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Recover the address
+            * @notice Recover the address
             */
             function recoverAddress(bytes32 _hash, bytes memory _signature) public pure returns (address) {
                 uint8 v;
@@ -345,7 +369,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Check if the public key matches the recovered address
+            * @notice Check if the public key matches the recovered address
             */
             function checkPkMatched(bytes memory _pk, address _address) public pure {
                 bytes32 hash = keccak256(_pk);
@@ -354,7 +378,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Verify an omniverse transaction
+            * @notice Verify an omniverse transaction
             */
             function verifyTransaction(RecordedCertificate storage rc, OmniverseTransactionData memory _data) public returns (VerifyResult) {
                 uint256 nonce = rc.txList.length;
@@ -398,17 +422,17 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         import "@openzeppelin/contracts/access/Ownable.sol";
         import "./ERC20.sol";
         import "./libraries/SkywalkerFungibleHelper.sol";
-        import "./interfaces/IOmniverseFungible.sol";
+        import "./interfaces/IERCOmniverseFungible.sol";
 
         /**
-        * @dev Implementation of the {IOmniverseFungible} interface
+        * @notice Implementation of the {IERCOmniverseFungible} interface
         */
-        contract SkywalkerFungible is ERC20, Ownable, IOmniverseFungible {
+        contract SkywalkerFungible is ERC20, Ownable, IERCOmniverseFungible {
             uint8 constant TRANSFER = 0;
             uint8 constant MINT = 1;
             uint8 constant BURN = 2;
 
-            /** @dev Used to index a delayed transaction
+            /** @notice Used to index a delayed transaction
             * sender: The account which sent the transaction
             * nonce: The nonce of the delayed transaction
             */
@@ -418,7 +442,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev The member information
+            * @notice The member information
             * chainId: The chain which the member belongs to
             * contractAddr: The contract address on the member chain
             */
@@ -448,7 +472,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             event OmniverseTokenTransfer(bytes from, bytes to, uint256 value);
 
             /**
-            * @dev Initiates the contract
+            * @notice Initiates the contract
             * @param _chainId The chain which the contract is deployed on
             * @param _name The name of the token
             * @param _symbol The symbol of the token
@@ -458,7 +482,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev See {IOmniverseFungible-sendOmniverseTransaction}
+            * @notice See {IERCOmniverseFungible-sendOmniverseTransaction}
             * Send an omniverse transaction
             */
             function sendOmniverseTransaction(OmniverseTransactionData calldata _data) external override {
@@ -466,7 +490,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev See {IOmniverseFungible-triggerExecution}
+            * @notice See {IERCOmniverseFungible-triggerExecution}
             */
             function triggerExecution() external {
                 require(delayedTxs.length > 0, "No delayed tx");
@@ -499,7 +523,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
             
             /**
-            * @dev Check if the transaction can be executed successfully
+            * @notice Check if the transaction can be executed successfully
             */
             function _checkExecution(OmniverseTransactionData memory txData) internal view {
                 Fungible memory fungible = SkywalkerFungibleHelper.decodeData(txData.payload);
@@ -519,7 +543,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Returns the nearest exexutable delayed transaction info
+            * @notice Returns the nearest exexutable delayed transaction info
             * or returns default if not found
             */
             function getExecutableDelayedTx() external view returns (DelayedTx memory ret) {
@@ -532,14 +556,14 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Returns the count of delayed transactions
+            * @notice Returns the count of delayed transactions
             */
             function getDelayedTxCount() external view returns (uint256) {
                 return delayedTxs.length;
             }
 
             /**
-            * @dev See {IOmniverseFungible-omniverseBalanceOf}
+            * @notice See {IERCOmniverseFungible-omniverseBalanceOf}
             * Returns the omniverse balance of a user
             */
             function omniverseBalanceOf(bytes calldata _pk) external view override returns (uint256) {
@@ -547,7 +571,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev See {IERC20-balanceOf}.
+            * @notice See {IERC20-balanceOf}.
             */
             function balanceOf(address account) public view virtual override returns (uint256) {
                 bytes storage pk = accountsMap[account];
@@ -560,7 +584,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Receive and check an omniverse transaction
+            * @notice Receive and check an omniverse transaction
             */
             function _omniverseTransaction(OmniverseTransactionData memory _data) internal {
                 // Check if the tx initiateSC is correct
@@ -600,7 +624,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Check if an omniverse transfer operation can be executed successfully
+            * @notice Check if an omniverse transfer operation can be executed successfully
             */
             function _checkOmniverseTransfer(bytes memory _from, uint256 _amount) internal view {
                 uint256 fromBalance = omniverseBalances[_from];
@@ -608,7 +632,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Exucute an omniverse transfer operation
+            * @notice Exucute an omniverse transfer operation
             */
             function _omniverseTransfer(bytes memory _from, bytes memory _to, uint256 _amount) internal {
                 _checkOmniverseTransfer(_from, _amount);
@@ -627,7 +651,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
             
             /**
-            * @dev Check if the public key is the owner
+            * @notice Check if the public key is the owner
             */
             function _checkOwner(bytes memory _pk) internal view {
                 address fromAddr = _pkToAddress(_pk);
@@ -635,7 +659,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Execute an omniverse mint operation
+            * @notice Execute an omniverse mint operation
             */
             function _omniverseMint(bytes memory _to, uint256 _amount) internal {
                 omniverseBalances[_to] += _amount;
@@ -646,7 +670,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Check if an omniverse burn operation can be executed successfully
+            * @notice Check if an omniverse burn operation can be executed successfully
             */
             function _checkOmniverseBurn(bytes memory _from, uint256 _amount) internal view {
                 uint256 fromBalance = omniverseBalances[_from];
@@ -654,7 +678,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Execute an omniverse burn operation
+            * @notice Execute an omniverse burn operation
             */
             function _omniverseBurn(bytes memory _from, uint256 _amount) internal {
                 omniverseBalances[_from] -= _amount;
@@ -662,7 +686,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Convert the public key to evm address
+            * @notice Convert the public key to evm address
             */
             function _pkToAddress(bytes memory _pk) internal pure returns (address) {
                 bytes32 hash = keccak256(_pk);
@@ -670,7 +694,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Add new chain members to the token
+            * @notice Add new chain members to the token
             */
             function setMembers(Member[] calldata _members) external onlyOwner {
                 for (uint256 i = 0; i < _members.length; i++) {
@@ -688,28 +712,28 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Returns chain members of the token
+            * @notice Returns chain members of the token
             */
             function getMembers() external view returns (Member[] memory) {
                 return members;
             }
             
             /**
-            @dev See {IERC20-decimals}.
+            @notice See {IERC20-decimals}.
             */
             function decimals() public view virtual override returns (uint8) {
                 return 12;
             }
 
             /**
-            * @dev See IOmniverseFungible
+            * @notice See IERCOmniverseFungible
             */
             function getTransactionCount(bytes memory _pk) external override view returns (uint256) {
                 return transactionRecorder[_pk].txList.length;
             }
 
             /**
-            * @dev See IOmniverseFungible
+            * @notice See IERCOmniverseFungible
             */
             function getTransactionData(bytes calldata _user, uint256 _nonce) external override view returns (OmniverseTransactionData memory txData, uint256 timestamp) {
                 RecordedCertificate storage rc = transactionRecorder[_user];
@@ -719,14 +743,14 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev Set the cooling down time of an omniverse transaction
+            * @notice Set the cooling down time of an omniverse transaction
             */
             function setCooingDownTime(uint256 _time) external {
                 cdTime = _time;
             }
 
             /**
-            * @dev Index the user is malicious or not
+            * @notice Index the user is malicious or not
             */
             function isMalicious(bytes memory _pk) public view returns (bool) {
                 RecordedCertificate storage rc = transactionRecorder[_pk];
@@ -734,7 +758,7 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
             }
 
             /**
-            * @dev See IOmniverseFungible
+            * @notice See IERCOmniverseFungible
             */
             function getChainId() external view returns (uint32) {
                 return chainId;
