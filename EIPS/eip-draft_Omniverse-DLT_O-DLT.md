@@ -53,8 +53,12 @@ struct OmniverseTransactionData {
     bytes signature;
 }
 ```
-- The member `nonce` is defined as `uint128` due to better compatibility for more tech stacks of blockchains.
-- The member `payload` is a user-defined data related to the o-transaction, which is encoded to bytes. For example:  
+- The data structure `OmniverseTransactionData` MUST be defined as above.
+- The member `nonce` MUST be defined as `uint128` due to better compatibility for more tech stacks of blockchains.
+- The member `chainId` MUST be defined as `uint32`.
+- The member `initiateSC` MUST be defined as `bytes`.
+- The member `from` MUST be defined as `bytes`.
+- The member `payload` MUST be defined as `bytes`. It is encoded from a user-defined data related to the o-transaction. For example:  
     - For fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
@@ -75,7 +79,7 @@ struct OmniverseTransactionData {
             uint256 amount;
         }
         ```
-        - The related raw data for `signature` in o-transaction is the concatenation of the raw bytes of op, ex_data, and amount.  
+        - The related raw data for `signature` in o-transaction is the concatenation of the raw bytes of `op`, `exData`, and `amount`.  
     - For non-fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
@@ -96,8 +100,8 @@ struct OmniverseTransactionData {
             uint256 tokenId;
         }
         ```
-        - The related raw data for `signature` in o-transaction is the concatenation of the raw bytes of op, ex_data, and tokenId. 
-- The member `signature` is RECOMMENDED to be created as follows, which is determined by certain omniverse token developers according to their situations:  
+        - The related raw data for `signature` in o-transaction is the concatenation of the raw bytes of `op`, `exData`, and `tokenId`. 
+- The member `signature` MUST be defined as `bytes`. It is RECOMMENDED to be created as follows, which is determined by certain omniverse token developers according to their situations:  
     - Concat the sectors in `OmniverseTransactionData` as below (take Fungible token for example) and calculate the hash with `keccak256`: 
         ```solidity
         function getTransactionHash(OmniverseTransactionData memory _data) public pure returns (bytes32) {
@@ -109,7 +113,7 @@ struct OmniverseTransactionData {
         ```
     - The signature is about the hash value.
 
-### Smart Contract
+### Smart Contract Interface
 - Omniverse Protocol  
     ```solidity
     import "../OmniverseTransactionData.sol";
