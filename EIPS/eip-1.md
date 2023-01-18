@@ -23,8 +23,8 @@ There are three types of EIP:
 
 - A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
   - **Core**: improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86](./eip-86.md)).
-  - **Networking**: includes improvements around [devp2p](https://github.com/ethereum/wiki/wiki/%C3%90%CE%9EVp2p-Wire-Protocol) ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol](https://github.com/ethereum/wiki/wiki/Light-client-protocol), as well as proposed improvements to network protocol specifications of [whisper](https://github.com/ethereum/go-ethereum/wiki/Whisper-Overview) and [swarm](https://github.com/ethereum/go-ethereum/pull/2959).
-  - **Interface**: includes improvements around client [API/RPC](https://github.com/ethereum/wiki/wiki/JSON-RPC) specifications and standards, and also certain language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI). The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
+  - **Networking**: includes improvements around [devp2p](https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md) ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol](https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node), as well as proposed improvements to network protocol specifications of [whisper](https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309) and [swarm](https://github.com/ethereum/go-ethereum/pull/2959).
+  - **Interface**: includes improvements around client [API/RPC](https://github.com/ethereum/execution-apis#README) specifications and standards, and also certain language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html). The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
   - **ERC**: application-level standards and conventions, including contract standards such as token standards ([EIP-20](./eip-20.md)), name registries ([EIP-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
 
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
@@ -38,6 +38,7 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 ### Special requirements for Core EIPs
 
 If a **Core** EIP mentions or proposes changes to the EVM (Ethereum Virtual Machine), it should refer to the instructions by their mnemonics and define the opcodes of those mnemonics at least once. A preferred way is the following:
+
 ```
 REVERT (0xfe)
 ```
@@ -48,13 +49,13 @@ REVERT (0xfe)
 
 Parties involved in the process are you, the champion or *EIP author*, the [*EIP editors*](#eip-editors), and the [*Ethereum Core Developers*](https://github.com/ethereum/pm).
 
-Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on [the Ethereum Magicians forum](https://ethereum-magicians.org/) to do this. 
+Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereum community first if an idea is original to avoid wasting time on something that will be rejected based on prior research. It is thus recommended to open a discussion thread on [the Ethereum Magicians forum](https://ethereum-magicians.org/) to do this.
 
 Once the idea has been vetted, your next responsibility will be to present (by means of an EIP) the idea to the reviewers and all interested parties, invite editors, developers, and the community to give feedback on the aforementioned channels. You should try and gauge whether the interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the work required for implementing a Core EIP will be much greater than for an ERC and the EIP will need sufficient interest from the Ethereum client teams. Negative community feedback will be taken into consideration and may prevent your EIP from moving past the Draft stage.
 
 ### Core EIPs
 
-For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP. 
+For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP.
 
 The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue](https://github.com/ethereum/pm/issues).  
 
@@ -64,9 +65,9 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 :warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum](https://ethereum-magicians.org/) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
-*In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.* 
+*In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.*
 
-### EIP Process 
+### EIP Process
 
 The following is the standardization process for all EIPs in all tracks:
 
@@ -84,7 +85,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
 
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status. 
+**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
@@ -98,12 +99,12 @@ Each EIP should have the following parts:
 
 - Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
 - Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-- Motivation _(optional)_ - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
-- Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://github.com/ethereum/wiki/wiki/Clients).
+- Motivation *(optional)* - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
+- Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 - Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
-- Backwards Compatibility _(optional)_ - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
-- Test Cases _(optional)_ - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
-- Reference Implementation _(optional)_ - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
+- Backwards Compatibility *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
+- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
+- Reference Implementation *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
 
@@ -143,7 +144,7 @@ Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
 
-#### `author` header
+### `author` header
 
 The `author` header lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the `author` header value must be:
 
@@ -163,35 +164,145 @@ It is not possible to use both an email and a GitHub username at the same time. 
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
-#### `discussions-to` header
+### `discussions-to` header
 
 While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
 The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
-#### `type` header
+### `type` header
 
 The `type` header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
-#### `category` header
+### `category` header
 
 The `category` header specifies the EIP's category. This is required for standards-track EIPs only.
 
-#### `created` header
+### `created` header
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
-#### `requires` header
+### `requires` header
 
-EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on.
+EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on. If such a dependency exists, this field is required.
+
+A `requires` dependency is created when the current EIP cannot be understood or implemented without a concept or technical element from another EIP. Merely mentioning another EIP does not necessarily create such a dependency.
 
 ## Linking to External Resources
 
-Links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+Other than the specific exceptions listed below, links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
+
+The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
+
+### Consensus Layer Specifications
+
+Links to the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
+```
+
+Which renders to:
+
+[Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
+
+Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
+```
+
+### Networking Specifications
+
+Links to the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+```
+
+Which renders as:
+
+[Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+```
+
+### Digital Object Identifier System
+
+Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
+
+````markdown
+This is a sentence with a footnote.[^1]
+
+[^1]:
+    ```csl-json
+    {
+      "type": "article",
+      "id": 1,
+      "author": [
+        {
+          "family": "Jameson",
+          "given": "Hudson"
+        }
+      ],
+      "DOI": "00.0000/a00000-000-0000-y",
+      "title": "An Interesting Article",
+      "original-date": {
+        "date-parts": [
+          [2022, 12, 31]
+        ]
+      },
+      "URL": "https://sly-hub.invalid/00.0000/a00000-000-0000-y",
+      "custom": {
+        "additional-urls": [
+          "https://example.com/an-interesting-article.pdf"
+        ]
+      }
+    }
+    ```
+````
+
+Which renders to:
+
+This is a sentence with a footnote.[^1]
+
+[^1]:
+    ```csl-json
+    {
+      "type": "article",
+      "id": 1,
+      "author": [
+        {
+          "family": "Jameson",
+          "given": "Hudson"
+        }
+      ],
+      "DOI": "00.0000/a00000-000-0000-y",
+      "title": "An Interesting Article",
+      "original-date": {
+        "date-parts": [
+          [2022, 12, 31]
+        ]
+      },
+      "URL": "https://sly-hub.invalid/00.0000/a00000-000-0000-y",
+      "custom": {
+        "additional-urls": [
+          "https://example.com/an-interesting-article.pdf"
+        ]
+      }
+    }
+    ```
+
+See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
+
+The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
 ## Linking to other EIPs
 
-References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP with `[EIP-1](./eip-1.md)`.
+References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
 
 ## Auxiliary Files
 
@@ -213,7 +324,7 @@ The current EIP editors are
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
 
-Emeritus EIP editors are 
+Emeritus EIP editors are
 
 - Casey Detrio (@cdetrio)
 - Hudson Jameson (@Souptacular)
@@ -251,29 +362,29 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 The `title` field in the preamble:
 
- - Should not include the word "standard" or any variation thereof; and
- - Should not include the EIP's number.
+- Should not include the word "standard" or any variation thereof; and
+- Should not include the EIP's number.
 
 ### Descriptions
 
 The `description` field in the preamble:
 
- - Should not include the word "standard" or any variation thereof; and
- - Should not include the EIP's number.
+- Should not include the word "standard" or any variation thereof; and
+- Should not include the EIP's number.
 
 ### EIP numbers
 
 When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
 
-### RFC 2119
+### RFC 2119 and RFC 8174
 
-EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) for terminology and to insert the following at the beginning of the Specification section:
+EIPs are encouraged to follow [RFC 2119](https://www.ietf.org/rfc/rfc2119.html) and [RFC 8174](https://www.ietf.org/rfc/rfc8174.html) for terminology and to insert the following at the beginning of the Specification section:
 
-> The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ## History
 
-This document was derived heavily from [Bitcoin's BIP-0001](https://github.com/bitcoin/bips) written by Amir Taaki which in turn was derived from [Python's PEP-0001](https://www.python.org/dev/peps/). In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
+This document was derived heavily from [Bitcoin's BIP-0001](https://github.com/bitcoin/bips) written by Amir Taaki which in turn was derived from [Python's PEP-0001](https://peps.python.org/). In many places text was simply copied and modified. Although the PEP-0001 text was written by Barry Warsaw, Jeremy Hylton, and David Goodger, they are not responsible for its use in the Ethereum Improvement Process, and should not be bothered with technical questions specific to Ethereum or the EIP. Please direct all comments to the EIP editors.
 
 ## Copyright
 
