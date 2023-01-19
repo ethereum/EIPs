@@ -1,21 +1,20 @@
 ---
 eip: <to be assigned>
-title: Omniverse Distributed Ledger Technology(O-DLT for short)
-description: The O-DLT is a new application-level token features built over multiple existing L1 public chains, enabling asset-related operations such as transfers and receptions running over different consensus spaces synchronously and equivalently.
-author: Shawn Zheng(@xiyu1984), Jason Cheng(chengjingxx@gmail.com), George Huang(@virgil2019), Kay Lin(@kay404)
+title: Omniverse DLT
+description: The Omniverse DLT is a application-level token features built over multiple existing L1 public chains
+author: Shawn Zheng (@xiyu1984), Jason Cheng (chengjingxx@gmail.com), George Huang (@virgil2019), Kay Lin (@kay404)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-01-17
-requires (*optional): <EIP number(s)>
 ---
 
 ## Abstract
 
 The **Omniverse DLT**(O-DLT for short) is a new application-level token features built **over** multiple existing L1 public chains, enabling asset-related operations such as transfers and receptions running over different consensus spaces **synchronously** and **equivalently**.  
 The core meaning of Omniverse is that the ***legitimacy of all on-chain states and operations can be equivalently verified and consistently recorded over different consensus spaces, regardless of where they were initiated.***  
-O-DLT works at an application level, which means everything related is processed in smart contracts or similar mechanisms, just as the ERC20/ERC721 did.  
+O-DLT works at an application level, which means everything related is processed in smart contracts or similar mechanisms, just as the EIP-20/EIP-721 did.  
 
 ## Motivation
 
@@ -234,19 +233,18 @@ struct OmniverseTransactionData {
 
 ## Rationale
 ### Architecture
-![image](https://user-images.githubusercontent.com/83746881/213079540-2159e0f1-d74c-495f-87b1-fa3334193069.png)
-  
+The key points in O-DLT include `Omniverse Account`, `Omniverse transaction`, `Omniverse Token`, `Omniverse Verification`, and `off-chain synchronizer`
 - The implementation of the Omniverse Account is not very hard, and we temporarily choose a common elliptic curve secp256k1 to make it out, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, we can adapt them with a simple mapping mechanism (Flow for example).  
 - The Omniverse Transaction guarantees the ultimate consistency of omniverse transactions(o-transaction for short) across all chains. The related data structure is `OmniverseTransactionData` mentioned [above](#data-structure).
     - The `nonce` is very important, which is the key point to synchronize the states globally.
     - The `nonce` appears in two places, the one is `nonce in o-transaction` data as above, and the other is `account nonce` maintained by on-chain O-DLT smart contracts. 
     - The `nonce in o-transaction` data will be verified according to the `account nonce` managed by on-chain O-DLT smart contracts.
-- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract). It can also be used with the combination of ERC20/ERC721. 
+- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract-interface). It can also be used with the combination of EIP-20/EIP-721. 
     - The first thing is verifying the signature of the o-transaction data. 
     - Then the operation will be added to a pre-execution cache, and wait for a fixed time until is executed. The waiting time will be able to be settled by the deployer, for example, 5 minutes. 
     - The off-chain synchronizer will deliver the o-transaction data to other chains. If another o-transaction data with the same nonce and the same sender account is received within the waiting time, and if there's any content in `OmniverseTransactionData` difference, a malicious attack happens and the related sender account will be punished. 
 - The Omniverse Verification is mainly about the verification of the signature implemented in different tech stacks according to the blockchain. As the signature is unfakeable and non-deniable, malicious attacks could be found deterministicly.
-- The bottom is the off-chain synchronizer. The synchronizer is a very simple off-chain procedure, and it just listens to the Omniverse events happening on-chain and delivers the latest o-transaction events. As everything in the Omniverse paradigm is along with a signature and is verified cryptographically, there's no need to worry about synchronizers doing malicious things, and I will explain it later. The off-chain part of O-DLT is indeed trust-free. Everyone can launch a synchronizer to get rewards by helping synchronize information.  
+- The last thing is the off-chain synchronizer. The synchronizer is a very simple off-chain procedure, and it just listens to the Omniverse events happening on-chain and delivers the latest o-transaction events. As everything in the Omniverse paradigm is along with a signature and is verified cryptographically, there's no need to worry about synchronizers doing malicious things, and I will explain it later. The off-chain part of O-DLT is indeed trust-free. Everyone can launch a synchronizer to get rewards by helping synchronize information.  
 
 ### Features
 The O-DLT has the following features:
@@ -254,8 +252,6 @@ The O-DLT has the following features:
 - The state of the tokens based on O-DLT is synchronous on different chains. If someone sends/receives one token on Ethereum, he will send/receive one token on other chains at the same time.
 
 ### Workflow
-![image](https://user-images.githubusercontent.com/83746881/212859794-13a0ba68-f89f-45cf-8fb4-e5fd09970166.png)
-
 - Suppose a common user `A` and the related operation `account nonce` is $k$.
 - `A` initiate an omniverse transfer operation on Ethereum by calling `omniverse_transfer`. The current `account nonce` of `A` in the O-DLT smart contracts deployed on Ethereum is $k$ so the valid value of `nonce in o-transaction` needs to be $k+1$.  
 - The O-DLT smart contracts on Ethereum verify the signature of the o-transaction data at an **application level**. If the verification for the signature and data succeeds, the o-transaction data will be published on the O-DLT smart contracts of the Ethereum side. The verification for the data includes:
