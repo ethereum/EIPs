@@ -2,7 +2,7 @@
 eip: <to be assigned>
 title: Omniverse DLT
 description: The Omniverse DLT is a application-level token features built over multiple existing L1 public chains
-author: Shawn Zheng (@xiyu1984), Jason Cheng (chengjingxx@gmail.com), George Huang (@virgil2019), Kay Lin (@kay404)
+author: Shawn Zheng (@xiyu1984), Jason Cheng <chengjingxx@gmail.com>, George Huang (@virgil2019), Kay Lin (@kay404)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -14,7 +14,7 @@ created: 2023-01-17
 
 The **Omniverse DLT**(O-DLT for short) is a new application-level token features built **over** multiple existing L1 public chains, enabling asset-related operations such as transfers and receptions running over different consensus spaces **synchronously** and **equivalently**.  
 The core meaning of Omniverse is that the ***legitimacy of all on-chain states and operations can be equivalently verified and consistently recorded over different consensus spaces, regardless of where they were initiated.***  
-O-DLT works at an application level, which means everything related is processed in smart contracts or similar mechanisms, just as the EIP-20/EIP-721 did.  
+O-DLT works at an application level, which means everything related is processed in smart contracts or similar mechanisms, just as the [EIP-20](./eip-20.md)/[EIP-721](./eip-721.md) did.  
 
 ## Motivation
 
@@ -239,7 +239,7 @@ The key points in O-DLT include `Omniverse Account`, `Omniverse transaction`, `O
     - The `nonce` is very important, which is the key point to synchronize the states globally.
     - The `nonce` appears in two places, the one is `nonce in o-transaction` data as above, and the other is `account nonce` maintained by on-chain O-DLT smart contracts. 
     - The `nonce in o-transaction` data will be verified according to the `account nonce` managed by on-chain O-DLT smart contracts.
-- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract-interface). It can also be used with the combination of EIP-20/EIP-721. 
+- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract-interface). It can also be used with the combination of [EIP-20](./eip-20.md)/[EIP-721](./eip-721.md). 
     - The first thing is verifying the signature of the o-transaction data. 
     - Then the operation will be added to a pre-execution cache, and wait for a fixed time until is executed. The waiting time will be able to be settled by the deployer, for example, 5 minutes. 
     - The off-chain synchronizer will deliver the o-transaction data to other chains. If another o-transaction data with the same nonce and the same sender account is received within the waiting time, and if there's any content in `OmniverseTransactionData` difference, a malicious attack happens and the related sender account will be punished. 
