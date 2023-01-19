@@ -29,15 +29,17 @@ For projects serving multiple chains, it might be useful that the token is able 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
+*The word `Omniverse` in definitions will be substituted with the assigned number.*
+
 ### Omniverse Account
-The Omniverse account is expressed as a public key created by the elliptic curve `secp256k1`, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, a mapping mechanism is needed.  
+The Omniverse account is RECOMMENDED to be expressed as a public key created by the elliptic curve `secp256k1`, which has already been supported by Ethereum tech stacks and can be used to generate an Ethereum address directly. For those who have a different address system, a mapping mechanism is RECOMMENDED.  
 
 ### Data Structure
 The definations of omniverse transaction data MUST be defined as follows:  
 ```solidity
 /**
  * @notice Omniverse transaction data structure
- * @member nonce: The serial number of an o-transactions sent from an Omniverse Account. If the current nonce of an o-account is k, the valid nonce in the next o-transaction is k+1. 
+ * @member nonce: The number of the o-transactions. If the current nonce of an omniverse account is `k`, the valid nonce of this o-account in the next o-transaction is `k+1`. 
  * @member chainId: The chain where the o-transaction is initiated
  * @member initiateSC: The contract address from which the o-transaction is first initiated
  * @member from: The Omniverse account which signs the o-transaction
@@ -62,15 +64,17 @@ struct OmniverseTransactionData {
     - For fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
-        * @notice Fungible token data structure, which will be encoded to or decoded from the field `payload` of `OmniverseTransactionData`
+        * @notice Fungible token data structure, from which the field `payload` in `OmniverseTransactionData` will be encoded
         *
         * @member op: The operation type
         * NOTE op: 0-31 are reserved values, 32-255 are custom values
-        *             op: 0 Transfers omniverse token `amount` from user `from` to user `exData`, `from` MUST have at least `amount` token
-        *             op: 1 User `from` mints token `amount` to user `exData`
-        *             op: 2 User `from` burns token `amount` from user `exData`
-        * @member exData: The operation data. This sector could be empty and is determined by `op`
-        * @member amount: The amount of token which is operated
+        *           op: 0 - omniverse account `from` transfers `amount` tokens to omniverse account `exData`, `from` have at least `amount` tokens
+        *           op: 1 - omniverse account `from` mints `amount` tokens to omniverse account `exData`
+        *           op: 2 - omniverse account `from` burns `amount` tokens from his own, `from` have at least `amount` tokens
+        * @member exData: The operation data. This sector could be empty and is determined by `op`. For example: 
+                    when `op` is 0 and 1, `exData` stores the omniverse account that receives.
+                    when `op` is 2, `exData` is empty.
+        * @member amount: The amount of tokens being operated
         */
         struct Fungible {
             uint8 op;
@@ -82,15 +86,17 @@ struct OmniverseTransactionData {
     - For non-fungible tokens it is RECOMMENDED as follows:  
         ```solidity
         /**
-        * @notice Non-Fungible token data structure, which will be encoded to or decoded from the field `payload` of `OmniverseTransactionData`
+        * @notice Non-Fungible token data structure, from which the field `payload` in `OmniverseTransactionData` will be encoded
         *
         * @member op: The operation type
         * NOTE op: 0-31 are reserved values, 32-255 are custom values
-        *             op: 0 Transfers omniverse token `tokenId` from user `from` to user `exData`, `from` MUST have the token with `tokenId`
-        *             op: 1 User `from` mints token with `tokenId` to user `exData`
-        *             op: 2 User `from` burns token with `tokenId` from user `exData`
+        *           op: 0 omniverse account `from` transfers token `tokenId` to omniverse account `exData`, `from` have the token with `tokenId`
+        *           op: 1 omniverse account `from` mints token `tokenId` to omniverse account `exData`
+        *           op: 2 omniverse account `from` burns token `tokenId`, `from` have the token with `tokenId`
         * @member exData: The operation data. This sector could be empty and is determined by `op`
-        * @member tokenId: The tokenId of the non-fungible token which is operated
+        *           when `op` is 0 and 1, `exData` stores the omniverse account that receives.
+                    when `op` is 2, `exData` is empty.
+        * @member tokenId: The tokenId of the non-fungible token being operated
         */
         struct NonFungible {
             uint8 op;
@@ -99,12 +105,25 @@ struct OmniverseTransactionData {
         }
         ```
         - The related raw data for `signature` in o-transaction is the concatenation of the raw bytes of `op`, `exData`, and `tokenId`. 
-- The member `signature` MUST be defined as `bytes`. It is RECOMMENDED to be created as follows, which is determined by certain omniverse token developers according to their situations:  
+- The member `signature` MUST be defined as `bytes`. It is RECOMMENDED to be created as follows, which could be determined by certain omniverse token developers according to their situations:  
     - Concat the sectors in `OmniverseTransactionData` as below (take Fungible token for example) and calculate the hash with `keccak256`: 
         ```solidity
+        /**
+        * @notice Decode `_data` from bytes to Fungible
+        * @return A `Fungible` instance
+        */
+        function decodeData(bytes memory _data) internal pure returns (Fungible memory) {
+            (uint8 op, bytes memory exData, uint256 amount) = abi.decode(_data, (uint8, bytes, uint256));
+            return Fungible(op, exData, amount);
+        }
+        
+        /**
+        * @notice Get the hash of a transaction
+        * @return Hash value of the raw data of an `OmniverseTransactionData` instance
+        */
         function getTransactionHash(OmniverseTransactionData memory _data) public pure returns (bytes32) {
             Fungible memory fungible = decodeData(_data.payload);
-            bytes memory payload = abi.encodePacked(fungible.op, fungible.exData, uint128(fungible.amount));
+            bytes memory payload = abi.encodePacked(fungible.op, fungible.exData, fungible.amount);
             bytes memory rawData = abi.encodePacked(_data.nonce, _data.chainId, _data.initiateSC, _data.from, payload);
             return keccak256(rawData);
         }
@@ -112,7 +131,7 @@ struct OmniverseTransactionData {
     - The signature is about the hash value.
 
 ### Smart Contract Interface
-- Every ERC-Omniverse Token MUST implement the `IERCOmniverseTransaction`  
+- Every ERC-Omniverse Token MUST implement the `IERCOmniverse`  
     ```solidity
     // import "{OmniverseTransactionData.sol}";
 
@@ -128,11 +147,11 @@ struct OmniverseTransactionData {
         /**
         * @notice Sends an omniverse transaction 
         * @dev 
-        * Note: MUST implement the validation of the signature in `_data.signature`
-        * Note: A map maintaining the omniverse accounts and their transaction nonces is RECOMMENDED 
-        * Note: MUST implement the validation of the nonce in `_data.nonce` according to the current account nonce
-        * Note: MUST implement the validation of the payload data
-        * Note: This interface is just for sending of an omniverse transaction, and the execution MUST NOT be within this interface 
+        * Note: MUST implement the validation of the `_data.signature`
+        * Note: A map maintaining the omniverse account and the related transaction nonce is RECOMMENDED  
+        * Note: MUST implement the validation of the `_data.nonce` according to the current account nonce
+        * Note: MUST implement the validation of the `_data. payload`
+        * Note: This interface is just for sending an omniverse transaction, and the execution MUST NOT be within this interface 
         * Note: The actual execution of an omniverse transaction is RECOMMENDED to be in another function and MAY be delayed for a time,
         * which is determined all by who publishes an O-DLT token
         * @param _data: the omniverse transaction data with type {OmniverseTransactionData}
@@ -217,18 +236,15 @@ struct OmniverseTransactionData {
 ### Architecture
 ![image](https://user-images.githubusercontent.com/83746881/213079540-2159e0f1-d74c-495f-87b1-fa3334193069.png)
   
-- The implementation of the Omniverse Account is not very hard, and we temporarily choose a common elliptic curve secp256k1 to make it out, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, we can adapt them with a simple mapping mechanism ([Flow for example](https://github.com/Omniverse-Web3-Labs/omniverse-flow)).  
+- The implementation of the Omniverse Account is not very hard, and we temporarily choose a common elliptic curve secp256k1 to make it out, which has already been supported by Ethereum tech stacks. For those who don’t support secp256k1 or have a different address system, we can adapt them with a simple mapping mechanism (Flow for example).  
 - The Omniverse Transaction guarantees the ultimate consistency of omniverse transactions(o-transaction for short) across all chains. The related data structure is `OmniverseTransactionData` mentioned [above](#data-structure).
     - The `nonce` is very important, which is the key point to synchronize the states globally.
-    - The `nonce` appears in two places, the one is `nonce in o-transaction` data as above, and the other is `account nonce` maintained by on-chain O-DLT smart contracts. The example codes about the `account nonce` can be found [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/SkywalkerFungible.sol#L50) 
-    - The `nonce in o-transaction` data will be verified according to the `account nonce` managed by on-chain O-DLT smart contracts. Some example codes can be found [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/libraries/OmniverseProtocol.sol#L64).
-- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract). It can also be used with the combination of ERC20/ERC721. The prototype of the code can be found [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/interfaces/IOmniverseFungible.sol)  
+    - The `nonce` appears in two places, the one is `nonce in o-transaction` data as above, and the other is `account nonce` maintained by on-chain O-DLT smart contracts. 
+    - The `nonce in o-transaction` data will be verified according to the `account nonce` managed by on-chain O-DLT smart contracts.
+- The Omniverse Token could be implemented with the [interfaces mentioned above](#smart-contract). It can also be used with the combination of ERC20/ERC721. 
     - The first thing is verifying the signature of the o-transaction data. 
     - Then the operation will be added to a pre-execution cache, and wait for a fixed time until is executed. The waiting time will be able to be settled by the deployer, for example, 5 minutes. 
     - The off-chain synchronizer will deliver the o-transaction data to other chains. If another o-transaction data with the same nonce and the same sender account is received within the waiting time, and if there's any content in `OmniverseTransactionData` difference, a malicious attack happens and the related sender account will be punished. 
-    - The example code of `sendOmniverseTransaction` is [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/SkywalkerFungible.sol#L103)
-    - and the example code of executing is [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/SkywalkerFungible.sol#L110). 
-    - The implementation for Omniverse Non-Fungible Token is almost the same and the defination of the interface can be found [here](https://github.com/Omniverse-Web3-Labs/omniverse-evm/blob/main/contracts/contracts/interfaces/IOmniverseNonFungible.sol) 
 - The Omniverse Verification is mainly about the verification of the signature implemented in different tech stacks according to the blockchain. As the signature is unfakeable and non-deniable, malicious attacks could be found deterministicly.
 - The bottom is the off-chain synchronizer. The synchronizer is a very simple off-chain procedure, and it just listens to the Omniverse events happening on-chain and delivers the latest o-transaction events. As everything in the Omniverse paradigm is along with a signature and is verified cryptographically, there's no need to worry about synchronizers doing malicious things, and I will explain it later. The off-chain part of O-DLT is indeed trust-free. Everyone can launch a synchronizer to get rewards by helping synchronize information.  
 
@@ -250,14 +266,20 @@ The O-DLT has the following features:
 - These synchronizers will rush to deliver this message because whoever submits to the destination chain first will get a reward. There's no will for independent synchronizers to do evil because they just deliver `A`'s o-transaction data. (The reward is coming from the service fee or a mining mechanism according to the average number of o-transactions within a fixed time. The strategy of the reward may not be just for the first one but for the first three with a gradual decrease.) 
 - Finally, the O-DLT smart contracts deployed on other chains will all receive the o-transaction data, verify the signature and execute it when the **waiting time is up**. After execution, the underlying `account nonce` will add 1. Now all the `account nonce` of account `A` will be $k+1$, and the state of the balances of the related account will be the same too.  
 
-We have provided an intuitive but non-rigorous [proof for the **ultimate consistency**](https://github.com/Omniverse-Web3-Labs/o-amm/blob/main/docs/Proof-of-ultimate-consistency.md) for a better understanding of the **synchronization** mechanisms.
+### Proof of ultimate consistency
+Take transferring omniverse tokens for example. A non-rigorous but intuitive proof is as below:  
+* At the first beginning, the nonce of an Omniverse account is set to be 0, every chain acts the same. Therefore $n=1$ is established.
+* Suppose $n=k$ is established.
+* $n=k+1$ happens when a new omniverse transaction first happens on one chain, Etheruem for instance. All the synchronizers will discover the new transaction on O-DLT smart contracts on Etheruem. 
+* The synchronizers will carry this transaction along with its signature to other chains in a rush, and the first submitters will be rewarded.
+* Very soon the state will be synchronized, and there's no need to worry about the omniverse transaction being fake as there's a signature with it. After executing the transaction on other chains, the balance and the nonce of the related Omniverse accounts will be the same all around. Up to this point, $n=k+1$ holds.  
 
 ## Reference Implementation
 - An Omniverse Account example: `3092860212ceb90a13e4a288e444b685ae86c63232bcb50a064cb3d25aa2c88a24cd710ea2d553a20b4f2f18d2706b8cc5a9d4ae4a50d475980c2ba83414a796`
     - The Omniverse Account is a public key of the elliptic curve `secp256k1`
     - The related private key of the example is:  `cdfa0e50d672eb73bc5de00cc0799c70f15c5be6b6fca4a1c82c35c7471125b6`
 
-- [Omniverse Fungible Token](https://github.com/Omniverse-Web3-Labs/omniverse-evm/tree/main/contracts/contracts)
+- Omniverse Fungible Token
     - Common Tools
         ```solidity
         // SPDX-License-Identifier: MIT
@@ -266,16 +288,17 @@ We have provided an intuitive but non-rigorous [proof for the **ultimate consist
         import "../OmniverseTransactionData.sol";
 
         /**
-        * @notice Fungible token data structure, which will be encoded from or decoded from
-        * the field `payload` of `OmniverseTransactionData`
+        * @notice Fungible token data structure, from which the field `payload` in `OmniverseTransactionData` will be encoded
         *
-        * op: The operation type
+        * @member op: The operation type
         * NOTE op: 0-31 are reserved values, 32-255 are custom values
-        *             op: 0 Transfers omniverse token `amount` from user `from` to user `exData`, `from` MUST have at least `amount` token
-        *             op: 1 User `from` mints token `amount` to user `exData`
-        *             op: 2 User `from` burns token `amount` from user `exData`
-        * exData: The operation data. This sector could be empty and is determined by `op`
-        * amount: The amount of token which is operated
+        *           op: 0 - omniverse account `from` transfers `amount` tokens to omniverse account `exData`, `from` have at least `amount` tokens
+        *           op: 1 - omniverse account `from` mints `amount` tokens to omniverse account `exData`
+        *           op: 2 - omniverse account `from` burns `amount` tokens from his own, `from` have at least `amount` tokens
+        * @member exData: The operation data. This sector could be empty and is determined by `op`. For example: 
+                    when `op` is 0 and 1, `exData` stores the omniverse account that receives.
+                    when `op` is 2, `exData` is empty.
+        * @member amount: The amount of tokens being operated
         */
         struct Fungible {
             uint8 op;
