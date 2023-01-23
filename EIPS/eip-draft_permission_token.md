@@ -1,36 +1,34 @@
 ---
-eip:
-title: Permission Token Standard
-author: Chiro <chiro@orochi.network>
+eip: draft_permission_token
+title: Permission Token
+description: A new token that held the permission of an address in an ecosystem
+author: Chiro <@chiro-hiro>
+discussions-to: https://ethereum-magicians.org/t/eip-644-a-standard-for-permission-token/9105
+status: Draft
 type: Standards Track
 category: ERC
-status: Draft
 created: 2022-01-19
 ---
 
-## Simple Summary
-
-A standard interface for permission tokens.
-
 ## Abstract
 
-A new token standard that held the permission of an address in an ecosystem. A permission token can be transferred/granted/revoked by the permission owner to an grantee's address.
+A new token standard that held the permission of an address in an ecosystem. A permission token can be transferred/delegated by the permission owner to an grantee's address.
 
 ## Motivation
 
-You may still encounter special roles like `Owner`, `Operator`, `Manager`, `Validator` in many existing smart contracts because people still using permissioned addresses to construct and manage them. It is difficult to audit and maintain security since these permissions are not managed centrally in a single smart contract.
+You may still encounter special roles like `Owner`, `Operator`, `Manager`, `Validator` in many existing smart contracts because we're still using permissioned addresses to operate and manage them. It is difficult to audit and maintain since these permissions are not managed centrally in a single smart contract.
 
-To secure the communication between smart contracts, this EIP provides a straightforward, centralized, and scalable method for managing permissions.
+To secure the communication between smart contracts, this EIP provides a straightforward, centralized, and scalable method for managing permissions. This EIP focus on secure cross-interactive between two
 
 ## Specification
 
-## Token
-
-### Methods
+We RECOMMENDED to define permissions are power of 2, that allowed us to create up to `2^256` different roles.
 
 **NOTES**:
 
 - The following specifications use syntax from Solidity `0.8.7` (or above)
+
+### Methods
 
 #### name
 
@@ -122,44 +120,25 @@ MUST trigger on any successful call to `approve(address _delegatee, uint256 _per
 event Approval(address indexed _owner, address indexed _delegatee, uint256 _permission)
 ```
 
-## Implementation
+## Rationale
 
-### Storage
+- Permission tokens describe an alternative to Access Control Lists (ACLS) for providing authorisation and improving security.
 
-A `mapping` is used to store 256 bits of permission of an given address:
+- Permission token balance of the relevant account in the supplied ecosystem is used to reflect permission and role.
 
-```solidity
-mapping (address => uint256) permissions;
-```
+- The ecosystem operator will benefit from centrally managing all rights and responsibilities since it will make granting and revoking permissions easier.
 
-Each permission MUST be defined as a power of 2, the important permission SHOULD greater than the less important one.
+- The permission owner may assign a portion of their authority to the delegatee so that they may act on the smart contract in their place. This type of delegation is still in use today, as may be seen in daily life.
 
-_Note_ `0` value SHOULD use to represent none permission.
+- Cross-interactivity between different ecosystems will be simpler since permission tokens make it simple to issue authorization to external smart contracts.
 
-```solidity
-uint256 constant PERMISSION_NONE = 0;
-uint256 constant PERMISSION_CREATE = 2**0;
-uint256 constant PERMISSION_SIGN = 2**1;
-uint256 constant PERMISSION_EXECUTE = 2**2;
-```
-
-_Note_ You can define roles by combining defined permissions, e.g: `uint256 constant ROLE_OPERATOR = PERMISSION_SIGN|PERMISSION_EXECUTE`.
-
-### Checking
-
-We can check a permission of a subset permission by using `AND` operator with bitmask.
-
-```solidity
-if (permissionToken.permissionOf(msg.sender) & permission != permission) {
-    revert AccessDenied();
-}
-```
+## Reference Implementation
 
 ### Implement
 
 `ERC-644`'s interface in `./IERC644.sol`.
 
-```
+```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
@@ -328,6 +307,10 @@ contract UseCase is Permissioned {
   }
 }
 ```
+
+## Security Considerations
+
+Need more discussion.
 
 ## Copyright
 
