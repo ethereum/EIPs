@@ -1,5 +1,5 @@
 ---
-eip:
+eip: draft_permission_token
 title: Permission Token
 description: A new token that held the permission of an address in an ecosystem
 author: Chiro (@chiro-hiro)
