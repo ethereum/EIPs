@@ -22,6 +22,8 @@ To secure the communication between smart contracts, this EIP provides a straigh
 
 ## Specification
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
 We RECOMMENDED to define permissions are power of 2, that allowed us to create up to `2^256` different roles.
 
 ### Notes
