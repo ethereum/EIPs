@@ -24,7 +24,7 @@ To secure the communication between smart contracts, this EIP provides a straigh
 
 We RECOMMENDED to define permissions are power of 2, that allowed us to create up to `2^256` different roles.
 
-**NOTES**:
+### Notes
 
 - The following specifications use syntax from Solidity `0.8.7` (or above)
 
