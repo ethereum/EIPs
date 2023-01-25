@@ -122,15 +122,7 @@ event Approval(address indexed _owner, address indexed _delegatee, uint256 _perm
 
 ## Rationale
 
-- Permission tokens describe an alternative to Access Control Lists (ACLS) for providing authorisation and improving security.
-
-- Permission token balance of the relevant account in the supplied ecosystem is used to reflect permission and role.
-
-- The ecosystem operator will benefit from centrally managing all rights and responsibilities since it will make granting and revoking permissions easier.
-
-- The permission owner may assign a portion of their authority to the delegatee so that they may act on the smart contract in their place. This type of delegation is still in use today, as may be seen in daily life.
-
-- Cross-interactivity between different ecosystems will be simpler since permission tokens make it simple to issue authorization to external smart contracts.
+Needs discussion.
 
 ## Reference Implementation
 
