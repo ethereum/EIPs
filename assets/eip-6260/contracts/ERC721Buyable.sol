@@ -77,6 +77,10 @@ abstract contract ERC721Buyable is ERC721, IERC721Buyable, Ownable {
 
         uint256 royalties = (msg.value * _royalty()) / _royaltyDenominator();
 
+        emit Purchase(buyer, seller, msg.value);
+
+        _safeTransfer(seller, buyer, _tokenId, "");
+
         if (seller == owner() || royalties == 0) {
             (bool success, ) = payable(seller).call{value: msg.value}("");
             require(success, "Something happened when paying the token owner");
@@ -87,10 +91,6 @@ abstract contract ERC721Buyable is ERC721, IERC721Buyable, Ownable {
             }("");
             require(success, "Something happened when paying the token owner");
         }
-
-        emit Purchase(buyer, seller, msg.value);
-
-        _safeTransfer(seller, buyer, _tokenId, "");
     }
 
     /**
