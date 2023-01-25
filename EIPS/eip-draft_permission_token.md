@@ -246,7 +246,7 @@ contract ERC644 is IERC644 {
 Example use case:
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.7;
 import "./IERC644.sol";
 
