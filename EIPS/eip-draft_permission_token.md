@@ -139,7 +139,7 @@ event Approval(address indexed _owner, address indexed _delegatee, uint256 _perm
 `ERC-644`'s interface in `./IERC644.sol`.
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.7;
 
 interface IERC644 {
