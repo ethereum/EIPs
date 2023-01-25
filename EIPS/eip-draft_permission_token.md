@@ -162,7 +162,7 @@ interface IERC644 {
 Simplest implement of Permission Token
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.7;
 import "./IERC644.sol";
 
