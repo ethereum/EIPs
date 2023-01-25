@@ -16,7 +16,7 @@ A new token standard that held the permission of an address in an ecosystem. A p
 
 ## Motivation
 
-You may still encounter special roles like `Owner`, `Operator`, `Manager`, `Validator` in many existing smart contracts because we're still using permissioned addresses to operate and manage them. It is difficult to audit and maintain since these permissions are not managed centrally in a single smart contract.
+Special roles like `Owner`, `Operator`, `Manager`, `Validator` are common for many smart contracts because permissioned addresses are used to operate and manage them. It is difficult to audit and maintain these system since these permissions are not managed centrally in a single smart contract.
 
 To secure the communication between smart contracts, this EIP provides a straightforward, centralized, and scalable method for managing permissions.
 
