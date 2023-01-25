@@ -1,8 +1,8 @@
 # Ethereum Improvement Proposals (EIPs)
 
-The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum client and application protocols. This repository tracks ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.
+The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum itself and conventions built upon it. This repository tracks past and ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.
 
-The [EIP status page](https://eips.ethereum.org/) tracks and lists Ethereum client and application protocols:
+The [status page](https://eips.ethereum.org/) tracks and lists EIPs, which can be divided into the following categories:
 
 - [Core EIPs](https://eips.ethereum.org/core) are improvements to the Ethereum consensus protocol.
 - [Networking EIPs](https://eips.ethereum.org/networking) specify the peer-to-peer networking layer of Ethereum.
