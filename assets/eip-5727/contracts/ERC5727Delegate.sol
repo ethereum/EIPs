@@ -10,7 +10,7 @@ import "./ERC5727Enumerable.sol";
 
 abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
     struct DelegateRequest {
-        address soul;
+        address owner;
         uint256 value;
         uint256 slot;
     }
@@ -86,7 +86,7 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
             _mintAllowed[_msgSender()][delegateRequestId] = false;
         }
         _mint(
-            _delegateRequests[delegateRequestId].soul,
+            _delegateRequests[delegateRequestId].owner,
             _delegateRequests[delegateRequestId].value,
             _delegateRequests[delegateRequestId].slot
         );
@@ -192,7 +192,7 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
     }
 
     function createDelegateRequest(
-        address soul,
+        address owner,
         uint256 value,
         uint256 slot
     ) external virtual override returns (uint256 delegateRequestId) {
@@ -202,7 +202,7 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
             "ERC5727Delegate: Value of Delegate Request cannot be zero"
         );
         delegateRequestId = _delegateRequestCount;
-        _delegateRequests[_delegateRequestCount].soul = soul;
+        _delegateRequests[_delegateRequestCount].owner = owner;
         _delegateRequests[_delegateRequestCount].value = value;
         _delegateRequests[_delegateRequestCount].slot = slot;
         _delegateRequestCount++;
@@ -235,7 +235,7 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
         return _delegatedTokens[operator].values();
     }
 
-    function soulOfDelegateRequest(uint256 delegateRequestId)
+    function ownerOfDelegateRequest(uint256 delegateRequestId)
         public
         view
         virtual
@@ -245,7 +245,7 @@ abstract contract ERC5727Delegate is ERC5727Enumerable, IERC5727Delegate {
             delegateRequestId < _delegateRequestCount,
             "ERC5727Delegate: Delegate request does not exist"
         );
-        return _delegateRequests[delegateRequestId].soul;
+        return _delegateRequests[delegateRequestId].owner;
     }
 
     function valueOfDelegateRequest(uint256 delegateRequestId)

@@ -15,12 +15,12 @@ interface IERC5727Governance is IERC5727 {
     function voters() external view returns (address[] memory);
 
     /**
-     * @notice Approve to mint the token described by the `approvalRequestId` to `soul`.
+     * @notice Approve to mint the token described by the `approvalRequestId` to `owner`.
      * @dev MUST revert if the caller is not a voter.
-     * @param soul The soul which the token to mint to
+     * @param owner The owner which the token to mint to
      * @param approvalRequestId The approval request describing the value and slot of the token to mint
      */
-    function approveMint(address soul, uint256 approvalRequestId) external;
+    function approveMint(address owner, uint256 approvalRequestId) external;
 
     /**
      * @notice Approve to revoke the `tokenId`.

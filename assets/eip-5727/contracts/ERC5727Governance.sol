@@ -50,26 +50,26 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
         return _votersArray.values();
     }
 
-    function approveMint(address soul, uint256 approvalRequestId)
+    function approveMint(address owner, uint256 approvalRequestId)
         public
         virtual
         override
         onlyRole(VOTER_ROLE)
     {
         require(
-            !_mintApprovals[_msgSender()][approvalRequestId][soul],
+            !_mintApprovals[_msgSender()][approvalRequestId][owner],
             "ERC5727Governance: You already approved this address"
         );
-        _mintApprovals[_msgSender()][approvalRequestId][soul] = true;
-        _mintApprovalCounts[approvalRequestId][soul] += 1;
+        _mintApprovals[_msgSender()][approvalRequestId][owner] = true;
+        _mintApprovalCounts[approvalRequestId][owner] += 1;
         if (
-            _mintApprovalCounts[approvalRequestId][soul] ==
+            _mintApprovalCounts[approvalRequestId][owner] ==
             _votersArray.length()
         ) {
-            _resetMintApprovals(approvalRequestId, soul);
+            _resetMintApprovals(approvalRequestId, owner);
             _mint(
                 _approvalRequests[approvalRequestId].creator,
-                soul,
+                owner,
                 _approvalRequests[approvalRequestId].value,
                 _approvalRequests[approvalRequestId].slot
             );
@@ -106,13 +106,13 @@ abstract contract ERC5727Governance is ERC5727Enumerable, IERC5727Governance {
             super.supportsInterface(interfaceId);
     }
 
-    function _resetMintApprovals(uint256 approvalRequestId, address soul)
+    function _resetMintApprovals(uint256 approvalRequestId, address owner)
         private
     {
         for (uint256 i = 0; i < _votersArray.length(); i++) {
-            _mintApprovals[_votersArray.at(i)][approvalRequestId][soul] = false;
+            _mintApprovals[_votersArray.at(i)][approvalRequestId][owner] = false;
         }
-        _mintApprovalCounts[approvalRequestId][soul] = 0;
+        _mintApprovalCounts[approvalRequestId][owner] = 0;
     }
 
     function _resetRevokeApprovals(uint256 tokenId) private {
