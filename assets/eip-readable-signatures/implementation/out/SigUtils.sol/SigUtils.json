@@ -1,0 +1,1157 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_DOMAIN_SEPARATOR",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "TRANSFER_TYPEHASH",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct TransferParameters",
+          "name": "_transfer",
+          "type": "tuple"
+        }
+      ],
+      "name": "getTypedDataHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x608060405234801561001057600080fd5b5060405161028538038061028583398101604081905261002f91610037565b600055610050565b60006020828403121561004957600080fd5b5051919050565b6102268061005f6000396000f3fe608060405234801561001057600080fd5b50600436106100355760003560e01c8062bf26f41461003a578063ba20b89d14610073575b600080fd5b6100617f4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e81565b60405190815260200160405180910390f35b610061610081366004610166565b6000805461008e836100ca565b60405161190160f01b6020820152602281019290925260428201526062015b604051602081830303815290604052805190602001209050919050565b60007f4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e826000015183602001518460400151856060015186608001516040516020016100ad969594939291909586526001600160a01b0394851660208701529290931660408501526060840152608083019190915260a082015260c00190565b80356001600160a01b038116811461016157600080fd5b919050565b600060a0828403121561017857600080fd5b60405160a0810181811067ffffffffffffffff821117156101a957634e487b7160e01b600052604160045260246000fd5b6040526101b58361014a565b81526101c36020840161014a565b6020820152604083013560408201526060830135606082015260808301356080820152809150509291505056fea26469706673582212207fae939f31c7a36f9645089586e4fd3eca392b040aae7a233ebe99afeba426d264736f6c63430008110033",
+    "sourceMap": "125:1189:34:-:0;;;189:92;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;238:16;:36;125:1189;;14:184:35;84:6;137:2;125:9;116:7;112:23;108:32;105:52;;;153:1;150;143:12;105:52;-1:-1:-1;176:16:35;;14:184;-1:-1:-1;14:184:35:o;:::-;125:1189:34;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x608060405234801561001057600080fd5b50600436106100355760003560e01c8062bf26f41461003a578063ba20b89d14610073575b600080fd5b6100617f4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e81565b60405190815260200160405180910390f35b610061610081366004610166565b6000805461008e836100ca565b60405161190160f01b6020820152602281019290925260428201526062015b604051602081830303815290604052805190602001209050919050565b60007f4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e826000015183602001518460400151856060015186608001516040516020016100ad969594939291909586526001600160a01b0394851660208701529290931660408501526060840152608083019190915260a082015260c00190565b80356001600160a01b038116811461016157600080fd5b919050565b600060a0828403121561017857600080fd5b60405160a0810181811067ffffffffffffffff821117156101a957634e487b7160e01b600052604160045260246000fd5b6040526101b58361014a565b81526101c36020840161014a565b6020820152604083013560408201526060830135606082015260808301356080820152809150509291505056fea26469706673582212207fae939f31c7a36f9645089586e4fd3eca392b040aae7a233ebe99afeba426d264736f6c63430008110033",
+    "sourceMap": "125:1189:34:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;507:144;;559:92;507:144;;;;;160:25:35;;;148:2;133:18;507:144:34;;;;;;;1112:200;;;;;;:::i;:::-;1196:7;1261:16;;1279:24;1293:9;1279:13;:24::i;:::-;1232:72;;-1:-1:-1;;;1232:72:34;;;1464:27:35;1507:11;;;1500:27;;;;1543:12;;;1536:28;1580:12;;1232:72:34;;;;;;;;;;;;;1222:83;;;;;;1215:90;;1112:200;;;:::o;695:293::-;778:7;559:92;874:9;:14;;;890:9;:12;;;904:9;:16;;;922:9;:15;;;939:9;:18;;;827:144;;;;;;;;;;;;1890:25:35;;;-1:-1:-1;;;;;1989:15:35;;;1984:2;1969:18;;1962:43;2041:15;;;;2036:2;2021:18;;2014:43;2088:2;2073:18;;2066:34;2131:3;2116:19;;2109:35;;;;1942:3;2160:19;;2153:35;1877:3;1862:19;;1603:591;196:173;264:20;;-1:-1:-1;;;;;313:31:35;;303:42;;293:70;;359:1;356;349:12;293:70;196:173;;;:::o;374:827::-;470:6;523:3;511:9;502:7;498:23;494:33;491:53;;;540:1;537;530:12;491:53;573:2;567:9;615:3;607:6;603:16;685:6;673:10;670:22;649:18;637:10;634:34;631:62;628:185;;;735:10;730:3;726:20;723:1;716:31;770:4;767:1;760:15;798:4;795:1;788:15;628:185;829:2;822:22;868:29;887:9;868:29;:::i;:::-;860:6;853:45;931:38;965:2;954:9;950:18;931:38;:::i;:::-;926:2;918:6;914:15;907:63;1031:2;1020:9;1016:18;1003:32;998:2;990:6;986:15;979:57;1097:2;1086:9;1082:18;1069:32;1064:2;1056:6;1052:15;1045:57;1164:3;1153:9;1149:19;1136:33;1130:3;1122:6;1118:16;1111:59;1189:6;1179:16;;;374:827;;;;:::o",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "TRANSFER_TYPEHASH()": "00bf26f4",
+    "getTypedDataHash((address,address,uint256,uint256,uint256))": "ba20b89d"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_DOMAIN_SEPARATOR\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"TRANSFER_TYPEHASH\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"}],\"internalType\":\"struct TransferParameters\",\"name\":\"_transfer\",\"type\":\"tuple\"}],\"name\":\"getTypedDataHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"test/SigUtils.sol\":\"SigUtils\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/=lib/openzeppelin-contracts/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":forge-std/=lib/forge-std/src/\"]},\"sources\":{\"src/MyToken/MyTokenStructs.sol\":{\"keccak256\":\"0xde5e1ea299b1d7eba67af677695439083cc72215d7fa65cf649fd3745f1ab4c4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5edb98f335e90ba4a016491e8167dfde4b7cbdda881d3b6bf086dcf3c3a60f57\",\"dweb:/ipfs/QmSo3KzDgZP28wSUr2mUJV3W5birytyhPxgJfG4noc2ou9\"]},\"test/SigUtils.sol\":{\"keccak256\":\"0x3aeb3f515e04fb4310f7dd959c50b0bc16b923481b95614cc54cec17eb0e4676\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://49badcd566b97b97a1aa19146b2b5144c3a189ba7ef927e24c6407948521a92b\",\"dweb:/ipfs/QmeEkyJ6nY3G1KjQgabfxcEsG5yfdAKTyx4q41Apu7bW2Y\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.17+commit.8df45f5f"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "_DOMAIN_SEPARATOR",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "TRANSFER_TYPEHASH",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "struct TransferParameters",
+              "name": "_transfer",
+              "type": "tuple",
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "from",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "nonce",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "deadline",
+                  "type": "uint256"
+                }
+              ]
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "getTypedDataHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ]
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        ":@openzeppelin/=lib/openzeppelin-contracts/",
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":forge-std/=lib/forge-std/src/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "test/SigUtils.sol": "SigUtils"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "src/MyToken/MyTokenStructs.sol": {
+        "keccak256": "0xde5e1ea299b1d7eba67af677695439083cc72215d7fa65cf649fd3745f1ab4c4",
+        "urls": [
+          "bzz-raw://5edb98f335e90ba4a016491e8167dfde4b7cbdda881d3b6bf086dcf3c3a60f57",
+          "dweb:/ipfs/QmSo3KzDgZP28wSUr2mUJV3W5birytyhPxgJfG4noc2ou9"
+        ],
+        "license": "MIT"
+      },
+      "test/SigUtils.sol": {
+        "keccak256": "0x3aeb3f515e04fb4310f7dd959c50b0bc16b923481b95614cc54cec17eb0e4676",
+        "urls": [
+          "bzz-raw://49badcd566b97b97a1aa19146b2b5144c3a189ba7ef927e24c6407948521a92b",
+          "dweb:/ipfs/QmeEkyJ6nY3G1KjQgabfxcEsG5yfdAKTyx4q41Apu7bW2Y"
+        ],
+        "license": "MIT"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "test/SigUtils.sol",
+    "id": 29438,
+    "exportedSymbols": {
+      "SigUtils": [
+        29437
+      ],
+      "TransferParameters": [
+        28150
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "32:1283:34",
+    "nodes": [
+      {
+        "id": 29371,
+        "nodeType": "PragmaDirective",
+        "src": "32:23:34",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "0.8",
+          ".17"
+        ]
+      },
+      {
+        "id": 29373,
+        "nodeType": "ImportDirective",
+        "src": "57:66:34",
+        "nodes": [],
+        "absolutePath": "src/MyToken/MyTokenStructs.sol",
+        "file": "src/MyToken/MyTokenStructs.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 29438,
+        "sourceUnit": 28151,
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 29372,
+              "name": "TransferParameters",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 28150,
+              "src": "65:18:34",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "id": 29437,
+        "nodeType": "ContractDefinition",
+        "src": "125:1189:34",
+        "nodes": [
+          {
+            "id": 29375,
+            "nodeType": "VariableDeclaration",
+            "src": "149:33:34",
+            "nodes": [],
+            "constant": false,
+            "mutability": "mutable",
+            "name": "DOMAIN_SEPARATOR",
+            "nameLocation": "166:16:34",
+            "scope": 29437,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 29374,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "149:7:34",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "id": 29385,
+            "nodeType": "FunctionDefinition",
+            "src": "189:92:34",
+            "nodes": [],
+            "body": {
+              "id": 29384,
+              "nodeType": "Block",
+              "src": "228:53:34",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "id": 29382,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 29380,
+                      "name": "DOMAIN_SEPARATOR",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 29375,
+                      "src": "238:16:34",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 29381,
+                      "name": "_DOMAIN_SEPARATOR",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 29377,
+                      "src": "257:17:34",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "238:36:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 29383,
+                  "nodeType": "ExpressionStatement",
+                  "src": "238:36:34"
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "parameters": {
+              "id": 29378,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29377,
+                  "mutability": "mutable",
+                  "name": "_DOMAIN_SEPARATOR",
+                  "nameLocation": "209:17:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 29385,
+                  "src": "201:25:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 29376,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "201:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "200:27:34"
+            },
+            "returnParameters": {
+              "id": 29379,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "228:0:34"
+            },
+            "scope": 29437,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "id": 29390,
+            "nodeType": "VariableDeclaration",
+            "src": "507:144:34",
+            "nodes": [],
+            "constant": true,
+            "functionSelector": "00bf26f4",
+            "mutability": "constant",
+            "name": "TRANSFER_TYPEHASH",
+            "nameLocation": "531:17:34",
+            "scope": 29437,
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 29386,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "507:7:34",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "5472616e7366657228616464726573732066726f6d2c6164647265737320746f2c75696e7432353620616d6f756e742c75696e74323536206e6f6e63652c75696e7432353620646561646c696e6529",
+                  "id": 29388,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "569:81:34",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e",
+                    "typeString": "literal_string \"Transfer(address from,address to,uint256 amount,uint256 nonce,uint256 deadline)\""
+                  },
+                  "value": "Transfer(address from,address to,uint256 amount,uint256 nonce,uint256 deadline)"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_4144f681a2e4d6d2035dcbc0720f95d08cc1779083c71290e8a4bb4c1529f59e",
+                    "typeString": "literal_string \"Transfer(address from,address to,uint256 amount,uint256 nonce,uint256 deadline)\""
+                  }
+                ],
+                "id": 29387,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": -8,
+                "src": "559:9:34",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 29389,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "559:92:34",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "id": 29416,
+            "nodeType": "FunctionDefinition",
+            "src": "695:293:34",
+            "nodes": [],
+            "body": {
+              "id": 29415,
+              "nodeType": "Block",
+              "src": "787:201:34",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "id": 29401,
+                            "name": "TRANSFER_TYPEHASH",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 29390,
+                            "src": "855:17:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 29402,
+                              "name": "_transfer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29393,
+                              "src": "874:9:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                "typeString": "struct TransferParameters memory"
+                              }
+                            },
+                            "id": 29403,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "884:4:34",
+                            "memberName": "from",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 28141,
+                            "src": "874:14:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 29404,
+                              "name": "_transfer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29393,
+                              "src": "890:9:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                "typeString": "struct TransferParameters memory"
+                              }
+                            },
+                            "id": 29405,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "900:2:34",
+                            "memberName": "to",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 28143,
+                            "src": "890:12:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 29406,
+                              "name": "_transfer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29393,
+                              "src": "904:9:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                "typeString": "struct TransferParameters memory"
+                              }
+                            },
+                            "id": 29407,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "914:6:34",
+                            "memberName": "amount",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 28145,
+                            "src": "904:16:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 29408,
+                              "name": "_transfer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29393,
+                              "src": "922:9:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                "typeString": "struct TransferParameters memory"
+                              }
+                            },
+                            "id": 29409,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "932:5:34",
+                            "memberName": "nonce",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 28147,
+                            "src": "922:15:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          {
+                            "expression": {
+                              "id": 29410,
+                              "name": "_transfer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29393,
+                              "src": "939:9:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                "typeString": "struct TransferParameters memory"
+                              }
+                            },
+                            "id": 29411,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "949:8:34",
+                            "memberName": "deadline",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 28149,
+                            "src": "939:18:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            },
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            },
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            },
+                            {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          ],
+                          "expression": {
+                            "id": 29399,
+                            "name": "abi",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": -1,
+                            "src": "827:3:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_abi",
+                              "typeString": "abi"
+                            }
+                          },
+                          "id": 29400,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberLocation": "831:6:34",
+                          "memberName": "encode",
+                          "nodeType": "MemberAccess",
+                          "src": "827:10:34",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_abiencode_pure$__$returns$_t_bytes_memory_ptr_$",
+                            "typeString": "function () pure returns (bytes memory)"
+                          }
+                        },
+                        "id": 29412,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "827:144:34",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      ],
+                      "id": 29398,
+                      "name": "keccak256",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": -8,
+                      "src": "804:9:34",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (bytes memory) pure returns (bytes32)"
+                      }
+                    },
+                    "id": 29413,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "804:177:34",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 29397,
+                  "id": 29414,
+                  "nodeType": "Return",
+                  "src": "797:184:34"
+                }
+              ]
+            },
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getStructHash",
+            "nameLocation": "704:13:34",
+            "parameters": {
+              "id": 29394,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29393,
+                  "mutability": "mutable",
+                  "name": "_transfer",
+                  "nameLocation": "744:9:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 29416,
+                  "src": "718:35:34",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                    "typeString": "struct TransferParameters"
+                  },
+                  "typeName": {
+                    "id": 29392,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 29391,
+                      "name": "TransferParameters",
+                      "nameLocations": [
+                        "718:18:34"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 28150,
+                      "src": "718:18:34"
+                    },
+                    "referencedDeclaration": 28150,
+                    "src": "718:18:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_TransferParameters_$28150_storage_ptr",
+                      "typeString": "struct TransferParameters"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "717:37:34"
+            },
+            "returnParameters": {
+              "id": 29397,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29396,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 29416,
+                  "src": "778:7:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 29395,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "778:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "777:9:34"
+            },
+            "scope": 29437,
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "id": 29436,
+            "nodeType": "FunctionDefinition",
+            "src": "1112:200:34",
+            "nodes": [],
+            "body": {
+              "id": 29435,
+              "nodeType": "Block",
+              "src": "1205:107:34",
+              "nodes": [],
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "hexValue": "1901",
+                            "id": 29427,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "string",
+                            "lValueRequested": false,
+                            "nodeType": "Literal",
+                            "src": "1249:10:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_stringliteral_301a50b291d33ce1e8e9064e3f6a6c51d902ec22892b50d58abf6357c6a45541",
+                              "typeString": "literal_string hex\"1901\""
+                            },
+                            "value": "\u0019\u0001"
+                          },
+                          {
+                            "id": 29428,
+                            "name": "DOMAIN_SEPARATOR",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 29375,
+                            "src": "1261:16:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          {
+                            "arguments": [
+                              {
+                                "id": 29430,
+                                "name": "_transfer",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 29419,
+                                "src": "1293:9:34",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                  "typeString": "struct TransferParameters memory"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                                  "typeString": "struct TransferParameters memory"
+                                }
+                              ],
+                              "id": 29429,
+                              "name": "getStructHash",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 29416,
+                              "src": "1279:13:34",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_internal_pure$_t_struct$_TransferParameters_$28150_memory_ptr_$returns$_t_bytes32_$",
+                                "typeString": "function (struct TransferParameters memory) pure returns (bytes32)"
+                              }
+                            },
+                            "id": 29431,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "nameLocations": [],
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "1279:24:34",
+                            "tryCall": false,
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_stringliteral_301a50b291d33ce1e8e9064e3f6a6c51d902ec22892b50d58abf6357c6a45541",
+                              "typeString": "literal_string hex\"1901\""
+                            },
+                            {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            },
+                            {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          ],
+                          "expression": {
+                            "id": 29425,
+                            "name": "abi",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": -1,
+                            "src": "1232:3:34",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_abi",
+                              "typeString": "abi"
+                            }
+                          },
+                          "id": 29426,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "memberLocation": "1236:12:34",
+                          "memberName": "encodePacked",
+                          "nodeType": "MemberAccess",
+                          "src": "1232:16:34",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
+                            "typeString": "function () pure returns (bytes memory)"
+                          }
+                        },
+                        "id": 29432,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1232:72:34",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      ],
+                      "id": 29424,
+                      "name": "keccak256",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": -8,
+                      "src": "1222:9:34",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                        "typeString": "function (bytes memory) pure returns (bytes32)"
+                      }
+                    },
+                    "id": 29433,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1222:83:34",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 29423,
+                  "id": 29434,
+                  "nodeType": "Return",
+                  "src": "1215:90:34"
+                }
+              ]
+            },
+            "functionSelector": "ba20b89d",
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getTypedDataHash",
+            "nameLocation": "1121:16:34",
+            "parameters": {
+              "id": 29420,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29419,
+                  "mutability": "mutable",
+                  "name": "_transfer",
+                  "nameLocation": "1164:9:34",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 29436,
+                  "src": "1138:35:34",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_TransferParameters_$28150_memory_ptr",
+                    "typeString": "struct TransferParameters"
+                  },
+                  "typeName": {
+                    "id": 29418,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 29417,
+                      "name": "TransferParameters",
+                      "nameLocations": [
+                        "1138:18:34"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 28150,
+                      "src": "1138:18:34"
+                    },
+                    "referencedDeclaration": 28150,
+                    "src": "1138:18:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_TransferParameters_$28150_storage_ptr",
+                      "typeString": "struct TransferParameters"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1137:37:34"
+            },
+            "returnParameters": {
+              "id": 29423,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 29422,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 29436,
+                  "src": "1196:7:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 29421,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1196:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1195:9:34"
+            },
+            "scope": 29437,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "SigUtils",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          29437
+        ],
+        "name": "SigUtils",
+        "nameLocation": "134:8:34",
+        "scope": 29438,
+        "usedErrors": []
+      }
+    ],
+    "license": "MIT"
+  },
+  "id": 34
+}
