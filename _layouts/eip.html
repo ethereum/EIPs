@@ -113,11 +113,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  {% if page.category == "ERC" %}
-  <p>{% include authorlist.html authors=page.author %}, "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
-  {% elsif page.category != "ERC" %}
-  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
-  {% endif %}
+  <p>{% include authorlist.html authors=page.author %}, "{% if page.category == "ERC" %}ERC{% else %}EIP{% endif %}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
