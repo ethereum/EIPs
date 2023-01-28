@@ -59,13 +59,13 @@ contract ERC5727Example is
     }
 
     function mint(
-        address soul,
+        address owner,
         uint256 value,
         uint256 slot,
         uint256 expiryDate,
         bool shadowed
     ) public virtual onlyOwner {
-        uint256 tokenId = _mint(soul, value, slot);
+        uint256 tokenId = _mint(owner, value, slot);
         if (shadowed) {
             _shadow(tokenId);
         }
@@ -77,13 +77,13 @@ contract ERC5727Example is
     }
 
     function mintBatch(
-        address[] memory souls,
+        address[] memory owners,
         uint256 value,
         uint256 slot,
         uint256 expiryDate,
         bool shadowed
     ) public virtual onlyOwner {
-        uint256[] memory tokenIds = _mintBatch(souls, value, slot);
+        uint256[] memory tokenIds = _mintBatch(owners, value, slot);
         for (uint256 i = 0; i < tokenIds.length; i++) {
             if (shadowed) _shadow(tokenIds[i]);
             _setExpiryDate(tokenIds[i], expiryDate);
@@ -96,7 +96,7 @@ contract ERC5727Example is
 
     function _beforeTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
@@ -108,7 +108,7 @@ contract ERC5727Example is
     {
         ERC5727Enumerable._beforeTokenMint(
             issuer,
-            soul,
+            owner,
             tokenId,
             value,
             slot,
@@ -116,7 +116,7 @@ contract ERC5727Example is
         );
         ERC5727SlotEnumerable._beforeTokenMint(
             issuer,
-            soul,
+            owner,
             tokenId,
             value,
             slot,
@@ -126,7 +126,7 @@ contract ERC5727Example is
 
     function _afterTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
@@ -134,7 +134,7 @@ contract ERC5727Example is
     ) internal virtual override(ERC5727, ERC5727Enumerable) {
         ERC5727Enumerable._afterTokenMint(
             issuer,
-            soul,
+            owner,
             tokenId,
             value,
             slot,
@@ -157,5 +157,17 @@ contract ERC5727Example is
     {
         ERC5727Enumerable._beforeTokenDestroy(tokenId);
         ERC5727SlotEnumerable._beforeTokenDestroy(tokenId);
+    }
+
+    function slotURI(
+        uint256 slot
+    )
+        public
+        view
+        virtual
+        override(ERC5727, ERC5727SlotEnumerable)
+        returns (string memory)
+    {
+        return ERC5727SlotEnumerable.slotURI(slot);
     }
 }

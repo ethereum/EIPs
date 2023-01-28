@@ -180,22 +180,39 @@ interface IERC3475 {
     // EVENTS
     /**
      * @notice MUST trigger when tokens are transferred, including zero value transfers.
+     * e.g: 
+     emit Transfer(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, 0x492Af743654549b12b1B807a9E0e8F397E44236E,0x3d03B6C79B75eE7aB35298878D05fe36DC1fEf, [IERC3475.Transaction(1,14,500)])
+    means that operator 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef wants to transfer 500 bonds of class 1 , Nonce 14 of owner 0x492Af743654549b12b1B807a9E0e8F397E44236E to address  0x3d03B6C79B75eE7aB35298878D05fe36DC1fEf.
      */
     event Transfer(address indexed _operator, address indexed _from, address indexed _to, Transaction[] _transactions);
     /**
      * @notice MUST trigger when tokens are issued
+     * @notice Issue MUST trigger when Bonds are issued. This SHOULD not include zero value Issuing.
+    * @dev This SHOULD not include zero value issuing.
+    * @dev Issue MUST be triggered when the operator (i.e Bank address) contract issues bonds to the given entity.
+    eg: emit Issue(_operator, 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef,[IERC3475.Transaction(1,14,500)]); 
+    issue by address(operator) 500 Bonds(nonce14,class 0) to address 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
      */
     event Issue(address indexed _operator, address indexed _to, Transaction[] _transactions);
     /**
-     * @notice MUST trigger when tokens are redeemed
+     * @notice MUST trigger when tokens are redeemed.
+     * @notice Redeem MUST trigger when Bonds are redeemed. This SHOULD not include zero value redemption.
+     * eg: emit Redeem(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef,0x492Af743654549b12b1B807a9E0e8F397E44236E,[IERC3475.Transaction(1,14,500)]);
+     * this emit event when 5000 bonds of class 1, nonce 14 owned by address 0x492Af743654549b12b1B807a9E0e8F397E44236E are being redeemed by 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
      */
     event Redeem(address indexed _operator, address indexed _from, Transaction[] _transactions);
     /**
      * @notice MUST trigger when tokens are burned
+     * @dev `Burn` MUST trigger when the bonds are being redeemed via staking (or being invalidated) by the bank contract.
+     * @dev `Burn` MUST trigger when Bonds are burned. This SHOULD not include zero value burning
+     * @notice emit Burn(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef,0x492Af743654549b12b1B807a9E0e8F397E44236E,[IERC3475.Transaction(1,14,500)]);
+     * emits event when 5000 bonds of owner 0x492Af743654549b12b1B807a9E0e8F397E44236E of type (class 1, nonce 14) are burned by operator 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
      */
     event Burn(address indexed _operator, address indexed _from, Transaction[] _transactions);
     /**
      * @dev MUST emit when approval for a second party/operator address to manage all bonds from a classId given for an owner address is enabled or disabled (absence of an event assumes disabled).
+     * @dev its emitted when address(_owner) approves the address(_operator) to transfer his bonds.
+     * @notice Approval MUST trigger when bond holders are approving an _operator. This SHOULD not include zero value approval. 
      */
     event ApprovalFor(address indexed _owner, address indexed _operator, bool _approved);
 }

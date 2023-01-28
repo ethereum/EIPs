@@ -10,18 +10,18 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 interface IERC5727 is IERC165 {
     /**
      * @dev MUST emit when a token is minted.
-     * @param soul The address that the token is minted to
+     * @param owner The address that the token is minted to
      * @param tokenId The token minted
      * @param value The value of the token minted
      */
-    event Minted(address indexed soul, uint256 indexed tokenId, uint256 value);
+    event Minted(address indexed owner, uint256 indexed tokenId, uint256 value);
 
     /**
      * @dev MUST emit when a token is revoked.
-     * @param soul The owner soul of the revoked token
+     * @param owner The owner of the revoked token
      * @param tokenId The revoked token
      */
-    event Revoked(address indexed soul, uint256 indexed tokenId);
+    event Revoked(address indexed owner, uint256 indexed tokenId);
 
     /**
      * @dev MUST emit when a token is charged.
@@ -39,10 +39,10 @@ interface IERC5727 is IERC165 {
 
     /**
      * @dev MUST emit when a token is destroyed.
-     * @param soul The owner soul of the destroyed token
+     * @param owner The owner of the destroyed token
      * @param tokenId The token to destroy.
      */
-    event Destroyed(address indexed soul, uint256 indexed tokenId);
+    event Destroyed(address indexed owner, uint256 indexed tokenId);
 
     /**
      * @dev MUST emit when the slot of a token is set or changed.
@@ -73,12 +73,12 @@ interface IERC5727 is IERC165 {
     function slotOf(uint256 tokenId) external view returns (uint256);
 
     /**
-     * @notice Get the owner soul of a token.
+     * @notice Get the owner of a token.
      * @dev MUST revert if the `tokenId` does not exist
-     * @param tokenId the token for which to query the owner soul
-     * @return The address of the owner soul of `tokenId`
+     * @param tokenId the token for which to query the owner
+     * @return The address of the owner of `tokenId`
      */
-    function soulOf(uint256 tokenId) external view returns (address);
+    function ownerOf(uint256 tokenId) external view returns (address);
 
     /**
      * @notice Get the validity of a token.
