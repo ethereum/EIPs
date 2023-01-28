@@ -12,8 +12,8 @@ interface IERC5727Delegate is IERC5727 {
     /**
      * @notice Delegate a one-time minting right to `operator` for `delegateRequestId` delegate request.
      * @dev MUST revert if the caller does not have the right to delegate.
-     * @param operator The soul to which the minting right is delegated
-     * @param delegateRequestId The delegate request describing the soul, value and slot of the token to mint
+     * @param operator The owner to which the minting right is delegated
+     * @param delegateRequestId The delegate request describing the owner, value and slot of the token to mint
      */
     function mintDelegate(address operator, uint256 delegateRequestId) external;
 
@@ -21,8 +21,8 @@ interface IERC5727Delegate is IERC5727 {
      * @notice Delegate one-time minting rights to `operators` for corresponding delegate request in `delegateRequestIds`.
      * @dev MUST revert if the caller does not have the right to delegate.
      *   MUST revert if the length of `operators` and `delegateRequestIds` do not match.
-     * @param operators The souls to which the minting right is delegated
-     * @param delegateRequestIds The delegate requests describing the soul, value and slot of the tokens to mint
+     * @param operators The owners to which the minting right is delegated
+     * @param delegateRequestIds The delegate requests describing the owner, value and slot of the tokens to mint
      */
     function mintDelegateBatch(
         address[] memory operators,
@@ -32,7 +32,7 @@ interface IERC5727Delegate is IERC5727 {
     /**
      * @notice Delegate a one-time revoking right to `operator` for `tokenId` token.
      * @dev MUST revert if the caller does not have the right to delegate.
-     * @param operator The soul to which the revoking right is delegated
+     * @param operator The owner to which the revoking right is delegated
      * @param tokenId The token to revoke
      */
     function revokeDelegate(address operator, uint256 tokenId) external;
@@ -41,7 +41,7 @@ interface IERC5727Delegate is IERC5727 {
      * @notice Delegate one-time minting rights to `operators` for corresponding token in `tokenIds`.
      * @dev MUST revert if the caller does not have the right to delegate.
      *   MUST revert if the length of `operators` and `tokenIds` do not match.
-     * @param operators The souls to which the revoking right is delegated
+     * @param operators The owners to which the revoking right is delegated
      * @param tokenIds The tokens to revoke
      */
     function revokeDelegateBatch(
@@ -52,14 +52,14 @@ interface IERC5727Delegate is IERC5727 {
     /**
      * @notice Mint a token described by `delegateRequestId` delegate request as a delegate.
      * @dev MUST revert if the caller is not delegated.
-     * @param delegateRequestId The delegate requests describing the soul, value and slot of the token to mint.
+     * @param delegateRequestId The delegate requests describing the owner, value and slot of the token to mint.
      */
     function delegateMint(uint256 delegateRequestId) external;
 
     /**
      * @notice Mint tokens described by `delegateRequestIds` delegate request as a delegate.
      * @dev MUST revert if the caller is not delegated.
-     * @param delegateRequestIds The delegate requests describing the soul, value and slot of the tokens to mint.
+     * @param delegateRequestIds The delegate requests describing the owner, value and slot of the tokens to mint.
      */
     function delegateMintBatch(uint256[] memory delegateRequestIds) external;
 
@@ -78,14 +78,14 @@ interface IERC5727Delegate is IERC5727 {
     function delegateRevokeBatch(uint256[] memory tokenIds) external;
 
     /**
-     * @notice Create a delegate request describing the `soul`, `value` and `slot` of a token.
-     * @param soul The soul of the delegate request.
+     * @notice Create a delegate request describing the `owner`, `value` and `slot` of a token.
+     * @param owner The owner of the delegate request.
      * @param value The value of the delegate request.
      * @param slot The slot of the delegate request.
      * @return delegateRequestId The id of the delegate request
      */
     function createDelegateRequest(
-        address soul,
+        address owner,
         uint256 value,
         uint256 slot
     ) external returns (uint256 delegateRequestId);
