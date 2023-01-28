@@ -1,11 +1,13 @@
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./IERC-6150.sol";
+import "./interfaces/IERC6150.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 abstract contract ERC6150 is ERC721, IERC6150 {
     mapping(uint256 => uint256) private _parentOf;
     mapping(uint256 => uint256[]) private _childrenOf;
+    mapping(uint256 => uint256) private _indexInChildrenArray;
 
     constructor(
         string memory name_,
@@ -33,7 +35,9 @@ abstract contract ERC6150 is ERC721, IERC6150 {
     function childrenOf(
         uint256 tokenId
     ) public view virtual override returns (uint256[] memory childrenIds) {
-        _requireMinted(tokenId);
+        if (tokenId > 0) {
+            _requireMinted(tokenId);
+        }
         childrenIds = _childrenOf[tokenId];
     }
 
@@ -49,6 +53,10 @@ abstract contract ERC6150 is ERC721, IERC6150 {
     ) public view virtual override returns (bool) {
         _requireMinted(tokenId);
         return _childrenOf[tokenId].length == 0;
+    }
+
+    function _getIndexInChildrenArray(uint256 tokenId) internal view virtual {
+        return _indexInChildrenArray[tokenId];
     }
 
     function _safeBatchMintWithParent(
@@ -72,7 +80,7 @@ abstract contract ERC6150 is ERC721, IERC6150 {
     ) internal virtual {
         require(
             tokenIds.length == datas.length,
-            "EIP6150: tokenIds.length != datas.length"
+            "ERC6150: tokenIds.length != datas.length"
         );
         for (uint256 i = 0; i < tokenIds.length; i++) {
             _safeMintWithParent(to, parentId, tokenIds[i], datas[i]);
@@ -93,19 +101,40 @@ abstract contract ERC6150 is ERC721, IERC6150 {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        require(tokenId > 0, "EIP6150: tokenId is zero");
+        require(tokenId > 0, "ERC6150: tokenId is zero");
         if (parentId != 0)
-            require(_exists(parentId), "EIP6150: parentId doesn't exists");
+            require(_exists(parentId), "ERC6150: parentId doesn't exist");
 
         _beforeMintWithParent(to, parentId, tokenId);
 
         _parentOf[tokenId] = parentId;
+        _indexInChildrenArray[tokenId] = _childrenOf.length;
         _childrenOf[parentId].push(tokenId);
 
         _safeMint(to, tokenId, data);
         emit Minted(msg.sender, to, parentId, tokenId);
 
         _afterMintWithParent(to, parentId, tokenId);
+    }
+
+    function _safeBurn(uint256 tokenId) internal virtual {
+        require(_exists(tokenId), "ERC6150: tokenId doesn't exist");
+        require(isLeaf(tokenId), "ERC6150: tokenId is not a leaf");
+
+        uint256 parent = _parentOf[tokenId];
+        uint256 lastTokenIndex = _childrenOf[parent].length - 1;
+        uint256 targetTokenIndex = _indexInChildrenArray[tokenId];
+        uint256 lastIndexToken = _childrenOf[parent][lastTokenIndex];
+        if (lastTokenIndex > targetTokenIndex) {
+            _childrenOf[parent][targetTokenIndex] = lastIndexToken;
+            _indexInChildrenArray[lastIndexToken] = targetTokenIndex;
+        }
+
+        delete _childrenOf[parent][lastIndexToken];
+        delete _indexInChildrenArray[tokenId];
+        delete _parentOf[tokenId];
+
+        _burn(tokenId);
     }
 
     function _beforeMintWithParent(
