@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 6384
 title: Humanly readable offline signatures
 description: A procedure for making a proposed to be signed buffer of typed structured data humanly readable.
 author: Tal Be'ery (@talbeerysec), Roi Vazan (@DeVaz1)
