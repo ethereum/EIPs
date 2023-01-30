@@ -5,7 +5,7 @@ import "src/IEvalEIP712Buffer.sol";
 import {ItemType, OrderType, OfferItem, ConsiderationItem, OrderComponents} from "src/SeaPort/SeaPortStructs.sol";
 import {SeaPort712ParserHelper} from "src/SeaPort/SeaPort712ParserHelper.sol";
 
-contract SeaPortMock {
+contract SeaPortMock is IEvalEIP712Buffer {
     address public immutable eip712TransalatorContract;
 
     bytes32 private constant TYPE_HASH =
@@ -20,8 +20,8 @@ contract SeaPortMock {
     function evalEIP712Buffer(
         bytes32 domainSeparator,
         string memory primaryType,
-        bytes memory encodedSignature
-    ) public view returns (string[] memory) {
+        bytes memory typedDataBuffer
+    ) public view override returns (string[] memory) {
         require(
             keccak256(abi.encodePacked(primaryType)) == keccak256(abi.encodePacked("OrderComponents")),
             "SeaPortMock: Invalid primary type"

@@ -50,7 +50,7 @@ contract MyToken is ERC20, EIP712, IEvalEIP712Buffer {
     function evalEIP712Buffer(
         bytes32 domainSeparator,
         string memory primaryType,
-        bytes memory encodedData
+        bytes memory typedDataBuffer
     ) public view override returns (string[] memory) {
         require(
             keccak256(abi.encodePacked(primaryType)) == keccak256(abi.encodePacked("Transfer")),
