@@ -1,0 +1,27 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ethereum EIPs</title>
+    <description>A feed of all EIPs</description>
+    <link>{{ site.url }}</link>
+    <atom:link href="{{ site.url }}/all.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+    {% assign eips = site.pages | sort: 'eip' %}
+    {% for eip in eips %}
+      <item>
+        <title>{{ eip.title | xml_escape }}</title>
+        <category>{{ eip.type | xml_escape }}/{{ eip.category | xml_escape }}</category>
+        {% if eip.discussions-to %}
+          <comments>{{ eip.discussions-to | xml_escape }}</comments>
+        {% endif %}
+        <description>{{ eip.content | xml_escape }}</description>
+        <pubDate>{{ eip.created | date_to_rfc822 }}</pubDate>
+        <link>{{ site.url }}{{ eip.url }}</link>
+        <guid isPermaLink="true">{{ site.url }}{{ eip.url }}</guid>
+      </item>
+    {% endfor %}
+  </channel>
+</rss>
