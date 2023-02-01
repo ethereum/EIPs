@@ -51,7 +51,7 @@ layout: default
     {% elsif page.category != "ERC" %}
       EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     {% endif %}
-    <a href="{{ page["discussions-to"] | uri_escape }}" class="no-underline">
+    <a href="{{ page.discussions-to | uri_escape }}" class="no-underline">
       <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
         <use xlink:href="#bi-chat"/>
       </svg>
@@ -75,10 +75,16 @@ layout: default
           <td>{{ page.created }}</td>
         </tr>
       {% endif %}
-      {% if page.status != "Review" and page.status != "Last Call" and page.status != "Final" and page["discussions-to"] != undefined %}
+      {% if page.last-call-deadline != undefined %}
+        <tr>
+          <th scope="row">Last Call Deadline</th>
+          <td>{{ page.last-call-deadline" }}</td>
+        </tr>
+      {% endif %}
+      {% if page.status != "Review" and page.status != "Last Call" and page.status != "Final" and page.discussions-to != undefined %}
         <tr>
           <th scope="row">Discussion Link</th>
-          <td><a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">{{ page["discussions-to"] | xml_escape }}</a></td>
+          <td><a href="{{ page.discussions-to | uri_escape }}" target="__blank">{{ page.discussions-to | xml_escape }}</a></td>
         </tr>
       {% endif %}
       {% if page.requires != undefined %}
@@ -95,7 +101,7 @@ layout: default
     <div class="alert alert-primary d-flex align-items-center" role="alert">
       <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" style="width:2.5em;height:2.5em;"><use xlink:href="#bi-megaphone-fill"/></svg>
       <div class="text-center w-100">
-        <a href="{{ page["discussions-to"] | uri_escape }}" target="__blank">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
+        <a href="{{ page.discussions-to | uri_escape }}" target="__blank">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
       </div>
     </div>
   {% endif %}
@@ -128,9 +134,9 @@ https://schema.org/TechArticle
     "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
     "datePublished": "{{ page.created | date: "%Y-%m-%d" }}",
-{% if page["discussions-to"] != undefined %}
-    "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
-{% endif %}    
+    {% if page.discussions-to != undefined %}
+    "discussionUrl": "{{ page.discussions-to | uri_escape }}",
+    {% endif %}
     "inLanguage": "en-US",
     "license": "#copyright",
     "copyrightYear": "{{ page.created | date: "%Y" }}"
