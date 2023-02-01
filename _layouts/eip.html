@@ -18,6 +18,25 @@ layout: default
 </svg>
 
 <div class="home">
+  <h1 class="page-heading">
+    {% if page.category == "ERC" %}
+      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% elsif page.category != "ERC" %}
+      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% endif %}
+    <a href="{{ page["discussions-to"] | uri_escape }}" class="no-underline">
+      <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <use xlink:href="#bi-chat"/>
+      </svg>
+    </a>
+    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}" class="no-underline">
+      <svg role="img" aria-label="Source" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <use xlink:href="#bi-code"/>
+      </svg>
+    </a>
+  </h1>
+  <h3>{{ page.description | xml_escape }}</h3>
+
   <span class="h5">
     {% if page.status == "Stagnant" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
@@ -25,7 +44,7 @@ layout: default
     {% if page.status == "Withdrawn" %}
       <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP has been withdrawn, and should not be used.">🛑 Withdrawn</span>
     {% endif %}
-    {% if page.status == "Draft" or	page.status == "Review" %}
+    {% if page.status == "Draft" or page.status == "Review" %}
       <span class="badge text-light bg-warning" data-bs-toggle="tooltip" data-bs-title="This EIP is not yet recommended for general use or implementation, as it is subject to normative (breaking) changes.">⚠️ {{ page.status }}</span>
     {% endif %}
     {% if page.status == "Last Call" %}
@@ -45,24 +64,6 @@ layout: default
       <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. " href="../meta">Meta</a>
     {% endif %}
   </span>
-  <h1 class="page-heading">
-    {% if page.category == "ERC" %}
-      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% elsif page.category != "ERC" %}
-      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% endif %}
-    <a href="{{ page["discussions-to"] | uri_escape }}" class="no-underline">
-      <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
-        <use xlink:href="#bi-chat"/>
-      </svg>
-    </a>
-    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}" class="no-underline">
-      <svg role="img" aria-label="Source" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
-        <use xlink:href="#bi-code"/>
-      </svg>
-    </a>
-  </h1>
-  <h3>{{ page.description | xml_escape }}</h3>
   <table class="table table-borderless preamble">
     <tbody>
       <tr>
