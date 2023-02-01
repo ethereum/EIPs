@@ -9,7 +9,7 @@ abstract contract ERC5727Shadow is ERC5727, IERC5727Shadow {
 
     modifier onlyManager(uint256 tokenId) {
         require(
-            _msgSender() == _getTokenOrRevert(tokenId).soul ||
+            _msgSender() == _getTokenOrRevert(tokenId).owner ||
                 _msgSender() == _getTokenOrRevert(tokenId).issuer,
             "ERC5727Shadow: You are not the manager"
         );
@@ -19,7 +19,7 @@ abstract contract ERC5727Shadow is ERC5727, IERC5727Shadow {
     function _beforeView(uint256 tokenId) internal view virtual override {
         require(
             !_shadowed[tokenId] ||
-                _msgSender() == _getTokenOrRevert(tokenId).soul ||
+                _msgSender() == _getTokenOrRevert(tokenId).owner ||
                 _msgSender() == _getTokenOrRevert(tokenId).issuer,
             "ERC5727Shadow: the token is shadowed"
         );
