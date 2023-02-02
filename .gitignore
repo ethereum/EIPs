@@ -8,6 +8,8 @@ vendor
 .gitpod.yml
 .DS_Store
 /.idea
+workspace.code-workspace
+.vscode
 
 # Secrets
 .vercel
