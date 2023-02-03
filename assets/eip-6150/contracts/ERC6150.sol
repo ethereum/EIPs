@@ -55,7 +55,9 @@ abstract contract ERC6150 is ERC721, IERC6150 {
         return _childrenOf[tokenId].length == 0;
     }
 
-    function _getIndexInChildrenArray(uint256 tokenId) internal view virtual {
+    function _getIndexInChildrenArray(
+        uint256 tokenId
+    ) internal view virtual returns (uint256) {
         return _indexInChildrenArray[tokenId];
     }
 
