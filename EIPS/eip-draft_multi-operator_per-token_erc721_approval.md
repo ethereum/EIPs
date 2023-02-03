@@ -36,43 +36,42 @@ This EIP therefore defines a fine-grained approach for approving multiple operat
 
 ### Non-goals
 
+1. Security measures for protecting NFTs other than through limiting the scope of operator approvals.
+2. Compatibility with [EIP-1155](./eip-1155.md) semi-fungible tokens. However we note that the mechanisms described herein also apply to approval for an operator to control the entire balance of an ERC1155 token *type* without requiring approval for all tokens, regardless of type.
+
 ## Specification
-
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
--->
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 To comply with this EIP, a contract MUST implement `IERCTBD` (defined herein) and the `ERC165` and `ERC721` interfaces; see [EIP-165](./eip-165.md) and [EIP-721](./eip-721.md) respectively.
 
+Compliant contracts MAY revert on calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure, thus forcing all approvals to be at the level of a single token.
+
 ```
 interface IERCTBD {
     /**
-     * @notice Emitted when an operator is enabled or disabled for a token.
+     * @notice Emitted when an operator is explicitly enabled or disabled for a token.
      */
-    event ApprovalFor(
+    event ExplicitApprovalFor(
         address indexed operator,
         uint256 indexed tokenId,
         bool approved
     );
 
     /**
-     * @notice Emitted when all explicit approvals, as granted by either
-     *         `setApprovalFor()` function, are revoked for all tokens.
+     * @notice Emitted when all explicit approvals, as granted by either `setExplicitApprovalFor()` function, are
+     *         revoked for all tokens.
+     * @dev MUST be emitted upon calls to `revokeAllExplicitApprovals()`.
      */
     event AllExplicitApprovalsRevoked(address indexed owner);
 
     /**
-     * @notice Emitted when all explicit approvals, as granted by either
-     *         `setApprovalFor()` function, are revoked for the specific token.
-     * @dev Inclusion of an indexed owner assists off-chain indexing of
-     *      existing approvals.
-     * @param owner MUST be `ownerOf(tokenId)` as per ERC721.
+     * @notice Emitted when all explicit approvals, as granted by either `setExplicitApprovalFor()` function, are
+     *         revoked for the specific token.
+     * @dev MUST be emitted upon token transfer and calls to `revokeAllExplicitApprovals(tokenId)`.
+     * @dev Inclusion of an indexed owner address assists off-chain indexing of existing approvals.
+     * @param owner MUST be `ownerOf(tokenId)` as per ERC721; in the case of revocation due to transfer, this MUST be
+     *              the `from` address expected to be emitted in the respective `ERC721.Transfer()` event.
      */
     event AllExplicitApprovalsRevoked(
         address indexed owner,
@@ -82,52 +81,67 @@ interface IERCTBD {
     /**
      * @notice Approves the operator to manage the asset on behalf of its owner.
      * @dev Throws if msg.sender is not the current NFT owner.
-     * @dev Approvals set via this method MUST be cleared upon transfer of the
-     *      token to a new owner.
-     * @dev MUST emit `ApprovalFor(operator,tokenId,approved)`.
+     * @dev Approvals set via this method MUST be cleared upon transfer of the token to a new owner; akin to calling
+     *      `revokeAllExplicitApprovals(tokenId)`, including associated events.
+     * @dev MUST emit `ApprovalFor(operator, tokenId, approved)`.
+     * @dev MUST NOT have an effect on any standard ERC721 approval setters / getters.
      */
-    function setApprovalFor(
+    function setExplicitApproval(
         address operator,
         uint256 tokenId,
         bool approved
     ) external;
 
     /**
-     * @notice Approves the operator to manage the tokens on behalf of its owner.
-     * @dev Throws if msg.sender is not the current NFT owner of any of the
-     *      tokens.
-     * @dev Approvals set via this method MUST be cleared upon transfer of the
-     *      token to a new owner.
-     * @dev MUST emit `ApprovalFor(operator,tokenId,approved)` for each tokenId.
+     * @notice Approves the operator to manage the token(s) on behalf of their owner.
+     * @dev MUST be equivalent to calling `setExplicitApprovalFor(operator, tokenId, approved)` for each `tokenId` in
+     * the array.
      */
-    function setApprovalFor(
+    function setExplicitApproval(
         address operator,
-        uint256[] calldata tokenIds,
+        uint256[] memory tokenIds,
         bool approved
     ) external;
 
     /**
-     * @notice Revokes all approvals, for all tokens, previously granted by
-     *         `msg.sender` via either of the `setApprovalFor()` functions.
+     * @notice Revokes all explicit approvals, for all tokens, i.e. those granted by `msg.sender` via either of the
+     *         `setExplicitApprovalFor()` functions.
      * @dev MUST emit `AllExplicitApprovalsRevoked(msg.sender)`.
      */
     function revokeAllExplicitApprovals() external;
 
     /**
-     * @notice Revokes all approvals, for the specified token, previously
-     *         granted by `msg.sender` via either of the `setApprovalFor()`
-     *         functions.
-     * @dev This functionality MUST be invoked upon token transfer.
-     * @dev MUST emit `AllExplicitApprovalsRevoked(ownerOf(tokenId),tokenId)`.
+     * @notice Revokes all excplicit approvals, for the specified token, i.e. those granted by `msg.sender` via either
+     *         of the `setExplicitApprovalFor()` functions.
+     * @dev Throws if `msg.sender` is not the current NFT owner.
+     * @dev MUST emit `AllExplicitApprovalsRevoked(msg.sender, tokenId)`.
      */
     function revokeAllExplicitApprovals(uint256 tokenId) external;
 
     /**
+     * @notice Returns true if (a) `operator` was approved via either `setExplicitApprovalFor()` function on `tokenId`;
+     *         and (b) the token has not since been transferred.
+     * @dev Criterion (b) is important as an owner MUST NOT need to revoke approvals if receiving a token that they
+     *      previously owned.
+     */
+    function isExplicitlyApprovedFor(address operator, uint256 tokenId)
+        external
+        view
+        returns (bool);
+}
+```
+
+Compliant contracts SHOULD also implement IERCTBDAnyApproval.
+
+```
+interface IERCTBDAnyApproval {
+    /**
      * @notice Returns true if any of the following criteria are met:
-     *         1. `operator` was approved via either `setApprovalFor()` function
-     *            on `tokenId` and the token has not since been transferred; OR
+     *         1. `isExplicitlyApprovedFor(operator, tokenId) == true`; OR
      *         2. `isApprovedForAll(ownerOf(tokenId), operator) == true`; OR
      *         3. `getApproved(tokenId) == operator`.
+     * @dev The criteria MUST be extended if other mechanism(s) for approving operators are introduced. The criteria
+     *      MUST include all approval approaches, joined by logical OR.
      */
     function isApprovedFor(address operator, uint256 tokenId)
         external
@@ -138,6 +152,10 @@ interface IERCTBD {
 
 ## Rationale
 
+### Notes to be expanded upon
+1. Approvals granted via the newly introduced methods are called *explicit* as a means of easily distinguishing them from those granted via the standard `ERC721.approve()` and `ERC721.setApprovalForAll()` functions. They do *not*, however, function differently to other approvals.
+2. Abstracting `isApprovedFor()` into IERCTBDAnyApproval interface, as against keeping it in `IERCTBD` allows for modularity of plain IERCTBD implementations while also standardising the interface for checking approvals when interfacing with specific implementations and any future approval EIPs.
+
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
 
@@ -145,8 +163,6 @@ interface IERCTBD {
 
   TODO: Remove this comment before submitting
 -->
-
-TBD
 
 ## Backwards Compatibility
 
