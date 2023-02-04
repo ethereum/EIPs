@@ -34,11 +34,11 @@ abstract contract ERC6150ParentTransferable is
             );
         }
 
-        uint256 owner = ownerOf(tokenId);
-        uint256 oldParentId = parentOf[tokenId];
+        address owner = ownerOf(tokenId);
+        uint256 oldParentId = parentOf(tokenId);
         _safeBurn(tokenId);
         _safeMintWithParent(owner, newParentId, tokenId);
-        emit ParentTransferred(tokenId, oldParentId, newParantId);
+        emit ParentTransferred(tokenId, oldParentId, newParentId);
     }
 
     function batchTransferParent(
