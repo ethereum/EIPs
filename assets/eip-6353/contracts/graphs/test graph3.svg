@@ -1,0 +1,108 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="307pt" height="346pt" viewBox="0.00 0.00 306.75 346.00">
+<g id="graph0" class="graph" transform="translate(67.78970297827016,293.2079446015694) scale(0.757858283255199)" data-name="G">
+
+<polygon fill="#2e3e56" stroke="transparent" points="-4,4 -4,-342 302.75,-342 302.75,4 -4,4" style=""/>
+<g id="clust1" class="cluster" data-name="clusterCharityToken">
+
+<path fill="#445773" stroke="#445773" d="M20,-8C20,-8 278.75,-8 278.75,-8 284.75,-8 290.75,-14 290.75,-20 290.75,-20 290.75,-181 290.75,-181 290.75,-187 284.75,-193 278.75,-193 278.75,-193 20,-193 20,-193 14,-193 8,-187 8,-181 8,-181 8,-20 8,-20 8,-14 14,-8 20,-8" style=""/>
+<text text-anchor="middle" x="149.37" y="-176.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">CharityToken</text>
+</g>
+<g id="clust2" class="cluster" data-name="cluster_01">
+
+<polygon fill="#2e3e56" stroke="black" points="10.86,-201 10.86,-330 270.23,-330 270.23,-201 10.86,-201" style=""/>
+<text text-anchor="middle" x="140.54" y="-313.4" font-family="Times,serif" font-size="14.00" style="">Legend</text>
+</g>
+<!-- CharityToken.&lt;Constructor&gt; -->
+<g id="node1" class="node" pointer-events="visible" data-name="CharityToken.&lt;Constructor&gt;">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="83.86" cy="-142" rx="67.55" ry="18" style=""/>
+<text text-anchor="middle" x="83.86" y="-137.8" font-family="Times,serif" font-size="14.00" style="">&lt;Constructor&gt;</text>
+</g>
+<!-- CharityToken._mint -->
+<g id="node4" class="node" pointer-events="visible" data-name="CharityToken._mint">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="235.23" cy="-88" rx="33.64" ry="18" style=""/>
+<text text-anchor="middle" x="235.23" y="-83.8" font-family="Times,serif" font-size="14.00" style="">_mint</text>
+</g>
+<!-- CharityToken.&lt;Constructor&gt;&#45;&gt;CharityToken._mint -->
+<g id="edge1" class="edge" data-name="CharityToken.&lt;Constructor&gt;-&gt;CharityToken._mint">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M124.89,-127.53C147.37,-119.4 175.23,-109.33 197.21,-101.38" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="198.63,-104.59 206.85,-97.9 196.26,-98.01 198.63,-104.59" style=""/>
+</g>
+<!-- CharityToken.decimals -->
+<g id="node5" class="node" pointer-events="visible" data-name="CharityToken.decimals">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="235.23" cy="-142" rx="45.22" ry="18" style=""/>
+<text text-anchor="middle" x="235.23" y="-137.8" font-family="Times,serif" font-size="14.00" style="">decimals</text>
+</g>
+<!-- CharityToken.&lt;Constructor&gt;&#45;&gt;CharityToken.decimals -->
+<g id="edge2" class="edge" data-name="CharityToken.&lt;Constructor&gt;-&gt;CharityToken.decimals">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M151.68,-142C161.05,-142 170.58,-142 179.69,-142" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="179.75,-145.5 189.75,-142 179.75,-138.5 179.75,-145.5" style=""/>
+</g>
+<!-- CharityToken.mint -->
+<g id="node2" class="node" pointer-events="visible" data-name="CharityToken.mint">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="83.86" cy="-88" rx="28.99" ry="18" style=""/>
+<text text-anchor="middle" x="83.86" y="-83.8" font-family="Times,serif" font-size="14.00" style="">mint</text>
+</g>
+<!-- CharityToken.mint&#45;&gt;CharityToken._mint -->
+<g id="edge3" class="edge" data-name="CharityToken.mint-&gt;CharityToken._mint">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M112.6,-88C134.7,-88 166.02,-88 191.34,-88" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="191.43,-91.5 201.43,-88 191.43,-84.5 191.43,-91.5" style=""/>
+</g>
+<!-- CharityToken.checkInterface -->
+<g id="node3" class="node" pointer-events="visible" data-name="CharityToken.checkInterface">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="83.86" cy="-34" rx="67.71" ry="18" style=""/>
+<text text-anchor="middle" x="83.86" y="-29.8" font-family="Times,serif" font-size="14.00" style="">checkInterface</text>
+</g>
+<!-- CharityToken.IERC165 -->
+<g id="node6" class="node" pointer-events="visible" data-name="CharityToken.IERC165">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="235.23" cy="-34" rx="47.54" ry="18" style=""/>
+<text text-anchor="middle" x="235.23" y="-29.8" font-family="Times,serif" font-size="14.00" style="">IERC165</text>
+</g>
+<!-- CharityToken.checkInterface&#45;&gt;CharityToken.IERC165 -->
+<g id="edge4" class="edge" data-name="CharityToken.checkInterface-&gt;CharityToken.IERC165">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M152.11,-34C160.5,-34 169.01,-34 177.22,-34" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="177.42,-37.5 187.42,-34 177.42,-30.5 177.42,-37.5" style=""/>
+</g>
+<!-- key -->
+<g id="node7" class="node" pointer-events="visible" data-name="key">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="148.86,-297 18.86,-297 18.86,-209 148.86,-209 148.86,-297" style=""/>
+<text text-anchor="start" x="68.49" y="-278.4" font-family="Times,serif" font-size="14.00" style="">Internal Call</text>
+<text text-anchor="start" x="64.6" y="-258.4" font-family="Times,serif" font-size="14.00" style="">External Call</text>
+<text text-anchor="start" x="42.06" y="-238.4" font-family="Times,serif" font-size="14.00" style="">Defined Contract</text>
+<text text-anchor="start" x="28.46" y="-218.4" font-family="Times,serif" font-size="14.00" style="">Undefined Contract</text>
+</g>
+<!-- key2 -->
+<g id="node8" class="node" pointer-events="visible" data-name="key2">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="262.23,-297 208.23,-297 208.23,-209 262.23,-209 262.23,-297" style=""/>
+<text text-anchor="start" x="225.23" y="-278.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<text text-anchor="start" x="225.23" y="-258.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="#445773" stroke="transparent" points="223.23,-233 223.23,-253 248.23,-253 248.23,-233 223.23,-233" style=""/>
+<text text-anchor="start" x="225.23" y="-238.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="none" stroke="#e8726d" points="225.23,-215 225.23,-231 246.23,-231 246.23,-215 225.23,-215" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge5" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M141.86,-283C173.95,-283 184.42,-283 212.12,-283" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="212.23,-286.5 222.23,-283 212.23,-279.5 212.23,-286.5" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge6" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="white" stroke-width="2" d="M141.86,-263C173.95,-263 184.42,-263 212.12,-263" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="212.23,-266.5 222.23,-263 212.23,-259.5 212.23,-266.5" style=""/>
+</g>
+</g>
+</svg>
