@@ -11,11 +11,7 @@ requires: 165, 721
 
 ## Abstract
 
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
+Extends ERC721 to introduce fine-grained approval of one or more operators to control one or more tokens on behalf of an owner. Without this EIP, the only way to approve `>1` operators for a given token is via `setApprovalForAll()`, which affords the approved operator control over all assets and creates an unnecessarily broad security risk. This EIP introduces a mechanism for per-token control of grants, and rapid revocation of all approvals on a per-owner or per-token basis.
 
 ## Motivation
 
@@ -45,9 +41,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 To comply with this EIP, a contract MUST implement `IERCTBD` (defined herein) and the `ERC165` and `ERC721` interfaces; see [EIP-165](./eip-165.md) and [EIP-721](./eip-721.md) respectively.
 
-Compliant contracts MAY revert on calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure, thus forcing all approvals to be at the level of a single token.
-
 ```
+/**
+ * @dev Implementers concerned about the interplay between explicit approvals and the standard `ERC721` mechanisms MAY
+ *      choose to revert on all calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure and make it easier to
+ *      reason about approvals. Off-chain indexers of approvals SHOULD assume that an operator is approved if either of
+ *      `ERC721.Approval(…)` or `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding
+ *      revocation(s).
+ */
 interface IERCTBD {
     /**
      * @notice Emitted when an operator is explicitly enabled or disabled for a token.
@@ -177,20 +178,9 @@ interface IERCTBDAnyApproval {
   TODO: Remove this comment before submitting
 -->
 
-No backward compatibility issues found.
-
-## Test Cases
-
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
-
 ## Reference Implementation
+
+An [efficient mechanism for broad revocation of approvals](../assets/eip-TODO/) via incrementing nonces is included.
 
 <!--
   This section is optional.
@@ -202,6 +192,14 @@ No backward compatibility issues found.
 -->
 
 ## Security Considerations
+
+### Threat model
+
+### Mitigations
+
+### Other risks
+
+TODO: Interplay with `setApprovalForAll()`.
 
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.

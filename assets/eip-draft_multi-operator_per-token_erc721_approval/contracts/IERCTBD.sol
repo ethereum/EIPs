@@ -2,6 +2,13 @@
 // Copyright 2023 PROOF Holdings Inc
 pragma solidity >=0.8.16 <0.9.0;
 
+/**
+ * @dev Implementers concerned about the interplay between explicit approvals and the standard `ERC721` mechanisms MAY
+ *      choose to revert on all calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure and make it easier to
+ *      reason about approvals. Off-chain indexers of approvals SHOULD assume that an operator is approved if either of
+ *      `ERC721.Approval(…)` or `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding
+ *      revocation(s).
+ */
 interface IERCTBD {
     /**
      * @notice Emitted when an operator is explicitly enabled or disabled for a token.
