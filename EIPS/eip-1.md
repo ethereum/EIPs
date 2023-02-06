@@ -374,7 +374,7 @@ The `description` field in the preamble:
 
 ### EIP numbers
 
-When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+When referring to an EIP with a `category` of `ERC`, it must be written in the hyphenated form `ERC-X` where `X` is that EIP's assigned number. When referring to EIPs with any other `category`, it must be written in the hyphenated form `EIP-X` where `X` is that EIP's assigned number.
 
 ### RFC 2119 and RFC 8174
 
