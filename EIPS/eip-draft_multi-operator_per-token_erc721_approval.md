@@ -1,7 +1,7 @@
 ---
 title: Multi-operator, per-token ERC721 approval.
 description: Extends the ERC721 standard to allow token owners to approve multiple operators to control their assets on a per-token basis.
-author: Simon Fremaux (@dievardump), Cristian Espinoza (@crisgarner), David Huber (@cxkoda), 0xInuarashi (@0xInuarashi), Kartik Patel (@Slokh) and Arran Schlosberg (@aschlosberg)
+author: Cristian Espinoza (@crisgarner), Simon Fremaux (@dievardump), David Huber (@cxkoda), 0xInuarashi (@0xInuarashi), Kartik Patel (@Slokh) and Arran Schlosberg (@aschlosberg)
 discussions-to: https://ethereum-magicians.org/t/fine-grained-erc721-approval-for-multiple-operators/12796
 status: Draft
 type: ERC
@@ -156,6 +156,7 @@ interface IERCTBDAnyApproval {
 ### Notes to be expanded upon
 1. Approvals granted via the newly introduced methods are called *explicit* as a means of easily distinguishing them from those granted via the standard `ERC721.approve()` and `ERC721.setApprovalForAll()` functions. They do *not*, however, function differently to other approvals.
 2. Abstracting `isApprovedFor()` into IERCTBDAnyApproval interface, as against keeping it in `IERCTBD` allows for modularity of plain IERCTBD implementations while also standardising the interface for checking approvals when interfacing with specific implementations and any future approval EIPs.
+3. Inclusion of an indexed owner address in `AllExplicitApprovalsRevoked(address,uint256)` assists off-chain indexing of existing approvals.
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
