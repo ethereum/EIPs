@@ -1,14 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright 2023 PROOF Holdings Inc
-pragma solidity >=0.8.0;
+pragma solidity ^0.8.0;
 
-// TODO: use actual interfaces for 165 and 721.
-
-interface IERC165 {
-
-}
-
-interface IERC721 is IERC165 {}
+// IERC721 is renamed to ERC721 for compatibility with the original EIP defition.
+import {IERC721 as ERC721} from "@openzeppelin-contracts/contracts/interfaces/IERC721.sol";
 
 /**
  * @notice Extends ERC-721 to include per-token approval for multiple operators.
@@ -19,7 +14,7 @@ interface IERC721 is IERC165 {}
  * revocation(s), even if an `ExplicitApprovalFor(…, false)` is emitted.
  * @dev TODO: the ERC-165 identifier for this interface is TBD.
  */
-interface IERCTBD is IERC721 {
+interface IERCTBD is ERC721 {
     /**
      * @notice Emitted when approval is explicitly granted or revoked for a token.
      */
@@ -39,7 +34,6 @@ interface IERCTBD is IERC721 {
     /**
      * @notice Emitted when all explicit approvals, as granted by either `setExplicitApprovalFor()` function, are
      * revoked for the specific token.
-     * @dev MUST be emitted upon token transfer and calls to `revokeAllExplicitApprovals(tokenId)`.
      * @param owner MUST be `ownerOf(tokenId)` as per ERC721; in the case of revocation due to transfer, this MUST be
      * the `from` address expected to be emitted in the respective `ERC721.Transfer()` event.
      */
@@ -50,9 +44,9 @@ interface IERCTBD is IERC721 {
 
     /**
      * @notice Approves the operator to manage the asset on behalf of its owner.
-     * @dev Throws if msg.sender is not the current NFT owner.
-     * @dev Approvals set via this method MUST be cleared upon transfer of the token to a new owner; akin to calling
-     * `revokeAllExplicitApprovals(tokenId)`, including associated events.
+     * @dev Throws if `msg.sender` is not the current NFT owner, or an authorised operator of the current owner.
+     * @dev Approvals set via this method MUST be revoked upon transfer of the token to a new owner; equivalent to
+     * calling `revokeAllExplicitApprovals(tokenId)`, including associated events.
      * @dev MUST emit `ApprovalFor(operator, tokenId, approved)`.
      * @dev MUST NOT have an effect on any standard ERC721 approval setters / getters.
      */
@@ -81,16 +75,13 @@ interface IERCTBD is IERC721 {
 
     /**
      * @notice Revokes all excplicit approvals granted by `msg.sender` for the specified token.
-     * @dev Throws if `msg.sender` is not the current NFT owner.
+     * @dev Throws if `msg.sender` is not the current NFT owner, or an authorised operator of the current owner.
      * @dev MUST emit `AllExplicitApprovalsRevoked(msg.sender, tokenId)`.
      */
     function revokeAllExplicitApprovals(uint256 tokenId) external;
 
     /**
-     * @notice Returns true if (a) `operator` was approved via either `setExplicitApprovalFor()` function on `tokenId`;
-     * and (b) the token has not since been transferred.
-     * @dev Criterion (b) is important as an owner MUST NOT need to revoke approvals if receiving a token that they
-     * previously owned.
+     * @notice Query whether an address is an approved operator for a token.
      */
     function isExplicitlyApprovedFor(address operator, uint256 tokenId)
         external
@@ -98,7 +89,7 @@ interface IERCTBD is IERC721 {
         returns (bool);
 }
 
-interface IERCTBDAnyApproval is IERC165 {
+interface IERCTBDAnyApproval is ERC721 {
     /**
      * @notice Returns true if any of the following criteria are met:
      * 1. `isExplicitlyApprovedFor(operator, tokenId) == true`; OR

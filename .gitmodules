@@ -1,0 +1,3 @@
+[submodule "assets/eip-draft_multi-operator_per-token_erc721_approval/contracts/lib/openzeppelin-contracts"]
+	path = assets/eip-draft_multi-operator_per-token_erc721_approval/contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts.git
