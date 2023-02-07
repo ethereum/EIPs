@@ -110,7 +110,7 @@ abstract contract ERC6150 is ERC721, IERC6150 {
         _beforeMintWithParent(to, parentId, tokenId);
 
         _parentOf[tokenId] = parentId;
-        _indexInChildrenArray[tokenId] = _childrenOf.length;
+        _indexInChildrenArray[tokenId] = _childrenOf[parentId].length;
         _childrenOf[parentId].push(tokenId);
 
         _safeMint(to, tokenId, data);
