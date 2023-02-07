@@ -51,7 +51,7 @@ describe('RMRKMultiAssetEmotableMock', async function () {
       await expect(token.emote(tokenId, emoji1, true))
         .to.emit(token, 'Emoted')
         .withArgs(owner.address, tokenId.toNumber(), emoji1, true);
-      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(1));
+      expect(await token.emoteCountOf(tokenId, emoji1)).to.equal(bn(1));
     });
 
     it('can undo emote', async function () {
@@ -60,31 +60,31 @@ describe('RMRKMultiAssetEmotableMock', async function () {
       await expect(token.emote(tokenId, emoji1, false))
         .to.emit(token, 'Emoted')
         .withArgs(owner.address, tokenId.toNumber(), emoji1, false);
-      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(0));
+      expect(await token.emoteCountOf(tokenId, emoji1)).to.equal(bn(0));
     });
 
     it('can be emoted from different accounts', async function () {
       await token.connect(addrs[0]).emote(tokenId, emoji1, true);
       await token.connect(addrs[1]).emote(tokenId, emoji1, true);
       await token.connect(addrs[2]).emote(tokenId, emoji2, true);
-      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(2));
-      expect(await token.getEmoteCount(tokenId, emoji2)).to.equal(bn(1));
+      expect(await token.emoteCountOf(tokenId, emoji1)).to.equal(bn(2));
+      expect(await token.emoteCountOf(tokenId, emoji2)).to.equal(bn(1));
     });
 
     it('can add multiple emojis to same NFT', async function () {
       await token.emote(tokenId, emoji1, true);
       await token.emote(tokenId, emoji2, true);
-      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(1));
-      expect(await token.getEmoteCount(tokenId, emoji2)).to.equal(bn(1));
+      expect(await token.emoteCountOf(tokenId, emoji1)).to.equal(bn(1));
+      expect(await token.emoteCountOf(tokenId, emoji2)).to.equal(bn(1));
     });
 
     it('does nothing if new state is the same as old state', async function () {
       await token.emote(tokenId, emoji1, true);
       await token.emote(tokenId, emoji1, true);
-      expect(await token.getEmoteCount(tokenId, emoji1)).to.equal(bn(1));
+      expect(await token.emoteCountOf(tokenId, emoji1)).to.equal(bn(1));
 
       await token.emote(tokenId, emoji2, false);
-      expect(await token.getEmoteCount(tokenId, emoji2)).to.equal(bn(0));
+      expect(await token.emoteCountOf(tokenId, emoji2)).to.equal(bn(0));
     });
   });
 });

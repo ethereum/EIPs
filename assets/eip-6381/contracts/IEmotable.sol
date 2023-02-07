@@ -11,7 +11,7 @@ interface IEmotable {
         bool on
     );
 
-    function getEmoteCount(
+    function emoteCountOf(
         uint256 tokenId,
         bytes4 emoji
     ) external view returns (uint256);

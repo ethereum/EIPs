@@ -10,7 +10,7 @@ abstract contract Emotable is IEmotable {
         private _emotesPerAddress; // Cheaper than using a bool
     mapping(uint256 => mapping(bytes4 => uint256)) private _emotesPerToken;
 
-    function getEmoteCount(
+    function emoteCountOf(
         uint256 tokenId,
         bytes4 emoji
     ) public view returns (uint256) {
