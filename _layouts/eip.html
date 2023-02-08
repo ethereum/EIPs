@@ -19,11 +19,7 @@ layout: default
 
 <div class="home">
   <h1 class="page-heading">
-    {% if page.category == "ERC" %}
-      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% elsif page.category != "ERC" %}
-      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    {% endif %}
+    {% if page.category == "ERC" %}ERC{% else %}EIP{% endif -%}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
     <a href="{{ page["discussions-to"] | uri_escape }}" class="no-underline">
       <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
         <use xlink:href="#bi-chat"/>
