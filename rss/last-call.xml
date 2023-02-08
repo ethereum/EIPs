@@ -7,7 +7,7 @@ layout: null
     <title>Ethereum EIPs - Last Call Review</title>
     <description>All EIPs which are in the two-week "last call" status, please help review these and provide your feedback!</description>
     <link>{{ site.url }}</link>
-    <atom:link href="{{ site.url }}/last-call.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="{{ site.url }}/rss/last-call.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
     {% assign eips = site.pages | sort: 'eip' %}
     {% for eip in eips %}
@@ -16,8 +16,6 @@ layout: null
         <p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in Last Call status. It is authored by {{ eip.author }} and was originally created {{ eip.created }}. It is in the {{ eip.category }} category of type {{ eip.type }}. Please review and note any changes that should block acceptance.</p>
         {% if eip.discussions-to %}
           <p>The author has requested that discussions happen at the following URL: {{ eip.discussions-to }}</p>
-        {% else %}
-          <p>Please visit the [ethereum/EIPs issues to comment](https://github.com/ethereum/EIPs/issues/{{eip.eip}}).</p>
         {% endif %}
         <hr />
         {{ eip.content }}
