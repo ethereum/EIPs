@@ -12,7 +12,7 @@ import {IERC721 as ERC721} from "./IERC721.sol";
  * `ExplicitApprovalFor(…, false)` is emitted.
  * @dev TODO: the ERC-165 identifier for this interface is TBD.
  */
-interface IERCTBD is ERC721 {
+interface IERC6464 is ERC721 {
     /**
      * @notice Emitted when approval is explicitly granted or revoked for a token.
      */
@@ -87,7 +87,7 @@ interface IERCTBD is ERC721 {
         returns (bool);
 }
 
-interface IERCTBDAnyApproval is ERC721 {
+interface IERC6464AnyApproval is ERC721 {
     /**
      * @notice Returns true if any of the following criteria are met:
      * 1. `isExplicitlyApprovedFor(operator, tokenId) == true`; OR
