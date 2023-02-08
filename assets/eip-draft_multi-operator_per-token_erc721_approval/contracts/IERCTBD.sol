@@ -3,15 +3,13 @@
 pragma solidity ^0.8.0;
 
 // IERC721 is renamed to ERC721 for compatibility with the original EIP defition.
-import {IERC721 as ERC721} from "@openzeppelin-contracts/contracts/interfaces/IERC721.sol";
+import {IERC721 as ERC721} from "./IERC721.sol";
 
 /**
  * @notice Extends ERC-721 to include per-token approval for multiple operators.
- * @dev Implementers concerned about the interplay between explicit approvals and the standard `ERC721` mechanisms MAY
- * choose to revert on all calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure and make it easier to reason
- * about approvals. Off-chain indexers of approvals SHOULD assume that an operator is approved if either of
- * `ERC721.Approval(…)` or `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding
- * revocation(s), even if an `ExplicitApprovalFor(…, false)` is emitted.
+ * @dev Off-chain indexers of approvals SHOULD assume that an operator is approved if either of `ERC721.Approval(…)` or
+ * `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding revocation(s), even if an
+ * `ExplicitApprovalFor(…, false)` is emitted.
  * @dev TODO: the ERC-165 identifier for this interface is TBD.
  */
 interface IERCTBD is ERC721 {

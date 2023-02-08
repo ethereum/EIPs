@@ -28,7 +28,7 @@ This EIP therefore defines a fine-grained approach for approving multiple operat
 
 1. Ease of adoption for marketplaces; requires minimal changes to existing workflows.
 2. Ease of adoption for off-chain approval-indexing services.
-3. Simplified revocation of approvals; i.e. not requiring one per grant.
+3. Simple revocation of approvals; i.e. not requiring one per grant.
 
 ### Non-goals
 
@@ -44,11 +44,9 @@ To comply with this EIP, a contract MUST implement `IERCTBD` (defined herein) an
 ```
 /**
  * @notice Extends ERC-721 to include per-token approval for multiple operators.
- * @dev Implementers concerned about the interplay between explicit approvals and the standard `ERC721` mechanisms MAY
- * choose to revert on all calls to `ERC721.setApprovalForAll(…)` to reduce risk exposure and make it easier to reason
- * about approvals. Off-chain indexers of approvals SHOULD assume that an operator is approved if either of
- * `ERC721.Approval(…)` or `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding
- * revocation(s), even if an `ExplicitApprovalFor(…, false)` is emitted.
+ * @dev Off-chain indexers of approvals SHOULD assume that an operator is approved if either of `ERC721.Approval(…)` or
+ * `ERC721.ApprovalForAll(…, true)` events are witnessed without the corresponding revocation(s), even if an
+ * `ExplicitApprovalFor(…, false)` is emitted.
  * @dev TODO: the ERC-165 identifier for this interface is TBD.
  */
 interface IERCTBD is ERC721 {
