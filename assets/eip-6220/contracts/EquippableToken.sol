@@ -8,7 +8,6 @@ import "./ICatalog.sol";
 import "./IEquippable.sol";
 import "./IERC6059.sol";
 import "./library/EquippableLib.sol";
-import "./security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -67,7 +66,6 @@ error UnexpectedNumberOfChildren();
  */
 contract EquippableToken is
     Context,
-    ReentrancyGuard,
     IERC165,
     IERC721,
     IERC6059,
@@ -1753,7 +1751,7 @@ contract EquippableToken is
      */
     function equip(
         IntakeEquip memory data
-    ) public virtual onlyApprovedOrOwner(data.tokenId) nonReentrant {
+    ) public virtual onlyApprovedOrOwner(data.tokenId) {
         _equip(data);
     }
 
