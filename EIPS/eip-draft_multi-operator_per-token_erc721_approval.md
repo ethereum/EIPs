@@ -11,7 +11,7 @@ requires: 165, 721
 
 ## Abstract
 
-The ERC721 standard did not foresee the approval of multiple operators to manage a specific token on behalf of their owner. This lead to the establishment of `setApprovalForAll()` as the predominant way to authorise operators, which affords the approved address control over all assets and creates an unnecessarily broad security risk that has already been exploited in a multitude of phishing attacks. The presented EIP extends ERC721 by introducing a fine-grained, on-chain approval mechanism that allows owners to authorise multiple, specific operators on a per-token basis; this removes unnecessary access permissions and shrinks the surface for exploits to a minimum. The provided reference implementation further enables cheap revocation of all approvals on a per-owner or per-token basis.
+The ERC721 standard did not foresee the approval of multiple operators to manage a specific token on behalf of its owner. This lead to the establishment of `setApprovalForAll()` as the predominant way to authorise operators, which affords the approved address control over all assets and creates an unnecessarily broad security risk that has already been exploited in a multitude of phishing attacks. The presented EIP extends ERC721 by introducing a fine-grained, on-chain approval mechanism that allows owners to authorise multiple, specific operators on a per-token basis; this removes unnecessary access permissions and shrinks the surface for exploits to a minimum. The provided reference implementation further enables cheap revocation of all approvals on a per-owner or per-token basis.
 
 ## Motivation
 
@@ -109,7 +109,7 @@ interface IERCTBD is ERC721 {
     function revokeAllExplicitApprovals() external;
 
     /**
-     * @notice Revokes all excplicit approvals granted by `msg.sender` for the specified token.
+     * @notice Revokes all excplicit approvals granted for the specified token.
      * @dev Throws if `msg.sender` is not the current NFT owner, or an authorised operator of the current owner.
      * @dev MUST emit `AllExplicitApprovalsRevoked(msg.sender, tokenId)`.
      */
@@ -142,7 +142,7 @@ interface IERCTBDAnyApproval is ERC721 {
 
 ## Rationale
 
-### Notes to be expanded upon
+### Draft notes to be expanded upon
 1. Approvals granted via the newly introduced methods are called *explicit* as a means of easily distinguishing them from those granted via the standard `ERC721.approve()` and `ERC721.setApprovalForAll()` functions. However they follow the same intent: authorising operators to act on the owner's behalf.
 2. Abstracting `isApprovedFor()` into IERCTBDAnyApproval interface, as against keeping it in `IERCTBD` allows for modularity of plain IERCTBD implementations while also standardising the interface for checking approvals when interfacing with specific implementations and any future approval EIPs.
 3. Inclusion of an indexed owner address in `AllExplicitApprovalsRevoked(address,uint256)` assists off-chain indexing of existing approvals.

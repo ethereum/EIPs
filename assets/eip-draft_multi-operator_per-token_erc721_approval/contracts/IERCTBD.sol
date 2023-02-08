@@ -72,7 +72,7 @@ interface IERCTBD is ERC721 {
     function revokeAllExplicitApprovals() external;
 
     /**
-     * @notice Revokes all excplicit approvals granted by `msg.sender` for the specified token.
+     * @notice Revokes all excplicit approvals granted for the specified token.
      * @dev Throws if `msg.sender` is not the current NFT owner, or an authorised operator of the current owner.
      * @dev MUST emit `AllExplicitApprovalsRevoked(msg.sender, tokenId)`.
      */
