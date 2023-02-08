@@ -1,4 +1,4 @@
-all:
+governance:
   - lightclient
   - axic
   - gcolvin
