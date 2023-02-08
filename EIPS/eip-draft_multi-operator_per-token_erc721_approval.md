@@ -1,7 +1,7 @@
 ---
 title: Multi-operator, per-token ERC721 approval.
 description: Extends the ERC721 standard to allow token owners to approve multiple operators to control their assets on a per-token basis.
-author: Cristian Espinoza (@crisgarner), Simon Fremaux (@dievardump), David Huber (@cxkoda), 0xInuarashi (@0xInuarashi), Kartik Patel (@Slokh) and Arran Schlosberg (@aschlosberg)
+author: Cristian Espinoza (@crisgarner), Simon Fremaux (@dievardump), David Huber (@cxkoda), and Arran Schlosberg (@aschlosberg)
 discussions-to: https://ethereum-magicians.org/t/fine-grained-erc721-approval-for-multiple-operators/12796
 status: Draft
 type: ERC
