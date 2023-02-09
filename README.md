@@ -27,7 +27,7 @@ Consider any document not published at <https://eips.ethereum.org/> as a working
 
 All pull requests in this repository must pass automated checks before they can be automatically merged:
 
-- [EIP-Bot](https://github.com/ethereum/EIP-Bot/) determines when PRs can be automatically merged [^1]
+- [eip-review-bot](https://github.com/Pandapip1/eip-review-bot/) determines when PRs can be automatically merged [^1]
 - EIP-1 rules are enforced using [`eipw`](https://github.com/ethereum/eipw)[^2]
 - HTML formatting and broken links are enforced using [HTMLProofer](https://github.com/gjtorikian/html-proofer)[^2]
 - Spelling is enforced with [CodeSpell](https://github.com/codespell-project/codespell)[^2]
