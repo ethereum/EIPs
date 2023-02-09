@@ -323,6 +323,7 @@ The current EIP editors are
 - Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
+- Zainan Victor Zhou (@xinbenlv)
 
 Emeritus EIP editors are
 
