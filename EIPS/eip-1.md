@@ -269,6 +269,8 @@ Which renders to:
 
 This is a sentence with a footnote.[^1]
 
+<!-- markdownlint-disable MD046 -->
+
 [^1]:
     ```csl-json
     {
@@ -295,6 +297,8 @@ This is a sentence with a footnote.[^1]
       }
     }
     ```
+
+<!-- markdownlint-enable MD046 -->
 
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
