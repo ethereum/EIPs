@@ -31,4 +31,5 @@ jobs:
         close-pr-message: This pull request was closed due to inactivity. If you are still pursuing it, feel free to reopen it and respond to any feedback or request a review in a comment.
         days-before-pr-stale: 14
         days-before-pr-close: 42 # 42 + 14 weeks = 3 months
+        exempt-pr-milestones: "Manual Merge Queue"
         stale-pr-label: w-stale
