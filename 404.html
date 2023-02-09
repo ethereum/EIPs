@@ -4,20 +4,45 @@ layout: default
 
 <style type="text/css" media="screen">
   .container {
-    margin: 10px auto;
+    margin: 100px auto;
     max-width: 600px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   h1 {
     margin: 30px 0;
     font-size: 4em;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
     line-height: 1;
     letter-spacing: -1px;
+    color: #FF5733;
+  }
+  p {
+    font-size: 1.5em;
+    font-family: 'Arial', sans-serif;
+    color: #555555;
+    margin: 20px 0;
+  }
+  .error-image {
+    margin: 0px 0;
+    width: 300px;
+    height: 200px;
+  }
+  .back-home {
+    font-size: 1.2em;
+    font-family: 'Arial', sans-serif;
+    color: #555555;
+    text-decoration: underline;
+    margin-top: 50px;
   }
 </style>
 
 <div class="container">
+  <img class="error-image" src="http://tsagi.com/upload/medialibrary/155/1553924c996c252bcbe450d8215967d6/ebe2ba14a34f64b897fd175631d8ce3c.jpg" alt="404 error illustration">
   <h1>404</h1>
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
+  <p><strong>Oops! Page not found</strong></p>
+  <p>Sorry, the requested page could not be found.</p>
 </div>
+
