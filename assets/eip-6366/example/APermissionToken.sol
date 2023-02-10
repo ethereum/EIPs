@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.7;
-import "../EIP-6366/EIP6366Core.sol";
-import "../EIP-6366/EIP6366Meta.sol";
-import "../EIP-6366/interfaces/IEIP6366Error.sol";
+import "../contracts/EIP6366Core.sol";
+import "../contracts/EIP6366Meta.sol";
+import "../contracts/interfaces/IEIP6366Error.sol";
 
 /**
  * @dev An example for mintable permission token
