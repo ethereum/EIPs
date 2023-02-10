@@ -1,5 +1,5 @@
 {
-  "name": "soulbound-tokens",
+  "name": "non-transferrable-tokens",
   "scripts": {
     "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain",

@@ -3,15 +3,15 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "../ISoulbound.sol";
+import "../INonTransferrable.sol";
 
-error CannotTransferSoulbound();
+error CannotTransferNonTransferrable();
 
 /**
- * @title ERC721SoulboundMock
+ * @title ERC721NonTransferrableMock
  * Used for tests
  */
-contract ERC721SoulboundMock is ISoulbound, ERC721 {
+contract ERC721NonTransferrableMock is INonTransferrable, ERC721 {
     constructor(
         string memory name,
         string memory symbol
@@ -25,7 +25,7 @@ contract ERC721SoulboundMock is ISoulbound, ERC721 {
         _burn(tokenId);
     }
 
-    function isSoulbound(uint256 tokenId) public view returns (bool) {
+    function isNonTransferrable(uint256 tokenId) public view returns (bool) {
         return true;
     }
 
@@ -42,8 +42,8 @@ contract ERC721SoulboundMock is ISoulbound, ERC721 {
             uint256 lastTokenId = firstTokenId + batchSize;
             for (uint256 i = firstTokenId; i < lastTokenId; i++) {
                 uint256 tokenId = firstTokenId + i;
-                if (isSoulbound(tokenId)) {
-                    revert CannotTransferSoulbound();
+                if (isNonTransferrable(tokenId)) {
+                    revert CannotTransferNonTransferrable();
                 }
                 unchecked {
                     i++;
@@ -55,7 +55,7 @@ contract ERC721SoulboundMock is ISoulbound, ERC721 {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC721) returns (bool) {
-        return interfaceId == type(ISoulbound).interfaceId
+        return interfaceId == type(INonTransferrable).interfaceId
             || super.supportsInterface(interfaceId);
     }
 }

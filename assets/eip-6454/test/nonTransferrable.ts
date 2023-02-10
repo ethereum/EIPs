@@ -3,18 +3,18 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ERC721SoulboundMock } from "../typechain-types";
+import { ERC721NonTransferrableMock } from "../typechain-types";
 
-async function soulboundTokenFixture(): Promise<ERC721SoulboundMock> {
-  const factory = await ethers.getContractFactory("ERC721SoulboundMock");
+async function nonTransferrableTokenFixture(): Promise<ERC721NonTransferrableMock> {
+  const factory = await ethers.getContractFactory("ERC721NonTransferrableMock");
   const token = await factory.deploy("Chunky", "CHNK");
   await token.deployed();
 
   return token;
 }
 
-describe("Soulbound", async function () {
-  let soulbound: ERC721SoulboundMock;
+describe("NonTransferrable", async function () {
+  let nonTransferrable: ERC721NonTransferrableMock;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
   const tokenId = 1;
@@ -23,34 +23,34 @@ describe("Soulbound", async function () {
     const signers = await ethers.getSigners();
     owner = signers[0];
     otherOwner = signers[1];
-    soulbound = await loadFixture(soulboundTokenFixture);
+    nonTransferrable = await loadFixture(nonTransferrableTokenFixture);
 
-    await soulbound.mint(owner.address, 1);
+    await nonTransferrable.mint(owner.address, 1);
   });
 
-  it("can support IRMRKSoulbound", async function () {
-    expect(await soulbound.supportsInterface("0x911ec470")).to.equal(true);
+  it("can support IRMRKNonTransferrable", async function () {
+    expect(await nonTransferrable.supportsInterface("0x0083fc9d")).to.equal(true);
   });
 
   it("does not support other interfaces", async function () {
-    expect(await soulbound.supportsInterface("0xffffffff")).to.equal(false);
+    expect(await nonTransferrable.supportsInterface("0xffffffff")).to.equal(false);
   });
 
   it("cannot transfer", async function () {
     expect(
-      soulbound
+      nonTransferrable
         .connect(owner)
         ["safeTransferFrom(address,address,uint256)"](
           owner.address,
           otherOwner.address,
           tokenId
         )
-    ).to.be.revertedWithCustomError(soulbound, "CannotTransferSoulbound");
+    ).to.be.revertedWithCustomError(nonTransferrable, "CannotTransferNonTransferrable");
   });
 
   it("can burn", async function () {
-    await soulbound.connect(owner).burn(tokenId);
-    await expect(soulbound.ownerOf(tokenId)).to.be.revertedWith(
+    await nonTransferrable.connect(owner).burn(tokenId);
+    await expect(nonTransferrable.ownerOf(tokenId)).to.be.revertedWith(
       "ERC721: invalid token ID"
     );
   });
