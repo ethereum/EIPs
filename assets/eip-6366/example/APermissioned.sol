@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.7;
-import "../EIP-6366/interfaces/IEIP6366Core.sol";
-import "../EIP-6366/interfaces/IEIP6366Error.sol";
+import "../contracts/interfaces/IEIP6366Core.sol";
+import "../contracts/interfaces/IEIP6366Error.sol";
 
 /**
  * @dev Centralized definition of all possible permissions and roles
