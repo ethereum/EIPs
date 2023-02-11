@@ -2,6 +2,20 @@
 layout: default
 ---
 
+{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" %}
+<style>
+body {
+  background-image: url("data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' version='1.1'
+       height='50px' width='120px'>
+    <text x='0' y='15' fill='gray' font-size='20'>
+      {{ page.status }}
+    </text>
+  </svg>");
+}
+</style>
+{% endif %}
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="bi-megaphone-fill" fill="currentColor" viewBox="0 0 16 16">
     <title>Alert</title>
