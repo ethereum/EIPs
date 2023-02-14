@@ -3,15 +3,16 @@
 pragma solidity ^0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "../INonTransferrable.sol";
+import "../INonTransferable.sol";
+import "hardhat/console.sol";
 
-error CannotTransferNonTransferrable();
+error CannotTransferNonTransferable();
 
 /**
- * @title ERC721NonTransferrableMock
+ * @title ERC721NonTransferableMock
  * Used for tests
  */
-contract ERC721NonTransferrableMock is INonTransferrable, ERC721 {
+contract ERC721NonTransferableMock is INonTransferable, ERC721 {
     constructor(
         string memory name,
         string memory symbol
@@ -25,7 +26,8 @@ contract ERC721NonTransferrableMock is INonTransferrable, ERC721 {
         _burn(tokenId);
     }
 
-    function isNonTransferrable(uint256 tokenId) public view returns (bool) {
+    function isNonTransferable(uint256 tokenId) public view returns (bool) {
+        _requireMinted(tokenId);
         return true;
     }
 
@@ -42,8 +44,8 @@ contract ERC721NonTransferrableMock is INonTransferrable, ERC721 {
             uint256 lastTokenId = firstTokenId + batchSize;
             for (uint256 i = firstTokenId; i < lastTokenId; i++) {
                 uint256 tokenId = firstTokenId + i;
-                if (isNonTransferrable(tokenId)) {
-                    revert CannotTransferNonTransferrable();
+                if (isNonTransferable(tokenId)) {
+                    revert CannotTransferNonTransferable();
                 }
                 unchecked {
                     i++;
@@ -55,7 +57,7 @@ contract ERC721NonTransferrableMock is INonTransferrable, ERC721 {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC721) returns (bool) {
-        return interfaceId == type(INonTransferrable).interfaceId
+        return interfaceId == type(INonTransferable).interfaceId
             || super.supportsInterface(interfaceId);
     }
 }
