@@ -1,14 +1,13 @@
 ---
-eip: TBD
+eip: 6504
 title: On-Chain Escrowed Governance Incentives
-description: A standard for build contracts that escrow funds based on an account voting on a DAO proposal. 
-author: Josh Weintraub <jhweintraub@gmail.com><@0xTraub>
+description: Interface for building contracts that escrow funds based on an account voting on a DAO proposal
+author: Josh Weintraub <jhweintraub@gmail.com>(jhweintraub)(@0xTraub)
 discussions-to: https://ethereum-magicians.org/t/escrowed-and-private-bribes-for-generalized-dao-voting/12694
 status: Draft
 type: Standards Track
-category: ERC # Only required for Standards Track. Otherwise, remove this field.
+category: ERC
 created: 2023-02-07
-requires: EIP-1202 # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
 
 
@@ -31,7 +30,7 @@ While a ton of effort has gone into building bribe systems for DAOs like Curve, 
 
 4. For actors that wish to solicit incentives for their vote, this may require either active management, or the doxxing of their identify/psuedononymous identifier. A user who wishes to negotiate would need to provide a way for incentivizers to contact them, engage in a negotiation process, write and deploy escrow contracts, vote, and then claim their reward. This is a lengthy and involved process that requires active management and communication. This creates a limit on who is able to solicit these incentives, and leads to the centralization of profit towards the few who can sustain this process at length.
 
-5. Bribe Revenue as subsidies. As Vitalik wrote in his 2019 article [On Collusion ](https://vitalik.ca/general/2019/04/03/collusion.html), a potential solution would be a token that requires voters for a proposal to purchase the governance-token if the proposal-passes, subsidizing the cost of a bad decision for everyone else. If the revenue generated from these incentives is used (at least partly) to directly buy back those tokens by the treasury, then you get a similar outcome. The impact of a bad proposal being passed via-bribing is subsidized for everyone who didn't vote for it by having some value returned to token-holders. This not only makes malicious bribes more costly, as it has to offset the value accrued via buyback, but also means higher profits for recipients.
+5. Bribe Revenue as subsidies. As Vitalik wrote in a 2019 article, *On Collusion*, a potential solution would be a token that requires voters for a proposal to purchase the governance-token if the proposal-passes, subsidizing the cost of a bad decision for everyone else. If the revenue generated from these incentives is used (at least partly) to directly buy back those tokens by the treasury, then you get a similar outcome. The impact of a bad proposal being passed via-bribing is subsidized for everyone who didn't vote for it by having some value returned to token-holders. This not only makes malicious bribes more costly, as it has to offset the value accrued via buyback, but also means higher profits for recipients.
 
 ## Specification
 
