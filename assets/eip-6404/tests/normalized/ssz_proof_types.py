@@ -16,12 +16,12 @@ class TransactionProof(Container):
 # Proof 2: Proof that a transaction sends a certain minimum amount to a specific destination
 
 AMOUNT_PROOF_INDICES = [
-    get_generalized_index(TransactionPayload, 'tx_from'),
-    get_generalized_index(TransactionPayload, 'nonce'),
-    get_generalized_index(TransactionPayload, 'tx_to'),
-    get_generalized_index(TransactionPayload, 'tx_value'),
+    get_generalized_index(TransactionPayload, 'tx_from'),  # 16
+    get_generalized_index(TransactionPayload, 'nonce'),  # 17
+    get_generalized_index(TransactionPayload, 'tx_to'),  # 18
+    get_generalized_index(TransactionPayload, 'tx_value'),  # 19
 ]
-AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(AMOUNT_PROOF_INDICES)
+AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(AMOUNT_PROOF_INDICES)  # [5, 3]
 
 class AmountProof(Container):
     tx_from: ExecutionAddress
@@ -36,12 +36,12 @@ class AmountProof(Container):
 # Proof 3: Obtain sender addres who sent a certain minimum amount to a specific destination
 
 SENDER_PROOF_INDICES = [
-    get_generalized_index(TransactionPayload, 'tx_from'),
-    get_generalized_index(TransactionPayload, 'nonce'),
-    get_generalized_index(TransactionPayload, 'tx_to'),
-    get_generalized_index(TransactionPayload, 'tx_value'),
+    get_generalized_index(TransactionPayload, 'tx_from'),  # 16
+    get_generalized_index(TransactionPayload, 'nonce'),  # 17
+    get_generalized_index(TransactionPayload, 'tx_to'),  # 18
+    get_generalized_index(TransactionPayload, 'tx_value'),  # 19
 ]
-SENDER_PROOF_HELPER_INDICES = get_helper_indices(SENDER_PROOF_INDICES)
+SENDER_PROOF_HELPER_INDICES = get_helper_indices(SENDER_PROOF_INDICES)  # [5, 3]
 
 class SenderProof(Container):
     tx_from: ExecutionAddress
@@ -56,13 +56,13 @@ class SenderProof(Container):
 # Proof 4: Obtain transaction info including fees, but no calldata, access lists, or blobs
 
 INFO_PROOF_INDICES = [
-    get_generalized_index(TransactionPayload, 'tx_from'),
-    get_generalized_index(TransactionPayload, 'nonce'),
-    get_generalized_index(TransactionPayload, 'tx_to'),
-    get_generalized_index(TransactionPayload, 'tx_value'),
-    get_generalized_index(TransactionPayload, 'limits'),
+    get_generalized_index(TransactionPayload, 'tx_from'),  # 16
+    get_generalized_index(TransactionPayload, 'nonce'),  # 17
+    get_generalized_index(TransactionPayload, 'tx_to'),  # 18
+    get_generalized_index(TransactionPayload, 'tx_value'),  # 19
+    get_generalized_index(TransactionPayload, 'limits'),  # 21
 ]
-INFO_PROOF_HELPER_INDICES = get_helper_indices(INFO_PROOF_INDICES)
+INFO_PROOF_HELPER_INDICES = get_helper_indices(INFO_PROOF_INDICES)  # [20, 11, 3]
 
 class InfoProof(Container):
     tx_from: ExecutionAddress
