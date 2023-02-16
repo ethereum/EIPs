@@ -13,6 +13,31 @@
     <meta name="description" content="{{page.description | escape }}" />
     <meta property="og:description" content="{{page.description | escape }}" />
     <meta name="twitter:description" content="{{page.description | escape }}" />
+    {% if page.category == "ERC" %}
+      <meta name="citation_title" content="ERC-{{ page.eip }}: {{ page.title | escape }}">
+    {% else %}
+      <meta name="citation_title" content="EIP-{{ page.eip }}: {{ page.title | escape }}">
+    {% endif %}
+    {%- assign authors=include.authors|split:"," -%}
+    {% for author in authors %}
+      {%- if author contains "<" -%}
+        {%- assign authorparts=author|split:"<" -%}
+        <meta name="citation_author" content="{{ authorparts[0]|strip }}">
+      {%- elsif author contains "(@" -%}
+        {%- assign authorparts=author|split:"(@" -%}
+        <meta name="citation_author" content="{{ authorparts[0]|strip }}">
+      {%- else -%}
+        <meta name="citation_author" content="{{ author }}">
+      {%- endif -%}
+    {% endfor %}
+    {% if page.status == "Final" %}
+      {% assign pubdate = page.finalized | split: '-' %}
+      <meta name="citation_publication_date" content="{% for part in pubdate %}{{ part }}{% if forloop.last == false %}/{% endif %}/{% endfor %}">
+    {% endif %}
+    {% assign createdate = page.created | split: '-' %}
+    <meta name="citation_online_date" content="{% for part in createdate %}{{ part }}{% if forloop.last == false %}/{% endif %}/{% endfor %}">
+    <meta name="citation_technical_report_institution" content="Ethereum Improvement Proposals">
+    <meta name="citation_technical_report_number" content="{{ page.eip }}">
   {% else %}
   <title>{{ page.title | escape }} | {{site.title}}</title>
     <meta
