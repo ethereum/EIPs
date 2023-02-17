@@ -47,6 +47,8 @@ export default {
     async transformHead({ siteConfig, siteData, pageData, title, description, head, content }) {
         let { frontmatter } = pageData;
         if (frontmatter.eip) {
+            console.log(`\nGenerating Metadata for ${pageData.relativePath}\n`);
+
             let eipPrefix = frontmatter?.category === 'ERC' ? 'ERC-' : 'EIP-';
             let eipTitle = `${eipPrefix}${frontmatter.eip}: ${frontmatter.title}`;
             let authors = frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]);
@@ -101,23 +103,51 @@ export default {
         }
     },
     async transformPageData(pageData) {
+        console.log(`\nTransforming ${pageData.relativePath}\n`);
+        
         pageData = { ...pageData };
         let { frontmatter } = pageData;
 
         if (frontmatter.eip) {
-            // The below caused so much pain and suffering :|
-            let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
-            let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
-
-            if (final) {
-                frontmatter.finalized = `${final.getFullYear()}-${final.getMonth() + 1}-${final.getDate()}`;
+            // Try to read from cache
+            try {
+                let cache = JSON.parse(fs.readFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`));
+                frontmatter = { ...frontmatter, ...cache };
+            } catch (e) {
+                console.log(`\nCache miss for ${pageData.relativePath}\n`);
             }
-            frontmatter.created = `${initial.getFullYear()}-${initial.getMonth() + 1}-${initial.getDate()}`;
+            // The below caused so much pain and suffering :|
+            if (!frontmatter.created) {
+                let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
+                if (initial) {
+                    frontmatter.created = initial.toISOString().split('T')[0];
+                }
+            }
+            if (!frontmatter.finalized && frontmatter.status === 'Final') {
+                let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
+                if (final) {
+                    frontmatter.finalized = final.toISOString().split('T')[0];
+                }
+            }
+            if (frontmatter.created.toISOString) { // It's a date object. We don't want that.
+                frontmatter.created = frontmatter.created.toISOString().split('T')[0];
+            }
+
+            // Write to cache
+            if (!fs.existsSync('./.vitepress/cache/eips')) {
+                fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
+            }
+            fs.writeFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`, JSON.stringify({
+                created: frontmatter.created,
+                finalized: frontmatter.finalized,
+            }));
         }
         if (frontmatter.listing) {
             frontmatter.eips = eips;
             frontmatter.statuses = statuses;
         }
+        
+        console.log(`\nFinished Transforming ${pageData.relativePath}\n`);
 
         pageData.frontmatter = frontmatter;
         return pageData;

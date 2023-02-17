@@ -38,6 +38,12 @@ jobs:
           cache: npm
       - name: Install Packages
         run: npm ci
+      - name: Restore Cached Data
+        id: cache-vitepress-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: .vitepress/cache
+          key: vitepress-cache-v1
       - name: Build Website
         run: |
           export NODE_ENV=production
@@ -52,3 +58,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@0243b6c10d06cb8e95ed8ee471231877621202c0
+      - name: Cache Data
+        uses: actions/cache/save@v3
+        with:
+          path: .vitepress/cache
+          key: vitepress-cache-v1
