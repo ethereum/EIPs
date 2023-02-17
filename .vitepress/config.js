@@ -96,9 +96,9 @@ export default {
                     // LD+JSON
                     [ 'script', { type: 'application/ld+json' }, JSON.stringify({
                         "@type": "WebSite",
-                        "url": "{{site.url}}",
-                        "name": "{{site.title}}",
-                        "description": "{{site.description}}",
+                        "url": `https://eips.ethereum.org${pageData.path}`,
+                        "name": eipTitle,
+                        "description": description,
                         "@context": "https://schema.org"
                     })],
                 ].filter(x => x?.length);
