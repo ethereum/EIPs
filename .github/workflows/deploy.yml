@@ -21,18 +21,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout EIPs Repository (workflow_dispatch)
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         if: github.event_name == 'workflow_dispatch'
         with:
           fetch-depth: 0
           ref: ${{ github.event.inputs.branch }}
       - name: Checkout EIPs Repository (push)
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
         if: github.event_name == 'push'
         with:
           fetch-depth: 0
       - name: Setup NodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
         with:
           node-version: 16
           cache: npm
@@ -44,11 +44,11 @@ jobs:
           export NODE_OPTIONS=--max_old_space_size=4096
           npm build
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@fc89b04e7d263ef510d9e77d3a1d088fb2688522
       - name: Create GitHub Pages Artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@253fd476ed429e83b7aae64a92a75b4ceb1a17cf
         with:
           path: .vitepress/dist
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@0243b6c10d06cb8e95ed8ee471231877621202c0

@@ -36,30 +36,36 @@ jobs:
           name: pr_number
           path: pr/
 
-  htmlproofer:
-    name: HTMLProofer
+  build:
+    name: Build Website
     runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout EIP Repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
-
-      - name: Install Ruby
-        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
         with:
-          ruby-version: 2.6.0
-          bundler-cache: true
+          fetch-depth: 0 # Required for git diff to work
+
+      - name: Install NodeJS
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+        with:
+          node-version: 16
+          cache: npm
+
+      - name: Install Packages
+        run: npm ci
 
       - name: Build Website
         run: |
-          bundle exec jekyll doctor
-          bundle exec jekyll build
-
-      - name: HTML Proofer
-        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
-
-      - name: DNS Validator
-        run: bundle exec github-pages health-check
+          export NODE_ENV=production
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm build
+      
+      - name: Upload Website Artifact
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
+        with:
+          name: website
+          path: .vitepress/dist
 
   link-check:
     name: Link Check
