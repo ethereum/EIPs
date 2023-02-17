@@ -60,23 +60,23 @@ export default {
                 return [
                     // Regular Metadata
                     [ 'title', {}, eipTitle ]
-                    [ 'meta', { name: 'description', content: description }],
-                    [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org${pageData.path}` } ],
+                    [ 'meta', { name: 'description', content: pageData.description }],
+                    [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org/${pageData.relativePath}` } ],
                     ...authors.map(author => [ 'meta', { name: 'author', content: author } ]),
                     [ 'meta', { name: 'date', content: frontmatter.created.replace("-", "/") } ],
                     [ 'meta', { name: 'copyright', content: 'Public Domain' } ],
                     // Open Graph
                     [ 'meta', { property: 'og:title', content: eipTitle } ],
-                    [ 'meta', { property: 'og:description', content: description } ],
-                    [ 'meta', { property: 'og:url', content: `https://eips.ethereum.org${pageData.path}` } ],
+                    [ 'meta', { property: 'og:description', content: pageData.description } ],
+                    [ 'meta', { property: 'og:url', content: `https://eips.ethereum.org/${pageData.relativePath}` } ],
                     [ 'meta', { property: 'og:locale', content: 'en_US' } ],
-                    [ 'meta', { property: 'og:site_name', content: siteConfig.title } ],
+                    [ 'meta', { property: 'og:site_name', content: siteData.title } ],
                     [ 'meta', { property: 'og:type', content: 'article' } ],
                     // Twitter
                     [ 'meta', { name: 'twitter:card', content: 'summary' } ],
-                    [ 'meta', { name: 'twitter:site_name', content: siteConfig.title } ],
+                    [ 'meta', { name: 'twitter:site_name', content: siteData.title } ],
                     [ 'meta', { name: 'twitter:site', content: '@ethereum' } ], // TODO: Replace with EIPs Twitter account, if one exists
-                    [ 'meta', { name: 'twitter:description', content: description } ],
+                    [ 'meta', { name: 'twitter:description', content: pageData.description } ],
                     // Dublin Core
                     [ 'meta', { name: 'DC.title', content: eipTitle } ],
                     ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author } ]),
@@ -84,21 +84,21 @@ export default {
                     frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace("-", "/") } ] : [],
                     [ 'meta', { name: 'DC.format', content: 'text/html' } ],
                     [ 'meta', { name: 'DC.language', content: 'en-US' } ],
-                    [ 'meta', { name: 'DC.publisher', content: siteConfig.title } ],
+                    [ 'meta', { name: 'DC.publisher', content: siteData.title } ],
                     [ 'meta', { name: 'DC.rights', content: 'Public Domain' } ],
                     // Citation
                     [ 'meta', { name: 'citation_title', content: eipTitle } ],
                     ...authors.map(author => [ 'meta', { name: 'citation_author', content: author } ]),
                     [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace("-", "/") } ],
                     frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace("-", "/") } ] : [],
-                    [ 'meta', { name: 'citation_technical_report_institution', content: siteConfig.title } ],
+                    [ 'meta', { name: 'citation_technical_report_institution', content: siteData.title } ],
                     [ 'meta', { name: 'citation_technical_report_number', content: frontmatter.eip } ],
                     // LD+JSON
                     [ 'script', { type: 'application/ld+json' }, JSON.stringify({
                         "@type": "WebSite",
-                        "url": `https://eips.ethereum.org${pageData.path}`,
+                        "url": `https://eips.ethereum.org/${pageData.relativePath}`,
                         "name": eipTitle,
-                        "description": description,
+                        "description": pageData.description,
                         "@context": "https://schema.org"
                     })],
                 ].filter(x => x?.length);
