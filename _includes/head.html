@@ -35,7 +35,7 @@
       <meta name="citation_publication_date" content="{% for part in pubdate %}{{ part }}{% if forloop.last == false %}/{% endif %}/{% endfor %}">
     {% endif %}
     {% assign createdate = page.created | split: '-' %}
-    <meta name="citation_online_date" content="{% for part in createdate %}{{ part }}{% if forloop.last == false %}/{% endif %}/{% endfor %}">
+    <meta name="citation_online_date" content="{{ createdate | join: '/' }}">
     <meta name="citation_technical_report_institution" content="Ethereum Improvement Proposals">
     <meta name="citation_technical_report_number" content="{{ page.eip }}">
   {% else %}
