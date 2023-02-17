@@ -40,7 +40,7 @@ the transitioning period (i.e. until the old format has been retired), implement
 should pad `auth-body` with at least 100 bytes of junk data. Adding a random amount in
 range [100, 300] is recommended to vary the size of the packet.
 
-```text
+```txt
 auth-vsn         = 4
 auth-size        = size of enc-auth-body, encoded as a big-endian 16-bit integer
 auth-body        = rlp.list(sig, initiator-pubk, initiator-nonce, auth-vsn)
@@ -193,7 +193,7 @@ This EIP is backwards-compatible, all valid version 4 packets are still accepted
 
 devp2p hello packet advertising version 22 and containing a few additional list elements:
 
-```text
+```txt
 f87137916b6e6574682f76302e39312f706c616e39cdc5836574683dc6846d6f726b1682270fb840
 fda1cff674c90c9a197539fe3dfb53086ace64f83ed7c6eabec741f7f381cc803e52ab2cd55d5569
 bce4347107a310dfd5f88a010cd2ffd1005ca406f1842877c883666f6f836261720304
@@ -204,13 +204,13 @@ bce4347107a310dfd5f88a010cd2ffd1005ca406f1842877c883666f6f836261720304
 Implementations should accept the following encoded discovery packets as valid.
 The packets are signed using the secp256k1 node key
 
-```text
+```txt
 b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291
 ```
 
 ping packet with version 4, additional list elements:
 
-```text
+```txt
 e9614ccfd9fc3e74360018522d30e1419a143407ffcce748de3e22116b7e8dc92ff74788c0b6663a
 aa3d67d641936511c8f8d6ad8698b820a7cf9e1be7155e9a241f556658c55428ec0563514365799a
 4be2be5a685a80971ddcfa80cb422cdd0101ec04cb847f000001820cfa8215a8d790000000000000
@@ -219,7 +219,7 @@ aa3d67d641936511c8f8d6ad8698b820a7cf9e1be7155e9a241f556658c55428ec0563514365799a
 
 ping packet with version 555, additional list elements and additional random data:
 
-```text
+```txt
 577be4349c4dd26768081f58de4c6f375a7a22f3f7adda654d1428637412c3d7fe917cadc56d4e5e
 7ffae1dbe3efffb9849feb71b262de37977e7c7a44e677295680e9e38ab26bee2fcbae207fba3ff3
 d74069a50b902a82c9903ed37cc993c50001f83e82022bd79020010db83c4d001500000000abcdef
@@ -232,7 +232,7 @@ d74069a50b902a82c9903ed37cc993c50001f83e82022bd79020010db83c4d001500000000abcdef
 
 pong packet with additional list elements and additional random data:
 
-```text
+```txt
 09b2428d83348d27cdf7064ad9024f526cebc19e4958f0fdad87c15eb598dd61d08423e0bf66b206
 9869e1724125f820d851c136684082774f870e614d95a2855d000f05d1648b2d5945470bc187c2d2
 216fbe870f43ed0909009882e176a46b0102f846d79020010db885a308d313198a2e037073488208
@@ -243,7 +243,7 @@ a355c6010203c2040506a0c969a58f6f9095004c0177a6b47f451530cab38966a25cca5cb58f0555
 
 findnode packet with additional list elements and additional random data:
 
-```text
+```txt
 c7c44041b9f7c7e41934417ebac9a8e1a4c6298f74553f2fcfdcae6ed6fe53163eb3d2b52e39fe91
 831b8a927bf4fc222c3902202027e5e9eb812195f95d20061ef5cd31d502e47ecb61183f74a504fe
 04c51e73df81f25c4d506b26db4517490103f84eb840ca634cae0d49acb401d8a4c6b6fe8c55b70d
@@ -254,7 +254,7 @@ dd7fc0c04ad9ebf3919644c91cb247affc82b69bd2ca235c71eab8e49737c937a2c396
 
 neighbours packet with additional list elements and additional random data:
 
-```text
+```txt
 c679fc8fe0b8b12f06577f2e802d34f6fa257e6137a995f6f4cbfc9ee50ed3710faf6e66f932c4c8
 d81d64343f429651328758b47d3dbc02c4042f0fff6946a50f4a49037a72bb550f3a7872363a83e1
 b9ee6469856c24eb4ef80b7535bcf99c0004f9015bf90150f84d846321163782115c82115db84031
@@ -274,7 +274,7 @@ d96126051913f44582e8c199ad7c6d6819e9a56483f637feaac9448aacf8599020010db885a308d3
 In these test vectors, node A initiates a connection with node B.
 The values contained in all packets are given below:
 
-```text
+```txt
 Static Key A:    49a7b37aa6f6645917e7b807e9d1c00d4fa71f18343b0d4122a4d2df64dd6fee
 Static Key B:    b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291
 Ephemeral Key A: 869d6ecf5211f1cc60418a13b9d870b22959d0c16f02bec714c960dd2298a32d
@@ -284,7 +284,7 @@ Nonce B:         559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdff
 ```
 
 (Auth₁)  RLPx v4 format (sent from A to B):
-```text
+```txt
 048ca79ad18e4b0659fab4853fe5bc58eb83992980f4c9cc147d2aa31532efd29a3d3dc6a3d89eaf
 913150cfc777ce0ce4af2758bf4810235f6e6ceccfee1acc6b22c005e9e3a49d6448610a58e98744
 ba3ac0399e82692d67c1f58849050b3024e21a52c9d3b01d871ff5f210817912773e610443a9ef14
@@ -296,7 +296,7 @@ a4592ee77e2bd94d0be3691f3b406f9bba9b591fc63facc016bfa8
 ```
 
 (Auth₂) EIP-8 format with version 4 and no additional list elements (sent from A to B):
-```text
+```txt
 01b304ab7578555167be8154d5cc456f567d5ba302662433674222360f08d5f1534499d3678b513b
 0fca474f3a514b18e75683032eb63fccb16c156dc6eb2c0b1593f0d84ac74f6e475f1b8d56116b84
 9634a8c458705bf83a626ea0384d4d7341aae591fae42ce6bd5c850bfe0b999a694a49bbbaf3ef6c
@@ -311,7 +311,7 @@ c001edaeb5f8a06d2b26fb6cb93c52a9fca51853b68193916982358fe1e5369e249875bb8d0d0ec3
 ```
 
 (Auth₃) EIP-8 format with version 56 and 3 additional list elements (sent from A to B):
-```text
+```txt
 01b8044c6c312173685d1edd268aa95e1d495474c6959bcdd10067ba4c9013df9e40ff45f5bfd6f7
 2471f93a91b493f8e00abc4b80f682973de715d77ba3a005a242eb859f9a211d93a347fa64b597bf
 280a6b88e26299cf263b01b8dfdb712278464fd1c25840b995e84d367d743f66c0e54a586725b7bb
@@ -327,7 +327,7 @@ d490
 ```
 
 (Ack₁) RLPx v4 format (sent from B to A):
-```text
+```txt
 049f8abcfa9c0dc65b982e98af921bc0ba6e4243169348a236abe9df5f93aa69d99cadddaa387662
 b0ff2c08e9006d5a11a278b1b3331e5aaabf0a32f01281b6f4ede0e09a2d5f585b26513cb794d963
 5a57563921c04a9090b4f14ee42be1a5461049af4ea7a7f49bf4c97a352d39c8d02ee4acc416388c
@@ -337,7 +337,7 @@ d1497113d5c755e942d1
 ```
 
 (Ack₂) EIP-8 format with version 4 and no additional list elements (sent from B to A):
-```text
+```txt
 01ea0451958701280a56482929d3b0757da8f7fbe5286784beead59d95089c217c9b917788989470
 b0e330cc6e4fb383c0340ed85fab836ec9fb8a49672712aeabbdfd1e837c1ff4cace34311cd7f4de
 05d59279e3524ab26ef753a0095637ac88f2b499b9914b5f64e143eae548a1066e14cd2f4bd7f814
@@ -354,7 +354,7 @@ e754d021bfca14dc989753d61c413d261934e1a9c67ee060a25eefb54e81a4d14baff922180c395d
 ```
 
 (Ack₃) EIP-8 format with version 57 and 3 additional list elements (sent from B to A):
-```text
+```txt
 01f004076e58aae772bb101ab1a8e64e01ee96e64857ce82b1113817c6cdd52c09d26f7b90981cd7
 ae835aeac72e1573b8a0225dd56d157a010846d888dac7464baf53f2ad4e3d584531fa203658fab0
 3a06c9fd5e35737e417bc28c1cbf5e5dfc666de7090f69c3b29754725f84f75382891c561040ea1d
@@ -372,14 +372,14 @@ c8c2c5098dbdd28fca547b3f58c01a424ac05f869f49c6a34672ea2cbbc558428aa1fe48bbfd6115
 
 Node B derives the connection secrets for (Auth₂, Ack₂) as follows:
 
-```text
+```txt
 aes-secret = 80e8632c05fed6fc2a13b0f8d31a3cf645366239170ea067065aba8e28bac487
 mac-secret = 2ea74ec5dae199227dff1af715362700e989d889d7a493cb0639691efb8e5f98
 ```
 
 Running B's `ingress-mac` keccak state on the string "foo" yields the hash
 
-```text
+```txt
 ingress-mac("foo") = 0c7ec6340062cc46f5e9f1e3cf86f8c8c403c5a0964f5df0ebd34a75ddc86db5
 ```
 

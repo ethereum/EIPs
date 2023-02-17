@@ -138,7 +138,7 @@ Both these opcodes have been repriced before, and the client internals for manag
 
 This is the implementation for the new opcode in go-ethereum:
 
-```golang
+```go
 
 func opSelfBalance(pc *uint64, interpreter *EVMInterpreter, contract *Contract, memory *Memory, stack *Stack) ([]byte, error) {
 	stack.push(interpreter.intPool.get().Set(interpreter.evm.StateDB.GetBalance(contract.Address())
