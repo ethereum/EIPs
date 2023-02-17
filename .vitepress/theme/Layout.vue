@@ -103,4 +103,7 @@ const { Layout } = DefaultTheme;
 a img {
     display:inline-block;
 }
+vp-doc {
+    text-align: left;
+}
 </style>
