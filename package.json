@@ -18,9 +18,9 @@
   },
   "homepage": "https://eips.ethereum.org/",
   "devDependencies": {
-    "vitepress": "^1.0.0-alpha.46",
-    "vue": "^3.2.47",
+    "cross-env": "^5.0.5",
     "increase-memory-limit": "^1.0.3",
-    "cross-env": "^5.0.5"
+    "vitepress": "^1.0.0-alpha.46",
+    "vue": "^3.2.47"
   }
 }

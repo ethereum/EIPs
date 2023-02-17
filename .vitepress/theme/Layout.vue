@@ -1,7 +1,7 @@
 <script setup>
-import DefaultTheme from 'vitepress/theme'
+import DefaultTheme from 'vitepress/theme';
 
-const { Layout } = DefaultTheme
+const { Layout } = DefaultTheme;
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const { Layout } = DefaultTheme
         <template #doc-before v-if="$frontmatter.eip">
             <div class="vp-doc">
                 <h1 v-if="$frontmatter?.category != 'erc'">
-                    <a v-bind:href="$frontmatter['discussions-to']" class="no-underline" v-if="$frontmatter['discussions-to']">
+                    <a :href="$frontmatter['discussions-to']" class="no-underline" v-if="$frontmatter['discussions-to']">
                         <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
                             <use xlink:href="#bi-chat"/>
                         </svg>
@@ -43,7 +43,7 @@ const { Layout } = DefaultTheme
                     <Badge type="info" text="Informational" v-if="$frontmatter.type == 'Informational'"/>
                 </h1>
                 <h3 v-if="$frontmatter.description">{{ $frontmatter.description }}</h3>
-                <a v-bind:href="$frontmatter['discussions-to']" target="__blank">
+                <a :href="$frontmatter['discussions-to']" target="__blank">
                     <Badge type="tip" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'" style="width: 100%;">
                         <svg class="inline-svg" style="width:2.5em;height:1.5em;">
                             <use xlink:href="#bi-megaphone-fill"/>
@@ -58,12 +58,12 @@ const { Layout } = DefaultTheme
                             <td>
                                 <span v-for='author in $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g)'>
                                     <span v-if="author.match(/(?<=\<).*(?=\>)/g)">
-                                        <a v-bind:href="`mailto:${author.match(/(?<=\<).*(?=\>)/g).pop()}`">
+                                        <a :href="`mailto:${author.match(/(?<=\<).*(?=\>)/g).pop()}`">
                                             {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
                                         </a>
                                     </span>
                                     <span v-else-if="author.match(/(?<=\(@)[\w-]+(?=\))/g)">
-                                        <a v-bind:href="`https://github.com/${author.match(/(?<=\(@)[\w-]+(?=\))/g).pop()}`">
+                                        <a :href="`https://github.com/${author.match(/(?<=\(@)[\w-]+(?=\))/g).pop()}`">
                                             {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
                                         </a>
                                     </span>
