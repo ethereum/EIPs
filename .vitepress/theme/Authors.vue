@@ -1,4 +1,7 @@
-{%- assign authors=include.authors|split:"," -%}
+<script setup>
+</script>
+<template>
+    {{ $frontmatter.authors.match(/(?<=^|,\s*)(?:\w+)/g).join(", ") }}
 {%- for author in authors -%}
   {%- if author contains "<" -%}
     {%- assign authorparts=author|split:"<" -%}
@@ -11,3 +14,4 @@
   {%- endif -%}
   {% if forloop.last == false %}, {% endif %}
 {%- endfor -%}
+</template>

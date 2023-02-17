@@ -11,3 +11,7 @@ vendor
 
 # Secrets
 .vercel
+
+# Node
+node_modules
+.vitepress/cache
