@@ -22,6 +22,7 @@
     "gray-matter": "^4.0.3",
     "increase-memory-limit": "^1.0.3",
     "simple-git": "^3.16.1",
+    "vite-logger": "^0.0.1",
     "vitepress": "^1.0.0-alpha.46",
     "vue": "^3.2.47"
   }

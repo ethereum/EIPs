@@ -1,8 +1,11 @@
 import simpleGit from "simple-git";
 import fs from 'fs';
 import grayMatter from 'gray-matter';
+import { createLogger } from 'vite-logger';
 
 const git = simpleGit();
+
+const logger = createLogger('info', true);
 
 const statuses = [ 'Living', 'Last Call', 'Final', 'Review', 'Draft', 'Withdrawn', 'Stagnant' ]
 const eips = fs.readdirSync('./EIPS/').map(file => {
@@ -45,111 +48,121 @@ export default {
     appearance: true,
     titleTemplate: false,
     async transformHead({ siteConfig, siteData, pageData, title, description, head, content }) {
-        let { frontmatter } = pageData;
-        if (frontmatter.eip) {
-            console.log(`\nGenerating Metadata for ${pageData.relativePath}\n`);
-
-            let eipPrefix = frontmatter?.category === 'ERC' ? 'ERC-' : 'EIP-';
-            let eipTitle = `${eipPrefix}${frontmatter.eip}: ${frontmatter.title}`;
-            let authors = frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]);
-
-            return [
-                // Regular Metadata
-                [ 'title', {}, eipTitle ]
-                [ 'meta', { name: 'description', content: description }],
-                [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org${pageData.path}` } ],
-                ...authors.map(author => [ 'meta', { name: 'author', content: author } ]),
-                [ 'meta', { name: 'date', content: frontmatter.created.replace("-", "/") } ],
-                [ 'meta', { name: 'copyright', content: 'Public Domain' } ],
-                // Open Graph
-                [ 'meta', { property: 'og:title', content: eipTitle } ],
-                [ 'meta', { property: 'og:description', content: description } ],
-                [ 'meta', { property: 'og:url', content: `https://eips.ethereum.org${pageData.path}` } ],
-                [ 'meta', { property: 'og:locale', content: 'en_US' } ],
-                [ 'meta', { property: 'og:site_name', content: siteConfig.title } ],
-                [ 'meta', { property: 'og:type', content: 'article' } ],
-                // Twitter
-                [ 'meta', { name: 'twitter:card', content: 'summary' } ],
-                [ 'meta', { name: 'twitter:site_name', content: siteConfig.title } ],
-                [ 'meta', { name: 'twitter:site', content: '@ethereum' } ], // TODO: Replace with EIPs Twitter account, if one exists
-                [ 'meta', { name: 'twitter:description', content: description } ],
-                // Dublin Core
-                [ 'meta', { name: 'DC.title', content: eipTitle } ],
-                ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author } ]),
-                [ 'meta', { name: 'DC.date', content: frontmatter.created.replace("-", "/") } ],
-                frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace("-", "/") } ] : [],
-                [ 'meta', { name: 'DC.format', content: 'text/html' } ],
-                [ 'meta', { name: 'DC.language', content: 'en-US' } ],
-                [ 'meta', { name: 'DC.publisher', content: siteConfig.title } ],
-                [ 'meta', { name: 'DC.rights', content: 'Public Domain' } ],
-                // Citation
-                [ 'meta', { name: 'citation_title', content: eipTitle } ],
-                ...authors.map(author => [ 'meta', { name: 'citation_author', content: author } ]),
-                [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace("-", "/") } ],
-                frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace("-", "/") } ] : [],
-                [ 'meta', { name: 'citation_technical_report_institution', content: siteConfig.title } ],
-                [ 'meta', { name: 'citation_technical_report_number', content: frontmatter.eip } ],
-                // LD+JSON
-                [ 'script', { type: 'application/ld+json' }, JSON.stringify({
-                    "@type": "WebSite",
-                    "url": "{{site.url}}",
-                    "name": "{{site.title}}",
-                    "description": "{{site.description}}",
-                    "@context": "https://schema.org"
-                })],
-            ].filter(x => x.length > 0);
-        } else {
-            return [];
+        try { // Custom error handling needed because of the way VitePress handles errors (i.e. it doesn't)
+            let { frontmatter } = pageData;
+            if (frontmatter.eip) {
+                logger.info(`Generating Metadata for ${pageData.relativePath}`);
+    
+                let eipPrefix = frontmatter?.category === 'ERC' ? 'ERC-' : 'EIP-';
+                let eipTitle = `${eipPrefix}${frontmatter.eip}: ${frontmatter.title}`;
+                let authors = frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]);
+    
+                return [
+                    // Regular Metadata
+                    [ 'title', {}, eipTitle ]
+                    [ 'meta', { name: 'description', content: description }],
+                    [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org${pageData.path}` } ],
+                    ...authors.map(author => [ 'meta', { name: 'author', content: author } ]),
+                    [ 'meta', { name: 'date', content: frontmatter.created.replace("-", "/") } ],
+                    [ 'meta', { name: 'copyright', content: 'Public Domain' } ],
+                    // Open Graph
+                    [ 'meta', { property: 'og:title', content: eipTitle } ],
+                    [ 'meta', { property: 'og:description', content: description } ],
+                    [ 'meta', { property: 'og:url', content: `https://eips.ethereum.org${pageData.path}` } ],
+                    [ 'meta', { property: 'og:locale', content: 'en_US' } ],
+                    [ 'meta', { property: 'og:site_name', content: siteConfig.title } ],
+                    [ 'meta', { property: 'og:type', content: 'article' } ],
+                    // Twitter
+                    [ 'meta', { name: 'twitter:card', content: 'summary' } ],
+                    [ 'meta', { name: 'twitter:site_name', content: siteConfig.title } ],
+                    [ 'meta', { name: 'twitter:site', content: '@ethereum' } ], // TODO: Replace with EIPs Twitter account, if one exists
+                    [ 'meta', { name: 'twitter:description', content: description } ],
+                    // Dublin Core
+                    [ 'meta', { name: 'DC.title', content: eipTitle } ],
+                    ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author } ]),
+                    [ 'meta', { name: 'DC.date', content: frontmatter.created.replace("-", "/") } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace("-", "/") } ] : [],
+                    [ 'meta', { name: 'DC.format', content: 'text/html' } ],
+                    [ 'meta', { name: 'DC.language', content: 'en-US' } ],
+                    [ 'meta', { name: 'DC.publisher', content: siteConfig.title } ],
+                    [ 'meta', { name: 'DC.rights', content: 'Public Domain' } ],
+                    // Citation
+                    [ 'meta', { name: 'citation_title', content: eipTitle } ],
+                    ...authors.map(author => [ 'meta', { name: 'citation_author', content: author } ]),
+                    [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace("-", "/") } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace("-", "/") } ] : [],
+                    [ 'meta', { name: 'citation_technical_report_institution', content: siteConfig.title } ],
+                    [ 'meta', { name: 'citation_technical_report_number', content: frontmatter.eip } ],
+                    // LD+JSON
+                    [ 'script', { type: 'application/ld+json' }, JSON.stringify({
+                        "@type": "WebSite",
+                        "url": "{{site.url}}",
+                        "name": "{{site.title}}",
+                        "description": "{{site.description}}",
+                        "@context": "https://schema.org"
+                    })],
+                ].filter(x => x?.length);
+            } else {
+                return [];
+            }
+        } catch (error) {
+            logger.error(error);
+            throw error;
         }
     },
     async transformPageData(pageData) {
-        console.log(`\nTransforming ${pageData.relativePath}`);
-        
-        pageData = { ...pageData };
-        let { frontmatter } = pageData;
+        try { // Custom error handling needed because of the way VitePress handles runtime errors (i.e. it doesn't)
+            logger.info(`Transforming ${pageData.relativePath}`);
+            
+            pageData = { ...pageData };
+            let { frontmatter } = pageData;
 
-        if (frontmatter.eip) {
-            // Try to read from cache
-            try {
-                let cache = JSON.parse(fs.readFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`));
-                frontmatter = { ...frontmatter, ...cache };
-            } catch (e) {
-                console.log(`\nCache miss for ${pageData.relativePath}\n`);
-            }
-            // The below caused so much pain and suffering :|
-            if (!frontmatter.created) {
-                let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
-                if (initial) {
-                    frontmatter.created = initial.toISOString().split('T')[0];
+            if (frontmatter.eip) {
+                // Try to read from cache
+                try {
+                    let cache = JSON.parse(fs.readFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`));
+                    frontmatter = { ...frontmatter, ...cache };
+                } catch (e) {
+                    logger.info(`Cache miss for ${pageData.relativePath}`);
                 }
-            }
-            if (!frontmatter.finalized && frontmatter.status === 'Final') {
-                let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
-                if (final) {
-                    frontmatter.finalized = final.toISOString().split('T')[0];
+                // The below caused so much pain and suffering :|
+                if (!frontmatter.created) {
+                    let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
+                    if (initial) {
+                        frontmatter.created = initial.toISOString().split('T')[0];
+                    }
                 }
-            }
-            if (frontmatter.created.toISOString) { // It's a date object. We don't want that.
-                frontmatter.created = frontmatter.created.toISOString().split('T')[0];
-            }
+                if (!frontmatter.finalized && frontmatter.status === 'Final') {
+                    let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
+                    if (final) {
+                        frontmatter.finalized = final.toISOString().split('T')[0];
+                    }
+                }
+                if (frontmatter.created.toISOString) { // It's a date object. We don't want that.
+                    frontmatter.created = frontmatter.created.toISOString().split('T')[0];
+                }
 
-            // Write to cache
-            if (!fs.existsSync('./.vitepress/cache/eips')) {
-                fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
+                // Write to cache
+                if (!fs.existsSync('./.vitepress/cache/eips')) {
+                    fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
+                }
+                fs.writeFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`, JSON.stringify({
+                    created: frontmatter.created,
+                    finalized: frontmatter.finalized,
+                }));
             }
-            fs.writeFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`, JSON.stringify({
-                created: frontmatter.created,
-                finalized: frontmatter.finalized,
-            }));
-        }
-        if (frontmatter.listing) {
-            frontmatter.eips = eips;
-            frontmatter.statuses = statuses;
-        }
-        
-        console.log(`\nFinished Transforming ${pageData.relativePath}\n`);
+            if (frontmatter.listing) {
+                frontmatter.eips = eips;
+                frontmatter.statuses = statuses;
+            }
+            
+            logger.info(`Finished Transforming ${pageData.relativePath}`);
 
-        pageData.frontmatter = frontmatter;
-        return pageData;
+            pageData.frontmatter = frontmatter;
+            return pageData;
+        } catch (e) {
+            logger.error(e);
+            throw e;
+        }
     }
 }
