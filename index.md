@@ -31,7 +31,7 @@ Describes any change that affects most or all Ethereum implementations, such as 
 
 #### Core
 
-Improvements requiring a consensus fork (e.g. [EIP-4844](./EIPS/eip-4844.md), [EIP-1557](./EIPS/eip-1557.md)), as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions.
+Improvements requiring a consensus fork (e.g. [EIP-4844](./EIPS/eip-4844.md), [EIP-1559](./EIPS/eip-1559.md)), as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions.
 
 #### Networking
 

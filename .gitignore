@@ -15,3 +15,5 @@ vendor
 # Node
 node_modules
 .vitepress/cache
+.vitepress/dist
+.vitepress/.temp

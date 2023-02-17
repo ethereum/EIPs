@@ -39,7 +39,7 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 If a **Core** EIP mentions or proposes changes to the EVM (Ethereum Virtual Machine), it should refer to the instructions by their mnemonics and define the opcodes of those mnemonics at least once. A preferred way is the following:
 
-```
+```txt
 REVERT (0xfe)
 ```
 
@@ -264,37 +264,6 @@ This is a sentence with a footnote.[^1]
     }
     ```
 ````
-
-Which renders to:
-
-This is a sentence with a footnote.[^1]
-
-[^1]:
-    ```csl-json
-    {
-      "type": "article",
-      "id": 1,
-      "author": [
-        {
-          "family": "Jameson",
-          "given": "Hudson"
-        }
-      ],
-      "DOI": "00.0000/a00000-000-0000-y",
-      "title": "An Interesting Article",
-      "original-date": {
-        "date-parts": [
-          [2022, 12, 31]
-        ]
-      },
-      "URL": "https://sly-hub.invalid/00.0000/a00000-000-0000-y",
-      "custom": {
-        "additional-urls": [
-          "https://example.com/an-interesting-article.pdf"
-        ]
-      }
-    }
-    ```
 
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
