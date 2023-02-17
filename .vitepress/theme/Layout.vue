@@ -56,15 +56,15 @@ const { Layout } = DefaultTheme
                         <tr>
                             <th>Authors</th>
                             <td>
-                                <span v-for="author in $frontmatter?.author.match(/(?<=^|,\s*)(?:\w[^<(,]+[^\s,]\s*(?:\(\@\w+\))?\s*(?:\<[\w@.]+\>)?)(?=(?:$|,))/g)">
-                                    <span v-if="author.match(/(?<=\<)([\w@.]+)(?=\>)/g)">
-                                        <a v-bind:href="`mailto:${author.match(/(?<=\<)([\w@.]+)(?=\>)/g).pop()}`">
-                                            {{ author.match(/(?<=^|,\s*)(?:\w[^<(,]+[^\s,])(?=\s*(?:\(\@\w+\))?\s*(?:\<[\w@.]+\>)?(?:$|,))/g).pop() }}
+                                <span v-for='author in $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g)'>
+                                    <span v-if="author.match(/(?<=\<).*(?=\>)/g)">
+                                        <a v-bind:href="`mailto:${author.match(/(?<=\<).*(?=\>)/g).pop()}`">
+                                            {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
                                         </a>
                                     </span>
-                                    <span v-else-if="author.match(/(?<=\(\@)(?:\w+)(?=\))/g)">
-                                        <a v-bind:href="`https://github.com/${author.match(/(?<=\(\@)(?:\w+)(?=\))/g).pop()}`">
-                                            {{ author.match(/(?<=^|,\s*)(?:\w[^<(,]+[^\s,])(?=\s*(?:\(\@\w+\))?\s*(?:\<[\w@.]+\>)?(?:$|,))/g).pop() }}
+                                    <span v-else-if="author.match(/(?<=\(@)[\w-]+(?=\))/g)">
+                                        <a v-bind:href="`https://github.com/${author.match(/(?<=\(@)[\w-]+(?=\))/g).pop()}`">
+                                            {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
                                         </a>
                                     </span>
                                     <span v-else>
@@ -86,7 +86,7 @@ const { Layout } = DefaultTheme
             <div class="vp-doc">
                 <h2>Citation</h2>
                 <p>Please cite this document as:</p>
-                <p>{{ $frontmatter?.author.match(/(?<=^|,\s*)(?:\w[^<(]+\w)(?=\s*(?:\(\@\w+\))?\s*(?:\<[\w@.]+\>)?(?:$|,))/g).join(", ") }}{{ $frontmatter?.category == "ERC" ? "ERC" : "EIP" }}-{{ $frontmatter?.eip }}: {{ $frontmatter?.title }}{{ $frontmatter?.status == "Draft" || $frontmatter?.status == "Stagnant" || $frontmatter?.status == "Withdrawn" || $frontmatter?.status == "Review" || $frontmatter?.status == "Last Call" ? "[DRAFT]" : "" }}, <em>Ethereum Improvement Proposals</em>, no. {{ $frontmatter?.eip }}, {{ $frontmatter?.created.split("-")[0] }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ $frontmatter?.eip }}.</p>
+                <p>{{ $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }} {{ $frontmatter?.category == "ERC" ? "ERC" : "EIP" }}-{{ $frontmatter?.eip }}: {{ $frontmatter?.title }}{{ $frontmatter?.status == "Draft" || $frontmatter?.status == "Stagnant" || $frontmatter?.status == "Withdrawn" || $frontmatter?.status == "Review" || $frontmatter?.status == "Last Call" ? "[DRAFT]" : "" }}, <em>Ethereum Improvement Proposals</em>, no. {{ $frontmatter?.eip }}, {{ $frontmatter?.created.split("-")[0] }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ $frontmatter?.eip }}.</p>
             </div>
         </template>
     </Layout>
