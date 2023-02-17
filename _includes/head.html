@@ -14,30 +14,30 @@
     <meta property="og:description" content="{{page.description | escape }}" />
     <meta name="twitter:description" content="{{page.description | escape }}" />
     {% if page.category == "ERC" %}
-      <meta name="citation_title" content="ERC-{{ page.eip }}: {{ page.title | escape }}">
+      <meta name="citation_title" content="ERC-{{ page.eip | escape }}: {{ page.title | escape }}">
     {% else %}
-      <meta name="citation_title" content="EIP-{{ page.eip }}: {{ page.title | escape }}">
+      <meta name="citation_title" content="EIP-{{ page.eip | escape }}: {{ page.title | escape }}">
     {% endif %}
     {%- assign authors=include.authors|split:"," -%}
     {% for author in authors %}
       {%- if author contains "<" -%}
         {%- assign authorparts=author|split:"<" -%}
-        <meta name="citation_author" content="{{ authorparts[0]|strip }}">
+        <meta name="citation_author" content="{{ authorparts[0] | strip | escape }}">
       {%- elsif author contains "(@" -%}
         {%- assign authorparts=author|split:"(@" -%}
-        <meta name="citation_author" content="{{ authorparts[0]|strip }}">
+        <meta name="citation_author" content="{{ authorparts[0] | strip | escape }}">
       {%- else -%}
-        <meta name="citation_author" content="{{ author }}">
+        <meta name="citation_author" content="{{ author | escape }}">
       {%- endif -%}
     {% endfor %}
     {% if page.status == "Final" %}
       {% assign pubdate = page.finalized | split: '-' %}
-      <meta name="citation_publication_date" content="{{ pubdate | join: '/' }}">
+      <meta name="citation_publication_date" content="{{ pubdate | join: '/' | escape }}">
     {% endif %}
     {% assign createdate = page.created | split: '-' %}
     <meta name="citation_online_date" content="{{ createdate | join: '/' }}">
     <meta name="citation_technical_report_institution" content="Ethereum Improvement Proposals">
-    <meta name="citation_technical_report_number" content="{{ page.eip }}">
+    <meta name="citation_technical_report_number" content="{{ page.eip | escape }}">
   {% else %}
   <title>{{ page.title | escape }} | {{site.title}}</title>
     <meta
