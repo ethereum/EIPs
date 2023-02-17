@@ -103,7 +103,7 @@ export default {
         }
     },
     async transformPageData(pageData) {
-        console.log(`\nTransforming ${pageData.relativePath}\n`);
+        console.log(`\nTransforming ${pageData.relativePath}`);
         
         pageData = { ...pageData };
         let { frontmatter } = pageData;
