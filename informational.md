@@ -6,8 +6,8 @@ listing: true
 <!-- markdownlint-disable no-inline-html reference-links-images no-reversed-links -->
 
 <div v-for="status in $frontmatter.statuses">
-    <h2>{{ status }}</h2>
-    <table style="width: 100%; display: table;">
+    <h2 v-if="$frontmatter.eips.filter(eip => eip.status == status && eip.type == 'Informational').length">{{ status }}</h2>
+    <table style="width: 100%; display: table;" v-if="$frontmatter.eips.filter(eip => eip.status == status && eip.type == 'Informational').length">
         <thead>
             <tr>
                 <th>EIP</th>
@@ -16,7 +16,7 @@ listing: true
             </tr>
         </thead>
         <tbody>
-            <tr v-for="eip of $frontmatter.eips.filter(eip => eip.status == status && eip.type == "Informational")">
+            <tr v-for="eip of $frontmatter.eips.filter(eip => eip.status == status && eip.type == 'Informational')">
                 <td><a :href="`./eip-${eip.eip}`">{{ eip.category == "ERC" ? "ERC" : "EIP" }}-{{ eip.eip }}</a></td>
                 <td>{{ eip.title }}</td>
                 <td>{{ eip?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }}</td>
