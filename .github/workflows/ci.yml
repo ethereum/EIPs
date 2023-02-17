@@ -59,7 +59,7 @@ jobs:
         run: |
           export NODE_ENV=production
           export NODE_OPTIONS=--max_old_space_size=4096
-          npm build
+          npm run build
       
       - name: Upload Website Artifact
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce
