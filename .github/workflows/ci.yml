@@ -36,7 +36,7 @@ jobs:
           name: pr_number
           path: pr/
 
-  build:
+  htmlproofer:
     name: Build Website
     runs-on: ubuntu-20.04
 
