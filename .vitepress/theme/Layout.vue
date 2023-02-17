@@ -100,4 +100,7 @@ const { Layout } = DefaultTheme;
   height: 100%;
   object-fit: cover;
 }
+a img {
+    display:inline-block;
+}
 </style>

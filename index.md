@@ -1,8 +1,7 @@
-# EIPs
+---
+---
 
-[![Ethereum Cat Herders Discord](https://dcbadge.vercel.app/api/server/Nz6rtfJ8Cu?style=flat)](https://discord.io/EthCatHerders)
-[![Ethereum Research Discord](https://dcbadge.vercel.app/api/server/EVTQ9crVgQ?style=flat)](https://discord.gg/EVTQ9crVgQ)
-[![All Wallet Developers Discord](https://dcbadge.vercel.app/api/server/mRzPXmmYEA?style=flat)](https://discord.gg/mRzPXmmYEA)
+# Ethereum Improvement Proposals [![Ethereum Cat Herders Discord](https://dcbadge.vercel.app/api/server/Nz6rtfJ8Cu?style=flat)](https://discord.io/EthCatHerders) [![Ethereum Research Discord](https://dcbadge.vercel.app/api/server/EVTQ9crVgQ?style=flat)](https://discord.gg/EVTQ9crVgQ) [![All Wallet Developers Discord](https://dcbadge.vercel.app/api/server/mRzPXmmYEA?style=flat)](https://discord.gg/mRzPXmmYEA)
 
 Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards. Network upgrades are discussed separately in the [Ethereum Project Management](https://github.com/ethereum/pm/) repository.
 
