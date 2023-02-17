@@ -164,5 +164,9 @@ export default {
             logger.error(e);
             throw e;
         }
+    },
+    async buildEnd(siteConfig) {
+        logger.info('Copying CNAME');
+        fs.copyFileSync('./CNAME', './.vitepress/dist/CNAME');
     }
 }
