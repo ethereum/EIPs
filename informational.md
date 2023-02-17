@@ -17,7 +17,7 @@ listing: true
         </thead>
         <tbody>
             <tr v-for="eip of $frontmatter.eips.filter(eip => eip.status == status && eip.type == 'Informational')">
-                <td><a :href="`./eip-${eip.eip}`">{{ eip.category == "ERC" ? "ERC" : "EIP" }}-{{ eip.eip }}</a></td>
+                <td><a :href="`./EIPS/eip-${eip.eip}`">{{ eip.category == "ERC" ? "ERC" : "EIP" }}-{{ eip.eip }}</a></td>
                 <td>{{ eip.title }}</td>
                 <td>{{ eip?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }}</td>
             </tr>
