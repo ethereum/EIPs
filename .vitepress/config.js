@@ -195,7 +195,7 @@ export default {
                 for (let eip in await eips) {
                     let eipData = (await eips)[eip];
 
-                    if (Object.getOwnPropertyNames(filter).every(key => filter[key](eip[key]))) {
+                    if (["type", "category", "status"].every(key => !filter[key] || filter[key](eip[key]))) {
                         feed.addItem({
                             title: eipData.title,
                             id: `${url}/EIPS/eip-${eip}`,
