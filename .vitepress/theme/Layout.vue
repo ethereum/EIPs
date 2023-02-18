@@ -36,8 +36,7 @@ const { Layout } = DefaultTheme;
                     <Badge type="danger" text="🛑 Withdrawn" v-if="$frontmatter.status == 'Withdrawn'"/>
                     <Badge type="warning" text="⚠️ Draft" v-if="$frontmatter.status == 'Draft'"/>
                     <Badge type="warning" text="⚠️ Review" v-if="$frontmatter.status == 'Review'"/>
-                    <Badge type="info" text="📢 Last Call" v-if="$frontmatter.status == 'Last Call'"/>
-                    <Badge type="info" text="Standards Track" v-if="$frontmatter.type == 'Standards Track'"/>
+                    <Badge type="warning" text="📢 Last Call" v-if="$frontmatter.status == 'Last Call'"/>
                     <Badge type="info" text="Core" v-if="$frontmatter.category == 'Core'"/>
                     <Badge type="info" text="Networking" v-if="$frontmatter.category == 'Networking'"/>
                     <Badge type="info" text="Interface" v-if="$frontmatter.category == 'Interface'"/>
@@ -49,10 +48,11 @@ const { Layout } = DefaultTheme;
                     <Badge type="tip" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'" style="width: 100%; padding:0.5em;">
                         <svg class="inline-svg" style="width:2.5em;height:1.5em;">
                             <use xlink:href="#bi-megaphone-fill"/>
-                        </svg>This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.
+                        </svg>
+                        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.
                     </Badge>
                 </a>
-                <table>
+                <table class="preamble-table">
                     <tbody>
                         <tr>
                             <th>Authors</th>
@@ -76,7 +76,7 @@ const { Layout } = DefaultTheme;
                             </td>
                         </tr>
                         <tr>
-                            <td>Created</td>
+                            <th>Created</th>
                             <td>{{ $frontmatter?.created }}</td>
                         </tr>
                     </tbody>
@@ -103,6 +103,10 @@ const { Layout } = DefaultTheme;
 }
 a img {
     display:inline-block;
+}
+.preamble-table, .preamble-table * {
+    border: none !important;
+    background-color: inherit !important;
 }
 
 /* Centering is added randomly by the parent element of these. This is to override it. */
