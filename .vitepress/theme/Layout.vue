@@ -28,7 +28,10 @@ const { Layout } = DefaultTheme;
                             <use xlink:href="#bi-chat"/>
                         </svg>
                     </a>
-                    EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}<br/>
+                    EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}
+                </h1>
+                <h3 v-if="$frontmatter.description" style="margin-top: 0.1em;">{{ $frontmatter.description }}</h3>
+                <p style="margin-bottom: 1em;">
                     <Badge type="danger" text="🚧 Stagnant" v-if="$frontmatter.status == 'Stagnant'"/>
                     <Badge type="danger" text="🛑 Withdrawn" v-if="$frontmatter.status == 'Withdrawn'"/>
                     <Badge type="warning" text="⚠️ Draft" v-if="$frontmatter.status == 'Draft'"/>
@@ -41,14 +44,12 @@ const { Layout } = DefaultTheme;
                     <Badge type="info" text="ERC" v-if="$frontmatter.category == 'ERC'"/>
                     <Badge type="info" text="Meta" v-if="$frontmatter.type == 'Meta'"/>
                     <Badge type="info" text="Informational" v-if="$frontmatter.type == 'Informational'"/>
-                </h1>
-                <h3 v-if="$frontmatter.description">{{ $frontmatter.description }}</h3>
+                </p>
                 <a :href="$frontmatter['discussions-to']" target="__blank">
-                    <Badge type="tip" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'" style="width: 100%;">
+                    <Badge type="tip" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'" style="width: 100%; padding:0.5em;">
                         <svg class="inline-svg" style="width:2.5em;height:1.5em;">
                             <use xlink:href="#bi-megaphone-fill"/>
-                        </svg>This EIP is in the process of being peer-reviewed.<br/>
-                        If you are interested in this EIP, please participate using this discussion link.
+                        </svg>This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.
                     </Badge>
                 </a>
                 <table>
