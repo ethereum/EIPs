@@ -19,6 +19,7 @@
   "homepage": "https://eips.ethereum.org/",
   "devDependencies": {
     "cross-env": "^5.0.5",
+    "feed": "^4.2.2",
     "gray-matter": "^4.0.3",
     "increase-memory-limit": "^1.0.3",
     "simple-git": "^3.16.1",

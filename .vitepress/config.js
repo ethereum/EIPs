@@ -2,17 +2,21 @@ import simpleGit from "simple-git";
 import fs from 'fs';
 import grayMatter from 'gray-matter';
 import { createLogger } from 'vite-logger';
+import { Feed } from 'feed';
+
+import feedConfig from "./feeds.js";
 
 const git = simpleGit();
 
 const logger = createLogger('info', true);
 
 const statuses = [ 'Living', 'Last Call', 'Final', 'Review', 'Draft', 'Withdrawn', 'Stagnant' ]
-const eips = fs.readdirSync('./EIPS/').map(file => {
+const eips = Promise.all(fs.readdirSync('./EIPS/').map(async file => {
     let eipContent = fs.readFileSync(`./EIPS/${file}`, 'utf8');
     let eipData = grayMatter(eipContent);
-    return eipData.data;
-}).sort((a, b) => a.eip - b.eip);
+    let lastStatusChange = new Date((await git.raw(['blame', `EIPS/${file}`])).split('\n').filter(line => line.match(/status:/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
+    return { ...eipData.data, lastStatusChange };
+})).then(res => res.sort((a, b) => a.eip - b.eip));
 
 export default {
     title: 'Ethereum Improvement Proposals',
@@ -138,21 +142,19 @@ export default {
                         frontmatter.finalized = final.toISOString().split('T')[0];
                     }
                 }
-                if (frontmatter.created.toISOString) { // It's a date object. We don't want that.
+                if (frontmatter.created instanceof Date) {
                     frontmatter.created = frontmatter.created.toISOString().split('T')[0];
                 }
 
                 // Write to cache
-                if (!fs.existsSync('./.vitepress/cache/eips')) {
-                    fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
-                }
+                fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
                 fs.writeFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`, JSON.stringify({
                     created: frontmatter.created,
                     finalized: frontmatter.finalized,
                 }));
             }
             if (frontmatter.listing) {
-                frontmatter.eips = eips;
+                frontmatter.eips = await eips;
                 frontmatter.statuses = statuses;
             }
             
@@ -166,7 +168,54 @@ export default {
         }
     },
     async buildEnd(siteConfig) {
-        logger.info('Copying CNAME');
-        fs.copyFileSync('./CNAME', './.vitepress/dist/CNAME');
+        logger.info('Copying favicon.ico');
+        fs.copyFileSync('./favicon.ico', './.vitepress/dist/favicon.ico');
+
+        logger.info('Making feeds');
+
+        const url = "https://eips.ethereum.org";
+        fs.mkdirSync('./.vitepress/dist/rss', { recursive: true });
+        fs.mkdirSync('./.vitepress/dist/atom', { recursive: true });
+
+        for (let feedName in feedConfig) {
+            try {
+                logger.info(`Making \`${feedName}\` feed`);
+                const feed = new Feed({
+                    title: feedConfig[feedName].title,
+                    description: feedConfig[feedName].description,
+                    id: `${url}/rss/${feedName}.xml`,
+                    link: `${url}/rss/${feedName}.xml`,
+                    language: 'en',
+                    image: `${url}/assets/logo/favicon-32x32.png`,
+                    favicon: `${url}/favicon.ico`,
+                    copyright: 'Creative Commons Zero v1.0 Universal',
+                });
+                let { filter } = feedConfig[feedName];
+
+                for (let eip in await eips) {
+                    let eipData = (await eips)[eip];
+
+                    if (Object.getOwnPropertyNames(filter).every(key => filter[key](eip[key]))) {
+                        feed.addItem({
+                            title: eipData.title,
+                            id: `${url}/EIPS/eip-${eip}`,
+                            link: `${url}/EIPS/eip-${eip}`,
+                            date: eipData.lastStatusChange,
+                            description: eipData.description,
+                            //author: eipData.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]),
+                            content: eipData.content,
+                            guid: eip,
+                        });
+                    }
+                }
+
+                // Export the feed
+                fs.writeFileSync(`./.vitepress/dist/rss/${feedName}.xml`, feed.rss2());
+                fs.writeFileSync(`./.vitepress/dist/atom/${feedName}.atom`, feed.atom1());
+            } catch (e) {
+                logger.error(e);
+                throw e;
+            }
+        }
     }
 }
