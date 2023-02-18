@@ -18,6 +18,10 @@ const eips = Promise.all(fs.readdirSync('./EIPS/').map(async file => {
     return { ...eipData.data, lastStatusChange };
 })).then(res => res.sort((a, b) => a.eip - b.eip));
 
+function formatDateString(date) {
+    return date.toISOString().split('T')[0];
+}
+
 export default {
     title: 'Ethereum Improvement Proposals',
     description: 'Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.',
@@ -133,17 +137,17 @@ export default {
                 if (!frontmatter.created) {
                     let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
                     if (initial) {
-                        frontmatter.created = initial.toISOString().split('T')[0];
+                        frontmatter.created = formatDateString(initial);
                     }
                 }
                 if (!frontmatter.finalized && frontmatter.status === 'Final') {
                     let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
                     if (final) {
-                        frontmatter.finalized = final.toISOString().split('T')[0];
+                        frontmatter.finalized = formatDateString(final);
                     }
                 }
                 if (frontmatter.created instanceof Date) {
-                    frontmatter.created = frontmatter.created.toISOString().split('T')[0];
+                    frontmatter.created = formatDateString(frontmatter.created);
                 }
 
                 // Write to cache
