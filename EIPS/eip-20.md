@@ -5,7 +5,6 @@ author: Fabian Vogelsteller <fabian@ethereum.org>, Vitalik Buterin <vitalik.bute
 type: Standards Track
 category: ERC
 status: Final
-created: 2015-11-19
 ---
 
 ## Simple Summary

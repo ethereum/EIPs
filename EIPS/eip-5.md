@@ -5,7 +5,6 @@ author: Christian Reitwiessner <c@ethdev.com>
 status: Final
 type: Standards Track
 category: Core
-created: 2015-11-22
 ---
 
 ### Abstract

@@ -5,7 +5,6 @@ author: Vitalik Buterin (@vbuterin)
 status: Final
 type: Standards Track
 category: Core
-created: 2015-11-15
 ---
 
 ### Meta reference

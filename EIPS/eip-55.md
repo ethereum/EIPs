@@ -6,7 +6,6 @@ discussions-to: https://github.com/ethereum/eips/issues/55
 type: Standards Track
 category: ERC
 status: Final
-created: 2016-01-14
 ---
 
 # Specification

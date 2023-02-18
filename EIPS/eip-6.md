@@ -5,7 +5,6 @@ author: Hudson Jameson <hudson@hudsonjameson.com>
 status: Final
 type: Standards Track
 category: Interface
-created: 2015-11-22
 ---
 
 ### Abstract

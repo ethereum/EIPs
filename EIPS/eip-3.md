@@ -5,7 +5,6 @@ author: Martin Holst Swende <martin@swende.se>
 status: Withdrawn
 type: Standards Track
 category: Core
-created: 2015-11-19
 ---
 
 # Abstract

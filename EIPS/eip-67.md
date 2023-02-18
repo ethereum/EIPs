@@ -7,7 +7,6 @@ discussions-to: https://github.com/ethereum/EIPs/issues/67
 status: Withdrawn
 type: Standards Track
 category: ERC
-created: 2016-02-17
 withdrawal-reason: Superseded by EIP-681
 ---
 

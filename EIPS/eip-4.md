@@ -4,7 +4,6 @@ title: EIP Classification
 author: Joseph Chow (@ethers)
 status: Final
 type: Meta
-created: 2015-11-17
 ---
 
 # Abstract

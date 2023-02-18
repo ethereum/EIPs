@@ -4,7 +4,6 @@ title: EIP Purpose and Guidelines
 status: Living
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
-created: 2015-10-27
 ---
 
 ## What is an EIP?
@@ -134,8 +133,6 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `category`: *One of `Core`, `Networking`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
 
-`created`: *Date the EIP was created on*
-
 `requires`: *EIP number(s)* (Optional field)
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
@@ -177,10 +174,6 @@ The `type` header specifies the type of EIP: Standards Track, Meta, or Informati
 ### `category` header
 
 The `category` header specifies the EIP's category. This is required for standards-track EIPs only.
-
-### `created` header
-
-The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
 ### `requires` header
 
