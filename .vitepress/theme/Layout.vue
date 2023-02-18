@@ -28,7 +28,7 @@ const { Layout } = DefaultTheme;
                             <use xlink:href="#bi-chat"/>
                         </svg>
                     </a>
-                    EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}
+                    EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}<br/>
                     <Badge type="danger" text="🚧 Stagnant" v-if="$frontmatter.status == 'Stagnant'"/>
                     <Badge type="danger" text="🛑 Withdrawn" v-if="$frontmatter.status == 'Withdrawn'"/>
                     <Badge type="warning" text="⚠️ Draft" v-if="$frontmatter.status == 'Draft'"/>
