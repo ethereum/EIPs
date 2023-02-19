@@ -239,6 +239,10 @@ export default withPwa(defineConfig({
                 // Export the feed
                 fs.writeFileSync(`./.vitepress/dist/rss/${feedName}.xml`, feed.rss2());
                 fs.writeFileSync(`./.vitepress/dist/atom/${feedName}.atom`, feed.atom1());
+
+                // Copy ALL the assets
+                logger.info('Copying assets');
+                fs.copyFileSync('./assets', './.vitepress/dist/assets', { recursive: true });
             } catch (e) {
                 logger.error(e);
                 throw e;
