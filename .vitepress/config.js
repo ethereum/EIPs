@@ -24,6 +24,18 @@ function formatDateString(date) {
     return date.toISOString().split('T')[0];
 }
 
+function copyDirectorySync(from, to) {
+    // Recursively copy a directory, without overwriting existing files
+    for (let file of fs.readdirSync(from)) {
+        if (fs.statSync(`${from}/${file}`).isDirectory()) { // If directory, recursively copy
+            fs.mkdirSync(`${to}/${file}`, { recursive: true });
+            copyDirectorySync(`${from}/${file}`, `${to}/${file}`);
+        } else if (!fs.existsSync(`${to}/${file}`)) { // If file doesn't exist, don't skip
+            fs.copyFileSync(`${from}/${file}`, `${to}/${file}`);
+        }
+    }
+}
+
 export default withPwa(defineConfig({
     title: 'Ethereum Improvement Proposals',
     description: 'Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.',
@@ -194,7 +206,6 @@ export default withPwa(defineConfig({
 
         for (let feedName in feedConfig) {
             try {
-                logger.info(`Making \`${feedName}\` feed`);
                 const feed = new Feed({
                     title: feedConfig[feedName].title,
                     description: feedConfig[feedName].description,
@@ -214,7 +225,6 @@ export default withPwa(defineConfig({
 
                     for (let key of Object.keys(filter)) {
                         if (filter[key] && !filter[key](eipData[key])) {
-                            logger.info(`Skipping ${eip} in \`${feedName}\` because ${key} does not match filter`);
                             skip = true;
                             break;
                         }
@@ -223,7 +233,6 @@ export default withPwa(defineConfig({
                     if (skip) {
                         continue;
                     }
-                    logger.info(`Adding ${eip} to feed \`${feedName}\``);
                     feed.addItem({
                         title: eipData.title,
                         id: `${url}/EIPS/eip-${eip}`,
@@ -240,13 +249,15 @@ export default withPwa(defineConfig({
                 fs.writeFileSync(`./.vitepress/dist/rss/${feedName}.xml`, feed.rss2());
                 fs.writeFileSync(`./.vitepress/dist/atom/${feedName}.atom`, feed.atom1());
 
-                // Copy ALL the assets
-                logger.info('Copying assets');
-                fs.copyFileSync('./assets', './.vitepress/dist/assets', { recursive: true });
+                logger.info(`Finished making \`${feedName}\` feed`);
             } catch (e) {
                 logger.error(e);
                 throw e;
             }
+
+            // Copy ALL the assets
+            logger.info('Copying assets');
+            copyDirectorySync('./assets', './.vitepress/dist/assets');
         }
     },
     pwa: {
