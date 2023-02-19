@@ -1,6 +1,7 @@
 import DefaultTheme from 'vitepress/theme';
-import Layout from './Layout.vue';
-import Listing from './Listing.vue';
+
+import Layout from './components/Layout.vue';
+import EipsListing from './components/EipsListing.vue';
 
 export default {
   ...DefaultTheme,
@@ -8,6 +9,6 @@ export default {
   enhanceApp({ app, router, siteData }) {
     DefaultTheme.enhanceApp({ app, router, siteData });
 
-    app.component('Listing', Listing);
+    app.component('EipsListing', EipsListing);
   }
 };

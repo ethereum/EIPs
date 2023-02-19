@@ -1,6 +1,8 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme';
 
+import ReloadPrompt from './ReloadPrompt.vue'
+
 const { Layout } = DefaultTheme;
 </script>
 
@@ -91,6 +93,9 @@ const { Layout } = DefaultTheme;
                 <p>Please cite this document as:</p>
                 <p>{{ $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }}, "{{ $frontmatter?.category == "ERC" ? "ERC" : "EIP" }}-{{ $frontmatter?.eip }}: {{ $frontmatter?.title }}{{ $frontmatter?.status == "Draft" || $frontmatter?.status == "Stagnant" || $frontmatter?.status == "Withdrawn" || $frontmatter?.status == "Review" || $frontmatter?.status == "Last Call" ? "[DRAFT]" : "" }}," <em>Ethereum Improvement Proposals</em>, no. {{ $frontmatter?.eip }}, {{ $frontmatter?.created.split("-")[0] }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ $frontmatter?.eip }}.</p>
             </div>
+        </template>
+        <template #layout-bottom>
+            <ReloadPrompt/>
         </template>
     </Layout>
 </template>

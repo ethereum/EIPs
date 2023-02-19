@@ -18,12 +18,14 @@
   },
   "homepage": "https://eips.ethereum.org/",
   "devDependencies": {
+    "@vite-pwa/vitepress": "^0.0.5",
     "cross-env": "^5.0.5",
     "feed": "^4.2.2",
     "gray-matter": "^4.0.3",
     "increase-memory-limit": "^1.0.3",
     "simple-git": "^3.16.1",
     "vite-logger": "^0.0.1",
+    "vite-plugin-pwa": "^0.14.4",
     "vitepress": "^1.0.0-alpha.46",
     "vue": "^3.2.47"
   }

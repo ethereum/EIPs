@@ -3,6 +3,8 @@ import fs from 'fs';
 import grayMatter from 'gray-matter';
 import { createLogger } from 'vite-logger';
 import { Feed } from 'feed';
+import { withPwa } from '@vite-pwa/vitepress';
+import { defineConfig } from 'vitepress';
 
 import feedConfig from './feeds.js';
 
@@ -22,13 +24,13 @@ function formatDateString(date) {
     return date.toISOString().split('T')[0];
 }
 
-export default {
+export default withPwa(defineConfig({
     title: 'Ethereum Improvement Proposals',
     description: 'Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.',
     cleanUrls: true,
     base: '/',
     themeConfig: {
-        logo: '/assets/images/ethereum-logo.svg',
+        logo: '/assets/website/ethereum-logo.svg',
         outline: 'deep',
         editLink: {
           pattern: 'https://github.com/ethereum/EIPs/edit/main/docs/:path',
@@ -53,7 +55,16 @@ export default {
         [ 'meta', { name: 'Content-Type', content: 'text/html; charset=utf-8' } ],
         [ 'meta', { name: 'robots', content: 'index, follow' } ],
         [ 'meta', { name: 'google-site-verification', content: 'WS13rn9--86Zk6QAyoGH7WROxbaJWafZdaPlecJVGSo' } ], // Gives @Pandapip1 limited access (analytics & re-indexing) to Google Search Console; access can be revoked at any time by removing this line
-        [ 'link', { rel: 'icon', type: 'image/svg', href: '/assets/images/ethereum-logo.svg' } ]
+        [ 'link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/assets/website/apple-touch-icon.png' } ],
+        [ 'link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/assets/website/favicon-32x32.png' } ],
+        [ 'link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/assets/website/favicon-16x16.png' } ],
+        [ 'link', { rel: 'mask-icon', href: '/assets/website/safari-pinned-tab.svg', color: '#5bbad5' } ],
+        [ 'link', { rel: 'shortcut icon', href: '/assets/website/favicon.ico' } ],
+        [ 'meta', { name: 'apple-mobile-web-app-title', content: 'Ethereum Improvement Proposals' } ],
+        [ 'meta', { name: 'application-name', content: 'Ethereum Improvement Proposals' } ],
+        [ 'meta', { name: 'msapplication-TileColor', content: '#da532c' } ],
+        [ 'meta', { name: 'msapplication-config', content: '/assets/website/browserconfig.xml' } ],
+        [ 'meta', { name: 'theme-color', content: '#ffffff' } ]
     ],
     appearance: true,
     titleTemplate: false,
@@ -111,7 +122,7 @@ export default {
                         'name': eipTitle,
                         'description': pageData.description,
                         '@context': 'https://schema.org'
-                    })],
+                    })]
                 ].filter(x => x?.length);
             } else {
                 return [];
@@ -190,7 +201,7 @@ export default {
                     id: `${url}/rss/${feedName}.xml`,
                     link: `${url}/rss/${feedName}.xml`,
                     language: 'en',
-                    image: `${url}/assets/logo/favicon-32x32.png`,
+                    image: `${url}/assets/website/favicon-32x32.png`,
                     favicon: `${url}/favicon.ico`,
                     copyright: 'Creative Commons Zero v1.0 Universal',
                 });
@@ -233,5 +244,31 @@ export default {
                 throw e;
             }
         }
+    },
+    pwa: {
+        injectRegister: 'script',
+        workbox: {
+            globPatterns: ['EIPS/*', '**/*.{js,css,html}'] // Items to save to offline cache
+        },
+        manifest: {
+            "name": "Ethereum Improvement Proposals",
+            "short_name": "EIPs",
+            "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+            "icons": [
+                {
+                    "src": "/assets/images/android-chrome-192x192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "/assets/images/android-chrome-512x512.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ],
+            "theme_color": "#ffffff",
+            "background_color": "#ffffff",
+            "display": "standalone"
+        }
     }
-}
+}));
