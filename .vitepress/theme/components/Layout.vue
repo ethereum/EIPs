@@ -78,6 +78,10 @@ const { Layout } = DefaultTheme;
                                 </span>
                             </td>
                         </tr>
+                        <tr v-if="$frontmatter.finalized">
+                            <th>Finalized</th>
+                            <td>{{ $frontmatter?.finalized }}</td>
+                        </tr>
                         <tr>
                             <th>Created</th>
                             <td>{{ $frontmatter?.created }}</td>
