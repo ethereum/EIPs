@@ -29,12 +29,12 @@ export default {
     base: '/',
     themeConfig: {
         logo: '/assets/images/ethereum-logo.svg',
-        repo: 'ethereum/EIPs',
-        docsDir: 'EIPS',
-        docsBranch: 'master',
-        editLinks: true,
-        editLinkText: 'Edit this page on GitHub',
-        lastUpdated: 'Last Updated',
+        outline: 'deep',
+        editLink: {
+          pattern: 'https://github.com/ethereum/EIPs/edit/main/docs/:path',
+          text: 'Edit this page on GitHub'
+        },
+        lastUpdatedText: 'Last Updated',
         nav: [
             { text: 'Home', link: '/' },
             { text: 'All', link: '/all' },
