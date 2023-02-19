@@ -50,7 +50,6 @@ export default withPwa(defineConfig({
         },
         lastUpdatedText: 'Last Updated',
         nav: [
-            { text: 'Home', link: '/' },
             { text: 'All', link: '/all' },
             { text: 'Core', link: '/core' },
             { text: 'Networking', link: '/networking' },
