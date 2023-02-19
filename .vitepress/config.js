@@ -230,6 +230,31 @@ export default withPwa(defineConfig({
                     finalized: frontmatter.finalized,
                 }));
             }
+            if (frontmatter.eip) {
+                // More convenient author data
+                let authors = [];
+                for (let author of frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g)) {
+                    let authorName = author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g);
+                    let emailData = author.match(/(?<=\<).*(?=\>)/g);
+                    let githubData = author.match(/(?<=\(@)[\w-]+(?=\))/g);
+                    if (emailData) {
+                        authors.push({
+                            name: authorName.pop(),
+                            email: emailData.pop()
+                        });
+                    } else if (githubData) {
+                        authors.push({
+                            name: authorName.pop(),
+                            github: githubData.pop()
+                        });
+                    } else {
+                        authors.push({
+                            name: authorName.pop()
+                        });
+                    }
+                }
+                frontmatter.authorData = authors;
+            }
             if (frontmatter.listing) {
                 frontmatter.eips = await eips;
                 frontmatter.statuses = statuses;

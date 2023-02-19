@@ -1,7 +1,10 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme';
 
-import ReloadPrompt from './ReloadPrompt.vue'
+import ReloadPrompt from './ReloadPrompt.vue';
+
+import EipCitation from './EipCitation.vue';
+import EipPreamble from './EipPreamble.vue';
 
 const { Layout } = DefaultTheme;
 </script>
@@ -23,79 +26,10 @@ const { Layout } = DefaultTheme;
     </svg>
     <Layout>
         <template #doc-before v-if="$frontmatter.eip">
-            <div class="vp-doc">
-                <h1 v-if="$frontmatter?.category != 'erc'">
-                    <a :href="$frontmatter['discussions-to']" class="no-underline" v-if="$frontmatter['discussions-to']">
-                        <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
-                            <use xlink:href="#bi-chat"/>
-                        </svg>
-                    </a>
-                    EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}
-                </h1>
-                <h3 v-if="$frontmatter.description" style="margin-top: 0.1em;">{{ $frontmatter.description }}</h3>
-                <p style="margin-bottom: 1em;">
-                    <Badge type="danger" text="🚧 Stagnant" v-if="$frontmatter.status == 'Stagnant'"/>
-                    <Badge type="danger" text="🛑 Withdrawn" v-if="$frontmatter.status == 'Withdrawn'"/>
-                    <Badge type="warning" text="⚠️ Draft" v-if="$frontmatter.status == 'Draft'"/>
-                    <Badge type="warning" text="⚠️ Review" v-if="$frontmatter.status == 'Review'"/>
-                    <Badge type="warning" text="📢 Last Call" v-if="$frontmatter.status == 'Last Call'"/>
-                    <Badge type="tip" text="Final" v-if="$frontmatter.status == 'Final'"/>
-                    <Badge type="tip" text="Living" v-if="$frontmatter.status == 'Living'"/>
-                    <Badge type="info" text="Core" v-if="$frontmatter.category == 'Core'"/>
-                    <Badge type="info" text="Networking" v-if="$frontmatter.category == 'Networking'"/>
-                    <Badge type="info" text="Interface" v-if="$frontmatter.category == 'Interface'"/>
-                    <Badge type="info" text="ERC" v-if="$frontmatter.category == 'ERC'"/>
-                    <Badge type="info" text="Meta" v-if="$frontmatter.type == 'Meta'"/>
-                    <Badge type="info" text="Informational" v-if="$frontmatter.type == 'Informational'"/>
-                </p>
-                <div class="tip custom-block" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'">
-                    <p class="custom-block-title">
-                        <svg class="inline-svg"><use xlink:href="#bi-megaphone-fill"/></svg>
-                        <span>Peer Review Notice</span>
-                    </p>
-                    <p>This EIP is in the process of being peer-reviewed. <a :href="$frontmatter['discussions-to']">If you are interested in this EIP, and have feedback to share, please participate using this discussion link.</a> Thank you!</p>
-                </div>
-                <table class="preamble-table">
-                    <tbody>
-                        <tr>
-                            <th>Authors</th>
-                            <td>
-                                <span v-for='author in $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g)'>
-                                    <span v-if="author.match(/(?<=\<).*(?=\>)/g)">
-                                        <a :href="`mailto:${author.match(/(?<=\<).*(?=\>)/g).pop()}`">
-                                            {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
-                                        </a>
-                                    </span>
-                                    <span v-else-if="author.match(/(?<=\(@)[\w-]+(?=\))/g)">
-                                        <a :href="`https://github.com/${author.match(/(?<=\(@)[\w-]+(?=\))/g).pop()}`">
-                                            {{ author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g).pop() }}
-                                        </a>
-                                    </span>
-                                    <span v-else>
-                                        {{ author }}
-                                    </span>
-                                    &nbsp;
-                                </span>
-                            </td>
-                        </tr>
-                        <tr v-if="$frontmatter.finalized">
-                            <th>Finalized</th>
-                            <td>{{ $frontmatter?.finalized }}</td>
-                        </tr>
-                        <tr>
-                            <th>Created</th>
-                            <td>{{ $frontmatter?.created }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <EipPreamble/>
         </template>
         <template #doc-after v-if="$frontmatter.eip">
-            <div class="vp-doc">
-                <h2>Citation</h2>
-                <p>Please cite this document as:</p>
-                <p>{{ $frontmatter?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }}, "{{ $frontmatter?.category == "ERC" ? "ERC" : "EIP" }}-{{ $frontmatter?.eip }}: {{ $frontmatter?.title }}{{ $frontmatter?.status == "Draft" || $frontmatter?.status == "Stagnant" || $frontmatter?.status == "Withdrawn" || $frontmatter?.status == "Review" || $frontmatter?.status == "Last Call" ? "[DRAFT]" : "" }}," <em>Ethereum Improvement Proposals</em>, no. {{ $frontmatter?.eip }}, {{ $frontmatter?.created.split("-")[0] }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ $frontmatter?.eip }}.</p>
-            </div>
+            <EipCitation/>
         </template>
         <template #layout-bottom>
             <ReloadPrompt/>
