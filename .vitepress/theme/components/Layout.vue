@@ -48,14 +48,13 @@ const { Layout } = DefaultTheme;
                     <Badge type="info" text="Meta" v-if="$frontmatter.type == 'Meta'"/>
                     <Badge type="info" text="Informational" v-if="$frontmatter.type == 'Informational'"/>
                 </p>
-                <a :href="$frontmatter['discussions-to']" target="__blank">
-                    <Badge type="tip" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'" style="width: 100%; padding:0.5em;">
-                        <svg class="inline-svg" style="width:2.5em;height:1.5em;">
-                            <use xlink:href="#bi-megaphone-fill"/>
-                        </svg>
-                        This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.
-                    </Badge>
-                </a>
+                <div class="tip custom-block" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'">
+                    <p class="custom-block-title">
+                        <svg class="inline-svg"><use xlink:href="#bi-megaphone-fill"/></svg>
+                        <span>Peer Review Notice</span>
+                    </p>
+                    <p>This EIP is in the process of being peer-reviewed. <a :href="$frontmatter['discussions-to']">If you are interested in this EIP, and have feedback to share, please participate using this discussion link.</a> Thank you!</p>
+                </div>
                 <table class="preamble-table">
                     <tbody>
                         <tr>
@@ -105,7 +104,8 @@ const { Layout } = DefaultTheme;
   display: inline-block;
   fill: currentColor;
   width: 1.5ex;
-  height: 100%;
+  height: 1.5ex;
+  margin: 0 0.25em;
   object-fit: cover;
 }
 a img {
