@@ -37,6 +37,8 @@ const { Layout } = DefaultTheme;
                     <Badge type="warning" text="⚠️ Draft" v-if="$frontmatter.status == 'Draft'"/>
                     <Badge type="warning" text="⚠️ Review" v-if="$frontmatter.status == 'Review'"/>
                     <Badge type="warning" text="📢 Last Call" v-if="$frontmatter.status == 'Last Call'"/>
+                    <Badge type="tip" text="Final" v-if="$frontmatter.status == 'Living'"/>
+                    <Badge type="tip" text="Living" v-if="$frontmatter.status == 'Living'"/>
                     <Badge type="info" text="Core" v-if="$frontmatter.category == 'Core'"/>
                     <Badge type="info" text="Networking" v-if="$frontmatter.category == 'Networking'"/>
                     <Badge type="info" text="Interface" v-if="$frontmatter.category == 'Interface'"/>
