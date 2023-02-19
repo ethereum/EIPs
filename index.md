@@ -42,7 +42,7 @@ features:
     linkText: View Informational EIPs
   - icon: 📦
     title: Meta EIPs
-    details: Meta EIPs describe changes to the EIP process, or other non-operational changes.
+    details: Meta EIPs describe changes to the EIP process, or other non-optional changes.
     link: /meta
     linkText: View Meta EIPs
 ---
