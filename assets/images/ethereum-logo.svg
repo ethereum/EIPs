@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg alt="ETH diamond (color filled, SVG)" version="1.1" xmlns="http://www.w3.org/2000/svg" width="142.000000pt" height="215.000000pt" viewBox="0 0 142.000000 215.000000" preserveAspectRatio="xMidYMid meet">
+    <g transform="matrix(1,0,0,1,-1259.52,-529.088)">
+        <g id="Ethereum">
+            <g id="Bottom">
+                <g id="Purple2" transform="matrix(1.08181,0,0,-1.03277,-108.829,1366.48)">
+                    <path d="M1394.74,693.463L1330.36,604.024L1330.36,654.238L1394.74,693.463Z" style="fill: rgb(200, 178, 245); stroke: rgb(52, 65, 192); stroke-width: 2.27px;"></path>
+                </g>
+                <g id="Yellow2" transform="matrix(-1.08181,0,0,-1.03277,2769.57,1366.48)">
+                    <path d="M1394.74,693.463L1330.36,604.024L1330.36,654.238L1394.74,693.463Z" style="fill: rgb(238, 203, 192); stroke: rgb(52, 65, 192); stroke-width: 2.27px;"></path>
+                </g>
+            </g>
+            <g id="Top">
+                <g id="Blue1" transform="matrix(-1,0,0,1,2659.32,-0.0263692)">
+                    <path d="M1398.61,639.614L1328.95,608.641L1328.95,679.249L1398.61,639.614Z" style="fill: rgb(135, 169, 240); stroke: rgb(52, 65, 192); stroke-width: 2.4px;"></path>
+                </g>
+                <g id="Purple1" transform="matrix(1,0,0,1,1.41643,-0.0263692)">
+                    <path d="M1398.61,639.614L1328.95,608.641L1328.95,679.249L1398.61,639.614Z" style="fill: rgb(202, 179, 245); stroke: rgb(52, 65, 192); stroke-width: 2.4px;"></path>
+                </g>
+                <g id="Yellow1" transform="matrix(-1.08181,0,0,1.03277,2769.57,-93.5314)">
+                    <path d="M1394.74,709.855L1330.36,604.024L1330.36,679.865L1394.74,709.855Z" style="fill: rgb(238, 203, 192); stroke: rgb(52, 65, 192); stroke-width: 2.27px;"></path>
+                </g>
+                <g id="Green1" transform="matrix(1.08181,0,0,1.03277,-108.829,-93.5314)">
+                    <path d="M1394.74,709.855L1330.36,604.024L1330.36,679.865L1394.74,709.855Z" style="fill: rgb(184, 251, 246); stroke: rgb(52, 65, 192); stroke-width: 2.27px;"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

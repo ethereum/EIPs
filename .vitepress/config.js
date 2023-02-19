@@ -1,10 +1,10 @@
-import simpleGit from "simple-git";
+import simpleGit from 'simple-git';
 import fs from 'fs';
 import grayMatter from 'gray-matter';
 import { createLogger } from 'vite-logger';
 import { Feed } from 'feed';
 
-import feedConfig from "./feeds.js";
+import feedConfig from './feeds.js';
 
 const git = simpleGit();
 
@@ -28,6 +28,7 @@ export default {
     cleanUrls: true,
     base: '/',
     themeConfig: {
+        logo: '/assets/images/ethereum-logo.svg',
         repo: 'ethereum/EIPs',
         docsDir: 'EIPS',
         docsBranch: 'master',
@@ -51,10 +52,12 @@ export default {
         [ 'meta', { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge,chrome=1' } ],
         [ 'meta', { name: 'Content-Type', content: 'text/html; charset=utf-8' } ],
         [ 'meta', { name: 'robots', content: 'index, follow' } ],
-        [ 'meta', { name: "google-site-verification", content: "WS13rn9--86Zk6QAyoGH7WROxbaJWafZdaPlecJVGSo" } ], // Gives @Pandapip1 limited access (analytics & re-indexing) to Google Search Console; access can be revoked at any time by removing this line
+        [ 'meta', { name: 'google-site-verification', content: 'WS13rn9--86Zk6QAyoGH7WROxbaJWafZdaPlecJVGSo' } ], // Gives @Pandapip1 limited access (analytics & re-indexing) to Google Search Console; access can be revoked at any time by removing this line
+        [ 'link', { rel: 'icon', type: 'image/svg', href: '/assets/images/ethereum-logo.svg' } ]
     ],
     appearance: true,
     titleTemplate: false,
+    lastUpdated: true,
     async transformHead({ siteConfig, siteData, pageData, title, description, head, content }) {
         try { // Custom error handling needed because of the way VitePress handles errors (i.e. it doesn't)
             let { frontmatter } = pageData;
@@ -71,7 +74,7 @@ export default {
                     [ 'meta', { name: 'description', content: pageData.description }],
                     [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org/${pageData.relativePath}` } ],
                     ...authors.map(author => [ 'meta', { name: 'author', content: author } ]),
-                    [ 'meta', { name: 'date', content: frontmatter.created.replace("-", "/") } ],
+                    [ 'meta', { name: 'date', content: frontmatter.created.replace('-', '/') } ],
                     [ 'meta', { name: 'copyright', content: 'Public Domain' } ],
                     // Open Graph
                     [ 'meta', { property: 'og:title', content: eipTitle } ],
@@ -88,8 +91,8 @@ export default {
                     // Dublin Core
                     [ 'meta', { name: 'DC.title', content: eipTitle } ],
                     ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author } ]),
-                    [ 'meta', { name: 'DC.date', content: frontmatter.created.replace("-", "/") } ],
-                    frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace("-", "/") } ] : [],
+                    [ 'meta', { name: 'DC.date', content: frontmatter.created.replace('-', '/') } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace('-', '/') } ] : [],
                     [ 'meta', { name: 'DC.format', content: 'text/html' } ],
                     [ 'meta', { name: 'DC.language', content: 'en-US' } ],
                     [ 'meta', { name: 'DC.publisher', content: siteData.title } ],
@@ -97,17 +100,17 @@ export default {
                     // Citation
                     [ 'meta', { name: 'citation_title', content: eipTitle } ],
                     ...authors.map(author => [ 'meta', { name: 'citation_author', content: author } ]),
-                    [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace("-", "/") } ],
-                    frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace("-", "/") } ] : [],
+                    [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace('-', '/') } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace('-', '/') } ] : [],
                     [ 'meta', { name: 'citation_technical_report_institution', content: siteData.title } ],
                     [ 'meta', { name: 'citation_technical_report_number', content: frontmatter.eip } ],
                     // LD+JSON
                     [ 'script', { type: 'application/ld+json' }, JSON.stringify({
-                        "@type": "WebSite",
-                        "url": `https://eips.ethereum.org/${pageData.relativePath}`,
-                        "name": eipTitle,
-                        "description": pageData.description,
-                        "@context": "https://schema.org"
+                        '@type': 'WebSite',
+                        'url': `https://eips.ethereum.org/${pageData.relativePath}`,
+                        'name': eipTitle,
+                        'description': pageData.description,
+                        '@context': 'https://schema.org'
                     })],
                 ].filter(x => x?.length);
             } else {
@@ -135,7 +138,7 @@ export default {
                 }
                 // The below caused so much pain and suffering :|
                 if (!frontmatter.created) {
-                    let initial = new Date((await git.log(["--diff-filter=A", "--", pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
+                    let initial = new Date((await git.log(['--diff-filter=A', '--', pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
                     if (initial) {
                         frontmatter.created = formatDateString(initial);
                     }
@@ -172,12 +175,9 @@ export default {
         }
     },
     async buildEnd(siteConfig) {
-        logger.info('Copying favicon.ico');
-        fs.copyFileSync('./favicon.ico', './.vitepress/dist/favicon.ico');
-
         logger.info('Making feeds');
 
-        const url = "https://eips.ethereum.org";
+        const url = 'https://eips.ethereum.org';
         fs.mkdirSync('./.vitepress/dist/rss', { recursive: true });
         fs.mkdirSync('./.vitepress/dist/atom', { recursive: true });
 
