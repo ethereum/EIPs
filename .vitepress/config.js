@@ -199,18 +199,30 @@ export default {
                 for (let eip in await eips) {
                     let eipData = (await eips)[eip];
 
-                    if (["type", "category", "status"].every(key => !filter[key] || filter[key](eip[key]))) {
-                        feed.addItem({
-                            title: eipData.title,
-                            id: `${url}/EIPS/eip-${eip}`,
-                            link: `${url}/EIPS/eip-${eip}`,
-                            date: eipData.lastStatusChange,
-                            description: eipData.description,
-                            //author: eipData.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]),
-                            content: eipData.content,
-                            guid: eip,
-                        });
+                    let skip = false;
+
+                    for (let key of Object.keys(filter)) {
+                        if (filter[key] && !filter[key](eipData[key])) {
+                            logger.info(`Skipping ${eip} in \`${feedName}\` because ${key} does not match filter`);
+                            skip = true;
+                            break;
+                        }
                     }
+
+                    if (skip) {
+                        continue;
+                    }
+                    logger.info(`Adding ${eip} to feed \`${feedName}\``);
+                    feed.addItem({
+                        title: eipData.title,
+                        id: `${url}/EIPS/eip-${eip}`,
+                        link: `${url}/EIPS/eip-${eip}`,
+                        date: eipData.lastStatusChange,
+                        description: eipData.description,
+                        //author: eipData.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]),
+                        content: eipData.content,
+                        guid: eip,
+                    });
                 }
 
                 // Export the feed
