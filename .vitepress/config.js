@@ -271,12 +271,12 @@ export default withPwa(defineConfig({
             "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
             "icons": [
                 {
-                    "src": "/assets/images/android-chrome-192x192.png",
+                    "src": "/assets/website/android-chrome-192x192.png",
                     "sizes": "192x192",
                     "type": "image/png"
                 },
                 {
-                    "src": "/assets/images/android-chrome-512x512.png",
+                    "src": "/assets/website/android-chrome-512x512.png",
                     "sizes": "512x512",
                     "type": "image/png"
                 }
