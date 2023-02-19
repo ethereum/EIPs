@@ -201,8 +201,8 @@ Which renders to:
 
 Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
-```javascript
-regex = /^https:\/\/github\.com\/ethereum\/consensus-specs\/blob\/[0-9a-f]{40}\/.*$/g;
+```rust
+Regex::new(r"https:\/\/github\.com\/ethereum\/consensus-specs\/blob\/[0-9a-f]{40}\/.*$")
 ```
 
 ### Networking Specifications
@@ -219,8 +219,8 @@ Which renders as:
 
 Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
-```javascript
-regex = /^https:\/\/github.com\/ethereum\/devp2p\/blob\/[0-9a-f]{40}\/.*$/g;
+```rust
+Regex::new(r"https:\/\/github\.com\/ethereum\/devp2p\/blob\/[0-9a-f]{40}\/.*$")
 ```
 
 ### Digital Object Identifier System
