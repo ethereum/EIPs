@@ -280,22 +280,13 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
-- Greg Colvin (@gcolvin)
-- Matt Garnett (@lightclient)
-- Sam Wilson (@SamWilsn)
-- Zainan Victor Zhou (@xinbenlv)
+<!-- markdownlint-disable-next-line no-inline-html -->
+<VPTeamMembers size="small" :members="$frontmatter.editors" />
 
 Emeritus EIP editors are
 
-- Casey Detrio (@cdetrio)
-- Hudson Jameson (@Souptacular)
-- Martin Becze (@wanderer)
-- Micah Zoltu (@MicahZoltu)
-- Nick Johnson (@arachnid)
-- Nick Savers (@nicksavers)
-- Vitalik Buterin (@vbuterin)
+<!-- markdownlint-disable-next-line no-inline-html -->
+<VPTeamMembers size="small" :members="$frontmatter.emeritusEditors" />
 
 If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md).
 

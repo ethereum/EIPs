@@ -5,6 +5,7 @@ import { createLogger } from 'vite-logger';
 import { Feed } from 'feed';
 import { withPwa } from '@vite-pwa/vitepress';
 import { defineConfig } from 'vitepress';
+import yaml from 'js-yaml';
 
 import feedConfig from './feeds.js';
 
@@ -149,6 +150,53 @@ export default withPwa(defineConfig({
             
             pageData = { ...pageData };
             let { frontmatter } = pageData;
+
+            if (frontmatter.eip == 1) { // EIP-1: Inject the most up to date EIP editor list
+                let editors = [];
+                let emeritusEditors = [];
+                let editorfile = await fs.promises.readFile('./config/eip-editors.yml', 'utf8');
+                let editordata = yaml.load(editorfile);
+                let editorUsernames = [];
+                let inactiveEditorUsernames = [];
+                for (let editorType in editordata) {
+                    for (let editor of editordata[editorType]) {
+                        if (editorUsernames.includes(editor)) continue;
+                        if (editorType === 'inactive') {
+                            inactiveEditorUsernames.push(editor);
+                        } else {
+                            editorUsernames.push(editor);
+                        }
+                    }
+                }
+                for (let username of editorUsernames) {
+                    let editorTypes = [];
+                    for (let editorType in editordata) {
+                        if (editordata[editorType].includes(username)) {
+                            editorTypes.push(editorType.charAt(0).toUpperCase() + editorType.slice(1));
+                        }
+                    }
+                    editors.push({
+                        avatar: `https://github.com/${username}.png`,
+                        name: username,
+                        title: editorTypes.join(', '),
+                        links: [
+                            { icon: 'github', link: `https://github.com/${username}` }
+                        ]
+                    });
+                }
+                for (let username of inactiveEditorUsernames) {
+                    emeritusEditors.push({
+                        avatar: `https://github.com/${username}.png`,
+                        name: username,
+                        title: 'Emeritus Editor',
+                        links: [
+                            { icon: 'github', link: `https://github.com/${username}` }
+                        ]
+                    });
+                }
+                frontmatter.editors = editors;
+                frontmatter.emeritusEditors = emeritusEditors;
+            }
 
             if (frontmatter.eip) {
                 // Try to read from cache
