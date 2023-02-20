@@ -1,11 +1,9 @@
 import { defineConfig } from 'vite';
-import { SearchPlugin } from 'vitepress-plugin-search';
+import { SimpleSearch } from 'vitepress-plugin-simple-search';
 
 // Handled mostly by vitepress
 export default defineConfig({
-    plugins: [SearchPlugin({
-        previewLength: 62,
-        buttonLabel: 'Search',
-        placeholder: 'Search EIPs'
+    plugins: [SimpleSearch({
+        partialsToIgnore: [ 'assets', '.vitepress', 'node_modules', '404', 'index', 'readme', 'license' ] // Exclude these partials from search results
     })],
 });
