@@ -190,14 +190,15 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
 
     assert False
 
+transactions = Transactions(
+    tx_list=[
+        normalize_signed_transaction(encoded_signed_tx, cfg)
+        for encoded_signed_tx in encoded_signed_txs
+    ],
+    chain_id=cfg.chain_id,
+)
+
 if __name__ == '__main__':
-    transactions = Transactions(
-        tx_list=[
-            normalize_signed_transaction(encoded_signed_tx, cfg)
-            for encoded_signed_tx in encoded_signed_txs
-        ],
-        chain_id=cfg.chain_id,
-    )
     print('transactions_root')
     print(f'0x{transactions.hash_tree_root().hex()}')
 
