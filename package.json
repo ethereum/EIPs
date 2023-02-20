@@ -29,7 +29,6 @@
     "vite-logger": "^0.0.1",
     "vite-plugin-pwa": "^0.14.4",
     "vitepress": "^1.0.0-alpha.46",
-    "vitepress-plugin-simple-search": "^1.3.3",
     "vue": "^3.2.47",
     "yaml": "^2.2.1"
   }

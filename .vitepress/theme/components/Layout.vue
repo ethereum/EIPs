@@ -5,6 +5,7 @@ import ReloadPrompt from './ReloadPrompt.vue';
 
 import EipCitation from './EipCitation.vue';
 import EipPreamble from './EipPreamble.vue';
+import GoogleSearch from './GoogleSearch.vue';
 
 const { Layout } = DefaultTheme;
 </script>
@@ -33,6 +34,9 @@ const { Layout } = DefaultTheme;
         </template>
         <template #layout-bottom>
             <ReloadPrompt/>
+        </template>
+        <template #nav-bar-content-before>
+            <GoogleSearch/>
         </template>
     </Layout>
 </template>
