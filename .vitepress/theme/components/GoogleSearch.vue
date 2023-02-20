@@ -19,16 +19,10 @@ let searchitem = ref("");
                     <kbd class="DocSearch-Button-Key"></kbd>
                     <kbd class="DocSearch-Button-Key">Search</kbd>
                 </a>
-                <input type="submit" class="DocSearch-Button-Placeholder" value="Search" style="display: none;" id="searchsubmit"/>
+                <input type="submit" class="DocSearch-Button-Placeholder" value="Search" style="display: none;" id="searchsubmit" onclick="document.getElementById('clicksearch').click();return false;"/>
             </span>
         </form>
     </div>
-    <component :is="'script'" async>
-        document.getElementById("searchsubmit").addEventListener("click", function(e) {
-            document.getElementById("clicksearch").click();
-            e.preventDefault();
-        });
-    </component>
 </template>
 <style>
 /* Overrides the default Google search box styles */
