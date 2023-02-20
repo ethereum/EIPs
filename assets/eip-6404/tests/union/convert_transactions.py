@@ -1,5 +1,3 @@
-from rlp import decode
-from snappy import compress
 from ssz_tx_types import *
 from create_transactions import *
 
@@ -102,11 +100,12 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
 
     assert False
 
+transactions = Transactions(*[
+    normalize_signed_transaction(encoded_signed_tx, cfg)
+    for encoded_signed_tx in encoded_signed_txs
+])
+
 if __name__ == '__main__':
-    transactions = Transactions(*[
-        normalize_signed_transaction(encoded_signed_tx, cfg)
-        for encoded_signed_tx in encoded_signed_txs
-    ])
     print('transactions_root')
     print(f'0x{transactions.hash_tree_root().hex()}')
 

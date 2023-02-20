@@ -1,4 +1,5 @@
 from rlp import decode
+from snappy import compress
 from eip2718_tx_types import *
 
 # Use `sign_transactions.py` to re-generate signatures after editing this file.
@@ -108,6 +109,6 @@ if __name__ == '__main__':
                 decode(encoded_signed_tx, LegacySignedTransaction))
         else:
             assert False
-        print(f'{tx_index} - {len(encoded_signed_tx)} bytes')
+        print(f'{tx_index} - {len(encoded_signed_tx)} bytes (Snappy: {len(compress(encoded_signed_tx))} bytes)')
         print(f'0x{tx_hash.hex()}')
         print(encoded_signed_tx[:1024].hex())
