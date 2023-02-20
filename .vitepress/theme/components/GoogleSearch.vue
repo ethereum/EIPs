@@ -23,7 +23,7 @@ let searchitem = ref("");
             </span>
         </form>
     </div>
-    <component :is="'script'">
+    <component :is="'script'" async>
         document.getElementById("searchsubmit").addEventListener("click", function(e) {
             document.getElementById("clicksearch").click();
             e.preventDefault();
