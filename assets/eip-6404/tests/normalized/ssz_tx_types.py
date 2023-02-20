@@ -80,20 +80,17 @@ class BlobDetails(Container):
     max_fee_per_data_gas: uint256
     blob_versioned_hashes: List[VersionedHash, MAX_VERSIONED_HASHES_LIST_SIZE]
 
-class TransactionDetails(Container):
-    limits: TransactionLimits
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]  # EIP-2930
-    blob: Optional[BlobDetails]  # EIP-4844
-
 class TransactionPayload(Container):
     tx_from: ExecutionAddress
+    nonce: uint64
     tx_to: DestinationAddress
     tx_value: uint256
     tx_input: ByteList[MAX_CALLDATA_SIZE]
-    details: TransactionDetails
-    nonce: uint64
+    limits: TransactionLimits
     sig_type: TransactionSignatureType
     signature: TransactionSignature
+    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]  # EIP-2930
+    blob: Optional[BlobDetails]  # EIP-4844
 
 class Transaction(Container):
     payload: TransactionPayload

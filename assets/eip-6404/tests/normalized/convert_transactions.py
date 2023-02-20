@@ -1,9 +1,5 @@
-from remerkleable.basic import boolean, uint64, uint256
-from remerkleable.byte_arrays import ByteList
-from remerkleable.complex import Container, List
-from remerkleable.union import Union
-from rlp import decode, Serializable
-from rlp.sedes import Binary, CountableList, List as RLPList, big_endian_int, binary
+from rlp import decode
+from snappy import compress
 from ssz_tx_types import *
 from create_transactions import *
 
@@ -35,26 +31,24 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
         return Transaction(
             payload=TransactionPayload(
                 tx_from=tx_from,
+                nonce=signed_tx.message.nonce,
                 tx_to=tx_to,
                 tx_value=signed_tx.message.value,
                 tx_input=signed_tx.message.data,
-                details=TransactionDetails(
-                    limits=TransactionLimits(
-                        gas=signed_tx.message.gas,
-                        max_fee_per_gas=signed_tx.message.max_fee_per_gas,
-                        max_priority_fee_per_gas=signed_tx.message.max_priority_fee_per_gas,
-                    ),
-                    access_list=signed_tx.message.access_list,
-                    blob=Optional[BlobDetails](BlobDetails(
-                        max_fee_per_data_gas=signed_tx.message.max_fee_per_data_gas,
-                        blob_versioned_hashes=signed_tx.message.blob_versioned_hashes,
-                    )),
+                limits=TransactionLimits(
+                    gas=signed_tx.message.gas,
+                    max_fee_per_gas=signed_tx.message.max_fee_per_gas,
+                    max_priority_fee_per_gas=signed_tx.message.max_priority_fee_per_gas,
                 ),
-                nonce=signed_tx.message.nonce,
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP4844,
                 ),
                 signature=signature,
+                access_list=signed_tx.message.access_list,
+                blob=Optional[BlobDetails](BlobDetails(
+                    max_fee_per_data_gas=signed_tx.message.max_fee_per_data_gas,
+                    blob_versioned_hashes=signed_tx.message.blob_versioned_hashes,
+                )),
             ),
             tx_hash=compute_eip4844_tx_hash(signed_tx),
         )
@@ -84,25 +78,23 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
         return Transaction(
             payload=TransactionPayload(
                 tx_from=tx_from,
+                nonce=signed_tx.nonce,
                 tx_to=tx_to,
                 tx_value=signed_tx.amount,
                 tx_input=signed_tx.data,
-                details=TransactionDetails(
-                    limits=TransactionLimits(
-                        gas=signed_tx.gas_limit,
-                        max_fee_per_gas=signed_tx.max_fee_per_gas,
-                        max_priority_fee_per_gas=signed_tx.max_priority_fee_per_gas,
-                    ),
-                    access_list=[AccessTuple(
-                        address=access_tuple[0],
-                        storage_keys=access_tuple[1],
-                    ) for access_tuple in signed_tx.access_list],
+                limits=TransactionLimits(
+                    gas=signed_tx.gas_limit,
+                    max_fee_per_gas=signed_tx.max_fee_per_gas,
+                    max_priority_fee_per_gas=signed_tx.max_priority_fee_per_gas,
                 ),
-                nonce=signed_tx.nonce,
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP1559,
                 ),
                 signature=signature,
+                access_list=[AccessTuple(
+                    address=access_tuple[0],
+                    storage_keys=access_tuple[1],
+                ) for access_tuple in signed_tx.access_list],
             ),
             tx_hash=compute_eip1559_tx_hash(signed_tx),
         )
@@ -132,25 +124,23 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
         return Transaction(
             payload=TransactionPayload(
                 tx_from=tx_from,
+                nonce=signed_tx.nonce,
                 tx_to=tx_to,
                 tx_value=signed_tx.value,
                 tx_input=signed_tx.data,
-                details=TransactionDetails(
-                    limits=TransactionLimits(
-                        gas=signed_tx.gasLimit,
-                        max_fee_per_gas=signed_tx.gasPrice,
-                        max_priority_fee_per_gas=signed_tx.gasPrice,
-                    ),
-                    access_list=[AccessTuple(
-                        address=access_tuple[0],
-                        storage_keys=access_tuple[1],
-                    ) for access_tuple in signed_tx.accessList],
+                limits=TransactionLimits(
+                    gas=signed_tx.gasLimit,
+                    max_fee_per_gas=signed_tx.gasPrice,
+                    max_priority_fee_per_gas=signed_tx.gasPrice,
                 ),
-                nonce=signed_tx.nonce,
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP2930,
                 ),
                 signature=signature,
+                access_list=[AccessTuple(
+                    address=access_tuple[0],
+                    storage_keys=access_tuple[1],
+                ) for access_tuple in signed_tx.accessList],
             ),
             tx_hash=compute_eip2930_tx_hash(signed_tx),
         )
@@ -180,17 +170,15 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
         return Transaction(
             payload=TransactionPayload(
                 tx_from=tx_from,
+                nonce=signed_tx.nonce,
                 tx_to=tx_to,
                 tx_value=signed_tx.value,
                 tx_input=signed_tx.data,
-                details=TransactionDetails(
-                    limits=TransactionLimits(
-                        gas=signed_tx.startgas,
-                        max_fee_per_gas=signed_tx.gasprice,
-                        max_priority_fee_per_gas=signed_tx.gasprice,
-                    ),
+                limits=TransactionLimits(
+                    gas=signed_tx.startgas,
+                    max_fee_per_gas=signed_tx.gasprice,
+                    max_priority_fee_per_gas=signed_tx.gasprice,
                 ),
-                nonce=signed_tx.nonce,
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_LEGACY,
                     no_replay_protection=(signed_tx.v in (27, 28)),
@@ -216,7 +204,7 @@ if __name__ == '__main__':
     tx_index=0
     for tx in transactions.tx_list:
         encoded = tx.encode_bytes()
-        print(f'{tx_index} - {len(encoded)} bytes')
+        print(f'{tx_index} - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(f'0x{tx.tx_hash.hex()}')
         print(encoded.hex())
         tx_index += 1
