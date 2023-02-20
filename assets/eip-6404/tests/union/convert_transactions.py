@@ -1,4 +1,5 @@
 from rlp import decode
+from snappy import compress
 from ssz_tx_types import *
 from create_transactions import *
 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     tx_index=0
     for tx in transactions:
         encoded = tx.encode_bytes()
-        print(f'{tx_index} - {len(encoded)} bytes')
+        print(f'{tx_index} - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(f'0x{tx.get_backing().getter(2).merkle_root().hex()}')
         print(encoded.hex())
         tx_index += 1
