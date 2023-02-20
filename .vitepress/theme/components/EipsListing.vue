@@ -15,7 +15,7 @@ import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $f
             <tbody>
                 <tr v-for="eip of $frontmatter.eips.filter(eip => eip.status == status && Object.keys($frontmatter.filter).every(key => $frontmatter.filter[key].includes({ ...eip }[key])))">
                     <td><a :href="`./EIPS/eip-${eip.eip}`">{{ eip.category == 'ERC' ? 'ERC' : 'EIP' }}-{{ eip.eip }}</a></td>
-                    <td>{{ eip.title }}</td>
+                    <td>{{ eip.onlyTitle }}</td>
                     <td>{{ eip?.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]).join(", ") }}</td>
                 </tr>
             </tbody>

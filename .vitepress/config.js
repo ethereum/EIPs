@@ -18,7 +18,14 @@ const eips = Promise.all(fs.readdirSync('./EIPS/').map(async file => {
     let eipContent = fs.readFileSync(`./EIPS/${file}`, 'utf8');
     let eipData = grayMatter(eipContent);
     let lastStatusChange = new Date((await git.raw(['blame', `EIPS/${file}`])).split('\n').filter(line => line.match(/status:/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
-    return { ...eipData.data, lastStatusChange };
+    let onlyTitle = eipData.data.title;
+    let eipPrefix = eipData.data.category === 'ERC' ? 'EIP' : 'EIP';
+    let newTitle = `${eipPrefix}-${eipData.data.eip}: ${eipData.data.title}`;
+    let newPreamble = { ...eipData.data };
+    newPreamble.title = newTitle;
+    newPreamble.onlyTitle = onlyTitle;
+    newPreamble.lastStatusChange = lastStatusChange;
+    return newPreamble;
 })).then(res => res.sort((a, b) => a.eip - b.eip));
 
 function formatDateString(date) {
@@ -229,6 +236,14 @@ export default withPwa(defineConfig({
                     created: frontmatter.created,
                     finalized: frontmatter.finalized,
                 }));
+            }
+            if (frontmatter.eip) {
+                // Override the title
+                let onlyTitle = frontmatter.title;
+                let eipPrefix = frontmatter.category === 'ERC' ? 'ERC' : 'EIP';
+                pageData.title = `${eipPrefix}-${frontmatter.eip}: ${frontmatter.title}`;
+                frontmatter.title = pageData.title;
+                frontmatter.onlyTitle = onlyTitle;
             }
             if (frontmatter.eip) {
                 // More convenient author data

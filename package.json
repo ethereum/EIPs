@@ -21,6 +21,7 @@
     "@vite-pwa/vitepress": "^0.0.5",
     "cross-env": "^5.0.5",
     "feed": "^4.2.2",
+    "flexsearch": "^0.7.31",
     "gray-matter": "^4.0.3",
     "increase-memory-limit": "^1.0.3",
     "js-yaml": "^4.1.0",
@@ -28,6 +29,7 @@
     "vite-logger": "^0.0.1",
     "vite-plugin-pwa": "^0.14.4",
     "vitepress": "^1.0.0-alpha.46",
+    "vitepress-plugin-search": "^1.0.4-alpha.19",
     "vue": "^3.2.47",
     "yaml": "^2.2.1"
   }

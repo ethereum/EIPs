@@ -1,6 +1,11 @@
 import { defineConfig } from 'vite';
+import { SearchPlugin } from 'vitepress-plugin-search';
 
-// Handled by vitepress
-// This is here for future extensibility, if needed
+// Handled mostly by vitepress
 export default defineConfig({
+    plugins: [SearchPlugin({
+        previewLength: 62,
+        buttonLabel: 'Search',
+        placeholder: 'Search EIPs'
+    })],
 });

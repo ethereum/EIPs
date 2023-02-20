@@ -9,7 +9,7 @@ import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $f
                     <use xlink:href="#bi-chat"/>
                 </svg>
             </a>
-            EIP-{{ $frontmatter.eip }}: {{ $frontmatter.title }}
+            {{ $frontmatter.title }}
         </h1>
         <h3 v-if="$frontmatter.description" style="margin-top: 0.1em;">{{ $frontmatter.description }}</h3>
         <p style="margin-bottom: 1em;">
@@ -29,11 +29,32 @@ import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $f
         </p>
         <div class="tip custom-block" v-if="$frontmatter.status == 'Review' || $frontmatter.status == 'Last Call'">
             <p class="custom-block-title">
-                <svg class="inline-svg"><use xlink:href="#bi-megaphone-fill"/></svg>
                 <span>Peer Review Notice</span>
             </p>
             <p>This EIP is in the process of being peer-reviewed. <a :href="$frontmatter['discussions-to']">If you are interested in this EIP, and have feedback to share, please participate using this discussion link.</a> Thank you!</p>
         </div>
+        <div class="warning custom-block" v-if="$frontmatter.status == 'Draft'">
+            <p class="custom-block-title">
+                <svg class="inline-svg"><use xlink:href="#bi-megaphone-fill"/></svg>
+                <span>Draft Notice</span>
+            </p>
+            <p>This EIP is in the process of being drafted. The content of this EIP is not final and can change at any time; this EIP is not yet suitable for use in production. Thank you!</p>
+        </div>
+        <div class="danger custom-block" v-if="$frontmatter.status == 'Withdrawn'">
+            <p class="custom-block-title">
+                <span>Withdrawn</span>
+            </p>
+            <p>This EIP has been withdrawn by its authors. <span v-if="$frontmatter['withdrawal-reason']">The authors have provided the following reason:</span></p>
+            <p v-if="$frontmatter['withdrawal-reason']">{{ $frontmatter['withdrawal-reason'] }}</p>
+        </div>
+        <div class="danger custom-block" v-if="$frontmatter.status == 'Stagnant'">
+            <p class="custom-block-title">
+                <span>Stagnant</span>
+            </p>
+            <p>This EIP has had no recent activity for at least 6 months, and has automatically been marked as stagnant. This EIP should not be used in production.</p>
+            <p>If you are interested in helping move this EIP to final, <a :href="`https://github.com/ethereum/EIPs/edit/master/EIPS/eip-${$frontmatter.eip}.md`" target="_blank">create a PR to move this EIP back to Draft and add yourself as an author</a>, and an EIP editor will help guide you through the process. Thank you!</p>
+        </div>
+        
         <table class="preamble-table">
             <tbody>
                 <tr>
