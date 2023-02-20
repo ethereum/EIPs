@@ -24,8 +24,9 @@ let searchitem = ref("");
         </form>
     </div>
     <component :is="'script'">
-        document.getElementById("searchsubmit").addEventListener("click", function() {
+        document.getElementById("searchsubmit").addEventListener("click", function(e) {
             document.getElementById("clicksearch").click();
+            e.preventDefault();
         });
     </component>
 </template>
