@@ -6,9 +6,15 @@
     </div>
 </template>
 <style>
+/* Overrides the default Google search box styles */
 .gsc-control-cse {
     background-color: inherit !important;
     border: none !important;
+    color: #000000 !important;
+}
+.gsc-completion-container {
+    background-color: #ffffff !important;
+    border: 1px solid #000000 !important;
     color: #000000 !important;
 }
 </style>
