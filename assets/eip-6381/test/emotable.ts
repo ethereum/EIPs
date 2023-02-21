@@ -31,7 +31,7 @@ describe('RMRKMultiAssetEmotableMock', async function () {
   });
 
   it('can support IEmotable', async function () {
-    expect(await token.supportsInterface('0xf8d6854d')).to.equal(true);
+    expect(await token.supportsInterface('0x580d1840')).to.equal(true);
   });
 
   it('can support IERC721', async function () {
