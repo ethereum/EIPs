@@ -16,8 +16,10 @@ from eip2718_tx_types import (
     MAX_TRANSACTIONS_PER_PAYLOAD,
     MAX_VERSIONED_HASHES_LIST_SIZE,
     AccessTuple,
+    DestinationAddress,
     ExecutionAddress,
     Hash32,
+    TransactionLimits,
     VersionedHash,
 )
 
@@ -60,21 +62,6 @@ def ecdsa_recover_tx_from(signature: TransactionSignature, sig_hash: Hash32) -> 
     recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[0:64], signature[64])
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_hash, recover_sig, raw=True))
     return ExecutionAddress(keccak(public_key.serialize())[12:32])
-
-class DestinationType(uint8):
-    pass
-
-DESTINATION_TYPE_REGULAR = DestinationType(0x00)
-DESTINATION_TYPE_CREATE = DestinationType(0x01)
-
-class DestinationAddress(Container):
-    destination_type: DestinationType
-    address: ExecutionAddress
-
-class TransactionLimits(Container):
-    gas: uint64
-    max_fee_per_gas: uint256
-    max_priority_fee_per_gas: uint256  # EIP-1559
 
 class BlobDetails(Container):
     max_fee_per_data_gas: uint256

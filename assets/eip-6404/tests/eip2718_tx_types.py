@@ -1,5 +1,5 @@
 from eth_hash.auto import keccak
-from remerkleable.basic import boolean, uint64, uint256
+from remerkleable.basic import boolean, uint8, uint64, uint256
 from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32, Bytes48
 from remerkleable.complex import Container, List, Vector
 from remerkleable.union import Union
@@ -229,6 +229,16 @@ class BlobTransactionNetworkWrapper(Container):
     blobs: List[Vector[BLSFieldElement, FIELD_ELEMENTS_PER_BLOB], LIMIT_BLOBS_PER_TX]
     kzg_aggregated_proof: KZGProof
 
+class DestinationType(uint8):
+    pass
+
+DESTINATION_TYPE_REGULAR = DestinationType(0x00)
+DESTINATION_TYPE_CREATE = DestinationType(0x01)
+
+class DestinationAddress(Container):
+    destination_type: DestinationType
+    address: ExecutionAddress
+
 class ContractAddressData(Serializable):
     fields = (
         ('tx_from', Binary(20, 20)),
@@ -240,3 +250,15 @@ def compute_contract_address(tx_from: ExecutionAddress, nonce: uint64) -> Execut
         tx_from=tx_from,
         nonce=nonce,
     )))[12:32])
+
+class TransactionLimits(Container):
+    max_priority_fee_per_gas: uint256
+    max_fee_per_gas: uint256
+    gas: uint64
+
+class TransactionInfo(Container):
+    tx_from: ExecutionAddress
+    nonce: uint64
+    tx_to: DestinationAddress
+    tx_value: uint256
+    limits: TransactionLimits

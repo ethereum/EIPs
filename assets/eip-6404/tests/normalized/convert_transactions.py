@@ -36,9 +36,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                 tx_value=signed_tx.message.value,
                 tx_input=signed_tx.message.data,
                 limits=TransactionLimits(
-                    gas=signed_tx.message.gas,
-                    max_fee_per_gas=signed_tx.message.max_fee_per_gas,
                     max_priority_fee_per_gas=signed_tx.message.max_priority_fee_per_gas,
+                    max_fee_per_gas=signed_tx.message.max_fee_per_gas,
+                    gas=signed_tx.message.gas,
                 ),
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP4844,
@@ -83,9 +83,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                 tx_value=signed_tx.amount,
                 tx_input=signed_tx.data,
                 limits=TransactionLimits(
-                    gas=signed_tx.gas_limit,
-                    max_fee_per_gas=signed_tx.max_fee_per_gas,
                     max_priority_fee_per_gas=signed_tx.max_priority_fee_per_gas,
+                    max_fee_per_gas=signed_tx.max_fee_per_gas,
+                    gas=signed_tx.gas_limit,
                 ),
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP1559,
@@ -129,9 +129,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                 tx_value=signed_tx.value,
                 tx_input=signed_tx.data,
                 limits=TransactionLimits(
-                    gas=signed_tx.gasLimit,
-                    max_fee_per_gas=signed_tx.gasPrice,
                     max_priority_fee_per_gas=signed_tx.gasPrice,
+                    max_fee_per_gas=signed_tx.gasPrice,
+                    gas=signed_tx.gasLimit,
                 ),
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_EIP2930,
@@ -175,9 +175,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                 tx_value=signed_tx.value,
                 tx_input=signed_tx.data,
                 limits=TransactionLimits(
-                    gas=signed_tx.startgas,
-                    max_fee_per_gas=signed_tx.gasprice,
                     max_priority_fee_per_gas=signed_tx.gasprice,
+                    max_fee_per_gas=signed_tx.gasprice,
+                    gas=signed_tx.startgas,
                 ),
                 sig_type=TransactionSignatureType(
                     tx_type=TRANSACTION_TYPE_LEGACY,
@@ -197,15 +197,15 @@ transactions = Transactions(
     ],
     chain_id=cfg.chain_id,
 )
+transactions_root = transactions.hash_tree_root()
 
 if __name__ == '__main__':
     print('transactions_root')
-    print(f'0x{transactions.hash_tree_root().hex()}')
+    print(f'0x{transactions_root.hex()}')
 
-    tx_index=0
-    for tx in transactions.tx_list:
+    for tx_index in range(len(transactions.tx_list)):
+        tx = transactions.tx_list[tx_index]
         encoded = tx.encode_bytes()
         print(f'{tx_index} - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(f'0x{tx.tx_hash.hex()}')
         print(encoded.hex())
-        tx_index += 1
