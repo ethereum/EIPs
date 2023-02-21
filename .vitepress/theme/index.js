@@ -4,6 +4,7 @@ import { VPTeamMembers } from 'vitepress/theme'
 
 import Layout from './components/Layout.vue';
 import EipsListing from './components/EipsListing.vue';
+import SearchWidget from './components/SearchWidget.vue';
 
 export default {
   ...DefaultTheme,
@@ -13,5 +14,6 @@ export default {
 
     app.component('EipsListing', EipsListing);
     app.component('VPTeamMembers', VPTeamMembers);
+    app.component('SearchWidget', SearchWidget);
   }
 };

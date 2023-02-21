@@ -5,9 +5,15 @@ import ReloadPrompt from './ReloadPrompt.vue';
 
 import EipCitation from './EipCitation.vue';
 import EipPreamble from './EipPreamble.vue';
-import GoogleSearch from './GoogleSearch.vue';
 
 const { Layout } = DefaultTheme;
+
+// Redirect to search on k keypress (if not in search page, and not in input field)
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
+        window.location.href = '/search';
+    }
+});
 </script>
 
 <template>
@@ -36,7 +42,20 @@ const { Layout } = DefaultTheme;
             <ReloadPrompt/>
         </template>
         <template #nav-bar-content-before>
-            <GoogleSearch/>
+            <div id="docsearch">
+                <a class="DocSearch DocSearch-Button" aria-label="Search" href="/search">
+                    <span class="DocSearch-Button-Container">
+                        <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
+                            <path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke=""></path>
+                        </svg>
+                        <span class="DocSearch-Button-Placeholder">Search</span>
+                    </span>
+                    <span class="DocSearch-Button-Keys">
+                        <kbd class="DocSearch-Button-Key"></kbd>
+                        <kbd class="DocSearch-Button-Key">K</kbd>
+                    </span>
+                </a>
+            </div>
         </template>
     </Layout>
 </template>

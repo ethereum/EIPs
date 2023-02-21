@@ -270,8 +270,10 @@ export default withPwa(defineConfig({
                 }
                 frontmatter.authorData = authors;
             }
-            frontmatter.allEips = await eips;
-            frontmatter.allStatuses = statuses;
+            if (frontmatter.listing) {
+                frontmatter.allEips = await eips;
+                frontmatter.allStatuses = statuses;
+            }
             
             logger.info(`Finished Transforming ${pageData.relativePath}`);
 
