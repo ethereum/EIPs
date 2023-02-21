@@ -104,15 +104,15 @@ transactions = Transactions(*[
     normalize_signed_transaction(encoded_signed_tx, cfg)
     for encoded_signed_tx in encoded_signed_txs
 ])
+transactions_root = transactions.hash_tree_root()
 
 if __name__ == '__main__':
     print('transactions_root')
-    print(f'0x{transactions.hash_tree_root().hex()}')
+    print(f'0x{transactions_root.hex()}')
 
-    tx_index=0
-    for tx in transactions:
+    for tx_index in range(len(transactions)):
+        tx = transactions[tx_index]
         encoded = tx.encode_bytes()
         print(f'{tx_index} - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(f'0x{tx.get_backing().getter(2).merkle_root().hex()}')
         print(encoded.hex())
-        tx_index += 1
