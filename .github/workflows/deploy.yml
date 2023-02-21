@@ -47,7 +47,7 @@ jobs:
       - name: Build Website
         run: |
           export NODE_ENV=production
-          export NODE_OPTIONS=--max_old_space_size=4096
+          export NODE_OPTIONS=--max_old_space_size=6144
           npm run build
       - name: Configure GitHub Pages
         uses: actions/configure-pages@fc89b04e7d263ef510d9e77d3a1d088fb2688522
