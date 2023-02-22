@@ -1,6 +1,6 @@
 import DefaultTheme from 'vitepress/theme';
 
-import { VPTeamMembers } from 'vitepress/theme'
+import { VPTeamMembers } from 'vitepress/theme';
 
 import Layout from './components/Layout.vue';
 import EipsListing from './components/EipsListing.vue';

@@ -7,13 +7,6 @@ import EipCitation from './EipCitation.vue';
 import EipPreamble from './EipPreamble.vue';
 
 const { Layout } = DefaultTheme;
-
-// Redirect to search on k keypress (if not in search page, and not in input field)
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
-        window.location.href = '/search';
-    }
-});
 </script>
 
 <template>
@@ -58,6 +51,15 @@ document.addEventListener('keydown', (e) => {
             </div>
         </template>
     </Layout>
+    <!-- Hacky way to add a script to the page -->
+    <!-- Doesn't support JS comments! -->
+    <component :is="'script'">
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
+                window.location.href = '/search';
+            }
+        });
+    </component>
 </template>
 
 <style>

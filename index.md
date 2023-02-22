@@ -10,7 +10,7 @@ hero:
   actions:
     - theme: brand
       text: Browse EIPs
-      link: /all
+      link: /search
     - theme: alt
       text: View on GitHub
       link: https://github.com/ethereum/EIPs

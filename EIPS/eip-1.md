@@ -1,6 +1,7 @@
 ---
 eip: 1
 title: EIP Purpose and Guidelines
+description: Formalizes the EIP process
 status: Living
 type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
