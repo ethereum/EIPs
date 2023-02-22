@@ -50,16 +50,16 @@ const { Layout } = DefaultTheme;
                 </a>
             </div>
         </template>
+        <!-- Hacky way to add a script to the page -->
+        <!-- Doesn't support JS comments! -->
+        <component :is="'script'" v-html="`
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
+                    window.location.href = '/search';
+                }
+            });
+        `"></component>
     </Layout>
-    <!-- Hacky way to add a script to the page -->
-    <!-- Doesn't support JS comments! -->
-    <component :is="'script'" v-html="`
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
-                window.location.href = '/search';
-            }
-        });
-    `"></component>
 </template>
 
 <style>
