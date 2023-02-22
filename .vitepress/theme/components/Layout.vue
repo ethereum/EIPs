@@ -53,13 +53,13 @@ const { Layout } = DefaultTheme;
     </Layout>
     <!-- Hacky way to add a script to the page -->
     <!-- Doesn't support JS comments! -->
-    <component :is="'script'">
+    <component :is="'script'" v-html="`
         document.addEventListener('keydown', (e) => {
             if (e.key === 'k' && document?.activeElement?.tagName?.toLowerCase() !== 'input' && window?.location?.pathname !== '/search') {
                 window.location.href = '/search';
             }
         });
-    </component>
+    `"></component>
 </template>
 
 <style>
