@@ -36,7 +36,7 @@ let results = computed(() => {
         }
         for (let modifier of searchModifiers) {
             let [key, value] = modifier.split(":");
-            if (eip[key].toLowerCase() != value.toLowerCase()) return false;
+            if (eip[key]?.toLowerCase() != value?.toLowerCase()) return false;
         }
         return true;
     }).sort((eip1, eip2) => {
