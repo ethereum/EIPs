@@ -25,8 +25,8 @@ for (let eip of frontmatter.allEips) {
 
 let search = ref("");
 let results = computed(() => {
-    let searchQuery = search.value.toLowerCase().split(/[\s-_]+/);
-    let searchModifiers = searchQuery.filter(q => q && q.includes(":"));
+    let searchQuery = search.value.toLowerCase().match(/([^\s-_"]|((?<!\\)".*(?!\\)"))+/g);
+    let searchModifiers = searchQuery.filter(q => q && q.includes(":")).map(q => q.replace(`"`, ""));
     searchQuery = searchQuery.filter(q => q && !q.includes(":"));
     let results = transformedEips.filter(eip => {
         for (let query of searchQuery) {
