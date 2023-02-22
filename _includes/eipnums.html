@@ -1,4 +1,4 @@
 {% assign eips=include.eips|split:"," %}
 {% for eipnum in eips %}
-  <a href="{{eipnum|strip|prepend:"eip-" }}">{{eipnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
+  <a href="{{eipnum|strip|prepend:"eip-" }}">EIP-{{eipnum|strip}}</a>{% if forloop.last == false %}, {% endif %}
 {% endfor %}
