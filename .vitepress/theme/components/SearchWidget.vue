@@ -1,7 +1,6 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $frontmatter
-import { getCurrentInstance } from 'vue';
-import { useVueFuse } from 'vue-fuse';
+import { getCurrentInstance, ref, computed } from 'vue';
 
 // Get front matter from the current page (in app.config.globalProperties.$frontmatter)
 let vm = getCurrentInstance();
@@ -21,10 +20,20 @@ for (let eip of frontmatter.allEips) {
     });
 }
 
-const { search, results, noResults } = useVueFuse(transformedEips, {
-    keys: ['title', 'wrongTitle'],
-    threshold: 0.3,
-});
+let search = ref("");
+let results = computed(() => {
+    let searchQuery = search.value.toLowerCase().split(/[\s-_]+/);
+    let results = transformedEips.filter(eip => {
+        for (let query of searchQuery) {
+            if (!eip?.title?.toLowerCase()?.includes(query) && !eip?.wrongTitle?.toLowerCase()?.includes(query) && !eip?.description?.toLowerCase()?.includes(query)) {
+                return false;
+            }
+        }
+        return true;
+    }).sort((eip1, eip2) => eip1.eip - eip2.eip);
+    console.log(results);
+    return results;
+})
 </script>
 <template>
     <div type="button" class="DocSearch DocSearch-Button" aria-label="Search">
@@ -36,7 +45,7 @@ const { search, results, noResults } = useVueFuse(transformedEips, {
         </span>
     </div>
     <div>
-        <p v-if="noResults">Sorry, no results for {{search}}</p>
+        <p v-if="!results.length">Sorry, no results for <code>{{search}}</code></p>
         <div class="info custom-block search-result" v-for="(r, i) in results" :key="i">
             <p class="custom-block-title">
                 <a :href="r.link">{{ r.title }}</a>

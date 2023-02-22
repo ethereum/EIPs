@@ -22,7 +22,6 @@
     "cross-env": "^5.0.5",
     "feed": "^4.2.2",
     "flexsearch": "^0.7.31",
-    "fuse.js": "^6.6.2",
     "gray-matter": "^4.0.3",
     "increase-memory-limit": "^1.0.3",
     "js-yaml": "^4.1.0",
@@ -31,7 +30,6 @@
     "vite-plugin-pwa": "^0.14.4",
     "vitepress": "^1.0.0-alpha.46",
     "vue": "^3.2.47",
-    "vue-fuse": "^4.1.1",
     "yaml": "^2.2.1"
   }
 }
