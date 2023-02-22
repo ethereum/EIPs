@@ -69,13 +69,13 @@ watch(search, (newSearch) => {
 });
 </script>
 <template>
-    <div type="button" class="DocSearch DocSearch-Button" aria-label="Search">
-        <span class="DocSearch-Button-Container">
-            <svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20">
-                <path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke=""></path>
-            </svg>
-            <input type="text" v-model="search" placeholder="Search..." autofocus>
-        </span>
+    <div role="button" aria-expanded="true" aria-haspopup="listbox" aria-labelledby="docsearch-label" class="DocSearch" tabindex="0">
+        <header class="DocSearch-SearchBar">
+            <form class="DocSearch-Form">
+                <label class="DocSearch-MagnifierLabel" for="docsearch-input" id="docsearch-label"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" style="--darkreader-inline-stroke: currentColor;" data-darkreader-inline-stroke=""></path></svg></label>
+                <input v-model="search" class="DocSearch-Input" aria-autocomplete="both" aria-labelledby="docsearch-label" id="docsearch-input" autocomplete="off" autocorrect="off" autocapitalize="none" enterkeyhint="search" spellcheck="false" autofocus="true" placeholder="Search docs" maxlength="64" type="search">
+            </form>
+        </header>
     </div>
     <div>
         <p v-if="!results.length">Sorry, no results for <code>{{search}}</code></p>
