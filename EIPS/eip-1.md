@@ -154,6 +154,10 @@ or
 
 > Random J. User (@username)
 
+or
+
+> Random J. User (@username) &lt;address@dom.ain&gt;
+
 if the email address or GitHub username is included, and
 
 > Random J. User
