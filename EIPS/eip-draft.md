@@ -1,8 +1,8 @@
 ---
 title: Non-fungible Token Bound Accounts
-description: An interface and registry for smart contract accounts owned by EIP-721 tokens
-author: Jayden Windle (@jaydenwindle), Benny Giang (bg@futureprimitive.xyz), Steve Jang, Druzy Downs (@druzydowns), Raymond Huynh (@huynhr), Alanah Lam (alanah@futureprimitive.xyz)
-discussions-to: <URL>
+description: An interface and registry for smart contract accounts owned by ERC-721 tokens
+author: Jayden Windle (@jaydenwindle), Benny Giang <bg@futureprimitive.xyz>, Steve Jang, Druzy Downs (@druzydowns), Raymond Huynh (@huynhr), Alanah Lam <alanah@futureprimitive.xyz>
+discussions-to: https://ethereum-magicians.org/t/non-fungible-token-bound-accounts/13030
 status: Draft
 type: Standards Track
 category: ERC
