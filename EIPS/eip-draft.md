@@ -1,4 +1,5 @@
 ---
+eip: 6551
 title: Non-fungible Token Bound Accounts
 description: An interface and registry for smart contract accounts owned by ERC-721 tokens
 author: Jayden Windle (@jaydenwindle), Benny Giang <bg@futureprimitive.xyz>, Steve Jang, Druzy Downs (@druzydowns), Raymond Huynh (@huynhr), Alanah Lam <alanah@futureprimitive.xyz>
@@ -102,7 +103,7 @@ The registry SHALL deploy all token bound account contracts using the `create2` 
 The registry SHALL implement the following interface:
 
 ```solidity
-interface IERCXXXXRegistry {
+interface IERC6551Registry {
     /// @dev Each registry MUST emit the AccountCreated event upon account creation
     event AccountCreated(
         address account,
@@ -147,8 +148,8 @@ All token bound account implementations MUST implement [ERC-1271](./eip-1271.md)
 All token bound account implementations MUST implement the following interface:
 
 ```solidity
-/// @dev the ERC-165 identifier for this interface is `TODO`
-interface IERCXXXXAccount {
+/// @dev the ERC-165 identifier for this interface is `0xeff4d378`
+interface IERC6551Account {
     /// @dev Token bound accounts MUST implement a `receive` function.
     ///
     /// Token bound accounts MAY perform arbitrary logic to restrict conditions
@@ -236,7 +237,7 @@ Non-fungible token contracts that do not implement an `ownerOf` method, such as 
 
 ## Reference Implementation
 
-#### ERCXXXXAccount.sol
+#### ERC6551Account.sol
 
 ```solidity=
 // SPDX-License-Identifier: UNLICENSED
@@ -247,7 +248,7 @@ import "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import "sstore2/utils/Bytecode.sol";
 
 
-contract ExampleERCXXXXAccount is IERC165, IERCXXXXAccount {
+contract ExampleERC6551Account is IERC165, IERC6551XAccount {
     receive() external payable {}
 
     function executeCall(
@@ -288,13 +289,13 @@ contract ExampleERCXXXXAccount is IERC165, IERCXXXXAccount {
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         return (
             interfaceId == type(IERC165).interfaceId ||
-            interfaceId == type(IERCXXXXAccount).interfaceId
+            interfaceId == type(IERC6551Account).interfaceId
         );
     }
 }
 ```
 
-#### ERCXXXXRegistry.sol
+#### ERC6551Registry.sol
 
 ```solidity=
 // SPDX-License-Identifier: UNLICENSED
@@ -303,7 +304,7 @@ pragma solidity ^0.8.13;
 import "openzeppelin-contracts/utils/introspection/ERC165Checker.sol"
 import "openzeppelin-contracts/utils/Create2.sol";
 
-contract ERCXXXXRegistry is IERCXXXXRegistry {
+contract ERC6551Registry is IERC6551Registry {
     error InvalidImplementation();
 
     function createAccount(
@@ -314,7 +315,7 @@ contract ERCXXXXRegistry is IERCXXXXRegistry {
     ) external returns (address) {
         bool isValidImplementation = ERC165Checker.supportsInterface(
             implementation,
-            type(IERCXXXXAccount).interfaceId
+            type(IERC6551Account).interfaceId
         );
 
         if (!isValidImplementation) revert InvalidImplementation();
