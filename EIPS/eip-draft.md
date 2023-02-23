@@ -49,7 +49,7 @@ The system outlined in this proposal has two main components:
 - A standard interface for token bound account implementations
 
 The following diagram illustrates the relationship between ERC-721 tokens, ERC-721 token owners, token bound accounts, and the Registry:
-![](./assets/eip-draft/diagram.png)
+![](../assets/eip-draft/diagram.png)
 
 ### Registry
 
@@ -97,7 +97,7 @@ The registry contract is permissionless, immutable, and has no owner. The regist
 
 The registry contract will be deployed to the following address: `TBD`
 
-The registry SHALL deploy all token bound account contracts using the `create2` opcode with a salt value of `keccak256(abi.encode(chainId, tokenContract, tokenId))`.
+The registry SHALL deploy all token bound account contracts using the `create2` opcode with a salt value derived from the ERC-721 token contract address, token ID, and [EIP-155](./eip-155.md) chain ID.
 
 The registry SHALL implement the following interface:
 
