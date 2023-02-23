@@ -27,7 +27,7 @@ Unlike other forms of on-chain identity, ERC-721 tokens cannot act as an agent o
 - An automated investment portfolio composed of multiple fungible assets
 - A punch pass membership card granting access to an establishment and recording a history of past interactions
 
-Several proposals have attempted to give ERC-721 tokens the ability to own assets. Some notable proposals include [ERC-998](./eip-998.md), [ERC-3653](https://github.com/ethereum/EIPs/commit/7d9c75a5883ada0cd895d4da4c15bf5f6d890078), and [ERC-6150](./eip-6150.md).
+Several proposals have attempted to give ERC-721 tokens the ability to own assets. Some notable proposals include [ERC-998](./eip-998.md) and [ERC-6150](./eip-6150.md).
 
 Each of these proposals define an extension to the ERC-721 standard. This requires smart contract authors to include proposal support in their ERC-721 token contracts. As a result, these proposals are largely incompatible with previously deployed ERC-721 contracts.
 
