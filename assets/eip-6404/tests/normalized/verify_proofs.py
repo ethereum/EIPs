@@ -137,6 +137,8 @@ def verify_info_proof(
     ) == transactions_root
 
     return TransactionInfo(
+        tx_index=proof.tx_index,
+        tx_hash=proof.tx_hash,
         tx_from=proof.tx_from,
         nonce=proof.nonce,
         tx_to=proof.tx_to,
