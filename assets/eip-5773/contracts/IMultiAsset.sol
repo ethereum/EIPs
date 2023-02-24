@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 interface IMultiAsset {
     event AssetSet(uint64 assetId);
 
-    event AssetAddedToToken(
-        uint256 indexed tokenId,
+    event AssetAddedToTokens(
+        uint256[] tokenId,
         uint64 indexed assetId,
         uint64 indexed replacesId
     );
@@ -47,46 +47,46 @@ interface IMultiAsset {
 
     function rejectAllAssets(uint256 tokenId, uint256 maxRejections) external;
 
-    function setPriority(uint256 tokenId, uint16[] calldata priorities)
-        external;
+    function setPriority(
+        uint256 tokenId,
+        uint16[] calldata priorities
+    ) external;
 
-    function getActiveAssets(uint256 tokenId)
-        external
-        view
-        returns (uint64[] memory);
+    function getActiveAssets(
+        uint256 tokenId
+    ) external view returns (uint64[] memory);
 
-    function getPendingAssets(uint256 tokenId)
-        external
-        view
-        returns (uint64[] memory);
+    function getPendingAssets(
+        uint256 tokenId
+    ) external view returns (uint64[] memory);
 
-    function getActiveAssetPriorities(uint256 tokenId)
-        external
-        view
-        returns (uint16[] memory);
+    function getActiveAssetPriorities(
+        uint256 tokenId
+    ) external view returns (uint16[] memory);
 
-    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
-        external
-        view
-        returns (uint64);
+    function getAssetReplacements(
+        uint256 tokenId,
+        uint64 newAssetId
+    ) external view returns (uint64);
 
-    function getAssetMetadata(uint256 tokenId, uint64 assetId)
-        external
-        view
-        returns (string memory);
+    function getAssetMetadata(
+        uint256 tokenId,
+        uint64 assetId
+    ) external view returns (string memory);
 
     function approveForAssets(address to, uint256 tokenId) external;
 
-    function getApprovedForAssets(uint256 tokenId)
-        external
-        view
-        returns (address);
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) external view returns (address);
 
-    function setApprovalForAllForAssets(address operator, bool approved)
-        external;
+    function setApprovalForAllForAssets(
+        address operator,
+        bool approved
+    ) external;
 
-    function isApprovedForAllForAssets(address owner, address operator)
-        external
-        view
-        returns (bool);
+    function isApprovedForAllForAssets(
+        address owner,
+        address operator
+    ) external view returns (bool);
 }

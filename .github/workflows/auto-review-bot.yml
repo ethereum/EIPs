@@ -24,7 +24,7 @@ jobs:
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: Pandapip1/eip-review-bot@dist
+        uses: ethereum/eip-review-bot@dist
         with:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml

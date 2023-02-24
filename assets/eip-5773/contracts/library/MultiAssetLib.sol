@@ -3,11 +3,10 @@
 pragma solidity ^0.8.0;
 
 library MultiAssetLib {
-    function indexOf(uint64[] memory A, uint64 a)
-        internal
-        pure
-        returns (uint256, bool)
-    {
+    function indexOf(
+        uint64[] memory A,
+        uint64 a
+    ) internal pure returns (uint256, bool) {
         uint256 length = A.length;
         for (uint256 i; i < length; ) {
             if (A[i] == a) {
