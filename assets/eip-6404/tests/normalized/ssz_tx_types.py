@@ -61,7 +61,8 @@ def ecdsa_recover_tx_from(signature: TransactionSignature, sig_hash: Hash32) -> 
     ecdsa = ECDSA()
     recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[0:64], signature[64])
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_hash, recover_sig, raw=True))
-    return ExecutionAddress(keccak(public_key.serialize())[12:32])
+    uncompressed = public_key.serialize(compressed=False)
+    return ExecutionAddress(keccak(uncompressed)[12:32])
 
 class BlobDetails(Container):
     max_fee_per_data_gas: uint256
