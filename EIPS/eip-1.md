@@ -267,6 +267,9 @@ This is a sentence with a footnote.[^1]
 
 Which renders to:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable code-block-style -->
+
 This is a sentence with a footnote.[^1]
 
 [^1]:
@@ -295,6 +298,8 @@ This is a sentence with a footnote.[^1]
       }
     }
     ```
+
+<!-- markdownlint-restore -->
 
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
