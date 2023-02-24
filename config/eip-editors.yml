@@ -16,6 +16,7 @@ erc:
   - SamWilsn
   - Pandapip1
   - xinbenlv
+  - abcoathup
 networking:
   - lightclient
   - axic
@@ -32,6 +33,7 @@ meta:
   - SamWilsn
   - Pandapip1
   - xinbenlv
+  - abcoathup
 informational:
   - lightclient
   - axic
@@ -39,3 +41,4 @@ informational:
   - SamWilsn
   - Pandapip1
   - xinbenlv
+  - abcoathup
