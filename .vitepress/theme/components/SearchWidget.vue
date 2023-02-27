@@ -1,6 +1,29 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $frontmatter
-import { getCurrentInstance, ref, computed, watch } from 'vue';
+import { getCurrentInstance, computed, watch, reactive, ref } from 'vue';
+
+let searchModifiers = reactive({
+    status: {
+        draft: false,
+        stagnant: false,
+        living: true,
+        review: true,
+        final: true,
+        withdrawn: false,
+        "last call": false,
+    },
+    type: {
+        "standards track": true,
+        meta: true,
+        informational: true,
+    },
+    category: {
+        erc: true,
+        core: true,
+        networking: true,
+        interface: true,
+    },
+});
 
 // Get front matter from the current page (in app.config.globalProperties.$frontmatter)
 let vm = getCurrentInstance();
@@ -25,11 +48,11 @@ for (let eip of frontmatter.allEips) {
 
 let search = ref("");
 let results = computed(() => {
-    let searchQuery = search.value.toLowerCase().match(/([^\s-_"]|((?<!\\)".*(?!\\)"))+/g);
+    let _ = searchModifiers; // Re-render when this changes
+    let searchQuery = search.value.toLowerCase().split(" ");
     if (!searchQuery) {
         searchQuery = [];
     };
-    let searchModifiers = searchQuery.filter(q => q && q.includes(":")).map(q => q.replaceAll(`"`, ""));
     searchQuery = searchQuery.filter(q => q && !q.includes(":"));
     let results = transformedEips.filter(eip => {
         for (let query of searchQuery) {
@@ -37,9 +60,16 @@ let results = computed(() => {
                 return false;
             }
         }
-        for (let modifier of searchModifiers) {
-            let [key, value] = modifier.split(":");
-            if (eip[key]?.toLowerCase() != value?.toLowerCase()) return false;
+        for (let modifier in searchModifiers) {
+            let matchesAny = false;
+            for (let value in searchModifiers[modifier]) {
+                if (searchModifiers[modifier][value] && eip[modifier]?.toLowerCase() == value) {
+                    matchesAny = true;
+                }
+            }
+            if (!matchesAny) {
+                return false;
+            }
         }
         return true;
     }).sort((eip1, eip2) => {
@@ -57,6 +87,24 @@ const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('search')) {
     search.value = urlParams.get('search');
 }
+if (urlParams.has('status')) {
+    let status = urlParams.get('status').split(',');
+    for (let s of status) {
+        searchModifiers.status[s] = true;
+    }
+}
+if (urlParams.has('type')) {
+    let type = urlParams.get('type').split(',');
+    for (let t of type) {
+        searchModifiers.type[t] = true;
+    }
+}
+if (urlParams.has('category')) {
+    let category = urlParams.get('category').split(',');
+    for (let c of category) {
+        searchModifiers.category[c] = true;
+    }
+}
 
 // Update query params
 watch(search, (newSearch) => {
@@ -67,8 +115,45 @@ watch(search, (newSearch) => {
     }
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
 });
+watch(searchModifiers, (newSearchModifiers) => {
+    let status = [];
+    let type = [];
+    let category = [];
+    for (let s in newSearchModifiers.status) {
+        if (newSearchModifiers.status[s]) {
+            status.push(s);
+        }
+    }
+    for (let t in newSearchModifiers.type) {
+        if (newSearchModifiers.type[t]) {
+            type.push(t);
+        }
+    }
+    for (let c in newSearchModifiers.category) {
+        if (newSearchModifiers.category[c]) {
+            category.push(c);
+        }
+    }
+    if (status.length) {
+        urlParams.set('status', status.join(','));
+    } else {
+        urlParams.delete('status');
+    }
+    if (type.length) {
+        urlParams.set('type', type.join(','));
+    } else {
+        urlParams.delete('type');
+    }
+    if (category.length) {
+        urlParams.set('category', category.join(','));
+    } else {
+        urlParams.delete('category');
+    }
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+}, { deep: true });
 </script>
 <template>
+    <!-- Search Bar -->
     <div role="button" aria-expanded="true" aria-haspopup="listbox" aria-labelledby="docsearch-label" class="DocSearch" tabindex="0" style="margin-bottom: 1em;">
         <header class="DocSearch-SearchBar">
             <form class="DocSearch-Form">
@@ -77,6 +162,121 @@ watch(search, (newSearch) => {
             </form>
         </header>
     </div>
+    <!-- Filters -->
+    <table>
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.draft" />
+                        Draft ({{ results.length ? results.filter(r => r.status == 'Draft').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.type['standards track']" />
+                        Standards Track ({{ results.length ? results.filter(r => r.type == 'Standards Track').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.category.erc" />
+                        ERC ({{ results.length ? results.filter(r => r.category == 'ERC').length : 0 }})
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.review" />
+                        Review ({{ results.length ? results.filter(r => r.status == 'Review').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.type.informational" />
+                        Informational ({{ results.length ? results.filter(r => r.type == 'Informational').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.category.core" />
+                        Core ({{ results.length ? results.filter(r => r.category == 'Core').length : 0 }})
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.last_call" />
+                        Last Call ({{ results.length ? results.filter(r => r.status == 'Last Call').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.type.meta" />
+                        Meta ({{ results.length ? results.filter(r => r.type == 'Meta').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.category.interface" />
+                        Interface ({{ results.length ? results.filter(r => r.category == 'Interface').length : 0 }})
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.final" />
+                        Final ({{ results.length ? results.filter(r => r.status == 'Final').length : 0 }})
+                    </label>
+                </td>
+                <td>
+                </td>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.category.networking" />
+                        Networking ({{ results.length ? results.filter(r => r.category == 'Networking').length : 0 }})
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.living" />
+                        Living ({{ results.length ? results.filter(r => r.status == 'Living').length : 0 }})
+                    </label>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.stagnant" />
+                        Stagnant ({{ results.length ? results.filter(r => r.status == 'Stagnant').length : 0 }})
+                    </label>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" v-model="searchModifiers.status.withdrawn" />
+                        Withdrawn ({{ results.length ? results.filter(r => r.status == 'Withdrawn').length : 0 }})
+                    </label>
+                </td>
+                <td colspan="2"></td>
+            </tr>
+        </tbody>
+    </table>
     <div>
         <p v-if="!results.length">Sorry, no results for <code>{{search}}</code></p>
         <div class="info custom-block search-result" v-for="(r, i) in results" :key="i">
