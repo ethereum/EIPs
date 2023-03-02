@@ -1,0 +1,617 @@
+---
+eip: 
+title: EVM Modular Arithmetic Extensions
+status: Draft
+type: standards track
+author: Jared Wasinger <@jwasinger>, Alex Beregszaszi (@axic)
+discussions-to: 
+category: Core
+created: 2023-02-26
+requires: 4750, 3670
+---
+
+## Abstract
+
+EVMMAX (EVM Modular Arithmetic Extensions) adds new optimized modular addition subtraction and multiplication opcodes to the EVM.  These support odd moduli up to 4096 bits in size.
+
+## Motivation
+
+Benefits of this new model for modular arithmetic in the EVM:
+* enables elliptic curve arithmetic operations on various curves including BLS12-381 to be implemented as EVM contracts
+* For operations on values up to 256bits in size, reduces gas cost per operation by 90-95% compared to the current `MULMOD` and `ADDMOD` opcodes.
+* for all cases where modexp precompile is useful, it could now be implemented as an EVM contract.
+* enables substantial cost reductions for algebraic hash functions (e.g. MiMC/Poseidon), zkp verification in the EVM.
+
+## Specification
+
+#### Overview
+
+Contracts that use EVMMAX make use of a new EOF section type called a setup section.  This contains a modulus, the number of values that will be allocated to perform operations on and a special parameter specific to the chosen modulus which is precomputed off-chain by the contract author.
+
+Multiple setup sections can be present to allow use of different moduli in the same contract.  To use a modulus that is chosen during contract execution, a setup section omits the modulus and special parameter.
+
+During contract execution, a contract calls a setup instruction `SETUPX`, sourcing modulus and special parameter from a setup section (or if the setup section is configured to use a dynamic modulus, loading the modulus from memory and computing the special parameter). `SETUPX` allocates a zeroed memory space separate from EVM memory.
+
+The modulus, special parameter and memory space are associated with the current call frame state and referred to as the active modulus state.  If `SETUPX` is invoked multiple times in a call frame (using the same setup section): the modulus, special parameter are cached on the first invocation and the allocated memory space persists for the duration of the call.
+
+New store and load opcodes `STOREX`/`LOADX` are used to copy multiples values to/from EVM memory the memory space of the active modulus state.
+
+Arithmetic is performed with `ADDMODX`/`SUBMODX`/`MULMODX` opcodes which take and return no stack arguments, require a 3-byte immediate value appended to the opcode.
+
+The immediate is interpreted as 3 1-byte values `z`, `x`, `y` which are indexes to the array of EVMMAX values that comprises the memory space of the active modulus state.
+
+An arithmetic operation is performed on inputs at index `x`/`y` placing the result in index `z`.
+
+#### Conventions
+
+1. `x === y % m`: `x % m == y % m`
+2. `pow(x, -1, m)`: The modular multiplicative inverse of `x` with respect to modulus `m`. `x * pow(x, -1, m) === 1 % m`
+2. Opcode definition syntax is formatted as `mneumonic {immediate - type} {immediate2 - type} ...: stack_val_1, stack_val_2, ...` where immediates are listed in the order that they proceed the opcode and stack values are ordered starting at the top of the stack.
+3. In the provided pseudocode, it is assumed that opcode gas charging logic is executed prior to execution logic.
+
+#### Constants
+
+| Name | Value | Description |
+| ---- | ---- | ---- |
+| `SYSTEM_WORD_SIZE_BITS` | varies depending on the system | word size in bits of a client's CPU |
+| `MAX_MOD_SIZE` | 4096 bits | tentative modulus size limit |
+| `STOREX_BASE_GAS` | 3 | base gas cost for `STOREX` opcode |
+| `LOADX_BASE_GAS` | 3 | base gas cost for `LOADX` opcode |
+| `SETUPX_BASE_GAS` | 3 | base gas cost for `SETUPX` opcode |
+| `EVMMAX_MAX_MEM` | 65,536 bytes | maximum amount of EVMMAX memory that can be used in a call frame |
+| `MULMODX_SUBQUADRATIC_START` | 50 | modulus size in in multiples of 8 bytes where we switch to subquadratic mulmont cost model |
+
+#### Context Variables
+
+| Name | Type | Meaning |
+| ---- | ------- | --- |
+| `evmmax_state` | `EVMMAXState` | a variable representing ephemeral state which exists for the duration of the current call and in the scope of the current call frame |
+| `evm_memory` | `bytes` | EVM memory for the current call context |
+| `expand_evm_memory` | `func(new_size_evm_words: int) -> int` | EVM memory expansion cost function, using modified rule according to this EIP |
+| `evm_stack` | object | Allows access to the stack via `pop()` and `peek(n)` which return `int` stack elements |
+| `contract_code` | `bytes` | code of the currently-executing contract |
+| `pc` | `int` | EVM program counter |
+
+```
+class EVMMAXState():
+    def __init__(self):
+        # ModState currently being used
+        self.active_mod_state = None
+        # a lookup of mod_id (int) -> ModState
+        self.mod_states = {}
+
+class ModState():
+    def __init__(self, mod: int, num_vals_used: int, mod: int, r: int, r_squared: int, mod_inv_full=None, mod_inv=None):
+        self.mod = mod
+        # size (expressed in multiples of 8 bytes) needed to represent mod
+        self.val_size_multiplier = math.ceil(len(hex(mod)[2:]) / (2 * 8))
+        
+        self.mod_inv = mod_inv
+        self.mod_inv_full = mod_inv_full
+        self.r = r
+        self.r_squared = r_squared
+        # a memory space of size num_vals_used * val_size_multiplier
+        self.values = [0] * self.num_vals_used
+```
+
+#### Helpers
+
+```
+# -----------------------------------------------------------------------------
+#  gas-charging helpers
+
+def cost_precompute_mont(val_size_multiplier: int) -> int:
+    PRECOMPUTE_MONT_GAS_A = ?
+    PRECOMPUTE_MONT_GAS_B = ?
+    return math.ceil(PRECOMPUTE_MONT_GAS_A * val_size_multiplier +\
+                     PRECOMPUTE_MONT_GAS_B)
+
+def cost_addmodx(val_size_multiplier: int) -> int:
+    ADDMODX_GAS_A = 0.20
+    ADDMODX_GAS_B = 0.15
+    
+    cost = 0
+    if val_size_multiplier == 6:
+        cost = 1
+    else:
+        cost = round(ADDMODX_GAS_A * limb_count + ADDMODX_GAS_B)
+
+    if cost == 0:
+        cost = 1
+    
+    return cost
+
+def cost_mulmontx(val_size_multiplier: int) -> int:
+    MULMODX_LO_GAS_A = 0.090
+    MULMODX_LO_GAS_B = 0 
+    MULMODX_LO_GAS_C = 0.24
+
+    MULMODX_HI_GAS_A = 0 
+    MULMODX_HI_GAS_B = 10.0
+    MULMODX_HI_GAS_C = -270.0
+    
+    cost = 0
+
+    if val_size_multiplier == 6:
+        cost = 2
+    elif val_size_multiplier <= MULMODX_SUBQUADRATIC_CUTOFF:
+        cost = math.ceil(MULMODX_LO_GAS_A * (val_size_multiplier ** 2) + \
+            MULMODX_LO_GAS_B * val_size_multiplier + \
+            MULMODX_LO_GAS_C)
+    else:
+        cost = math.ceil(MULMODX_HI_GAS_A * val_size_multiplier ** 2 + \
+            MULMODX_HI_GAS_B * val_size_multiplier + \
+            MULMODX_HI_GAS_C)
+
+    if cost == 0:
+        cost = 1
+        
+    return cost
+
+# -----------------------------------------------------------------------------
+#  bigint helpers
+#   a bigint is a unsigned number represented as a list of unsigned system words in descending order of significance
+
+# split a double-width value into hi/low words
+def hi_lo(double_width_val: int) -> (int, int):
+    base = 2**SYSTEM_WORD_SIZE_BITS
+    assert double_width_val < base**SYSTEM_WORD_SIZE_BITS, "val must fit in two words"
+    return (double_width_val >> SYSTEM_WORD_SIZE_BITS) % base, double_width_val % base
+
+def bigint_to_int(x: [int]) -> int:
+    res = 0
+    for i in reversed(range(len(x))):
+        res += x[i] * 2**(SYSTEM_WORD_BITS ** (len(x) - i - 1))
+    return res
+
+def int_to_bigint(x: int, word_count: int):
+    res = [0] * word_count
+    for i in range(word_count):
+        res[word_count - i - 1] = x & (2**SYSTEM_WORD_BITS - 1)
+        x >>= SYSTEM_WORD_BITS
+    return res
+
+# return x - y (omitting borrow-out)
+def bigint_sub(x: [int], y: [int]) -> [int]:
+    num_words = len(x)
+    res = [0] * num_words
+    c = 0 
+
+    for i in reversed(range(num_words)):
+        c, res[i] = sub_with_borrow(x[i], y[i], c)
+
+    return res
+
+# return x >= y
+def bigint_gte(x: [int], y: [int]) -> bool:
+    for (x_word, y_word) in list(zip(x,y)):
+        if x_word > y_word:
+            return True
+        elif x_word < y_word:
+            return False
+    # x == y
+    return True
+
+# CIOS Montgomery multiplication algorithm
+#
+# input:
+# * x, y, mod - bigint inputs of `val_size_multiplier` length.  the most significant limb of the modulus cannot be zero.
+# * mod_inv - pow(-mod, -1, 2**SYSTEM_WORD_SIZE_BITS)
+# requires:
+# * x < mod and y < mod
+# * mod_int % 2 != 0
+# * mod[0] != 0
+# returns:
+#    (x * y * pow(2**(SYSTEM_WORD_SIZE_BITS * val_size_multiplier), -1, mod)) % mod represented as a bigint
+# note: references to x_int/y_int/mod_int/t_int refer to the python int representation of the corresponding bigint variable
+def mulmont_quadratic(x: [int], y: [int], mod: [int], modinv: int) -> [int]:
+    assert len(x) == len(y) and len(y) == len(mod), "{}, {}, {}".format(x, y, mod)
+    assert mod[0] != 0, "modulus must occupy all words"
+
+    word_count = len(mod)
+
+    t = [0] * (word_count + 2)
+
+    for i in reversed(range(word_count)):
+        # first inner-loop: t <- t + x_int * y[i]
+        c = 0
+        for j in reversed(range(word_count)):
+            c, t[j + 2] = hi_lo(t[j + 2] + x[j] * y[i] + c)
+
+        t[0], t[1] = hi_lo(t[1] + c)
+
+        m = (modinv * t[-1]) % BASE
+        c, _ = hi_lo(m * mod[-1] + t[-1])
+
+        # second inner-loop:
+        #    1. t_int <- t_int + modinv * mod_int * t[-1]
+        #    2. t_int <- t_int // (2**SYSTEM_WORD_SIZE)
+        # note:
+        #    after step 1:
+        #    * modinv * mod_int * t[-1] === -1 % (2**SYSTEM_WORD_SIZE_BITS)
+        #    * t_int === (t_int + (-1) t_int) % (2**SYSTEM_WORD_SIZE_BITS) === 0 % (2**SYSTEM_WORD_SIZE_BITS)
+        #    so the shift in step 2 is a word-sized right shift.
+        #    Steps 1 and 2 are combined and the shift is implict.
+        for j in reversed(range(1, word_count)):
+            c, t[j + 2] = hi_lo(t[j + 1] + mod[j - 1] * m + c)
+
+        hi, t[2] = hi_lo(t[1] + c)
+        t[1] = t[0] + hi
+
+    # t_int = (t_int + t_int * mod_int * pow(-(2**(SYSTEM_WORD_SIZE_BITS*len(mod))), -1, mod_int)) // (2 ** (len(mod) * SYSTEM_WORD_SIZE_BITS))
+    # 0 < t_int < 2 * mod_int
+    t = t[1:]
+    if t[0] != 0:
+        # result occupies len(mod) + 1 words so it must be greater than modulus
+        return bigint_sub(t, [0] + mod)[1:]
+    elif bigint_gte(t[1:], mod):
+        return bigint_sub(t[1:], mod)
+    else:
+        return t[1:]
+
+# subquadratic mulmont:  same general algorithm as mulmont_quadratic with the assumption
+# 	that any multiplications will be performed using Karatsuba subquadratic multiplication algorithm
+# input:
+#   x, y, mod (int) - x < mod and y < mod
+#   mod (int) - an odd modulus
+# 	R (int) -  a power of two, and greater than mod
+# 	mod_inv (int) - pow(-mod, -1, R)
+# output:
+#	(x * y * pow(R, -1, mod)) % mod
+#
+def mulmont_subquadratic(x: int, y: int, mod: int, mod_inv: int, R: int) -> int:
+    T = x * y
+    m = ((T % R) * mod_inv) % R
+    T = T + m * mod
+    T /= R
+    if T >= mod:
+        T -= mod
+    return T
+
+def mulmont(mod_state: ModState, x: int, y: int) -> int:
+    if mod_state.val_size_multiplier >= MULMODX_SUBQUADRATIC_START:
+        return mulmont_subquadratic(x, y, mod_state.mod, mod_state.mod_inv_full, mod_state.r)
+    else:
+        x_bigint = int_to_bigint(x)
+        y_bigint = int_to_bigint(y)
+        mod_bigint = int_to_bigint(mod_state.mod)
+        return bigint_to_int(mulmont_quadratic(x_bigint, y_bigint, mod_bigint, mod_state.modinv))
+```
+
+### Setup Section
+
+Introduce a new section type with `section_kind = 0x03`.
+
+#### Section Body
+```
+mod_id <uint64> - setup section identifier
+mod_size <uint64> - size in bytes needed to represent the modulus
+vals_used <uint16> - number of allocated values (1-256)
+mod_entry_size <uint64> - size of the modulus entry in the setup section (0 if setup section is dynamic)
+mod_inv <8 bytes> - special "Montgomery" parameter: pow(-mod, -1, 1<<64). (omitted if mod_size == 0)
+mod <mod_size bytes> - modulus in big-endian ordering.  (omitted if mod_size == 0)
+mod_inv_full <mod_size bytes> - Montgomery parameter for subquadratic mulmont.  Omitted if ceil(mod_size / 8) < MULMODX_SUBQUADRATIC_START
+```
+
+### New Opcodes
+
+| Mneumonic | Opcode | Immediate size (bytes) | Stack in | Stack out |
+| ----- | ----- | ----- | ----- | ---- |
+| SETUPX | 0x21 | 1 | 1 | 0 |
+| ADDMODX | 0x22 | 3 | 0 | 0 |
+| SUBMODX | 0x23 | 3 | 0 | 0 |
+| MULMODX | 0x24 | 3 | 0 | 0 |
+| LOADX | 0x25 | 0 | 3 | 0 |
+| STOREX | 0x26 | 0 | 3 | 0 |
+
+#### SETUPX
+
+`SETUPX {mod_id - byte}: mod_offset`
+
+##### Gas Charging
+```
+mod_id = int(contract_code[pc+1:pc+2])
+
+mod_offset = evm_stack.peek(0)
+mod_size = setup_sections[mod_id].mod_size
+cost = SETUPX_BASE_GAS
+
+if mod_offset + mod_size > len(evm_memory):
+    raise Exception("cannot load a modulus that would extend beyond the bounds of EVM memory")
+
+val_size_multiplier = math.ceil(setup_sections[mod_id].val_size / 8)
+vals_used = setup_sections[mod_id].vals_used
+
+if setup_sections[mod_id].mod_size == 0:
+    # dynamic setup section
+    cost += cost_precompute_mont(val_size_multiplier)
+    
+if not mod_id in evmmax_state.mod_states:
+    cost += cost_evm_expand_memory(vals_used * val_size_multiplier * 8)
+````
+##### Execution
+```
+mod_offset = stack.pop()
+mod = None
+mod_inv = None
+mod_id = int(contract_code[pc+1:pc+2])
+
+if mod_id in evmmax_state.mods[mod_id]:
+    # this mod state was previously used in this call context. it is already allocated
+    evmmax_state.active_mod_state = evmmax_state.mods[mod_id]
+    return
+
+val_size = setup_sections[mod_id].val_size
+val_size_multiplier = math.ceil(val_size / 8)
+
+if evmmax_state.mods[mod_id].modulus == 0:
+    # setup section with dynamic modulus
+    mod = int.from_bytes(evm_memory[mod_offset:mod_offset+val_size], byteorder='big')
+    if mod == 0 or mod % 2 == 0:
+        raise Exception("modulus must be nonzero and odd")
+    
+    mod_inv = pow(-mod, -1, 2**SYSTEM_WORD_SIZE_BITS)
+else:
+    mod = setup_sections[mod_id].mod
+    
+    # note: non-64bit system would have to compute mod_inv here as the setup section value is specific to 64-bit
+	if val_size_multiplier > MULMODX_SUBQUADRATIC_CUTOFF:
+		mod_inv_full = pow(-r, -1, mod)
+	else:
+		mod_inv = setup_sections[mod_id].mod_inv
+
+r = 2**(SYSTEM_WORD_SIZE_BITS * val_size_multiplier)
+r_squared = r**2 % mod
+mod_state_memory = [0] * vals_used
+
+mod_state = ModState(mod, val_size, mod_state_memory, r, r_squared, mod_inv_full=mod_inv_full, mod_inv=mod_inv)
+
+evmmax_state.mods[mod_id] = mod_state
+evmmax_state.active_mod_state = mod_state
+```
+
+#### LOADX
+`LOADX: dst_offset, val_idx, num_vals`
+
+##### Description
+Load EVMMAX values in the current active modulus state to EVM memory.
+
+##### Gas Charging
+```
+cost = LOADX_BASE_GAS
+
+val_size_multiplier = evmmax_state.active_mod_state.val_size_multiplier
+if dst_offset + num_vals * val_size_multiplier > evm_mem_size:
+    cost += cost_evm_mem_expansion(evm_mem_size, (dst_offset + num_vals * val_size_multiplier) - evm_mem_size)
+
+cost += gas_cost_mulmont(mod_state.val_size) * mod_state.num_vals
+```
+
+##### Execution
+```
+if num_vals == 0:
+    return
+
+mod_state = evmmax_state.active_mod_state
+if mod_state == None:
+    raise Exception("no modulus set")
+
+if val_idx + num_vals > len(mod_state.vals):
+    raise Exception("attempt to load beyond allocated values")
+
+if dst_offset + num_vals * mod_state.val_size > evm_mem_size:
+    expand_evm_memory((dst_offset + num_vals * mod_state.val_size_multiplier * 8) - evm_mem_size)
+
+cur_dst_offset = dst_offset
+for i in range(num_vals):
+    mont_val = mod_state.vals[start_val + i]
+
+    # convert the value to canonical form
+    val = mod_state.mulmont(mont_val, 1)
+
+    evm_memory[cur_dst_offset:cur_dst_offset + mod_state.val_size_multiplier] = mont_val.to_bytes(mod_state.val_size_multiplier * 8, byteorder='big')
+    cur_dst_offset += mod_state.val_size_multiplier * 8
+```
+
+#### STOREX
+`STOREX: dst_val, offset, num_vals`
+
+##### Description
+
+Store values from EVM memory into EVMMAX memory space of the current active modulus state, validating that they are reduced by the modulus.
+
+##### Gas Charging
+
+```
+val_size_multiplier = evmmax_state.active_mod_state.val_size_multiplier
+cost = STOREX_BASE_COST + num_vals * gas_cost_mulmont(val_size_multiplier)
+```
+##### Execution
+```
+if num_vals == 0:
+    return
+
+mod_state = evmmax_state.active_mod_state
+if mod_state == None:
+    raise Exception("no modulus set")
+
+if dst_val + num_vals > len(mod_state.vals):
+    raise Exception("attempt to copy to destination beyond allocated values")
+
+if offset + num_vals * mod_state.val_size_multiplier * 8 > len(evm_memory):
+    raise Exception("source of copy would extend beyond allocated memory")
+
+cur_src_offset = offset
+r = 2** (mod_state.val_size_multiplier * SYSTEM_WORD_SIZE_BITS) % mod_state.mod
+r_squared = r ** 2 % mod_state.mod
+
+for i in range(num_vals):
+    val = int.from_bytes(evm_memory[cur_src_offset:cur_src_offset + mod_state.val_size_multiplier * 8], byteorder='big')
+    
+    if val >= mod_state.modulus:
+        raise Exception("values cannot be greater than the modulus")
+    
+    # convert the value to Montgomery form
+    mont_val = mod_state.mulmont(val, r_squared)
+
+    mod_state.vals[dst_val + i] = mont_val
+    cur_offset += mod_state.val_size_multiplier * 8
+```
+
+#### ADDMODX
+
+`ADDMODX {z_offset - byte}, {x_offset - byte}, {y_offset - byte}:`
+
+##### Description
+
+Compute the modular addition of two EVMMAX values, storing the result in an output.
+
+##### Gas Charging
+```
+val_size_multiplier = evmmax_state.active_mod_state.val_size_multiplier
+cost = cost_addmodx(val_size_multiplier)
+```
+
+##### Execution
+```
+mod_state = evmmax_state.active_modulus
+if mod_state == None:
+    raise Exception("no mod state set")
+
+z_offset = int(contract_code[pc+1:pc+2])
+x_offset = int(contract_code[pc+2:pc+3])
+y_offset = int(contract_code[pc+3:pc+4])
+
+if x_offset >= mod_state.vals_used or y_offset >= mod_state.vals_used or z_offset >= mod_state.vals_used:
+    raise Exception("out of bounds value reference")
+
+mod_state.values[z_offset] = (mod_state.values[x_offset] + mod_state.values[y_offset]) % mod_state.mod
+```
+
+#### SUBMODX
+
+`SUBMODX {z_offset - byte}, {x_offset - byte}, {y_offset - byte}:`
+
+##### Description
+Compute the modular subtraction of two EVMMAX values in the current active modulus state, storing the result in an output.
+
+##### Gas Charging
+
+Same as `ADDMODX`.
+
+##### Execution
+```
+mod_state = evmmax_state.active_modulus
+if mod_state == None:
+    raise Exception("no mod state set")
+
+z_offset = int(contract_code[pc+1:pc+2])
+x_offset = int(contract_code[pc+2:pc+3])
+y_offset = int(contract_code[pc+3:pc+4])
+
+if x_offset >= mod_state.vals_used or y_offset >= mod_state.vals_used or z_offset >= mod_state.vals_used:
+    raise Exception("out of bounds value reference")
+
+mod_state.values[z_offset] = (mod_state.values[x_offset] - mod_state.values[y_offset]) % mod_state.mod
+```
+
+#### `MULMODX`
+
+`MULMODX {z_offset - byte}, {x_offset - byte}, {y_offset - byte}:`
+
+##### Description
+Compute the Montgomery modular multiplication of two EVMMAX values in the current active modulus state, storing the result in an output.
+
+##### Gas Charging
+```
+val_size_multiplier = evmmax_state.active_mod_state.val_size_multiplier
+cost = cost_mulmodx(val_size_multiplier)
+```
+
+##### Execution
+```
+mod_state = evmmax_state.active_modulus
+if mod_state == None:
+    raise Exception("no mod state set")
+
+z_offset = int(contract_code[pc+1:pc+2])
+x_offset = int(contract_code[pc+2:pc+3])
+y_offset = int(contract_code[pc+3:pc+4])
+
+if x_offset >= mod_state.vals_used or y_offset >= mod_state.vals_used or z_offset >= mod_state.vals_used:
+    raise Exception("out of bounds value reference")
+
+mod_state.values[z_offset] = mulmont(mod_state.values[x_offset], mod_state.values[y_offset], mod_state.mod, mod_state.mod_inv)
+```
+
+### Changes to Contract Execution
+
+Any EVM operation which expands memory `x` bytes will charge to expand memory to `cur_evm_mem_size + x + evmmax_mem_size` bytes where `evmmax_mem_size` is the size of all allocated EVMMAX values in the current call context (the sum of the values used by each `mod_id` that has been previously/currently set with `SETUPX`).
+
+### Changes to Contract Creation
+
+#### Code Section Validation:
+* cannot contain `SETUPX{id}` if there is not a setup section with `mod_id == id`.
+
+#### Setup Section Validation:
+* assert that the section is not malformed
+* assert there is no other setup section with the same `mod_id`
+* if `mod_size != 0`:
+    * assert that the modulus is odd and the msb is set
+    * if `ceil(mod_size / 8) < MULMODX_SUBQUADRATIC_START`:
+        * assert `(mod * mod_inv) % (2 ** 64) == 1`
+    * else:
+        * assert `(mod * mod_inv_full) % (2 ** (ceil(mod_size / 8) * 64) == 1`
+
+Reject contracts where:
+* there exists a setup section with `mod_id = id` where there is no `SETUPX{id}` in any code section.
+* the sum of `vals_used * val_size_multiplier * 8` from each setup section is greater than `EVMMAX_MAX_MEM`.
+
+Assume that there is some extra cost to account for these validation rules (amount TBD based on benchmarks.  will scale linearly with the number of dynamic setup sections).
+
+## Rationale
+
+### Montgomery Modular Multiplication
+
+EVMMAX values are stored internally in Montgomery form. Expressing values in Montgomery form enables the use of Montgomery reduction in modular multiplication which gives a substantial performance gain versus naive modular multiplication.
+
+Modular addition and subtraction on Montgomery form values is computed the same as normal.
+
+### Memory Alignment for EVMMAX Values
+
+`LOADX`/`STOREX` move 64bit-aligned big-endian values to/from the memory space of the active modulus state.  `SETUPX` memory expansion pricing is tuned to assume that values will be stored in a as 64bit-aligned values in their EVMMAX memory space.
+
+This choice is made to keep EVMMAX memory aligned to ensure performance.
+
+### Gas Costs
+
+#### Arithmetic Opcodes
+`ADDMODX` and `SUBMODX` can each be implemented using a single extended-precision addition, and single extended precision subtraction.  This justifies a linear cost model.
+
+`MULMODX` runtime scales quadratically with input size.  After a certain threshold, the quadratic complexity of `mulmont_quadratic` dominates and it becomes more performant to use `mulmont_subquadratic`.  Thus, there is a segmented cost model to reflect different asymptotic behavior between quadratic/subquadratic `mulmont`.
+
+`ADDMODX`/`SUBMODX`/`MULMODX` pricing includes the cost of arithmetic and latency of accessing input values from CPU cache.
+
+The price model assumes that the implementation will be generic for most bitwidths with the exception of 321-384bits which is priced aggressively.
+
+#### Load/Store Opcodes
+
+These perform conversion to/from Montgomery and canonical forms for each value copied (a single `mulmont` per value converted).  The overhead of memory loading/copying is covered by `cost_mulmontx`.
+
+#### Setup opcode
+
+Specific costs TBD.
+
+Price model for static/dynamic modulus includes overhead of computing the parameter `ModState.r_squared` used internally by `STOREX` to convert values to Montgomery form.
+
+##### Dynamic Modulus
+
+Gas cost should include overhead of computing the Montgomery parameter via a modular inverse.
+
+For choices of `val_size_multiplier` up to `MULMODX_SUBQUADRATIC`, this is constant (the inverse can be computed using the lowest `SYSTEM_WORD_SIZE_BITS` bits of the modulus).
+
+At larger sizes, a full modular inverse has to be computed over a `SYSTEM_WORD_SIZE_BITS * val_size_multiplier` bit modulus.
+
+##### Static Modulus
+
+If `SETUPX` has not been previously executed for the given `mod_id`, charge memory expansion cost for allocating the `ModState` memory space.
