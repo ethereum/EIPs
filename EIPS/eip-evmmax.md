@@ -6,7 +6,7 @@ type: standards track
 author: Jared Wasinger <@jwasinger>, Alex Beregszaszi (@axic)
 discussions-to: 
 category: Core
-created: 2023-02-26
+created: 2023-03-02
 requires: 4750, 3670
 ---
 
@@ -26,19 +26,19 @@ Benefits of this new model for modular arithmetic in the EVM:
 
 #### Overview
 
-Contracts that use EVMMAX make use of a new EOF section type called a setup section.  This contains a modulus, the number of values that will be allocated to perform operations on and a special parameter specific to the chosen modulus which is precomputed off-chain by the contract author.
+Contracts that use EVMMAX make use of a new EOF section type called a setup section.  This contains a modulus, the number of values that will be allocated to perform operations on and a special parameter (called the "Montgomery parameter") specific to the chosen modulus which is precomputed off-chain by the contract author.
 
-Multiple setup sections can be present to allow use of different moduli in the same contract.  To use a modulus that is chosen during contract execution, a setup section omits the modulus and special parameter.
+Multiple setup sections can be present to allow use of different moduli in the same contract.  To use a modulus that is chosen during contract execution, a setup section omits the modulus and Montgomery parameter.
 
-During contract execution, a contract calls a setup instruction `SETUPX`, sourcing modulus and special parameter from a setup section (or if the setup section is configured to use a dynamic modulus, loading the modulus from memory and computing the special parameter). `SETUPX` allocates a zeroed memory space separate from EVM memory.
+During contract execution, a contract calls a setup instruction `SETUPX`, sourcing modulus and Montgomery parameter from a setup section (or if the setup section is configured to use a dynamic modulus, loading the modulus from memory and computing the special parameter). `SETUPX` allocates a zeroed memory space separate from EVM memory.
 
-The modulus, special parameter and memory space are associated with the current call frame state and referred to as the active modulus state.  If `SETUPX` is invoked multiple times in a call frame (using the same setup section): the modulus, special parameter are cached on the first invocation and the allocated memory space persists for the duration of the call.
+The modulus, Montgomery parameter and memory space are associated with the current call frame state and referred to as the active modulus state.  If `SETUPX` is called again to switch to a different modulus, the memory space and computed Montgomery parameter of the previous active modulus state remain allocated.
 
-New store and load opcodes `STOREX`/`LOADX` are used to copy multiples values to/from EVM memory the memory space of the active modulus state.
+New store and load opcodes `STOREX`/`LOADX` are used to copy multiples values to/from EVM memory and the memory space of the active modulus state.
 
-Arithmetic is performed with `ADDMODX`/`SUBMODX`/`MULMODX` opcodes which take and return no stack arguments, require a 3-byte immediate value appended to the opcode.
+Arithmetic is performed with `ADDMODX`/`SUBMODX`/`MULMODX` opcodes which take and return no stack items, require a 3-byte immediate value appended to the opcode.
 
-The immediate is interpreted as 3 1-byte values `z`, `x`, `y` which are indexes to the array of EVMMAX values that comprises the memory space of the active modulus state.
+The immediate is interpreted as 3 1-byte values `z`, `x`, `y` which are indexes to the array of EVMMAX values that comprise the memory space of the active modulus state.
 
 An arithmetic operation is performed on inputs at index `x`/`y` placing the result in index `z`.
 
@@ -70,6 +70,7 @@ An arithmetic operation is performed on inputs at index `x`/`y` placing the resu
 | `expand_evm_memory` | `func(new_size_evm_words: int) -> int` | EVM memory expansion cost function, using modified rule according to this EIP |
 | `evm_stack` | object | Allows access to the stack via `pop()` and `peek(n)` which return `int` stack elements |
 | `contract_code` | `bytes` | code of the currently-executing contract |
+| `setup_sections` | `dict` | map of `mod_id` (`int`) to a setup section object (field names are from setup section spec. `int` values) |
 | `pc` | `int` | EVM program counter |
 
 ```
@@ -280,7 +281,7 @@ def mulmont(mod_state: ModState, x: int, y: int) -> int:
 
 ### Setup Section
 
-Introduce a new section type with `section_kind = 0x03`.
+Introduce a new section type with `section_kind = 3`.
 
 #### Section Body
 ```
@@ -288,9 +289,9 @@ mod_id <uint64> - setup section identifier
 mod_size <uint64> - size in bytes needed to represent the modulus
 vals_used <uint16> - number of allocated values (1-256)
 mod_entry_size <uint64> - size of the modulus entry in the setup section (0 if setup section is dynamic)
-mod_inv <8 bytes> - special "Montgomery" parameter: pow(-mod, -1, 1<<64). (omitted if mod_size == 0)
-mod <mod_size bytes> - modulus in big-endian ordering.  (omitted if mod_size == 0)
-mod_inv_full <mod_size bytes> - Montgomery parameter for subquadratic mulmont.  Omitted if ceil(mod_size / 8) < MULMODX_SUBQUADRATIC_START
+mod <mod_size bytes> - modulus in big-endian ordering.  (omitted if setup section is dynamic)
+mod_inv <8 bytes> - Montgomery parameter: pow(-mod, -1, 1<<64). (omitted if setup section is dynamic or ceil(mod_size / 8) >= MULMODX_SUBQUADRATIC_START))
+mod_inv_full <mod_size bytes> - Montgomery parameter for subquadratic mulmont.  (omitted if setup section is dynamic or ceil(mod_size / 8) < MULMODX_SUBQUADRATIC_START)
 ```
 
 ### New Opcodes
@@ -319,10 +320,10 @@ cost = SETUPX_BASE_GAS
 if mod_offset + mod_size > len(evm_memory):
     raise Exception("cannot load a modulus that would extend beyond the bounds of EVM memory")
 
-val_size_multiplier = math.ceil(setup_sections[mod_id].val_size / 8)
 vals_used = setup_sections[mod_id].vals_used
+val_size_multiplier = math.ceil(setup_sections[mod_id].val_size / 8)
 
-if setup_sections[mod_id].mod_size == 0:
+if setup_sections[mod_id].mod_entry_size == 0:
     # dynamic setup section
     cost += cost_precompute_mont(val_size_multiplier)
     
@@ -337,7 +338,7 @@ mod_inv = None
 mod_id = int(contract_code[pc+1:pc+2])
 
 if mod_id in evmmax_state.mods[mod_id]:
-    # this mod state was previously used in this call context. it is already allocated
+    # this mod state was previously used in this call frame. it is already allocated
     evmmax_state.active_mod_state = evmmax_state.mods[mod_id]
     return
 
@@ -349,7 +350,6 @@ if evmmax_state.mods[mod_id].modulus == 0:
     mod = int.from_bytes(evm_memory[mod_offset:mod_offset+val_size], byteorder='big')
     if mod == 0 or mod % 2 == 0:
         raise Exception("modulus must be nonzero and odd")
-    
     mod_inv = pow(-mod, -1, 2**SYSTEM_WORD_SIZE_BITS)
 else:
     mod = setup_sections[mod_id].mod
