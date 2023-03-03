@@ -172,7 +172,6 @@ Many existing tokens deployed on the Ethereum network already support this EIP.
 
 Bob was able to transfer a total of $N+M$ tokens instead of a total of $M$.
 
-(Written by Mikhail Vladimirov <mikhail.vladimirov@gmail.com> and Dmitry Khovratovich <khovratovich@gmail.com>, edited by Pandapip1 (@Pandapip1))
 
 #### Mitigation of re-appproval attack
 
