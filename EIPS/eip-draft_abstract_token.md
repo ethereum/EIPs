@@ -2,7 +2,7 @@
 title: Abstract Token Standard
 description: move tokens on- and off-chain as desired, enabling zero-cost minting while preserving on-chain composability
 author: Chris Walker (chris@ckwalker.com)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/draft-eip-abstract-token-standard/13152
 status: Draft
 type: Standards Track
 category: ERC
