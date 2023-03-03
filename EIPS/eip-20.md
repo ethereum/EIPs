@@ -12,8 +12,8 @@ created: 2015-11-19
 
 ## Abstract
 
-This EIP standardizes an interface for fungible tokens within smart contracts.
-The interface has basic transfer functionality, and allows tokens to be approved so they can be spent by another on-chain third party.
+The following standard allows for the implementation of a standard API for tokens within smart contracts.
+This standard provides basic functionality to transfer tokens, as well as allow tokens to be approved so they can be spent by another on-chain third party.
 
 ## Motivation
 
