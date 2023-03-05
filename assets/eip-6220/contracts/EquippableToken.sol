@@ -1678,7 +1678,9 @@ contract EquippableToken is
             _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        emit AssetAddedToTokens(tokenIds, assetId, replacesAssetWithId);
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
