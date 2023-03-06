@@ -26,7 +26,7 @@ Bitwise operations are very cheap and fast. For example doing an `AND` bitwise o
 ### Flexibility
 
 With the 256 bits of the `uint256`, we can create up to 256 different permissions which leads to $2^{256}$ unique combinations (a.k.a. roles).
-*(A role is a combination of multiple permissions).* All roles don't have to be predefined.
+*(A role is a combination of multiple permissions).* Not all roles have to be predefined.
 
 Since permissions are defined as powers of two, we can use the `OR` operator to create new role based on multiple permissions.
 
