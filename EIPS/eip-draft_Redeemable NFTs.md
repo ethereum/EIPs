@@ -1,7 +1,7 @@
 ---
 title: <The EIP title is a few words, not a complete sentence>
 description: <Description is one full (short) sentence>
-author: RE:DREAMER Lab (@REDREAMER_Lab), Archie Chang (@ChangArchie), Kai Yu ()
+author: RE:DREAMER Lab (@REDREAMER_Lab), Archie Chang (@ChangArchie), Kai Yu (@cynical_kai)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -34,9 +34,112 @@ This section is optional.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-**Every ERC-1105 compliant contract must implement the `ERC1105` and `ERC721` interfaces**
+**Every ERC-9999 compliant contract must implement the `ERC9999` and `ERC721` interfaces**
 
 ```solidity
+pragma solidity ^0.8.16;
+
+/// @title ERC-9999 Redeemable NFT Standard
+/// @dev See https://eips.ethereum.org/EIPS/eip-9999
+/// Note: 
+interface ERC9999 /* is ERC721 */ {
+    /// @dev This emits when any RNFT has been redeemed.
+    event Redeem(
+        address indexed _operator,
+        uint256 indexed _tokenId,
+        address redeemer,
+        bytes32 _redemptionId,
+        string _memo
+    );
+
+    /// @dev This emits when the redemption is canceled.
+    event Cancel(
+      address indexed _operator,
+      uint256 indexed _tokenId,
+      bytes32 _redemptionId,
+      string _memo
+    );
+
+    /// @notice Check whether the redemption created by the operator is redeemed or not.
+    /// @dev 
+    /// @param _operator The operator redeemed the RNFT.
+    /// @param _redemptionId The identifier for redemption.
+    /// @param _tokenId The identifier for an RNFT.
+    /// @return The RNFT is redeemed or not.
+    function isRedeemed(address _operator, bytes32 _redemptionId, uint256 _tokenId) external view returns (bool);
+
+    /// @notice List the redemptions of speficic operator and RNFT.
+    /// @dev
+    /// @param _operator The operator redeemed the RNFT.
+    /// @param _tokenId The redemptions for an RNFT.
+    /// @return The redemptions of speficic `_operator` and `_tokenId`.
+    function getRedemptionIds(address _operator, uint256 _tokenId) external view returns (bytes32[]);
+    
+    /// @notice Redeem an RNFT
+    /// @dev
+    /// @param _redemptionId The redemption to redeem.
+    /// @param _tokenId The RNFT to redeem.
+    /// @param _memo
+    function redeem(bytes32 _redemptionId, uint256 _tokenId, string _memo) external;
+
+    /// @notice Cancel a redemption
+    /// @dev
+    /// @param _redemptionId The redemption to cancel.
+    /// @param _tokenId The RNFT to cancel.
+    /// @param _memo
+    function cancel(bytes32 _redemptionId, uint256 _tokenId, string _memo) external;
+}
+```
+
+The **metadata extension** is OPTIONAL for ERC-5566 smart contracts (see "caveats", below). This allows your smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
+
+```solidity
+/// @title ERC-721 Non-Fungible Token Standard, optional metadata extension
+/// @dev See https://eips.ethereum.org/EIPS/eip-9999
+///  Note: the ERC-165 identifier for this interface is 0x5b5e139f.
+interface ERC9999Metadata /* is ERC721Metadata */ {
+    /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
+    /// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
+    ///  3986. The URI may point to a JSON file that conforms to the "ERC9999
+    ///  Metadata JSON Schema".
+    function tokenURI(uint256 _tokenId) external view returns (string);
+}
+```
+
+This is the "ERC9999 Metadata JSON Schema" referenced above.
+
+```json
+{
+    "title": "Asset Metadata",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Identifies the asset to which this NFT represents"
+        },
+        "description": {
+            "type": "string",
+            "description": "Describes the asset to which this NFT represents"
+        },
+        "image": {
+            "type": "string",
+            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+        }
+    },
+    "redemptions": {
+        "scope-assetId-redemptionId": {
+            "status": "redeemed"
+        },
+        "operaotr-tokenId-redemptionId": {
+            "status": "shipping",
+            "description": "Over the past 55 years, the legendary superhero Ultraman, created by Tsuburaya Productions, has wowed audiences across the world. From TV and film to manga and video games, Ultraman is an unrivalled Japanese pop-culture icon, akin to Superman in the West - and for the very first time, he's venturing into the metaverse."
+        },
+        "Brave Series Universe": {
+            "status": "paid",
+            "description": "The Brave Series RNFT is a redeemable NFT that can be redeemed for a physical Demon King Figure with unique attributes. Limited number of only 500 worldwide."
+        }
+    }
+}
 ```
 
 ## Rationale
