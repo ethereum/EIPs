@@ -12,7 +12,7 @@ created: 2023-02-27
 
 ## Abstract
 
-This EIP offers a standard for building a bit-based permission and role system. Each permission is represented by a single bit in `uint256` from which we can defined up to `256` permissions and `2²⁵⁶` roles. We are able to specify the importance of permission based on the order of the bits.
+This EIP offers a standard for building a bit-based permission and role system. Each permission is represented by a single bit. By using an `uint256`, up to $256$ permissions and $2^{256}$ roles can be defined. We are able to specify the importance of permission based on the order of the bits.
 
 ## Motivation
 
