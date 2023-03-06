@@ -72,9 +72,6 @@ ownedPermission & requiredPermission == requiredPermission
 
 Needs discussion.
 
-## Reference Implementation
-
-Needs discussion.
 
 ## Security Considerations
 
