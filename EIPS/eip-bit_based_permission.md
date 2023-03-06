@@ -21,7 +21,7 @@ By using bitwise and bitmask operations to determine access rights, we gain in e
 
 ### Gas cost efficiency
 
-Bitwise operations are very cheap and fast. For example doing an `AND` bitwise operation on a permission bitmak is cheaper than other comparaison.
+Bitwise operations are very cheap and fast. For example, doing an `AND` bitwise operation on a permission bitmask is significantly cheaper than calling any number of `LOAD` opcodes.
 
 ### Flexibility
 
