@@ -1,5 +1,5 @@
 ---
-eip:
+eip: 6617
 title: Bit Based Permission
 description: A permission and role system based on bits
 author: Chiro (@chiro-hiro), Victor Dusart (@vdusart)
