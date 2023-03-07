@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "./IMultiAsset.sol";
+import "./IERC5773.sol";
 import "./library/MultiAssetLib.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-contract MultiAssetToken is Context, IERC721, IMultiAsset {
+contract MultiAssetToken is Context, IERC721, IERC5773 {
     using MultiAssetLib for uint256;
     using MultiAssetLib for uint64[];
     using MultiAssetLib for uint128[];
