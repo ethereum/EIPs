@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface IMultiAsset {
+interface IERC5773 {
     event AssetSet(uint64 assetId);
 
     event AssetAddedToTokens(

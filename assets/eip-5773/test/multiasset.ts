@@ -60,7 +60,7 @@ describe("MultiAsset", async () => {
       expect(await token.supportsInterface("0x80ac58cd")).to.equal(true);
     });
 
-    it("can support IMultiAsset", async function () {
+    it("can support IERC5773", async function () {
       expect(await token.supportsInterface("0xd1526708")).to.equal(true);
     });
 
