@@ -1,5 +1,7 @@
 {
-  "ignorePatterns": [],
+  "ignorePatterns": [
+    "[`]*csl-json"
+  ],
   "replacementPatterns": [
     {
       "pattern": "^/",
