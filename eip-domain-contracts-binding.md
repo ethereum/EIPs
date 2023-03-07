@@ -55,8 +55,6 @@ An added advantage to this approach is to predictably find the the official cont
   TODO: Remove this comment before submitting
 -->
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
-
 ### Terms
   1. `Two-way` binding: Being able to verify what official contracts of a domain are offchain and onchain
   2. `Dapp Registry contract (DRC)`: This is a contract that is to be deployed by dapp developer that validates if a contract address is official
