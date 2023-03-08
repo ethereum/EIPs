@@ -1,7 +1,5 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
-const AbiCoder = ethers.utils.AbiCoder;
-const Keccak256 = ethers.utils.keccak256;
 
 describe("Livecycle Unit-Tests for Smart Derivative Contract", () => {
 
@@ -14,19 +12,18 @@ describe("Livecycle Unit-Tests for Smart Derivative Contract", () => {
       Terminated: 4,
   };
 
-  const abiCoder = new AbiCoder();
-  const trade_data = "<xml>here are the trade specification</xml";
+  const tradeData = "<xml>here are the trade specification</xml";
   let sdc;
   let token;
   let tokenManager;
   let counterparty1;
   let counterparty2;
-  let trade_id;
+  let tradeId;
   let initialLiquidityBalance = 5000;
   let terminationFee = 100;
   let marginBufferAmount = 900;
-  const settlementAmount1 = 200; // successful settlement in favour to CP1
-  const settlementAmount2 = -1400; // failing settlement larger than buffer in favour to CP1
+  const settlementAmount1 = 200; // successful settlement in favour to counterparty 1 (CP1)
+  const settlementAmount2 = -1400; // failing settlement larger than buffer in favour to counterparty 1 (CP1)
 
   before(async () => {
     const [_tokenManager, _counterparty1, _counterparty2] = await ethers.getSigners();
@@ -53,17 +50,17 @@ describe("Livecycle Unit-Tests for Smart Derivative Contract", () => {
   });
 
   it("Counterparty1 incepts a trade", async () => {
-     const incept_call = await sdc.connect(counterparty1).inceptTrade(trade_data,"initialMarketData");
+     const incept_call = await sdc.connect(counterparty1).inceptTrade(tradeData,"initialMarketData");
      let tradeid =  await sdc.connect(counterparty1).getTradeID();
      //console.log("TradeId: %s", tradeid);
-     await expect(incept_call).to.emit(sdc, "TradeIncepted").withArgs(counterparty1.address,tradeid,trade_data);
+     await expect(incept_call).to.emit(sdc, "TradeIncepted").withArgs(counterparty1.address,tradeid,tradeData);
      let trade_state =  await sdc.connect(counterparty1).getTradeState();
      await expect(trade_state).equal(TradeState.Incepted);
    });
 
 
   it("Counterparty2 confirms a trade", async () => {
-     const confirm_call = await sdc.connect(counterparty2).confirmTrade(trade_data,"initialMarketData");
+     const confirm_call = await sdc.connect(counterparty2).confirmTrade(tradeData,"initialMarketData");
      //console.log("TradeId: %s", await sdc.callStatic.getTradeState());
      let balanceSDC = await token.connect(counterparty2).balanceOf(sdc.address);
      await expect(confirm_call).to.emit(sdc, "TradeConfirmed");
@@ -110,7 +107,7 @@ describe("Livecycle Unit-Tests for Smart Derivative Contract", () => {
    it("Second settlement fails due to high transfer amount in favour to counteparty 2 - Trade terminates", async () => {
      const callInitSettlement = await sdc.connect(counterparty2).initiateSettlement();
      await expect(callInitSettlement).to.emit(sdc, "ProcessSettlementRequest");
-     const callPerformSettlement = await sdc.connect(counterparty2).performSettlement(settlementAmount2,"settlementData");
+     const callPerformSettlement = await sdc.connect(counterparty2).performSettlement(settlementAmount2, "settlementData");
      await expect(callPerformSettlement).to.emit(sdc, "TradeTerminated");
 
      let balanceSDC = parseInt(await token.connect(counterparty2).balanceOf(sdc.address));
