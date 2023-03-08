@@ -20,28 +20,5 @@ We provide the essential steps to compile the contracts and run provided unit te
 Check that you have the latest version of npm and node via `npm -version` (should be better than 8.5.0) and `node -v` (should be better than 16.14.2).
 
 1. Check out project
-2. Go to folder and initialise a new npm project: `npm init -y`. A basic `package.json` file should occur
-3. Install Hardhat as local solidity dev environment: `npx hardhat`
-4. Select following option: Create an empty hardhat.config.js
-5. Install Hardhat as a development dependency: `npm install --save-dev hardhat`
-6. Install further testing dependencies:
-`npm install --save-dev @nomiclabs/hardhat-waffle @nomiclabs/hardhat-ethers ethereum-waffle chai  ethers solidity-coverage`
-7. Install open zeppelin contracts: `npm install @openzeppelin/contracts`
-8. add plugins to hardhat.config.ts: 
-```
-require("@nomiclabs/hardhat-waffle"); 
-require('solidity-coverage');
-```
-
-9. Adding commands to `package.json`:
-``` 
-"scripts": {
-    "build": "hardhat compile",
-    "test:light": "hardhat test",
-    "test": "hardhat coverage"
-  },
-```
-9. run `npm run build`
-10. run `npm run test`
-
-
+2. Go to folder and install dependencies: Run `npm i`. The `node_modules` folder should be created
+3. run `npx hardhat test`

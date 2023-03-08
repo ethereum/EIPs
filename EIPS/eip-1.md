@@ -154,13 +154,15 @@ or
 
 > Random J. User (@username)
 
-if the email address or GitHub username is included, and
+or
+
+> Random J. User (@username) &lt;address@dom.ain&gt;
+
+if the email address and/or GitHub username is included, and
 
 > Random J. User
 
-if the email address is not given.
-
-It is not possible to use both an email and a GitHub username at the same time. If important to include both, one could include their name twice, once with the GitHub username, and once with the email.
+if neither the email address nor the GitHub username are given.
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
