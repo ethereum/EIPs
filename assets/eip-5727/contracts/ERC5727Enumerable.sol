@@ -15,7 +15,7 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
     mapping(address => uint256) private _numberOfValidTokens;
 
     Counters.Counter private _emittedCount;
-    Counters.Counter private _soulsCount;
+    Counters.Counter private _ownersCount;
 
     function supportsInterface(bytes4 interfaceId)
         public
@@ -31,14 +31,14 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
 
     function _beforeTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
         bool valid
     ) internal virtual override {
-        if (_indexedTokenIds[soul].length() == 0) {
-            _soulsCount.increment();
+        if (_indexedTokenIds[owner].length() == 0) {
+            _ownersCount.increment();
         }
         //unused variables
         issuer;
@@ -50,15 +50,15 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
 
     function _afterTokenMint(
         address issuer,
-        address soul,
+        address owner,
         uint256 tokenId,
         uint256 value,
         uint256 slot,
         bool valid
     ) internal virtual override {
-        _indexedTokenIds[soul].add(tokenId);
+        _indexedTokenIds[owner].add(tokenId);
         if (valid) {
-            _numberOfValidTokens[soul] += 1;
+            _numberOfValidTokens[owner] += 1;
         }
         //unused variables
         issuer;
@@ -68,55 +68,55 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
     }
 
     function _mint(
-        address soul,
+        address owner,
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256 tokenId) {
         tokenId = _emittedCount.current();
-        _mintUnsafe(soul, tokenId, value, slot, true);
-        emit Minted(soul, tokenId, value);
+        _mintUnsafe(owner, tokenId, value, slot, true);
+        emit Minted(owner, tokenId, value);
         _emittedCount.increment();
     }
 
     function _mint(
         address issuer,
-        address soul,
+        address owner,
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256 tokenId) {
         tokenId = _emittedCount.current();
-        _mintUnsafe(issuer, soul, tokenId, value, slot, true);
-        emit Minted(soul, tokenId, value);
+        _mintUnsafe(issuer, owner, tokenId, value, slot, true);
+        emit Minted(owner, tokenId, value);
         _emittedCount.increment();
     }
 
     function _mintBatch(
-        address[] memory souls,
+        address[] memory owners,
         uint256 value,
         uint256 slot
     ) internal virtual returns (uint256[] memory tokenIds) {
-        tokenIds = new uint256[](souls.length);
-        for (uint256 i = 0; i < souls.length; i++) {
-            tokenIds[i] = _mint(souls[i], value, slot);
+        tokenIds = new uint256[](owners.length);
+        for (uint256 i = 0; i < owners.length; i++) {
+            tokenIds[i] = _mint(owners[i], value, slot);
         }
     }
 
     function _afterTokenRevoke(uint256 tokenId) internal virtual override {
-        assert(_numberOfValidTokens[_getTokenOrRevert(tokenId).soul] > 0);
-        _numberOfValidTokens[_getTokenOrRevert(tokenId).soul] -= 1;
+        assert(_numberOfValidTokens[_getTokenOrRevert(tokenId).owner] > 0);
+        _numberOfValidTokens[_getTokenOrRevert(tokenId).owner] -= 1;
     }
 
     function _beforeTokenDestroy(uint256 tokenId) internal virtual override {
-        address soul = soulOf(tokenId);
+        address owner = ownerOf(tokenId);
 
         if (_getTokenOrRevert(tokenId).valid) {
-            assert(_numberOfValidTokens[soul] > 0);
-            _numberOfValidTokens[soul] -= 1;
+            assert(_numberOfValidTokens[owner] > 0);
+            _numberOfValidTokens[owner] -= 1;
         }
-        EnumerableSet.remove(_indexedTokenIds[soul], tokenId);
-        if (EnumerableSet.length(_indexedTokenIds[soul]) == 0) {
-            assert(_soulsCount.current() > 0);
-            _soulsCount.decrement();
+        EnumerableSet.remove(_indexedTokenIds[owner], tokenId);
+        if (EnumerableSet.length(_indexedTokenIds[owner]) == 0) {
+            assert(_ownersCount.current() > 0);
+            _ownersCount.decrement();
         }
     }
 
@@ -124,51 +124,51 @@ abstract contract ERC5727Enumerable is ERC5727, IERC5727Enumerable {
         _emittedCount.increment();
     }
 
-    function _tokensOfSoul(address soul)
+    function _tokensOfOwner(address owner)
         internal
         view
         returns (uint256[] memory tokenIds)
     {
-        tokenIds = _indexedTokenIds[soul].values();
-        require(tokenIds.length != 0, "ERC5727: the soul has no token");
+        tokenIds = _indexedTokenIds[owner].values();
+        require(tokenIds.length != 0, "ERC5727: the owner has no token");
     }
 
-    function emittedCount() public view virtual override returns (uint256) {
+    function totalSupply() public view virtual override returns (uint256) {
         return _emittedCount.current();
     }
 
-    function soulsCount() public view virtual override returns (uint256) {
-        return _soulsCount.current();
+    function ownersCount() public view virtual override returns (uint256) {
+        return _ownersCount.current();
     }
 
-    function balanceOf(address soul)
+    function balanceOf(address owner)
         public
         view
         virtual
         override
         returns (uint256)
     {
-        return _indexedTokenIds[soul].length();
+        return _indexedTokenIds[owner].length();
     }
 
-    function hasValid(address soul)
+    function hasValid(address owner)
         public
         view
         virtual
         override
         returns (bool)
     {
-        return _numberOfValidTokens[soul] > 0;
+        return _numberOfValidTokens[owner] > 0;
     }
 
-    function tokenOfSoulByIndex(address soul, uint256 index)
+    function tokenOfOwnerByIndex(address owner, uint256 index)
         public
         view
         virtual
         override
         returns (uint256)
     {
-        EnumerableSet.UintSet storage ids = _indexedTokenIds[soul];
+        EnumerableSet.UintSet storage ids = _indexedTokenIds[owner];
         require(
             index < EnumerableSet.length(ids),
             "ERC5727: Token does not exist"

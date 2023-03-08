@@ -154,13 +154,15 @@ or
 
 > Random J. User (@username)
 
-if the email address or GitHub username is included, and
+or
+
+> Random J. User (@username) &lt;address@dom.ain&gt;
+
+if the email address and/or GitHub username is included, and
 
 > Random J. User
 
-if the email address is not given.
-
-It is not possible to use both an email and a GitHub username at the same time. If important to include both, one could include their name twice, once with the GitHub username, and once with the email.
+if neither the email address nor the GitHub username are given.
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
@@ -267,6 +269,9 @@ This is a sentence with a footnote.[^1]
 
 Which renders to:
 
+<!-- markdownlint-capture -->
+<!-- markdownlint-disable code-block-style -->
+
 This is a sentence with a footnote.[^1]
 
 [^1]:
@@ -296,6 +301,8 @@ This is a sentence with a footnote.[^1]
     }
     ```
 
+<!-- markdownlint-restore -->
+
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
 The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
@@ -323,6 +330,8 @@ The current EIP editors are
 - Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
+- Zainan Victor Zhou (@xinbenlv)
+- Gajinder Singh (@g11tech)
 
 Emeritus EIP editors are
 
@@ -374,7 +383,7 @@ The `description` field in the preamble:
 
 ### EIP numbers
 
-When referring to an EIP by number, it should be written in the hyphenated form `EIP-X` where `X` is the EIP's assigned number.
+When referring to an EIP with a `category` of `ERC`, it must be written in the hyphenated form `ERC-X` where `X` is that EIP's assigned number. When referring to EIPs with any other `category`, it must be written in the hyphenated form `EIP-X` where `X` is that EIP's assigned number.
 
 ### RFC 2119 and RFC 8174
 
