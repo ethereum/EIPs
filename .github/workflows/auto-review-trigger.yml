@@ -1,14 +1,6 @@
 on:
   pull_request_target:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
   pull_request_review:
-    types:
-      - submitted
-      - dismissed
   workflow_dispatch:
     inputs:
       pr_number:
@@ -18,6 +10,10 @@ on:
   issue_comment:
     types:
       - created
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 name: Auto Review Bot Trigger
 jobs:
@@ -33,7 +29,7 @@ jobs:
 
       - name: Write PR Number - PR Review
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && !endsWith(github.event.sender, '-bot') && !endsWith(github.event.sender, '[bot]')
+        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
 
