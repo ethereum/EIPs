@@ -5,11 +5,11 @@ pragma solidity ^0.8.16;
 import "./IERC5773.sol";
 
 /**
- * @title IEquippable
+ * @title IERC6220
  * @author RMRK team
  * @notice Interface smart contract of the equippable module.
  */
-interface IEquippable is IERC5773 {
+interface IERC6220 is IERC5773 {
     /**
      * @notice Used to store the core structure of the `Equippable` component.
      * @return assetId The ID of the asset equipping a child
