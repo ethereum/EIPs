@@ -5,7 +5,7 @@
 pragma solidity ^0.8.16;
 
 import "./ICatalog.sol";
-import "./IEquippable.sol";
+import "./IERC6220.sol";
 import "./IERC6059.sol";
 import "./library/EquippableLib.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -69,7 +69,7 @@ contract EquippableToken is
     IERC165,
     IERC721,
     IERC6059,
-    IEquippable
+    IERC6220
 {
     using Address for address;
     using EquippableLib for uint64[];
@@ -223,7 +223,7 @@ contract EquippableToken is
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC6059).interfaceId ||
-            interfaceId == type(IEquippable).interfaceId;
+            interfaceId == type(IERC6220).interfaceId;
     }
 
     /**
@@ -1678,14 +1678,16 @@ contract EquippableToken is
             _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        emit AssetAddedToTokens(tokenIds, assetId, replacesAssetWithId);
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     // --------------------- EQUIPPABLE GETTERS ---------------------
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function canTokenBeEquippedWithAssetIntoSlot(
         address parent,
@@ -1703,7 +1705,7 @@ contract EquippableToken is
     }
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function isChildEquipped(
         uint256 tokenId,
@@ -1714,7 +1716,7 @@ contract EquippableToken is
     }
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function getAssetAndEquippableData(
         uint256 tokenId,
@@ -1734,7 +1736,7 @@ contract EquippableToken is
     }
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function getEquipment(
         uint256 tokenId,
@@ -1747,7 +1749,7 @@ contract EquippableToken is
     // --------------------- EQUIPPABLE SETTERS ---------------------
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function equip(
         IntakeEquip memory data
@@ -1756,7 +1758,7 @@ contract EquippableToken is
     }
 
     /**
-     * @inheritdoc IEquippable
+     * @inheritdoc IERC6220
      */
     function unequip(
         uint256 tokenId,
@@ -1800,7 +1802,7 @@ contract EquippableToken is
         // Check from child perspective intention to be used in part
         // We add reentrancy guard because of this call, it happens before updating state
         if (
-            !IEquippable(child.contractAddress)
+            !IERC6220(child.contractAddress)
                 .canTokenBeEquippedWithAssetIntoSlot(
                     address(this),
                     child.tokenId,

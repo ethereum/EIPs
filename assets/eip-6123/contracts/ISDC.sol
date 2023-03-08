@@ -67,7 +67,7 @@ interface ISDC {
     /**
      * @dev Emitted  when a new trade is incepted from a eligible counterparty
      * @param initiator is the address from which trade was incepted
-     * @param tradeID is the tradeID (e.g. generated internally)
+     * @param tradeId is the trade ID (e.g. generated internally)
      * @param tradeData holding the trade parameters
      */
     event TradeIncepted(address initiator, string tradeId, string tradeData);
@@ -116,14 +116,14 @@ interface ISDC {
     /**
      * @dev Emitted when a counterparty proactively requests an early termination of the underlying trade
      * @param cpAddress the address of the requesting party
-     * @param tradeID the trade identifier which is supposed to be terminated
+     * @param tradeId the trade identifier which is supposed to be terminated
      */
     event TradeTerminationRequest(address cpAddress, string tradeId);
 
     /**
      * @dev Emitted when early termination request is confirmed by the opposite party
      * @param cpAddress the party which confirms the trade termination
-     * @param tradeID the trade identifier which is supposed to be terminated
+     * @param tradeId the trade identifier which is supposed to be terminated
      */
     event TradeTerminationConfirmed(address cpAddress, string tradeId);
 
@@ -176,14 +176,14 @@ interface ISDC {
     /**
      * @notice Called from a counterparty to request a mutual termination
      * @dev emits a {TradeTerminationRequest}
-     * @param tradeID the trade identifier which is supposed to be terminated
+     * @param tradeId the trade identifier which is supposed to be terminated
      */
     function requestTradeTermination(string memory tradeId) external;
 
     /**
      * @notice Called from a counterparty to confirm a termination, which will triggers a final settlement before trade gets inactive
      * @dev emits a {TradeTerminationConfirmed}
-     * @param tradeID the trade identifier of the trade which is supposed to be terminated
+     * @param tradeId the trade identifier of the trade which is supposed to be terminated
      */
     function confirmTradeTermination(string memory tradeId) external;
 }
