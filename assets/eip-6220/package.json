@@ -1,5 +1,5 @@
 {
-  "name": "equippable-tokens",
+  "name": "erc-6220",
   "dependencies": {
     "@openzeppelin/contracts": "^4.6.0"
   },
