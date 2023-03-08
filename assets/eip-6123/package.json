@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@finmath.net/sdc": "^0.2.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "ethereumjs-wallet": "^1.0.2",
+    "ethers": "^5.0.0",
+    "hardhat": "^2.12.1",
+    "hardhat-contract-sizer": "^2.6.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0",
+    "solidity-coverage": "^0.8.2"
+  }
+}
