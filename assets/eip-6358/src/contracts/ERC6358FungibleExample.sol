@@ -28,7 +28,7 @@ struct Fungible {
 /**
  * @notice Implementation of the {IERC6358Fungible} interface
  */
-contract SkywalkerFungible is ERC20, Ownable, IERC6358Fungible {
+contract ERC6358FungibleExample is ERC20, Ownable, IERC6358Fungible {
     uint8 constant TRANSFER = 0;
     uint8 constant MINT = 1;
     uint8 constant BURN = 2;
