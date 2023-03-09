@@ -1392,10 +1392,10 @@ __asm__ (
     ".section .rodata\n"
     ".global transactions_root\n"
     "transactions_root:\n"
-    ".incbin \"proofs/transactions_root.bin\"\n"
+    ".incbin \"proofs/transactions_root.ssz\"\n"
     ".global proof\n"
     "proof:\n"
-    ".incbin \"proofs/" QUOTE(PROOF_TYPE) "_" QUOTE(PROOF_INDEX) ".bin\"\n"
+    ".incbin \"proofs/" QUOTE(PROOF_TYPE) "_" QUOTE(PROOF_INDEX) ".ssz\"\n"
     ".global num_proof_bytes\n"
     ".set num_proof_bytes, . - proof\n"
     ".section .text\n"
@@ -1443,7 +1443,7 @@ void main(void)
                 break;
             }
             end_time = timing_counter_get();
-            printk("tx_index = %u\n", proof[64]);
+            printk("tx_index = %u\n", proof[33]);
         } break;
         case AMOUNT: {
             const ExecutionAddress expected_tx_to = {
