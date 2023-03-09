@@ -26,5 +26,5 @@ npx ganache -s 0
 Open another terminate
 
 ```
-npm truffle test
+npx truffle test
 ```
