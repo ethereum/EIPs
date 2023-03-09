@@ -10,14 +10,14 @@ const { util } = require('config');
 const CHAIN_ID = 0;
 const ONE_TOKEN = '1000000000000000000';
 const TEN_TOKEN = '10000000000000000000';
-const TOKEN_SYMBOL = 'skywalker';
+const TOKEN_SYMBOL = 'ERC6358Fungible';
 const COOL_DOWN = 2;
 
 const TRANSFER = 0;
 const MINT = 1;
 const BURN = 2;
 
-const Fungible = artifacts.require('./MockFungible.sol');
+const Fungible = artifacts.require('./ERC6358FungibleExample.sol');
 const OmniverseProtocolHelper = artifacts.require('./OmniverseProtocolHelper.sol');
 Fungible.defaults({
     gas: 8000000,
@@ -100,7 +100,7 @@ let encodeTransfer = (from, toPk, amount, nonce) => {
     return txData;
 }
     
-contract('SkywalkerFungible', function() {
+contract('ERC6358Fungible', function() {
     before(async function() {
         await initContract();
     });

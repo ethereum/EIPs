@@ -28,7 +28,7 @@ struct NonFungible {
 /**
  * @notice Implementation of the {IERC6358NonFungible} interface
  */
-contract SkywalkerNonFungible is Ownable, IERC6358NonFungible {
+contract ERC6358NonFungibleExample is Ownable, IERC6358NonFungible {
     uint8 constant TRANSFER = 0;
     uint8 constant MINT = 1;
     uint8 constant BURN = 2;

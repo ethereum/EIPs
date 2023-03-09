@@ -9,14 +9,14 @@ const { util } = require('config');
 
 const CHAIN_ID = 0;
 const TOKEN_ID = 1;
-const TOKEN_SYMBOL = 'skywalker';
+const TOKEN_SYMBOL = 'ERC6358NonFungible';
 const COOL_DOWN = 2;
 
 const TRANSFER = 0;
 const MINT = 1;
 const BURN = 2;
 
-const NonFungible = artifacts.require('./SkywalkerNonFungible.sol');
+const NonFungible = artifacts.require('./ERC6358NonFungibleExample.sol');
 const OmniverseProtocolHelper = artifacts.require('./OmniverseProtocolHelper.sol');
 NonFungible.defaults({
     gas: 8000000,
@@ -99,7 +99,7 @@ let encodeTransfer = (from, toPk, tokenId, nonce) => {
     return txData;
 }
     
-contract('SkywalkerNonFungible', function() {
+contract('ERC6358NonFungible', function() {
     before(async function() {
         await initContract();
     });
