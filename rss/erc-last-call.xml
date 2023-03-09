@@ -16,7 +16,7 @@ layout: null
       {% capture description %}
         <p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in Last Call status. It is authored by {{ eip.author }} and was originally created {{ eip.created }}. It is in the {{ eip.category }} category of type {{ eip.type }}. Please review and note any changes that should block acceptance.</p>
         {% if eip.discussions-to %}
-          <p>The author has requested that discussions happen at the following URL: {{ eip.discussions-to }}</p>
+          <p>The author has requested that discussions happen at the following URL: <a href="{{ eip.discussions-to }}">{{ eip.discussions-to }}</a></p>
         {% endif %}
         <hr />
         {{ eip.content }}
