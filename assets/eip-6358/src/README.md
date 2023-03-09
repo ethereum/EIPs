@@ -12,6 +12,7 @@ npm install
 
 ## Compilation
 ```
+touch .secret
 npx truffle compile
 ```
 
@@ -22,6 +23,8 @@ npx ganache -s 0
 ```
 
 ### Test
+Open another terminate
+
 ```
 npm truffle test
 ```
