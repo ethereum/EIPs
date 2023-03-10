@@ -1,7 +1,8 @@
 ---
+eip: 6672
 title: Multi-redeemable NFTs
 description: An extension of EIP-721 which enables an NFT to be redeemed multiple times for either a physical or digital object
-author: RE:DREAMER Lab (@REDREAMER_Lab), Archie Chang (@ChangArchie), Kai Yu (@cynical_kai)
+author: RE:DREAMER Lab (dev@redreamer.io), Archie Chang (@ArchieR7), Kai Yu (@chihkaiyu), Yonathan Randyanto (Randyanto)
 discussions-to: https://ethereum-magicians.org/t/eip-multi-redeemable-nft-extension/xxxxx
 status: Draft
 type: Standards Track
@@ -12,7 +13,7 @@ requires: 165, 721
 
 ## Abstract
 
-This EIP proposes an extension to the [EIP-721](./eip-721.md) standard for Non-Fungible Tokens (NFTs) to enable multi-redeemable NFTs. This extension would allow an NFT to be redeemed multiple times for either physical or digital objects and maintain a record of its redemption status on the blockchain.
+This EIP proposes an extension to the [ERP-721](./eip-721.md) standard for Non-Fungible Tokens (NFTs) to enable multi-redeemable NFTs. This extension would allow an NFT to be redeemed multiple times for either physical or digital objects and maintain a record of its redemption status on the blockchain.
 
 ## Motivation
 
@@ -151,7 +152,7 @@ The combination of `_operator`, `_tokenId`, and `_redemptionId` is REQUIRED to b
 
 ### Metadata Choices (metadata extension)
 
-To provide additional information about a redemption, `redemptions` key-value pairs is added to the "ERC721 Metadata Extension". The key format for the redemptions key-value pairs MUST be standardized as `operator-tokenId-redemptionId`, where `operator` is the operator wallet address, `tokenId` is  the identifier of the token that has been redeemed., and `redemptionId` is the redemption identifier. The same combination of keys is used for the redemption flag, and the same rationale applies.
+To provide additional information about a redemption, `redemptions` key-value pairs is added to the "ERC-721 Metadata Extension". The key format for the redemptions key-value pairs MUST be standardized as `operator-tokenId-redemptionId`, where `operator` is the operator wallet address, `tokenId` is  the identifier of the token that has been redeemed., and `redemptionId` is the redemption identifier. The same combination of keys is used for the redemption flag, and the same rationale applies.
 
 The value of the key `operator-tokenId-redemptionId` is an object that contains the `status` and `description` of the redemption.
 
@@ -165,11 +166,11 @@ The value of the key `operator-tokenId-redemptionId` is an object that contains 
 
 ## Backwards Compatibility
 
-This standard is compatible with EIP-721.
+This standard is compatible with [ERC-721](./eip-721.md).
 
 ## Reference Implementation
 
-Here's an example of an EIP-721 that includes the Multi-Redeemable (IERC-6672) extension:
+Here's an example of an [ERC-721](./eip-721.md) that includes the Multi-Redeemable (IERC-6672) extension:
 
 ```solidity
 // SPDX-License-Identifier: UNLICENSED
