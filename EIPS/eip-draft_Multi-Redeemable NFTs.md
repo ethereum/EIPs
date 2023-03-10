@@ -1,0 +1,246 @@
+---
+title: Multi-redeemable NFTs
+description: An extension of EIP-721 which enables an NFT to be redeemed multiple times for either a physical or digital object
+author: RE:DREAMER Lab (@REDREAMER_Lab), Archie Chang (@ChangArchie), Kai Yu (@cynical_kai)
+discussions-to: https://ethereum-magicians.org/t/eip-multi-redeemable-nft-extension/xxxxx
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-02-21
+requires: 165, 721
+---
+​
+## Abstract
+​
+This EIP proposes an extension to the [EIP-721](./eip-721.md) standard for Non-Fungible Tokens (NFTs) to enable multi-redeemable NFTs. This extension would allow an NFT to be redeemed multiple times for either physical or digital objects and maintain a record of its redemption status on the blockchain.
+​
+## Motivation
+​
+[EIP-5560](./eip-5560.md) enables only one-time redemption of an NFT, which means the same NFT cannot be re-used for another redemption from different campaigns or events. Our proposed multi-redeemable NFT is an improved alternative to the [EIP-5560](./eip-5560.md) redeemable NFT.
+​
+## Specification
+​
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+​
+**Every contract compliant with this EIP MUST implement `ERC9999` and `ERC721` interfaces.**
+​
+```solidity
+pragma solidity ^0.8.16;
+​
+/// @title ERC-9999 Redeemable NFT Standard
+/// @dev See https://eips.ethereum.org/EIPS/eip-9999
+interface ERC9999 /* is ERC721 */ {
+    /// @dev This event emits when an NFT is redeemed.
+    event Redeem(
+        address indexed _operator,
+        uint256 indexed _tokenId,
+        address redeemer,
+        bytes32 _redemptionId,
+        string _memo
+    );
+​
+    /// @dev This event emits when a redemption is canceled.
+    event Cancel(
+      address indexed _operator,
+      uint256 indexed _tokenId,
+      bytes32 _redemptionId,
+      string _memo
+    );
+​
+    /// @notice Check whether an NFT is already used for redemption or not.
+    /// @dev 
+    /// @param _operator The address of the operator of the redemption platform.
+    /// @param _redemptionId The identifier for a redemption.
+    /// @param _tokenId The identifier for an NFT.
+    /// @return Whether an NFT is already redeemed or not.
+    function isRedeemed(address _operator, bytes32 _redemptionId, uint256 _tokenId) external view returns (bool);
+​
+    /// @notice List the redemptions created by the given operator for the given NFT.
+    /// @dev
+    /// @param _operator The address of the operator of the redemption platform.
+    /// @param _tokenId The identifier for an NFT.
+    /// @return List of redemptions of speficic `_operator` and `_tokenId`.
+    function getRedemptionIds(address _operator, uint256 _tokenId) external view returns (bytes32[]);
+    
+    /// @notice Redeem an NFT
+    /// @dev
+    /// @param _redemptionId The identifier created by the operator for a redemption.
+    /// @param _tokenId The NFT to redeem.
+    /// @param _memo
+    function redeem(bytes32 _redemptionId, uint256 _tokenId, string _memo) external;
+​
+    /// @notice Cancel a redemption
+    /// @dev
+    /// @param _redemptionId The redemption to cancel.
+    /// @param _tokenId The NFT to cancel the redemption.
+    /// @param _memo
+    function cancel(bytes32 _redemptionId, uint256 _tokenId, string _memo) external;
+}
+```
+​
+The **metadata extension** is OPTIONAL for ERC-9999 smart contracts (see "caveats", below). This allows your smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
+​
+```solidity
+/// @title ERC-99999 Multi-Redeemable Token Standard, optional metadata extension
+/// @dev See https://eips.ethereum.org/EIPS/eip-9999
+interface ERC9999Metadata /* is ERC721Metadata */ {
+    /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
+    /// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
+    ///  3986. The URI may point to a JSON file that conforms to the "ERC9999
+    ///  Metadata JSON Schema".
+    function tokenURI(uint256 _tokenId) external view returns (string);
+}
+```
+​
+This is the "ERC9999 Metadata JSON Schema" referenced above.
+​
+```json
+{
+    "title": "Asset Metadata",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Identifies the asset to which this NFT represents"
+        },
+        "description": {
+            "type": "string",
+            "description": "Describes the asset to which this NFT represents"
+        },
+        "image": {
+            "type": "string",
+            "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+        }
+    },
+    "redemptions": {
+        "operator-tokenId-redemptionId": {
+            "status": {
+                "type": "string",
+                "description": "The status of a redemption. Enum type can be used to represent the redemption status, such as redeemed, shipping, paid."
+            },
+            "description": {
+                "type": "string",
+                "description": "Describes the object that has been redeemed for an NFT, such as the name of an action figure series name or the color of the product."
+            }
+        }
+    }
+}
+```
+​
+## Rationale
+​
+### Redeem and Cancel Mechanism
+​
+An operator SHALL only make an update to the redemption created by itself. Therefore, the `redeem()` and `cancel()` functions do not have an `_operator` parameter, and the `msg.sender` address MUST be used as the `_operator`.
+​
+### Key Choices for Redemption Flag
+​
+The combination of `_operator`, `_tokenId`, and `_redemptionId` is REQUIRED to be used as the key in the redemption flag key-value pairs. The reasoning is as follows:
+​
+- Operator wallet address, i.e. `_operator`
+​
+    It's possible that there are more than one party who would like to use the same NFT for redemption. For example, MisterPunks NFTs are eligible to be redemeed for both Event-X and Event-Y tickets, and each event's ticket redemption is handled by a different operator.
+​
+- Token identifier, i.e. `_tokenId`
+​
+    Each NFT holder will have different redemption records created by the same operator. Therefore, it's important to use token identifier as one of the keys.
+​
+- Redemption identifier, i.e. `_redemptionId`
+​
+    Using `_redemptionId` as one of the keys enables NFT holders to redeem the same NFT to the same operator multiple times. For example, Operator-X has 2 campaigns, i.e. campaign A and campaign B, and both campaigns allow for MisterPunks NFTs to be redemeed for physical action figures. Holder of MisterPunk #7 is eligible for redemption in both campaigns and each redemption is recorded with the same `_operator` and `_tokenId`, but with different `_redemptionId`.
+​
+### Metadata Choices (metadata extension)
+​
+To provide additional information about a redemption, `redemptions` key-value pairs is added to the "ERC721 Metadata Extension". The key format for the redemptions key-value pairs MUST be standardized as `operator-tokenId-redemptionId`, where `operator` is the operator wallet address, `tokenId` is  the identifier of the token that has been redeemed., and `redemptionId` is the redemption identifier. The same combination of keys is used for the redemption flag, and the same rationale applies.
+​
+The value of the key `operator-tokenId-redemptionId` is an object that contains the `status` and `description` of the redemption.
+​
+- Redemption status, i.e. `status`
+​
+    The redemption status can have a more granular level, rather than just being a flag with a `true` or `false` value. For instance, in cases of physical goods redemption, we may require the redemption status to be either `redeemed`, `paid`, or `shipping`. It is RECOMMENDED to use a string enum that is comprehensible by both the operator and the marketplace or any other parties that want to exhibit the status of the redemption.
+​
+- Description of the redemption, i.e. `description`
+​
+    The `description` can be used to provide more details about the redemption, such as information about the concert ticket, a detailed description of the action figures, and more.
+​
+## Backwards Compatibility
+​
+This standard is compatible with EIP-721.
+​
+## Reference Implementation
+​
+Here's an example of an EIP-721 that includes the Multi-Redeemable (IERC9999) extension:
+​
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.16;
+​
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./interfaces/IERC9999.sol";
+​
+contract ERC9999 is ERC721, IERC9999 {
+    mapping(address => mapping(uint256 => mapping(bytes32 => bool))) redemptionStatus;
+    mapping(address => mapping(uint256 => mapping(bytes32 => string))) public memos;
+    mapping(address => mapping(uint256 => bytes32[])) redemptions;
+​
+    constructor() ERC721("MultiRedeemableNFT", "MRNFT") {}
+​
+    function isRedeemed(address _operator, bytes32 _redemptionId, uint256 _tokenId) external view returns (bool) {
+        return _isRedeemed(_operator, _redemptionId, _tokenId);
+    }
+​
+    function getRedemptionIds(address _operator, uint256 _tokenId) external view returns (bytes32[] memory) {
+        require(redemptions[_operator][_tokenId].length > 0, "ERC9999: token doesn't have any redemptions.");
+        return redemptions[_operator][_tokenId];
+    }
+    
+    function redeem(bytes32 _redemptionId, uint256 _tokenId, string memory _memo) external {
+        address _operator = msg.sender;
+        require(!_isRedeemed(_operator, _redemptionId, _tokenId), "ERC9999: token already redeemed.");
+        _update(_operator, _redemptionId, _tokenId, _memo, true);
+        redemptions[_operator][_tokenId].push(_redemptionId);
+    }
+​
+    function cancel(bytes32 _redemptionId, uint256 _tokenId, string memory _memo) external {
+        address _operator = msg.sender;
+        require(_isRedeemed(_operator, _redemptionId, _tokenId), "ERC9999: token doesn't redeemed.");
+        _update(_operator, _redemptionId, _tokenId, _memo, false);
+        _removeRedemption(_operator, _redemptionId, _tokenId);
+    }
+​
+    function _isRedeemed(address _operator, bytes32 _redemptionId, uint256 _tokenId) internal view returns (bool) {
+        require(_exists(_tokenId), "ERC9999: token doesn't exists.");
+        return redemptionStatus[_operator][_tokenId][_redemptionId];
+    }
+​
+    function _update(address _operator, bytes32 _redemptionId, uint256 _tokenId, string memory _memo, bool isRedeemed_) internal {
+        redemptionStatus[_operator][_tokenId][_redemptionId] = isRedeemed_;
+        memos[_operator][_tokenId][_redemptionId] = _memo;
+    }
+​
+    function _removeRedemption(address _operator, bytes32 _redemptionId, uint256 _tokenId) internal {
+        bytes32[] storage _redemptions = redemptions[_operator][_tokenId];
+        for (uint i = 0; i < _redemptions.length; i++) {
+            if (_redemptions[i] == _redemptionId) {
+                if (i == _redemptions.length - 1) {
+                    _redemptions.pop();
+                } else {
+                    for (uint j = 0; j < _redemptions.length - 1; j++) {
+                        _redemptions[j] = _redemptions[j+1];
+                    }
+                }
+                redemptions[_operator][_tokenId] = _redemptions;
+                return;
+            }
+        }
+    }
+}
+```
+​
+## Security Considerations
+​
+Needs discussion.
+​
+## Copyright
+​
+Copyright and related rights waived via [CC0](../LICENSE.md).
