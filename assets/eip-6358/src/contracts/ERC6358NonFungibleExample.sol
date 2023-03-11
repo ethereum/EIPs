@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./ERC721.sol";
 import "./libraries/OmniverseProtocolHelper.sol";
 import "./interfaces/IERC6358NonFungible.sol";
 
