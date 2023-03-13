@@ -1,5 +1,5 @@
 ---
-title: ERC-6679: NFT Flashloans
+title: ERC-6680: NFT Flashloans
 description: Minimal interface for ERC-721 NFT flashloans
 author: out.eth (@outdoteth)
 status: Draft
@@ -17,7 +17,7 @@ This standard is an extension of the existing flashloan standard ([EIP-3156](./e
 
 The current flashloan standard, [EIP-3156](./eip-3156.md), only supports ERC-20 tokens. ERC-721 tokens are sufficiently different from ERC-20 tokens that they require an extension of this existing standard to support them. 
 
-In most cases, the handling of fee payments will be desired to be paid in a seperate currency to the loaned NFTs because NFTs themselves cannot be fractionalized. Consider the following example where the flashloan provider charges a 0.1 ETH fee on each NFT that is flashloaned; The interface must provide methods that allow the borrower to determine the fee rate on each NFT and also the currency that the fee should be paid in.
+In most cases, the handling of fee payments will be desired to be paid in a seperate currency to the loaned NFTs because NFTs themselves cannot always be fractionalized. Consider the following example where the flashloan provider charges a 0.1 ETH fee on each NFT that is flashloaned; The interface must provide methods that allow the borrower to determine the fee rate on each NFT and also the currency that the fee should be paid in.
 
 ## Specification
 
@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ```solidity
 pragma solidity ^0.8.19;
 
-interface INFTFlashLender {
+interface IERC6680 {
     /// @dev The address of the token used to pay flash loan fees.
     function flashFeeToken() external view returns (address);
 
@@ -53,7 +53,7 @@ We choose to extend as much of the existing flashloan standard (EIP-3156) as pos
 
 ## Backwards Compatibility
 
-This EIP is fully backwards compatible with [EIP-3156](./eip-3156.md) with the exception of the `maxFlashLoan` method. This method does not make sense within the context of NFTs because NFTs are not fungible. However it is part of the existing flashloan standard and so it is not possible to remove it without breaking backwards compatibility. It is suggested that any contract implementing this EIP without the intention of supporting ERC20 flashloans should always return `0` from `maxFlashLoan`. For example:
+This EIP is fully backwards compatible with [EIP-3156](./eip-3156.md) with the exception of the `maxFlashLoan` method. This method does not make sense within the context of NFTs because NFTs are not fungible. However it is part of the existing flashloan standard and so it is not possible to remove it without breaking backwards compatibility. It is RECOMMENDED that any contract implementing this EIP without the intention of supporting ERC20 flashloans should always return `0` from `maxFlashLoan`. For example:
 
 ```solidity
 function maxFlashLoan(address token) public pure override returns (uint256) {
@@ -73,9 +73,9 @@ import "../interfaces/IERC20.sol";
 import "../interfaces/IERC721.sol";
 import "../interfaces/IERC3156FlashBorrower.sol";
 import "../interfaces/IERC3156FlashLender.sol";
-import "../interfaces/INFTFlashLender.sol";
+import "../interfaces/IERC6680.sol";
 
-contract ExampleFlashLender is INFTFlashLender, IERC3156FlashLender {
+contract ExampleFlashLender is IERC6680, IERC3156FlashLender {
     uint256 internal _feePerNFT;
     address internal _flashFeeToken;
 
@@ -106,7 +106,7 @@ contract ExampleFlashLender is INFTFlashLender, IERC3156FlashLender {
         returns (bool)
     {
         // check that the NFT is available for a flash loan
-        require(availableForFlashLoan(token, tokenId), "NFTFlashLender: NFT not available for flash loan");
+        require(availableForFlashLoan(token, tokenId), "IERC6680: NFT not available for flash loan");
 
         // transfer the NFT to the borrower
         IERC721(token).safeTransferFrom(address(this), address(receiver), tokenId);
@@ -119,7 +119,7 @@ contract ExampleFlashLender is INFTFlashLender, IERC3156FlashLender {
             receiver.onFlashLoan(msg.sender, token, tokenId, fee, data) == keccak256("ERC3156FlashBorrower.onFlashLoan");
 
         // check that the NFT was returned by the borrower
-        require(IERC721(token).ownerOf(tokenId) == address(this), "NFTFlashLender: NFT not returned by borrower");
+        require(IERC721(token).ownerOf(tokenId) == address(this), "IERC6680: NFT not returned by borrower");
 
         // transfer the fee from the borrower
         IERC20(flashFeeToken()).transferFrom(msg.sender, address(this), fee);
