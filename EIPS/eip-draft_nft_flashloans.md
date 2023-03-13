@@ -53,7 +53,7 @@ We choose to extend as much of the existing flashloan standard (EIP-3156) as pos
 
 ## Backwards Compatibility
 
-This EIP is fully backwards compatible with [EIP-3156](./eip-3156.md) with the exception of the `maxFlashLoan` method. This method does not make sense within the context of NFTs because NFTs are not fungible. However it is part of the existing flashloan standard and so it is not possible to remove it without breaking backwards compatibility. It is suggested that any contract implementing this EIP should return `0` from `maxFlashLoan`. For example:
+This EIP is fully backwards compatible with [EIP-3156](./eip-3156.md) with the exception of the `maxFlashLoan` method. This method does not make sense within the context of NFTs because NFTs are not fungible. However it is part of the existing flashloan standard and so it is not possible to remove it without breaking backwards compatibility. It is suggested that any contract implementing this EIP without the intention of supporting ERC20 flashloans should always return `0` from `maxFlashLoan`. For example:
 
 ```solidity
 function maxFlashLoan(address token) public pure override returns (uint256) {
