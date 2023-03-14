@@ -5,7 +5,7 @@ const keccak256 = require('keccak256');
 const Web3 = require('web3');
 const web3js = new Web3(Web3.givenProvider);
 const assert = require('assert');
-const { util } = require('config');
+// const { util } = require('config');
 
 const CHAIN_ID = 0;
 const ONE_TOKEN = '1000000000000000000';
