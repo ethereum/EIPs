@@ -1,5 +1,5 @@
 ---
-title: ERC-6680: NFT Flashloans
+title: NFT Flashloans
 description: Minimal interface for ERC-721 NFT flashloans
 author: out.eth (@outdoteth)
 status: Draft
