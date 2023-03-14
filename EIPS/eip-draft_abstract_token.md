@@ -1,7 +1,8 @@
 ---
-title: Abstract Token Standard
+eip: abstract-token
+title: Abstract Token
 description: move tokens on- and off-chain as desired, enabling zero-cost minting while preserving on-chain composability
-author: Chris Walker (chris@ckwalker.com)
+author: Chris Walker (@cr-walker) <chris@ckwalker.com>
 discussions-to: https://ethereum-magicians.org/t/draft-eip-abstract-token-standard/13152
 status: Draft
 type: Standards Track
@@ -16,7 +17,7 @@ Abstract tokens provide a standard interface to:
 * Reify tokens on-chain via smart contract
 * Dereify tokens back into messages
 
-Abstract tokens can comply with existing standards like ERC20, ERC721, and ERC1155. The standard allows wallets and other applications to better handle *potential* tokens before any consensus-dependent events occur on-chain.
+Abstract tokens can comply with existing standards like [ERC-20]()./eip-20.md), [ERC-721](./eip-721.md), and [ERC-1155](./eip-1155.md). The standard allows wallets and other applications to better handle *potential* tokens before any consensus-dependent events occur on-chain.
 
 ## Motivation
 Abstract tokens enable zero-cost token minting, facilitating high-volume applications by allowing token holders to reify tokens (place the tokens on-chain) as desired. Example use cases:
@@ -80,8 +81,8 @@ Reification MUST be idempotent: a particular token message may be used to reify 
 Returns the status of a particular message
 `function status(AbstractTokenMessage calldata message) external view returns (AbstractTokenMessageStatus status);`
 
-#### EIP 165 interface
-All abstract token contracts must support EIP-165 and include the Abstract Token interface ID in their supported interfaces.
+#### ERC-165 interface
+All abstract token contracts must support [ERC-165](./eip-165.md) and include the Abstract Token interface ID in their supported interfaces.
 
 #### dereify
 Moves token(s) from a contract to a message intended for another contract and/or chain.
@@ -100,19 +101,19 @@ If implemented, dereification:
 Return the id of token(s) defined in a token message.
 `function id(AbstractTokenMessage calldata message) external view returns (uint256);`
 
-OPTIONAL - abstract token contracts without a well-defined token ID (e.g. ERC20) MAY return `0` or not implement this method.
+OPTIONAL - abstract token contracts without a well-defined token ID (e.g. ERC-20) MAY return `0` or not implement this method.
 
 #### amount
 Return the amount of token(s) defined in a token message.
 `function amount(AbstractTokenMessage calldata message) external view returns (uint256);`
 
-OPTIONAL - abstract token contracts without a well-defined token amount (e.g. ERC721) MAY return `0` or not implement this method.
+OPTIONAL - abstract token contracts without a well-defined token amount (e.g. ERC-721) MAY return `0` or not implement this method.
 
 #### uri
 Return the amount of token(s) defined in a token message.
 `function uri(AbstractTokenMessage calldata message) external view returns (string memory);`
 
-OPTIONAL - abstract token contracts without a well-defined uri (e.g. ERC20) MAY return `""` or not implement this method.
+OPTIONAL - abstract token contracts without a well-defined uri (e.g. ERC-20) MAY return `""` or not implement this method.
 
 ### Events
 #### Reify
@@ -126,7 +127,7 @@ The Dereify event MUST be emitted when tokens are dereified into a message
 ### Application to existing token standards
 Abstract tokens compatible with existing token standards MUST overload existing token transfer functions to allow transfers from abstract token messages.
 
-### AbstractERC20
+### Abstract ERC-20
 ```solidity
 interface IAbstractERC20 is IAbstractToken, IERC20, IERC165 {
   // reify the message and then transfer tokens
@@ -146,7 +147,7 @@ interface IAbstractERC20 is IAbstractToken, IERC20, IERC165 {
 }
 ```
 
-### AbstractERC721
+### Abstract ERC-721
 ```solidity
 interface IAbstractERC721 is IAbstractToken, IERC721 {
   function safeTransferFrom(
@@ -166,7 +167,7 @@ interface IAbstractERC721 is IAbstractToken, IERC721 {
 }
 ```
 
-### AbstractERC1155
+### Abstract ERC-1155
 ```
 interface IAbstractERC1155 is IAbstractToken, IERC1155 {
   function safeTransferFrom(
