@@ -1,7 +1,9 @@
 ---
+eip: 6680
 title: NFT Flashloans
 description: Minimal interface for ERC-721 NFT flashloans
 author: out.eth (@outdoteth)
+discussions-to: https://ethereum-magicians.org/t/eip-6680-nft-flashloans/13294
 status: Draft
 type: Standards Track
 category: ERC
