@@ -1,5 +1,5 @@
 ---
-eip: abstract-token
+eip: 6604
 title: Abstract Token
 description: move tokens on- and off-chain as desired, enabling zero-cost minting while preserving on-chain composability
 author: Chris Walker (@cr-walker) <chris@ckwalker.com>
