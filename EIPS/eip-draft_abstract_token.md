@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2023-03-03
-requires: EIP 165
+requires: 20, 165, 721, 1155
 ---
 
 ## Abstract
