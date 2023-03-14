@@ -145,6 +145,12 @@ It's possible that the `flashFeeToken` method could return a malicious contract.
 
 Needs discussion.
 
+## References
+
+There exists an example implementation here:
+
+* outdoteth/ERC-6680-example: https://github.com/outdoteth/ERC6680-example
+
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
