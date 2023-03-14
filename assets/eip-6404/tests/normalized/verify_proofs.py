@@ -8,20 +8,18 @@ def verify_transaction_proof(
 ):
     assert proof.tx_hash == expected_tx_hash
 
-    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 4 + uint64(proof.tx_index))
+    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
     assert calculate_multi_merkle_root(
         [
             proof.payload_root.hash_tree_root(),
             proof.tx_hash.hash_tree_root(),
-            cfg.chain_id,
         ],
         proof.tx_branch,
         [
             tx_gindex * 2 + 0,
             tx_gindex * 2 + 1,
-            CHAIN_ID_INDEX,
         ],
-        get_helper_indices([tx_gindex, CHAIN_ID_INDEX]),
+        get_helper_indices([tx_gindex]),
     ) == transactions_root
 
 def verify_amount_proof(
@@ -46,20 +44,18 @@ def verify_amount_proof(
         AMOUNT_PROOF_HELPER_INDICES,
     )
 
-    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 4 + uint64(proof.tx_index))
+    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
     assert calculate_multi_merkle_root(
         [
             payload_root,
             proof.tx_hash.hash_tree_root(),
-            cfg.chain_id,
         ],
         proof.tx_branch,
         [
             tx_gindex * 2 + 0,
             tx_gindex * 2 + 1,
-            CHAIN_ID_INDEX,
         ],
-        get_helper_indices([tx_gindex, CHAIN_ID_INDEX]),
+        get_helper_indices([tx_gindex]),
     ) == transactions_root
 
 def verify_sender_proof(
@@ -84,20 +80,18 @@ def verify_sender_proof(
         SENDER_PROOF_HELPER_INDICES,
     )
 
-    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 4 + uint64(proof.tx_index))
+    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
     assert calculate_multi_merkle_root(
         [
             payload_root,
             proof.tx_hash.hash_tree_root(),
-            cfg.chain_id,
         ],
         proof.tx_branch,
         [
             tx_gindex * 2 + 0,
             tx_gindex * 2 + 1,
-            CHAIN_ID_INDEX,
         ],
-        get_helper_indices([tx_gindex, CHAIN_ID_INDEX]),
+        get_helper_indices([tx_gindex]),
     ) == transactions_root
 
     return proof.tx_from
@@ -120,20 +114,18 @@ def verify_info_proof(
         INFO_PROOF_HELPER_INDICES,
     )
 
-    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 4 + uint64(proof.tx_index))
+    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
     assert calculate_multi_merkle_root(
         [
             payload_root,
             proof.tx_hash.hash_tree_root(),
-            cfg.chain_id,
         ],
         proof.tx_branch,
         [
             tx_gindex * 2 + 0,
             tx_gindex * 2 + 1,
-            CHAIN_ID_INDEX,
         ],
-        get_helper_indices([tx_gindex, CHAIN_ID_INDEX]),
+        get_helper_indices([tx_gindex]),
     ) == transactions_root
 
     return TransactionInfo(

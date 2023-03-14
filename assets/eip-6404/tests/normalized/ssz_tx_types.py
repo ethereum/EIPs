@@ -84,6 +84,5 @@ class Transaction(Container):
     payload: TransactionPayload
     tx_hash: Hash32
 
-class Transactions(Container):
-    tx_list: List[Transaction, MAX_TRANSACTIONS_PER_PAYLOAD]
-    chain_id: uint256
+class Transactions(List[Transaction, MAX_TRANSACTIONS_PER_PAYLOAD]):
+    pass
