@@ -14,9 +14,36 @@ contract APermissionToken is EIP6366Core, EIP6366Meta {
     uint256 private constant PERMISSION_DENIED = 2 ** 0;
 
     /**
+     * @dev Permission to vote
+     */
+    uint256 internal constant PERMISSION_VOTE = 2 ** 1;
+
+    /**
      * @dev Permission to transfer permission token
      */
-    uint256 private constant PERMISSION_TRANSFER = 2 ** 2;
+    uint256 internal constant PERMISSION_TRANSFER = 2 ** 2;
+
+    /**
+     * @dev Permission to execute
+     */
+    uint256 internal constant PERMISSION_EXECUTE = 2 ** 3;
+
+    /**
+     * @dev Permission to create
+     */
+    uint256 internal constant PERMISSION_CREATE = 2 ** 4;
+
+    /**
+     * @dev Admin role
+     */
+    uint256 internal constant ROLE_ADMIN =
+        PERMISSION_VOTE | PERMISSION_EXECUTE | PERMISSION_CREATE;
+
+    /**
+     * @dev Operator role
+     */
+    uint256 internal constant ROLE_OPERATOR =
+        PERMISSION_EXECUTE | PERMISSION_VOTE;
 
     /**
      * @dev Permission to manage permission token
@@ -28,7 +55,7 @@ contract APermissionToken is EIP6366Core, EIP6366Meta {
      */
     modifier allow(uint256 required) {
         address owner = msg.sender;
-        if (!_permissionRequire(required, _permissionOf(owner))) {
+        if (!_permissionRequire(_permissionOf(owner), required)) {
             revert IEIP6366Error.AccessDenied(owner, owner, required);
         }
         _;
@@ -38,7 +65,7 @@ contract APermissionToken is EIP6366Core, EIP6366Meta {
      * @dev Deny blacklisted address
      */
     modifier notBlacklisted() {
-        if (_permissionRequire(PERMISSION_DENIED, _permissionOf(msg.sender))) {
+        if (_permissionRequire(_permissionOf(msg.sender), PERMISSION_DENIED)) {
             revert IEIP6366Error.AccessDenied(
                 msg.sender,
                 msg.sender,
@@ -52,28 +79,47 @@ contract APermissionToken is EIP6366Core, EIP6366Meta {
      * @dev Construct ERC-6366
      */
     constructor() EIP6366Meta("Ecosystem A Permission Token", "APT") {
-        _setDescription(0, "PERMISSION_DENIED", "Blacklisted address");
-        _setDescription(1, "PERMISSION_VOTE", "Permission owner able to vote");
         _setDescription(
-            2,
+            PERMISSION_DENIED,
+            "PERMISSION_DENIED",
+            "Blacklisted address"
+        );
+        _setDescription(
+            PERMISSION_VOTE,
+            "PERMISSION_VOTE",
+            "Permission owner can vote"
+        );
+        _setDescription(
+            PERMISSION_TRANSFER,
             "PERMISSION_TRANSFER",
-            "Permission owner able to transfer"
+            "Permission owner can transfer"
         );
         _setDescription(
-            3,
+            PERMISSION_EXECUTE,
             "PERMISSION_EXECUTE",
-            "Permission owner able to execute"
+            "Permission owner can execute"
         );
         _setDescription(
-            4,
+            PERMISSION_CREATE,
             "PERMISSION_CREATE",
-            "Permission owner able to create"
+            "Permission owner can create"
         );
         _setDescription(
-            255,
+            PERMISSION_MASTER,
             "PERMISSION_MASTER",
-            "Permission owner able to mint and update desscription"
+            "Permission owner can mint and update description"
         );
+        _setDescription(
+            ROLE_ADMIN,
+            "ROLE_ADMIN",
+            "Admin role can vote, execute and create"
+        );
+        _setDescription(
+            ROLE_OPERATOR,
+            "ROLE_OPERATOR",
+            "Operator role can execute and vote"
+        );
+
         // Assign master permission to deployer
         _mint(msg.sender, PERMISSION_MASTER);
     }
