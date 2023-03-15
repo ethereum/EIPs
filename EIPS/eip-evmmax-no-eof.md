@@ -558,7 +558,13 @@ mod_state.values[z_offset] = mulmont(mod_state, mod_state.values[x_offset], mod_
 
 ### Changes to Contract Execution
 
+#### EVM Memory Expansion Cost Function
+
 Any EVM operation which expands memory `x` bytes will charge to expand memory to `cur_evm_mem_size + x + evmmax_mem_size` bytes where `evmmax_mem_size` is the size of all allocated EVMMAX values in the current call context (the sum of the values used by each `mod_id` that has been previously/currently set with `SETUPX`).
+
+#### Jumpdest Analysis
+
+Jumpdest analysis is modified to disallow jumps into immediate data for `ADDMDOX`/`SUBMODX`/`MULMODX`.
 
 ## Rationale
 
@@ -594,3 +600,7 @@ These perform conversion to/from Montgomery and canonical forms for each value c
 #### SETUPX
 
 TODO
+
+## Backwards Compatibility
+
+Jumpdest analysis changes in ths EIP could potentially break existing contracts where a jump destination occurs in the 3 bytes proceeding a `0x22`/`0x23`/`0x24`.  This is unlikely to affect many existing contracts.  Further analysis of deployed contract bytecode can determine with certainty, which (if any) contracts could be broken.
