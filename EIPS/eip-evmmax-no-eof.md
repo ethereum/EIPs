@@ -1,5 +1,5 @@
 ---
-eip: 
+eip: 6690
 title: EVM Modular Arithmetic Extensions (EVMMAX)
 status: Draft
 type: standards track
