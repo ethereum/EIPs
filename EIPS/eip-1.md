@@ -232,6 +232,64 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
 ```
 
+### Other Well Known Standards Bodies
+
+Links to other well known standards bodies specification may be included using normal markdown syntax. Be mindful of the requirements set for each SDO as these were chosen in order to maintain links to stable URLs.
+
+#### World Wide Web Consortium (W3C)
+
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax, such as:
+
+```markdown
+[W3C Secure Context](https://www.w3.org/TR/secure-contexts/)
+```
+
+Which renders as:
+
+[W3C Secure Context](https://www.w3.org/TR/secure-contexts/)
+
+Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace, and so MUST match this regular expression:
+
+```regex
+^https:\/\/www.w3.org\/TR\/.*$
+```
+
+#### Internet Engineering Task Force (IETF)
+
+Links to an Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[RFC-8446](https://www.rfc-editor.org/rfc/rfc8446)
+```
+
+Which renders as:
+
+[RFC-8446](https://www.rfc-editor.org/rfc/rfc8446)
+
+Permitted IETF specification URLs MUST anchor to a specification with an assigned RFC number (meaning cannot reference internet drafts), and so MUST match this regular expression:
+
+```regex
+^https:\/\/www.rfc-editor.org\/rfc\/.*$
+```
+
+#### Web Hypertext Application Technology Working Group (WHATWG)
+
+Links to WHATWG specification may be included using normal markdown syntax, such as:
+
+```markdown
+[WHATWG HTML Spec](https://html.spec.whatwg.org/)
+```
+
+Which renders as:
+
+[WHATWG HTML Spec](https://html.spec.whatwg.org/)
+
+Permitted WHATWG specification URLs MUST anchor to a specification defined in the spec subdomain (idea specifications are not allowed), and so MUST match this regular expression:
+
+```regex
+^https:\/\/[a-z]*.spec.whatwg.org.*$
+```
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
