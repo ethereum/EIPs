@@ -18,19 +18,14 @@ contract EIP6366Meta is IEIP6366Meta {
     string private tsymbol;
 
     /**
-     * @dev Mapping index to permission's name
+     * @dev Mapping permission value to permission's name
      */
     mapping(uint256 => string) private permissionNames;
 
     /**
-     * @dev Mapping index to permission's description
+     * @dev Mapping permission value to permission's description
      */
     mapping(uint256 => string) private permissionDescriptions;
-
-    /**
-     * @dev Reverse mapping permission to index
-     */
-    mapping(uint256 => uint256) private permissionIndexs;
 
     /**
      * @dev Constructor of permission token
@@ -55,11 +50,11 @@ contract EIP6366Meta is IEIP6366Meta {
     }
 
     /**
-     * @dev Get permission's description by index
-     * @param _index Index of description record
+     * @dev Get permission's description by value
+     * @param _permission  Value of the permission
      */
     function getDescription(
-        uint256 _index
+        uint256 _permission
     )
         external
         view
@@ -67,17 +62,17 @@ contract EIP6366Meta is IEIP6366Meta {
         override
         returns (PermissionDescription memory description)
     {
-        return _getDescription(_index);
+        return _getDescription(_permission);
     }
 
     /**
-     * @dev Set the description of given index
-     * @param _index Description's index
+     * @dev Set the description of given permission
+     * @param _permission Value of the permission
      * @param _name Name of the permission
      * @param _description Description of the permission
      */
     function setDescription(
-        uint256 _index,
+        uint256 _permission,
         string memory _name,
         string memory _description
     ) external virtual override returns (bool) {
@@ -85,28 +80,23 @@ contract EIP6366Meta is IEIP6366Meta {
     }
 
     function _getDescription(
-        uint256 _index
+        uint256 _permission
     ) internal view returns (PermissionDescription memory description) {
         return
             PermissionDescription({
-                index: _index,
-                permission: 2 ** _index,
-                name: permissionNames[_index],
-                description: permissionDescriptions[_index]
+                permission: _permission,
+                name: permissionNames[_permission],
+                description: permissionDescriptions[_permission]
             });
     }
 
     function _setDescription(
-        uint256 _index,
+        uint256 _permission,
         string memory _name,
         string memory _description
     ) internal returns (bool success) {
-        if (_index > 256) {
-            revert IEIP6366Error.OutOfRange();
-        }
-        permissionIndexs[2 ** _index] = _index;
-        permissionNames[_index] = _name;
-        permissionDescriptions[_index] = _description;
+        permissionNames[_permission] = _name;
+        permissionDescriptions[_permission] = _description;
         return true;
     }
 }

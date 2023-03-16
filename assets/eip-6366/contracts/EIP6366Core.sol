@@ -57,10 +57,10 @@ contract EIP6366Core is IEIP6366Core {
      * @param _permission Checking permission set
      */
     function permissionRequire(
-        uint256 _required,
-        uint256 _permission
+        uint256 _permission,
+        uint256 _required
     ) external view virtual override returns (bool isPermissioned) {
-        return _permissionRequire(_required, _permission);
+        return _permissionRequire(_permission, _required);
     }
 
     /**
@@ -159,8 +159,8 @@ contract EIP6366Core is IEIP6366Core {
     }
 
     function _permissionRequire(
-        uint256 _required,
-        uint256 _permission
+        uint256 _permission,
+        uint256 _required
     ) internal pure returns (bool isPermissioned) {
         return _required == _permission & _required;
     }
@@ -172,8 +172,8 @@ contract EIP6366Core is IEIP6366Core {
     ) internal view returns (bool isPermissioned) {
         return
             _permissionRequire(
-                _required,
-                _permissionOf(_actor) | _delegated(_owner, _actor)
+                _permissionOf(_actor) | _delegated(_owner, _actor),
+                _required
             );
     }
 

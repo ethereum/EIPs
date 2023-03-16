@@ -5,12 +5,16 @@ pragma solidity ^0.8.7;
  * @dev Defined the interface of the core of EIP6366 that MUST to be implemented
  */
 interface IEIP6366Core {
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Transfer(
+        address indexed _from,
+        address indexed _to,
+        uint256 indexed _permission
+    );
 
     event Approval(
         address indexed _owner,
         address indexed _delegatee,
-        uint256 _permission
+        uint256 indexed _permission
     );
 
     function transfer(
@@ -28,8 +32,8 @@ interface IEIP6366Core {
     ) external view returns (uint256 permission);
 
     function permissionRequire(
-        uint256 _required,
-        uint256 _permission
+        uint256 _permission,
+        uint256 _required
     ) external view returns (bool isPermissioned);
 
     function hasPermission(
