@@ -9,7 +9,7 @@ pragma solidity ^0.8.15;
  */
 
 contract MultiAssetRenderUtils {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2**16 - 1;
+    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
 
     struct ActiveAsset {
         uint64 id;
@@ -24,12 +24,10 @@ contract MultiAssetRenderUtils {
         string metadata;
     }
 
-    function getActiveAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (ActiveAsset[] memory)
-    {
+    function getActiveAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (ActiveAsset[] memory) {
         IMultiAsset target_ = IMultiAsset(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
@@ -55,12 +53,10 @@ contract MultiAssetRenderUtils {
         return activeAssets;
     }
 
-    function getPendingAssets(address target, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (PendingAsset[] memory)
-    {
+    function getPendingAssets(
+        address target,
+        uint256 tokenId
+    ) public view virtual returns (PendingAsset[] memory) {
         IMultiAsset target_ = IMultiAsset(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
@@ -118,11 +114,10 @@ contract MultiAssetRenderUtils {
     /**
      * @notice Returns the asset metadata with the highest priority for the given token
      */
-    function getTopAssetMetaForToken(address target, uint256 tokenId)
-        external
-        view
-        returns (string memory)
-    {
+    function getTopAssetMetaForToken(
+        address target,
+        uint256 tokenId
+    ) external view returns (string memory) {
         IMultiAsset target_ = IMultiAsset(target);
         uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
