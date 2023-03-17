@@ -256,15 +256,15 @@ Permitted W3C recommendation URLs MUST anchor to a specification in the technica
 
 #### Internet Engineering Task Force (IETF)
 
-Links to an Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
+Links to an Request For Comment (RFC) specification may be included using normal markdown syntax, and must follow the non-hyphenated format `RFC X`, where `X` is the RFC number. For example, the following link would be allowed:
 
 ```markdown
-[RFC-8446](https://www.rfc-editor.org/rfc/rfc8446)
-```
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+a```
 
 Which renders as:
 
-[RFC-8446](https://www.rfc-editor.org/rfc/rfc8446)
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
 
 Permitted IETF specification URLs MUST anchor to a specification with an assigned RFC number (meaning cannot reference internet drafts), and so MUST match this regular expression:
 
