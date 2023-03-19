@@ -1,0 +1,15 @@
+{
+  "ignorePatterns": [
+    "[`]*csl-json"
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "/github/workspace/"
+    }
+  ],
+  "aliveStatusCodes": [
+    200,
+    429
+  ]
+}
