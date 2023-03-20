@@ -1,8 +1,9 @@
 ---
+eip: <not assigned>
 title: Revert creation in case of collision
 description: Revert contract creation if address already has code
 author: Renan Rodrigues de Souza (@RenanSouza2)
-discussions-to: <-->
+discussions-to: https://ethereum-magicians.org/t/eip-revert-on-address-collision/13442
 status: Draft
 type: Standards Track
 category: Core
