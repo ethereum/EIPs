@@ -22,8 +22,6 @@ The L2 WG is an open-source initiative with a scope to
 - For EVM compatible public blockchains, identify, document, and devise solution approaches for Layer 2 Blockchain scalability solution specific challenges such as MEV, block (gas) limits, TVL concentration, etc.
 - Identify and document characteristics of Layer 2 Blockchain environments for EVM compatible public blockchains that will be key in addressing mainstream and enterprise adoption.
 
-The work is an [EEA Community Project](https://entethalliance.org/eeacommunityprojects/), which is managed by [OASIS](https://oasis-open-projects.org/).
-
 This particular work is motivated by a significant challenge around the definition and listing of tokens on Layer 1 (L1), Layer 2 (L2), and Sidechain systems. Note that for simplicity, this document we will collectively refer to L1, L2 and Sidechain systems as chains below since the challenge described below is valid across all such systems:
 
 * Consensus on the "canonical" token on chain B that corresponds to some token on chain A. When one wants to bridge token X from chain A to chain B, one must create some new representation of the token on chain B. It is worth noting that this problem is not limited to L2s -- every chain connected via bridges must deal with the same issue.
@@ -472,17 +470,17 @@ The schema for a canonical token list is given below as follows and can be utili
 Data Schema Testability: As the above data schema follows a JSON/JSON-LD schema format, and since such formats are known to be testable for schema conformance (see for example the [W3C CCG Traceability Work Item](https://github.com/w3c-ccg/traceability-interop)), the above data schema is testable.
 
 -------
-# 4 Conformance
+### Conformance
 
 This section describes the conformance clauses and tests required to achieve an implementation that is provably conformant with the requirements in this document.
 
-## 4.1 Conformance Targets
+#### Conformance Targets
 
 This document does not yet define a standardized set of test-fixtures with test inputs for all MUST, SHOULD, and MAY requirements with conditional MUST or SHOULD requirements. 
 
 A standardized set of test-fixtures with test inputs for all MUST, SHOULD, and MAY requirements with conditional MUST or SHOULD requirements is intended to be published with the next version of the standard.
 
-## 4.2 Conformance Levels
+#### Conformance Levels
 
 This section specifies the conformance levels of this standard. The conformance levels offer implementers several levels of conformance. These can be used to establish competitive differentiation.
 
@@ -501,6 +499,7 @@ A claim that a canonical token list implementation conforms to this specificatio
 
 [[R5]](#r5) testability: Since each of the non-conformance-target requirements in this documents is testable, so must be the totality of the requirements in this document. Therefore, conformance tests for all requirements can exist, be described, be built and implemented and results can be recorded as required in [[R5]](#r5).
 
+----
 
 ## Security Considerations
 
@@ -517,6 +516,8 @@ The standard does not set any requirements for the use of specific applications/
 ## Security Considerations: Internationalization and Localization
 
 The standard encourages implementers to follow the [W3C "Strings on the Web: Language and Direction Metadata" best practices guide](#W3C-String-Meta) for identifying language and base direction for strings used on the Web wherever appropriate.
+
+----
 
 ### Appendix A - Normative References
 
