@@ -36,7 +36,7 @@ See Figure 1 for the conceptual root &rarr; leaf design with offset.
 <div align="left">
 <figure>
   <img
-  src="../assets/eip-xxxx/address-aliasing-root-leaf-design.png"
+  src="../assets/eip-XXXX/address-aliasing-root-leaf-design.png"
       alt="The figure describes conceptually how (interoperability) messages from source to target chain utilize address aliasing. At the bottom an EVM based L1 is uni-directionally connected to three EVM based L2s -- A, B, and C -- each with an alias of L1 address + L1 Offset. In addition, A is uni-directionally connected to B with an alias of L1 address + L1 offset + A offset. B is uni-directionally connected to an EVM-based Layer 3 or L3 with an alias of L1 address + L1 offset + B offset signaling that the address is anchored on L1 via the L2 B. And finally D is uni-directionally connected to C via the alias L1 address + L1 offset + B offset plus D offset indicating the asset chain of custody from L1 to B to D to C."
   >
   <figcaption> Figure 1: Root &rarr; Leaf address aliasing concept using an chain immanent characteristics from L1 to L2 and L3 and back </figcaption>
@@ -48,7 +48,7 @@ To further clarify the connections between the different possible paths an asset
 <div align="left">
 <figure>
   <img
-  src="../assets/eip-xxxx/visual-Highlight-Path-Red-evm-based-aliasing..png"
+  src="../assets/eip-XXXX/visual-Highlight-Path-Red-evm-based-aliasing..png"
       alt="The figure is the same as Figure 1. However, the uni-directional connections between the EVM based L1 to the L2 B, to the L3 D, and finally to the L2 C are highlighted in red."
   >
   <figcaption> Figure 2: Visually highlighted path in red from the EVM based L1 to the B L2, to the D L3, and finally to the C L2 </figcaption>
