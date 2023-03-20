@@ -1,13 +1,13 @@
 ---
 eip: XXXX
-title: L2 Aliasing of EVM based Addresses
+title: L2 Aliasing of EVM-based Addresses
 description: Identify and translate EVM-based addresses from different Layer 1, Layer 2, or Sidechains
 author: AKelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969) on behalf of the EEA Communities Project [L2 Working Group](https://github.com/eea-oasis/L2)
 discussions-to: https://ethereum-magicians.org/t/l2-aliasing-of-evm-based-addresses-from-the-eea-oasis-community-projects-l2-standards-working-group/13093
 status: Draft
 type: Standards Track
 category: ERC
-created: 2022-03-14
+created: 2022-03-20
 requires: 55
 ---
 
@@ -32,8 +32,6 @@ The ability to unambiguously, and deterministically, relate an address for a dig
 Hence, this document establishes an unambiguous and deterministic standard for EVM based address aliasing based on the concept of root &rarr; leaf where an address alias is derived based on the address on the origin chain and an offset which is an immutable characteristic of the origin chain.
 
 See Figure 1 for the conceptual root &rarr; leaf design with offset.
-
-![Fig1](../assets/eip-xxxx/address-aliasing-root-leaf-design.png)
 
 <div align="left">
 <figure>
