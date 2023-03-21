@@ -6,7 +6,6 @@ pragma solidity ^0.8.7;
  */
 interface IEIP6366Meta {
     struct PermissionDescription {
-        uint256 index;
         uint256 permission;
         string name;
         string description;
@@ -23,11 +22,11 @@ interface IEIP6366Meta {
     function symbol() external view returns (string memory);
 
     function getDescription(
-        uint256 _index
+        uint256 _permission
     ) external view returns (PermissionDescription memory description);
 
     function setDescription(
-        uint256 _index,
+        uint256 _permission,
         string memory _name,
         string memory _description
     ) external returns (bool success);
