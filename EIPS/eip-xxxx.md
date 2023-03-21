@@ -2,7 +2,7 @@
 eip: XXXX
 title: L2 Aliasing of EVM-based Addresses
 description: Identify and translate EVM-based addresses from different Layer 1, Layer 2, or Sidechains
-author: AKelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969) on behalf of the EEA Communities Project [L2 Working Group](https://github.com/eea-oasis/L2)
+author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969) on behalf of the EEA Communities Project [L2 Working Group](https://github.com/eea-oasis/L2)
 discussions-to: https://ethereum-magicians.org/t/l2-aliasing-of-evm-based-addresses-from-the-eea-oasis-community-projects-l2-standards-working-group/13093
 status: Draft
 type: Standards Track
