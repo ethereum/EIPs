@@ -12,7 +12,7 @@ requires: 165
 
 ## Abstract
 
-This ERC outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
+[ERC-4365](./eip-draft_title_abbrev.md) outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
 
 Contrary to the ERC-1155 standard, this ERC does not enforce transferability as it recognizes situations where implementers might not want to allow it. Additionally, it introduces several extensions used to expand the functionality like the **Expirable extension** which provides a simple way to add an expiry date to tokens.
 
