@@ -1,5 +1,4 @@
 ---
-eip: <to be assigned>
 title: Redeemable Tokens
 description: A proposition for redeemable tokens
 author: Lucaz Lindgren (@LucazFFz)
@@ -32,7 +31,7 @@ Additionally, these tokens can be used to create, among others, vouchers, gift c
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-**Every smart contract implementing this ERC MUST implement the all of the functions in the `ERC4365` interface. Additionally, they MUST implement the ERC-165 `supportsInterface` function and MUST return the constant value `true` if the constant value `0x9d1da9d1` is passed through the `interfaceId` argument.**
+**Every smart contract implementing this ERC MUST implement the all of the functions in the `IERC4365` interface. Additionally, they MUST implement the ERC-165 `supportsInterface` function and MUST return the constant value `true` if the constant value `0x9d1da9d1` is passed through the `interfaceId` argument.**
 
 ```solidity
 interface IERC4365 is IERC165 {
