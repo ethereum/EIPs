@@ -46,5 +46,3 @@ interface IERC4365Receiver is IERC165 {
         bytes calldata data
     ) external returns (bytes4);
 }
-
-
