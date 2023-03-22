@@ -182,7 +182,8 @@ contract SDC is ISDC {
         uint256 hash = uint256(keccak256(abi.encode(_tradeData, _initialSettlementData)));
         pendingRequests[hash] = msg.sender;
         tradeID = Strings.toString(hash);
-        tradeData = _tradeData; // Set Trade Data to enable querying already in inception state
+        tradeData = _tradeData; // Set trade data to enable querying already in inception state
+        lastSettlementData = _initialSettlementData; // Store settlement data to make them available for confirming party
 
         emit TradeIncepted(msg.sender, tradeID, _tradeData);
     }
