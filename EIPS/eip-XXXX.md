@@ -1,4 +1,5 @@
 ---
+eip: XXXX
 title: L2 Token List
 description: Token List that ensures the correct identification of tokens from different Layer 1, Layer 2, or Sidechains.
 author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969), Pavel Sinelnikov (@psinelnikov) on behalf of the EEA Communities Project [L2 Working Group](https://github.com/eea-oasis/L2)
