@@ -26,12 +26,3 @@ s-withdrawn: this?.new?.status == "Withdrawn"
 c-new: this?.new?.eip && !this?.old?.eip
 c-update: this?.new?.eip && this?.old?.eip && this?.new?.status == this?.old?.status
 c-status: this?.new?.eip && this?.old?.eip && this?.new?.status != this?.old?.status
-
-#### Waiting Labels ###
-
-# Generic
-
-# EIP Author
-
-# EIP Editor
-e-number: isNaN(this?.new?.eip) && this?.new?.eip
