@@ -260,7 +260,7 @@ Links to an Request For Comment (RFC) specification may be included using normal
 
 ```markdown
 [RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
-a```
+```
 
 Which renders as:
 
