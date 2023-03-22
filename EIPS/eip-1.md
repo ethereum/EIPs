@@ -238,7 +238,7 @@ Links to other well known standards bodies specification may be included using n
 
 #### World Wide Web Consortium (W3C)
 
-Links to a W3C "Recommendation" status specification may be included using normal markdown syntax, such as:
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax, where the content of the link is the title of the specification. For example, the following link would be allowed:
 
 ```markdown
 [W3C Secure Context](https://www.w3.org/TR/secure-contexts/)
