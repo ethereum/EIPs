@@ -29,15 +29,3 @@ jobs:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml
           pr_number: ${{ steps.save-pr-number.outputs.pr }}
-
-      - name: Enable Auto-Merge
-        uses: reitermarkus/automerge@a25ea0de41019ad13380d22e01db8f5638f1bcdc
-        with:
-          token: ${{ secrets.TOKEN }}
-          pull-request: ${{ steps.save-pr-number.outputs.pr }}
-
-      - name: Submit Approval
-        uses: hmarr/auto-approve-action@24ec4c8cc344fe1cdde70ff37e55ace9e848a1d8
-        with:
-          github-token: ${{ secrets.TOKEN }}
-          pull-request-number: ${{ steps.save-pr-number.outputs.pr }}
