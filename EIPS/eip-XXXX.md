@@ -1,4 +1,5 @@
 ---
+eip:
 title: L2 Token List
 description: Token List that ensures the correct identification of tokens from different Layer 1, Layer 2, or Sidechains.
 author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969), Pavel Sinelnikov (@psinelnikov)
@@ -130,16 +131,16 @@ All properties in the schema identified in the description to be a Universal Res
 [[R3]](#r3) testability: All requirements for [RFC 3986](#rfc3986) are testable.
 
 <a name="r4"> **[R4]** </a>
-The chainId property utilized MUST allow for the requirements of the [EIP-155](#eip155) standard to be met.
+The chainId property utilized MUST allow for the requirements of the [EIP-155](#eip-155) standard to be met.
 
 Namely, transaction replay protection on the network that is identified by the chainId property value. Note, that for replay protection to be guaranteed, the chainId should be unique. Ensuring a unique chainId is beyond the scope of this document.
 
 [[R4]](#r4) testability: EIP-155 requires that a transaction hash is derived from the keccak256 hash of the following nine RLP encoded elements `(nonce, gasprice, startgas, to, value, data, chainid, 0, 0)` which can be tested easily with existing cryptographic libraries. EIP-155 further requires that the `v` value of the secp256k1 signature must be set to `{0,1} + CHAIN_ID * 2 + 35` where `{0,1}` is the parity of the `y` value of the curve point for which the signature `r`-value is the `x`-value in the secp256k1 signing process. This requirement is testable with available open-source secp256k1 digital signature suites. Therefore, [[R4]](#r4) is testable. 
 
 <a name="d2"> **[D2]** </a>
-The `chainId` property SHOULD follow [EIP-3220](#eip3220) draft standard.
+The `chainId` property SHOULD follow [EIP-3220](#eip-3220) draft standard.
 
-[[D2]](#d2) testability: The [EIP-3220](#eip3220) draft standard can be tested because the crosschain id is specified as a concatenation of well-defined strings, and using open source tooling can be used to parse and split a crosschain id, the obtained string segments can be compared against expected string lengths, and context dependent, the values for the strings specified in the standard. Consequently, [[D2]](#d2) is testable.
+[[D2]](#d2) testability: The [EIP-3220](#eip-3220) draft standard can be tested because the crosschain id is specified as a concatenation of well-defined strings, and using open source tooling can be used to parse and split a crosschain id, the obtained string segments can be compared against expected string lengths, and context dependent, the values for the strings specified in the standard. Consequently, [[D2]](#d2) is testable.
 
 <a name="o1"> **[O1]** </a>
 The `humanReadableTokenSymbol` property MAY be used.
@@ -467,7 +468,7 @@ The schema for a canonical token list is given below as follows and can be utili
     "additionalProperties": false,
 }
 ```
-Data Schema Testability: As the above data schema follows a JSON/JSON-LD schema format, and since such formats are known to be testable for schema conformance (see for example the [W3C CCG Traceability Work Item](https://github.com/w3c-ccg/traceability-interop)), the above data schema is testable.
+Data Schema Testability: As the above data schema follows a JSON/JSON-LD schema format, and since such formats are known to be testable for schema conformance (see for example the W3C CCG Traceability Work Item, the above data schema is testable.
 
 -------
 ### Conformance
@@ -503,7 +504,7 @@ A claim that a canonical token list implementation conforms to this specificatio
 
 ## Rationale
 
-The standard is extending and clarifying current custom lists such as from Arbitrum and Optimism as referenced in the [Motivation](#motivation) or the [Tokenlist Project](https://tokenlists.org/) to improve clarity, security and encourage adoption by non-Web3 native entities.
+The standard is extending and clarifying current custom lists such as from Arbitrum and Optimism as referenced in the [Motivation](#motivation) or the Uniswap Tokenlist Project to improve clarity, security and encourage adoption by non-Web3 native entities.
 
 ---
 
@@ -530,34 +531,32 @@ The standard encourages implementers to follow the [W3C "Strings on the Web: Lan
 The following documents are referenced in such a way that some or all of their content constitute requirements of this document.
 
 <a name="rfc2119"> **[RFC2119]** </a>\
- S. Bradner, Key words for use in RFCs to Indicate Requirement Levels, http://www.ietf.org/rfc/rfc2119.txt, IETF RFC 2119, March 1997.
+ S. Bradner, Key words for use in RFCs to Indicate Requirement Levels, IETF RFC 2119, March 1997.
 
 <a name="jsonld"> **[JSONLD]** </a>\
-JSON-LD 1.1, M. Sporny, D. Longley, G. Kellogg, M. Lanthaler, Pierre-Antoine Champin, N. Lindström, W3C Recommendation, July 2020 , https://www.w3.org/TR/2020/REC-json-ld11-20200716/. Latest version available at https://www.w3.org/TR/json-ld11/. 
+JSON-LD 1.1, M. Sporny, D. Longley, G. Kellogg, M. Lanthaler, Pierre-Antoine Champin, N. Lindström, W3C Recommendation, July 2020 
 
 <a name="rfc3986"> **[RFC3986]** </a>\
-T. Berners-Lee, R. Fielding,  L. Masinter, Uniform Resource Identifier (URI): Generic Syntax, IETF RFC 3986, January 2005, https://www.ietf.org/rfc/rfc3986.txt.
+T. Berners-Lee, R. Fielding,  L. Masinter, Uniform Resource Identifier (URI): Generic Syntax, IETF RFC 3986, January 2005
 
-<a name="eip155"> **[EIP-155]** </a>\
-Vitalik Buterin, "EIP-155: Simple replay attack protection," Ethereum Improvement Proposals, no. 155, October 2016. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-155.
+<a name="eip-155"> **[EIP-155]** </a>\
+Vitalik Buterin, "EIP-155: Simple replay attack protection," Ethereum Improvement Proposals, no. 155, October 2016.
 
-<a name="eip3220"> **[EIP-3220]** </a>\
-Weijia Zhang, Peter Robinson, "EIP-3220: Crosschain Identifier Specification [DRAFT]," Ethereum Improvement Proposals, no. 3220, October 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3220.
+<a name="eip-3220"> **[EIP-3220]** </a>\
+Weijia Zhang, Peter Robinson, "EIP-3220: Crosschain Identifier Specification [DRAFT]," Ethereum Improvement Proposals, no. 3220, October 2020.
 
 
 ### Appendix B - Non-Normative References
 
 <a name="w3c-did"> **[W3C-DID]** </a>\
-Decentralized Identifiers (DIDs) v1.0, M. Sporny, D. Longley, M. Sabadello, D. Reed, O. Steele, C. Allen, W3C W3C Recommendation, July 2022, https://www.w3.org/TR/2022/REC-did-core-20220719/. Latest version available at https://www.w3.org/TR/did-core/.
+Decentralized Identifiers (DIDs) v1.0, M. Sporny, D. Longley, M. Sabadello, D. Reed, O. Steele, C. Allen, W3C W3C Recommendation, July 2022
 
 
 <a name="w3c-string-meta"> **[W3C-String-Meta]** </a>\
-Strings on the Web: Language and Direction Metadata, R. Ishida, A. Phillips, August 2022,
-https://www.w3.org/TR/string-meta/
+Strings on the Web: Language and Direction Metadata, R. Ishida, A. Phillips, August 2022
 
 <a name="cve-2021-42574"> **[CVE-2021-42574]** </a>\
-NIST Publication, 2021,
-https://nvd.nist.gov/vuln/detail/CVE-2021-42574
+CVE-2021-42574, NIST Publication, 2021
 
 ----
 ## Copyright
