@@ -1,14 +1,13 @@
 ---
-eip: XXXX
 title: L2 Token List
 description: Token List that ensures the correct identification of tokens from different Layer 1, Layer 2, or Sidechains.
-author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969), Pavel Sinelnikov (@psinelnikov) on behalf of the EEA Communities Project [L2 Working Group](https://github.com/eea-oasis/L2)
+author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969), Pavel Sinelnikov (@psinelnikov)
 discussions-to: https://ethereum-magicians.org/t/canonical-token-list-standard-from-the-eea-oasis-community-projects-l2-standards-working-group/13091
 status: Draft
 type: Standards Track
 category: ERC
-requires: 155, 3220
 created: 2023-03-20
+requires: 155, 3220
 ---
 
 ## Abstract
@@ -17,7 +16,7 @@ The document describes the minimal set of business and technical prerequisites, 
 
 ## Motivation
 
-The L2 WG is an open-source initiative with a scope to
+The L2 WG of the EEA Communities Projects managed by OASIS is an open-source initiative with a scope to
 - Identify and document the most relevant use cases and business requirements for Layer 2 and other Blockchain Scalability solutions for EVM compatible public blockchains
  * Define a technical standard with identification and differentiation of classes of scalability solutions as required that meet both ecosystem and enterprise requirements, with a particular focus on interoperability between Layer 2 solutions for EVM compatible public blockchains
  * For EVM compatible public blockchains, identify, document, and devise solution approaches for Layer 2 Blockchain scalability solution specific challenges such as MEV, block (gas) limits, TVL concentration, etc.
@@ -33,7 +32,7 @@ Note that both of these issues are fundamental problems for the current multi-ch
 
 Therefore, the goal of this document is to help token users to operationalize and disambiguate the usage of a token in their systems.
 
-For lists of canonical tokens, L2s currently maintain their own customized versions of the Uniswap token list. For example, Arbitrum maintains a [token list](https://bridge.arbitrum.io/token-list-42161.json) with various custom extensions. Optimism also maintains a [custom token list](https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json), but with different extensions. It should be noted that both of these custom extensions refer to the bridge that these tokens can be carried through. However, these are not the only bridges that the tokens can be carried through, which means that bridges and token lists should be separated. Also note that currently, both Optimism and Arbitrum base "canonicity" on the token name + symbol pair.
+For lists of canonical tokens, L2s currently maintain their own customized versions of the Uniswap token list. For example, Arbitrum maintains a token list with various custom extensions. Optimism also maintains a custom token list, but with different extensions. It should be noted that both of these custom extensions refer to the bridge that these tokens can be carried through. However, these are not the only bridges that the tokens can be carried through, which means that bridges and token lists should be separated. Also note that currently, both Optimism and Arbitrum base "canonicity" on the token name + symbol pair.
 
 An example of an Arbitrum token entry is given below:
 ```
@@ -77,7 +76,7 @@ Note that requirements are uniquely numbered in ascending order within each requ
 
 Example : It should be read that [R1] is an absolute requirement of the specification whereas [D1] is a recommendation and [O1] is truly optional.
 
-The schema for a canonical token list utilizes draft version 7 of https://json-schema.org for consistency purposes with the [W3C CCG](https://w3c-ccg.github.io/) effort. 
+The schema for a canonical token list utilizes draft version 7 of json-schema.org for consistency purposes with the W3C CCG effort. 
 
 <a name="r1"> **[R1]** </a>
 The following data elements MUST be present in a canonical token list:
@@ -131,7 +130,7 @@ All properties in the schema identified in the description to be a Universal Res
 [[R3]](#r3) testability: All requirements for [RFC 3986](#rfc3986) are testable.
 
 <a name="r4"> **[R4]** </a>
-The chainId property utilized MUST allow for the requirements of the EIP-155 standard to be met.
+The chainId property utilized MUST allow for the requirements of the [EIP-155](#eip155) standard to be met.
 
 Namely, transaction replay protection on the network that is identified by the chainId property value. Note, that for replay protection to be guaranteed, the chainId should be unique. Ensuring a unique chainId is beyond the scope of this document.
 
@@ -502,6 +501,12 @@ A claim that a canonical token list implementation conforms to this specificatio
 
 ----
 
+## Rationale
+
+The standard is extending and clarifying current custom lists such as from Arbitrum and Optimism as referenced in the [Motivation](#motivation) or the [Tokenlist Project](https://tokenlists.org/) to improve clarity, security and encourage adoption by non-Web3 native entities.
+
+---
+
 ## Security Considerations
 
 There are no additional security requirements apart from the warnings that URIs utilized in implementations of this standard might be direct to malicious resources such as websites, and that implementers should ensure that data utilized for a canonical token list is secure and correct. Since this standard is focused on a data schema and its data properties there are no additional security considerations from for example homoglyph attacks (see [CVE-2021-42574](#CVE-2021-42574)).
@@ -517,12 +522,6 @@ The standard does not set any requirements for the use of specific applications/
 ### Security Considerations: Internationalization and Localization
 
 The standard encourages implementers to follow the [W3C "Strings on the Web: Language and Direction Metadata" best practices guide](#W3C-String-Meta) for identifying language and base direction for strings used on the Web wherever appropriate.
-
-----
-
-## Rationale
-
-The standard is extending and clarifying current custom lists such as from Arbitrum and Optimism as referenced in the [Motivation](#motivation) or the [Tokenlist Project](https://tokenlists.org/) to improve clarity, security and encourage adoption by non-Web3 native entities.
 
 ----
 
