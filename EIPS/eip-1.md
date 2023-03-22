@@ -278,7 +278,7 @@ Links to WHATWG specifications may be included using normal markdown syntax, whe
 
 ```markdown
 [WHATWG HTML Spec](https://html.spec.whatwg.org/)
-a```
+```
 
 Which renders as:
 
@@ -288,7 +288,7 @@ Permitted WHATWG specification URLs MUST anchor to a specification defined in th
 
 ```regex
 ^https:\/\/[a-z]*.spec.whatwg.org.*$
-a```
+```
 
 ### Digital Object Identifier System
 
