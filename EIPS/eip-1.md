@@ -274,11 +274,11 @@ Permitted IETF specification URLs MUST anchor to a specification with an assigne
 
 #### Web Hypertext Application Technology Working Group (WHATWG)
 
-Links to WHATWG specification may be included using normal markdown syntax, such as:
+Links to WHATWG specifications may be included using normal markdown syntax, where the content of the link is the title of the specification, followed by ` Specification` if applicable. For example, the following link would be allowed:
 
 ```markdown
 [WHATWG HTML Spec](https://html.spec.whatwg.org/)
-```
+a```
 
 Which renders as:
 
@@ -288,7 +288,7 @@ Permitted WHATWG specification URLs MUST anchor to a specification defined in th
 
 ```regex
 ^https:\/\/[a-z]*.spec.whatwg.org.*$
-```
+a```
 
 ### Digital Object Identifier System
 
