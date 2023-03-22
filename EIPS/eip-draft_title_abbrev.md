@@ -185,29 +185,6 @@ The **Supply extension** is OPTIONAL for compliant smart contracts. This allows 
 - Implementers are RECOMMENDED to override the `_beforeMint` hook to increment total supply upon minting and decrement upon burning.
 
 ```solidity
-interface IERC4365Payable is IERC4365 {
-    /**
-     * @dev Sets the price `amount` for the token of token type `id`.
-     */
-    function setPrice(uint256 id, uint256 amount) external;
-
-    /**
-     * @dev [Batched] version of {setPrice}.
-     */
-    function setBatchPrices(uint256[] memory ids, uint256[] memory amounts) external;
-
-    /**
-     * @dev Returns the price for the token type `id`.
-     */
-    function price(uint256 id) external view returns (uint256);
-}
-```
-
-The **Payable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique price for each token ID. Smart contracts implementing the `ERC4365Payable` extension MUST abide by the following:
-
-- Implementers SHOULD require recipients to provide funding equal to the token price.
-
-```solidity
 interface IERC4365Supply is IERC4365 {
     /**
      * @dev Sets the max supply for the token of token type `id`.
@@ -233,6 +210,29 @@ interface IERC4365Supply is IERC4365 {
      * @dev Indicates whether any token of token type `id` exists, or not.
      */
     function exists(uint256 id) external view returns (bool);
+}
+```
+
+The **Payable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique price for each token ID. Smart contracts implementing the `ERC4365Payable` extension MUST abide by the following:
+
+- Implementers SHOULD require recipients to provide funding equal to the token price.
+
+```solidity
+interface IERC4365Payable is IERC4365 {
+    /**
+     * @dev Sets the price `amount` for the token of token type `id`.
+     */
+    function setPrice(uint256 id, uint256 amount) external;
+
+    /**
+     * @dev [Batched] version of {setPrice}.
+     */
+    function setBatchPrices(uint256[] memory ids, uint256[] memory amounts) external;
+
+    /**
+     * @dev Returns the price for the token type `id`.
+     */
+    function price(uint256 id) external view returns (uint256);
 }
 ```
 
