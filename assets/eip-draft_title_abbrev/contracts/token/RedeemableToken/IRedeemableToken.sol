@@ -5,7 +5,7 @@ import "../../utils/introspection/IERC165.sol";
 
 /**
  * @dev Interface proposal for Redeemable tokens.
- * Note: The ERC-165 identifier for this interface is 0x9d1da9d1. 
+ * Note: The ERC-165 identifier for this interface is 0x9d1da9d1.  
  */
 interface IRedeemableToken is IERC165 {
     /**
