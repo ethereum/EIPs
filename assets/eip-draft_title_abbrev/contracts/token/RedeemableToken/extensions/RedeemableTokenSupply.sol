@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "./IERC4365Supply.sol";
-import "../ERC4365.sol";
+import "./IRedeemableTokenSupply.sol";
+import "../RedeemableToken.sol";
 
 /**
- * @dev See {IERC4365Supply}.
+ * @dev See {IRedeemableTokenSupply}.
  */
-abstract contract ERC4365Supply is ERC4365 {
+abstract contract RedeemableTokenSupply is RedeemableToken {
     // Mapping from token ID to total supply.
     mapping(uint256 => uint256) private _totalSupply;
 
@@ -30,26 +30,26 @@ abstract contract ERC4365Supply is ERC4365 {
     }
 
     /**
-     * @dev See {IERC4365Supply-totalSupply}.
+     * @dev See {IRedeemableTokenSupply-totalSupply}.
      */
     function totalSupply(uint256 id) public view virtual returns (uint256) {
         return _totalSupply[id];
     }
 
     /**
-     * @dev See {IERC4365Supply-maxSupply}.
+     * @dev See {IRedeemableTokenSupply-maxSupply}.
      */
     function maxSupply(uint256 id) public view virtual returns (uint256) {
         uint256 max = _maxSupply[id];
-        require(max != 0, "ERC4365Supply: no maxSupply set");
+        require(max != 0, "RedeemableTokenSupply: no maxSupply set");
         return max;
     }
 
     /**
-     * @dev See {IERC4365Supply-exists}.
+     * @dev See {IRedeemableTokenSupply-exists}.
      */
     function exists(uint256 id) public view virtual returns (bool) {
-        return ERC4365Supply.totalSupply(id) > 0;
+        return RedeemableTokenSupply.totalSupply(id) > 0;
     }
 
     /**
@@ -63,7 +63,7 @@ abstract contract ERC4365Supply is ERC4365 {
      * @dev [Batched] version of {setMaxSupply}.
      */
     function _setBatchMaxSupplies(uint256[] memory ids, uint256[] memory amounts) internal {
-        require(ids.length == amounts.length, "ERC4365Supply: ids and amounts length mismatch");
+        require(ids.length == amounts.length, "RedeemableTokenSupply: ids and amounts length mismatch");
 
         for (uint256 i = 0; i < ids.length; i++) {
             _setMaxSupply(ids[i], amounts[i]);
@@ -71,7 +71,7 @@ abstract contract ERC4365Supply is ERC4365 {
     }
 
     /**
-     * @dev See {ERC4365-_beforeMint}.
+     * @dev See {RedeemableToken-_beforeMint}.
      */
     function _beforeMint(
         address minter,
@@ -86,7 +86,7 @@ abstract contract ERC4365Supply is ERC4365 {
     }
 
     /**
-     * @dev See {ERC4365-_beforeBurn.
+     * @dev See {RedeemableToken-_beforeBurn.
      */
     function _beforeBurn(
         address burner,
@@ -96,7 +96,7 @@ abstract contract ERC4365Supply is ERC4365 {
     ) internal virtual override {
         super._beforeBurn(burner, from, id, amount);
 
-        require(_totalSupply[id] >= amount, "ERC4365: burn amount exceeds totalSupply");
+        require(_totalSupply[id] >= amount, "RedeemableToken: burn amount exceeds totalSupply");
         unchecked {
             _totalSupply[id] -= amount;
         }

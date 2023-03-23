@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../IERC4365.sol";
+import "../IRedeemableToken.sol";
 
 /**
- * @dev Proposal of an interface for ERC-4365 tokens with an expiry date.
+ * @dev Proposal of an interface for Redeemable Tokens with an expiry date.
  * NOTE: The dates are stored as unix timestamps in seconds.
  */
-interface IERC4365Expirable is IERC4365 {
+interface IRedeemableTokenExpirable is IRedeemableToken {
     /**
      * @dev Sets the expiry date for the token of token type `id`.
      */

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../IERC4365.sol";
+import "../IRedeemableToken.sol";
 
 /**
- * @dev Proposal of an interface for ERC-4365 tokens with a price.
+ * @dev Proposal of an interface for Redeemable Tokens with a price.
  */
-interface IERC4365Payable is IERC4365 {
+interface IRedeemableTokenPayable is IRedeemableToken {
     /**
      * @dev Sets the price `amount` for the token of token type `id`.
      */

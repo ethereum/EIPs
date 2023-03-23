@@ -12,7 +12,7 @@ requires: 165
 
 ## Abstract
 
-This EIP outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
+This ERC outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
 
 Contrary to the ERC-1155 standard, this ERC does not enforce transferability as it recognizes situations where implementers might not want to allow it. Additionally, it introduces several extensions used to expand the functionality like the **Expirable extension** which provides a simple way to add an expiry date to tokens.
 
@@ -136,7 +136,7 @@ In addition, in order for a contract to be compliant with this ERC, it MUST abid
 The **URI Storage extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique URI for each token ID.
 
 ```solidity
-interface IERC4365URIStorage is IERC4365 {
+interface IRedeemableTokenURIStorage is IRedeemableToken {
     /**
      * @dev Emitted when the URI for token type `id` changes to `value`, if it is a non-programmatic URI.
      */
@@ -149,12 +149,12 @@ interface IERC4365URIStorage is IERC4365 {
 }
 ```
 
-The **Expirable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique expiry date for each token ID. Smart contracts implementing the `ERC4365Expirable` extension MUST abide by the following:
+The **Expirable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique expiry date for each token ID. Smart contracts implementing the `RedeemableTokenExpirable` extension MUST abide by the following:
 
 - Implementers MUST NOT allow tokens to be minted or redeemed if expired.
 
 ```solidity
-interface IERC4365Expirable is IERC4365 {
+interface IRedeemableTokenExpirable is IRedeemableToken {
     /**
      * @dev Sets the expiry date for the token of token type `id`.
      */
@@ -178,14 +178,14 @@ interface IERC4365Expirable is IERC4365 {
 }
 ```
 
-The **Supply extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique max supply for each token ID. Smart contracts implementing the `ERC4365Supply` extension MUST abide by the following:
+The **Supply extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique max supply for each token ID. Smart contracts implementing the `RedeemableTokenSupply` extension MUST abide by the following:
 
 - Implementers SHOULD NOT allow tokens to be minted if total supply exceeds max supply.
 - Implementers SHOULD increment total supply upon minting and decrement upon burning.
 - Implementers are RECOMMENDED to override the `_beforeMint` hook to increment total supply upon minting and decrement upon burning.
 
 ```solidity
-interface IERC4365Supply is IERC4365 {
+interface IRedeemableTokenSupply is IRedeemableToken {
     /**
      * @dev Sets the max supply for the token of token type `id`.
      */
@@ -213,12 +213,12 @@ interface IERC4365Supply is IERC4365 {
 }
 ```
 
-The **Payable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique price for each token ID. Smart contracts implementing the `ERC4365Payable` extension MUST abide by the following:
+The **Payable extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique price for each token ID. Smart contracts implementing the `RedeemableTokenPayable` extension MUST abide by the following:
 
 - Implementers SHOULD require recipients to provide funding equal to the token price.
 
 ```solidity
-interface IERC4365Payable is IERC4365 {
+interface IRedeemableTokenPayable is IRedeemableToken {
     /**
      * @dev Sets the price `amount` for the token of token type `id`.
      */
@@ -264,7 +264,7 @@ Alternatively, a more intuitive approach to represent non-fungible tokens is to 
 
 ERC-1155, likewise this ERC, conveniently supports batch operations, where a batch is represented by an array of token IDs and an amount for each token ID making it possible to for example mint multiple token IDs in one call.
 
-However, a batch often time only concerns one address. While minting a batch of tokens to an address in one transaction is convenient, supporting the ability to mint to multiple addresses in one transaction is even more convenient. Therefore, this ERC support bundle operations. A bundle is simply a collection of batches where each batch have a seperate address.
+However, a batch often time only concerns one address. While minting a batch of tokens to an address in one transaction is convenient, supporting the ability to mint to multiple addresses in one transaction is even more convenient. Therefore, this ERC supports bundle operations. A bundle is simply a collection of batches where each batch has a separate address.
 
 ### Transfer
 
@@ -276,7 +276,7 @@ The core addition to redeemable tokens is the possibility to redeem tokens in ex
 
 ### Safe Mint Only
 
-This ERC takes inspiration from the ERC-1155 standard and only supports safe-style transfers when minting tokens. This enables receiver contracts to depend on `ERC4365Mint` or `ERC4365MintBatch` functions to be called at the end of minting. This allows receivers to reject an increase in balance.
+This ERC takes inspiration from the ERC-1155 standard and only supports safe-style transfers when minting tokens. This enables receiver contracts to depend on `RedeemableTokenMint` or `RedeemableTokenMintBatch` functions to be called at the end of minting. This allows receivers to reject an increase in balance.
 
 ## Backwards Compatibility
 

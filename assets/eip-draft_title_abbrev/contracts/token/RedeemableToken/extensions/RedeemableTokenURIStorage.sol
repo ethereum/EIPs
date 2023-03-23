@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.0;
 
-import "../ERC4365.sol";
+import "../RedeemableToken.sol";
 import "../../../utils/introspection/ERC165.sol";
-import "./IERC4365URIStorage.sol";
+import "./IRedeemableTokenURIStorage.sol";
 
 /**
- * @dev See {IERC4365URIStorage}.
+ * @dev See {IRedeemableTokenURIStorage}.
  */
-abstract contract ERC4365URIStorage is ERC165, IERC4365URIStorage, ERC4365 {
+abstract contract RedeemableTokenURIStorage is ERC165, IRedeemableTokenURIStorage, RedeemableToken {
     // Optional mapping for token URIs.
     mapping(uint256 => string) private _tokenURIs;
 
@@ -17,14 +17,14 @@ abstract contract ERC4365URIStorage is ERC165, IERC4365URIStorage, ERC4365 {
         public
         view
         virtual
-        override(ERC4365, ERC165, IERC165)
+        override(RedeemableToken, ERC165, IERC165)
         returns (bool)
     {
-        return interfaceId == type(IERC4365URIStorage).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IRedeemableTokenURIStorage).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
-     * @dev See {IERC4365URIStorage-tokenURI}.
+     * @dev See {IRedeemableTokenURIStorage-tokenURI}.
      */
     function tokenURI(uint256 id) public view virtual override returns (string memory) {
         string memory _tokenURI = _tokenURIs[id];

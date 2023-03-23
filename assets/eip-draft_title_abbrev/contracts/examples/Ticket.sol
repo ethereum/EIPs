@@ -2,15 +2,15 @@
 
 pragma solidity ^0.8.0;
 
-import "../token/ERC4365/IERC4365.sol";
-import "../token/ERC4365/extensions/ERC4365Expirable.sol";
+import "../token/RedeemableToken/IRedeemableToken.sol";
+import "../token/RedeemableToken/extensions/RedeemableTokenExpirable.sol";
 
-contract Ticket is ERC4365, ERC4365Expirable {
+contract Ticket is RedeemableToken, RedeemableTokenExpirable {
     using Address for address;
 
     address public owner;
 
-    constructor(address owner_, string memory baseURI_) ERC4365(baseURI_) {
+    constructor(address owner_, string memory baseURI_) RedeemableToken(baseURI_) {
         owner = owner_;
     }
 

@@ -4,14 +4,14 @@ pragma solidity ^0.8.0;
 
 import "../../utils/Address.sol";
 import "../../utils/Context.sol";
-import "./IERC4365Receiver.sol";
+import "./IRedeemableTokenReceiver.sol";
 import "../../utils/introspection/ERC165.sol";
-import "./IERC4365.sol";
+import "./IRedeemableToken.sol";
 
 /**
  * @dev Implementation proposal for redeemable tokens (tickets).
  */
-contract ERC4365 is Context, ERC165, IERC4365 {
+contract RedeemableToken is Context, ERC165, IRedeemableToken {
     using Address for address;
 
     // Mapping from token ID to account balances. id => (account => balance)
@@ -32,7 +32,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
     }
 
     /**
-     * @dev See {IERC4365-redeem}.
+     * @dev See {IRedeemableToken-redeem}.
      */
     function redeem(
         address account, 
@@ -41,7 +41,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
         bytes memory data
     ) external virtual {
         require(_balances[id][account] >= _redeemed[id][account] + amount, 
-            "ERC4365: redeem amount exceeds balance");
+            "RedeemableToken: redeem amount exceeds balance");
 
         _beforeRedeem(account, id, amount, data);
 
@@ -53,7 +53,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-        return interfaceId == type(IERC4365).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IRedeemableToken).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -72,12 +72,12 @@ contract ERC4365 is Context, ERC165, IERC4365 {
      * @dev See {IERC-4365-balanceOf}.
      */
     function balanceOf(address account, uint256 id) public view virtual returns (uint256) {
-        require(account != address(0), "ERC4365: address zero is not a valid owner");
+        require(account != address(0), "RedeemableToken: address zero is not a valid owner");
         return _balances[id][account];
     }
 
     /**
-     * @dev See {IERC4365-balanceOfBatch}.
+     * @dev See {IRedeemableToken-balanceOfBatch}.
      */
     function balanceOfBatch(address account, uint256[] memory ids)
         public
@@ -96,7 +96,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
     }
 
     /**
-     * @dev See {IERC4365-balanceOfBundle}.
+     * @dev See {IRedeemableToken-balanceOfBundle}.
      */
     function balanceOfBundle(address[] memory accounts, uint256[][] memory ids)
         public
@@ -115,15 +115,15 @@ contract ERC4365 is Context, ERC165, IERC4365 {
     }
 
     /**
-     * @dev See {IERC4365-balanceOfRedeemed}.
+     * @dev See {IRedeemableToken-balanceOfRedeemed}.
      */
     function balanceOfRedeemed(address account, uint256 id) public view virtual returns (uint256) {
-        require(account != address(0), "ERC4365: address zero is not a valid owner");
+        require(account != address(0), "RedeemableToken: address zero is not a valid owner");
         return _redeemed[id][account];
     }
 
     /**
-     * @dev See {IERC4365-balanceOfRedeemedBatch}.
+     * @dev See {IRedeemableToken-balanceOfRedeemedBatch}.
      */
     function balanceOfRedeemedBatch(address account, uint256[] memory ids) 
         public 
@@ -142,7 +142,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
     }
 
     /**
-     * @dev See {IERC4365-balanceOfRedeemedBundle}.
+     * @dev See {IRedeemableToken-balanceOfRedeemedBundle}.
      */
     function balanceOfRedeemedBundle(address[] memory accounts, uint256[][] memory ids) 
         public 
@@ -189,7 +189,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
      * 
      * Requirements:
      * - `to` cannot be the zero address.
-     * - If `to` refers to a smart contract, it must implement [IERC4365REceiver-onERC4365Received] and
+     * - If `to` refers to a smart contract, it must implement [IRedeemableTokenREceiver-onRedeemableTokenReceived] and
      * return the acceptance magic value.
      */
     function _mint(
@@ -218,7 +218,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
      * 
      * Requirements:
      * - `ids` and `amounts` must have the same length.  
-     * - If `to` refers to a smart contract, it must implement [IERC4365REceiver-onERC4365BatchReceived] and
+     * - If `to` refers to a smart contract, it must implement [IRedeemableTokenREceiver-onRedeemableTokenBatchReceived] and
      * return the acceptance magic value.
      */
     function _mintBatch(
@@ -275,14 +275,14 @@ contract ERC4365 is Context, ERC165, IERC4365 {
         uint256 id,
         uint256 amount
     ) internal virtual {
-        require(from != address(0), "ERC4365: burn from the zero address");
+        require(from != address(0), "RedeemableToken: burn from the zero address");
 
         address burner = _msgSender();
 
         _beforeBurn(burner, from, id, amount);
 
         uint256 fromBalance = _balances[id][from];
-        require(fromBalance >= amount, "ERC4365: burn amount exceeds balance");
+        require(fromBalance >= amount, "RedeemableToken: burn amount exceeds balance");
         unchecked {
             _balances[id][from] = fromBalance - amount;
         }
@@ -303,8 +303,8 @@ contract ERC4365 is Context, ERC165, IERC4365 {
         uint256[] memory ids,
         uint256[] memory amounts
     ) internal virtual {
-        require(from != address(0), "ERC4365: burn from the zero address");
-        require(ids.length == amounts.length, "ERC4365: ids and amounts length mismatch");
+        require(from != address(0), "RedeemableToken: burn from the zero address");
+        require(ids.length == amounts.length, "RedeemableToken: ids and amounts length mismatch");
 
         address burner = _msgSender();
 
@@ -315,7 +315,7 @@ contract ERC4365 is Context, ERC165, IERC4365 {
             _beforeBurn(burner, from, ids[i], amounts[i]);
 
             uint256 fromBalance = _balances[id][from];
-            require(fromBalance >= amount, "ERC4365: burn amount exceeds balance");
+            require(fromBalance >= amount, "RedeemableToken: burn amount exceeds balance");
             unchecked {
                 _balances[id][from] = fromBalance - amount;
             }
@@ -375,14 +375,14 @@ contract ERC4365 is Context, ERC165, IERC4365 {
         bytes memory data
     ) private {
         if (to.isContract()) {
-            try IERC4365Receiver(to).onERC4365Mint(minter, id, amount, data) returns (bytes4 response) {
-                if (response != IERC4365Receiver.onERC4365Mint.selector) {
-                    revert("ERC4365: ERC4365Receiver rejected tokens");
+            try IRedeemableTokenReceiver(to).onRedeemableTokenMint(minter, id, amount, data) returns (bytes4 response) {
+                if (response != IRedeemableTokenReceiver.onRedeemableTokenMint.selector) {
+                    revert("RedeemableToken: RedeemableTokenReceiver rejected tokens");
                 }
             } catch Error(string memory reason) {
                 revert(reason);
             } catch {
-                revert("ERC4365: mint to non-ERC4365Receiver implementer");
+                revert("RedeemableToken: mint to non-RedeemableTokenReceiver implementer");
             }
         }
     }
@@ -395,17 +395,17 @@ contract ERC4365 is Context, ERC165, IERC4365 {
         bytes memory data
     ) private {
         if (to.isContract()) {
-            try IERC4365Receiver(to).onERC4365BatchMint(minter, ids, amounts, data) returns (
+            try IRedeemableTokenReceiver(to).onRedeemableTokenBatchMint(minter, ids, amounts, data) returns (
                 bytes4 response
             ) {
-                if (response != IERC4365Receiver.onERC4365BatchMint.selector) {
+                if (response != IRedeemableTokenReceiver.onRedeemableTokenBatchMint.selector) {
                     
-                    revert("ERC4365: ERC4365Receiver rejected tokens");
+                    revert("RedeemableToken: RedeemableTokenReceiver rejected tokens");
                 }
             } catch Error(string memory reason) {
                 revert(reason);
             } catch {
-                revert("ERC4365: mint to non-ERC4365Receiver implementer");
+                revert("RedeemableToken: mint to non-RedeemableTokenReceiver implementer");
             }
         }
     }

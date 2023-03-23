@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../IERC4365.sol";
+import "../IRedeemableToken.sol";
 
 /**
- * @dev Proposal of an interface for ERC-4365 tokens with a max supply.
+ * @dev Proposal of an interface for Redeemable Tokens with a max supply.
  */
-interface IERC4365Supply is IERC4365 {
+interface IRedeemableTokenSupply is IRedeemableToken {
     /**
      * @dev Sets the max supply for the token of token type `id`.
      */

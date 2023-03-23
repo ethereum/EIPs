@@ -2,13 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "./IERC4365Payable.sol";
-import "../ERC4365.sol";
+import "./IRedeemableTokenPayable.sol";
+import "../RedeemableToken.sol";
 
 /**
- * @dev See {IERC4365Payable}.
+ * @dev See {IRedeemableTokenPayable}.
  */
-abstract contract ERC4365Payable is ERC4365 {
+abstract contract RedeemableTokenPayable is RedeemableToken {
     // Optional mapping for token price. 
     mapping(uint256 => uint256) private _price;
 
@@ -27,11 +27,11 @@ abstract contract ERC4365Payable is ERC4365 {
     }
 
     /**
-     * @dev See {IERC4365Payable-price}.
+     * @dev See {IRedeemableTokenPayable-price}.
      */
     function price(uint256 id) public view virtual returns (uint256) {
         uint256 amount = _price[id];
-        require(amount != 0, "ERC4365Pay: no price set");
+        require(amount != 0, "RedeemableTokenPay: no price set");
         return amount;
     }
 
@@ -46,7 +46,7 @@ abstract contract ERC4365Payable is ERC4365 {
      * @dev [Batched] version of {_setPrice}.
      */
     function _setBatchPrices(uint256[] memory ids, uint256[] memory amounts) internal {
-        require(ids.length == amounts.length, "ERC4365Supply: ids and amounts length mismatch");
+        require(ids.length == amounts.length, "RedeemableTokenSupply: ids and amounts length mismatch");
 
         for (uint256 i = 0; i < ids.length; i++) {
             _setPrice(ids[i], amounts[i]);

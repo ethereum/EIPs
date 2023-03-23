@@ -7,7 +7,7 @@ import "../../utils/introspection/IERC165.sol";
  * @dev Interface proposal for Redeemable tokens.
  * Note: The ERC-165 identifier for this interface is 0x9d1da9d1. 
  */
-interface IERC4365 is IERC165 {
+interface IRedeemableToken is IERC165 {
     /**
      * @dev Emitted when `amount` tokens of token type `id` are minted to `to` by `minter`.
      */
