@@ -12,7 +12,7 @@ requires: 165
 
 ## Abstract
 
-[ERC-4365](./eip-draft_title_abbrev.md) outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
+This EIP outlines a smart contract interface that can represent any number of fungible and non-fungible redeemable token types. The standard builds upon the [ERC-1155](./eip-1155.md) standard borrowing many of the ideas introduced by it including support for multiple tokens within the same contract and batch operations.
 
 Contrary to the ERC-1155 standard, this ERC does not enforce transferability as it recognizes situations where implementers might not want to allow it. Additionally, it introduces several extensions used to expand the functionality like the **Expirable extension** which provides a simple way to add an expiry date to tokens.
 
@@ -31,10 +31,10 @@ Additionally, these tokens can be used to create, among others, vouchers, gift c
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-**Every smart contract implementing this ERC MUST implement the all of the functions in the `ERC4365` interface. Additionally, they MUST implement the ERC-165 `supportsInterface` function and MUST return the constant value `true` if the constant value `0x9d1da9d1` is passed through the `interfaceId` argument.**
+**Every smart contract implementing this ERC MUST implement the all of the functions in the `IRedeemableToken` interface. Additionally, they MUST implement the [ERC-165](./eip-165.md) `supportsInterface` function and MUST return the constant value `true` if the constant value `0x9d1da9d1` is passed through the `interfaceId` argument.**
 
 ```solidity
-interface IERC4365 is IERC165 {
+interface IRedeemableToken is IERC165 {
     /**
      * @dev Emitted when `amount` tokens of token type `id` are minted to `to` by `minter`.
      */
@@ -131,7 +131,7 @@ In addition, in order for a contract to be compliant with this ERC, it MUST abid
 - Implementers SHOULD allow token recipients to burn any token they receive.
 - Implementers MAY enable token issuers to burn the tokens they issued.
 
-**Smart contracts MUST implement all of the functions in the `ERC4365Receiver` interface to accept tokens being minted to them.**
+**Smart contracts MUST implement all of the functions in the `IRedeemableTokenReceiver` interface to accept tokens being minted to them.**
 
 The **URI Storage extension** is OPTIONAL for compliant smart contracts. This allows contracts to associate a unique URI for each token ID.
 
