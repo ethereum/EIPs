@@ -9,7 +9,7 @@ contract ERC6672 is ERC721, IERC6672 {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     bytes4 public constant IERC6672_ID = type(IERC6672).interfaceId;
-    
+
     mapping(address => mapping(uint256 => mapping(bytes32 => bool))) redemptionStatus;
     mapping(address => mapping(uint256 => mapping(bytes32 => string))) public memos;
     mapping(address => mapping(uint256 => EnumerableSet.Bytes32Set)) redemptions;
@@ -51,5 +51,12 @@ contract ERC6672 is ERC721, IERC6672 {
 
     function _removeRedemption(address _operator, bytes32 _redemptionId, uint256 _tokenId) internal {
         redemptions[_operator][_tokenId].remove(_redemptionId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool) {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC6672).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }
