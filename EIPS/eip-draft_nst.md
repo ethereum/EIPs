@@ -1,8 +1,8 @@
 ---
-eip: n
+eip: <to be assigned>
 title: Non-Sellable Tokens
 description: Prevent speculation on NFTs by replacing transfers by a barter mecanism
-author: Cédric Nicolas (@cedric-n-icolas), Casey (casey@logion.community), Grégoire (@), Kerel Verwaerde (@NSTKerel), Matthieu Chassagne (Matthieu@amcconsults.com), Perrin (@pgrandne), Rafael Fitoussi (@fi2c), Raphael (@RaphaelHardFork), Virgil (@virgilea2410)
+author: Cédric Nicolas (@cedric-n-icolas), Casey <casey@logion.community>, Kerel Verwaerde (@NSTKerel), Matthieu Chassagne <Matthieu@amcconsults.com>, Perrin (@pgrandne), Rafael Fitoussi (@fi2c), Raphael (@RaphaelHardFork), Virgil (@virgilea2410)
 discussions-to: https://ethereum-magicians.org
 status: Draft
 type: Standards Track
@@ -83,7 +83,7 @@ See [Define the barter terms](#define-the-barter-terms) section for precisions o
 
 ##### transferFor
 
-Verifies signature following the [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) procedure, increases the nonce of `data.owner` and transfers the `data.bid.tokenId` to `to` account.
+Verifies signature following the [EIP-712](./eip-712.md) procedure, increases the nonce of `data.owner` and transfers the `data.bid.tokenId` to `to` account.
 
 This function MUST be called only by an authorized NST contracts, the call MUST occur when users are calling the `barter` function.
 
@@ -135,7 +135,7 @@ event BarterNetworkUpdated(address indexed tokenAddr, bool indexed barterable);
 
 Barter terms are represented as the `barter` function's arguments and MUST:
 
-- be signed following the [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md) procedure
+- be signed following the [EIP-712](./eip-712.md) procedure
 - be shared equally between NSTs
 - have included for each tokens:
   - contract address
@@ -166,7 +166,7 @@ struct BarterTerms {
 }
 ```
 
-Barters MAY be declined into several types, if any, `barter` and `transferFor` MUST leverage Solidity's [functions overloading](https://docs.soliditylang.org/en/latest/contracts.html#function-overloading) to implement the specific logic for each barter type. See following example:
+Barters MAY be declined into several types, if any, `barter` and `transferFor` MUST leverage Solidity's functions overloading to implement the specific logic for each barter type. See following example:
 
 ```solidity
 {...}
