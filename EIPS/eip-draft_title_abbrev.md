@@ -1,4 +1,5 @@
 ---
+eip: 6732
 title: Redeemable Tokens
 description: A proposition for redeemable tokens
 author: Lucaz Lindgren (@LucazFFz)
