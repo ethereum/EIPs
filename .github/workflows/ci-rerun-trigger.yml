@@ -10,7 +10,7 @@ jobs:
     name: Trigger
     steps:
       - name: Trigger
-        uses: actions/github-script@d556feaca394842dc55e4734bf3bb9f685482fa0
+        uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975
         if: github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
         with:
           script: |
