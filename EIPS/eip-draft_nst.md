@@ -13,11 +13,11 @@ requires: 712, 721
 
 ## Abstract
 
-This EIP is an extension of [EIP-712](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) to create non-sellable tokens (NST). It proposes a strong resriction on transfers in order to prevent speculation on token price while maintaining the possibility of transfers, transfers are performed in a barter way (send to receive or receive to send) in an ecosystem controled by the creator.
+This EIP is an extension of [EIP-721](./eip-721.md) to create non-sellable tokens (NST). It proposes a strong resriction on transfers in order to prevent speculation on token price while maintaining the possibility of transfers, transfers are performed in a barter way (send to receive or receive to send) in an ecosystem controled by the creator.
 
 ## Motivation
 
-Interest for soulbound tokens (SBT) in the Ethereum community still growing since the V. Buterin [idea publication](https://vitalik.ca/general/2022/01/26/soulbound.html), highlighting the non-transferrability (non-)features to prevent, _in fine_, speculation of the token. While a lot of propositions emerged for implementation of SBT, the non-transferability is often too restrictive and requires a certain level of centralization, especially when users want to transfer a SBT between two owned accounts. Thus SBTs are way more fitted for account-bounded properties such as reputation, voting rights, privileges, ...
+Interest for soulbound tokens (SBT) in the Ethereum community still growing since the V. Buterin idea publication (Soulbound, 2022-01-26), highlighting the non-transferrability (non-)features to prevent, _in fine_, speculation of the token. While a lot of propositions emerged for implementation of SBT, the non-transferability is often too restrictive and requires a certain level of centralization, especially when users want to transfer a SBT between two owned accounts. Thus SBTs are way more fitted for account-bounded properties such as reputation, voting rights, privileges, ...
 
 In case of transferable items which cannot be sellable, SBTs can fit but they require strong level of centralization as transfer are restricted by the token creator (or the community in case of DAO managed SBT). Here some examples of possibles NSTs:
 
@@ -87,7 +87,7 @@ Verifies signature following the [EIP-712](https://github.com/ethereum/EIPs/blob
 
 This function MUST be called only by an authorized NST contracts, the call MUST occur when users are calling the `barter` function.
 
-NOTE: using [ECDSA.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/ECDSA.sol) (`v4.7.3` at least) and [EIP712.sol](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/EIP712.sol) library from OpenZeppelin is very RECOMMENDED for signature verifications, verification only based on `ecrecover` SHOULD NOT be used (see [Solidity documentation](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#mathematical-and-cryptographic-functions)).
+NOTE: using `ECDSA.sol`(`v4.7.3` at least) and `EIP-712.sol` libraries from OpenZeppelin is very RECOMMENDED for signature verifications, verification only based on `ecrecover` SHOULD NOT be used (see the Solidity documentation, Mathematical and Cryptographic Functions).
 
 ```solidity
 function transferFor(BarterTerms memory data, address to, bytes memory signature) external;
@@ -187,7 +187,7 @@ function barter(MultiBarterTerms memory data, bytes memory signature) external;
 
 ### Contract interface
 
-Every contract compliant with this EIP MUST implement [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) where the following methods MUST be disabled:
+Every contract compliant with this EIP MUST implement [ERC-721](./eip-721.md) where the following methods MUST be disabled:
 
 - `safeTransferFrom(address,address,uint256,bytes)` (`0xb88d4fde`)
 - `safeTransferFrom(address,address,uint256)` (`0x42842e0e`)
@@ -195,7 +195,7 @@ Every contract compliant with this EIP MUST implement [ERC721](https://github.co
 
 ## Rationale
 
-This EIP has been designed to leverage existant features of the [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) such as `approve/allowance` and `Transfer` events and leave the full control on the implementation.
+This EIP has been designed to leverage existant features of the [ERC-721](./eip-721.md) such as `approve/allowance` and `Transfer` events and leave the full control on the implementation.
 
 ### Permissionless barter
 
@@ -225,15 +225,15 @@ Implementing a many-to-many NST contract is quite imossible as the barter occurs
 
 ### Register of allowed NST
 
-Creating an universal register for barter allowances between NST contract (like the [EIP-1820](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1820.md)) would be hard to maintain and easy to bypass.
+Creating an universal register for barter allowances between NST contract (like the [ERC-1820](./eip-1820.md)) would be hard to maintain and easy to bypass.
 
 ### Third party protocol
 
-Implementing a service for barter NFT is already existant (see [Sudoswap](https://otc.sudoswap.xyz/#/create)). Such a service still enable one-way transfer through EIP721 properties and thus not prevent the sellability of the token.
+Implementing a service for barter NFT is already existant (see Sudoswap OTC). Such a service still enable one-way transfer through EIP-721 properties and thus not prevent the sellability of the token.
 
 ## Backwards Compatibility
 
-Excepted disabled methods specified in [Contract interface](#contract-interface), this EIP is backward compatible with [EIP-721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md).
+Excepted disabled methods specified in [Contract interface](#contract-interface), this EIP is backward compatible with [EIP-721](./eip-721.md).
 
 ## Test Cases
 
@@ -247,7 +247,7 @@ The references implementation includes unit tests written using Foundry
 
 ### Sign and broadcast signed messages
 
-In regards to [EIP-712 security considerations](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md#security-considerations), we includes in the [Specification](#specification) that signed including barter terms must include a `nonce` to avoid replay attack, `tokenAddr` and the `tokenId` to avoid front-running attack on a barter.
+In regards to [EIP-712 security considerations](./eip-712.md#security-considerations), we includes in the [Specification](#specification) that signed including barter terms must include a `nonce` to avoid replay attack, `tokenAddr` and the `tokenId` to avoid front-running attack on a barter.
 
 Moreover adding a `deadline` is also recommanded in case of non-used signed message.
 
