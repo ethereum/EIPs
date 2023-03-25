@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.13;
 
-import {PermissionlessERC_NMultiBarter} from "../contracts/mocks/PermissionlessERC_NMultiBarter.sol";
-import {IERC_N} from "../contracts/IERC_N.sol";
-import {ERC_NMultiBarter} from "../contracts/extensions/ERC_NMultiBarter.sol";
+import {PermissionlessERC6774MultiBarter} from "../contracts/mocks/PermissionlessERC6774MultiBarter.sol";
+import {IERC6774} from "../contracts/IERC6774.sol";
+import {ERC6774MultiBarter} from "../contracts/extensions/ERC6774MultiBarter.sol";
 
 contract Utils {
     bytes32 internal constant EIP712_TYPEHASH =
@@ -82,19 +82,15 @@ contract Utils {
         internal
         pure
         returns (
-            PermissionlessERC_NMultiBarter.BarterTerms memory data,
+            PermissionlessERC6774MultiBarter.BarterTerms memory data,
             bytes32 structHash
         )
     {
-        PermissionlessERC_NMultiBarter.Componant memory bid = IERC_N.Componant({
-            tokenAddr: bidTokenAddr,
-            tokenId: bidTokenId
-        });
-        PermissionlessERC_NMultiBarter.Componant memory ask = IERC_N.Componant({
-            tokenAddr: askTokenAddr,
-            tokenId: askTokenId
-        });
-        data = IERC_N.BarterTerms(bid, ask, nonce, owner, deadline);
+        PermissionlessERC6774MultiBarter.Componant memory bid = IERC6774
+            .Componant({tokenAddr: bidTokenAddr, tokenId: bidTokenId});
+        PermissionlessERC6774MultiBarter.Componant memory ask = IERC6774
+            .Componant({tokenAddr: askTokenAddr, tokenId: askTokenId});
+        data = IERC6774.BarterTerms(bid, ask, nonce, owner, deadline);
 
         bytes32 bidStructHash = keccak256(
             abi.encode(COMPONANT_TYPEHASH, bidTokenAddr, bidTokenId)
@@ -126,21 +122,21 @@ contract Utils {
         internal
         pure
         returns (
-            PermissionlessERC_NMultiBarter.MultiBarterTerms memory data,
+            PermissionlessERC6774MultiBarter.MultiBarterTerms memory data,
             bytes32 structHash
         )
     {
-        PermissionlessERC_NMultiBarter.MultiComponant
-            memory bid = ERC_NMultiBarter.MultiComponant({
+        PermissionlessERC6774MultiBarter.MultiComponant
+            memory bid = ERC6774MultiBarter.MultiComponant({
                 tokenAddr: bidTokenAddr,
                 tokenIds: bidTokenIds
             });
-        PermissionlessERC_NMultiBarter.MultiComponant
-            memory ask = ERC_NMultiBarter.MultiComponant({
+        PermissionlessERC6774MultiBarter.MultiComponant
+            memory ask = ERC6774MultiBarter.MultiComponant({
                 tokenAddr: askTokenAddr,
                 tokenIds: askTokenIds
             });
-        data = ERC_NMultiBarter.MultiBarterTerms(
+        data = ERC6774MultiBarter.MultiBarterTerms(
             bid,
             ask,
             nonce,

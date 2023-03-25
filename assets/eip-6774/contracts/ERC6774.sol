@@ -6,9 +6,9 @@ import {ERC721, IERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC
 import {EIP712} from "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
-import {IERC_N} from "./IERC_N.sol";
+import {IERC6774} from "./IERC6774.sol";
 
-contract ERC_N is ERC721, EIP712, IERC_N {
+contract ERC6774 is ERC721, EIP712, IERC6774 {
     using ECDSA for bytes32;
 
     error BarterNotEnabled(address tokenAddr);
@@ -51,12 +51,12 @@ contract ERC_N is ERC721, EIP712, IERC_N {
                                               PUBLIC FUNCTIONS
     ////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-    /// @dev See {IERC_N-barter}
+    /// @dev See {IERC6774-barter}
     function barter(
         BarterTerms memory data,
         bytes memory signature
     ) external onlyExchangeable(data.bid.tokenAddr) {
-        IERC_N(data.bid.tokenAddr).transferFor(data, msg.sender, signature);
+        IERC6774(data.bid.tokenAddr).transferFor(data, msg.sender, signature);
 
         // transfer ask token
         if (!_isApprovedOrOwner(msg.sender, data.ask.tokenId))
@@ -64,7 +64,7 @@ contract ERC_N is ERC721, EIP712, IERC_N {
         _transfer(msg.sender, data.owner, data.ask.tokenId);
     }
 
-    /// @dev See {IERC_N-transferFor}
+    /// @dev See {IERC6774-transferFor}
     function transferFor(
         BarterTerms memory data,
         address to,
@@ -88,12 +88,12 @@ contract ERC_N is ERC721, EIP712, IERC_N {
                                                 GETTERS
     ////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-    /// @dev See {IERC_N-nonce}
+    /// @dev See {IERC6774-nonce}
     function nonce(address account) external view returns (uint256) {
         return _nonces[account];
     }
 
-    /// @dev See {IERC_N-isBarterable}
+    /// @dev See {IERC6774-isBarterable}
     function isBarterable(address tokenAddr) external view returns (bool) {
         return _barterables[tokenAddr];
     }

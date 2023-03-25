@@ -2,16 +2,16 @@
 
 pragma solidity ^0.8.13;
 
-import {ERC_NMultiBarter} from "../extensions/ERC_NMultiBarter.sol";
+import {ERC6774MultiBarter} from "../extensions/ERC6774MultiBarter.sol";
 
-contract PermissionlessERC_NMultiBarter is ERC_NMultiBarter {
+contract PermissionlessERC6774MultiBarter is ERC6774MultiBarter {
     string internal ipfsHash;
 
     constructor(
         string memory _name,
         string memory _symbol,
         string memory _ipfsHash
-    ) ERC_NMultiBarter(_name, _symbol) {
+    ) ERC6774MultiBarter(_name, _symbol) {
         ipfsHash = _ipfsHash;
     }
 

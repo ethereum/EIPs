@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.13;
 
-interface IERC_N {
+interface IERC6774 {
     /**
      * @dev Emitted when a `tokenAddr` is settled as barterable (`barterable` == true)
      * or stopped from being barterable (`barterable` == false)

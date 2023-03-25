@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.13;
 
-import {ERC_N, IERC_N} from "../ERC_N.sol";
+import {ERC6774, IERC6774} from "../ERC6774.sol";
 
-contract ERC_NMultiBarter is ERC_N {
+contract ERC6774MultiBarter is ERC6774 {
     struct MultiComponant {
         address tokenAddr;
         uint256[] tokenIds;
@@ -27,7 +27,7 @@ contract ERC_NMultiBarter is ERC_N {
     constructor(
         string memory _name,
         string memory _symbol
-    ) ERC_N(_name, _symbol) {
+    ) ERC6774(_name, _symbol) {
         MULTI_COMPONANT_TYPEHASH = keccak256(
             abi.encodePacked(
                 "MultiComponant(address tokenAddr,uint256[] tokenIds)"
@@ -48,7 +48,7 @@ contract ERC_NMultiBarter is ERC_N {
         MultiBarterTerms memory data,
         bytes memory signature
     ) external onlyExchangeable(data.bid.tokenAddr) {
-        ERC_NMultiBarter(data.bid.tokenAddr).transferFor(
+        ERC6774MultiBarter(data.bid.tokenAddr).transferFor(
             data,
             msg.sender,
             signature

@@ -5,16 +5,16 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 import {Utils} from "./Utils.t.sol";
-import {PermissionlessERC_NMultiBarter} from "../contracts/mocks/PermissionlessERC_NMultiBarter.sol";
-import {IERC_N} from "../contracts/IERC_N.sol";
+import {PermissionlessERC6774MultiBarter} from "../contracts/mocks/PermissionlessERC6774MultiBarter.sol";
+import {IERC6774} from "../contracts/IERC6774.sol";
 
-contract ERCN_test is Test, Utils {
+contract ERC6774_test is Test, Utils {
     using stdStorage for StdStorage;
 
     // tokens
-    PermissionlessERC_NMultiBarter internal ticket;
+    PermissionlessERC6774MultiBarter internal ticket;
     address internal TICKET;
-    PermissionlessERC_NMultiBarter internal discount;
+    PermissionlessERC6774MultiBarter internal discount;
     address internal DISCOUNT;
 
     // users and their private keys
@@ -29,9 +29,9 @@ contract ERCN_test is Test, Utils {
 
     function setUp() public {
         // deploy tokens
-        ticket = new PermissionlessERC_NMultiBarter("Ticket", "00", "");
+        ticket = new PermissionlessERC6774MultiBarter("Ticket", "00", "");
         TICKET = address(ticket);
-        discount = new PermissionlessERC_NMultiBarter("Discount", "01", "");
+        discount = new PermissionlessERC6774MultiBarter("Discount", "01", "");
         DISCOUNT = address(discount);
 
         // enable barters
@@ -67,7 +67,7 @@ contract ERCN_test is Test, Utils {
         discount.mint(USER2, 12);
 
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes memory signature
         ) = workaround_User1Ask(DISCOUNT, 12);
 
@@ -86,7 +86,7 @@ contract ERCN_test is Test, Utils {
         discount.mint(USER2, 12);
 
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes memory signature
         ) = workaround_User1Ask(DISCOUNT, 12);
 
@@ -121,7 +121,7 @@ contract ERCN_test is Test, Utils {
         ticket.mint(USER2, 50);
 
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes memory signature
         ) = workaround_User1Ask(TICKET, 50);
 
@@ -138,7 +138,7 @@ contract ERCN_test is Test, Utils {
         ticket.enableBarterWith(TICKET);
 
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes memory signature
         ) = workaround_User1Ask(TICKET, 50);
 
@@ -154,7 +154,7 @@ contract ERCN_test is Test, Utils {
         discount.mint(USER2, 12);
 
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes memory signature
         ) = workaround_User1Ask(DISCOUNT, 12);
 
@@ -189,7 +189,7 @@ contract ERCN_test is Test, Utils {
     function test_barter_CannotUseAnExpiredSignature() public {
         vm.warp(1000);
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes32 structHash
         ) = workaround_CreateBarterTerms({
                 bidTokenAddr: TICKET,
@@ -232,7 +232,7 @@ contract ERCN_test is Test, Utils {
         discount.mint(USER4, 4);
 
         (
-            PermissionlessERC_NMultiBarter.MultiBarterTerms memory data,
+            PermissionlessERC6774MultiBarter.MultiBarterTerms memory data,
             bytes memory signature
         ) = workaround_User3Ask();
 
@@ -269,7 +269,7 @@ contract ERCN_test is Test, Utils {
         discount.mint(USER4, 4);
 
         (
-            PermissionlessERC_NMultiBarter.MultiBarterTerms memory data,
+            PermissionlessERC6774MultiBarter.MultiBarterTerms memory data,
             bytes memory signature
         ) = workaround_User4TryWithEmptyBid();
 
@@ -284,9 +284,9 @@ contract ERCN_test is Test, Utils {
     function workaround_User1Ask(
         address tokenAddr,
         uint256 tokenId
-    ) internal view returns (IERC_N.BarterTerms memory, bytes memory) {
+    ) internal view returns (IERC6774.BarterTerms memory, bytes memory) {
         (
-            IERC_N.BarterTerms memory data,
+            IERC6774.BarterTerms memory data,
             bytes32 structHash
         ) = workaround_CreateBarterTerms({
                 bidTokenAddr: TICKET,
@@ -315,7 +315,7 @@ contract ERCN_test is Test, Utils {
         internal
         view
         returns (
-            PermissionlessERC_NMultiBarter.MultiBarterTerms memory data,
+            PermissionlessERC6774MultiBarter.MultiBarterTerms memory data,
             bytes memory
         )
     {
@@ -356,7 +356,7 @@ contract ERCN_test is Test, Utils {
         internal
         view
         returns (
-            PermissionlessERC_NMultiBarter.MultiBarterTerms memory data,
+            PermissionlessERC6774MultiBarter.MultiBarterTerms memory data,
             bytes memory
         )
     {

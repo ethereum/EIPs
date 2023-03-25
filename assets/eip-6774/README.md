@@ -1,17 +1,17 @@
-# Reference implementations of ERC-N
+# Reference implementations of ERC-6774
 
 ## Contract
 
-**ERC-N implementations:**
+**ERC-6774 implementations:**
 
-- [IERC_N.sol](./contracts/IERC_N.sol): interface of `ERC_N`
-- [ERC_N.sol](./contracts/ERC_N.sol): a simple and minimal implementation for one-to-one barter type
-- [ERC_NMultiBarter.sol](./contracts/extensions/ERC_NMultiBarter.sol): an extensions of `ERC_N.sol` for barter several token belonging to the same contract
+- [IERC6774.sol](./contracts/IERC6774.sol): interface of `ERC6774`
+- [ERC6774.sol](./contracts/ERC6774.sol): a simple and minimal implementation for one-to-one barter type
+- [ERC6774MultiBarter.sol](./contracts/extensions/ERC6774MultiBarter.sol): an extensions of `ERC6774.sol` for barter several token belonging to the same contract
 
 **Mocks contracts:**
 
-- [PermissionlessERC_N.sol](./contracts/mocks/PermissionlessERC_N.sol): an exemple of implementation of `ERC_N`
-- [PermissionlessERC_NMultiBarter.sol](./contracts/mocks/PermissionlessERC_NMultiBarter.sol): an exemple of implementation of `ERC_NMultiBarter`
+- [PermissionlessERC6774.sol](./contracts/mocks/PermissionlessERC6774.sol): an exemple of implementation of `ERC6774`
+- [PermissionlessERC6774MultiBarter.sol](./contracts/mocks/PermissionlessERC6774MultiBarter.sol): an exemple of implementation of `ERC6774MultiBarter`
 
 _These contract are used in `test`_
 

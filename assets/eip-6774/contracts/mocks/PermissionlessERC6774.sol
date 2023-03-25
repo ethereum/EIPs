@@ -2,16 +2,16 @@
 
 pragma solidity ^0.8.13;
 
-import {ERC_N} from "../ERC_N.sol";
+import {ERC6774} from "../ERC6774.sol";
 
-contract PermissionlessERC_N is ERC_N {
+contract PermissionlessERC6774 is ERC6774 {
     string internal ipfsHash;
 
     constructor(
         string memory _name,
         string memory _symbol,
         string memory _ipfsHash
-    ) ERC_N(_name, _symbol) {
+    ) ERC6774(_name, _symbol) {
         ipfsHash = _ipfsHash;
     }
 
