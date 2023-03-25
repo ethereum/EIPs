@@ -1,9 +1,9 @@
 ---
-eip: <to be assigned>
+eip: 6774
 title: Non-Sellable Tokens
-description: Prevent speculation on NFTs by replacing transfers by a barter mecanism
+description: Prevent speculation on NFTs by replacing transfers by a barter mechanism
 author: Cédric Nicolas (@cedric-n-icolas), Casey <casey@logion.community>, Kerel Verwaerde (@NSTKerel), Matthieu Chassagne <Matthieu@amcconsults.com>, Perrin (@pgrandne), Rafael Fitoussi (@fi2c), Raphael (@RaphaelHardFork), Virgil (@virgilea2410)
-discussions-to: https://ethereum-magicians.org
+discussions-to: https://ethereum-magicians.org/t/eip-6774-non-sellable-tokens/13528
 status: Draft
 type: Standards Track
 category: ERC
@@ -13,7 +13,7 @@ requires: 712, 721
 
 ## Abstract
 
-This EIP is an extension of [EIP-721](./eip-721.md) to create non-sellable tokens (NST). It proposes a strong resriction on transfers in order to prevent speculation on token price while maintaining the possibility of transfers, transfers are performed in a barter way (send to receive or receive to send) in an ecosystem controled by the creator.
+This EIP is an extension of [ERC-721](./eip-721.md) to create non-sellable tokens (NST). It proposes a strong resriction on transfers in order to prevent speculation on token price while maintaining the possibility of transfers, transfers are performed in a barter way (send to receive or receive to send) in an ecosystem controled by the creator.
 
 ## Motivation
 
@@ -38,7 +38,7 @@ The key words "MUST", "REQUIRED", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIO
 
 An approval mechanism is REQUIRED before performing barters between two tokens, belonging to the same or different NST contracts (see [Permissonless barter](#permissionless-barter)).
 
-Every contract compliant with this EIP MUST implement this transfer mecanism:
+Every contract compliant with this EIP MUST implement this transfer mechanism:
 
 1. UserA signs a message taking up the terms of the barter
 2. UserB accepts and concludes the barter by calling the `barter` function
@@ -229,11 +229,11 @@ Creating an universal register for barter allowances between NST contract (like 
 
 ### Third party protocol
 
-Implementing a service for barter NFT is already existant (see Sudoswap OTC). Such a service still enable one-way transfer through EIP-721 properties and thus not prevent the sellability of the token.
+Implementing a service for barter NFT is already existant (see Sudoswap OTC). Such a service still enable one-way transfer through ERC-721 properties and thus not prevent the sellability of the token.
 
 ## Backwards Compatibility
 
-Excepted disabled methods specified in [Contract interface](#contract-interface), this EIP is backward compatible with [EIP-721](./eip-721.md).
+Excepted disabled methods specified in [Contract interface](#contract-interface), this EIP is backward compatible with [ERC-721](./eip-721.md).
 
 ## Test Cases
 
