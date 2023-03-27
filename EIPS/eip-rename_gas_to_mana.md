@@ -51,20 +51,23 @@ A Solidity contract to estimate the used `mana` via the _new_ `manaleft()` synta
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-contract ManaTesting {
-    function testInlined(uint256 length) external view returns (uint256 manaUsed) {
-        uint256 total;
+contract ManaMetering {
+    function oldWay() external view returns (string memory, uint256 manaUsed) {
+        string memory hiMom = "Hi Mom, ";
+        string memory missYou = "miss you.";
         uint256 startMana = manaleft();
-        for (uint256 i; i < length; i = _uncheckedInc(i)) {
-            total += i;
-        }
+        string memory concat = string(abi.encodePacked(hiMom, missYou));
         manaUsed = startMana - manaleft();
+        return (concat, manaUsed);
     }
 
-    function _uncheckedInc(uint256 i) private pure returns (uint256) {
-        unchecked {
-            return i + 1;
-        }
+    function newWay() external view returns (string memory, uint256 manaUsed) {
+        string memory hiMom = "Hi Mom, ";
+        string memory missYou = "miss you.";
+        uint256 startMana = manaleft();
+        string memory concat = string.concat(hiMom, missYou);
+        manaUsed = startMana - manaleft();
+        return (concat, manaUsed);
     }
 }
 ```
