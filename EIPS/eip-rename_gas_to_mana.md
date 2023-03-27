@@ -73,7 +73,7 @@ contract ManaTesting {
 
 An example of how to set the `manaLimit` in MetaMask:
 
-![MetaMask manaLimit](./MetaMask_Mana.png)
+![MetaMask manaLimit](../assets/eip-rename_gas_to_mana/MetaMask_Mana.png)
 
 ## Security Considerations
 
