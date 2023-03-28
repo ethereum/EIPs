@@ -1,8 +1,8 @@
 ---
 title: Ethereum state using a unified verkle tree
-description: <Description is one full (short) sentence>
-author: Vitalik Buterin (@vbuterin), Dankrad Feist (@dankrad), Kevaundray Wedderburn (@kevaundray), Guillaume Ballet (@gballet), Piper Merriam () and Gottfried Herold ()
-discussions-to: <URL>
+description: This introduces a new Verkle state tree alongside the existing MPT.
+author: Vitalik Buterin (@vbuterin), Dankrad Feist (@dankrad), Kevaundray Wedderburn (@kevaundray), Guillaume Ballet (@gballet), Piper Merriam (@pipermerriam) and Gottfried Herold (@GottfriedHerold)
+discussions-to: https://ethereum-magicians.org/t/proposed-verkle-tree-scheme-for-ethereum-state/5805
 status: Draft
 type: Standards Track
 category: Core
@@ -20,23 +20,7 @@ Introduce a new Verkle state tree alongside the existing hexary Patricia tree. A
 
 ## Specification
 
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
--->
-
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
-
-## Rationale
-
-This implements all of the logic in transitioning to a Verkle tree, and at the same time reforms gas costs, but does so in a minimally disruptive way that does not require simultaneously changing the whole tree structure. Instead, we add a new Verkle tree that starts out empty, and only new changes to state and copies of accessed state are stored in the tree. The Patricia tree continues to exist, but is frozen.
-
-This sets the stage for a future hard fork that swaps the Patricia tree in-place with a Verkle tree storing the same data. Unlike [EIP 2584](https://eips.ethereum.org/EIPS/eip-2584), this replacement Verkle tree does not need to be computed by clients in real time. Instead, because the Patricia tree would at that point be fixed, the replacement Verkle tree can be computed off-chain.
-
-### Verkle tree design
 
 The Verkle tree uses a single-layer tree structure with 32-byte keys and values for several reasons:
 
@@ -58,6 +42,12 @@ The main differences from gas costs in Berlin are:
 Gains from the latter two properties have not yet been analyzed, but are likely to significantly offset the losses from the first property. It’s likely that once compilers adapt to these rules, efficiency will increase further.
 
 The precise specification of when access events take place, which makes up most of the complexity of the gas repricing, is necessary to clearly specify when data needs to be saved to the period 1 tree.
+
+## Rationale
+
+This implements all of the logic in transitioning to a Verkle tree, and at the same time reforms gas costs, but does so in a minimally disruptive way that does not require simultaneously changing the whole tree structure. Instead, we add a new Verkle tree that starts out empty, and only new changes to state and copies of accessed state are stored in the tree. The Patricia tree continues to exist, but is frozen.
+
+This sets the stage for a future hard fork that swaps the Patricia tree in-place with a Verkle tree storing the same data. Unlike [EIP 2584](https://eips.ethereum.org/EIPS/eip-2584), this replacement Verkle tree does not need to be computed by clients in real time. Instead, because the Patricia tree would at that point be fixed, the replacement Verkle tree can be computed off-chain.
 
 ## Forward-compatibility
 
