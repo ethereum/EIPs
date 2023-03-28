@@ -1,5 +1,4 @@
 ---
-eip:
 title: Rename `gas` to `mana`
 description: This EIP picks up on Vitalik Buterin's (@vbuterin) original proposal in 2015 to rename `gas` to `mana`
 author: Pascal Caversaccio (@pcaversaccio)
