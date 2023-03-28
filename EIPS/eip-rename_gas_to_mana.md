@@ -1,19 +1,18 @@
 ---
 eip:
 title: Rename `gas` to `mana`
-description: This EIP picks up on Vitalik Buterin's (@vbuterin) EIP-102, which aimed to rename `gas` to `mana`
+description: This EIP picks up on Vitalik Buterin's (@vbuterin) original proposal in 2015 to rename `gas` to `mana`
 author: Pascal Caversaccio (@pcaversaccio)
 discussions-to: https://ethereum-magicians.org/t/rename-gas-to-mana/13570
 status: Draft
 type: Standards Track
 category: Core
 created: 2023-03-27
-requires: 102
 ---
 
 ## Abstract
 
-This EIP picks up on Vitalik Buterin's (@vbuterin) proposal in [EIP-102](https://github.com/ethereum/EIPs/issues/29), which aimed to rename `gas` to `mana`.
+This EIP picks up on Vitalik Buterin's (@vbuterin) original proposal in 2015 to rename `gas` to `mana`.
 
 ## Motivation
 
@@ -31,7 +30,7 @@ The core term `gas` MUST be renamed to `mana`. This MUST also include renaming t
 
 ## Rationale
 
-The underlying rationale for reviving the original [EIP-102](https://github.com/ethereum/EIPs/issues/29) is that we have finally arrived at the age of PoS, and given the roadmap ahead, I consider this moment as the last opportunity to make such a far-reaching semantic change.
+The underlying rationale for reviving Vitalik's original proposal from 2015 is that we have finally arrived at the age of PoS, and given the roadmap ahead (i.e. "The Surge", "The Scourge", "The Verge", "The Purge", "The Splurge"), I consider this moment as the last opportunity to make such a far-reaching semantic change.
 
 ## Backwards Compatibility
 
@@ -45,10 +44,10 @@ If a transaction requires more `mana` than allowed by the `manaLimit`, it is rev
 
 ### Example 2
 
-A Solidity contract to estimate the used `mana` via the _new_ `manaleft()` syntax for dedicated function calls.
+A Solidity contract to estimate the used `mana` via the new `manaleft()` syntax (replacing `gasleft()`) for dedicated function calls.
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
 pragma solidity 0.8.19;
 
 contract ManaMetering {
@@ -71,6 +70,8 @@ contract ManaMetering {
     }
 }
 ```
+
+In Vyper, the same behaviour can be replicated with the new transaction property `msg.mana`, which replaces `msg.gas`.
 
 ### Example 3
 
