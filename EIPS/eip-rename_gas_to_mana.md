@@ -6,7 +6,7 @@ author: Pascal Caversaccio (@pcaversaccio)
 discussions-to: https://ethereum-magicians.org/t/rename-gas-to-mana/13570
 status: Draft
 type: Standards Track
-category: Core
+category: Interface
 created: 2023-03-27
 ---
 
