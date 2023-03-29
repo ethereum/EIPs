@@ -157,6 +157,11 @@ export default withPwa(defineConfig({
             
             pageData = { ...pageData };
             let { frontmatter } = pageData;
+            
+            let eip = pageData.relativePath.match(/(?<=^EIPS\/eip-)[\w_]+(?=.md)/)?.[0];
+            if (eip) {
+                frontmatter.eip = eip;
+            }
 
             if (frontmatter.eip == 1) { // EIP-1: Inject the most up to date EIP editor list
                 let editors = [];
