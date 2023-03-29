@@ -49,7 +49,7 @@ interface IERC5773 {
 
     function setPriority(
         uint256 tokenId,
-        uint16[] calldata priorities
+        uint64[] calldata priorities
     ) external;
 
     function getActiveAssets(
@@ -62,7 +62,7 @@ interface IERC5773 {
 
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) external view returns (uint16[] memory);
+    ) external view returns (uint64[] memory);
 
     function getAssetReplacements(
         uint256 tokenId,
