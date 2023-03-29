@@ -4,5 +4,6 @@
     "config:base",
     ":disableDependencyDashboard"
   ],
-  "prConcurrentLimit": 0
+  "prConcurrentLimit": 100,
+  "ignorePaths": ["**/assets/**"]
 }

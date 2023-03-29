@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Write PR Number - PR Target
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
+        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
         env:
           PR_NUMBER: ${{ github.event.number }}
 
