@@ -8,6 +8,7 @@ import {
   MultiAssetRenderUtils,
 } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { BigNumber } from "ethers";
 
 describe("MultiAsset", async () => {
   let token: MultiAssetTokenMock;
@@ -61,7 +62,7 @@ describe("MultiAsset", async () => {
     });
 
     it("can support IERC5773", async function () {
-      expect(await token.supportsInterface("0xd1526708")).to.equal(true);
+      expect(await token.supportsInterface("0x06b4329a")).to.equal(true);
     });
 
     it("cannot support other interfaceId", async function () {
@@ -586,11 +587,11 @@ describe("MultiAsset", async () => {
       const tokenId = 1;
       await addAssetsToToken(tokenId);
 
-      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([0, 1]);
+      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([BigNumber.from(0), BigNumber.from(1)]);
       await expect(token.setPriority(tokenId, [2, 1]))
         .to.emit(token, "AssetPrioritySet")
         .withArgs(tokenId);
-      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([2, 1]);
+      expect(await token.getActiveAssetPriorities(tokenId)).to.be.eql([BigNumber.from(2), BigNumber.from(1)]);
     });
 
     it("cannot set priorities for non owned token", async function () {

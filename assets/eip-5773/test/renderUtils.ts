@@ -64,8 +64,8 @@ describe("Render Utils", async function () {
       expect(
         await renderUtils.getActiveAssets(multiasset.address, tokenId)
       ).to.eql([
-        [resId, 10, "ipfs://res1.jpg"],
-        [resId2, 5, "ipfs://res2.jpg"],
+        [resId, BigNumber.from(10), "ipfs://res1.jpg"],
+        [resId2, BigNumber.from(5), "ipfs://res2.jpg"],
       ]);
     });
     it("can get pending assets", async function () {
