@@ -27,7 +27,7 @@
     "@types/yargs": "^17.0.8",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.5.3",
+    "ethers": "^6.1.0",
     "hardhat": "^2.8.2",
     "hardhat-deploy": "^0.9.24",
     "solc": "^0.8.11",
