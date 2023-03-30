@@ -56,13 +56,16 @@ An added advantage to this approach is to predictably find the the official cont
 -->
 
 ### Terms
+
   1. `Two-way` binding: Being able to verify what official contracts of a domain are offchain and onchain
   2. `Dapp Registry contract (DRC)`: This is a contract that is to be deployed by dapp developer that validates if a contract address is official
   3. `Registry contract`: This is a contract that maintains the mapping between domain and its DRC.
   4. `DApp Developer (DAD)`: The one who is developing the decentralised application
   
 ### Implementation
+
   The DAD must create a custom file on their domain at `/contracts.json` route. The file must return the information about the official contracts in the following structure:
+  
   ```javascript
     // Returns the array of this structure
     {
@@ -74,6 +77,7 @@ An added advantage to this approach is to predictably find the the official cont
   ```
   
   Further, DAD must deploy a DRC that has the following structure:
+  
   ```solidity
     interface IDAppRegistry {
       
@@ -82,6 +86,7 @@ An added advantage to this approach is to predictably find the the official cont
   ```
   
   We define the Registry contract as:
+  
   ```solidity
     contract DomainContractRegistry {
       struct RegistryInfo {
@@ -112,6 +117,7 @@ An added advantage to this approach is to predictably find the the official cont
        
     }
   ```
+  
   DAD must register their domain in this registry to validate domain ownership. 
 
 ## Rationale
@@ -144,6 +150,7 @@ An added advantage to this approach is to predictably find the the official cont
 No backward compatibility issues found.
 
 ## Test Cases
+
 TBD
 <!--
   This section is optional for non-Core EIPs.
@@ -155,6 +162,7 @@ TBD
 -->
 
 ## Reference Implementation
+
 TBD
 <!--
   This section is optional.
