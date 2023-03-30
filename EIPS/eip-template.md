@@ -1,7 +1,7 @@
 ---
 title: Ethereum state using a unified verkle tree
 description: This introduces a new Verkle state tree alongside the existing MPT.
-author: Vitalik Buterin (@vbuterin), Dankrad Feist (@dankrad), Kevaundray Wedderburn (@kevaundray), Guillaume Ballet (@gballet), Piper Merriam (@pipermerriam) and Gottfried Herold (@GottfriedHerold)
+author: Vitalik Buterin (@vbuterin), Dankrad Feist (@dankrad), Kevaundray Wedderburn (@kevaundray), Guillaume Ballet (@gballet), Piper Merriam (@pipermerriam), Gottfried Herold (@GottfriedHerold)
 discussions-to: https://ethereum-magicians.org/t/proposed-verkle-tree-scheme-for-ethereum-state/5805
 status: Draft
 type: Standards Track
