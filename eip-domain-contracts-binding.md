@@ -63,7 +63,7 @@ An added advantage to this approach is to predictably find the the official cont
   
 ### Implementation
   The DAD must create a custom file on their domain at `/contracts.json` route. The file must return the information about the official contracts in the following structure:
-  ```
+  ```javascript
     // Returns the array of this structure
     {
       contractAddress: "0x...abc",
@@ -73,8 +73,8 @@ An added advantage to this approach is to predictably find the the official cont
     }[]
   ```
   
-  Further, DAD must deploy deploy a DRC that has the following structure:
-  ```
+  Further, DAD must deploy a DRC that has the following structure:
+  ```solidity
     interface IDAppRegistry {
       
       function isMyContract(address _address) external view returns (bool);
@@ -82,7 +82,7 @@ An added advantage to this approach is to predictably find the the official cont
   ```
   
   We define the Registry contract as:
-  ```
+  ```solidity
     contract DomainContractRegistry {
       struct RegistryInfo {
         address dappRegistry;
@@ -94,7 +94,7 @@ An added advantage to this approach is to predictably find the the official cont
       function setDappRegistry(string memory _domain, address _dappRegistry) external {
         // check if a domain already has a dapp registry mapped
         // if yes, check if owner is same. if so, allow the change
-        // if no, revert
+        // if no, recordTransition(_domain, _dappRegistry);
         
         IDappRegistry dappRegistry = IDappRegistry(_dappRegistry);
         // Use chainlink to the call `{{domain}}/contracts.json`. 
@@ -103,6 +103,13 @@ An added advantage to this approach is to predictably find the the official cont
         
         // If all addresses match, update registryMap
       }
+      
+      // In case of a domain transfer, register that there is potential change in registry mapping
+      // and a new owner may be attempting to update registry
+      // A cool-off period is applied on the domain marking a potential transfer in ownership
+      // Cool-off period can be 7 days
+      function recordTransition(string memory _domain, address _dappRegistry) internal
+       
     }
   ```
   DAD must register their domain in this registry to validate domain ownership. 
@@ -137,7 +144,7 @@ An added advantage to this approach is to predictably find the the official cont
 No backward compatibility issues found.
 
 ## Test Cases
-
+TBD
 <!--
   This section is optional for non-Core EIPs.
 
@@ -148,7 +155,7 @@ No backward compatibility issues found.
 -->
 
 ## Reference Implementation
-
+TBD
 <!--
   This section is optional.
 
@@ -159,7 +166,6 @@ No backward compatibility issues found.
 -->
 
 ## Security Considerations
-
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
