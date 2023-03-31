@@ -18,7 +18,7 @@ A standard interface for Fungible Key Bound Tokens, also known as a Fungible **K
 
 The following standard allows for the implementation of a standard API for tokens within smart contracts and provides basic functionality to the `addBinding`[^2] function. This function creates **Key Wallets**[^3], which are used to `allowTransfer`[^4] or `allowApproval`[^5] in order to conduct a **Safe Transfer**[^6] of fungible tokens. In the process, the tokens are also safely approved so they can be spent by the user or another on-chain third-party entity.
 
-This functionality is fully optional and security features malleable to suit one's needs. To activate it, the holder must add 2 different wallets when emitting the `addBinding`[^2] function. These will be known as `_keyWallet1`[^7] and `_keyWallet2`[^8]. If the user does not activate the assets security feature, **KBTs**[^1] **Default Behavior**[^22] is the same as a traditional fungible _ERC-20_[^9] token. However, even when the security feature is activated, the standard has **Default Values**[^23] which the user can input to achieve the same result.
+This functionality is fully optional and security features malleable to suit one's needs. To activate it, the holder must add 2 different wallets when emitting the `addBinding`[^2] function. These will be known as `_keyWallet1`[^7] and `_keyWallet2`[^8]. If the user does not activate the assets security feature, **KBTs**[^1] **Default Behavior**[^22] is the same as a traditional fungible [_ERC-20_](../EIPS/eip-20.md) token. However, even when the security feature is activated, the standard has **Default Values**[^23] which the user can input to achieve the same result.
 
 We considered **KBTs**[^1] being used by every individual who wishes to add additional security to their fungible assets, as well as consignment to third-party wallets/brokers/banks/insurers. **KBTs**[^1] allow tokens to be more resilient to attacks/thefts, by providing additional protection to the asset itself on a self-custodial level.
 
@@ -656,7 +656,7 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^6]: A **Safe Transfer** is when 1 of the **Key Wallets** safely approved the use of the fungible token.
 [^7]: The `keyWallet1` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^8]: The `keyWallet2` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
-[^9]: The _ERC-20_ is the token standard for creating smart contract-enabled fungible tokens to be used in the Ethereum ecosystem. [Source](https://www.investopedia.com/news/what-erc20-and-what-does-it-mean-ethereum/#:~:text=What's%20the%20Difference%20Be)
+[^9]: The _ERC-20_ is the token standard for creating smart contract-enabled fungible tokens to be used in the Ethereum ecosystem. [Source][erc-20 link]
 [^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source](https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
 [^11]: The **Holding Wallet** refers to the wallet containing the **KBTs**.
 [^12]: The `safeFallback` function moves **KBTs** from the **Holding Wallet** to the **Key Wallet** that didn't call the `safeFallback` function.
@@ -680,6 +680,7 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^30]: The `_time` in `allowApproval` represents the number of blocks an `approve` can take place in.
 [^31]: The `_numberOfTransfers` is the number of transfers a third-party entity can conduct via `transfer` on the user's behalf.
 
+[erc-20 link]: https://www.investopedia.com/news/what-erc20-and-what-does-it-mean-ethereum/#:~:text=What's%20the%20Difference%20Be
 [kbtstandard]: https://www.kbtstandard.org/
 [ref repository]: https://github.com/KBTstandard/KBT-20
 [test cases]: https://github.com/KBTstandard/KBT-20/blob/main/test/kbt20.js
