@@ -10,8 +10,6 @@ created: 2023-03-01
 requires: 721
 ---
 
-## Simple Summary
-
 A standard interface for Non-Fungible Key Bound Tokens, also known as a Non-Fungible **KBT**[^1].
 
 ## Abstract
@@ -62,7 +60,7 @@ During the development process, the potential advantages **KBTs**[^1] explored w
 
 ## Specification
 
-### ERC721XToken (Token Contract)
+### ERC-N (Token Contract)
 
 **NOTES**:
 
@@ -577,9 +575,9 @@ Increased Confidence: With **KBTs**[^1], holders can be confident that their tok
 
 User Experience: **KBTs**[^1] optional security features improve the overall user experience and Ethereum ecosystem by ensuring a safety net for those who decide to use it. Those that do not use the security features are not hindered in any way. This safety net can increase global adoption as people can remain confident in the security of their assets, even in the scenario of a compromised wallet.
 
-_Note_: The latest developments, information, and tests for the standard can be found at the official website www.kbtstandard.org.
+_Note_: The latest developments, information, and tests for the standard can be found at the official kbtstandard.org website.
 
-## Backward Compatibility
+## Backwards Compatibility
 
 Key Bound Tokens are designed to be backward-compatible with existing token standards and wallets. Existing tokens and wallets will continue to function as normal, and will not be affected by the implementation of **KBTs**[^1].
 
@@ -595,7 +593,7 @@ Average Gas used (_GWEI_[^17] ):
 - `allowTransfer` - 50,025
 - `allowApproval` - 44,983
 
-## Implementation
+## Reference Implementation
 
 The GitHub repository [KBTstandard repository](https://github.com/KBTstandard/KBT-721) contains the implementation.
 
@@ -615,7 +613,7 @@ By redirecting the funds it prevents a single point of failure. If an attacker w
 
 Scenario: **Key Wallet**[^3] has been compromised, call `resetBindings`[^13].
 
-`resetBindings`[^13]: This function was created in the event that the owner believes `keyWallet1`[^7] or `keyWallet2`[^8] has been compromised. It can also be used if the owner losses access to one of the **Key Wallets**[^3]. In this instance, the user has the ability to call `resetBindings`[^13], removing the bound **Key Wallets**[^3] and resetting the security features. The digital asset will now function as a traditional _ERC-20_[^9] until `addBindings`[^2] is called again and a new set of **Key Wallets**[^3] are added.
+`resetBindings`[^13]: This function was created in the event that the owner believes `keyWallet1`[^7] or `keyWallet2`[^8] has been compromised. It can also be used if the owner losses access to one of the **Key Wallets**[^3]. In this instance, the user has the ability to call `resetBindings`[^13], removing the bound **Key Wallets**[^3] and resetting the security features. The digital asset will now function as a traditional _ERC-721_[^9] until `addBindings`[^2] is called again and a new set of **Key Wallets**[^3] are added.
 
 The reason why `keyWallet1`[^7] or `keyWallet2`[^8] are required to call the `resetBindings`[^13] function is because a **Holding Wallet**[^11] having the ability to call `resetBindings`[^13] could result in an immediate loss of funds. The attacker would only need to gain access to the **Holding Wallet**[^11] and call `resetBindings`[^13].
 
@@ -647,9 +645,9 @@ The `allowApproval`[^5] function requires a **Key Wallet**[^2] which enables the
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE).
+Copyright and related rights waived via [CC0](../LICENSE.md).
 
-## Footnotes
+---
 
 [^1]: The abbreviation for Key Bound Tokens is **KBTs**.
 [^2]: The `addBinding` function is used to add **Key Wallets**.
@@ -659,8 +657,8 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^6]: A **Safe Transfer** is when 1 of the **Key Wallets** safely approved the use of the non-fungible token.
 [^7]: The `keyWallet1` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^8]: The `keyWallet2` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
-[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. Source - https://www.investopedia.com/non-fungible-tokens-nft-5115211)
-[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. Source - https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
+[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. [Source](https://www.investopedia.com/non-fungible-tokens-nft-5115211)
+[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source](https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
 [^11]: The **Holding Wallet** refers to the wallet containing the **KBTs**.
 [^12]: The `safeFallback` function moves **KBTs** from the **Holding Wallet** to the **Key Wallet** that didn't call the `safeFallback` function.
 [^13]: The `resetBindings` function resets the **Key Wallets** allowing the **Holding Wallet** to add new ones.
@@ -669,8 +667,8 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^16]: The `_address` represents tha address that the asset will be sent too.
 [^17]: The denomination of the cryptocurrency ether (ETH), used on the Ethereum network to buy and sell goods and services is known as _GWEI_. [Source](<https://www.investopedia.com/terms/g/gwei-ethereum.asp#:~:text=Key%20Takeaways-,Gwei%20is%20a%20denomination%20of%20the%20cryptocurrency%20ether%20(ETH)%2C,to%20specify%20Ethereum%20gas%20prices.>)
 [^18]: Security known as _Slip-39_, describes a way to securely back up a secret value using Shamir's Secret Sharing scheme. The secret value, called a Master Secret (MS) in SLIP-39 terminology, is first encrypted by a passphrase, producing an Encrypted Master Secret (EMS). [Source](https://docs.trezor.io/trezor-firmware/core/misc/slip0039.html)
-[^19]: The amount stolen in the USA provided by FTC reports. [Source](https://www.ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight)
-[^20]: The size of FTX at the time of the collapse. [Source](https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.)
+[^19]: The amount stolen in the USA provided by FTC reports. Source - https://www.ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight
+[^20]: The size of FTX at the time of the collapse. Source - https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.
 [^21]: The amount lost in the collapse of FTX. [Source](https://www.bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall)
 [^22]: A **Default Behaviour/s** refers to bahaviour/s present in the preexisting non-fungible _ERC-721_ standard.
 [^23]: A **Default Value/s** refer to a value/s that emulates the non-fungible _ERC-721_ **Default Behaviour/s**.
