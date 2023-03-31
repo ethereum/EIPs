@@ -10,8 +10,6 @@ created: 2023-03-01
 requires: 20
 ---
 
-## Simple Summary
-
 A standard interface for Fungible Key Bound Tokens, also known as a Fungible **KBT**[^1].
 
 ## Abstract
@@ -576,7 +574,7 @@ User Experience: **KBTs**[^1] optional security features improve the overall use
 
 _Note_: The latest developments, information, and tests for the standard can be found at the official website [kbtstandard][kbtstandard].
 
-## Backward Compatibility
+## Backwards Compatibility
 
 Key Bound Tokens are designed to be backward-compatible with existing token standards and wallets. Existing tokens and wallets will continue to function as normal, and will not be affected by the implementation of **KBTs**[^1].
 
@@ -592,7 +590,7 @@ Average Gas used (_GWEI_[^17] ):
 - `allowTransfer` - 49,887
 - `allowApproval` - 44,971
 
-## Implementation
+## Reference Implementation
 
 The GitHub repository [KBTstandard repository][ref repository] contains the implementation.
 
@@ -646,7 +644,7 @@ The `allowApproval`[^5] function requires a **Key Wallet**[^2] which enables the
 
 Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE).
 
-## Footnotes
+---
 
 [^1]: The abbreviation for Key Bound Tokens is **KBTs**.
 [^2]: The `addBinding` function is used to add **Key Wallets**.
