@@ -1,12 +1,13 @@
 ---
-eip: XXXX
-title: Non-Fungible Key Bound Token Standard
+eip: 6809
+title: Non-Fungible Key Bound Token
+description: An interface for Non-Fungible Key Bound Tokens, also known as a Non-Fungible **KBT**[^1].
 author: Mihai Onila (@MihaiORO), Nick Zeman (@NickZCZ), Narcis Cotaie (@NarcisCRO)
-discussions-to: https://github.com/ethereum/EIPs/issues/xxxx
+discussions-to: https://ethereum-magicians.org/t/non-fungible-key-bound-token-kbt/13625
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-03-01
+created: 2023-03-31
 requires: 721
 ---
 
