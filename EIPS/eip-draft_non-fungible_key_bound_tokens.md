@@ -18,7 +18,7 @@ A standard interface for Non-Fungible Key Bound Tokens, also known as a Non-Fung
 
 The following standard allows for the implementation of a standard API for tokens within smart contracts and provides basic functionality to the `addBinding`[^2] function. This function creates **Key Wallets**[^3], which are used to `allowTransfer`[^4] or `allowApproval`[^5] in order to conduct a **Safe Transfer**[^6] of non-fungible tokens. In the process, the tokens are also safely approved so they can be spent by the user or another on-chain third-party entity.
 
-This functionality is fully optional and security features malleable to suit one's needs. To activate it, the holder must add 2 different wallets when emitting the `addBinding`[^2] function. These will be known as `_keyWallet1`[^7] and `_keyWallet2`[^8]. If the user does not activate the assets security feature, **KBTs**[^1] **Default Behavior**[^22] is the same as a traditional non-fungible _ERC-721_[^9] token. However, even when the security feature is activated, the standard has **Default Values**[^23] which the user can input to achieve the same result.
+This functionality is fully optional and security features malleable to suit one's needs. To activate it, the holder must add 2 different wallets when emitting the `addBinding`[^2] function. These will be known as `_keyWallet1`[^7] and `_keyWallet2`[^8]. If the user does not activate the assets security feature, **KBTs**[^1] **Default Behavior**[^22] is the same as a traditional non-fungible [_ERC-721_](https://eips.ethereum.org/EIPS/eip-721) token. However, even when the security feature is activated, the standard has **Default Values**[^23] which the user can input to achieve the same result.
 
 We considered **KBTs**[^1] being used by every individual who wishes to add additional security to their non-fungible assets, as well as consignment to third-party wallets/brokers/banks/insurers/museums. **KBTs**[^1] allow tokens to be more resilient to attacks/thefts, by providing additional protection to the asset itself on a self-custodial level.
 
@@ -659,8 +659,8 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^6]: A **Safe Transfer** is when 1 of the **Key Wallets** safely approved the use of the non-fungible token.
 [^7]: The `keyWallet1` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^8]: The `keyWallet2` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
-[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. [Source](https://www.investopedia.com/non-fungible-tokens-nft-5115211)
-[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source](https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
+[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. Source - https://www.investopedia.com/non-fungible-tokens-nft-5115211)
+[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. Source - https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
 [^11]: The **Holding Wallet** refers to the wallet containing the **KBTs**.
 [^12]: The `safeFallback` function moves **KBTs** from the **Holding Wallet** to the **Key Wallet** that didn't call the `safeFallback` function.
 [^13]: The `resetBindings` function resets the **Key Wallets** allowing the **Holding Wallet** to add new ones.
