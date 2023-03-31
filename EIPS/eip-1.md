@@ -198,7 +198,7 @@ The process governing permitted external resources is described in [EIP-5757](./
 
 ### Consensus Layer Specifications
 
-Links to the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
+Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
 
 ```markdown
 [Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
@@ -216,7 +216,7 @@ Permitted Consensus Layer Specifications URLs must anchor to a specific commit, 
 
 ### Networking Specifications
 
-Links to the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
+Links to specific commits of files within the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
 
 ```markdown
 [Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
