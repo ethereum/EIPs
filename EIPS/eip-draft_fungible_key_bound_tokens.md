@@ -574,7 +574,7 @@ Increased Confidence: With **KBTs**[^1], holders can be confident that their tok
 
 User Experience: **KBTs**[^1] optional security features improve the overall user experience and Ethereum ecosystem by ensuring a safety net for those who decide to use it. Those that do not use the security features are not hindered in any way. This safety net can increase global adoption as people can remain confident in the security of their assets, even in the scenario of a compromised wallet.
 
-_Note_: The latest developments, information, and tests for the standard can be found at the official website www.kbtstandard.org.
+_Note_: The latest developments, information, and tests for the standard can be found at the official website [kbtstandard][kbtstandard].
 
 ## Backward Compatibility
 
@@ -582,7 +582,7 @@ Key Bound Tokens are designed to be backward-compatible with existing token stan
 
 ## Test Cases
 
-The [KBTstandard repository](https://github.com/KBTstandard/KBT-20) has all the [tests](https://github.com/KBTstandard/KBT-20/blob/main/test/kbt20.js).
+The [KBTstandard repository][ref repository] has all the [tests][test cases].
 
 Average Gas used (_GWEI_[^17] ):
 
@@ -594,7 +594,7 @@ Average Gas used (_GWEI_[^17] ):
 
 ## Implementation
 
-The GitHub repository [KBTstandard repository](https://github.com/KBTstandard/KBT-20) contains the implementation.
+The GitHub repository [KBTstandard repository][ref repository] contains the implementation.
 
 ## Security Considerations
 
@@ -679,3 +679,7 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^29]: The `_allFunds` is a bool that can be set to true or false.
 [^30]: The `_time` in `allowApproval` represents the number of blocks an `approve` can take place in.
 [^31]: The `_numberOfTransfers` is the number of transfers a third-party entity can conduct via `transfer` on the user's behalf.
+
+[kbtstandard]: https://www.kbtstandard.org/
+[ref repository]: https://github.com/KBTstandard/KBT-20
+[test cases]: https://github.com/KBTstandard/KBT-20/blob/main/test/kbt20.js
