@@ -1,12 +1,13 @@
 ---
-eip: XXX
-title: Fungible Key Bound Token Standard
+eip: 6808
+title: Fungible Key Bound Token
+description: An interface for Fungible Key Bound Tokens, also known as a Fungible **KBT**[^1].
 author: Mihai Onila (@MihaiORO), Nick Zeman (@NickZCZ), Narcis Cotaie (@NarcisCRO)
-discussions-to: https://github.com/ethereum/EIPs/issues/xxx
+discussions-to: https://ethereum-magicians.org/t/fungible-key-bound-token-kbt/13624
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-03-01
+created: 2023-03-31
 requires: 20
 ---
 
@@ -572,7 +573,7 @@ Increased Confidence: With **KBTs**[^1], holders can be confident that their tok
 
 User Experience: **KBTs**[^1] optional security features improve the overall user experience and Ethereum ecosystem by ensuring a safety net for those who decide to use it. Those that do not use the security features are not hindered in any way. This safety net can increase global adoption as people can remain confident in the security of their assets, even in the scenario of a compromised wallet.
 
-_Note_: The latest developments, information, and tests for the standard can be found at the official website [kbtstandard][kbtstandard].
+_Note_: The latest developments, information, and tests for the standard can be found at the official kbtstandard.org website.
 
 ## Backwards Compatibility
 
@@ -686,9 +687,6 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [ftx url]: https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.
 [bloomberg url]: https://www.bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall
 [investopedia url 1]: https://www.investopedia.com/terms/p/proof-work.asp
-
-## [investopedia url 2]: https://www.investopedia.com/terms/p/proof-stake-pos.asp
-
-[kbtstandard]: https://www.kbtstandard.org/
+[investopedia url 2]: https://www.investopedia.com/terms/p/proof-stake-pos.asp
 [ref repository]: https://github.com/KBTstandard/KBT-20
 [test cases]: https://github.com/KBTstandard/KBT-20/blob/main/test/kbt20.js
