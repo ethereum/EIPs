@@ -657,8 +657,8 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [^6]: A **Safe Transfer** is when 1 of the **Key Wallets** safely approved the use of the non-fungible token.
 [^7]: The `keyWallet1` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^8]: The `keyWallet2` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
-[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. [Source](https://www.investopedia.com/non-fungible-tokens-nft-5115211)
-[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source](https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
+[^9]: The _ERC-721_ is the token standard for creating smart contract-enabled non-fungible tokens to be used in the Ethereum ecosystem. Source - investopedia.com/non-fungible-tokens-nft-5115211 website.
+[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. Source - vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/ website.
 [^11]: The **Holding Wallet** refers to the wallet containing the **KBTs**.
 [^12]: The `safeFallback` function moves **KBTs** from the **Holding Wallet** to the **Key Wallet** that didn't call the `safeFallback` function.
 [^13]: The `resetBindings` function resets the **Key Wallets** allowing the **Holding Wallet** to add new ones.
@@ -667,16 +667,16 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [^16]: The `_address` represents tha address that the asset will be sent too.
 [^17]: The denomination of the cryptocurrency ether (ETH), used on the Ethereum network to buy and sell goods and services is known as _GWEI_. [Source](<https://www.investopedia.com/terms/g/gwei-ethereum.asp#:~:text=Key%20Takeaways-,Gwei%20is%20a%20denomination%20of%20the%20cryptocurrency%20ether%20(ETH)%2C,to%20specify%20Ethereum%20gas%20prices.>)
 [^18]: Security known as _Slip-39_, describes a way to securely back up a secret value using Shamir's Secret Sharing scheme. The secret value, called a Master Secret (MS) in SLIP-39 terminology, is first encrypted by a passphrase, producing an Encrypted Master Secret (EMS). [Source](https://docs.trezor.io/trezor-firmware/core/misc/slip0039.html)
-[^19]: The amount stolen in the USA provided by FTC reports. Source - https://www.ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight
-[^20]: The size of FTX at the time of the collapse. Source - https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.
-[^21]: The amount lost in the collapse of FTX. [Source](https://www.bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall)
+[^19]: The amount stolen in the USA provided by FTC reports. Source - ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight website.
+[^20]: The size of FTX at the time of the collapse. Source - unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls' website.
+[^21]: The amount lost in the collapse of FTX. Source - bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall website.
 [^22]: A **Default Behaviour/s** refers to bahaviour/s present in the preexisting non-fungible _ERC-721_ standard.
 [^23]: A **Default Value/s** refer to a value/s that emulates the non-fungible _ERC-721_ **Default Behaviour/s**.
 [^24]: The _FTC_ is an abbreviation for the Federal Trades Commission in the United States of America.
 [^25]: A _NIC/s_ is a Newly Industrialized Country/Countries.
 [^26]: A _LEDC/s_ is a Less Economically Developed Country/Countries.
-[^27]: A _PoW_ protocol, Proof-of-Work protocol, is a blockchain consensus mechanism in which computing power is used to verify cryptocurrency transactions and add them to the blockchain. [Source](https://www.investopedia.com/terms/p/proof-work.asp)
-[^28]: A _PoS_ protocol, Proof-of-Stake protocol, is a cryptocurrency consensus mechanism for processing transactions and creating new blocks in a blockchain. [Source](https://www.investopedia.com/terms/p/proof-stake-pos.asp)
+[^27]: A _PoW_ protocol, Proof-of-Work protocol, is a blockchain consensus mechanism in which computing power is used to verify cryptocurrency transactions and add them to the blockchain. Source - investopedia.com/terms/p/proof-work.asp website.
+[^28]: A _PoS_ protocol, Proof-of-Stake protocol, is a cryptocurrency consensus mechanism for processing transactions and creating new blocks in a blockchain. Source - https://www.investopedia.com/terms/p/proof-stake-pos.asp website.
 [^29]: The `_allFunds` is a bool that can be set to true or false.
 [^30]: The `_time` in `allowApproval` represents the number of blocks an `approve` can take place in.
 [^31]: The `_numberOfTransfers` is the number of transfers a third-party entity can conduct via `transferFrom` on the user's behalf.
