@@ -60,7 +60,7 @@ During the development process, the potential advantages **KBTs**[^1] explored w
 
 ## Specification
 
-### ERC20XToken (Token Contract)
+### ERC-N (Token Contract)
 
 **NOTES**:
 
@@ -642,7 +642,7 @@ The `allowApproval`[^5] function requires a **Key Wallet**[^2] which enables the
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE).
+Copyright and related rights waived via [CC0](../LICENSE.md).
 
 ---
 
@@ -655,30 +655,40 @@ Copyright and related rights waived via [CC0](https://eips.ethereum.org/LICENSE)
 [^7]: The `keyWallet1` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^8]: The `keyWallet2` is 1 of the 2 **Key Wallets** set when calling the `addBinding` function.
 [^9]: The _ERC-20_ is the token standard for creating smart contract-enabled fungible tokens to be used in the Ethereum ecosystem. [Source][erc-20 link]
-[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source](https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/)
+[^10]: Security known as _BIP-39_, defines how wallets create seed phrases and generate encryption keys. [Source][vaul bip 39]
 [^11]: The **Holding Wallet** refers to the wallet containing the **KBTs**.
 [^12]: The `safeFallback` function moves **KBTs** from the **Holding Wallet** to the **Key Wallet** that didn't call the `safeFallback` function.
 [^13]: The `resetBindings` function resets the **Key Wallets** allowing the **Holding Wallet** to add new ones.
 [^14]: The `_amount` represents the amount of the asset intended to be spent.
 [^15]: The `_time` in `allowTransfer` represents the number of blocks a `transfer` can take place in.
 [^16]: The `_address` represents tha address that the asset will be sent too.
-[^17]: The denomination of the cryptocurrency ether (ETH), used on the Ethereum network to buy and sell goods and services is known as _GWEI_. [Source](<https://www.investopedia.com/terms/g/gwei-ethereum.asp#:~:text=Key%20Takeaways-,Gwei%20is%20a%20denomination%20of%20the%20cryptocurrency%20ether%20(ETH)%2C,to%20specify%20Ethereum%20gas%20prices.>)
-[^18]: Security known as _Slip-39_, describes a way to securely back up a secret value using Shamir's Secret Sharing scheme. The secret value, called a Master Secret (MS) in SLIP-39 terminology, is first encrypted by a passphrase, producing an Encrypted Master Secret (EMS). [Source](https://docs.trezor.io/trezor-firmware/core/misc/slip0039.html)
-[^19]: The amount stolen in the USA provided by FTC reports. [Source](https://www.ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight)
-[^20]: The size of FTX at the time of the collapse. [Source](https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.)
-[^21]: The amount lost in the collapse of FTX. [Source](https://www.bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall)
+[^17]: The denomination of the cryptocurrency ether (ETH), used on the Ethereum network to buy and sell goods and services is known as _GWEI_. [Source][gwei url]
+[^18]: Security known as _Slip-39_, describes a way to securely back up a secret value using Shamir's Secret Sharing scheme. The secret value, called a Master Secret (MS) in SLIP-39 terminology, is first encrypted by a passphrase, producing an Encrypted Master Secret (EMS). [Source][trezor url]
+[^19]: The amount stolen in the USA provided by FTC reports. [Source][ftc url]
+[^20]: The size of FTX at the time of the collapse. [Source][ftx url]
+[^21]: The amount lost in the collapse of FTX. [Source][bloomberg url]
 [^22]: A **Default Behaviour/s** refers to bahaviour/s present in the preexisting fungible _ERC-20_ standard.
 [^23]: A **Default Value/s** refer to a value/s that emulate the fungible _ERC-20_ **Default Behaviour/s**.
 [^24]: The _FTC_ is an abbreviation for the Federal Trades Commission in the United States of America.
 [^25]: A _NIC/s_ is a Newly Industrialized Country/Countries.
 [^26]: A _LEDC/s_ is a Less Economically Developed Country/Countries.
-[^27]: A _PoW_ protocol, Proof-of-Work protocol, is a blockchain consensus mechanism in which computing power is used to verify cryptocurrency transactions and add them to the blockchain. [Source](https://www.investopedia.com/terms/p/proof-work.asp)
-[^28]: A _PoS_ protocol, Proof-of-Stake protocol, is a cryptocurrency consensus mechanism for processing transactions and creating new blocks in a blockchain. [Source](https://www.investopedia.com/terms/p/proof-stake-pos.asp)
+[^27]: A _PoW_ protocol, Proof-of-Work protocol, is a blockchain consensus mechanism in which computing power is used to verify cryptocurrency transactions and add them to the blockchain. [Source][investopedia url 1]
+[^28]: A _PoS_ protocol, Proof-of-Stake protocol, is a cryptocurrency consensus mechanism for processing transactions and creating new blocks in a blockchain. [Source][investopedia url 2]
 [^29]: The `_allFunds` is a bool that can be set to true or false.
 [^30]: The `_time` in `allowApproval` represents the number of blocks an `approve` can take place in.
 [^31]: The `_numberOfTransfers` is the number of transfers a third-party entity can conduct via `transfer` on the user's behalf.
 
 [erc-20 link]: https://www.investopedia.com/news/what-erc20-and-what-does-it-mean-ethereum/#:~:text=What's%20the%20Difference%20Be
+[vaul bip 39]: https://vault12.com/securemycrypto/crypto-security-basics/what-is-bip39/
+[gwei url]: https://www.investopedia.com/terms/g/gwei-ethereum.asp#:~:text=Key%20Takeaways-,Gwei%20is%20a%20denomination%20of%20the%20cryptocurrency%20ether%20(ETH)%2C,to%20specify%20Ethereum%20gas%20prices.
+[trezor url]: https://docs.trezor.io/trezor-firmware/core/misc/slip0039.html
+[ftc url]: https://www.ftc.gov/business-guidance/blog/2022/06/reported-crypto-scam-losses-2021-top-1-billion-says-ftc-data-spotlight
+[ftx url]: https://www.unsw.edu.au/news/2022/11/why-the-collapse-of-ftx-is-worse-than-enron#:~:text=FTX%20was%20the%20second%20largest,complete%20failure%20of%20corporate%20controls'.
+[bloomberg url]: https://www.bloomberg.com/news/articles/2022-11-10/sam-bankman-fried-s-ftx-faces-8-billion-shortfall-possible-bankruptcy?leadSource=uverify%20wall
+[investopedia url 1]: https://www.investopedia.com/terms/p/proof-work.asp
+
+## [investopedia url 2]: https://www.investopedia.com/terms/p/proof-stake-pos.asp
+
 [kbtstandard]: https://www.kbtstandard.org/
 [ref repository]: https://github.com/KBTstandard/KBT-20
 [test cases]: https://github.com/KBTstandard/KBT-20/blob/main/test/kbt20.js
