@@ -1,13 +1,18 @@
 ---
 title: Token Mapping Slot Retrieval Extension
-description: The proposed approach in this paper suggests a technique for enhancing the precision of off-chain transaction simulations by making accessible the reserved storage location of the mapping in ERC-20/ERC-721/EIP-1155 contracts.
+description: >-
+  The proposed approach in this paper suggests a technique for enhancing the
+  precision of off-chain transaction simulations by making accessible the
+  reserved storage location of the mapping in ERC-20/ERC-721/EIP-1155 contracts.
 author: qdqd (@qd-qd) <qdqdqdqdqd@protonmail.com>
-discussions-to: https://ethereum-magicians.org/t/eip-6823-token-mapping-slot-retrieval-extension/13666
+discussions-to: >-
+  https://ethereum-magicians.org/t/eip-6823-token-mapping-slot-retrieval-extension/13666
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-03-29
 requires: 20,721,1155
+eip: draft_token_mapping_slot_retrieval_extension
 ---
 
 ## Abstract
