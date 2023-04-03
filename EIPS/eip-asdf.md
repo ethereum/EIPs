@@ -1,5 +1,4 @@
 ---
-eip: 6811
 title: Ethereum To The Moon!
 description: Makes a minimal number of changes that allow Ethereum to be used on the moon
 author: Pandapip1 (@Pandapip1)
