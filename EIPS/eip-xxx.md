@@ -1,9 +1,9 @@
 ---
-eip: tbd
+eip: 6821
 title: Support ENS Name for Web3 URL
 description: A mapping from an ENS name to the contract address in web3://
 author: Qi Zhou (@qizhou), Qiang Zhu (@qzhodl)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/eip-6821-support-ens-name-for-web3-url/13654
 status: Draft
 type: Standards Track
 category: ERC
