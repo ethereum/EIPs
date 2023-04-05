@@ -19,7 +19,7 @@ contract ERC6774 is ERC721, EIP712, IERC6774 {
 
     /// @dev set typehashes immuatable
     bytes32 public immutable override BARTER_TERMS_TYPEHASH;
-    bytes32 public immutable override COMPONANT_TYPEHASH;
+    bytes32 public immutable override COMPONENT_TYPEHASH;
 
     /// @dev users nonces to protect against replay attack
     mapping(address => uint256) private _nonces;
@@ -37,12 +37,12 @@ contract ERC6774 is ERC721, EIP712, IERC6774 {
         string memory name_,
         string memory symbol_
     ) ERC721(name_, symbol_) EIP712(name_, "1") {
-        COMPONANT_TYPEHASH = keccak256(
-            abi.encodePacked("Componant(address tokenAddr,uint256 tokenId)")
+        COMPONENT_TYPEHASH = keccak256(
+            abi.encodePacked("Component(address tokenAddr,uint256 tokenId)")
         );
         BARTER_TERMS_TYPEHASH = keccak256(
             abi.encodePacked(
-                "BarterTerms(Componant bid,Componant ask,uint256 nonce,address owner,uint48 deadline)Componant(address tokenAddr,uint256 tokenId)"
+                "BarterTerms(Component bid,Component ask,uint256 nonce,address owner,uint48 deadline)Component(address tokenAddr,uint256 tokenId)"
             )
         );
     }
@@ -202,10 +202,10 @@ contract ERC6774 is ERC721, EIP712, IERC6774 {
 
         // disgest data following EIP712
         bytes32 bidStructHash = keccak256(
-            abi.encode(COMPONANT_TYPEHASH, data.bid.tokenAddr, data.bid.tokenId)
+            abi.encode(COMPONENT_TYPEHASH, data.bid.tokenAddr, data.bid.tokenId)
         );
         bytes32 askStructHash = keccak256(
-            abi.encode(COMPONANT_TYPEHASH, data.ask.tokenAddr, data.ask.tokenId)
+            abi.encode(COMPONENT_TYPEHASH, data.ask.tokenAddr, data.ask.tokenId)
         );
 
         return

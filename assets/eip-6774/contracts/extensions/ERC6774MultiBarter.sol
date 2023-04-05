@@ -5,37 +5,37 @@ pragma solidity ^0.8.13;
 import {ERC6774, IERC6774} from "../ERC6774.sol";
 
 contract ERC6774MultiBarter is ERC6774 {
-    struct MultiComponant {
+    struct MultiComponent {
         address tokenAddr;
         uint256[] tokenIds;
     }
 
     struct MultiBarterTerms {
-        MultiComponant bid;
-        MultiComponant ask;
+        MultiComponent bid;
+        MultiComponent ask;
         uint256 nonce;
         address owner;
         uint48 deadline;
     }
 
-    /// @dev restrict barter with an empty {MultiComponant.tokenIds} array
-    error EmptyMultiComponant();
+    /// @dev restrict barter with an empty {MultiComponent.tokenIds} array
+    error EmptyMultiComponent();
 
     bytes32 public immutable MULTI_BARTER_TERMS_TYPEHASH;
-    bytes32 public immutable MULTI_COMPONANT_TYPEHASH;
+    bytes32 public immutable MULTI_COMPONENT_TYPEHASH;
 
     constructor(
         string memory _name,
         string memory _symbol
     ) ERC6774(_name, _symbol) {
-        MULTI_COMPONANT_TYPEHASH = keccak256(
+        MULTI_COMPONENT_TYPEHASH = keccak256(
             abi.encodePacked(
-                "MultiComponant(address tokenAddr,uint256[] tokenIds)"
+                "MultiComponent(address tokenAddr,uint256[] tokenIds)"
             )
         );
         MULTI_BARTER_TERMS_TYPEHASH = keccak256(
             abi.encodePacked(
-                "MultiBarterTerms(MultiComponant bid,MultiComponant ask,uint256 nonce,address owner,uint48 deadline)MultiComponant(address tokenAddr,uint256[] tokenIds)"
+                "MultiBarterTerms(MultiComponent bid,MultiComponent ask,uint256 nonce,address owner,uint48 deadline)MultiComponent(address tokenAddr,uint256[] tokenIds)"
             )
         );
     }
@@ -53,7 +53,7 @@ contract ERC6774MultiBarter is ERC6774 {
             msg.sender,
             signature
         );
-        if (data.ask.tokenIds.length == 0) revert EmptyMultiComponant();
+        if (data.ask.tokenIds.length == 0) revert EmptyMultiComponent();
 
         for (uint256 i; i < data.ask.tokenIds.length; ) {
             if (!_isApprovedOrOwner(msg.sender, data.ask.tokenIds[i]))
@@ -71,7 +71,7 @@ contract ERC6774MultiBarter is ERC6774 {
         address to,
         bytes memory signature
     ) external onlyExchangeable(msg.sender) {
-        if (data.bid.tokenIds.length == 0) revert EmptyMultiComponant();
+        if (data.bid.tokenIds.length == 0) revert EmptyMultiComponent();
         // reconstruct the hash of signed message and use nonce
         bytes32 structHash = _checkAndDisgestData(data);
 
@@ -104,14 +104,14 @@ contract ERC6774MultiBarter is ERC6774 {
         // disgest data following EIP712
         bytes32 bidStructHash = keccak256(
             abi.encode(
-                MULTI_COMPONANT_TYPEHASH,
+                MULTI_COMPONENT_TYPEHASH,
                 data.bid.tokenAddr,
                 keccak256(abi.encodePacked(data.bid.tokenIds))
             )
         );
         bytes32 askStructHash = keccak256(
             abi.encode(
-                MULTI_COMPONANT_TYPEHASH,
+                MULTI_COMPONENT_TYPEHASH,
                 data.ask.tokenAddr,
                 keccak256(abi.encodePacked(data.ask.tokenIds))
             )

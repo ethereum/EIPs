@@ -12,14 +12,14 @@ interface IERC6774 {
         bool indexed barterable
     );
 
-    struct Componant {
+    struct Component {
         address tokenAddr;
         uint256 tokenId;
     }
 
     struct BarterTerms {
-        Componant bid;
-        Componant ask;
+        Component bid;
+        Component ask;
         uint256 nonce;
         address owner;
         uint48 deadline;
@@ -28,8 +28,8 @@ interface IERC6774 {
     /// @dev Typehash of the {BarterTerms} struct
     function BARTER_TERMS_TYPEHASH() external view returns (bytes32);
 
-    /// @dev Typehash of the {Componant} struct
-    function COMPONANT_TYPEHASH() external view returns (bytes32);
+    /// @dev Typehash of the {Component} struct
+    function COMPONENT_TYPEHASH() external view returns (bytes32);
 
     /**
      * @dev return the current nonce for `account`. This value must

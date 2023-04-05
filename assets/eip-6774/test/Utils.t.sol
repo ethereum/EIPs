@@ -12,26 +12,26 @@ contract Utils {
             "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
         );
 
-    bytes32 internal constant COMPONANT_TYPEHASH =
+    bytes32 internal constant COMPONENT_TYPEHASH =
         keccak256(
-            abi.encodePacked("Componant(address tokenAddr,uint256 tokenId)")
+            abi.encodePacked("Component(address tokenAddr,uint256 tokenId)")
         );
-    bytes32 internal constant MULTI_COMPONANT_TYPEHASH =
+    bytes32 internal constant MULTI_COMPONENT_TYPEHASH =
         keccak256(
             abi.encodePacked(
-                "MultiComponant(address tokenAddr,uint256[] tokenIds)"
+                "MultiComponent(address tokenAddr,uint256[] tokenIds)"
             )
         );
     bytes32 internal constant BARTER_TERMS_TYPEHASH =
         keccak256(
             abi.encodePacked(
-                "BarterTerms(Componant bid,Componant ask,uint256 nonce,address owner,uint48 deadline)Componant(address tokenAddr,uint256 tokenId)"
+                "BarterTerms(Component bid,Component ask,uint256 nonce,address owner,uint48 deadline)Component(address tokenAddr,uint256 tokenId)"
             )
         );
     bytes32 internal constant MULTI_BARTER_TERMS_TYPEHASH =
         keccak256(
             abi.encodePacked(
-                "MultiBarterTerms(MultiComponant bid,MultiComponant ask,uint256 nonce,address owner,uint48 deadline)MultiComponant(address tokenAddr,uint256[] tokenIds)"
+                "MultiBarterTerms(MultiComponent bid,MultiComponent ask,uint256 nonce,address owner,uint48 deadline)MultiComponent(address tokenAddr,uint256[] tokenIds)"
             )
         );
 
@@ -86,17 +86,17 @@ contract Utils {
             bytes32 structHash
         )
     {
-        PermissionlessERC6774MultiBarter.Componant memory bid = IERC6774
-            .Componant({tokenAddr: bidTokenAddr, tokenId: bidTokenId});
-        PermissionlessERC6774MultiBarter.Componant memory ask = IERC6774
-            .Componant({tokenAddr: askTokenAddr, tokenId: askTokenId});
+        PermissionlessERC6774MultiBarter.Component memory bid = IERC6774
+            .Component({tokenAddr: bidTokenAddr, tokenId: bidTokenId});
+        PermissionlessERC6774MultiBarter.Component memory ask = IERC6774
+            .Component({tokenAddr: askTokenAddr, tokenId: askTokenId});
         data = IERC6774.BarterTerms(bid, ask, nonce, owner, deadline);
 
         bytes32 bidStructHash = keccak256(
-            abi.encode(COMPONANT_TYPEHASH, bidTokenAddr, bidTokenId)
+            abi.encode(COMPONENT_TYPEHASH, bidTokenAddr, bidTokenId)
         );
         bytes32 askStructHash = keccak256(
-            abi.encode(COMPONANT_TYPEHASH, askTokenAddr, askTokenId)
+            abi.encode(COMPONENT_TYPEHASH, askTokenAddr, askTokenId)
         );
         structHash = keccak256(
             abi.encode(
@@ -126,13 +126,13 @@ contract Utils {
             bytes32 structHash
         )
     {
-        PermissionlessERC6774MultiBarter.MultiComponant
-            memory bid = ERC6774MultiBarter.MultiComponant({
+        PermissionlessERC6774MultiBarter.MultiComponent
+            memory bid = ERC6774MultiBarter.MultiComponent({
                 tokenAddr: bidTokenAddr,
                 tokenIds: bidTokenIds
             });
-        PermissionlessERC6774MultiBarter.MultiComponant
-            memory ask = ERC6774MultiBarter.MultiComponant({
+        PermissionlessERC6774MultiBarter.MultiComponent
+            memory ask = ERC6774MultiBarter.MultiComponent({
                 tokenAddr: askTokenAddr,
                 tokenIds: askTokenIds
             });
@@ -146,14 +146,14 @@ contract Utils {
 
         bytes32 bidStructHash = keccak256(
             abi.encode(
-                MULTI_COMPONANT_TYPEHASH,
+                MULTI_COMPONENT_TYPEHASH,
                 bidTokenAddr,
                 keccak256(abi.encodePacked(bidTokenIds))
             )
         );
         bytes32 askStructHash = keccak256(
             abi.encode(
-                MULTI_COMPONANT_TYPEHASH,
+                MULTI_COMPONENT_TYPEHASH,
                 askTokenAddr,
                 keccak256(abi.encodePacked(askTokenIds))
             )

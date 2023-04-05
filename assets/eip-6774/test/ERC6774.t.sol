@@ -274,7 +274,7 @@ contract ERC6774_test is Test, Utils {
         ) = workaround_User4TryWithEmptyBid();
 
         vm.prank(USER3);
-        vm.expectRevert(abi.encodeWithSignature("EmptyMultiComponant()"));
+        vm.expectRevert(abi.encodeWithSignature("EmptyMultiComponent()"));
         ticket.barter(data, signature);
     }
 
