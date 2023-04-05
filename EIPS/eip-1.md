@@ -248,24 +248,6 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
 ```
 
-### Ethereum Yellow Paper
-
-Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
-
-```markdown
-[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
-```
-
-Which renders to:
-
-[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
-
-Permitted Ethereum Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
-
-```regex
-^(https://github.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/.*|https://github.com/ethereum/yellowpaper/tree/[0-9a-f]{40}/.*)$
-```
-
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
