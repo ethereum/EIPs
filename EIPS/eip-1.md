@@ -216,6 +216,24 @@ Permitted Consensus Layer Specifications URLs must anchor to a specific commit, 
 ^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
 ```
 
+### Ethereum Yellow Paper
+
+Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
+```
+
+Which renders to:
+
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/1016c0603062b76388e3c3c19786cd5f9ca9ac61/paper.pdf)
+
+Permitted Ethereum Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/.*|https://github.com/ethereum/yellowpaper/tree/[0-9a-f]{40}/.*)$
+```
+
 ### Networking Specifications
 
 Links to specific commits of files within the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
