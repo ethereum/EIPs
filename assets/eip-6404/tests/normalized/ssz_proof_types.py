@@ -3,8 +3,6 @@ from remerkleable.complex import Vector
 from ssz_tx_types import *
 from proof_helpers import *
 
-CHAIN_ID_INDEX = 3
-
 # Proof 1: Obtain the sequential `tx_index` within an `ExecutionPayload` for a specific `tx_hash`
 
 class TransactionProof(Container):

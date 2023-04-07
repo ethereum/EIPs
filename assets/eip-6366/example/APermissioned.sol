@@ -55,7 +55,7 @@ contract APermissioned {
      * @dev Allow the actor who has required permission
      */
     modifier allowOwner(uint256 _required) {
-        if (!opt.permissionRequire(_required, opt.permissionOf(msg.sender))) {
+        if (!opt.permissionRequire(opt.permissionOf(msg.sender), _required)) {
             revert IEIP6366Error.AccessDenied(
                 msg.sender,
                 msg.sender,
@@ -71,8 +71,8 @@ contract APermissioned {
     modifier notBlacklisted() {
         if (
             opt.permissionRequire(
-                PERMISSION_DENIED,
-                opt.permissionOf(msg.sender)
+                opt.permissionOf(msg.sender),
+                PERMISSION_DENIED
             )
         ) {
             revert IEIP6366Error.AccessDenied(

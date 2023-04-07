@@ -88,3 +88,12 @@ h1 a {
   height: 100%;
   object-fit: cover;
 }
+
+@media print {
+
+  header,
+  footer {
+    display: none;
+  }
+}
+
