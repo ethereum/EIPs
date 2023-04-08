@@ -7,7 +7,6 @@ interface IERC6059 {
     struct DirectOwner {
         uint256 tokenId;
         address ownerAddress;
-        bool isNft;
     }
 
     event NestTransfer(
