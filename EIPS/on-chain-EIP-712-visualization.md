@@ -1,7 +1,7 @@
 ---
 eip: <to be assigned>
-title: on-chain EIP-712 Visualization 
-description: on-chain visualization of EIP-712 payloads into structured data that highlights the potential consequences for users' assets 
+title: on-chain EIP-712 Visualization
+description: on-chain visualization of EIP-712 payloads into structured data that highlights the potential consequences for users' assets
 author: Abderrahmen Hanafi (@a6-dou)
 discussions-to: https://ethereum-magicians.org/
 status: Draft
@@ -13,7 +13,7 @@ requires: 712
 
 ## Abstract
 
-Numerous protocols employ distinct EIP-712 schemas, leading to unavoidable inconsistencies across the ecosystem. To address this issue, we propose a standardized approach for dApps to implement an on-chain view function called `visualizeEIP712Message`. This function takes an abi encoded EIP-712 payload message as input and returns a universally agreed-upon structured data format that emphasizes the potential impact on users' assets. Wallets can then display this structured data in a user-friendly manner, ensuring a consistent experience for end-users when interacting with various dApps and protocols.
+Numerous protocols employ distinct [EIP-712](./eip-712.md) schemas, leading to unavoidable inconsistencies across the ecosystem. To address this issue, we propose a standardized approach for dApps to implement an on-chain view function called `visualizeEIP712Message`. This function takes an abi encoded EIP-712 payload message as input and returns a universally agreed-upon structured data format that emphasizes the potential impact on users' assets. Wallets can then display this structured data in a user-friendly manner, ensuring a consistent experience for end-users when interacting with various dApps and protocols.
 
 ## Motivation
 
