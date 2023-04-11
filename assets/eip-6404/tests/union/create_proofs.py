@@ -1,3 +1,5 @@
+from os import mkdir
+from shutil import rmtree
 from ssz_proof_types import *
 from convert_transactions import *
 
@@ -243,8 +245,19 @@ info_proofs = [
 ]
 
 if __name__ == '__main__':
+    dir = os_path.join(os_path.dirname(os_path.realpath(__file__)), 'proofs')
+    if os_path.exists(dir) and os_path.isdir(dir):
+        rmtree(dir)
+    mkdir(dir)
+
     print('transactions_root')
     print(f'0x{transactions_root.hex()}')
+    file = open(os_path.join(dir, f'transactions_root.ssz'), 'wb')
+    file.write(transactions_root)
+    file.close()
+
+    file = open(os_path.join(dir, f'nil_0.ssz'), 'wb')
+    file.close()
 
     for tx_index in range(len(transactions)):
         print()
@@ -252,15 +265,27 @@ if __name__ == '__main__':
         encoded = transaction_proofs[tx_index].encode_bytes()
         print(f'{tx_index} - TransactionProof - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(encoded.hex())
+        file = open(os_path.join(dir, f'transaction_{tx_index}.ssz'), 'wb')
+        file.write(encoded)
+        file.close()
 
         encoded = amount_proofs[tx_index].encode_bytes()
         print(f'{tx_index} - AmountProof - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(encoded.hex())
+        file = open(os_path.join(dir, f'amount_{tx_index}.ssz'), 'wb')
+        file.write(encoded)
+        file.close()
 
         encoded = sender_proofs[tx_index].encode_bytes()
         print(f'{tx_index} - SenderProof - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(encoded.hex())
+        file = open(os_path.join(dir, f'sender_{tx_index}.ssz'), 'wb')
+        file.write(encoded)
+        file.close()
 
         encoded = info_proofs[tx_index].encode_bytes()
         print(f'{tx_index} - InfoProof - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(encoded.hex())
+        file = open(os_path.join(dir, f'info_{tx_index}.ssz'), 'wb')
+        file.write(encoded)
+        file.close()

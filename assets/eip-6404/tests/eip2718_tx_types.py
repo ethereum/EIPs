@@ -1,5 +1,5 @@
 from eth_hash.auto import keccak
-from remerkleable.basic import boolean, uint8, uint64, uint256
+from remerkleable.basic import boolean, uint8, uint32, uint64, uint256
 from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32, Bytes48
 from remerkleable.complex import Container, List, Vector
 from remerkleable.union import Union
@@ -257,6 +257,8 @@ class TransactionLimits(Container):
     gas: uint64
 
 class TransactionInfo(Container):
+    tx_index: uint32
+    tx_hash: Hash32
     tx_from: ExecutionAddress
     nonce: uint64
     tx_to: DestinationAddress

@@ -1,3 +1,4 @@
+from remerkleable.settings import zero_hashes
 from secp256k1 import ECDSA, PublicKey
 from create_proofs import *
 
@@ -81,6 +82,7 @@ def verify_amount_proof(
                     proof.tx_proof.value().startgas.hash_tree_root(),
                     proof.tx_proof.value().to.hash_tree_root(),
                     proof.tx_proof.value().value.hash_tree_root(),
+                    zero_hashes[1],
                 ],
                 proof.tx_proof.value().multi_branch,
                 LEGACY_AMOUNT_PROOF_INDICES,
@@ -164,6 +166,7 @@ def verify_sender_proof(
                     proof.tx_proof.value().startgas.hash_tree_root(),
                     proof.tx_proof.value().to.hash_tree_root(),
                     proof.tx_proof.value().value.hash_tree_root(),
+                    zero_hashes[1],
                 ],
                 proof.tx_proof.value().multi_branch,
                 LEGACY_SENDER_PROOF_INDICES,
@@ -181,7 +184,8 @@ def verify_sender_proof(
         0x01 if signature.y_parity else 0,
     )
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_root, recover_sig, raw=True))
-    tx_from = ExecutionAddress(keccak(public_key.serialize())[12:32])
+    uncompressed = public_key.serialize(compressed=False)
+    tx_from = ExecutionAddress(keccak(uncompressed)[12:32])
 
     tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
     assert calculate_multi_merkle_root(
@@ -216,14 +220,17 @@ def verify_info_proof(
                     proof.tx_proof.value().gas.hash_tree_root(),
                     proof.tx_proof.value().to.hash_tree_root(),
                     proof.tx_proof.value().value.hash_tree_root(),
+                    cfg.chain_id.hash_tree_root(),
                 ],
                 proof.tx_proof.value().multi_branch,
                 EIP4844_INFO_PROOF_INDICES,
                 EIP4844_INFO_PROOF_HELPER_INDICES,
             )
+            print(sig_root.hex())
             to = proof.tx_proof.value().to
             signature = proof.tx_proof.value().signature
             info = TransactionInfo(
+                tx_index=proof.tx_index,
                 nonce=proof.tx_proof.value().nonce,
                 tx_value=proof.tx_proof.value().value,
                 limits=TransactionLimits(
@@ -241,6 +248,7 @@ def verify_info_proof(
                     proof.tx_proof.value().gas_limit.hash_tree_root(),
                     proof.tx_proof.value().destination.hash_tree_root(),
                     proof.tx_proof.value().amount.hash_tree_root(),
+                    cfg.chain_id.hash_tree_root(),
                 ],
                 proof.tx_proof.value().multi_branch,
                 EIP1559_INFO_PROOF_INDICES,
@@ -249,6 +257,7 @@ def verify_info_proof(
             to = proof.tx_proof.value().destination
             signature = proof.tx_proof.value().signature
             info = TransactionInfo(
+                tx_index=proof.tx_index,
                 nonce=proof.tx_proof.value().nonce,
                 tx_value=proof.tx_proof.value().amount,
                 limits=TransactionLimits(
@@ -265,6 +274,7 @@ def verify_info_proof(
                     proof.tx_proof.value().gas_limit.hash_tree_root(),
                     proof.tx_proof.value().to.hash_tree_root(),
                     proof.tx_proof.value().value.hash_tree_root(),
+                    cfg.chain_id.hash_tree_root(),
                 ],
                 proof.tx_proof.value().multi_branch,
                 EIP2930_INFO_PROOF_INDICES,
@@ -273,6 +283,7 @@ def verify_info_proof(
             to = proof.tx_proof.value().to
             signature = proof.tx_proof.value().signature
             info = TransactionInfo(
+                tx_index=proof.tx_index,
                 nonce=proof.tx_proof.value().nonce,
                 tx_value=proof.tx_proof.value().value,
                 limits=TransactionLimits(
@@ -289,6 +300,7 @@ def verify_info_proof(
                     proof.tx_proof.value().startgas.hash_tree_root(),
                     proof.tx_proof.value().to.hash_tree_root(),
                     proof.tx_proof.value().value.hash_tree_root(),
+                    zero_hashes[1],
                 ],
                 proof.tx_proof.value().multi_branch,
                 LEGACY_INFO_PROOF_INDICES,
@@ -301,6 +313,7 @@ def verify_info_proof(
                 s = proof.tx_proof.value().signature.s,
             )
             info = TransactionInfo(
+                tx_index=proof.tx_index,
                 nonce=proof.tx_proof.value().nonce,
                 tx_value=proof.tx_proof.value().value,
                 limits=TransactionLimits(
@@ -316,7 +329,8 @@ def verify_info_proof(
         0x01 if signature.y_parity else 0,
     )
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_root, recover_sig, raw=True))
-    info.tx_from = ExecutionAddress(keccak(public_key.serialize())[12:32])
+    uncompressed = public_key.serialize(compressed=False)
+    info.tx_from = ExecutionAddress(keccak(uncompressed)[12:32])
 
     match to.selector():
         case 1:
@@ -330,17 +344,28 @@ def verify_info_proof(
                 address=compute_contract_address(info.tx_from, info.nonce),
             )
 
-    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
-    assert calculate_multi_merkle_root(
+    info.tx_hash = calculate_multi_merkle_root(
         [
             sig_root,
             proof.tx_proof.value().signature.hash_tree_root(),
+        ],
+        [],
+        [
+            GeneralizedIndex(2),
+            GeneralizedIndex(3),
+        ],
+        [],
+    )
+
+    tx_gindex = GeneralizedIndex(MAX_TRANSACTIONS_PER_PAYLOAD * 2 + uint64(proof.tx_index))
+    assert calculate_multi_merkle_root(
+        [
+            info.tx_hash.hash_tree_root(),
             uint8(proof.tx_proof.selector()).hash_tree_root(),
         ],
         proof.tx_branch,
         [
-            tx_gindex * 4 + 0,
-            tx_gindex * 4 + 1,
+            tx_gindex * 2 + 0,
             tx_gindex * 2 + 1,
         ],
         get_helper_indices([tx_gindex]),

@@ -368,7 +368,7 @@ describe("EquippableTokenMock with Slots", async () => {
       await loadFixture(slotsFixture));
   });
 
-  it("can support IEquippable", async function () {
+  it("can support IERC6220", async function () {
     expect(await soldier.supportsInterface("0x28bc9ae4")).to.equal(true);
   });
 
