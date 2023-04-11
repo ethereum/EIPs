@@ -1,5 +1,5 @@
 ---
-eip: 6811
+eip: <to be assigned>
 title: on-chain EIP-712 Visualization 
 description: on-chain visualization of EIP-712 payloads into structured data that highlights the potential consequences for users' assets 
 author: Abderrahmen Hanafi (@a6-dou)
@@ -31,11 +31,11 @@ The adoption of a universal solution will not only streamline the efforts and re
 
 currently, most of the wallets display something similar to image below
 
-![](../assets/eip-6811/current-EIP-712-signature-wallet-interface.png)
+![](../assets/on-chain-EIP-712-visualization/current-EIP-712-signature-wallet-interface.png)
 
 with visualization we can achieve something similar to image below where more insightful details are revealed to user thanks to the structured data returned from the EIP
 
-![](../assets/eip-6811/vision-EIP-712-signature-wallet-interface.png)
+![](../assets/on-chain-EIP-712-visualization/vision-EIP-712-signature-wallet-interface.png)
 
 ## Specification
 
@@ -139,7 +139,7 @@ No backward compatibility issues found.
 
 ## Reference Implementation
 
-openSea Seaport NFT marketplace implementation example is available [here](../assets//eip-6811/contracts/SeaPortEIP712Visualizer.sol)
+openSea Seaport NFT marketplace implementation example is available [here](../assets/on-chain-EIP-712-visualization/contracts/SeaPortEIP712Visualizer.sol)
 
 ## Security Considerations
 
