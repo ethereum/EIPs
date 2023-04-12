@@ -21,16 +21,16 @@ A standard interface allows any tokens on Ethereum to be re-used by other applic
 
 ## Specification
 
-## Token
+### Token
 
-### Methods
+#### Methods
 
 **NOTES**:
 
  - The following specifications use syntax from Solidity `0.4.17` (or above)
  - Callers MUST handle `false` from `returns (bool success)`.  Callers MUST NOT assume that `false` is never returned!
 
-#### name
+##### name
 
 Returns the name of the token - e.g. `"MyToken"`.
 
@@ -41,7 +41,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 function name() public view returns (string)
 ```
 
-#### symbol
+##### symbol
 
 Returns the symbol of the token. E.g. "HIX".
 
@@ -52,7 +52,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 function symbol() public view returns (string)
 ```
 
-#### decimals
+##### decimals
 
 Returns the number of decimals the token uses - e.g. `8`, means to divide the token amount by `100000000` to get its user representation.
 
@@ -63,7 +63,7 @@ but interfaces and other contracts MUST NOT expect these values to be present.
 function decimals() public view returns (uint8)
 ```
 
-#### totalSupply
+##### totalSupply
 
 Returns the total token supply.
 
@@ -71,7 +71,7 @@ Returns the total token supply.
 function totalSupply() public view returns (uint256)
 ```
 
-#### balanceOf
+##### balanceOf
 
 Returns the account balance of another account with address `_owner`.
 
@@ -79,7 +79,7 @@ Returns the account balance of another account with address `_owner`.
 function balanceOf(address _owner) public view returns (uint256 balance)
 ```
 
-#### transfer
+##### transfer
 
 Transfers `_value` amount of tokens to address `_to`, and MUST fire the `Transfer` event.
 The function SHOULD `throw` if the message caller's account balance does not have enough tokens to spend.
@@ -90,7 +90,7 @@ The function SHOULD `throw` if the message caller's account balance does not hav
 function transfer(address _to, uint256 _value) public returns (bool success)
 ```
 
-#### transferFrom
+##### transferFrom
 
 Transfers `_value` amount of tokens from address `_from` to address `_to`, and MUST fire the `Transfer` event.
 
@@ -104,7 +104,7 @@ The function SHOULD `throw` unless the `_from` account has deliberately authoriz
 function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
 ```
 
-#### approve
+##### approve
 
 Allows `_spender` to withdraw from your account multiple times, up to the `_value` amount. If this function is called again it overwrites the current allowance with `_value`.
 
@@ -117,7 +117,7 @@ THOUGH The contract itself shouldn't enforce it, to allow backwards compatibilit
 function approve(address _spender, uint256 _value) public returns (bool success)
 ```
 
-#### allowance
+##### allowance
 
 Returns the amount which `_spender` is still allowed to withdraw from `_owner`.
 
@@ -125,9 +125,9 @@ Returns the amount which `_spender` is still allowed to withdraw from `_owner`.
 function allowance(address _owner, address _spender) public view returns (uint256 remaining)
 ```
 
-### Events
+#### Events
 
-#### Transfer
+##### Transfer
 
 MUST trigger when tokens are transferred, including zero value transfers.
 
@@ -137,23 +137,13 @@ A token contract which creates new tokens SHOULD trigger a Transfer event with t
 event Transfer(address indexed _from, address indexed _to, uint256 _value)
 ```
 
-#### Approval
+##### Approval
 
 MUST trigger on any successful call to `approve(address _spender, uint256 _value)`.
 
 ``` js
 event Approval(address indexed _owner, address indexed _spender, uint256 _value)
 ```
-
-## Rationale
-
-### The approve and transferFrom flow
-
-`approve` and `transferFrom` can be used in conjunction with one another to allow smart contracts to take an action if and only if a transfer succeeds. This enables use cases such as decentralized exchanges, which can trustlessly swap one token for another.
-
-### Decimals is optional
-
-Some tokens might wish to use a base unit other than $10^{-18}$, and sometimes it doesn't make sense to have a fraction of a token. However, not every token might reasonably need to specify `decimals`. Thus, `decimals` is optional.
 
 ## Backwards Compatibility
 
