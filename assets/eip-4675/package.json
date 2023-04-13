@@ -23,7 +23,7 @@
     "@openzeppelin/contracts": "^4.4.1",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^17.0.8",
+    "@types/node": "^18.14.6",
     "@types/yargs": "^17.0.8",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.4.0",
