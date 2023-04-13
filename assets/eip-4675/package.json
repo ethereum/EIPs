@@ -26,7 +26,7 @@
     "@types/node": "^18.14.6",
     "@types/yargs": "^17.0.8",
     "chai": "^4.3.4",
-    "ethereum-waffle": "^3.4.0",
+    "ethereum-waffle": "^4.0.10",
     "ethers": "^5.5.3",
     "hardhat": "^2.8.2",
     "hardhat-deploy": "^0.9.24",
