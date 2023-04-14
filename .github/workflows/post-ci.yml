@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch PR Data
-        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
           name: pr_number
           workflow: ci.yml
