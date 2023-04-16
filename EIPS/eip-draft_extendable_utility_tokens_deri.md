@@ -1,4 +1,5 @@
 ---
+eip: .nan
 title: Extendable Utility Tokens Derived from Origin NFTs
 description: Structure and interface to increase the utility of Origin NFTs without transferring Origin NFTs
 author: JB Won (@hypeodive), Geonwoo Shin(@0xdagarn), Jeniffer Lee(@)
