@@ -8,6 +8,7 @@
     "**/assets/**"
   ],
   "ignoreDeps": [
-    "**/jekyll-label-action"
+    "Pandapip1/jekyll-label-action",
+    "ethereum/eipw-action
   ]
 }
