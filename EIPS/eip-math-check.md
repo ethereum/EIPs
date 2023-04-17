@@ -3,11 +3,11 @@ eip: NaN
 title: Math checking in EVM
 description: Check for math underflows overflows and division by zero at EVM level
 author: Renan Rodrigues de Souza (@RenanSouza2)
-discussions-to: -
+discussions-to: https://ethereum-magicians.org/t/eip-math-checking/13846
 status: Draft
 type: Standards Track
 category: Core
-created: -
+created: 2023-04-16
 ---
 
 ## Abstract
