@@ -93,7 +93,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
-A PR moving an EIP from one status to another MUST contain no changes other than the status update. Any other changes MUST be submitted in one or more separate PRs.
+A PR moving an EIP from one status to another MUST contain no changes other than the status update. Any other changes MUST be submitted in one or more separate PRs. When the content of an EIP changes, the git branch of any PR that changes the status of that EIP MUST be updated to reflect the current version.
 
 ## What belongs in a successful EIP?
 
