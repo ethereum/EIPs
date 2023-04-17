@@ -195,9 +195,7 @@ A `requires` dependency is created when the current EIP cannot be understood or 
 EIPs may have a `adoptable` header. There are a two options available:
 
 - `false`: No changes.
-- `true`: Marking a proposal as `adoptable: true` allows _anyone_, with editor permission, to champion the proposal should it become `Stagnant`. Specifically, any editor can merge anyone else's PR that only changes the `status` header of the EIP from `Stagnant` to `Draft`. 
-
-
+- `any`: If the EIP stagnantes, any individual can choose to champion the EIP, subject to the approval of an editor. Specifically, this permits any editor to merge a pull request submitted by any other person, so long as that pull request only changes a proposal's `status` header from `Stagnant` to `Draft`, and appends the individual's name as a co-author, and as long as that proposal has `adoptable: any` set.
 
 ## Linking to External Resources
 
