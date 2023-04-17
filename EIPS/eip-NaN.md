@@ -1,5 +1,5 @@
 ---
-eip: NaN
+eip: .nan
 title: Math checking in EVM
 description: Check for math underflows overflows and division by zero at EVM level
 author: Renan Rodrigues de Souza (@RenanSouza2)
