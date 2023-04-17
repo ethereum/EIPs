@@ -4,5 +4,11 @@
     "config:base",
     ":disableDependencyDashboard"
   ],
-  "ignorePaths": ["**/assets/**"]
+  "ignorePaths": [
+    "**/assets/**"
+  ],
+  "ignoreDeps": [
+    "Pandapip1/jekyll-label-action",
+    "ethereum/eipw-action"
+  ]
 }
