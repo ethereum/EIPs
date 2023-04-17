@@ -12,7 +12,7 @@ created: -
 
 ## Abstract
 
-This EIP adds many math checking to EVM arithmetic. The list includes underflows, overflows, division by zero (FINISH HERE). A new opcode is added to get the flags and clean them.
+This EIP adds many math checking to EVM arithmetic. The list includes underflows, overflows, division by zero. A new opcode is added to get the flags and clean them.
 
 ## Motivation
 
