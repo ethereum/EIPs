@@ -4,5 +4,10 @@
     "config:base",
     ":disableDependencyDashboard"
   ],
-  "ignorePaths": ["**/assets/**"]
+  "ignorePaths": [
+    "**/assets/**"
+  ],
+  "ignoreDeps": [
+    "**/jekyll-label-action"
+  ]
 }
