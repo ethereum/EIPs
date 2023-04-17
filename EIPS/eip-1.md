@@ -192,7 +192,12 @@ A `requires` dependency is created when the current EIP cannot be understood or 
 
 #### `adoptable` header
 
-EIPs may have a `adoptable` header. If this is `true`, then any PR changing `status` from `Stagnant` to a non-final state no longer requires author approval (instead only requiring editor approval.) Marking a proposal as `adoptable` allows _anyone_ to edit the author list and take over the proposal should it become stagnant. Marking proposals as `adoptable` is recommended.
+EIPs may have a `adoptable` header. There are a two options available:
+
+- `false`: No changes.
+- `true`: Marking a proposal as `adoptable: true` allows _anyone_, with editor permission, to champion the proposal should it become `Stagnant`. Specifically, any editor can merge anyone else's PR that only changes the `status` header of the EIP from `Stagnant` to `Draft`. 
+
+
 
 ## Linking to External Resources
 
