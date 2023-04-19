@@ -56,6 +56,10 @@ Lastly, the proposed transfer-mechanism has two major side-benefits, which drast
 This comes with the only "disadvantage" we see; funding for all transactions need to be provided through the issuing/transferring smart contract.
 
 
+**CONCEPT IDEA; Limit transfers of Tokens, with each attestation granting you one transfer. For strictly Digital Soul (TM) settings, no messing with transfersLeftPerToken[tokenId]**
+
+Benefit of current solution; transferAnchor no longer access-controlled, hence, the transferrer can pay for gas!
+
 ## Specification
 
 <!--
@@ -68,20 +72,67 @@ This comes with the only "disadvantage" we see; funding for all transactions nee
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-### Physical Object
-- MUST comprise an `ANCHOR`, acting as the unique physical object identifier, typically a serial number (plain (NOT RECOMMENDED) or hashed (RECOMMENDED))
-- MUST comprise a physical security device, marking or any other feature that enables proofing physical presence for `ATTESTATION` through the `ORACLE`
-- Is RECOMMENDED to employ `ANCHOR` technologies featuring irreproducible security features.
-- In general it is NOT RECOMMENDED to employ `ANCHOR` technologies that can easily be replicated (e.g. barcodes, "ordinary" NFC chips, .. ). Replication includes physical and digital replication.
+### Definitions
+
+- `ASSET` refers to the "thing", being it physical or digital, which is represented through NFTs according to the proposed standard.
+- `CONTROLLING THE ASSET` ... TODO [_in physical proximity to the physical asset_]
+- An `ANCHOR` uniquely identifies an off-chain asset, being it physical (Refer Specification for Phygitals) or digital.
+- An `ORACLE` has signing capabilities and one or more `ORACLES` are trusted by the Smart Contract.
+
 
 ### ORACLE
-- MUST provide an `ATTESTATION`. Below we define the format (the `ATTESTATION`), how the oracle testifies that the `to` address of a transfer has been specified in physical proximity to the physical object associated with the particular `ANCHOR` that is being transferred.
+- MUST provide an `ATTESTATION`. Below we define the format (the `ATTESTATION`), how the oracle testifies that the `to` address of a transfer has been specified under the pre-condition of `CONTROLLING` the asset associated with the particular `ANCHOR` that is being transferred.
 - The `ATTESTATION` MUST contain 
   - `to`, MUST be address 
-  - `anchor`, MUST be 1:1 mappable to a physical object
+  - `anchor`, MUST be 1:1 mappable to the `ASSET`
   - `attestationTime`, (MUST be UTC milliseconds)
-  - `attestationId` (MUST identify each `ATTESTATION` ever issued by `ORACLE`, including `ATTESTATION`s never used on-chain. Hashing is RECOMMENDED to obfuscate the total number of conducted `ATTESTATION`s)
+  - `expireTime`, (MUST be UTC milliseconds)
+  - OPTIONAL additional data
 
+### Smart contract
+- MUST implement ERC-721 interface
+- RECOMMENDED to implement the ERC-721 Enumerable interface
+- MUST ensure tokens only eixist for valid `ANCHOR` exists.
+- MUST define a `MAX_ATTESTATION_EXPIRE_TIME`, which is enforced in case an ORACLE's expireTime is bigger.
+- MUST have bidirectional mapping `tokenPerAnchor[anchor]` and `anchorPerToken[token]`. This implies that a maximum of one token per `ANCHOR` exists.
+- MUST have a `transfersPerAnchor[anchor]`, recording how often a particular `ANCHOR` has been transferred. This counter needs to be prevailed, even if the `ÀNCHOR` is wrapped into different tokens (e.g. when burning and re-issuing a token)
+- MUST have a `unboundTransfersLeft[tokenId]`, indiciating how often a token can be transferred independently of an anchor, i.e. without ATTESTATION. 
+  - 0 for each tokenId per default. 
+  - This may also be used to implement a "temporary" decoupling of tokens, which is not subject to this standard.
+- MUST implement a mechanism `validAnchor(anchor, ...)` to ensure an ANCHOR passed through attestation is valid, i.e. is on the "list" of valid anchors. RECOMMENDED to implement this through Merkle-Trees, i.e. `validAnchor(anchor, proof)`.
+- MUST implement `validAttestation(...)`, which MUST only return `true` when
+  - `ATTESTATION` originates from a trusted `ORACLE`. It is RECOMMENDED to verify this by using access control to specify a trusted `ORACLE` and gating `validAttestation()` with those access control mechanism. e.g. use any of the well known `onlyOwner()`, `onlyRole(ORACLE_ROLE)`, ... modifiers.
+  - `ATTESTATION` has not expired yet, computed as `curTime() - ATTESTATION.attestationTime <= MIN(MAX_ATTESTATION_EXPIRE_TIME, ATTESTATION.expireTime)`
+  - `ATTESTATION` has not already been used. "Used" being defined in a transfer has been made using an `ATTESTATION` with the same `attestationId`
+  - `validAnchor(anchor, ...) == True`
+- MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
+  - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE) 
+  - MUST immutably define one of the above listed modes expose it via `transferLimitUpdateMode()`
+  - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (when `transferLimitUpdateMode() != FIXED`)
+- MUST implement `transfersLeft(anchor)`, returning the number of transfers left (i.e. `transferLimit(anchor)-transfersPerAnchor[anchor]`) for a particular anchor
+- MUST implement `isNonTransferable(tokenId)` (from IERC6454) which MUST return true when 
+  - unboundTransfersLeft[tokenId]<= 0, indicating ANCHOR-independent transferrability of the token.
+  - `transferBlocked[anchorPerToken[tokenId]] == true`
+  - OR any other OPTIONAL blocking condition applies
+- MAY overload `transferBlocked(tokenId)` with `transferBlocked(anchor)`
+- MUST extend ERC-721 token transfer mechanisms by adding additional conditions to i.e. `transferFrom`, `safeTransferFrom` and RECOMMENDED to implement that through ERC721 `_beforeTokenTransfer` hook which
+  - MUST throw when `isNonTransferable(anchor[tokenId])` returns `true`.
+  - MUST decrement `allowedUnanchoredTransfers[tokenId]`
+- MUST implement `transferAnchor(anchor, to, {attestation})` which
+  - MUST store the `attestationId` used to authorize each token transfer
+  - MUST throw when `validAttestation(..) == false`
+   - MUST increment `transfersPerAnchor[anchor]`, whenever an token associated `token[anchor]` has been transferred through this method
+  - RECOMMENDED (when using the recommended `_beforeTokenTransfer` hook) to increment `allowedUnanchoredTransfers[tokenId]` allowing to pass the hook (which will decrease it again, hence maintaining the status quo)
+  - MUST either
+    - call `_safeTransferFrom(ownerOf(tokenPerAnchor[anchor]), to, tokenPerAnchor[anchor])` when `tokenPerAnchor[anchor]` exists
+    - or create a new token wrapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `token[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
+
+- RECOMMENDED to implement transferable(tokenId), isSoulbound(tokenId), ... indicating the UNANCHORED Transferability. TODO reference ERCs from Discord.
+
+
+
+## Specification for Phygitals
+### ORACLE
 - Issuing an `ATTESTATION` requires that the `ORACLE`
   - MUST proof physical proximity between an input device (e.g. smartphone) specifying the `to` address and a particular physical `ANCHOR` and it's associated physical object. Typical acceptable proximity is ranges between some millimeters to several meters. 
   - The physical presence MUST be verified beyond reasonable doubt, in particular the employed method 
@@ -90,33 +141,27 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   - MUST be implemented under the assumption that the party defining the `to` address has malicious intent and to acquire false `ATTESTATION`, without currently or ever having access to the physical object comprising the physical `ANCHOR`.
 
 
-### Smart contract
-- MUST implement ERC-721 interface
-- RECOMMENDED to implement the ERC-721 Enumerable interface
-- MUST have bidirectional mapping `token[anchor]` and `anchor[token]`. This implies that a maximum of one token per `ANCHOR` exists.
-- MUST have a `transfersPerAnchor[anchor]`, recording how often a particular `ANCHOR` has been transferred. This counter needs to be prevailed, even if the `ÀNCHOR` is wrapped into different tokens (e.g. when burning and re-issuing a token)
-- MUST implement `validAttestation()`, which MUST only return `true` when
-  - `ATTESTATION` originates from a trusted `ORACLE`. It is RECOMMENDED to verify this by using access control to specify a trusted `ORACLE` and gating `validAttestation()` with those access control mechanism. e.g. use any of the well known `onlyOwner()`, `onlyRole(ORACLE_ROLE)`, ... modifiers.
-  - `ATTESTATION` has not expired yet, based on `attestationTime` and a defined `attestationExpiryTime`
-  - `ATTESTATION` has not already been used. "Used" being defined in a transfer has been made using an `ATTESTATION` with the same `attestationId`
-- MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
-  - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE) 
-  - MUST immutably define one of the above listed modes expose it via `transferLimitUpdateMode()`
-  - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (when `transferLimitUpdateMode() != FIXED`)
-- MUST implement `transfersLeft(anchor)`, returning the number of transfers left (i.e. `transferLimit(anchor)-transfersPerAnchor[anchor]`) for a particular anchor
-- MUST implement `transferBlocked(tokenId)`, returning `true` when 
-  - `transfersLeft(token[anchor]) <= 0`
-  - OR any other OPTIONAL blocking condition applies
-- MAY overload `transferBlocked(tokenId)` with `transferBlocked(anchor)`
-- MUST extend ERC-721 token transfer mechanisms, i.e. `Transfer`, `transferFrom`, `safeTransferFrom` defining additionally conditions for all mentioned, i.e.
-  - MUST throw when `validAttestation(..)` returns `false`
-  - MUST throw when `transferBlocked(anchor[tokenId])` returns `true`.
-  - MUST store the `attestationId` used to authorize each token transfer
-  - MUST increment `transfersPerAnchor[anchor]`, whenever an token associated `token[anchor]` has been transferred
-  - _TODO Double-check whether this enforces 1:1 relationship or whether zombie-tokens can occur, i.e. there is still an unburned token left representing the same anchor, but not recorded in `token[anchor]` nor in `anchor[token]`.
-- MUST implement `transferAnchor(anchor, to, {attestation})` which either
-  - MUST call `safeTransferFrom(ownerOf(token[anchor]), to, token[anchor])` when `token[anchor]` exists
-  - or MUST create a new token wrapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `token[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
+### Physical Object
+- MUST comprise an `ANCHOR`, acting as the unique physical object identifier, typically a serial number (plain (NOT RECOMMENDED) or hashed (RECOMMENDED))
+- MUST comprise a physical security device, marking or any other feature that enables proofing physical presence for `ATTESTATION` through the `ORACLE`
+- Is RECOMMENDED to employ `ANCHOR` technologies featuring irreproducible security features.
+- In general it is NOT RECOMMENDED to employ `ANCHOR` technologies that can easily be replicated (e.g. barcodes, "ordinary" NFC chips, .. ). Replication includes physical and digital replication.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -------------------------- TODO WORDING AND CONSIDERING  ------- 
 
