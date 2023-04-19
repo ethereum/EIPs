@@ -2,7 +2,7 @@
 title: Modular Smart Contract Accounts and Plugins
 description: An interface for modular smart contract accounts with plugins.
 author: Adam Egyed (@adamegyed), Fangting Liu (@trinity-0111)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-modular-smart-contract-accounts-and-plugins/13885
 status: Draft
 type: Standards Track
 category: ERC
@@ -12,7 +12,7 @@ requires: 4337
 
 ## Abstract
 
-This proposal standardizes smart contract accounts and account plugins, which are smart contract interfaces that allow for composable logic within smart contract accounts. This proposal is compliant with ERC-4337, and builds on the existing work from ERC-2535 when defining interfaces for updating and querying modular function implementations.
+This proposal standardizes smart contract accounts and account plugins, which are smart contract interfaces that allow for composable logic within smart contract accounts. This proposal is compliant with [ERC-4337](./eip-4337.md), and builds on the existing work from [ERC-2535](./eip-2535.md) when defining interfaces for updating and querying modular function implementations.
 
 Goals:
 
