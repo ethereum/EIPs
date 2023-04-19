@@ -1,0 +1,74 @@
+---
+eip: <to be assigned>
+title: SETCODE instruction
+author: William Morriss (@wjmelements)
+discussions-to: <to be assigned>
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-04-20
+---
+
+## Abstract
+Introduce the `SETCODE` (`0x49`) instruction, which replaces the code of the current executing address from memory.
+Future calls to the modified contract use the new code.
+
+## Motivation
+Many contracts are upgradeable in order to facilitate improvement or defer decisions without migrating to a new address.
+Contracts presently do this in several ways:
+
+The oldest method uses `CALL`.
+The limitation of this method is that owned state must be modifiable by all future implementations.
+
+Second, `DELEGATECALL` can proxy the implementation.
+Some proxies are minimal while others branch to many separate implementation accounts.
+This method can also bypass account code size limits.
+
+A third method uses `SELFDESTRUCT` and `CREATE2` to replace code in-place.
+This method improves upon the prior methods by removing the need to call into external contracts.
+One limitation of this method is that any internal state is removed by `SELFDESTRUCT`.
+Another limitation is that `SELFDESTRUCT` does not remove code until the end of the transaction, sacrificing availability until `CREATE2` can complete the upgrade.
+
+Given the upcoming deprecation of `SELFDESTRUCT`, `SETCODE` introduces a better method for replacing code in-place.
+
+## Specification
+When inside of a `CREATE`-like execution scope that returns new code for the executing address (the account returned by `ADDRESS`), `SETCODE` causes an exceptional abort.
+Otherwise, `SETCODE` consumes two words from the stack: offset and length.
+These specify a range of memory containing the new code.
+Any validations that would be performed on the result of `CREATE` or `CREATE2` occur immediately, potentially causing failure with exceptional abort.
+Code replacement is deferred; the current execution scope and its children proceed before code replacement.
+After the current execution scope exits successfully (neither reverting nor aborting), the code in the executing account is replaced.
+Like `SSTORE`, this account modification will be reverted if a parent scope reverts or aborts.
+Unlike `SELFDESTRUCT`, `SETCODE` does not clear account balance or storage.
+
+Multiple `SETCODE` operations inside the same execution scope are allowed and replace the pending replacement.
+
+A `SELFDESTRUCT` operation discards the pending code.
+
+### Gas
+The gas cost of this operation is the sum of G<sub>selfdestruct</sub> and the product of G<sub>codedeposit</sub> and the number of bytes in the new code.
+
+## Rationale
+The gas cost of `SETCODE` is comparable to `CREATE` but excludes G<sub>create</sub> because no execution context is created, nor any new account.
+Other account modification costs are accounted for outside of execution gas.
+
+Unlike `SELFDESTRUCT`, execution proceeds normally after `SETCODE` in order to allow return data.
+
+## Backwards Compatibility
+The only prior operation changing code is `SELFDESTRUCT`.
+`SELFDESTRUCT` remains compatible by discarding any pending replacement code.
+
+## Test Cases
+| CodeStart            | CallData         | CodeResult           | Gas  |
+|----------------------|------------------|----------------------|------|
+| 365f5f37365f4900     | 365f5f37365f4900 | 365f5f37365f4900     | 6613 |
+| 365f5f37365f4900     | 00               | 00                   | 5213 |
+| 365f5f37365f4900     |                  |                      | 5013 |
+| 365f5f37365f49595ffd | 365f5f37365f4900 | 365f5f37365f49595ffd | 6617 |
+| 365f5f37365f49fe     | 365f5f37365f4900 | 365f5f37365f49fe     |  all |
+
+## Implementation
+TODO
+
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
