@@ -29,7 +29,7 @@ However, managing multiple wallet instances provides a worse user experience, fr
 
 We propose a standard that coordinates the implementation work between plugin developers and wallet developers. This standard defines a modular smart contract account capable of supporting all standard-conformant plugins. This allows users to have greater portability of their data, and for plugin developers to not have to choose specific wallet implementations to support.
 
-![MSCA Shared Components Diagram](https://drive.google.com/uc?export=view&id=1NFl0KLuomK5W0623Ky6oA6U9HSeDx3zO)
+<img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png">
 
 We take inspiration from ERC-2535’s diamond pattern and extend it to plugins in order to provide a similar set of functions to add, update, remove, and inspect plugins. Much like ERC-2535’s facets, these plugins contain execution logic. They also incorporate validation schemes and other associated functions or hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. By combining these new contract interfaces with the interfaces defined in ERC-2535, accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
@@ -62,7 +62,7 @@ A smart contract account handles two kinds of calls: one from `Entrypoint` throu
 
 A call to the smart contract account can be decomposed into 4 steps as shown in the diagram below. The validation step (Step 1) validates if the caller is allowed to call. The pre execution hook step (Step 2) can be used to do any pre execution checks or updates. It can also be used with the post execution hook step (Step 4) to perform certain verifications. The execution step (Step 3) performs a performs a call-defined task or collection of tasks.
 
-![MSCA Two Call Paths Diagram](https://drive.google.com/uc?export=view&id=134UgCY8oH1IGrLe4TFoDQOagOVsnadhr)
+<img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Two_Call_Paths_Diagram.png">
 
 Each step is modularized and can have different combinations and infinite functionalities. **The smart contract account should orchestrate the above 4 steps.** For example, a MSCA has a fallback functions that orchestrate the above 4 steps for the account.
 
