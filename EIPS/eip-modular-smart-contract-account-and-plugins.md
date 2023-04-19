@@ -29,6 +29,8 @@ However, managing multiple wallet instances provides a worse user experience, fr
 
 We propose a standard that coordinates the implementation work between plugin developers and wallet developers. This standard defines a modular smart contract account capable of supporting all standard-conformant plugins. This allows users to have greater portability of their data, and for plugin developers to not have to choose specific wallet implementations to support.
 
+![MSCA Shared Components Diagram](https://drive.google.com/uc?export=view&id=1NFl0KLuomK5W0623Ky6oA6U9HSeDx3zO)
+
 We take inspiration from ERC-2535’s diamond pattern and extend it to plugins in order to provide a similar set of functions to add, update, remove, and inspect plugins. Much like ERC-2535’s facets, these plugins contain execution logic. They also incorporate validation schemes and other associated functions or hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. By combining these new contract interfaces with the interfaces defined in ERC-2535, accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
 Defining this as a standard for smart contract accounts will make plugins easier to develop securely and will allow for greater interoperability.
@@ -41,93 +43,116 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - An **account** (or **smart contract account, SCA**) is a smart contract that can be used to send transactions and hold digital assets. It implements the `IAccount` interface from ERC-4337.
 - A **modular account** (or **modular smart contract account, MSCA**) is an account that supports modular functions. There are three types of modular functions:
-    - **Validation functions** validate the caller’s authenticity and authority to the account.
-    - **Execution functions** execute any custom logic allowed by the account.
-    - **Hooks** execute custom logic and checks before and/or after an execution function.
+  - **Validation functions** validate the caller’s authenticity and authority to the account.
+  - **Execution functions** execute any custom logic allowed by the account.
+  - **Hooks** execute custom logic and checks before and/or after an execution function.
 - A **validation function** is a function that validates authentication and authorization of a caller to the account. There are two types of validation functions:
-    - **User Operation Validator** functions handle calls to `validateUserOp` and check the validity of an ERC-4337 user operation. The function may have any function name, but MUST take in the parameters `(UserOperation calldata, bytes32, uint256)`, representing the user operation, user operation hash, and required prefund. It MUST return `(uint256)`, representing packed validation data for `authorizer`, `validUntil`, and `validAfter`.
-    - **Runtime Validator** functions run before an execution function, and enforce checks. Common checks include enforcing only calls from `EntryPoint` or an owner.
+  - **User Operation Validator** functions handle calls to `validateUserOp` and check the validity of an ERC-4337 user operation. The function may have any function name, but MUST take in the parameters `(UserOperation calldata, bytes32, uint256)`, representing the user operation, user operation hash, and required prefund. It MUST return `(uint256)`, representing packed validation data for `authorizer`, `validUntil`, and `validAfter`.
+  - **Runtime Validator** functions run before an execution function, and enforce checks. Common checks include enforcing only calls from `EntryPoint` or an owner.
 - An **execution function** is a smart contract function that defines execution for a **modular account**. Much like existing proxy standards, execution functions are run in the context of the account using `delegatecall`.
 - A **hook** is a smart contract function executed before or after an **execution function**, with the ability to modify state or cause the entire call to revert. There are two types of **hooks**.
-    - **preHook** functions run before an **execution function;**. They map optionally return data to be consumed the **postHook**.
-    - **postHook** functions run after an **execution function**. They can optionally take  returned data from **preHook**.
+  - **preHook** functions run before an **execution function;**. They map optionally return data to be consumed the **postHook**.
+  - **postHook** functions run after an **execution function**. They can optionally take returned data from **preHook**.
 - **Associated function** refers to either a validation function or a hook.
 - A **plugin** is a deployed smart contract that hosts any amount of the above three kinds of modular functions: execution functions, validation functions, or hooks.
+
+### Overview
+
+A smart contract account handles two kinds of calls: one from `Entrypoint` through ERC-4337, the other are direct calls from EOA and other smart contracts. The proposal supports both use cases.
+
+A call to the smart contract account can be decomposed into 4 steps as shown in the diagram below. The validation step (Step 1) validates if the caller is allowed to call. The pre execution hook step (Step 2) can be used to do any pre execution checks or updates. It can also be used with the post execution hook step (Step 4) to perform certain verifications. The execution step (Step 3) performs a performs a call-defined task or collection of tasks.
+
+![MSCA Two Call Paths Diagram](https://drive.google.com/uc?export=view&id=134UgCY8oH1IGrLe4TFoDQOagOVsnadhr)
+
+Each step is modularized and can have different combinations and infinite functionalities. **The smart contract account should orchestrate the above 4 steps.** For example, a MSCA has a fallback functions that orchestrate the above 4 steps for the account.
 
 ### Interfaces
 
 Account interface. Modular Smart Contract Accounts MUST implement this interface to support ERC-4337 and view functions.
 
-`IAccount.sol`    
+`IAccount.sol`
+
 > ```solidity
 > interface IAccount {
 >     /**
->         * Validate user's signature and nonce
->         * the entryPoint will make the call to the recipient only if this validation call returns successfully.
->         * signature failure should be reported by returning SIG_VALIDATION_FAILED (1).
->         * This allows making a "simulation call" without a valid signature
->         * Other failures (e.g. nonce mismatch, or invalid signature format) should still revert to signal failure.
->         *
->         * @dev Must validate caller is the entryPoint.
->         *      Must validate the signature and nonce
->         * @param userOp the operation that is about to be executed.
->         * @param userOpHash hash of the user's request data. can be used as the basis for signature.
->         * @param missingAccountFunds missing funds on the account's deposit in the entrypoint.
->         *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.
->         *      The excess is left as a deposit in the entrypoint, for future calls.
->         *      can be withdrawn anytime using "entryPoint.withdrawTo()"
->         *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.
->         * @return validationData packaged ValidationData structure. use `_packValidationData` and `_unpackValidationData` to encode and decode
->         *      <20-byte> sigAuthorizer - 0 for valid signature, 1 to mark signature failure,
->         *         otherwise, an address of an "authorizer" contract.
->         *      <6-byte> validUntil - last timestamp this operation is valid. 0 for "indefinite"
->         *      <6-byte> validAfter - first timestamp this operation is valid
->         *      If an account doesn't use time-range, it is enough to return SIG_VALIDATION_FAILED value (1) for signature failure.
->         *      Note that the validation code cannot use block.timestamp (or block.number) directly.
->         */
+>      * Validate user's signature and nonce
+>      * the entryPoint will make the call to the recipient only if this validation call returns successfully.
+>      * signature failure should be reported by returning SIG_VALIDATION_FAILED (1).
+>      * This allows making a "simulation call" without a valid signature
+>      * Other failures (e.g. nonce mismatch, or invalid signature format) should still revert to signal failure.
+>      *
+>      * @dev Must validate caller is the entryPoint.
+>      *      Must validate the signature and nonce
+>      * @param userOp the operation that is about to be executed.
+>      * @param userOpHash hash of the user's request data. can be used as the basis for signature.
+>      * @param missingAccountFunds missing funds on the account's deposit in the entrypoint.
+>      *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.
+>      *      The excess is left as a deposit in the entrypoint, for future calls.
+>      *      can be withdrawn anytime using "entryPoint.withdrawTo()"
+>      *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.
+>      * @return validationData packaged ValidationData structure. use `_packValidationData` and `_unpackValidationData` to encode and decode
+>      *      <20-byte> sigAuthorizer - 0 for valid signature, 1 to mark signature failure,
+>      *         otherwise, an address of an "authorizer" contract.
+>      *      <6-byte> validUntil - last timestamp this operation is valid. 0 for "indefinite"
+>      *      <6-byte> validAfter - first timestamp this operation is valid
+>      *      If an account doesn't use time-range, it is enough to return SIG_VALIDATION_FAILED value (1) for signature failure.
+>      *      Note that the validation code cannot use block.timestamp (or block.number) directly.
+>      */
 >     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
 >     external returns (uint256 validationData);
+>
+>     /**
+>      * @notice Add/replace/remove any number of global plugins and optionally execute
+>      *         a function with delegatecall
+>      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
+>      * @param init The address of the contract or facet to execute calldata
+>      * @param callData A function call, including function selector and arguments
+>      *                  calldata is executed with delegatecall on init
+>      */
+>    function updateGlobalPlugins(AssociatedFunction[] memory globalPluginUpdates, address init, bytes calldata callData)
+>        external;
 > }
 > ```
 
 Plugin modification interface. Modular Smart Contract Accounts MAY implement this interface to support updates to plugins.
 
-`IPluginUpdate.sol`    
+`IPluginUpdate.sol`
+
 > ```solidity
 > interface IPluginUpdate {
-> 
+>
 >     enum PluginAction {
 >         ADD,
 >         REPLACE,
 >         REMOVE
 >     }
-> 
+>
 >     enum AssociatedFunctionType {
->         USER_OP_VALIDATION,
->         RUNTIME_VALIDATION,
+>         USER_OP_VALIDATOR,
+>         RUNTIME_VALIDATOR,
 >         PRE_HOOK,
 >         POST_HOOK
 >     }
-> 
+>
 >     struct PluginUpdate {
 >         address executionPluginAddress;
 >         PluginAction action;
 >         ExecutionUpdate[] executionUpdates;
 >     }
-> 
+>
 >     struct ExecutionUpdate {
 >         bytes4 executionSelector;
 >         AssociatedFunction[] associatedFunctions;
 >     }
-> 
+>
 >     struct AssociatedFunction {
 >         AssociatedFunctionType functionType;
 >         address implAddress;
 >         bytes4 implSelector;
 >     }
-> 
+>
 >     event PluginsUpdated(PluginUpdate[] pluginUpdates, address init, bytes callData);
-> 
+>
 >     /**
 >         * @notice Add/replace/remove any number of plugins and optionally execute
 >         *         a function with delegatecall
@@ -145,15 +170,16 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 
 Plugin inspection interface. Modular Smart Contract Accounts MUST implement this interface to support visibility in plugin configuration.
 
-`IPluginLoupe.sol`    
+`IPluginLoupe.sol`
+
 > ```solidity
 > interface IPluginLoupe {
-> 
+>
 >     struct PluginInfo {
 >         address executionPluginAddress;
 >         FunctionConfig[] configs;
 >     }
-> 
+>
 >     struct FunctionConfig {
 >         bytes4 executionSelector;
 >         FunctionReference userOpValidator;
@@ -161,23 +187,24 @@ Plugin inspection interface. Modular Smart Contract Accounts MUST implement this
 >         FunctionReference preHook;
 >         FunctionReference postHook;
 >     }
-> 
+>
 >     struct FunctionReference {
 >         address implAddress;
 >         bytes4 implSelector;
 >     }
-> 
+>
 >     function getPlugins() external view returns (PluginInfo[] memory);
-> 
+>
 >     function getPlugin(address executionPluginAddress) external view returns (FunctionConfig[] memory functions);
-> 
+>
 >     function getFunctionConfig(bytes4 executionSelector) external view returns (FunctionConfig memory);
 > }
 > ```
 
-Plugins MUST implement the following interface.
+Plugin interface. Plugins MUST implement the following interface.
 
-`IPlugin.sol` 
+`IPlugin.sol`
+
 ```solidity
 interface IPlugin {
   // Returns the starting storage slot owned by the plugin.
@@ -189,23 +216,62 @@ interface IPlugin {
 
 ### Expected behavior
 
-**Plugins**
+**Calls to** `updatePlugins`
+
+The function `updatePlugins` takes in an array of updates to perform, and an optional initialization function. The function MUST perform the update operation sequentially, then, if the address provided in `init` is not `address(0)`, MUST `delegatecall` into `init` with the calldata `callData`.
+
+> :warning: The ability to update a plugin is very powerful. The security of the updatePlugins determines the security of the account. It is critical for Account builders to make sure updatePlugins has the proper security consideration and access control in place.
+
+**Calls to `validateUserOp`**
+
+When the function `validateUserOp` is called on an MSCA by the `EntryPoint`, it MUST find the user operation validator defined for the selector in `userOp.callData`, which is in the first four bytes. If there is no function defined for the selector, or if `userOp.callData.length < 4`, then execution MUST revert. Otherwise, the MSCA MUST `delegatecall` the validator function with the user operation, its hash, and the required prefund as parameters. The returned validation data from the user operation validator MUST be returned by `validateUserOp`.
+
+**Calls to execution functions**
+
+When a function other than `validateUserOp` is called on an MSCA, it MUST find the plugin configuration for the corresponding selector added via `updatePlugins`. If no corresponding plugin is found, the MSCA MUST revert. Otherwise, the MSCA MUST perform the following steps:
+
+- If a `runtimeValidator` function is defined, `delegatecall` into the function with the execution function’s calldata as parameter.
+- If there are global `preHook`s, `delegatecall` into the each with the execution function’s calldata.
+- If an associated `preHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` returns data, it MUST be preserved until the call to `postHook`.
+- `delegatecall` into the execution function.
+- If an associated `postHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` function returned data, the MSCA MUST pass that data in to `postHook`.
+- If there are global `postHook`s, `delegatecall` into the each with the execution function’s calldata.
+
+> :warning: If the execution function does not have a definition for either `runtimeValidator`, `preHook`, or `postHook`, the undefined functions will be skipped. The execution function will be executed and it may change account state.
+
+> :bulb: If, during the execution of `runtimeValidator`, the caller can be established as the EntryPoint contract, it is guaranteed the associated user operation validator has returned a valid signature. Validation MAY be skipped.
+
+**Plugin update operations**
+
+When `updatePlugins` is called with `PluginAction.ADD`, the following MUST occur:
+
+- Each `executionSelector` must be added their parent `executionPluginAddress` as a valid implementation contract to forward calls to.
+- Each `AssociatedFunction` must be added to their parent execution function in the role specified by `associatedFunctionType`.
+
+Execution function selectors MUST be unique when added.
+
+When `updatePlugins` is called with `PluginAction.REPLACE`, each `executionSelector` MUST override any previous execution definition for said function selector. Any associated function defined MUST override previously defined function selectors. Existing associated functions not specified in this operation MUST NOT be modified.
+
+When `updatePlugins` is called with `PluginAction.REMOVE`, both execution function definitions and associated function definitions MUST be removed. The contents of the `associatedFunctions` array MUST be ignored.
+
+When adding a plugin function of any type, the MSCA MAY call `pluginStorageRoot()` on the plugin. If the returned `bytes32` value has ever been returned by a previously added plugin, the MSCA MAY revert and reject the operation.
+
+**Plugins Storage Management**
 
 Plugins MAY access the storage of other plugins. If a plugin does not have any plugin-specific storage, it MUST return `0` for the method `pluginStorageRoot()`.
 
 Plugin contracts MUST NOT define or access storage structs growing from slot 0.
 
-Plugin storage management is managed by plugin implementations. Storage management may be done through statically linked Solidity libraries. 
+Plugin storage management is managed by plugin implementations. Here is an example where storage management is done through statically linked Solidity libraries.
 
-`LibMyPlugin.sol`    
+`LibMyPlugin.sol`
+
 ```solidity
 library LibMyPlugin {
     bytes32 constant MY_PLUGIN_POSITION = keccak256("plugin.standard.my.plugin");
-
     struct MyPluginStorage {
         // Any storage fields you need
     }
-
     // Return my plugin storage struct for reading and writing
     function getStorage() internal pure returns (MyPluginStorage storage storageStruct) {
         bytes32 position = MY_PLUGIN_POSITION;
@@ -216,42 +282,6 @@ library LibMyPlugin {
 }
 ```
 
-**Calls to `validateUserOp`**
-
-When the function `validateUserOp` is called on an MSCA by the `EntryPoint`, it MUST find the user operation validator defined for the selector in `userOp.callData`, which is in the first four bytes. If there is no function defined for the selector, or if `userOp.callData.length < 4`, then execution MUST revert. Otherwise, the MSCA MUST `delegatecall` the validator function with the user operation, its hash, and the required prefund as parameters. The returned validation data from the user operation validator MUST be returned by `validateUserOp`.
-
-**Calls to execution functions**
-
-When a function other than `validateUserOp` is called on an MSCA, it MUST find the plugin configuration for the corresponding selector added via `updatePlugins`. If no corresponding plugin is found, the MSCA MUST revert. Otherwise, the MSCA MUST perform the following steps:
-
-- If a `runtimeValidation` function is defined, `delegatecall` into the function with the execution function’s calldata as parameter.
-- If a `preHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` returns data, it MUST be preserved until the call to `postHook`.
-- `delegatecall` into the execution function.
-- If a `postHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` function returned data, the MSCA MUST pass that data in to `postHook`.
-
-If the execution function does not have a definition for either `runtimeValidator`, `preHook`, or `postHook`, the undefined functions will be skipped. The execution function will be executed and it may change account state.
-
-If, during the execution of `runtimeValidation`, the caller can be established as the EntryPoint contract, it is guaranteed the associated user operation validator has returned a valid signature.
-
-**Calls to** `updatePlugins`
-
-The function `updatePlugins` takes in an array of updates to perform, and an optional initialization function. The function MUST perform the update operation sequentially, then, if the address provided in `init` is not `address(0)`, MUST `delegatecall` into `init` with the calldata `callData`.
-
-**Plugin update operations** 
-
-When `updatePlugins` is called with `PluginAction.ADD`, the following MUST occur:
-
-- Each `executionSelector` must be added their parent `executionPluginAddress` as a valid implementation contract to forward calls to.
-- Each `AssociatedFunction` must be added to their parent execution function in the role specified by `associatedFunctionType`.
-
-Execution function selectors MUST be unique when added.
-
-When `updatePlugins` is called with `PluginAction.REPLACE`, each `executionSelector` MUST override any previous execution definition for said function selector. Any associated function defined MUST override previously defined function selectors. Existing associated functions not specified in this operation MUST NOT be modified. 
-
-When `updatePlugins` is called with `PluginAction.REMOVE`, both execution function definitions and associated function definitions MUST be removed. The contents of the `associatedFunctions` array MUST be ignored.
-
-When adding a plugin function of any type, the MSCA MAY call `pluginStorageRoot()` on the plugin. If the returned `bytes32` value has ever been returned by a previously added plugin, the MSCA MAY revert and reject the operation.
-
 **Plugin Functions**
 
 Execution functions may have any function signature, but must be unique for the account. When added to an MSCA via `updatePlugins`, the function selector of the execution function will be mapped from the modular account to the plugin.
@@ -259,20 +289,20 @@ Execution functions may have any function signature, but must be unique for the 
 User Operation Validation functions may have any function name, and MUST take in the parameters `(UserOperation calldata, bytes32)`, representing the user operation and the user operation hash. The functions MUST return `(uint256)`, representing packed validation data for `authorizer`, `validUntil`, and `validAfter`.
 
 > Here is an example function signature of a conformant user operation validator function:
-> 
+>
 > ```solidity
 > function validateSignature(UserOperation calldata userOp, bytes32 userOpHash) external returns (uint256 validationData);
 > ```
 
-Runtime Validation Functions may have any function name, and MUST take in the parameters `(bytes calldata)`. 
+Runtime Validation Functions may have any function name, and MUST take in the parameters `(bytes calldata)`.
 
 > Here is an example function signature of a conformant runtime validator function:
-> 
+>
 > ```solidity
 > function validateOwnership(bytes calldata) external;
 > ```
 
-Hooks may have any function name. 
+Hooks may have any function name.
 
 The preHook function MUST take in the parameters `(bytes calldata data)` and return `(bytes calldata preHookReturnedData)`.
 
