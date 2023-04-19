@@ -1,0 +1,84 @@
+---
+eip: tbd
+title: Versioned TokenId Standard for Dynamic NFTs
+author: James Wenzel (emo.eth, @emo_eth)
+discussions-to: https://ethereum-magicians.org/t/tbd
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-04-19
+requires: 721
+---
+
+## Simple Summary
+This EIP proposes an extension to the EIP-721 non-fungible token standard by introducing a Versioned TokenId standard for "dynamic" NFTs with on or offchain properties that may change over time. The new `versionedTokenId` is meant to track both the "identifier" of a token as well as its current "version" so that old outstanding orders and approvals for updated tokens are automatically invalidated.
+
+## Abstract
+The key change this EIP makes to the EIP-721 standard is the introduction of Versioned TokenIds. A `uint256 versionedTokenId` MUST encode both the true token "identifier" along with a "version number". Encoding details should be left up to individual token implementations.
+
+When any onchain action occurs that changes a dynamic token's metadata (on or offchain), the token contract MUST emit a transfer event for the current `versionedTokenId` from the current owner to the null address (i.e., "burning" the old token). It also then MUST emit a transfer event of an updated `versionedTokenId` (which encodes the new "version number" and the same "identifier") from the null address to the original owner. The actual encoded token "identifier" MUST not change, and the encoded "version number" MUST change.
+
+## Motivation
+The primary motivation for this EIP is to prevent unintentional sales or approved transfers of tokens whose metadata has been updated, while maintaining backward compatibility with all known marketplaces. 
+
+Currently, if a token has a metadata update that makes it subjectively more or less valuable, all open orders, bids, and asks will still be valid. This standard aims to prevent malicious or unintended sales and previously approved transfers of NFTs after they have been changed on or offchain. By implementing this EIP, developers can create NFTs that automatically update their `versionedTokenId` when metadata changes occur, which will invalidate open orders and ensure that only the latest version of a token is used in onchain transactions.
+
+## Specification
+
+### Methods
+
+#### getCurrentVersionedTokenId
+
+```solidity
+function getCurrentVersionedTokenId(uint256 tokenId) external view returns (uint256);
+```
+
+This method MUST return the current Versioned TokenId for the "identifier" encoded by a given `tokenId`. 
+
+It MUST revert if passed a `tokenId` with an invalid or non-existent "identifier." 
+
+It MUST return the current "version number" for the "identifier" encoded by the `tokenId`.
+
+It MUST NOT revert if the encoded "version number" is incorrect or outdated. This is to ensure it is always possible to find the current "version number" for a given token, even with an out-of-date or otherwise incorrect `versionedTokenId` (so long as the encoded "identifier" is valid).
+
+Implementation details about storage and retrieval of versioned token IDs SHOULD be left up to individual implementations.
+
+
+Since some NFT marketplaces allow for bulk-signing of up to millions of orders, token developers who anticipate many metadata updates for their token SHOULD make individual token "version numbers" non-incremental but monotonically increasing. They SHOULD use a method of deriving new "version numbers" that makes it difficult or impossible to anticipate future `versionedTokenIds` far in advance, in order to make bulk signature phishing impractical. 
+
+As an example, one method would be to use the current BLOCKHASH or PREVRANDAO to increment the current version number, truncated to the desired number of bits. While BLOCKHASH and PREVRANDAO are deterministic and able to be influenced, they are impractical to predict indefinitely far in advance, and are not easily influenced by a single actor.
+
+
+### Changes to EIP-721 Methods
+The following methods from EIP-721 MUST be updated to handle `versionedTokenIds`:
+
+```solidity
+function approve(address, uint256) external;
+
+function getApproved(uint256) external returns (address) external view;
+
+function ownerOf(uint256) external returns (address) external view;
+
+function transferFrom(address, address, uint256) external;
+
+function safeTransferFrom(address, address, uint256) external;
+
+function safeTransferFrom(address, address, uint256, bytes) external;
+
+function tokenURI(uint256) external view returns (string); // from the optional ERC721Metadata extension
+```
+
+Each method MUST revert when called with a `versionedTokenId` that encodes an incorrect or outdated "version number". Each method SHOULD behave normally when called with a `versionedTokenId` that encodes the correct "version number" for a valid "identifier."
+
+
+### Events
+
+#### `event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);`
+
+The standard ERC-721 `Transfer` event MUST be emitted when a token's metadata changes, first for the current `versionedTokenId` (including its encoded "token version") from the current owner to the null address, then for the updated `versionedTokenId` (which encodes the new "token version" and the same "identifier") from the null address to the original owner.
+
+
+
+## Rationale
+
+The introduction of versioned token IDs allows for better and safer marketplace handling of NFTs with changing metadata, and ensures that only the latest "version" of a token is used in onchain transactions. The specified behavior in this EIP minimizes the changes to the EIP-721 standard while maintaining full backwards compatibility with all known marketplaces.
