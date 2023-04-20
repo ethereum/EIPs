@@ -2,7 +2,7 @@
 eip: TBD
 title: Automatically Reset Tesnet
 description: Testnet network that periodically rolls back to genesis
-author: Mário Havel (@taxmeifyoucan),  pk910 (pk910),  Rémy Roy (@remyroy)
+author: Mário Havel (@taxmeifyoucan),  pk910 (@pk910),  Rémy Roy (@remyroy)
 discussions-to: 
 status: Draft
 type: TBD
@@ -112,7 +112,7 @@ Genesis Validators => Epochs until < 66% majority
 
 #### ChainId 
 
-ChainId is a variable because it needs to keep changing with each new genesis to avoid replay attack. The ChainId in `genesis 0` is hardcoded constant and network iterates it with new gensis. 
+ChainId is a variable because it needs to keep changing with each new genesis to avoid replay attack. The function for new ChainId value is a simple iteration (+1). The ChainId in `genesis 0` is hardcoded constant and network iterates it with new gensis. 
 
 It shouldn't collide with any other existing EVM chain even after longer period of iterations. 
 
