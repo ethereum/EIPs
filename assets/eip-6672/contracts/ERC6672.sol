@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./interfaces/IERC6672.sol";
 
-contract ERC6672 is ERC721, IERC6672 {
+abstract contract ERC6672 is ERC721, IERC6672 {
     using EnumerableSet for EnumerableSet.Bytes32Set;
 
     bytes4 public constant IERC6672_ID = type(IERC6672).interfaceId;
