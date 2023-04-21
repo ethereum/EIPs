@@ -149,6 +149,7 @@ TODO - if any input?
 
 TODO:
 - Instead of burn, maybe better to return tokens to this smart contract? otherwise, when a user burns, a new token is issued representing an anchor that was wrapped into a previous token before. Not an issue for most use-cases, but strictly speaking breaks historic "1:1" relation and makes tokenURI strictly necessary to tie to anchor.
+- -> Definitely do this, also eliminates complexity around the allowance wallet as stated in chat.
 
 
 
