@@ -72,7 +72,7 @@ A simple Batch Calls JSON Schema is:
   - `to` : REQUIRED, smart contract address or wallet address
   - `value` : REQUIRED, ETH amount (wei)
   - `abi` : REQUIRED, The abi MAY be a JSON string or the parsed Object (using JSON.parse) which is emitted by the [Solidity compiler](https://solidity.readthedocs.io/en/v0.6.0/using-the-compiler.html#output-description) (or compatible languages).<br>
-  The abi MAY also be a [Human-Readable](https://blog.ricmoo.com/human-readable-contract-abis-in-ethers-js-141902f4d917) Abi, which is a format the Ethers created to simplify manually typing the ABI into the source and so that a Contract ABI can also be referenced easily within the same source file.
+  The abi MAY also be a [Human-Readable](https://blog.ricmoo.com/human-readable-contract-abis-in-ethers-js-141902f4d917) Abi, which is a format the Ethers created to simplify manually typing the ABI into the source and so that a Contract ABI can also be referenced easily within the same source file.<br>
   The abi SHOULD be empty string if it's not a contract call.
   - `params` : REQUIRED, the params to this contract function call.
   The params SHOULD be empty array if it's not a contract call.
