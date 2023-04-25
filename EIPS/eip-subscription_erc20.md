@@ -1,14 +1,14 @@
 ---
-eip: 6933
-title: Subscription-Based ERC20 Token
-description: erc20 access to a service or product that requires recurring payments.
+eip: subscription_erc20
+title: Subscription-Based Token
+description: access to a service or product that requires recurring payments.
 author: 360 Core <hello@360coreinc.com>, Robin Rajput (@0xRobinR)
 discussions-to: https://ethereum-magicians.org/t/erc-subscription-based-erc20-token/13964
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-04-25
-requires: EIP-20
+requires: EIP20
 ---
 
 ## Abstract
