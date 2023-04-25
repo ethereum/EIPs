@@ -69,13 +69,8 @@ TBD
 ## Backwards Compatibility
 No backward compatibility issues found.
 
-## Reference Implementation
-To be developed
-
 ## Security Considerations
-
 Needs discussion.
 
 ## Copyright
-
 Copyright and related rights waived via [CC0](../LICENSE.md).
