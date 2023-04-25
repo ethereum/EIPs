@@ -100,17 +100,21 @@ Account interface. Modular Smart Contract Accounts MUST implement this interface
 >      */
 >     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
 >     external returns (uint256 validationData);
->
->     /**
->      * @notice Add/replace/remove any number of global plugins and optionally execute
->      *         a function with delegatecall
->      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
->      * @param init The address of the contract or facet to execute calldata
->      * @param callData A function call, including function selector and arguments
->      *                  calldata is executed with delegatecall on init
->      */
->    function updateGlobalPlugins(AssociatedFunction[] memory globalPluginUpdates, address init, bytes calldata callData)
->        external;
+> }
+> ```
+
+Account interface. Modular Smart Contract Accounts MAY implement `viewCall` to support view functions without the need to add view functions selectors into storage through updatePlugins.
+
+`IModularAccount.sol`
+
+> ```solidity
+> interface IModularAccount {
+>    /**
+>     * view function calls to the account
+>     * @param implAddress the address of the implmentation contract
+>     * @param data params to pass to the view function
+>     */
+>    function viewCall(address implAddress, bytes calldata data) external returns (bytes memory);
 > }
 > ```
 
@@ -152,6 +156,7 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >     }
 >
 >     event PluginsUpdated(PluginUpdate[] pluginUpdates, address init, bytes callData);
+>     event GlobalPluginsUpdated(AssociatedFunction[] globalPluginUpdates, address init, bytes callData);
 >
 >     /**
 >         * @notice Add/replace/remove any number of plugins and optionally execute
@@ -165,6 +170,17 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >         *                  calldata is executed with delegatecall on init
 >         */
 >     function updatePlugins(PluginUpdate[] memory pluginUpdates, address init, bytes calldata callData) external;
+>
+>     /**
+>      * @notice Add/replace/remove any number of global plugins and optionally execute
+>      *         a function with delegatecall
+>      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
+>      * @param init The address of the contract or facet to execute calldata
+>      * @param callData A function call, including function selector and arguments
+>      *                  calldata is executed with delegatecall on init
+>      */
+>    function updateGlobalPlugins(AssociatedFunction[] memory globalPluginUpdates, address init, bytes calldata callData)
+>        external;
 > }
 > ```
 
@@ -303,9 +319,11 @@ Runtime Validation Functions may have any function name, and MUST take in the pa
 > ```
 
 Hooks may have any function name.
-
+Global hooks are used for every tx.
+The global preHook function MUST take in the parameters `(bytes calldata data)`.
+The global postHook function MUST take in the parameters `(bytes calldata data)`.
+For sets of hooks that are used specifically with execution funtions, they can be paired and share information through returned value.
 The preHook function MUST take in the parameters `(bytes calldata data)` and return `(bytes calldata preHookReturnedData)`.
-
 The postHook function MUST take in the parameters `(bytes calldata data, bytes calldata preHookReturnedData)`.
 
 ## Rationale
