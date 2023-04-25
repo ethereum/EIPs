@@ -1,7 +1,7 @@
 ---
 title: Subscription-Based ERC20 Token
 description: This EIP proposes a subscription-based ERC-20 token that can be used to provide access to a service or product that requires recurring payments.
-author: 360 Core <hello@360coreinc.com>
+author: 360 Core <hello@360coreinc.com>, Robin Rajput <@0xRobinR>
 discussions-to: https://ethereum-magicians.org/t/erc-subscription-based-erc20-token/13964
 status: Draft
 type: Standards Track
