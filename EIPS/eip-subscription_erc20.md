@@ -1,24 +1,25 @@
 ---
+eip: 6933
 title: Subscription-Based ERC20 Token
-description: This EIP proposes a subscription-based ERC-20 token that can be used to provide access to a service or product that requires recurring payments.
-author: 360 Core <hello@360coreinc.com>, Robin Rajput <@0xRobinR>
+description: erc20 access to a service or product that requires recurring payments.
+author: 360 Core <hello@360coreinc.com>, Robin Rajput (@0xRobinR)
 discussions-to: https://ethereum-magicians.org/t/erc-subscription-based-erc20-token/13964
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-4-25
+created: 2023-04-25
 requires: EIP-20
 ---
 
 ## Abstract
 
-The subscription-based ERC-20 token extends the basic ERC-20 token standard with a `subscribe` and `unsubscribe` function, which allow users to subscribe or unsubscribe from the subscription service. The `subscriptionFee` and `subscriptionFrequency` variables define the cost and frequency of the subscription. The `nextPaymentDate` mapping keeps track of the next payment date for each subscriber.
+The subscription-based [ERC-20](./eip-20.md) token extends the basic [ERC-20](./eip-20.md) token standard with a `subscribe` and `unsubscribe` function, which allow users to subscribe or unsubscribe from the subscription service. The `subscriptionFee` and `subscriptionFrequency` variables define the cost and frequency of the subscription. The `nextPaymentDate` mapping keeps track of the next payment date for each subscriber.
 
 This EIP also proposes adding `renewSubscription` functions to the token contract, that can be used by token holders to renew their subscription to a service or product that requires recurring payments in the form of the token.
 
 ## Motivation
 
-The subscription-based ERC-20 token provides a more flexible and convenient way to manage recurring payments. It can be used for a wide range of services and products that require regular payments, such as subscription-based content platforms, gaming services, and more.
+The subscription-based [ERC-20](./eip-20.md) token provides a more flexible and convenient way to manage recurring payments. It can be used for a wide range of services and products that require regular payments, such as subscription-based content platforms, gaming services, and more.
 
 ## Specification
 
