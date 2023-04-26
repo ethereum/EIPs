@@ -60,26 +60,29 @@ Lastly we want to mention two major side-benefits of using the proposed standard
 ### Related work
 We primarily aim to onboard physical or digital ASSETS into dApps, which do not signing-capabilities of their own (contrary to EIP-5791's approach using crypto-chip based solutions). Note that we do not see any restrictions preventing to use EIP-5791 in combination with this standard, as the address of the crypto-chip qualifies as an ANCHOR.
 
+--- TO BE EXTENDED ---
 
 
 ## Specification
-
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
--->
-
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-### Definitions
+### Definitions (alphabetical)
+
+- An `ANCHOR` uniquely identifies the off-chain ASSET, being it physical or digital. 
+- An `ANCHOR TECHNOLOGY` MUST ensure that
+  - the ANCHOR is inseperable from the ASSET (physically or otherwise)
+  - an ORACLE can establish beyond reasonable doubt that the ASSET is CONTROLLED.
+  - For physical ASSETS, MUST fulfill [Specification for Physical Assets](#additional-specifications-for-physical-assets)
 
 - `ASSET` refers to the "thing", being it physical or digital, which is represented through NFTs according to the proposed standard. Typically, an ASSET does not have signing capabilities.
-- `CONTROLLING THE ASSET` ... TODO [_in physical proximity to the physical asset_]
-- An `ANCHOR` uniquely identifies the ASSET, being it physical (Refer [Specification for Physical Assets](#additional-specifications-for-physical-assets)) or digital.
-- An `ORACLE` has signing capabilities and one or more `ORACLES` are trusted by the Smart Contract.
+
+- `ATTESTATION` is the confirmation that PROOF OF CONTROL was established when specifying the `to` (receiver, beneficiary) address. 
+
+- `PROOF OF CONTROL` over the ASSET means owning or otherwise controlling an ASSET. How Proof of Control is established depends on the ASSET and may be implemented using technical, legal or other means. For physical ASSETS, CONTROL is typically verified by proofing physical proximity between a physical ASSET and an input device (e.g. a smartphone) used to specify the `to` address.
+
+- An `ORACLE` has signing capabilities. MUST be able to sign ATTESTATIONS off-chain in a way s.t. signatures can be verified on-chain.
+
+- An ATTESTATION 
 
 ### ORACLE
 
