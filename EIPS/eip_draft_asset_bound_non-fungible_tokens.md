@@ -11,19 +11,22 @@ requires: 721, 165
 ---
 
 ## Abstract
+This standard allows to integrate physical and digital ASSETS without signing capabilities into dApps/web3 by extending ERC-721.
 
-This standard allows to integrate "plain" physical and digital assets without signing capabilities into dApps/web3 by extending ERC-721.
+An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The `ANCHOR-TECHNOLOGY` must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR-TECHNOLOGY must further allow to establish a `PROOF-OF-CONTROL` over the ASSET through an `ORACLE`. For physical ASSETS, PROOF-OF-CONTROL corresponds for example to proof of physical presence. 
 
-An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The ANCHOR technology must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR technology must further allow to proof control over the ASSET through an `ORACLE`. For physical ASSETS, proof-of-control corresponds to proof-of-physical-presence. 
-
-The ANCHOR is wrapped 1:1 in a token, hence represents each individual ASSET 1:1 on-chain.
-Wrapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is verified on-chain. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address.
+The ANCHOR is mapped 1:1 to a tokenId on-chain, hence represents each individual ASSET 1:1.
+Wrapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is on-chain-verifyable. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address, e.g. through a user-device.
 
 This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. The proposed `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
 
 We also outline for optional use
 - a `FLOATING`-concept (temporarily or permanently enabling "traditional" ERC-721 transfers without ATTESTATION)
 - `ATTESTATION-LIMITS`, which are RECOMMENDED to implement for security reasons when gas is paid through a central account
+
+Figure 1 below shows an example system employing ERC-XXXX using a smartphone as user-device to interact with a physical ASSET.
+
+![img](../assets/eip-draft_asset-bound_non-fungible_token/img/concept_diagram.png)    
 
 
 ## Motivation
@@ -68,8 +71,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Definitions (alphabetical)
 
-- An `ANCHOR` uniquely identifies the off-chain ASSET, being it physical or digital. 
-- An `ANCHOR TECHNOLOGY` MUST ensure that
+- `ANCHOR` uniquely identifies the off-chain ASSET, being it physical or digital. 
+- `ANCHOR TECHNOLOGY` MUST ensure that
   - the ANCHOR is inseperable from the ASSET (physically or otherwise)
   - an ORACLE can establish beyond reasonable doubt that the ASSET is CONTROLLED.
   - For physical ASSETS, MUST fulfill [Specification for Physical Assets](#additional-specifications-for-physical-assets)
@@ -81,8 +84,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 - `PROOF OF CONTROL` over the ASSET means owning or otherwise controlling an ASSET. How Proof of Control is established depends on the ASSET and may be implemented using technical, legal or other means. For physical ASSETS, CONTROL is typically verified by proofing physical proximity between a physical ASSET and an input device (e.g. a smartphone) used to specify the `to` address.
 
 - An `ORACLE` has signing capabilities. MUST be able to sign ATTESTATIONS off-chain in a way s.t. signatures can be verified on-chain.
-
-- An ATTESTATION 
 
 ### ORACLE
 
@@ -258,5 +259,6 @@ TODO
 - Add merkle-tree leaves
 
 ## Copyright
-
-TBD (copyright and related rights will be waved somehow)
+TODO: Find legal language for the following:
+- Certain Systems, e.g. the one according to Figure 1, may be subject to patent-pending EPxxxxx / USxxxx (not published yet) and a license may be required. Check with (add way of contact here). 
+- We do declare, that we explicitely waive copyright and XXX for the present EIP-xxxx and the provided ERC-xxxx reference implementation, i.e. we license the EIP under TODO SPDX-license string  
