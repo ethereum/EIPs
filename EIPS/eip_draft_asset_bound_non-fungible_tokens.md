@@ -1,6 +1,6 @@
 ---
 title: Asset-bound Non-Fungible Tokens
-description: Asset-bound Non-Fungible Tokens are used to anchor a token 1:1 to an (offchain / physical) asset and the token transfers are authorized through attestation of control over the asset.
+description: Asset-bound Non-Fungible Tokens anchor a token 1:1 to a (physical or digital) asset and token transfers are authorized through attestation of control over the asset.
 author: Thomas Bergmueller (@tbergmueller) <tb@authenticvision.com>, Lukas Meyer <lukas@ibex.host>
 discussions-to: <URL>
 status: Draft
@@ -12,15 +12,18 @@ requires: 721, 165
 
 ## Abstract
 
-This standard aims to onboard "plain" physical and digital off-chain assets without signing capabilities into dApps/web3 by extending ERC-721.
+This standard allows to integrate "plain" physical and digital assets without signing capabilities into dApps/web3 by extending ERC-721.
 
-An asset, e.g. a physical object, is equipped with a `ANCHOR` technology. The `ANCHOR` technology must be chosen s.t. it allows to uniquely identify the `ASSET`. The `ANCHOR` technology further needs to enable proofing control over the asset through an `ORACLE` technology. For physical assets, Proof of Control is done by proofing physical presence. By wrapping the `ANCHOR` in a token we can represent each ASSET 1:1 on-chain.
+An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The ANCHOR technology must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR technology must further allow to proof control over the ASSET through an `ORACLE`. For physical ASSETS, proof-of-control corresponds to proof-of-physical-presence. 
 
-To do this in a secure, inseperable manner, the `ORACLE` must issue an `ATTESTATION`, where the `ORACLE` testifies that s particular ASSET associated with an ANCHOR has been CONTROLLED when defining the receiving `to`-address for any token transfer.
+The ANCHOR is wrapped 1:1 in a token, hence represents each individual ASSET 1:1 on-chain.
+Wrapping in a secure, inseperable manner requires the ORACLE to issue an `ATTESTATION`. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address. The ORACLE issues an ATTESTATION through off-chain signature.
 
-`transferAnchor(attestation)` is permissionless, i.e. neither the sender (`from`) nor the receiver (`to`) need to sign. Transfer authorization is solely provided through the `ORACLE`'s `ATTESTATION`. Note depending on the use-case, the implementation of `ATTESTED-TRANSFER-LIMITS` is needed for security reasons.
+This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
 
-We also outline the FLOATING-concept (temporarily decoupling the token from the anchor, hence enabling "traditional" ERC-721 transfers without implementation) may be implemented using the present standard.
+We also outline 
+- a `FLOATING`-concept (temporarily or permanently enabling "traditional" ERC-721 transfers without ATTESTATION)
+- `ATTESTATION-LIMITS`, which are RECOMMENDED to implement for security reasons when gas is paid through a central account
 
 
 
