@@ -17,7 +17,7 @@ This standard allows to integrate "plain" physical and digital assets without si
 An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The ANCHOR technology must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR technology must further allow to proof control over the ASSET through an `ORACLE`. For physical ASSETS, proof-of-control corresponds to proof-of-physical-presence. 
 
 The ANCHOR is wrapped 1:1 in a token, hence represents each individual ASSET 1:1 on-chain.
-Wrapping in a secure, inseperable manner requires the ORACLE to issue an `ATTESTATION`. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address. The ORACLE issues an ATTESTATION through off-chain signature.
+Wrapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is verified on-chain. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address.
 
 This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. The proposed `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
 
@@ -26,10 +26,8 @@ We also outline for optional use
 - `ATTESTATION-LIMITS`, which are RECOMMENDED to implement for security reasons when gas is paid through a central account
 
 
-
 ## Motivation
-
-The well-known ERC-721 establishes that NFTs may represent "ownership over physical properties [...] as well as digital collectables and even more abstract things such as responsibilities" - in a broader sense, we will refer to all those things as `ASSETS`.
+The well-known ERC-721 establishes that NFTs may represent "ownership over physical properties [...] as well as digital collectables and even more abstract things such as responsibilities" - in a broader sense, we will refer to all those things as `ASSETS`, which typically have value to people.
 
 ### The Problem
 NFTs are nowadays often confused as being assets themselves. Very commonly people treat an NFT's metdata (images, traits, ...) as asset-class, with the their rarity often defining the value of an invididual NFT. 
@@ -38,28 +36,31 @@ It is a common misconception from NFT-investors that metadata is immutable, ofte
 While we do not want to solve for this misconception, we do see a huge issue with a related common practice today. Off-chain ASSETS ("ownership over physical products", "digital collectables", "in-game assets", "responsibilities", ...) are linked to an NFT solely through metadata. Approaches to ensure on-chain integrity between metadata (=reference to ASSET) and a token are rarely seen.
 Without ensuring integrity of metadata on-chain, we consider linking an asset through metadata very problematic, as it requires absolute trust inte controller of the metadata. We need to trust the controller of metadata to not not [accidentially or willingly] alter the metadata. Further, we need to trust that the metadata provider at tokenURI is available until eternity, which has been proven otherwise (IPFS bucket disappears, central tokenURI-provider has downtimes, ...).
 
-### ASSET-BOUND NON-FUNGIBLE TOKEN
+Finally, representing ownership of off-chain ASSETS through NFT suffers from the inhert problem that the integrity between off-chain ownership and on-chain representation as NFT is not enforcible. dApps merely rely on some extra off-chain processes *trying* to ensure integrity, but as soon as the current owner of an NFT is incooperative or incapacitated, those approaches typically and integrity is no longer given.
+
+### ASSET-BOUND NON-FUNGIBLE TOKENS
 In this standard we propose to
-1. Elevate the concept of representing physical or digital off-chain `ASSETS` by anchoring the `ASSET` inseperably into an NFT on-chain. 
-1. A change in off-chain ownership over the `ASSET` inevitably should be reflected by a change in on-chain ownership over the anchored NFT. 
+1. Elevate the concept of representing physical or digital off-chain `ASSETS` by on-chain anchoring the `ASSET` inseperably into an NFT. 
 1. Being off-chain in control over the `ASSET` must mean being on-chain in control over the anchored NFT.
+1. (Related) A change in off-chain ownership over the `ASSET` inevitably should be reflected by a change in on-chain ownership over the anchored NFT. 
 
 As 2. and 3. indicate, the control/ownership/posession of the ASSET should be the source of truth, _not_ the posession of an NFT anchored the ASSET. Hence, we propose an `ASSET-BOUND NFT`, where off-chain CONTROL over the ASSET enforces on-chain CONTROL over the anchored NFT.
+Also the proposed ASSET-BOUND NFTs allow to anchor digital metadata inseperably to the `ASSET`. When the `ASSET` is a physical asset, this allows to design "phygitals" in their purest form, i.e. creating a "phygital" asset with a physical and digital component that are inseperable. [Note that metadata itself can still change, e.g. for "Evolvable NFT"]
 
-The proposed NFTs allow to anchor digital metadata inseperably to the `ASSET`. When the `ASSET` is a physical asset, this allows to design "phygitals" in their purest form, i.e. creating a "phygital" asset with a physical and digital component that are inseperable.
+We propose to complement the existing transfer control mechanisms of a token according to ERC-721, `Approval` according to EIP-721 and `Permit` according to EIP-4494, by another mechanism; `ATTESTATION`. An ATTESTATION is signed off-chain by the ORACLE and must only be issued when the ORACLE verified that whoever specifies the `to` address or beneficiary address has simultanously been in control over the ASSET. The `to` address of an attestation may be used for Transfers as well as for approvals and other authorizations.
 
-We primarily aim to onboard physical or digital assets into dApps, which do not signing-capabilities of their own (contrary to EIP-5791's approach using crypto-chip based solutions). Note that we do not see any restrictions on using the proposed standard also for `ASSETS` with signing capabilities.
+Transactions authorized via `ATTESTATION` shall not require signature or approval from neither the `from` (donor, owner, sender) nor `to` (beneficiary, receiver) account, i.e. making transfers permissionless. Ideally, transaction are signed independent from the `ORACLE` as well, allowing different scenarios in terms of gas-fees. 
 
-We propose to complement the existing transfer control mechanisms of a token according to ERC-721, `Approval` according to EIP-721 and `Permit` according to EIP-4494, by another mechanism; `ATTESTATION`. An `ATTESTATION` is solely issued under the pre-condition of an `ORACLE` verifying that whoever specifies the `to` address or beneficiary address has simultanously been in control over the `ASSET`. The `to` address of an attestation may be used for Transfers as well as for approvals.
-
-Transfers with `ATTESTATION` shall not require signature or approval from neither the `from` nor `to` account, i.e. making transfers permissionless. Ideally, signing the transaction is independent from the `ORACLE` as well, allowing different scenarios in terms of gas-fees.
-
-Tokens according to ERC-721 that implement this standard are named `ANCHORs`. Note `ANCHOR` can refer to the `bytes32` anchor itself, or the token representing it.
-
-Lastly we want to empathize two major side-benefits, which drastically lower hurdles for onboarding web2 users and increase their security;
+Lastly we want to mention two major side-benefits of using the proposed standard, which drastically lowers hurdles in onboarding web2 users and increase their security;
 
 - New users can participate in dApps/DeFi without ever owning crypto currency (when gas-fees are paid through a third-party account, typically the ASSET issuer, who signs `transferAnchor()` transactions)
 - Users cannot get scammed. Common attacks (e.g. wallet-drainer scams) are no longer possible or easily reverted, since only the anchored NFT can be stolen, not the ASSET itself. Also mishaps like transferring the NFT to the wrong account, losing access to an account etc can be mitigated by executing another `transferAnchor()` transaction based on proofing control over the `ASSET`, i.e. the physical object.
+
+
+### Related work
+We primarily aim to onboard physical or digital ASSETS into dApps, which do not signing-capabilities of their own (contrary to EIP-5791's approach using crypto-chip based solutions). Note that we do not see any restrictions preventing to use EIP-5791 in combination with this standard, as the address of the crypto-chip qualifies as an ANCHOR.
+
+
 
 ## Specification
 
