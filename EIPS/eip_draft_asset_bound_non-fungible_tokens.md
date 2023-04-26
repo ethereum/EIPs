@@ -22,11 +22,11 @@ This standard to proposes to use `ATTESTATIONS` as authorization for the followi
 
 We also outline for optional use
 - a `FLOATING`-concept (temporarily or permanently enabling "traditional" ERC-721 transfers without ATTESTATION)
-- `ATTESTATION-LIMITS`, which are RECOMMENDED to implement for security reasons when gas is paid through a central account
+- `ATTESTATION-LIMITS`, which are recommended to implement for security reasons, when gas is paid through a central account (see Figure 1)
 
-Figure 1 below shows an example system employing ERC-XXXX using a smartphone as user-device to interact with a physical ASSET.
+Figure 1 below shows a the data flow of an asset-bound NFT transfer through a simplified example system employing ERC-XXXX. The system is utilizing a smartphone as user-device to interact with a physical ASSET.
 
-![img](../assets/eip-draft_asset-bound_non-fungible_token/img/concept_diagram.png)    
+![Figure 1: Sample system](../assets/eip-draft_asset-bound_non-fungible_token/img/concept_diagram.png)    
 
 
 ## Motivation
@@ -56,7 +56,7 @@ Transactions authorized via `ATTESTATION` shall not require signature or approva
 
 Lastly we want to mention two major side-benefits of using the proposed standard, which drastically lowers hurdles in onboarding web2 users and increase their security;
 
-- New users can participate in dApps/DeFi without ever owning crypto currency (when gas-fees are paid through a third-party account, typically the ASSET issuer, who signs `transferAnchor()` transactions)
+- New users, e.g `0xaa...aa` (Fig.1), can use gasless wallets, hence participate in Web3/dApps/DeFi and mint+transfer tokens without ever owning crypto currency. Gas-fees may be paid through a third-party account `0x..gasPayer` (Fig.1). The gas is typically covered by the ASSET issuer, who signs `transferAnchor()` transactions
 - Users cannot get scammed. Common attacks (e.g. wallet-drainer scams) are no longer possible or easily reverted, since only the anchored NFT can be stolen, not the ASSET itself. Also mishaps like transferring the NFT to the wrong account, losing access to an account etc can be mitigated by executing another `transferAnchor()` transaction based on proofing control over the `ASSET`, i.e. the physical object.
 
 
@@ -81,57 +81,78 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - `ATTESTATION` is the confirmation that PROOF OF CONTROL was established when specifying the `to` (receiver, beneficiary) address. 
 
-- `PROOF OF CONTROL` over the ASSET means owning or otherwise controlling an ASSET. How Proof of Control is established depends on the ASSET and may be implemented using technical, legal or other means. For physical ASSETS, CONTROL is typically verified by proofing physical proximity between a physical ASSET and an input device (e.g. a smartphone) used to specify the `to` address.
+- `PROOF-OF-CONTROL` over the ASSET means owning or otherwise controlling an ASSET. How Proof of Control is established depends on the ASSET and may be implemented using technical, legal or other means. For physical ASSETS, CONTROL is typically verified by proofing physical proximity between a physical ASSET and an input device (e.g. a smartphone) used to specify the `to` address.
 
 - An `ORACLE` has signing capabilities. MUST be able to sign ATTESTATIONS off-chain in a way s.t. signatures can be verified on-chain.
 
 ### ORACLE
 
-- MUST provide an `ATTESTATION`. Below we define the format (the `ATTESTATION`), how the oracle testifies that the `to` address of a transfer has been specified under the pre-condition of `CONTROLLING THE ASSET` associated with the particular `ANCHOR` being transferred to `to`.
-- The `ATTESTATION` MUST contain
-  - `to`, MUST be address
-  - `anchor`, MUST be 1:1 mappable to the `ASSET`
-  - `attestationTime`, Time of attestation (MUST be UTC seconds),
-  - `validStartTime`, Blocktime must be greater than this value (MUST be UTC seconds)
-  - `validEndTime`, Blocktime must be smaller than this value(MUST be UTC seconds)
-  - `proof`, Carrier for proof-Mechanism for checking whether an anchor is valid. Typically Merkle-Proof
-  - `signature`, ETH-signature (65 bytes), Signature when a trusted oracle signed the `keccak256([to, anchor, attestationTime, expireTime, proof])`, typically abi-encoded.
+- MUST provide an ATTESTATION. Below we define the format how an ORACLE testifies that the `to` address of a transfer has been specified under the pre-condition of PROOF-OF-CONTROL associated with the particular ANCHOR being transferred to `to`.
+- The ATTESTATION MUST contain
+  - `to`, MUST be address, specifying the beneficiary, e.g. the to-address, approved account etc.
+  - `anchor`, aka the ASSET identifier, MUST have a 1:1 relation to the `ASSET`
+  - `attestationTime`, UTC seconds, time when attestation was signed by ORACLE,
+  - `validStartTime` UTC seconds, start time of the ATTESTATION's validity timespan
+  - `validEndTime`, UTC seconds, end time of the ATTESTATION's validity timespan
+  - `proof`, Data for proof-mechanism in checking an anchor's validity. Typically Merkle-Proof
+  - `signature`, ETH-signature (65 bytes). Output of an ORACLE signing the `attestationHash = keccak256([to, anchor, attestationTime, validStartTime, validEndTime, proof])`. Values typically abi-encoded.
+- How PROOF-OF-CONTROL is establish in detail through an ANCHOR-TECHNOLOGY is not subject to this standard. Minimal specification on ORACLE requirements and ANCHOR-TECHNOLOGY requirements when using Physical ASSETS is in  [Specification for Physical Assets](#additional-specifications-for-physical-assets).
 
-### Smart contract
-
-- MUST implement ERC-721 interface
-- MUST ensure tokens only exist for valid `ANCHOR`.
-- MUST have an immutable `canFloat` boolean, indicating whether anchors can be released, i.e. whether tokens can be transferred without attestation, i.e. without proof of CONTROL OVER ASSET. RECOMMENDED to set canFloat via constructor at deploy time.
+### ERC-XXXXContract
+- MUST implement ERC-721 and ERC-165
+- MUST ensure tokens only exist for valid `ANCHORS`
 - MUST define a `maxAttestationValidTime`, which is enforced in case an `ATTESTATION`'s `expireTime` is bigger.
 - MUST have bidirectional mapping `tokenPerAnchor[anchor]` and `anchorPerToken[token]`. This implies that a maximum of one token per `ANCHOR` exists.
-- MUST have `isReleasedAnchor[anchor]`, indicating which particular anchors are currently released, i.e. can be transfered or minted.
-  - This MAY be used to implement a "temporary" decoupling of tokens, which is not subject to this standard but a reference implementation is available.
-  - `transferAnchor()` ensures `isReleasedAnchor[anchor]` is temporarily set to true
-- MUST implement a mechanism `validAnchor(anchor, ...)` to ensure an ANCHOR passed through attestation is valid, i.e. is on the "list" of valid anchors. RECOMMENDED to implement this through Merkle-Trees, i.e. `validAnchor(anchor, proof)`.
-- MUST implement `validateAttestation(...)` modifier, which MUST throw when any of the below occurs:
-  - `ATTESTATION` originates from a non-trusted `ORACLE`.
-  - `ATTESTATION` has expired, either when
-    - WHEN `attestation.attestationTime + maxAttestationValidTime > block.timestamp`
-    - OR when `block.timestamp > attestation.expireTime`
-  - `ATTESTATION` has already been used. "Used" being defined in at least one transfer has been made using a particular `ATTESTATION`.
-  - `validAnchor(anchor, ...) == False`
-  - MAY throw under OPTIONAL additional conditions
+- MUST have `anchorIsReleased[anchor]`, indicating which particular anchors are currently released, i.e. can be transfered or minted. 
+  - This is the key mechanism for token transfer mechanism extension.
+  - This MAY be used to implement FLOATING, a "temporary" decoupling between ASSET and tokens. See "FLOATING"
+- MUST have a mechnism to determine whether an ANCHOR is valid for the contract. This is typically implemented via MerkleTrees.
+  - MUST implement `validAnchor(anchor, proof)` which returns true when anchor is valid, i.e. MerkleProof is correct, false otherwise.
+- MUST implement `decodeAttestationIfValid(attestation)`
+  - Returns `attestation.to`, `attestation.anchor`, `attestation.attestationHash`
+  - MUST throw when 
+    - `ATTESTATION` originates from a non-trusted `ORACLE`.
+    - `ATTESTATION` has expired, either when
+      - WHEN `attestation.attestationTime + maxAttestationValidTime > block.timestamp`
+      - OR when `block.timestamp > attestation.expireTime`
+    - `ATTESTATION` has already been used. "Used" being defined in at least one transfer has been made using a particular `ATTESTATION`.
+    - `validAnchor(attestation.anchor, attestation.proof)` returns `false`
+  - RECOMMENDED to call a hook `_beforeAttestationUse(to, anchor)` before returning decoded data
+  - MAY throw under OPTIONAL additional conditions, typically implemented by using the `_beforeAttestationUse`
+- MUST extend ERC-721 token transfer mechanisms by adding additional throw conditions to `transferFrom`. 
+  - MUST throw when `anchorIsReleased[anchorByToken[tokenId]] == false`
+  - MUST throw when batchSize > 1, i.e. no batch transfers are supported with this contract.
+  - RECOMMENDED to implement the above through ERC721 `_beforeTokenTransfer` hook
+  - MUST emit `AnchorTransfer(from, to, anchorByToken[tokenId], tokenId)`
 
-- MUST extend ERC-721 token transfer mechanisms by adding additional conditions to i.e. `transferFrom`, `safeTransferFrom` and RECOMMENDED to implement that through ERC721 `_beforeTokenTransfer` hook which
-  - MUST throw when `isReleased[anchor[tokenId]] == false`
-  - MUST increment `transfersPerAnchor[tokenByAnchor[anchor]]`, whenever an associated token has been transferred through this method
-- MUST implement `transferAnchor(attestation)` which
-  - MUST use the `validateAttestation(attestation)` modifier
-  - MUST record each `attestation` used to authorize each token transfer. RECOMMENDED by storing `keccak256(attestation)`
-  - MUST temporarily set `isReleasedAnchor[anchor]=true` to allow a transfer or mint
-  - MUST ensure `isReleasedAnchor[anchor]` has the same state before and invoking `transferAnchor()`.
-  - MUST either
-    - call `_safeTransferFrom(ownerOf(tokenPerAnchor[anchor]), to, tokenPerAnchor[anchor])` when `tokenPerAnchor[anchor]` exists
-    - or create a new token wrapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `tokenByAnchor[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
+- MUST implement `attestationsUsedByAnchor(anchor)`, returning how many attestations have already been used for a specific anchor.
+
+- MUST implement `transferAnchor(attestation)`, burnAnchor(attestation), approveAnchor(attestation) which
+  - MUST use the `decodeAttestationIfValid(attestation)` to determine `to`, `anchor` and `attestationHash`
+  - MUST record each `attestation` used to authorize each token transfer. RECOMMENDED by storing each used `attestationHash`
+  - MUST increment `attestationsUsedByAnchor[anchor]`, whenever an associated token has been transferred through this method
+  - MUST emit `AttestationUsed`
+  - `transferAnchor(attestation)`, corresponding to ERC721 `safeTransferFrom(from, to, tokenId)` and also responsible for minting further
+    - MUST temporarily set `anchorIsReleased[anchor]=true` to allow a transfer or mint
+    - MUST ensure `anchorIsReleased[anchor]` has the same state as before `transferAnchor()` has been invoked.
+    - MUST either
+      - call `_safeTransferFrom(ownerOf(tokenByAnchor[anchor]), to, tokenByAnchor[anchor])` when `tokenByAnchor[anchor]` exists
+      - or create a new token wrapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `tokenByAnchor[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
+    - MUST emit `AnchorTransfer(from, to, anchor, tokenByAnchor[anchor])`
+  - burnAnchor(attestation), corresponding to ERC721 `burn(tokenId)` 
+    - TODO, see reference IMPL in the meantime
+  - approveAnchor(attestation), corresponding to ERC721 `approve(to, tokenId)`
+    - TODO, see reference IMPL in the meantime
+
+- MUST implement ERC721 burn()
+
+- RECOMMENDED to have a `tokenURI(tokenId)` implemented to return an anchorBased-URI, i.e. `baseURI/anchor`. (= Anchoring metadata to anchored ASSET). Before an anchor is not used for the first time, the ANCHOR's mapping to tokenId is unknown. Hence, using the anchor instead of the tokenId is preferred.
 
 - RECOMMENDED to implement any or multiple of the following interfaces: transferable(tokenId), isSoulbound(tokenId), isNonTransferable (), `isNonTransferable(tokenId)` according to IERC6454.
-- RECOMMENDED to have a `tokenURI(tokenId)` implemented to return an anchorBased-URI, i.e. `baseURI/anchor`. (= Anchoring metadata to anchored ASSET). So even if there are different tokens in time, which represent the same anchor, the same tokenURI needs to be returned for all those tokens (granted baseURI etc does not change).  
 
+
+### ERC-XXXX Attestation-limited
+- MUST extend ERC-XXXX
 - MAY implement the `IERCxxxxAttestedTransferLimit` interface. This is a MUST when transaction-costs are provided through a central account, e.g. through the ORACLE (or associated authorities) itself to avoid fund-draining. If implemented, this mechanism
   - MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
     - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
@@ -142,11 +163,17 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (if not configured as FIXED)
   - The above mechanism MAY be used for DeFi application, lending etc to temporarily block transferAnchor(anchor), e.g. over a renting or lending period.
 
-## Additional Specifications for PHYSICAL ASSETS
+- MAY implement Floating
+    - MUST have an immutable `canFloat` boolean, indicating whether anchors can be released temporarily, i.e. the ASSET is floating. If `canFloat==false`, tokens can only be transferred with ATTESTATION. RECOMMENDED to set canFloat via constructor at deploy time.
 
-In case the `ASSET` is a physical object, good or property, the following ADDITIONAL specifications apply:
+### ERC-XXX Floatable
 
-### ORACLE
+
+## Additional Specifications for PHYSICAL ASSETS and ANCHOR-TECHNOLOGY
+
+In case the `ASSET` is a physical object, good or property, the following ADDITIONAL specifications MUST be satisifed:
+
+### ORACLE for Physical Anchors
 
 - Issuing an `ATTESTATION` requires that the `ORACLE`
   - MUST proof physical proximity between an input device (e.g. smartphone) specifying the `to` address and a particular physical `ANCHOR` and it's associated physical object. Typical acceptable proximity is ranges between some millimeters to several meters.
@@ -155,26 +182,22 @@ In case the `ASSET` is a physical object, good or property, the following ADDITI
     - MUST be robust against spoofing (e.g. presentation attacks) etc.
   - MUST be implemented under the assumption that the party defining the `to` address has malicious intent and to acquire false `ATTESTATION`, without currently or ever having access to the physical object comprising the physical `ANCHOR`.
 
-### Physical Object
+### Physical ASSET
 
 - MUST comprise an `ANCHOR`, acting as the unique physical object identifier, typically a serial number (plain (NOT RECOMMENDED) or hashed (RECOMMENDED))
 - MUST comprise a physical security device, marking or any other feature that enables proofing physical presence for `ATTESTATION` through the `ORACLE`
-- Is RECOMMENDED to employ `ANCHOR` technologies featuring irreproducible security features.
-- In general it is NOT RECOMMENDED to employ `ANCHOR` technologies that can easily be replicated (e.g. barcodes, "ordinary" NFC chips, .. ). Replication includes physical and digital replication.
+- Is RECOMMENDED to employ ANCHOR-TECHNOLOGIES featuring irreproducible security features.
+- In general it is NOT RECOMMENDED to employ ANCHOR-TECHNOLOGIES that can easily be replicated (e.g. barcodes, "ordinary" NFC chips, .. ). Replication includes physical and digital replication.
 
 ## Specification when using digital ASSETs
 
 TODO - if any input?
 
 ## Alternatives Considered
+- Soulbound burn+mint combination, e.g. through Consensual Soulbound Tokens (EIP-5484). Disregarded because appearance is highly dubious, when the same asset is represented through multiple tokens over time. An predecessor of this EIP has used this approach and can be found at [Mumbai Testnet](https://mumbai.polygonscan.com/address/0xd04c443913f9ddcfea72c38fed2d128a3ecd719e), in particular [this transaction](https://mumbai.polygonscan.com/tx/0xe5ff2c505c80249c60c84621ff6ee13432acf6f3d9a9dd5c065d5ea77ff7bc8e).
 
-- Soulbound burn+mint combi, e.g. through Consensual Soulbound Tokens (EIP-5484)
-- Addign a blockTransfer(tokenId) for DeFi -> Decided not to standardize as not core-functionality, can be built on top of this standard like for normal NFT-lending.
 
-TODO:
 
-- Instead of burn, maybe better to return tokens to this smart contract? otherwise, when a user burns, a new token is issued representing an anchor that was wrapped into a previous token before. Not an issue for most use-cases, but strictly speaking breaks historic "1:1" relation and makes tokenURI strictly necessary to tie to anchor.
-- -> Definitely do this, also eliminates complexity around the allowance wallet as stated in chat.
 
 ## Rationale
 
