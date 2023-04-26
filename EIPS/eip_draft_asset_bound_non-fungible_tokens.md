@@ -98,6 +98,41 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   - `signature`, ETH-signature (65 bytes). Output of an ORACLE signing the `attestationHash = keccak256([to, anchor, attestationTime, validStartTime, validEndTime, proof])`. Values typically abi-encoded.
 - How PROOF-OF-CONTROL is establish in detail through an ANCHOR-TECHNOLOGY is not subject to this standard. Minimal specification on ORACLE requirements and ANCHOR-TECHNOLOGY requirements when using Physical ASSETS is in  [Specification for Physical Assets](#additional-specifications-for-physical-assets).
 
+Minimal Typescript sample using ethers library and OZ MerkleTrees:
+```
+export async function minimalAttestationExample() {
+  // #################################### PRELIMINARIES
+  const merkleTestAnchors = [
+      ['0x' + createHash('sha256').update('TestAnchor123').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor124').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor125').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor126').digest('hex')],
+      ['0x' + createHash('sha256').update('SaltLeave').digest('hex')] // shall never be used on-chain!
+      ]
+  const merkleTree = StandardMerkleTree.of(merkleTestAnchors, ["bytes32"]);
+
+  // #################################### ACCOUNTS
+  // Alice shall get the NFT, oracle signs the attestation off-chain 
+  const [alice, oracle] = await ethers.getSigners();
+
+  // #################################### CREATE AN ATTESTATION
+  const to = alice.address;
+  const anchor = merkleTestAnchors[0][0];
+  const proof = merkleTree.getProof([anchor]);
+  const attestationTime = Math.floor(Date.now() / 1000.0); // Now in seconds UTC
+
+  const validStartTime = 0;
+  const validEndTime = attestationTime + 15 * 60; // 15 minutes valid from attestation
+
+  // Hash and sign. In practice, oracle shall only sign when Proof-of-Control is established!
+  const messageHash = ethers.utils.solidityKeccak256(["address", "bytes32", "uint256", 'uint256', "uint256", "bytes32[]"], [to, anchor, attestationTime, validStartTime, validEndTime, proof]);
+  const sig = await oracle.signMessage(ethers.utils.arrayify(messageHash));
+  // Encode
+  return ethers.utils.defaultAbiCoder.encode(['address', 'bytes32', 'uint256', 'uint256', 'uint256', 'bytes32[]', 'bytes'], [to, anchor, attestationTime,  validStartTime, validStartTime, proof, sig]);
+}
+```
+
+
 ### ERC-XXXXContract
 
 Every ERC-XXXX compliant contract must implement the IERCxxxx, ERC721 and ERC165 interfaces (subject to “caveats” below):
@@ -250,30 +285,82 @@ interface IERCxxxx {
   - approveAnchor(attestation), corresponding to ERC721 `approve(to, tokenId)`
     - TODO, see reference IMPL in the meantime
 
-- MUST implement ERC721 burn()
+- MUST implement ERC721 `burn()`
 
 - RECOMMENDED to have a `tokenURI(tokenId)` implemented to return an anchorBased-URI, i.e. `baseURI/anchor`. (= Anchoring metadata to anchored ASSET). Before an anchor is not used for the first time, the ANCHOR's mapping to tokenId is unknown. Hence, using the anchor instead of the tokenId is preferred.
 
 - RECOMMENDED to implement any or multiple of the following interfaces: transferable(tokenId), isSoulbound(tokenId), isNonTransferable (), `isNonTransferable(tokenId)` according to IERC6454.
 
+- MAY implement the `IERCxxxxAttestationLimited` interface. This is a MUST when transaction-costs are provided through a central account, e.g. through the ORACLE (or associated authorities) itself to avoid fund-draining.
 
-### ERC-XXXX Attestation-limited
+- MAY implement the `IERCxxxxFloatable` interface. 
+
+
+
+### ERC-XXXX Attestation-limited (WIP!)
+```
+interface IERCxxxxAttestationLimited {
+    enum AttestedTransferLimitUpdatePolicy {
+        IMMUTABLE,
+        INCREASE_ONLY,
+        DECREASE_ONLY,
+        FLEXIBLE
+    }
+    function updateGlobalAttestedTransferLimit(uint256 _nrTransfers) external;
+    function attestatedTransfersLeft(bytes32 _anchor) external view returns (uint256 nrTransfersLeft);
+
+    event GlobalAttestedTransferLimitUpdate(
+        uint256 indexed transferLimit,
+        address updatedBy
+    );
+
+    event AttestedTransferLimitUpdate(
+        uint256 indexed transferLimit,
+        bytes32 indexed anchor,
+        address updatedBy
+    );
+}
+```
+
 - MUST extend ERC-XXXX
-- MAY implement the `IERCxxxxAttestedTransferLimit` interface. This is a MUST when transaction-costs are provided through a central account, e.g. through the ORACLE (or associated authorities) itself to avoid fund-draining. If implemented, this mechanism
-  - MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
-    - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
-    - MUST immutably define one of the above listed modes expose it via `transferLimitUpdateMode()`
-    - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (when `transferLimitUpdateMode() != FIXED`)
-  - MUST implement `transfersLeft(anchor)`, returning the number of transfers left (i.e. `transferLimit(anchor)-transfersPerAnchor[anchor]`) for a particular anchor
-  - MAY be immutably configureable (at deploytime), wheter transfer limit is FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
-  - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (if not configured as FIXED)
-  - The above mechanism MAY be used for DeFi application, lending etc to temporarily block transferAnchor(anchor), e.g. over a renting or lending period.
+- MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
+  - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
+  - MUST immutably define one of the above listed modes expose it via `transferLimitUpdateMode()`
+  - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (when `transferLimitUpdateMode() != FIXED`)
+- MUST implement `transfersLeft(anchor)`, returning the number of transfers left (i.e. `transferLimit(anchor)-transfersPerAnchor[anchor]`) for a particular anchor
+- MAY be immutably configureable (at deploytime), wheter transfer limit is FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
+- RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (if not configured as FIXED)
+- The above mechanism MAY be used for DeFi application, lending etc to temporarily block transferAnchor(anchor), e.g. over a renting or lending period.
 
-- MAY implement Floating
-    - MUST have an immutable `canFloat` boolean, indicating whether anchors can be released temporarily, i.e. the ASSET is floating. If `canFloat==false`, tokens can only be transferred with ATTESTATION. RECOMMENDED to set canFloat via constructor at deploy time.
 
-### ERC-XXX Floatable
+### ERC-XXX Floatable (WIP!!)
+```
+interface IERCxxxxFloatable is IERCxxxx {
+    function canStartFloating(ERCxxxxAuthorization op) external;
+    function canStopFloating(ERCxxxxAuthorization op) external;
 
+    function allowFloating(bytes32 anchor, bool _doFloat) external;
+    function isFloating(bytes32 anchor) external view returns (bool);
+
+    event AnchorFloatingState(
+        bytes32 indexed anchor,
+        uint256 indexed tokenId,
+        bool indexed isFloating
+    );
+
+    event CanStartFloating(
+        ERCxxxxAuthorization indexed authorization,
+        address maintainer
+    );
+
+   event CanStopFloating(
+        ERCxxxxAuthorization indexed authorization,
+        address maintainer
+    );
+}
+```
+
+- MUST have an immutable `canFloat` boolean, indicating whether anchors can be released temporarily, i.e. the ASSET is floating. If `canFloat==false`, tokens can only be transferred with ATTESTATION. RECOMMENDED to set canFloat via constructor at deploy time.
 
 ## Additional Specifications for PHYSICAL ASSETS and ANCHOR-TECHNOLOGY
 
@@ -304,7 +391,6 @@ TODO - if any input?
 
 
 
-
 ## Rationale
 
 <!--
@@ -317,10 +403,9 @@ TODO - if any input?
 
 TODO not really started
 
-
 TODO make a point that NFTs today are often seen as asset and that decoupling the asset from the NFT has the benefit, of the token can being stolen, but this does not mean the asset is stolen. 
 
-Why 1:1? For N:1 etc, use a contract to proxy or wrap this contract.
+Why 1:1 support only? For N:1 etc, use a contract to proxy or wrap this contract.
 
 Gas fees are paid through
 - ORACLE respectively associated centralized account (so not from the beneficiary)
@@ -358,6 +443,7 @@ No backward compatibility issues found.
 
   TODO: Remove this comment before submitting
 -->
+TODO: Migrate from reference implementation and add to assets/eip-xxxx/
 
 ## Reference Implementation
 
