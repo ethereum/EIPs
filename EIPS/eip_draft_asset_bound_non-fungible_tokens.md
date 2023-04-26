@@ -19,9 +19,9 @@ An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The ANCHOR tec
 The ANCHOR is wrapped 1:1 in a token, hence represents each individual ASSET 1:1 on-chain.
 Wrapping in a secure, inseperable manner requires the ORACLE to issue an `ATTESTATION`. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address. The ORACLE issues an ATTESTATION through off-chain signature.
 
-This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
+This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. The proposed `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
 
-We also outline 
+We also outline for optional use
 - a `FLOATING`-concept (temporarily or permanently enabling "traditional" ERC-721 transfers without ATTESTATION)
 - `ATTESTATION-LIMITS`, which are RECOMMENDED to implement for security reasons when gas is paid through a central account
 
@@ -29,9 +29,22 @@ We also outline
 
 ## Motivation
 
-The well-known ERC-721 outlines that NFTs can represent "ownership over physical properties [...] as well as digital collectables and even more abstract things such as responsibilities" - in a broader sense, we will refer to all those things as `ASSETS`.
+The well-known ERC-721 establishes that NFTs may represent "ownership over physical properties [...] as well as digital collectables and even more abstract things such as responsibilities" - in a broader sense, we will refer to all those things as `ASSETS`.
 
-The following proposed standard extends ERC-721 and elevates the concept of representing physical or digital `ASSETS` by strictly anchoring the `ASSET` inseperably into an NFT. Consequently, a change in ownership over the `ASSET` inevitably should be reflected by a change in ownership over the anchored NFT. Moreover, being in control over the `ASSET` must mean being in control over the anchored NFT.
+### The Problem
+NFTs are nowadays often confused as being assets themselves. Very commonly people treat an NFT's metdata (images, traits, ...) as asset-class, with the their rarity often defining the value of an invididual NFT. 
+It is a common misconception from NFT-investors that metadata is immutable, often to an extent, where said experts are shocked when learning that their PFP metadata (which they've seen as an asset) can be changed anytime through the controller of metadata, although there are even standards (ERC-4906) to spread the word when metadata changes.
+
+While we do not want to solve for this misconception, we do see a huge issue with a related common practice today. Off-chain ASSETS ("ownership over physical products", "digital collectables", "in-game assets", "responsibilities", ...) are linked to an NFT solely through metadata. Approaches to ensure on-chain integrity between metadata (=reference to ASSET) and a token are rarely seen.
+Without ensuring integrity of metadata on-chain, we consider linking an asset through metadata very problematic, as it requires absolute trust inte controller of the metadata. We need to trust the controller of metadata to not not [accidentially or willingly] alter the metadata. Further, we need to trust that the metadata provider at tokenURI is available until eternity, which has been proven otherwise (IPFS bucket disappears, central tokenURI-provider has downtimes, ...).
+
+### ASSET-BOUND NON-FUNGIBLE TOKEN
+In this standard we propose to
+1. Elevate the concept of representing physical or digital off-chain `ASSETS` by anchoring the `ASSET` inseperably into an NFT on-chain. 
+1. A change in off-chain ownership over the `ASSET` inevitably should be reflected by a change in on-chain ownership over the anchored NFT. 
+1. Being off-chain in control over the `ASSET` must mean being on-chain in control over the anchored NFT.
+
+As 2. and 3. indicate, the control/ownership/posession of the ASSET should be the source of truth, _not_ the posession of an NFT anchored the ASSET. Hence, we propose an `ASSET-BOUND NFT`, where off-chain CONTROL over the ASSET enforces on-chain CONTROL over the anchored NFT.
 
 The proposed NFTs allow to anchor digital metadata inseperably to the `ASSET`. When the `ASSET` is a physical asset, this allows to design "phygitals" in their purest form, i.e. creating a "phygital" asset with a physical and digital component that are inseperable.
 
