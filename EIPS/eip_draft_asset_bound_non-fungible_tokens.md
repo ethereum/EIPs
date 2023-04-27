@@ -135,7 +135,7 @@ export async function minimalAttestationExample() {
 
 ### ERC-XXXXContract
 
-Every ERC-XXXX compliant contract must implement the IERCxxxx, ERC721 and ERC165 interfaces (subject to “caveats” below):
+Every ERC-XXXX compliant contract must implement the [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol), ERC721 and ERC165 interfaces (subject to “caveats” below):
 ```
 /**
  * @title IERCxxxx Asset-Bound Non-Fungible Tokens 
@@ -298,6 +298,8 @@ interface IERCxxxx {
 
 
 ### ERC-XXXX Attestation-limited (WIP!)
+Every ERC-XXXX compliant contract MAY implement the [IERCxxxxAttestationLimited](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxAttestationLimited.sol) and MUST implement ERC721 and ERC165 interfaces (subject to “caveats” below):
+
 ```
 interface IERCxxxxAttestationLimited {
     enum AttestedTransferLimitUpdatePolicy {
@@ -334,6 +336,8 @@ interface IERCxxxxAttestationLimited {
 
 
 ### ERC-XXX Floatable (WIP!!)
+Every ERC-XXXX compliant contract MAY implement the [IERCxxxxFloatable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxFloatable.sol) and MUST implement ERC721 and ERC165 interfaces (subject to “caveats” below):
+
 ```
 interface IERCxxxxFloatable is IERCxxxx {
     function canStartFloating(ERCxxxxAuthorization op) external;
@@ -420,43 +424,22 @@ Gas fees are paid through
 
 ## Backwards Compatibility
 
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
 No backward compatibility issues found.
 
 ## Test Cases
+Test cases are available:
+- For only implementing [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/test/ERCxxxx.ts)
+- For implementing [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/test/ERCxxxxFull.ts)
 
-<!--
-  This section is optional for non-Core EIPs.
 
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
-TODO: Migrate from reference implementation and add to assets/eip-xxxx/
 
 ## Reference Implementation
 
-<!--
-  This section is optional.
+Reference implemntations, which can be extended in your actual implementation are available:
+- Minimal implementation, only supporting [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxx.sol)
+- Full implementation, support [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxxFull.sol)
 
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
 
-  TODO: Remove this comment before submitting
--->
-
-Reference-Implementation WIP: <https://git.avdev.at/dlt/physical-transferable-nft/-/tree/initial?ref_type=heads>
 
 ## Security Considerations
 
@@ -468,10 +451,12 @@ Reference-Implementation WIP: <https://git.avdev.at/dlt/physical-transferable-nf
   TODO: Remove this comment before submitting
 -->
 
-Needs discussion.
 TODO
+- Valid anchors
+  - Outline merkle-tree salt leaves
+  - Why using merkle-trees and not simply store all available anchors on-chain (besides memory issues)
+- Maintainance-role over using ownership (Ownable is used by marketplaces to manage the collection)
 
-- Add merkle-tree leaves
 
 ## Copyright
 TODO: Find legal language for the following:
