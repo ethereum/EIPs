@@ -65,5 +65,5 @@ if __name__ == '__main__':
 
     do_test(Optional[Union[None, uint64, uint32]](None))
     do_test(Optional[Union[None, uint64, uint32]](Union[None, uint64, uint32](selector=0)))
-    do_test(Optional[Union[None, uint64, uint32]](Union[None, uint64, uint32](64, selector=1)))
-    do_test(Optional[Union[None, uint64, uint32]](Union[None, uint64, uint32](32, selector=2)))
+    do_test(Optional[Union[None, uint64, uint32]](Union[None, uint64, uint32](selector=1, value=64)))
+    do_test(Optional[Union[None, uint64, uint32]](Union[None, uint64, uint32](selector=2, value=32)))

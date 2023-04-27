@@ -13,7 +13,7 @@ import "./BaseBidOnAddresses.sol";
 /// - a combination of a collateral contract address and collateral token ID
 ///   (a counter of donated amount of collateral tokens, don't confuse with collateral tokens themselves)
 ///
-/// In functions of this contact `condition` is always a customer's original address.
+/// In functions of this contract `condition` is always a customer's original address.
 ///
 /// We receive funds in ERC-1155, see also https://github.com/vporton/wrap-tokens
 contract BidOnAddresses is BaseBidOnAddresses {

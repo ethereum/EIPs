@@ -282,7 +282,7 @@ describe('NestableToken', function () {
       expect(await parent.supportsInterface('0x80ac58cd')).to.equal(true);
     });
 
-    it('can support INestable', async function () {
+    it('can support IERC6059', async function () {
       expect(await parent.supportsInterface('0x42b0e56f')).to.equal(true);
     });
 
@@ -1115,7 +1115,7 @@ describe('NestableToken', function () {
       ).to.be.revertedWithCustomError(child, 'IsNotContract');
     });
 
-    it('cannot nest tranfer to contract if it does implement INestable', async function () {
+    it('cannot nest tranfer to contract if it does implement IERC6059', async function () {
       const ERC721 = await ethers.getContractFactory('ERC721Mock');
       const nonNestable = await ERC721.deploy('Non receiver', 'NR');
       await nonNestable.deployed();
@@ -1124,7 +1124,7 @@ describe('NestableToken', function () {
       ).to.be.revertedWithCustomError(child, 'NestableTransferToNonNestableImplementer');
     });
 
-    it('can nest tranfer to INestable contract', async function () {
+    it('can nest tranfer to IERC6059 contract', async function () {
       await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId);
       expect(await child.ownerOf(childId1)).to.eql(firstOwner.address);
       expect(await child.directOwnerOf(childId1)).to.eql([parent.address, bn(parentId), true]);
