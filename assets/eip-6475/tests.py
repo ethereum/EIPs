@@ -36,6 +36,10 @@ if __name__ == '__main__':
     do_test(Optional[boolean](None))
     do_test(Optional[boolean](True))
 
+    do_test(Optional[Optional[uint64]](None))
+    do_test(Optional[Optional[uint64]](Optional[uint64](None)))
+    do_test(Optional[Optional[uint64]](Optional[uint64](64)))
+
     class Foo(Container):
         a: uint64
         b: Optional[uint32]
@@ -50,6 +54,17 @@ if __name__ == '__main__':
     do_test(Optional[Vector[uint64, 1]](Vector[uint64, 1](64)))
     do_test(Optional[Vector[uint64, 5]](None))
     do_test(Optional[Vector[uint64, 5]](Vector[uint64, 5](64, 64, 64, 64, 64)))
+
+    do_test(Optional[List[uint64, 1]](None))
+    do_test(Optional[List[uint64, 1]](List[uint64, 1]()))
+    do_test(Optional[List[uint64, 1]](List[uint64, 1](64)))
+    do_test(Optional[List[uint64, 5]](List[uint64, 5](64, 64)))
+    do_test(Optional[List[Optional[uint64], 9]](None))
+    do_test(Optional[List[Optional[uint64], 9]](
+        List[Optional[uint64], 9](Optional[uint64](None), Optional[uint64](64))))
+    do_test(Optional[List[Foo, 1]](List[Foo, 1](Foo(a=64, b=Optional[uint32](32)))))
+    do_test(Optional[List[Optional[Foo], 1]](
+        List[Optional[Foo], 1](Optional[Foo](Foo(a=64, b=Optional[uint32](32), c=Optional[uint16](16))))))
 
     do_test(Optional[Bitvector[1]](None))
     do_test(Optional[Bitvector[1]](Bitvector[1](True)))

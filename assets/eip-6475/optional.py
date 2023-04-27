@@ -30,9 +30,6 @@ class Optional(MonoSubtreeView):
         return super().__new__(cls, backing=backing, hook=hook, **kwargs)
 
     def __class_getitem__(cls, element_type) -> Type["Optional"]:
-        if element_type.min_byte_length() == 0:
-            raise Exception(f"Invalid option type: ${element_type}")
-
         limit = 1
         contents_depth = get_depth(limit)
         packed = isinstance(element_type, BasicView)
