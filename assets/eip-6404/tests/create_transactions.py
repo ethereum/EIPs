@@ -62,9 +62,8 @@ encoded_signed_txs = List[ByteList[MAX_BYTES_PER_TRANSACTION], MAX_TRANSACTIONS_
                 max_priority_fee_per_gas=69_123_456_789,
                 max_fee_per_gas=69_123_456_789,
                 gas=21_000,
-                to=Union[None, ExecutionAddress](
-                    selector=1,
-                    value=ExecutionAddress(bytes.fromhex('d8dA6BF26964aF9D7eEd9e03E53415D37aA96045')),
+                to=Optional[ExecutionAddress](
+                    ExecutionAddress(bytes.fromhex('d8dA6BF26964aF9D7eEd9e03E53415D37aA96045'))
                 ),
                 value=3_141_592_653,
                 data=bytes([]),

@@ -1,8 +1,13 @@
+from os import path as os_path
+from sys import path
+current_dir = os_path.dirname(os_path.dirname(os_path.realpath(__file__)))
+path.append(current_dir + '/../eip-6475')
+
+from optional import Optional
 from eth_hash.auto import keccak
 from remerkleable.basic import boolean, uint8, uint32, uint64, uint256
 from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32, Bytes48
 from remerkleable.complex import Container, List, Vector
-from remerkleable.union import Union
 from rlp import encode, Serializable
 from rlp.sedes import Binary, CountableList, List as RLPList, big_endian_int, binary
 
@@ -188,7 +193,7 @@ class BlobTransaction(Container):
     max_priority_fee_per_gas: uint256
     max_fee_per_gas: uint256
     gas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     data: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]

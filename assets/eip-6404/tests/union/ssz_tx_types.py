@@ -13,6 +13,7 @@ from eip2718_tx_types import (
     AccessTuple,
     ECDSASignature,
     ExecutionAddress,
+    Optional,
     SignedBlobTransaction,
 )
 
@@ -20,7 +21,7 @@ class LegacySSZTransaction(Container):
     nonce: uint64
     gasprice: uint256
     startgas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     data: ByteList[MAX_CALLDATA_SIZE]
 
@@ -38,7 +39,7 @@ class EIP2930SSZTransaction(Container):
     nonce: uint64
     gas_price: uint256
     gas_limit: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     data: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
@@ -53,7 +54,7 @@ class EIP1559SSZTransaction(Container):
     max_priority_fee_per_gas: uint256
     max_fee_per_gas: uint256
     gas_limit: uint64
-    destination: Union[None, ExecutionAddress]
+    destination: Optional[ExecutionAddress]
     amount: uint256
     data: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]

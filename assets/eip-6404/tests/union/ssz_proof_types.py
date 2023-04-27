@@ -2,7 +2,7 @@ from remerkleable.basic import uint8, uint32
 from remerkleable.complex import Vector
 from ssz_tx_types import *
 from proof_helpers import *
-from eip2718_tx_types import BlobTransaction
+from eip2718_tx_types import BlobTransaction, Optional
 
 # Proof 1: Obtain the sequential `tx_index` within an `ExecutionPayload` for a specific `tx_hash`
 
@@ -24,7 +24,7 @@ LEGACY_AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(LEGACY_AMOUNT_PROOF_INDI
 
 class LegacyAmountProof(Container):
     startgas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(LEGACY_AMOUNT_PROOF_HELPER_INDICES)]
     signature_root: Root
@@ -36,7 +36,7 @@ EIP2930_AMOUNT_PROOF_INDICES = [
 EIP2930_AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(EIP2930_AMOUNT_PROOF_INDICES)  # [7, 2]
 
 class EIP2930AmountProof(Container):
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP2930_AMOUNT_PROOF_HELPER_INDICES)]
     signature_root: Root
@@ -50,7 +50,7 @@ EIP1559_AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(EIP1559_AMOUNT_PROOF_IN
 
 class EIP1559AmountProof(Container):
     gas_limit: uint64
-    destination: Union[None, ExecutionAddress]
+    destination: Optional[ExecutionAddress]
     amount: uint256
     multi_branch: Vector[Root, len(EIP1559_AMOUNT_PROOF_HELPER_INDICES)]
     signature_root: Root
@@ -64,7 +64,7 @@ EIP4844_AMOUNT_PROOF_HELPER_INDICES = get_helper_indices(EIP4844_AMOUNT_PROOF_IN
 
 class EIP4844AmountProof(Container):
     gas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP4844_AMOUNT_PROOF_HELPER_INDICES)]
     signature_root: Root
@@ -94,7 +94,7 @@ LEGACY_SENDER_PROOF_HELPER_INDICES = get_helper_indices(LEGACY_SENDER_PROOF_INDI
 
 class LegacySenderProof(Container):
     startgas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(LEGACY_SENDER_PROOF_HELPER_INDICES)]
     signature: LegacyECDSASignature
@@ -106,7 +106,7 @@ EIP2930_SENDER_PROOF_INDICES = [
 EIP2930_SENDER_PROOF_HELPER_INDICES = get_helper_indices(EIP2930_SENDER_PROOF_INDICES)  # [7, 2]
 
 class EIP2930SenderProof(Container):
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP2930_SENDER_PROOF_HELPER_INDICES)]
     signature: ECDSASignature
@@ -120,7 +120,7 @@ EIP1559_SENDER_PROOF_HELPER_INDICES = get_helper_indices(EIP1559_SENDER_PROOF_IN
 
 class EIP1559SenderProof(Container):
     gas_limit: uint64
-    destination: Union[None, ExecutionAddress]
+    destination: Optional[ExecutionAddress]
     amount: uint256
     multi_branch: Vector[Root, len(EIP1559_SENDER_PROOF_HELPER_INDICES)]
     signature: ECDSASignature
@@ -134,7 +134,7 @@ EIP4844_SENDER_PROOF_HELPER_INDICES = get_helper_indices(EIP4844_SENDER_PROOF_IN
 
 class EIP4844SenderProof(Container):
     gas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP4844_SENDER_PROOF_HELPER_INDICES)]
     signature: ECDSASignature
@@ -168,7 +168,7 @@ class LegacyInfoProof(Container):
     nonce: uint64
     gasprice: uint256
     startgas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(LEGACY_INFO_PROOF_HELPER_INDICES)]
     signature: LegacyECDSASignature
@@ -187,7 +187,7 @@ class EIP2930InfoProof(Container):
     nonce: uint64
     gas_price: uint256
     gas_limit: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP2930_INFO_PROOF_HELPER_INDICES)]
     signature: ECDSASignature
@@ -208,7 +208,7 @@ class EIP1559InfoProof(Container):
     max_priority_fee_per_gas: uint256
     max_fee_per_gas: uint256
     gas_limit: uint64
-    destination: Union[None, ExecutionAddress]
+    destination: Optional[ExecutionAddress]
     amount: uint256
     multi_branch: Vector[Root, len(EIP1559_INFO_PROOF_HELPER_INDICES)]
     signature: ECDSASignature
@@ -229,7 +229,7 @@ class EIP4844InfoProof(Container):
     max_priority_fee_per_gas: uint256
     max_fee_per_gas: uint256
     gas: uint64
-    to: Union[None, ExecutionAddress]
+    to: Optional[ExecutionAddress]
     value: uint256
     multi_branch: Vector[Root, len(EIP4844_INFO_PROOF_HELPER_INDICES)]
     signature: ECDSASignature

@@ -24,10 +24,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                     max_priority_fee_per_gas=signed_tx.max_priority_fee_per_gas,
                     max_fee_per_gas=signed_tx.max_fee_per_gas,
                     gas_limit=signed_tx.gas_limit,
-                    destination=Union[None, ExecutionAddress](
-                        selector=1,
-                        value=ExecutionAddress(signed_tx.destination),
-                    ) if len(signed_tx.destination) > 0 else Union[None, ExecutionAddress](),
+                    destination=Optional[ExecutionAddress](
+                        ExecutionAddress(signed_tx.destination)
+                    ) if len(signed_tx.destination) > 0 else Optional[ExecutionAddress](None),
                     amount=signed_tx.amount,
                     data=signed_tx.data,
                     access_list=[AccessTuple(
@@ -54,10 +53,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                     nonce=signed_tx.nonce,
                     gas_price=signed_tx.gasPrice,
                     gas_limit=signed_tx.gasLimit,
-                    to=Union[None, ExecutionAddress](
-                        selector=1,
-                        value=ExecutionAddress(signed_tx.to),
-                    ) if len(signed_tx.to) > 0 else Union[None, ExecutionAddress](),
+                    to=Optional[ExecutionAddress](
+                        ExecutionAddress(signed_tx.to),
+                    ) if len(signed_tx.to) > 0 else Optional[ExecutionAddress](None),
                     value=signed_tx.value,
                     data=signed_tx.data,
                     access_list=[AccessTuple(
@@ -83,10 +81,9 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
                     nonce=signed_tx.nonce,
                     gasprice=signed_tx.gasprice,
                     startgas=signed_tx.startgas,
-                    to=Union[None, ExecutionAddress](
-                        selector=1,
-                        value=ExecutionAddress(signed_tx.to),
-                    ) if len(signed_tx.to) > 0 else Union[None, ExecutionAddress](),
+                    to=Optional[ExecutionAddress](
+                        ExecutionAddress(signed_tx.to),
+                    ) if len(signed_tx.to) > 0 else Optional[ExecutionAddress](None),
                     value=signed_tx.value,
                     data=signed_tx.data,
                 ),
