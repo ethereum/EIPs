@@ -31,7 +31,7 @@
     "hardhat": "^2.8.2",
     "hardhat-deploy": "^0.9.24",
     "solc": "^0.8.11",
-    "solidity-coverage": "^0.7.17",
+    "solidity-coverage": "^0.8.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4",
     "yargs": "^17.3.1"
