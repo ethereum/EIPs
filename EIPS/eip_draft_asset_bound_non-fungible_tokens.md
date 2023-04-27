@@ -16,7 +16,7 @@ This standard allows to integrate physical and digital ASSETS without signing ca
 An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The `ANCHOR-TECHNOLOGY` must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR-TECHNOLOGY must further allow to establish a `PROOF-OF-CONTROL` over the ASSET through an `ORACLE`. For physical ASSETS, PROOF-OF-CONTROL corresponds for example to proof of physical presence. 
 
 The ANCHOR is mapped 1:1 to a tokenId on-chain, hence represents each individual ASSET 1:1.
-Wrapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is on-chain-verifyable. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address, e.g. through a user-device.
+Mapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is on-chain-verifyable. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address, e.g. through a user-device.
 
 This standard to proposes to use `ATTESTATIONS` as authorization for the following ERC721 mechanisms: `transfer`, `burn` and `approve`. The proposed `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION. 
 
@@ -278,7 +278,7 @@ interface IERCxxxx {
     - MUST ensure `anchorIsReleased[anchor]` has the same state as before `transferAnchor()` has been invoked.
     - MUST either
       - call `_safeTransferFrom(ownerOf(tokenByAnchor[anchor]), to, tokenByAnchor[anchor])` when `tokenByAnchor[anchor]` exists
-      - or create a new token wrapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `tokenByAnchor[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
+      - or create a new token mapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `tokenByAnchor[anchor]` does not exist. It is RECOMMENDED use the ERC721-Enumerable mechanics to acquire `newTokenId`.
     - MUST emit `AnchorTransfer(from, to, anchor, tokenByAnchor[anchor])`
   - burnAnchor(attestation), corresponding to ERC721 `burn(tokenId)` 
     - TODO, see reference IMPL in the meantime
