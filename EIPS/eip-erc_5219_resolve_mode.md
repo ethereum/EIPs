@@ -41,8 +41,6 @@ No backward compatibility issues found.
 ## Reference Implementation
 
 ```solidity
-/// @dev IDecentralizedApp is the ERC-5219 interface
-
 abstract contract ERC5219Resolver is IDecentralizedApp {
     function resolveMode() public pure returns (string mode) {
       return "erc5219";
@@ -53,7 +51,7 @@ abstract contract ERC5219Resolver is IDecentralizedApp {
 
 ## Security Considerations
 
-The security considerations of [ERC-4804](./eip-4804#security-considerations) and [ERC-5219](./eip-5219#security-considerations) apply.
+The security considerations of [ERC-4804](./eip-4804.md#security-considerations) and [ERC-5219](./eip-5219.md#security-considerations) apply.
 
 ## Copyright
 
