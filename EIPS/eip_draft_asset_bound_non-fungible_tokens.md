@@ -435,10 +435,10 @@ Test cases are available:
 
 ## Reference Implementation
 
-Reference implemntations, which can be extended in your actual implementation are available:
+The reference implementations are [MIT](../assets/eip-draft_asset-bound_non-fungible_token/LICENSE.md) licensed and can therefore be freely used.
+
 - Minimal implementation, only supporting [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxx.sol)
 - Full implementation, support [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxxFull.sol)
-
 
 
 ## Security Considerations
@@ -459,6 +459,6 @@ TODO
 
 
 ## Copyright
-TODO: Find legal language for the following:
-- Certain Systems, e.g. the one according to Figure 1, may be subject to patent-pending EPxxxxx / USxxxx (not published yet) and a license may be required. Check with (add way of contact here). 
-- We do declare, that we explicitely waive copyright and XXX for the present EIP-xxxx and the provided ERC-xxxx reference implementation, i.e. we license the EIP under TODO SPDX-license string  
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+The reference implementations are [MIT](../assets/eip-draft_asset-bound_non-fungible_token/LICENSE.md) licensed.
