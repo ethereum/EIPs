@@ -10,7 +10,7 @@ def do_test(value):
         assert value.encode_bytes() == b''
         assert value.hash_tree_root() == List[value.__class__, 1]().hash_tree_root()
     else:
-        assert value.encode_bytes() == v.encode_bytes()
+        assert value.encode_bytes() == bytes([0x01]) + v.encode_bytes()
         assert value.hash_tree_root() == List[value.__class__, 1](v).hash_tree_root()
     assert value.__class__.decode_bytes(value.encode_bytes()) == value
 

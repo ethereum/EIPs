@@ -3,6 +3,7 @@ from remerkleable.basic import uint256
 from remerkleable.complex import MonoSubtreeView
 from remerkleable.core import BasicView, View, ViewHook
 from remerkleable.tree import Gindex, Node, PairNode, get_depth, subtree_fill_to_contents, zero_node
+from remerkleable.tree import LEFT_GINDEX, RIGHT_GINDEX
 
 T = TypeVar('T', bound="Optional")
 
@@ -132,7 +133,7 @@ class Optional(MonoSubtreeView):
 
     @classmethod
     def tree_depth(cls) -> int:
-        return cls.contents_depth() + 1  # 1 extra for length mix-in
+        return cls.contents_depth() + 1  # 1 extra for mix-in
 
     @classmethod
     def limit(cls) -> int:
@@ -143,32 +144,42 @@ class Optional(MonoSubtreeView):
         if scope == 0:
             return cls()
         else:
-            return cls(cls.element_cls().deserialize(stream, scope))
+            is_some = stream.read(1)
+            if is_some != bytes([0x01]):
+                raise ValueError(f"Unexpected is_some {is_some} (expected: 1)")
+            return cls(cls.element_cls().deserialize(stream, scope - 1))
 
     def serialize(self, stream: BinaryIO) -> int:
         v = self.get()
         if v is None:
             return 0
         else:
-            return v.serialize(stream)
+            stream.write(bytes([0x01]))
+            return 1 + v.serialize(stream)
 
     @classmethod
     def navigate_type(cls, key: Any) -> Type[View]:
-        if key >= cls.limit():
-            raise KeyError
-        return super().navigate_type(key)
+        if key in ('__selector__', '__is_some__'):
+            return uint256
+        if not isinstance(key, int):
+            raise TypeError(f"expected integer key, got {key}")
+        if not (0 <= int(key) <= 1):
+            raise KeyError(f"key {key} is not a valid selector for optional {repr(cls)}")
+        return cls.element_cls()
 
     @classmethod
     def key_to_static_gindex(cls, key: Any) -> Gindex:
-        if key == '__is_some__':
+        if key in ('__selector__', '__is_some__'):
             return RIGHT_GINDEX
-        if key >= cls.limit():
-            raise KeyError
-        return super().key_to_static_gindex(key)
+        if not isinstance(key, int):
+            raise TypeError(f"expected integer key, got {key}")
+        if not (0 <= int(key) <= 1):
+            raise KeyError(f"key {key} is not a valid selector for optional {repr(cls)}")
+        return LEFT_GINDEX
 
     @classmethod
     def default_node(cls) -> Node:
-        return PairNode(zero_node(cls.contents_depth()), zero_node(0))  # mix-in 0 as list length
+        return PairNode(zero_node(cls.contents_depth()), zero_node(0))  # mix-in 0
 
     @classmethod
     def is_fixed_byte_length(cls) -> bool:
@@ -182,4 +193,4 @@ class Optional(MonoSubtreeView):
     def max_byte_length(cls) -> int:
         elem_cls = cls.element_cls()
         bytes_per_elem = elem_cls.max_byte_length()
-        return bytes_per_elem
+        return 1 + bytes_per_elem
