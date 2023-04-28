@@ -401,13 +401,17 @@ TODO - if any input?
 
 ## Rationale
 
-In this EIP we propose a standard and three optional extensions that cover tokenization of ownership and posession based use cases. When `ASSETs` ownership or posession changes, the digital representation of that asset also changes. Those state changes often times result into shifting obligations and privileges for the involved parties.
+In this EIP we propose a standard and three optional extensions that cover tokenization of ownership and posession based use cases. When `ASSETs` ownership or posession changes, the digital representation of that asset also changes. Those state changes often  result into shifting obligations and privileges for the involved parties.
 
 Therefore tokenization of `ASSET` without a digital representations of `ASSET`s associated obligation and properties is not complete. Below we explain for each context how it can be mapped with the standards proposed in this EIP.
 
-During `ASSET`s lifecycle, the ownership and posession state changes multiple, sometimes thousands, of times. Even if `ASSET` is mass produced and plenty available, each `ASSET` has an individual property graph.
+During `ASSET`s lifecycle, the ownership and posession state changes multiple, sometimes thousands, of times. Even if physical `ASSET` is mass produced with fungible characteristics, each `ASSET` has an individual property graph and thus becomes non-fungible.
 
-Hence this EIP follows the design decision that `ASSET` and `ANCHOR` are always mapped 1-1 and not 1-N, so that `ANCHOR` represents the individual property graph of `ASSET`
+Hence this EIP follows the design decision that `ASSET` and `ANCHOR` are always mapped 1-1 and not 1-N, so that `ANCHOR` represents the individual property graph of `ASSET`. Furthermore the token chosen for `ASSET` has to be of a non-fungible token format.
+
+As we're mentioning in the introduction, the concept around asset tokenization suffers the inherent problem that *integrity between off-chain ownership and on-chain representation as NFT is not enforcible*.
+
+In this EIP we propose standards that make it possible to create protocols that can make those representations enforcible by using `PROOF-OF-CONTROL` and several optional extensions.
 
 ### Posession
 
@@ -423,13 +427,7 @@ Posession based use cases are covered by the core EIP: The holder of `ASSET` is 
 
 ### Ownership
 
-Ownership for example can be burdened with liens and obligations as well as rights and benefits. I.e. owned `ASSET` can be used for collateral, can be rented or can even yield a return.
-
-A few examples for ownership obligations, liens, rights and return:
-
-- If an appartment with a lease contract is sold, the new owner has to honor the lease (obligation), hence the property has a lien.
-- If the appartment has a mortgage, it can not be transferred without refinancing, hence transfer without re-financing has to be locked.
-- Oil options grant ownership of a barrel of oil on a certain date. The barrel has not yet be produced. On maturity date, the right of ownership is appended by the obligation to pick up the barrel from storage.
+Ownership can be burdened with liens and obligations as well as rights and benefits. I.e. owned `ASSET` can be used for collateral, can be rented or can even yield a return.
 
 **Use Case 3 - Securing ownership from theft:** If `ASSET` is owned, the owner wants to prevent further `ATTESTATION` to prevent theft.
 
@@ -445,10 +443,6 @@ A few examples for ownership obligations, liens, rights and return:
 - This is interesting for use-cases, where e.g. ASSETS are not available for user yet, i.e. proof-of-control may only be available later. The asset (which is securely locked  or maybe even not built yet) should  already be tradable. As soon as the asset becomes available, isReleased[anchor] = false, and we have asset-based transfer method.  Example Dreißigacker (wine has to age for 5 years, but people should already be able to trade the bottle on NFT marketplaces. Like "deeds" / "grundbucheinträgie" / Besitzurkunde / Einverleibungsukrunden / ...) 
 - Nice side-effect; If I make an floatable (with floatingChange-permission OWNER) , and I'm travelling, i.e. have not access to the ASSET, I can (as the current owner of the mapped token) make it floatable, transfer the NFT with standard ERC-71 mechansims to another wallet.
 - Also allows for "lending" or "delegating" an NFT to somebody (e.g. for free) by actually transferring it, but by keeping the asset I have always a way to get it back if somebody should be unwilling to return it. Example, DookieDash (level increase via gamers), or I lend you as a my metaverse land. In order to use it, it must be in a wallet you control. So I have to send it to you, for Helix knowing it's yours.
-
-TODO make a point that NFTs today are often seen as asset and that decoupling the asset from the NFT has the benefit, of the token can being stolen, but this does not mean the asset is stolen.
-
-Why 1:1 support only? For N:1 etc, use a contract to proxy or wrap this contract.
 
 Gas fees are paid through
 
