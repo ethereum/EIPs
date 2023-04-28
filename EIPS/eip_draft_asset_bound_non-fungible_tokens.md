@@ -413,7 +413,15 @@ As we're mentioning in the introduction, the concept around asset tokenization s
 
 In this EIP we propose standards that make it possible to create protocols that can make those representations enforcible by using `PROOF-OF-CONTROL` and several optional extensions.
 
-### Posession
+### Supported use-cases
+
+- A means to block transfer by `ATTESTATION` and through pre-approved operators under certain conditions and an immutable indication wether it's blockable.. (e.g. block all transfers until DeFi Loan is paid off.)
+
+- A `AllowTransferMode` that is set immutably at contract creation time and allows to limit the authorization mechanisms allowed to transfer. (e.g. AllowTransferAttestation, AllowTransferAttestationBurn, AllowTransferAll)
+
+- A limit of `ATTESTATIONs` that can be issued per token, and an indication `AttestationMode` wether this limit is mutable. (e.g. LimitImmutable, LimitIncreaseOnly, LimitMutable)
+
+#### Example Use Cases for representation of Posession
 
 Posession based use cases are covered by the core EIP: The holder of `ASSET` is in posession of `ASSET`. Nonetheless possession is an important social and economical tool: In many sports games posession of `ASSET`, commonly referred to as "the ball", is of essence. Posession can come with certain obligations and privileges.
 
@@ -425,36 +433,35 @@ Posession based use cases are covered by the core EIP: The holder of `ASSET` is 
 
 **Use Case 2b - Lendable digital twin:** The gamer can lend his sneakers to a friend in the metaverse, so that friend can run faster.
 
-### Ownership
+#### Example Use Cases To Represent Ownership
 
 Ownership can be burdened with liens and obligations as well as rights and benefits. I.e. owned `ASSET` can be used for collateral, can be rented or can even yield a return.
 
 **Use Case 3 - Securing ownership from theft:** If `ASSET` is owned, the owner wants to prevent further `ATTESTATION` to prevent theft.
 
-**Use Case 4 - Owning an house with a mortage:** The owner holds `ANCHOR` as proof of ownership, the DeFi-Bank finances the house and put a lock on the transfer of `ANCHOR`. Transfers of `ANCHOR` require the mortage to be paid off. Selling `ASSET` (the house) off-chain will be impossible, as it's no longer possible to finance the house.
+**Use Case 4 - Selling an house with a mortage:** The owner holds `ANCHOR` as proof of ownership, the DeFi-Bank finances the house and put a lock on the transfer of `ANCHOR`. Transfers of `ANCHOR` require the mortage to be paid off. Selling `ASSET` (the house) off-chain will be impossible, as it's no longer possible to finance the house.
 
-**Use Case 5 - Selling a house with a tenant:** A lease contract puts a lien on `ASSETs` `ANCHOR`. The old owner removes the lock, the new owner buys and refinances the house. Transfer of `ANCHOR` will also transfer the obligations and benefits of the lien to the new owner.
+**Use Case 5 - Selling a house with a lease:** A lease contract puts a lien on `ASSETs` `ANCHOR`. The old owner removes the lock, the new owner buys and refinances the house. Transfer of `ANCHOR` will also transfer the obligations and benefits of the lien to the new owner.
 
 **Use Case 6 - Buying a brand new car with downpayment:** A buyer configures a car and provides a downpayment. As long as the car is not produced, the `ANCHOR` can float and be traded on market places. The owner of `ANCHOR` at time of delivery of `ASSET` has the obligation to pick up the car and pay full price.
 
 **Use Case 7 - Buying a barrel of oil by forward transaction:** A buyer buys an oil option on a forward contract for one barrel of oil (`ASSET`). On maturity date the buyer has the obligation to pick up the oil.
 
-- By making a token floatable, it is "only" extending ERC721, as it has the full support of ERC721 including standard transfer logics. The anchorTransfer() in that becomes an alternative but additional way
-- This is interesting for use-cases, where e.g. ASSETS are not available for user yet, i.e. proof-of-control may only be available later. The asset (which is securely locked  or maybe even not built yet) should  already be tradable. As soon as the asset becomes available, isReleased[anchor] = false, and we have asset-based transfer method.  Example Dreißigacker (wine has to age for 5 years, but people should already be able to trade the bottle on NFT marketplaces. Like "deeds" / "grundbucheinträgie" / Besitzurkunde / Einverleibungsukrunden / ...) 
-- Nice side-effect; If I make an floatable (with floatingChange-permission OWNER) , and I'm travelling, i.e. have not access to the ASSET, I can (as the current owner of the mapped token) make it floatable, transfer the NFT with standard ERC-71 mechansims to another wallet.
-- Also allows for "lending" or "delegating" an NFT to somebody (e.g. for free) by actually transferring it, but by keeping the asset I have always a way to get it back if somebody should be unwilling to return it. Example, DookieDash (level increase via gamers), or I lend you as a my metaverse land. In order to use it, it must be in a wallet you control. So I have to send it to you, for Helix knowing it's yours.
+#### Use Case Matrix
 
-Gas fees are paid through
-
-- ORACLE respectively associated centralized account (so not from the beneficiary)
-- or through arbitrary accounts, most commonly by either the `from` or `to` account I assume.
-
-### Supported use-cases
-
-- A means to block transfer by `ATTESTATION` and through pre-approved operators under certain conditions and an immutable indication wether it's blockable.. (e.g. block all transfers until DeFi Loan is paid off.)
-
-- A `AllowTransferMode` that is set immutably at contract creation time and allows to limit the authorization mechanisms allowed to transfer. (e.g. AllowTransferAttestation, AllowTransferAttestationBurn, AllowTransferAll)
-- A limit of `ATTESTATIONs` that can be issued per token, and an indication `AttestationMode` wether this limit is mutable. (e.g. LimitImmutable, LimitIncreaseOnly, LimitMutable)
+| Use Case | EIP-XXXX approveAuth | EIP-XXXX burnAuth | Floatable | Attestation-Limit | Lock & Lien |
+|---------------|---|---|---|---|---|
+| **Managing Posession** |
+| Token gating  | ASSET | ANY | Incompatible | - | - |
+| Digital twin  | ASSET | ANY | Incompatible | - | - |
+| Scarce digital twin | ASSET | ANY | Incompatible | Implemented | - |
+| Lendable digital twin         | OWNER_AND_ASSET | ASSET | Implemented | - | - |
+| **Managing Ownership** |
+| Securing ownership from theft   | OWNER or OWNER_AND_ASSET | ANY | Compatible | - | Implemented |
+| Selling an house with a mortage  | ASSET  or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
+| Selling a house with a lease | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
+| Buying a brand new car with downpayment | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
+| Buying a barrel of oil by forward transaction | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
 
 ## Backwards Compatibility
 
