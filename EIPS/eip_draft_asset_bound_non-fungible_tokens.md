@@ -401,15 +401,50 @@ TODO - if any input?
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+In this EIP we propose a standard and three optional extensions that cover tokenization of ownership and posession based use cases. When `ASSETs` ownership or posession changes, the digital representation of that asset also changes. Those state changes often times result into shifting obligations and privileges for the involved parties.
 
-  The current placeholder is acceptable for a draft.
+Therefore tokenization of `ASSET` without a digital representations of `ASSET`s associated obligation and properties is not complete. Below we explain for each context how it can be mapped with the standards proposed in this EIP.
 
-  TODO: Remove this comment before submitting
--->
+During `ASSET`s lifecycle, the ownership and posession state changes multiple, sometimes thousands, of times. Even if `ASSET` is mass produced and plenty available, each `ASSET` has an individual property graph.
 
-TODO not really started
+Hence this EIP follows the design decision that `ASSET` and `ANCHOR` are always mapped 1-1 and not 1-N, so that `ANCHOR` represents the individual property graph of `ASSET`
+
+### Posession
+
+Posession based use cases are covered by the core EIP: The holder of `ASSET` is in posession of `ASSET`. Nonetheless possession is an important social and economical tool: In many sports games posession of `ASSET`, commonly referred to as "the ball", is of essence. Posession can come with certain obligations and privileges.
+
+**Use Case 1 - Posession based token gating:** Club guest in posession of limited T-Shirt gets a token which allows him to open the door to the VIP lounge.
+
+**Use Case 2 - Posession based digital twin:** A gamer is in posession of a pair of sneakers, and gets a token to wear them in metaverse.
+
+**Use Case 2a - Scarce posession based digital twin:** The producer of the sneaker decided that the product includes a limit of 5 digital twins, to create scarcity.
+
+**Use Case 2b - Lendable digital twin:** The gamer can lend his sneakers to a friend in the metaverse, so that friend can run faster.
+
+### Ownership
+
+Ownership for example can be burdened with liens and obligations as well as rights and benefits. I.e. owned `ASSET` can be used for collateral, can be rented or can even yield a return.
+
+A few examples for ownership obligations, liens, rights and return:
+
+- If an appartment with a lease contract is sold, the new owner has to honor the lease (obligation), hence the property has a lien.
+- If the appartment has a mortgage, it can not be transferred without refinancing, hence transfer without re-financing has to be locked.
+- Oil options grant ownership of a barrel of oil on a certain date. The barrel has not yet be produced. On maturity date, the right of ownership is appended by the obligation to pick up the barrel from storage.
+
+**Use Case 3 - Securing ownership from theft:** If `ASSET` is owned, the owner wants to prevent further `ATTESTATION` to prevent theft.
+
+**Use Case 4 - Owning an house with a mortage:** The owner holds `ANCHOR` as proof of ownership, the DeFi-Bank finances the house and put a lock on the transfer of `ANCHOR`. Transfers of `ANCHOR` require the mortage to be paid off. Selling `ASSET` (the house) off-chain will be impossible, as it's no longer possible to finance the house.
+
+**Use Case 5 - Selling a house with a tenant:** A lease contract puts a lien on `ASSETs` `ANCHOR`. The old owner removes the lock, the new owner buys and refinances the house. Transfer of `ANCHOR` will also transfer the obligations and benefits of the lien to the new owner.
+
+**Use Case 6 - Buying a brand new car with downpayment:** A buyer configures a car and provides a downpayment. As long as the car is not produced, the `ANCHOR` can float and be traded on market places. The owner of `ANCHOR` at time of delivery of `ASSET` has the obligation to pick up the car and pay full price.
+
+**Use Case 7 - Buying a barrel of oil by forward transaction:** A buyer buys an oil option on a forward contract for one barrel of oil (`ASSET`). On maturity date the buyer has the obligation to pick up the oil.
+
+- By making a token floatable, it is "only" extending ERC721, as it has the full support of ERC721 including standard transfer logics. The anchorTransfer() in that becomes an alternative but additional way
+- This is interesting for use-cases, where e.g. ASSETS are not available for user yet, i.e. proof-of-control may only be available later. The asset (which is securely locked  or maybe even not built yet) should  already be tradable. As soon as the asset becomes available, isReleased[anchor] = false, and we have asset-based transfer method.  Example Dreißigacker (wine has to age for 5 years, but people should already be able to trade the bottle on NFT marketplaces. Like "deeds" / "grundbucheinträgie" / Besitzurkunde / Einverleibungsukrunden / ...) 
+- Nice side-effect; If I make an floatable (with floatingChange-permission OWNER) , and I'm travelling, i.e. have not access to the ASSET, I can (as the current owner of the mapped token) make it floatable, transfer the NFT with standard ERC-71 mechansims to another wallet.
+- Also allows for "lending" or "delegating" an NFT to somebody (e.g. for free) by actually transferring it, but by keeping the asset I have always a way to get it back if somebody should be unwilling to return it. Example, DookieDash (level increase via gamers), or I lend you as a my metaverse land. In order to use it, it must be in a wallet you control. So I have to send it to you, for Helix knowing it's yours.
 
 TODO make a point that NFTs today are often seen as asset and that decoupling the asset from the NFT has the benefit, of the token can being stolen, but this does not mean the asset is stolen.
 
