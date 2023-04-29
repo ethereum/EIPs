@@ -369,7 +369,64 @@ interface IERCxxxxFloatable is IERCxxxx {
 }
 ```
 
-- MUST have an immutable `canFloat` boolean, indicating whether anchors can be released temporarily, i.e. the ASSET is floating. If `canFloat==false`, tokens can only be transferred with ATTESTATION. RECOMMENDED to set canFloat via constructor at deploy time.
+### ERC-XXXX Lockable (WIP!!)
+
+ERC-XXXX Lockable is a mechanism that enables third party smart contracts to lock transfer of `ASSET` besides having a valid `ATTESTATION`. This enables, amongst other things, the use of `ASSET` as on-chain collateral, and can be used for protection against theft through `ATTESTATION`.
+
+ERC-XXXX Lockable has a hard `LOCK` that prevents transfers, and a `LIEN` mechanism. While `LOCK` prevents transfer, `LIEN` indicates that `ASSET` is burdened with a third party liability (i.e. a lease contract).
+
+Every ERC-XXXX compliant contract MAY implement the [IERCxxxxLockable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxLockable.sol) and MUST implement ERC721 and ERC165 interfaces (subject to “caveats” below):
+
+```Solidity
+interface IERCxxxxLockable is IERCxxxx {
+
+    function addLockingAccount(address lockingAddress, bool canLock, bool canLien) external;
+    function changeLockingAccount(address lockingAddress, bool canLock, bool canLien) external;
+    function removeLockingAccount(address lockingAddress) external;
+
+    function accountLocksLength(address lockingAddress) external view returns (uint);
+    function getAccountLocks(address lockingAddress, uint) external view returns (uint256 tokenId);
+    
+    function accountLiensLength(address lockingAddress) external view returns (uint);
+    function getAccountLiens(address lockingAddress, uint) external view returns (uint256 tokenId);
+    
+    function addLock(uint256 tokenId) external;
+    function removeLock(uint256 tokenId,) external;
+
+    function addLien(uint256 tokenId) external;
+    function removeLien(uint256 tokenId,) external;
+
+    function anchorIsLocked(bytes32 anchor) external view returns (bool);
+    function anchorHasLien(bytes32 anchor) external view returns (bool);
+
+    function tokenIsLocked(bytes32 anchor) external view returns (bool);
+    function tokenHasLien(bytes32 anchor) external view returns (bool);
+
+    event AnchorLockAdded(
+        bytes32 indexed anchor,
+        address indexed lockingAccount,
+        uint256 indexed lockCount
+    );
+
+    event AnchorLockRemoved(
+        bytes32 indexed anchor,
+        address indexed lockingAccount,
+        uint256 indexed lockCount
+    );
+
+    event AnchorLienAdded(
+        bytes32 indexed anchor,
+        address indexed lienAccount,
+        uint256 indexed lienCount
+    );
+
+    event AnchorLienRemoved(
+        bytes32 indexed anchor,
+        address indexed lienAccount,
+        uint256 indexed lienCount
+    );
+}
+```
 
 ## Additional Specifications for PHYSICAL ASSETS and ANCHOR-TECHNOLOGY
 
