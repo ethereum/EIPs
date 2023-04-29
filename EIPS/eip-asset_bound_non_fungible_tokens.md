@@ -1,0 +1,524 @@
+---
+title: Asset-bound Non-Fungible Tokens
+description: Asset-bound NFTs anchor a token 1-1 to an asset and transfers are authorized through oracle-attestation of control over the asset
+author: Thomas Bergmueller (@tbergmueller) <thomas.bergmueller@authenticvision.com>, Lukas Meyer (@ibex-technology) <lukas@ibex.host>
+discussions-to: https://ethereum-magicians.org/t/draft-erc-xxxx-asset-bound-non-fungible-tokens/14056
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-04-29
+requires: 165, 721
+---
+
+## Abstract
+
+This standard allows to integrate physical and digital ASSETS without signing capabilities into dApps/web3 by extending [ERC-721](eip-721.md).
+
+An `ASSET`, e.g. a physical object, is equipped with an `ANCHOR`. The `ANCHOR-TECHNOLOGY` must be chosen s.t. an ANCHOR allows to uniquely identify the ASSET. The ANCHOR-TECHNOLOGY must further allow to establish a `PROOF-OF-CONTROL` over the ASSET through an `ORACLE`. For physical ASSETS, PROOF-OF-CONTROL corresponds for example to proof of physical presence.
+
+The ANCHOR is mapped 1:1 to a tokenId on-chain, hence represents each individual ASSET 1:1.
+Mapping in a secure, inseperable manner requires the ORACLE to issue an off-chain signed `ATTESTATION`, which is on-chain-verifyable. Through the ATTESTATION, the ORACLE testifies that a particular ASSET associated with an ANCHOR has been `CONTROLLED` when defining a `to`-address, e.g. through a user-device.
+
+This standard to proposes to use `ATTESTATIONS` as authorization for the following [ERC-721](eip-721.md) mechanisms: `transfer`, `burn` and `approve`. The proposed `transferAnchor(attestation)`, `burnAnchor(attestation)` and `approveAnchor(attestation)` are permissionless, i.e. neither the sender/owner (`from`) nor the receiver (`to`) need to sign. Authorization is solely provided through the ORACLE's ATTESTATION.
+
+We also outline for optional use
+
+- a `FLOATING`-concept (temporarily or permanently enabling "traditional" [ERC-721](eip-721.md) transfers without ATTESTATION)
+- `ATTESTATION-LIMITS`, which are recommended to implement for security reasons, when gas is paid through a central account (see Figure 1)
+
+Figure 1 below shows a the data flow of an asset-bound NFT transfer through a simplified example system employing the proposed standard. The system is utilizing a smartphone as user-device to interact with a physical ASSET.
+
+![Figure 1: Sample system](../assets/eip-asset_bound_non_fungible_tokens/img/concept_diagram.png)
+
+## Motivation
+
+The well-known [ERC-721](eip-721.md) establishes that NFTs may represent "ownership over physical properties [...] as well as digital collectables and even more abstract things such as responsibilities" - in a broader sense, we will refer to all those things as `ASSETS`, which typically have value to people.
+
+### The Problem
+
+NFTs are nowadays often confused as being assets themselves. Very commonly people treat an NFT's metdata (images, traits, ...) as asset-class, with the their rarity often defining the value of an invididual NFT.
+It is a common misconception from NFT-investors that metadata is immutable, often to an extent, where said experts are shocked when learning that their PFP metadata (which they've seen as an asset) can be changed anytime through the controller of metadata, although there are even standards ([ERC-4906](eip-4906.md)) to spread the word when metadata changes.
+
+While we do not want to solve for this misconception, we do see a huge issue with a related common practice today. Off-chain ASSETS ("ownership over physical products", "digital collectables", "in-game assets", "responsibilities", ...) are linked to an NFT solely through metadata. Approaches to ensure on-chain integrity between metadata (=reference to ASSET) and a token are rarely seen.
+Without ensuring integrity of metadata on-chain, we consider linking an asset through metadata very problematic, as it requires absolute trust inte controller of the metadata. We need to trust the controller of metadata to not not [accidentially or willingly] alter the metadata. Further, we need to trust that the metadata provider at tokenURI is available until eternity, which has been proven otherwise (IPFS bucket disappears, central tokenURI-provider has downtimes, ...).
+
+Finally, representing ownership of off-chain ASSETS through NFT suffers from the inhert problem that the integrity between off-chain ownership and on-chain representation as NFT is not enforcible. dApps merely rely on some extra off-chain processes *trying* to ensure integrity, but as soon as the current owner of an NFT is incooperative or incapacitated, those approaches typically and integrity is no longer given.
+
+### ASSET-BOUND NON-FUNGIBLE TOKENS
+
+In this standard we propose to
+
+1. Elevate the concept of representing physical or digital off-chain `ASSETS` by on-chain anchoring the `ASSET` inseperably into an NFT.
+1. Being off-chain in control over the `ASSET` must mean being on-chain in control over the anchored NFT.
+1. (Related) A change in off-chain ownership over the `ASSET` inevitably should be reflected by a change in on-chain ownership over the anchored NFT.
+
+As 2. and 3. indicate, the control/ownership/posession of the ASSET should be the source of truth, *not* the posession of an NFT anchored the ASSET. Hence, we propose an `ASSET-BOUND NFT`, where off-chain CONTROL over the ASSET enforces on-chain CONTROL over the anchored NFT.
+Also the proposed ASSET-BOUND NFTs allow to anchor digital metadata inseperably to the `ASSET`. When the `ASSET` is a physical asset, this allows to design "phygitals" in their purest form, i.e. creating a "phygital" asset with a physical and digital component that are inseperable. [Note that metadata itself can still change, e.g. for "Evolvable NFT"]
+
+We propose to complement the existing transfer control mechanisms of a token according to ERC-721, `Approval` according to [ERC-721](eip-721.md) and `Permit` according to [ERC-4494](eip-4494.md), by another mechanism; `ATTESTATION`. An ATTESTATION is signed off-chain by the ORACLE and must only be issued when the ORACLE verified that whoever specifies the `to` address or beneficiary address has simultanously been in control over the ASSET. The `to` address of an attestation may be used for Transfers as well as for approvals and other authorizations.
+
+Transactions authorized via `ATTESTATION` shall not require signature or approval from neither the `from` (donor, owner, sender) nor `to` (beneficiary, receiver) account, i.e. making transfers permissionless. Ideally, transaction are signed independent from the `ORACLE` as well, allowing different scenarios in terms of gas-fees.
+
+Lastly we want to mention two major side-benefits of using the proposed standard, which drastically lowers hurdles in onboarding web2 users and increase their security;
+
+- New users, e.g `0xaa...aa` (Fig.1), can use gasless wallets, hence participate in Web3/dApps/DeFi and mint+transfer tokens without ever owning crypto currency. Gas-fees may be paid through a third-party account `0x..gasPayer` (Fig.1). The gas is typically covered by the ASSET issuer, who signs `transferAnchor()` transactions
+- Users cannot get scammed. Common attacks (e.g. wallet-drainer scams) are no longer possible or easily reverted, since only the anchored NFT can be stolen, not the ASSET itself. Also mishaps like transferring the NFT to the wrong account, losing access to an account etc can be mitigated by executing another `transferAnchor()` transaction based on proofing control over the `ASSET`, i.e. the physical object.
+
+### Related work
+
+We primarily aim to onboard physical or digital ASSETS into dApps, which do not signing-capabilities of their own (contrary to [ERC-5791](eip-5791.md) approach using crypto-chip based solutions). Note that we do not see any restrictions preventing to use ERC-5791 in combination with this standard, as the address of the crypto-chip qualifies as an ANCHOR.
+
+--- TO BE EXTENDED ---
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Definitions (alphabetical)
+
+- `ANCHOR` uniquely identifies the off-chain ASSET, being it physical or digital.
+- `ANCHOR TECHNOLOGY` MUST ensure that
+  - the ANCHOR is inseperable from the ASSET (physically or otherwise)
+  - an ORACLE can establish beyond reasonable doubt that the ASSET is CONTROLLED.
+  - For physical ASSETS, MUST fulfill [Specification for Physical Assets](#additional-specifications-for-physical-assets)
+
+- `ASSET` refers to the "thing", being it physical or digital, which is represented through NFTs according to the proposed standard. Typically, an ASSET does not have signing capabilities.
+
+- `ATTESTATION` is the confirmation that PROOF OF CONTROL was established when specifying the `to` (receiver, beneficiary) address.
+
+- `PROOF-OF-CONTROL` over the ASSET means owning or otherwise controlling an ASSET. How Proof of Control is established depends on the ASSET and may be implemented using technical, legal or other means. For physical ASSETS, CONTROL is typically verified by proofing physical proximity between a physical ASSET and an input device (e.g. a smartphone) used to specify the `to` address.
+
+- An `ORACLE` has signing capabilities. MUST be able to sign ATTESTATIONS off-chain in a way s.t. signatures can be verified on-chain.
+
+### ORACLE
+
+- MUST provide an ATTESTATION. Below we define the format how an ORACLE testifies that the `to` address of a transfer has been specified under the pre-condition of PROOF-OF-CONTROL associated with the particular ANCHOR being transferred to `to`.
+- The ATTESTATION MUST contain
+  - `to`, MUST be address, specifying the beneficiary, e.g. the to-address, approved account etc.
+  - `anchor`, aka the ASSET identifier, MUST have a 1:1 relation to the `ASSET`
+  - `attestationTime`, UTC seconds, time when attestation was signed by ORACLE,
+  - `validStartTime` UTC seconds, start time of the ATTESTATION's validity timespan
+  - `validEndTime`, UTC seconds, end time of the ATTESTATION's validity timespan
+  - `proof`, Data for proof-mechanism in checking an anchor's validity. Typically Merkle-Proof
+  - `signature`, ETH-signature (65 bytes). Output of an ORACLE signing the `attestationHash = keccak256([to, anchor, attestationTime, validStartTime, validEndTime, proof])`. Values typically abi-encoded.
+- How PROOF-OF-CONTROL is establish in detail through an ANCHOR-TECHNOLOGY is not subject to this standard. Minimal specification on ORACLE requirements and ANCHOR-TECHNOLOGY requirements when using Physical ASSETS is in  [Specification for Physical Assets](#additional-specifications-for-physical-assets).
+
+Minimal Typescript sample using ethers library and OZ MerkleTrees:
+
+```TypeScript
+export async function minimalAttestationExample() {
+  // #################################### PRELIMINARIES
+  const merkleTestAnchors = [
+      ['0x' + createHash('sha256').update('TestAnchor123').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor124').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor125').digest('hex')],
+      ['0x' + createHash('sha256').update('TestAnchor126').digest('hex')],
+      ['0x' + createHash('sha256').update('SaltLeave').digest('hex')] // shall never be used on-chain!
+      ]
+  const merkleTree = StandardMerkleTree.of(merkleTestAnchors, ["bytes32"]);
+
+  // #################################### ACCOUNTS
+  // Alice shall get the NFT, oracle signs the attestation off-chain 
+  const [alice, oracle] = await ethers.getSigners();
+
+  // #################################### CREATE AN ATTESTATION
+  const to = alice.address;
+  const anchor = merkleTestAnchors[0][0];
+  const proof = merkleTree.getProof([anchor]);
+  const attestationTime = Math.floor(Date.now() / 1000.0); // Now in seconds UTC
+
+  const validStartTime = 0;
+  const validEndTime = attestationTime + 15 * 60; // 15 minutes valid from attestation
+
+  // Hash and sign. In practice, oracle shall only sign when Proof-of-Control is established!
+  const messageHash = ethers.utils.solidityKeccak256(["address", "bytes32", "uint256", 'uint256', "uint256", "bytes32[]"], [to, anchor, attestationTime, validStartTime, validEndTime, proof]);
+  const sig = await oracle.signMessage(ethers.utils.arrayify(messageHash));
+  // Encode
+  return ethers.utils.defaultAbiCoder.encode(['address', 'bytes32', 'uint256', 'uint256', 'uint256', 'bytes32[]', 'bytes'], [to, anchor, attestationTime,  validStartTime, validStartTime, proof, sig]);
+}
+```
+
+### Proposed base contract
+Every contract compliant to this standard MUST implement the [IERCxxxx](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxx.sol), [ERC-721](eip-721.md) and [ERC-165](eip-165.md) interfaces (subject to “caveats” below):
+
+```Solidity
+/**
+ * @title IERCxxxx Asset-Bound Non-Fungible Tokens 
+ * @author Thomas Bergmueller (@tbergmueller) <tb@authenticvision.com>
+ * @notice Asset-bound Non-Fungible Tokens anchor a token 1:1 to a (physical or digital) asset and token transfers are authorized through attestation of control over the asset
+ * @dev See EIP-XXXX (todo link) for details
+ */
+interface IERCxxxx {
+    /// Used for several authorization mechansims, e.g. who can burn, who can set approval, ... 
+    /// @dev Specifying the role in the ecosystem. Used in conjunction with ERCxxxxAuthorization
+    enum ERCxxxxRole {
+        OWNER,  // =0, The owner of the digital token
+        ISSUER, // =1, The issuer (contract) of the tokens, typically represented through a MAINTAINER_ROLE, the contract owner etc.
+        ASSET,  // =2, The asset identified by the anchor
+        INVALID // =3, Reserved, do not use.
+    }
+
+    /// @dev Authorization, typically mapped to authorizationMaps, where each bit indicates whether a particular ERCxxxxRole is authorized 
+    ///      Typically used in constructor (hardcoded or params) to set burnAuthorization and approveAuthorization
+    ///      Also used in optional updateBurnAuthorization, updateApproveAuthorization 
+    enum ERCxxxxAuthorization {
+        NONE,               // = 0,      // None of the above
+        OWNER,              // = (1<<OWNER), // The owner of the token, i.e. the digital representation
+        ISSUER,             // = (1<<ISSUER), // The issuer of the tokens, i.e. this smart contract
+        ASSET,              // = (1<<ASSET), // The asset, i.e. via attestation
+        OWNER_AND_ISSUER,   // = (1<<OWNER) | (1<<ISSUER),
+        OWNER_AND_ASSET,    // = (1<<OWNER) | (1<<ASSET),
+        ASSET_AND_ISSUER,   // = (1<<ASSET) | (1<<ISSUER),
+        ALL                 // = (1<<OWNER) | (1<<ISSUER) | (1<<ASSET) // Owner + Issuer + Asset
+    }
+
+    event OracleUpdate(address indexed oracle, bool indexed trusted);
+    event AnchorTransfer(address indexed from, address indexed to, bytes32 indexed anchor, uint256 tokenId);
+    event AttestationUsed(address indexed to, bytes32 indexed anchor, bytes32 indexed attestationHash, uint256 totalUsedAttestationsForAnchor);
+    event ValidAnchorsUpdate(bytes32 indexed validAnchorHash, address indexed maintainer);
+
+    // state requesting methods
+    function anchorByToken(uint256 tokenId) external view returns (bytes32 anchor);
+    function tokenByAnchor(bytes32 anchor) external view returns (uint256 tokenId);
+    function attestationsUsedByAnchor(bytes32 anchor) external view returns (uint256 usageCount);
+    function decodeAttestationIfValid(bytes memory attestation) external view returns (address to, bytes32 anchor, bytes32 attestationHash);
+    function anchorIsReleased(bytes32 anchor) external view returns (bool isReleased);
+
+
+    /**
+     * @notice Adds or removes a trusted oracle, used when verifying signatures in `decodeAttestationIfValid()`
+     * @dev Emits OracleUpdate
+     * @param _oracle address of oracle
+     * @param _isTrusted true to add, false to remove
+     */
+    function updateOracle(address _oracle, bool _isTrusted) external;
+
+    /**
+     * @notice Transfers the ownership of an NFT mapped to attestation.anchor to attestation.to address. Uses ERC-721 safeTransferFrom and safeMint.
+     * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation. 
+     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     *      
+     *      Throws when attestation invalid or already used, 
+     *      Throws when attestation.to == ownerOf(tokenByAnchor(attestation.anchor)). See EIP-XXXX
+     *      Emits AnchorTransfer and AttestationUsed  
+     *  
+     * @param attestation Attestation, refer EIP-XXXX for details
+     * 
+     * @return anchor The anchor, which is mapped to `tokenId`
+     * @return to The `to` address, where the token with `tokenId` was transferd
+     * @return tokenId The tokenId, which is mapped to the `anchor`     * 
+     */
+    function transferAnchor(bytes memory attestation) external returns (bytes32 anchor, address to, uint256 tokenId);
+
+     /**
+     * @notice Approves attestation.to the token mapped to attestation.anchor. Uses ERC-721.approve(to, tokenId).
+     * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation.
+     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     * 
+     *      Throws when attestation invalid or already used
+     *      Throws when ERCxxxxRole.ASSET is not authorized to approve
+     * 
+     * @param attestation Attestation, refer EIP-XXXX for details 
+     */
+    function approveAnchor(bytes memory attestation) external;
+
+    /**
+     * @notice Burns the token mapped to attestation.anchor. Uses ERC-721._burn.
+     * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation.
+     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     * 
+     *      Throws when attestation invalid or already used
+     *      Throws when ERCxxxxRole.ASSET is not authorized to burn
+     * 
+     * @param attestation Attestation, refer EIP-XXXX for details 
+     */
+    function burnAnchor(bytes memory attestation) external;
+
+    
+    /// @notice Update the Merkle root containing the valid anchors. Consider salt-leaves!
+    /// @dev Proof (transferAnchor) needs to provided from this tree. 
+    /// @dev The merkle-tree needs to contain at least one "salt leaf" in order to not publish the complete merkle-tree when all anchors should have been dropped at least once. 
+    /// @param merkleRootNode The root, containing all anchors we want validated.
+    function updateValidAnchors(bytes32 merkleRootNode) external;
+}
+```
+
+#### Caveats
+
+- MUST implement ERC-721 and ERC-165
+- MUST ensure tokens only exist for valid `ANCHORS`
+- MUST define a `maxAttestationValidTime`, which is enforced in case an `ATTESTATION`'s `expireTime` is bigger.
+- MUST have bidirectional mapping `tokenPerAnchor[anchor]` and `anchorPerToken[token]`. This implies that a maximum of one token per `ANCHOR` exists.
+- MUST have `anchorIsReleased[anchor]`, indicating which particular anchors are currently released, i.e. can be transfered or minted.
+  - This is the key mechanism for token transfer mechanism extension.
+  - This MAY be used to implement FLOATING, a "temporary" decoupling between ASSET and tokens. See "FLOATING"
+- MUST have a mechnism to determine whether an ANCHOR is valid for the contract. This is typically implemented via MerkleTrees.
+  - MUST implement `validAnchor(anchor, proof)` which returns true when anchor is valid, i.e. MerkleProof is correct, false otherwise.
+- MUST implement `decodeAttestationIfValid(attestation)`
+  - Returns `attestation.to`, `attestation.anchor`, `attestation.attestationHash`
+  - MUST throw when
+    - `ATTESTATION` originates from a non-trusted `ORACLE`.
+    - `ATTESTATION` has expired, either when
+      - WHEN `attestation.attestationTime + maxAttestationValidTime > block.timestamp`
+      - OR when `block.timestamp > attestation.expireTime`
+    - `ATTESTATION` has already been used. "Used" being defined in at least one transfer has been made using a particular `ATTESTATION`.
+    - `validAnchor(attestation.anchor, attestation.proof)` returns `false`
+  - RECOMMENDED to call a hook `_beforeAttestationUse(to, anchor)` before returning decoded data
+  - MAY throw under OPTIONAL additional conditions, typically implemented by using the `_beforeAttestationUse`
+- MUST extend ERC-721 token transfer mechanisms by adding additional throw conditions to `transferFrom`.
+  - MUST throw when `anchorIsReleased[anchorByToken[tokenId]] == false`
+  - MUST throw when batchSize > 1, i.e. no batch transfers are supported with this contract.
+  - RECOMMENDED to implement the above through ERC-721 `_beforeTokenTransfer` hook
+  - MUST emit `AnchorTransfer(from, to, anchorByToken[tokenId], tokenId)`
+
+- MUST implement `attestationsUsedByAnchor(anchor)`, returning how many attestations have already been used for a specific anchor.
+
+- MUST implement `transferAnchor(attestation)`, `burnAnchor(attestation)`, `approveAnchor(attestation)` which
+  - MUST use the `decodeAttestationIfValid(attestation)` to determine `to`, `anchor` and `attestationHash`
+  - MUST record each `attestation` used to authorize each token transfer. RECOMMENDED by storing each used `attestationHash`
+  - MUST increment `attestationsUsedByAnchor[anchor]`, whenever an associated token has been transferred through this method
+  - MUST emit `AttestationUsed`
+  - `transferAnchor(attestation)`, corresponding to ERC-721 `safeTransferFrom(from, to, tokenId)` and also responsible for minting further
+    - MUST temporarily set `anchorIsReleased[anchor]=true` to allow a transfer or mint
+    - MUST ensure `anchorIsReleased[anchor]` has the same state as before `transferAnchor()` has been invoked.
+    - MUST either
+      - call `_safeTransferFrom(ownerOf(tokenByAnchor[anchor]), to, tokenByAnchor[anchor])` when `tokenByAnchor[anchor]` exists
+      - or create a new token mapping the `ANCHOR` through calling the de-facto standard `_safeMint(to, newTokenId)` if `tokenByAnchor[anchor]` does not exist. It is RECOMMENDED use the ERC-721-Enumerable mechanics to acquire `newTokenId`.
+    - MUST emit `AnchorTransfer(from, to, anchor, tokenByAnchor[anchor])`
+  - burnAnchor(attestation), corresponding to ERC-721 `burn(tokenId)`
+    - TODO, see reference IMPL in the meantime
+  - approveAnchor(attestation), corresponding to ERC-721 `approve(to, tokenId)`
+    - TODO, see reference IMPL in the meantime
+
+- MUST implement ERC-721 `burn()`
+
+- RECOMMENDED to have a `tokenURI(tokenId)` implemented to return an anchorBased-URI, i.e. `baseURI/anchor`. (= Anchoring metadata to anchored ASSET). Before an anchor is not used for the first time, the ANCHOR's mapping to tokenId is unknown. Hence, using the anchor instead of the tokenId is preferred.
+
+- RECOMMENDED to implement any or multiple of the following interfaces: transferable(tokenId), isSoulbound(tokenId), isNonTransferable (), `isNonTransferable(tokenId)` according to [ERC-6454](eip-6454.md) ...
+
+- MAY implement the `IERCxxxxAttestationLimited` interface subject to [IERCxxxxAttestationLimited](#iercxxxxattestationlimited)
+-- This is a MUST when transaction-costs are provided through a central account, e.g. through the ORACLE (or associated authorities) itself to avoid fund-draining.
+
+- MAY implement the `IERCxxxxFloatable` interface subject to [IERCxxxxFloatable](#iercxxxxfloatable).
+
+### IERCxxxxAttestationLimited
+WIP!!!
+
+Every contract compliant to this standard MAY implement the [IERCxxxxAttestationLimited](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxAttestationLimited.sol) and MUST implement ERC-721 and ERC-165 interfaces (subject to “caveats” below):
+
+```Solidity
+interface IERCxxxxAttestationLimited is IERCxxxx {
+    enum AttestedTransferLimitUpdatePolicy {
+        IMMUTABLE,
+        INCREASE_ONLY,
+        DECREASE_ONLY,
+        FLEXIBLE
+    }
+    function updateGlobalAttestedTransferLimit(uint256 _nrTransfers) external;
+    function updateAttestedTransferLimit(bytes32 anchor, uint256 _nrTransfers) external;
+    function attestatedTransfersLeft(bytes32 _anchor) external view returns (uint256 nrTransfersLeft);
+
+    event GlobalAttestedTransferLimitUpdate(
+        uint256 indexed transferLimit,
+        address updatedBy
+    );
+
+    event AttestedTransferLimitUpdate(
+        uint256 indexed transferLimit,
+        bytes32 indexed anchor,
+        address updatedBy
+    );
+}
+```
+
+- MUST extend IERCxxxx
+- MUST implement `transferLimit(anchor)`, specifying how often an `ANCHOR` can be transferred in total. The contract
+  - SHALL support different transfer limit update modes, namely FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
+  - MUST immutably define one of the above listed modes expose it via `transferLimitUpdateMode()`
+  - RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (when `transferLimitUpdateMode() != FIXED`)
+- MUST implement `transfersLeft(anchor)`, returning the number of transfers left (i.e. `transferLimit(anchor)-transfersPerAnchor[anchor]`) for a particular anchor
+- MAY be immutably configureable (at deploytime), wheter transfer limit is FIXED, INCREASABLE, DECREASABLE, FLEXIBLE (= INCREASABLE and DECREASABLE)
+- RECOMMENDED to have a global transfer limit, which can be overwritten on a token-basis (if not configured as FIXED)
+- The above mechanism MAY be used for DeFi application, lending etc to temporarily block transferAnchor(anchor), e.g. over a renting or lending period.
+
+### IERCxxxxFloatable
+WIP!!!
+
+Every contract compliant to this standard  MAY implement the [IERCxxxxFloatable](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxFloatable.sol) and MUST implement ERC-721 and ERC-165 interfaces (subject to “caveats” below):
+
+```Solidity
+interface IERCxxxxFloatable is IERCxxxx {
+    function canStartFloating(ERCxxxxAuthorization op) external;
+    function canStopFloating(ERCxxxxAuthorization op) external;
+
+    function allowFloating(bytes32 anchor, bool _doFloat) external;
+    function isFloating(bytes32 anchor) external view returns (bool);
+
+    event AnchorFloatingState(
+        bytes32 indexed anchor,
+        uint256 indexed tokenId,
+        bool indexed isFloating
+    );
+
+    event CanStartFloating(
+        ERCxxxxAuthorization indexed authorization,
+        address maintainer
+    );
+
+   event CanStopFloating(
+        ERCxxxxAuthorization indexed authorization,
+        address maintainer
+    );
+}
+```
+
+- MUST have an immutable `canFloat` boolean, indicating whether anchors can be released temporarily, i.e. the ASSET is floating. If `canFloat==false`, tokens can only be transferred with ATTESTATION. RECOMMENDED to set canFloat via constructor at deploy time.
+
+
+### Additional Specifications for PHYSICAL ASSETS
+
+In case the `ASSET` is a physical object, good or property, the following ADDITIONAL specifications MUST be satisifed:
+
+#### ORACLE for Physical Anchors
+
+- Issuing an `ATTESTATION` requires that the `ORACLE`
+  - MUST proof physical proximity between an input device (e.g. smartphone) specifying the `to` address and a particular physical `ANCHOR` and it's associated physical object. Typical acceptable proximity is ranges between some millimeters to several meters.
+  - The physical presence MUST be verified beyond reasonable doubt, in particular the employed method
+    - MUST be robust against duplication or reproduction attempts of the physical `ANCHOR`,
+    - MUST be robust against spoofing (e.g. presentation attacks) etc.
+  - MUST be implemented under the assumption that the party defining the `to` address has malicious intent and to acquire false `ATTESTATION`, without currently or ever having access to the physical object comprising the physical `ANCHOR`.
+
+#### Physical ASSET
+
+- MUST comprise an `ANCHOR`, acting as the unique physical object identifier, typically a serial number (plain (NOT RECOMMENDED) or hashed (RECOMMENDED))
+- MUST comprise a physical security device, marking or any other feature that enables proofing physical presence for `ATTESTATION` through the `ORACLE`
+- Is RECOMMENDED to employ ANCHOR-TECHNOLOGIES featuring irreproducible security features.
+- In general it is NOT RECOMMENDED to employ ANCHOR-TECHNOLOGIES that can easily be replicated (e.g. barcodes, "ordinary" NFC chips, .. ). Replication includes physical and digital replication.
+
+### Specification when using digital ASSETs
+
+- TODO formal definition, shall extend to digital-only AND abstract assets (e.g. memberships)
+- Maybe use Physical and non-physical assets (to extend to abstract assets)?
+- Requirements on Oracles and Proof-of-Control for Digital ASSETs will not be defined in this EIP
+
+
+### Alternatives Considered
+
+- Soulbound burn+mint combination, e.g. through Consensual Soulbound Tokens ([ERC-5484](eip-5484.md)). Disregarded because appearance is highly dubious, when the same asset is represented through multiple tokens over time. An predecessor of this EIP has used this approach and can be found deployed to Mumbai Testnet under address `0xd04c443913f9ddcfea72c38fed2d128a3ecd719e`.
+
+
+## Rationale
+
+ERC-721 outlines that "NFTs can represent ownership over digital or physical assets". ERC-721 excels in this task when used to represent ownership over digital, on-chain assets, i.e. when the asset is "holding a token of a specific contract" or the asset is an NFT's metadata. However, we do see the inherent problem of non-enforcability, when ERC-721 is used without further adaptions to represent off-chain ASSETs, in particular physical objects or goods such as physical collectibles, cars, rental agreements involving physical goods etc.
+
+When an off-chain ASSET's ownership or posession changes, this shall be refleced on-chain through the corresponding NFT. Over an ASSET's lifecycle, the ASSET's ownership and posession state changes multiple, sometimes thousands, of times. Each of those state changes may result in shifting obligations and privileges for the involved parties. Therefore tokenization of an ASSET _without_ enforcably anchoring the ASSET's associated obligation and properties to the token is not complete. Nowadays, off-chain ASSETs are often "anchored" through adding an ASSET-identifier to a NFT's metadata. Metadata is off-chain. The majority of implementations completely neglect that metadata can be changed off-chain. More serious implementations strive to preserve integrity by e.g. hashing metadata and storing the hash mapped to the tokenId on-chain. However, this approach does not allow for use-case, where metadata besides the asset-identifier, e.g. traits, "hours played", ... shall be mutable or evolvable.
+
+In the proposed EIP we suggest to map an ASSET identifier (`ANCHOR`) on-chain to `tokenId`s.
+
+Even if a (physical) ASSET is mass produced with fungible characteristics, each ASSET has an individual property graph and thus shall be represented in a non-fungible way. Hence this EIP follows the design decision that ASSET (represented via a unique asset identifier called ANCHOR) and token are always mapped 1-1 and not 1-N, so that a token represents the individual property graph of the ASSET.
+
+In this EIP we propose a standard and two optional extensions that cover tokenization in ownership- and posession-based use cases. We will denote the standard and it's extensions through their interface names, i.e. the standard is IERCxxxx, while the extensions are IERCxxxxAttestationLimited and IERCxxxFloatable.
+
+The standard IERCxxxx describes how to create NFT-representations of ASSETS in an enforcible manner by using PROOF-OF-CONTROL through an ORACLE. While the standard enables already many use-cases, we propose three optional extensions, which may be implemented to support additional use-cases.
+
+
+### Example Use Cases for representation of Posession
+
+Posession based use cases are covered by IERCxxxx: The holder of `ASSET` is in posession of `ASSET`. Possession is an important social and economical tool: In many sports games posession of `ASSET`, commonly referred to as "the ball", is of essence. Posession can come with certain obligations and privileges.
+
+**Posession based token gating:** Club guest in posession of limited T-Shirt (ASSET) gets a token which allows him to open the door to the VIP lounge.
+
+**Posession based digital twin:** A gamer is in posession of a pair of physical sneakers (ASSET), and gets a digital twin (NFT) to wear them in metaverse.
+
+**Scarce posession based digital twin:** The producer of the sneakers (ASSET) decided that the product includes a limit of 5 digital twins (NFTs), to create scarcity.
+
+**Lendable digital twin:** The gamer can lend his sneaker-tokens (NFT) to a friend in the metaverse, so that the friend can run faster.
+
+### Example Use Cases To Represent Ownership
+
+Ownership over an ASSET can come with rights and benefits as well as being burdened with liens and obligations. For example, an owned `ASSET` can be used for collateral, can be rented or can even yield a return.
+
+**Securing ownership from theft:** If ASSET is owned off-chain, the owner wants to secure the anchored NFT, i.e. not allow transfers to prevent theft or recover the NFT easily through the ASSET.
+
+**Selling a house with a mortage:** The owner holds NFT as proof of ownership. The DeFi-Bank finances the house and puts a lock on the transfer of NFT. Allow Transfers of the NFT require the mortage to be paid off. Selling the ASSET (house) off-chain will be impossible, as it's no longer possible to finance the house.
+
+**Selling a house with a lease:** A lease contract puts a lien on an ASSET's anchored NFT. The old owner removes the lock, the new owner buys and refinances the house. Transfer of NFT will also transfer the obligations and benefits of the lien to the new owner. As a lien-interface, the proposed EIP can for example be extended with [ERC-5604](eip-5604.md)
+
+**Buying a brand new car with downpayment:** A buyer configures a car and provides a downpayment, for a car that will have an ANCHOR. As long as the car is not produced, the NFT can float and be traded on NFT market places. The owner of the NFT at time of delivery of the ASSET has the the permission to pick up the car and the obligation to pay full price.
+
+**Buying a barrel of oil by forward transaction:** A buyer buys an oil option on a forward contract for one barrel of oil (`ASSET`). On maturity date the buyer has the obligation to pick up the oil.
+
+#### Use Case Matrix
+The use case matrix shows which extensions and settings must (additionally to IERCxxxx!) be implemented for the example use-cases
+
+Note that for `Lockable` listed in the table below, the proposed EIP can be extended with any Lock- or Lien-Mechanism known to extend for ERC-721. Suitable extensions to achieve `Lockable` are for example [ERC-5058](eip-5058.md) or [ERC-5753](eip-5753.md). We recommend to verify whether a token is locked in the `_beforeTokenTransfer()`-hook, as this is called from `safeTransferFrom()` as well as `transferAnchor()`, hence suitable to block "standard" ERC-721 transfers as well as the proposed attestation-based transfers.
+
+
+| Use Case | EIP-XXXX approveAuth | EIP-XXXX burnAuth | IERCxxxxFloatable | IERCxxxxAttestationLimited | Lockable |
+|---------------|---|---|---|---|---|
+| **Managing Posession** |
+| Token gating  | ASSET | ANY | incompatible | - | - |
+| Digital twin  | ASSET | ANY | incompatible | - | - |
+| Scarce digital twin | ASSET | ANY | incompatible | required | - |
+| Lendable digital twin         | OWNER_AND_ASSET | ASSET | required | - | - |
+| **Managing Ownership** |
+| Securing ownership from theft   | OWNER or OWNER_AND_ASSET | ANY | optional | - | required |
+| Selling an house with a mortage  | ASSET  or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Selling a house with a lease | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Buying a brand new car with downpayment | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Buying a barrel of oil by forward transaction | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+
+
+Legend:
+- required ... we don't see a way how to implement the use-case without it
+- incompatible ... this MUSTN'T be implemented, as it is a security risk for the use-case
+- optional ... this MAY optionally be implemented
+
+
+
+## Backwards Compatibility
+
+No backward compatibility issues found. Further Discussion appreciated!
+
+This EIP is fully compatible with ERC-721 and (when extended with the IERCxxxxFloatable-interface) corresponds to the well-known ERC-721 behavior with an additional authorization-mechanism via attestations. Therefore we recommend - especially for physical assets - to use the present EIP instead of ERC-721 and amend it with extensions designed for ERC-721.
+
+Many ERC-721 extensions suggest to add additional throw-conditions to transfer methods. This standard is fully compatible, as
+- The often-used ERC-721 `_beforeTokenTransfer()` hook is called for all transfers including attestation-authorized transfers.
+- A `_beforeAnchorUse()` hook is suggested in the reference implementation, which only is called when using attestation as authorization.
+
+## Test Cases
+
+Test cases are available:
+
+- For only implementing [IERCxxxx](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxx.sol) can be found [here](../assets/eip-asset_bound_non_fungible_tokens/test/ERCxxxx.ts)
+- For implementing [IERCxxxx](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-asset_bound_non_fungible_tokens/test/ERCxxxxFull.ts)
+
+## Reference Implementation
+
+The reference implementations are [MIT](../assets/eip-asset_bound_non_fungible_tokens/LICENSE.md) licensed. They can be freely used with digital assets as defined in the present EIP. No general license is granted to the _commercial_ use or application of the reference implementation or derived works with physical assets as defined in the present EIP. Visit metaanchor.io for further details. 
+
+- Minimal implementation, only supporting [IERCxxxx](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxx.sol) can be found [here](../assets/eip-asset_bound_non_fungible_tokens/contracts/ERCxxxx.sol)
+- Full implementation, support [IERCxxxx](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-asset_bound_non_fungible_tokens/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-asset_bound_non_fungible_tokens/contracts/ERCxxxxFull.sol)
+
+## Security Considerations
+
+<!--
+  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+
+  The current placeholder is acceptable for a draft.
+
+  TODO: Remove this comment before submitting
+-->
+
+Needs discussion.
+
+Rough considerations and TODO
+- Valid anchors
+  - Outline merkle-tree salt leaves
+  - Why using merkle-trees and not simply store all available anchors on-chain (besides memory issues)
+- Maintainance-role over using ownership (Ownable is used by marketplaces to manage the collection)
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+The reference implementations are [MIT](../assets/eip-asset_bound_non_fungible_tokens/LICENSE.md) licensed. They can be freely used with digital assets as defined in the present EIP. No general license is granted to the _commercial_ use or application of the reference implementation or derived works with physical assets as defined in the present EIP. Visit metaanchor.io for further details. 
