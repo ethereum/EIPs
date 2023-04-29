@@ -458,19 +458,21 @@ TODO - if any input?
 
 ## Rationale
 
-In this EIP we propose a standard and three optional extensions that cover tokenization of ownership and posession based use cases. When `ASSETs` ownership or posession changes, the digital representation of that asset also changes. Those state changes often  result into shifting obligations and privileges for the involved parties.
+ERC-721 outlines that "NFTs can represent ownership over digital or physical assets". ERC-721 excels in this task when used to represent ownership over digital, on-chain assets, i.e. when the asset is "holding a token of a specific contract" or the asset is an NFT's metadata. However, we do see the inherent problem of non-enforcability, when ERC-721 is used without further adaptions to represent off-chain ASSETs, in particular physical objects or goods such as physical collectibles, cars, rental agreements involving physical goods etc.
 
-Therefore tokenization of `ASSET` without a digital representations of `ASSET`s associated obligation and properties is not complete. Below we explain for each context how it can be mapped with the standards proposed in this EIP.
+When an off-chain ASSET's ownership or posession changes, this shall be refleced on-chain through the corresponding NFT. Over an ASSET's lifecycle, the ASSET's ownership and posession state changes multiple, sometimes thousands, of times. Each of those state changes may result in shifting obligations and privileges for the involved parties. Therefore tokenization of an ASSET _without_ enforcably anchoring the ASSET's associated obligation and properties to the token is not complete. Nowadays, off-chain ASSETs are often "anchored" through adding an ASSET-identifier to a NFT's metadata. Metadata is off-chain. The majority of implementations completely neglect that metadata can be changed off-chain. More serious implementations strive to preserve integrity by e.g. hashing metadata and storing the hash mapped to the tokenId on-chain. However, this approach does not allow for use-case, where metadata besides the asset-identifier, e.g. traits, "hours played", ... shall be mutable or evolvable.
 
-During `ASSET`s lifecycle, the ownership and posession state changes multiple, sometimes thousands, of times. Even if physical `ASSET` is mass produced with fungible characteristics, each `ASSET` has an individual property graph and thus becomes non-fungible.
+In proposed EIP we suggest to map an ASSET identifier (`ANCHOR`) on-chain to `tokenId`s.
 
-Hence this EIP follows the design decision that `ASSET` and `ANCHOR` are always mapped 1-1 and not 1-N, so that `ANCHOR` represents the individual property graph of `ASSET`. Furthermore the token chosen for `ASSET` has to be of a non-fungible token format.
+Even if a (physical) ASSET is mass produced with fungible characteristics, each ASSET has an individual property graph and thus shall be represented in a non-fungible way. Hence this EIP follows the design decision that ASSET (represented via a unique asset identifier called ANCHOR) and token are always mapped 1-1 and not 1-N, so that a token represents the individual property graph of the ASSET.
 
-As we're mentioning in the introduction, the concept around asset tokenization suffers the inherent problem that *integrity between off-chain ownership and on-chain representation as NFT is not enforcible*.
+In this EIP we propose a standard and three optional extensions that cover tokenization in ownership- and posession-based use cases. We will denote the standard and it's extensions through their interface names, i.e. the standard is IERCxxxx, while the extensions are IERCxxxxAttestationLimited, IERCxxxFloatable and IERCxxxxLockable.
 
-In this EIP we propose standards that make it possible to create protocols that can make those representations enforcible by using `PROOF-OF-CONTROL` and several optional extensions.
+The standard IERCxxxx describes how to create NFT-representations of ASSETS in an enforicble manner by using PROOF-OF-CONTROL through an ORACLE. While the standard enables already many use-cases, we propose three optional extensions, which may be implemented to support additional use-cases.
 
-### Supported use-cases
+
+
+### Supported use-cases (WIP)
 
 - A means to block transfer by `ATTESTATION` and through pre-approved operators under certain conditions and an immutable indication wether it's blockable.. (e.g. block all transfers until DeFi Loan is paid off.)
 
@@ -478,47 +480,58 @@ In this EIP we propose standards that make it possible to create protocols that 
 
 - A limit of `ATTESTATIONs` that can be issued per token, and an indication `AttestationMode` wether this limit is mutable. (e.g. LimitImmutable, LimitIncreaseOnly, LimitMutable)
 
-#### Example Use Cases for representation of Posession
+### Example Use Cases for representation of Posession
 
-Posession based use cases are covered by the core EIP: The holder of `ASSET` is in posession of `ASSET`. Nonetheless possession is an important social and economical tool: In many sports games posession of `ASSET`, commonly referred to as "the ball", is of essence. Posession can come with certain obligations and privileges.
+Posession based use cases are covered by IERCxxxx: The holder of `ASSET` is in posession of `ASSET`. Nonetheless possession is an important social and economical tool: In many sports games posession of `ASSET`, commonly referred to as "the ball", is of essence. Posession can come with certain obligations and privileges.
 
-**Use Case 1 - Posession based token gating:** Club guest in posession of limited T-Shirt gets a token which allows him to open the door to the VIP lounge.
+**Use Case 1 - Posession based token gating:** Club guest in posession of limited T-Shirt (ASSET) gets a token which allows him to open the door to the VIP lounge.
 
-**Use Case 2 - Posession based digital twin:** A gamer is in posession of a pair of sneakers, and gets a token to wear them in metaverse.
+**Use Case 2 - Posession based digital twin:** A gamer is in posession of a pair of physical sneakers (ASSET), and gets a digital twin (NFT) to wear them in metaverse.
 
-**Use Case 2a - Scarce posession based digital twin:** The producer of the sneaker decided that the product includes a limit of 5 digital twins, to create scarcity.
+**Use Case 2a - Scarce posession based digital twin:** The producer of the sneakers (ASSET) decided that the product includes a limit of 5 digital twins (NFTs), to create scarcity.
 
-**Use Case 2b - Lendable digital twin:** The gamer can lend his sneakers to a friend in the metaverse, so that friend can run faster.
+**Use Case 2b - Lendable digital twin:** The gamer can lend his sneaker-tokens (NFT) to a friend in the metaverse, so that the friend can run faster.
 
-#### Example Use Cases To Represent Ownership
+### Example Use Cases To Represent Ownership
 
-Ownership can be burdened with liens and obligations as well as rights and benefits. I.e. owned `ASSET` can be used for collateral, can be rented or can even yield a return.
+Ownership over an ASSET can come with rights and benefits as well as being burdened with liens and obligations. For example, an owned `ASSET` can be used for collateral, can be rented or can even yield a return.
 
-**Use Case 3 - Securing ownership from theft:** If `ASSET` is owned, the owner wants to prevent further `ATTESTATION` to prevent theft.
+**Use Case 3 - Securing ownership from theft:** If ASSET is owned off-chain, the owner wants to secure the anchored NFT, i.e. not allow transfers to prevent theft or recover the NFT easily through the ASSET.
 
-**Use Case 4 - Selling an house with a mortage:** The owner holds `ANCHOR` as proof of ownership, the DeFi-Bank finances the house and put a lock on the transfer of `ANCHOR`. Transfers of `ANCHOR` require the mortage to be paid off. Selling `ASSET` (the house) off-chain will be impossible, as it's no longer possible to finance the house.
+**Use Case 4 - Selling a house with a mortage:** The owner holds NFT as proof of ownership. The DeFi-Bank finances the house and puts a lock on the transfer of NFT. Allow Transfers of the NFT require the mortage to be paid off. Selling the ASSET (house) off-chain will be impossible, as it's no longer possible to finance the house.
 
-**Use Case 5 - Selling a house with a lease:** A lease contract puts a lien on `ASSETs` `ANCHOR`. The old owner removes the lock, the new owner buys and refinances the house. Transfer of `ANCHOR` will also transfer the obligations and benefits of the lien to the new owner.
+**Use Case 5 - Selling a house with a lease:** A lease contract puts a lien on an ASSET's anchored NFT. The old owner removes the lock, the new owner buys and refinances the house. Transfer of NFT will also transfer the obligations and benefits of the lien to the new owner.
 
-**Use Case 6 - Buying a brand new car with downpayment:** A buyer configures a car and provides a downpayment. As long as the car is not produced, the `ANCHOR` can float and be traded on market places. The owner of `ANCHOR` at time of delivery of `ASSET` has the obligation to pick up the car and pay full price.
+**Use Case 6 - Buying a brand new car with downpayment:** A buyer configures a car and provides a downpayment, for a car that will have an ANCHOR. As long as the car is not produced, the NFT can float and be traded on NFT market places. The owner of the NFT at time of delivery of the ASSET has the the permission to pick up the car and the obligation to pay full price.
 
 **Use Case 7 - Buying a barrel of oil by forward transaction:** A buyer buys an oil option on a forward contract for one barrel of oil (`ASSET`). On maturity date the buyer has the obligation to pick up the oil.
 
 #### Use Case Matrix
+The use case matrix shows which extensions and settings must (additionally to IERCxxxx!) be implemented for the example use-cases
 
-| Use Case | EIP-XXXX approveAuth | EIP-XXXX burnAuth | Floatable | Attestation-Limit | Lock & Lien |
+
+
+| Use Case | EIP-XXXX approveAuth | EIP-XXXX burnAuth | IERCxxxxFloatable | IERCxxxxAttestationLimited | IERCxxxxLockable |
 |---------------|---|---|---|---|---|
 | **Managing Posession** |
-| Token gating  | ASSET | ANY | Incompatible | - | - |
-| Digital twin  | ASSET | ANY | Incompatible | - | - |
-| Scarce digital twin | ASSET | ANY | Incompatible | Implemented | - |
-| Lendable digital twin         | OWNER_AND_ASSET | ASSET | Implemented | - | - |
+| Token gating  | ASSET | ANY | incompatible | - | - |
+| Digital twin  | ASSET | ANY | incompatible | - | - |
+| Scarce digital twin | ASSET | ANY | incompatible | required | - |
+| Lendable digital twin         | OWNER_AND_ASSET | ASSET | required | - | - |
 | **Managing Ownership** |
-| Securing ownership from theft   | OWNER or OWNER_AND_ASSET | ANY | Compatible | - | Implemented |
-| Selling an house with a mortage  | ASSET  or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
-| Selling a house with a lease | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
-| Buying a brand new car with downpayment | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
-| Buying a barrel of oil by forward transaction | ASSET or OWNER_AND_ASSET | ANY | Compatible | Compatible | Implemented |
+| Securing ownership from theft   | OWNER or OWNER_AND_ASSET | ANY | optional | - | required |
+| Selling an house with a mortage  | ASSET  or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Selling a house with a lease | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Buying a brand new car with downpayment | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+| Buying a barrel of oil by forward transaction | ASSET or OWNER_AND_ASSET | ANY | optional | optional | required |
+
+
+Legend:
+- required ... we don't see a way how to implement the use-case without it
+- incompatible ... this MUSTN'T be implemented, as it is a security risk for the use-case
+- optional ... this MAY optionally be implemented
+
+
 
 ## Backwards Compatibility
 
@@ -533,7 +546,7 @@ Test cases are available:
 
 ## Reference Implementation
 
-Reference implemntations, which can be extended in your actual implementation are available:
+The reference implementations are [MIT](../assets/eip-draft_asset-bound_non-fungible_token/LICENSE.md) licensed and can therefore be freely used.
 
 - Minimal implementation, only supporting [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxx.sol)
 - Full implementation, support [IERCxxxx](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxx.sol), [IERCxxxxFloatable](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxFloatable.sol) and [IERCxxxxAttestationLimited](../assets/eip-draft_asset-bound_non-fungible_token/contracts/IERCxxxxAttestationLimited.sol) can be found [here](../assets/eip-draft_asset-bound_non-fungible_token/contracts/ERCxxxxFull.sol)
@@ -556,8 +569,6 @@ TODO
 - Maintainance-role over using ownership (Ownable is used by marketplaces to manage the collection)
 
 ## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
 
-TODO: Find legal language for the following:
-
-- Certain Systems, e.g. the one according to Figure 1, may be subject to patent-pending EPxxxxx / USxxxx (not published yet) and a license may be required. Check with (add way of contact here).
-- We do declare, that we explicitely waive copyright and XXX for the present EIP-xxxx and the provided ERC-xxxx reference implementation, i.e. we license the EIP under TODO SPDX-license string  
+The reference implementations are [MIT](../assets/eip-draft_asset-bound_non-fungible_token/LICENSE.md) licensed.

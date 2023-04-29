@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
-// Licensing TODO, see EIP!!!
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.18;
 
