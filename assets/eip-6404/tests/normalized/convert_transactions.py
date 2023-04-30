@@ -16,17 +16,16 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
             signed_tx.signature.s,
         )
         tx_from = ecdsa_recover_tx_from(signature, compute_eip4844_sig_hash(signed_tx))
-        match signed_tx.message.to.selector():
-            case 1:
-                tx_to = DestinationAddress(
-                    destination_type=DESTINATION_TYPE_REGULAR,
-                    address=signed_tx.message.to.value(),
-                )
-            case 0:
-                tx_to = DestinationAddress(
-                    destination_type=DESTINATION_TYPE_CREATE,
-                    address=compute_contract_address(tx_from, signed_tx.message.nonce),
-                )
+        if signed_tx.message.to.get() is not None:
+            tx_to = DestinationAddress(
+                destination_type=DESTINATION_TYPE_REGULAR,
+                address=signed_tx.message.to.get(),
+            )
+        else:
+            tx_to = DestinationAddress(
+                destination_type=DESTINATION_TYPE_CREATE,
+                address=compute_contract_address(tx_from, signed_tx.message.nonce),
+            )
 
         return Transaction(
             payload=TransactionPayload(
