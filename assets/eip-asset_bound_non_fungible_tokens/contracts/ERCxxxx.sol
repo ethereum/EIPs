@@ -217,7 +217,7 @@ contract ERCxxxx is
         anchorByUsedAttestation[attestationHash] = anchor;
         uint256 totalAttestationsByAnchor = attestationsUsedByAnchor[anchor] +1;
         attestationsUsedByAnchor[anchor] = totalAttestationsByAnchor;
-        emit AttestationUsed(to, anchor, attestationHash, totalAttestationsByAnchor );
+        emit AttestationUse(to, anchor, attestationHash, totalAttestationsByAnchor );
     }
 
     function transferAnchor(bytes memory attestation) public virtual

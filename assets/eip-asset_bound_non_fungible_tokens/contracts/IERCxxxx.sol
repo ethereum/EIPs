@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.18;
-
 /**
  * @title IERCxxxx Asset-Bound Non-Fungible Tokens 
  * @author Thomas Bergmueller (@tbergmueller) <tb@authenticvision.com>
@@ -20,7 +19,7 @@ interface IERCxxxx {
 
     /// @dev Authorization, typically mapped to authorizationMaps, where each bit indicates whether a particular ERCxxxxRole is authorized 
     ///      Typically used in constructor (hardcoded or params) to set burnAuthorization and approveAuthorization
-    ///      Also used in optional updateBurnAuthorization, updateApproveAuthorization
+    ///      Also used in optional updateBurnAuthorization, updateApproveAuthorization 
     enum ERCxxxxAuthorization {
         NONE,               // = 0,      // None of the above
         OWNER,              // = (1<<OWNER), // The owner of the token, i.e. the digital representation
@@ -34,7 +33,7 @@ interface IERCxxxx {
 
     event OracleUpdate(address indexed oracle, bool indexed trusted);
     event AnchorTransfer(address indexed from, address indexed to, bytes32 indexed anchor, uint256 tokenId);
-    event AttestationUsed(address indexed to, bytes32 indexed anchor, bytes32 indexed attestationHash, uint256 totalUsedAttestationsForAnchor);
+    event AttestationUse(address indexed to, bytes32 indexed anchor, bytes32 indexed attestationHash, uint256 totalUsedAttestationsForAnchor);
     event ValidAnchorsUpdate(bytes32 indexed validAnchorHash, address indexed maintainer);
 
     // state requesting methods
