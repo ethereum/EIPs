@@ -7,9 +7,10 @@ import "../MultiAssetToken.sol";
 contract MultiAssetTokenMock is MultiAssetToken {
     address private _issuer;
 
-    constructor(string memory name, string memory symbol)
-        MultiAssetToken(name, symbol)
-    {
+    constructor(
+        string memory name,
+        string memory symbol
+    ) MultiAssetToken(name, symbol) {
         _setIssuer(_msgSender());
     }
 
@@ -46,10 +47,10 @@ contract MultiAssetTokenMock is MultiAssetToken {
         _addAssetToToken(tokenId, assetId, overwrites);
     }
 
-    function addAssetEntry(uint64 id, string memory metadataURI)
-        external
-        onlyIssuer
-    {
+    function addAssetEntry(
+        uint64 id,
+        string memory metadataURI
+    ) external onlyIssuer {
         _addAssetEntry(id, metadataURI);
     }
 
