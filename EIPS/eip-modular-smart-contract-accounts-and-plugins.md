@@ -31,7 +31,7 @@ We propose a standard that coordinates the implementation work between plugin de
 
 <img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png">
 
-We take inspiration from ERC-2535’s diamond pattern and extend it to plugins in order to provide a similar set of functions to add, update, remove, and inspect plugins. Much like ERC-2535’s facets, these plugins contain execution logic. They also incorporate validation schemes and other associated functions or hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. By combining these new contract interfaces with the interfaces defined in ERC-2535, accounts adopting this ERC will support modular, upgradable execution and validation logic.
+We take inspiration from ERC-2535’s diamond pattern and adopt a similar composability by proposing three types of plugins. However, you are not required to implement the account with a multi-facet proxy pattern. These plugins contain execution logic. They also incorporate validation schemes and hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. Accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
 Defining this as a standard for smart contract accounts will make plugins easier to develop securely and will allow for greater interoperability.
 
@@ -49,7 +49,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 - A **validation function** is a function that validates authentication and authorization of a caller to the account. There are two types of validation functions:
   - **User Operation Validator** functions handle calls to `validateUserOp` and check the validity of an ERC-4337 user operation. The function may have any function name, but MUST take in the parameters `(UserOperation calldata, bytes32, uint256)`, representing the user operation, user operation hash, and required prefund. It MUST return `(uint256)`, representing packed validation data for `authorizer`, `validUntil`, and `validAfter`.
   - **Runtime Validator** functions run before an execution function, and enforce checks. Common checks include enforcing only calls from `EntryPoint` or an owner.
-- An **execution function** is a smart contract function that defines execution for a **modular account**. Much like existing proxy standards, execution functions are run in the context of the account using `delegatecall`.
+- An **execution function** is a smart contract function that defines execution for a **modular account**.
 - A **hook** is a smart contract function executed before or after an **execution function**, with the ability to modify state or cause the entire call to revert. There are two types of **hooks**.
   - **preHook** functions run before an **execution function;**. They map optionally return data to be consumed the **postHook**.
   - **postHook** functions run after an **execution function**. They can optionally take returned data from **preHook**.
@@ -164,61 +164,24 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >     event GlobalPluginsUpdated(AssociatedFunction[] globalPluginUpdates, address init, bytes callData);
 >
 >     /**
->         * @notice Add/replace/remove any number of plugins and optionally execute
->         *         a function with delegatecall
+>         * @notice Add/replace/remove any number of plugins and optionally execute a function
 >         * @param pluginUpdates Contains the plugin addresses and function selectors.
 >         *        executionPluginAddress specifies the plugin containing the execution functions defined within
 >         *        pluginAction denotes what operation to perform
 >         *        executionUpdates denote which execution function and associated function to perform the opeartion on.
 >         * @param init The address of the contract or facet to execute calldata
 >         * @param callData A function call, including function selector and arguments
->         *                  calldata is executed with delegatecall on init
 >         */
 >     function updatePlugins(PluginUpdate[] memory pluginUpdates, address init, bytes calldata callData) external;
 >
 >     /**
->      * @notice Add/replace/remove any number of global plugins and optionally execute
->      *         a function with delegatecall
+>      * @notice Add/replace/remove any number of global plugins and optionally execute a function
 >      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
 >      * @param init The address of the contract or facet to execute calldata
 >      * @param callData A function call, including function selector and arguments
->      *                  calldata is executed with delegatecall on init
 >      */
 >    function updateGlobalPlugins(GlobalPluginUpdate[] memory globalPluginUpdates, address init, bytes calldata callData)
 >        external;
-> }
-> ```
-
-Plugin inspection interface. Modular Smart Contract Accounts MUST implement this interface to support visibility in plugin configuration.
-
-`IPluginLoupe.sol`
-
-> ```solidity
-> interface IPluginLoupe {
->
->     struct PluginInfo {
->         address executionPluginAddress;
->         FunctionConfig[] configs;
->     }
->
->     struct FunctionConfig {
->         bytes4 executionSelector;
->         FunctionReference userOpValidator;
->         FunctionReference runtimeValidator;
->         FunctionReference preHook;
->         FunctionReference postHook;
->     }
->
->     struct FunctionReference {
->         address implAddress;
->         bytes4 implSelector;
->     }
->
->     function getPlugins() external view returns (PluginInfo[] memory);
->
->     function getPlugin(address executionPluginAddress) external view returns (FunctionConfig[] memory functions);
->
->     function getFunctionConfig(bytes4 executionSelector) external view returns (FunctionConfig memory);
 > }
 > ```
 
