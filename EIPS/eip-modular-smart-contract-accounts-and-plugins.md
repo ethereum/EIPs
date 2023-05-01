@@ -185,6 +185,39 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 > }
 > ```
 
+Plugin inspection interface. Modular Smart Contract Accounts MAY implement this interface to support visibility in plugin configuration on-chain. Note this will require extra storage.
+
+`IPluginLoupe.sol`
+
+> ```solidity
+> interface IPluginLoupe {
+>
+>     struct PluginInfo {
+>         address executionPluginAddress;
+>         FunctionConfig[] configs;
+>     }
+>
+>     struct FunctionConfig {
+>         bytes4 executionSelector;
+>         FunctionReference userOpValidator;
+>         FunctionReference runtimeValidator;
+>         FunctionReference preHook;
+>         FunctionReference postHook;
+>     }
+>
+>     struct FunctionReference {
+>         address implAddress;
+>         bytes4 implSelector;
+>     }
+>
+>     function getPlugins() external view returns (PluginInfo[] memory);
+>
+>     function getPlugin(address executionPluginAddress) external view returns (FunctionConfig[] memory functions);
+>
+>     function getFunctionConfig(bytes4 executionSelector) external view returns (FunctionConfig memory);
+> }
+> ```
+
 Plugin interface. Plugins MUST implement the following interface.
 
 `IPlugin.sol`
