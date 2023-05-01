@@ -1,4 +1,5 @@
 ---
+eip: 6944
 title: ERC-5219 Resolve Mode
 description: Adds an ERC-4804 resolveMode to support ERC-5219 requests
 author: Gavin John (@Pandapip1), Qi Zhou (@qizhou)
