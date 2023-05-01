@@ -2,10 +2,11 @@
 eip: TBD
 title: Automatically Reset Tesnet
 description: Testnet network that periodically rolls back to genesis
-author: Mário Havel (@taxmeifyoucan),  pk910 (@pk910),  Rémy Roy (@remyroy)
+author: Mário Havel (@taxmeifyoucan), pk910 (@pk910), Rémy Roy (@remyroy)
 discussions-to: 
 status: Draft
-type: TBD
+type: Standards Track
+category: Core
 created: 2023-04-10
 ---
 
@@ -71,7 +72,6 @@ When the network reaches a slot with a timestamp `>= terminal_timestamp`:
 
 Clients should be able to do this without restarting, operating the network fully independently and with minimal downtime. This is necessary for infrastructure providers but redundant for users just joining the network for a short term testing. 
 
-
 ## Rationale
 
 Ephemeral testnets with deterministic parameters and the same infrastracture provides a sustainable alernative to traditional testnets. At each reset, faucets are filled again so a lot of testnet ETH is available for contract or validator testing. 
@@ -88,8 +88,7 @@ By defining two functions for Genesis and Reset, this EIP enables two levels of 
     * This would require also support of the Reset feature
     * Needed for running infrastructure, genesis validators and bootnodes
 
-The design is also compatible with nodes managed by external tooling, i.e. even if client doesn't implement these features, it can run on the same network as other nodes which are automatically reset by scripts.  
-
+The design is also compatible with nodes managed by external tooling, i.e. even if client doesn't implement these features, it can run on the same network as other nodes which are automatically reset by scripts.
 
 ### Constants and variables
 
