@@ -31,7 +31,7 @@ We propose a standard that coordinates the implementation work between plugin de
 
 <img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png">
 
-We take inspiration from ERC-2535’s diamond pattern and extend it to plugins in order to provide a similar set of functions to add, update, remove, and inspect plugins. Much like ERC-2535’s facets, these plugins contain execution logic. They also incorporate validation schemes and other associated functions or hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. By combining these new contract interfaces with the interfaces defined in ERC-2535, accounts adopting this ERC will support modular, upgradable execution and validation logic.
+We take inspiration from ERC-2535’s diamond pattern and adopt a similar composability by proposing three types of plugins. However, you are not required to implement the account with a multi-facet proxy pattern. These plugins contain execution logic. They also incorporate validation schemes and hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. Accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
 Defining this as a standard for smart contract accounts will make plugins easier to develop securely and will allow for greater interoperability.
 
@@ -144,6 +144,11 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >         ExecutionUpdate[] executionUpdates;
 >     }
 >
+>     struct GlobalPluginUpdate {
+>         PluginAction action;
+>         AssociatedFunction globalPlugin;
+>     }
+>
 >     struct ExecutionUpdate {
 >         bytes4 executionSelector;
 >         AssociatedFunction[] associatedFunctions;
@@ -159,32 +164,28 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >     event GlobalPluginsUpdated(AssociatedFunction[] globalPluginUpdates, address init, bytes callData);
 >
 >     /**
->         * @notice Add/replace/remove any number of plugins and optionally execute
->         *         a function with delegatecall
+>         * @notice Add/replace/remove any number of plugins and optionally execute a function
 >         * @param pluginUpdates Contains the plugin addresses and function selectors.
 >         *        executionPluginAddress specifies the plugin containing the execution functions defined within
 >         *        pluginAction denotes what operation to perform
 >         *        executionUpdates denote which execution function and associated function to perform the opeartion on.
 >         * @param init The address of the contract or facet to execute calldata
 >         * @param callData A function call, including function selector and arguments
->         *                  calldata is executed with delegatecall on init
 >         */
 >     function updatePlugins(PluginUpdate[] memory pluginUpdates, address init, bytes calldata callData) external;
 >
 >     /**
->      * @notice Add/replace/remove any number of global plugins and optionally execute
->      *         a function with delegatecall
+>      * @notice Add/replace/remove any number of global plugins and optionally execute a function
 >      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
 >      * @param init The address of the contract or facet to execute calldata
 >      * @param callData A function call, including function selector and arguments
->      *                  calldata is executed with delegatecall on init
 >      */
->    function updateGlobalPlugins(AssociatedFunction[] memory globalPluginUpdates, address init, bytes calldata callData)
+>    function updateGlobalPlugins(GlobalPluginUpdate[] memory globalPluginUpdates, address init, bytes calldata callData)
 >        external;
 > }
 > ```
 
-Plugin inspection interface. Modular Smart Contract Accounts MUST implement this interface to support visibility in plugin configuration.
+Plugin inspection interface. Modular Smart Contract Accounts MAY implement this interface to support visibility in plugin configuration on-chain. Note this will require extra storage.
 
 `IPluginLoupe.sol`
 
