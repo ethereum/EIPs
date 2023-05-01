@@ -49,7 +49,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 - A **validation function** is a function that validates authentication and authorization of a caller to the account. There are two types of validation functions:
   - **User Operation Validator** functions handle calls to `validateUserOp` and check the validity of an ERC-4337 user operation. The function may have any function name, but MUST take in the parameters `(UserOperation calldata, bytes32, uint256)`, representing the user operation, user operation hash, and required prefund. It MUST return `(uint256)`, representing packed validation data for `authorizer`, `validUntil`, and `validAfter`.
   - **Runtime Validator** functions run before an execution function, and enforce checks. Common checks include enforcing only calls from `EntryPoint` or an owner.
-- An **execution function** is a smart contract function that defines execution for a **modular account**.
+- An **execution function** is a smart contract function that defines the execution of a function for a **modular account**.
 - A **hook** is a smart contract function executed before or after an **execution function**, with the ability to modify state or cause the entire call to revert. There are two types of **hooks**.
   - **preHook** functions run before an **execution function;**. They map optionally return data to be consumed the **postHook**.
   - **postHook** functions run after an **execution function**. They can optionally take returned data from **preHook**.
@@ -235,24 +235,24 @@ interface IPlugin {
 
 **Calls to** `updatePlugins`
 
-The function `updatePlugins` takes in an array of updates to perform, and an optional initialization function. The function MUST perform the update operation sequentially, then, if the address provided in `init` is not `address(0)`, MUST `delegatecall` into `init` with the calldata `callData`.
+The function `updatePlugins` takes in an array of updates to perform, and an optional initialization function. The function MUST perform the update operation sequentially, then, if the address provided in `init` is not `address(0)`, MUST execute `init` with the calldata `callData`.
 
 > :warning: The ability to update a plugin is very powerful. The security of the updatePlugins determines the security of the account. It is critical for Account builders to make sure updatePlugins has the proper security consideration and access control in place.
 
 **Calls to `validateUserOp`**
 
-When the function `validateUserOp` is called on an MSCA by the `EntryPoint`, it MUST find the user operation validator defined for the selector in `userOp.callData`, which is in the first four bytes. If there is no function defined for the selector, or if `userOp.callData.length < 4`, then execution MUST revert. Otherwise, the MSCA MUST `delegatecall` the validator function with the user operation, its hash, and the required prefund as parameters. The returned validation data from the user operation validator MUST be returned by `validateUserOp`.
+When the function `validateUserOp` is called on an MSCA by the `EntryPoint`, it MUST find the user operation validator defined for the selector in `userOp.callData`, which is in the first four bytes. If there is no function defined for the selector, or if `userOp.callData.length < 4`, then execution MUST revert. Otherwise, the MSCA MUST execute the validator function with the user operation, its hash, and the required prefund as parameters. The returned validation data from the user operation validator MUST be returned by `validateUserOp`.
 
 **Calls to execution functions**
 
 When a function other than `validateUserOp` is called on an MSCA, it MUST find the plugin configuration for the corresponding selector added via `updatePlugins`. If no corresponding plugin is found, the MSCA MUST revert. Otherwise, the MSCA MUST perform the following steps:
 
-- If a `runtimeValidator` function is defined, `delegatecall` into the function with the execution function’s calldata as parameter.
-- If there are global `preHook`s, `delegatecall` into the each with the execution function’s calldata.
-- If an associated `preHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` returns data, it MUST be preserved until the call to `postHook`.
-- `delegatecall` into the execution function.
-- If an associated `postHook` is defined, `delegatecall` into the associated function with the execution function’s calldata. If the `preHook` function returned data, the MSCA MUST pass that data in to `postHook`.
-- If there are global `postHook`s, `delegatecall` into the each with the execution function’s calldata.
+- If a `runtimeValidator` function is defined, execute the function with the execution function’s calldata as parameter.
+- If there are global `preHook`s, execute each with the execution function’s calldata.
+- If an associated `preHook` is defined, execute the associated function with the execution function’s calldata. If the `preHook` returns data, it MUST be preserved until the call to `postHook`.
+- execute the execution function.
+- If an associated `postHook` is defined, execute the associated function with the execution function’s calldata. If the `preHook` function returned data, the MSCA MUST pass that data in to `postHook`.
+- If there are global `postHook`s, execute each with the execution function’s calldata.
 
 > :warning: If the execution function does not have a definition for either `runtimeValidator`, `preHook`, or `postHook`, the undefined functions will be skipped. The execution function will be executed and it may change account state.
 
