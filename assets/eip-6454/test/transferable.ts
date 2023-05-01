@@ -5,7 +5,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ERC721NonTransferableMock } from "../typechain-types";
 
-async function nonTransferableTokenFixture(): Promise<ERC721NonTransferableMock> {
+async function transferableTokenFixture(): Promise<ERC721NonTransferableMock> {
   const factory = await ethers.getContractFactory("ERC721NonTransferableMock");
   const token = await factory.deploy("Chunky", "CHNK");
   await token.deployed();
@@ -23,13 +23,14 @@ describe("NonTransferable", async function () {
     const signers = await ethers.getSigners();
     owner = signers[0];
     otherOwner = signers[1];
-    nonTransferable = await loadFixture(nonTransferableTokenFixture);
+    nonTransferable = await loadFixture(transferableTokenFixture);
 
     await nonTransferable.mint(owner.address, 1);
+    await nonTransferable.mint(otherOwner.address, 2);
   });
 
   it("can support IRMRKNonTransferable", async function () {
-    expect(await nonTransferable.supportsInterface("0xa7331ab1")).to.equal(true);
+    expect(await nonTransferable.supportsInterface("0x23f06346")).to.equal(true);
   });
 
   it("does not support other interfaces", async function () {
@@ -43,16 +44,18 @@ describe("NonTransferable", async function () {
         ["safeTransferFrom(address,address,uint256)"](
           owner.address,
           otherOwner.address,
-          tokenId
+          tokenId + 1
         )
     ).to.be.revertedWithCustomError(nonTransferable, "CannotTransferNonTransferable");
   });
 
+  it("returns the expected transferability state", async function () {
+    expect(await nonTransferable['isTransferable(uint256)'](tokenId)).to.equal(false);
+    expect(await nonTransferable['isTransferable(uint256,address,address)'](tokenId, owner.address, otherOwner.address)).to.equal(true);
+  })
+
   it("reverts if token does not exist", async function () {
-    expect(
-      nonTransferable
-        .isNonTransferable(10)
-    ).to.be.revertedWith("CannotTransferNonTransferable");
+    await expect(nonTransferable['isTransferable(uint256)'](10)).to.be.revertedWith("ERC721: invalid token ID");
   });
 
   it("can burn", async function () {
