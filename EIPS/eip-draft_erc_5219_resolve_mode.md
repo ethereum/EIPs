@@ -3,7 +3,7 @@ eip: draft_erc_5219_resolve_mode
 title: ERC-5219 Resolve Mode
 description: Adds an ERC-4804 resolveMode to support ERC-5219 requests
 author: Gavin John (@Pandapip1), Qi Zhou (@qizhou)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/erc-5219-resolve-mode/14088
 status: Draft
 type: Standards Track
 category: ERC
