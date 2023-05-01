@@ -33,6 +33,7 @@ interface IERCxxxx {
 
     event OracleUpdate(address indexed oracle, bool indexed trusted);
     event AnchorTransfer(address indexed from, address indexed to, bytes32 indexed anchor, uint256 tokenId);
+    event AnchorApproval(address indexed owner, address approved, bytes32 indexed anchor, uint256 tokenId);
     event AttestationUse(address indexed to, bytes32 indexed anchor, bytes32 indexed attestationHash, uint256 totalUsedAttestationsForAnchor);
     event ValidAnchorsUpdate(bytes32 indexed validAnchorHash, address indexed maintainer);
 
@@ -95,7 +96,7 @@ interface IERCxxxx {
 
     
     /// @notice Update the Merkle root containing the valid anchors. Consider salt-leaves!
-    /// @dev Proof (transferAnchor) needs to provided from this tree. 
+    /// @dev Proof (transferAnchor) needs to be provided from this tree. 
     /// @dev The merkle-tree needs to contain at least one "salt leaf" in order to not publish the complete merkle-tree when all anchors should have been dropped at least once. 
     /// @param merkleRootNode The root, containing all anchors we want validated.
     function updateValidAnchors(bytes32 merkleRootNode) external;

@@ -39,7 +39,7 @@ describe("ERCxxxx: Asset-Bound NFT --- Full", function () {
     await abnftContract.connect(owner).grantRole(abnftContract.MAINTAINER_ROLE(), maintainer.address);
 
     // set attestation Limit per anchor
-    await abnftContract.connect(maintainer).updateGlobalAttestedTransferLimit(attestationLimitPerAnchor);
+    await abnftContract.connect(maintainer).updateGlobalAttestationLimit(attestationLimitPerAnchor);
 
     // Create Merkle Tree
     const merkleTree = StandardMerkleTree.of(merkleTestAnchors, ["bytes32"]);
@@ -116,7 +116,7 @@ describe("Anchor-Floating", function () {
     .withArgs(ERCxxxxAuthorization.OWNER_AND_ASSET, maintainer.address);
 
     await expect(abnftContract.connect(alice).allowFloating(anchor, true))
-    .to.emit(abnftContract, "AnchorFloatingState")
+    .to.emit(abnftContract, "AnchorFloatingStateChange")
     .withArgs(anchor, tokenId, true);
   });
 
@@ -129,7 +129,7 @@ describe("Anchor-Floating", function () {
     .withArgs(ERCxxxxAuthorization.OWNER_AND_ASSET, maintainer.address);
 
     await expect(abnftContract.connect(alice).allowFloating(anchor, true))
-    .to.emit(abnftContract, "AnchorFloatingState")
+    .to.emit(abnftContract, "AnchorFloatingStateChange")
     .withArgs(anchor, tokenId, true);
 
     await expect(abnftContract.connect(mallory).transferFrom(alice.address, mallory.address, tokenId))
@@ -158,7 +158,7 @@ describe("Anchor-Floating", function () {
     .withArgs(ERCxxxxAuthorization.ISSUER, maintainer.address);
 
     await expect(abnftContract.connect(maintainer).allowFloating(anchor, true))
-    .to.emit(abnftContract, "AnchorFloatingState")
+    .to.emit(abnftContract, "AnchorFloatingStateChange")
     .withArgs(anchor, tokenId, true);
   });
 
@@ -179,7 +179,7 @@ describe("Anchor-Floating", function () {
     .withArgs(alice.address, maintainer.address, tokenId)
     
     await expect(abnftContract.connect(maintainer).allowFloating(anchor, true))
-    .to.emit(abnftContract, "AnchorFloatingState")
+    .to.emit(abnftContract, "AnchorFloatingStateChange")
     .withArgs(anchor, tokenId, true);
   });
 
@@ -202,7 +202,7 @@ describe("Anchor-Floating", function () {
     .withArgs(ERCxxxxAuthorization.OWNER, maintainer.address);
 
     await expect(abnftContract.connect(alice).allowFloating(anchor, true))
-    .to.emit(abnftContract, "AnchorFloatingState")
+    .to.emit(abnftContract, "AnchorFloatingStateChange")
     .withArgs(anchor, tokenId, true);
     
     await expect(abnftContract.connect(bob).transferFrom(alice.address, carl.address, tokenId))
@@ -246,16 +246,16 @@ describe("Attested Transfer Limits", function () {
   it("SHOULD allow maintainer to update global attestation limit", async function () {
     const { abnftContract, maintainer, oracle, merkleTree, alice, bob, gasProvider, mallory,carl} = await deployForAttestationLimit(10, AttestedTransferLimitUpdatePolicy.FLEXIBLE);
 
-    await expect(abnftContract.connect(mallory).updateGlobalAttestedTransferLimit(5))
+    await expect(abnftContract.connect(mallory).updateGlobalAttestationLimit(5))
     .to.revertedWith("AccessControl: account 0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc is missing role 0x339759585899103d2ace64958e37e18ccb0504652c81d4a1b8aa80fe2126ab95");
 
     // Should be able to update
-    await expect(abnftContract.connect(maintainer).updateGlobalAttestedTransferLimit(5))
-    .to.emit(abnftContract, "GlobalAttestedTransferLimitUpdate") // Standard ERC721 event
+    await expect(abnftContract.connect(maintainer).updateGlobalAttestationLimit(5))
+    .to.emit(abnftContract, "GlobalAttestationLimitUpdate") // Standard ERC721 event
     .withArgs(5, maintainer.address);
 
     // Check effect, but requesting transfers left from a non-existent anchor
-    expect(await abnftContract.attestatedTransfersLeft(invalidAnchor))
+    expect(await abnftContract.attestationUsagesLeft(invalidAnchor))
     .to.be.equal(5);
   });
 
@@ -263,25 +263,33 @@ describe("Attested Transfer Limits", function () {
     const globalLimit = 10;
     const specificAnchorLimit = 5;
     const { abnftContract, maintainer, oracle, merkleTree, alice, bob, gasProvider, mallory,carl} = await deployForAttestationLimit(globalLimit, AttestedTransferLimitUpdatePolicy.FLEXIBLE);
+
     const anchor = merkleTestAnchors[0][0];
+    const mintAttestationAlice = await createAttestation(alice.address, anchor, oracle, merkleTree); // Mint to alice
+    const tokenId = 1;
+
+    await expect(abnftContract.connect(gasProvider).transferAnchor(mintAttestationAlice))
+    .to.emit(abnftContract, "Transfer") // Standard ERC721 event
+    .withArgs(NULLADDR, alice.address, tokenId);
+
 
     // Note that an anchor does not need to exist yet for playing with the limits
     // Check effect, but requesting transfers left from a non-existent anchor
-    expect(await abnftContract.attestatedTransfersLeft(invalidAnchor))
+    expect(await abnftContract.attestationUsagesLeft(invalidAnchor))
     .to.be.equal(globalLimit);
     
     // Should be able to update
-    await expect(abnftContract.connect(maintainer).updateAttestedTransferLimit(anchor, specificAnchorLimit))
-    .to.emit(abnftContract, "AttestedTransferLimitUpdate") // Standard ERC721 event
-    .withArgs(specificAnchorLimit, anchor, maintainer.address);
+    await expect(abnftContract.connect(maintainer).updateAttestationLimit(anchor, specificAnchorLimit))
+    .to.emit(abnftContract, "AttestationLimitUpdate") // Standard ERC721 event
+    .withArgs(anchor, tokenId, specificAnchorLimit, maintainer.address);
 
     // Check unchanged global effect, but requesting transfers left from a non-existent anchor
-    expect(await abnftContract.attestatedTransfersLeft(invalidAnchor))
+    expect(await abnftContract.attestationUsagesLeft(invalidAnchor))
     .to.be.equal(globalLimit);
     
     // Check verify effect
-    expect(await abnftContract.attestatedTransfersLeft(anchor))
-    .to.be.equal(specificAnchorLimit);
+    expect(await abnftContract.attestationUsagesLeft(anchor))
+    .to.be.equal(specificAnchorLimit-1); // 1 has been used to mint
   });
 
   it("Should enforce anchor limits (global + local)", async function () {
@@ -298,16 +306,8 @@ describe("Attested Transfer Limits", function () {
     const limitedAnchorToCarl = await createAttestation(carl.address, limitedAnchor, oracle, merkleTree); // Mint to carl
     const limitedAnchorToMallory = await createAttestation(mallory.address, limitedAnchor, oracle, merkleTree); // Limit reached!
         
-    // Update anchor based limit
-    await expect(abnftContract.connect(maintainer).updateAttestedTransferLimit(limitedAnchor, specificAnchorLimit))
-    .to.emit(abnftContract, "AttestedTransferLimitUpdate") // Standard ERC721 event
-    .withArgs(specificAnchorLimit, limitedAnchor, maintainer.address);
-
-    expect(await abnftContract.attestatedTransfersLeft(anchor))
+    expect(await abnftContract.attestationUsagesLeft(anchor))
     .to.be.equal(globalLimit);
-
-    expect(await abnftContract.attestatedTransfersLeft(limitedAnchor))
-    .to.be.equal(specificAnchorLimit);
 
     // ####################################### FIRST ANCHOR
     await expect(abnftContract.connect(gasProvider).transferAnchor(anchorToAlice))
@@ -322,6 +322,14 @@ describe("Attested Transfer Limits", function () {
     // ###################################### SECOND ANCHOR
     await expect(abnftContract.connect(gasProvider).transferAnchor(limitedAnchorToCarl))
     .to.emit(abnftContract, "Transfer");
+
+    // Update anchor based limit
+    await expect(abnftContract.connect(maintainer).updateAttestationLimit(limitedAnchor, specificAnchorLimit))
+    .to.emit(abnftContract, "AttestationLimitUpdate") 
+    .withArgs(limitedAnchor, 2, specificAnchorLimit, maintainer.address);
+    
+    expect(await abnftContract.attestationUsagesLeft(limitedAnchor))
+    .to.be.equal(specificAnchorLimit-1); // one was used to mint
 
     await expect(abnftContract.connect(gasProvider).transferAnchor(limitedAnchorToMallory))
     .to.revertedWith("ERC-XXXX: No attested transfers left");

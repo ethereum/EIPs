@@ -5,24 +5,31 @@ pragma solidity ^0.8.18;
 import "./IERCxxxx.sol";
 
 interface IERCxxxxAttestationLimited is IERCxxxx {
-    enum AttestedTransferLimitUpdatePolicy {
+    enum AttestationLimitUpdatePolicy {
         IMMUTABLE,
         INCREASE_ONLY,
         DECREASE_ONLY,
         FLEXIBLE
     }
-    function updateGlobalAttestedTransferLimit(uint256 _nrTransfers) external;
-    function updateAttestedTransferLimit(bytes32 anchor, uint256 _nrTransfers) external;
-    function attestatedTransfersLeft(bytes32 _anchor) external view returns (uint256 nrTransfersLeft);
+    function updateGlobalAttestationLimit(uint256 _nrTransfers) external;
+    function updateAttestationLimit(bytes32 anchor, uint256 _nrTransfers) external;
+    function attestationUsagesLeft(bytes32 _anchor) external view returns (uint256 nrTransfersLeft);
 
-    event GlobalAttestedTransferLimitUpdate(
+    event GlobalAttestationLimitUpdate(
         uint256 indexed transferLimit,
         address updatedBy
     );
 
-    event AttestedTransferLimitUpdate(
-        uint256 indexed transferLimit,
+    event AttestationLimitUpdate(
         bytes32 indexed anchor,
+        uint256 indexed tokenId,
+        uint256 indexed transferLimit,
         address updatedBy
+    );
+
+    event AttestationLimitReached(
+        bytes32 indexed anchor,
+        uint256 indexed tokenId,
+        uint256 indexed transferLimit
     );
 }

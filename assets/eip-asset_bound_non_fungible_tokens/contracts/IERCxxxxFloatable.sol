@@ -11,7 +11,7 @@ interface IERCxxxxFloatable is IERCxxxx {
     function allowFloating(bytes32 anchor, bool _doFloat) external;
     function isFloating(bytes32 anchor) external view returns (bool);
 
-    event AnchorFloatingState(
+    event AnchorFloatingStateChange(
         bytes32 indexed anchor,
         uint256 indexed tokenId,
         bool indexed isFloating
