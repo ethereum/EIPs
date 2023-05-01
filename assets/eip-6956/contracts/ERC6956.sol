@@ -10,19 +10,19 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-import "./IERCxxxx.sol";
+import "./IERC6956.sol";
 
 // Uncomment this line to use console.log
 import "hardhat/console.sol";
 
-// TODO RENAME TO ERCXXXX once granted, then derived contracts can say 'is ERCXXXX', when the reference
+// TODO RENAME TO ERC6956 once granted, then derived contracts can say 'is ERC6956', when the reference
 // implementation shall be used
-contract ERCxxxx is
+contract ERC6956 is
     ERC721,
     ERC721Enumerable,
     ERC721Burnable,
     AccessControl,
-    IERCxxxx 
+    IERC6956 
 {
     using Counters for Counters.Counter;
 
@@ -66,27 +66,27 @@ contract ERCxxxx is
     uint8 burnAuthorizationMap;
     uint8 approveAuthorizationMap;
 
-    function createAuthorizationMap(ERCxxxxAuthorization _auth) public pure returns (uint8)  {
+    function createAuthorizationMap(ERC6956Authorization _auth) public pure returns (uint8)  {
        uint8 authMap = 0;
-       if(_auth == ERCxxxxAuthorization.OWNER 
-            || _auth == ERCxxxxAuthorization.OWNER_AND_ASSET 
-            || _auth == ERCxxxxAuthorization.OWNER_AND_ISSUER 
-            || _auth == ERCxxxxAuthorization.ALL) {
-        authMap |= uint8(1<<uint8(ERCxxxxRole.OWNER));
+       if(_auth == ERC6956Authorization.OWNER 
+            || _auth == ERC6956Authorization.OWNER_AND_ASSET 
+            || _auth == ERC6956Authorization.OWNER_AND_ISSUER 
+            || _auth == ERC6956Authorization.ALL) {
+        authMap |= uint8(1<<uint8(ERC6956Role.OWNER));
        } 
        
-       if(_auth == ERCxxxxAuthorization.ISSUER 
-            || _auth == ERCxxxxAuthorization.ASSET_AND_ISSUER 
-            || _auth == ERCxxxxAuthorization.OWNER_AND_ISSUER 
-            || _auth == ERCxxxxAuthorization.ALL) {
-        authMap |= uint8(1<<uint8(ERCxxxxRole.ISSUER));
+       if(_auth == ERC6956Authorization.ISSUER 
+            || _auth == ERC6956Authorization.ASSET_AND_ISSUER 
+            || _auth == ERC6956Authorization.OWNER_AND_ISSUER 
+            || _auth == ERC6956Authorization.ALL) {
+        authMap |= uint8(1<<uint8(ERC6956Role.ISSUER));
        }
 
-       if(_auth == ERCxxxxAuthorization.ASSET 
-            || _auth == ERCxxxxAuthorization.ASSET_AND_ISSUER 
-            || _auth == ERCxxxxAuthorization.OWNER_AND_ASSET 
-            || _auth == ERCxxxxAuthorization.ALL) {
-        authMap |= uint8(1<<uint8(ERCxxxxRole.ASSET));
+       if(_auth == ERC6956Authorization.ASSET 
+            || _auth == ERC6956Authorization.ASSET_AND_ISSUER 
+            || _auth == ERC6956Authorization.OWNER_AND_ASSET 
+            || _auth == ERC6956Authorization.ALL) {
+        authMap |= uint8(1<<uint8(ERC6956Role.ASSET));
        }
 
        return authMap;
@@ -102,15 +102,15 @@ contract ERCxxxx is
 
     function roleBasedAuthorization(bytes32 anchor, uint8 authorizationMap) internal view returns (bool) {
         uint256 tokenId = tokenByAnchor[anchor];        
-        ERCxxxxRole myRole = ERCxxxxRole.INVALID;
-        ERCxxxxRole alternateRole = ERCxxxxRole.INVALID;
+        ERC6956Role myRole = ERC6956Role.INVALID;
+        ERC6956Role alternateRole = ERC6956Role.INVALID;
         
         if(_isApprovedOrOwner(_msgSender(), tokenId)) {
-            myRole = ERCxxxxRole.OWNER;
+            myRole = ERC6956Role.OWNER;
         }
 
         if(hasRole(MAINTAINER_ROLE, msg.sender)) {
-            alternateRole = ERCxxxxRole.ISSUER;
+            alternateRole = ERC6956Role.ISSUER;
         }
 
         return hasAuthorization(myRole, authorizationMap) 
@@ -130,7 +130,7 @@ contract ERCxxxx is
      {
         // remember the tokenId of burned tokens, s.t. one can issue the token with the same number again
         bytes32 anchor = anchorByToken[tokenId];
-        require(roleBasedAuthorization(anchor, burnAuthorizationMap), "ERC-XXXX: No permission to burn");
+        require(roleBasedAuthorization(anchor, burnAuthorizationMap), "ERC-6956: No permission to burn");
 
         anchorIsReleased[anchor] = true; // burning means the anchor is certainly released
         burnedTokensByAnchor[anchor] = tokenId;  
@@ -142,14 +142,14 @@ contract ERCxxxx is
     }
 
     function burnAnchor(bytes memory attestation) public
-        authorized(ERCxxxxRole.ASSET, burnAuthorizationMap)
+        authorized(ERC6956Role.ASSET, burnAuthorizationMap)
      {
         address to;
         bytes32 anchor;
         bytes32 attestationHash;
         (to, anchor, attestationHash) = decodeAttestationIfValid(attestation);
         uint256 tokenId = tokenByAnchor[anchor];
-        require(tokenId>0, "ERC-XXXX Token does not exist, call transferAnchor first to mint");
+        require(tokenId>0, "ERC-6956 Token does not exist, call transferAnchor first to mint");
         // remember the tokenId of burned tokens, s.t. one can issue the token with the same number again
         burnedTokensByAnchor[anchor] = tokenId;  
         anchorIsReleased[anchor] = true; // burning means the anchor is certainly released
@@ -163,13 +163,13 @@ contract ERCxxxx is
     function _beforeAttestationIsUsed(bytes32 anchor, address to) internal view virtual {}
     
     function approveAnchor(bytes memory attestation) public 
-        authorized(ERCxxxxRole.ASSET, approveAuthorizationMap)
+        authorized(ERC6956Role.ASSET, approveAuthorizationMap)
     {
         address to;
         bytes32 anchor;
         bytes32 attestationHash;
         (to, anchor, attestationHash) = decodeAttestationIfValid(attestation);
-        require(tokenByAnchor[anchor]>0, "ERC-XXXX Token does not exist, call transferAnchor first to mint");
+        require(tokenByAnchor[anchor]>0, "ERC-6956 Token does not exist, call transferAnchor first to mint");
         super._approve(to, tokenByAnchor[anchor]);
         commitAttestation(to, anchor, attestationHash);
     }
@@ -185,8 +185,8 @@ contract ERCxxxx is
         internal view
         override(ERC721, ERC721Enumerable)
     {
-        require(batchSize == 1, "EIP-XXXX: batchSize must be 1");
-        require(anchorIsReleased[anchorByToken[tokenId]], "EIP-XXXX: Token not transferable");
+        require(batchSize == 1, "EIP-6956: batchSize must be 1");
+        require(anchorIsReleased[anchorByToken[tokenId]], "EIP-6956: Token not transferable");
     }
 
     /// @dev Verifies a anchor is valid and mints a token to the target address.
@@ -234,7 +234,7 @@ contract ERCxxxx is
 
         if(fromToken > 0) {
             from = ownerOf(fromToken);
-            require(from != to, "ERC-XXXX: Token already owned");
+            require(from != to, "ERC-6956: Token already owned");
             _safeTransfer(from, to, fromToken, "");
         } else {
             _safeMint(to, anchor);
@@ -254,13 +254,13 @@ contract ERCxxxx is
         emit ValidAnchorsUpdate(_validAnchors, msg.sender);
     }
 
-    function hasAuthorization(ERCxxxxRole _role, uint8 _auth ) public pure returns (bool) {
+    function hasAuthorization(ERC6956Role _role, uint8 _auth ) public pure returns (bool) {
         uint8 result = uint8(_auth & (1 << uint8(_role)));
         return result > 0;
     }
 
-    modifier authorized(ERCxxxxRole _role, uint8 _authMap) {
-        require(hasAuthorization(_role, _authMap), "ERC-XXXX Not authorized");
+    modifier authorized(ERC6956Role _role, uint8 _authMap) {
+        require(hasAuthorization(_role, _authMap), "ERC-6956 Not authorized");
         _;
     }
 
@@ -273,7 +273,7 @@ contract ERCxxxx is
         returns (bool)
     {
         return
-            interfaceId == type(IERCxxxx).interfaceId ||
+            interfaceId == type(IERC6956).interfaceId ||
             super.supportsInterface(interfaceId);
     }
     
@@ -292,17 +292,17 @@ contract ERCxxxx is
         address signer = _extractSigner(messageHash, signature);
 
         // Check if from trusted oracle
-        require(trustedOracles[signer], "EIP-XXXX Attestation not signed by trusted oracle");
-        require(anchorByUsedAttestation[attestationHash] <= 0, "EIP-XXXX Attestation already used");
+        require(trustedOracles[signer], "EIP-6956 Attestation not signed by trusted oracle");
+        require(anchorByUsedAttestation[attestationHash] <= 0, "EIP-6956 Attestation already used");
 
         // Check expiry
         uint256 timestamp = block.timestamp;
-        require(timestamp > validStartTime, "ERC-XXXX Attestation not valid yet");
-        require(attestationTime + maxAttestationExpireTime > block.timestamp, "ERC-XXXX Attestation expired");
-        require(validEndTime > block.timestamp, "ERC-XXXX Attestation no longer valid");
+        require(timestamp > validStartTime, "ERC-6956 Attestation not valid yet");
+        require(attestationTime + maxAttestationExpireTime > block.timestamp, "ERC-6956 Attestation expired");
+        require(validEndTime > block.timestamp, "ERC-6956 Attestation no longer valid");
 
         // check anchor is indeed valid in contract
-        require(validAnchor(anchor, proof), "ERC-XXXX Anchor not valid");
+        require(validAnchor(anchor, proof), "ERC-6956 Anchor not valid");
         // Calling hook!
         _beforeAttestationIsUsed(anchor, to);
         return(to,  anchor, attestationHash);
@@ -346,12 +346,12 @@ contract ERCxxxx is
         baseURI = tokenBaseURI;
     }
 
-    function updateBurnAuthorization(ERCxxxxAuthorization _burnAuth) public onlyRole(MAINTAINER_ROLE) {
+    function updateBurnAuthorization(ERC6956Authorization _burnAuth) public onlyRole(MAINTAINER_ROLE) {
         burnAuthorizationMap = createAuthorizationMap(_burnAuth);
         // TODO event
     }
  
-    function updateApproveAuthorization(ERCxxxxAuthorization _approveAuth) public onlyRole(MAINTAINER_ROLE) {
+    function updateApproveAuthorization(ERC6956Authorization _approveAuth) public onlyRole(MAINTAINER_ROLE) {
         approveAuthorizationMap = createAuthorizationMap(_approveAuth);
         // TODO event
     }
@@ -363,8 +363,8 @@ contract ERCxxxx is
 
             // OWNER and ASSET shall normally be in sync anyway, so this is reasonable default 
             // authorization for approve and burn, as it mimicks ERC-721 behavior
-            burnAuthorizationMap = createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ASSET);
-            approveAuthorizationMap = createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ASSET);
+            burnAuthorizationMap = createAuthorizationMap(ERC6956Authorization.OWNER_AND_ASSET);
+            approveAuthorizationMap = createAuthorizationMap(ERC6956Authorization.OWNER_AND_ASSET);
     }
     /*
     * #################################################################################################################################

@@ -1,26 +1,27 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.18;
+
 /**
- * @title IERCxxxx Asset-Bound Non-Fungible Tokens 
+ * @title IERC6956 Asset-Bound Non-Fungible Tokens 
  * @author Thomas Bergmueller (@tbergmueller) <tb@authenticvision.com>
  * @notice Asset-bound Non-Fungible Tokens anchor a token 1:1 to a (physical or digital) asset and token transfers are authorized through attestation of control over the asset
- * @dev See EIP-XXXX (todo link) for details
+ * @dev See EIP-6956 (todo link) for details
  */
-interface IERCxxxx {
+interface IERC6956 {
     /// Used for several authorization mechansims, e.g. who can burn, who can set approval, ... 
-    /// @dev Specifying the role in the ecosystem. Used in conjunction with ERCxxxxAuthorization
-    enum ERCxxxxRole {
+    /// @dev Specifying the role in the ecosystem. Used in conjunction with ERC6956Authorization
+    enum ERC6956Role {
         OWNER,  // =0, The owner of the digital token
         ISSUER, // =1, The issuer (contract) of the tokens, typically represented through a MAINTAINER_ROLE, the contract owner etc.
         ASSET,  // =2, The asset identified by the anchor
         INVALID // =3, Reserved, do not use.
     }
 
-    /// @dev Authorization, typically mapped to authorizationMaps, where each bit indicates whether a particular ERCxxxxRole is authorized 
+    /// @dev Authorization, typically mapped to authorizationMaps, where each bit indicates whether a particular ERC6956Role is authorized 
     ///      Typically used in constructor (hardcoded or params) to set burnAuthorization and approveAuthorization
     ///      Also used in optional updateBurnAuthorization, updateApproveAuthorization 
-    enum ERCxxxxAuthorization {
+    enum ERC6956Authorization {
         NONE,               // = 0,      // None of the above
         OWNER,              // = (1<<OWNER), // The owner of the token, i.e. the digital representation
         ISSUER,             // = (1<<ISSUER), // The issuer of the tokens, i.e. this smart contract
@@ -56,13 +57,13 @@ interface IERCxxxx {
     /**
      * @notice Transfers the ownership of an NFT mapped to attestation.anchor to attestation.to address. Uses ERC-721 safeTransferFrom and safeMint.
      * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation. 
-     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     *      When using centralized "transaction-signers" (paying for gas), implement IERC6956AttestationLimited!
      *      
      *      Throws when attestation invalid or already used, 
-     *      Throws when attestation.to == ownerOf(tokenByAnchor(attestation.anchor)). See EIP-XXXX
+     *      Throws when attestation.to == ownerOf(tokenByAnchor(attestation.anchor)). See EIP-6956
      *      Emits AnchorTransfer and AttestationUsed  
      *  
-     * @param attestation Attestation, refer EIP-XXXX for details
+     * @param attestation Attestation, refer EIP-6956 for details
      * 
      * @return anchor The anchor, which is mapped to `tokenId`
      * @return to The `to` address, where the token with `tokenId` was transferd
@@ -73,24 +74,24 @@ interface IERCxxxx {
      /**
      * @notice Approves attestation.to the token mapped to attestation.anchor. Uses ERC-721.approve(to, tokenId).
      * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation.
-     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     *      When using centralized "transaction-signers" (paying for gas), implement IERC6956AttestationLimited!
      * 
      *      Throws when attestation invalid or already used
-     *      Throws when ERCxxxxRole.ASSET is not authorized to approve
+     *      Throws when ERC6956Role.ASSET is not authorized to approve
      * 
-     * @param attestation Attestation, refer EIP-XXXX for details 
+     * @param attestation Attestation, refer EIP-6956 for details 
      */
     function approveAnchor(bytes memory attestation) external;
 
     /**
      * @notice Burns the token mapped to attestation.anchor. Uses ERC-721._burn.
      * @dev Permissionless, i.e. anybody invoke and sign a transaction. The transfer is authorized through the oracle-signed attestation.
-     *      When using centralized "transaction-signers" (paying for gas), implement IERCxxxxAttestationLimited!
+     *      When using centralized "transaction-signers" (paying for gas), implement IERC6956AttestationLimited!
      * 
      *      Throws when attestation invalid or already used
-     *      Throws when ERCxxxxRole.ASSET is not authorized to burn
+     *      Throws when ERC6956Role.ASSET is not authorized to burn
      * 
-     * @param attestation Attestation, refer EIP-XXXX for details 
+     * @param attestation Attestation, refer EIP-6956 for details 
      */
     function burnAnchor(bytes memory attestation) external;
 

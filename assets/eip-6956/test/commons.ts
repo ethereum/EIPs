@@ -4,7 +4,7 @@ import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
 import { float } from "hardhat/internal/core/params/argumentTypes";
 
 
-export enum ERCxxxxAuthorization {
+export enum ERC6956Authorization {
     NONE,// = 0, // None of the above - a 1:1 relationship is maintained
     OWNER,// = (1 << 1), // The owner of the token, i.e. the digital representation
     ISSUER,// = (1 << 2), // The issuer of the tokens, i.e. this smart contract
@@ -15,7 +15,7 @@ export enum ERCxxxxAuthorization {
     ALL// = (1<<1) | (1<<2) | (1<<3) // Owner + Issuer + Asset
     }
     
-export enum ERCxxxxRole {
+export enum ERC6956Role {
     OWNER,
     ISSUER,
     ASSET

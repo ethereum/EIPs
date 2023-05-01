@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { createHash } from 'node:crypto';
 import { StandardMerkleTree } from "@openzeppelin/merkle-tree";
-import { ERCxxxxAuthorization, ERCxxxxRole, merkleTestAnchors, NULLADDR, createAttestation} from "./commons";
+import { ERC6956Authorization, ERC6956Role, merkleTestAnchors, NULLADDR, createAttestation} from "./commons";
 
 
 
@@ -39,16 +39,16 @@ export async function minimalAttestationExample() {
 }
 
 
-describe("ERCxxxx: Asset-Bound NFT --- Basics", function () {
+describe("ERC6956: Asset-Bound NFT --- Basics", function () {
   // Fixture to deploy the abnftContract contract and assigne roles.
   // Besides owner there's user, minter and burner with appropriate roles.
   async function deployAbNftFixture() {
     // Contracts are deployed using the first signer/account by default
     const [owner, maintainer, oracle, alice, bob, mallory, hacker, carl, gasProvider ] = await ethers.getSigners();
 
-    const AbNftContract = await ethers.getContractFactory("ERCxxxx");
-    //const burnAuthorization = ERCxxxxAuthorization.ALL;
-    //const approveAuthorization = ERCxxxxAuthorization.ALL;
+    const AbNftContract = await ethers.getContractFactory("ERC6956");
+    //const burnAuthorization = ERC6956Authorization.ALL;
+    //const approveAuthorization = ERC6956Authorization.ALL;
 
     const abnftContract = await AbNftContract.connect(owner).deploy("Asset-Bound NFT test", "ABNFT");
     await abnftContract.connect(owner).grantRole(abnftContract.MAINTAINER_ROLE(), maintainer.address);
@@ -85,7 +85,7 @@ describe("ERCxxxx: Asset-Bound NFT --- Basics", function () {
 
   /*
   describe("Deployment & Settings", function () {
-    it("Should implement EIP-165 support the EIP-XXXX interface", async function () {
+    it("Should implement EIP-165 support the EIP-6956 interface", async function () {
       const { abnftContract } = await loadFixture(deployPTNFTFixture);
       expect("TODO not implemented yet").to.be.equal(true);
       // FIXME
@@ -95,63 +95,63 @@ describe("ERCxxxx: Asset-Bound NFT --- Basics", function () {
 */
 
 describe("Authorization Map tests", function () {
-  it("SHOULD interpret ERCxxxxAuthorization correctly", async function () {
+  it("SHOULD interpret ERC6956Authorization correctly", async function () {
     // Create the message to sign
     const { abnftContract } = await loadFixture(deployAbNftFixture);      
 
     // OWNER
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.NONE)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.NONE)))
       .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ISSUER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ASSET)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ISSUER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET_AND_ISSUER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.OWNER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ALL)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.OWNER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ALL)))
     .to.be.equal(true);
 
     // ISSUER
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.NONE)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.NONE)))
       .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ISSUER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ASSET)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ISSUER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET_AND_ISSUER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ISSUER, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ALL)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ISSUER, await abnftContract.createAuthorizationMap(ERC6956Authorization.ALL)))
     .to.be.equal(true);
 
 
     // ASSET
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.NONE)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.NONE)))
       .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.ISSUER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ASSET)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ASSET)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.OWNER_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.OWNER_AND_ISSUER)))
     .to.be.equal(false);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ASSET_AND_ISSUER)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.ASSET_AND_ISSUER)))
     .to.be.equal(true);
-    await expect(await abnftContract.hasAuthorization(ERCxxxxRole.ASSET, await abnftContract.createAuthorizationMap(ERCxxxxAuthorization.ALL)))
+    await expect(await abnftContract.hasAuthorization(ERC6956Role.ASSET, await abnftContract.createAuthorizationMap(ERC6956Authorization.ALL)))
     .to.be.equal(true);
   });
 });
@@ -170,7 +170,7 @@ describe("Authorization Map tests", function () {
 
         const fraudAttestation = await createAttestation(to, anchor, mallory, merkleTree);
         await expect(abnftContract.assertAttestation(fraudAttestation))
-          .to.be.revertedWith("EIP-XXXX Attestation not signed by trusted oracle");
+          .to.be.revertedWith("EIP-6956 Attestation not signed by trusted oracle");
       });
 
       it("SHOULD allow mint and transfer with valid attestations", async function() {
@@ -187,7 +187,7 @@ describe("Authorization Map tests", function () {
         // Token is now at bob... so alice may hire a hacker quickly and re-use her attestation to get 
         // the token back from Bob ... which shall of course not work
         await expect(abnftContract.connect(hacker).transferAnchor(mintAttestationAlice))
-        .to.revertedWith("EIP-XXXX Attestation already used") // Standard ERC721 event
+        .to.revertedWith("EIP-6956 Attestation already used") // Standard ERC721 event
       })    
       
 
@@ -195,7 +195,7 @@ describe("Authorization Map tests", function () {
         const { abnftContract, alice, bob} = await loadFixture(deployABTandMintTokenToAlice);      
   
         await expect(abnftContract.connect(alice).transferFrom(alice.address, bob.address, 1)) 
-        .to.revertedWith("EIP-XXXX: Token not transferable");
+        .to.revertedWith("EIP-6956: Token not transferable");
       })
       
       it("SHOULDN'T allow approveAnchor followed by safeTransfer when anchor not floating", async function() {
@@ -215,7 +215,7 @@ describe("Authorization Map tests", function () {
 
         // Even though Bob is approved, cannot transfer, since anchor is not floating
         await expect(abnftContract.connect(bob).transferFrom(alice.address, carl.address, tokenId))
-        .to.revertedWith("EIP-XXXX: Token not transferable");
+        .to.revertedWith("EIP-6956: Token not transferable");
       })
 
       it("SHOULDN't allow to attesting arbitrary anchors", async function() {
@@ -229,7 +229,7 @@ describe("Authorization Map tests", function () {
         // Let the oracle create an valid attestation (from the oracle's view)
         const attestationAlice = await createAttestation(alice.address, anchor, oracle, merkleTree); // Mint to alice  
         await expect(abnftContract.connect(hacker).transferAnchor(attestationAlice))
-        .to.revertedWith("ERC-XXXX Anchor not valid")
+        .to.revertedWith("ERC-6956 Anchor not valid")
       })
 
       it("SHOULDN't allow using attestations before validity ", async function() {
@@ -245,7 +245,7 @@ describe("Authorization Map tests", function () {
         const twoMinInFuture =  curTime + 2 * 60;
         const attestationAlice = await createAttestation(alice.address, anchor, oracle, merkleTree, twoMinInFuture); // Mint to alice  
         await expect(abnftContract.connect(alice).transferAnchor(attestationAlice))
-        .to.revertedWith("ERC-XXXX Attestation not valid yet")
+        .to.revertedWith("ERC-6956 Attestation not valid yet")
       })
   });
 
@@ -256,7 +256,7 @@ describe("Authorization Map tests", function () {
 
       // Let bob try to burn... should not work
       await expect(abnftContract.connect(bob).burn(tokenId))
-      .to.revertedWith("ERC-XXXX: No permission to burn");
+      .to.revertedWith("ERC-6956: No permission to burn");
 
       // Alice then burns, which shall be transaction to 0x0
       await expect(abnftContract.connect(alice).burn(tokenId))
@@ -274,7 +274,7 @@ describe("Authorization Map tests", function () {
 
       // Let mallory try to burn... should not work
       await expect(abnftContract.connect(mallory).burn(tokenId))
-      .to.revertedWith("ERC-XXXX: No permission to burn");
+      .to.revertedWith("ERC-6956: No permission to burn");
 
       // Bob is approved, so bob can burn
       await expect(abnftContract.connect(bob).burn(tokenId))
@@ -289,11 +289,11 @@ describe("Authorization Map tests", function () {
       
       const tokenId = await abnftContract.tokenByAnchor(anchor);
 
-      await abnftContract.connect(maintainer).updateBurnAuthorization(ERCxxxxAuthorization.ISSUER);
+      await abnftContract.connect(maintainer).updateBurnAuthorization(ERC6956Authorization.ISSUER);
 
       // Let mallory try to burn... should not work
       await expect(abnftContract.connect(mallory).burn(tokenId))
-      .to.revertedWith("ERC-XXXX: No permission to burn");
+      .to.revertedWith("ERC-6956: No permission to burn");
 
       // Bob is approved, so bob can burn
       await expect(abnftContract.connect(maintainer).burn(tokenId))
@@ -313,7 +313,7 @@ describe("Authorization Map tests", function () {
 
       // Let mallory try to burn... should not work
       await expect(abnftContract.connect(mallory).burn(tokenId))
-      .to.revertedWith("ERC-XXXX: No permission to burn");
+      .to.revertedWith("ERC-6956: No permission to burn");
 
       // Bob is approved, so bob can burn
       await expect(abnftContract.connect(bob).burn(tokenId))
@@ -328,7 +328,7 @@ describe("Authorization Map tests", function () {
 
       // Let mallory try to burn a token based on the creation anchor..
       await expect(abnftContract.connect(mallory).burnAnchor(mintAttestationAlice))
-      .to.revertedWith("EIP-XXXX Attestation already used");
+      .to.revertedWith("EIP-6956 Attestation already used");
 
       // Now, using a fresh attestation, the same guy can burn
       await expect(abnftContract.connect(mallory).burnAnchor(burnAttestation))
