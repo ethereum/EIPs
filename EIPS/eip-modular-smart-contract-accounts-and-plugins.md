@@ -144,6 +144,11 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >         ExecutionUpdate[] executionUpdates;
 >     }
 >
+>     struct GlobalPluginUpdate {
+>         PluginAction action;
+>         AssociatedFunction globalPlugin;
+>     }
+>
 >     struct ExecutionUpdate {
 >         bytes4 executionSelector;
 >         AssociatedFunction[] associatedFunctions;
@@ -179,7 +184,7 @@ Plugin modification interface. Modular Smart Contract Accounts MAY implement thi
 >      * @param callData A function call, including function selector and arguments
 >      *                  calldata is executed with delegatecall on init
 >      */
->    function updateGlobalPlugins(AssociatedFunction[] memory globalPluginUpdates, address init, bytes calldata callData)
+>    function updateGlobalPlugins(GlobalPluginUpdate[] memory globalPluginUpdates, address init, bytes calldata callData)
 >        external;
 > }
 > ```
