@@ -1,5 +1,5 @@
 ---
-eip: 6914
+eip: draft_reuse_withdrawn_validator_indi
 title: Reuse Withdrawn Validator Indices
 description: Reuse fully withdrawn and safe to reuse validator indices for new beacon chain deposits.
 author: Lion (@dapplion), Danny Ryan (@djrtwo)
