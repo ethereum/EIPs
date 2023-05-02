@@ -1,5 +1,5 @@
 ---
-eip: 6734
+eip: draft_l2_token_list
 title: L2 Token List
 description: Token List that ensures the correct identification of tokens from different Layer 1, Layer 2, or Sidechains.
 author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969), Pavel Sinelnikov (@psinelnikov)
