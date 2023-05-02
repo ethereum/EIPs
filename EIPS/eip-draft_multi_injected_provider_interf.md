@@ -1,5 +1,5 @@
 ---
-eip: 6963
+eip: draft_multi_injected_provider_interf
 title: Multi Injected Provider Interface (aka MIPI)
 description: Using `window.evmproviders` instead of `window.ethereum`
 author: Pedro Gomes (@pedrouid), Kosala Hemachandra (@kvhnuke), Richard Moore (@ricmoo), Gregory Markou (@GregTheGreek)
