@@ -14,10 +14,7 @@ requires: 4337
 
 This proposal standardizes smart contract accounts and account plugins, which are smart contract interfaces that allow for composable logic within smart contract accounts. This proposal is compliant with [ERC-4337](./eip-4337.md), and builds on the existing work from [ERC-2535](./eip-2535.md) when defining interfaces for updating and querying modular function implementations.
 
-Goals:
-
-- Provide standards for how validation, execution, and hook functions for smart contract accounts should be written.
-- Provide standards for how compliant accounts should add, update, remove, and inspect plugins.
+This modular approach splits account functionality into three categories, delegates them to external contracts, and defines an expected execution flow from accounts.
 
 ## Motivation
 
@@ -29,11 +26,16 @@ However, managing multiple wallet instances provides a worse user experience, fr
 
 We propose a standard that coordinates the implementation work between plugin developers and wallet developers. This standard defines a modular smart contract account capable of supporting all standard-conformant plugins. This allows users to have greater portability of their data, and for plugin developers to not have to choose specific wallet implementations to support.
 
-<img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png">
+![diagram showing relationship between accounts and plugins of each type](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png)
 
 We take inspiration from ERC-2535’s diamond pattern and adopt a similar composability by proposing three types of plugins. However, you are not required to implement the account with a multi-facet proxy pattern. These plugins contain execution logic. They also incorporate validation schemes and hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. Accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
 Defining this as a standard for smart contract accounts will make plugins easier to develop securely and will allow for greater interoperability.
+
+Goals:
+
+- Provide standards for how validation, execution, and hook functions for smart contract accounts should be written.
+- Provide standards for how compliant accounts should add, update, remove, and inspect plugins.
 
 ## Specification
 
@@ -62,7 +64,7 @@ A smart contract account handles two kinds of calls: one from `Entrypoint` throu
 
 A call to the smart contract account can be decomposed into 4 steps as shown in the diagram below. The validation step (Step 1) validates if the caller is allowed to call. The pre execution hook step (Step 2) can be used to do any pre execution checks or updates. It can also be used with the post execution hook step (Step 4) to perform certain verifications. The execution step (Step 3) performs a performs a call-defined task or collection of tasks.
 
-<img src="../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Two_Call_Paths_Diagram.png">
+![diagram showing execution flow within an account](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Two_Call_Paths_Diagram.png)
 
 Each step is modularized and can have different combinations and infinite functionalities. **The smart contract account should orchestrate the above 4 steps.** For example, a MSCA has a fallback functions that orchestrate the above 4 steps for the account.
 
@@ -70,157 +72,156 @@ Each step is modularized and can have different combinations and infinite functi
 
 Account interface. Modular Smart Contract Accounts MUST implement this interface to support ERC-4337 and view functions.
 
-`IAccount.sol`
+#### `IAccount.sol`
 
-> ```solidity
-> interface IAccount {
->     /**
->      * Validate user's signature and nonce
->      * the entryPoint will make the call to the recipient only if this validation call returns successfully.
->      * signature failure should be reported by returning SIG_VALIDATION_FAILED (1).
->      * This allows making a "simulation call" without a valid signature
->      * Other failures (e.g. nonce mismatch, or invalid signature format) should still revert to signal failure.
->      *
->      * @dev Must validate caller is the entryPoint.
->      *      Must validate the signature and nonce
->      * @param userOp the operation that is about to be executed.
->      * @param userOpHash hash of the user's request data. can be used as the basis for signature.
->      * @param missingAccountFunds missing funds on the account's deposit in the entrypoint.
->      *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.
->      *      The excess is left as a deposit in the entrypoint, for future calls.
->      *      can be withdrawn anytime using "entryPoint.withdrawTo()"
->      *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.
->      * @return validationData packaged ValidationData structure. use `_packValidationData` and `_unpackValidationData` to encode and decode
->      *      <20-byte> sigAuthorizer - 0 for valid signature, 1 to mark signature failure,
->      *         otherwise, an address of an "authorizer" contract.
->      *      <6-byte> validUntil - last timestamp this operation is valid. 0 for "indefinite"
->      *      <6-byte> validAfter - first timestamp this operation is valid
->      *      If an account doesn't use time-range, it is enough to return SIG_VALIDATION_FAILED value (1) for signature failure.
->      *      Note that the validation code cannot use block.timestamp (or block.number) directly.
->      */
->     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
->     external returns (uint256 validationData);
-> }
-> ```
+```solidity
+interface IAccount {
+    /**
+     * Validate user's signature and nonce
+     * the entryPoint will make the call to the recipient only if this validation call returns successfully.
+     * signature failure should be reported by returning SIG_VALIDATION_FAILED (1).
+     * This allows making a "simulation call" without a valid signature
+     * Other failures (e.g. nonce mismatch, or invalid signature format) should still revert to signal failure.
+     *
+     * @dev Must validate caller is the entryPoint.
+     *      Must validate the signature and nonce
+     * @param userOp the operation that is about to be executed.
+     * @param userOpHash hash of the user's request data. can be used as the basis for signature.
+     * @param missingAccountFunds missing funds on the account's deposit in the entrypoint.
+     *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.
+     *      The excess is left as a deposit in the entrypoint, for future calls.
+     *      can be withdrawn anytime using "entryPoint.withdrawTo()"
+     *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.
+     * @return validationData packaged ValidationData structure. use `_packValidationData` and `_unpackValidationData` to encode and decode
+     *      <20-byte> sigAuthorizer - 0 for valid signature, 1 to mark signature failure,
+     *         otherwise, an address of an "authorizer" contract.
+     *      <6-byte> validUntil - last timestamp this operation is valid. 0 for "indefinite"
+     *      <6-byte> validAfter - first timestamp this operation is valid
+     *      If an account doesn't use time-range, it is enough to return SIG_VALIDATION_FAILED value (1) for signature failure.
+     *      Note that the validation code cannot use block.timestamp (or block.number) directly.
+     */
+    function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
+    external returns (uint256 validationData);
+}
+```
 
 Account interface. Modular Smart Contract Accounts MAY implement `viewCall` to support view functions without the need to add view functions selectors into storage through updatePlugins.
 
-`IModularAccount.sol`
+#### `IModularAccount.sol`
 
-> ```solidity
-> interface IModularAccount {
->    /**
->     * view function calls to the account
->     * @param implAddress the address of the implmentation contract
->     * @param data params to pass to the view function
->     */
->    function viewCall(address implAddress, bytes calldata data) external returns (bytes memory);
-> }
-> ```
+```solidity
+interface IModularAccount {
+   /**
+    * view function calls to the account
+    * @param implAddress the address of the implmentation contract
+    * @param data params to pass to the view function
+    */
+   function viewCall(address implAddress, bytes calldata data) external returns (bytes memory);
+}
+```
 
 Plugin modification interface. Modular Smart Contract Accounts MAY implement this interface to support updates to plugins.
 
-`IPluginUpdate.sol`
+#### `IPluginUpdate.sol`
 
-> ```solidity
-> interface IPluginUpdate {
->
->     enum PluginAction {
->         ADD,
->         REPLACE,
->         REMOVE
->     }
->
->     enum AssociatedFunctionType {
->         USER_OP_VALIDATOR,
->         RUNTIME_VALIDATOR,
->         PRE_HOOK,
->         POST_HOOK
->     }
->
->     struct PluginUpdate {
->         address executionPluginAddress;
->         PluginAction action;
->         ExecutionUpdate[] executionUpdates;
->     }
->
->     struct GlobalPluginUpdate {
->         PluginAction action;
->         AssociatedFunction globalPlugin;
->     }
->
->     struct ExecutionUpdate {
->         bytes4 executionSelector;
->         AssociatedFunction[] associatedFunctions;
->     }
->
->     struct AssociatedFunction {
->         AssociatedFunctionType functionType;
->         address implAddress;
->         bytes4 implSelector;
->     }
->
->     event PluginsUpdated(PluginUpdate[] pluginUpdates, address init, bytes callData);
->     event GlobalPluginsUpdated(AssociatedFunction[] globalPluginUpdates, address init, bytes callData);
->
->     /**
->         * @notice Add/replace/remove any number of plugins and optionally execute a function
->         * @param pluginUpdates Contains the plugin addresses and function selectors.
->         *        executionPluginAddress specifies the plugin containing the execution functions defined within
->         *        pluginAction denotes what operation to perform
->         *        executionUpdates denote which execution function and associated function to perform the opeartion on.
->         * @param init The address of the contract or facet to execute calldata
->         * @param callData A function call, including function selector and arguments
->         */
->     function updatePlugins(PluginUpdate[] memory pluginUpdates, address init, bytes calldata callData) external;
->
->     /**
->      * @notice Add/replace/remove any number of global plugins and optionally execute a function
->      * @param globalPluginUpdates Contains the plugin addresses and function selectors.
->      * @param init The address of the contract or facet to execute calldata
->      * @param callData A function call, including function selector and arguments
->      */
->    function updateGlobalPlugins(GlobalPluginUpdate[] memory globalPluginUpdates, address init, bytes calldata callData)
->        external;
-> }
-> ```
+```solidity
+interface IPluginUpdate {
+    enum PluginAction {
+        ADD,
+        REPLACE,
+        REMOVE
+    }
+
+    enum AssociatedFunctionType {
+        USER_OP_VALIDATOR,
+        RUNTIME_VALIDATOR,
+        PRE_HOOK,
+        POST_HOOK
+    }
+
+    struct PluginUpdate {
+        address executionPluginAddress;
+        PluginAction action;
+        ExecutionUpdate[] executionUpdates;
+    }
+
+    struct GlobalPluginUpdate {
+        PluginAction action;
+        AssociatedFunction globalPlugin;
+    }
+
+    struct ExecutionUpdate {
+        bytes4 executionSelector;
+        AssociatedFunction[] associatedFunctions;
+    }
+
+    struct AssociatedFunction {
+        AssociatedFunctionType functionType;
+        address implAddress;
+        bytes4 implSelector;
+    }
+
+    event PluginsUpdated(PluginUpdate[] pluginUpdates, address init, bytes callData);
+
+    event GlobalPluginsUpdated(AssociatedFunction[] globalPluginUpdates, address init, bytes callData);
+
+    /**
+        * @notice Add/replace/remove any number of plugins and optionally execute a function
+        * @param pluginUpdates Contains the plugin addresses and function selectors.
+        *        executionPluginAddress specifies the plugin containing the execution functions defined within
+        *        pluginAction denotes what operation to perform
+        *        executionUpdates denote which execution function and associated function to perform the opeartion on.
+        * @param init The address of the contract or facet to execute calldata
+        * @param callData A function call, including function selector and arguments
+        */
+    function updatePlugins(PluginUpdate[] memory pluginUpdates, address init, bytes calldata callData) external;
+
+    /**
+     * @notice Add/replace/remove any number of global plugins and optionally execute a function
+     * @param globalPluginUpdates Contains the plugin addresses and function selectors.
+     * @param init The address of the contract or facet to execute calldata
+     * @param callData A function call, including function selector and arguments
+     */
+   function updateGlobalPlugins(GlobalPluginUpdate[] memory globalPluginUpdates, address init, bytes calldata callData)
+       external;
+}
+```
 
 Plugin inspection interface. Modular Smart Contract Accounts MAY implement this interface to support visibility in plugin configuration on-chain. Note this will require extra storage.
 
-`IPluginLoupe.sol`
+#### `IPluginLoupe.sol`
 
-> ```solidity
-> interface IPluginLoupe {
->
->     struct PluginInfo {
->         address executionPluginAddress;
->         FunctionConfig[] configs;
->     }
->
->     struct FunctionConfig {
->         bytes4 executionSelector;
->         FunctionReference userOpValidator;
->         FunctionReference runtimeValidator;
->         FunctionReference preHook;
->         FunctionReference postHook;
->     }
->
->     struct FunctionReference {
->         address implAddress;
->         bytes4 implSelector;
->     }
->
->     function getPlugins() external view returns (PluginInfo[] memory);
->
->     function getPlugin(address executionPluginAddress) external view returns (FunctionConfig[] memory functions);
->
->     function getFunctionConfig(bytes4 executionSelector) external view returns (FunctionConfig memory);
-> }
-> ```
+```solidity
+interface IPluginLoupe {
+    struct PluginInfo {
+        address executionPluginAddress;
+        FunctionConfig[] configs;
+    }
+
+    struct FunctionConfig {
+        bytes4 executionSelector;
+        FunctionReference userOpValidator;
+        FunctionReference runtimeValidator;
+        FunctionReference preHook;
+        FunctionReference postHook;
+    }
+
+    struct FunctionReference {
+        address implAddress;
+        bytes4 implSelector;
+    }
+
+    function getPlugins() external view returns (PluginInfo[] memory);
+
+    function getPlugin(address executionPluginAddress) external view returns (FunctionConfig[] memory functions);
+
+    function getFunctionConfig(bytes4 executionSelector) external view returns (FunctionConfig memory);
+}
+```
 
 Plugin interface. Plugins MUST implement the following interface.
 
-`IPlugin.sol`
+#### `IPlugin.sol`
 
 ```solidity
 interface IPlugin {
@@ -237,7 +238,7 @@ interface IPlugin {
 
 The function `updatePlugins` takes in an array of updates to perform, and an optional initialization function. The function MUST perform the update operation sequentially, then, if the address provided in `init` is not `address(0)`, MUST execute `init` with the calldata `callData`.
 
-> :warning: The ability to update a plugin is very powerful. The security of the updatePlugins determines the security of the account. It is critical for Account builders to make sure updatePlugins has the proper security consideration and access control in place.
+> **⚠️ The ability to update a plugin is very powerful. The security of the updatePlugins determines the security of the account. It is critical for Account builders to make sure updatePlugins has the proper security consideration and access control in place.**
 
 **Calls to `validateUserOp`**
 
@@ -254,9 +255,9 @@ When a function other than `validateUserOp` is called on an MSCA, it MUST find t
 - If an associated `postHook` is defined, execute the associated function with the execution function’s calldata. If the `preHook` function returned data, the MSCA MUST pass that data in to `postHook`.
 - If there are global `postHook`s, execute each with the execution function’s calldata.
 
-> :warning: If the execution function does not have a definition for either `runtimeValidator`, `preHook`, or `postHook`, the undefined functions will be skipped. The execution function will be executed and it may change account state.
+> **⚠️ If the execution function does not have a definition for either `runtimeValidator`, `preHook`, or `postHook`, the undefined functions will be skipped. The execution function will be executed and it may change account state.**
 
-> :bulb: If, during the execution of `runtimeValidator`, the caller can be established as the EntryPoint contract, it is guaranteed the associated user operation validator has returned a valid signature. Validation MAY be skipped.
+> **💡 If, during the execution of `runtimeValidator`, the caller can be established as the EntryPoint contract, it is guaranteed the associated user operation validator has returned a valid signature. Validation MAY be skipped.**
 
 **Plugin update operations**
 
@@ -286,9 +287,11 @@ Plugin storage management is managed by plugin implementations. Here is an examp
 ```solidity
 library LibMyPlugin {
     bytes32 constant MY_PLUGIN_POSITION = keccak256("plugin.standard.my.plugin");
+
     struct MyPluginStorage {
         // Any storage fields you need
     }
+
     // Return my plugin storage struct for reading and writing
     function getStorage() internal pure returns (MyPluginStorage storage storageStruct) {
         bytes32 position = MY_PLUGIN_POSITION;
@@ -319,11 +322,11 @@ Runtime Validation Functions may have any function name, and MUST take in the pa
 > function validateOwnership(bytes calldata) external;
 > ```
 
-Hooks may have any function name.
-Global hooks are used for every tx.
+Hooks MAY have any function name.
+Global hooks MUST be executed for every incoming call.
 The global preHook function MUST take in the parameters `(bytes calldata data)`.
 The global postHook function MUST take in the parameters `(bytes calldata data)`.
-For sets of hooks that are used specifically with execution funtions, they can be paired and share information through returned value.
+For sets of hooks that are used specifically with execution funtions, they MAY be paired and share information through returned value.
 The preHook function MUST take in the parameters `(bytes calldata data)` and return `(bytes calldata preHookReturnedData)`.
 The postHook function MUST take in the parameters `(bytes calldata data, bytes calldata preHookReturnedData)`.
 
