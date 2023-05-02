@@ -338,7 +338,7 @@ The diamond pattern of ERC-2535 is the logical starting point for achieving this
 
 This proposal includes several interfaces that build on ERC-4337 and is ispired by ERC-2535. First, we standardize a set of modular plugins that allow smart contract developers greater flexibility in bundling validation, execution and hook logic. We also propose interfaces like `IPluginUpdate` that take inspiration from the diamond standard, and provide methods for updating and querying execution functions, validation schemes, and hooks.
 
-To impliment this standard, a modified diamond pattern is needed. However, a diamond pattern is not required or enforced, an MSCA implementation is considered compliant with this standard as long as it satisfies the requirements of this standard.
+The diamond standard's interfaces are not required or enforced by this standard. An MSCA implementation is considered compliant with this standard as long as it satisfies the interface requirements and expected behaviors.
 
 ## Backwards Compatibility
 
