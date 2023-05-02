@@ -334,9 +334,11 @@ The postHook function MUST take in the parameters `(bytes calldata data, bytes c
 
 ERC-4337 compatible accounts must implement the IAccount interface, which consists of only one method that bundles validation with execution: validateUserOp. A primary design rationale for this proposal is to extend the possible functions for a smart contract account beyond this single method by unbundling these and other functions, while retaining the benefits of account abstraction.
 
-The diamond pattern of ERC-2535 is the logical starting point for achieving this extension into multiple functionality, given its suitability for implementing multiple execution calls to ERC-4337 compatible accounts from EntryPoint. It also meets our other primary design rationale of generalizability to calls to EOA/SC accounts. However, the diamond pattern is constrained by its inability to customize validation schemes and other logic linked to specific execution functions in the context of `validateUserOp`.
+The diamond pattern of ERC-2535 is the logical starting point for achieving this extension into multiple functionality, given its suitability for implementing multiple execution calls to ERC-4337 compatible accounts from EntryPoint. It also meets our other primary design rationale of generalizability to calls to EOA/SC accounts. However, a strict diamond pattern is constrained by its inability to customize validation schemes and other logic linked to specific execution functions in the context of `validateUserOp`.
 
-This proposal includes several methods that build on ERC-4337 and ERC-2535 while also addressing these limitations. First, we standardize a set of modular plugins that allow smart contract developers greater flexibility in bundling validation, execution and hook logic. We also propose interfaces `IPluginUpdate` and `IPluginLoupe` that take inspiration from the diamond standard, and provide methods for updating and querying execution functions, validation schemes, and hooks.
+This proposal includes several interfaces that build on ERC-4337 and is ispired by ERC-2535. First, we standardize a set of modular plugins that allow smart contract developers greater flexibility in bundling validation, execution and hook logic. We also propose interfaces like `IPluginUpdate` that take inspiration from the diamond standard, and provide methods for updating and querying execution functions, validation schemes, and hooks.
+
+To impliment this standard, a modified diamond pattern is needed. However, a diamond pattern is not required or enforced, an MSCA implementation is considered compliant with this standard as long as it satisfies the requirements of this standard.
 
 ## Backwards Compatibility
 
