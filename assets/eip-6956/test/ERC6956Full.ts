@@ -39,7 +39,7 @@ describe("ERC6956: Asset-Bound NFT --- Full", function () {
     const AbNftContract = await ethers.getContractFactory("ERC6956Full");
 
     const abnftContract = await AbNftContract.connect(owner).deploy("Asset-Bound NFT test", "ABNFT", limitUpdatePolicy);
-    await abnftContract.connect(owner).grantRole(abnftContract.MAINTAINER_ROLE(), maintainer.address);
+    await abnftContract.connect(owner).updateMaintainer(maintainer.address, true);
 
     // set attestation Limit per anchor
     await abnftContract.connect(maintainer).updateGlobalAttestationLimit(attestationLimitPerAnchor);
@@ -77,8 +77,8 @@ describe("Anchor-Floating", function () {
   it("SHOULD only allow maintainer to specify canStartFloating and canStopFloating", async function () {
     const { abnftContract, merkleTree, owner, maintainer, mallory } = await loadFixture(deployAbNftAndMintTokenToAliceFixture);
 
-    await expect(abnftContract.canStartFloating(ERC6956Authorization.ALL))
-    .to.revertedWith("AccessControl: account 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 is missing role 0x339759585899103d2ace64958e37e18ccb0504652c81d4a1b8aa80fe2126ab95");
+    await expect(abnftContract.connect(mallory).canStartFloating(ERC6956Authorization.ALL))
+    .to.revertedWith("ERC6956: Only maintainer allowed");
 
     await expect(abnftContract.connect(maintainer).canStartFloating(ERC6956Authorization.ALL))
     .to.emit(abnftContract, "CanStartFloating")
@@ -94,7 +94,7 @@ describe("Anchor-Floating", function () {
 
     // Mallory mustnot be able to change default behavior
     await expect(abnftContract.connect(mallory).updateAnchorFloatingByDefault(true))
-    .to.revertedWith("AccessControl: account 0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc is missing role 0x339759585899103d2ace64958e37e18ccb0504652c81d4a1b8aa80fe2126ab95");
+    .to.revertedWith("ERC6956: Only maintainer allowed");
 
     // Maintainer must be able to update
     await expect(abnftContract.connect(maintainer).updateAnchorFloatingByDefault(true))
@@ -269,7 +269,7 @@ describe("Attested Transfer Limits", function () {
     const { abnftContract, maintainer, oracle, merkleTree, alice, bob, gasProvider, mallory,carl} = await deployForAttestationLimit(10, AttestedTransferLimitUpdatePolicy.FLEXIBLE);
 
     await expect(abnftContract.connect(mallory).updateGlobalAttestationLimit(5))
-    .to.revertedWith("AccessControl: account 0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc is missing role 0x339759585899103d2ace64958e37e18ccb0504652c81d4a1b8aa80fe2126ab95");
+    .to.revertedWith("ERC6956: Only maintainer allowed");
 
     // Should be able to update
     await expect(abnftContract.connect(maintainer).updateGlobalAttestationLimit(5))

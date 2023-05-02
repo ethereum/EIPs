@@ -51,7 +51,7 @@ describe("ERC6956: Asset-Bound NFT --- Basics", function () {
     //const approveAuthorization = ERC6956Authorization.ALL;
 
     const abnftContract = await AbNftContract.connect(owner).deploy("Asset-Bound NFT test", "ABNFT");
-    await abnftContract.connect(owner).grantRole(abnftContract.MAINTAINER_ROLE(), maintainer.address);
+    await abnftContract.connect(owner).updateMaintainer(maintainer.address, true);
 
     // Create Merkle Tree
     const merkleTree = StandardMerkleTree.of(merkleTestAnchors, ["bytes32"]);
@@ -362,7 +362,7 @@ describe("Metadata tests", function () {
     const { abnftContract, maintainer, mallory } = await loadFixture(deployABTandMintTokenToAlice);      
 
     await expect(abnftContract.connect(mallory).updateBaseURI("http://test.xyz/"))
-    .to.revertedWith("AccessControl: account 0x9965507d1a55bcc2695c58ba16fb37d819b0a4dc is missing role 0x339759585899103d2ace64958e37e18ccb0504652c81d4a1b8aa80fe2126ab95");
+    .to.revertedWith("ERC6956: Only maintainer allowed");
 
     await abnftContract.connect(maintainer).updateBaseURI("http://test.xyz/");
     // FIXME event would be nice    

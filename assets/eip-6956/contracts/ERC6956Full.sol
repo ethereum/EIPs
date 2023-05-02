@@ -5,7 +5,6 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -46,14 +45,14 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     }
 
     function updateAnchorFloatingByDefault(bool _floatsByDefault) public 
-    onlyRole(MAINTAINER_ROLE) {
+    onlyMaintainer() {
         floatingByDefault = true;
         emit DefaultFloatingStateChange(_floatsByDefault, msg.sender);      
     }
 
     function updateGlobalAttestationLimit(uint256 _nrTransfers) 
         public 
-        onlyRole(MAINTAINER_ROLE) 
+        onlyMaintainer() 
     {
        requireValidLimitUpdate(globalAttestedTransferLimitByAnchor, _nrTransfers);
        globalAttestedTransferLimitByAnchor = _nrTransfers;
@@ -62,7 +61,7 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
 
     function updateAttestationLimit(bytes32 anchor, uint256 _nrTransfers) 
         public 
-        onlyRole(MAINTAINER_ROLE) 
+        onlyMaintainer() 
     {
        uint256 currentLimit = attestedTransferLimit(anchor);
        requireValidLimitUpdate(currentLimit, _nrTransfers);
@@ -87,13 +86,13 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     /// ##############################################################################################  FLOATABILITY
     /// ###############################################################################################################################
     function canStartFloating(ERC6956Authorization op) public
-        onlyRole(MAINTAINER_ROLE) {
+        onlyMaintainer() {
         canStartFloatingMap = createAuthorizationMap(op);
         emit CanStartFloating(op, msg.sender);
     }
         
     function canStopFloating(ERC6956Authorization op) public
-        onlyRole(MAINTAINER_ROLE) {
+        onlyMaintainer() {
         canStopFloatingMap = createAuthorizationMap(op);
         emit CanStopFloating(op, msg.sender);
     } 

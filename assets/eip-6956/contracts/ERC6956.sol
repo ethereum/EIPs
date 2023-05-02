@@ -5,7 +5,6 @@ pragma solidity ^0.8.18;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -21,19 +20,13 @@ contract ERC6956 is
     ERC721,
     ERC721Enumerable,
     ERC721Burnable,
-    AccessControl,
     IERC6956 
 {
     using Counters for Counters.Counter;
 
     mapping(bytes32 => bool) public anchorIsReleased; // currently released anchors. Per default, all anchors are dropped, i.e. 1:1 bound
     
-     /// @notice PAUSER_ROLE Can pause and unpause the contract
-    /// @return Role hash, as should be passed to hasRole(), grantRole()
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-    /// @notice MAINTAINER_ROLE can updateValidAnchors()
-    /// @return Role hash, as should be passed to hasRole(), grantRole()
-    bytes32 public constant MAINTAINER_ROLE = keccak256("MAINTAINER_ROLE");
+    mapping(address => bool) public maintainers;
 
     /// @notice Resolves tokenID to anchor. Inverse of tokenByAnchor
     mapping(uint256 => bytes32) public anchorByToken;
@@ -65,6 +58,8 @@ contract ERC6956 is
 
     uint8 burnAuthorizationMap;
     uint8 approveAuthorizationMap;
+
+
 
     function createAuthorizationMap(ERC6956Authorization _auth) public pure returns (uint8)  {
        uint8 authMap = 0;
@@ -109,12 +104,29 @@ contract ERC6956 is
             myRole = ERC6956Role.OWNER;
         }
 
-        if(hasRole(MAINTAINER_ROLE, msg.sender)) {
+        if(isMaintainer(msg.sender)) {
             alternateRole = ERC6956Role.ISSUER;
         }
 
         return hasAuthorization(myRole, authorizationMap) 
                     || hasAuthorization(alternateRole, authorizationMap);
+    }
+
+    /**
+     * @dev A very simple function wich MUST return false, when `a` is not a maintainer
+     *      When derived contracts extend ERC6956 contract, this function may be overridden
+     *      e.g. by using AccessControl, onlyOwner or other common mechanisms
+     * 
+     *      Having this simple mechanism in the reference implementation ensures that the reference
+     *      implementation is fully ERC-6956 compatible 
+     */
+    function isMaintainer(address a) public virtual view returns (bool) {
+        return maintainers[a];
+    }
+
+    modifier onlyMaintainer() {
+        require(isMaintainer(msg.sender), "ERC6956: Only maintainer allowed");
+        _;
     }
 
 
@@ -175,7 +187,7 @@ contract ERC6956 is
     }
     
     function updateOracle(address _oracle, bool _trust) public
-        onlyRole(MAINTAINER_ROLE) 
+        onlyMaintainer() 
     {
         trustedOracles[_oracle] = _trust;
         emit OracleUpdate(_oracle, _trust);
@@ -191,6 +203,18 @@ contract ERC6956 is
 
     /// @dev hook called after an anchor is minted
     function _afterAnchorMint(address to, bytes32 anchor, uint256 tokenId) internal virtual {}
+
+    /**
+     * @notice Add (_add=true) or remove (_add=false) a maintainer
+     * @dev Note this is a trivial implementation, which can leave the contract without a maintainer.
+     * Since the function is access-controlled via onlyMaintainer, this results in the contract
+     * becoming unmaintainable. 
+     * This may be desired behavior, for example if the contract shall become immutable until 
+     * all eternity, therefore making a project truly trustless. 
+     */
+    function updateMaintainer(address _maintainer, bool _add) public onlyMaintainer() {
+        maintainers[_maintainer] = _add;
+    }
 
     /// @dev Verifies a anchor is valid and mints a token to the target address.
     /// Internal function to be called whenever minting is needed.
@@ -254,7 +278,7 @@ contract ERC6956 is
     /// @notice Update the Merkle root containing the valid anchors. Consider salt-leaves!
     /// @dev Proof (safeMint, dropAnchor) needs to provided from this tree. The merkle-tree needs to contain at least one "salt leaf" in order to not publish the complete merkle-tree when all anchors should have been dropped at least once. 
     /// @param _validAnchors The root, containing all anchors we want validated.
-    function updateValidAnchors(bytes32 _validAnchors) public onlyRole(MAINTAINER_ROLE) {
+    function updateValidAnchors(bytes32 _validAnchors) public onlyMaintainer() {
         validAnchorsMerkleRoot = _validAnchors;
         emit ValidAnchorsUpdate(_validAnchors, msg.sender);
     }
@@ -274,7 +298,7 @@ contract ERC6956 is
         public
         view
         virtual
-        override(ERC721, ERC721Enumerable, AccessControl)
+        override(ERC721, ERC721Enumerable)
         returns (bool)
     {
         return
@@ -347,23 +371,23 @@ contract ERC6956 is
     /// @notice Set a new BaseURI. Can be used with dynamic NFTs that have server APIs, IPFS-buckets
     /// or any other suitable system. Refer tokenURI(tokenId) for anchor-based or tokenId-based format.
     /// @param tokenBaseURI The token base-URI. Must end with slash '/'.
-    function updateBaseURI(string calldata tokenBaseURI) public onlyRole(MAINTAINER_ROLE) {
+    function updateBaseURI(string calldata tokenBaseURI) public onlyMaintainer() {
         baseURI = tokenBaseURI;
     }
 
-    function updateBurnAuthorization(ERC6956Authorization _burnAuth) public onlyRole(MAINTAINER_ROLE) {
+    function updateBurnAuthorization(ERC6956Authorization _burnAuth) public onlyMaintainer() {
         burnAuthorizationMap = createAuthorizationMap(_burnAuth);
         // TODO event
     }
  
-    function updateApproveAuthorization(ERC6956Authorization _approveAuth) public onlyRole(MAINTAINER_ROLE) {
+    function updateApproveAuthorization(ERC6956Authorization _approveAuth) public onlyMaintainer() {
         approveAuthorizationMap = createAuthorizationMap(_approveAuth);
         // TODO event
     }
 
     constructor(string memory _name, string memory _symbol)
         ERC721(_name, _symbol) {            
-            _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+            maintainers[msg.sender] = true; // deployer is automatically maintainer
             // Indicates general float-ability, i.e. whether anchors can be digitally dropped and released
 
             // OWNER and ASSET shall normally be in sync anyway, so this is reasonable default 
