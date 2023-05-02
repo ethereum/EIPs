@@ -13,7 +13,7 @@ requires: 1193
 
 ## Abstract
 
-A Javascript interface injected by browser extensions installed by the user that enables user selection from multiple wallet providers using a window object labelled `window.evemproviders` instead of overwriting `window.ethereum` object.
+A Javascript interface injected by browser extensions installed by the user that enables user selection from multiple wallet providers using a window object labelled `window.evmproviders` instead of overwriting `window.ethereum` object.
 
 ## Motivation
 
@@ -147,7 +147,7 @@ if (!window.evmproviders) {
 
 const provider = { info, ethereum }
 window.evmproviders.push(provider)
-window.postMessage({ eventName: "evmprovidersAdded", provider})
+window.postMessage({ eventName: "evmProviderAdded", provider})
 ```
 
 ### Dapp Library
