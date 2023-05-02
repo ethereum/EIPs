@@ -1,5 +1,5 @@
 ---
-eip: 6735
+eip: draft_l2_aliasing_of_evm_based_addre
 title: L2 Aliasing of EVM-based Addresses
 description: Identify and translate EVM-based addresses from different Layer 1, Layer 2, or Sidechains
 author: Kelvin Fichter (@smartcontracts), Andreas Freund (@Therecanbeonlyone1969)
