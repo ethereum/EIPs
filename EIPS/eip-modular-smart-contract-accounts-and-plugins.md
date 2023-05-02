@@ -332,7 +332,7 @@ The postHook function MUST take in the parameters `(bytes calldata data, bytes c
 
 ## Rationale
 
-ERC-4337 compatible accounts must implement the IAccount interface, which consists of only one method that bundles validation with execution: validateUserOp. A primary design rationale for this proposal is to extend the possible functions for a smart contract account beyond this single method by unbundling these and other functions, while retaining the benefits of account abstraction.
+ERC-4337 compatible accounts must implement the `IAccount` interface, which consists of only one method that bundles validation with execution: `validateUserOp`. A primary design rationale for this proposal is to extend the possible functions for a smart contract account beyond this single method by unbundling these and other functions, while retaining the benefits of account abstraction.
 
 The diamond pattern of ERC-2535 is the logical starting point for achieving this extension into multiple functionality, given its suitability for implementing multiple execution calls to ERC-4337 compatible accounts from EntryPoint. It also meets our other primary design rationale of generalizability to calls to EOA/SC accounts. However, a strict diamond pattern is constrained by its inability to customize validation schemes and other logic linked to specific execution functions in the context of `validateUserOp`.
 
