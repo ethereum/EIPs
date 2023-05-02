@@ -31,6 +31,7 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     /// @dev Counts the number of attested transfers by Anchor
     bool public canFloat; // Indicates whether tokens can "float" in general, i.e. be transferred without attestation
     bool public allFloating;
+    bool public floatingByDefault;
 
     function requireValidLimitUpdate(uint256 oldValue, uint256 newValue) internal view {
         if(newValue > oldValue) {
@@ -38,6 +39,16 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
         } else {
             require(transferLimitPolicy == AttestationLimitUpdatePolicy.FLEXIBLE || transferLimitPolicy == AttestationLimitUpdatePolicy.DECREASE_ONLY, "EIP-6956: Updating attestedTransferLimit violates policy");
         }
+    }
+
+    function _afterAnchorMint(address /*to*/, bytes32 anchor, uint256 /*tokenId*/) internal override(ERC6956) virtual {
+        _allowFloating(anchor, floatingByDefault);        
+    }
+
+    function updateAnchorFloatingByDefault(bool _floatsByDefault) public 
+    onlyRole(MAINTAINER_ROLE) {
+        floatingByDefault = true;
+        emit DefaultFloatingStateChange(_floatsByDefault, msg.sender);      
     }
 
     function updateGlobalAttestationLimit(uint256 _nrTransfers) 
@@ -76,25 +87,21 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     /// ##############################################################################################  FLOATABILITY
     /// ###############################################################################################################################
     function canStartFloating(ERC6956Authorization op) public
-        floatable()
-        onlyRole(MAINTAINER_ROLE)
-     {
+        onlyRole(MAINTAINER_ROLE) {
         canStartFloatingMap = createAuthorizationMap(op);
         emit CanStartFloating(op, msg.sender);
-
     }
         
     function canStopFloating(ERC6956Authorization op) public
-        floatable()
         onlyRole(MAINTAINER_ROLE) {
         canStopFloatingMap = createAuthorizationMap(op);
         emit CanStopFloating(op, msg.sender);
-    }
+    } 
 
-    modifier floatable() {
-        require(canFloat, "ERC-6956: Tokens not floatable");
-        _;
-    }      
+    function _allowFloating(bytes32 anchor, bool _doFloat) internal {
+        anchorIsReleased[anchor] = _doFloat;
+        emit AnchorFloatingStateChange(anchor, tokenByAnchor[anchor], _doFloat);
+    }
 
     function allowFloating(bytes32 anchor, bool _doFloat)    
      public 
@@ -106,8 +113,7 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
         }
 
         require(_doFloat != isFloating(anchor), "EIP-6956: allowFloating can only be called when changing floating state");
-        anchorIsReleased[anchor] = _doFloat;
-        emit AnchorFloatingStateChange(anchor, tokenByAnchor[anchor], _doFloat);
+        _allowFloating(anchor, _doFloat);        
     }
 
     function _beforeAttestationIsUsed(bytes32 anchor, address to) internal view virtual override(ERC6956) {
@@ -123,11 +129,10 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     constructor(
         string memory _name, 
         string memory _symbol, 
-        bool _canFloat, 
         AttestationLimitUpdatePolicy _limitUpdatePolicy)
         ERC6956(_name, _symbol) {          
-            canFloat = _canFloat;
             transferLimitPolicy = _limitUpdatePolicy;
-            // TODO Parameter for "Float by default, i.e. each minted anchor is floating"
+
+        // Note per default no-one change floatability. canStartFloating and canStopFloating needs to be configured first!        
     }
 }

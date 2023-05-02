@@ -189,6 +189,9 @@ contract ERC6956 is
         require(anchorIsReleased[anchorByToken[tokenId]], "EIP-6956: Token not transferable");
     }
 
+    /// @dev hook called after an anchor is minted
+    function _afterAnchorMint(address to, bytes32 anchor, uint256 tokenId) internal virtual {}
+
     /// @dev Verifies a anchor is valid and mints a token to the target address.
     /// Internal function to be called whenever minting is needed.
     /// Parameters:
@@ -211,6 +214,7 @@ contract ERC6956 is
         // After minting, the anchor is guaranteed to be dropped.
         // Needs to be explicitely set due to the burn() mechanism, where tokenIds are re-used.
         delete anchorIsReleased[anchor]; 
+        _afterAnchorMint(to, anchor, tokenId);
     }
 
     function commitAttestation(address to, bytes32 anchor, bytes32 attestationHash) internal {
@@ -229,19 +233,20 @@ contract ERC6956 is
         uint256 fromToken = tokenByAnchor[anchor]; // tokenID, null if not exists
         address from = address(0); // owneraddress or 0x00, if not exists
 
-        bool releaseStateBefore = anchorIsReleased[anchor];
-        anchorIsReleased[anchor] = true; // Attestation always temporarily releases the anchor        
 
         if(fromToken > 0) {
             from = ownerOf(fromToken);
             require(from != to, "ERC-6956: Token already owned");
+            bool releaseStateBefore = anchorIsReleased[anchor];
+            anchorIsReleased[anchor] = true; // Attestation always temporarily releases the anchor        
             _safeTransfer(from, to, fromToken, "");
+            anchorIsReleased[anchor] = releaseStateBefore;
         } else {
+            anchorIsReleased[anchor] = true; // Attestation always temporarily releases the anchor
             _safeMint(to, anchor);
         }
         // You need to read it from memory, since it may have changed! 
         commitAttestation(to, anchor, attestationHash);
-        anchorIsReleased[anchor] = releaseStateBefore;
 
         return (anchor, to, tokenId);
     }
