@@ -1,5 +1,5 @@
 ---
-eip: draft_erc_721_holding_time_tracking
+eip: 6806
 title: ERC-721 Holding Time Tracking
 description: Add holding time information to ERC-721 tokens
 author: Saitama (@saitama2009), Combo <combo@1combo.io>, Luigi <luigi@1combo.io>
