@@ -1,5 +1,5 @@
 ---
-eip: 6960
+eip: draft_dual_layer_token
 title: Dual Layer Token
 description: Token with a two-level classification system using mainId and subId
 author: Adam Boudjemaa (@aboudjem), Mohamad Hammoud (@mohamadhammoud), Nawar Hisso (@nawar-hisso), Khawla Hassan (@khawlahssn), Mohammad Zakeri Rad (@zakrad), Ashish Sood <soodgen@gmail.com>
