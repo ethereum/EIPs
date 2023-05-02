@@ -9,6 +9,7 @@
   ],
   "ignoreDeps": [
     "Pandapip1/jekyll-label-action",
-    "ethereum/eipw-action"
+    "ethereum/eipw-action",
+    "ethereum/eip-review-bot"
   ]
 }
