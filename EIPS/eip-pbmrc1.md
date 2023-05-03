@@ -47,8 +47,10 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
     - A set of conditions that determines the mechanism by which the underlying token of value is being unwrapped to an intended recipient
 - We would define a base specification of what a PBM should entail, with extensions to the base specification implemented as another specification on top of the base specification.
 
-### A Note on Implementing Interfaces
+### Fungibility 
+Each PBM token may or may not be fungible to one another within the same contract. The standard does NOT mandate how an implementation must do this.
 
+### A Note on Implementing Interfaces
 In order to allow the implementors of the PBM token standards to have maximum flexibility in the way they structure the PBM business logic, a PBM can implement an interface in one of two ways: directly (`contract ContractName is InterfaceName`), or by adding functions to it from one or more interfaces. For the purposes of this specification, when a PBM is said to implement an interface, either method of implementation is permitted.
 
 
@@ -64,7 +66,10 @@ Example of token details:
 
 ```solidity
 
-    /// @dev structure representing all the details of a PBM type
+    /// Mapping of token ids to token details
+    mapping (uint256 => PBMToken) internal tokenTypes ; 
+
+    /// @dev structure representing all the details corresponding to a PBM tokenId
     struct PBMToken {
         // name of the token 
         string name;  
@@ -92,33 +97,17 @@ Example of token details:
 ```
 
 
-### PBMRC1_TokenManager Interface
 
-```solidity
-
-``` 
-
+## Extensions
 
 ### PBMRC1_Refundable Interface
 The Refundable extension is OPTIONAL for compliant smart contracts. This allows contracts to support a refund flow. 
 
 ```solidity
   
-  /// @dev Returns `true` or `false` if a particular token is meant to allow a refund process.
-  function isRefundable(uint256 tokenId) external view returns (bool);
-
-  /// @notice Issues a refund to a PBM user
-  /// @dev If a PBM token is refundable, merchant will be able to call this function to undo the entire payment process, and returning the PBM to the user. 
-  Compliant smart contract must keep a record of the payment details in order to execute a refund.
-  /// @param tokenId
-  /// @param
-  /// @param
-  function revertPBMPayment(address user, uint256 tokenId, )
-
-```
 
 
-## Extensions
+``` 
 
 ### PBMRC2 - Non preloaded PBM Interface
 
@@ -126,24 +115,9 @@ The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. T
 
 Compliant contract **MUST** implement the following interface:
 
+<!-- TBD Copy from PBMRC2.sol -->
 ```solidity
-// SPDX-License-Identifier: GPL-2.0-or-later
-pragma solidity ^0.8.0;
 
-/**
-*    @dev 
-*/
-interface PBMRC2_NonPreloadedPBM is PBMRC1 {
-  // <!-- TBD List of events emitted, and parameters for each functions -->
-
-  /// loads a token of value into the PBM
-  function load() external; 
-
-  function loadAndSafeTransferFrom() external; 
-
-  /// takes out the underlying token of value
-  function unload() external;
-}
 
 ```
 

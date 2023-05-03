@@ -133,7 +133,46 @@ abstract contract PBMRC1 is IPBMRC1, ERC1155Metadata_URI, IERC173, IERC5679Ext11
 
 
     /// LIST OF EVENTS TO BE EMITTED
-
+    event TokenUnwrap(address from , address to, uint256[] tokenIds, uint256[] amounts,address ERC20Token, uint256 ERC20TokenValue); 
+    event PBMrevoked(address beneficiary, uint256 PBMTokenId, address ERC20Token, uint256 ERC20TokenValue);
+    event PBMspotTokenWithdraw(address beneficiary, uint256 PBMTokenId, address ERC20Token, uint256 ERC20TokenValue);
+    event NewPBMTypeCreated(uint256 tokenId, string tokenName, uint256 amount, uint256 expiry, address creator);
 }
 
 
+/// @notice Smart contracts MUST implement the ERC-165 `supportsInterface` function and signify support for the `PBMRC1_TokenReceiver` interface to accept callbacks.
+/// TBD: What are the considerations involved when calling a contract callback? Refer to ERC1155 callback consideration for examples.
+interface PBMRC1_TokenReceiver {
+    /**
+        @notice Handles the callback from a PBM smart contract upon unwrapping
+        @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap`. 
+        This function MUST revert if it rejects the transfer.
+        The receiver smart contract must support type(PBMRC1_TokenReceiver).interfaceId or else it MUST result in the transaction being reverted by the caller.
+
+        @param _operator  The address which initiated the transfer (i.e. msg.sender)
+        @param _from      The address which previously owned the token
+        @param _id        The ID of the token being unwrapped
+        @param _value     The amount of tokens being transferred
+        @param _data      Additional data with no specified format
+        @return           `bytes4(keccak256("onPBMRC1Received(address,address,uint256,uint256,bytes)"))`
+    */
+    function onPBMRC1Received(address _operator, address _from, uint256 _id, uint256 _value, bytes calldata _data) external returns(bytes4);
+
+    /**
+        @notice Handles the callback from a PBM smart contract upon unwrapping a batch of tokens
+        @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap`. 
+        This function MUST revert if it rejects the transfer.
+        The receiver smart contract must support type(PBMRC1_TokenReceiver).interfaceId or else it MUST result in the transaction being reverted by the caller.
+
+        @param _operator  The address which initiated the transfer (i.e. msg.sender)
+        @param _from      The address which previously owned the token
+        @param _id        The ID of the token being unwrapped
+        @param _value     The amount of tokens being transferred
+        @param _data      Additional data with no specified format
+        @return           `bytes4(keccak256("onPBMRC1BatchReceived(address,address,uint256,uint256,bytes)"))`
+    */
+    function onPBMRC1BatchReceived(address _operator, address _from, uint256[] calldata _ids, uint256[] calldata _values, bytes calldata _data) external returns(bytes4);       
+
+
+    
+}

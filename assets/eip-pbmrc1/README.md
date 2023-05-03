@@ -8,7 +8,7 @@ We provide a list of sample PBM implementation for reference.
 
 - `contracts/preloaded-pbm/XXXX.sol` - PBMRC1 implementation contract to demonstrate preloaded PBMs
 - `contracts/non-preloaded-pbm/XXXX.sol` - Interface contract
-<!-- - `contracts/attest-unlock-pbm/XXXX.sol` - Implementation contract to demonstrate a 3rd party attestation to allow unwrap of a PBM -->
+<!-- - `contracts/attest-unlock-pbm/XXXX.sol` - contract to demonstrate a 3rd party attestation to allow unwrap of a PBM -->
 - `contracts/XXXX.sol` - Interface contract
 - `contracts/ERC20.sol` - ERC20 token contract for unit tests
 - `test/XXXXX.js` - Unit tests for livecycle of the PBM implementation 
