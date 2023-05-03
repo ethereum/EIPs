@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 interface IERC5773 {
     event AssetSet(uint64 assetId);
 
-    event AssetAddedToToken(
-        uint256 indexed tokenId,
+    event AssetAddedToTokens(
+        uint256[] tokenId,
         uint64 indexed assetId,
         uint64 indexed replacesId
     );

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.15;
 
-import "./IMultiAsset.sol";
+import "./IERC5773.sol";
 import "./library/MultiAssetLib.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
-contract MultiAssetToken is Context, IERC721, IMultiAsset {
+contract MultiAssetToken is Context, IERC721, IERC5773 {
     using MultiAssetLib for uint256;
     using MultiAssetLib for uint64[];
     using MultiAssetLib for uint128[];
@@ -52,7 +52,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
     mapping(uint256 => uint64[]) internal _activeAssets;
 
     //mapping of tokenId to an array of asset priorities
-    mapping(uint256 => uint16[]) internal _activeAssetPriorities;
+    mapping(uint256 => uint64[]) internal _activeAssetPriorities;
 
     //Double mapping of tokenId to active assets
     mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
@@ -71,18 +71,14 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
 
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         return
-            interfaceId == type(IMultiAsset).interfaceId ||
+            interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 
-    function balanceOf(address owner)
-        public
-        view
-        virtual
-        override
-        returns (uint256)
-    {
+    function balanceOf(
+        address owner
+    ) public view virtual override returns (uint256) {
         require(
             owner != address(0),
             "ERC721: address zero is not a valid owner"
@@ -90,13 +86,9 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         return _balances[owner];
     }
 
-    function ownerOf(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function ownerOf(
+        uint256 tokenId
+    ) public view virtual override returns (address) {
         address owner = _owners[tokenId];
         require(
             owner != address(0),
@@ -135,13 +127,9 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         _approveForAssets(to, tokenId);
     }
 
-    function getApproved(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (address)
-    {
+    function getApproved(
+        uint256 tokenId
+    ) public view virtual override returns (address) {
         require(
             _exists(tokenId),
             "MultiAsset: approved query for nonexistent token"
@@ -150,12 +138,9 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         return _tokenApprovals[tokenId];
     }
 
-    function getApprovedForAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (address)
-    {
+    function getApprovedForAssets(
+        uint256 tokenId
+    ) public view virtual returns (address) {
         require(
             _exists(tokenId),
             "MultiAsset: approved query for nonexistent token"
@@ -163,38 +148,31 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         return _tokenApprovalsForAssets[tokenId];
     }
 
-    function setApprovalForAll(address operator, bool approved)
-        public
-        virtual
-        override
-    {
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public virtual override {
         _setApprovalForAll(_msgSender(), operator, approved);
     }
 
-    function isApprovedForAll(address owner, address operator)
-        public
-        view
-        virtual
-        override
-        returns (bool)
-    {
+    function isApprovedForAll(
+        address owner,
+        address operator
+    ) public view virtual override returns (bool) {
         return _operatorApprovals[owner][operator];
     }
 
-    function setApprovalForAllForAssets(address operator, bool approved)
-        public
-        virtual
-        override
-    {
+    function setApprovalForAllForAssets(
+        address operator,
+        bool approved
+    ) public virtual override {
         _setApprovalForAllForAssets(_msgSender(), operator, approved);
     }
 
-    function isApprovedForAllForAssets(address owner, address operator)
-        public
-        view
-        virtual
-        returns (bool)
-    {
+    function isApprovedForAllForAssets(
+        address owner,
+        address operator
+    ) public view virtual returns (bool) {
         return _operatorApprovalsForAssets[owner][operator];
     }
 
@@ -250,12 +228,10 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         return _owners[tokenId] != address(0);
     }
 
-    function _isApprovedOrOwner(address spender, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedOrOwner(
+        address spender,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         require(
             _exists(tokenId),
             "MultiAsset: approved query for nonexistent token"
@@ -266,12 +242,10 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
             getApproved(tokenId) == spender);
     }
 
-    function _isApprovedForAssetsOrOwner(address user, uint256 tokenId)
-        internal
-        view
-        virtual
-        returns (bool)
-    {
+    function _isApprovedForAssetsOrOwner(
+        address user,
+        uint256 tokenId
+    ) internal view virtual returns (bool) {
         require(
             _exists(tokenId),
             "MultiAsset: approved query for nonexistent token"
@@ -473,7 +447,7 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         } else {
             // We use the current size as next priority, by default priorities would be [0,1,2...]
             _activeAssetPriorities[tokenId].push(
-                uint16(_activeAssets[tokenId].length)
+                uint64(_activeAssets[tokenId].length)
             );
             _activeAssets[tokenId].push(assetId);
             replacesId = uint64(0);
@@ -512,10 +486,10 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         _afterRejectAsset(tokenId, index, assetId);
     }
 
-    function rejectAllAssets(uint256 tokenId, uint256 maxRejections)
-        external
-        virtual
-    {
+    function rejectAllAssets(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) external virtual {
         require(
             _isApprovedForAssetsOrOwner(_msgSender(), tokenId),
             "MultiAsset: not owner or approved"
@@ -538,10 +512,10 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         _afterRejectAllAssets(tokenId);
     }
 
-    function setPriority(uint256 tokenId, uint16[] memory priorities)
-        external
-        virtual
-    {
+    function setPriority(
+        uint256 tokenId,
+        uint64[] memory priorities
+    ) external virtual {
         uint256 length = priorities.length;
         require(
             length == _activeAssets[tokenId].length,
@@ -559,59 +533,43 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
         _afterSetPriority(tokenId, priorities);
     }
 
-    function getActiveAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
+    function getActiveAssets(
+        uint256 tokenId
+    ) public view virtual returns (uint64[] memory) {
         return _activeAssets[tokenId];
     }
 
-    function getPendingAssets(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint64[] memory)
-    {
+    function getPendingAssets(
+        uint256 tokenId
+    ) public view virtual returns (uint64[] memory) {
         return _pendingAssets[tokenId];
     }
 
-    function getActiveAssetPriorities(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint16[] memory)
-    {
+    function getActiveAssetPriorities(
+        uint256 tokenId
+    ) public view virtual returns (uint64[] memory) {
         return _activeAssetPriorities[tokenId];
     }
 
-    function getAssetReplacements(uint256 tokenId, uint64 newAssetId)
-        public
-        view
-        virtual
-        returns (uint64)
-    {
+    function getAssetReplacements(
+        uint256 tokenId,
+        uint64 newAssetId
+    ) public view virtual returns (uint64) {
         return _assetReplacements[tokenId][newAssetId];
     }
 
-    function getAssetMetadata(uint256 tokenId, uint64 assetId)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
+    function getAssetMetadata(
+        uint256 tokenId,
+        uint64 assetId
+    ) public view virtual returns (string memory) {
         if (!_tokenAssets[tokenId][assetId])
             revert("MultiAsset: Token does not have asset");
         return _assets[assetId];
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual returns (string memory) {
         return "";
     }
 
@@ -656,21 +614,23 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
             _assetReplacements[tokenId][assetId] = replacesAssetWithId;
         }
 
-        emit AssetAddedToToken(tokenId, assetId, replacesAssetWithId);
+        uint256[] memory tokenIds = new uint256[](1);
+        tokenIds[0] = tokenId;
+        emit AssetAddedToTokens(tokenIds, assetId, replacesAssetWithId);
         _afterAddAssetToToken(tokenId, assetId, replacesAssetWithId);
     }
 
     // HOOKS
 
-    function _beforeAddAsset(uint64 id, string memory metadataURI)
-        internal
-        virtual
-    {}
+    function _beforeAddAsset(
+        uint64 id,
+        string memory metadataURI
+    ) internal virtual {}
 
-    function _afterAddAsset(uint64 id, string memory metadataURI)
-        internal
-        virtual
-    {}
+    function _afterAddAsset(
+        uint64 id,
+        string memory metadataURI
+    ) internal virtual {}
 
     function _beforeAddAssetToToken(
         uint256 tokenId,
@@ -712,13 +672,13 @@ contract MultiAssetToken is Context, IERC721, IMultiAsset {
 
     function _afterRejectAllAssets(uint256 tokenId) internal virtual {}
 
-    function _beforeSetPriority(uint256 tokenId, uint16[] memory priorities)
-        internal
-        virtual
-    {}
+    function _beforeSetPriority(
+        uint256 tokenId,
+        uint64[] memory priorities
+    ) internal virtual {}
 
-    function _afterSetPriority(uint256 tokenId, uint16[] memory priorities)
-        internal
-        virtual
-    {}
+    function _afterSetPriority(
+        uint256 tokenId,
+        uint64[] memory priorities
+    ) internal virtual {}
 }
