@@ -52,8 +52,8 @@ interface ProviderInfo {
 The values in the `ProviderInfo` MUST be used as follows:
 
 - uuid - locally unique of the wallet provider (UUIDv4 compliant)
-- walletId - globally unique identifier of the walelt provider (eg. `my-wallet-extension` or `awesomewallet`)
-- name - human-readable name of the wallet provider (e.g. `MyWalletExtension` or `AwesomeWallet`)
+- walletId - globally unique identifier of the wallet provider (eg. `io.dopewallet.extension` or `awesomewallet`)
+- name - human-readable name of the wallet provider (e.g. `DopeWalletExtension` or `AwesomeWallet`)
 - icon - uri encoded image (RFC-3986 complaint)
 
 ### EVMProvider
@@ -111,6 +111,21 @@ window.addEventListener("message", (event: EVMProviderAddedEvent) => {});
 Standardizing a `ProviderInfo` type allows determining the necessary information to populate a wallet selection popup. This is particularly useful for web3 onboarding libraries such as Web3Modal, RainbowKit, Web3Onboard, ConnectKit, etc.
 
 The name `evmproviders` was chosen to include all EIP-1193 providers that support any EVM chain.
+
+A locally unique identifier prevents from conflicts using the same globally unique identifier by using UUID v4.0
+
+A globally unique identifier is used to for machine-readable detection of which wallet is being used and it can take different formats, for example:
+
+```sh
+# lowercase name
+awesomewallet
+
+# legacy JS variable
+isCoolWallet
+
+# reserved domain
+io.dopewallet.app
+```
 
 A uri encoded image was chosen to enable flexibility for multiple protocols for fetching and rendering icons, for example:
 
