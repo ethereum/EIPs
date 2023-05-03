@@ -1,0 +1,69 @@
+---
+eip: xxxx (the number is temporary, suggest a food one, please)
+title: Minimalistic Efficient Lockable tokens
+author: Francesco Sullo (@sullof)
+discussions-to: https://ethereum-magicians.org/t/erc721-default-lockable-proposal/13366
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-05-02
+---
+
+## Simple Summary
+This proposal introduces a lockable interface for ERC721 tokens that optimizes gas usage by eliminating unnecessary events. It allows for the management of lock status on individual tokens, thus enhancing interactivity with other contracts.
+
+## Abstract
+
+The IERCxxxx interface forms the foundation for the creation and management of lockable ERC721 tokens. It provides a gas-efficient approach by emitting a `DefaultLocked(bool locked)` event upon deployment, setting the initial lock status for all tokens, while individual `Locked(uint256 indexed tokenId, bool locked)` events handle subsequent status changes for specific tokens. The interface also includes a view function `locked(uint256 tokenId)` to return the current lock status of a token.
+
+## Motivation
+
+Existing lockable token proposals often mandate the emission of an event each time a token is minted. This results in unnecessary gas consumption, especially in cases where tokens are permanently locked from inception to destruction (e.g., soulbounds or non-transferable badges). This proposal offers a more gas-efficient solution that only emits events upon contract deployment and status changes of individual tokens.
+
+## Specification
+
+The IERC721DefaultLockable interface is defined as follows:
+
+```solidity
+interface IERCxxxx {
+  
+    // Emitted when the contract is deployed, 
+    // defining the default status of any token that will be minted.
+    // It may be emitted again if/when the default behavior changes.
+    event DefaultLocked(bool locked);
+
+    // Emitted any time the status of a specific tokenId changes
+    event Locked(uint256 indexed tokenId, bool locked);
+
+    // Returns the status of a tokenId.
+    // It should revert if the token does not exist.
+    function locked(uint256 tokenId) external view returns (bool);
+}
+
+```
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+## Rationale
+
+This standard aims to minimize gas usage by reducing the emission of events. The **DefaultLocked** event sets the initial lock status for all tokens, thus eliminating the need for an event upon the minting of each token. The **Locked** event serves to track changes to individual tokens' lock status.
+
+The **locked** function provides the current lock status of a token, enabling interaction with other contracts.
+
+## Backwards Compatibility
+
+This standard is fully backwards compatible with existing ERC721 contracts. It can be easily integrated into existing contracts and will not cause any conflicts or disruptions.
+
+## Reference Implementation
+
+There isn't a reference implementation due to the simplicity of the proposal.
+A production-ready implementation can be found in the Cruna Dominant-Subordinate protocol at https://github.com/cruna-cc/DS-protocol/tree/main/contracts
+
+
+## Security Considerations
+
+This EIP does not introduce any known security considerations. However, as with any smart contract standard, it is crucial to employ rigorous security measures in the implementation of this interface.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
