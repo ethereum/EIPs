@@ -26,7 +26,7 @@ However, managing multiple wallet instances provides a worse user experience, fr
 
 We propose a standard that coordinates the implementation work between plugin developers and wallet developers. This standard defines a modular smart contract account capable of supporting all standard-conformant plugins. This allows users to have greater portability of their data, and for plugin developers to not have to choose specific wallet implementations to support.
 
-![diagram showing relationship between accounts and plugins of each type](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.png)
+![diagram showing relationship between accounts and plugins of each type](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Shared_Components_Diagram.svg)
 
 We take inspiration from ERC-2535’s diamond pattern and adopt a similar composability by proposing three types of plugins. However, you are not required to implement the account with a multi-facet proxy pattern. These plugins contain execution logic. They also incorporate validation schemes and hooks. Validation schemes define the circumstances under which the smart contract account will approve actions taken on its behalf, while hooks allow for pre- and post-execution controls. Accounts adopting this ERC will support modular, upgradable execution and validation logic.
 
@@ -64,7 +64,7 @@ A smart contract account handles two kinds of calls: one from `Entrypoint` throu
 
 A call to the smart contract account can be decomposed into 4 steps as shown in the diagram below. The validation step (Step 1) validates if the caller is allowed to call. The pre execution hook step (Step 2) can be used to do any pre execution checks or updates. It can also be used with the post execution hook step (Step 4) to perform certain verifications. The execution step (Step 3) performs a performs a call-defined task or collection of tasks.
 
-![diagram showing execution flow within an account](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Two_Call_Paths_Diagram.png)
+![diagram showing execution flow within an account](../assets/eip-modular-smart-contract-accounts-and-plugins/MSCA_Two_Call_Paths_Diagram.svg)
 
 Each step is modularized and can have different combinations and infinite functionalities. **The smart contract account should orchestrate the above 4 steps.** For example, a MSCA has a fallback functions that orchestrate the above 4 steps for the account.
 
@@ -332,11 +332,13 @@ The postHook function MUST take in the parameters `(bytes calldata data, bytes c
 
 ## Rationale
 
-ERC-4337 compatible accounts must implement the IAccount interface, which consists of only one method that bundles validation with execution: validateUserOp. A primary design rationale for this proposal is to extend the possible functions for a smart contract account beyond this single method by unbundling these and other functions, while retaining the benefits of account abstraction.
+ERC-4337 compatible accounts must implement the `IAccount` interface, which consists of only one method that bundles validation with execution: `validateUserOp`. A primary design rationale for this proposal is to extend the possible functions for a smart contract account beyond this single method by unbundling these and other functions, while retaining the benefits of account abstraction.
 
-The diamond pattern of ERC-2535 is the logical starting point for achieving this extension into multiple functionality, given its suitability for implementing multiple execution calls to ERC-4337 compatible accounts from EntryPoint. It also meets our other primary design rationale of generalizability to calls to EOA/SC accounts. However, the diamond pattern is constrained by its inability to customize validation schemes and other logic linked to specific execution functions in the context of `validateUserOp`.
+The diamond pattern of ERC-2535 is the logical starting point for achieving this extension into multiple functionality, given its suitability for implementing multiple execution calls to ERC-4337 compatible accounts from EntryPoint. It also meets our other primary design rationale of generalizability to calls to EOA/SC accounts. However, a strict diamond pattern is constrained by its inability to customize validation schemes and other logic linked to specific execution functions in the context of `validateUserOp`.
 
-This proposal includes several methods that build on ERC-4337 and ERC-2535 while also addressing these limitations. First, we standardize a set of modular plugins that allow smart contract developers greater flexibility in bundling validation, execution and hook logic. We also propose interfaces `IPluginUpdate` and `IPluginLoupe` that take inspiration from the diamond standard, and provide methods for updating and querying execution functions, validation schemes, and hooks.
+This proposal includes several interfaces that build on ERC-4337 and is ispired by ERC-2535. First, we standardize a set of modular plugins that allow smart contract developers greater flexibility in bundling validation, execution and hook logic. We also propose interfaces like `IPluginUpdate` that take inspiration from the diamond standard, and provide methods for updating and querying execution functions, validation schemes, and hooks.
+
+The diamond standard's interfaces are not required or enforced by this standard. An MSCA implementation is considered compliant with this standard as long as it satisfies the interface requirements and expected behaviors.
 
 ## Backwards Compatibility
 
