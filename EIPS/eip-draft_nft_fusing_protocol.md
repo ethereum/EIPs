@@ -1,5 +1,5 @@
 ---
-eip: draft_nft_fusing_protocol
+eip: 6927
 title: NFT Fusing Protocol
 description: Fusing multiple NFTs into a new one.
 author: Saitama (@saitama2009), Combo <combo@1combo.io>, Luigi <luigi@1combo.io>, Gary <gary.y.mao@gmail.com>, Ansen <anssen712@yahoo.com>
