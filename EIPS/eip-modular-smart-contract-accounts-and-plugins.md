@@ -1,4 +1,5 @@
 ---
+eip: 6900
 title: Modular Smart Contract Accounts and Plugins
 description: An interface for modular smart contract accounts with plugins.
 author: Adam Egyed (@adamegyed), Fangting Liu (@trinity-0111)
