@@ -37,7 +37,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 - PBM **MUST** provide a mechanism for all transacting parties to verify the condition by which the token of value can be unwrapped
 - PBM **MUST** wrap an underlying token of value.
     - The wrapping of the token can be done either upon the creation of the PBM or wrapped on the fly at a later date.
-    - A token of value can be implemented in any widely accepted ERC. E.g. ERC20, ERC777
+    - A token of value can be implemented in any widely accepted ERC. E.g. ERC-20, ERC-777, ERC-1363
         - The definition of the word value goes beyond the current scope of our work - refer to project orchid white paper page 14 for details.
     - Consequently, the semantic use of the words "wrap" and "unwrap" would convey the bounding and unbounding of the underlying token.
 - PBM **SHALL** adhere to the definition of “wrapping” or “wrap” to mean bounding a token in accordance with PBM business logic during its lifecycle stage.
@@ -48,7 +48,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 - We would define a base specification of what a PBM should entail, with extensions to the base specification implemented as another specification on top of the base specification.
 
 ### Fungibility 
-Each PBM token may or may not be fungible to one another within the same contract. The standard does NOT mandate how an implementation must do this.
+It is possible to create multiple types of PBM token sets within the same smart contract. Each PBM token may or may not be fungible to one another within the same contract.The standard does NOT mandate how an implementation must do this.
 
 ### A Note on Implementing Interfaces
 In order to allow the implementors of the PBM token standards to have maximum flexibility in the way they structure the PBM business logic, a PBM can implement an interface in one of two ways: directly (`contract ContractName is InterfaceName`), or by adding functions to it from one or more interfaces. For the purposes of this specification, when a PBM is said to implement an interface, either method of implementation is permitted.
@@ -56,7 +56,7 @@ In order to allow the implementors of the PBM token standards to have maximum fl
 
 ### Terms
 1. **PBM Token** Refers to purpose bound money, represented as a [ERC-1155](./eip-1155.md) token. Each token would hold specific details that is required by the PBM business logic. A PBM smart contract is able to issue any amount of PBM Tokens
-1. **Spot Token** Underlying ERC20 compaitible token of value that is to be held by the smart contract. The term spot token was chosen to refer to a specific digital token or asset traded in the spot market and hence would convey that the token has an underlying value ascribe to it. 
+1. **Spot Token** Underlying ERC-20 compaitible token of value that is to be held by the smart contract. The term spot token was chosen to refer to a specific digital token or asset traded in the spot market and hence would convey that the token has an underlying value ascribe to it. 
 
 
 ### Token Details
@@ -128,7 +128,9 @@ Compliant contract **MUST** implement the following interface:
 
 This design extends the [ERC-1155](./eip-1155.md) standards in order to acheive ease of adoption across wallet providers as most wallet providers are able to support and display ER-C20, ERC-1155 and ERC-721 standards with ease. An implementation which doesn't extends these standards will require the wallet provider to build a custom user interface and interfacing logic which will impede the go to market process.
 
-This standard sticks to the push transaction model where the transfer of PBM is initiated on the senders side. By embedding the unwrapping logic within the [ERC-1155](./eip-1155.md) safeTransfer function, modern wallets are able to support the required PBM logic immediately. 
+This standard sticks to the push transaction model where the transfer of PBM is initiated on the senders side. By embedding the unwrapping logic within the [ERC-1155](./eip-1155.md) `safeTransfer` function, modern wallets are able to support the required PBM logic immediately. 
+
+
 
 ### Customisabiltiy 
 Each ERC-1155 PBM Token would map to an underlying `PBMToken` data structure that implementors are free to customize in accordance to the business logic.
@@ -177,6 +179,8 @@ This EIP depends on the security soundness of the underlying book keeping behavi
 - The PBM contract should carefully design the access control for which role is granted permission to mint a new token. Failing to safe guard such behavior can cause fraudulent issuance and an elevation of total supply.
 
 - The mapping of each PBM tokens to the amount of underlying spot token held by the smart contract should be carefully accounted for and audited.
+
+It is recommended to adopt a token standard that is compaitible with ERC-20. Examples of such tokens will be ERC-777, ERC-1363. ERC-20 however remains the most used as a result of the high degree of confidence in its security and simplicity.
 
 
 ## Copyright
