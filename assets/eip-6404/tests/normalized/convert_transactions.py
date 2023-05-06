@@ -190,21 +190,18 @@ def normalize_signed_transaction(encoded_signed_tx: bytes, cfg: ExecutionConfig)
 
     assert False
 
-transactions = Transactions(
-    tx_list=[
-        normalize_signed_transaction(encoded_signed_tx, cfg)
-        for encoded_signed_tx in encoded_signed_txs
-    ],
-    chain_id=cfg.chain_id,
-)
+transactions = List[Transaction, MAX_TRANSACTIONS_PER_PAYLOAD](*[
+    normalize_signed_transaction(encoded_signed_tx, cfg)
+    for encoded_signed_tx in encoded_signed_txs
+])
 transactions_root = transactions.hash_tree_root()
 
 if __name__ == '__main__':
     print('transactions_root')
     print(f'0x{transactions_root.hex()}')
 
-    for tx_index in range(len(transactions.tx_list)):
-        tx = transactions.tx_list[tx_index]
+    for tx_index in range(len(transactions)):
+        tx = transactions[tx_index]
         encoded = tx.encode_bytes()
         print(f'{tx_index} - {len(encoded)} bytes (Snappy: {len(compress(encoded))})')
         print(f'0x{tx.tx_hash.hex()}')

@@ -94,7 +94,7 @@ __attribute__((warn_unused_result))
 static int verify_transaction_proof(
     const void *proof,
     size_t num_proof_bytes,
-    const ExecutionConfig *cfg,
+    const ExecutionConfig *cfg __attribute__((unused)),
     const Root *transactions_root,
     const Root *expected_tx_hash)
 {
@@ -131,7 +131,6 @@ static int verify_transaction_proof(
         tx_branch++;
     }
     hash_combine(&root, &root, tx_branch);
-    hash_combine(&root, &root, &cfg->chain_id);
     if (memcmp(&root, transactions_root, sizeof root)) return 1;
     consume((1 + TX_DEPTH) * sizeof *tx_branch);
 
@@ -143,7 +142,7 @@ __attribute__((warn_unused_result))
 static int verify_amount_proof(
     const void *proof,
     size_t num_proof_bytes,
-    const ExecutionConfig *cfg,
+    const ExecutionConfig *cfg __attribute__((unused)),
     const Root *transactions_root,
     const ExecutionAddress *expected_tx_to,
     const Bytes32 *expected_tx_value_min)
@@ -224,7 +223,6 @@ static int verify_amount_proof(
         tx_branch++;
     }
     hash_combine(&root, &root, tx_branch);
-    hash_combine(&root, &root, &cfg->chain_id);
     if (memcmp(&root, transactions_root, sizeof root)) return 1;
     consume((1 + TX_DEPTH) * sizeof *tx_branch);
 
@@ -236,7 +234,7 @@ __attribute__((warn_unused_result))
 static int verify_sender_proof(
     const void *proof,
     size_t num_proof_bytes,
-    const ExecutionConfig *cfg,
+    const ExecutionConfig *cfg __attribute__((unused)),
     const Root *transactions_root,
     const ExecutionAddress *expected_tx_to,
     const Bytes32 *expected_tx_value_min,
@@ -319,7 +317,6 @@ static int verify_sender_proof(
         tx_branch++;
     }
     hash_combine(&root, &root, tx_branch);
-    hash_combine(&root, &root, &cfg->chain_id);
     if (memcmp(&root, transactions_root, sizeof root)) return 1;
     consume((1 + TX_DEPTH) * sizeof *tx_branch);
 
@@ -331,7 +328,7 @@ __attribute__((warn_unused_result))
 static int verify_info_proof(
     const void *proof,
     size_t num_proof_bytes,
-    const ExecutionConfig *cfg,
+    const ExecutionConfig *cfg __attribute__((unused)),
     const Root *transactions_root,
     TransactionInfo *info)
 {
@@ -439,7 +436,6 @@ static int verify_info_proof(
         tx_branch++;
     }
     hash_combine(&root, &root, tx_branch);
-    hash_combine(&root, &root, &cfg->chain_id);
     if (memcmp(&root, transactions_root, sizeof root)) return 1;
     consume((1 + TX_DEPTH) * sizeof *tx_branch);
 
@@ -455,10 +451,10 @@ __asm__ (
     ".section .rodata\n"
     ".global transactions_root\n"
     "transactions_root:\n"
-    ".incbin \"proofs/transactions_root.bin\"\n"
+    ".incbin \"proofs/transactions_root.ssz\"\n"
     ".global proof\n"
     "proof:\n"
-    ".incbin \"proofs/" QUOTE(PROOF_TYPE) "_" QUOTE(PROOF_INDEX) ".bin\"\n"
+    ".incbin \"proofs/" QUOTE(PROOF_TYPE) "_" QUOTE(PROOF_INDEX) ".ssz\"\n"
     ".global num_proof_bytes\n"
     ".set num_proof_bytes, . - proof\n"
     ".section .text\n"
