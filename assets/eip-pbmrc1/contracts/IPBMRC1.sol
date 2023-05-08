@@ -167,7 +167,6 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// - The caller must be either the creator of the token type or the smart contract owner.
     function revokePBM(uint256 tokenId) external;
 
-
     /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
     /// @param tokenId The unique identifier for the newly created PBM token type.
     /// @param tokenName A human-readable string representing the name of the newly created PBM token type.
