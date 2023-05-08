@@ -32,7 +32,7 @@ interface IERC5007Composable /* is IERC5007 */ {
         address newToken1Owner,
         uint256 newToken2Id,
         address newToken2Owner,
-        int64 splitTime
+        uint64 splitTime
     ) external;
 
     /**
