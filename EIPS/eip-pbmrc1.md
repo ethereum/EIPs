@@ -59,37 +59,81 @@ In order to allow the implementors of the PBM token standards to have maximum fl
 1. **Spot Token** Underlying ERC-20 compaitible token of value that is to be held by the smart contract. The term spot token was chosen to refer to a specific digital token or asset traded in the spot market and hence would convey that the token has an underlying value ascribe to it. 
 
 
-### Token Details
-A state variable consisting of all details required to facilitate the business logic for a particular PBM type must be defined. The compulsory fields are not defined, but may be defined by later proposals.
+### PBM token details
+A state variable consisting of all additional details required to facilitate the business logic for a particular PBM type MUST be defined. The compulsory fields are not defined, but may be defined by later proposals. 
+
+An external function may be exposed to create new PBMToken as well at a later date.
 
 Example of token details:
 
 ```solidity
 
-    /// Mapping of token ids to token details
+    /// @dev Mapping of each ERC-1155 tokenId to its corresponding PBM token details.
     mapping (uint256 => PBMToken) internal tokenTypes ; 
 
-    /// @dev structure representing all the details corresponding to a PBM tokenId
+    /// @dev Structure representing all the details corresponding to a PBM tokenId.
     struct PBMToken {
-        // name of the token 
-        string name;  
-        // value of the token in context of the underlying wrapped ERC20 compaitible token.
-        uint256 faceValue; 
-        // token will be rendered useless after this time.
-        uint256 expiry; 
-        // records the creator of this PBM type on this smart contract.
-        address creator; 
-        // remaining balance
-        uint256 balanceSupply; 
-        // metadata uri for ERC1155 display purposes
+        // Name of the token.
+        string name;
+        // Value of the token in the context of the underlying wrapped ERC20-compatible token.
+        uint256 faceValue;
+        // Token will be rendered useless after this time.
+        uint256 expiry;
+        // Address of the creator of this PBM type on this smart contract.
+        address creator;
+        // Remaining balance of the token.
+        uint256 balanceSupply;
+        // Metadata URI for ERC1155 display purposes.
         string uri;
 
-        // add other state variables ...
+        // Add other state variables...
     }
+
+    /// @notice Creates a new PBM token type with the provided data.
+    /// @dev Example response of token URI (reference: https://docs.opensea.io/docs/metadata-standards):
+    /// {
+    ///     "name": "StraitsX-12",
+    ///     "description": "12$ SGD test voucher",
+    ///     "image": "https://gateway.pinata.cloud/ipfs/QmQ1x7NHakFYin9bHwN7zy4NdSYS84w6C33hzxpZwCAFPu",
+    ///     "attributes": [
+    ///         {
+    ///             "trait_type": "Value",
+    ///             "value": "12"
+    ///         }
+    ///     ]
+    /// }
+    function createPBMTokenType(
+        string memory name,
+        uint256 faceValue,
+        uint256 tokenExpiry,
+        address creator,
+        string memory tokenURI
+    ) external;
 
 ``` 
 
+### PBM Address List
+A list of targeted addresses for PBM unwrapping must be specified in an address list. 
+
+```solidity
+
+/// @title PBM Address list Interface. 
+/// @notice The PBM address list stores and manages whitelisted merchants address for the PBMs 
+/// a merchant in general is anyone who is providing goods or services and is hence deemed to be able to unwrap a PBM.
+interface IPBMAddressList {
+
+    /// @notice Checks if the given address is whitelisted as a merchant.
+    /// @param _address The address to check
+    /// @return True if address is a merchant, else false
+    function isMerchant(address _address) external returns (bool);
+
+}
+
+```
+
 ### PBMRC1 - Base Interface
+
+<!-- TBD Copy from IPBMRC1.sol -->
 
 ```solidity
 
@@ -97,17 +141,7 @@ Example of token details:
 ```
 
 
-
 ## Extensions
-
-### PBMRC1_Refundable Interface
-The Refundable extension is OPTIONAL for compliant smart contracts. This allows contracts to support a refund flow. 
-
-```solidity
-  
-
-
-``` 
 
 ### PBMRC2 - Non preloaded PBM Interface
 
@@ -115,7 +149,7 @@ The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. T
 
 Compliant contract **MUST** implement the following interface:
 
-<!-- TBD Copy from PBMRC2.sol -->
+<!-- TBD Copy from IPBMRC2.sol -->
 ```solidity
 
 
@@ -129,7 +163,6 @@ Compliant contract **MUST** implement the following interface:
 This design extends the [ERC-1155](./eip-1155.md) standards in order to acheive ease of adoption across wallet providers as most wallet providers are able to support and display ER-C20, ERC-1155 and ERC-721 standards with ease. An implementation which doesn't extends these standards will require the wallet provider to build a custom user interface and interfacing logic which will impede the go to market process.
 
 This standard sticks to the push transaction model where the transfer of PBM is initiated on the senders side. By embedding the unwrapping logic within the [ERC-1155](./eip-1155.md) `safeTransfer` function, modern wallets are able to support the required PBM logic immediately. 
-
 
 
 ### Customisabiltiy 

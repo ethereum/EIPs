@@ -2,25 +2,31 @@
 pragma solidity ^0.8.0;
 
 // TBD: go through each function params and adopt _param name standard?
+// TBD: check the parameters of each functions. are they necessary? does it need to be an array?
+/// LIST OF EVENTS TO BE EMITTED
+// TBD: check the parameters of the events 
+// TBD: consider these events to be added into safeMint functions if they are going to wrap an underlying eRC20tokens
+// TBD: consider other events to be EMITTED 
+// TBD: event logs emitted by the smart contract will provide enough data to create an accurate record of all current token balances.
+// A database or explorer may listen to events and be able to provide indexed and categorized searches
 
-
-/// @title PBM Specification
+/// @title PBM Specification interface 
 /// @notice The PBM (purpose bound money) allows us to add logical requirements on the use of ERC-20 tokens. 
 /// The PBM acts as wrapper around the ERC-20 tokens and implements the necessary logic. 
-interface IPBMRC1 {
+/// @dev PBM creator must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
+interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     
     /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
     /// contract expiry, and the PBM address list.
     /// @param spotToken_ The address of the underlying ERC20 token.
     /// @param expiry_ The contract-wide expiry timestamp (in Unix epoch time).
-    /// @param merchantAddressList_ The address of the PBMAddressList smart contract.
-    function initialise(address spotToken_, uint256 expiry_, address merchantAddressList_) external; 
+    /// @param purposeBoundAddressList_ This should point to a smart contract that manages the condition by which a PBM is allowed to move to or to be unwrapped.
+    function initialise(address spotToken_, uint256 expiry_, address purposeBoundAddressList_) external; 
 
     /// @notice Returns the Uniform Resource Identifier (URI) metadata information for the PBM with the corresponding tokenId
     /// @dev URIs are defined in RFC 3986. 
     /// The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
-    /// Developer may choose to adhere strictly to the ERC1155Metadata_URI extension interface
-    /// or returns an uri that adheres to the ERC-1155 Metadata URI JSON Schema
+    /// Developer may choose to adhere to the ERC1155Metadata_URI extension interface if necessary
     /// @param tokenId The id for the PBM in query
     /// @return Returns the metadata URI string for the PBM
     function uri(uint256 tokenId) external  view returns (string memory);
@@ -154,21 +160,26 @@ interface IPBMRC1 {
     /// @notice Allows the creator of a PBM token type to retrieve all locked-up underlying ERC-20 tokens within that PBM.
     /// @dev Ensure that only the creator of the PBM token type or the contract owner can call this function. 
     /// Validate the token state and existence, handle PBM token burning if necessary, safely transfer the remaining ERC-20 tokens to the originator, 
-    /// and emit an appropriate event for logging purposes.
+    /// must emit {PBMrevokeWithdraw} upon a successful revoke.
     /// @param tokenId The identifier of the PBM token type
     /// Requirements:
     /// - `tokenId` should be a valid identifier for an existing PBM token type.
     /// - The caller must be either the creator of the token type or the smart contract owner.
     function revokePBM(uint256 tokenId) external;
 
-    /// @notice Emitted when underlying ERC-20 tokens are transferred to a whitelisted merchant ( payment )
-    /// @param from The account from which the PBM ( NFT )(s) is moving from 
-    /// @param to The account which is receiving the PBM ( NFT )(s)
-    /// @param tokenIds The identifiers of the different PBM token type
-    /// @param amounts The number of ( quantity ) the different PBM types that are to be created
-    /// @param ERC20Token The address of the underlying ERC-20 token 
-    /// @param ERC20TokenValue The number of underlying ERC-20 tokens transferred
-    event TokenUnwrapMerchantPayment(address from , address to, uint256[] tokenIds, uint256[] amounts,address ERC20Token, uint256 ERC20TokenValue); 
+    /// @notice Retrieves the details of a PBM token type given its tokenId.
+    /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
+    /// @param tokenId The identifier of the PBM token type.
+    /// @return A PBMToken struct containing all the details of the specified PBM token type.
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory); 
+
+    /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
+    /// @param tokenId The unique identifier for the newly created PBM token type.
+    /// @param tokenName A human-readable string representing the name of the newly created PBM token type.
+    /// @param amount The initial supply of the newly created PBM token type.
+    /// @param expiry The timestamp at which the newly created PBM token type will expire.
+    /// @param creator The address of the account that created the new PBM token type.
+    event NewPBMTypeCreated(uint256 tokenId, string tokenName, uint256 amount, uint256 expiry, address creator);
 
     /// @notice Emitted when a PBM type creator withdraws the underlying ERC-20 tokens from all the remaining expired PBMs
     /// @param beneficiary the address ( PBM type creator ) which receives the ERC20 Token
@@ -176,4 +187,36 @@ interface IPBMRC1 {
     /// @param ERC20Token The address of the underlying ERC-20 token 
     /// @param ERC20TokenValue The number of underlying ERC-20 tokens transferred 
     event PBMrevokeWithdraw(address beneficiary, uint256 PBMTokenId, address ERC20Token, uint256 ERC20TokenValue);
+
+    /// @notice Emitted when the underlying tokens are unwrapped and transferred to a specific purpose-bound address.
+    /// This event signifies the end of the PBM lifecycle, as all necessary conditions have been met to release the underlying tokens to the recipient.
+    /// @param from The address from which the PBM tokens are being unwrapped.
+    /// @param to The purpose-bound address receiving the unwrapped underlying tokens.
+    /// @param tokenIds An array containing the identifiers of the unwrapped PBM token types.
+    /// @param amounts An array containing the quantities of the corresponding unwrapped PBM tokens.
+    /// @param ERC20Token The address of the underlying ERC-20 token.
+    /// @param ERC20TokenValue The amount of unwrapped underlying ERC-20 tokens transferred.
+    event TokenUnwrapForTarget(address from, address to, uint256[] tokenIds, uint256[] amounts, address ERC20Token, uint256 ERC20TokenValue);
+
+    /// @notice Emitted when PBM tokens are burned, resulting in the unwrapping of the underlying tokens for the designated recipient.
+    /// This event is required if there is an unwrapping of the underlying tokens during the PBM (NFT) burning process.
+    /// @param from The address from which the PBM tokens are being burned.
+    /// @param to The address receiving the unwrapped underlying tokens.
+    /// @param tokenIds An array containing the identifiers of the burned PBM token types.
+    /// @param amounts An array containing the quantities of the corresponding burned PBM tokens.
+    /// @param ERC20Token The address of the underlying ERC-20 token.
+    /// @param ERC20TokenValue The amount of unwrapped underlying ERC-20 tokens transferred.
+    event TokenUnwrapForPBMBurn(address from, address to, uint256[] tokenIds, uint256[] amounts, address ERC20Token, uint256 ERC20TokenValue);
+
+    /// Indicates the wrapping of an token into the PBM smart contract. 
+    /// @notice Emitted when underlying tokens are wrapped within the PBM smart contract.
+    /// This event signifies the beginning of the PBM lifecycle, as tokens are now managed by the conditions within the PBM contract.
+    /// @param from The address initiating the token wrapping process, and 
+    /// @param tokenIds An array containing the identifiers of the token types being wrapped.
+    /// @param amounts An array containing the quantities of the corresponding wrapped tokens.
+    /// @param ERC20Token The address of the underlying ERC-20 token.
+    /// @param ERC20TokenValue The amount of wrapped underlying ERC-20 tokens transferred.
+    event TokenWrap(address from, uint256[] tokenIds, uint256[] amounts,address ERC20Token, uint256 ERC20TokenValue); 
 }
+
+

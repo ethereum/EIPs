@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 /**
 *    @dev 
 */
-interface PBMRC2_NonPreloadedPBM is PBMRC1 {
+interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
 
-  /// @notice This interface extends PBMRC1, adding functions to mint PBM tokens as empty containers without underlying tokens of value.
+  /// @notice This interface extends IPBMRC1, adding functions to mint PBM tokens as empty containers without underlying tokens of value.
   /// The loading of the underlying token of value will come later. 
   function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
   function safeMintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
