@@ -7,7 +7,7 @@ status:  DRAFT
 type: Standards Track
 category: ERC
 created: 2023-04-01
-requires: 165, 1155
+requires: 165, 173, 1155
 ---
 
 <!-- Notes: replace PRBMRC with EIP upon creating a PR to EIP Main repo -->
@@ -26,7 +26,6 @@ It combines the concept of programmable payments - automatic execution of paymen
 
 This standard is critical to ensure that introducing PBM does not lead to fragmentation of various proprietary standard. By making the PBM specification open, it allows for interoperability across different platforms, wallets, payment systems and rails.
 
-<!-- -------------------------------------------------------------------------------------------------------- -->
 ## Specification
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “NOT RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
@@ -110,6 +109,12 @@ Example of token details:
         string memory tokenURI
     ) external;
 
+
+    /// @notice Retrieves the details of a PBM token type given its tokenId.
+    /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
+    /// @param tokenId The identifier of the PBM token type.
+    /// @return A PBMToken struct containing all the details of the specified PBM token type.
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory); 
 ``` 
 
 ### PBM Address List
@@ -143,6 +148,49 @@ interface IPBMAddressList {
 
 ## Extensions
 
+### PBMRC1 - Token Receiver
+Smart contracts MUST implement all of the functions in the PBMRC1_TokenReceiver interface to subscribe to PBM unwrap callbacks 
+
+```solidity 
+pragma solidity ^0.8.0;
+
+/// @notice Smart contracts MUST implement the ERC-165 `supportsInterface` function and signify support for the `PBMRC1_TokenReceiver` interface to accept callbacks.
+/// It is optional for a receiving smart contract to implement the `PBMRC1_TokenReceiver` interface
+/// @dev WARNING: Reentrancy guard procedure, Non delegate call, or the check-effects-interaction pattern must be adhere to when calling an external smart contract.
+/// The interface functions MUST only be called at the end of the `unwrap` function.
+interface PBMRC1_TokenReceiver {
+    /**
+        @notice Handles the callback from a PBM smart contract upon unwrapping
+        @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap` if the
+        receiver smart contract supports type(PBMRC1_TokenReceiver).interfaceId
+        @param _operator  The address which initiated the transfer (i.e. msg.sender)
+        @param _from      The address which previously owned the token
+        @param _id        The ID of the token being unwrapped
+        @param _value     The amount of tokens being transferred
+        @param _data      Additional data with no specified format
+        @return           `bytes4(keccak256("onPBMRC1Unwrap(address,address,uint256,uint256,bytes)"))`
+    */
+    function onPBMRC1Unwrap(address _operator, address _from, uint256 _id, uint256 _value, bytes calldata _data) external returns(bytes4);
+
+    /**
+        @notice Handles the callback from a PBM smart contract upon unwrapping a batch of tokens
+        @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap` if the
+        receiver smart contract supports type(PBMRC1_TokenReceiver).interfaceId
+
+        @param _operator  The address which initiated the transfer (i.e. msg.sender)
+        @param _from      The address which previously owned the token
+        @param _id        The ID of the token being unwrapped
+        @param _value     The amount of tokens being transferred
+        @param _data      Additional data with no specified format
+        @return           `bytes4(keccak256("onPBMRC1BatchUnwrap(address,address,uint256,uint256,bytes)"))`
+    */
+    function onPBMRC1BatchUnwrap(address _operator, address _from, uint256[] calldata _ids, uint256[] calldata _values, bytes calldata _data) external returns(bytes4);       
+}
+
+```
+
+
+
 ### PBMRC2 - Non preloaded PBM Interface
 
 The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. This allows contracts to bind an underlying token of value to the PBM at a later date instead of during a minting process.
@@ -154,6 +202,8 @@ Compliant contract **MUST** implement the following interface:
 
 
 ```
+
+
 
 
 ## Rationale

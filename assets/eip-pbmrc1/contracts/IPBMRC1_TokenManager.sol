@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 
 interface IPBMRC1_TokenManager {
- 
 
      /**
     * @notice Creates a new PBM token type, with its own token characteristics.
