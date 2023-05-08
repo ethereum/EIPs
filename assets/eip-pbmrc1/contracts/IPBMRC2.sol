@@ -1,14 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.0;
 
+// TBD: add param docs for load, loadto. Check all params documented.
+
 /**
-*    @dev 
-*/
+ *  @dev This interface extends IPBMRC1, adding functions for working with non-preloaded PBMs.
+ *  Non-preloaded PBMs are minted as empty containers without any underlying tokens of value,
+ *  allowing the loading of the underlying token to happen at a later stage.
+ */
 interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
 
-  /// @notice This interface extends IPBMRC1, adding functions to mint PBM tokens as empty containers without underlying tokens of value.
-  /// The loading of the underlying token of value will come later. 
+  /// @notice This function extends IPBMRC1 to mint PBM tokens as empty containers without underlying tokens of value.
+  /// @dev The loading of the underlying token of value can be done by calling the `load` function. The function parameters should be identical to IPBMRC1
   function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
+
+  /// @notice This function extends IPBMRC1 to mint PBM tokens as empty containers without underlying tokens of value.
+  /// @dev The loading of the underlying token of value can be done by calling the `load` function. The function parameters should be identical to IPBMRC1
   function safeMintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
 
   /// Given a PBM token id, wrap an amount of ERC20 tokens that is purpose bound by `tokenId` 

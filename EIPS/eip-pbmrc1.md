@@ -10,7 +10,7 @@ created: 2023-04-01
 requires: 165, 173, 1155
 ---
 
-<!-- Notes: replace PRBMRC with EIP upon creating a PR to EIP Main repo -->
+<!-- Notes: replace PRBMRC with an EIP number upon creating a PR to EIP Main repo -->
 ## Abstract
 
 This PBMRC outlines a smart contract interface that builds upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf) 
@@ -138,7 +138,7 @@ interface IPBMAddressList {
 
 ### PBMRC1 - Base Interface
 
-<!-- TBD Copy from IPBMRC1.sol -->
+<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC1.sol  -->
 
 ```solidity
 
@@ -189,21 +189,18 @@ interface PBMRC1_TokenReceiver {
 
 ```
 
-
-
 ### PBMRC2 - Non preloaded PBM Interface
 
 The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. This allows contracts to bind an underlying token of value to the PBM at a later date instead of during a minting process.
 
 Compliant contract **MUST** implement the following interface:
 
-<!-- TBD Copy from IPBMRC2.sol -->
+<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC2.sol  -->
+
 ```solidity
 
 
 ```
-
-
 
 
 ## Rationale
