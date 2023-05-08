@@ -13,7 +13,7 @@ requires: 165, 1155
 <!-- Notes: replace PRBMRC with EIP upon creating a PR to EIP Main repo -->
 ## Abstract
 
-This PBMRC outlines a smart contract interface that builts upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf) 
+This PBMRC outlines a smart contract interface that builds upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf) 
 
 It builts upon the [ERC-1155](./eip-1155.md) standard to leverage upon existing widespread support that wallet providers has implemeneted to display the PBM and to trigger various transfer logic.
 
@@ -24,7 +24,7 @@ Purpose Bound Money (PBM) refers to a protocol that specifies the conditions und
 
 It combines the concept of programmable payments - automatic execution of payments once a pre-defined set of conditions are met and programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
 
-This standard is critical to ensure that introducing PBM do not lead to fragmentation of various propietary standard. By making the PBM specification open, it allows for interoperability across different platforms, wallets, payment systems and rails.
+This standard is critical to ensure that introducing PBM does not lead to fragmentation of various proprietary standard. By making the PBM specification open, it allows for interoperability across different platforms, wallets, payment systems and rails.
 
 <!-- -------------------------------------------------------------------------------------------------------- -->
 ## Specification

@@ -6,8 +6,8 @@ pragma solidity ^0.8.0;
 */
 interface PBMRC2_NonPreloadedPBM is PBMRC1 {
 
-  /// @notice These 2 functions are similar to PBMRC1, except that there's no need to transfer an underlying token of value into the 
-  /// pbm smart contract. The PBM will just be an empty envelope at this point in time, since it doesn't have an underlying token.
+  /// @notice This interface extends PBMRC1, adding functions to mint PBM tokens as empty containers without underlying tokens of value.
+  /// The loading of the underlying token of value will come later. 
   function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
   function safeMintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
 
@@ -26,15 +26,20 @@ interface PBMRC2_NonPreloadedPBM is PBMRC1 {
   /// @dev allocates underlying token to be used exclusively by the PBM token `tokenId` type for `recipient`
   function loadTo(uint256 tokenId, uint256 amount, address recipient) external; 
   
+  /// @notice Retrieves the balance of the underlying ERC-20 token associated with a specific PBM token type and user address.
+  /// This function provides a way to check the amount of the underlying token that a user has loaded into a particular PBM token.
+  /// @param tokenId The identifier of the PBM token type for which the underlying token balance is being queried.
+  /// @param user The address of the user whose underlying token balance is being queried.
+  /// @return The balance of the underlying ERC-20 token associated with the specified PBM token type and user address.
+  function underlyingBalanceOf(uint256 tokenId, address user) external view returns (uint256);
 
-  /// @notice Unloads the underlying token from the PBM smart contract by extracting the specified amount of the token.
-/// Emits {TokenUnload} event
-/// @param tokenId Identifier of the PBM token type to be unloaded.
-/// @param amount The quantity of the corresponding tokens to be unloaded.
-function unload(uint256 tokenId, uint256 amount) external;
+  /// @notice Unloads the underlying token from the PBM smart contract by extracting the specified amount of the token for the caller.
+  /// Emits {TokenUnload} event.
+  /// @dev The underlying token will be removed and transferred to the address of the caller (msg.sender).
+  /// @param tokenId Identifier of the PBM token type to be unloaded.
+  /// @param amount The quantity of the corresponding tokens to be unloaded.
+  function unload(uint256 tokenId, uint256 amount) external;
 
-
-  /// TBD: consider removing address ERC20Token, uint256 ERC20TokenValue , since these variables are to be immutable?
   /// Emitted when an underlying token is loaded into a PBM
   /// @param caller Address by which ERC20token is taken from.
   /// @param to Address by which the token is loaded and assigned to
@@ -54,22 +59,3 @@ function unload(uint256 tokenId, uint256 amount) external;
   /// @param ERC20TokenValue The amount of unloaded underlying ERC-20 tokens transferred.
   event TokenUnload(address caller, address from, uint256 tokenId, uint256 amount, address ERC20Token, uint256 ERC20TokenValue);
 }
-
-
-/**
-  TBD: decide if the below functions should be included in the interface.
-  thought process here is, it should not. adds complexity, functions should only do 1 thing, and 
-  if needed the implementors can figure this out themselves.
- */
-  // function loadAndUnwrap();
-  // function loadAndUnwrapTo();
-
-  // /// function will pull ERC20 tokens from msg.sender to load into the PBM
-  // /// caller should have the approval to send the PBMs on behalf of the owner (`from` addresss)
-  // /// loads ERC20 token from the caller to be given to the recipient specified in the `from` address bound to `tokenId`
-  // /// subsequently unwraps 
-  // function loadAndSafeTransferFrom(address from, address to, uint256 tokenId, uint256 amount, bytes memory data) external; 
-
-  // /// function will pull ERC20 tokens from msg.sender to load into the PBM
-  // /// loads ERC20 token from the caller
-  // function loadAndSafeTransfer(address to, uint256 tokenId, uint256 amount, bytes memory data) external; 
