@@ -46,22 +46,19 @@ contract Consumer {
       return owner;
     }
 
+    // check for token holder interface support
     try IERC165(owner).supportsInterface(0x16b900ff) returns (bool ret) {
-      // contract does not support token holder interface
-      if (!ret) {
-        return owner;
-      }
+      if (!ret) return owner;
     } catch {
       return owner;
     }
 
     // check for held owner
-    address addr = IERC721Holder(owner).heldOwnerOf(address(token), tokenId);
-    if (addr == address(0)) {
-      return owner;
-    }
+    try IERC721Holder(owner).heldOwnerOf(address(token), tokenId) returns (address user) {
+      if (user != address(0)) return user;
+    } catch {}
 
-    return addr;
+    return owner;
   }
 
   /**

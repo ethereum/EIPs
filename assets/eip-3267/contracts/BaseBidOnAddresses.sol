@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-3.0-or-later
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.7.1;
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { ABDKMath64x64 } from "abdk-libraries-solidity/ABDKMath64x64.sol";

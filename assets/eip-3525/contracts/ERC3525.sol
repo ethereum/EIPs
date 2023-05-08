@@ -125,8 +125,9 @@ contract ERC3525 is IERC3525, IERC3525Metadata, ERC721Enumerable {
     }
 
     function _burn(uint256 tokenId_) internal virtual override {
-        ERC721._burn(tokenId_);
         address owner = ERC721.ownerOf(tokenId_);
+        ERC721._burn(tokenId_);
+
         uint256 slot = _slots[tokenId_];
         uint256 value = _values[tokenId_];
 
