@@ -100,7 +100,7 @@ contract("test ERC5007", async accounts => {
         
 
         console.log("IERC5007Composable InterfaceId:", await demo.getInterfaceId())
-        let isSupport = await demo.supportsInterface('0xf140be0d');
+        let isSupport = await demo.supportsInterface('0x75cf3842');
         assert.equal(isSupport, true , "supportsInterface error");
     });
 
