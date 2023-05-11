@@ -75,7 +75,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
 
-**Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted. EIP editors and accounts authorized by any EIP editor can assign EIP numbers, which need not be unsigned integers. EIP numbers can also be unassigned by the account that assigned that number, as long as it is not the only assigned number. If multiple numbers are assigned, the EIP author is free to choose from any of the assigned numbers.
+**Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted. EIP editors and accounts authorized by any EIP editor can assign EIP numbers, which need not be unsigned integers for EIPs with a status of Draft. EIP numbers can also be unassigned by the account that assigned that number, as long as it is not the only assigned number. If multiple numbers are assigned, the EIP author is free to choose from any of the assigned numbers.
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
