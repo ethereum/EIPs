@@ -3,18 +3,18 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ERC721NonTransferableMock } from "../typechain-types";
+import { ERC721TransferableMock } from "../typechain-types";
 
-async function transferableTokenFixture(): Promise<ERC721NonTransferableMock> {
-  const factory = await ethers.getContractFactory("ERC721NonTransferableMock");
+async function transferableTokenFixture(): Promise<ERC721TransferableMock> {
+  const factory = await ethers.getContractFactory("ERC721TransferableMock");
   const token = await factory.deploy("Chunky", "CHNK");
   await token.deployed();
 
   return token;
 }
 
-describe("NonTransferable", async function () {
-  let nonTransferable: ERC721NonTransferableMock;
+describe("Transferable", async function () {
+  let nonTransferable: ERC721TransferableMock;
   let owner: SignerWithAddress;
   let otherOwner: SignerWithAddress;
   const tokenId = 1;
@@ -30,7 +30,7 @@ describe("NonTransferable", async function () {
   });
 
   it("can support IRMRKNonTransferable", async function () {
-    expect(await nonTransferable.supportsInterface("0x23f06346")).to.equal(true);
+    expect(await nonTransferable.supportsInterface("0x91a6262f")).to.equal(true);
   });
 
   it("does not support other interfaces", async function () {
@@ -50,12 +50,12 @@ describe("NonTransferable", async function () {
   });
 
   it("returns the expected transferability state", async function () {
-    expect(await nonTransferable['isTransferable(uint256)'](tokenId)).to.equal(false);
-    expect(await nonTransferable['isTransferable(uint256,address,address)'](tokenId, owner.address, otherOwner.address)).to.equal(true);
+    expect(await nonTransferable['isTransferable(uint256,address,address)'](tokenId, ethers.constants.AddressZero, ethers.constants.AddressZero)).to.equal(false);
+    expect(await nonTransferable['isTransferable(uint256,address,address)'](tokenId, ethers.constants.AddressZero, otherOwner.address)).to.equal(true);
   })
 
   it("reverts if token does not exist", async function () {
-    await expect(nonTransferable['isTransferable(uint256)'](10)).to.be.revertedWith("ERC721: invalid token ID");
+    await expect(nonTransferable['isTransferable(uint256,address,address)'](10, owner.address, otherOwner.address)).to.be.revertedWith("ERC721: invalid token ID");
   });
 
   it("can burn", async function () {
