@@ -2,8 +2,7 @@
 eip: 6963
 title: Multi Injected Provider Interface (aka MIPI)
 description: Using window events to announce injected providers
-author: Pedro Gomes (@pedrouid), Kosala Hemachandra (@kvhnuke), Richard Moore (@ricmoo), Gregory Markou (@GregTheGreek), 
-Kyle Den Hartog (kdenhartog), Glitch (glitch-txs), Sam Wilson (@SamWilsn), Micah Zoltu (@MicahZoltu)
+author: Pedro Gomes (@pedrouid), Kosala Hemachandra (@kvhnuke), Richard Moore (@ricmoo), Gregory Markou (@GregTheGreek), Kyle Den Hartog (kdenhartog), Glitch (glitch-txs), Sam Wilson (@SamWilsn), Micah Zoltu (@MicahZoltu)
 discussions-to: https://ethereum-magicians.org/t/eip-6963-multi-injected-provider-interface-aka-mipi/14076/2
 status: Draft
 type: Standards Track
