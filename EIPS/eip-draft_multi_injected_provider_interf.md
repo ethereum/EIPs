@@ -159,12 +159,17 @@ Here is a reference implementation for an injected script by a wallet provider t
 
 ```typescript
 function onPageLoad() {
-  const ethereum: EIP1193Provider = {...}
+  let ethereum: EIP1193Provider
 
   window.ethereum = ethereum
 
   function announceProvider() {
-    const info: ProviderInfo = {...}
+    const info: ProviderInfo = {
+      walletId: "org.example.wallet"
+      uuid: "350670db-19fa-4704-a166-e52e178b59d2
+      name: "Example Wallet"
+      icon: "https://wallet.example.org/icon.png"
+    }
     const provider = { info, ethereum }
     window.dispatchEvent(new CustomEvent("evmProviderAnnounced", { detail: provider }))
   }
