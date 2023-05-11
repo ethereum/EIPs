@@ -21,7 +21,7 @@ It is impossible for today's Ethereum to literally "go to the moon" due to a lim
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-* The time between blocks MUST be changed from 12 seconds to 10 minutes (50x longer).
+* The time between blocks MUST be changed from 12 seconds to 600 seconds (10 minutes).
 * The per-block validator reward MUST be multiplied by 50
 * The number of blocks per epoch MUST be reduced from 4 to 2
 
