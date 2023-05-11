@@ -25,7 +25,7 @@ Contracts wishing to use ERC-5219 as their ERC-4804 resolve mode must implement 
 /// @dev IDecentralizedApp is the ERC-5219 interface
 interface IERC5219Resolver is IDecentralizedApp {
     // @notice The ERC-4804 resolve mode
-    // @dev    This MUST return "5219" for ERC-5219 resolution (case-insensitive). The other options, as of writing this, are "auto" for automatic resolution, or "manual" for manual resolution.
+    // @dev    This MUST return "5219" (0x00000000000000000000000035323139) for ERC-5219 resolution (case-insensitive). The other options, as of writing this, are "auto" for automatic resolution, or "manual" for manual resolution.
     function resolveMode() external pure returns (bytes32 mode);
 }
 ```
