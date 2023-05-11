@@ -1,7 +1,7 @@
 ---
 eip: draft_multi_injected_provider_interf
 title: Multi Injected Provider Interface (aka MIPI)
-description: Using `window.evmproviders` instead of `window.ethereum`
+description: Using window events to announce injected providers
 author: Pedro Gomes (@pedrouid), Kosala Hemachandra (@kvhnuke), Richard Moore (@ricmoo), Gregory Markou (@GregTheGreek)
 discussions-to: https://ethereum-magicians.org/t/eip-6963-multi-injected-provider-interface-aka-mipi/14076/2
 status: Draft
@@ -13,7 +13,7 @@ requires: 1193
 
 ## Abstract
 
-A Javascript interface injected by browser extensions installed by the user that enables user selection from multiple wallet providers using a window object labelled `window.evmproviders` instead of overwriting `window.ethereum` object.
+A Javascript communication protocol that enables multiple wallet providers to interface with an EVM-based application using a browser extension injected script through window events.
 
 ## Motivation
 
@@ -25,9 +25,9 @@ This results not only in a degraded user experience but also increases the barri
 
 Some browser extensions attempt to counteract this problem by delaying their injection to overwrite the same `window.ethereum` object which creates an unfair competition for wallet providers and lack of interoperability.
 
-In this proposal, we provide a solution that optimitizes for interoperability and enables fairer competition by lowering the barrier to entry for new wallet providers to improve the user experience on Ethereum.
+In this proposal, we provide a solution that optimitizes for interoperability of multiple wallet providers and enables fairer competition by lowering the barrier to entry for new wallet providers to improve the user experience on Ethereum.
 
-This is achieved by replacing the current window object `window.ethereum` with a new window object `window.evmproviders` that enables multiple browser extensions to be exposed for user selection in the web page.
+This is achieved by introducing a set of window events to provide a two-way communication protocol between Ethereum libraries and injected scripts provided by browser extensions thus enabling users to select their wallet of choice.
 
 ## Specification
 
@@ -42,8 +42,8 @@ Each wallet provider will be exposed with the following interface `ProviderInfo`
  * Represents the assets needed to display a wallet
  */
 interface ProviderInfo {
-  uuid: string;
   walletId: string;
+  uuid: string;
   name: string;
   icon: string;
 }
@@ -51,8 +51,8 @@ interface ProviderInfo {
 
 The values in the `ProviderInfo` MUST be used as follows:
 
-- uuid - locally unique of the wallet provider (UUIDv4 compliant)
 - walletId - globally unique identifier of the wallet provider (eg. `io.dopewallet.extension` or `awesomewallet`)
+- uuid - locally unique of the wallet provider (UUIDv4 compliant)
 - name - human-readable name of the wallet provider (e.g. `DopeWalletExtension` or `AwesomeWallet`)
 - icon - uri encoded image (RFC-3986 complaint)
 
@@ -69,48 +69,50 @@ interface EVMProvider {
 
 The `EIP1193Provider` interface is documented at [EIP-1193](./eip-1193.md) and can be used to override the `window.ethereum` object once the user as explicitly selected it.
 
-### window.evmproviders
+### Window Event
 
-A web app will be able to display multiple wallet providers that were injected by browser extensions by parsing the window object `window.evmproviders` which will include an array of wallet providers that follow the `EVMProvider` described above
+Different wallet providers might inject their scripts at different timeframes plus there is no guarantees that the Ethereum library in the web page will be loaded before all injected scripts are present in the page.
 
-```typescript
-window.evmproviders = EVMProvider[]
-```
-
-Popular Ethereum libraries will be able to parse this object to display multiple injected providers easily with the name, icon and description from the `ProviderInfo` and then use the provided `EIP1193Provider` to continue operating for future calls to the blockchain.
-
-### Event Listeners
-
-Different wallet providers might inject their scripts at different timeframes plus there is no guarantees that the dapp library in the web page will be loaded after all injected scripts have populated the window object `window.evmProviders`
-
-Therefore we will use `window.postMessage` and `window.addEventListener` to observe future changes to the window object that is tracking all providers.
-
-Whenever a new wallet provider is added it should be tracked with the following event payload:
+To emit events it must use `window.dispatchEvent` and to observe events it must use `window.addEventListener`. There will be two event interfaces:
 
 ```typescript
-interface EVMProviderAddedEvent {
-  eventName: "evmProviderAdded";
-  provider: EVMProvider;
+// Requesting an EVM provider
+interface EVMProviderRequestedEvent extends Event {
+  type: "evmProviderRequested";
+}
+
+// Annoucing an EVM provider
+interface EVMProviderAnnouncedEvent extends CustomEvent {
+  type: "evmProviderAnnounced";
+  detail: EVMProvider;
 }
 ```
 
-A wallet provider will add their own EIP-1193 provider to the `window.evmProviders` and then emit a message as follows:
+Therefore both Wallet providers and the Ethereum library must emit events when they initialize.
 
 ```typescript
-window.postMessage(event as EVMProviderAddedEvent);
+// Ethereum library initializes
+window.dispatchEvent(new Event("evmProviderRequested"));
+
+// Wallet provider initializes
+window.dispatchEvent(
+  new CustomEvent("evmProviderAnnounced", { detail: provider })
+);
 ```
 
-A dapp library will be able to observe these events by listening with `window.addEventListener` to the `message` event:
+Additionally the Wallet providers will react to the event emitted by the Ethereum library.
 
 ```typescript
-window.addEventListener("message", (event: EVMProviderAddedEvent) => {});
+window.addEventListener("evmProviderRequested", () => {
+  window.dispatchEvent(
+    new CustomEvent("evmProviderAnnounced", { detail: provider })
+  );
+});
 ```
 
 ## Rationale
 
-Standardizing a `ProviderInfo` type allows determining the necessary information to populate a wallet selection popup. This is particularly useful for web3 onboarding libraries such as Web3Modal, RainbowKit, Web3Onboard, ConnectKit, etc.
-
-The name `evmproviders` was chosen to include all EIP-1193 providers that support any EVM chain.
+Regarding the interfaces, standardizing a `ProviderInfo` type allows determining the necessary information to populate a wallet selection popup. This is particularly useful for web3 onboarding libraries such as Web3Modal, RainbowKit, Web3Onboard, ConnectKit, etc.
 
 A locally unique identifier prevents from conflicts using the same globally unique identifier by using UUID v4.0
 
@@ -140,6 +142,10 @@ ipfs://QmZ8ify1Z3pSpJjRANKsWLDqZrJjjZJ9e7o65LheQ2pFqb
 https://ethereum.org/static/f541df14fca86543040c113725b5bd1a/99bcf/metamask.webp
 ```
 
+Regarding the event-based approach, previous proposal introduced mechanisms that relied on a single window object that could be overriden by multiple parties
+
+Therefore using an event-based approach we avoid these race conditions and potential attacks by making the communication available both ways.
+
 ## Backwards Compatibility
 
 This EIP doesn't require supplanting `window.ethereum`, so it doesn't directly break existing applications. However, the recommended behavior of eventually supplanting `window.ethereum` would break existing applications that rely on it.
@@ -151,40 +157,41 @@ This EIP doesn't require supplanting `window.ethereum`, so it doesn't directly b
 Here is a reference implementation for an injected script by a wallet provider to support this new interface in parallel with the existing pattern.
 
 ```typescript
-const info: ProviderInfo = {...}
-const ethereum: EIP1193Provider = {...}
-
-window.ethereum = ethereum
-
-if (!window.evmproviders) {
-  window.evmproviders = []
-}
-
-const provider = { info, ethereum }
-window.evmproviders.push(provider)
-window.postMessage({ eventName: "evmProviderAdded", provider})
-```
-
-### Dapp Library
-
-Here is a reference implementation for a dapp library to display and track multiple wallet providers that are injected by browser extensions.
-
-```typescript
-let providers = [];
-
 function onPageLoad() {
-  if (window.evmProviders) {
-    providers = window.evmProviders;
+  const ethereum: EIP1193Provider = {...}
+
+  window.ethereum = ethereum
+
+  function announceProvider() {
+    const info: ProviderInfo = {...}
+    const provider = { info, ethereum }
+    window.dispatchEvent(new CustomEvent("evmProviderAnnounced", { detail: provider }))
   }
 
-  window.addEventListener("message", (event) => {
-    if (
-      typeof event.data !== "string" &&
-      event.data.eventName === "evmProviderAdded"
-    ) {
-      providers.push(event.data.provider);
+  window.addEventListener("evmProviderRequested", (event: EVMProviderRequestedEvent) => {
+    announceProvider()
+  })
+
+  announceProvider()
+}
+```
+
+### Ethereum library
+
+Here is a reference implementation for a Ethereum library to display and track multiple wallet providers that are injected by browser extensions.
+
+```typescript
+function onPageLoad() {
+  const providers: EVMProvider[] = [];
+
+  window.addEventListener(
+    "evmProviderAnnounced",
+    (event: EVMProviderAnnouncedEvent) => {
+      providers.push(event.detail);
     }
-  });
+  );
+
+  window.dispatchEvent(new Event("evmProviderRequested"));
 }
 ```
 
