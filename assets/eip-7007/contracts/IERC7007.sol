@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @dev Required interface of an ERC7007 compliant contract.
+ * Note: the ERC-165 identifier for this interface is 0x7e52e423.
  */
 interface IERC7007 is IERC165, IERC721 {
     /**

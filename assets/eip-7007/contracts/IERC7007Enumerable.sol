@@ -5,6 +5,7 @@ import "./IERC7007.sol";
 
 /**
  * @title ERC7007 Token Standard, optional enumeration extension
+ * Note: the ERC-165 identifier for this interface is 0xfa1a557a.
  */
 interface IERC7007Enumerable is IERC7007 {
     /**
