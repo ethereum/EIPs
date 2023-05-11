@@ -2,11 +2,12 @@
 pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @dev Required interface of an ERC7007 compliant contract.
  */
-interface IERC7007 is IERC165 {
+interface IERC7007 is IERC165, IERC721 {
     /**
      * @dev Emitted when `tokenId` token is minted.
      */
