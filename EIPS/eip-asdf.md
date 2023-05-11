@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ## Rationale
 
 * The block gas limit is multiplied by fifty to compensate for the time between blocks being multiplied by fifty.
-* The per-block validator reward is also multiplied by 50 to copensate for the time between blocks being multiplied by fifty.
+* The per-block validator reward is also multiplied by fifty to compensate for the time between blocks being multiplied by fifty.
 * Epochs are changed to be 2 blocks long so that finality can be reached in a reasonable amount of time.
 
 ## Backwards Compatibility
