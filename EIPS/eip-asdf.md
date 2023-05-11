@@ -1,6 +1,6 @@
 ---
 title: To The Moon—10 Minute Blocks
-description: Makes a minimal number of changes that allow Ethereum to be used on the moon
+description: Increases the block time to facilitate finality over cosmic distances
 author: Pandapip1 (@Pandapip1)
 discussions-to: https://ethereum-magicians.org/t/ethereum-to-the-moon/13633
 status: Draft
