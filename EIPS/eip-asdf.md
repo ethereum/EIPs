@@ -15,7 +15,7 @@ This EIP makes a minimal number of changes to allow Ethereum to be used on the m
 
 ## Motivation
 
-It is impossible for Ethereum to literally "go to the moon" due to a limitation in the protocol: the block length. Should validators attempt to validate on the surface of the moon, they would find that the ~1.25 second communication delay (caused by the speed of light) might cause issues with synchronization, considering the 12-second timer between blocks. The validators would eventually be ejected on the terrestrial chain after leaking. If however a substantial number of validators are displaced (think 1/3), they might follow their own fork and would eventually eject the terrestrial to finalize their own chain.
+It is impossible for today's Ethereum to literally "go to the moon" due to a limitation in the protocol: the block length. Should validators attempt to validate on the surface of the moon, they would find that the ~1.25 second communication delay (caused by the speed of light) might cause issues with synchronization, considering the 12-second timer between blocks. The validators would eventually be ejected on the terrestrial chain after leaking. If however a substantial number of validators are displaced (think 1/3), they might follow their own fork and would eventually eject the terrestrial to finalize their own chain.
 
 ## Specification
 
