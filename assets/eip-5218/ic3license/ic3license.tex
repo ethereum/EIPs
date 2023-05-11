@@ -5,14 +5,13 @@
 \usepackage{authblk}
 
 \title{The \iccclicense\\}
-\author{James Grimmelmann}
-\affil{Cornell Tech and Cornell Law School\\Institute for Cryptocurrencies and Contracts}
-\date{DISCUSSION DRAFT 3\\\today}
+\author{The Institute for Cryptocurrencies and Contracts (IC3) \and The Coalition of Automated Legal Applications (COALA)}
+\date{Version 1.0\\\today}
 
 \usepackage{xspace}
 
 \newcommand{\eiplicense}{EIP-5218\xspace}
-\newcommand{\iccclicense}{IC3 NFT License\xspace}
+\newcommand{\iccclicense}{Token-Bound NFT License\xspace}
 
 \newcommand{\keyword}[1]{\textbf{#1}\xspace}
 
@@ -24,8 +23,8 @@
 
 \newcommand{\noderivative}{\keyword{No-Derivatives}}
 \newcommand{\derivative}{\keyword{Derivatives}}
-\newcommand{\sharealike}{\keyword{Share-Alike}}
-\newcommand{\derivativetracking}{\keyword{Derivative-Tracking}}
+\newcommand{\derivativetracking}{\keyword{Derivatives-NFT}}
+\newcommand{\sharealike}{\keyword{Derivatives-NFT-Share-Alike}}
 
 \newcommand{\ledger}{\keyword{Ledger-Authoritative}}
 \newcommand{\legal}{\keyword{Legal-Authoritative}}
@@ -62,13 +61,15 @@ The \iccclicense is a copyright license specifically designed for use with NFTs.
 The \iccclicense has four optional features that a licensor can use or not when choosing a license:
 \begin{itemize}
 \item The license can be \commercial (C) or \noncommercial (NC). A \commercial license allows the user to make money from merchandise and other uses of the work; a \noncommercial license does not.
-\item The license can be \derivative (D), \derivativetracking (DT), \sharealike (SA), or \noderivative (ND). A \derivative license allows the user to make derivative works and adaptations (like remixes and videos) without restriction. A \derivativetracking license allows derivative works but requires them to be registered and tracked as NFTs themselves. A \sharealike license is like \derivativetracking but also requires that the derivative works be relicensed under the same license. And a \noderivative license prohibits derivative works entirely. (These options are ordered from least restrictive to most restrictive.)
+\item The license can be \derivative (D), \derivativetracking (DT), \sharealike (DTSA), or \noderivative (ND). A \derivative license allows the user to make derivative works and adaptations (like remixes and videos) without restriction. A \derivativetracking license allows derivative works but requires them to be registered and tracked as NFTs themselves. A \sharealike license is like \derivativetracking but also requires that the derivative works be relicensed under the same license. And a \noderivative license prohibits derivative works entirely. (These options are ordered from least restrictive to most restrictive.)
 \item The license can be \publiclicense (PL) or \nopubliclicense (NPL). A \publiclicense license, in addition to the specific rights granted to the user, grants to the public a broad copyright license to reproduce the work (but not to make derivative works). A \nopubliclicense license grants only the specific rights to the user.
-\item The license can be \ledger (Ledger) or \legal (Legal). A \ledger license means that the current state of the blockchain ledger is always authoritative for who owns the NFT and has rights under the license, even if the NFT is stolen or transferred by mistake. A \legal license gives the courts flexibility to correct ownership of the license in clear cases of theft and fraud.
+\item The license can be \ledger (Ledger) or \legal (Legal). A \ledger license means that the current state of the blockchain ledger is always authoritative for who owns the NFT and has rights under the license, even if the NFT is stolen or transferred by mistake. A \legal license gives the courts flexibility to correct ownership of the license in clear cases of theft and fraud. 
 \end{itemize}
-All four options are independent, so that they can be set for a choice of thirty-two total licenses, e.g. NC-D-NPL-Ledger means the license version that allows only Non-Commercial uses, allows Deriviative works, includes No Public License, and makes the Ledger authoritative for the state of the license. Once an \iccclicense has been used on an NFT, that license stays with it. The licensor should not in general expect to be able to revoke the license or choose a different one.
+All four options are independent, so that they can be set for a choice of thirty-two total licenses, e.g. NC-D-NPL-Ledger means the license version that allows only Non-Commercial uses, allows Derivative works, includes No Public License, and makes the Ledger authoritative for the state of the license. Once an \iccclicense has been used on an NFT, that license stays with it. The licensor should not expect to be able to choose a different license after the initial release.
 
-The rest of this document describes the design choices of the \iccclicense. Appendix \ref{sec:human} provides a short human-readable summary of the license terms. Appendix \ref{sec:text} contains the actual text of the license family; 
+The simplest combination of license options is C-D-NPL-Ledger, which provides a straightforward license that gives the current owner of the NFT (as defined by the blockchain) full rights over the associated work. This is the default \iccclicense; the other license options can be thought of as variations on it.
+
+The rest of this document describes the design choices of the \iccclicense. Appendix \ref{sec:human} provides a short human-readable summary of the license terms. Appendix \ref{sec:text} contains the actual text of the license family.
 
 
 \section{Design Goals}
@@ -83,22 +84,22 @@ The \iccclicense has been specifically designed to work with blockchain-based NF
 \end{enumerate}
 This system can be widely distributed (like a public blockchain), moderately distributed (like a private blockchain), or fully centralized (like a database with a single administrator). Use of the \iccclicense for other kinds of licensing is strongly discouraged.
 
-The \iccclicense has also been specifically designed to work with NFTs that implement the interface defined in \eiplicense. This is a general smart contract interface that provides modular support for common features in copyright licensing, including transfer, sublicensing, and revocation. The \iccclicense can also be used with NFTs that implement the generic NFT interface defined in EIP-721, or with other NFTs, but the \eiplicense interface is recommended to reduce ambiguity about when there has been a transfer, sublicense, or revocation.
+The \iccclicense has also been specifically designed to work with NFTs that implement the interface defined in \eiplicense. This is a general smart-contract interface that provides modular support for common features in copyright licensing, including transfer, sublicensing, and revocation. The \iccclicense can also be used with NFTs that implement the generic NFT interface defined in EIP-721, or with other NFTs, but the \eiplicense interface is recommended to reduce ambiguity about when there has been a transfer, sublicense, or revocation.
 
 
 \section{Taking Effect}
 
-The \iccclicense is structured as a license, rather than a contract. The licensor unilaterally grants a copyright license to the current owner of the NFT. The owner does not need to do anything to accept the license; they receive it automatically. If the owner transfers the NFT to someone else, the license transfers with them. The previous owner is no longer licensed; the new owner receives a license on exactly the same terms. This too is automatic, the new owner does not need to do anything to accept the license.
+The \iccclicense is structured as a license, rather than a contract. The licensor unilaterally grants a copyright license to the current owner of the NFT. The owner does not need to do anything to accept the license; they receive it automatically. If the owner transfers the NFT to someone else, the license transfers with it. The old owner is no longer licensed; the new owner receives a license on exactly the same terms. This too is automatic, the new owner does not need to do anything to accept the license.
 
 Standard techniques used by lawyers to create binding terms of use for websites do not work for NFTs on blockchains. Consider the clickthrough agreements used by websites: when you create an account, you must check a box indicating that you agree to the website's terms of use. This works because you have taken an action (checking the box) that is clearly and specifically linked to the legal terms and nothing else. There is no question about whether you meant to agree when you checked the box, because there is no other reason to check the box. 
 
-But a blockchain does not have a checkbox or even a website. Someone who receives an EIP-721 NFT need not have done anything at all. They may never have visited the NFT sponsor's website, or even know about this. An NFT could  migrate from one resale platform to another; someone who has agreed to one platform's terms need not have agreed to the other's. This means that any promises by the \emph{licensee} in a license contract are illusory. The licensor has no guarantee that a downstream NFT owner has actually agreed to the license terms. Thus, the \iccclicense does not give the licensee any duties, so there is no need for them to agree to anything.
+But a blockchain does not have a checkbox or even a website. Someone who receives an EIP-721 NFT need not have done anything at all. They may never have visited the NFT sponsor's website, or even know that there is a website. An NFT could migrate from one resale platform to another; someone who has agreed to one platform's terms might not have agreed to the other's. This means that any promises by the \emph{licensee} in an NFT license contract are illusory. The licensor has no guarantee that a downstream NFT owner has actually agreed to the license terms. Thus, the \iccclicense does not give the licensee any duties, so there is no need for them to agree to anything.
 
 On the other hand, the \iccclicense does attempt to ensure that the \emph{licensor} has clearly indicated their intent to be bound by the license terms. It does so by saying that the license becomes effective when the licensor ``Invokes'' it through a ``Licensing Process,'' i.e., uses a technical process to connect an NFT with the \iccclicense. This definition includes (but is not limited to) the \eiplicense interface. 
 
 The essential idea of \eiplicense  is to make it explicit when a licensor intends to create a copyright license. This signal is clearest when the licensor takes an act that (a) says that it creates a license, and (b) does not do anything else. Signing a licensing contract on paper meets this test, because the paper says that it creates a license and the only reason to sign it is to create the license. \eiplicense is intended to be a smart-contract version of that piece of paper. 
 
-The \iccclicense can be used with any smart contract or other technical process that meets the definition of a Licensing Process. It is not intended to be used on a website or other off-chain setting where the on-chain transactions do not link out to the license. It is not recommended to use the \iccclicense as part of a larger multi-step architecture unless there is some individual step in the system that meets the definition of a Licensing Process where the licensor clearly indicates their intent to create a license.
+The \iccclicense can be used with any smart contract or other technical process that meets the definition of a Licensing Process. It is not intended to be used on a website or in other off-chain settings where on-chain transactions do not link out to the license. It is not recommended to use the \iccclicense as part of a larger multi-step architecture unless there is some individual step in the system that meets the definition of a Licensing Process in which the licensor clearly indicates their intent to create a license.
 
 
 \section{License Terms}
@@ -114,36 +115,38 @@ The license grant is non-exclusive. It is not currently possible to guarantee th
 Drawing on the success of the Creative Commons license suite, the \iccclicense can be customized in four ways: 
 \begin{enumerate}
 \item To be either \commercial or \noncommercial.
-\item To allow \derivative works, to allow them but require that they be \derivativetracking on chain, to allow them but require that they be relicensed under \sharealike terms, or to specify that \noderivative works at all. 
+\item To allow \derivative works, to allow them but require that they be \derivativetracking on chain, to allow them but require that they be relicensed under \sharealike terms, or to specify that \noderivative works are allowed at all. 
 \item To grant a \publiclicense to members of the public besides the NFT owner, or to grant \nopubliclicense.
 \item To track ownership of the NFT entirely on-chain (\ledger) or to follow the legal system's rules on ownership (\legal). (This option is discussed in section~\ref{sec:trans}.)
 \end{enumerate} 
-These four options can be set independently, for a total of 32 license variations.
+These four options can be set independently, for a total of 32 theoertically possible license variations. However, it does not generally make sense to use both \noderivative and \publiclicense options, because then the NFT owner doesn't receive any useful rights beyond what everyone receives under the public license grant.
 
-Regardless of which license options are used, all versions of the \iccclicense include two specific uses that are always allowed. First, the material can be used to sell the NFT, e.g. on an online NFT marketplace listing. This is an essential part of truth in advertising; someone considering buying the NFT typically needs to be able to see what creative work they will actually be getting. A similar clause is present in many other NFT licenses, although we have attempted to generalize it so that it is less tied to the specifics of how any particular NFT marketplace works. Second, the \iccclicense generally allows free use of the material to identify the NFT owner publicly, e.g. in a Twitter profile hexagon. This too is widespread in the NFT community and widely allowed by other NFT licenses.
+Regardless of which license options are used, all versions of the \iccclicense include two specific uses that are always allowed. First, the material can be used to sell the NFT, e.g. on an online NFT marketplace listing. This is an essential part of truth in advertising; someone considering buying the NFT typically needs to be able to see what creative work they will actually be getting. A similar clause is present in many other NFT licenses, although we have attempted to generalize it so that it is less tied to the specifics of how any particular NFT marketplace works. Second, the \iccclicense generally allows free use of the material to identify the NFT owner publicly, e.g. in a social-media profile. This too is widespread in the NFT community and widely allowed by other NFT licenses.
 
 
 \subsection{Commercial Uses}
 
-If the license is \noncommercial, it excludes any uses directed to ``commercial advantage or monetary compensation,'' which includes any cases in which people are required to pay to get a copy of the work.  The definition of the \noncommercial license option specifically \emph{allows} the sale of the NFT itself. The resale of NFTs, like the resale of unique works of fine art, is a recognized and important use case. What the NonCommercial license option prohibits is the commercialization of the work by making and selling \emph{other} copies of the work, such as selling posters of an image attached to an NFT, or creating a video series based on a character depicted in a work associated with an NFT.
+If the license is \noncommercial, it excludes any uses directed to ``commercial advantage or monetary compensation,'' which includes any cases in which people are required to pay to get a copy of the work.  The definition of the \noncommercial license option specifically \emph{allows} the sale of the NFT itself. The resale of NFTs, like the resale of unique works of fine art, is a recognized and important use case. What the \noncommercial license option prohibits is the commercialization of the work by making and selling \emph{other} copies of the work, such as selling posters of an image attached to an NFT, or creating a video series based on a character depicted in a work associated with an NFT.
 
-Whether the license is \commercial or \noncommercial, no royalties are required. Under the \commercial license option, the NFT owner is allowed to keep all of their revenues from commercializing the work. Under the \noncommercial license option, such commercialization is not allowed at all, and constitutes a breach of the license allowing the licensor to sue for infringement. Royalties pose complicated computation and drafting problems, which we have not attempted to solve in the current draft. If a platform charges a fee for an NFT listing or sale, this is neither required nor prohibited by the \iccclicense; it is an issue between the NFT owner and the platform, not between the NFT owner and the licensor.  
+Whether the license is \commercial or \noncommercial, no royalties are required. Under the \commercial license option, the NFT owner is allowed to keep all of their revenues from commercializing the work. Under the \noncommercial license option, such commercialization is not allowed at all, and constitutes a breach of the license allowing the licensor to sue for infringement. Royalties pose complicated computation and drafting problems, which we have not attempted to solve. If a platform charges a fee for an NFT listing or sale, this is neither required nor prohibited by the \iccclicense; it is an issue between the NFT owner and the platform, not between the NFT owner and the licensor.  
 
-Similarly, if the NFT owner sells the NFT, this is not an event that entitles the NFT owner to any royalties under this license.  This does not prevent the \iccclicense from being used with a smart contract that requires royalty payments. We merely have not attempted to make payment of royalties part of the copyright license. For example, a smart contract could tie invocation of NFT transfer functions to payment of required royalties. (But see EIP-2981 (NFT Royalty Standard) for discussion of the reasons why such requirements may not  be effective in practice.) 
+Similarly, if the NFT owner sells the NFT, this is not an event that entitles the NFT owner to any royalties under this license.  This does not prevent the \iccclicense from being used with a smart contract that requires royalty payments. We merely have not attempted to make payment of royalties part of the copyright license. For example, a smart contract could tie invocation of NFT transfer functions to payment of required royalties. (But see \href{https://eips.ethereum.org/EIPS/eip-2981}{EIP-2981} (NFT Royalty Standard) for discussion of the reasons why such requirements may not  be effective in practice.) 
 
 \subsection{Derivative Works}
 
 If the licensor chooses to allow derivative works with \derivative, \derivativetracking, or \sharealike, the license grant also allows the NFT owner to use ``Adapted Material,'' which uses language from the Creative Commons license suite to define what counts as a derivative work. To reflect the customs of the NFT community, we added language to make clear that simply reproducing the work in a different medium -- e.g., printing T-shirts of a JPEG -- doesn't count as making a derivative work. Only new projects -- such as modifying artwork, remixing a song, or making a TV series based on a character -- are derivative works.
 
-When the license requires \derivativetracking or \sharealike, the grant of permission to make derivative works is conditional on using the same technical mechanism (an ``NFT Generator'') that created the NFT to also create an NFT for the derivative work. These two options implement a \emph{technical} compatibility condition, one that aims to keep derivative works on the same technical standard as the NFT itself. The license is platform-agnostic, so it can be used with different smart contracts, different blockchains, and even non-blockchain systems. The point is simply that when one of these license options is selected, the derivative-work NFTs will live in the same ecosystem used for the NFT.
+The options to enable derivative works are cumulative: \derivative enables the creation of derivative works in all circumstances, \derivativetracking includes the derivative conditions, and introduces additional requirements concerning the technical properties of the NFT associated with the derivative work; and \sharealike includes all of the above conditions, and introduces an additional requirement concerning the legal licensing terms of the derivative work.
 
-When the license requires \sharealike, the requirement of using the same technical mechanism is supplemented with the further requirement that the derivative-work NFT be licensed using the same license. This is a \emph{legal} compatibility condition; it closely corresponds to the Share-Alike license option in the Creative Commons license suite. Note that \sharealike implies \derivativetracking. In the context of NFTs, the point of a Share-Alike license could be defeated by tying the license to an derivative-work NFT whose technical implementation departed too significantly from the implementation of the underlying NFT. Rather than try to prohibit the use of what the Creative Commons suite calls ``Effective Technical Measures'' and take on the difficult task of defining them in the context of NFTs, we have chosen simply to require use of the same implementation for the derivative-work NFT, on the theory that the original NFT creator can choose an appropriate implementation at the time of minting.
+When the license requires \derivativetracking, the grant of permission to make derivative works is conditional on creating an NFT for the derivative work that (1) subsists on the same ledger as the original NFT; (2) has materially the same properties and functionality as the original NFT; (3) causes the derivative NFT to reference the original NFT in such a way as to ensure that for each NFT, it is technically straightforward to identify all of its derivative NFTs. This option implements a \emph{technical} compatibility condition, one that aims to keep derivative works on the \emph{same technical standard} and on the \emph{same ledger} as the original NFT. 
+
+When the license requires Share-Alike, the requirement of using the same technical mechanism (as prescribed by \derivativetracking) is supplemented with the further requirement that the derivative work be licensed using the same licensing terms. This is a \emph{legal compatibility} condition; it closely corresponds to the Share-Alike license option in the Creative Commons license suite. Note that \sharealike implies \derivativetracking because in the context of NFTs, the point of a Share-Alike license could be defeated by tying the license to a derivative-work NFT whose technical implementation departed too significantly from the implementation of the underlying NFT. This means that not only must the NFT associated with the derivative work implement the same technical standards, but it must also adopt the same properties and parameters as the original-work NFT in order to comply with the terms of the legal license.
 
 \subsection{Public Licenses}
 
 One common use case for NFTs is to reserve a few privileges for the NFT owner while giving the public a license to use the creative work associated with the NFT. This could be accomplished through dual licensing, in which the creator explicitly uses one license for the NFT owner and another for the public. But this approach is unsatisfactory; dual licensing gives up some of the convenience and clarity of having all of the relevant license terms clearly located in one place. Nor is it appropriate to include a public license in every version of the NFT license. The public-license model for NFTs is not universal; many NFTs give rights in the creative work only to the NFT owner.
 
-Thus, the IC3 NFT License includes a public license as a license option. When \publiclicense is selected, the license grants described above, which give specific broad rights to the NFT owner, are accompanied by a public license grant (specifically, a Creative Commons Attribution-NoDerivatives license) that gives the public the right to use the work, but not to make derivative works.
+Thus, the \iccclicense includes a public license as a license option. When \publiclicense is selected, the license grants described above, which give specific broad rights to the NFT owner, are accompanied by a public license grant (specifically, a Creative Commons Attribution-NoDerivatives license) that gives the public the right to use the work, but not to make derivative works.
 
 
 
@@ -162,7 +165,7 @@ This is an irreconcilable difference of views about how ledgers ought to operate
  
 To keep the distinction clear, the license uses the term ``Controller'' for the person who has control of an NFT via a private key, and ``Owner'' for the person who is legally entitled to the license. The \ledger option is implemented by defining the Owner to be the Controller (so the two concepts are the same), and the \legal option by defining the Owner to be the ``person or entity who is legally entitled to be its Controller.'' (In theory, it would be possible for a license to fine-tune the circumstances under which it does and does not transfer by stating its own rules, but at the cost of decreased compatibility with both the blockchain and with the legal system. The \iccclicense does not attempt this task.)
 
-The licensor may optionally provide a ``Grace Period'' as part of the smart contract for the NFT. If present, it allows a NFT owner to continue using the work (but not to create new derivatives of it) for a period of time following the transfer of the NFT. The Grace Period is defined in terms of a ``Grace Period Process,'' e.g. a smart-contract method that indicates whether the grace period has expired or no. In our view, this is the most general solution to the question of how long a grace period should be, if any. The licensor is not locked in to any particular choice, and putting this function in the smart-contract logic avoids any difficulties translating human-readable terms like ``two days'' into computation-friendly form.
+The licensor may optionally provide a ``Grace Period'' as part of the smart contract for the NFT. If present, it allows a NFT owner to continue using the work (but not to create new derivatives of it) for a period of time following the transfer of the NFT. The Grace Period is defined in terms of a ``Grace Period Process,'' e.g. a smart-contract method that indicates whether the grace period has expired or not. In our view, this is the most general solution to the question of how long a grace period should be, if any. The licensor is not locked in to any particular choice, and putting this function in the smart-contract logic avoids any difficulties translating human-readable terms like ``two days'' into computation-friendly form.
 
 \section{Revocation}
 
@@ -170,10 +173,10 @@ The \iccclicense can be revoked, but it does not define the conditions of revoca
 
 The reasoning for this design choice can be illustrated by considering the \eiplicense interface, which defines a generic \code{revokeLicense()} method that can be called by a \code{\_revoker} address designated by the creator of the license. Thus, the following are all possible:
 \begin{itemize}
-\item The \code{\_revoker} is the licensor. The license can be freely revoked at any time.
+\item The \code{\_revoker} is the licensor. The license can only be revoked with the consent of the licensor.
 \item The \code{\_revoker} is the licensee. The license can only be revoked with the consent of the licensee.
 \item The \code{\_revoker} is the zero address. The license is irrevocable.
-\item The \code{\_revoker} is a smart contract which can be invoked to call the \eiplicense \code{revokeLicense()} method after the passage of 30 days from the time the license is issued. The license is for a limited time.
+\item The \code{\_revoker} is a smart contract which can be invoked by anyone to call the \eiplicense \code{revokeLicense()} method after the passage of 30 days from the time the license is issued. The license is for a limited time.
 \item The \code{\_revoker} is a smart contract which can be invoked to call the \eiplicense \code{revokeLicense()} method upon the payment of a specified amount to the licensee. The licensor has an option to buy out the licensee.
 \end{itemize}
 In other words, the \eiplicense is completely generic in supporting arbitrary licensing logic, and because the \iccclicense defers to the Licensing Process (e.g., smart contract), it is also completely generic. Once again, the license is designed to work with the \eiplicense interface, but it is drafted so that any technical process serving the same function can be used instead.
@@ -182,7 +185,7 @@ In other words, the \eiplicense is completely generic in supporting arbitrary li
 
 The \iccclicense takes a similarly broad and deferential attitude toward sublicensing. In practice, sublicensing is likely to be particularly useful in two scenarios. First, the owner may wish to contract with others to produce goods embodying the work, like T-shirts or song downloads. Here, a sublicense is practically necessary in a world where people don't personally print T-shirts and host downloads, but instead hire professionals to do it for them. Second, sublicensing is necessary for many derivative works: producing an animated video series, for example, will require a sublicense to a production company. Thus, the license generally allows for the free sublicensing of any of the rights held by the NFT owner.
 
-The \iccclicense does not attempt to enforce the requirement that a sublicense be compatible with the license it is issued under. The sublicense need not be the \iccclicense; indeed, it usually will not be. It is up to the sublicensor to choose license terms that are appropriate and are within the scope of their own license. What the \eiplicense standard can do is ensure that a party checking the licensing status of an NFT can see all of the licenses and sublicenses in force. But in general, the sublicenses may be arbitrary human-readable documents, rather than standardized machine-readable ones; it is up to the human reading them to understand their terms. (Future versions of the \iccclicense and technical standards may fill in more sublicensing options and provide technical mechanisms to describe them; we have not attempted to solve these problems here and now.)
+The \iccclicense does not attempt to enforce the requirement that a sublicense be compatible with the license it is issued under. The sublicense need not be the \iccclicense; indeed, it usually will not be. It is up to the sublicensor to choose license terms that are appropriate and are within the scope of their own license. What the \eiplicense standard can do is ensure that a party checking the licensing status of an NFT can see all of the licenses and sublicenses in force. But in general, the sublicenses may be arbitrary human-readable documents, rather than standardized machine-readable ones; it is up to the human reading them to understand their terms. (Future licenses and technical standards may fill in more sublicensing options and provide technical mechanisms to describe them; we have not attempted to solve these problems here and now.)
 
 As with revocation, the \iccclicense allows for a sublicense to be recorded on the blockchain, and as with revocation, these sublicenses are specifically supported by the \eiplicense interface. Again, the support is generic; the sublicense must include a link to its terms, and the \eiplicense interface does not attempt to verify that the sublicense's terms are compatible with the license's terms. Indeed, the license does not require that all sublicenses be explicitly recorded in the smart contract; for a T-shirt vendor or a web host, this is overkill. 
 
@@ -192,29 +195,31 @@ Instead, the advantage of recording a sublicense on the blockchain is that it ma
 
 \section{Boilerplate}
 
-The \iccclicense includes a section advising courts on how to interpret it in the event of a dispute. Although the license itself does not force the copyright license to keep in sync with ownership on the blockchain, it advises courts that maintaining the reliability of blockchain records is an important goal, encouraging them to pick interpretations that make the blockchain a useful and authoritative source for understanding the status of a copyright license. In addition, the interpretation clause encourages courts to promote other common legal policies, such as fairness, uniformity, and predictability.
+The \iccclicense includes a section advising courts on how to interpret it in the event of a dispute. Although the license itself does not always force the copyright license to keep in sync with ownership on the blockchain, it advises courts that maintaining the reliability of blockchain records is an important goal, encouraging them to pick interpretations that make the blockchain a useful and authoritative source for understanding the status of a copyright license. In addition, the interpretation clause encourages courts to promote other common legal policies, such as fairness, uniformity, and predictability.
 
-The severability clause and the disclaimer of warranties and limitation of liability are based on the text of the Creative Commons license suite. These licenses are also intended to create licenses in members of the public (including people who may be unknown to the licensor), so their use cases are broadly similar. Several other clauses and definitions, including disclaimer at the start of the license text, are also adapted from language used in the Creative Commons licenses.
+The severability clause and the disclaimer of warranties and limitation of liability are based on the text of the Creative Commons license suite. These licenses are also intended to create licenses in members of the public (including people who may be unknown to the licensor), so their use cases are broadly similar. Several other clauses and definitions, including the disclaimer at the start of the license text, are also adapted from language used in the Creative Commons licenses.
 
 \appendix
 
 \section{Human-Readable Summary}
 \label{sec:human}
 
-This is a human-readable summary of the IC3 NFT [\derivative{} | \noderivative{}] [\commercial{} | \noncommercial{}] [\ledger{} | \legal{}] License. It is not a substitute for the license, and you should carefully review the license to understand its terms and how they may apply to you.
+This is a human-readable summary of the Token-Bound NFT [\commercial{} | \noncommercial{}] [\derivative{} | \derivativetracking{} | \sharealike{} | \noderivative{}]  [\publiclicense{} | \nopubliclicense{}] [\ledger{} | \legal{}] License. It is not a substitute for the license, and you should carefully review the license to understand its terms and how they may apply to you.
 
 This license gives you the following rights to use a creative work associated with an NFT on a ledger (such as a blockchain): 
 
 \begin{itemize}
 \item \textbf{Use and Share}: You can make copies of the work, use them personally, and share them with others \iflicenseoption{\noncommercial}{, but not for commercial purposes}.
-\item \ifnotlicenseoption{\noderivative}{\textbf{Derivatives}: you can make new works that include and build on the work, use them, and share them with others \iflicenseoption{\noncommercial}{, but not for commercial purposes} \iflicenseoption{\derivativetracking}{, provided that you also release them as NFTs} \iflicenseoption{\sharealike}{, provided that you also release them as NFTs under the same license}.}
+\item \ifnotlicenseoption{\noderivative}{\textbf{Derivatives}: you can make new works that include and build on the work, use them, and share them with others \iflicenseoption{\noncommercial}{, but not for commercial purposes} \iflicenseoption{\derivativetracking}{, provided that you also release them as NFTs using the same technical standard and on the same ledger as the original NFT \iflicenseoption{\sharealike}{under the same license}}.}
 \item \textbf{Ownership}: You can use the work to show that you own the NFT.
 \item \textbf{Sale}: If you sell the NFT, you can use the work to show people what the NFT is.
 \end{itemize}
 
 You have these rights as long as you own the NFT, but when you sell or transfer the NFT, your rights will end and the new owner will have these rights instead. \iflicenseoption{\ledger}{For purposes of this license, the owner of the NFT is whoever the ledger says owns it. This means that if the NFT is stolen, your rights under this license will pass to the new owner.} \iflicenseoption{\legal}{For purposes of this license, the owner of the NFT is whoever the legal system says owns it. This means that if the NFT is stolen, you will retain your rights under this license.}
 
-Your rights to the work are not guaranteed to be exclusive. The copyright owner who made an NFT of the work may have the right to allow others to use the work, as well.
+Your rights to the work are not guaranteed to be exclusive. The copyright owner who made an NFT of the work may have the right to allow others to use the work, as well. 
+
+\iflicenseoption{\publiclicense}{In addition, the copyright owner has given everyone the right to use and share the work, regardless of whether they own the NFT.}
 
 This license terminates if the technical process that created it says that it has been terminated. You should check that process to see whether the license is still in effect and how it can be terminated. If this license does terminate, your rights under it will end, and you must stop using the work.
 
@@ -224,7 +229,7 @@ This license terminates if the technical process that created it says that it ha
 
 \begin{sffamily} 
  
-\emph{The Initiative for Cryptocurrencies and Contracts (IC3) is not a law firm and does not provide legal services or legal advice. Publication of the text of the \iccclicense does not create a lawyer-client or other relationship. IC3 makes this text and related information available on an “as-is” basis. IC3 gives no warranties regarding this license, any material licensed under its terms and conditions, or any related information. IC3 disclaims all liability for damages resulting from their use to the fullest extent possible.}\\\\
+\emph{The Initiative for Cryptocurrencies and Contracts (IC3) and Coalition of Automated Legal Applications (COALA) are not law firms and do not provide legal services or legal advice. Publication of the text of the \iccclicense does not create a lawyer-client or other relationship. IC3 and COALA make this text and related information available on an ``as-is'' basis. IC3 and COALA give no warranties regarding this license, any material licensed under its terms and conditions, or any related information. IC3 and COALA disclaim all liability for damages resulting from their use to the fullest extent possible.}\\\\
 The \iccclicense (the ``License'') grants you certain intellectual property rights with respect to Licensed Material associated with an NFT. When you acquire the NFT, you own the personal property rights to the token underlying the NFT (e.g., the right to freely sell, transfer, or otherwise dispose of that  NFT), but you do not own the associated Licensed Material. Instead, the Licensor grants you a specified limited license to use the Licensed Material, as set forth below:
 
 \sect{Definitions}
@@ -237,15 +242,13 @@ The \iccclicense (the ``License'') grants you certain intellectual property righ
 		
 	\item	A ``Ledger'' is a blockchain, database, or other digital system that records information about Unique Identifiers.
 		
-	\item	An ``NFT'' is a Unique Identifier in a Ledger.
+	\item	An ``NFT'' is a Unique Identifier recorded in a Ledger.
 		
 	\item	A ``Private Key'' is a cryptographic key, the use of which is necessary to modify the information about a Unique Identifier recorded in a Ledger.
 		
 	\item An NFT  is ``Associated'' with a person or entity when that person or entity has substantially exclusive control over the Private Key necessary to modify the information about that Unique Identifier in that Ledger.
 		
 	\item The ``Controller'' of an NFT is the person or entity with whom the NFT is Associated.
-	
-	\item An ``NFT Generator'' is a smart contract, function, or other service that creates NFTs in a Ledger.
 
 	\end{itemize}
 
@@ -298,9 +301,9 @@ The \iccclicense (the ``License'') grants you certain intellectual property righ
 
 	\item	An NFT is ``Sublicensed'' when the NFT indicates that it has been sublicensed by means of a Licensing Process.
 
-	\item 	\iflicenseoption{\derivativetracking}{Adapted Material is ``Derivative Tracked'' from an NFT (the ``Parent NFT'') when the Parent NFT is Sublicensed by means of a Licensing Process that (1) creates another NFT (the ``Child NFT'') by means of the same NFT Generator that created the Parent NFT, (2) causes the Child NFT to be Linked to Adapted Material, and (3) causes the Child NFT and Parent NFT to have materially the same properties and functionality, except for the identity of the parties they are Associated with and the identity of the material they are Linked to.}
+	\item 	\iflicenseoption{\derivativetracking}{Adapted Material is ``Derivative Tracked'' from an NFT (the ``Parent NFT'') when the Parent NFT is Sublicensed by means of a Licensing Process that (1) creates another NFT (the ``Child NFT'') on the same Ledger as the Parent NFT, (2) causes the Child NFT to be Linked to Adapted Material, and (3) causes the Child NFT and Parent NFT to have materially the same properties and functionality, except for the identity of the parties they are Associated with and the identity of the material they are Linked to.}
 
-	\item 	\iflicenseoption{\sharealike}{Adapted Material is ``Share-Alike Sublicensed'' from an NFT (the ``Parent NFT'') when the Parent NFT is Sublicensed by means of a Licensing Process that (1) creates another NFT (the ``Child NFT'') by means of the same NFT Generator that created the Parent NFT, (2) causes the Child NFT to be Linked to Adapted Material, (3) causes the Child NFT and Parent NFT to have materially the same properties and functionality, except for the identity of the parties they are Associated with and the identity of the material they are Linked to, and (4)causes the Child NFT to Invoke this license.}
+	\item 	\iflicenseoption{\sharealike}{Adapted Material is ``Share-Alike Sublicensed'' from an NFT (the ``Parent NFT'') when the Parent NFT is Sublicensed by means of a Licensing Process that (1) creates another NFT (the ``Child NFT'') on the same Ledger as the Parent NFT, (2) causes the Child NFT to be Linked to Adapted Material, (3) causes the Child NFT and Parent NFT to have materially the same properties and functionality, except for the identity of the parties they are Associated with and the identity of the material they are Linked to, and (4) causes the Child NFT to Invoke this license.}
 
 	\item	To ``Transfer'' an NFT is to change, modify, or update the Ledger such that the identity of the Owner of that NFT changes, by any legally sufficient means, including sale, barter, gift, bequest, or operation of law. 
 		
@@ -326,11 +329,11 @@ Subject to the terms and conditions of this License, and on the condition that Y
 \end{itemize}
 This License becomes effective when the Licensor causes the License NFT to Invoke it. Because this is a unilateral license grant and not a contract, Your assent is not required for it to become effective. \iflicenseoption{\publiclicense}{This license grant is in addition to any rights granted to You as a member of the public under the terms of the Public License Grant above.}
 
-All rights granted under this License last for the full duration of the Licensor's Licensed Rights, except that if the License NFT Revokes this License, Your rights under this license grant will terminate, along with all sublicenses granted hereunder. 
+All rights granted under this License last for the full duration of the Licensor's Licensed Rights, except that if the License NFT Revokes this License, Your rights under this license grant will terminate, as will all sublicenses granted hereunder.
 
-This license grant is non-transferable. If the License NFT is Transferred such that You are no longer the Owner, Your rights under this license grant will terminate. Notwithstanding the previous sentence, if the Licensing Process contains a Grace Period Process, You may continue to Use the Licensed Material and any already-existing Adapted Material under the terms of the license grant above during the Grace Period, but You may not Create or Use new Adapted Material or grant new sublicenses during the Grace Period.
+This license grant is non-transferable. If the License NFT is Transferred such that You are no longer the Owner, Your rights under this license grant will terminate. Notwithstanding the previous sentence, if the Licensing Process contains a Grace Period Process, You may continue to Use the Licensed Material and any already-existing Adapted Material under the terms of the license grant above during the Grace Period, but You may not Create or Use new Adapted Material, grant new sublicenses, or Use the Licensed Material to identify yourself as the owner of the License NFT.
 
-If the License NFT is Transferred, any sublicenses granted hereunder that are Sublicensed will continue in force as sublicenses from the new Owner. If You have become the Owner of the License NFT as a result of a Transfer, you automatically grant any such sublicenses that are Sublicensed. This License does not by itself require you to continue or grant any sublicenses given by a previous Owner that were not Sublicensed, but it does not prohibit other law from doing so.
+If the License NFT is Transferred, any sublicenses granted hereunder that are Sublicensed will continue in force as sublicenses from the new Owner. If You have become the Owner of the License NFT as a result of a Transfer, you automatically grant any such sublicenses that are Sublicensed. This License does not by itself require you to continue or grant any sublicenses given by a previous Owner that were not Sublicensed, but it does not prevent other law from doing so.
 
 
 \sect{Interpretation}

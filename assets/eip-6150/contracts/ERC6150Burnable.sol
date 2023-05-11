@@ -5,17 +5,6 @@ import "./ERC6150.sol";
 import "./interfaces/IERC6150Burnable.sol";
 
 abstract contract ERC6150Burnable is ERC6150, IERC6150Burnable {
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC6150) returns (bool) {
-        return
-            interfaceId == type(IERC6150Burnable).interfaceId ||
-            super.supportsInterface(interfaceId);
-    }
-
     function safeBurn(uint256 tokenId) public virtual override {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),

@@ -8,17 +8,6 @@ abstract contract ERC6150ParentTransferable is
     ERC6150,
     IERC6150ParentTransferable
 {
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC6150) returns (bool) {
-        return
-            interfaceId == type(IERC6150ParentTransferable).interfaceId ||
-            super.supportsInterface(interfaceId);
-    }
-
     function transferParent(
         uint256 newParentId,
         uint256 tokenId
@@ -34,11 +23,11 @@ abstract contract ERC6150ParentTransferable is
             );
         }
 
-        uint256 owner = ownerOf(tokenId);
-        uint256 oldParentId = parentOf[tokenId];
+        address owner = ownerOf(tokenId);
+        uint256 oldParentId = parentOf(tokenId);
         _safeBurn(tokenId);
         _safeMintWithParent(owner, newParentId, tokenId);
-        emit ParentTransferred(tokenId, oldParentId, newParantId);
+        emit ParentTransferred(tokenId, oldParentId, newParentId);
     }
 
     function batchTransferParent(

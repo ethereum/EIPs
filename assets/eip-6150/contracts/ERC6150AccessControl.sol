@@ -7,17 +7,6 @@ import "./interfaces/IERC6150AccessControl.sol";
 abstract contract ERC6150AccessControl is ERC6150, IERC6150AccessControl {
     mapping(address => mapping(uint256 => bool)) private _isAdminOf;
 
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC6150) returns (bool) {
-        return
-            interfaceId == type(IERC6150AccessControl).interfaceId ||
-            super.supportsInterface(interfaceId);
-    }
-
     function isAdminOf(
         uint256 tokenId,
         address account

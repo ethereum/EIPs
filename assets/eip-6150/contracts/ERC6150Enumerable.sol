@@ -5,17 +5,6 @@ import "./ERC6150.sol";
 import "./interfaces/IERC6150Enumerable.sol";
 
 abstract contract ERC6150Enumerable is ERC6150, IERC6150Enumerable {
-    /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC6150) returns (bool) {
-        return
-            interfaceId == type(IERC6150Enumerable).interfaceId ||
-            super.supportsInterface(interfaceId);
-    }
-
     function childrenCountOf(
         uint256 parentId
     ) external view virtual override returns (uint256) {

@@ -2,7 +2,7 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
-$content-width: 960px;
+$content-width: 1152px;
 
 @import 'minima';
 
@@ -30,10 +30,22 @@ $content-width: 960px;
   color: #111;
 }
 
+.table-borderless, .table-borderless * {
+  border-style : hidden !important; // !important To override Jekyll styling
+  background-color: rgba(0,0,0,0) !important;
+}
+
+table.preamble > tbody > tr > :not(:first-child) {
+  width: 100%;
+}
+
+table.preamble > tbody > tr > :first-child {
+  white-space: nowrap;
+}
+
 a, a:link {
   color: #726E97;
   text-decoration: none;
-  transition: 0.5s;
 }
 
 a:visited {
@@ -42,44 +54,46 @@ a:visited {
 
 a:hover, a:active {
   color: #7F557D;
-  box-shadow: 0 3px 0 #7F557D;
+  text-decoration: underline;
 }
 
-.status {
-  border-radius: 6px;
-  line-height: 18px;
-  overflow: hidden;
-  padding: 12px;
+.site-footer, .site-footer * {
+  box-sizing: content-box !important; // !important To override bootstrap styling
+}
+
+.no-underline {
+  text-decoration: none !important; // !important To override previous <a> styling
+}
+
+.badge:hover {
+  filter: brightness(75%);
+  transition: all 0.25s ease;
+}
+
+h1 {
+  vertical-align: middle;
+}
+
+h1 a {
+  height: 1em;
   display: inline-block;
-  margin-bottom: 15px;
+  vertical-align: baseline;
 }
 
-.draft {
-  @extend .status;
-  background-color: #fffbea;
-  border: solid 1px #f1c40f;
+.inline-svg {
+  display: inline-block;
+  vertical-align: bottom;
+  fill: currentColor;
+  width: 1.5ex;
+  height: 100%;
+  object-fit: cover;
 }
 
-.review {
-  @extend .status;
-  background-color: #f0f7fb;
-  border: solid 1px #3498db;
+@media print {
+
+  header,
+  footer {
+    display: none;
+  }
 }
 
-.lastcall {
-  @extend .status;
-  background-color: #e7f6f0;
-  border: solid 1px #27ae60;
-}
-
-.stagnant {
-  @extend .status;
-  background-color: #ffdead;
-  border: solid 1px #ff6700;
-}
-
-.withdrawn {
-  @extend .status;
-  background-color: #f9e7e5;
-  border: solid 1px #c0392b;
-}

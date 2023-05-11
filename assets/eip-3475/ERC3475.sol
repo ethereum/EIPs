@@ -49,16 +49,18 @@ contract ERC3475 is IERC3475 {
         _classMetadata[0].title = "symbol";
         _classMetadata[0]._type = "string";
         _classMetadata[0].description = "symbol of the class";
-        _classes[0]._values[0].stringValue = "DBIT Fix 6M";
-        _classMetadata[1].title = "symbol";
-        _classMetadata[1]._type = "string";
-        _classMetadata[1].description = "symbol of the class";
-        _classes[1]._values[0].stringValue = "DBIT Fix test Instantaneous";
-
         // define "period of the class";
         _classMetadata[5].title = "period";
         _classMetadata[5]._type = "int";
-        _classMetadata[5].description = "details about issuance and redemption time";
+        _classMetadata[5].description = "value (in months) about maturity time";
+
+
+
+
+        // describing the symbol of the different class
+        _classes[0]._values[0].stringValue = "DBIT Fix 6M";
+        _classes[1]._values[0].stringValue = "DBIT Fix test Instantaneous";
+
         
         // define the maturity time period (for the test class).
         _classes[0]._values[5].uintValue = 10;
@@ -74,15 +76,16 @@ contract ERC3475 is IERC3475 {
         _classes[1].nonces[1]._values[0].uintValue = block.timestamp + 2;
         _classes[1].nonces[2]._values[0].uintValue = block.timestamp + 3;
 
-        // define "maturity of the nonce";
+        // define metadata explaining "maturity of the nonce";
         _classes[0]._nonceMetadata[0].title = "maturity";
         _classes[0]._nonceMetadata[0]._type = "int";
         _classes[0]._nonceMetadata[0].description = "maturity date in integer";
+        
         _classes[1]._nonceMetadata[0].title = "maturity";
-        _classes[0]._nonceMetadata[0]._type = "int";
+        _classes[1]._nonceMetadata[0]._type = "int";
         _classes[1]._nonceMetadata[0].description = "maturity date in integer";
 
-        // defining the value status 
+        // initializing all of the nonces for issued bonds
         _classes[0].nonces[0]._values[0].boolValue = true;
         _classes[0].nonces[1]._values[0].boolValue = true;
         _classes[0].nonces[2]._values[0].boolValue = true;

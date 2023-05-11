@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch PR Data
-        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
           name: pr_number
           workflow: ci.yml
@@ -23,9 +23,9 @@ jobs:
       - name: Save PR Data
         id: save-pr-data
         run: |
-          echo "::set-output name=pr_number::$(cat pr_number)"
-          echo "::set-output name=pr_sha::$(cat pr_sha)"
-          echo "::set-output name=merge_sha::$(cat merge_sha)"
+          echo "pr_number=$(cat pr_number)" >> $GITHUB_OUTPUT
+          echo "pr_sha=$(cat pr_sha)" >> $GITHUB_OUTPUT
+          echo "merge_sha=$(cat merge_sha)" >> $GITHUB_OUTPUT
 
       - name: Add Comment
         uses: marocchino/sticky-pull-request-comment@39c5b5dc7717447d0cba270cd115037d32d28443
@@ -38,7 +38,7 @@ jobs:
             Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
 
       - name: Add Waiting Label
-        uses: actions-ecosystem/action-add-labels@bd52874380e3909a1ac983768df6976535ece7f8
+        uses: actions-ecosystem/action-add-labels@288072f1a3b596f4350fe135bcfe381a23abadef
         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
           labels: w-ci
@@ -47,7 +47,7 @@ jobs:
           github_token: ${{ github.token }}
 
       - name: Remove Waiting Label
-        uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0
+        uses: actions-ecosystem/action-remove-labels@d05162525702062b6bdef750ed8594fc024b3ed7
         if: ${{ github.event.workflow_run.conclusion != 'failure' }}
         with:
           labels: w-ci
