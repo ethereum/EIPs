@@ -1,0 +1,113 @@
+---
+eip: xxxx
+title: NFT Authorship Attribution
+description: An extension of ERC-721 standards for authorship attribution.
+author: Carlos Flores ([@strollinghome](https://github.com/strollinghome))
+discussions-to:
+status: Draft
+created: 2023-05-11
+requires: 55, 155, 712, 721
+---
+
+## Abstract
+
+This Ethereum Improvement Proposal (EIP) aims to solve the issue of authorship misattribution for ERC-721 Non-Fungible Tokens (NFT). To achieve this, this EIP proposes a mechanism where the NFT author signs the required parameters for the NFT creation, including the NFT metadata and a hash of any other relevant information. The signed parameters and the signature are then validated and emitted during the deployment transaction, which allows the NFT to validate the authorship and NFT platforms to attribute authorship correctly. This method ensures that even if a different wallet sends the deployment transaction, the correct authorship is attributed to the actual author.
+
+## Motivation
+
+Current NFT platforms assume that the wallet deploying the smart contract is the author of the NFT, leading to a misattribution of authorship in cases where a different wallet sends the deployment transaction. This proposal aims to solve the problem by allowing authors to sign the parameters required for NFT creation so that any wallet can send the deployment transaction without misattributing authorship.
+
+## Specification
+
+The keywords “MUST,” “MUST NOT,” “REQUIRED,” “SHALL,” “SHALL NOT,” “SHOULD,” “SHOULD NOT,” “RECOMMENDED,” “MAY,” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+
+ERC-721 compliant contracts MAY implement this NFT Authorship Attribution extension to provide a standard event to be emitted that defines the NFT author at the time of contract creation.
+
+### Definitions
+
+- **Author**: the creator of an NFT.
+- **Minter**: the wallet responsible for submitting the deployment transaction; the minter and the authors MAY be the same, in which case the event can be omitted.
+
+This EIP takes advantage of the fact that contract addresses can be precomputed before a contract is deployed. Whether the NFT contract is deployed through another contract (a factory) or through an EOA, authorship can be correctly attributed using this specification.
+
+**Signing Mechanism**
+
+Authorship is obtained by signing an [EIP-712](./eip-712.md) compatible message; all signatures compliant with this EIP MUST include all fields defined. The struct signed is:
+
+```solidity
+struct AuthorshipAttribution {
+	string name;
+	string symbol;
+	bytes32 salt;
+	address token;
+}
+```
+
+Where `name` and `symbol` are the ERC721 metadata parameters, `salt` is an additional randomness parameter, and `token` is the NFTs address. Any extra parameters used to deploy the NFT contract MAY be hashed into the `salt` parameter.
+
+**Signature Validation**
+
+Authorship attribution is given through a new event that MUST be emitted by the NFT contract during the deployment transaction. The event includes all the fields necessary to reconstruct the signed digest and validate the signature to ensure it matches the specified author. The event name is `AuthorshipAttribution` and includes the fields:
+
+- `name`: ERC721Metadata name parameter
+- `symbol`: ERC721Metadata symbol parameter
+- `salt`: an extra parameter that encodes other relevant information for deploying the NFT contract
+- `token`: the address of the NFT contract deployed
+- `verifyingContract`: the address of the contract verifying the signature (for EIP-712 signature validation)
+- `version`: the version of the contract verifying the signature (for EIP-712 signature validation)
+- `author`: the author of the NFT
+- `signature`: the author’s signature
+
+The event is defined as follows:
+
+```solidity
+event AuthorshipAttribution(
+	string name,               // <-------------------------------------
+	string symbol,             //      Parameters signed by Author     |
+	bytes32 salt,              //                                      |
+	address token,             // <-------------------------------------
+	address verifyingContract, // <-------------------------------------
+	string domainName,         //      EIP-712 Domain Data            |
+	string version,            // <-------------------------------------
+	address author,            // <--- Author --------------------------
+	bytes signature            // <--- Author Signature ----------------
+);
+```
+
+Note that although a `chainId` is necessary for EIP-712 signatures, we omit the parameter from the event as it can be inferred through the transaction data. The `token` parameter MUST match the address of the `emitter` field of the event.
+
+A platform can verify the validity of authorship attribution by reconstructing the signature digest with the parameters emitted and recovering the signer from the `signature` parameter. The `author` parameter MUST match the recovered signer from the `signature` parameter. After verification, the platform can safely attribute authorship to the `author` instead of the account that submitted the transaction.
+
+## Reference Implementation.
+
+See [authorship-attribution](https://github.com/strollinghome/authorship-attribution).
+
+## Rationale
+
+By standardizing the `AuthorshipAttribution` event, this EIP enables platforms to ascertain authorship without relying on implicit assumptions. Establishing a standard for authorship attribution empowers minters to manage the complex aspects of deploying contracts while preserving accurate onchain authorship information. This approach ensures a more reliable and transparent method for identifying NFT creators, fostering trust among participants in the NFT ecosystem.
+
+[EIP-5375](./eip-5375.md) attempts to solve the same issue and although offchain data offers improved backward compatibility, ensuring accurate and immutable authorship is vital for NFTs. A standardized onchain method for attributing authorship is inherently more reliable and secure.
+
+In contrast to this EIP, EIP-5375 does not facilitate specifying authorship for all tokens within an NFT collection, which is a prevalent practice, particularly in emerging edition use cases.
+
+Both this EIP and EIP-5375 share similar limitations regarding address-based authorship:
+
+> The standard defines a protocol to verify that a certain *address* provided consent. However, it does not guarantee that the address corresponds to the expected author […]. Proving a link between an address and the entity behind it is beyond the scope of this document.
+
+## Backwards Compatibility
+
+Since the standard requires an event to be emitted during the NFTs deployment transaction, existing NFTs cannot implement this standard.
+
+## Security Considerations
+
+A potential attack exploiting this EIP could involve deceiving authors into signing authorship consent messages unintentionally. Consequently, authors MUST ensure that all signature fields correspond to the necessary ones before signing.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
+## Citation
+
+Please cite this document as:
+
+Carlos Flores <[@strollinghome](https://github.com/strollinghome)>, "EIP-XXXX: NFT Authorship Attribution," Ethereum Improvement Proposals, no. XXXX, May 2023. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-XXXX.
