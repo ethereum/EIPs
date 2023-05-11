@@ -1,5 +1,5 @@
 ---
-eip: draft_multi_injected_provider_interf
+eip: 6963
 title: Multi Injected Provider Interface (aka MIPI)
 description: Using window events to announce injected providers
 author: Pedro Gomes (@pedrouid), Kosala Hemachandra (@kvhnuke), Richard Moore (@ricmoo), Gregory Markou (@GregTheGreek)
