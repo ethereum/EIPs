@@ -1,0 +1,66 @@
+---
+title: Automatic Transaction Representation
+description: A living standard for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
+author: Gavin John (@Pandapip1)
+discussions-to: <URL>
+status: Living
+type: Standards Track
+category: ERC
+created: 2023-05-12
+requires: 20, 712, 721, 1046, 1155
+---
+
+## Abstract
+
+This EIP proposes an extendable standard to allow wallets to provide a rich representation of a transaction or signature request to the user. This representation is generated automatically from the transaction data and/or signature request.
+
+## Motivation
+
+While signing transactions is made much more secure by [EIP-712](./eip-712.md), most wallets end up displaying the raw JSON/YAML representation of the transaction to the user. This is not very user friendly and can lead to users being tricked into signing transactions that they did not intend to sign, as the average user is unable to read it.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+The following rules MUST be followed by compliant wallets. Since this is a living standard, additional rules may be added in the future. When specifying compliance with this EIP, the date of the latest implemented version MUST be specified.
+
+Only Final EIPs may be referenced in this EIP.
+
+### General Rules
+
+- If the transaction would revert, the wallet MUST indicate this to the user and add a warning that the transaction will fail.
+- If the transaction would consume more than 90% of the set gas limit, the wallet MUST indicate this to the user and add a warning that the transaction may fail.
+- If the request comes from a non-URI source (e.g. a QR code), the wallet MUST indicate the source of the request to the user.
+- If the request comes from a URI source, the wallet MUST indicate the source of the request to the user, including the URI scheme, host, and port. If the transaction originates from an embedded frame (e.g. an iframe or webview), the wallet MUST indicate this to the user and add a warning that the request may not be trustworthy.
+- If the request references a contract that doesn't have verified source code, the wallet MUST indicate this to the user and add a warning that the request may not be trustworthy. Additionally, a warning badge MAY be displayed next to any such contract.
+- If the wallet has a list of known malicious contracts, and a request references one of these contracts, the wallet MUST indicate this to the user and add a warning that the request may not be trustworthy. Additionally, a warning badge SHOULD be displayed next to any such contract.
+
+### Asset Transfer Rules
+
+- If a transfer of tokens ([ERC-20](./eip-20.md), [ERC-721](./eip-721.md), [ERC-1046](./eip-1046.md)-compatible, or [ERC-1155](./eip-1155.md)) or a chain's native currency is included in the transaction, the wallet SHOULD display the amount of tokens being transferred, the token's symbol (if available), the token's name (if available), an image of the token (if available), the token's contract address, the recipient's address, and the sender's address.
+  - If the transaction format is known, and the transaction request doesn't explicitly disallow it, the wallet SHOULD allow the user to edit the amount of asset being transferred. If/when the user does, the wallet MUST update the transaction request accordingly.
+  - If more than one transfer of the same asset is included in the transaction, the wallet MAY display the net transfer amount instead of each individual transfer.
+  - If more than one transfer of different assets is included in the transaction, the wallet SHOULD display the transfers as a trade.
+    - If the maximum slippage can be determined, the wallet SHOULD display the maximum slippage.
+    - If the determined slippage is greater than some user-defined thresholds (with sensible defaults e.g. 1%, 5%, 10%), the wallet SHOULD display progressively more severe warnings to the user.
+- If an appproval is included in a transaction, it must follow the same rules as a transfer, except that the approvals MUST NOT be represented as a trade.
+
+### Staking
+
+- If the transaction stakes native currency for validator rewards, the wallet SHOULD display the amount of native currency being staked (determined by the transaction value), the public key, and withdrawal credentials (fetched from the `DepositEvent` event).
+
+## Rationale
+
+An automatically-generated representation of a transaction is much more user-friendly and easier to understand than the raw JSON/YAML representation. Additionally, the wallet and user don't need to trust the website or contract to generate a correct representation.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Security Considerations
+
+No security considerations found.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
