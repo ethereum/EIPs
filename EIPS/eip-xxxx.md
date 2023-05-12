@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 7017
 title: Notification Interface
 description: An interface for notifications
 author: Oliver Stehr (@Oli-art)
