@@ -17,8 +17,8 @@ contract ERC5007ComposableTest is ERC5007Composable  {
         address to_,
         uint256 tokenId_,
         uint256 assetId_,
-        int64 startTime_,
-        int64 endTime_
+        uint64 startTime_,
+        uint64 endTime_
     ) public {
         _mintTimeNftWithAssetId(to_, tokenId_, assetId_, startTime_, endTime_);
     }
