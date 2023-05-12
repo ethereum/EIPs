@@ -1,6 +1,6 @@
 ---
 title: Automatic Transaction Representation
-description: A living standard for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
+description: Living guidelines for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
 author: Gavin John (@Pandapip1)
 discussions-to: https://ethereum-magicians.org/t/automatic-transaction-representation/14256
 status: Living
