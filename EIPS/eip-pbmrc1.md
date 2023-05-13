@@ -2,7 +2,7 @@
 eip: TBD
 title: Purpose bound money
 description: An interface extending EIP-1155 for <placeholder>, supporting use case such as <placeholder>
-authors: Victor Liew (@Alcedo), Wong Tse Jian (@wongtsejian)
+authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian)
 discussions-to: https://ethereum-magicians.org (Create a discourse here for early feedback)
 status:  DRAFT
 type: Standards Track
@@ -20,7 +20,7 @@ It builds upon the [ERC-1155](./eip-1155.md) standard, by leveraging pre-existin
 
 ## Motivation
 
-The establishment of this protocol seeks to forestalls technology fragmentation and consequently a lack of interoperability. By making the PBM specification open, it gives new participants easy and free access to the pre-existing market standards, enabling interoperability across different platforms, wallets, payment systems and rails. This would lower cost of entry for new participants, foster a vibrant payment landscape and prevent the development of walled gardens and monopolies, ultimately leading to more efficient, affordable services and better user experiences.
+The establishment of this proposal seeks to forestalls technology fragmentation and consequently a lack of interoperability. By making the PBM specification open, it gives new participants easy and free access to the pre-existing market standards, enabling interoperability across different platforms, wallets, payment systems and rails. This would lower cost of entry for new participants, foster a vibrant payment landscape and prevent the development of walled gardens and monopolies, ultimately leading to more efficient, affordable services and better user experiences.
 
 ## Definitions
 
@@ -31,15 +31,13 @@ A PBM based architecture has several distinct components:
     - a good store of value;
     - a suitable unit of account; and
     - a medium of exchange;
-- **Spot Token Issuer** - is a regulated financial institution providing the underlying digital currency backing the PBM Token. Spot Token Issuer mints a compatible digital currency when it receives fiat currencies from a PBM Creator and burns digital currency when a PBM Token recipient wishes to exchange unwrapped PBM Tokens for fiat currencies.
-- **PBM Wrapper** - a smart contract, which wraps the Spot Token, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this paper). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying Spot Token;
+- **PBM Wrapper** - a smart contract, which wraps the Spot Token, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying Spot Token;
 - **PBM Token** - the Spot Token and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a [ERC-1155](./eip-1155.md) token.
   - PBM Tokens are bearer instruments, with self-contained programming logic, and can be transferred between two parties without involving intermediaries. It combines the concept of:
     - programmable payment - automatic execution of payments once a pre-defined set of conditions are met; and
     - programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
-- **PBM Creator** defines the conditions of the PBM Wrapper to create PBM Tokens. A PBM Creator is able to issue any amount of PBM Tokens, provided that the PBM Creator deposits equivalent amounts of fiat currencies with the Spot Token Issuer.
-- **PBM Infrastructure** - consisting of a ledger-based infrastructure. While a PBM can be either distributed ledger technology (DLT) based or non-DLT based, the scope of this PBMRC paper is limited to a DLT-based infrastructure build upon the Ethereum blockchain;
-- **PBM Wallet** - cryptographic wallets which holds users' private keys, granting them access to PBMs.
+- **PBM Creator** defines the conditions of the PBM Wrapper to create PBM Tokens.
+- **PBM Wallet** - cryptographic wallets which can either be an EOA (Externally Owned Account) that is controlled by a private key, or a smart contract wallet.
 
 ## Specification
 
@@ -49,48 +47,40 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - Whether a PBM Token **SHOULD** have an expiry time will be decided by the PBM Creator, the spec itself should not enforce an expiry time.
   - To align with our goals of making PBM Token a suitable construct for all kinds of business logic that could occur in the real world.
-
   - Should an expiry time not be needed, the expiry time can be set to infinity.
 
 - PBM **SHALL** adhere to the definition of “wrap” or “wrapping” to mean bounding a token in accordance with PBM business logic during its lifecycle stage.
+                              
+- PBM **MUST** incorporate both a whitelist and a blacklist of addresses as a key element of the conditions that must be satisfied prior to unwrapping the underlying Spot Token
 
 - PBM **SHALL** adhere to the definition of “unwrap” or “unwrapping” to mean the release of a token in accordance with the PBM business logic during its lifecycle stage.
 
 - A valid PBM Token **MUST** consists of an underlying Spot Token and the PBM Wrapper.
-  - The wrapping of the Spot Token can be done either upon the creation of the PBM Token or at a later date prior to its issuance.
+  - The Spot Token can be wrapped either upon the creation of the PBM Token or at a later date.
   
-  - A Spot Token can implement any widely accepted ERC-20 compatible ERC e.g. ERC-20, ERC-777, ERC-1363.
+  - A Spot Token can be implemented as any widely accepted ERC-20 compatible token, such as ERC-20, ERC-777, or ERC-1363.
 
 - PBM Wrapper **MUST** provide a mechanism for all transacting parties to verify that all necessary condition(s) have been met before allowing the PBM Token to be unwrapped. Refer to Auditability section for elaborations.
 
-- The PBM Creator **MUST** be an owner (i.e. PBM Creator) responsible for the creation and maintenance of the PBM.
-  
-- This paper defines a base specification of what a PBM should entail. Extensions to this base specification can be implemented as separate specifications.
+- This proposal defines a base specification of what a PBM should entail. Extensions to this base specification can be implemented as separate specifications.
 
 ### Auditability
 
-PBM Wrapper **SHOULD** provide mechanism(s) to verify that specified conditions for unwrapping a PBM is met. Such mechanisms could involve automated validation or asynchronous user inputs from transacting parties and/or whitelisted third parties validators. As the fulfilment of PBM conditions is likely to be subjected to audits, all necessary evidence to support such audits shall be documented:
+PBM Wrapper **SHOULD** provide mechanism(s) to make it easy for the public to verify the smart contract logic for unwrapping a PBM. Such mechanisms could then be leveraged by automated validation or asynchronous user verifications from transacting parties and/or whitelisted third parties attestations. 
 
-- The interface/events emitted **SHOULD** allow a finegrained recreation of the transaction history.
+As the fulfilment of PBM conditions is likely to be subjected to audits to ensure trust amongst all transacting parties, the following evidence shall be documented to support audits:
+
+- The interface/events emitted **SHOULD** allow a fine-grained recreation of the transaction history.
 - The source code **SHOULD** be verified and formally published on a blockchain explorer.
-- Depending on the sensitivity of the information, the evidence **MAY** need to be encrypted and stored in secure, private storage locations outside of the public blockchain.
 
 ### Fungibility
 
 A PBM Wrapper **SHOULD** be able to wrap multiple types of compatible Spot Tokens. Spot Tokens wrapped by the same PBM wrapper may or may not be fungible to one another. The standard does NOT mandate how an implementation must do this.
 
-### A Note on Implementing Interfaces
-
-In order to allow the implementors of this PBM standard to have maximum flexibility in the way they structure the PBM business logic, a PBM can implement this interface in two ways:
-
-- directly by declaring that (`contract ContractName is InterfaceName`); or
-- indirectly by adding all functions from this interface into the contract. The indirect method allows the contract to implement additional interfaces.
-
 ### PBM token details
 
-A state variable consisting of all additional details required to facilitate the business logic for a particular PBM type MUST be defined. The compulsory fields are listed in the `struct PBMToken` (below), additional, optional state variables may be defined by later proposals.
+The ERC-1155 Multi Token Standard enables each token ID to correspond to a unique, configurable token type. All essential details facilitating the business or display logic for a specific PBM type **MUST** be defined for each token type. The mandatory fields for this purpose are outlined in the `struct PBMToken` (below). Future proposals may define additional, optional state variables as needed.
 
-An external function may be exposed to create new PBM Token as well at a later date.
 
 Example of token details:
 
@@ -101,48 +91,57 @@ abstract contract IPBMRC1_TokenManager {
     /// @dev Mapping of each ERC-1155 tokenId to its corresponding PBM Token details.
     mapping (uint256 => PBMToken) internal tokenTypes ; 
 
-    /// @dev Structure representing all the details corresponding to a PBM tokenId.
+    /// @notice A PBM token MUST include compulsory state variables (name, faceValue, expiry, and uri) to adhere to this standard.
+    /// @dev Represents all the details corresponding to a PBM tokenId.
     struct PBMToken {
-        //Compulsory state variables (name, faceValue, expiry, creator, balanceSupply and uri) MUST be included for all PBM token implementing this interface.
         // Name of the token.
         string name;
-        // Value of the underlying wrapped ERC20-compatible Spot Token. It is typically denominated in a fiat currency as most merchants only accept fiat currency.
+
+        // Value of the underlying wrapped ERC20-compatible Spot Token. Additional information on the `faceValue` can be specified by
+        // adding the optional variables: `currencySymbol` or `tokenSymbol` as indicated below
         uint256 faceValue;
-        // Token will be rendered useless after this time (expressed in Unix Epoch time).
+
+        // Time after which the token will be rendered useless (expressed in Unix Epoch time).
         uint256 expiry;
-        // Address of the creator of this PBM type on this smart contract.
-        address creator;
-        // Address of the owner of this PBM type on this smart contract.
-        address owner;
-        // Remaining balance of the PBM Token.
-        uint256 balanceSupply;
-        // Metadata URI for ERC1155 display purposes.
+
+        // Metadata URI for ERC-1155 display purposes.
         string uri;
 
-        //List of optional state variables
-        // A abbreviation for the PBM token name may be assigned
+        // OPTIONAL: Indicates if the PBM token can be transferred from the user's wallet.
+        bool isTransferable;
+
+        // OPTIONAL: Determines whether the PBM will be burned upon expiry, under certain conditions, or at the owner's discretion, preventing wallets from assuming the PBM's permanent presence in a user's wallet.
+        bool burnable;
+
+        // OPTIONAL: Number of decimal places for the token.    
+        uint8 decimals; 
+
+        // OPTIONAL: Number of decimal places for the token.    
+        uint8 decimals; 
+
+        // OPTIONAL: The address of the creator of this PBM type on this smart contract.
+        address creator;
+
+        // OPTIONAL: The running balance of the PBM Token type that has been minted.
+        uint256 totalSupply;
+
+        // OPTIONAL: An ISO4217 three-character alphabetic code may be needed for the faceValue in multicurrency PBM use cases.
+        string currencySymbol;
+
+        // OPTIONAL: An abbreviation for the PBM token name may be assigned.
         string tokenSymbol;
-        // ISO4217 three character alphabetic code may be needed for the faceValue in a multicurrency PBM use cases
-        string currencySymbol
-        
+
         // Add other optional state variables below...
-
     }
+}
+```
 
+An external function may be exposed to create new PBM Token as well at a later date.
+
+```solidity
     /// @notice Creates a new PBM Token type with the provided data.
-    /// @dev The caller of createPBMTokenType shall be responsible for setting the owner and creator address.
-    /// Example response of token URI (reference: https://docs.opensea.io/docs/metadata-standards):
-    /// {
-    ///     "name": "StraitsX-12",
-    ///     "description": "$12 SGD test voucher",
-    ///     "image": "https://gateway.pinata.cloud/ipfs/QmQ1x7NHakFYin9bHwN7zy4NdSYS84w6C33hzxpZwCAFPu",
-    ///     "attributes": [
-    ///         {
-    ///             "trait_type": "Value",
-    ///             "value": "12"
-    ///         }
-    ///     ]
-    /// }
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the owner and creator address. 
+    /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
     function createPBMTokenType(
         string memory _name,
         uint256 _faceValue,
@@ -151,14 +150,16 @@ abstract contract IPBMRC1_TokenManager {
         address _owner,
         string memory _tokenURI
     ) external;
+```
 
+Implementors of the standard **MUST** define a method to retrieve a PBM token detail
 
+```solidity
     /// @notice Retrieves the details of a PBM Token type given its tokenId.
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
-    /// @param _tokenId The identifier of the PBM token type.
+    /// @param tokenId The identifier of the PBM token type.
     /// @return A PBMToken struct containing all the details of the specified PBM token type.
-    function getTokenDetails(uint256 _tokenId) external view returns(PBMToken memory); 
-}
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory); 
 ```
 
 ### PBM Address List

@@ -13,7 +13,7 @@ pragma solidity ^0.8.0;
 /// @title PBM Specification interface 
 /// @notice The PBM (purpose bound money) allows us to add logical requirements on the use of ERC-20 tokens. 
 /// The PBM acts as wrapper around the ERC-20 tokens and implements the necessary logic. 
-/// @dev PBM creator must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
+/// @dev PBM deployer must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
 interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     
     /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
