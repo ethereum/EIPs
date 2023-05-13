@@ -1,0 +1,60 @@
+{
+  "name": "@ndujalabs/erc721lockable",
+  "version": "0.5.0",
+  "description": "A simple approach to lock NFT in place w/out losing ownership",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "/contracts/**/*.sol"
+  ],
+  "scripts": {
+    "test": "npx hardhat test",
+    "compile": "npx hardhat compile",
+    "lint": "prettier --write 'contracts/**/*.sol' && solhint 'contracts/**/*.sol'",
+    "format": "npx prettier --write ./test/fixtures/**/*.js ./**/*.js",
+    "coverage": "NODE_ENV=test npx hardhat coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndujaLabs/erc721lockable.git"
+  },
+  "author": {
+    "name": "Francesco Sullo",
+    "email": "francesco@sullo.co"
+  },
+  "bugs": {
+    "url": "https://github.com/ndujaLabs/erc721lockable/issues"
+  },
+  "homepage": "https://github.com/ndujaLabs/erc721lockable#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
+    "@nomiclabs/hardhat-waffle": "^2.0.5",
+    "@openzeppelin/hardhat-upgrades": "^1.25.3",
+    "chai": "^4.3.7",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.14.0",
+    "hardhat-contract-sizer": "^2.8.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "husky": "^8.0.3",
+    "prettier": "^2.8.8",
+    "prettier-plugin-solidity": "^1.1.3",
+    "pretty-quick": "^3.1.3",
+    "require-or-mock": "^0.2.1",
+    "solhint": "^3.4.1",
+    "solidity-coverage": "^0.7.22",
+    "soliutils": "^0.0.4",
+    "typescript": "^4.9.5"
+  },
+  "lint-staged": {
+    "*.js": "prettier --write"
+  },
+  "dependencies": {
+    "@cruna/cruna-protocol": "^1.0.3",
+    "@openzeppelin/contracts": "^4.8.3",
+    "@openzeppelin/contracts-upgradeable": "^4.8.3"
+  }
+}
