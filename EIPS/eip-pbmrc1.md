@@ -116,9 +116,6 @@ abstract contract IPBMRC1_TokenManager {
         // OPTIONAL: Number of decimal places for the token.    
         uint8 decimals; 
 
-        // OPTIONAL: Number of decimal places for the token.    
-        uint8 decimals; 
-
         // OPTIONAL: The address of the creator of this PBM type on this smart contract.
         address creator;
 
