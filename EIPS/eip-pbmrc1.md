@@ -38,6 +38,7 @@ A PBM based architecture has several distinct components:
     - programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
 - **PBM Creator** defines the conditions of the PBM Wrapper to create PBM Tokens.
 - **PBM Wallet** - cryptographic wallets which can either be an EOA (Externally Owned Account) that is controlled by a private key, or a smart contract wallet.
+- **Merchant** - In the context of this proposal, a Merchant is broadly defined as the ultimate recipient, or endpoint, for PBM tokens, to which these tokens are intrinsically directed or purpose-bound to.
 
 ## Specification
 
@@ -62,6 +63,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - PBM Wrapper **MUST** provide a mechanism for all transacting parties to verify that all necessary condition(s) have been met before allowing the PBM Token to be unwrapped. Refer to Auditability section for elaborations.
 
+- The PBM Token **MUST** be burnt upon being fully unwrapped and used.
+
 - This proposal defines a base specification of what a PBM should entail. Extensions to this base specification can be implemented as separate specifications.
 
 ### Auditability
@@ -79,7 +82,7 @@ A PBM Wrapper **SHOULD** be able to wrap multiple types of compatible Spot Token
 
 ### PBM token details
 
-The ERC-1155 Multi Token Standard enables each token ID to correspond to a unique, configurable token type. All essential details facilitating the business or display logic for a specific PBM type **MUST** be defined for each token type. The mandatory fields for this purpose are outlined in the `struct PBMToken` (below). Future proposals may define additional, optional state variables as needed.
+The ERC-1155 Multi Token Standard enables each token ID to correspond to a unique, configurable token type. All essential details facilitating the business or display logic for a specific PBM type **MUST** be defined for each token type. The mandatory fields for this purpose are outlined in the `struct PBMToken` (below). Future proposals may define additional, optional state variables as needed. Once a token detail has been defined, it **MUST** be immutable. 
 
 
 Example of token details:
@@ -107,10 +110,10 @@ abstract contract IPBMRC1_TokenManager {
         // Metadata URI for ERC-1155 display purposes.
         string uri;
 
-        // OPTIONAL: Indicates if the PBM token can be transferred from the user's wallet.
+        // OPTIONAL: Indicates if the PBM token can be transferred to a non merchant wallet.
         bool isTransferable;
 
-        // OPTIONAL: Determines whether the PBM will be burned upon expiry, under certain conditions, or at the owner's discretion, preventing wallets from assuming the PBM's permanent presence in a user's wallet.
+        // OPTIONAL: Determines whether the PBM will be burned or revoked upon expiry, under certain predefined conditions, or at the owner's discretion. 
         bool burnable;
 
         // OPTIONAL: Number of decimal places for the token.    
@@ -118,6 +121,9 @@ abstract contract IPBMRC1_TokenManager {
 
         // OPTIONAL: The address of the creator of this PBM type on this smart contract.
         address creator;
+
+        // OPTIONAL: The smart contract address of the spot token.
+        address tokenAddress;
 
         // OPTIONAL: The running balance of the PBM Token type that has been minted.
         uint256 totalSupply;
@@ -133,18 +139,17 @@ abstract contract IPBMRC1_TokenManager {
 }
 ```
 
-An external function may be exposed to create new PBM Token as well at a later date.
+An external function may be exposed to create new PBM Token as well at a later date. 
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
-    /// @dev The caller of createPBMTokenType shall be responsible for setting the owner and creator address. 
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
     function createPBMTokenType(
         string memory _name,
         uint256 _faceValue,
         uint256 _tokenExpiry,
         address _creator,
-        address _owner,
         string memory _tokenURI
     ) external;
 ```
@@ -163,63 +168,11 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
 
 A list of targeted addresses for PBM unwrapping must be specified in an address list.
 
+<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
+
+
 ```solidity
 
-pragma solidity ^0.8.0;
-
-/// @title PBM Address list Interface. Functions and events relating to whitelisting of merchant stores 
-/// and blacklisting of wallet addresses.
-/// @notice This interface defines a scheme to manage whitelisted merchant addresses and blacklisted  
-/// wallet addresses for the PBMs. A merchant in general is anyone who is providing goods or services 
-/// and is hence deemed to be able to unwrap a PBM.
-/// Implementers will define the appropriate logic to whitelist or blacklist specific merchant addresses.
-
-interface IPBMAddressList {
-
-    /// @notice Adds wallet addresses to the blacklist, preventing them from receiving PBM tokens.
-    /// @param _addresses An array of wallet addresses to be blacklisted.
-    /// @param _metadata Optional comments or notes about the blacklisted addresses.
-    function blacklistAddresses(address[] memory _addresses, string memory _metadata) external; 
-
-    /// @notice Removes wallet addresses from the blacklist, allowing them to receive PBM tokens.
-    /// @param _addresses An array of wallet addresses to be removed from the blacklist.
-    /// @param _metadata Optional comments or notes about the removed addresses.
-    function unBlacklistAddresses(address[] memory _addresses, string memory _metadata) external; 
-
-    /// @notice Checks if the address is one of the blacklisted addresses
-    /// @param _address The address to query
-    /// @return _bool True if address is blacklisted, else false
-    function isBlacklisted(address _address) external returns (bool) ; 
-
-    /// @notice Registers merchant wallet addresses to differentiate between users and merchants.
-    /// @dev The 'unwrapTo' function is called when invoking the PBM 'safeTransferFrom' function for valid merchant addresses.
-    /// @param _addresses An array of merchant wallet addresses to be added.
-    /// @param _metadata Optional comments or notes about the added addresses.
-    function addMerchantAddresses(address[] memory _addresses, string memory _metadata) external; 
-
-    /// @notice Unregisters wallet addresses from the merchant list.
-    /// @dev Removes the specified wallet addresses from the list of recognized merchants.
-    /// @param _addresses An array of merchant wallet addresses to be removed.
-    /// @param _metadata Optional comments or notes about the removed addresses.
-    function removeMerchantAddresses(address[] memory _addresses, string memory _metadata) external; 
-
-    /// @notice Checks if the address is one of the whitelisted merchant
-    /// @param _address The address to query
-    /// @return _bool True if the address is a merchant that is NOT blacklisted, otherwise false.
-    function isMerchant(address _address) external returns (bool) ; 
-    
-    /// @notice Event emitted when the Merchant List is edited
-    /// @param action Tags "add" or "remove" for action type
-    /// @param addresses An array of merchant wallet addresses that was whitelisted
-    /// @param metadata Optional comments or notes about the added or removed addresses.
-    event MerchantList(string _action, address[] _addresses, string _metadata);
-    
-    /// @notice Event emitted when the Blacklist is edited
-    /// @param action Tags "add" or "remove" for action type
-    /// @param addresses An array of wallet addresses that was blacklisted
-    /// @param metadata Optional comments or notes about the added or removed addresses.
-    event Blacklist(string _action, address[] _addresses, string _metadata);
-}
 
 ```
 

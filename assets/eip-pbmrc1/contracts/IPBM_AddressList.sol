@@ -1,50 +1,29 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.0;
 
 /// @title PBM Address list Interface. 
 /// @notice The PBM address list stores and manages whitelisted merchants and blacklisted address for the PBMs 
-/// a merchant in general is anyone who is providing goods or services and is hence deemed to be able to unwrap a PBM.
 interface IPBMAddressList {
 
-    /// @notice Adds wallet addresses to the blacklist who are unable to receive the pbm tokens.
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    function blacklistAddresses(address[] memory addresses, string memory metadata) external; 
-
-    /// @notice Removes wallet addresses from the blacklist who are  unable to receive the PBM tokens.
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    function unBlacklistAddresses(address[] memory addresses, string memory metadata) external; 
-
     /// @notice Checks if the address is one of the blacklisted addresses
-    /// @param _address The address in query
-    /// @return True if address is a blacklisted, else false
+    /// @param _address The address to query
+    /// @return _bool True if address is blacklisted, else false
     function isBlacklisted(address _address) external returns (bool) ; 
 
-    /// @notice Adds wallet addresses of merchants who are the only wallets able to receive the underlying ERC-20 tokens (whitelisting).
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    function addMerchantAddresses(address[] memory addresses, string memory metadata) external; 
-
-    /// @notice Removes wallet addresses from the merchant addresses who are  able to receive the underlying ERC-20 tokens (un-whitelisting).
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    function removeMerchantAddresses(address[] memory addresses, string memory metadata) external; 
-
     /// @notice Checks if the address is one of the whitelisted merchant
-    /// @param _address The address in query
-    /// @return True if address is a merchant, else false
+    /// @param _address The address to query
+    /// @return _bool True if the address is a merchant that is NOT blacklisted, otherwise false.
     function isMerchant(address _address) external returns (bool) ; 
     
     /// @notice Event emitted when the Merchant List is edited
     /// @param action Tags "add" or "remove" for action type
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    event MerchantList(string action, address[] addresses, string metadata);
+    /// @param addresses An array of merchant wallet addresses that was whitelisted
+    /// @param metadata Optional comments or notes about the added or removed addresses.
+    event MerchantList(string _action, address[] _addresses, string _metadata);
     
     /// @notice Event emitted when the Blacklist is edited
     /// @param action Tags "add" or "remove" for action type
-    /// @param addresses The list of merchant wallet address
-    /// @param metadata any comments on the addresses being added 
-    event Blacklist(string action, address[] addresses, string metadata);
+    /// @param addresses An array of wallet addresses that was blacklisted
+    /// @param metadata Optional comments or notes about the added or removed addresses.
+    event Blacklist(string _action, address[] _addresses, string _metadata);
 }

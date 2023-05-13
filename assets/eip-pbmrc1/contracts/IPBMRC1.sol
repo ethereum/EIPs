@@ -148,8 +148,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
 
     /// @notice Unwraps the underlying ERC-20 compatible tokens to an intended end point (ie: merchant) upon fulfilling the required PBM conditions.
     /// @dev Add implementation specific logic for the conditions under which a PBM processes and transfers the underlying tokens here.
-    /// e.g. If the receving wallet is a whitelisted merchant wallet address, the PBM(NFT) will be burnt and the underlying ERC-20 tokens 
-    /// will unwrapped to be transferred to the merchant wallet instead.
+    /// e.g. If the receving wallet is a whitelisted merchant wallet address, the PBM(NFT) MUST be burnt and the underlying ERC-20 tokens 
+    /// will unwrapped to be transferred to the merchant wallet.
+    /// MUST emit the event {{TokenUnwrapForTarget}} on success
     /// @param from The account currently holding the PBM
     /// @param to The account receiving the PBM (NFT)
     /// @param tokenId The identifier of the PBM token type
