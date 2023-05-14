@@ -1,4 +1,5 @@
 ---
+eip: 7023
 title: Automatic Transaction Representation
 description: Living guidelines for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
 author: Gavin John (@Pandapip1)
