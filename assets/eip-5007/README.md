@@ -6,6 +6,7 @@ This standard is an extension of [ERC-721](../../EIPS/eip-721.md). It proposes s
 
 ## Install
 ```
+npm install truffle -g
 npm install
 ```
 
