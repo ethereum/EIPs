@@ -19,7 +19,7 @@ const eips = Promise.all(fs.readdirSync('./EIPS/').map(async file => {
     let eipData = grayMatter(eipContent);
     let lastStatusChange = new Date((await git.raw(['blame', `EIPS/${file}`])).split('\n').filter(line => line.match(/status:/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
     let onlyTitle = eipData.data.title;
-    let eipPrefix = eipData.data.category === 'ERC' ? 'EIP' : 'EIP';
+    let eipPrefix = eipData.data.category === 'ERC' ? 'ERC' : 'EIP';
     let newTitle = `${eipPrefix}-${eipData.data.eip}: ${eipData.data.title}`;
     let newPreamble = { ...eipData.data };
     newPreamble.title = newTitle;
