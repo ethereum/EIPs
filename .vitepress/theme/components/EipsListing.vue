@@ -1,6 +1,6 @@
 <script setup>
 import DefaultTheme from 'vitepress/theme'; // Gets rid of compiler error for $frontmatter
-import { getCurrentInstance, computed, watch, reactive, ref } from 'vue';
+import { getCurrentInstance } from 'vue';
 
 let vm = getCurrentInstance();
 let app = vm.appContext.app;
