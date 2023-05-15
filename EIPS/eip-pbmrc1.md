@@ -51,7 +51,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
   - Should an expiry time not be needed, the expiry time can be set to infinity.
 
 - PBM **SHALL** adhere to the definition of “wrap” or “wrapping” to mean bounding a token in accordance with PBM business logic during its lifecycle stage.
-                              
+
 - PBM **MUST** incorporate both a whitelist and a blacklist of addresses as a key element of the conditions that must be satisfied prior to unwrapping the underlying Spot Token
 
 - PBM **SHALL** adhere to the definition of “unwrap” or “unwrapping” to mean the release of a token in accordance with the PBM business logic during its lifecycle stage.
@@ -69,7 +69,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Auditability
 
-PBM Wrapper **SHOULD** provide mechanism(s) to make it easy for the public to verify the smart contract logic for unwrapping a PBM. Such mechanisms could then be leveraged by automated validation or asynchronous user verifications from transacting parties and/or whitelisted third parties attestations. 
+PBM Wrapper **SHOULD** provide mechanism(s) to make it easy for the public to verify the smart contract logic for unwrapping a PBM. Such mechanisms could then be leveraged by automated validation or asynchronous user verifications from transacting parties and/or whitelisted third parties attestations.
 
 As the fulfilment of PBM conditions is likely to be subjected to audits to ensure trust amongst all transacting parties, the following evidence shall be documented to support audits:
 
@@ -82,8 +82,7 @@ A PBM Wrapper **SHOULD** be able to wrap multiple types of compatible Spot Token
 
 ### PBM token details
 
-The ERC-1155 Multi Token Standard enables each token ID to correspond to a unique, configurable token type. All essential details facilitating the business or display logic for a specific PBM type **MUST** be defined for each token type. The mandatory fields for this purpose are outlined in the `struct PBMToken` (below). Future proposals may define additional, optional state variables as needed. Once a token detail has been defined, it **MUST** be immutable. 
-
+The ERC-1155 Multi Token Standard enables each token ID to correspond to a unique, configurable token type. All essential details facilitating the business or display logic for a specific PBM type **MUST** be defined for each token type. The mandatory fields for this purpose are outlined in the `struct PBMToken` (below). Future proposals may define additional, optional state variables as needed. Once a token detail has been defined, it **MUST** be immutable.
 
 Example of token details:
 
@@ -139,7 +138,7 @@ abstract contract IPBMRC1_TokenManager {
 }
 ```
 
-An external function may be exposed to create new PBM Token as well at a later date. 
+An external function may be exposed to create new PBM Token as well at a later date.
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
@@ -169,7 +168,6 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
 A list of targeted addresses for PBM unwrapping must be specified in an address list.
 
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
-
 
 ```solidity
 
@@ -205,8 +203,7 @@ interface PBMRC1_TokenReceiver {
         @notice Handles the callback from a PBM smart contract upon unwrapping
         @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap` if the
         receiver smart contract supports type(PBMRC1_TokenReceiver).interfaceId
-        @param _operator  The address which initiated the transfer (either the address which previously owned the token or the address authorised to make transfers on 
-                          the owner's behalf) (i.e. msg.sender)
+        @param _operator  The address which initiated the transfer (either the address which previously owned the token or the address authorised to make transfers on the owner's behalf) (i.e. msg.sender)
         @param _from      The address which previously owned the token
         @param _id        The ID of the token being unwrapped
         @param _value     The amount of tokens being transferred
@@ -220,8 +217,7 @@ interface PBMRC1_TokenReceiver {
         @dev An PBM smart contract MUST call this function on the token recipient contract, at the end of a `unwrap` if the
         receiver smart contract supports type(PBMRC1_TokenReceiver).interfaceId
 
-        @param _operator  The address which initiated the transfer (either the address which previously owned the token or the address authorised to make transfers on 
-                          the owner's behalf) (i.e. msg.sender)
+        @param _operator  The address which initiated the transfer (either the address which previously owned the token or the address authorised to make transfers on the owner's behalf) (i.e. msg.sender)
         @param _from      The address which previously owned the token
         @param _id        The ID of the token being unwrapped
         @param _value     The amount of tokens being transferred
