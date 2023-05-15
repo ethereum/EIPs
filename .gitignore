@@ -19,6 +19,8 @@ node_modules
 .vitepress/cache
 .vitepress/dist
 .vitepress/.temp
+vite.config.js.*
+.vitepress/config.js.*
 
 # VSCode
 .vscode

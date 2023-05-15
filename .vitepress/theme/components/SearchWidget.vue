@@ -30,22 +30,6 @@ let vm = getCurrentInstance();
 let app = vm.appContext.app;
 const frontmatter = app.config.globalProperties.$frontmatter;
 
-let transformedEips = [];
-for (let eip of frontmatter.allEips) {
-    let eipPrefix = eip.category == 'ERC' ? 'ERC' : 'EIP'; // Since some people use the wrong prefix
-    let wrongEipPrefix = eip.category == 'ERC' ? 'EIP' : 'ERC'; // Since some people use the wrong prefix
-    transformedEips.push({
-        title: `${eipPrefix}-${eip.eip}: ${eip.onlyTitle}`,
-        wrongTitle: `${wrongEipPrefix}-${eip.eip}: ${eip.onlyTitle}`,
-        description: eip.description,
-        author: eip.author,
-        link: `/EIPS/eip-${eip.eip}`,
-        status: eip.status,
-        type: eip.type,
-        category: eip.category,
-    });
-}
-
 let search = ref("");
 let results = computed(() => {
     let _ = searchModifiers; // Re-render when this changes
@@ -54,7 +38,7 @@ let results = computed(() => {
         searchQuery = [];
     };
     searchQuery = searchQuery.filter(q => q && !q.includes(":"));
-    let results = transformedEips.filter(eip => {
+    let results = frontmatter.allEips.filter(eip => {
         for (let query of searchQuery) {
             if (!eip?.title?.toLowerCase()?.includes(query) && !eip?.wrongTitle?.toLowerCase()?.includes(query) && !eip?.description?.toLowerCase()?.includes(query)) {
                 return false;
@@ -77,7 +61,14 @@ let results = computed(() => {
         let status1 = statusOrder.indexOf(eip1.status.toLowerCase());
         let status2 = statusOrder.indexOf(eip2.status.toLowerCase());
         if (status1 != status2) return status1 - status2;
-        return eip1.eip - eip2.eip
+        // Then sort by presence of a numeric EIP 'number'
+        if (!isNaN(parseInt(eip1.eip)) && isNaN(parseInt(eip2.eip))) return eip1.eip - eip2.eip;
+        if (isNaN(parseInt(eip1.eip))) return 1;
+        if (isNaN(parseInt(eip2.eip))) return -1;
+        // Then finally sort by creation date
+        let created1 = new Date(eip1.created);
+        let created2 = new Date(eip2.created);
+        if (created1 != created2) return created1 - created2;
     });
     return results;
 });

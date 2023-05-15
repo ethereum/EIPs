@@ -1,45 +1,35 @@
-import simpleGit from 'simple-git';
-import fs from 'fs';
-import grayMatter from 'gray-matter';
+import fs from 'node:fs/promises';
+
 import { createLogger } from 'vite-logger';
 import { Feed } from 'feed';
 import { withPwa } from '@vite-pwa/vitepress';
 import { defineConfig } from 'vitepress';
-import yaml from 'js-yaml';
 
-import feedConfig from './feeds.js';
-
-const git = simpleGit();
+import { fetchEips, getEipTransformedPremable } from './parser';
 
 const logger = createLogger('info', true);
 
-const statuses = [ 'Living', 'Last Call', 'Final', 'Review', 'Draft', 'Withdrawn', 'Stagnant' ]
-const eips = Promise.all(fs.readdirSync('./EIPS/').map(async file => {
-    let eipContent = fs.readFileSync(`./EIPS/${file}`, 'utf8');
-    let eipData = grayMatter(eipContent);
-    let lastStatusChange = new Date((await git.raw(['blame', `EIPS/${file}`])).split('\n').filter(line => line.match(/status:/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
-    let onlyTitle = eipData.data.title;
-    let eipPrefix = eipData.data.category === 'ERC' ? 'ERC' : 'EIP';
-    let newTitle = `${eipPrefix}-${eipData.data.eip}: ${eipData.data.title}`;
-    let newPreamble = { ...eipData.data };
-    newPreamble.title = newTitle;
-    newPreamble.onlyTitle = onlyTitle;
-    newPreamble.lastStatusChange = lastStatusChange;
-    return newPreamble;
-})).then(res => res.sort((a, b) => a.eip - b.eip));
+logger.info('Fetching EIPs', { timestamp: true });
+const eips = await fetchEips();
+logger.info('Fetched EIPs', { timestamp: true });
 
-function formatDateString(date) {
-    return date.toISOString().split('T')[0];
-}
-
-function copyDirectorySync(from, to) {
+async function copyDirectory(from, to) {
     // Recursively copy a directory, without overwriting existing files
-    for (let file of fs.readdirSync(from)) {
-        if (fs.statSync(`${from}/${file}`).isDirectory()) { // If directory, recursively copy
-            fs.mkdirSync(`${to}/${file}`, { recursive: true });
-            copyDirectorySync(`${from}/${file}`, `${to}/${file}`);
-        } else if (!fs.existsSync(`${to}/${file}`)) { // If file doesn't exist, don't skip
-            fs.copyFileSync(`${from}/${file}`, `${to}/${file}`);
+    // Uses fs.constants.COPYFILE_EXCL to avoid overwriting files
+    await fs.mkdir(to, { recursive: true });
+    let files = await fs.readdir(from);
+    for (let file of files) {
+        let current = await fs.lstat(`${from}/${file}`);
+        if (current.isDirectory()) {
+            await copyDirectory(`${from}/${file}`, `${to}/${file}`);
+        } else {
+            try {
+                await fs.copyFile(`${from}/${file}`, `${to}/${file}`, fs.constants.COPYFILE_EXCL);
+            } catch (e) {
+                if (e.code !== 'EEXIST') {
+                    throw e; // If the error isn't because the file already exists, throw it
+                }
+            }
         }
     }
 }
@@ -90,22 +80,19 @@ export default withPwa(defineConfig({
     lastUpdated: true,
     async transformHead({ siteConfig, siteData, pageData, title, description, head, content }) {
         try { // Custom error handling needed because of the way VitePress handles errors (i.e. it doesn't)
-            let { frontmatter } = pageData;
-            if (frontmatter.eip) {
+            if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
                 logger.info(`Generating Metadata for ${pageData.relativePath}`);
-    
-                let eipPrefix = frontmatter?.category === 'ERC' ? 'ERC-' : 'EIP-';
-                let eipTitle = `${eipPrefix}${frontmatter.eip}: ${frontmatter.title}`;
-                let authors = frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]);
+                
+                let frontmatter = await getEipTransformedPremable(pageData.relativePath.split('/').pop());
     
                 return [
                     // Regular Metadata
                     [ 'title', {}, eipTitle ]
                     [ 'meta', { name: 'description', content: pageData.description }],
                     [ 'link', { rel: 'canonical', href: `https://eips.ethereum.org/${pageData.relativePath}` } ],
-                    ...authors.map(author => [ 'meta', { name: 'author', content: author } ]),
+                    ...authors.map(author => [ 'meta', { name: 'author', content: author.name } ]),
                     [ 'meta', { name: 'date', content: frontmatter.created.replace('-', '/') } ],
-                    [ 'meta', { name: 'copyright', content: 'Public Domain' } ],
+                    [ 'meta', { name: 'copyright', content: 'CC0 1.0 Universal (Public Domain)' } ],
                     // Open Graph
                     [ 'meta', { property: 'og:title', content: eipTitle } ],
                     [ 'meta', { property: 'og:description', content: pageData.description } ],
@@ -120,18 +107,18 @@ export default withPwa(defineConfig({
                     [ 'meta', { name: 'twitter:description', content: pageData.description } ],
                     // Dublin Core
                     [ 'meta', { name: 'DC.title', content: eipTitle } ],
-                    ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author } ]),
-                    [ 'meta', { name: 'DC.date', content: frontmatter.created.replace('-', '/') } ],
-                    frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalized.replace('-', '/') } ] : [],
+                    ...authors.map(author => [ 'meta', { name: 'DC.creator', content: author.name } ]),
+                    [ 'meta', { name: 'DC.date', content: frontmatter.createdSlashSeperated } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'DC.issued', content: frontmatter.finalizedSlashSeperated } ] : [],
                     [ 'meta', { name: 'DC.format', content: 'text/html' } ],
                     [ 'meta', { name: 'DC.language', content: 'en-US' } ],
                     [ 'meta', { name: 'DC.publisher', content: siteData.title } ],
-                    [ 'meta', { name: 'DC.rights', content: 'Public Domain' } ],
+                    [ 'meta', { name: 'DC.rights', content: 'CC0 1.0 Universal (Public Domain)' } ],
                     // Citation
                     [ 'meta', { name: 'citation_title', content: eipTitle } ],
-                    ...authors.map(author => [ 'meta', { name: 'citation_author', content: author } ]),
-                    [ 'meta', { name: 'citation_online_date', content: frontmatter.created.replace('-', '/') } ],
-                    frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalized.replace('-', '/') } ] : [],
+                    ...authors.map(author => [ 'meta', { name: 'citation_author', content: author.name } ]),
+                    [ 'meta', { name: 'citation_online_date', content: frontmatter.createdSlashSeperated } ],
+                    frontmatter.finalized ? [ 'meta', { name: 'citation_publication_date', content: frontmatter.finalizedSlashSeperated } ] : [],
                     [ 'meta', { name: 'citation_technical_report_institution', content: siteData.title } ],
                     [ 'meta', { name: 'citation_technical_report_number', content: frontmatter.eip } ],
                     // LD+JSON
@@ -153,139 +140,53 @@ export default withPwa(defineConfig({
     },
     async transformPageData(pageData) {
         try { // Custom error handling needed because of the way VitePress handles runtime errors (i.e. it doesn't)
-            logger.info(`Transforming ${pageData.relativePath}`);
-            
-            pageData = { ...pageData };
-            let { frontmatter } = pageData;
-            
-            let eip = pageData.relativePath.match(/(?<=^EIPS\/eip-)[\w_]+(?=.md)/)?.[0];
-            if (eip) {
-                frontmatter.eip = eip;
-            }
+            logger.info(`Transforming ${pageData.relativePath}`, { timestamp: true });
 
-            if (frontmatter.eip == 1) { // EIP-1: Inject the most up to date EIP editor list
-                let editors = [];
-                let emeritusEditors = [];
-                let editorfile = await fs.promises.readFile('./config/eip-editors.yml', 'utf8');
-                let editordata = yaml.load(editorfile);
-                let editorUsernames = [];
-                let inactiveEditorUsernames = [];
-                for (let editorType in editordata) {
-                    for (let editor of editordata[editorType]) {
-                        if (editorUsernames.includes(editor)) continue;
-                        if (editorType === 'inactive') {
-                            inactiveEditorUsernames.push(editor);
-                        } else {
-                            editorUsernames.push(editor);
-                        }
-                    }
-                }
-                for (let username of editorUsernames) {
-                    let editorTypes = [];
-                    for (let editorType in editordata) {
-                        if (editordata[editorType].includes(username)) {
-                            editorTypes.push(editorType.charAt(0).toUpperCase() + editorType.slice(1));
-                        }
-                    }
-                    editors.push({
-                        avatar: `https://github.com/${username}.png`,
-                        name: username,
-                        title: editorTypes.join(', '),
-                        links: [
-                            { icon: 'github', link: `https://github.com/${username}` }
-                        ]
+            if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
+                pageData = { ...pageData };
+                pageData.frontmatter = await getEipTransformedPremable(pageData.relativePath.split('/').pop());
+                logger.info(`Transformed ${pageData.relativePath} (EIP)`, { timestamp: true });
+                return pageData;
+            } else if (pageData.frontmatter.listing) {
+                pageData = { ...pageData };
+                if (pageData.filter !== undefined) {
+                    pageData.frontmatter.filteredEips = eips.filter(eip => {
+                        return Object.keys(pageData.frontmatter.filter).every(key => pageData.frontmatter.filter[key].includes(eip[key]));
+                    }).map(eip => {
+                        return {
+                            eip: eip.eip,
+                            title: eip.title,
+                            status: eip.status,
+                            authorData: eip.authorData,
+                        };
                     });
-                }
-                for (let username of inactiveEditorUsernames) {
-                    emeritusEditors.push({
-                        avatar: `https://github.com/${username}.png`,
-                        name: username,
-                        title: 'Emeritus Editor',
-                        links: [
-                            { icon: 'github', link: `https://github.com/${username}` }
-                        ]
+                    logger.info(`Transformed ${pageData.relativePath} (listing page)`, { timestamp: true });
+                } else {
+                    // Inject all EIPs into the search page (only a subset of the data is searchable)
+                    pageData.frontmatter.allEips = eips.map(eip => {
+                        return {
+                            eip: eip.eip,
+                            title: eip.title,
+                            wrongTitle: eip.wrongTitle,
+                            status: eip.status,
+                            type: eip.type,
+                            category: eip.category,
+                            authors: eip.authors,
+                            created: eip.created,
+                        };
                     });
-                }
-                frontmatter.editors = editors;
-                frontmatter.emeritusEditors = emeritusEditors;
-            }
-
-            if (frontmatter.eip) {
-                // Try to read from cache
-                try {
-                    let cache = JSON.parse(fs.readFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`));
-                    frontmatter = { ...frontmatter, ...cache };
-                } catch (e) {
-                    logger.info(`Cache miss for ${pageData.relativePath}`);
-                }
-                // The below caused so much pain and suffering :|
-                if (!frontmatter.created) {
-                    let initial = new Date((await git.log(['--diff-filter=A', '--', pageData.relativePath])).latest.date); // Only one match, so this is fine to use latest
-                    if (initial) {
-                        frontmatter.created = formatDateString(initial);
-                    }
-                }
-                if (!frontmatter.finalized && frontmatter.status === 'Final') {
-                    let final = new Date((await git.raw(['blame', pageData.relativePath])).split('\n').filter(line => line.match(/status:\s+final/gi))?.pop()?.match(/(?<=\s)\d+-\d+-\d+/g)?.pop());
-                    if (final) {
-                        frontmatter.finalized = formatDateString(final);
-                    }
-                }
-                if (frontmatter.created instanceof Date) {
-                    frontmatter.created = formatDateString(frontmatter.created);
+                    logger.info(`Transformed ${pageData.relativePath} (search page)`, { timestamp: true });
                 }
 
-                // Write to cache
-                fs.mkdirSync('./.vitepress/cache/eips', { recursive: true });
-                fs.writeFileSync(`./.vitepress/cache/eips/${frontmatter.eip}.json`, JSON.stringify({
-                    created: frontmatter.created,
-                    finalized: frontmatter.finalized,
-                }));
-            }
-            if (frontmatter.eip) {
-                // Override the title
-                let onlyTitle = frontmatter.title;
-                let eipPrefix = frontmatter.category === 'ERC' ? 'ERC' : 'EIP';
-                pageData.title = `${eipPrefix}-${frontmatter.eip}: ${frontmatter.title}`;
-                frontmatter.title = pageData.title;
-                frontmatter.onlyTitle = onlyTitle;
-            }
-            if (frontmatter.eip) {
-                // More convenient author data
-                let authors = [];
-                for (let author of frontmatter.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g)) {
-                    let authorName = author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g);
-                    let emailData = author.match(/(?<=\<).*(?=\>)/g);
-                    let githubData = author.match(/(?<=\(@)[\w-]+(?=\))/g);
-                    if (emailData) {
-                        authors.push({
-                            name: authorName.pop(),
-                            email: emailData.pop()
-                        });
-                    } else if (githubData) {
-                        authors.push({
-                            name: authorName.pop(),
-                            github: githubData.pop()
-                        });
-                    } else {
-                        authors.push({
-                            name: authorName.pop()
-                        });
-                    }
-                }
-                frontmatter.authorData = authors;
-            }
-            if (frontmatter.listing) {
-                frontmatter.allEips = await eips;
-                frontmatter.allStatuses = statuses;
-            }
-            
-            logger.info(`Finished Transforming ${pageData.relativePath}`);
+                return pageData;
+            } else {
+                logger.info(`Transformed ${pageData.relativePath} (No special effects)`, { timestamp: true });
 
-            pageData.frontmatter = frontmatter;
-            return pageData;
+                return pageData;
+            }
         } catch (e) {
-            logger.error(e);
+            logger.error(`Error transforming ${pageData.relativePath}`, { timestamp: true });
+            logger.error(e, { timestamp: true });
             throw e;
         }
     },
@@ -293,64 +194,73 @@ export default withPwa(defineConfig({
         logger.info('Making feeds');
 
         const url = 'https://eips.ethereum.org';
-        fs.mkdirSync('./.vitepress/dist/rss', { recursive: true });
-        fs.mkdirSync('./.vitepress/dist/atom', { recursive: true });
 
-        for (let feedName in feedConfig) {
-            try {
-                const feed = new Feed({
-                    title: feedConfig[feedName].title,
-                    description: feedConfig[feedName].description,
-                    id: `${url}/rss/${feedName}.xml`,
-                    link: `${url}/rss/${feedName}.xml`,
-                    language: 'en',
-                    image: `${url}/assets/website/favicon-32x32.png`,
-                    favicon: `${url}/favicon.ico`,
-                    copyright: 'Creative Commons Zero v1.0 Universal',
-                });
-                let { filter } = feedConfig[feedName];
+        try {
+            const feed = new Feed({
+                title: feedConfig[feedName].title,
+                description: feedConfig[feedName].description,
+                id: `${url}/rss/${feedName}.xml`,
+                link: `${url}/rss/${feedName}.xml`,
+                language: 'en',
+                image: `${url}/assets/website/favicon-32x32.png`,
+                favicon: `${url}/favicon.ico`,
+                copyright: 'CC0 1.0 Universal (Public Domain)',
+            });
 
-                for (let eip in await eips) {
-                    let eipData = (await eips)[eip];
+            for (let eip in eips) {
+                let eipData = eips[eip];
 
-                    let skip = false;
+                let skip = false;
 
-                    for (let key of Object.keys(filter)) {
-                        if (filter[key] && !filter[key](eipData[key])) {
-                            skip = true;
-                            break;
-                        }
+                for (let key of Object.keys(filter)) {
+                    if (filter[key] && !filter[key](eipData[key])) {
+                        skip = true;
+                        break;
                     }
-
-                    if (skip) {
-                        continue;
-                    }
-                    feed.addItem({
-                        title: eipData.title,
-                        id: `${url}/EIPS/eip-${eip}`,
-                        link: `${url}/EIPS/eip-${eip}`,
-                        date: eipData.lastStatusChange,
-                        description: eipData.description,
-                        //author: eipData.author.match(/(?<=^|,\s*)[^\s]([^,"]|".*")+(?=(?:$|,))/g).map(author => author.match(/(?<![(<].*)[^\s(<][^(<]*\w/g)[0]),
-                        content: eipData.content,
-                        guid: eip,
-                    });
                 }
 
-                // Export the feed
-                fs.writeFileSync(`./.vitepress/dist/rss/${feedName}.xml`, feed.rss2());
-                fs.writeFileSync(`./.vitepress/dist/atom/${feedName}.atom`, feed.atom1());
-
-                logger.info(`Finished making \`${feedName}\` feed`);
-            } catch (e) {
-                logger.error(e);
-                throw e;
+                if (skip) {
+                    continue;
+                }
+                feed.addItem({
+                    title: eipData.title,
+                    id: `${url}/EIPS/eip-${eip}`,
+                    link: `${url}/EIPS/eip-${eip}`,
+                    date: eipData.lastStatusChange,
+                    description: eipData.description,
+                    author: parseAuthorData(eipData.authors).map(author => author.name),
+                    category: [
+                        {
+                            name: eipData.category ?? eipData.type,
+                            term: eipData.category ?? eipData.type,
+                            scheme: `${url}/category`,
+                            domain: `${url}/category`
+                        },
+                        {
+                            name: eipData.status,
+                            term: eipData.status,
+                            scheme: `${url}/status`,
+                            domain: `${url}/status`
+                        }
+                    ],
+                    content: eipData.content,
+                    guid: eip,
+                });
             }
 
-            // Copy ALL the assets
-            logger.info('Copying assets');
-            copyDirectorySync('./assets', './.vitepress/dist/assets');
+            // Export the feed
+            await fs.writeFile(`./.vitepress/dist/eips-rss.xml`, feed.rss2());
+            await fs.writeFile(`./.vitepress/dist/eips.atom`, feed.atom1());
+
+            logger.info(`Finished making \`${feedName}\` feed`);
+        } catch (e) {
+            logger.error(e);
+            throw e;
         }
+
+        // Copy ALL the assets
+        logger.info('Copying assets');
+        await copyDirectory('./assets', './.vitepress/dist/assets');
     },
     pwa: {
         injectRegister: 'script',

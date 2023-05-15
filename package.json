@@ -2,6 +2,7 @@
   "name": "eips-website",
   "version": "1.0.0",
   "description": "The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum itself and conventions built upon it. This repository tracks past and ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.",
+  "type": "module",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
@@ -28,7 +29,7 @@
     "simple-git": "^3.16.1",
     "vite-logger": "^0.0.1",
     "vite-plugin-pwa": "^0.14.4",
-    "vitepress": "^1.0.0-alpha.46",
+    "vitepress": "^1.0.0-alpha.75",
     "vue": "^3.2.47",
     "yaml": "^2.2.1"
   }
