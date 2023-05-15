@@ -85,6 +85,9 @@ export default withPwa(defineConfig({
                 
                 let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
                 let frontmatter = eips.find(eip => eip.eip === eipN);
+                if (!frontmatter) {
+                    throw new Error(`EIP ${eipN} not found`);
+                }
     
                 return [
                     // Regular Metadata
@@ -147,6 +150,11 @@ export default withPwa(defineConfig({
                 pageData = { ...pageData };
                 let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
                 pageData.frontmatter = eips.find(eip => eip.eip === eipN);
+
+                if (!pageData.frontmatter) {
+                    throw new Error(`EIP ${eipN} not found`);
+                }
+
                 logger.info(`Transformed ${pageData.relativePath} (EIP)`, { timestamp: true });
                 return pageData;
             } else if (pageData.frontmatter.listing) {
