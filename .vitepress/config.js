@@ -5,7 +5,7 @@ import { Feed } from 'feed';
 import { withPwa } from '@vite-pwa/vitepress';
 import { defineConfig } from 'vitepress';
 
-import { fetchEips, getEipTransformedPremable } from './parser';
+import { fetchEips, filenameToEipNumber } from './parser';
 
 const logger = createLogger('info', true);
 
@@ -83,7 +83,8 @@ export default withPwa(defineConfig({
             if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
                 logger.info(`Generating Metadata for ${pageData.relativePath}`);
                 
-                let frontmatter = await getEipTransformedPremable(pageData.relativePath.split('/').pop());
+                let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
+                let frontmatter = eips.find(eip => eip.eip === eipN);
     
                 return [
                     // Regular Metadata
@@ -144,7 +145,8 @@ export default withPwa(defineConfig({
 
             if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
                 pageData = { ...pageData };
-                pageData.frontmatter = await getEipTransformedPremable(pageData.relativePath.split('/').pop());
+                let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
+                pageData.frontmatter = eips.find(eip => eip.eip === eipN);
                 logger.info(`Transformed ${pageData.relativePath} (EIP)`, { timestamp: true });
                 return pageData;
             } else if (pageData.frontmatter.listing) {

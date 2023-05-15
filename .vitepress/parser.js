@@ -54,6 +54,7 @@ export async function getEipTransformedPremable(file) {
 }
 
 export async function filenameToEipNumber(filename) {
+    if (!filename || !filename.match(/(?<=^EIPS\/eip-)[\w_]+(?=.md)/)?.[0]) return false;
     return filename.match(/(?<=^EIPS\/eip-)[\w_]+(?=.md)/)?.[0];
 }
 
