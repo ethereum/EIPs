@@ -1,0 +1,15 @@
+{
+    "name": "StraitsX-0.01",
+    "description": "$0.01 SGD test voucher",
+    "image": "https://gateway.pinata.cloud/ipfs/Qmf69TDf3JccGvF9BB4rp4b934QYD8uiffXzfWMgxK3ozk",
+    "attributes": [
+        {
+          "trait_type": "Value", 
+          "value": "0.01"
+        },
+        {
+            "trait_type": "Expired", 
+            "value": "False"
+        }
+    ]
+}
