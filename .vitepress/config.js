@@ -11,6 +11,10 @@ const logger = createLogger('info', true);
 
 logger.info('Fetching EIPs', { timestamp: true });
 const eips = await fetchEips();
+const eipsSpread = {};
+for (let eip of eips) {
+    eipsSpread[eip.eip] = eip;
+}
 logger.info('Fetched EIPs', { timestamp: true });
 
 async function copyDirectory(from, to) {
@@ -83,8 +87,11 @@ export default withPwa(defineConfig({
             if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
                 logger.info(`Generating Metadata for ${pageData.relativePath}`);
                 
-                let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
-                let frontmatter = eips.find(eip => eip.eip === eipN);
+                let eipN = await filenameToEipNumber(pageData.relativePath.split('/')[1]);
+                if (!eipN) {
+                    throw new Error(`EIP ${pageData.relativePath} not found`);
+                }
+                let frontmatter = eipsSpread[eipN];
                 if (!frontmatter) {
                     throw new Error(`EIP ${eipN} not found`);
                 }
@@ -148,12 +155,17 @@ export default withPwa(defineConfig({
 
             if (pageData.relativePath.match(/EIPS\/eip-\w+\.md/)) {
                 pageData = { ...pageData };
-                let eipN = filenameToEipNumber(pageData.relativePath.split('/')[1]);
-                pageData.frontmatter = eips.find(eip => eip.eip === eipN);
-
-                if (!pageData.frontmatter) {
+                
+                let eipN = await filenameToEipNumber(pageData.relativePath.split('/')[1]);
+                if (!eipN) {
+                    throw new Error(`EIP ${pageData.relativePath} not found`);
+                }
+                let frontmatter = eipsSpread[eipN];
+                if (!frontmatter) {
                     throw new Error(`EIP ${eipN} not found`);
                 }
+
+                pageData.frontmatter = frontmatter;
 
                 logger.info(`Transformed ${pageData.relativePath} (EIP)`, { timestamp: true });
                 return pageData;
