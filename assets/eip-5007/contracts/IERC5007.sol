@@ -10,7 +10,7 @@ interface IERC5007 /* is IERC1155 */ {
      *
      * - `tokenId` must exist.
      */
-    function startTime(uint256 tokenId) external view returns (int64);
+    function startTime(uint256 tokenId) external view returns (uint64);
 
     /**
      * @dev Returns the end time of the NFT.
@@ -19,5 +19,5 @@ interface IERC5007 /* is IERC1155 */ {
      *
      * - `tokenId` must exist.
      */
-    function endTime(uint256 tokenId) external view returns (int64);
+    function endTime(uint256 tokenId) external view returns (uint64);
 }
