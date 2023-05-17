@@ -12,49 +12,57 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./ERC6956.sol";
 import "./IERC6956AttestationLimited.sol";
 import "./IERC6956Floatable.sol";
+import "./IERC6956ValidAnchors.sol";
 
-contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
-
-    uint8 canStartFloatingMap;
-    uint8 canStopFloatingMap;
+/**
+ * @title ASSET-BOUND NFT implementation with all interfaces
+ * @author Thomas Bergmueller (@tbergmueller)
+ * @notice Extends ERC6956.sol with additional interfaces and functionality
+ * 
+ * @dev Error-codes
+ * ERROR | Message
+ * ------|-------------------------------------------------------------------
+ * E1-20 | See ERC6956.sol
+ * E21   | No permission to start floating
+ * E22   | No permission to stop floating
+ * E23   | allowFloating can only be called when changing floating state
+ * E24   | No attested transfers left
+ * E25   | data must contain merkle-proof
+ * E26   | Anchor not valid
+ * E27   | Updating attestedTransferLimit violates policy
+ */
+contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable, IERC6956ValidAnchors {
+    Authorization public floatStartAuthorization;
+    Authorization public floatStopAuthorization;
 
     /// ###############################################################################################################################
     /// ##############################################################################################  IERC6956AttestedTransferLimited
     /// ###############################################################################################################################
     
-    mapping(bytes32 => uint256) attestedTransferLimitByAnchor;
-    
+    mapping(bytes32 => uint256) public attestedTransferLimitByAnchor;
+    mapping(bytes32 => FloatState) public floatingStateByAnchor;
+
     uint256 public globalAttestedTransferLimitByAnchor;
-    AttestationLimitUpdatePolicy public transferLimitPolicy;
+    AttestationLimitPolicy public attestationLimitPolicy;
 
-    /// @dev Counts the number of attested transfers by Anchor
-    bool public canFloat; // Indicates whether tokens can "float" in general, i.e. be transferred without attestation
     bool public allFloating;
-    bool public floatingByDefault;
 
-    function requireValidLimitUpdate(uint256 oldValue, uint256 newValue) internal view {
+    /// @dev The merkle-tree root node, where proof is validated against. Update via updateValidAnchors(). Use salt-leafs in merkle-trees!
+    bytes32 private _validAnchorsMerkleRoot;
+
+    function _requireValidLimitUpdate(uint256 oldValue, uint256 newValue) internal view {
         if(newValue > oldValue) {
-            require(transferLimitPolicy == AttestationLimitUpdatePolicy.FLEXIBLE || transferLimitPolicy == AttestationLimitUpdatePolicy.INCREASE_ONLY, "EIP-6956: Updating attestedTransferLimit violates policy");
+            require(attestationLimitPolicy == AttestationLimitPolicy.FLEXIBLE || attestationLimitPolicy == AttestationLimitPolicy.INCREASE_ONLY, "ERC6956-E27");
         } else {
-            require(transferLimitPolicy == AttestationLimitUpdatePolicy.FLEXIBLE || transferLimitPolicy == AttestationLimitUpdatePolicy.DECREASE_ONLY, "EIP-6956: Updating attestedTransferLimit violates policy");
+            require(attestationLimitPolicy == AttestationLimitPolicy.FLEXIBLE || attestationLimitPolicy == AttestationLimitPolicy.DECREASE_ONLY, "ERC6956-E27");
         }
-    }
-
-    function _afterAnchorMint(address /*to*/, bytes32 anchor, uint256 /*tokenId*/) internal override(ERC6956) virtual {
-        _allowFloating(anchor, floatingByDefault);        
-    }
-
-    function updateAnchorFloatingByDefault(bool _floatsByDefault) public 
-    onlyMaintainer() {
-        floatingByDefault = true;
-        emit DefaultFloatingStateChange(_floatsByDefault, msg.sender);      
     }
 
     function updateGlobalAttestationLimit(uint256 _nrTransfers) 
         public 
         onlyMaintainer() 
     {
-       requireValidLimitUpdate(globalAttestedTransferLimitByAnchor, _nrTransfers);
+       _requireValidLimitUpdate(globalAttestedTransferLimitByAnchor, _nrTransfers);
        globalAttestedTransferLimitByAnchor = _nrTransfers;
        emit GlobalAttestationLimitUpdate(_nrTransfers, msg.sender);
     }
@@ -63,13 +71,13 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
         public 
         onlyMaintainer() 
     {
-       uint256 currentLimit = attestedTransferLimit(anchor);
-       requireValidLimitUpdate(currentLimit, _nrTransfers);
+       uint256 currentLimit = attestationLimit(anchor);
+       _requireValidLimitUpdate(currentLimit, _nrTransfers);
        attestedTransferLimitByAnchor[anchor] = _nrTransfers;
        emit AttestationLimitUpdate(anchor, tokenByAnchor[anchor], _nrTransfers, msg.sender);
     }
 
-    function attestedTransferLimit(bytes32 anchor) public view returns (uint256 limit) {
+    function attestationLimit(bytes32 anchor) public view returns (uint256 limit) {
         if(attestedTransferLimitByAnchor[anchor] > 0) { // Per anchor overwrites always, even if smaller than globalAttestedTransferLimit
             return attestedTransferLimitByAnchor[anchor];
         } 
@@ -79,59 +87,120 @@ contract ERC6956Full is ERC6956, IERC6956AttestationLimited, IERC6956Floatable {
     function attestationUsagesLeft(bytes32 anchor) public view returns (uint256 nrTransfersLeft) {
         // FIXME panics when attestationsUsedByAnchor > attestedTransferLimit 
         // since this should never happen, maybe ok?
-        return attestedTransferLimit(anchor) - attestationsUsedByAnchor[anchor];
+        return attestationLimit(anchor) - attestationsUsedByAnchor[anchor];
     }
 
     /// ###############################################################################################################################
     /// ##############################################################################################  FLOATABILITY
     /// ###############################################################################################################################
-    function canStartFloating(ERC6956Authorization op) public
+    
+    function updateFloatingAuthorization(Authorization startAuthorization, Authorization stopAuthorization) public
         onlyMaintainer() {
-        canStartFloatingMap = createAuthorizationMap(op);
-        emit CanStartFloating(op, msg.sender);
-    }
-        
-    function canStopFloating(ERC6956Authorization op) public
-        onlyMaintainer() {
-        canStopFloatingMap = createAuthorizationMap(op);
-        emit CanStopFloating(op, msg.sender);
-    } 
-
-    function _allowFloating(bytes32 anchor, bool _doFloat) internal {
-        anchorIsReleased[anchor] = _doFloat;
-        emit AnchorFloatingStateChange(anchor, tokenByAnchor[anchor], _doFloat);
+            floatStartAuthorization = startAuthorization;
+            floatStopAuthorization = stopAuthorization;
+            emit FloatingAuthorizationChange(startAuthorization, stopAuthorization, msg.sender);
     }
 
-    function allowFloating(bytes32 anchor, bool _doFloat)    
-     public 
-     {        
-        if(_doFloat) {
-            require(roleBasedAuthorization(anchor, canStartFloatingMap), "ERC-6956: No permission to start floating");
+    function floatAll(bool doFloatAll) public onlyMaintainer() {
+        require(doFloatAll != allFloating, "ERC6956-E23");
+        allFloating = doFloatAll;
+        emit FloatingAllStateChange(doFloatAll, msg.sender);
+    }
+
+
+    function _floating(bool defaultFloatState, FloatState anchorFloatState) internal pure returns (bool floats) {
+        if(anchorFloatState == FloatState.Default) {
+            return defaultFloatState;
+        }
+        return anchorFloatState == FloatState.Floating; 
+    }
+
+    function float(bytes32 anchor, FloatState newFloatState) public 
+    {
+        bool currentFloatState = floating(anchor);
+        bool willFloat = _floating(allFloating, newFloatState);
+
+        require(willFloat != currentFloatState, "ERC6956-E23");
+
+        if(willFloat) {
+            require(_roleBasedAuthorization(anchor, createAuthorizationMap(floatStartAuthorization)), "ERC6956-E21");
         } else {
-            require(roleBasedAuthorization(anchor, canStopFloatingMap), "ERC-6956: No permission to stop floating");
+            require(_roleBasedAuthorization(anchor, createAuthorizationMap(floatStopAuthorization)), "ERC6956-E22");
         }
 
-        require(_doFloat != isFloating(anchor), "EIP-6956: allowFloating can only be called when changing floating state");
-        _allowFloating(anchor, _doFloat);        
+        floatingStateByAnchor[anchor] = newFloatState;
+        emit FloatingStateChange(anchor, tokenByAnchor[anchor], newFloatState, msg.sender);
     }
 
-    function _beforeAttestationIsUsed(bytes32 anchor, address to) internal view virtual override(ERC6956) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
+        internal virtual
+        override(ERC6956)  {
+            bytes32 anchor = anchorByToken[tokenId];
+                    
+            if(!_anchorIsReleased[anchor]) {
+                // Only write when not already released - this saves gas, as memory-write is quite expensive compared to IF
+                if(floating(anchor)) {
+                    _anchorIsReleased[anchor] = true; // FIXME OPTIMIZATION, we do not need 
+                }
+            }
+             
+            super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        }
+    function _beforeAttestationUse(bytes32 anchor, address to, bytes memory data) internal view virtual override(ERC6956) {
         // empty, can be overwritten by derived conctracts.
-        require(attestationUsagesLeft(anchor) > 0, "ERC-6956: No attested transfers left");
-        super._beforeAttestationIsUsed(anchor, to);
+        require(attestationUsagesLeft(anchor) > 0, "ERC6956-E24");
+
+        // IERC6956ValidAnchors check anchor is indeed valid in contract
+        require(data.length > 0, "ERC6956-E25");
+        bytes32[] memory proof;
+        (proof) = abi.decode(data, (bytes32[])); // Decode it with potentially more data following. If there is more data, this may be passed on to safeTransfer
+        require(anchorValid(anchor, proof), "ERC6956-E26");
+
+        super._beforeAttestationUse(anchor, to, data);
     }
 
-    function isFloating(bytes32 anchor) public view returns (bool){
-        return anchorIsReleased[anchor];
+
+    /// @notice Update the Merkle root containing the valid anchors. Consider salt-leaves!
+    /// @dev Proof (transferAnchor) needs to be provided from this tree. 
+    /// @dev The merkle-tree needs to contain at least one "salt leaf" in order to not publish the complete merkle-tree when all anchors should have been dropped at least once. 
+    /// @param merkleRootNode The root, containing all anchors we want validated.
+    function updateValidAnchors(bytes32 merkleRootNode) public onlyMaintainer() {
+        _validAnchorsMerkleRoot = merkleRootNode;
+        emit ValidAnchorsUpdate(merkleRootNode, msg.sender);
+    }
+
+    function anchorValid(bytes32 anchor, bytes32[] memory proof) public virtual view returns (bool) {
+        return MerkleProof.verify(
+            proof,
+            _validAnchorsMerkleRoot,
+            keccak256(bytes.concat(keccak256(abi.encode(anchor)))));
+    }
+
+    function floating(bytes32 anchor) public view returns (bool){
+        return _floating(allFloating, floatingStateByAnchor[anchor]);
     }    
 
     constructor(
         string memory _name, 
         string memory _symbol, 
-        AttestationLimitUpdatePolicy _limitUpdatePolicy)
+        AttestationLimitPolicy _limitUpdatePolicy)
         ERC6956(_name, _symbol) {          
-            transferLimitPolicy = _limitUpdatePolicy;
+            attestationLimitPolicy = _limitUpdatePolicy;
 
         // Note per default no-one change floatability. canStartFloating and canStopFloating needs to be configured first!        
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC6956)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC6956AttestationLimited).interfaceId ||
+            interfaceId == type(IERC6956Floatable).interfaceId ||
+            interfaceId == type(IERC6956ValidAnchors).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }

@@ -1,10 +1,13 @@
 {
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "hardhat": "^2.14.0"
+    "hardhat": "^2.14.0",
+    "hardhat-contract-sizer": "^2.8.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.3",
-    "@openzeppelin/merkle-tree": "^1.0.4"
+    "@openzeppelin/merkle-tree": "^1.0.4",
+    "@primitivefi/hardhat-dodoc": "^0.2.3",
+    "solhint": "^3.4.1"
   }
 }
