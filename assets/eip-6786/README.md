@@ -2,8 +2,6 @@
 
 # ERC6786 Royalty Debt Registry
 
-[![License: CC0-1.0](https://img.shields.io/badge/License-CC0-yellow.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
-
 </div>
 
 This project provides a reference implementation of the proposed `ERC-6786 Royalty Debt Registry`.
