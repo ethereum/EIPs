@@ -1,0 +1,103 @@
+---
+eip: scheme_handler_discovery_option_for_wallets
+title: Scheme-Handler Discovery Option for Wallets
+description: Using custom protocol handlers to initiate connections between web pages and wallets.
+author: Sam Wilson (@SamWilsn)
+discussions-to: https://ethereum-magicians.org/t/shadow-a-scheme-handler-discovery-option-for-wallets/14330
+status: Draft
+type: Standards Track
+category: Interface
+created: 2023-05-15
+requires: 1193
+---
+
+## Abstract
+
+This proposal (affectionately known as SHADOW) is an alternative to [EIP-1193](./eip-1193.md) for wallet discovery in web browsers that requires no special permissions. Web pages intending to open a connection to a wallet inject an `iframe` tag pointing at a well-known scheme. Communication between the page and the wallet uses the `postMessage` API.
+
+## Motivation
+
+Current wallet discovery methods (eg. `window.ethereum`) only support one active wallet at a time, and require browser extensions to request broad permissions to modify web pages.
+
+Ideally users should be able to have multiple wallets active, and choose between them at runtime. This not only results in an improved user experience but also reduces the barrier to entry for new browser extensions as users are no longer forced to only install one browser extension at a time.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Initiating a Connection
+
+To initiate a connection to a provider, a web page SHOULD:
+
+1. Add an event listener to `window` for the `"message"` event (or set `window.onmessage`.)
+2. Create an `iframe` tag with a `src` attribute value of `web+evm://`; then
+3. Attach the `iframe` to the DOM.
+4. Wait for a `"message"` event with a non-nullish `source` equal to the `iframe`'s `contentWindow`.
+5. Save the first port from the message event for further communication. This is referred to as the "primary port."
+
+The event received in step 3 MAY contain additional information about the provider. If present, the event data SHALL satisfy the following TypeScript interface:
+
+```typescript
+interface ProviderInfo {
+    name: string;
+    icon: string;
+}
+```
+
+Where:
+
+ - **`name`** is the human-readable name of the provider; and
+ - **`icon`** is a URI pointing at an image. See [Icon Images](#icon-images).
+
+### Communicating on an Established Connection
+
+The web page and wallet MAY make requests of the other. The party making the request is known as the requester, and the replying party is known as the responder.
+
+A requester MAY make requests of the responder by sending a message (using `postMessage`) on the primary port. The message MAY include a `MessagePort` as the first item of the message's transfer list to receive a reply. This port is known as a "reply port." The message's data MUST satisfy [EIP-1193](./eip-1193.md)'s `RequestArguments` interface, and SHALL be interpreted as described there.
+
+The responder SHALL respond by posting a single message to the reply port, if a reply port was transferred. The message's data SHALL satisfy the following TypeScript interface, where `ProviderRpcError` is defined in EIP-1193:
+
+```typescript
+interface Response {
+    result?: unknown;
+    error?: ProviderRpcError;
+}
+```
+
+Exactly one of `result` or `error` SHALL be present on the response.
+
+If present, `result` SHALL be equivalent to the `result` field of the named JSON-RPC method's response.
+
+Error objects SHOULD follow the recommendations set out in EIP-1193.
+
+A request without a transferred reply port SHALL NOT be considered an error, even if a reply would have been sent.
+
+### Icon Images
+
+<!-- TODO -->
+
+## Rationale
+
+The slightly added complexity of using an `iframe` to communicate with the provider is well worth the benefits it brings.
+
+First, any web page (and not just browser extensions) can register a handler for a protocol. That means better support for pure web wallets, native executable wallets, and hardware wallets. As long as a wallet can serve a page securely, it can register itself as a handler.
+
+Multiple protocol handlers can register themselves in the same browser.
+
+## Backwards Compatibility
+
+While not backwards compatible with EIP-1193, this proposal uses extremely similar data structures to make the transition as painless as possible.
+
+It is possible to implement an EIP-1193 compatible provider using this proposal like so:
+
+<!-- TODO: Show example of implementing EIP-1193 provider on top of this proposal. -->
+
+## Security Considerations
+
+<!-- TODO: Needs more discussion. -->
+
+Both providers and web pages MUST verify the origin of messages before trusting them.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
