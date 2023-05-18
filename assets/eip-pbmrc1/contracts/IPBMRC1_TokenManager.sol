@@ -47,4 +47,26 @@ abstract contract IPBMRC1_TokenManager {
 
         // Add other optional state variables below...
     }
+
+    /// @notice Creates a new PBM Token type with the provided data.
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
+    /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
+    /// @param _name Name of the token.
+    /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
+    /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
+    /// @param _creator The address of the creator of this PBM type on this smart contract (e.g. msg.sender)
+    /// @param _tokenURI Metadata URI for ERC-1155 display purposes
+    function createPBMTokenType(
+        string memory _name,
+        uint256 _faceValue,
+        uint256 _tokenExpiry,
+        address _creator,
+        string memory _tokenURI
+    ) external;
+
+    /// @notice Retrieves the details of a PBM Token type given its tokenId.
+    /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
+    /// @param tokenId The identifier of the PBM token type.
+    /// @return pbmToken_ A PBMToken struct containing all the details of the specified PBM token type.
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory pbmToken_); 
 }
