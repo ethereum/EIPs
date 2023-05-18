@@ -24,13 +24,23 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
   /// underlying data structure must record how much the msg.sender has loaded in for the particular pbm `tokenId`
   /// in this function call, the msg.sender is the user bearing the PBM token
   /// loading conditions can be specify in this function.
+  /// Emits {TokenUnload} event.
   /// @dev allocates underlying token to be used exclusively by the PBM token `tokenId` type
+  /// @param tokenId   The identifier of the PBM token type to load
+  /// @param amount    The amount of ERC20 tokens to be loaded
   function load(uint256 tokenId, uint256 amount) external; 
 
-  /// Given a PBM token id, wrap an amount of ERC20 tokens into it.
-  /// function will pull ERC20 tokens from msg.sender 
+  /// Given a PBM token id, wrap an amount of ERC20 tokens purpose bound by `tokenId` and transfer the loaded tokens to recipient.
+  /// function will pull ERC20 tokens from msg.sender
+  /// Approval must be given to the PBM smart contract in order to for the pbm to pull money from msg.sender 
   /// underlying data structure will record how much the msg.sender has loaded into the PBM to be given to a recipient
+  /// in this function call, the msg.sender is the user bearing the PBM token
+  /// loading conditions can be specify in this function.
+  /// Emits {TokenUnload} event.
   /// @dev allocates underlying token to be used exclusively by the PBM token `tokenId` type for `recipient`
+  /// @param tokenId   The identifier of the PBM token type to load
+  /// @param amount    The amount of ERC20 tokens to be loaded for `recipient`
+  /// @param recipient The recipient to receive the loaded ERC20 tokens.
   function loadTo(uint256 tokenId, uint256 amount, address recipient) external; 
   
   /// @notice Retrieves the balance of the underlying ERC-20 token associated with a specific PBM token type and user address.
@@ -47,7 +57,7 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
   /// @param amount The quantity of the corresponding tokens to be unloaded.
   function unload(uint256 tokenId, uint256 amount) external;
 
-  /// Emitted when an underlying token is loaded into a PBM
+  /// @notice Emitted when an underlying token is loaded into a PBM
   /// @param caller Address by which ERC20token is taken from.
   /// @param to Address by which the token is loaded and assigned to
   /// @param tokenId Identifier of the PBM token types being loaded
