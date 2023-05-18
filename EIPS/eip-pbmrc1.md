@@ -276,9 +276,23 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 
 ## Security Considerations
 <!-- TBD Improvement: Think of other security considerations + Read up other security considerations in various EIPS and add on to this.  Improve grammer, sentence structure -->
+- Everything used in a smart contract is publicly visible, even local variables and state variables marked `private`.
+
+- Due to gas limit, loops that do not have a fixed number of iterations have to be used cautiously.
+
+- Never use tx.origin to check for authorization. `msg.sender` should be used to check for authorization.
+
+- If library code is used as part of a `delegatecall`, make sure library code is stateless to prevent malicious actors from changing state in your contract via `delegatecall`.
+
+- Malicious actors may try to front run transactions. As transactions take some time before they are mined, an attacker can watch the transaction pool and send a transaction, have it included in a block before the original transaction. This mechanism can be abused to re-order transactions to the attacker's advantage. A commitment scheme can be used to prevent front running.
+
+- Don't use block.timestamp for a source of entropy and random number.
+
+- Signing messages off-chain and having a contract that requires that signature before executing a function is a useful technique. However, the same signature can be exploited by malicious actors to execute a function multiple times. This can be harmful if the signer's intention was to approve a transaction once. To prevent signature replay, messages should be signed with nonce and address of the contract.
 
 - Malicious users may attempt to:
 
+  - Double spend through reentrancy.
   - clone existing PBM Tokens to perform double-spending;
   - create invalid PBM Token with no underlying Spot Token; or
   - falsifying the face value of PBM token through wrapping of fraudulent/invalid/worthless Spot Tokens.
@@ -294,6 +308,15 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 - This EIP depends on the security soundness of the underlying book keeping behavior of the token implementation.
 
   - The PBM Wrapper should be carefully designed to ensure effective control over permission to mint a new token. Failing to safeguard permission to mint a new PBM Token can cause fraudulent issuance and and unauthorised inflation of total token supply.
+
+  - The access control over permission to burn tokens should be carefully designed. Typically, only the following two roles are entitled to burn a token:
+
+    - Role 1. Prior to a PBM expiry, only whitelisted merchants with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they holds.
+    - Role 2. After a PBM has expired:
+      - whitelisted merchants with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they hold; and
+      - PBM owners are allowed to burn unused PBM Tokens remaining in the hands of non-whitelisted merchants to retrieve underlying Spot Tokens.
+
+  - Nevertheless, we do recognize there are potentially other use cases where a third type of role may be entitled to burning. Implementors should be cautious when designing access control over burning of PBM Tokens.
 
   - The mapping of each PBM Tokens to the amount of underlying spot token held by the smart contract should be carefully accounted for and audited.
 
