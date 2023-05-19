@@ -95,20 +95,109 @@ A PR moving an EIP from Last Call to Final SHOULD contain no changes other than 
 
 **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
-## What belongs in a successful EIP?
+## What's in an EIP?
 
-Each EIP should have the following parts:
+An EIP should must no more than one of each section, in the following order:
 
-- Preamble - RFC 822 style headers containing metadata about the EIP, including the EIP number, a short descriptive title (limited to a maximum of 44 characters), a description (limited to a maximum of 140 characters), and the author details. Irrespective of the category, the title and description should not include EIP number. See [below](./eip-1.md#eip-header-preamble) for details.
-- Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-- Motivation *(optional)* - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
-- Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-- Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
-- Backwards Compatibility *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
-- Test Cases *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
-- Reference Implementation *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
-- Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-- Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
+### Preamble/Front Matter
+
+**Required for all EIPs**
+
+An EIP's preamble consists of RFC 822-style headers with EIP metadata. See [EIP Header/Preamble](#eip-header-preamble) for details.
+
+### Abstract
+
+**Required for all EIPs**
+
+The abstract is a short paragraph (multi-sentence) technical summary. This should be a very terse yet human-readable version of the specification and motivation sections, and should define the narrow scope of the EIP. Reading an abstract should be sufficient to generally understand the EIP.
+
+This is a normative section.
+
+### Motivation
+
+**Required for Core EIPs; Optional for all non-Core EIPs**
+
+The Motivation section explains in detail the problem that the EIP's Specification solves. Readers are assumed to know that lack of interoperability is a problem; this section should be omitted if the only problem being solved is a lack of interoperability.
+
+**An EIP's solution to the problems should be discussed in the Rationale, and must not be discussed in the Motivation.*
+
+This is a non-normative section.
+
+### Specification 
+
+**Required for all EIPs**
+
+The Specification describes the EIP's solution to the problems listed in the Motivation section. The specification must clearly identify the characteristics of the solution in detail. The specification should be as general as possible while avoiding ambiguity.
+
+This is a normative section. If this section conflicts with any other normative section, the other section must be amended to satisfy the specification unless it is evident that the specification is incorrect.
+
+### Rationale
+
+**Required for all EIPs**
+
+The rationale describes how the specification solves the problems described in the Rationale, and discusses why particular design decisions were made over others, including any tradeoffs made. The rationale must discuss important objections or concerns raised about the EIP.
+
+**The Rationale should assume that the reader has read the Motivation. It is okay to restate a problem and relevant characteristics when discussing the solution, but do not mention irrelevant characteristics.**
+
+This is a non-normative section.
+
+### Backwards Compatibility
+
+**Required for all EIPs**
+
+The Backwards Compatibility section describes any backward incompatibilities and their consequences. If no backward incompatibilities are found, the following wording can be used:
+
+```md
+No backward compatibility issues found.
+```
+
+If the EIP is in draft or review, the following wording should be used until significant discussion has taken place:
+
+```md
+No backward compatibility issues found. Needs discussion.
+```
+
+This is a non-normative section. Additions of newly-identified backward compatibility issues should be proposed, even after an EIP reaches final.
+
+### Test Cases
+
+**Required for all Core EIPs; Optional for all non-Core EIPs**
+
+The Test Cases section provides data with which to test implementations. Tests should either be inlined in the EIP as input/expected output pairs (recommended), or included as unit tests in the EIP's assets directory.
+
+This is a normative section, but in the case of a conflict, the Specification section is considered more normative, and the Test Cases should be amended.
+
+### Reference Implementation
+
+**Optional for all EIPs**
+
+The Reference Implementation provides a minimal non-production-ready implementation that people can use to assist in understanding or implementing the specification. More complex, production-ready implementations can be submitted to [ERCRef](https://github.com/ercref/ercref-contracts) and/or [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts).
+
+This is a non-normative section. In the case of a conflict with the Specification section, the Reference Implementation should be amended.
+
+### Security Considerations
+
+**Required for all EIPs**
+
+The Security Considerations section discusses the security and privacy implications of the proposed specifciation. The section should include attack vectors, deanonymization and fingerprinting risks, potential ramifications of an exploit, pitfalls, or any other information that could be important for evaluating the security of any system that implements the EIP. The following wording can be used while an EIP is in draft or review:
+
+```md
+No security considerations found. Needs discussion.
+```
+
+This is a non-normative section. Additions of newly-identified security considerations should be proposed, even after an EIP reaches final.
+
+### Copyright Waiver
+
+**Required for all EIPs**
+
+All EIPs must be licenced using the CC0 1.0 Universal Public Domain Dedication. The copyright waiver MUST link to the repository's `LICENSE.md` file and use the following wording:
+
+```md
+Copyright and related rights waived via [CC0](../LICENSE.md).
+```
+
+All assets that can legally be licensed under CC0 must be licensed under CC0 or multi-licensed with CC0.
 
 ## EIP Formats and Templates
 
