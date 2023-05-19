@@ -97,7 +97,7 @@ A PR moving an EIP from Last Call to Final SHOULD contain no changes other than 
 
 ## What's in an EIP?
 
-An EIP should must no more than one of each section, in the following order:
+An EIP must contain no more than one of each section, in the following order:
 
 ### Preamble/Front Matter
 
@@ -184,6 +184,8 @@ The Security Considerations section discusses the security and privacy implicati
 ```md
 No security considerations found. Needs discussion.
 ```
+
+EIPs cannot be moved to Last Call or Final with an insufficient security considerations.
 
 This is a non-normative section. Additions of newly-identified security considerations should be proposed, even after an EIP reaches final.
 
