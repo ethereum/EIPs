@@ -13,17 +13,17 @@ requires: 165, 721, 1155
 
 ## Abstract
 
-This proposal aims to allows contracts, such as NFTs that support [ERC-721](./eip-721.md) and [ERC-1155](./eip-721.md) interfaces, to explicitly signal the creator a particular NFT.
+This proposal aims to allow NFTs that support [ERC-721](./eip-721.md) or [ERC-1155](./eip-721.md) interfaces to explicitly signal the creator a particular NFT.
 
 ## Motivation
 
-Today’s NFT marketplaces, galleries, and platforms implicitly assume the creator based on the address of the contract deployer or the EOA address that mints the NFT. This lack of consistency creates confusion among consumers viewing the same NFT on different marketplaces or platforms. It also creates frustration among creators. This proposal allows a creator to explicitly prove their authorship of one or more NFTs on an NFT smart contract.
+Today's NFT marketplaces, galleries, and platforms implicitly assume the creator based on the address of the contract deployer address or the EOA address that mints an NFT. And some platforms mint NFT contracts on behalf of creators so that the creator provenance is unverifiable information within the NFT metadata. This lack of consistency creates confusion among consumers viewing the same NFT on different marketplaces or platforms. It also creates frustration among creators. This proposal allows a creator to explicitly prove their authorship of one or more NFTs on an NFT smart contract.
 
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
 
-**Every ERC-xxxx compliant contract must implement the `ERC165` and `ERC721` or `ERC1155` interfaces**
+**Every ERC-xxxx compliant contract MUST implement the `ERC165` and `ERC721` or `ERC1155` interfaces**
 
 ```solidity
 
@@ -98,11 +98,11 @@ abstract contract ERCxxxx is IERCxxxx {
 
 ### Contract Owner Creator Assignment
 
-An NFT contract may be written to allow a particular role or the contract owner to specify the creator address for a particular NFT `tokenId`.
+An NFT contract supporting this standard MUST allow a particular role or the contract owner to specify the creator address for a particular NFT `tokenId`.
 
 ### Creator Approval
 
-An NFT contract may be written to allow `verifyTokenProvenance` to be called while checking that only the Contract Owner approved creator address may successfully call this function for a given `tokenId`.
+An NFT contract supporting this standard MUST allow `verifyTokenProvenance` to be called and MUST only allow the Contract Owner approved creator address to successfully call this function for a given `tokenId`.
 
 ## Backwards Compatibility
 
