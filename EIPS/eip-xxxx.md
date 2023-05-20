@@ -70,7 +70,7 @@ abstract contract ERCxxxx is IERCxxxx {
     }
 
     /**
-     * @dev Sets the creator information for a specific token id.
+     * @dev Sets the creator information for a specific tokenId.
      *
      * Requirements:
      *
@@ -86,7 +86,7 @@ abstract contract ERCxxxx is IERCxxxx {
     }
 
     /**
-     * @dev Deletes creator information for the specified token.
+     * @dev Deletes creator information for the specified tokenId.
      */
     function _deleteTokenProvenance(uint256 tokenId) internal virtual {
         delete _tokenCreators[tokenId];
