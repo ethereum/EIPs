@@ -31,7 +31,7 @@ jobs:
           echo $MERGE_SHA > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
         with:
           name: pr_number
           path: pr/
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
       - name: Install Ruby
         uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
@@ -67,10 +67,10 @@ jobs:
     
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
         
       - name: Link Checker
-        uses: gaurav-nelson/github-action-markdown-link-check@0a51127e9955b855a9bbfa1ff5577f1d1338c9a5
+        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
         with:
           config-file: config/mlc_config.json
           use-quiet-mode: no
@@ -83,7 +83,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
       - name: Get Changed Files
         id: changed
@@ -96,7 +96,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run CodeSpell
-        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
         if: steps.changed.outcome == 'success'
         with:
           check_filenames: true
@@ -110,9 +110,9 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
-      - uses: ethereum/eipw-action@9968ac8604824d17c9d4cb99863e11e5e91342c3
+      - uses: ethereum/eipw-action@70379db401cbb3197454d8e02589af42d4ac5d21
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -123,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
       - name: Get Changed Files
         id: changed
@@ -136,7 +136,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@16d9da45919c958a8d1ddccb4bd7028e8848e4f1
+        uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
         if: steps.changed.outcome == 'success'
         with:
           command: config

@@ -76,7 +76,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
     // Mapping of child token address to child token ID to whether they are pending or active on any token
     // We might have a first extra mapping from token ID, but since the same child cannot be nested into multiple tokens
     //  we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) private _childIsInActive;
+    mapping(address => mapping(uint256 => uint256)) internal _childIsInActive;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -255,7 +255,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
         _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
 
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, 0, to, false);
+        _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
@@ -304,7 +304,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
             tokenId
         );
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
+        _updateOwnerAndClearApprovals(tokenId, destinationId, to);
         _balances[to] += 1;
 
         // Sending to NFT:
@@ -482,8 +482,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
         _balances[to] += 1;
         _directOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: destinationId != 0
+            tokenId: destinationId
         });
     }
 
@@ -513,8 +512,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
 
     /**
      * @notice Used to retrieve the immediate owner of the given token.
-     * @dev In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be
-     *  `false`.
+     * @dev In the event the NFT is owned by an externally owned account, `tokenId` will be `0`.
      * @param tokenId ID of the token for which the immediate owner is being retrieved
      * @return address Address of the immediate owner. If the token is owned by an externally owned account, its address
      *  will be returned. If the token is owned by another token, the parent token's collection smart contract address
@@ -529,7 +527,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
         DirectOwner memory owner = _directOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.isNft);
+        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
     }
 
     ////////////////////////////////////////
@@ -713,19 +711,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
      * @param tokenId ID of the token being updated
      * @param destinationId ID of the token to receive the given token
      * @param to Address of account to receive the token
-     * @param isNft A boolean value signifying whether the new owner is a token (`true`) or externally owned account
-     *  (`false`)
      */
     function _updateOwnerAndClearApprovals(
         uint256 tokenId,
         uint256 destinationId,
-        address to,
-        bool isNft
+        address to
     ) internal {
         _directOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: isNft
+            tokenId: destinationId
         });
 
         // Clear approvals from the previous owner
