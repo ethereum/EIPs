@@ -1,0 +1,129 @@
+---
+title: Interoperable Digital Media Indexing
+description: Interoperable Indexing of Digital Media on the EVM-compatible Blockchains.
+author: Bofu Chen (@bafu), Tammy Yang (@tammyyang)
+discussions-to: https://ethereum-magicians.org/t/<subject>/9999
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-05-22
+---
+
+## Abstract
+
+This EIP proposes an interoperable indexing strategy designed to enhance the organization and retrieval of digital media information across multiple smart contracts and EVM-compatible blockchains. This system enhances the traceability and verification of cross-contract and cross-chain data, facilitating a more efficient discovery of storage locations and crucial information related to media assets. The major purpose is to foster an integrated digital media environment on the blockchain.
+
+## Motivation
+
+Given the significant role digital media files play on the Internet, it's crucial to have a robust and efficient method for indexing immutable information. Existing systems encounter challenges due to the absence of a universal, interoperable identifier for digital media content. This leads to fragmentation and complications in retrieving metadata, storage information, or the provenance of specific media assets. The issues become increasingly critical as the volume of digital media continues to expand.
+
+The motivation behind this EIP is to establish a standardized, decentralized, and interoperable approach to index digital media across EVM-compatible networks. By integrating Decentralized Content Identifiers (CIDs), such as IPFS CID, and Commit events, this EIP puts forward a mechanism enabling unique identification and indexing of each digital media file. Moreover, this system suggests a way for users to access a complete history of data associated with digital media assets, from creation to the current status. This full view enhances transparency, thereby providing users with the necessary information for future interactions with digital media.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Content Identifier
+
+Before the indexing process for digital media can begin, it is REQUIRED to generate unique Content Identifiers for each file. This identifier should the same as the Content Identifiers on the decentralized storage, ensuring each identifier provides access to the metadata, media information, and the content file itself. While there's no explicit requirement for the choice of decentralized storage, it is RECOMMENDED to use IPFS Content Identifiers Version 1 (CIDv1) and follow the same generation rule as Kubo, which is the reference implementation for IPFS. The following also use IPFS CIDv1 as sample implementation.
+
+```sh
+# Unique Identifier example: IPFS CIDv1 of ETH Diamond (gray)
+bafkreicywxg6xz5u4ytremvhaw25b44n6rksse2hfms5rnlb2b5rya5n2a
+```
+
+### Commit Function
+
+To index digital media, we shall call the commit function and generate Commit event:
+
+```solidity
+/**
+ * @notice Emitted when a new commit is made.
+ * @param recorder The address of the account making the commit.
+ * @param assetCid The content identifier of the asset being committed.
+ * @param commitData The data associated with the commit.
+ */
+event Commit(address indexed recorder, string indexed assetCid, string commitData);
+
+/**
+ * @notice Registers a commit for an asset.
+ * Emits a Commit event and records the block number of the commit in the recordLogs mapping for the provided assetCid.
+ * @dev Emits a Commit event and logs the block number of the commit event.
+ * @param assetCid The content identifier of the asset being committed.
+ * @param commitData The data associated with the commit.
+ * @return The block number at which the commit was made.
+ */
+function commit(string memory assetCid, string memory commitData) public returns (uint256 blockNumber);
+```
+
+## Rationale
+
+<!--
+  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+
+  The current placeholder is acceptable for a draft.
+
+  TODO: Remove this comment before submitting
+-->
+
+This method creates a common interface that any digital media system can use to provide a standard way of indexing and searching their content.
+
+<figure>
+<img src="https://user-images.githubusercontent.com/292790/239763873-e8579364-64af-4688-ae9d-aa953ee397e5.jpg" alt="" style="width:100%">
+<figcaption align = "center"><b>Figure 1: Digital Media Indexing Relationships and Lookup</b></figcaption>
+</figure>
+
+This EIP aims to create an interoperable indexing system to associate all data of the same digital content together (Figure 1). This will make it easier for users to find and trust digital media content, and it will also make it easier for systems to share and exchange information about this digital media content.
+
+The design decisions in this EIP prioritize the effectiveness and efficiency of the indexing method. To achieve this, Decentralized Content Identifiers (CIDs) such as IPFS CIDv1, are utilized to uniquely identify digital media content across all systems. This approach offers accurate and precise searching of media, along with the following benefits:
+
+1. Strengthened data integrity: CIDs serve as cryptographic hashes of the content, ensuring their uniqueness and preventing forgery. With the content in hand, obtaining the CID allows for searching relevant information associated with that content.
+
+2. Streamlined data portability: CIDs enable the seamless transfer of digital media content across different systems, eliminating the need for re-encoding or reconfiguration of protocols. This promotes a more interoperable and open indexing system. For example, in cases where Non-Fungible Tokens (NFTs) are created prior to Commit events, the digital media content can still be indexed by converting the file referenced by the tokenURI using the same mechanism. This conversion process ensures that the digital media content associated with NFT tokens can be indexed with a consistent identification approach.
+
+## Reference Implementation
+
+```solidity
+// SPDX-License-Identifier: GPL-3.0-or-later
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+contract CommitRegister is Initializable {
+    using ECDSA for bytes32;
+
+    mapping(string => uint[]) public commitLogs;
+
+    event Commit(address indexed recorder, string indexed assetCid, string commitData);
+
+    function initialize() public initializer {}
+
+    function commit(string memory assetCid, string memory commitData) public returns (uint256 blockNumber) {
+        emit Commit(msg.sender, assetCid, commitData);
+        commitLogs[assetCid].push(block.number);
+        return block.number;
+    }
+
+    function getCommits(string memory assetCid) public view returns (uint[] memory) {
+        return commitLogs[assetCid];
+    }
+}
+```
+
+## Security Considerations
+
+When implementing this EIP, it's essential to address several security aspects to ensure the safety and integrity of the digital media index:
+
+1. Input Validation: Given that commit function accepts string parameters, it's important to validate these inputs to avoid potential injection attacks. Although such attacks are less common in smart contracts than traditional web development, caution should be exercised.
+
+2. Data Integrity: The commit function relies on IPFS CIDs, which are assumed to be correct and point to the right data. It's important to note that this EIP doesn't validate the content behind the IPFS CIDs and the commit data, which remains a responsibility of the users or implementing applications.
+
+3. Event Listening: Systems relying on listening to the Commit events for changes need to be aware of potential missed events or incorrect ordering, especially during periods of network congestion or reorganizations.
+
+Implementers should consider these security aspects in the context of their specific use case and deployment scenario. It is strongly recommended to perform a comprehensive security audit before deploying any implementation of this EIP to a live network.
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
