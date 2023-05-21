@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: CC0
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-interface IERC6785 {
+interface IERC5678 {
 
     // Logged when the utility description URL of an NFT is changed
     /// @notice Emitted when the utilityURL of an NFT is changed
@@ -18,10 +18,10 @@ interface IERC6785 {
     /// @dev The empty string for `utilityUri` indicates that there is no utility associated
     /// @param tokenId The NFT to get the user address for
     /// @return The utility uri for this NFT
-    function getUtilityUri(uint256 tokenId) external view returns (string memory);
+    function utilityUriOf(uint256 tokenId) external view returns (string memory);
 
     /// @notice Get the changes made to utilityUri
     /// @param tokenId The NFT to get the user address for
     /// @return The history of changes to `utilityUri` for this NFT
-    function getUtilityHistory(uint256 tokenId) external view returns(string[] memory);
+    function utilityHistoryOf(uint256 tokenId) external view returns(string[] memory);
 }

@@ -1,6 +1,0 @@
-node_modules
-package-lock.json
-
-#Hardhat files
-cache
-artifacts
