@@ -2,7 +2,7 @@
 title: ERC721 Lockable
 description: Interface for enabling locking of ERC721 using locker and approver
 author: Piyush Chittara (@streamnft-tech)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/erc721-lockable/14425
 status: Draft
 category: ERC
 created: 2023-05-25
