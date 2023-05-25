@@ -1,5 +1,5 @@
 ---
-eip: 
+eip: draft_ERC721Lockable
 title: ERC-721 Lockable
 description: Interface for enabling locking of ERC-721 using locker and approver
 author: Piyush Chittara (@streamnft-tech)
@@ -102,6 +102,6 @@ Please cite this document as: <>
 
 
 ## Other Lockable Implementation
-* [EIP-5753] Filipp Makarov (@filmakarov), "ERC-5753: Lockable Extension for EIP-721 [DRAFT]," Ethereum Improvement Proposals, no. 5753, October 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5753.
+* [EIP-5753](https://eips.ethereum.org/EIPS/eip-5753)
 
-* [EIP-5058] Tyler (@radiocaca), Alex (@gojazdev), John (@sfumato00), "ERC-5058: Lockable Non-Fungible Tokens [DRAFT]," Ethereum Improvement Proposals, no. 5058, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5058.
+* [EIP-5058](https://eips.ethereum.org/EIPS/eip-5058)
