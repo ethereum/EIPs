@@ -1,0 +1,105 @@
+---
+title: ERC721 Lockable
+description: Interface for enabling locking of ERC721 using locker and approver
+author: Piyush Chittara (@streamnft-tech)
+discussions-to: <URL>
+status: Draft
+category: ERC
+created: 2023-05-25
+requires: EIP-165,EIP-721
+---
+
+## Abstract
+An extension of EIP-721, this standard incorporates `locking` features into NFTs, allowing for various uses while preventing sale or transfer. The token's owner or operator has the ability to lock it, specifying an unlocker address (either an EOA or a contract) that exclusively holds the power to unlock the token. Owner can also provide approval for token-id, enabling ability to lock asset while address holds the token approval. Upon token transfer these rights get purged.
+
+
+## Motivation
+EIP-721 has sparked an unprecedented surge in demand for NFTs. However, despite this tremendous success, NFT economy suffers from secondary liquidity where it remains Illiquid in owner’s wallet. There are projects such as NFTfi, Paraspace which aims to address the liquidity challenge, but they entail below mentioned inconveniences and risks for owners as they necessitate transferring the participating NFTs to the projects' contracts. 
+
+
+* Loss of utility: The utility value of NFTs diminishes when they are transferred to an escrow account, no longer remaining under the direct custody of the owners.
+* Lack of composability: The market could benefit from increased liquidity if NFT owners had access to multiple financial tools, such as leveraging loans and renting out their assets for maximum returns. Composability serves as the missing piece in creating a more efficient market.
+* Smart contract vulnerabilities: NFTs are susceptible to loss or theft due to potential bugs or vulnerabilities present in the smart contracts they rely on.
+
+
+The aforementioned issues contribute to a poor user experience (UX), and we propose enhancing the EIP-721 standard by implementing a native locking mechanism: 
+Rather than being transferred to a smart contract, an NFT remains securely stored in self-custody but is locked. 
+During the lock period, the NFT's transfer is restricted while its other properties remain unchanged. 
+NFT Owner retains the ability to use or distribute it’s utility
+
+
+NFTs have numerous use cases where it is crucial for the NFT to remain within the owner's wallet, even when it serves as collateral for a loan. Whether it's authorizing access to a Discord server, or utilizing NFT within a play-to-earn (P2E) game, owner should have the freedom to do so throughout the lending period. Just as real estate owner can continue living in their mortgaged house, take personal loan or keep tenants to generate passive income, these functionalities should be available to NFT owners to bring more investors in NFT economy.
+
+
+Lockable NFTs enable the following use cases :
+* NFT-collateralized loans: Utilize NFT as collateral for a loan without locking it on the lending protocol contract. Instead, lock it within owner’s wallet while still enjoying all the utility of NFT.
+* No collateral rentals of NFTs: Borrow an NFT for a fee without the need for significant collateral. Renter can use the NFT but not transfer it, ensuring the lender's safety. The borrowing service contract automatically returns the NFT to the lender once the borrowing period expires.
+* Buy Now Pay Later: The buyer receives the locked NFT and can immediately begin using it. However, they are unable to sell the NFT until all installments are paid. Failure to complete the full payment results in the NFT returning to the seller, along with a fee.
+* Composability: Maximize liquidity by having access to multiple financial tools. Imagine taking a loan against NFT and putting it on rentals to generate passive income.
+* Primary sales: Mint an NFT for a partial payment and settle the remaining amount once owner is satisfied with the collection's progress.
+* Soulbound: Organization can mint and self assign `locker`, send token to user and lock the asset.
+* Safety: Safely and conveniently use exclusive blue chip NFTs. Lockable extension allows owner to lock NFT and designate secure cold wallet as the unlocker. This way, owner can keep NFT on MetaMask and easily use it, even if a hacker gains access to MetaMask account. Without access to the cold wallet, the hacker cannot transfer NFT, ensuring its safety.
+
+By extending the EIP-721 standard, the proposed standard enables secure and convenient management of underlying NFT assets. It natively supports prevalent NFTFi use cases such as, staking, lending, and renting. We anticipate that this proposed standard will foster increased engagement of NFT owners in NFTFi projects, thereby enhancing the overall vitality of the NFT ecosystem.
+
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+EIP-721 compliant contracts MAY implement this EIP to provide standard methods of locking and unlocking the token at its current owner address. If the token is `locked`, the `getLocked` function MUST return an address that is able to `unlock` the token. For tokens that are not `locked`, the getLocked function MUST return `address(0)`.
+
+Token owner MAY set `locker` to any address. Token MAY be locked by `locker` which MUST change the state from `UNLOCKED` to `LOCKED`. `lock` transaction MUST revert if token is not `UNLOCKED`. `unlock` transaction MUST revert if token is not `LOCKED`. `unlock` transaction MUST change state back to `UNLOCKED`.
+
+Token owner MAY set approval to any address. Token MAY be `locked` by `approver` which MUST change the state from `UNLOCKED` to `LOCKED_APPROVED`. `lockApproved` transaction MUST revert if token is not `UNLOCKED`. `unlockApproved` transaction MUST revert if token is not `LOCKED_APPROVED`. `unlockApproved` MUST change state back to `UNLOCKED`. 
+
+`approve` transaction MUST revert if token is not `UNLOCKED`. tansfer transaction MUST revert if token state is `LOCKED`. transfer transaction MUST pass if state is `LOCKED_APPROVED` and caller is `approved`, else MUST revert otherwise.
+
+## Rationale
+
+This approach presents a minimalistic solution that focuses on locking items and specifying who has the authority to unlock them. It offers flexibility and extensibility, accommodating various potential use cases mentioned in the Motivation section.
+
+Moreover, when there is a requirement to grant temporary or redeemable rights for a NFT, such as rentals or purchases with installments, this EIP involves the actual transfer of the token to the temporary user's wallet, rather than simply assigning a role. This design choice ensures compatibility with existing NFT ecosystem tools and dApps,  without necessitating additional interfaces or logic implementation.
+
+This functionality already exists on Solana, enabling ease for NFT liquidity and use cases. This EIP shall introduce same functionality to EVM ecosystem. The naming and reference implementation of functions and storage entities resemble the Approval flow outlined in [EIP-721], ensuring an intuitive user experience. 
+
+Existing [ERC721Upgradedable] can upgrade to ERC721 Locakable to unlock locking capability inherently and unlock underlying liquidity features.
+
+
+## Backwards Compatibility
+
+This standard is compatible with current EIP-721 standards.
+
+## Test Cases
+
+Test cases can be found [here](../assets/eip-ERC721Lockable/test/test.js).
+
+## Reference Implementation
+
+Reference Interface can be found [here](../assets/eip-ERC721Lockable/IERC721Lockable.sol).
+
+Reference Implementation can be found [here](../assets/eip-ERC721Lockable/ERC721Lockable.sol).
+
+## Security Considerations
+
+There are no security considerations related directly to the implementation of this standard for the contract that manages EIP-721 tokens.
+
+### Considerations for the contracts that work with lockable tokens
+* Make sure that every contract that is stated as `locker` can actually unlock the `LOCKED` token only.
+* Make sure that the approved contract can unlock the `LOCKED_APPROVED` token only.
+* `LOCKED` token with in-accesible account or un-verified contract address can lead to permanent lock of the token.
+* There are use cases, that involve transferring the token to a temporary owner and then lock it. For example, NFT rentals. Smart contracts that manage such services should always use `transferFrom` instead of `safeTransferFrom` to avoid re-entrancies.
+* There are no MEV considerations regarding lockable tokens as only authorized parties are allowed to lock and unlock.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE).
+
+## Citation
+Please cite this document as: <>
+
+
+## Other Lockable Implementation
+* [EIP-5753] Filipp Makarov (@filmakarov), "ERC-5753: Lockable Extension for EIP-721 [DRAFT]," Ethereum Improvement Proposals, no. 5753, October 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5753.
+
+* [EIP-5058] Tyler (@radiocaca), Alex (@gojazdev), John (@sfumato00), "ERC-5058: Lockable Non-Fungible Tokens [DRAFT]," Ethereum Improvement Proposals, no. 5058, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5058.
