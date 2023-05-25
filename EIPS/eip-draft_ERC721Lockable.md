@@ -93,7 +93,7 @@ There are no security considerations related directly to the implementation of t
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](../LICENSE).
+Copyright and related rights waived via [CC0](../LICENSE.md).
 
 ## Citation
 Please cite this document as: <>
