@@ -4,9 +4,10 @@ description: Interface for enabling locking of ERC721 using locker and approver
 author: Piyush Chittara (@streamnft-tech)
 discussions-to: https://ethereum-magicians.org/t/erc721-lockable/14425
 status: Draft
+type: Standards Track
 category: ERC
 created: 2023-05-25
-requires: EIP-165,EIP-721
+requires: 165, 721
 ---
 
 ## Abstract
