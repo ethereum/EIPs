@@ -3,11 +3,13 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./IERC721Lockable.sol";
+import "./IERC7066.sol";
 
 /// @title Lockable Extension for ERC721
+/// @dev Implementation for the Lockable extension
+/// @author StreamNFT 
 
-abstract contract ERC721Lockable is ERC721,IERC721Lockable{
+abstract contract ERC7066 is ERC721,IERC7066{
 
 
     /*///////////////////////////////////////////////////////////////
@@ -200,7 +202,7 @@ abstract contract ERC721Lockable is ERC721,IERC721Lockable{
      */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
          return
-            interfaceId == type(IERC721Lockable).interfaceId ||
+            interfaceId == type(IERC7066).interfaceId ||
             super.supportsInterface(interfaceId);
     }
 }

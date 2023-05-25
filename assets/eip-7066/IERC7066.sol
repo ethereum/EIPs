@@ -2,11 +2,11 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-/// @title IERC721Lockable
+/// @title Lockable Extension for ERC721
 /// @dev Interface for the Lockable extension
-/// @author streamNFT 
+/// @author StreamNFT 
 
-interface IERC721Lockable{
+interface IERC7066{
     
     /**
      * @dev Emitted when locker is set for token `id` 
