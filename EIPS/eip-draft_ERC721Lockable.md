@@ -1,4 +1,5 @@
 ---
+eip: 
 title: ERC721 Lockable
 description: Interface for enabling locking of ERC721 using locker and approver
 author: Piyush Chittara (@streamnft-tech)
