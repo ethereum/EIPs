@@ -32,7 +32,7 @@ describe('MyNFT', function () {
 			await myNFT.connect(deployer).mint();
 			await expect(
 				myNFT.connect(acc1).setLocker(0, acc1.address)
-			).to.be.revertedWith('ERC721Lockable : Owner Required');
+			).to.be.revertedWith('ERC7066 : Owner Required');
 		});
 
 		it('Should not allow to set locker when token is locked', async function () {
@@ -45,7 +45,7 @@ describe('MyNFT', function () {
 			//second check
 			await expect(
 				myNFT.connect(deployer).setLocker(0, acc2.address)
-			).to.be.revertedWith('ERC721Lockable : Locked');
+			).to.be.revertedWith('ERC7066 : Locked');
 		});
 
 		it('Should not allow to set locker when token is locked_approved', async function () {
@@ -53,7 +53,7 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
 			await expect(
 				myNFT.connect(deployer).setLocker(0, acc1.address)
-			).to.be.revertedWith('ERC721Lockable : Locked');
+			).to.be.revertedWith('ERC7066 : Locked');
 		});
 	});
 
@@ -61,7 +61,7 @@ describe('MyNFT', function () {
 		it('Should not allow anyone to remove locker', async () => {
 			const { myNFT, deployer, acc1 } = await mintAndSetAuthority();
 			await expect(myNFT.connect(acc1).removeLocker(0)).to.be.revertedWith(
-				'ERC721Lockable : Owner Required'
+				'ERC7066 : Owner Required'
 			);
 		});
 		it('Should not allow to remove locker when token is locked', async () => {
@@ -70,7 +70,7 @@ describe('MyNFT', function () {
 			await myNFT.connect(acc1).lock(0);
 
 			await expect(myNFT.connect(deployer).removeLocker(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked'
+				'ERC7066 : Locked'
 			);
 		});
 
@@ -78,7 +78,7 @@ describe('MyNFT', function () {
 			// minted token by deployer, acc1- locker, acc2- lock approved
 			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
 			await expect(myNFT.connect(deployer).removeLocker(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked'
+				'ERC7066 : Locked'
 			);
 		});
 	});
@@ -95,10 +95,10 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
 
 			await expect(myNFT.connect(acc2).lock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locker Required'
+				'ERC7066 : Locker Required'
 			);
 			await expect(myNFT.connect(deployer).lock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locker Required'
+				'ERC7066 : Locker Required'
 			);
 		});
 
@@ -106,7 +106,7 @@ describe('MyNFT', function () {
 			// minted token by deployer, acc1- lock authority, acc2- lock approved
 			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
 			await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked'
+				'ERC7066 : Locked'
 			);
 		});
 
@@ -118,7 +118,7 @@ describe('MyNFT', function () {
 
 			//second check
 			await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked'
+				'ERC7066 : Locked'
 			);
 		});
 	});
@@ -128,10 +128,10 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
 
 			await expect(myNFT.connect(acc2).unlock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locker Required'
+				'ERC7066 : Locker Required'
 			);
 			await expect(myNFT.connect(deployer).unlock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locker Required'
+				'ERC7066 : Locker Required'
 			);
 		});
 
@@ -139,7 +139,7 @@ describe('MyNFT', function () {
 			// minted token by deployer, acc1- lock authority, acc2- lock approved
 			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
 			await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked by approved'
+				'ERC7066 : Locked by approved'
 			);
 		});
 
@@ -147,7 +147,7 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
 
 			await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-				'ERC721Lockable : Unlocked'
+				'ERC7066 : Unlocked'
 			);
 		});
 	});
@@ -160,7 +160,7 @@ describe('MyNFT', function () {
 
 			await expect(
 				myNFT.connect(deployer).approve(acc2.address, 0)
-			).to.be.revertedWith('ERC721Lockable : Locked');
+			).to.be.revertedWith('ERC7066 : Locked');
 		});
 
 		it('Should not approve when token is locked_approved', async function () {
@@ -168,7 +168,7 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
 			await expect(
 				myNFT.connect(acc1).approve(acc2.address, 0)
-			).to.be.revertedWith('ERC721Lockable : Locked');
+			).to.be.revertedWith('ERC7066 : Locked');
 		});
 
 		it('Should not allow anyone to approve', async function () {
@@ -186,7 +186,7 @@ describe('MyNFT', function () {
 		it('Should not allow anyone without approval', async function () {
 			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
 			await expect(myNFT.connect(acc2).lockApproved(0)).to.be.revertedWith(
-				'ERC721Lockable : Required approval'
+				'ERC7066 : Required approval'
 			);
 		});
 
@@ -198,7 +198,7 @@ describe('MyNFT', function () {
 			await myNFT.connect(acc1).lock(0);
 
 			await expect(myNFT.connect(acc2).lockApproved(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked'
+				'ERC7066 : Locked'
 			);
 		});
 	});
@@ -208,7 +208,7 @@ describe('MyNFT', function () {
 			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
 
 			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC721Lockable : Required approval'
+				'ERC7066 : Required approval'
 			);
 		});
 
@@ -221,7 +221,7 @@ describe('MyNFT', function () {
 			//lock the token by lock authority
 			await myNFT.connect(acc1).lock(0);
 			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC721Lockable : Locked by locker'
+				'ERC7066 : Locked by locker'
 			);
 		});
 
@@ -232,7 +232,7 @@ describe('MyNFT', function () {
 			await myNFT.connect(deployer).setApprovalForAll(acc2.address, true);
 
 			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC721Lockable : Unlocked'
+				'ERC7066 : Unlocked'
 			);
 		});
 	});
@@ -248,7 +248,7 @@ describe('MyNFT', function () {
 					myNFT
 						.connect(deployer)
 						.transferFrom(deployer.address, acc3.address, 0)
-				).to.be.revertedWith('ERC721Lockable : Locked');
+				).to.be.revertedWith('ERC7066 : Locked');
 			});
 			it('Should not allow transfer by anyone without approval(lock_approved,ERC721)', async function () {
 				const { myNFT, deployer, acc1, acc2, acc3 } = await approveAcc2();
@@ -265,7 +265,7 @@ describe('MyNFT', function () {
 					myNFT
 						.connect(deployer)
 						.transferFrom(deployer.address, acc3.address, 0)
-				).to.be.revertedWith('ERC721Lockable : Required approval');
+				).to.be.revertedWith('ERC7066 : Required approval');
 			});
 
 			it('Should allow approved person to transfer token', async function () {
@@ -296,7 +296,7 @@ describe('MyNFT', function () {
 					.connect(deployer)
 					.transferFrom(deployer.address, acc3.address, 0);
 				await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-					'ERC721Lockable : Locker Required'
+					'ERC7066 : Locker Required'
 				);
 			});
 
@@ -308,7 +308,7 @@ describe('MyNFT', function () {
 					.transferFrom(deployer.address, acc3.address, 0);
 				await myNFT.connect(acc3).setLocker(0, acc1.address);
 				await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-					'ERC721Lockable : Unlocked'
+					'ERC7066 : Unlocked'
 				);
 			});
 		});
