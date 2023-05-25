@@ -21,7 +21,7 @@ Furthermore, the obsolete functionality of specifying output buffer address is r
 
 Lastly, instead of returning a boolean for execution status, an extensible list of status codes is returned: `0` for success, `1` for revert, `2` for failure.
 
-We expect most new contracts to rely on the new instructions (for simplicity and in order to save gas), and some specific contracts where gas limiting is required to keep using the old instructions (e.g. [EIP-4337](./eip-4337.md)).
+We expect most new contracts to rely on the new instructions (for simplicity and in order to save gas), and some specific contracts where gas limiting is required to keep using the old instructions (e.g. [ERC-4337](./eip-4337.md)).
 
 ## Motivation
 
