@@ -1,0 +1,74 @@
+---
+eip: xxxx
+title: MIME Type For Web3 URL in Auto Mode
+description: Deteremine the MIME type of a Web3 URL in auto mode
+author: Qi Zhou (@qizhou), Nand2 (@nand2)
+discussions-to: TBD
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-05-28
+requires: 4804
+---
+
+## Abstract
+
+This standard extends the Web3 URL like `web3://` in [ERC-4804](./eip-4804.md) in auto mode to deteremine the MIME type of a link via additional queries.
+
+## Motivation
+
+Web3 URL defines a way to deteremine the MIME type of a link in auto mode via the suffix of the last argument.  However, most of existing contracts on Ethereum do not expect such suffix and thus the current Web3 URL cannot display the web contents on existing contracts in a correct way (e.g., rendering an SVG image rather than the XML text).  The standard proposes additional queries for a Web3 URL to deteremine the MIME type.
+
+## Specification
+
+The standard introduces three types of queries to determine the MIME type.
+- `mime.content=<contentType>`, where `<contentType>`, after URL decoding, sets the `Content-Type` field in the response header; or
+- `mime.type=<fileType>`, where `<fileType>` is the file suffix that determines `Content-Type` field in the response header; or
+- `mime.dataurl=(true|false)`, which determines whether to decode the returned EVM data and set the MIME type according to data URL standard.  If the data cannot be parsed as data URL, an error will be returned.
+  
+If multiple queries are present, the last query will be applied.  If none of the query is specified, the `Content-Type` is undefined.
+  
+### Examples
+
+#### Example 1
+
+```
+web3://0x91cf36c92feb5c11d3f5fe3e8b9e212f7472ec14/accessorizedImageOf/1289?mime.content=image%2Fsvg%2Bxml
+```
+
+where the contract is in auto mode.
+
+The protocol will call the contract `0x91cf36c92feb5c11d3f5fe3e8b9e212f7472ec14` with the message defined in ERC-4804 and the `Content-Type` is set to `image/svg+xml`.
+
+#### Example 2
+
+```
+web3://0x91cf36c92feb5c11d3f5fe3e8b9e212f7472ec14/accessorizedImageOf/1289?mime.type=svg
+```
+
+where the contract is in auto mode.
+
+The protocol will call the contract `0x91cf36c92feb5c11d3f5fe3e8b9e212f7472ec14` with the message defined in ERC-4804 and the `Content-Type` is set to `image/svg+xml`.
+
+#### Example 3
+
+```
+web3://0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7/tokenURI/100?mime.dataurl=true
+```
+
+where the contract is in auto mode, and the returned data is `data:application/json;base64,...`.
+
+The protocol will call the contract `0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7` with the message defined in ERC-4804 and decode the data according to data URL standard, whcih sets the `Content-Type` to `applicaiton/json`,
+
+## Rationale
+
+The standard uses three types of queries rather than a single type of query to avoid confusion - an implementer or a user can easily tell the expected returned MIME of a link.  Further, in auto mode, the query parts are not used to form the EVM message (e.g., calldata) and thus it is safe to introduce new queries.
+
+## Security Considerations
+
+No security considerations were found.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
