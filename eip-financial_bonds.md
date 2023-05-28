@@ -1,6 +1,6 @@
 ---
 title: Financial Bonds
-description: <Description is one full (short) sentence>
+description: This interface defines a specification for financial bonds tokenization
 author: Samuel Gwlanold Edoumou (@Edoumou)
 discussions-to: https://ethereum-magicians.org/t/financial-bonds/14461
 status: Draft
@@ -30,7 +30,7 @@ and be used by applications like decentrailized exchanges.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-**Every [ERC] compliant contract MUST implement the following ERC- interface**
+**Every contract compliant with the EIP MUST implement the following ERC- interface**
 
 ```solidity
 pragma solidity ^0.8.0;
@@ -239,11 +239,11 @@ Tokenizing bonds will offer several advantages compared to traditional bond issu
 
 ## Reference Implementation
 
-The reference implementation will be added in the assets folder
+The reference implementation will be added in the assets folder after the PR is merged
 
 ## Security Considerations
 
-Will be completed.
+When implementing the the ERC, it is important to consider security risk related to functions that give approval to operators to manage owner's bonds, and to functions that allow to transfer bonds. Functions `transferAll` and `transferAllFrom` allow to transfer all the balance of an account, therefore, it is crucial to ensure that only the bonds owner and accounts that have been approved by the bonds owner can call these functions.
 
 ## Copyright
 
