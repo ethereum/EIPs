@@ -24,12 +24,12 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
         address newToken1Owner,
         uint256 newToken2Id,
         address newToken2Owner,        
-        int64 splitTime
+        uint64 splitTime
     ) public virtual override {
         require(_isApprovedOrOwner(_msgSender(), oldTokenId), "ERC5007: caller is not owner nor approved");
 
-        int64 oldTokenStartTime = _timeNftMapping[oldTokenId].startTime;
-        int64 oldTokenEndTime = _timeNftMapping[oldTokenId].endTime;
+        uint64 oldTokenStartTime = _timeNftMapping[oldTokenId].startTime;
+        uint64 oldTokenEndTime = _timeNftMapping[oldTokenId].endTime;
         require(
             oldTokenStartTime <= splitTime &&
                 splitTime < oldTokenEndTime,
@@ -107,8 +107,8 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
         address to_,
         uint256 tokenId_,
         uint256 assetId_,
-        int64 startTime_,
-        int64 endTime_
+        uint64 startTime_,
+        uint64 endTime_
     ) internal virtual {
         super._mintTimeNft(to_, tokenId_, startTime_, endTime_);
         _assetIdMapping[tokenId_] = assetId_;
