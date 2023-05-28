@@ -1,5 +1,5 @@
 ---
-eip: xxxx
+eip: 7087
 title: MIME Type For Web3 URL in Auto Mode
 description: Deteremine the MIME type of a Web3 URL in auto mode
 author: Qi Zhou (@qizhou), Nand2 (@nand2)
