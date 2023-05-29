@@ -33,7 +33,7 @@ contract ERC5496 is ERC721, IERC5496 {
         address user,
         uint64 expires
     ) external virtual {
-        require(_isApprovedOrOwner(msg.sender, tokenId) || _isDelegatorOrHolder(msg.sender, tokenId, privId), "ERC721: transfer caller is not owner nor approved");
+        require((hasPrivilege(tokenId, privId, ownerOf(tokenId)) && _isApprovedOrOwner(msg.sender, tokenId)) || _isDelegatorOrHolder(msg.sender, tokenId, privId), "ERC721: transfer caller is not owner nor approved");
         require(expires < block.timestamp + 30 days, "expire time invalid");
         require(privId < privilegeTotal, "invalid privilege id");
         privilegeBook[tokenId].privilegeEntry[privId].user = user;
