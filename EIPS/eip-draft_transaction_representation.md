@@ -1,7 +1,7 @@
 ---
 eip: 7023
-title: Automatic Transaction Representation
-description: Living guidelines for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
+title: Automatic Transaction Representation v1
+description: Guidelines for automatically generating a human-readable representation of a transaction and its corresponding EIP-712 signature.
 author: Gavin John (@Pandapip1)
 discussions-to: https://ethereum-magicians.org/t/automatic-transaction-representation/14256
 status: Draft
@@ -23,9 +23,9 @@ While signing transactions is made much more secure by [EIP-712](./eip-712.md), 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-The following rules MUST be followed by compliant wallets. Since this is a living standard, additional rules may be added in the future. When specifying compliance with this EIP, the date of the latest implemented version MUST be specified.
+Only Final EIPs may be referenced in this EIP or future versions of 'Automatic Transaction Representation' EIPs. Wallets SHOULD refer to 'Automatic Transaction Representation' EIPs by their full title, including the version. 'Automatic Transaction Representation' EIPs SHOULD include the full list of rules, as well as indicating the changes made in the Rationale section.
 
-Only Final EIPs may be referenced in this EIP.
+The following rules MUST be followed by compliant wallets:
 
 ### General Rules
 
