@@ -1,0 +1,250 @@
+---
+title: Financial Bonds
+description: This interface defines a specification for financial bonds tokenization
+author: Samuel Gwlanold Edoumou (@Edoumou)
+discussions-to: https://ethereum-magicians.org/t/financial-bonds/14461
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-05-28
+---
+
+## Abstract
+
+The proposed standard allows for the implementation of basic functionality for fixed income financial bonds with smart contracts.
+Principal bonds characteristics such as the bond isin, the issue volume, the issue date, the maturity date, the coupon rate,
+the coupon frequency, the principal, or the day count basis are defined to allow issuing bonds in the primary market (origination),
+and different transfer functions allow to buy or sell bonds in the secondary market. The standard also providses a functionality to
+allow bonds to be approved by owners in order to be spent by third party.
+
+## Motivation
+
+Fixed income instruments is one of the asset classes that is widely used by corporations and other entities to raise funds. Bonds
+are considered more secured than equity since the issuer is supposed to repay the principal at maturity in addition to coupons
+that are paid to investsors.
+
+This standard interface allows fixed income instruments to be represented as on-chain tokens, so as they can be managed through wallets,
+and be used by applications like decentrailized exchanges.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+**Every contract compliant with the EIP MUST implement the following ERC- interface**
+
+```solidity
+pragma solidity ^0.8.0;
+
+/**
+* @title ERC- Financial Bonds tandard
+*/
+interface IERC {
+    /**
+    *  @notice Returns the bond isin
+    */
+    function isin() external view returns(string memory);
+
+    /**
+    * @notice Returs the bond name
+    */
+    function name() external view returns(string memory);
+
+    /**
+    * @notice Returns the bond symbol
+    */
+    function symbol() external view returns(string memory);
+
+    /**
+    * @notice Returns the numbr of decimals the bond uses - e?g `10`, means to divide the token amount by `10000000000`
+    *
+    * OPTIONAL
+    */
+    function decimals() external view returns(uint8);
+
+    /**
+    * @notice Returns the bond currency. This is the contract address of the token used to pay and return the bond principal
+    */
+    function currency() external view returns(address);
+
+    /**
+    * @notice Returns the copoun currency. This is the contract address of the token used to pay coupons. It can be same as the the one used for the principal
+    */
+    function currencyOfCoupon() external view returns(address);
+
+    /**
+    * @notice Returns the bond denominiation. This is the minimum amount in which the Bonds may be issued. It must be expressend in unnit of the principal currency
+    *         ex: If the denomination is equal to 1,000 and the currency is USDC, then bond denomination is equal to 1,000 USDC
+    */
+    function denomination() external view returns(uint256);
+
+    /**
+    * @notice Returns the issue volume (total debt amount) in denomination unit
+    *         ex: if denomination = $1,000, and the total debt is $5,000,000
+    *         then, issueVolume() = $5,000, 000 / $1,000 = 5,000 bonds
+    */
+    function issueVolume() external view returns(uint256);
+
+    /**
+    * @notice Returns the bond interest rate in basis point unit
+    *         1 basis point = 0.01% = 0.0001
+    *         ex: if interest rate = 5%, then coupon() => 500 basis points
+    */
+    function couponRate() external view returns(uint256);
+
+    /**
+    * @notice Returns the coupon type
+    *         ex: 0: Zero coupon, 1: Fixed Rate, 2: Floating Rate, etc...
+    */
+    function couponType() external view returns(uint256);
+
+    /**
+    * @notice Returns the coupon frequency, i.e. the number of times coupons are paid in a year.
+    */
+    function couponFrequency() external view returns(uint256);
+
+    /**
+    * @notice Returns the date when bonds were issued to investors. This is a Unix Timestamp like the one returned by block.timestamp
+    */
+    function issueDate() external view returns(uint256);
+
+    /**
+    * @notice Returns the bond maturity date, i.e, the date when the pricipal is repaid. This is a Unix Timestamp like the one returned by block.timestamp
+    *         The maturityDate MUST be less than the issueDate
+    */
+    function maturityDate() external view returns(uint256);
+
+    /**
+    * @notice Returns the day count basis
+    *         Ex: 0: actual/actual, 1: actual/360, etc...
+    */
+    function dayCountBasis() external view returns(uint256);
+
+    /**
+    * @notice Returns the principal of an account in denomination unit
+    *         Ex: if denomination = $1,000, and the user has invested $5,000
+    *             then principalOf(_account) = 5,000/1,000 = 5
+    * @param _account account address
+    */
+    function principalOf(address _account) external view returns(uint256);
+
+    /**
+    * @notice Returns the amount of tokens the `_spender` account has been authorized by the `_owner``
+    *         acount to manage their bonds
+    * @param _owner the bondholder address
+    * @param _spender the address that has been authorized by the bondholder
+    */
+    function approval(address _owner, address _spender) external view returns(uint256);
+
+    /**
+    * @notice Authorizes `_spender` account to manage `_amount`of their bonds
+    * @param _spender the address to be authorized by the bondholder
+    * @param _amount amount of bond to approve. _amount MUST be a multiple of denomination
+    */
+    function approve(address _spender, uint256 _amount) external;
+
+    /**
+    * @notice Authorizes the `_spender` account to manage all their bonds
+    * @param _spender the address to be authorized by the bondholder
+    */
+    function approveAll(address _spender) external;
+
+    /**
+    * @notice Lower the allowance of `_spender`by `_amount`
+    * @param _spender the address to be authorized by the bondholder
+    * @param _amount amount of bond to remove approval; _amount MUST be a multiple of denomination
+    */
+    function disapprove(address _spender, uint256 _amount) external;
+
+    /**
+    * @notice Disapproves `_spender` to manage all the bonds the have been allowed to manage by the caller
+    * @param _spender the address to remove the authorization by from
+    */
+    function disapproveAll(address _spender) external;
+
+    /**
+    * @notice Moves `_amount`bonds to address `_to`
+    * @param _to the address to send the bonds to
+    * @param _amount amount of bond to transfer. _amount MUST be a multiple of denomination
+    * @param _data additional information provided by the token holder
+    */
+    function transfer(address _to, uint256 _amount, bytes calldata _data) external;
+
+    /**
+    * @notice Moves all bonds to address `_to`
+    * @param _to the address to send the bonds to
+    * @param _data additional information provided by the token holder
+    */
+    function transferAll(address _to, bytes calldata _data) external;
+
+    /**
+    * @notice Moves `_amount` bonds from an account that has authorized through the approve function
+    * @param _from the bondholder address
+    * @param _to the address to transfer bonds to
+    * @param _amount amount of bond to transfer. _amount MUST be a multiple of denomination
+    * @param _data additional information provided by the token holder
+    */
+    function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external;
+
+    /**
+    * @notice Moves all bonds from an `_from` to `_to`. The caller must have been authorized through the approve function
+    * @param _from the bondholder address
+    * @param _to the address to transfer bonds to
+    * @param _data additional information provided by the token holder
+    */
+    function transferAllFrom(address _from, address _to, bytes calldata _data) external;
+
+    /**
+    * @notice MUST be emitted when bonds are transferred
+    * @param _from the account that owns bonds
+    * @param _to the account that receives the bond
+    * @param _amount the amount of bonds to be transferred
+    * @param _data additional information provided by the token holder
+    */
+    event Transferred(address _from, address _to, uint256 _amount, bytes _data);
+
+    /**
+    * @notice MUST be emitted when an account is approved
+    * @param _owner the bonds owner
+    * @param _spender the account to be allowed to spend bonds
+    * @param _amount the amount allowed by _owner to be spent by _spender.
+    */
+    event Approved(address _owner, address _spender, uint256 _amount);
+
+    /**
+    * @notice MUST be emmitted when an account is disapproved
+    * @param _owner the bonds owner
+    * @param _sepender the account that has been allowed to spend bonds
+    * @param _amount the amount of tokens to disapprove
+    */
+    event Disapproved(address _owner, address _spender, uint256 _amount);
+}
+```
+
+## Rationale
+
+The financial bond standard is designed to represennt fixed income assets, which reprensent a loan made by an investor to a borrower. The proposed design has been motivated by
+the necessity to tokenize fixed income assets, and to represent to bond token with same characteristics as in traditional finance. Keeping the same properties as in tradional finance
+is necessary for issuers and investors to move to tokenized bonds without major difficulties. The same structure used in tradional finace, i.e issuer-investment bank-investors
+can be used for the bond standard, in that case the investment bank intermediary may be replaced by smart contracts. In the case of institutional issuance, the smart contracts
+can be managed by the investment bank. Decentralized exchanges may also use the bond standard to list bonds, in that case, decentralized exchanges will be in charge of managing
+the smart contracts.
+
+Tokenizing bonds will offer several advantages compared to traditional bond issuance and trading, among with:
+
+1. Fractional ownership: The bond standard does not limit the bond denomination to some minimum value compared to traditioanal bonds where the denomination is typically equal to $100 or $1,000.
+2. Accessibility: By allowing lower investment thresholds, tokenized bonds are supposed to attract retail investors who could not participate in traditional markets due to high minimum investment requirements.
+3. Increased liquidity: Fractioanal ownership will bring new investors in the bond market, this will increase liquidity in the bsond market.
+4. Cost savings: By replacing intermediaries with smart contracts, bond's tokenization will reduce costs associated with the bond issuance and management.
+5. Easy accessibility and 24/7 trading: Tokenized bonds are supposed to be traded on digital platforms such as decentralized exchanges. Therefore, they will be more accessible compared to tradional bond market.
+
+## Reference Implementation
+
+The reference implementation will be added in the assets folder after the PR is merged
+
+## Security Considerations
+
+When implementing the the ERC, it is important to consider security risk related to functions that give approval to operators to manage owner's bonds, and to functions that allow to transfer bonds. Functions `transferAll` and `transferAllFrom` allow to transfer all the balance of an account, therefore, it is crucial to ensure that only the bonds owner and accounts that have been approved by the bonds owner can call these functions.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
