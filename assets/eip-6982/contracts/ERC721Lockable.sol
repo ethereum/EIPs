@@ -8,8 +8,11 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IERC721Lockable.sol";
+import "./IERC6982.sol";
 
-contract ERC721Lockable is IERC721Lockable, Ownable, ERC721, ERC721Enumerable {
+// This is an example of lockable ERC721 using IERC6982 as basic interface
+
+contract ERC721Lockable is IERC6982, IERC721Lockable, Ownable, ERC721, ERC721Enumerable {
   using Address for address;
 
   mapping(address => bool) private _locker;

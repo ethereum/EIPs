@@ -4,10 +4,7 @@ pragma solidity ^0.8.19;
 // Author:
 // Francesco Sullo <francesco@sullo.co>
 
-import "@cruna/cruna-protocol/soulbound/IERC6982.sol";
-
-// ERC165 interface id is 0x2e4e0d27
-interface IERC721Lockable is IERC6982 {
+interface IERC721Lockable {
   event LockerSet(address locker);
   event LockerRemoved(address locker);
   event ForcefullyUnlocked(uint256 tokenId);

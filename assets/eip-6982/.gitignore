@@ -65,3 +65,4 @@ db
 .openzeppelin
 /test/fixtures/csv
 /export
+pnpm-lock.yaml

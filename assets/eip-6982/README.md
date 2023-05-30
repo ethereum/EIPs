@@ -9,6 +9,3 @@ npm i -g pnpm
 pnpm i
 pnpm test
 ```
-
-This implementation is used in many projects.  
-The package is on NPM at https://www.npmjs.com/package/@ndujalabs/erc721lockable

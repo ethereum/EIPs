@@ -13,7 +13,7 @@ describe("ERC721Lockable", function () {
 
   beforeEach(async function () {
     // myPool = await deployContract("MyPlayer");
-    myToken = await deployContractUpgradeable("ERC721LockableUpgradeableMock", ["My token", "NFT"]);
+    myToken = await deployContract("ERC721LockableMock", "My token", "NFT");
     myLocker = await deployContract("MyLocker")
   });
 
