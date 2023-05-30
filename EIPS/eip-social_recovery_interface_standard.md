@@ -1,8 +1,8 @@
 ---
-title: Social Recovery Interface Standard
+title: Social Recovery Interface
 description: Interfaces for social recovery account supporting various guardian types and customizable recovery policies.
-author: John Zhang (@johnz1019), Davis Xiang (@xcshuan), Kyle Xu (@kylexyxu), George Zhang(@odysseus0)
-discussions-to: 
+author: John Zhang (@johnz1019), Davis Xiang (@xcshuan), Kyle Xu (@kylexyxu), George Zhang (@odysseus0)
+discussions-to: https://ethereum-magicians.org/t/eip-social-recovery-interface/14494
 status: Draft
 type: Standards Track
 category: ERC
@@ -110,7 +110,7 @@ struct Permission {
 
 The `Identity` structure represents various types of guardians. The process of identity verification is as follows:
 
-- When the `signer` value in the declared entity is empty, this implies that the `Identity` entity is of EOA/SCA account type. In this case, `guardianVerifier` address should be the address of EOA/SCA (the actual signer). For permission verification of this `Identity` entity, one can use `SignatureChecker.isValidSignatureNow` from the [Openzeppelin](https://docs.openzeppelin.com/contracts/4.x/api/utils#SignatureChecker) library, which supports both ECDSA and ERC1271 signature verifications.
+- When the `signer` value in the declared entity is empty, this implies that the `Identity` entity is of EOA/SCA account type. In this case, `guardianVerifier` address should be the address of EOA/SCA (the actual signer). For permission verification of this `Identity` entity, one can use `SignatureChecker.isValidSignatureNow` from the Openzeppelin library, which supports both ECDSA and [ERC-1271](./eip-1271.md) signature verifications.
 - When the `signer` value in the declared entity is non-empty, this suggests that the `Identity` entity is of non-account type. In this case, permission verification can be accomplished by calling `guardianVerifier` address contract instance through `IGuardianPermissionVerifier` interface.
 
 
@@ -219,7 +219,7 @@ interface IRecoveryAccount {
 
     /**
      * @dev Return the domain separator name and version for signatures
-     * Also return the domainSeparator for EIP712 signature
+     * Also return the domainSeparator for EIP-712 signature
      */
 
     /// @notice             Domain separator name for signatures
@@ -228,8 +228,8 @@ interface IRecoveryAccount {
     /// @notice             Domain separator version for signatures
     function DOMAIN_SEPARATOR_VERSION() external view returns (string memory);
 
-    /// @notice             returns the domainSeparator for EIP712 signature
-    /// @return             the bytes32 domainSeparator for EIP712 signature
+    /// @notice             returns the domainSeparator for EIP-712 signature
+    /// @return             the bytes32 domainSeparator for EIP-712 signature
     function domainSeparatorV4() external view returns (bytes32);
 
     /**
@@ -238,7 +238,7 @@ interface IRecoveryAccount {
      */
     function updateGuardians(RecoveryPolicy[] recoveryPolicyConfig) external onlySelf;
 
-    // Generate eip712 message hash,
+    // Generate EIP-712 message hash,
     // Iterate over signatures for verification,
     // Verify recovery policy,
     // Store temporary state or recover immediately based on the result returned by verifyRecoveryPolicy.
@@ -276,7 +276,7 @@ interface IRecoveryAccount {
 
 ```
 
-- For the `Guardian`'s signable message, it SHOULD employ EIP712 type signature to ensure the content of the signature is readable and can be confirmed accurately during the Guardian signing process.
+- For the `Guardian`'s signable message, it SHOULD employ [EIP-712](./eip-712.md) type signature to ensure the content of the signature is readable and can be confirmed accurately during the Guardian signing process.
 - `getRecoveryNonce()` SHOULD be separated from nonces associated with account asset operations, as social recovery is a function at the account layer.
 
 
@@ -305,7 +305,7 @@ Note: This workflow is presented as an illustrative example to clarify the coord
    }
    ```
 
-2. When GuardianA and GuardianB assist the user in performing account recovery, they are to confirm the EIP-712 structured data for signing, which might look like this:
+2. When GuardianA and GuardianB assist the user in performing account recovery, they are to confirm the [EIP-712](./eip-712.md) structured data for signing, which might look like this:
 
    ```json
    {
@@ -366,7 +366,7 @@ Note: This workflow is presented as an illustrative example to clarify the coord
 
 4. `startRecovery() `function's processing logic is as follows:
 
-   - Generate a message hash (`msgHash`) from the input parameters `0xA`, `newOwners` and internally generated EIP712 signature parameters and `RecoveryNonce`.
+   - Generate a message hash (`msgHash`) from the input parameters `0xA`, `newOwners` and internally generated [EIP-712](./eip-712.md) signature parameters and `RecoveryNonce`.
    - Extract `guardian` and corresponding `signature` from the input parameters `permissions` and process them as follows:
      - If `guardianA.signer` is non-empty (Identity A), call `IGuardianPermissionVerifier(guardianVerifier1).isValidPermissions(signerA, msgHash, permissionA.signature)` to validate the signature.
      - If `guardianA.signer` is empty (Identity B), call the internal function `SignatureChecker.isValidSignatureNow(guardianVerifier2, msgHash, permissionB.signature)` to validate the signature.
