@@ -153,14 +153,14 @@ contract ERC7092 is IERC7092, BondStorage {
     function decreaseAllowance(address _spender, uint256 _amount) external  {
         address _owner = msg.sender;
 
-        _disapprove(_owner, _spender, _amount);
+        _decreaseAllowance(_owner, _spender, _amount);
     }
 
     function decreaseAllowanceForAll(address _spender) external {
         address _owner = msg.sender;
         uint256 _amount = _principals[_owner];
 
-        _disapprove(_owner, _spender, _amount);
+        _decreaseAllowance(_owner, _spender, _amount);
     }
 
     function transfer(address _to, uint256 _amount, bytes calldata _data) external {
@@ -212,7 +212,7 @@ contract ERC7092 is IERC7092, BondStorage {
         emit Approved(_owner, _spender, _amount);
     }
 
-    function _disapprove(address _owner, address _spender, uint256 _amount) internal virtual {
+    function _decreaseAllowance(address _owner, address _spender, uint256 _amount) internal virtual {
         require(_owner != address(0), "ERC7092: OWNER_ZERO_ADDRESS");
         require(_spender != address(0), "ERC7092: SPENDER_ZERO_ADDRESS");
         require(_amount > 0, "ERC7092: INVALID_AMOUNT");
