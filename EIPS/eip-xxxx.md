@@ -1,0 +1,148 @@
+---
+eip: <to be assigned>>
+title: Clustered ERC-721
+description: Extend the ERC-721 standard to allow for clusters of NFTs ad sub-collections
+author: Francesco Sullo (@sullof)
+discussions-to: https://ethereum-magicians.org/t/clustered-nft-for-sub-collections/14502
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-05-30
+requires: 721, 165
+---
+
+## Abstract
+
+A standard interface for contracts that manage clusters or sub-collections of ERC721 tokens within a single contract.
+
+This EIP introduces a new standard interface for Ethereum contracts that manage multiple clusters or sub-collections of ERC721 tokens within a single contract. This allows the tokens to be grouped together in a way that maintains each group's distinct identity and metadata.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+A contract that includes this interface must implement the ERC721 interface and adhere to the same specifications and restrictions. Additionally, it must implement the following functions:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+
+/**
+ * @title IClusteredERC721
+ * @dev IClusteredERC721 interface allows managing clusters or sub-collections of ERC721 tokens within a single contract
+ */
+interface IClusteredERC721 {
+
+  /**
+   * @dev Emitted when a new cluster is added
+   */
+  event ClusterAdded(uint256 indexed clusterId, string name, string symbol, string baseTokenURI, uint256 size);
+
+  /**
+   * @dev Emitted when ownership of a cluster is transferred
+   */
+  event ClusterOwnershipTransferred(uint256 indexed clusterId, address indexed previousOwner, address indexed newOwner);
+
+  /**
+   * @notice Gets the id of the cluster to which a token belongs
+   * @param tokenId ID of the token
+   * @return uint256 ID of the cluster to which the token belongs
+   */
+  function clusterOf(uint256 tokenId) external view returns (uint256);
+
+  /**
+   * @notice Gets the name of a cluster
+   * @param clusterId ID of the cluster
+   * @return string Name of the cluster
+   */
+  function nameOf(uint256 clusterId) external view returns (string memory);
+
+  /**
+   * @notice Gets the symbol of a cluster
+   * @param clusterId ID of the cluster
+   * @return string Symbol of the cluster
+   */
+  function symbolOf(uint256 clusterId) external view returns (string memory);
+
+  /**
+   * @notice Gets the range of token IDs that are included in a specific cluster
+   * @param clusterId ID of the cluster
+   * @return (uint256, uint256) Start and end of the token ID range
+   */
+  function rangeOf(uint256 clusterId) external view returns (uint256, uint256);
+
+  /**
+   * @notice Gets the owner of a cluster
+   * @param clusterId ID of the cluster
+   * @return address Owner of the cluster
+   */
+  function clusterOwner(uint256 clusterId) external view returns (address);
+
+  /**
+   * @notice Gets last cluster ID
+      Since the cluster IDs MUST be sequential, starting from 1, the last cluster ID is also the total number of clusters
+   * @return uint256 Total number of clusters
+   */
+  function lastClusterId() external view returns (uint256);
+
+  /**
+ * @notice Adds a new cluster
+   * @dev The ClusterAdded event MUST be emitted upon successful execution
+   * @param name Name of the cluster
+   * @param symbol Symbol of the cluster
+   * @param baseTokenURI Base Token URI of the cluster
+   * @param size Size of the cluster (number of tokens)
+   * @param clusterOwner Address of the cluster owner
+   * @return uint256 ID of the newly added cluster
+   */
+  function addCluster(string memory name, string memory symbol, string memory baseTokenURI, uint256 size, address clusterOwner) external;
+
+  /**
+   * @notice Transfers ownership of a cluster
+   * @dev The ClusterOwnershipTransferred event MUST be emitted upon successful execution
+   * @param clusterId ID of the cluster
+   * @param newOwner Address of the new owner
+   */
+  function transferClusterOwnership(uint256 clusterId, address newOwner) external;
+
+  /**
+   * @notice Gets the normalized token ID for a token
+   * @dev The normalized token ID is the token ID within the cluster, starting from 1
+   * @param tokenId ID of the token
+   * @return uint256 Normalized token ID
+   */
+  function normalizedTokenId(uint256 tokenId) external view returns (uint256);
+}
+
+```
+
+## Rationale
+
+Non-fungible tokens (NFTs) have proven to be a transformative way of demonstrating ownership over both digital and physical assets. However, when multiple categories or groups of NFTs are managed within a single contract, it can become difficult and confusing. This EIP presents a standard interface that simplifies the management of grouped NFTs. This is particularly beneficial in scenarios where collections of NFTs can be logically grouped together under a common theme or characteristic, while still necessitating that each maintains its unique identity and metadata.
+
+Additionally, this EIP aims to alleviate the financial burden for developers who may not be able to afford the costs associated with deploying a new contract for each distinct collection. With this interface, a single contract can manage an infinite number of clusters, thus streamlining the creation process for new collections. This parallels the function of marketplaces such as OpenSea or SuperRare, which support lazy-minting by allowing the creation of multiple unique tokens within a single contract.
+
+By facilitating the creation of distinct clusters within one contract, this standard provides greater flexibility and simplicity for managing collections of NFTs. This allows for a more organized representation of NFTs, aiding both developers and users in navigation and interaction, while preserving the unique attributes of each token.
+
+
+## Backwards Compatibility
+
+This EIP is fully backwards compatible with the existing ERC721 standard. A contract that implements IClusteredERC721 also implements ERC721.
+
+
+## Reference Implementation
+
+coming soon
+
+## Security Considerations
+
+Given that a single contract under this standard allows for the creation of an unlimited number of sub-collections, each mintable by their respective cluster owners, it's crucial for marketplaces and other interacting entities to accurately distinguish between these sub-collections. Each sub-collection should be treated as a distinct entity, rather than conflating them as part of a single collection.
+
+This distinction is essential for maintaining the security and integrity of the contract, as it helps to prevent unauthorized actions across different clusters. Misidentifying clusters can lead to unintentional access permissions, faulty transactions, or incorrect display of data. Therefore, it is highly recommended that adequate measures are taken to ensure proper identification and handling of the individual sub-collections within a contract.
+
+Additionally, developers implementing this interface should take extra precautions in their permissioning system to make sure that only the rightful cluster owners are allowed to mint tokens in their respective clusters. Robust implementation of access controls is critical in avoiding potential security vulnerabilities associated with unauthorized minting.
+
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
