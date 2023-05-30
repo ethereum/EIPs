@@ -1,4 +1,5 @@
 ---
+eip: 7093
 title: Social Recovery Interface
 description: Interfaces for social recovery account supporting various guardian types and customizable recovery policies.
 author: John Zhang (@johnz1019), Davis Xiang (@xcshuan), Kyle Xu (@kylexyxu), George Zhang (@odysseus0)
