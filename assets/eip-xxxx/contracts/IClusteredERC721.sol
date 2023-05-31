@@ -6,6 +6,7 @@ pragma solidity ^0.8.9;
 /**
  * @title IClusteredERC721
  * @dev IClusteredERC721 interface allows managing clusters or sub-collections of ERC721 tokens within a single contract
+    ERC165 InterfaceId = 0x8a7bc8c2
  */
 interface IClusteredERC721 {
   /**

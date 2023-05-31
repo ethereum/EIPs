@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IClusteredERC721.sol";
 
-import "hardhat/console.sol";
+//import "hardhat/console.sol";
 
 // Reference implementation of ClusteredERC721
 
@@ -71,7 +71,7 @@ contract ClusteredNFT is IClusteredERC721, ERC721, Ownable {
       return type(uint).max;
     }
 
-    uint start = 0;
+    uint start;
     uint end = _nextClusterId - 1;
     uint mid;
 
@@ -144,5 +144,9 @@ contract ClusteredNFT is IClusteredERC721, ERC721, Ownable {
     if (clusters[clusterId].owner != msg.sender) revert NotClusterOwner();
     if (clusters[clusterId].nextTokenId > clusters[clusterId].firstTokenId + clusters[clusterId].size - 1) revert ClusterFull();
     _mint(to, clusters[clusterId].nextTokenId++);
+  }
+
+  function getInterfaceId() external view returns(bytes4) {
+    return type(IClusteredERC721).interfaceId;
   }
 }

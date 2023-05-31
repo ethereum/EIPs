@@ -1,6 +1,6 @@
-# EIP 6982 implementation
+# Clustered NFT implementation
 
-As a reference implementation of EIP-6982 we use the Nduja Labs ERC721Lockable contract.
+As a reference implementation of Clustered NFT
 
 To run the tests, run the following commands:
 

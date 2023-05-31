@@ -1,31 +1,15 @@
 {
   "name": "clustered-erc721",
   "version": "0.1.0",
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "/contracts/**/*.sol"
-  ],
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "lint": "prettier --write 'contracts/**/*.sol' && solhint 'contracts/**/*.sol'",
-    "format": "npx prettier --write ./test/fixtures/**/*.js ./**/*.js",
     "coverage": "NODE_ENV=test npx hardhat coverage"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ndujaLabs/erc721lockable.git"
   },
   "author": {
     "name": "Francesco Sullo",
     "email": "francesco@sullo.co"
   },
-  "bugs": {
-    "url": "https://github.com/ndujaLabs/erc721lockable/issues"
-  },
-  "homepage": "https://github.com/ndujaLabs/erc721lockable#readme",
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.3",
@@ -33,13 +17,9 @@
     "chai": "^4.3.7",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.7.2",
-    "hardhat": "^2.14.0",
-  },
-  "lint-staged": {
-    "*.js": "prettier --write"
+    "hardhat": "^2.14.0"
   },
   "dependencies": {
-    "@cruna/cruna-protocol": "^1.0.3",
     "@openzeppelin/contracts": "^4.8.3",
     "@openzeppelin/contracts-upgradeable": "^4.8.3"
   }

@@ -24,19 +24,16 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 A contract that includes this interface must implement the ERC721 interface and adhere to the same specifications and restrictions. Additionally, it must implement the following functions:
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
-
 /**
  * @title IClusteredERC721
  * @dev IClusteredERC721 interface allows managing clusters or sub-collections of ERC721 tokens within a single contract
+    ERC165 InterfaceId = 0x8a7bc8c2
  */
 interface IClusteredERC721 {
-
   /**
    * @dev Emitted when a new cluster is added
    */
-  event ClusterAdded(uint256 indexed clusterId, string name, string symbol, string baseTokenURI, uint256 size);
+  event ClusterAdded(uint256 indexed clusterId, string name, string symbol, string baseTokenURI, uint256 size, address owner);
 
   /**
    * @dev Emitted when ownership of a cluster is transferred
@@ -79,23 +76,27 @@ interface IClusteredERC721 {
   function clusterOwner(uint256 clusterId) external view returns (address);
 
   /**
-   * @notice Gets last cluster ID
-      Since the cluster IDs MUST be sequential, starting from 1, the last cluster ID is also the total number of clusters
+   * @notice Gets how many clusters have been added
    * @return uint256 Total number of clusters
    */
-  function lastClusterId() external view returns (uint256);
+  function clustersCount() external view returns (uint256);
 
   /**
- * @notice Adds a new cluster
+   * @notice Adds a new cluster
    * @dev The ClusterAdded event MUST be emitted upon successful execution
    * @param name Name of the cluster
    * @param symbol Symbol of the cluster
    * @param baseTokenURI Base Token URI of the cluster
    * @param size Size of the cluster (number of tokens)
    * @param clusterOwner Address of the cluster owner
-   * @return uint256 ID of the newly added cluster
    */
-  function addCluster(string memory name, string memory symbol, string memory baseTokenURI, uint256 size, address clusterOwner) external;
+  function addCluster(
+    string memory name,
+    string memory symbol,
+    string memory baseTokenURI,
+    uint256 size,
+    address clusterOwner
+  ) external;
 
   /**
    * @notice Transfers ownership of a cluster
@@ -141,6 +142,8 @@ Given that a single contract under this standard allows for the creation of an u
 This distinction is essential for maintaining the security and integrity of the contract, as it helps to prevent unauthorized actions across different clusters. Misidentifying clusters can lead to unintentional access permissions, faulty transactions, or incorrect display of data. Therefore, it is highly recommended that adequate measures are taken to ensure proper identification and handling of the individual sub-collections within a contract.
 
 Additionally, developers implementing this interface should take extra precautions in their permissioning system to make sure that only the rightful cluster owners are allowed to mint tokens in their respective clusters. Robust implementation of access controls is critical in avoiding potential security vulnerabilities associated with unauthorized minting.
+
+Finally, the contract, should avoid that two clusters share the same name or the same baseTokenURI, etc. to avoid scams.
 
 
 ## Copyright

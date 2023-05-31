@@ -1,7 +1,4 @@
 require("@nomiclabs/hardhat-waffle");
-require("@openzeppelin/hardhat-upgrades");
-require("hardhat-contract-sizer");
-require("solidity-coverage");
 
 
 // You need to export an object to set up your config
