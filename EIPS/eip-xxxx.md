@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>>
+eip: 7108
 title: Clustered ERC-721
 description: Extend the ERC-721 standard to allow for clusters of NFTs ad sub-collections
 author: Francesco Sullo (@sullof)
