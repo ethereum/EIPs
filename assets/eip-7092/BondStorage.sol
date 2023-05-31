@@ -69,4 +69,8 @@ contract BondStorage {
     function bondInfo() public view returns(Bond memory) {
         return _bond[bondISIN];
     }
+    
+    function issuerInfo() public view returns(Issuer memory) {
+        return _issuer[bondISIN];
+    }
 }
