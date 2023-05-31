@@ -77,7 +77,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
 
-**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
+**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review. For ERC EIPs, author SHOULD provide (or convince someone to provide) a reference implementation before moving to `Review` status. 
 
 **Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
