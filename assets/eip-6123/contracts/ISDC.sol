@@ -136,8 +136,9 @@ interface ISDC {
      * @dev emits a {TradeIncepted} event
      * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
      * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
+     * @param _upfrontPayment provides an initial payment amount upfront
      */
-    function inceptTrade(string memory _tradeData, string memory _initialSettlementData) external;
+    function inceptTrade(string memory _tradeData, string memory _initialSettlementData, int256 _upfrontPayment) external;
 
     /**
      * @notice Performs a matching of provided trade data and settlement data
