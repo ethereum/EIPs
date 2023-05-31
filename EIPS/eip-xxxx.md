@@ -24,6 +24,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 A contract that includes this interface must implement the ERC721 interface and adhere to the same specifications and restrictions. Additionally, it must implement the following functions:
 
 ```solidity
+pragma solidity ^0.8.9;
+
 /**
  * @title IClusteredERC721
  * @dev IClusteredERC721 interface allows managing clusters or sub-collections of ERC721 tokens within a single contract
