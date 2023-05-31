@@ -56,6 +56,7 @@ describe.only("ClusteredNFT", function () {
 
     expect(await clusteredNFT.clusterOf(2223)).equal(1);
 
+
     const range = await clusteredNFT.rangeOf(0);
 
     expect(range[0]).equal(1);
@@ -63,7 +64,10 @@ describe.only("ClusteredNFT", function () {
 
     expect(await clusteredNFT.normalizedTokenId(1)).equal(1);
     expect(await clusteredNFT.normalizedTokenId(2223)).equal(1);
+    expect(await clusteredNFT.normalizedTokenId(2224)).equal(2);
     expect(await clusteredNFT.normalizedTokenId(2225)).equal(3);
+
+    expect(await clusteredNFT.tokenURI(2224)).equal("https://bud-token.cc/meta/2");
 
     // verify that the binary search works as expected
 

@@ -14,6 +14,9 @@ import "./IERC7108.sol";
 // Reference implementation of ERC-7108
 
 contract ERC7108 is IERC7108, ERC721, Ownable {
+
+  using Strings for uint256;
+
   error ZeroAddress();
   error NotClusterOwner();
   error SizeTooLarge();
@@ -146,7 +149,15 @@ contract ERC7108 is IERC7108, ERC721, Ownable {
     _mint(to, clusters[clusterId].nextTokenId++);
   }
 
-  function getInterfaceId() external view returns(bytes4) {
+  function tokenURI(uint256 tokenId) public view override returns (string memory) {
+    _requireMinted(tokenId);
+    uint256 clusterId = _binarySearch(tokenId);
+    string memory baseURI = clusters[clusterId].baseTokenURI;
+    tokenId -= clusters[clusterId].firstTokenId - 1;
+    return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
+  }
+
+  function getInterfaceId() external pure returns(bytes4) {
     return type(IERC7108).interfaceId;
   }
 }
