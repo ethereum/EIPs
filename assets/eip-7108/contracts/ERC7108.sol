@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IClusteredERC721.sol";
+import "./IERC7108.sol";
 
 //import "hardhat/console.sol";
 
-// Reference implementation of ClusteredERC721
+// Reference implementation of ERC-7108
 
-contract ClusteredNFT is IClusteredERC721, ERC721, Ownable {
+contract ERC7108 is IERC7108, ERC721, Ownable {
   error ZeroAddress();
   error NotClusterOwner();
   error SizeTooLarge();
@@ -147,6 +147,6 @@ contract ClusteredNFT is IClusteredERC721, ERC721, Ownable {
   }
 
   function getInterfaceId() external view returns(bytes4) {
-    return type(IClusteredERC721).interfaceId;
+    return type(IERC7108).interfaceId;
   }
 }

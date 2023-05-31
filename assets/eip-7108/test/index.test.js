@@ -5,7 +5,7 @@ describe.only("ClusteredNFT", function () {
   let ClusteredNFT, clusteredNFT, owner, owner2, owner3, bob, alice, fred, john;
 
   beforeEach(async function () {
-    ClusteredNFT = await ethers.getContractFactory("ClusteredNFT");
+    ClusteredNFT = await ethers.getContractFactory("ERC7108");
 
     [owner, owner2, owner3, bob, alice, fred, john] = await ethers.getSigners();
 
