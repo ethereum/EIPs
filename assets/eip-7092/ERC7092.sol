@@ -10,12 +10,10 @@ import "./BondStorage.sol";
 contract ERC7092 is IERC7092, BondStorage {
     constructor(
         string memory _bondISIN,
-        Bond memory _bondInfo,
         Issuer memory _issuerInfo
     )  {
         bondISIN = _bondISIN;
         _bondManager = msg.sender;
-        _bond[_bondISIN] = _bondInfo;
         _issuer[_bondISIN] = _issuerInfo;
     }
 
