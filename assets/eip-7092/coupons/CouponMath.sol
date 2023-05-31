@@ -12,9 +12,9 @@ library CouponMath {
         address _investor,
         address _bondContract
     ) external view returns(uint256) {
-        uint256 couponRate = IERC(_bondContract).couponRate();
-        uint256 denomination = IERC(_bondContract).denomination();
-        uint256 principal = IERC(_bondContract).principalOf(_investor);
+        uint256 couponRate = IERC7092(_bondContract).couponRate();
+        uint256 denomination = IERC7092(_bondContract).denomination();
+        uint256 principal = IERC7092(_bondContract).principalOf(_investor);
 
         return principal * denomination * couponRate;
     }
@@ -30,18 +30,21 @@ library CouponMath {
         uint256 _duration,
         address _bondContract
     ) external view returns(uint256) {
-        uint256 couponRate = IERC(_bondContract).couponRate();
-        uint256 couponDenomination = IERC(_bondContract).denomination();
-        uint256 principal = IERC(_bondContract).principalOf(_investor);
-        uint256 frequency = IERC(_bondContract).couponFrequency();
+        uint256 couponRate = IERC7092(_bondContract).couponRate();
+        uint256 couponDenomination = IERC7092(_bondContract).denomination();
+        uint256 principal = IERC7092(_bondContract).principalOf(_investor);
+        uint256 frequency = IERC7092(_bondContract).couponFrequency();
         uint256 numberOfDays = _numberOfDays(_bondContract);
 
         return principal * couponDenomination * couponRate * _duration / (frequency * numberOfDays);
     }
 
-
+    /**
+    * @notice Returns the number of days in a year based on the base count basis used.
+    *         Here we just check for two values.
+    */
     function _numberOfDays(address _bondContract) private view returns(uint256) {
-        uint256 dayCountBasis = IERC(_bondContract).dayCountBasis();
+        uint256 dayCountBasis = IERC7092(_bondContract).dayCountBasis();
 
         if(dayCountBasis == 0) {
             return 365;
