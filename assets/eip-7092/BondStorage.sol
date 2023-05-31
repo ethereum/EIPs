@@ -54,6 +54,7 @@ contract BondStorage {
         require(msg.sender == _bondManager, "BondStorage: ONLY_BOND_MANAGER");
         _;
     }
+    
     event BondIssued(IssueData[] _issueData, Bond _bond);
     event BondRedeemed();
 
