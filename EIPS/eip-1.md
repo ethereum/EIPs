@@ -270,6 +270,26 @@ Permitted W3C recommendation URLs MUST anchor to a specification in the technica
 ^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
 ```
 
+### Web Hypertext Application Technology Working Group (WHATWG)
+
+Links to WHATWG specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+```
+
+Which renders as:
+
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+
+Permitted WHATWG specification URLs must anchor to a specification defined in the `spec` subdomain (idea specifications are not allowed) and to a commit snapshot, and so must match this regular expression:
+
+```regex
+^https:\/\/[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$
+```
+
+Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
