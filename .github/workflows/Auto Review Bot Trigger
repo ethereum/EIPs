@@ -1,7 +1,7 @@
 on:
   workflow_run:
     workflows:
-      - Auto Review Bot Trigger
+      - 
     types:
       - completed
 
