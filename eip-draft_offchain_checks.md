@@ -19,6 +19,7 @@ We propose a low cost approach to distribute ERC-20 tokens for high-frequency to
 Mass token issuance is one of the most common blockchain activities, traditionally done by direct transfers of tokens to receiver addresses, or programming the issuance logic into smart contracts for receivers to mind their tokens on-chain. Both approaches involve high gas cost especially in large receiver base or high frequency issuance cases.
 
 This approach minimize on-chain operations while maintaining security with the following steps:
+
 1. Issuer register the token once with the Check contract which would mint tokens for the receivers
 1. Issuer writes as many off-chain Checks as needed to receivers with no gas, Checks signed by the issuer are non-reputable
 1. Receiver collects any number of Checks off-chain with no gas cost
@@ -93,6 +94,7 @@ interface ERC20Check {
 ```
 
 ### Off-chain Check data
+
 * The off-chain Check data MUST comply with the Check data structure defined in the ERC20Check interface
 * beginId for each (tokenAddr, receiverAddr) MUST starts with 1
 * Checks issued individually from the issuer MUST have beginId == endId
@@ -102,6 +104,7 @@ interface ERC20Check {
 * Receiver MUST sign each received Check (individual or bundled) before submit to the Check contract to mint
 
 * Example of a single signed Check from issuer
+
 ```json
 {
     "tokenAddr":"0x80307b478b1e4cc06c5ED1a4cedD0d6Bf312dd4E",
@@ -119,6 +122,7 @@ interface ERC20Check {
 ```
 
 * Example of a bundle Check request sent by the receiver to the issuer: "please bundle Check 10-11 into a single Check"
+
 ```json
 [
     {
@@ -151,6 +155,7 @@ interface ERC20Check {
 ```
 
 * Example of a bundled Check returned by the issuer as response to bundle request
+
 ```json
 {
     "tokenAddr":"0x80307b478b1e4cc06c5ED1a4cedD0d6Bf312dd4E",
