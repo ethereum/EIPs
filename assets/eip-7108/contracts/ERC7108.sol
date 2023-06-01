@@ -129,11 +129,13 @@ contract ERC7108 is IERC7108, ERC721, Ownable {
     return _nextClusterId;
   }
 
-  function transferClusterOwnership(uint256 clusterId, address newOwner) public override {
+  // This function was originally part of the interface but it was removed
+  // to leave the implementer full freedom about how to manage the ownership
+  function transferClusterOwnership(uint256 clusterId, address newOwner) public {
     if (newOwner == address(0)) revert ZeroAddress();
     if (clusters[clusterId].owner != msg.sender) revert NotClusterOwner();
     clusters[clusterId].owner = newOwner;
-    emit ClusterOwnershipTransferred(clusterId, msg.sender, newOwner);
+    emit ClusterOwnershipTransferred(clusterId, newOwner);
   }
 
   function normalizedTokenId(uint256 tokenId) public view override returns (uint256) {

@@ -12,7 +12,7 @@ describe.only("ClusteredNFT", function () {
     clusteredNFT = await ClusteredNFT.deploy("ClusteredNFT", "cNFT");
     await clusteredNFT.deployed();
 
-    expect(await clusteredNFT.getInterfaceId()).equal("0x8a7bc8c2");
+    expect(await clusteredNFT.getInterfaceId()).equal("0x4d676ad4");
   });
 
   it("Deploys contracts, mints tokens and checks ownerships", async function () {
