@@ -2,7 +2,6 @@
 title: SoulBounds. Standard Interface for Soulbound Assets
 description: Standard interface for representing and managing soulbound assets based on the ERC-1155 token standard.
 author: Leonid Shaydenko (@lssleo)
-discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
