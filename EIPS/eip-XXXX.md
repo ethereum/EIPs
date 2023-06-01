@@ -1,6 +1,6 @@
 ---
-title: SoulBounds. Standard Interface for Soulbound Assets
-description: Standard interface for representing and managing soulbound assets based on the ERC-1155 token standard.
+title: SoulBounds - Standard Interface for Soulbound Assets
+description: Interface for representing and managing soulbound assets based on the ERC-1155 token standard
 author: Leonid Shaydenko (@lssleo)
 status: Draft
 type: Standards Track
@@ -20,7 +20,8 @@ The concept of soulbound assets is commonly used in gaming and non-fungible toke
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-Smart contracts implementing the SoulBounds interface MUST implement all of the functions defined in the IERC1155SoulBounds interface.
+Smart contracts implementing the SoulBounds interface MUST implement all of the functions defined in the IERC1155SoulBounds interface
+
 
 The SoulBounds interface extends the ERC-1155 token standard by introducing the following additional functions:
 
