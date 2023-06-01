@@ -290,6 +290,24 @@ Permitted WHATWG specification URLs must anchor to a specification defined in th
 
 Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
 
+### Internet Engineering Task Force (IETF)
+
+Links to an IETF Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+```
+
+Which renders as:
+
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+
+Permitted IETF specification URLs MUST anchor to a specification with an assigned RFC number (meaning cannot reference internet drafts), and so MUST match this regular expression:
+
+```regex
+^https:\/\/www.rfc-editor.org\/rfc\/.*$
+```
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
