@@ -4,7 +4,7 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "coverage": "NODE_ENV=test npx hardhat coverage"
+    "clean": "rm -rf artifacts && rm -rf cache && rm -rf node_modules && rm -rf pnpm*"
   },
   "author": {
     "name": "Francesco Sullo",
