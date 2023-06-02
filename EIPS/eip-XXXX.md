@@ -1,4 +1,5 @@
 ---
+eip: 7121
 title: SoulBounds - Standard Interface for Soulbound Assets
 description: Interface for representing and managing soulbound assets based on the ERC-1155 token standard
 author: Leonid Shaydenko (@lssleo)
