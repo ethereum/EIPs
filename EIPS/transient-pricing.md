@@ -1,7 +1,7 @@
 ---
 title: Decrease TLOAD/TSTORE pricing for common cases
 description: Improve the efficiency of TLOAD/TSTORE by introducing a quadratic(?) pricing model.
-author: tbd
+author: @charles-cooper, @prestwich, ...(?)
 discussions-to: none yet
 status: Draft
 type: Standards Track
@@ -23,6 +23,9 @@ One of the most important use cases that EIP-1153 enables is cheap reentrancy pr
 Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with database journaling.
 
 This EIP proposes a quadratic pricing model, which is cheaper for common cases (fewer than 33 slots are written per contract), while making DoS using transient storage prohibitively expensive.
+
+XXX: probably go with 9 gas per tload and 15 gas per tstore.
+Does that make transient storage easier to memory dos than warm storage?
 
 
 ## Specification
