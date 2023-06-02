@@ -1,7 +1,7 @@
 ---
 title: Decrease TLOAD/TSTORE pricing for common cases
 description: Improve the efficiency of TLOAD/TSTORE by introducing a quadratic(?) pricing model.
-author: @charles-cooper, @prestwich, ...(?)
+author: @charles-cooper, @prestwich, @brockelmore, ...(?)
 discussions-to: none yet
 status: Draft
 type: Standards Track
