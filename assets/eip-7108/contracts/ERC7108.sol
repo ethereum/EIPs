@@ -33,7 +33,7 @@ contract ERC7108 is IERC7108, ERC721 {
   }
 
   mapping(uint256 => Cluster) public clusters;
-  mapping(address => uint256[]) public clusterIdByOwners;
+//  mapping(address => uint256[]) public clusterIdByOwners;
   uint256 public maxSize = 10000;
 
   uint256 private _nextClusterId = 0;
@@ -63,7 +63,7 @@ contract ERC7108 is IERC7108, ERC721 {
       size: uint32(size),
       nextTokenId: uint32(lastTokenIdInClusters + 1)
     });
-    clusterIdByOwners[clusterOwner_].push(_nextClusterId);
+    // clusterIdByOwners[clusterOwner_].push(_nextClusterId);
     emit ClusterAdded(_nextClusterId, name, symbol, baseTokenURI, size, clusterOwner_);
     _nextClusterId++;
   }
