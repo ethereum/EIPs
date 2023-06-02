@@ -1,3 +1,5 @@
 {
-  "**/*.{sol}": "// SPDX-License-Identifier: CC0-1.0"
+  "**/*.{sol}": [
+    "// SPDX-License-Identifier: CC0-1.0"
+  ]
 }
