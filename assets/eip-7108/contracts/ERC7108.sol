@@ -33,10 +33,10 @@ contract ERC7108 is IERC7108, ERC721 {
   }
 
   mapping(uint256 => Cluster) public clusters;
-//  mapping(address => uint256[]) public clusterIdByOwners;
+  mapping(address => uint256[]) public clusterIdByOwners;
   uint256 public maxSize = 10000;
 
-  uint256 private _nextClusterId = 0;
+  uint256 private _nextClusterId;
 
   constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
@@ -63,9 +63,13 @@ contract ERC7108 is IERC7108, ERC721 {
       size: uint32(size),
       nextTokenId: uint32(lastTokenIdInClusters + 1)
     });
-    // clusterIdByOwners[clusterOwner_].push(_nextClusterId);
+     clusterIdByOwners[clusterOwner_].push(_nextClusterId);
     emit ClusterAdded(_nextClusterId, name, symbol, baseTokenURI, size, clusterOwner_);
     _nextClusterId++;
+  }
+
+  function clustersByOwner(address owner) public view returns (uint256[] memory) {
+    return clusterIdByOwners[owner];
   }
 
   function _binarySearch(uint x) internal view returns(uint) {

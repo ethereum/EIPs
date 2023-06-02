@@ -74,8 +74,9 @@ describe.only("ClusteredNFT", function () {
     let k = (await clusteredNFT.rangeOf(1))[1].toNumber();
     let k0 = k;
     let l = 2;
-    for (let i =0, j=1000;i< 80; i++, j += 33) {
-      await clusteredNFT.connect(owner3).addCluster("Some Token", "ST", "https://some-token.cc/meta/", j, owner3.address)
+    for (let i =0, j=1000;i< 79; i++, j += 33) {
+      let owner = i % 2 ? owner2 : owner3;
+      await clusteredNFT.connect(owner3).addCluster("Some Token", "ST", "https://some-token.cc/meta/", j, owner.address)
       let v = k + j - 10
       const result = await clusteredNFT.clusterOf(v);
       expect(result).equal(i + 2);
@@ -84,13 +85,21 @@ describe.only("ClusteredNFT", function () {
 
     k = k0;
     j = 1000;
-    for (let i =0, j=1000;i< 80; i++, j += 33) {
+    for (let i =0, j=1000;i< 79; i++, j += 33) {
       let v = k + j - 10
       const result = await clusteredNFT.clusterOf(v);
       // console.log(v, result, i + 2);
       expect(result).equal(i + 2);
       k += j - 1;
     }
+
+    let myClusters = (await clusteredNFT.clustersByOwner(owner3.address)).map(e => e.toNumber());
+    expect(myClusters.length).equal(41);
+    expect(myClusters[10]).equal(20);
+
+    myClusters = (await clusteredNFT.clustersByOwner(owner2.address)).map(e => e.toNumber());
+    expect(myClusters.length).equal(40);
+    expect(myClusters[10]).equal(21);
 
 
   });
