@@ -35,7 +35,7 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 
 [ERC-20](./eip-20.md) compliant contracts MAY implement this EIP.
 
-All the operations that change the ownership of a Token, like a `transfer`/`transferFrom`, SHALL create a `TransferValidation` pending to be validated and emit a `ValidateTransfer`, and SHALL NOT transfer the Tokens.
+All the operations that change the ownership of Tokens, like a `transfer`/`transferFrom`, SHALL create a `TransferValidation` pending to be validated and emit a `ValidateTransfer`, and SHALL NOT transfer the Tokens.
 
 All the operations that enable an approval to manage a Token, like an `approve`, SHALL create an `ApprovalValidation` pending to be validated and emit a `ValidateApproval`, and SHALL NOT enable an approval.
 
@@ -330,7 +330,7 @@ contract ERC20V is IERC20V, ERC20 {
 
 ## Security Considerations
 
-As is defined in the Specification the operations that change the ownership of a Tokens or enable an approval to manage the Tokens SHALL create a `TransferValidation` or an `ApprovalValidation` pending to be validated and SHALL NOT transfer the Tokens or enable an approval.
+As is defined in the Specification the operations that change the ownership of Tokens or enable an approval to manage the Tokens SHALL create a `TransferValidation` or an `ApprovalValidation` pending to be validated and SHALL NOT transfer the Tokens or enable an approval.
 
 With this premise in mind, the operations in charge of validating a `TransferValidation` or an `ApprovalValidation` must be protected with the maximum security required by the applied system.
 
