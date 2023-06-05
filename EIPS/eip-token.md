@@ -260,7 +260,7 @@ contract ERC20V is IERC20V, ERC20 {
         ApprovalValidation memory v = approvalValidation(approvalId);
         require(!v.valid, "ERC20V: the approval is already validated");
 
-        super._approval(v.owner, v.spender, v.amount);
+        super._approve(v.owner, v.spender, v.amount);
 
         _approvalValidations[approvalId].valid = true;
     }
