@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-interface IERC5678 {
+interface IERC6785 {
 
     // Logged when the utility description URL of an NFT is changed
     /// @notice Emitted when the utilityURL of an NFT is changed
