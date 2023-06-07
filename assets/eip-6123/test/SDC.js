@@ -53,10 +53,10 @@ describe("Livecycle Unit-Tests for Smart Derivative Contract", () => {
   });
 
   it("Counterparty1 incepts a trade", async () => {
-     const incept_call = await sdc.connect(counterparty1).inceptTrade(trade_data,"initialMarketData");
+     const incept_call = await sdc.connect(counterparty1).inceptTrade(trade_data, "initialMarketData", 0);
      let tradeid =  await sdc.connect(counterparty1).getTradeID();
      //console.log("TradeId: %s", tradeid);
-     await expect(incept_call).to.emit(sdc, "TradeIncepted").withArgs(counterparty1.address,tradeid,trade_data);
+     await expect(incept_call).to.emit(sdc, "TradeIncepted").withArgs(counterparty1.address, tradeid, trade_data);
      let trade_state =  await sdc.connect(counterparty1).getTradeState();
      await expect(trade_state).equal(TradeState.Incepted);
    });
