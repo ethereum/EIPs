@@ -298,15 +298,16 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
   - create invalid PBM Token with no underlying Spot Token; or
   - falsifying the face value of PBM token through wrapping of fraudulent/invalid/worthless Spot Tokens.
 
-- Compliant contracts should pay attention to the balance change for each user when a token is being consumed or minted.
-
-- To ensure consistency, when the contract is being suspended, or a user is being restricted from transferring a token, due to suspected fraud, erroneous transfers etc, similar restrictions **MUST** be applied to the user's requests to unwrap the PBM Token.
+- For consistency, when the contract is suspended or a user's token transfer is restricted due to suspected fraudulent activity or erroneous transfers, corresponding restrictions **MUST** be applied to the user's unwrap requests for the PBM Token.
 
 - Security audits and tests should be performed to verify that unwrap logic behaves as expected or if any complex business logic is being implemented that involves calling an external smart contract to prevent re-entrancy attacks and other forms of call chain attacks.
 
-- This EIP depends on the security soundness of the underlying book keeping behavior of the token implementation.
+- This EIP relies on the secure and accurate bookkeeping behavior of the token implementation.
+  - Contracts adhering to this standard should closely monitor balance changes for each user during token consumption or minting.
 
-  - The PBM Wrapper should be carefully designed to ensure effective control over permission to mint a new token. Failing to safeguard permission to mint a new PBM Token can cause fraudulent issuance and and unauthorised inflation of total token supply.
+  - The PBM Wrapper must be meticulously designed to ensure effective control over the permission to mint new tokens. Failure to secure the minting permission can lead to fraudulent issuance and unauthorized inflation of the total token supply.
+
+  - The mapping of each PBM Token to the corresponding amount of underlying spot token held by the smart contract requires careful accounting and auditing.
 
   - The access control over permission to burn tokens should be carefully designed. Typically, only the following two roles are entitled to burn a token:
 
