@@ -148,14 +148,14 @@ abstract contract ERC7066 is ERC721,IERC7066{
    /**
      * @dev External function to tranfer and update locker for the token. Verifies if the msg.sender is owner
      */
-    function transferWithLock(uint256 id, address from, address to, address _locker) external virtual override{
-        _transferWithLock(id,from,to,_locker);
+    function transferAndLock(uint256 id, address from, address to, address _locker) external virtual override{
+        _transferAndLock(id,from,to,_locker);
     }
 
    /**
      * @dev Internal function to tranfer and update locker for the token. Verifies if the msg.sender is owner
      */
-    function _transferWithLock(uint256 id, address from, address to, address _locker) internal {
+    function _transferAndLock(uint256 id, address from, address to, address _locker) internal {
         transferFrom(from, to, id); 
         _setLocker(id,_locker);
     }
@@ -163,16 +163,16 @@ abstract contract ERC7066 is ERC721,IERC7066{
     /**
      * @dev External function to tranfer, update locker and approve locker for the token. Verifies if the msg.sender is owner
      */
-    function transferWithApprove(uint256 id, address from, address to, address _approved) external virtual override{
-        _transferWithApprove(id,from,to,_approved);
+    function transferAndApprove(uint256 id, address from, address to, address _approver) external virtual override{
+        _transferAndApprove(id,from,to,_approver);
     }
 
     /**
      * @dev Internal function to tranfer, update locker and approve locker for the token. Verifies if the msg.sender is owner
      */
-    function _transferWithApprove(uint256 id, address from, address to, address _approved) internal {
+    function _transferAndApprove(uint256 id, address from, address to, address _approver) internal {
         transferFrom(from, to, id); 
-        _approve(_approved, id);
+        _approve(_approver, id);
     }
 
     /*///////////////////////////////////////////////////////////////

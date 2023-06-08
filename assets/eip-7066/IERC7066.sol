@@ -72,12 +72,12 @@ interface IERC7066{
     /**
      * @dev Tranfer and update locker for the token  if the msg.sender is owner
      */
-    function transferWithLock(uint256 id, address from, address to, address _locker) external;
+    function transferAndLock(uint256 id, address from, address to, address _locker) external;
 
     /**
      * @dev Tranfer, update locker and approve locker for the token  if the msg.sender is owner
      */
-    function transferWithApprove(uint256 id, address from, address to, address _approved) external;
+    function transferAndApprove(uint256 id, address from, address to, address _approver) external;
 
     /**
      * @dev Returns the wallet, that is stated as unlocking wallet for the `tokenId` token.
