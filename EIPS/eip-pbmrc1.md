@@ -257,17 +257,13 @@ Each ERC-1155 PBM Token would map to an underlying `PBMToken` data structure tha
 
 By mapping the underlying ERC-1155 token model with an additional data structure, it allows for the flexibility in the management of multiple token types within the same smart contract with multiple conditional unwrapping logic attached to each token type which reduces the gas costs as there is no need to deploy multiple smart contracts for each token types.
 
-1. This EIP makes no assumption on access control and under what conditions can a function be executed. It is the responsibility of the PBM Creator to determine what a user is able to do and the conditions by which a asset is consumed.
+1. To keep it simple, this standard *intentionally* omits functions or events that doesn't add to definition and concept of a PBM.
 
-2. The event notifies subscribers who are interested to learn whenever an PBM Token is being consumed.
+2. This EIP makes no assumption on access control and under what conditions can a function be executed. It is the responsibility of the PBM Creator to determine what a user is able to do and the conditions by which a asset is consumed.
 
-3. To keep it simple, this standard _intentionally_ omits functions or events related to the creation of a consumable asset. because of XYZ
+3. Metadata associated to the PBM standard is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from [EIP-721](./eip-721.md). Refer to Opensea's metadata-standards for an implementation example.
 
-4. Metadata associated to the consumables is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from [EIP-721](./eip-721.md). Refer to Opensea's metadata-standards for an implementation example.
-
-5. It is **OPTIONAL** to include an parameter `address consumer` for `consume` and `isConsumableBy` functions so that an NFT **MAY** be consumed for someone other than the transaction initiator.
-
-6. To allow for future extensibility, it is **RECOMMENDED** that developers read and adopt the specifications for building general extensibility for method behaviours ([ERC-5750](./eip-5750.md)).
+4. To allow for future extensibility, it is **RECOMMENDED** that developers read and adopt the specifications for building general extensibility for method behaviours ([ERC-5750](./eip-5750.md)).
 
 ## Backwards Compatibility
 
