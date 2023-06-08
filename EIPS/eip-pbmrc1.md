@@ -300,8 +300,6 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 
 - Compliant contracts should pay attention to the balance change for each user when a token is being consumed or minted.
 
-- If PBM Tokens are sent to a recipient wallet that is not compatible with PBM Wrapper the transaction **MUST** fail and PBM Tokens should remain in the sender's PBM Wallet.
-
 - To ensure consistency, when the contract is being suspended, or a user is being restricted from transferring a token, due to suspected fraud, erroneous transfers etc, similar restrictions **MUST** be applied to the user's requests to unwrap the PBM Token.
 
 - Security audits and tests should be performed to verify that unwrap logic behaves as expected or if any complex business logic is being implemented that involves calling an external smart contract to prevent re-entrancy attacks and other forms of call chain attacks.
