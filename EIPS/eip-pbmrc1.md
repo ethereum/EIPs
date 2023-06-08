@@ -259,7 +259,7 @@ By mapping the underlying ERC-1155 token model with an additional data structure
 
 1. To keep it simple, this standard *intentionally* omits functions or events that doesn't add to definition and concept of a PBM.
 
-2. This EIP makes no assumption on access control and under what conditions can a function be executed. It is the responsibility of the PBM Creator to determine what a user is able to do and the conditions by which a asset is consumed.
+2. This EIP makes no assumptions about access control or the conditions under which a function can be executed. It is the responsibility of the PBM creator to determine the various roles involved in each specific PBM business flow.
 
 3. Metadata associated to the PBM standard is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from [EIP-721](./eip-721.md). Refer to Opensea's metadata-standards for an implementation example.
 
