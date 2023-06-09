@@ -32,8 +32,8 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * and allows setting locker for tokenid
      */
     function setLocker(uint256 id, address _locker) public virtual override {
-        require(msg.sender==ownerOf(id), "ERC7066 : Owner Required");
-        require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
+        require(msg.sender==ownerOf(id), "ERC7066: Required Owner");
+        require(state[id]==State.UNLOCKED, "ERC7066: Locked");
         _setLocker(id,_locker);
     }
 
@@ -50,8 +50,8 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * and allows removal of locker for tokenid if token is unlocked
      */
     function removeLocker(uint256 id) public virtual override {
-        require(msg.sender==ownerOf(id), "ERC7066 : Owner Required");
-        require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
+        require(msg.sender==ownerOf(id), "ERC7066: Required Owner");
+        require(state[id]==State.UNLOCKED, "ERC7066: Locked");
         _removeLocker(id);
     }
 
@@ -78,7 +78,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * reverts otherwise
      */
     function lock(uint256 id) public virtual override{
-        require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
+        require(state[id]==State.UNLOCKED, "ERC7066: Locked");
         if(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id)== msg.sender){
             lockApprove(id);
         } else if (msg.sender==locker[id]){
@@ -109,7 +109,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * reverts otherwise
      */
     function unlock(uint256 id) public virtual override{
-        require(state[id]!=State.UNLOCKED, "ERC7066 : Unlocked");
+        require(state[id]!=State.UNLOCKED, "ERC7066: Unlocked");
         if(state[id]==State.LOCKED_APPROVED){
             unlockApprove(id);
         }else if(state[id]==State.LOCKED){
@@ -123,7 +123,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * @dev Internal function to unlock the token. Verifies if the msg.sender is approved
      */
     function unlockApprove(uint256 id) internal{
-        require(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id)== msg.sender,"ERC7066: Approve Required");
+        require(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id)== msg.sender,"ERC7066: Required Approve");
         state[id]=State.UNLOCKED;
         emit Unlock(id);
     }
@@ -132,7 +132,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * @dev Internal function to unlock the token. Verifies if the msg.sender is locker
      */
     function unlockLocker(uint256 id) internal {
-        require(locker[id]==msg.sender,"ERC7066: Locker Required");
+        require(locker[id]==msg.sender,"ERC7066: Required Locker");
         state[id]=State.UNLOCKED;
         emit Unlock(id);
     }
@@ -177,7 +177,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      * @dev Override approve to make sure token is unlocked
      */
     function approve(address to, uint256 tokenId) public virtual override {
-        require (state[tokenId]==State.UNLOCKED, "ERC7066 : Locked"); // so the unlocker stays approved
+        require (state[tokenId]==State.UNLOCKED, "ERC7066: Locked"); // so the unlocker stays approved
         super.approve(to, tokenId);
     }
 
@@ -193,9 +193,9 @@ abstract contract ERC7066 is ERC721,IERC7066{
     ) internal virtual override {
         // if it is a Transfer or Burn, we always deal with one token, that is startTokenId
         if (from != address(0)) { 
-            require(state[startTokenId]!=State.LOCKED,"ERC7066 : Locked");
+            require(state[startTokenId]!=State.LOCKED,"ERC7066: Locked");
             require(state[startTokenId]==State.UNLOCKED || isApprovedForAll(ownerOf(startTokenId), msg.sender) 
-            || getApproved(startTokenId) == msg.sender, "ERC7066 : Required approval");
+            || getApproved(startTokenId) == msg.sender, "ERC7066: Required Approved");
         }
         super._beforeTokenTransfer(from,to,startTokenId,quantity);
     }
