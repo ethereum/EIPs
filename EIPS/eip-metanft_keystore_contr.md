@@ -101,7 +101,7 @@ Restrictions, on the other hand, provide a structured way to control the modific
 
 By leveraging Properties and Restrictions together within the MetaNFT, this standard delivers a powerful framework that amplifies the potential of NFTs. In particular, MetaNFTs can be leveraged to represent [KeyStore contracts](https://vitalik.eth.limo/general/2023/06/09/three_transitions.html), abstracting the data-storage from the logic that consumes it.
 
-![MetaNFT example](../assets/eip-7161/CoreAndPMs.jpg)
+![MetaNFT example](../assets/eip-7171/CoreAndPMs.jpg)
 
 
 ## Backwards Compatibility
@@ -110,7 +110,7 @@ This EIP is intended to augment the functionality of existing token standards wi
 
 It offers an extension that allows for the storage and retrieval of Properties and Restrictions within a MetaNFT while maintaining compatibility with existing EIPs related to NFTs and tokenization.
 
-We evaluate compatibility with popular tokenization standards on the following apendix [here](../assets/eip-7161/eip-7161-compat.md)
+We evaluate compatibility with popular tokenization standards on the following apendix [here](../assets/eip-7171/eip-7171-compat.md)
 
 
 
