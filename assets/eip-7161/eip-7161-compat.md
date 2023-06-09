@@ -15,8 +15,6 @@
 
 **ERC-4907 (Shared Ownership)**: MetaNFTs can represent shared ownership and are therefore compatible with ERC-4907. The proposed properties and restrictions can provide additional controls for such tokens.
 
-**4910**
-
 **EIP-5050 (Interactive NFTs)**: The new standard compliments EIP-5050 by adding Properties and Restrictions, allowing for even richer interactions with NFTs.
 
 **EIP-5095 (Principal Tokens)**: MetaNFTs would be fully compatible with EIP-5095, and additional properties or restrictions could be implemented to further define the parameters of a loan.
@@ -30,22 +28,3 @@
 **EIP-5560 (Redeemable NFTs)**: MetaNFTs can be redeemable and therefore compatible with EIP-5560. The properties and restrictions associated with MetaNFTs can provide additional control mechanisms for redeemable tokens.
 
 **EIP-5633 (Composable Soulbound NFTs)**: MetaNFTs can be composable and soulbound, thus compatible with EIP-5633. Furthermore, properties and restrictions can provide further configuration for these types of tokens.
-
-
-**5216**
-
-**5725**
-
-**6551**
-
-**6147**
-
-**6150**
-
-**6220**
-
-**6454**
-
-**6551**
-
-**6672**
