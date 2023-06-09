@@ -5,41 +5,40 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IERC7066.sol";
 
-/// @title Lockable Extension for ERC721
-/// @dev Implementation for the Lockable extension
+/// @title ERC7066: Lockable Extension for ERC721
+/// @dev Implementation for the Lockable extension ERC7066 for ERC721
 /// @author StreamNFT 
 
 abstract contract ERC7066 is ERC721,IERC7066{
 
 
     /*///////////////////////////////////////////////////////////////
-                            LOCKABLE EXTENSION STORAGE                        
+                            ERC7066 EXTENSION STORAGE                        
     //////////////////////////////////////////////////////////////*/
 
-    //Mapping from token id to user address for locking permission
+    //Mapping from token-id to user address for locking permission
     mapping(uint256 => address) internal locker;
-    //Mapping from token id to state of token
+    //Mapping from token-id to state of token
     mapping(uint256 => State) internal state;
     //Possible states of a token
     enum State{UNLOCKED,LOCKED,LOCKED_APPROVED}
 
     /*///////////////////////////////////////////////////////////////
-                              LOCKABLE LOGIC
+                              ERC7066 LOGIC
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * @dev External function to set locker. Verifies if the msg.sender is the owner
+     * @dev Public function to set locker. Verifies if the msg.sender is the owner
      * and allows setting locker for tokenid
      */
-    function setLocker(uint256 id, address _locker) external virtual override {
+    function setLocker(uint256 id, address _locker) public virtual override {
         require(msg.sender==ownerOf(id), "ERC7066 : Owner Required");
         require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
         _setLocker(id,_locker);
     }
 
     /**
-     * @dev Internal function to set locker. Verifies if the msg.sender is the owner
-     * and allows setting locker for tokenid
+     * @dev Internal function to set locker. 
      */
     function _setLocker(uint256 id, address _locker) internal {
         locker[id]=_locker;
@@ -47,18 +46,17 @@ abstract contract ERC7066 is ERC721,IERC7066{
     }
 
     /**
-     * @dev External function to remove locker. Verifies if the msg.sender is the owner
+     * @dev Public function to remove locker. Verifies if the msg.sender is the owner
      * and allows removal of locker for tokenid if token is unlocked
      */
-    function removeLocker(uint256 id) external virtual override {
+    function removeLocker(uint256 id) public virtual override {
         require(msg.sender==ownerOf(id), "ERC7066 : Owner Required");
         require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
         _removeLocker(id);
     }
 
     /**
-     * @dev Internal function to remove locker. Verifies if the msg.sender is the owner
-     * and allows removal of locker for tokenid if token is unlocked
+     * @dev Internal function to remove locker.
      */
     function _removeLocker(uint256 id) internal {
         delete locker[id];
@@ -70,109 +68,105 @@ abstract contract ERC7066 is ERC721,IERC7066{
      *      address(0) means token is not locked
      *      reverts if token does not exist
      */
-    function lockerOf(uint256 id) external virtual view override returns(address){
+    function lockerOf(uint256 id) public virtual view override returns(address){
         require(_exists(id), "ERC7066: Nonexistent token");
         return locker[id];
     }
 
     /**
-     * @dev Public function to lock the token. Verifies if the msg.sender is locker
+     * @dev Public function to lock the token. Verifies if the msg.sender is locker or approver
+     * reverts otherwise
      */
-    function lock(uint256 id) external virtual override{
-        require(msg.sender==locker[id], "ERC7066 : Locker Required");
+    function lock(uint256 id) public virtual override{
         require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
-        _lock(id);
-    }
-
-    /**
-     * @dev Internal function to lock the token. Verifies if the msg.sender is locker
-     */
-    function _lock(uint256 id) internal {
-        state[id]=State.LOCKED;
-        emit Lock(id);
-    }
-
-    /**
-     * @dev External function to unlock the token. Verifies if the msg.sender is locker
-     */
-    function unlock(uint256 id) external virtual override{
-        require(msg.sender==locker[id], "ERC7066 : Locker Required");
-        require(state[id]!=State.LOCKED_APPROVED, "ERC7066 : Locked by approved");
-        require(state[id]!=State.UNLOCKED, "ERC7066 : Unlocked");
-        _unlock(id);
-    }
-
-    /**
-     * @dev Internal function to unlock the token. Verifies if the msg.sender is locker
-     */
-    function _unlock(uint256 id) internal {
-        state[id]=State.UNLOCKED;
-        emit Unlock(id);
-    }
-
-    /**
-     * @dev Public function to lock the token. Verifies if the msg.sender is approved
-     */
-    function lockApproved(uint256 id) external virtual override{
-        require(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id) == msg.sender, "ERC7066 : Required approval");
-        require(state[id]==State.UNLOCKED, "ERC7066 : Locked");
-        _lockApproved(id);
+        if(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id)== msg.sender){
+            lockApprove(id);
+        } else if (msg.sender==locker[id]){
+            lockLocker(id);
+        } else{
+            revert("ERC7066: Required locker or approve");
+        }
     }
 
     /**
      * @dev Internal function to lock the token. Verifies if the msg.sender is approved
      */
-    function _lockApproved(uint256 id) internal  {
+    function lockApprove(uint256 id) internal {
         state[id]=State.LOCKED_APPROVED;
-        emit LockApproved(id);    
+        emit Lock(id);
     }
 
     /**
-     * @dev External function to unlock the token. Verifies if the msg.sender is approved
+     * @dev Internal function to lock the token. Verifies if the msg.sender is locker
      */
-    function unlockApproved(uint256 id) external virtual override{
-        require(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id) == msg.sender, "ERC7066 : Required approval");
-        require(state[id]!=State.LOCKED, "ERC7066 : Locked by locker");
+    function lockLocker(uint256 id) internal {
+        state[id]=State.LOCKED;
+        emit Lock(id);
+    }
+
+    /**
+     * @dev External function to unlock the token. Verifies the msg.sender is locker or approver
+     * reverts otherwise
+     */
+    function unlock(uint256 id) public virtual override{
         require(state[id]!=State.UNLOCKED, "ERC7066 : Unlocked");
-        _unlockApproved(id);
+        if(state[id]==State.LOCKED_APPROVED){
+            unlockApprove(id);
+        }else if(state[id]==State.LOCKED){
+            unlockLocker(id);
+        }else{
+            revert("ERC7066: Required locker or approve");
+        }
     }
 
     /**
      * @dev Internal function to unlock the token. Verifies if the msg.sender is approved
      */
-    function _unlockApproved(uint256 id) internal{
+    function unlockApprove(uint256 id) internal{
+        require(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id)== msg.sender,"ERC7066: Approve Required");
         state[id]=State.UNLOCKED;
-        emit UnlockApproved(id);
-    }
-
-   /**
-     * @dev External function to tranfer and update locker for the token. Verifies if the msg.sender is owner
-     */
-    function transferAndLock(uint256 id, address from, address to, address _locker) external virtual override{
-        _transferAndLock(id,from,to,_locker);
-    }
-
-   /**
-     * @dev Internal function to tranfer and update locker for the token. Verifies if the msg.sender is owner
-     */
-    function _transferAndLock(uint256 id, address from, address to, address _locker) internal {
-        transferFrom(from, to, id); 
-        _setLocker(id,_locker);
+        emit Unlock(id);
     }
 
     /**
-     * @dev External function to tranfer, update locker and approve locker for the token. Verifies if the msg.sender is owner
+     * @dev Internal function to unlock the token. Verifies if the msg.sender is locker
      */
-    function transferAndApprove(uint256 id, address from, address to, address _approver) external virtual override{
-        _transferAndApprove(id,from,to,_approver);
+    function unlockLocker(uint256 id) internal {
+        require(locker[id]==msg.sender,"ERC7066: Locker Required");
+        state[id]=State.UNLOCKED;
+        emit Unlock(id);
+    }
+
+   /**
+     * @dev Public function to tranfer and lock the token. Verifies if the msg.sender is locker or approver
+     * reverts otherwise
+     */
+    function transferAndLock(uint256 id, address from, address to, address operator) public virtual override{
+        if(isApprovedForAll(ownerOf(id), msg.sender) || getApproved(id) == msg.sender){
+            transferApprove(id,from,to,operator);
+        }else if(msg.sender==locker[id]){
+            transferLocker(id,from,to,operator);
+        }else{
+            revert("ERC7066: Required locker or approve");
+        }
+    }
+
+   /**
+     * @dev Internal function to tranfer, update locker and lock the token.
+     */
+    function transferLocker(uint256 id, address from, address to, address operator) internal {
+        transferFrom(from, to, id); 
+        _setLocker(id,operator);
+        lockLocker(id);
     }
 
     /**
-     * @dev Internal function to tranfer, update locker and approve locker for the token. Verifies if the msg.sender is owner
+     * @dev Internal function to tranfer, update approve and lock the token.
      */
-    function _transferAndApprove(uint256 id, address from, address to, address _approver) internal {
+    function transferApprove(uint256 id, address from, address to, address operator) internal {
         transferFrom(from, to, id); 
-        _approve(_approver, id);
+        _approve(operator, id);
+        lockApprove(id);
     }
 
     /*///////////////////////////////////////////////////////////////

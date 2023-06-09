@@ -19,25 +19,14 @@ interface IERC7066{
     event RemoveLocker (uint256 indexed id);
 
     /**
-     * @dev Emitted when `id` token is locked by `locker`
+     * @dev Emitted when `id` token is locked
      */
     event Lock (uint256 indexed id);
 
     /**
-     * @dev Emitted when `id` token is unlocked by `locker`
+     * @dev Emitted when `id` token is unlocked
      */
     event Unlock (uint256 indexed id);
-
-    /**
-     * @dev Emitted when `id` token is locked by `approved`
-     */
-    event LockApproved (uint256 indexed id);
-
-    /**
-     * @dev Emitted when `id` token is unlocked by `approved`
-     */
-    event UnlockApproved (uint256 indexed id);
-
 
     /**
      * @dev Gives the `_locker` address permission to lock if msg.sender is owner
@@ -50,39 +39,24 @@ interface IERC7066{
     function removeLocker(uint256 id) external;
 
    /**
-     * @dev Lock the token `id` if msg.sender is locker
+     * @dev Lock the token `id` if msg.sender is locker or approved
      */
     function lock(uint256 id) external;
 
     /**
-     * @dev Unlocks the token `id` if msg.sender is locker
+     * @dev Unlocks the token `id` if msg.sender is locker or approved
      */
     function unlock(uint256 id) external;
 
     /**
-     * @dev Lock the token `id` if msg.sender is approved
-     */
-    function lockApproved(uint256 id) external;
-
-    /**
-     * @dev Unlock the token `id` if msg.sender is approved
-     */
-    function unlockApproved(uint256 id) external;
-
-    /**
-     * @dev Tranfer and update locker for the token  if the msg.sender is owner
+     * @dev Tranfer and lock the token if the msg.sender is locker or approved
      */
     function transferAndLock(uint256 id, address from, address to, address _locker) external;
 
     /**
-     * @dev Tranfer, update locker and approve locker for the token  if the msg.sender is owner
-     */
-    function transferAndApprove(uint256 id, address from, address to, address _approver) external;
-
-    /**
-     * @dev Returns the wallet, that is stated as unlocking wallet for the `tokenId` token.
+     * @dev Returns the wallet, that is stated as unlocking wallet for the `id` token.
      * If address(0) returned, that means token is not locked. Any other result means token is locked.
      */
-    function lockerOf(uint256 tokenId) external view returns (address);
+    function lockerOf(uint256 id) external view returns (address);
 
 }
