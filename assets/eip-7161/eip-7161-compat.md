@@ -2,7 +2,6 @@
 # MetaNFT Standard EIP
 ## Backwards Compatibility Analysis
 
-
 **EIP-2309 (Consecutive batch minting)**: The MetaNFT standard doesn't interfere with the batch minting process prescribed by EIP-2309. Instead, it offers an additional layer of customization for NFTs without affecting their creation process.
 
 **EIP-2615 (Swap Orders)**: This standard does not disrupt the atomic swap functionality introduced by EIP-2615. MetaNFTs may be involved in swap orders, with their properties and restrictions intact.
