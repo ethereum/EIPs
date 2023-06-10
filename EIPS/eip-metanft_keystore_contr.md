@@ -56,32 +56,6 @@ A case-by-case analysis was performed and summarized [here](../assets/eip-7210/e
 
 **Restriction**: A configuration data structure associated with a Property within the MetaNFT. Restrictions are REQUIRED to define conditions under which a Property can be modified.
 
-### MetaNFT Functionality
-A MetaNFT MUST extend the functionality of traditional NFTs through the incorporation of Properties and Restrictions in its internal storage. The Properties and Restrictions of a MetaNFT SHALL be stored on-chain and be made accessible to smart contracts. The interface defining this interaction is as follows:
-
-**Examples of Properties**:
-
-**Metadata**: This could include the name, description, image URL, and other metadata associated with the NFT. For example, in the case of an art NFT, the setProperty function could be used to set the artist's name, the creation date, the medium, and other relevant information.
-
-**Ownership History**: The setProperty function could be used to record the ownership history of the NFT. Each time the NFT is transferred, a new entry could be added to the ownership history property.
-
-**Royalties**: The setProperty function could be used to set a royalties property for the NFT. This could specify a percentage of future sales that should be paid to the original creator.
-
-**Zero-Knowledge Proofs**: The setProperty function could be used to store Identity information related to the NFTs owner and signed by KYC provider.
-
-**Oracle Subscription**: An oracle system can stream data periodically into the Property.
-
-
-
-**Examples of restrictions**:
-
-**Transfer Restrictions**: The setRestriction function could be used to limit who the NFT can be transferred to. For example, it could be used to prevent the NFT from being transferred to certain addresses in the case of Soulbound tokens.
-
-**Usage Restrictions**: The setRestriction function could be used to limit how the NFT can be used. For example, in the case of a digital asset in a game, the setRestriction function could be used to specify that the asset can only be used in certain ways or at certain times.
-
-**Geographical Restrictions**: The setRestriction function could be used to limit where the NFT can be used. For example, in the case of a ticket to a physical event, the setRestriction function could be used to specify that the ticket can only be used in a certain location.
-
-
 ### Interface
 
 ```solidity
@@ -148,7 +122,38 @@ interface IERC7210 {
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
+### MetaNFT Functionality
+A MetaNFT MUST extend the functionality of traditional NFTs through the incorporation of Properties and Restrictions in its internal storage. The Properties and Restrictions of a MetaNFT SHALL be stored on-chain and be made accessible to smart contracts. The interface defining this interaction is as follows:
+
+**Examples of Properties**:
+
+**Metadata**: This could include the name, description, image URL, and other metadata associated with the NFT. For example, in the case of an art NFT, the setProperty function could be used to set the artist's name, the creation date, the medium, and other relevant information.
+
+**Ownership History**: The setProperty function could be used to record the ownership history of the NFT. Each time the NFT is transferred, a new entry could be added to the ownership history property.
+
+**Royalties**: The setProperty function could be used to set a royalties property for the NFT. This could specify a percentage of future sales that should be paid to the original creator.
+
+**Zero-Knowledge Proofs**: The setProperty function could be used to store Identity information related to the NFTs owner and signed by KYC provider.
+
+**Oracle Subscription**: An oracle system can stream data periodically into the Property.
+
+
+
+**Examples of restrictions**:
+
+**Transfer Restrictions**: The setRestriction function could be used to limit who the NFT can be transferred to. For example, it could be used to prevent the NFT from being transferred to certain addresses in the case of Soulbound tokens.
+
+**Usage Restrictions**: The setRestriction function could be used to limit how the NFT can be used. For example, in the case of a digital asset in a game, the setRestriction function could be used to specify that the asset can only be used in certain ways or at certain times.
+
+**Geographical Restrictions**: The setRestriction function could be used to limit where the NFT can be used. For example, in the case of a ticket to a physical event, the setRestriction function could be used to specify that the ticket can only be used in a certain location.
+
+
+
 ## Rationale
+
+The decision to encode Properties and Restrictions as bytes in the MetaNFT Interface is primarily driven by flexibility and future-proofing. Encoding as bytes allows for a wide range of data types to be stored, including but not limited to strings, integers, addresses, and more complex data structures, providing the developer with flexibility to accommodate diverse use cases. Furthermore, as Ethereum and its standards continue to evolve, encoding as bytes ensures that the MetaNFT standard can support future data types or structures without requiring significant changes to the standard itself.
+
+A case-by-case example on potential Properties and Restrictions encodings was performed and summarized [here](../assets/eip-7210/eip-7210-encoding.md).
 
 The inclusion of Properties and Restrictions within a MetaNFT provides the capability to associate a richer set of on-chain accessible information with an NFT. This enables a wide array of complex, dynamic, and interactive use cases to be implemented with NFTs.
 
@@ -163,7 +168,7 @@ By leveraging Properties and Restrictions together within the MetaNFT, this stan
 
 ## Backwards Compatibility
 
-This EIP is intended to augment the functionality of existing token standards without introducing breaking changes. As such, it does not present any backwards compatibility issues. Already deployed NFTs can wrapped as Properties, with the application of Restrictions relevant to each use-case.
+This EIP is intended to augment the functionality of existing token standards without introducing breaking changes. As such, it does not present any backwards compatibility issues. Already deployed NFTs can be wrapped as Properties, with the application of Restrictions relevant to each use-case.
 
 It offers an extension that allows for the storage and retrieval of Properties and Restrictions within a MetaNFT while maintaining compatibility with existing EIPs related to NFTs and tokenization.
 
