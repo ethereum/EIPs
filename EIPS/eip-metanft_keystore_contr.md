@@ -25,11 +25,13 @@ requires: 721, 1155
 
 ## Motivation
 
-The Ethereum ecosystem hosts a rich diversity of token standards, each designed to cater to specific use cases. While such diversity spurs innovation, it also results in a highly fragmented landscape, especially for Non-Fungible Tokens (NFTs). NFTs, conforming to standards such as ERC-721 and ERC-1155, have often faced limitations when representing complex digital assets. While each standard serves its purpose, they often lack the flexibility needed to manage additional on-chain data associated with the utility of these tokens.
+This proposal is motivated by the need to extend the capabilities of NFTs beyond their static nature, enabling them to hold mutable states and reflect changes over time. This is particularly relevant for use cases where the state of the NFT needs to change in response to certain events or conditions, as well as when the storage and the logic must be separated. For instance, NFTs representing Keystore contracts, Smart Wallets, or the digital representation of dynamic assets.
 
-This EIP is driven by the need to address these limitations. We propose the standardization of an interface for storing and accessing data on-chain, codifying information as Properties and Restrictions associated with NFTs use cases. This enhancement is designed to work by extending existing token standards, providing a flexible, efficient, and coherent way to manage the data associated with NFTs.
+The Ethereum ecosystem hosts a rich diversity of token standards, each designed to cater to specific use cases. While such diversity spurs innovation, it also results in a highly fragmented landscape, especially for Non-Fungible Tokens (NFTs). NFTs conforming to standards such as ERC-721 and ERC-1155 have often faced limitations when representing complex digital assets. While each standard serves its purpose, they often lack the flexibility needed to manage additional on-chain data associated with the utility of these tokens.
 
-The key motivations driving this proposal are:
+Furthermore, there is a need for a standardized interface to manage these mutable states for tokenization. Without a standard, different projects might implement their own ways of managing mutable states, incurring in further fragmentation and interoperability issues. A standard interface would provide all NFTs, regardless of their specific use case, with a mechanism for interacting with each other in a consistent and predictable way.
+
+We propose the standardization of an interface for storing and accessing data on-chain, codifying information as Properties and Restrictions associated with NFTs use cases. This enhancement is designed to work by extending existing token standards, providing a flexible, efficient, and coherent way to manage the data associated with:
 
 - **Standard Neutrality**: The standard aims to separate the data logic from the token standard. This neutral approach would allow NFTs to transition seamlessly between different token standards, promoting interactions with platforms or marketplaces designed for those standards. This could significantly improve interoperability among different standards, reducing fragmentation in the NFT landscape.
 
@@ -40,8 +42,6 @@ The key motivations driving this proposal are:
 - **Minimized Redundancy**: Currently, developers often need to write similar code for different token standards, leading to unnecessary redundancy. A standardized interface would allow developers to separate the data storage code from the underlying token utility logic, reducing redundancy and promoting greater unity in the ecosystem.
 
 - **Actionable data**: Current practices often store metadata off-chain, rendering it inaccessible for smart contracts without the use of oracles. Moreover, metadata is often used to store information that could otherwise be considered data relevant to the NFT's inherent identity. This EIP seeks to rectify this issue by introducing a standardized interface for reading and storing additional on-chain data related to NFTs.
-
-The current EIP is not focused on creating a new token standard, but rather offering a flexible, universal, and objective approach that caters to a variety of use cases. The motivation behind this proposal is to provide a more unified, efficient, and flexible framework for managing on-chain data associated with NFTs, in the form of Properties and Restrictions. By doing so, this standard aims to reduce the need for multiple overlapping standards, fostering a more cohesive Ethereum ecosystem.
 
 A case-by-case analysis was performed and summarized [here](../assets/eip-7210/eip-7210-compat.md).
 
