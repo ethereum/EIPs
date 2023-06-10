@@ -9,54 +9,54 @@ pragma solidity >=0.7.0 <0.9.0;
 interface IERC7066{
     
     /**
-     * @dev Emitted when locker is set for token `id` 
+     * @dev Emitted when locker is set for tokenId
      */
-    event SetLocker (uint256 indexed id, address _locker);
+    event SetLocker (uint256 indexed tokenId, address _locker);
 
     /**
-     * @dev Emitted when locker is removed for token `id` 
+     * @dev Emitted when locker is removed for tokenId
      */
-    event RemoveLocker (uint256 indexed id);
+    event RemoveLocker (uint256 indexed tokenId);
 
     /**
-     * @dev Emitted when `id` token is locked
+     * @dev Emitted when tokenId is locked
      */
-    event Lock (uint256 indexed id);
+    event Lock (uint256 indexed tokenId);
 
     /**
-     * @dev Emitted when `id` token is unlocked
+     * @dev Emitted when tokenId is unlocked
      */
-    event Unlock (uint256 indexed id);
+    event Unlock (uint256 indexed tokenId);
 
     /**
      * @dev Gives the `_locker` address permission to lock if msg.sender is owner
      */
-    function setLocker(uint256 id, address _locker) external;
+    function setLocker(uint256 tokenId, address _locker) external;
 
     /**
-     * @dev Purge the permission to lock if `id` is `unlocked` and msg.sender is owner
+     * @dev Purge the permission to lock if tokenId is `unlocked` and msg.sender is owner
      */
-    function removeLocker(uint256 id) external;
+    function removeLocker(uint256 tokenId) external;
 
    /**
-     * @dev Lock the token `id` if msg.sender is locker or approved
+     * @dev Lock the tokenId if msg.sender is locker or approved
      */
-    function lock(uint256 id) external;
+    function lock(uint256 tokenId) external;
 
     /**
-     * @dev Unlocks the token `id` if msg.sender is locker or approved
+     * @dev Unlocks the tokenId if msg.sender is locker or approved
      */
-    function unlock(uint256 id) external;
+    function unlock(uint256 tokenId) external;
 
     /**
      * @dev Tranfer and lock the token if the msg.sender is locker or approved
      */
-    function transferAndLock(uint256 id, address from, address to, address _locker) external;
+    function transferAndLock(uint256 tokenId, address from, address to, address _locker) external;
 
     /**
-     * @dev Returns the wallet, that is stated as unlocking wallet for the `id` token.
+     * @dev Returns the wallet, that is stated as unlocking wallet for the tokenId.
      * If address(0) returned, that means token is not locked. Any other result means token is locked.
      */
-    function lockerOf(uint256 id) external view returns (address);
+    function lockerOf(uint256 tokenId) external view returns (address);
 
 }
