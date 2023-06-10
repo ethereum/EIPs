@@ -8,12 +8,12 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2023-06-09
-requires: 721
+requires: 721, 1155
 ---
 
 ## Abstract
 
-- MetaNFTs are an interface that extends NFTs
+- This EIP proposes a standard interface for NFTs (MetaNFTs) that allows for the storage and retrieval of additional on-chain data, referred to as Properties and Restrictions. This enhances the capabilities of NFTs, enabling them to hold mutable states and reflect changes over time.
 
 - MetaNFTs aim to address the limitations of traditional NFTs by enabling on-chain data aggregation, providing an interface for standardized, interoperable, and composable data management solutions within NFTs.
 
