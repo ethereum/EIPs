@@ -13,6 +13,8 @@ requires: 721
 
 ## Abstract
 
+- MetaNFTs are an interface that extends NFTs
+
 - MetaNFTs aim to address the limitations of traditional NFTs by enabling on-chain data aggregation, providing an interface for standardized, interoperable, and composable data management solutions within NFTs.
 
 - MetaNFTs store data as Properties, an agnostic data structure. Properties can have Restrictions (i.e. in the case of an identity-based Property or SoulBound Tokens, a Transfer Restriction; in the case of staking, a Lock Restriction).
@@ -41,6 +43,8 @@ The key motivations driving this proposal are:
 
 The current EIP is not focused on creating a new token standard, but rather offering a flexible, universal, and objective approach that caters to a variety of use cases. The motivation behind this proposal is to provide a more unified, efficient, and flexible framework for managing on-chain data associated with NFTs, in the form of Properties and Restrictions. By doing so, this standard aims to reduce the need for multiple overlapping standards, fostering a more cohesive Ethereum ecosystem.
 
+A case-by-case analysis was performed and summarized [here](../assets/eip-7210/eip-7210-compat.md).
+
 
 ## Specification
 
@@ -55,24 +59,71 @@ The current EIP is not focused on creating a new token standard, but rather offe
 ### MetaNFT Functionality
 A MetaNFT MUST extend the functionality of traditional NFTs through the incorporation of Properties and Restrictions in its internal storage. The Properties and Restrictions of a MetaNFT SHALL be stored on-chain and be made accessible to smart contracts. The interface defining this interaction is as follows:
 
+### Examples of Properties that could be set include:
+
+**Metadata**: This could include the name, description, image URL, and other metadata associated with the NFT. For example, in the case of an art NFT, the setProperty function could be used to set the artist's name, the creation date, the medium, and other relevant information.
+
+**Ownership History**: The setProperty function could be used to record the ownership history of the NFT. Each time the NFT is transferred, a new entry could be added to the ownership history property.
+
+**Royalties**: The setProperty function could be used to set a royalties property for the NFT. This could specify a percentage of future sales that should be paid to the original creator.
+
+**Zero-Knowledge Proofs**: The setProperty function could be used to store Identity information related to the NFTs owner.
+
+### Examples of restrictions that could be set include:
+
+**Transfer Restrictions**: The setRestriction function could be used to limit who the NFT can be transferred to. For example, it could be used to prevent the NFT from being transferred to certain addresses in the case of Soulbound tokens.
+
+**Usage Restrictions**: The setRestriction function could be used to limit how the NFT can be used. For example, in the case of a digital asset in a game, the setRestriction function could be used to specify that the asset can only be used in certain ways or at certain times.
+
+**Geographical Restrictions**: The setRestriction function could be used to limit where the NFT can be used. For example, in the case of a ticket to a physical event, the setRestriction function could be used to specify that the ticket can only be used in a certain location.
+
+
 ```solidity
 interface IMetaNFT {
+  /**
+   * @notice Gets a property of the MetaNFT.
+   * @dev This function allows anyone to get a property of the MetaNFT.
+   * @param _tokenId The ID of the MetaNFT.
+   * @param _propertyKey The key of the property to be retrieved.
+   * @return _propertyValue The value of the property.
+   */
   function getProperty(
       uint256 tokenId,
       string calldata propertyKey
     ) external view returns (bytes memory);
 
+  /**
+   * @notice Gets a restriction of the MetaNFT.
+   * @dev This function allows anyone to get a restriction of the MetaNFT.
+   * @param _tokenId The ID of the MetaNFT.
+   * @param _restrictionKey The key of the restriction to be retrieved.
+   * @return _restrictionValue The value of the restriction.
+  */
   function getRestriction(
       uint256 tokenId,
       string calldata restrictionKey
     ) external view returns (bytes memory);
 
+  /**
+   * @notice Sets a property of the MetaNFT.
+   * @dev This function allows the owner or an authorized operator to set a property of the MetaNFT.
+   * @param _tokenId The ID of the MetaNFT.
+   * @param _propertyKey The key of the property to be set.
+   * @param _propertyValue The value of the property to be set.
+  */
   function setProperty(
       uint256 tokenId,
       string calldata propertyKey,
       bytes calldata propertyValue
     ) external;
 
+  /**
+   * @notice Sets a restriction of the MetaNFT.
+   * @dev This function allows the owner or an authorized operator to set a restriction of the MetaNFT.
+   * @param _tokenId The ID of the MetaNFT.
+   * @param _restrictionKey The key of the restriction to be set.
+   * @param _restrictionValue The value of the restriction to be set.
+   */
   function setRestriction(
       uint256 tokenId,
       string calldata restrictionKey,
@@ -106,12 +157,9 @@ By leveraging Properties and Restrictions together within the MetaNFT, this stan
 
 ## Backwards Compatibility
 
-This EIP is intended to augment the functionality of existing token standards without introducing breaking changes. As such, it does not present any backwards compatibility issues.
+This EIP is intended to augment the functionality of existing token standards without introducing breaking changes. As such, it does not present any backwards compatibility issues. Already deployed NFTs can wrapped as Properties, with the application of Restrictions relevant to each use-case.
 
 It offers an extension that allows for the storage and retrieval of Properties and Restrictions within a MetaNFT while maintaining compatibility with existing EIPs related to NFTs and tokenization.
-
-We evaluate compatibility with popular tokenization standards on the following apendix [here](../assets/eip-7171/eip-7171-compat.md)
-
 
 
 ## Reference Implementation
@@ -125,6 +173,16 @@ We evaluate compatibility with popular tokenization standards on the following a
 3. Increased on-chain data storage could also lead to potential privacy concerns. It's important to ensure that no sensitive or personally identifiable information is stored within MetaNFT metadata.
 4. Ensuring decentralized control over the selection of Property Managers is critical to maintain the decentralization ethos of Ethereum.
 5. Developers must also be cautious of potential interoperability and compatibility issues with systems that have not yet adapted to this new standard.
+
+The presence of mutable Properties and Restrictions can be used to implement security measures. In the context of preventing unauthorized access and modifications, a MetaNFT keystore contracts could implement the following strategies, adapted to each use-case:
+
+**Role-Based Access Control (RBAC)**: Only accounts assigned to specific roles at a Restriction level can perform certain actions on a Property. For instance, only an 'owner' might be able to call setProperty or setRestriction functions.
+
+**Time Locks**: Time locks can be used to delay certain actions, giving the community or a governance mechanism time to react if something malicious is happening. For instance, changes to Properties or Restrictions could be delayed depending on the use-case.
+
+**Multi-Signature (Multisig) Properties**: Multisig Properties could be implemented with Restrictions that require more than one account to approve an action performed on the Property. This could be used as an additional layer of security for critical functions. For instance, changing certain properties or restrictions might require approval from multiple trusted signers.
+
+
 
 This EIP requires further discussions
 
