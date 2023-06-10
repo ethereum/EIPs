@@ -59,7 +59,7 @@ A case-by-case analysis was performed and summarized [here](../assets/eip-7210/e
 ### MetaNFT Functionality
 A MetaNFT MUST extend the functionality of traditional NFTs through the incorporation of Properties and Restrictions in its internal storage. The Properties and Restrictions of a MetaNFT SHALL be stored on-chain and be made accessible to smart contracts. The interface defining this interaction is as follows:
 
-### Examples of Properties that could be set include:
+**Examples of Properties**:
 
 **Metadata**: This could include the name, description, image URL, and other metadata associated with the NFT. For example, in the case of an art NFT, the setProperty function could be used to set the artist's name, the creation date, the medium, and other relevant information.
 
@@ -67,9 +67,13 @@ A MetaNFT MUST extend the functionality of traditional NFTs through the incorpor
 
 **Royalties**: The setProperty function could be used to set a royalties property for the NFT. This could specify a percentage of future sales that should be paid to the original creator.
 
-**Zero-Knowledge Proofs**: The setProperty function could be used to store Identity information related to the NFTs owner.
+**Zero-Knowledge Proofs**: The setProperty function could be used to store Identity information related to the NFTs owner and signed by KYC provider.
 
-### Examples of restrictions that could be set include:
+**Oracle Subscription**: An oracle system can stream data periodically into the Property.
+
+
+
+**Examples of restrictions**:
 
 **Transfer Restrictions**: The setRestriction function could be used to limit who the NFT can be transferred to. For example, it could be used to prevent the NFT from being transferred to certain addresses in the case of Soulbound tokens.
 
@@ -78,8 +82,10 @@ A MetaNFT MUST extend the functionality of traditional NFTs through the incorpor
 **Geographical Restrictions**: The setRestriction function could be used to limit where the NFT can be used. For example, in the case of a ticket to a physical event, the setRestriction function could be used to specify that the ticket can only be used in a certain location.
 
 
+### Interface
+
 ```solidity
-interface IMetaNFT {
+interface IERC7210 {
   /**
    * @notice Gets a property of the MetaNFT.
    * @dev This function allows anyone to get a property of the MetaNFT.
