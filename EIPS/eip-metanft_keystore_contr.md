@@ -152,7 +152,7 @@ Restrictions, on the other hand, provide a structured way to control the modific
 
 By leveraging Properties and Restrictions together within the MetaNFT, this standard delivers a powerful framework that amplifies the potential of NFTs. In particular, MetaNFTs can be leveraged to represent [KeyStore contracts](https://vitalik.eth.limo/general/2023/06/09/three_transitions.html), abstracting the data-storage from the logic that consumes it.
 
-![MetaNFT example](../assets/eip-7171/CoreAndPMs.jpg)
+![MetaNFT example](../assets/eip-7210/CoreAndPMs.jpg)
 
 
 ## Backwards Compatibility
