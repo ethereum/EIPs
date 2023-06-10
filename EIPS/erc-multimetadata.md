@@ -1,4 +1,5 @@
 ---
+eip: 7160
 title: ERC721 Multi-Metadata Extension
 description: "This EIP proposes an extension to the ERC721 standards to support multiple metadata URIs per token via a new tokenURIs method that returns the pinned metadata index and a list of metadata URIs."
 author: 0xG (@0xGh)
