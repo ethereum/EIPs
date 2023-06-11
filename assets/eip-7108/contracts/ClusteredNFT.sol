@@ -12,7 +12,7 @@ import "./IERC7108.sol";
 
 // Reference implementation of ERC-7108
 
-contract ERC7108 is IERC7108, ERC721 {
+contract ClusteredNFT is IERC7108, ERC721 {
 
   using Strings for uint256;
 
@@ -39,6 +39,16 @@ contract ERC7108 is IERC7108, ERC721 {
   uint256 private _nextClusterId;
 
   constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+
+  function supportsInterface(bytes4 interfaceId)
+  public
+  view virtual
+  override(ERC721)
+  returns (bool)
+  {
+    return type(IERC7108).interfaceId == interfaceId
+    || super.supportsInterface(interfaceId);
+  }
 
   // in this implementation anyone can create a new collection
   function addCluster(
@@ -72,19 +82,19 @@ contract ERC7108 is IERC7108, ERC721 {
     return clusterIdByOwners[owner];
   }
 
-  function _binarySearch(uint x) internal view returns(uint) {
+  function _binarySearch(uint256 x) internal view returns(uint) {
     if (_nextClusterId == 0) {
       return type(uint).max;
     }
 
-    uint start;
-    uint end = _nextClusterId - 1;
-    uint mid;
+    uint256 start;
+    uint256 end = _nextClusterId - 1;
+    uint256 mid;
 
     while (start <= end) {
       mid = start + (end - start) / 2;
-      uint first = uint(clusters[mid].firstTokenId);
-      uint next = uint(clusters[mid].firstTokenId + clusters[mid].size);
+      uint256 first = uint(clusters[mid].firstTokenId);
+      uint256 next = uint(clusters[mid].firstTokenId + clusters[mid].size);
       if (x >= first && x < next) {
         return mid;
       }
@@ -154,7 +164,7 @@ contract ERC7108 is IERC7108, ERC721 {
     _mint(to, clusters[clusterId].nextTokenId++);
   }
 
-  function tokenURI(uint256 tokenId) public view override returns (string memory) {
+  function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
     _requireMinted(tokenId);
     uint256 clusterId = _binarySearch(tokenId);
     string memory baseURI = clusters[clusterId].baseTokenURI;
@@ -162,7 +172,7 @@ contract ERC7108 is IERC7108, ERC721 {
     return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
   }
 
-  function getInterfaceId() external pure returns(bytes4) {
+  function getInterfaceId() external pure virtual returns(bytes4) {
     return type(IERC7108).interfaceId;
   }
 }
