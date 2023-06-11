@@ -7,12 +7,13 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./IERC7108.sol";
+import "./IERC7108Enumerable.sol";
 
 //import "hardhat/console.sol";
 
 // Reference implementation of ERC-7108
 
-contract ERC7108 is IERC7108, ERC721 {
+contract ClusteredNFTEnumerable is IERC7108, IERC7108Enumerable, ERC721, ERC721Enumerable {
 
   using Strings for uint256;
 
@@ -40,6 +41,26 @@ contract ERC7108 is IERC7108, ERC721 {
 
   constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
+
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
+  internal
+  override(ERC721, ERC721Enumerable)
+  {
+    super._beforeTokenTransfer(from, to, tokenId, batchSize);
+  }
+
+  function supportsInterface(bytes4 interfaceId)
+  public
+  view
+  override(ERC721, ERC721Enumerable)
+  returns (bool)
+  {
+    return type(IERC7108).interfaceId == interfaceId
+    || type(IERC7108Enumerable).interfaceId == interfaceId
+    || super.supportsInterface(interfaceId);
+  }
+
+
   // in this implementation anyone can create a new collection
   function addCluster(
     string memory name,
@@ -47,7 +68,7 @@ contract ERC7108 is IERC7108, ERC721 {
     string memory baseTokenURI,
     uint256 size,
     address clusterOwner_
-  ) public override {
+  ) external override {
     if (clusterOwner_ == address(0)) revert ZeroAddress();
     if (size > maxSize) revert SizeTooLarge();
     uint256 lastTokenIdInClusters;
@@ -68,23 +89,23 @@ contract ERC7108 is IERC7108, ERC721 {
     _nextClusterId++;
   }
 
-  function clustersByOwner(address owner) public view returns (uint256[] memory) {
+  function clustersByOwner(address owner) external view returns (uint256[] memory) {
     return clusterIdByOwners[owner];
   }
 
-  function _binarySearch(uint x) internal view returns(uint) {
+  function _binarySearch(uint256 x) internal view returns(uint) {
     if (_nextClusterId == 0) {
       return type(uint).max;
     }
 
-    uint start;
-    uint end = _nextClusterId - 1;
-    uint mid;
+    uint256 start;
+    uint256 end = _nextClusterId - 1;
+    uint256 mid;
 
     while (start <= end) {
       mid = start + (end - start) / 2;
-      uint first = uint(clusters[mid].firstTokenId);
-      uint next = uint(clusters[mid].firstTokenId + clusters[mid].size);
+      uint256 first = uint(clusters[mid].firstTokenId);
+      uint256 next = uint(clusters[mid].firstTokenId + clusters[mid].size);
       if (x >= first && x < next) {
         return mid;
       }
@@ -106,17 +127,17 @@ contract ERC7108 is IERC7108, ERC721 {
     return type(uint).max;
   }
 
-  function clusterOf(uint256 tokenId) public view override returns (uint256) {
+  function clusterOf(uint256 tokenId) external view override returns (uint256) {
     uint256 clusterId = _binarySearch(tokenId);
     if (clusterId == type(uint256).max) revert ClusterNotFound();
     return clusterId;
   }
 
-  function nameOf(uint256 clusterId) public view override returns (string memory) {
+  function nameOf(uint256 clusterId) external view override returns (string memory) {
     return clusters[clusterId].name;
   }
 
-  function symbolOf(uint256 clusterId) public view override returns (string memory) {
+  function symbolOf(uint256 clusterId) external view override returns (string memory) {
     return clusters[clusterId].symbol;
   }
 
@@ -124,30 +145,30 @@ contract ERC7108 is IERC7108, ERC721 {
     return (clusters[clusterId].firstTokenId, clusters[clusterId].firstTokenId + clusters[clusterId].size - 1);
   }
 
-  function clusterOwner(uint256 clusterId) public view override returns (address) {
+  function clusterOwner(uint256 clusterId) external view override returns (address) {
     return clusters[clusterId].owner;
   }
 
-  function clustersCount() public view override returns (uint256) {
+  function clustersCount() external view override returns (uint256) {
     return _nextClusterId;
   }
 
   // This function was originally part of the interface but it was removed
   // to leave the implementer full freedom about how to manage the ownership
-  function transferClusterOwnership(uint256 clusterId, address newOwner) public {
+  function transferClusterOwnership(uint256 clusterId, address newOwner) external {
     if (newOwner == address(0)) revert ZeroAddress();
     if (clusters[clusterId].owner != msg.sender) revert NotClusterOwner();
     clusters[clusterId].owner = newOwner;
     emit ClusterOwnershipTransferred(clusterId, newOwner);
   }
 
-  function normalizedTokenId(uint256 tokenId) public view override returns (uint256) {
+  function normalizedTokenId(uint256 tokenId) external view override returns (uint256) {
     uint256 clusterId = _binarySearch(tokenId);
     if (clusterId == type(uint32).max) revert ClusterNotFound();
     return tokenId - clusters[clusterId].firstTokenId + 1;
   }
 
-  function mint(uint256 clusterId, address to) public {
+  function mint(uint256 clusterId, address to) external {
     if (clusters[clusterId].owner == address(0)) revert ClusterNotFound();
     if (clusters[clusterId].owner != msg.sender) revert NotClusterOwner();
     if (clusters[clusterId].nextTokenId > clusters[clusterId].firstTokenId + clusters[clusterId].size - 1) revert ClusterFull();
@@ -163,6 +184,26 @@ contract ERC7108 is IERC7108, ERC721 {
   }
 
   function getInterfaceId() external pure returns(bytes4) {
-    return type(IERC7108).interfaceId;
+    return type(IERC7108Enumerable).interfaceId;
+  }
+
+  // enumerable part
+
+  function balanceOfWithin(address owner, uint256 clusterId) external view  override returns(uint) {
+    uint256 balance = balanceOf(owner);
+    if (balance != 0)  {
+      uint result = 0;
+      (uint256 start, uint end) = rangeOf(clusterId);
+      for (uint256 i = 0; i < balance; i++) {
+        uint256 tokenId = tokenOfOwnerByIndex(owner, i);
+        if (tokenId >= start && tokenId <= end) {
+          result++;
+        } else if (tokenId > end) {
+          break;
+        }
+      }
+      balance = result;
+    }
+    return balance;
   }
 }
