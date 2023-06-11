@@ -198,8 +198,6 @@ contract ClusteredNFTEnumerable is IERC7108, IERC7108Enumerable, ERC721, ERC721E
         uint256 tokenId = tokenOfOwnerByIndex(owner, i);
         if (tokenId >= start && tokenId <= end) {
           result++;
-        } else if (tokenId > end) {
-          break;
         }
       }
       balance = result;

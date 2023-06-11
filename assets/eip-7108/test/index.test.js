@@ -136,9 +136,14 @@ describe.only("ClusteredNFT", function () {
             .withArgs(addr0, bob.address, expected);
       }
 
-      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 0)).equal(4);
-      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 1)).equal(5);
-      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 2)).equal(6);
+      for (let i =1; i <= 15; i++) {
+        let owner = i > 9 ? owner3 : i > 4 ? owner2 : owner4;
+        await clusteredNFTEnumerable.connect(owner).mint(i > 9 ? 2 : i > 4 ? 1 : 0, bob.address)
+      }
+
+      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 0)).equal(8);
+      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 1)).equal(10);
+      expect(await clusteredNFTEnumerable.balanceOfWithin(bob.address, 2)).equal(12);
 
     });
   });
