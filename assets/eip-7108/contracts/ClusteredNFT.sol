@@ -42,7 +42,7 @@ contract ClusteredNFT is IERC7108, ERC721 {
 
   function supportsInterface(bytes4 interfaceId)
   public
-  view
+  view virtual
   override(ERC721)
   returns (bool)
   {
@@ -164,7 +164,7 @@ contract ClusteredNFT is IERC7108, ERC721 {
     _mint(to, clusters[clusterId].nextTokenId++);
   }
 
-  function tokenURI(uint256 tokenId) public view override returns (string memory) {
+  function tokenURI(uint256 tokenId) public view virtual override(ERC721) returns (string memory) {
     _requireMinted(tokenId);
     uint256 clusterId = _binarySearch(tokenId);
     string memory baseURI = clusters[clusterId].baseTokenURI;
@@ -172,7 +172,7 @@ contract ClusteredNFT is IERC7108, ERC721 {
     return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
   }
 
-  function getInterfaceId() external pure returns(bytes4) {
+  function getInterfaceId() external pure virtual returns(bytes4) {
     return type(IERC7108).interfaceId;
   }
 }
