@@ -132,7 +132,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         - `from` cannot be the zero address.
         - `from` must have at least amount specified in `_amounts` of the corresponding token type tokenId in `_tokenIds` array.
      */
-    function burnBatch(address from, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
+    function burnBatch(address from, uint256[] calldata tokenIds, uint256[] calldata amounts, bytes calldata data) external;
 
     /// @notice Transfers the PBM(NFT) from one wallet to another. 
     /// @dev This function extends the ERC-1155 standard in order to allow the PBM token to be freely transferred between wallet addresses due to 
@@ -149,7 +149,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @dev This function extends the ERC-1155 standard in order to allow the PBM token to be freely transferred between wallet addresses due to 
     /// widespread support accross wallet providers.  Specific conditions and restrictions on whether a pbm can be moved across addresses can be incorporated in this function.
     /// Unwrap logic MAY also be placed within this function to be called.
-    /// If the receiving wallet is a whitelisted merchant wallet address, the PBM(NFT)(s) will be burnt and the underlying ERC-20 tokens will be transferred to the merchant wallet instead.
+    /// If the receiving wallet is a whitelisted /redeemer wallet address, the PBM(NFT)(s) will be burnt and the underlying ERC-20 tokens will be transferred to the merchant/redeemer wallet instead.
     /// @param from The account from which the PBM (NFT)(s) is moving from 
     /// @param to The account which is receiving the PBM (NFT)(s)
     /// @param ids The identifiers of the different PBM token type
@@ -157,10 +157,10 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @param data To record any data associated with the transaction, can be left blank if none. 
     function safeBatchTransferFrom(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) external; 
 
-    /// @notice Unwraps the underlying ERC-20 compatible tokens to an intended end point (ie: merchant) upon fulfilling the required PBM conditions.
+    /// @notice Unwraps the underlying ERC-20 compatible tokens to an intended end point (ie: merchant/redeemer) upon fulfilling the required PBM conditions.
     /// @dev Add implementation specific logic for the conditions under which a PBM processes and transfers the underlying tokens here.
-    /// e.g. If the receving wallet is a whitelisted merchant wallet address, the PBM (NFT) MUST be burnt and the underlying ERC-20 tokens 
-    /// will unwrapped to be transferred to the merchant wallet.
+    /// e.g. If the receving wallet is a whitelisted merchant/redeemer wallet address, the PBM (NFT) MUST be burnt and the underlying ERC-20 tokens 
+    /// will unwrapped to be transferred to the merchant/redeemer wallet.
     /// MUST emit the event {TokenUnwrapForTarget} on success
     /// @param from The account currently holding the PBM
     /// @param to The account receiving the PBM (NFT)
@@ -179,7 +179,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// - The caller must be either the creator of the token type or the smart contract owner.
     function revokePBM(uint256 tokenId) external;
 
-/// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
+    /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
     /// @param tokenId The unique identifier for the newly created PBM token type.
     /// @param tokenName A human-readable string representing the name of the newly created PBM token type.
     /// @param amount The initial supply of the newly created PBM token type.
@@ -195,7 +195,8 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     event PBMrevokeWithdraw(address beneficiary, uint256 PBMTokenId, address ERC20Token, uint256 ERC20TokenValue);
 
     /// @notice Emitted when the underlying tokens are unwrapped and transferred to a specific purpose-bound address.
-    /// This event signifies the end of the PBM lifecycle, as all necessary conditions have been met to release the underlying tokens to the recipient (whitelisted merchant with non-blacklisted wallet address).
+    /// This event signifies the end of the PBM lifecycle, as all necessary conditions have been met to release the underlying tokens to the recipient (whitelisted merchant/redeemer with non-blacklisted wallet address).
+    /// If there are multiple different underlying tokens involved in a single unwrap operation, this event should be emitted for each underlying token.
     /// @param from The address from which the PBM tokens are being unwrapped.
     /// @param to The purpose-bound address receiving the unwrapped underlying tokens.
     /// @param tokenIds An array containing the identifiers of the unwrapped PBM token types.
@@ -206,6 +207,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
 
     /// @notice Emitted when PBM tokens are burned, resulting in the unwrapping of the underlying tokens for the designated recipient.
     /// This event is required if there is an unwrapping of the underlying tokens during the PBM (NFT) burning process.
+    /// If there are multiple different underlying tokens involved in a single unwrap operation, this event should be emitted for each underlying token.
     /// @param from The address from which the PBM tokens are being burned.
     /// @param to The address receiving the unwrapped underlying tokens.
     /// @param tokenIds An array containing the identifiers of the burned PBM token types.
@@ -216,6 +218,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
 
     /// Indicates the wrapping of an token into the PBM smart contract. 
     /// @notice Emitted when underlying tokens are wrapped within the PBM smart contract.
+    /// If there are multiple different underlying tokens involved in a single wrap operation, this event should be emitted for each underlying token.
     /// This event signifies the beginning of the PBM lifecycle, as tokens are now managed by the conditions within the PBM contract.
     /// @param from The address initiating the token wrapping process, and 
     /// @param tokenIds An array containing the identifiers of the token types being wrapped.

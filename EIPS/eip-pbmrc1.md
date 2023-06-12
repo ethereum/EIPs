@@ -4,7 +4,7 @@ title: Purpose bound money
 description: An interface extending EIP-1155 for <placeholder>, supporting use case such as <placeholder>
 authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian)
 discussions-to: https://ethereum-magicians.org (Create a discourse here for early feedback)
-status:  DRAFT
+status: DRAFT
 type: Standards Track
 category: ERC
 created: 2023-04-01
@@ -12,6 +12,7 @@ requires: 165, 173, 1155
 ---
 
 <!-- Notes: replace PRBMRC with EIP upon creating a PR to EIP Main repo -->
+
 ## Abstract
 
 This PBMRC outlines a smart contract interface that builds upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf).
@@ -38,7 +39,7 @@ A PBM based architecture has several distinct components:
     - programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
 - **PBM Creator** defines the conditions of the PBM Wrapper to create PBM Tokens.
 - **PBM Wallet** - cryptographic wallets which can either be an EOA (Externally Owned Account) that is controlled by a private key, or a smart contract wallet.
-- **Merchant** - In the context of this proposal, a Merchant is broadly defined as the ultimate recipient, or endpoint, for PBM tokens, to which these tokens are intrinsically directed or purpose-bound to.
+- **Merchant / Redeemer** - In the context of this proposal, a Merchant or a Redeemer is broadly defined as the ultimate recipient, or endpoint, for PBM tokens, to which these tokens are intrinsically directed or purpose-bound to.
 
 ## Specification
 
@@ -47,6 +48,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 ### Overview
 
 - Whether a PBM Token **SHOULD** have an expiry time will be decided by the PBM Creator, the spec itself should not enforce an expiry time.
+
   - To align with our goals of making PBM Token a suitable construct for all kinds of business logic that could occur in the real world.
   - Should an expiry time not be needed, the expiry time can be set to infinity.
 
@@ -57,8 +59,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 - PBM **SHALL** adhere to the definition of “unwrap” or “unwrapping” to mean the release of a token in accordance with the PBM business logic during its lifecycle stage.
 
 - A valid PBM Token **MUST** consists of an underlying Spot Token and the PBM Wrapper.
+
   - The Spot Token can be wrapped either upon the creation of the PBM Token or at a later date.
-  
+
   - A Spot Token can be implemented as any widely accepted ERC-20 compatible token, such as ERC-20, ERC-777, or ERC-1363.
 
 - PBM Wrapper **MUST** provide a mechanism for all transacting parties to verify that all necessary condition(s) have been met before allowing the PBM Token to be unwrapped. Refer to Auditability section for elaborations.
@@ -91,7 +94,7 @@ pragma solidity ^0.8.0;
 
 abstract contract IPBMRC1_TokenManager {
     /// @dev Mapping of each ERC-1155 tokenId to its corresponding PBM Token details.
-    mapping (uint256 => PBMToken) internal tokenTypes ; 
+    mapping (uint256 => PBMToken) internal tokenTypes ;
 
     /// @notice A PBM token MUST include compulsory state variables (name, faceValue, expiry, and uri) to adhere to this standard.
     /// @dev Represents all the details corresponding to a PBM tokenId.
@@ -109,14 +112,14 @@ abstract contract IPBMRC1_TokenManager {
         // Metadata URI for ERC-1155 display purposes.
         string uri;
 
-        // OPTIONAL: Indicates if the PBM token can be transferred to a non merchant wallet.
+        // OPTIONAL: Indicates if the PBM token can be transferred to a non merchant/redeemer wallet.
         bool isTransferable;
 
-        // OPTIONAL: Determines whether the PBM will be burned or revoked upon expiry, under certain predefined conditions, or at the owner's discretion. 
+        // OPTIONAL: Determines whether the PBM will be burned or revoked upon expiry, under certain predefined conditions, or at the owner's discretion.
         bool burnable;
 
-        // OPTIONAL: Number of decimal places for the token.    
-        uint8 decimals; 
+        // OPTIONAL: Number of decimal places for the token.
+        uint8 decimals;
 
         // OPTIONAL: The address of the creator of this PBM type on this smart contract.
         address creator;
@@ -142,7 +145,7 @@ An external function may be exposed to create new PBM Token as well at a later d
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
-    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address.
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
     function createPBMTokenType(
         string memory _name,
@@ -160,7 +163,7 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
     /// @param tokenId The identifier of the PBM token type.
     /// @return A PBMToken struct containing all the details of the specified PBM token type.
-    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory); 
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory);
 ```
 
 ### PBM Address List
@@ -224,7 +227,7 @@ interface PBMRC1_TokenReceiver {
         @param _data      Additional data with no specified format
         @return           `bytes4(keccak256("onPBMRC1BatchUnwrap(address,address,uint256,uint256,bytes)"))`
     */
-    function onPBMRC1BatchUnwrap(address _operator, address _from, uint256[] calldata _ids, uint256[] calldata _values, bytes calldata _data) external returns(bytes4);       
+    function onPBMRC1BatchUnwrap(address _operator, address _from, uint256[] calldata _ids, uint256[] calldata _values, bytes calldata _data) external returns(bytes4);
 }
 
 ```
@@ -258,7 +261,7 @@ By mapping the underlying ERC-1155 token model with an additional data structure
 
 2. The event notifies subscribers who are interested to learn whenever an PBM Token is being consumed.
 
-3. To keep it simple, this standard *intentionally* omits functions or events related to the creation of a consumable asset. because of XYZ
+3. To keep it simple, this standard _intentionally_ omits functions or events related to the creation of a consumable asset. because of XYZ
 
 4. Metadata associated to the consumables is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from [EIP-721](./eip-721.md). Refer to Opensea's metadata-standards for an implementation example.
 
@@ -275,7 +278,9 @@ This interface is designed to be compatible with [ERC-1155](./eip-1155.md).
 Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/README.md).
 
 ## Security Considerations
+
 <!-- TBD Improvement: Think of other security considerations + Read up other security considerations in various EIPS and add on to this.  Improve grammer, sentence structure -->
+
 - Everything used in a smart contract is publicly visible, even local variables and state variables marked `private`.
 
 - Due to gas limit, loops that do not have a fixed number of iterations have to be used cautiously.
@@ -311,10 +316,10 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 
   - The access control over permission to burn tokens should be carefully designed. Typically, only the following two roles are entitled to burn a token:
 
-    - Role 1. Prior to a PBM expiry, only whitelisted merchants with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they holds.
+    - Role 1. Prior to a PBM expiry, only whitelisted merchants/redeemers with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they holds.
     - Role 2. After a PBM has expired:
-      - whitelisted merchants with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they hold; and
-      - PBM owners are allowed to burn unused PBM Tokens remaining in the hands of non-whitelisted merchants to retrieve underlying Spot Tokens.
+      - whitelisted merchants/redeemers with non-blacklisted wallet addresses are allowed to unwrap and burn tokens that they hold; and
+      - PBM owners are allowed to burn unused PBM Tokens remaining in the hands of non-whitelisted merchants/redeemers to retrieve underlying Spot Tokens.
 
   - Nevertheless, we do recognize there are potentially other use cases where a third type of role may be entitled to burning. Implementors should be cautious when designing access control over burning of PBM Tokens.
 

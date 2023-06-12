@@ -21,7 +21,7 @@ abstract contract IPBMRC1_TokenManager {
         // Metadata URI for ERC-1155 display purposes.
         string uri;
 
-        // OPTIONAL: Indicates if the PBM token can be transferred to a non merchant wallet.
+        // OPTIONAL: Indicates if the PBM token can be transferred to a non merchant/redeemer wallet.
         bool isTransferable;
 
         // OPTIONAL: Determines whether the PBM will be burned or revoked upon expiry, under certain predefined conditions, or at the owner's discretion. 
@@ -30,7 +30,7 @@ abstract contract IPBMRC1_TokenManager {
         // OPTIONAL: Number of decimal places for the token.    
         uint8 decimals; 
 
-        // OPTIONAL: The address of the creator of this PBM type on this smart contract.
+        // OPTIONAL: The address of the creator of this PBM type on this smart contract. This field is optional because the creator is msg.sender by default.
         address creator;
 
         // OPTIONAL: The smart contract address of the spot token.
@@ -54,15 +54,13 @@ abstract contract IPBMRC1_TokenManager {
     /// @param _name Name of the token.
     /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
     /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
-    /// @param _creator The address of the creator of this PBM type on this smart contract (e.g. msg.sender)
     /// @param _tokenURI Metadata URI for ERC-1155 display purposes
     function createPBMTokenType(
         string memory _name,
         uint256 _faceValue,
         uint256 _tokenExpiry,
-        address _creator,
         string memory _tokenURI
-    ) external;
+    ) external returns (uint256 tokenId_);
 
     /// @notice Retrieves the details of a PBM Token type given its tokenId.
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
