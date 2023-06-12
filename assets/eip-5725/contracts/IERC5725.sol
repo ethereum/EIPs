@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
+ * @notice A non-fungible token standard used to vest ERC-20 tokens over a vesting release curve
  *  scheduled using timestamps.
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
