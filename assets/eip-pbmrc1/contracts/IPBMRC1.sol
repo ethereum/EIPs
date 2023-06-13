@@ -16,13 +16,14 @@ pragma solidity ^0.8.0;
 /// @dev PBM deployer must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
 interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     
-        /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
+    /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
     /// contract expiry, and the PBM address list.
     /// @param _spotToken The address of the underlying ERC20 token.
     /// @param _expiry The contract-wide expiry timestamp (in Unix epoch time).
-    /// @param _pbmWrapperAddress This should point to a smart contract, which contains conditions governing a PBM and an address
-    /// list that determines whether a PBM is allowed to move to or to be unwrapped.
-    function initialise(address _spotToken, uint256 _expiry, address _pbmWrapperAddress) external; 
+    /// @param _pbmWrapperLogic This should point to a smart contract, which contains conditions governing a PBM and other 
+    /// relevant business logic as a way of implementing inversion of control. 
+    /// An example of this would be an address list that determines whether a PBM is allowed to move to or to be unwrapped. 
+    function initialise(address _spotToken, uint256 _expiry, address _pbmWrapperLogic) external; 
 
     /// @notice Returns the Uniform Resource Identifier (URI) metadata information for the PBM with the corresponding tokenId
     /// @dev URIs are defined in RFC 3986. 
