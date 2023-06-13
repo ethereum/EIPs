@@ -2,7 +2,7 @@
 eip: TBD
 title: Purpose bound money
 description: An interface extending EIP-1155 for <placeholder>, supporting use case such as <placeholder>
-authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian)
+authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian), Chin Sin Ong (@chinsinong)
 discussions-to: https://ethereum-magicians.org (Create a discourse here for early feedback)
 status: DRAFT
 type: Standards Track
@@ -275,8 +275,6 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 
 ## Security Considerations
 
-<!-- TBD Improvement: Think of other security considerations + Read up other security considerations in various EIPS and add on to this.  Improve grammer, sentence structure -->
-
 - Everything used in a smart contract is publicly visible, even local variables and state variables marked `private`.
 
 - Due to gas limit, loops that do not have a fixed number of iterations have to be used cautiously.
@@ -292,7 +290,6 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 - Signing messages off-chain and having a contract that requires that signature before executing a function is a useful technique. However, the same signature can be exploited by malicious actors to execute a function multiple times. This can be harmful if the signer's intention was to approve a transaction once. To prevent signature replay, messages should be signed with nonce and address of the contract.
 
 - Malicious users may attempt to:
-
   - Double spend through reentrancy.
   - clone existing PBM Tokens to perform double-spending;
   - create invalid PBM Token with no underlying Spot Token; or
@@ -317,8 +314,6 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
       - PBM owners are allowed to burn unused PBM Tokens remaining in the hands of non-whitelisted merchants/redeemers to retrieve underlying Spot Tokens.
 
   - Nevertheless, we do recognize there are potentially other use cases where a third type of role may be entitled to burning. Implementors should be cautious when designing access control over burning of PBM Tokens.
-
-  - The mapping of each PBM Tokens to the amount of underlying spot token held by the smart contract should be carefully accounted for and audited.
 
 - It is recommended to adopt a token standard that is compatible with ERC-20. Examples of such compatible tokens includes tokens implementing ERC-777 or ERC-1363. However, ERC-20 remains the most widely accepted because of its simplicity and there is a high degree of confidence in its security.
 
