@@ -11,7 +11,7 @@ interface IERC7092 {
     function isin() external view returns(string memory);
 
     /**
-    * @notice Returs the bond name
+    * @notice Returns the bond name
     */
     function name() external view returns(string memory);
 
@@ -21,7 +21,7 @@ interface IERC7092 {
     function symbol() external view returns(string memory);
 
     /**
-    * @notice Returns the numbr of decimals the bond uses - e?g `10`, means to divide the token amount by `10000000000`
+    * @notice Returns the number of decimals the bond uses - e.g `10`, means to divide the token amount by `10000000000`
     *
     * OPTIONAL
     */
@@ -38,8 +38,8 @@ interface IERC7092 {
     function currencyOfCoupon() external view returns(address);
 
     /**
-    * @notice Returns the bond denominiation. This is the minimum amount in which the Bonds may be issued. It must be expressend in unnit of the principal currency
-    *         ex: If the denomination is equal to 1,000 and the currency is USDC, then bond denomination is equal to 1,000 USDC
+    * @notice Returns the bond denominiation. This is the minimum amount in which the Bonds may be issued. It must be expressend in unit of the principal currency
+    *         ex: If the denomination is equal to 1,000 and the currency is USDC, then the bond denomination is equal to 1,000 USDC
     */
     function denomination() external view returns(uint256);
 
@@ -115,14 +115,14 @@ interface IERC7092 {
     function approveAll(address _spender) external;
 
     /**
-    * @notice Lower the allowance of `_spender` by `_amount`
+    * @notice Lowers the allowance of `_spender` by `_amount`
     * @param _spender the address to be authorized by the bondholder
     * @param _amount amount of bond to remove approval; _amount MUST be a multiple of denomination
     */
     function decreaseAllowance(address _spender, uint256 _amount) external;
 
     /**
-    * @notice Remove the allowance for `_spender`
+    * @notice Removes the allowance for `_spender`
     * @param _spender the address to remove the authorization by from
     */
     function decreaseAllowanceForAll(address _spender) external;
@@ -143,7 +143,7 @@ interface IERC7092 {
     function transferAll(address _to, bytes calldata _data) external;
 
     /**
-    * @notice Moves `_amount` bonds from an account that has authorized through the approve function
+    * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function
     * @param _from the bondholder address
     * @param _to the address to transfer bonds to
     * @param _amount amount of bond to transfer. _amount MUST be a multiple of denomination
@@ -152,7 +152,7 @@ interface IERC7092 {
     function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external;
 
     /**
-    * @notice Moves all bonds from an `_from` to `_to`. The caller must have been authorized through the approve function
+    * @notice Moves all bonds from `_from` to `_to`. The caller must have been authorized through the approve function
     * @param _from the bondholder address
     * @param _to the address to transfer bonds to
     * @param _data additional information provided by the token holder
