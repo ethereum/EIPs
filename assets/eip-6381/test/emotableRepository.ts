@@ -40,8 +40,8 @@ describe("RMRKEmotableRepositoryMock", async function () {
     repository = await loadFixture(emotableRepositoryFixture);
   });
 
-  it("can support IEmotableRepository", async function () {
-    expect(await repository.supportsInterface("0x08eb97a6")).to.equal(true);
+  it("can support IERC6381", async function () {
+    expect(await repository.supportsInterface("0xd9fac55a")).to.equal(true);
   });
 
   it("can support IERC165", async function () {
@@ -131,6 +131,362 @@ describe("RMRKEmotableRepositoryMock", async function () {
       expect(
         await repository.emoteCountOf(token.address, tokenId, emoji2)
       ).to.equal(bn(0));
+    });
+
+    it("can bulk emote", async function () {
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(0), bn(0)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([false, false]);
+
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [true, true]
+        )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          true
+        )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji2,
+          true
+        );
+
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(1), bn(1)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([true, true]);
+    });
+
+    it("can bulk undo emote", async function () {
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [true, true]
+        )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          true
+        )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji2,
+          true
+        );
+
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(1), bn(1)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([true, true]);
+
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [false, false]
+        )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          false
+        )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji2,
+          false
+        );
+
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(0), bn(0)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([false, false]);
+    });
+
+    it("can bulk emote and unemote at the same time", async function () {
+      await repository.emote(token.address, tokenId, emoji2, true);
+
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(0), bn(1)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([false, true]);
+
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [true, false]
+        )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          true
+        )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji2,
+          false
+        );
+
+      expect(
+        await repository.bulkEmoteCountOf(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([bn(1), bn(0)]);
+
+      expect(
+        await repository.haveEmotersUsedEmotes(
+          [owner.address, owner.address],
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2]
+        )
+      ).to.eql([true, false]);
+    });
+
+    it("can not bulk emote if passing arrays of different length", async function () {
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [true]
+        )
+      ).to.be.revertedWithCustomError(
+        repository,
+        "BulkParametersOfUnequalLength"
+      );
+
+      await expect(
+        repository.bulkEmote(
+          [token.address],
+          [tokenId, tokenId],
+          [emoji1, emoji2],
+          [true, true]
+        )
+      ).to.be.revertedWithCustomError(
+        repository,
+        "BulkParametersOfUnequalLength"
+      );
+
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId],
+          [emoji1, emoji2],
+          [true, true]
+        )
+      ).to.be.revertedWithCustomError(
+        repository,
+        "BulkParametersOfUnequalLength"
+      );
+
+      await expect(
+        repository.bulkEmote(
+          [token.address, token.address],
+          [tokenId, tokenId],
+          [emoji1],
+          [true, true]
+        )
+      ).to.be.revertedWithCustomError(
+        repository,
+        "BulkParametersOfUnequalLength"
+      );
+    });
+
+    it("can use presigned emote to react to token", async function () {
+      const message = await repository.prepareMessageToPresignEmote(
+        token.address,
+        tokenId,
+        emoji1,
+        true,
+        bn(9999999999)
+      );
+
+      const signature = await owner.signMessage(ethers.utils.arrayify(message));
+
+      const r: string = signature.substring(0, 66);
+      const s: string = "0x" + signature.substring(66, 130);
+      const v: number = parseInt(signature.substring(130, 132), 16);
+
+      await expect(
+        repository
+          .connect(addrs[0])
+          .presignedEmote(
+            owner.address,
+            token.address,
+            tokenId,
+            emoji1,
+            true,
+            bn(9999999999),
+            v,
+            r,
+            s
+          )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          true
+        );
+    });
+
+    it("can use presigned emotes to bulk react to token", async function () {
+      const messages = await repository.bulkPrepareMessagesToPresignEmote(
+        [token.address, token.address],
+        [tokenId, tokenId],
+        [emoji1, emoji2],
+        [true, true],
+        [bn(9999999999), bn(9999999999)]
+      );
+
+      const signature1 = await owner.signMessage(
+        ethers.utils.arrayify(messages[0])
+      );
+      const signature2 = await owner.signMessage(
+        ethers.utils.arrayify(messages[1])
+      );
+
+      const r1: string = signature1.substring(0, 66);
+      const s1: string = "0x" + signature1.substring(66, 130);
+      const v1: number = parseInt(signature1.substring(130, 132), 16);
+      const r2: string = signature2.substring(0, 66);
+      const s2: string = "0x" + signature2.substring(66, 130);
+      const v2: number = parseInt(signature2.substring(130, 132), 16);
+
+      await expect(
+        repository
+          .connect(addrs[0])
+          .bulkPresignedEmote(
+            [owner.address, owner.address],
+            [token.address, token.address],
+            [tokenId, tokenId],
+            [emoji1, emoji2],
+            [true, true],
+            [bn(9999999999), bn(9999999999)],
+            [v1, v2],
+            [r1, r2],
+            [s1, s2]
+          )
+      )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji1,
+          true
+        )
+        .to.emit(repository, "Emoted")
+        .withArgs(
+          owner.address,
+          token.address,
+          tokenId.toNumber(),
+          emoji2,
+          true
+        );
     });
   });
 });
