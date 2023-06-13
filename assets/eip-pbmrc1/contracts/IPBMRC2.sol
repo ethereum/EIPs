@@ -52,9 +52,11 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
 
   /// @notice Unloads the underlying token from the PBM smart contract by extracting the specified amount of the token for the caller.
   /// Emits {TokenUnload} event.
-  /// @dev The underlying token will be removed and transferred to the address of the caller (msg.sender).
+  /// @dev The underlying token that belongs to the caller (msg.sender) will be removed and transferred
+  /// back to the caller.
   /// @param tokenId Identifier of the PBM token type to be unloaded.
-  /// @param amount The quantity of the corresponding tokens to be unloaded.
+  /// @param amount The quantity of the corresponding tokens to be unloaded. 
+  /// Amount should not exceed the amount that the caller has originally loaded into the PBM smart contract.
   function unload(uint256 tokenId, uint256 amount) external;
 
   /// @notice Emitted when an underlying token is loaded into a PBM
