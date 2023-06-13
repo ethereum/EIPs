@@ -1,315 +1,243 @@
 const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
-describe('MyNFT', function () {
+describe('NewToken', function () {
+	let LOCK1 = 'lock(uint256)';
+	let LOCK2 = 'lock(uint256,address)';
 	async function deployMyNFTFixture() {
 		const [deployer, acc1, acc2, acc3] = await ethers.getSigners();
 		const MyNFT = await ethers.getContractFactory('MyNFT');
 		let myNFT = await MyNFT.deploy();
 		await myNFT.deployed();
-
-		return { myNFT, deployer, acc1, acc2, acc3 };
-	}
-
-	async function mintAndSetAuthority() {
-		const { myNFT, deployer, acc1, acc2, acc3 } = await deployMyNFTFixture();
 		await myNFT.connect(deployer).mint();
-		await myNFT.connect(deployer).setLocker(0, acc1.address);
+
 		return { myNFT, deployer, acc1, acc2, acc3 };
 	}
 
-	async function approveAcc2() {
-		const { myNFT, deployer, acc1, acc2, acc3 } = await mintAndSetAuthority();
-		await myNFT.connect(deployer).approve(acc2.address, 0);
-		await myNFT.connect(deployer).setApprovalForAll(acc2.address, true);
-		await myNFT.connect(acc2).lockApproved(0);
+	async function approveUser1() {
+		const { myNFT, deployer, acc1, acc2, acc3 } = await deployMyNFTFixture();
+		await myNFT.connect(deployer).approve(acc1.address, 0);
+		await myNFT.connect(deployer).setApprovalForAll(acc1.address, true);
 		return { myNFT, deployer, acc1, acc2, acc3 };
 	}
 
-	describe('SetLocker', function () {
-		it('Should not allow anyone to set locker', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await deployMyNFTFixture();
-			await myNFT.connect(deployer).mint();
+	describe('lockerOf', () => {
+		it('Should return zero address for an unlocked token', async () => {
+			const { myNFT } = await deployMyNFTFixture();
+			expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
+		});
+
+		it('Should revert as token does not exist', async () => {
+			const { myNFT } = await deployMyNFTFixture();
+			await expect(myNFT.lockerOf(1)).to.be.revertedWith(
+				'ERC7066: Nonexistent token'
+			);
+		});
+	});
+
+	describe('lock - with one parameter', () => {
+		it('Should not lock if already locked', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK1](0);
+			await expect(myNFT.connect(deployer)[LOCK1](0)).to.be.revertedWith(
+				'ERC7066: Locked'
+			);
+		});
+
+		it('Should not allow random user to lock', async () => {
+			const { myNFT, acc1 } = await deployMyNFTFixture();
+			await expect(myNFT.connect(acc1)[LOCK1](0)).to.be.revertedWith(
+				'Require owner or approved'
+			);
+		});
+
+		it('Should be able to lock token by owner', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK1](0);
+			expect(await myNFT.lockerOf(0)).to.equal(deployer.address);
+		});
+
+		it('Should be able to lock token by approved_user', async () => {
+			const { myNFT, acc1 } = await approveUser1();
+			await myNFT.connect(acc1)[LOCK1](0);
+			expect(await myNFT.lockerOf(0)).to.equal(acc1.address);
+		});
+	});
+
+	describe('lock - with two parameters', () => {
+		it('Should not lock token if already locked', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK2](0, deployer.address);
 			await expect(
-				myNFT.connect(acc1).setLocker(0, acc1.address)
-			).to.be.revertedWith('ERC7066 : Owner Required');
+				myNFT.connect(deployer)[LOCK2](0, deployer.address)
+			).to.be.revertedWith('ERC7066: Locked');
 		});
 
-		it('Should not allow to set locker when token is locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await deployMyNFTFixture();
-			await myNFT.connect(deployer).mint();
-			// set locker and let him lock the token
-			await myNFT.connect(deployer).setLocker(0, acc1.address);
-			await myNFT.connect(acc1).lock(0);
-
-			//second check
+		it('Should not allow random user to lock', async () => {
+			const { myNFT, acc1 } = await deployMyNFTFixture();
 			await expect(
-				myNFT.connect(deployer).setLocker(0, acc2.address)
-			).to.be.revertedWith('ERC7066 : Locked');
+				myNFT.connect(acc1)[LOCK2](0, acc1.address)
+			).to.be.revertedWith('ERC7066: Require owner');
 		});
 
-		it('Should not allow to set locker when token is locked_approved', async function () {
-			// minted token by deployer, acc1- locker, acc2- lock approved
-			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
+		it('Should not allow approved_user to lock', async () => {
+			const { myNFT, acc1 } = await approveUser1();
 			await expect(
-				myNFT.connect(deployer).setLocker(0, acc1.address)
-			).to.be.revertedWith('ERC7066 : Locked');
+				myNFT.connect(acc1)[LOCK2](0, acc1.address)
+			).to.be.revertedWith('ERC7066: Require owner');
+		});
+
+		it('Should allow token owner to lock, locker is owner', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK2](0, deployer.address);
+			expect(await myNFT.lockerOf(0)).to.equal(deployer.address);
+		});
+
+		it('Should allow token owner to lock, locker is zero-address', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK2](0, ethers.constants.AddressZero);
+			expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
 		});
 	});
 
-	describe('RemoveLocker', function () {
-		it('Should not allow anyone to remove locker', async () => {
-			const { myNFT, deployer, acc1 } = await mintAndSetAuthority();
-			await expect(myNFT.connect(acc1).removeLocker(0)).to.be.revertedWith(
-				'ERC7066 : Owner Required'
-			);
-		});
-		it('Should not allow to remove locker when token is locked', async () => {
-			const { myNFT, deployer, acc1 } = await mintAndSetAuthority();
-			// lock the token by locker
-			await myNFT.connect(acc1).lock(0);
-
-			await expect(myNFT.connect(deployer).removeLocker(0)).to.be.revertedWith(
-				'ERC7066 : Locked'
-			);
-		});
-
-		it('Should not allow to set locker when token is locked_approved', async function () {
-			// minted token by deployer, acc1- locker, acc2- lock approved
-			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
-			await expect(myNFT.connect(deployer).removeLocker(0)).to.be.revertedWith(
-				'ERC7066 : Locked'
-			);
-		});
-	});
-
-	describe('lockerOf', function () {
-		it('Should get the correct locker address', async () => {
-			const { myNFT, acc1 } = await mintAndSetAuthority();
-			expect(await myNFT.connect(acc1).lockerOf(0)).to.equal(acc1.address);
-		});
-	});
-
-	describe('lock', function () {
-		it('Should not allow anyone to lock', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await expect(myNFT.connect(acc2).lock(0)).to.be.revertedWith(
-				'ERC7066 : Locker Required'
-			);
-			await expect(myNFT.connect(deployer).lock(0)).to.be.revertedWith(
-				'ERC7066 : Locker Required'
-			);
-		});
-
-		it('Should not allow to lock when token is locked_approved', async function () {
-			// minted token by deployer, acc1- lock authority, acc2- lock approved
-			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
-			await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-				'ERC7066 : Locked'
-			);
-		});
-
-		it('Should not allow to lock when token is locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			//lock the token by lock authority
-			await myNFT.connect(acc1).lock(0);
-
-			//second check
-			await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-				'ERC7066 : Locked'
-			);
-		});
-	});
-
-	describe('unlock', function () {
-		it('Should not allow anyone to unlock', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await expect(myNFT.connect(acc2).unlock(0)).to.be.revertedWith(
-				'ERC7066 : Locker Required'
-			);
+	describe('unlock', () => {
+		it('Should not unlock token if not locked', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
 			await expect(myNFT.connect(deployer).unlock(0)).to.be.revertedWith(
-				'ERC7066 : Locker Required'
+				'ERC7066: Unlocked'
 			);
 		});
 
-		it('Should not allow to lock when token is locked_approved', async function () {
-			// minted token by deployer, acc1- lock authority, acc2- lock approved
-			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
-			await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-				'ERC7066 : Locked by approved'
-			);
+		it('Should not unlock token if msg.sender is not the locker', async () => {
+			const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK1](0);
+			await expect(myNFT.connect(acc1).unlock(0)).to.be.reverted;
 		});
 
-		it('Should not allow to unlock when token is not locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
+		it('Should allow owner to unlock', async () => {
+			const { myNFT, deployer } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK1](0);
+			await myNFT.connect(deployer).unlock(0);
+			expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
+		});
 
-			await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-				'ERC7066 : Unlocked'
-			);
+		it('Should allow approver to unlock', async () => {
+			const { myNFT, acc1 } = await approveUser1();
+			await myNFT.connect(acc1)[LOCK1](0);
+			await myNFT.connect(acc1).unlock(0);
+			expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
 		});
 	});
 
-	describe('approve', function () {
-		it('Should not approve when token is locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await myNFT.connect(acc1).lock(0);
-
+	describe('transferAndLock', () => {
+		it('Should not allow if the user is not owner or approved', async () => {
+			const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
 			await expect(
-				myNFT.connect(deployer).approve(acc2.address, 0)
-			).to.be.revertedWith('ERC7066 : Locked');
+				myNFT
+					.connect(acc1)
+					.transferAndLock(0, deployer.address, acc1.address, false)
+			).to.be.reverted;
 		});
 
-		it('Should not approve when token is locked_approved', async function () {
-			// minted token by deployer, acc1- lock authority, acc2- lock approved
-			const { myNFT, deployer, acc1, acc2 } = await approveAcc2();
+		it('Should transfer and lock, msg.sender - owner ,setApproval - true', async () => {
+			const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
+			await myNFT
+				.connect(deployer)
+				.transferAndLock(0, deployer.address, acc1.address, true);
+			expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.lockerOf(0)).to.equal(deployer.address);
+			expect(await myNFT.getApproved(0)).to.equal(deployer.address);
+		});
+
+		it('Should transfer and lock,msg.sender - owner, setApproval - false', async () => {
+			const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
+			await myNFT
+				.connect(deployer)
+				.transferAndLock(0, deployer.address, acc1.address, false);
+			expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.lockerOf(0)).to.equal(deployer.address);
+			expect(await myNFT.getApproved(0)).to.equal(ethers.constants.AddressZero);
+		});
+
+		it('Should transfer and lock, msg.sender - approved_user, setApproval - true', async () => {
+			const { myNFT, deployer, acc1 } = await approveUser1();
+			await myNFT
+				.connect(acc1)
+				.transferAndLock(0, deployer.address, acc1.address, true);
+			expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.lockerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.getApproved(0)).to.equal(acc1.address);
+		});
+
+		it('Should transfer and lock, msg.sender - approved_user,setApproval - false', async () => {
+			const { myNFT, deployer, acc1 } = await approveUser1();
+			await myNFT
+				.connect(acc1)
+				.transferAndLock(0, deployer.address, acc1.address, false);
+			expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.lockerOf(0)).to.equal(acc1.address);
+			expect(await myNFT.getApproved(0)).to.equal(ethers.constants.AddressZero);
+		});
+	});
+
+	describe('approve', () => {
+		it('Should not allow if the user is not owner/approved_user', async () => {
+			const { myNFT, acc1 } = await deployMyNFTFixture();
+			await expect(myNFT.connect(acc1).approve(acc1.address, 0)).to.be.reverted;
+		});
+
+		it('Should not allow if token is locked', async () => {
+			const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
+			await myNFT.connect(deployer)[LOCK1](0);
 			await expect(
-				myNFT.connect(acc1).approve(acc2.address, 0)
-			).to.be.revertedWith('ERC7066 : Locked');
+				myNFT.connect(deployer).approve(acc1.address, 0)
+			).to.be.revertedWith('ERC7066: Locked');
 		});
 
-		it('Should not allow anyone to approve', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await expect(
-				myNFT.connect(acc1).approve(acc2.address, 0)
-			).to.be.revertedWith(
-				'ERC721: approve caller is not token owner or approved for all'
-			);
+		it('Should allow user with isApprovedForAll to approve', async () => {
+			const { myNFT, acc1, acc2 } = await approveUser1();
+			await myNFT.connect(acc1).approve(acc2.address, 0);
+			expect(await myNFT.getApproved(0)).to.equal(acc2.address);
 		});
 	});
 
-	describe('lockApproved', async function () {
-		it('Should not allow anyone without approval', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-			await expect(myNFT.connect(acc2).lockApproved(0)).to.be.revertedWith(
-				'ERC7066 : Required approval'
-			);
-		});
-
-		it('Should check if token is locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await myNFT.connect(deployer).approve(acc2.address, 0);
-			await myNFT.connect(deployer).setApprovalForAll(acc2.address, true);
-			await myNFT.connect(acc1).lock(0);
-
-			await expect(myNFT.connect(acc2).lockApproved(0)).to.be.revertedWith(
-				'ERC7066 : Locked'
-			);
-		});
-	});
-
-	describe('unlockApproved', async function () {
-		it('Should not allow anyone without approval', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC7066 : Required approval'
-			);
-		});
-
-		it('Should not allow unlockApproved when token is locked', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await myNFT.connect(deployer).approve(acc2.address, 0);
-			await myNFT.connect(deployer).setApprovalForAll(acc2.address, true);
-
-			//lock the token by lock authority
-			await myNFT.connect(acc1).lock(0);
-			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC7066 : Locked by locker'
-			);
-		});
-
-		it('Should check if token is in unlocked state', async function () {
-			const { myNFT, deployer, acc1, acc2 } = await mintAndSetAuthority();
-
-			await myNFT.connect(deployer).approve(acc2.address, 0);
-			await myNFT.connect(deployer).setApprovalForAll(acc2.address, true);
-
-			await expect(myNFT.connect(acc2).unlockApproved(0)).to.be.revertedWith(
-				'ERC7066 : Unlocked'
-			);
-		});
-	});
-
-	describe('transferFrom', async function () {
-		describe('Before Token Transfer', async function () {
-			it('Should not allow transfer when token is locked', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } =
-					await mintAndSetAuthority();
-
-				await myNFT.connect(acc1).lock(0);
+	describe('transferFrom', () => {
+		describe('beforeTokenTransfer', () => {
+			it('Should not allow transfer if the token is locked', async () => {
+				const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
+				await myNFT.connect(deployer)[LOCK1](0);
 				await expect(
 					myNFT
 						.connect(deployer)
-						.transferFrom(deployer.address, acc3.address, 0)
-				).to.be.revertedWith('ERC7066 : Locked');
+						.transferFrom(deployer.address, acc1.address, 0)
+				).to.be.revertedWith('ERC7066: Locked');
 			});
-			it('Should not allow transfer by anyone without approval(lock_approved,ERC721)', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } = await approveAcc2();
 
+			it('Should not allow transfer if user is not owner/approved_user', async () => {
+				const { myNFT, deployer, acc1, acc2 } = await approveUser1();
 				await expect(
-					myNFT.connect(acc1).transferFrom(deployer.address, acc3.address, 0)
+					myNFT.connect(acc2).transferFrom(deployer.address, acc1.address, 0)
 				).to.be.revertedWith('ERC721: caller is not token owner or approved');
 			});
-
-			it('Should not allow transfer by anyone without approval(lock_approved,ERC721_Lockable)', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } = await approveAcc2();
-
-				await expect(
-					myNFT
-						.connect(deployer)
-						.transferFrom(deployer.address, acc3.address, 0)
-				).to.be.revertedWith('ERC7066 : Required approval');
-			});
-
-			it('Should allow approved person to transfer token', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } = await approveAcc2();
-
-				await myNFT
-					.connect(acc2)
-					.transferFrom(deployer.address, acc3.address, 0);
-				expect(await myNFT.ownerOf(0)).to.equal(acc3.address);
-			});
 		});
 
-		describe('After Token Transfer', async function () {
-			it('Should check if token has new owner', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } =
-					await mintAndSetAuthority();
+		describe('afterTokenTransfer', async () => {
+			it('Should check if token has a locker', async () => {
+				const { myNFT, deployer, acc1 } = await deployMyNFTFixture();
 				await myNFT
 					.connect(deployer)
-					.transferFrom(deployer.address, acc3.address, 0);
-
-				expect(await myNFT.ownerOf(0)).to.equal(acc3.address);
+					.transferFrom(deployer.address, acc1.address, 0);
+				expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
+				expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
 			});
 
-			it('Should check if token does not have a lock authority', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } =
-					await mintAndSetAuthority();
+			it('Should be able to transfer by approved_user', async () => {
+				const { myNFT, deployer, acc1 } = await approveUser1();
 				await myNFT
-					.connect(deployer)
-					.transferFrom(deployer.address, acc3.address, 0);
-				await expect(myNFT.connect(acc1).lock(0)).to.be.revertedWith(
-					'ERC7066 : Locker Required'
-				);
-			});
-
-			it('Should check if token state is unlocked', async function () {
-				const { myNFT, deployer, acc1, acc2, acc3 } =
-					await mintAndSetAuthority();
-				await myNFT
-					.connect(deployer)
-					.transferFrom(deployer.address, acc3.address, 0);
-				await myNFT.connect(acc3).setLocker(0, acc1.address);
-				await expect(myNFT.connect(acc1).unlock(0)).to.be.revertedWith(
-					'ERC7066 : Unlocked'
-				);
+					.connect(acc1)
+					.transferFrom(deployer.address, acc1.address, 0);
+				expect(await myNFT.lockerOf(0)).to.equal(ethers.constants.AddressZero);
+				expect(await myNFT.ownerOf(0)).to.equal(acc1.address);
 			});
 		});
 	});
