@@ -41,7 +41,8 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         @param tokenId The identifier of the PBM token type to be copied.
         @param amount The number of the PBMs that are to be created
         @param data Additional data with no specified format, based on eip-5750
-            
+        
+        This function will transfer the underlying token from the caller into the PBM smart contract.
         IMPT: Before minting, the caller should approve the contract address to spend ERC-20 tokens on behalf of the caller.
             This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address. 
             Ref : https://eips.ethereum.org/EIPS/eip-20
@@ -73,6 +74,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         @param amounts The number of the PBMs that are to be created
         @param data Additional data with no specified format, based on eip-5750
 
+        This function will transfer the underlying token from the caller into the PBM smart contract.
         IMPT: Before minting, the caller should approve the contract address to spend ERC-20 tokens on behalf of the caller.
             This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address. 
             Ref : https://eips.ethereum.org/EIPS/eip-20
