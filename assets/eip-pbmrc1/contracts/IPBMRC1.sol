@@ -20,9 +20,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// contract expiry, and the PBM address list.
     /// @param _spotToken The address of the underlying ERC20 token.
     /// @param _expiry The contract-wide expiry timestamp (in Unix epoch time).
-    /// @param _pbmWrapperLogic This should point to a smart contract, which contains conditions governing a PBM and other 
-    /// relevant business logic as a way of implementing inversion of control. 
-    /// An example of this would be an address list that determines whether a PBM is allowed to move to or to be unwrapped. 
+    /// @param _pbmWrapperLogic This address should point to a smart contract that contains conditions governing a PBM; 
+    /// such as purpose-bound conditions (ie: an address list determining whether a PBM is permitted to be transferred to or to be unwrapped) 
+    /// and other relevant business logic, effectively implementing an inversion of control. 
     function initialise(address _spotToken, uint256 _expiry, address _pbmWrapperLogic) external; 
 
     /// @notice Returns the Uniform Resource Identifier (URI) metadata information for the PBM with the corresponding tokenId
