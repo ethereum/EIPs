@@ -51,8 +51,6 @@ interface IERC7108 {
 
   /**
    * @notice Gets the owner of a tokenId within a cluster
-      This function can be gas consuming and it is supposed to be called from
-      dApps rather than internally or from other smart contracts
    * @param normalizedTokenId_ The normalized ID of the token
    * @param clusterId ID of the cluster
    * @return the address of the owner of the token, if it exists
