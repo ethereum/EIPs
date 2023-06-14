@@ -6,8 +6,8 @@ import "./IERC5007.sol";
 
 abstract contract ERC5007 is ERC721, IERC5007 {
     struct TimeNftInfo {
-        int64 startTime;
-        int64 endTime;
+        uint64 startTime;
+        uint64 endTime;
     }
 
     mapping(uint256 => TimeNftInfo) internal _timeNftMapping;
@@ -20,7 +20,7 @@ abstract contract ERC5007 is ERC721, IERC5007 {
         view
         virtual
         override
-        returns (int64) {
+        returns (uint64) {
         require(_exists(tokenId), "ERC5007: invalid tokenId");
         return _timeNftMapping[tokenId].startTime;
     }
@@ -33,7 +33,7 @@ abstract contract ERC5007 is ERC721, IERC5007 {
         view
         virtual
         override
-        returns (int64) {
+        returns (uint64) {
         require(_exists(tokenId), "ERC5007: invalid tokenId");
         return _timeNftMapping[tokenId].endTime;
     }
@@ -50,8 +50,8 @@ abstract contract ERC5007 is ERC721, IERC5007 {
     function _mintTimeNft(
         address to_,
         uint256 tokenId_,
-        int64 startTime_,
-        int64 endTime_
+        uint64 startTime_,
+        uint64 endTime_
     ) internal virtual {
         require(endTime_ >= startTime_, 'ERC5007: invalid endTime');
         _mint(to_, tokenId_);
