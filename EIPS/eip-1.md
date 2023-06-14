@@ -267,7 +267,7 @@ Which renders as:
 Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
 
 ```regex
-^https:\/\/www\.w3\.org\/TR\/[0-9][0-9][0-9][0-9]/.*$
+^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
 ```
 
 ### Digital Object Identifier System
