@@ -50,6 +50,16 @@ interface IERC7108 {
   function rangeOf(uint256 clusterId) external view returns (uint256, uint256);
 
   /**
+   * @notice Gets the owner of a tokenId within a cluster
+      This function can be gas consuming and it is supposed to be called from
+      dApps rather than internally or from other smart contracts
+   * @param normalizedTokenId_ The normalized ID of the token
+   * @param clusterId ID of the cluster
+   * @return the address of the owner of the token, if it exists
+   */
+  function ownerOfWithin(uint256 normalizedTokenId_, uint256 clusterId) external view returns (address);
+
+  /**
    * @notice Gets the owner of a cluster
    * @param clusterId ID of the cluster
    * @return address Owner of the cluster
