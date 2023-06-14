@@ -67,5 +67,13 @@ abstract contract IPBMRC1_TokenManager {
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
     /// @param tokenId The identifier of the PBM token type.
     /// @return pbmToken_ A PBMToken struct containing all the details of the specified PBM token type.
-    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory pbmToken_); 
+    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory pbmToken_);
+
+    /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
+    /// @param tokenId The unique identifier for the newly created PBM token type.
+    /// @param tokenName A human-readable string representing the name of the newly created PBM token type.
+    /// @param amount The initial supply of the newly created PBM token type.
+    /// @param expiry The timestamp at which the newly created PBM token type will expire.
+    /// @param creator The address of the account that created the new PBM token type.
+    event NewPBMTypeCreated(uint256 tokenId, string tokenName, uint256 amount, uint256 expiry, address creator);
 }

@@ -76,7 +76,7 @@ PBM Wrapper **SHOULD** provide mechanism(s) to make it easy for the public to ve
 
 As the fulfilment of PBM conditions is likely to be subjected to audits to ensure trust amongst all transacting parties, the following evidence shall be documented to support audits:
 
-- The interface/events emitted **SHOULD** allow a fine-grained recreation of the transaction history.
+- The interface/events emitted **SHOULD** allow a fine-grained recreation of the transaction history, token types and token balances
 - The source code **SHOULD** be verified and formally published on a blockchain explorer.
 
 ### Fungibility
@@ -141,19 +141,25 @@ abstract contract IPBMRC1_TokenManager {
 }
 ```
 
-An external function may be exposed to create new PBM Token as well at a later date.
+An implementer has the option to define all token types upon PBM contract deployment. If needed, they can also expose an external function to create new PBM tokens at a later time.
+All token types created should emit a NewPBMTypeCreated event.
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
-    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address.
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
+    /// Must emit {NewPBMTypeCreated}
+    /// @param _name Name of the token.
+    /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
+    /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
+    /// @param _tokenURI Metadata URI for ERC-1155 display purposes
     function createPBMTokenType(
         string memory _name,
         uint256 _faceValue,
         uint256 _tokenExpiry,
-        address _creator,
         string memory _tokenURI
-    ) external;
+    ) external returns (uint256 tokenId_);
+
 ```
 
 Implementors of the standard **MUST** define a method to retrieve a PBM token detail
