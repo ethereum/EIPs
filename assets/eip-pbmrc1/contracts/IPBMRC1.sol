@@ -28,7 +28,8 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @notice Returns the Uniform Resource Identifier (URI) metadata information for the PBM with the corresponding tokenId
     /// @dev URIs are defined in RFC 3986. 
     /// The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
-    /// Developer may choose to adhere to the ERC1155Metadata_URI extension interface if necessary
+    /// Developer may choose to adhere to the ERC1155Metadata_URI extension interface if necessary.
+    /// The URI is not expected to be immutable.
     /// @param tokenId The id for the PBM in query
     /// @return Returns the metadata URI string for the PBM
     function uri(uint256 tokenId) external  view returns (string memory);
