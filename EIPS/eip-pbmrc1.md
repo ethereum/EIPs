@@ -168,7 +168,9 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
 
 ### PBM Address List
 
-A list of targeted addresses for PBM unwrapping must be specified in an address list.
+A targeted address list for PBM unwrapping must be specified. This list can be supplied either 
+through the initialization function as part of a composite contract that contains various business logic elements, 
+or it can be coded directly as a state variable within a PBM smart contract
 
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
 
