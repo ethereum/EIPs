@@ -51,6 +51,7 @@ abstract contract IPBMRC1_TokenManager {
     /// @notice Creates a new PBM Token type with the provided data.
     /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
+    /// Must emit {NewPBMTypeCreated}
     /// @param _name Name of the token.
     /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
     /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
