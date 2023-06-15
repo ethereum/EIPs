@@ -5,8 +5,8 @@ description: Language-agnostic canonicalisation of interface naming conventions
 author: Pascal Caversaccio (@pcaversaccio)
 discussions-to: https://ethereum-magicians.org/t/interface-naming-conventions/14692
 status: Draft
-type: Meta
-category: Interface
+type: Standards Track
+category: ERC
 created: 2023-06-15
 ---
 
