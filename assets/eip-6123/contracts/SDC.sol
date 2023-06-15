@@ -174,15 +174,18 @@ contract SDC is ISDC {
      * emits a TradeIncepted
      * can be called only when TradeState = Incepted
      */
-    function inceptTrade(string memory _tradeData, string memory _initialSettlementData) external override onlyCounterparty onlyWhenTradeInactive
+    function inceptTrade(string memory _tradeData, string memory _initialSettlementData, int256 _upfrontPayment) external override onlyCounterparty onlyWhenTradeInactive
     {
         processState = ProcessState.Initiation;
         tradeState = TradeState.Incepted; // Set TradeState to Incepted
 
+        _upfrontPayment; // To silence warning... TODO: Implement new feature.
+
         uint256 hash = uint256(keccak256(abi.encode(_tradeData, _initialSettlementData)));
         pendingRequests[hash] = msg.sender;
         tradeID = Strings.toString(hash);
-        tradeData = _tradeData; // Set Trade Data to enable querying already in inception state
+        tradeData = _tradeData; // Set trade data to enable querying already in inception state
+        lastSettlementData = _initialSettlementData; // Store settlement data to make them available for confirming party
 
         emit TradeIncepted(msg.sender, tradeID, _tradeData);
     }
