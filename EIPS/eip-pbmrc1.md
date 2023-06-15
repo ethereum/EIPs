@@ -142,7 +142,7 @@ abstract contract IPBMRC1_TokenManager {
 ```
 
 An implementer has the option to define all token types upon PBM contract deployment. If needed, they can also expose an external function to create new PBM tokens at a later time.
-All token types created should emit a NewPBMTypeCreated event.
+All token types created **SHOULD** emit a NewPBMTypeCreated event.
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
