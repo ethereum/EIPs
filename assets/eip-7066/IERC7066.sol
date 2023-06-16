@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: CC0-1.0
+// SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.0;
 
 /// @title Lockable Extension for ERC721
 /// @dev Interface for the ERC7066
 /// @author StreamNFT 
 
-interface IERC7066{
+interface IERC7066 is IERC721{
 
     /**
      * @dev Emitted when tokenId is locked
@@ -38,7 +38,7 @@ interface IERC7066{
      *      Lock the token and set locker to caller
      *      Optionally approve caller if bool setApprove flag is true
      */
-    function transferAndLock(uint256 tokenId, address from, address to, bool setApprove) external;
+    function transferAndLock(address from, address to, uint256 tokenId, bool setApprove) external;
 
     /**
      * @dev Returns the wallet, that is stated as unlocking wallet for the tokenId.

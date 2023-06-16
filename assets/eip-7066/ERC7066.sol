@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity ^0.8.0;
 
 import "./IERC7066.sol";
 
@@ -83,7 +83,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
      *      Lock the token and set locker to caller
      *.     Optionally approve caller if bool setApprove flag is true
      */
-    function transferAndLock(uint256 tokenId, address from, address to, bool setApprove) public virtual override{
+    function transferAndLock(address from, address to, uint256 tokenId, bool setApprove) public virtual override{
         _transferAndLock(tokenId,from,to,setApprove);
     }
 
@@ -105,7 +105,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
     /**
      * @dev Override approve to make sure token is unlocked
      */
-    function approve(address to, uint256 tokenId) public virtual override {
+    function approve(address to, uint256 tokenId) public virtual override(IERC721, ERC721) {
         require (locker[tokenId]==address(0), "ERC7066: Locked");
         super.approve(to, tokenId);
     }
@@ -152,7 +152,7 @@ abstract contract ERC7066 is ERC721,IERC7066{
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC721) returns (bool) {
          return
             interfaceId == type(IERC7066).interfaceId ||
             super.supportsInterface(interfaceId);
