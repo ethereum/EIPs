@@ -83,19 +83,19 @@ abstract contract ERC7066 is ERC721,IERC7066{
      *      Lock the token and set locker to caller
      *.     Optionally approve caller if bool setApprove flag is true
      */
-    function transferAndLock(address from, address to, uint256 tokenId, bool setApprove) public virtual override{
-        _transferAndLock(tokenId,from,to,setApprove);
+    function transferAndLock(address from, address to, uint256 tokenId, address _locker, bool setApprove) public virtual override{
+        _transferAndLock(tokenId,from,to,_locker,setApprove);
     }
 
     /**
      * @dev Internal function to tranfer, update locker/approve and lock the token.
      */
-    function _transferAndLock(uint256 tokenId, address from, address to, bool setApprove) internal {
+    function _transferAndLock(uint256 tokenId, address from, address to, address _locker, bool setApprove) internal {
         transferFrom(from, to, tokenId); 
         if(setApprove){
-            _approve(msg.sender, tokenId);
+            _approve(_locker, tokenId);
         }
-        _lock(tokenId,msg.sender);
+        _lock(tokenId,_locker);
     }
 
     /*///////////////////////////////////////////////////////////////

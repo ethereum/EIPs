@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /// @title Lockable Extension for ERC721
-/// @dev Interface for the ERC7066
+/// @dev Interface for ERC7066
 /// @author StreamNFT 
 
 interface IERC7066 is IERC721{
@@ -38,7 +38,7 @@ interface IERC7066 is IERC721{
      *      Lock the token and set locker to caller
      *      Optionally approve caller if bool setApprove flag is true
      */
-    function transferAndLock(address from, address to, uint256 tokenId, bool setApprove) external;
+    function transferAndLock(address from, address to, uint256 tokenId, address _locker, bool setApprove) external;
 
     /**
      * @dev Returns the wallet, that is stated as unlocking wallet for the tokenId.
