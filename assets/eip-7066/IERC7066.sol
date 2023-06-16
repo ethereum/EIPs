@@ -38,7 +38,7 @@ interface IERC7066 is IERC721{
      *      Lock the token and set locker to caller
      *      Optionally approve caller if bool setApprove flag is true
      */
-    function transferAndLock(address from, address to, uint256 tokenId, address _locker, bool setApprove) external;
+    function transferAndLock(address from, address to, uint256 tokenId, bool setApprove) external;
 
     /**
      * @dev Returns the wallet, that is stated as unlocking wallet for the tokenId.
