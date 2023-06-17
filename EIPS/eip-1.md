@@ -252,6 +252,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
 ```
 
+### World Wide Web Consortium (W3C)
+
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
+
+```markdown
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+```
+
+Which renders as:
+
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+
+Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
+
+```regex
+^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
+```
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
