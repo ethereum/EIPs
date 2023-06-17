@@ -1,0 +1,78 @@
+---
+title: ABI specification for REVERT reason string
+description: A proposal to extend the ABI specification to include typed errors in the REVERT reason string.
+author: Federico Bond (@federicobond)
+discussions-to: https://ethereum-magicians.org/t/eip-838-what-is-the-current-status/14671/2
+status: Draft
+type: Standards Track
+category: ERC
+created: 2020-08-20
+---
+
+## Abstract
+
+This proposal specifies how to encode potential error conditions in the JSON ABI of a smart contract. A high-level language could then provide a syntax for declaring and throwing these errors. The compiler will encode these errors in the reason parameter of the REVERT opcode in a way that can be easily reconstructed by libraries such as web3.
+
+
+## Motivation
+
+It's important to provide clear feedback to users (and developers) about what went wrong with their Ethereum transactions. The REVERT opcode is a step in the right direction, as it allows smart contract developers to encode a message describing the failure in the reason parameter. There is an implementation under review in Solidity that accepts a string, thus providing a low-level interface to this parameter. However, standardizing a method for passing errors from this parameter back to clients will bring many benefits to both users and developers.
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+## Specification
+
+To conform to this specification, compilers producing JSON ABIs SHOULD include error declarations alongside functions and events. Each error object MUST contain the keys name (string) and arguments (same types as the function’s inputs list). The value of type MUST be "error".
+
+Example:
+
+```
+{ "type": "error", "name": "InsufficientBalance", "arguments": [ { "name": "amount", "type": "uint256" } ] }
+```
+
+A selector for this error can be computed from its signature (InsufficientBalance() for the example above) in the same way that it's currently done for public functions and events. This selector MUST be included in the reason string so that clients can perform a lookup. Any arguments for the error are RLP encoded in the same way as return values from functions. The exact format in which both the selector and the arguments are encoded is to be defined. The Solidity implementation mentioned above leaves room for expansion by prefixing the free-form string with uint256(0).
+
+A high-level language like Solidity can then implement a syntax like this:
+
+```
+contract MyToken {
+  error InsufficientFunds(uint256 amount);
+
+  function transfer(address _to, uint256 _amount) {
+    if (balances[msg.sender] <= _amount)
+       throw InsufficientFunds(_amount);
+    ...
+  }
+  ...
+}
+```
+
+###Possible extensions
+
+
+1. A [NatSpec](https://github.com/ethereum/wiki/wiki/Ethereum-Natural-Specification-Format) comment above the error declaration can be used to provide a default error message. Arguments to the error can be interpolated in the message string with familiar NatSpec syntax.
+
+```
+/// @notice You don't have enough funds to transfer `amount`.
+error InsufficientFunds(uint256 amount);
+```
+
+2. A function may declare to its callers which errors it can throw. A list of these errors must be included in the JSON ABI item for that function, under the `errors` key. Example:
+
+```
+function transfer(address _to, uint256 _amount) throws(InsufficientFunds);
+```
+
+Special consideration should be given to error overloading if we want to support a similar syntax in the future, as errors with same name but different arguments will produce a different selector.
+
+## Backwards Compatibility
+
+Apps and tools that have not implemented this spec can ignore the encoded reason string when it's not prefixed by zero.
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
