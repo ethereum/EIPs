@@ -252,6 +252,44 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
 ```
 
+### World Wide Web Consortium (W3C)
+
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
+
+```markdown
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+```
+
+Which renders as:
+
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+
+Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
+
+```regex
+^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
+```
+
+### Web Hypertext Application Technology Working Group (WHATWG)
+
+Links to WHATWG specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+```
+
+Which renders as:
+
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+
+Permitted WHATWG specification URLs must anchor to a specification defined in the `spec` subdomain (idea specifications are not allowed) and to a commit snapshot, and so must match this regular expression:
+
+```regex
+^https:\/\/[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$
+```
+
+Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
