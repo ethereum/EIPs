@@ -328,36 +328,11 @@ interface IERC3643 is IERC20 {
     function batchUnfreezePartialTokens(address[] calldata _userAddresses, uint256[] calldata _amounts) external;
 
     /**
-     * @dev Returns the number of decimals used to get its user representation.
-     * For example, if `decimals` equals `2`, a balance of `505` tokens should
-     * be displayed to a user as `5,05` (`505 / 1 ** 2`).
-     *
-     * Tokens usually opt for a value of 18, imitating the relationship between
-     * Ether and Wei.
-     *
-     * NOTE: This information is only used for _display_ purposes: it in
-     * no way affects any of the arithmetic of the contract, including
-     * balanceOf() and transfer().
-     */
-    function decimals() external view returns (uint8);
-
-    /**
-     * @dev Returns the name of the token.
-     */
-    function name() external view returns (string memory);
-
-    /**
      * @dev Returns the address of the onchainID of the token.
      * the onchainID of the token gives all the information available
      * about the token and is managed by the token issuer or his agent.
      */
     function onchainID() external view returns (address);
-
-    /**
-     * @dev Returns the symbol of the token, usually a shorter version of the
-     * name.
-     */
-    function symbol() external view returns (string memory);
 
     /**
      * @dev Returns the TREX version of the token.
