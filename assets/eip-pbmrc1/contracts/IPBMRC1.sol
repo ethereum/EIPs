@@ -11,14 +11,14 @@ pragma solidity ^0.8.0;
 // A database or explorer may listen to events and be able to provide indexed and categorized searches
 
 /// @title PBM Specification interface 
-/// @notice The PBM (purpose bound money) allows us to add logical requirements on the use of ERC-20 tokens. 
-/// The PBM acts as wrapper around the ERC-20 tokens and implements the necessary business logic. 
+/// @notice The PBM (purpose bound money) allows us to add logical requirements on the use of sovTokens. 
+/// The PBM acts as wrapper around the sovTokens and implements the necessary business logic. 
 /// @dev PBM deployer must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
 interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     
     /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
     /// contract expiry, and the PBM address list.
-    /// @param _spotToken The address of the underlying ERC20 token.
+    /// @param _spotToken The address of the underlying sovToken.
     /// @param _expiry The contract-wide expiry timestamp (in Unix epoch time).
     /// @param _pbmWrapperLogic This address should point to a smart contract that contains conditions governing a PBM; 
     /// such as purpose-bound conditions (ie: an address list determining whether a PBM is permitted to be transferred to or to be unwrapped) 
@@ -43,7 +43,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         @param data Additional data with no specified format, based on eip-5750
         
         This function will transfer the underlying token from the caller into the PBM smart contract.
-        IMPT: Before minting, the caller should approve the contract address to spend ERC-20 tokens on behalf of the caller.
+        IMPT: Before minting, the caller should approve the contract address to spend sovTokens on behalf of the caller.
             This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address. 
             Ref : https://eips.ethereum.org/EIPS/eip-20
 
@@ -60,8 +60,8 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         - contract must not be paused
         - tokens must not be expired
         - `tokenId` should be a valid id that has already been created
-        - caller should have the necessary amount of the ERC-20 tokens required to mint
-        - caller should have approved the PBM contract to spend the ERC-20 tokens
+        - caller should have the necessary amount of the sovTokens required to mint
+        - caller should have approved the PBM contract to spend the sovTokens
         - receiver should not be blacklisted
      */
     function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
@@ -75,7 +75,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         @param data Additional data with no specified format, based on eip-5750
 
         This function will transfer the underlying token from the caller into the PBM smart contract.
-        IMPT: Before minting, the caller should approve the contract address to spend ERC-20 tokens on behalf of the caller.
+        IMPT: Before minting, the caller should approve the contract address to spend sovTokens on behalf of the caller.
             This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address. 
             Ref : https://eips.ethereum.org/EIPS/eip-20
 
@@ -93,8 +93,8 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         - tokens must not be expired
         - `tokenIds` should all be valid ids that have already been created
         - `tokenIds` and `amounts` list need to have the same number of values
-        - caller should have the necessary amount of the ERC-20 tokens required to mint
-        - caller should have approved the PBM contract to spend the ERC-20 tokens
+        - caller should have the necessary amount of the sovTokens required to mint
+        - caller should have approved the PBM contract to spend the sovTokens
         - receiver should not be blacklisted
      */
     function safeMintBatch(address receiver, uint256[] calldata tokenIds, uint256[] calldata amounts, bytes calldata data) external;
@@ -153,7 +153,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @dev This function extends the ERC-1155 standard in order to allow the PBM token to be freely transferred between wallet addresses due to 
     /// widespread support accross wallet providers.  Specific conditions and restrictions on whether a pbm can be moved across addresses can be incorporated in this function.
     /// Unwrap logic MAY also be placed within this function to be called.
-    /// If the receiving wallet is a whitelisted /redeemer wallet address, the PBM(NFT)(s) will be burnt and the underlying ERC-20 tokens will be transferred to the merchant/redeemer wallet instead.
+    /// If the receiving wallet is a whitelisted /redeemer wallet address, the PBM(NFT)(s) will be burnt and the underlying sovTokens will be transferred to the merchant/redeemer wallet instead.
     /// @param from The account from which the PBM (NFT)(s) is moving from 
     /// @param to The account which is receiving the PBM (NFT)(s)
     /// @param ids The identifiers of the different PBM token type
@@ -163,7 +163,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
 
     /// @notice Unwraps the underlying ERC-20 compatible tokens to an intended end point (ie: merchant/redeemer) upon fulfilling the required PBM conditions.
     /// @dev Add implementation specific logic for the conditions under which a PBM processes and transfers the underlying tokens here.
-    /// e.g. If the receving wallet is a whitelisted merchant/redeemer wallet address, the PBM (NFT) MUST be burnt and the underlying ERC-20 tokens 
+    /// e.g. If the receving wallet is a whitelisted merchant/redeemer wallet address, the PBM (NFT) MUST be burnt and the underlying sovTokens 
     /// will unwrapped to be transferred to the merchant/redeemer wallet.
     /// MUST emit the event {TokenUnwrapForTarget} on success
     /// @param from The account currently holding the PBM
@@ -173,9 +173,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @param data Additional data without a specified format, based on EIP-5750
     function unwrap(address from, address to, uint256 tokenId, uint256 amount, bytes memory data) internal; 
 
-    /// @notice Allows the creator of a PBM token type to retrieve all locked-up underlying ERC-20 tokens within that PBM.
+    /// @notice Allows the creator of a PBM token type to retrieve all locked-up underlying sovTokens within that PBM.
     /// @dev Ensure that only the creator of the PBM token type or the contract owner can call this function. 
-    /// Validate the token state and existence, handle PBM token burning if necessary, safely transfer the remaining ERC-20 tokens to the originator, 
+    /// Validate the token state and existence, handle PBM token burning if necessary, safely transfer the remaining sovTokens to the originator, 
     /// MUST emit {PBMrevokeWithdraw} upon a successful revoke.
     /// @param tokenId The identifier of the PBM token type
     /// Requirements:
@@ -183,12 +183,12 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// - The caller must be either the creator of the token type or the smart contract owner.
     function revokePBM(uint256 tokenId) external;
 
-    /// @notice Emitted when a PBM type creator withdraws the underlying ERC-20 tokens from all the remaining expired PBMs
-    /// @param beneficiary the address ( PBM type creator ) which receives the ERC20 Token
+    /// @notice Emitted when a PBM type creator withdraws the underlying sovTokens from all the remaining expired PBMs
+    /// @param beneficiary the address ( PBM type creator ) which receives the sovToken
     /// @param PBMTokenId The identifiers of the different PBM token type
-    /// @param ERC20Token The address of the underlying ERC-20 token 
-    /// @param ERC20TokenValue The number of underlying ERC-20 tokens transferred 
-    event PBMrevokeWithdraw(address beneficiary, uint256 PBMTokenId, address ERC20Token, uint256 ERC20TokenValue);
+    /// @param sovToken The address of the underlying sovToken 
+    /// @param sovTokenValue The number of underlying sovTokens transferred 
+    event PBMrevokeWithdraw(address beneficiary, uint256 PBMTokenId, address sovToken, uint256 sovTokenValue);
 
     /// @notice Emitted when the underlying tokens are unwrapped and transferred to a specific purpose-bound address.
     /// This event signifies the end of the PBM lifecycle, as all necessary conditions have been met to release the underlying tokens to the recipient (whitelisted merchant/redeemer with non-blacklisted wallet address).
@@ -197,9 +197,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @param to The purpose-bound address receiving the unwrapped underlying tokens.
     /// @param tokenIds An array containing the identifiers of the unwrapped PBM token types.
     /// @param amounts An array containing the quantities of the corresponding unwrapped PBM tokens.
-    /// @param ERC20Token The address of the underlying ERC-20 token.
-    /// @param ERC20TokenValue The amount of unwrapped underlying ERC-20 tokens transferred.
-    event TokenUnwrapForTarget(address from, address to, uint256[] tokenIds, uint256[] amounts, address ERC20Token, uint256 ERC20TokenValue);
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of unwrapped underlying sovTokens transferred.
+    event TokenUnwrapForTarget(address from, address to, uint256[] tokenIds, uint256[] amounts, address sovToken, uint256 sovTokenValue);
 
     /// @notice Emitted when PBM tokens are burned, resulting in the unwrapping of the underlying tokens for the designated recipient.
     /// This event is required if there is an unwrapping of the underlying tokens during the PBM (NFT) burning process.
@@ -208,9 +208,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @param to The address receiving the unwrapped underlying tokens.
     /// @param tokenIds An array containing the identifiers of the burned PBM token types.
     /// @param amounts An array containing the quantities of the corresponding burned PBM tokens.
-    /// @param ERC20Token The address of the underlying ERC-20 token.
-    /// @param ERC20TokenValue The amount of unwrapped underlying ERC-20 tokens transferred.
-    event TokenUnwrapForPBMBurn(address from, address to, uint256[] tokenIds, uint256[] amounts, address ERC20Token, uint256 ERC20TokenValue);
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of unwrapped underlying sovTokens transferred.
+    event TokenUnwrapForPBMBurn(address from, address to, uint256[] tokenIds, uint256[] amounts, address sovToken, uint256 sovTokenValue);
 
     /// Indicates the wrapping of an token into the PBM smart contract. 
     /// @notice Emitted when underlying tokens are wrapped within the PBM smart contract.
@@ -219,9 +219,9 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
     /// @param from The address initiating the token wrapping process, and 
     /// @param tokenIds An array containing the identifiers of the token types being wrapped.
     /// @param amounts An array containing the quantities of the corresponding wrapped tokens.
-    /// @param ERC20Token The address of the underlying ERC-20 token.
-    /// @param ERC20TokenValue The amount of wrapped underlying ERC-20 tokens transferred.
-    event TokenWrap(address from, uint256[] tokenIds, uint256[] amounts,address ERC20Token, uint256 ERC20TokenValue); 
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of wrapped underlying sovTokens transferred.
+    event TokenWrap(address from, uint256[] tokenIds, uint256[] amounts,address sovToken, uint256 sovTokenValue); 
 }
 
 

@@ -18,18 +18,18 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
   /// @dev The loading of the underlying token of value can be done by calling the `load` function. The function parameters should be identical to IPBMRC1
   function safeMintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
 
-  /// @notice Wrap an amount of ERC20 tokens into the PBM
-  /// @dev function will pull ERC20 tokens from msg.sender 
+  /// @notice Wrap an amount of sovTokens into the PBM
+  /// @dev function will pull sovTokens from msg.sender 
   /// Approval must be given to the PBM smart contract in order to for the pbm to pull money from msg.sender
   /// underlying data structure must record how much the msg.sender has been loaded into the PBM.  
   /// Emits {TokenLoad} event.
-  /// @param amount    The amount of ERC20 tokens to be loaded
+  /// @param amount    The amount of sovTokens to be loaded
   function load(uint256 amount) external; 
   
-  /// @notice Retrieves the balance of the underlying ERC-20 token associated with a specific PBM token type and user address.
+  /// @notice Retrieves the balance of the underlying sovToken associated with a specific PBM token type and user address.
   /// This function provides a way to check the amount of the underlying token that a user has loaded into a particular PBM token.
   /// @param user The address of the user whose underlying token balance is being queried.
-  /// @return The balance of the underlying ERC-20 token associated with the specified PBM token type and user address.
+  /// @return The balance of the underlying sovToken associated with the specified PBM token type and user address.
   function underlyingBalanceOf(address user) external view returns (uint256);
 
   /// @notice Unloads all of the underlying token belonging to the caller from the PBM smart contract.
@@ -41,19 +41,19 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
   function unload(uint256 amount) external;
 
   /// @notice Emitted when an underlying token is loaded into a PBM
-  /// @param caller Address by which ERC20token is taken from.
+  /// @param caller Address by which sovToken is taken from.
   /// @param to Address by which the token is loaded and assigned to
   /// @param amount The quantity of tokens to be loaded
-  /// @param ERC20Token The address of the underlying ERC-20 token.
-  /// @param ERC20TokenValue The amount of underlying ERC-20 tokens loaded
-  event TokenLoad(address caller, address to, uint256 amount, address ERC20Token, uint256 ERC20TokenValue); 
+  /// @param sovToken The address of the underlying sovToken.
+  /// @param sovTokenValue The amount of underlying sovTokens loaded
+  event TokenLoad(address caller, address to, uint256 amount, address sovToken, uint256 sovTokenValue); 
 
   /// @notice Emitted when an underlying token is unloaded from a PBM.
   /// This event indicates the process of releasing the underlying token from the PBM smart contract.
   /// @param caller The address initiating the token unloading process.
   /// @param from The address from which the token is being unloaded and removed from.
   /// @param amount The quantity of the corresponding unloaded tokens.
-  /// @param ERC20Token The address of the underlying ERC-20 token.
-  /// @param ERC20TokenValue The amount of unloaded underlying ERC-20 tokens transferred.
-  event TokenUnload(address caller, address from, uint256 amount, address ERC20Token, uint256 ERC20TokenValue);
+  /// @param sovToken The address of the underlying sovToken.
+  /// @param sovTokenValue The amount of unloaded underlying sovTokens transferred.
+  event TokenUnload(address caller, address from, uint256 amount, address sovToken, uint256 sovTokenValue);
 }
