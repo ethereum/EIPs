@@ -1,0 +1,156 @@
+---
+title: <simple token>
+description: <Designed for smart contract wallet>
+author: <Xiang(@wenzhenxiang),Ben77(@ben2077),Mingshi S.(@newnewsms)>
+discussions-to: <https://ethereum-magicians.org/t/simple-token-designed-for-smart-contract-wallet-aa/14757>
+status: Draft
+type: <Standards Track>
+category: <ERC> 
+created: <2023-06-21>
+---
+
+## Abstract
+
+This EIP is a new asset designed based on the user contract wallet (including AA), and is forward compatible with ERC20，to keep token assets simple, this EIP removes some functions of ERC20.
+
+## Motivation
+
+ERC20 tokens are Ethereum-based standard tokens that can be traded and transferred on the Ethereum network. But the essence of ERC20 is based on the EOA wallet design. EOA wallet has no state and code storage, and the smart contract wallet is different.
+
+Almost all ERCs related to tokens are adding functions, our opinion is the opposite, we think the token contract should be simpler, more functions are taken care of by the smart contract wallet.
+
+Our proposal is to design a simpler token asset based on the smart contract wallet, 
+
+It aims to achieve the following goals:
+
+1. Keep the asset contract simple, only need to be responsible for the transaction function
+2. approve and allowance functions are not managed by the token contract , approve and allowance should be configured at the user level instead of controlled by the asset contract, increasing the user's more playability , while avoiding part of the ERC20 contract risk.
+3. Remove the transferForm function, and a better way to call the other party's token assets is to access the other party's own contract instead of directly accessing the token asset contract.
+4. Forward compatibility with ERC20 means that all fungible tokens can be compatible with this proposal.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Compliant contracts MUST implement the following interface:
+
+```solidity
+pragma solidity ^0.8.20;
+
+/**
+ * @title ERCX Simple token interface 
+ * @dev See https://eips.ethereum.org/EIPS/eip-X
+ */
+interface IERCX {
+    /**
+     * @notice Used to notify transfer tokens.
+     * @param from Address of the from
+     * @param to Address of the receive
+     * @param value The transaction amount 
+     */
+    event Transfer(
+      address indexed from,
+      address indexed to,
+      uint256 value
+    );
+	
+	  /**
+     * @notice Get the total supply
+     * @return total The total supply amount
+     */
+    function totalSupply() 
+        external  
+        view
+        returns (uint256 total);
+	  
+	  /**
+     * @notice get the balance of owenr address
+     * @param owner Address of the owner
+     * @return balance The balance of the owenr address
+     */
+    function balanceOf(address owner) 
+        external
+	      view
+	      returns (uint256 balance);
+
+    /**
+     * @notice Transfer token
+     * @param to Address of the to
+     * @param value The transaction amount 
+     * @return success The bool value returns whether the transfer is successful
+     */
+    function transfer(address to, uint256 value)
+        external
+        returns (bool success);
+
+}
+```
+
+## Rationale
+
+The purpose of the proposal is to add a simple token for Ethereum smart contract wallet.  Token contracts are only responsible for transactions and define assets. 
+
+****Examples****
+
+The third party calls the user's token transaction`(transferForm)`, 
+
+Judges whether the receiving address is safe `(safeTransferForm)`, 
+
+permit extension for signed approvals `(ERC-2612,``permit)`
+
+authorizes the distribution of the user's own assets`(approve, allowance)`, 
+
+and adds the transfer hook function. `(ERC-777, hook)`
+
+The above work should be handled by the user's smart contract wallet, rather than the token contract itself.
+
+## Forwards Compatibility
+
+As mentioned in the beginning, this EIP is forward compatible with ERC-20. ERC-20 is backward compatible with this EIP.
+
+## Reference Implementation
+
+```solidity
+pragma solidity ^0.8.20;
+
+import "./IERCX.sol";
+import "../../math/SafeMath.sol";
+
+/**
+ * @title Standard ERCX token
+ * @dev Note: the ERC-165 identifier for this interface is 0xc1b31357
+ * @dev Implementation of the basic standard token.
+ */
+contract ERCX is IERCX {
+  using SafeMath for uint256;
+
+  mapping (address => uint256) private _balances;
+
+  uint256 private _totalSupply;
+
+  function totalSupply() external view returns (uint256) {
+    return _totalSupply;
+  }
+
+  function balanceOf(address owner) external view returns (uint256) {
+    return _balances[owner];
+  }
+
+  function transfer(address to, uint256 value) external returns (bool) {
+    require(value <= _balances[msg.sender]);
+    require(to != address(0));
+
+    _balances[msg.sender] = _balances[msg.sender].sub(value);
+    _balances[to] = _balances[to].add(value);
+    emit Transfer(msg.sender, to, value);
+    return true;
+  }
+
+}
+```
+
+## Security Considerations
+It should be noted that this EIP is not backward compatible with ERC20, so there will be incompatibility with existing dapps.
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
