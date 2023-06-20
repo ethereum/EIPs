@@ -1,21 +1,21 @@
 ---
-title: <simple token>
-description: <Designed for smart contract wallet>
-author: <Xiang(@wenzhenxiang),Ben77(@ben2077),Mingshi S.(@newnewsms)>
-discussions-to: <https://ethereum-magicians.org/t/simple-token-designed-for-smart-contract-wallet-aa/14757>
+title: simple token
+description: Designed for smart contract wallet
+author: Xiang (@wenzhenxiang), Ben77 (@ben2077), Mingshi S. (@newnewsms)
+discussions-to: https://ethereum-magicians.org/t/simple-token-designed-for-smart-contract-wallet-aa/14757
 status: Draft
-type: <Standards Track>
-category: <ERC> 
-created: <2023-06-21>
+type: Standards Track
+category: ERC 
+created: 2023-06-21
 ---
 
 ## Abstract
 
-This EIP is a new asset designed based on the user contract wallet (including AA), and is forward compatible with ERC20，to keep token assets simple, this EIP removes some functions of ERC20.
+This EIP is a new asset designed based on the user contract wallet (including AA), and is forward compatible with [ERC-20](./eip-20.md)，to keep token assets simple, this EIP removes some functions of ERC-20.
 
 ## Motivation
 
-ERC20 tokens are Ethereum-based standard tokens that can be traded and transferred on the Ethereum network. But the essence of ERC20 is based on the EOA wallet design. EOA wallet has no state and code storage, and the smart contract wallet is different.
+[ERC-20](./eip-20.md) tokens are Ethereum-based standard tokens that can be traded and transferred on the Ethereum network. But the essence of ERC-20 is based on the EOA wallet design. EOA wallet has no state and code storage, and the smart contract wallet is different.
 
 Almost all ERCs related to tokens are adding functions, our opinion is the opposite, we think the token contract should be simpler, more functions are taken care of by the smart contract wallet.
 
@@ -24,9 +24,9 @@ Our proposal is to design a simpler token asset based on the smart contract wall
 It aims to achieve the following goals:
 
 1. Keep the asset contract simple, only need to be responsible for the transaction function
-2. approve and allowance functions are not managed by the token contract , approve and allowance should be configured at the user level instead of controlled by the asset contract, increasing the user's more playability , while avoiding part of the ERC20 contract risk.
+2. approve and allowance functions are not managed by the token contract , approve and allowance should be configured at the user level instead of controlled by the asset contract, increasing the user's more playability , while avoiding part of the ERC-20 contract risk.
 3. Remove the transferForm function, and a better way to call the other party's token assets is to access the other party's own contract instead of directly accessing the token asset contract.
-4. Forward compatibility with ERC20 means that all fungible tokens can be compatible with this proposal.
+4. Forward compatibility with ERC-20 means that all fungible tokens can be compatible with this proposal.
 
 ## Specification
 
@@ -92,21 +92,21 @@ The purpose of the proposal is to add a simple token for Ethereum smart contract
 
 ****Examples****
 
-The third party calls the user's token transaction`(transferForm)`, 
+The third party calls the user's token transaction ([ERC-20](./eip-20.md), transferForm), 
 
-Judges whether the receiving address is safe `(safeTransferForm)`, 
+Judges whether the receiving address is safe ([ERC-721](./eip-721.md), safeTransferForm), 
 
-permit extension for signed approvals `(ERC-2612,``permit)`
+permit extension for signed approvals ([ERC-2612](./eip-2612.md), permit),
 
-authorizes the distribution of the user's own assets`(approve, allowance)`, 
+authorizes the distribution of the user's own assets (ERC-20, approve, allowance), 
 
-and adds the transfer hook function. `(ERC-777, hook)`
+and adds the transfer hook function. ([ERC-777](./eip-777.md), hook)
 
 The above work should be handled by the user's smart contract wallet, rather than the token contract itself.
 
-## Forwards Compatibility
+## Backwards Compatibility
 
-As mentioned in the beginning, this EIP is forward compatible with ERC-20. ERC-20 is backward compatible with this EIP.
+As mentioned in the beginning, this EIP is forward compatible with [ERC-20](./eip-20.md). ERC-20 is backward compatible with this EIP.
 
 ## Reference Implementation
 
@@ -150,7 +150,7 @@ contract ERCX is IERCX {
 ```
 
 ## Security Considerations
-It should be noted that this EIP is not backward compatible with ERC20, so there will be incompatibility with existing dapps.
+It should be noted that this EIP is not backward compatible with [ERC-20](./eip-20.md), so there will be incompatibility with existing dapps.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
