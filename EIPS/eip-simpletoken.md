@@ -1,11 +1,12 @@
 ---
+eip: 
 title: simple token
 description: Designed for smart contract wallet
 author: Xiang (@wenzhenxiang), Ben77 (@ben2077), Mingshi S. (@newnewsms)
 discussions-to: https://ethereum-magicians.org/t/simple-token-designed-for-smart-contract-wallet-aa/14757
 status: Draft
 type: Standards Track
-category: ERC 
+category: ERC
 created: 2023-06-21
 ---
 
