@@ -1,5 +1,5 @@
 ---
-eip: 
+eip: 9000
 title: simple token
 description: Designed for smart contract wallet
 author: Xiang (@wenzhenxiang), Ben77 (@ben2077), Mingshi S. (@newnewsms)
