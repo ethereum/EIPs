@@ -27,13 +27,13 @@ The establishment of this proposal seeks to forestalls technology fragmentation 
 
 A PBM based architecture has several distinct components:
 
-- **Spot Token** - a ERC-20 or ERC-20 compatible digital currency (e.g. ERC-777, ERC-1363) serving as the collateral backing the PBM Token.
+- **sovToken** - a ERC-20 or ERC-20 compatible digital currency (e.g. ERC-777, ERC-1363) serving as the store of value token (i.e. collateral backing the PBM Token).
   - Digital currency referred to in this PBMRC paper **SHOULD** possess the following properties:
     - a good store of value;
     - a suitable unit of account; and
     - a medium of exchange;
-- **PBM Wrapper** - a smart contract, which wraps the Spot Token, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying Spot Token;
-- **PBM Token** - the Spot Token and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a [ERC-1155](./eip-1155.md) token.
+- **PBM Wrapper** - a smart contract, which wraps the sovToken, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying sovToken;
+- **PBM Token** - the sovToken and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a [ERC-1155](./eip-1155.md) token.
   - PBM Tokens are bearer instruments, with self-contained programming logic, and can be transferred between two parties without involving intermediaries. It combines the concept of:
     - programmable payment - automatic execution of payments once a pre-defined set of conditions are met; and
     - programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
@@ -54,15 +54,15 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - PBM **SHALL** adhere to the definition of “wrap” or “wrapping” to mean bounding a token in accordance with PBM business logic during its lifecycle stage.
 
-- PBM **MUST** incorporate both a whitelist and a blacklist of addresses as a key element of the conditions that must be satisfied prior to unwrapping the underlying Spot Token
+- PBM **MUST** incorporate both a whitelist and a blacklist of addresses as a key element of the conditions that must be satisfied prior to unwrapping the underlying sovToken
 
 - PBM **SHALL** adhere to the definition of “unwrap” or “unwrapping” to mean the release of a token in accordance with the PBM business logic during its lifecycle stage.
 
-- A valid PBM Token **MUST** consists of an underlying Spot Token and the PBM Wrapper.
+- A valid PBM Token **MUST** consists of an underlying sovToken and the PBM Wrapper.
 
-  - The Spot Token can be wrapped either upon the creation of the PBM Token or at a later date.
+  - The sovToken can be wrapped either upon the creation of the PBM Token or at a later date.
 
-  - A Spot Token can be implemented as any widely accepted ERC-20 compatible token, such as ERC-20, ERC-777, or ERC-1363.
+  - A sovToken can be implemented as any widely accepted ERC-20 compatible token, such as ERC-20, ERC-777, or ERC-1363.
 
 - PBM Wrapper **MUST** provide a mechanism for all transacting parties to verify that all necessary condition(s) have been met before allowing the PBM Token to be unwrapped. Refer to Auditability section for elaborations.
 
@@ -102,7 +102,7 @@ abstract contract IPBMRC1_TokenManager {
         // Name of the token.
         string name;
 
-        // Value of the underlying wrapped ERC20-compatible Spot Token. Additional information on the `faceValue` can be specified by
+        // Value of the underlying wrapped ERC20-compatible sovToken. Additional information on the `faceValue` can be specified by
         // adding the optional variables: `currencySymbol` or `tokenSymbol` as indicated below
         uint256 faceValue;
 
@@ -124,7 +124,7 @@ abstract contract IPBMRC1_TokenManager {
         // OPTIONAL: The address of the creator of this PBM type on this smart contract.
         address creator;
 
-        // OPTIONAL: The smart contract address of the spot token.
+        // OPTIONAL: The smart contract address of the sovToken.
         address tokenAddress;
 
         // OPTIONAL: The running balance of the PBM Token type that has been minted.
@@ -146,11 +146,11 @@ All token types created **SHOULD** emit a NewPBMTypeCreated event.
 
 ```solidity
     /// @notice Creates a new PBM Token type with the provided data.
-    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address. 
+    /// @dev The caller of createPBMTokenType shall be responsible for setting the creator address.
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
     /// Must emit {NewPBMTypeCreated}
     /// @param _name Name of the token.
-    /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
+    /// @param _faceValue Value of the underlying wrapped ERC20-compatible sovToken.
     /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
     /// @param _tokenURI Metadata URI for ERC-1155 display purposes
     function createPBMTokenType(
@@ -174,8 +174,8 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
 
 ### PBM Address List
 
-A targeted address list for PBM unwrapping must be specified. This list can be supplied either 
-through the initialization function as part of a composite contract that contains various business logic elements, 
+A targeted address list for PBM unwrapping must be specified. This list can be supplied either
+through the initialization function as part of a composite contract that contains various business logic elements,
 or it can be coded directly as a state variable within a PBM smart contract
 
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
@@ -242,7 +242,7 @@ interface PBMRC1_TokenReceiver {
 
 ### PBMRC2 - Non preloaded PBM Interface
 
-The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. This allows contracts to bind an underlying Spot Token to the PBM at a later date instead of during a minting process.
+The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. This allows contracts to bind an underlying sovToken to the PBM at a later date instead of during a minting process.
 
 Compliant contract **MUST** implement the following interface:
 
@@ -265,7 +265,7 @@ Each ERC-1155 PBM Token would map to an underlying `PBMToken` data structure tha
 
 By mapping the underlying ERC-1155 token model with an additional data structure, it allows for the flexibility in the management of multiple token types within the same smart contract with multiple conditional unwrapping logic attached to each token type which reduces the gas costs as there is no need to deploy multiple smart contracts for each token types.
 
-1. To keep it simple, this standard *intentionally* omits functions or events that doesn't add to definition and concept of a PBM.
+1. To keep it simple, this standard _intentionally_ omits functions or events that doesn't add to definition and concept of a PBM.
 
 2. This EIP makes no assumptions about access control or the conditions under which a function can be executed. It is the responsibility of the PBM creator to determine the various roles involved in each specific PBM business flow.
 
@@ -298,9 +298,10 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 - Signing messages off-chain and having a contract that requires that signature before executing a function is a useful technique. However, the same signature can be exploited by malicious actors to execute a function multiple times. This can be harmful if the signer's intention was to approve a transaction once. To prevent signature replay, messages should be signed with nonce and address of the contract.
 
 - Malicious users may attempt to:
+
   - Double spend through reentrancy.
   - clone existing PBM Tokens to perform double-spending;
-  - create invalid PBM Token with no underlying Spot Token; or
+  - create invalid PBM Token with no underlying sovToken; or
   - falsifying the face value of PBM token through wrapping of fraudulent/invalid/worthless Spot Tokens.
 
 - For consistency, when the contract is suspended or a user's token transfer is restricted due to suspected fraudulent activity or erroneous transfers, corresponding restrictions **MUST** be applied to the user's unwrap requests for the PBM Token.
@@ -308,11 +309,12 @@ Reference implementations can be found in [`README.md`](../assets/eip-pbmrc1/REA
 - Security audits and tests should be performed to verify that unwrap logic behaves as expected or if any complex business logic is being implemented that involves calling an external smart contract to prevent re-entrancy attacks and other forms of call chain attacks.
 
 - This EIP relies on the secure and accurate bookkeeping behavior of the token implementation.
+
   - Contracts adhering to this standard should closely monitor balance changes for each user during token consumption or minting.
 
   - The PBM Wrapper must be meticulously designed to ensure effective control over the permission to mint new tokens. Failure to secure the minting permission can lead to fraudulent issuance and unauthorized inflation of the total token supply.
 
-  - The mapping of each PBM Token to the corresponding amount of underlying spot token held by the smart contract requires careful accounting and auditing.
+  - The mapping of each PBM Token to the corresponding amount of underlying sovToken held by the smart contract requires careful accounting and auditing.
 
   - The access control over permission to burn tokens should be carefully designed. Typically, only the following two roles are entitled to burn a token:
 

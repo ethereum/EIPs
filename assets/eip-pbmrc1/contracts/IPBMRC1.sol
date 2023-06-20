@@ -54,7 +54,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         and `tokenId` being _id for EIP-1155 were transferred from address 0x0 to the recipient address identified by receiver. 
         The total supply MUST increase accordingly.
 
-        MUST Emits {TokenWrap} event as the underlying Spot Token is wrapped by PBM wrapper smart contract during minting.
+        MUST Emits {TokenWrap} event as the underlying sovToken is wrapped by PBM wrapper smart contract during minting.
 
         Requirements:
         - contract must not be paused
@@ -86,7 +86,7 @@ interface IPBMRC1 is IERC173, IERC5679Ext1155 {
         and `tokenId` being _id for EIP-1155 were transferred from address 0x0 to the recipient address identified by receiver. 
         The total supply MUST increase accordingly.
 
-        MUST Emits {TokenWrap} event as the underlying Spot Token is wrapped by PBM wrapper smart contract during minting.
+        MUST Emits {TokenWrap} event as the underlying sovToken is wrapped by PBM wrapper smart contract during minting.
 
         Requirements:
         - contract must not be paused

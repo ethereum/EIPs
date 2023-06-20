@@ -11,7 +11,7 @@ abstract contract IPBMRC1_TokenManager {
         // Name of the token.
         string name;
 
-        // Value of the underlying wrapped ERC20-compatible Spot Token. Additional information on the `faceValue` can be specified by
+        // Value of the underlying wrapped ERC20-compatible sovToken. Additional information on the `faceValue` can be specified by
         // adding the optional variables: `currencySymbol` or `tokenSymbol` as indicated below
         uint256 faceValue;
 
@@ -33,7 +33,7 @@ abstract contract IPBMRC1_TokenManager {
         // OPTIONAL: The address of the creator of this PBM type on this smart contract. This field is optional because the creator is msg.sender by default.
         address creator;
 
-        // OPTIONAL: The smart contract address of the spot token.
+        // OPTIONAL: The smart contract address of the sovToken.
         address tokenAddress;
 
         // OPTIONAL: The running balance of the PBM Token type that has been minted.
@@ -53,7 +53,7 @@ abstract contract IPBMRC1_TokenManager {
     /// Example of uri can be found in [`sample-uri`](../assets/eip-pbmrc1/sample-uri/stx-10-static)
     /// Must emit {NewPBMTypeCreated}
     /// @param _name Name of the token.
-    /// @param _faceValue Value of the underlying wrapped ERC20-compatible Spot Token.
+    /// @param _faceValue Value of the underlying wrapped ERC20-compatible sovToken.
     /// @param _tokenExpiry Time after which the token will be rendered useless (expressed in Unix Epoch time).
     /// @param _tokenURI Metadata URI for ERC-1155 display purposes
     function createPBMTokenType(
