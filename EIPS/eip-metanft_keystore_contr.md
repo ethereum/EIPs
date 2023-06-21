@@ -57,7 +57,7 @@ A case-by-case analysis was performed and summarized [here](../assets/eip-7210/e
 ```solidity
 interface IERC7210 {
   /**
-   * @notice Gets a property of the MetaNFT.
+   * @notice Gets a Property Data point of the MetaNFT.
    * @dev This function allows anyone to get a property of the MetaNFT.
    * @param tokenId The ID of the MetaNFT.
    * @param propertyKey The key of the property to be retrieved.
@@ -71,7 +71,7 @@ interface IERC7210 {
     ) external view returns (bytes32);
 
   /**
-   * @notice Sets a property of the MetaNFT.
+   * @notice Sets a Property Data point within the MetaNFT.
    * @dev This function allows the owner or an authorized operator to set a property of the MetaNFT.
    * @param tokenId The ID of the MetaNFT.
    * @param propertyKey The key of the property to be set.
@@ -113,7 +113,9 @@ A MetaNFT MUST extend the functionality of traditional NFTs through the incorpor
 
 ## Rationale
 
-The decision to encode Properties as bytes32 in the MetaNFT Interface is primarily driven by flexibility and future-proofing. Encoding as bytes allows for a wide range of data types to be stored, including but not limited to strings, integers, addresses, and more complex data structures, providing the developer with flexibility to accommodate diverse use cases. Furthermore, as Ethereum and its standards continue to evolve, encoding as bytes ensures that the MetaNFT standard can support future data types or structures without requiring significant changes to the standard itself.
+The decision to encode Properties as bytes32 data containers in the MetaNFT Interface is primarily driven by flexibility and future-proofing. Encoding as bytes32 allows for a wide range of data types to be stored, including but not limited to strings, integers, addresses, and more complex data structures, providing the developer with flexibility to accommodate diverse use cases. Furthermore, as Ethereum and its standards continue to evolve, encoding as bytes32 ensures that the MetaNFT standard can support future data types or structures without requiring significant changes to the standard itself.
+
+Having a 2-layer data structure of `propertyKey` => `dataKey` => `dataValue` allows different applications to have their own address space. Implementations can manage access to this space using different `propertyKey` for different applications.
 
 A case-by-case example on potential Properties encodings was performed and summarized [here](../assets/eip-7210/eip-7210-encoding.md).
 
