@@ -36,7 +36,7 @@ A Solidity contract using namespaced storage can annotate a struct with the NatS
 
 A requirement for the location is that it shouldn't overlap with any storage location that would be used by the standard Solidity layout. This is in case namespaced storage is used alongside standard linear storage, either deliberately or accidentally.
 
-First, note that a namespace may be larger than a single storage slot, so a variable in a namespace will be placed in a slot `ns_loc(id) + k`. If we assume collision resistance of Keccak-256, the chosen `ns_loc` function has the desired property with very high probability, because the cases in which a Solidity variable receives a location like it, that is of the form `keccak256(X)`, are:
+First, note that a namespace may be larger than a single storage slot, so a variable in a namespace will be placed in a slot `ns_loc(id) + k`. If we assume collision resistance of Keccak-256, the chosen `ns_loc` function has the desired property with very high probability, because the cases in which a Solidity variable receives a location of the form `keccak256(X)` are:
 
 1. Arrays:
     1. If the array is at the top level and is variable number `N` in the layout, the location of the `k`th item in the array will be `keccak256(N) + k`, but `N` will be a number much smaller than `uint256(keccak256(id)) - 1`.
