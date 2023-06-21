@@ -13,7 +13,7 @@ requires: 712, 1155
 
 ## Abstract
 
-We propose a low cost approach to distribute [ERC-1155](./eip-1155.md) tokens for high-frequency token issuance use cases such as game rewards, implemented with a one-time deployed Check contract, the off-chain issuing and signing of Checks by the issuers, and batching or bundling of the Checks to mint tokens on-chain by the receivers.
+We propose a low cost approach to distribute [ERC-1155](./EIPS/eip-1155.md) tokens for high-frequency token issuance use cases such as game rewards, implemented with a one-time deployed Check contract, the off-chain issuing and signing of Checks by the issuers, and batching or bundling of the Checks to mint tokens on-chain by the receivers.
 
 ## Motivation
 
