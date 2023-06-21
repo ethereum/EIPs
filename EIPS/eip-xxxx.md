@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 7201
 title: Namespaced Storage Layout
 description: A formula for the storage location of structs in the namespaced storage pattern.
 author: Francisco Giordano (@frangio), Hadrien Croubois (@Amxx), Ernesto García (@ernestognw), Eric Lau (@ericglau)
