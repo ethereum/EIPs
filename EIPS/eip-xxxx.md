@@ -57,7 +57,7 @@ No backward compatibility issues found.
 pragma solidity ^0.8.19;
 
 contract Example {
-    /// @custom:storage-location erc1234:example.main
+    /// @custom:storage-location erc7201:example.main
     struct MainStorage {
         uint256 x;
         uint256 y;
