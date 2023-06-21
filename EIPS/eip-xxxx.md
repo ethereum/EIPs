@@ -1,7 +1,8 @@
 ---
+eip: <to be assigned>
 title: Namespaced Storage Layout
 description: A formula for the storage location of structs in the namespaced storage pattern.
-author: Francisco Giordano (@frangio), Hadrien Croubois (@Amxx), Ernesto García (@ernestognw), Eric Lau (@ericglau)>
+author: Francisco Giordano (@frangio), Hadrien Croubois (@Amxx), Ernesto García (@ernestognw), Eric Lau (@ericglau)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
