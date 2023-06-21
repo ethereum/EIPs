@@ -30,7 +30,7 @@ A _namespace id_ is a string that uniquely identifies a namespace in a contract.
 
 The storage location for a namespace is defined as `ns_loc(id: string) = keccak256(uint256(keccak256(id)) - 1)`.
 
-A Solidity contract using namespaced storage can annotate a struct with the NatSpec tag `@custom:storage-location erc1234:<NAMESPACE_ID>` to identify it as a namespace with id `<NAMESPACE_ID>`.
+A Solidity contract using namespaced storage can annotate a struct with the NatSpec tag `@custom:storage-location erc7201:<NAMESPACE_ID>` to identify it as a namespace with id `<NAMESPACE_ID>`.
 
 ## Rationale
 
