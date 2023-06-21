@@ -36,12 +36,12 @@ A Solidity contract using namespaced storage can annotate a struct with the NatS
 
 A requirement for the location is that it shouldn't overlap with any storage location that would be used by the standard Solidity layout. This is in case namespaced storage is used alongside standard linear storage, either deliberately or accidentally.
 
-First, note that a namespace may be larger than a single storage slot, so a variable in a namespace will be placed in a slot `ns_loc(id) + k`. If we assume collision resistance of Keccak-256, the chosen `ns_loc` function has the desired property with very high probability, because the cases in which a Solidity variable receives a location of the form `keccak256(X)` are:
+First, note that a namespace may be larger than a single storage slot, so a variable in a namespace will be placed in a slot `ns_loc(id) + k`. If we assume collision resistance of Keccak-256, the chosen `ns_loc` function has the desired property with very high probability, because the cases in which a Solidity variable receives a location of the form `keccak256(x)` are:
 
 1. Arrays:
-    1. If the array is at the top level and is variable number `N` in the layout, the location of the `k`th item in the array will be `keccak256(N) + k`, but `N` will be a number much smaller than `uint256(keccak256(id)) - 1`.
-    2. If the array is within another array or mapping, it will be in some location `keccak256(X) + j`, and the `k`th item will be at `keccak256(keccak256(X) + j) + k`. For this to equal `ns_loc(X) + k` we would need `j = -1`, but `j` will always be a positive number in standard Solidity layout.
-2. Mappings: The value for key `q` in a mapping will be at location `keccak256(H(q) . X)` where `X` is the location of the mapping itself. Note that `H(q)` can be any number of bytes. If it is a non-zero number of bytes, it is distinct from any `ns_loc(id) + k`. If it is zero bytes, it can be that `ns_loc(id) = keccak256(X)` if `X = keccak256(id) - 1`, but we know that `X` is the location of the mapping and (as mentioned for arrays above) a variable will be at `keccak256(Y) + j` for a positive number `j`.
+    1. If the array is at the top level and is variable number `n` in the layout, the location of the `k`th item in the array will be `keccak256(n) + k`, but `n` will be a number much smaller than `uint256(keccak256(id)) - 1`.
+    2. If the array is within another array or mapping, it will be in some location `keccak256(x) + j`, and the `k`th item will be at `keccak256(keccak256(x) + j) + k`. For this to equal `ns_loc(x) + k` we would need `j = -1`, but `j` will always be a positive number in standard Solidity layout.
+2. Mappings: The value for key `q` in a mapping will be at location `keccak256(h(q) . x)` where `x` is the location of the mapping itself. Note that `h(q)` can be any number of bytes. If it is a non-zero number of bytes, it is distinct from any `ns_loc(id) + k`. If it is zero bytes, it can be that `ns_loc(id) = keccak256(x)` if `x = keccak256(id) - 1`, but we know that `x` is the location of the mapping and (as mentioned for arrays above) a variable will be at `keccak256(y) + j` for a positive number `j`.
 
 ### Naming
 
