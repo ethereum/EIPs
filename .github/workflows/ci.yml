@@ -112,7 +112,7 @@ jobs:
       - name: Checkout EIP Repository
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
-      - uses: ethereum/eipw-action@70379db401cbb3197454d8e02589af42d4ac5d21
+      - uses: ethereum/eipw-action@2d1d689c81a07f93d9b091df0f3ef6a7c0de1492
         id: eipw
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
