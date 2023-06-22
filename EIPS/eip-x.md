@@ -1,5 +1,5 @@
 ---
-eip: x <not-assigned-yet>
+eip: <not-assigned-yet>
 title: Precompiled for secp256r1 Curve Support
 description: Proposal to add precompiled contract that allows signature verifications in the “secp256r1” elliptic curve.
 author: Ulaş Erdoğan (@ulerdogan), Doğan Alpaslan (@doganalpaslan)
@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/
 status: Draft
 type: Standards Track
 category: Core
-created: 2023-05-17
+created: 2023-06-22
 ---
 
 ## Abstract
