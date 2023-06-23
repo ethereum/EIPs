@@ -2,7 +2,7 @@
 title: About Contract Metadata
 description: This standard enhances transparency and informed decision-making by allowing the inclusion of relevant information, such as company details and audits, in Ethereum contracts.
 author: David Beatove (@Beatove)
-discussions-to:
+discussions-to: https://ethereum-magicians.org/t/eip-7205-about-contract-metadata/14795
 status: Draft
 type: Standards Track
 category: ERC
