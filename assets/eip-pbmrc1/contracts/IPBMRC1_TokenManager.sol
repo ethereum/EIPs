@@ -61,13 +61,13 @@ abstract contract IPBMRC1_TokenManager {
         uint256 _faceValue,
         uint256 _tokenExpiry,
         string memory _tokenURI
-    ) external returns (uint256 tokenId_);
+    ) external virtual returns (uint256 tokenId_);
 
     /// @notice Retrieves the details of a PBM Token type given its tokenId.
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
     /// @param tokenId The identifier of the PBM token type.
     /// @return pbmToken_ A PBMToken struct containing all the details of the specified PBM token type.
-    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory pbmToken_);
+    function getTokenDetails(uint256 tokenId) external virtual view returns(PBMToken memory pbmToken_);
 
     /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
     /// @param tokenId The unique identifier for the newly created PBM token type.
