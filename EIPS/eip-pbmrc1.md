@@ -28,17 +28,24 @@ The establishment of this proposal seeks to forestalls technology fragmentation 
 A PBM based architecture has several distinct components:
 
 - **sovToken** - a ERC-20 or ERC-20 compatible digital currency (e.g. ERC-777, ERC-1363) serving as the store of value token (i.e. collateral backing the PBM Token).
+
   - Digital currency referred to in this PBMRC paper **SHOULD** possess the following properties:
     - a good store of value;
     - a suitable unit of account; and
     - a medium of exchange;
+
 - **PBM Wrapper** - a smart contract, which wraps the sovToken, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying sovToken;
+
 - **PBM Token** - the sovToken and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a [ERC-1155](./eip-1155.md) token.
+
   - PBM Tokens are bearer instruments, with self-contained programming logic, and can be transferred between two parties without involving intermediaries. It combines the concept of:
     - programmable payment - automatic execution of payments once a pre-defined set of conditions are met; and
     - programmable money - the possibility of embedding rules within the medium of exchange itself that defines or constraints its usage.
+
 - **PBM Creator** defines the conditions of the PBM Wrapper to create PBM Tokens.
+
 - **PBM Wallet** - cryptographic wallets which can either be an EOA (Externally Owned Account) that is controlled by a private key, or a smart contract wallet.
+
 - **Merchant / Redeemer** - In the context of this proposal, a Merchant or a Redeemer is broadly defined as the ultimate recipient, or endpoint, for PBM tokens, to which these tokens are intrinsically directed or purpose-bound to.
 
 ## Specification
@@ -47,14 +54,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### Overview
 
-- Whether a PBM Token **SHOULD** have an expiry time will be decided by the PBM Creator, the spec itself should not enforce an expiry time.
-
-  - To align with our goals of making PBM Token a suitable construct for all kinds of business logic that could occur in the real world.
-  - Should an expiry time not be needed, the expiry time can be set to infinity.
-
 - PBM **SHALL** adhere to the definition of “wrap” or “wrapping” to mean bounding a token in accordance with PBM business logic during its lifecycle stage.
-
-- PBM **MUST** incorporate both a whitelist and a blacklist of addresses as a key element of the conditions that must be satisfied prior to unwrapping the underlying sovToken
 
 - PBM **SHALL** adhere to the definition of “unwrap” or “unwrapping” to mean the release of a token in accordance with the PBM business logic during its lifecycle stage.
 
@@ -66,13 +66,19 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 - PBM Wrapper **MUST** provide a mechanism for all transacting parties to verify that all necessary condition(s) have been met before allowing the PBM Token to be unwrapped. Refer to Auditability section for elaborations.
 
+- PBM **MUST** ensure the destination address for unwrapped sovToken is in a whitelist of Merchant/Redeemer addresses and not in a blacklist of banned addresses prior to unwrapping the underlying sovToken.
+
 - The PBM Token **MUST** be burnt upon being fully unwrapped and used.
+
+- A PBM Token **SHOULD** have an expiry time that is decided by the PBM Creator.
+
+  - For cases where an expiry time is not needed, the expiry time **SHOULD** be set to infinity.
 
 - This proposal defines a base specification of what a PBM should entail. Extensions to this base specification can be implemented as separate specifications.
 
 ### Auditability
 
-PBM Wrapper **SHOULD** provide mechanism(s) to make it easy for the public to verify the smart contract logic for unwrapping a PBM. Such mechanisms could then be leveraged by automated validation or asynchronous user verifications from transacting parties and/or whitelisted third parties attestations.
+PBM Wrapper **SHOULD** provide the public easily accessible mechanism(s) to verify the smart contract logic for unwrapping a PBM. Such mechanisms could be leveraged by automated validation or asynchronous user verifications from transacting parties and/or whitelisted third parties attestations.
 
 As the fulfilment of PBM conditions is likely to be subjected to audits to ensure trust amongst all transacting parties, the following evidence shall be documented to support audits:
 
@@ -121,7 +127,7 @@ abstract contract IPBMRC1_TokenManager {
         // OPTIONAL: Number of decimal places for the token.
         uint8 decimals;
 
-        // OPTIONAL: The address of the creator of this PBM type on this smart contract.
+        // OPTIONAL: The address of the creator of this PBM type on this smart contract. This field is optional because the creator is msg.sender by default.
         address creator;
 
         // OPTIONAL: The smart contract address of the sovToken.
@@ -158,7 +164,15 @@ All token types created **SHOULD** emit a NewPBMTypeCreated event.
         uint256 _faceValue,
         uint256 _tokenExpiry,
         string memory _tokenURI
-    ) external returns (uint256 tokenId_);
+    ) external virtual returns (uint256 tokenId_);
+
+    /// @notice Emitted when a new Purpose-Bound Token (PBM) type is created within the contract.
+    /// @param tokenId The unique identifier for the newly created PBM token type.
+    /// @param tokenName A human-readable string representing the name of the newly created PBM token type.
+    /// @param amount The initial supply of the newly created PBM token type.
+    /// @param expiry The timestamp at which the newly created PBM token type will expire.
+    /// @param creator The address of the account that created the new PBM token type.
+    event NewPBMTypeCreated(uint256 tokenId, string tokenName, uint256 amount, uint256 expiry, address creator);
 
 ```
 
@@ -168,8 +182,8 @@ Implementors of the standard **MUST** define a method to retrieve a PBM token de
     /// @notice Retrieves the details of a PBM Token type given its tokenId.
     /// @dev This function fetches the PBMToken struct associated with the tokenId and returns it.
     /// @param tokenId The identifier of the PBM token type.
-    /// @return A PBMToken struct containing all the details of the specified PBM token type.
-    function getTokenDetails(uint256 tokenId) external view returns(PBMToken memory);
+    /// @return pbmToken_ A PBMToken struct containing all the details of the specified PBM token type.
+    function getTokenDetails(uint256 tokenId) external virtual view returns(PBMToken memory pbmToken_);
 ```
 
 ### PBM Address List
@@ -181,7 +195,34 @@ or it can be coded directly as a state variable within a PBM smart contract
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
 
 ```solidity
+pragma solidity ^0.8.0;
 
+/// @title PBM Address list Interface.
+/// @notice The PBM address list stores and manages whitelisted merchants/redeemers and blacklisted address for the PBMs
+interface IPBMAddressList {
+
+    /// @notice Checks if the address is one of the blacklisted addresses
+    /// @param _address The address to query
+    /// @return bool_ True if address is blacklisted, else false
+    function isBlacklisted(address _address) external returns (bool bool_) ;
+
+    /// @notice Checks if the address is one of the whitelisted merchant/redeemer addresses
+    /// @param _address The address to query
+    /// @return bool_ True if the address is in merchant/redeemer whitelist and is NOT a blacklisted address, otherwise false.
+    function isMerchant(address _address) external returns (bool bool_) ;
+
+    /// @notice Event emitted when the Merchant/Redeemer List is edited
+    /// @param action Tags "add" or "remove" for action type
+    /// @param addresses An array of merchant wallet addresses that was just added or removed from Merchant/Redeemer whitelist
+    /// @param metadata Optional comments or notes about the added or removed addresses.
+    event MerchantList(string action, address[] addresses, string metadata);
+
+    /// @notice Event emitted when the Blacklist is edited
+    /// @param action Tags "add" or "remove" for action type
+    /// @param addresses An array of wallet addresses that was just added or removed from address blacklist
+    /// @param metadata Optional comments or notes about the added or removed addresses.
+    event Blacklist(string action, address[] addresses, string metadata);
+}
 
 ```
 
@@ -192,7 +233,230 @@ This interface contains the essential functions required to implement a pre-load
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC1.sol  -->
 
 ```solidity
+pragma solidity ^0.8.0;
 
+// TBD: go through each function params and adopt _param name standard?
+// TBD: check the parameters of each functions. are they necessary? does it need to be an array?
+/// LIST OF EVENTS TO BE EMITTED
+// TBD: check the parameters of the events
+// TBD: consider these events to be added into safeMint functions if they are going to wrap an underlying eRC20tokens
+// TBD: consider other events to be EMITTED
+// TBD: event logs emitted by the smart contract will provide enough data to create an accurate record of all current token balances.
+// A database or explorer may listen to events and be able to provide indexed and categorized searches
+
+/// @title PBM Specification interface
+/// @notice The PBM (purpose bound money) allows us to add logical requirements on the use of sovTokens.
+/// The PBM acts as wrapper around the sovTokens and implements the necessary business logic.
+/// @dev PBM deployer must assign an overall owner to the smart contract. If fine grain access controls are required, EIP-5982 can be used on top of ERC173
+interface IPBMRC1 is IERC173, IERC5679Ext1155 {
+
+    /// @notice Initialise the contract by specifying an underlying ERC20-compatible token address,
+    /// contract expiry, and the PBM address list.
+    /// @param _spotToken The address of the underlying sovToken.
+    /// @param _expiry The contract-wide expiry timestamp (in Unix epoch time).
+    /// @param _pbmWrapperLogic This address should point to a smart contract that contains conditions governing a PBM;
+    /// such as purpose-bound conditions (ie: an address list determining whether a PBM is permitted to be transferred to or to be unwrapped)
+    /// and other relevant business logic, effectively implementing an inversion of control.
+    function initialise(address _spotToken, uint256 _expiry, address _pbmWrapperLogic) external;
+
+    /// @notice Returns the Uniform Resource Identifier (URI) metadata information for the PBM with the corresponding tokenId
+    /// @dev URIs are defined in RFC 3986.
+    /// The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+    /// Developer may choose to adhere to the ERC1155Metadata_URI extension interface if necessary.
+    /// The URI is not expected to be immutable.
+    /// @param tokenId The id for the PBM in query
+    /// @return Returns the metadata URI string for the PBM
+    function uri(uint256 tokenId) external  view returns (string memory);
+
+    /**
+        @notice Creates a PBM copy ( ERC1155 NFT ) of an existing PBM token type.
+        @dev See {IERC5679Ext1155} on further implementation notes
+        @param receiver The wallet address to which the created PBMs need to be transferred to
+        @param tokenId The identifier of the PBM token type to be copied.
+        @param amount The number of the PBMs that are to be created
+        @param data Additional data with no specified format, based on eip-5750
+
+        This function will transfer the underlying token from the caller into the PBM smart contract.
+        IMPT: Before minting, the caller should approve the contract address to spend sovTokens on behalf of the caller.
+            This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address.
+            Ref : https://eips.ethereum.org/EIPS/eip-20
+
+        WARNING: Any contracts that externally call these safeMint() and safeMintBatch() functions should implement some sort of reentrancy guard procedure
+        (such as OpenZeppelin's ReentrancyGuard) or a Checks-effects-interactions pattern.
+
+        As per ERC-5679 standard: When the token is being minted, the transfer events MUST be emitted as if the token in the `amount` for EIP-1155
+        and `tokenId` being _id for EIP-1155 were transferred from address 0x0 to the recipient address identified by receiver.
+        The total supply MUST increase accordingly.
+
+        MUST Emits {TokenWrap} event as the underlying sovToken is wrapped by PBM wrapper smart contract during minting.
+
+        Requirements:
+        - contract must not be paused
+        - tokens must not be expired
+        - `tokenId` should be a valid id that has already been created
+        - caller should have the necessary amount of the sovTokens required to mint
+        - caller should have approved the PBM contract to spend the sovTokens
+        - receiver should not be blacklisted
+     */
+    function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
+
+    /**
+        @notice Creates multiple PBM copies (ERC1155 NFT) of an existing PBM token type.
+        @dev See {IERC5679Ext1155}.
+        @param receiver The wallet address to which the created PBMs need to be transferred to
+        @param tokenIds The identifier of the PBM token type
+        @param amounts The number of the PBMs that are to be created
+        @param data Additional data with no specified format, based on eip-5750
+
+        This function will transfer the underlying token from the caller into the PBM smart contract.
+        IMPT: Before minting, the caller should approve the contract address to spend sovTokens on behalf of the caller.
+            This can be done by calling the `approve` or `increaseMinterAllowance` functions of the ERC-20 contract and specifying `_spender` to be the PBM contract address.
+            Ref : https://eips.ethereum.org/EIPS/eip-20
+
+        WARNING: Any contracts that externally call these safeMint() and safeMintBatch() functions should implement some sort of reentrancy guard procedure
+        (such as OpenZeppelin's ReentrancyGuard) or a Checks-effects-interactions pattern.
+
+        As per ERC-5679 standard: When the token is being minted, the transfer events MUST be emitted as if the token in the `amount` for EIP-1155
+        and `tokenId` being _id for EIP-1155 were transferred from address 0x0 to the recipient address identified by receiver.
+        The total supply MUST increase accordingly.
+
+        MUST Emits {TokenWrap} event as the underlying sovToken is wrapped by PBM wrapper smart contract during minting.
+
+        Requirements:
+        - contract must not be paused
+        - tokens must not be expired
+        - `tokenIds` should all be valid ids that have already been created
+        - `tokenIds` and `amounts` list need to have the same number of values
+        - caller should have the necessary amount of the sovTokens required to mint
+        - caller should have approved the PBM contract to spend the sovTokens
+        - receiver should not be blacklisted
+     */
+    function safeMintBatch(address receiver, uint256[] calldata tokenIds, uint256[] calldata amounts, bytes calldata data) external;
+
+    /**
+        @notice Burns a PBM token. Upon burning of the tokens, the underlying wrapped token (if any) should be handled.
+        @dev Destroys `amount` tokens of token type `tokenId` from `from`
+        @dev See {IERC5679Ext1155}
+
+        @param from The originating wallet address of the PBMs to be burned
+        @param tokenId The identifier of the PBM token type
+        @param amount The amount of the PBMs that are to be burned
+        @param data Additional data with no specified format, based on eip-5750
+
+        MUST Emits {TransferSingle} event.
+        MUST Emits {TokenUnwrapForPBMBurn} event if the underlying wrapped token is moved out of the PBM smart contract.
+
+        Requirements:
+        - `from` cannot be the zero address.
+        - `from` must have at least `amount` tokens of token type `tokenId`.
+
+     */
+    function burn(address from, uint256 tokenId, uint256 amount, bytes calldata data) external;
+
+    /**
+        @notice Burns multiple PBM token. Upon burning of the tokens, the underlying wrapped token (if any) should be handled.
+        @dev Destroys `amount` tokens of token type `tokenId` from `from`
+        @dev See {IERC5679Ext1155}
+
+        @param from The originating wallet address of the PBMs to be burned
+        @param tokenIds The identifier of the PBM token types
+        @param amounts The amount of the PBMs that are to be burned for each tokenId in _tokenIds
+        @param data Additional data with no specified format, based on eip-5750
+
+        Must Emits {TransferSingle} event.
+        Must Emits {TokenUnwrapForPBMBurn} event if the underlying wrapped token is moved out of the PBM smart contract.
+
+        Requirements:
+        - `from` cannot be the zero address.
+        - `from` must have at least amount specified in `_amounts` of the corresponding token type tokenId in `_tokenIds` array.
+     */
+    function burnBatch(address from, uint256[] calldata tokenIds, uint256[] calldata amounts, bytes calldata data) external;
+
+    /// @notice Transfers the PBM(NFT) from one wallet to another.
+    /// @dev This function extends the ERC-1155 standard in order to allow the PBM token to be freely transferred between wallet addresses due to
+    /// widespread support accross wallet providers. Specific conditions and restrictions on whether a pbm can be moved across addresses can be incorporated in this function.
+    /// Unwrap logic MAY also be placed within this function to be called.
+    /// @param from The account from which the PBM (NFT) is moving from
+    /// @param to The account which is receiving the PBM (NFT)
+    /// @param id The identifier of the PBM token type
+    /// @param amount The number of (quantity) the PBM type that are to be transferred of the PBM type
+    /// @param data To record any data associated with the transaction, can be left blank if none
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
+
+    /// @notice Transfers the PBM(NFT)(s) from one wallet to another.
+    /// @dev This function extends the ERC-1155 standard in order to allow the PBM token to be freely transferred between wallet addresses due to
+    /// widespread support accross wallet providers.  Specific conditions and restrictions on whether a pbm can be moved across addresses can be incorporated in this function.
+    /// Unwrap logic MAY also be placed within this function to be called.
+    /// If the receiving wallet is a whitelisted /redeemer wallet address, the PBM(NFT)(s) will be burnt and the underlying sovTokens will be transferred to the merchant/redeemer wallet instead.
+    /// @param from The account from which the PBM (NFT)(s) is moving from
+    /// @param to The account which is receiving the PBM (NFT)(s)
+    /// @param ids The identifiers of the different PBM token type
+    /// @param amounts The number of (quantity) the different PBM types that are to be created
+    /// @param data To record any data associated with the transaction, can be left blank if none.
+    function safeBatchTransferFrom(address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) external;
+
+    /// @notice Unwraps the underlying ERC-20 compatible tokens to an intended end point (ie: merchant/redeemer) upon fulfilling the required PBM conditions.
+    /// @dev Add implementation specific logic for the conditions under which a PBM processes and transfers the underlying tokens here.
+    /// e.g. If the receving wallet is a whitelisted merchant/redeemer wallet address, the PBM (NFT) MUST be burnt and the underlying sovTokens
+    /// will unwrapped to be transferred to the merchant/redeemer wallet.
+    /// MUST emit the event {TokenUnwrapForTarget} on success
+    /// @param from The account currently holding the PBM
+    /// @param to The account receiving the PBM (NFT)
+    /// @param tokenId The identifier of the PBM token type
+    /// @param amount The quantity of the PBM type involved in this transaction
+    /// @param data Additional data without a specified format, based on EIP-5750
+    function unwrap(address from, address to, uint256 tokenId, uint256 amount, bytes memory data) internal;
+
+    /// @notice Allows the creator of a PBM token type to retrieve all locked-up underlying sovTokens within that PBM.
+    /// @dev Ensure that only the creator of the PBM token type or the contract owner can call this function.
+    /// Validate the token state and existence, handle PBM token burning if necessary, safely transfer the remaining sovTokens to the originator,
+    /// MUST emit {PBMrevokeWithdraw} upon a successful revoke.
+    /// @param tokenId The identifier of the PBM token type
+    /// Requirements:
+    /// - `tokenId` should be a valid identifier for an existing PBM token type.
+    /// - The caller must be either the creator of the token type or the smart contract owner.
+    function revokePBM(uint256 tokenId) external;
+
+    /// @notice Emitted when a PBM type creator withdraws the underlying sovTokens from all the remaining expired PBMs
+    /// @param beneficiary the address ( PBM type creator ) which receives the sovToken
+    /// @param PBMTokenId The identifiers of the different PBM token type
+    /// @param sovToken The address of the underlying sovToken
+    /// @param sovTokenValue The number of underlying sovTokens transferred
+    event PBMrevokeWithdraw(address beneficiary, uint256 PBMTokenId, address sovToken, uint256 sovTokenValue);
+
+    /// @notice Emitted when the underlying tokens are unwrapped and transferred to a specific purpose-bound address.
+    /// This event signifies the end of the PBM lifecycle, as all necessary conditions have been met to release the underlying tokens to the recipient (whitelisted merchant/redeemer with non-blacklisted wallet address).
+    /// If there are multiple different underlying tokens involved in a single unwrap operation, this event should be emitted for each underlying token.
+    /// @param from The address from which the PBM tokens are being unwrapped.
+    /// @param to The purpose-bound address receiving the unwrapped underlying tokens.
+    /// @param tokenIds An array containing the identifiers of the unwrapped PBM token types.
+    /// @param amounts An array containing the quantities of the corresponding unwrapped PBM tokens.
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of unwrapped underlying sovTokens transferred.
+    event TokenUnwrapForTarget(address from, address to, uint256[] tokenIds, uint256[] amounts, address sovToken, uint256 sovTokenValue);
+
+    /// @notice Emitted when PBM tokens are burned, resulting in the unwrapping of the underlying tokens for the designated recipient.
+    /// This event is required if there is an unwrapping of the underlying tokens during the PBM (NFT) burning process.
+    /// If there are multiple different underlying tokens involved in a single unwrap operation, this event should be emitted for each underlying token.
+    /// @param from The address from which the PBM tokens are being burned.
+    /// @param to The address receiving the unwrapped underlying tokens.
+    /// @param tokenIds An array containing the identifiers of the burned PBM token types.
+    /// @param amounts An array containing the quantities of the corresponding burned PBM tokens.
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of unwrapped underlying sovTokens transferred.
+    event TokenUnwrapForPBMBurn(address from, address to, uint256[] tokenIds, uint256[] amounts, address sovToken, uint256 sovTokenValue);
+
+    /// Indicates the wrapping of an token into the PBM smart contract.
+    /// @notice Emitted when underlying tokens are wrapped within the PBM smart contract.
+    /// If there are multiple different underlying tokens involved in a single wrap operation, this event should be emitted for each underlying token.
+    /// This event signifies the beginning of the PBM lifecycle, as tokens are now managed by the conditions within the PBM contract.
+    /// @param from The address initiating the token wrapping process, and
+    /// @param tokenIds An array containing the identifiers of the token types being wrapped.
+    /// @param amounts An array containing the quantities of the corresponding wrapped tokens.
+    /// @param sovToken The address of the underlying sovToken.
+    /// @param sovTokenValue The amount of wrapped underlying sovTokens transferred.
+    event TokenWrap(address from, uint256[] tokenIds, uint256[] amounts,address sovToken, uint256 sovTokenValue);
+}
 
 ```
 
@@ -249,7 +513,64 @@ Compliant contract **MUST** implement the following interface:
 <!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC2.sol  -->
 
 ```solidity
+pragma solidity ^0.8.0;
 
+// TBD: add param docs for load, loadto. Check all params documented.
+
+/**
+ *  @dev This interface extends IPBMRC1, adding functions for working with non-preloaded PBMs.
+ *  Non-preloaded PBMs are minted as empty containers without any underlying tokens of value,
+ *  allowing the loading of the underlying token to happen at a later stage.
+ */
+interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
+
+  /// @notice This function extends IPBMRC1 to mint PBM tokens as empty containers without underlying tokens of value.
+  /// @dev The loading of the underlying token of value can be done by calling the `load` function. The function parameters should be identical to IPBMRC1
+  function safeMint(address receiver, uint256 tokenId, uint256 amount, bytes calldata data) external;
+
+  /// @notice This function extends IPBMRC1 to mint PBM tokens as empty containers without underlying tokens of value.
+  /// @dev The loading of the underlying token of value can be done by calling the `load` function. The function parameters should be identical to IPBMRC1
+  function safeMintBatch(address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
+
+  /// @notice Wrap an amount of sovTokens into the PBM
+  /// @dev function will pull sovTokens from msg.sender
+  /// Approval must be given to the PBM smart contract in order to for the pbm to pull money from msg.sender
+  /// underlying data structure must record how much the msg.sender has been loaded into the PBM.
+  /// Emits {TokenLoad} event.
+  /// @param amount    The amount of sovTokens to be loaded
+  function load(uint256 amount) external;
+
+  /// @notice Retrieves the balance of the underlying sovToken associated with a specific PBM token type and user address.
+  /// This function provides a way to check the amount of the underlying token that a user has loaded into a particular PBM token.
+  /// @param user The address of the user whose underlying token balance is being queried.
+  /// @return The balance of the underlying sovToken associated with the specified PBM token type and user address.
+  function underlyingBalanceOf(address user) external view returns (uint256);
+
+  /// @notice Unloads all of the underlying token belonging to the caller from the PBM smart contract.
+  /// @dev The underlying token that belongs to the caller (msg.sender) will be removed and transferred
+  /// back to the caller.
+  /// Emits {TokenUnload} event.
+  /// @param amount The quantity of the corresponding tokens to be unloaded.
+  /// Amount should not exceed the amount that the caller has originally loaded into the PBM smart contract.
+  function unload(uint256 amount) external;
+
+  /// @notice Emitted when an underlying token is loaded into a PBM
+  /// @param caller Address by which sovToken is taken from.
+  /// @param to Address by which the token is loaded and assigned to
+  /// @param amount The quantity of tokens to be loaded
+  /// @param sovToken The address of the underlying sovToken.
+  /// @param sovTokenValue The amount of underlying sovTokens loaded
+  event TokenLoad(address caller, address to, uint256 amount, address sovToken, uint256 sovTokenValue);
+
+  /// @notice Emitted when an underlying token is unloaded from a PBM.
+  /// This event indicates the process of releasing the underlying token from the PBM smart contract.
+  /// @param caller The address initiating the token unloading process.
+  /// @param from The address from which the token is being unloaded and removed from.
+  /// @param amount The quantity of the corresponding unloaded tokens.
+  /// @param sovToken The address of the underlying sovToken.
+  /// @param sovTokenValue The amount of unloaded underlying sovTokens transferred.
+  event TokenUnload(address caller, address from, uint256 amount, address sovToken, uint256 sovTokenValue);
+}
 
 ```
 
