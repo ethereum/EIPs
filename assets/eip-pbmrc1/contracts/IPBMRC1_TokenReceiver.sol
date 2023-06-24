@@ -25,8 +25,8 @@ interface PBMRC1_TokenReceiver {
         receiver smart contract supports type(PBMRC1_TokenReceiver).interfaceId
         @param _operator  The address which initiated the transfer (either the address which previously owned the token or the address authorised to make transfers on the owner's behalf) (i.e. msg.sender)
         @param _from      The address which previously owned the token
-        @param _id        The ID of the token being unwrapped
-        @param _value     The amount of tokens being transferred
+        @param _ids       IDs of the tokend being unwrapped
+        @param _values     The amount of tokens being transferred
         @param _data      Additional data with no specified format
         @return           `bytes4(keccak256("onPBMRC1BatchUnwrap(address,address,uint256,uint256,bytes)"))`
     */
