@@ -1,13 +1,13 @@
 ---
 eip: TBD
 title: Purpose bound money
-description: An interface extending EIP-1155 for <placeholder>, supporting use case such as <placeholder>
+description: An interface extending ERC-1155 to standardise implementations of purpose-bound money, a hybrid form of programmable payment and programmable money. PBMs are bearer instruments, with self-contained programming logic and are transferrable between two parties without intermediaries. Purpose-bound money can be used to implement government disbursement tokens, shopping voucher tokens, prepaid tokens, rewards points token, purpose bound donation token, school allowance token etc.
 authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian), Chin Sin Ong (@chinsinong)
 discussions-to: https://ethereum-magicians.org (Create a discourse here for early feedback)
 status: DRAFT
 type: Standards Track
 category: ERC
-created: 2023-04-01
+created: 2023-06-24
 requires: 165, 173, 1155
 ---
 
@@ -15,9 +15,9 @@ requires: 165, 173, 1155
 
 ## Abstract
 
-This PBMRC outlines a smart contract interface that builds upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf).
+This proposal outlines a smart contract interface that builds upon the [ERC-1155](./eip-1155.md) standard to introduce the concept of a purpose bound money (PBM) defined in the [Project Orchid Whitepaper](../assets/eip-pbmrc1/MAS-Project-Orchid.pdf) and [PBM Technical Whitepaper](../assets/eip-pbmrc1/PBM-Technical-Whitepaper.pdf).
 
-It builds upon the [ERC-1155](./eip-1155.md) standard, by leveraging pre-existing, widespread support that wallet providers have implemented, to display the PBM and trigger various transfer logic.
+It builds upon the ERC-1155 standard, by leveraging pre-existing, widespread support that wallet providers have implemented, to display the PBM and trigger various transfer logic.
 
 ## Motivation
 
@@ -27,16 +27,16 @@ The establishment of this proposal seeks to forestalls technology fragmentation 
 
 A PBM based architecture has several distinct components:
 
-- **sovToken** - a ERC-20 or ERC-20 compatible digital currency (e.g. ERC-777, ERC-1363) serving as the store of value token (i.e. collateral backing the PBM Token).
+- **sovToken** - a [ERC-20](./eip-20.md) or ERC-20 compatible digital currency (e.g. [ERC-777](./eip-777.md), [ERC-1363](./eip-1363.md)) serving as the store of value token (i.e. collateral backing the PBM Token).
 
-  - Digital currency referred to in this PBMRC paper **SHOULD** possess the following properties:
+  - Digital currency referred to in this proposal **SHOULD** possess the following properties:
     - a good store of value;
     - a suitable unit of account; and
-    - a medium of exchange;
+    - a medium of exchange.
 
-- **PBM Wrapper** - a smart contract, which wraps the sovToken, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying sovToken;
+- **PBM Wrapper** - a smart contract, which wraps the sovToken, by specifying condition(s) that has/have to be met (referred to as PBM business logic in subsequent section of this proposal). The smart contract verifies that condition(s) has/have been met before unwrapping the underlying sovToken.
 
-- **PBM Token** - the sovToken and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a [ERC-1155](./eip-1155.md) token.
+- **PBM Token** - the sovToken and its PBM wrapper are collectively referred to as a PBM Token. PBM Tokens are represented as a ERC-1155 token.
 
   - PBM Tokens are bearer instruments, with self-contained programming logic, and can be transferred between two parties without involving intermediaries. It combines the concept of:
     - programmable payment - automatic execution of payments once a pre-defined set of conditions are met; and
@@ -576,9 +576,9 @@ interface PBMRC2_NonPreloadedPBM is IPBMRC1 {
 
 ## Rationale
 
-This paper extends the [ERC-1155](./eip-1155.md) standards in order to enable easy adoption by existing wallet providers. Currently, most wallet providers are able to support and display ERC-20, ERC-1155 and ERC-721 standards. An implementation which doesn't extend these standards will require the wallet provider to build a custom user interface and interfacing logic which increases the implementation cost and lengthen the time-to-market.
+This paper extends the ERC-1155 standards in order to enable easy adoption by existing wallet providers. Currently, most wallet providers are able to support and display ERC-20, ERC-1155 and [ERC-721](./eip-721.md) standards. An implementation which doesn't extend these standards will require the wallet provider to build a custom user interface and interfacing logic which increases the implementation cost and lengthen the time-to-market.
 
-This standard sticks to the push transaction model where the transfer of PBM is initiated on the senders side. Modern wallets can support the required PBM logic by embedding the unwrapping logic within the [ERC-1155](./eip-1155.md) `safeTransfer` function.
+This standard sticks to the push transaction model where the transfer of PBM is initiated on the senders side. Modern wallets can support the required PBM logic by embedding the unwrapping logic within the ERC-1155 `safeTransfer` function.
 
 ### Customisability
 
@@ -590,13 +590,13 @@ By mapping the underlying ERC-1155 token model with an additional data structure
 
 2. This EIP makes no assumptions about access control or the conditions under which a function can be executed. It is the responsibility of the PBM creator to determine the various roles involved in each specific PBM business flow.
 
-3. Metadata associated to the PBM standard is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from [EIP-721](./eip-721.md). Refer to Opensea's metadata-standards for an implementation example.
+3. Metadata associated to the PBM standard is not included the standard. If necessary, related metadata can be created with a separate metadata extension interface, e.g. `ERC721Metadata` from ERC-721. Refer to Opensea's metadata-standards for an implementation example.
 
 4. To allow for future extensibility, it is **RECOMMENDED** that developers read and adopt the specifications for building general extensibility for method behaviours ([ERC-5750](./eip-5750.md)).
 
 ## Backwards Compatibility
 
-This interface is designed to be compatible with [ERC-1155](./eip-1155.md).
+This interface is designed to be compatible with ERC-1155.
 
 ## Reference Implementation
 
