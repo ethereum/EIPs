@@ -1,4 +1,3 @@
----
 eip: 1
 title: EIP Purpose and Guidelines
 status: Living
@@ -67,33 +66,28 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 *In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea.*
 
+
 ### EIP Process
 
 The following is the standardization process for all EIPs in all tracks:
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-**Idea** - An idea that is pre-draft. This is not tracked within the EIP Repository.
+* Idea - An idea that is pre-draft. This is not tracked within the EIP Repository.
+* Draft - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when it is formatted to a minimal standard, with spelling errors, link formats, and similar problems reported only as warnings.
+* Review - An EIP Author marks an EIP as ready for and requesting Peer Review.  An Editor will merge the EIP when it meets all formatting requirements, including corect spelling and resolved links.
+* Last Call - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
+  * If this period results in necessary normative changes it will revert the EIP to `Review`.
+* Final - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
+  * A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
+* Stagnant - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
+  * *EIP Authors are notified of any algorithmic change to the status of their EIP*
+* Withdrawn - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
+* Living - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
-**Draft** - The first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when properly formatted.
+### ERC Peers
 
-**Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
-
-**Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
-
-If this period results in necessary normative changes it will revert the EIP to `Review`.
-
-**Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
-
-A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
-
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
-
->*EIP Authors are notified of any algorithmic change to the status of their EIP*
-
-**Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
-
-**Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
+Core EIPs are intensely scrutinized by the client teams and other developers and EIP Editors are generally familiar with the Ethereum protocol, whereas ERCs cover a wide and growing range of applications and are often outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, an ERC Author should, with the help of the Editors, designate at least two Peers with relevant expertise who can assist the Author refine the Idea technically, edit Drafts, and generally support the Author through the stages of the EIP Process.
 
 ## What belongs in a successful EIP?
 
@@ -110,11 +104,11 @@ Each EIP should have the following parts:
 - Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](../LICENSE.md).`
 
-## EIP Formats and Templates
+### EIP Formats and Templates
 
 EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) format. There is a [template](https://github.com/ethereum/EIPs/blob/master/eip-template.md) to follow.
 
-## EIP Header Preamble
+### EIP Header Preamble
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
@@ -146,7 +140,7 @@ Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
 
-### `author` header
+#### `author` header
 
 The `author` header lists the names, email addresses or usernames of the authors/owners of the EIP. Those who prefer anonymity may use a username only, or a first name and a username. The format of the `author` header value must be:
 
@@ -168,37 +162,41 @@ if neither the email address nor the GitHub username are given.
 
 At least one author must use a GitHub username, in order to get notified on change requests and have the capability to approve or reject them.
 
-### `discussions-to` header
+#### `discussions-to` header
 
 While an EIP is a draft, a `discussions-to` header will indicate the URL where the EIP is being discussed.
 
 The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum-magicians.org/). The URL cannot point to Github pull requests, any URL which is ephemeral, and any URL which can get locked over time (i.e. Reddit topics).
 
-### `type` header
+#### `type` header
 
 The `type` header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, networking, interface, or ERC).
 
-### `category` header
+#### `category` header
 
 The `category` header specifies the EIP's category. This is required for standards-track EIPs only.
 
-### `created` header
+#### `created` header
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
 
-### `requires` header
+#### `requires` header
 
 EIPs may have a `requires` header, indicating the EIP numbers that this EIP depends on. If such a dependency exists, this field is required.
 
 A `requires` dependency is created when the current EIP cannot be understood or implemented without a concept or technical element from another EIP. Merely mentioning another EIP does not necessarily create such a dependency.
 
-## Linking to External Resources
+### Linking to External Resources
 
 Other than the specific exceptions listed below, links to external resources **SHOULD NOT** be included. External resources may disappear, move, or change unexpectedly.
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
-### Execution Client Specifications
+External references not so permitted **MAY** be included at the Editors' discretion.  We take several precautions to help ensure their continued accessibility.  We follow [RFC 7322](https://www.rfc-editor.org/rfc/rfc7322.html) in requiring that outside references **MUST** be full citations, including author(s), title, publication information, and if available, a version number or other id. Links are acceptable, but **MUST NOT** be the sole information provided for a reference.  Links **SHOULD** meet the Requirements for Origins of EIP-5757, and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", relevant quotations from referenced works are encouraged, as the quote itself will not change.   
+
+Following the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references.  At the discretion of the Editors, Motivation and Rationale sections **MAY** include important Informative references -- these should be rare.
+
+#### Execution Client Specifications
 
 Links to the Ethereum Execution Client Specifications may be included using normal markdown syntax, such as:
 
@@ -216,7 +214,7 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
-### Consensus Layer Specifications
+#### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
 
@@ -234,7 +232,7 @@ Permitted Consensus Layer Specifications URLs must anchor to a specific commit, 
 ^https://github.com/ethereum/consensus-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
-### Networking Specifications
+#### Networking Specifications
 
 Links to specific commits of files within the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
 
@@ -252,7 +250,7 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
-### World Wide Web Consortium (W3C)
+#### World Wide Web Consortium (W3C)
 
 Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
 
@@ -270,7 +268,7 @@ Permitted W3C recommendation URLs MUST anchor to a specification in the technica
 ^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
 ```
 
-### Web Hypertext Application Technology Working Group (WHATWG)
+#### Web Hypertext Application Technology Working Group (WHATWG)
 
 Links to WHATWG specifications may be included using normal markdown syntax, such as:
 
@@ -290,7 +288,7 @@ Permitted WHATWG specification URLs must anchor to a specification defined in th
 
 Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
 
-### Internet Engineering Task Force (IETF)
+#### Internet Engineering Task Force (IETF)
 
 Links to an IETF Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
 
@@ -308,7 +306,7 @@ Permitted IETF specification URLs MUST anchor to a specification with an assigne
 ^https:\/\/www.rfc-editor.org\/rfc\/.*$
 ```
 
-### Bitcoin Improvement Proposal
+#### Bitcoin Improvement Proposal
 
 Links to Bitcoin Improvement Proposals may be included using normal markdown syntax, such as:
 
@@ -326,7 +324,7 @@ Permitted Bitcoin Improvement Proposal URLs must anchor to a specific commit, an
 ^(https://github.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki)$
 ```
 
-### Digital Object Identifier System
+#### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
 
@@ -401,11 +399,11 @@ See the [Citation Style Language Schema](https://resource.citationstyles.org/sch
 
 The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
-## Linking to other EIPs
+#### Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
 
-## Auxiliary Files
+### Auxiliary Files
 
 Images, diagrams and auxiliary files should be included in a subdirectory of the `assets` folder for that EIP as follows: `assets/eip-N` (where **N** is to be replaced with the EIP number). When linking to an image in the EIP, use relative links such as `../assets/eip-1/image.png`.
 
