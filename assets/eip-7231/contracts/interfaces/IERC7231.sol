@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.15;
 
-interface IERCXXXX {
+interface IERC7231 {
 
     /**
      * @notice emit the use binding informain

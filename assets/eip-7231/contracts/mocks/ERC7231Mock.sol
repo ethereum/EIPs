@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.17;
 
-import "../ERCXXXX.sol";
+import "../ERC7231.sol";
 
-contract ERCXXXXMock is ERCXXXX {
+contract ERC7231Mock is ERC7231 {
     
     constructor(
         string memory name,
         string memory symbol
-    ) ERCXXXX(name, symbol) {}
+    ) ERC7231(name, symbol) {}
 
     function mint(address to, uint256 tokenId) external {
         _mint(to, tokenId);

@@ -1,17 +1,17 @@
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ERCXXXXMock } from "../typechain-types";
+import { ERC7231Mock } from "../typechain-types";
 
 import { expect } from "chai";
 import  web3 from "web3";
 
 
-describe("ERCXXXX", async () => {
+describe("ERC7231", async () => {
 
   let owner : SignerWithAddress;
   let others: SignerWithAddress[];
 
-  let ERCXXXXMock: ERCXXXXMock;
+  let ERC7231Mock: ERC7231Mock;
 
   const name = "carvTest";
   const symbol = "CVTS";
@@ -34,23 +34,23 @@ describe("ERCXXXX", async () => {
 
     [owner, ...others] = await ethers.getSigners();
 
-    const ERCXXXXFactory = await ethers.getContractFactory("ERCXXXXMock");
-    ERCXXXXMock = await ERCXXXXFactory.deploy(name, symbol,);
-    await ERCXXXXMock.deployed();
+    const ERC7231Factory = await ethers.getContractFactory("ERC7231Mock");
+    ERC7231Mock = await ERC7231Factory.deploy(name, symbol,);
+    await ERC7231Mock.deployed();
 
-    // await ERCXXXXMock.
-    await ERCXXXXMock.connect(owner).mint(owner.address,tokenId);
+    // await ERC7231Mock.
+    await ERC7231Mock.connect(owner).mint(owner.address,tokenId);
     
   });
 
   describe("Init of Erc721 ", async function () {
 
     it("Name", async function () {
-      expect(await ERCXXXXMock.name()).to.equal(name);
+      expect(await ERC7231Mock.name()).to.equal(name);
     });
 
     it("Symbol", async function () {
-      expect(await ERCXXXXMock.symbol()).to.equal(symbol);
+      expect(await ERC7231Mock.symbol()).to.equal(symbol);
     });
     
   });
@@ -61,16 +61,16 @@ describe("ERCXXXX", async () => {
 
       let multiUserIDsHash = "0xa5b9d60f32436310afebcfda832817a68921beb782fabf7915cc0460b443116a"
       await expect(
-        ERCXXXXMock.connect(owner).setIdentitiesRoot(
+        ERC7231Mock.connect(owner).setIdentitiesRoot(
           tokenId,
           multiUserIDsHash
         )
-      ).to.emit(ERCXXXXMock,"SetIdentitiesRoot").withArgs(        
+      ).to.emit(ERC7231Mock,"SetIdentitiesRoot").withArgs(        
           tokenId,
           multiUserIDsHash
       );
 
-      let multiUserIDsRoot = await ERCXXXXMock.getIdentitiesRoot(
+      let multiUserIDsRoot = await ERC7231Mock.getIdentitiesRoot(
         tokenId
       );
       
@@ -94,7 +94,7 @@ describe("ERCXXXX", async () => {
       // const wallet = new ethers.Wallet(process.env.PK);
       const signature = await owner.signMessage(dataHashBin);
 
-      await ERCXXXXMock.connect(owner).setIdentitiesRoot(
+      await ERC7231Mock.connect(owner).setIdentitiesRoot(
         tokenId,ethHash
       )
 
@@ -105,7 +105,7 @@ describe("ERCXXXX", async () => {
         }
       )
 
-      let result = await ERCXXXXMock.verifyIdentitiesBinding(
+      let result = await ERC7231Mock.verifyIdentitiesBinding(
         tokenId,
         owner.address,
         userIDS,

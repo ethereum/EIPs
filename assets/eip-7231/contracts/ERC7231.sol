@@ -2,10 +2,10 @@
 pragma solidity ^0.8.17;
 
 import { StrSlice, toSlice } from "@dk1a/solidity-stringutils/src/StrSlice.sol";
-import "./interfaces/IERCXXXX.sol";
+import "./interfaces/IERC7231.sol";
 import "./ERC6066.sol";
 
-contract ERCXXXX is ERC6066, IERCXXXX {
+contract ERC7231 is ERC6066, IERC7231 {
 
     using { toSlice } for string;
     mapping (uint256 => bytes32) _idMultiIdentitiesRootBinding;
