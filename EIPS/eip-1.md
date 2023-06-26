@@ -86,9 +86,9 @@ The following is the standardization process for all EIPs in all tracks:
 - **Withdrawn** - The EIP Author(s) have withdrawn the proposed EIP. This state has finality and can no longer be resurrected using this EIP number. If the idea is pursued at later date it is considered a new proposal.
 - **Living** - A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
-### ERC Peers
+### Technical Assistants
 
-Core EIPs are intensely scrutinized by the client teams and other developers and EIP Editors are generally familiar with the Ethereum protocol, whereas ERCs cover a wide and growing range of applications and are often outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, an ERC Author should, with the help of the Editors, designate at least two Peers with relevant expertise who can help the Author refine the Idea technically, edit Drafts, and generally support the Author through the stages of the EIP Process.
+Core EIPs are intensely scrutinized by the client teams and other developers for technical soundness, but the EIP Editors may still lack relevant expertise. And the numerous ERCs cover a wide and growing range of applications that are even more likely to be outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, the Editors *at their discretion* may require Technical Assistants with the relevant expertise who can review the Author's Idea and work with the Author to ensure a technically sound proposal.
 
 ## What belongs in a successful EIP?
 
@@ -101,7 +101,7 @@ Each EIP should have the following parts:
 - **Rationale** - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 - **Backwards Compatibility** *(optional)* - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
 - **Test Cases** *(optional)* - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
-- **Reference Implementation** *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for all EIPs.
+- **Reference Implementation** *(optional)* - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for most EIPs. Final Core EIPs should link to the relevant Execution Client or Consensus Client commits that implement the EIP.
 - **Security Considerations** - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 - **Normative References**
 - **Informative References** - Complete references for all external resources must be included in these two sections, as specified below.  
@@ -195,13 +195,13 @@ Other than the specific exceptions listed below, links to external resources **S
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
-External resources not so permitted **MAY** be included *at the Editors' discretion*.
+External resources not so permitted **MAY** be included ***at the Editors' discretion***.
 
 A complete reference to every external resource **MUST** be included in a Normative or Informative References section.
 
-We take several precautions to help ensure the continued accessibility of all external resources.  We follow the requirements of the [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html): references **MUST** be full citations, including author(s), title, and publication information -- URLs are acceptable, but **MUST NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", relevant quotations from referenced works are encouraged, as embedded quotations will not change. 
+We take several precautions to ensure the continued accessibility of all external resources.  First, we follow the requirements of the [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html): references **MUST** be full citations, including author(s), title, and publication information -- URLs are acceptable, but **MUST NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", short quotations from referenced works are encouraged, as embedded quotations will not change. 
 
-Following the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references. Motivation and Rationale sections **MAY** include important Informative references -- these should be rare.
+According to the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references. Motivation and Rationale sections **MAY** include Informative references -- these should be rare.
 
 #### Execution Client Specifications
 
