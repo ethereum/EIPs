@@ -1,30 +1,28 @@
-import { Example1V1 } from "../typechain/Example1V1";
+import { Example0V1 } from "../typechain/Example0V1";
 import { Provider } from "@ethersproject/providers";
 import { Contract, Wallet } from "ethers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { pack } from "@ethersproject/solidity";
 
-let proxyContract: Example1V1;
-describe("example test  for 1 byte slot", function () {
+let proxyContract: Example0V1;
+describe("example test  for 0 slot", function () {
   before(
     "deploy minimal upgradable proxy when deploying logic contract",
     async function () {
       // deploy SimV1
-      const V1 = await ethers.getContractFactory("Example1V1");
+      const V1 = await ethers.getContractFactory("Example0V1");
       const v1 = await V1.deploy();
       await v1.deployed();
       console.log("logic payable contract", v1.address);
 
       // proxy's code
       const code = pack(
-        ["bytes1", "uint8", "bytes1", "address", "bytes"],
+        ["bytes1",  "address", "bytes"],
         [
-          "0x60",
-          await v1.getImplementSlot(),
           "0x73",
           v1.address,
-          "0x8155600960305f3960f81b60095260106039600a39601a5ff3365f5f375f5f365f60545af43d5f5f3e3d5f82601857fd5bf3",
+          "0x5f55600960285f396010603160093960195ff3365f5f375f5f365f5f545af43d5f5f3e3d5f82601757fd5bf3",
         ]
       );
       const proxyAddr = ethers.utils.getCreate2Address(

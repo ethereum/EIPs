@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-contract PayableTokenV2 {
+contract PayableToken0V2 {
     address private implementation;
     address public owner;
     uint256 public number;

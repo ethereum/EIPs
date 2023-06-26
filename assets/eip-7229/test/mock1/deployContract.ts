@@ -6,7 +6,7 @@ import { ethers } from "hardhat";
 import { pack } from "@ethersproject/solidity";
 
 let proxyContract: SimV1;
-describe("deploy contract by contract for 32 bytes slot", function () {
+describe("deploy contract by contract for 1 bytes slot", function () {
   before("deploy minimal upgradable proxy", async function () {
     // deploy SimV1
     const V1 = await ethers.getContractFactory("Test1");

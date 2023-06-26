@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-contract PayableTokenV2 {
+contract PayableToken0V1 {
     address private implementation;
     address public owner;
     uint256 public number;
 
     event Upgraded(address indexed implementation);
+
+    receive() external payable {
+        number += 1;
+    }
+
+    fallback() external payable {
+        number += 2;
+    }
 
     modifier OnlyOwner() {
         require(owner == msg.sender, "only owner");

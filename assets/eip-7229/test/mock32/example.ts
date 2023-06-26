@@ -1,11 +1,11 @@
-import { ExampleV1 } from "../typechain/ExampleV1";
+import { Example32V1 } from "../typechain/Example32V1";
 import { Provider } from "@ethersproject/providers";
 import { Contract, Wallet } from "ethers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { pack } from "@ethersproject/solidity";
 
-let proxyContract: ExampleV1;
+let proxyContract: Example32V1;
 describe("example test for 32 bytes slot", function () {
   before(
     "deploy minimal upgradable proxy when deploying logic contract",
