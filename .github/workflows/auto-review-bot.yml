@@ -26,6 +26,6 @@ jobs:
         id: auto-review-bot
         uses: ethereum/eip-review-bot@3e9905fcb72cf81ae9ed732df429c28b17e155b1
         with:
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           config: config/eip-editors.yml
           pr_number: ${{ steps.save-pr-number.outputs.pr }}
