@@ -401,6 +401,24 @@ See the [Citation Style Language Schema](https://resource.citationstyles.org/sch
 
 The top-level URL field must resolve to a copy of the referenced document which can be viewed at zero cost. Values under `additional-urls` must also resolve to a copy of the referenced document, but may charge a fee.
 
+### Other Websites
+
+Links to other websites are allowed as long as one of the following archival conditions are met:
+
+- In the case of an HTML document, a printer-safe PDF of the webpage (created using [readability.js](https://github.com/mozilla/readability)) is placed in `/assets/eip-<number>/archive/<domain>/<path>`, where path can use as many subfolders as need be. The port number is ignored.
+- In the case of any downloadable file without external references, a copy of that file is placed in `/assets/eip-<number>/archive/<domain>/<path>`, where path can use as many subfolders as need be. The port number is ignored.
+- In the case of any downloadable file with external references, a copy of that file and all external references, all modified to use those archived references, are placed in `/assets/eip-<number>/archive/<domain>/<path>`, where path can use as many subfolders as need be, and the domain and path depend on the file. The port number is ignored.
+
+Additionally, all of the below conditions must be met:
+
+- The link must use the `https` URI scheme
+
+If the conditions are met, the link can be used by adding a superscript, as follows:
+
+```markdown
+[<link text>](<link>)<sup>[\[archive\]](../assets/eip-<number>/archive/<...>)</sup>
+```
+
 ## Linking to other EIPs
 
 References to other EIPs should follow the format `EIP-N` where `N` is the EIP number you are referring to.  Each EIP that is referenced in an EIP **MUST** be accompanied by a relative markdown link the first time it is referenced, and **MAY** be accompanied by a link on subsequent references.  The link **MUST** always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc.  For example, you would link to this EIP as `./eip-1.md`.
