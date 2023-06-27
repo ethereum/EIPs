@@ -1,8 +1,8 @@
 ---
+eip: encumber
 title: Encumber
-eip: XXXX
-description: Extending token standards to allow pledging tokens without transferring ownership.
-author: Coburn Berry (@coburncoburn) Mykel Pereira (@mykelp)
+description: A token interface to allow pledging tokens without transferring ownership.
+author: Coburn Berry (@coburncoburn), Mykel Pereira (@mykelp), Scott Silver (@scott-silver)
 discussions-to: https://ethereum-magicians.org/t/encumber-extending-the-erc-20-token-standard-to-allow-pledging-tokens-without-giving-up-ownership/14849
 status: Draft
 type: Standards Track
@@ -11,10 +11,10 @@ created: 2023-06-27
 ---
 
 ## Abstract
-This ERC proposes an extension to the ERC-20 token standard by adding Encumber — the ability for an account to grant another account exclusive right to move some portion of their balance. Encumber is a stronger version of ERC-20 allowances. While ERC-20 approve grants another account the permission to transfer a specified token amount, encumber grants the same permission while ensuring that the tokens will be available when needed.
+This ERC proposes an extension to the [ERC-20](./eip-20.md) token standard by adding Encumber — the ability for an account to grant another account exclusive right to move some portion of their balance. Encumber is a stronger version of [ERC-20](./eip-20.md) allowances. While [ERC-20](./eip-20.md) approve grants another account the permission to transfer a specified token amount, encumber grants the same permission while ensuring that the tokens will be available when needed.
 
 ## Motivation
-Token holders commonly transfer their tokens to smart contracts which will return the tokens under specific conditions. In some cases, smart contracts do not actually need to hold the tokens, but need to guarantee they will be available if necessary. Since allowances do not provide a strong enough guarantee, the only way to do guarantee token availability presently is to transfer the token to the smart contract. Locking tokens without moving them gives more clear indication of the rights and ownership of the tokens. This allows for airdrops and other ancillary benefits of ownership to reach the true owner. It also adds another layer of safety, where draining a pool of ERC-20 tokens can be done in a single transfer, iterating accounts to transfer encumbered tokens would be significantly more prohibitive in gas usage.
+Token holders commonly transfer their tokens to smart contracts which will return the tokens under specific conditions. In some cases, smart contracts do not actually need to hold the tokens, but need to guarantee they will be available if necessary. Since allowances do not provide a strong enough guarantee, the only way to do guarantee token availability presently is to transfer the token to the smart contract. Locking tokens without moving them gives more clear indication of the rights and ownership of the tokens. This allows for airdrops and other ancillary benefits of ownership to reach the true owner. It also adds another layer of safety, where draining a pool of [ERC-20](./eip-20.md) tokens can be done in a single transfer, iterating accounts to transfer encumbered tokens would be significantly more prohibitive in gas usage.
 
 ## Specification
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
@@ -93,18 +93,17 @@ interface IERCXXXX {
 ```
 
 ## Rationale
-This extension adds flexibility to the ERC-20 token standard and caters to use cases where token locking is required, but it is preferential to maintain actual ownership of tokens. This interface can also be adapted to other token standards, such as ERC-721, in a straightforward manner.
+This extension adds flexibility to the [ERC-20](./eip-20.md) token standard and caters to use cases where token locking is required, but it is preferential to maintain actual ownership of tokens. This interface can also be adapted to other token standards, such as [ERC-721](./eip-721.md), in a straightforward manner.
 
 
 ## Backwards Compatibility
-This EIP is backwards compatible with the existing ERC-20 standard. Implementations must add the functionality to block transfer of tokens that are encumbered to another account.
+This EIP is backwards compatible with the existing [ERC-20](./eip-20.md) standard. Implementations must add the functionality to block transfer of tokens that are encumbered to another account.
 
 
 ## Reference Implementation
 
-This can be implemented as an extension of any base ERC-20 contract by modifying the transfer function to block the transfer of encumbered tokens and to release encumbrances when spent via transferFrom.
+This can be implemented as an extension of any base [ERC-20](./eip-20.md) contract by modifying the transfer function to block the transfer of encumbered tokens and to release encumbrances when spent via transferFrom.
 
-https://github.com/compound-finance/encumber_samples/blob/create-samples/src/encumberableERC20.sol
 
 ``` solidity
 
