@@ -179,9 +179,10 @@ An optional section that contains a reference/example implementation that people
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
 #### Normative References
-#### Informative References
 
-Complete references for all external resources must be included in one of these two sections, as specified below.  
+**Informative References**
+
+Complete references for each external resource must be included in one of these two sections, as specified below.  
 
 #### Copyright Waiver
 
@@ -275,13 +276,13 @@ Other than the specific exceptions listed below, links to external resources **S
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
-External resources not so permitted **MAY** be included ***at the Editors' discretion***.
+External resources not so permitted **MAY** be included *at the Editors' discretion*.
 
 A complete reference to every external resource **MUST** be included in a Normative or Informative References section.
 
 We take several precautions to ensure the continued accessibility of all external resources.  First, we follow the requirements of the [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html): references **MUST** be full citations, including author(s), title, and publication information -- URLs are acceptable, but **MUST NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", short quotations from referenced works are encouraged, as embedded quotations will not change. 
 
-According to the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references. Motivation and Rationale sections **MAY** include Informative references -- these should be rare.
+According to the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references. Motivation and Rationale sections **MAY** include Informative references.
 
 #### Execution Client Specifications
 
