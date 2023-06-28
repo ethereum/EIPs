@@ -1,15 +1,33 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.17;
 
-import { StrSlice, toSlice } from "@dk1a/solidity-stringutils/src/StrSlice.sol";
-import "./interfaces/IERC7231.sol";
-import "./ERC6066.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract ERC7231 is ERC6066, IERC7231 {
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import { StrSlice, toSlice } from "@dk1a/solidity-stringutils/src/StrSlice.sol";
+
+
+import "./interfaces/IERC7231.sol";
+
+
+contract ERC7231 is IERC7231,ERC721 {
 
     using { toSlice } for string;
     mapping (uint256 => bytes32) _idMultiIdentitiesRootBinding;
-    constructor(string memory _name, string memory _symbol) ERC6066(_name, _symbol) {}
+    mapping(uint256 => mapping(bytes32 => bool)) internal _idSignatureSetting;
+
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
+
+    /**
+     * @dev Checks if the sender owns NFT with ID tokenId
+     * @param id   NFT ID of the signing NFT
+     */
+    modifier onlyTokenOwner(uint256 id) {
+        //nft owner check
+        require(ownerOf(id) == msg.sender,"nft owner is not correct");
+        _;
+    }
+
 
     /**
      * @notice 
@@ -21,10 +39,8 @@ contract ERC7231 is ERC6066, IERC7231 {
         uint256 id,
         bytes32 multiIdentitiesRoot
     ) external {
-        
-        sign(id, multiIdentitiesRoot);
-        _idMultiIdentitiesRootBinding[id] = multiIdentitiesRoot;
 
+        _idMultiIdentitiesRootBinding[id] = multiIdentitiesRoot;
         emit SetIdentitiesRoot(id,multiIdentitiesRoot);
     }
     
@@ -52,27 +68,31 @@ contract ERC7231 is ERC6066, IERC7231 {
         uint256 id,address nftOwnerAddress,string[] memory userIDs,bytes32 multiIdentitiesRoot, bytes calldata signature
     ) external view returns (bool){
 
-        //nft owner check
+        //nft ownership validation
         require(ownerOf(id) == nftOwnerAddress,"nft owner is not correct");
 
-        //user id length check
+        //multi-identities root consistency validation
+        require(_idMultiIdentitiesRootBinding[id] == multiIdentitiesRoot,"");
+
+        //user id format validtion
         uint256 userIDLen = userIDs.length;
         require(userIDLen > 0,"userID cannot be empty");
-
 
         for(uint i = 0 ;i < userIDLen ;i ++){
             _verifyUserID(userIDs[i]);
         }
 
-        // bool isVerified = false;
-        bytes4 sigResult = isValidSignature(id,multiIdentitiesRoot,signature);
-        if(sigResult == BADVALUE){
-            return false;
-        }else{
-            return true;
-        }
+        //signature validation from nft owner
+        bool isVerified = SignatureChecker.isValidSignatureNow(msg.sender,multiIdentitiesRoot,signature);
+        return isVerified;
+
     }
 
+    /**
+     * @notice 
+     * @dev verify the userIDs binding 
+     * @param userID nft id 
+     */
     function _verifyUserID(string memory userID) internal view{
 
         require(bytes(userID).length > 0,"userID can not be empty");
@@ -94,6 +114,17 @@ contract ERC7231 is ERC6066, IERC7231 {
         //id hash check
         require(bytes(right.toString()).length == 64,"id hash length is not correct");
 
+    }
+
+    /**
+     * @dev ERC-165 support
+     */
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return
+            interfaceId == type(IERC7231).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
 }
