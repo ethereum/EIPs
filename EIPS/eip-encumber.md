@@ -1,5 +1,5 @@
 ---
-eip: encumber
+eip: 7246
 title: Encumber
 description: A token interface to allow pledging tokens without transferring ownership.
 author: Coburn Berry (@coburncoburn), Mykel Pereira (@mykelp), Scott Silver (@scott-silver)
