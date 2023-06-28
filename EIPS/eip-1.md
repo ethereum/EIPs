@@ -132,9 +132,9 @@ The EIP Author(s) have withdrawn the proposed EIP. This state has finality and c
 
 A special status for EIPs that are designed to be continually updated and not reach a state of finality. This includes most notably EIP-1.
 
-### Technical Assistants
+### Technical Peers
 
-Core EIPs are intensely scrutinized by the client teams and other developers for technical soundness, but the EIP Editors may still lack relevant expertise. And the numerous ERCs cover a wide and growing range of applications that are even more likely to be outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, the Editors *at their discretion* may require Technical Assistants with the relevant expertise who can review the Author's Idea and work with the Author to ensure a technically sound proposal.
+Core EIPs are intensely scrutinized by the client teams and other developers for technical soundness, but the EIP Editors may still lack relevant expertise. And the numerous ERCs cover a wide and growing range of applications that are even more likely to be outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, the Editors *at their discretion* may require Technical Peers with the relevant expertise who can review the Author's Idea and work with the Author to ensure a technically sound proposal.
 
 ## What belongs in a successful EIP?
 
@@ -172,7 +172,7 @@ Test cases for an implementation are mandatory for EIPs that are affecting conse
 
 #### Reference Implementation *(optional)*
 
-An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for most EIPs. Final Core EIPs should link to the relevant Execution Client or Consensus Client commits that implement the EIP.
+An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for many EIPs.  Most ERCs should include an implementation. Final Core EIPs should link to the relevant Execution Client or Consensus Client commits that implement the EIP.
 
 #### Security Considerations
 
@@ -533,7 +533,7 @@ For each new EIP that comes in, an editor does the following:
 - The title should accurately describe the content.
 - Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
 
-If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions.
+If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions and possibly a request for review by Technical Peers. 
 
 Once the EIP is ready for the repository, the EIP editor will:
 
