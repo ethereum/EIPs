@@ -1,4 +1,5 @@
 ---
+eip: 7045
 title: Increase the MAX_EFFECTIVE_BALANCE
 description: Allow validators to have larger effective balances, while maintaining the 32 ETH lower bound.
 author: Mike (@michaelneuder), Francesco (@fradamt), dapplion (@dapplion), Mikhail (@mkalinin), Aditya (@adiasg), Justin (@justindrake)
