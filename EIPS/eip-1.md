@@ -102,7 +102,8 @@ An idea that is pre-draft. This is not tracked within the EIP Repository.
 
 Draft is the first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when it meets some initial requirements: it should be technically sound, the title and preamble must be complete and descriptive, and required sections must be present and readable (but not necessarily complete.)  Problems with language like spelling, grammar, etc. are only considered warnings.
 
-The specification itself does not need to be completely fleshed out, but should contain enough content to give a good idea of the intent of the proposal. Importantly, the proposal must be a good fit for the EIP process, as defined by the EIP Editors.
+The specification itself does not need to be completely fleshed out, but should contain enough content to give a good idea of the intent of the proposal. Importantly, the proposal must actually be a proposal to improve Ethereum.
+
 #### Review
 
 An EIP Author marks an EIP as ready for and requesting Peer Review.  An Editor will merge the EIP when it meets all EIP requirements: it should be a technically sound, complete specification, properly formatted, with correct language, markup and external references.
