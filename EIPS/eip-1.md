@@ -100,7 +100,7 @@ An idea that is pre-draft. This is not tracked within the EIP Repository.
 
 #### Draft
 
-Draft is the first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when it meets some initial requirements: it should be technically sound the title and preamble must be complete and descriptive, and required sections must be present and readable (but not necessarily complete.)  Problems with language like spelling, grammar, etc. are only considered warnings.
+Draft is the first formally tracked stage of an EIP in development. An EIP is merged by an EIP Editor into the EIP repository when it meets some initial requirements: it should be technically sound, the title and preamble must be complete and descriptive, and required sections must be present and readable (but not necessarily complete.)  Problems with language like spelling, grammar, etc. are only considered warnings.
 
 The specification itself does not need to be completely fleshed out, but should contain enough content to give a good idea of the intent of the proposal. Importantly, the proposal must be a good fit for the EIP process, as defined by the EIP Editors.
 #### Review
