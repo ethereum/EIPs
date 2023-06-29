@@ -1,0 +1,42 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/ethereum/go-ethereum/core/vm
+                                            │ compare_p256Verify │ compare_ecrecover  │
+                                            │       sec/op       │   sec/op     vs base   │
+PrecompiledP256Verify/p256Verify-Gas=3450-8          57.75µ ± 1%
+PrecompiledEcrecover/-Gas=3000-8                                   50.48µ ± 1%
+geomean                                              57.75µ        50.48µ       ? ¹ ²
+¹ benchmark set differs from baseline; geomeans may not be comparable
+² ratios must be >0 to compute geomean
+
+                                            │ compare_p256Verify │ compare_ecrecover  │
+                                            │       gas/op       │   gas/op     vs base   │
+PrecompiledP256Verify/p256Verify-Gas=3450-8          3.450k ± 0%
+PrecompiledEcrecover/-Gas=3000-8                                   3.000k ± 0%
+geomean                                              3.450k        3.000k       ? ¹ ²
+¹ benchmark set differs from baseline; geomeans may not be comparable
+² ratios must be >0 to compute geomean
+
+                                            │ compare_p256Verify │ compare_ecrecover │
+                                            │       mgas/s       │   mgas/s    vs base   │
+PrecompiledP256Verify/p256Verify-Gas=3450-8           59.73 ± 1%
+PrecompiledEcrecover/-Gas=3000-8                                   59.42 ± 1%
+geomean                                               59.73        59.42       ? ¹ ²
+¹ benchmark set differs from baseline; geomeans may not be comparable
+² ratios must be >0 to compute geomean
+
+                                            │ compare_p256Verify │ compare_ecrecover │
+                                            │        B/op        │    B/op     vs base   │
+PrecompiledP256Verify/p256Verify-Gas=3450-8         1.523Ki ± 0%
+PrecompiledEcrecover/-Gas=3000-8                                   800.0 ± 0%
+geomean                                             1.523Ki        800.0       ? ¹ ²
+¹ benchmark set differs from baseline; geomeans may not be comparable
+² ratios must be >0 to compute geomean
+
+                                            │ compare_p256Verify │ compare_ecrecover │
+                                            │     allocs/op      │ allocs/op   vs base   │
+PrecompiledP256Verify/p256Verify-Gas=3450-8           33.00 ± 0%
+PrecompiledEcrecover/-Gas=3000-8                                   7.000 ± 0%
+geomean                                               33.00        7.000       ? ¹ ²
+¹ benchmark set differs from baseline; geomeans may not be comparable
+² ratios must be >0 to compute geomean
