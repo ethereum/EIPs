@@ -33,6 +33,10 @@ Products: tickets, games with and through people, data broakerage (geo location,
 
 ## Specification
 
+Mainnet (ID: 1) should be halted. In this case, no existing DApp will be served.
+
+IPFS ends, Swarm, Whisper
+
 ## Token
 ### Methods
 
