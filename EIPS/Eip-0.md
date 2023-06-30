@@ -12,7 +12,7 @@ created: 2023-06-30
 
 Closing the Ethereum ecosystem and bringing it to a hard halt. Since its humble beginnings, the Ethereum project has been open to the public. The past years, however, have made it clear that such an open ecosystem leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
 
-Closing the Ethereum ecosystem would be a remedy for almost all of these problems.
+Closing the Ethereum ecosystem to the public and returning it to the original community and owners would be a remedy for almost all of these problems.
 
 
 ## Abstract
