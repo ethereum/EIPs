@@ -2,7 +2,7 @@
 eip: TBD
 title: Purpose bound money
 description: An interface extending ERC-1155 to standardise implementations of purpose-bound money, a hybrid form of programmable payment and programmable money. PBMs are bearer instruments, with self-contained programming logic and are transferrable between two parties without intermediaries. Purpose-bound money can be used to implement government disbursement tokens, shopping voucher tokens, prepaid tokens, rewards points token, purpose bound donation token, school allowance token etc.
-authors: Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian), Chin Sin Ong (@chinsinong)
+authors: Orchid-Dev (@proj-orchid-straitsx), Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian), Chin Sin Ong (@chinsinong)
 discussions-to: https://ethereum-magicians.org (Create a discourse here for early feedback)
 status: DRAFT
 type: Standards Track
