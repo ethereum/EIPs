@@ -37,6 +37,10 @@ Mainnet (ID: 1) should be halted. In this case, no existing DApp will be served.
 
 IPFS ends, Swarm, Whisper
 
+Any existing smart contracts won't be served.
+
+Oracle connections will be ended.
+
 ## Token
 ### Methods
 
