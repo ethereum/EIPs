@@ -41,6 +41,8 @@ Any existing smart contracts won't be served.
 
 Oracle connections will be ended.
 
+Development of Solidty will most likely be abandoned completely and replaces by an actual programming language, adhering to commong programming language principles.
+
 ## Token
 ### Methods
 
