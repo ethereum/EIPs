@@ -17,7 +17,7 @@ Closing the Ethereum ecosystem to the public and returning it to the original co
 
 ## Abstract
 
-Closing the Ethereum chain to the public requires to remove all APIs, so no node is allowed to broadcast and answer any GET or POST requests. Going forward, the github repo will need to be switched to private. The chain itself as well as all data collected will need to be handed over to the rightful owners. Any future collection, publishing, and retrieval of data, except where required by law, will be deemed a criminal offence.
+Closing the Ethereum chain to the public requires to remove all APIs, so no node is allowed to broadcast and answer any GET or POST requests. Going forward, the github repo will need to be switched to private. The chain itself as well as all data collected will need to be handed over to the rightful owners. Any future collection, publishing, and retrieval of data, except where required by law, will be deemed a criminal offense.
 
 The following standard allows for the implementation of a standard API for tokens within smart contracts.
 This standard provides basic functionality to transfer tokens, as well as allow tokens to be approved so they can be spent by another on-chain third party.
