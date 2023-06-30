@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9; 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "./IERC2410Metadata.sol";
-import "./IERC2410.sol";
+import "./IERC7254Metadata.sol";
+import "./IERC7254.sol";
 
 /**
- * @dev Implementation of the {IERC2410} interface.
+ * @dev Implementation of the {IERC7254} interface.
  *
  * This implementation is agnostic to the way tokens are created. This means
  * that a supply mechanism has to be added in a derived contract using {_mint}.
@@ -18,9 +18,9 @@ import "./IERC2410.sol";
  *
  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
  * functions have been added to mitigate the well-known issues around setting
- * allowances. See {IERC2410-approve}.
+ * allowances. See {IERC7254-approve}.
  */
-contract ERC2410 is Context, IERC2410, IERC2410Metadata {
+contract ERC7254 is Context, IERC7254, IERC7254Metadata {
     mapping(address => UserInformation) private userInformation;
 
     mapping(address => uint256) private _balances;
@@ -68,26 +68,26 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      * be displayed to a user as `5.05` (`505 / 10 ** 2`).
      *
      * Tokens usually opt for a value of 18, imitating the relationship between
-     * Ether and Wei. This is the value {ERC2410} uses, unless this function is
+     * Ether and Wei. This is the value {ERC7254} uses, unless this function is
      * overridden;
      *
      * NOTE: This information is only used for _display_ purposes: it in
      * no way affects any of the arithmetic of the contract, including
-     * {IERC2410-balanceOf} and {IERC2410-transfer}.
+     * {IERC7254-balanceOf} and {IERC7254-transfer}.
      */
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
 
     /**
-     * @dev See {IERC2410-totalSupply}.
+     * @dev See {IERC7254-totalSupply}.
      */
     function totalSupply() public view virtual override returns (uint256) {
         return _totalSupply;
     }
 
      /**
-     * @dev See {IERC2410-balanceOf}.
+     * @dev See {IERC7254-balanceOf}.
      */
     function balanceOf(address account) public view virtual override returns (uint256) {
         return _balances[account];
@@ -101,7 +101,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     }
 
     /**
-     * @dev See {IERC2410-transfer}.
+     * @dev See {IERC7254-transfer}.
      *
      * Requirements:
      *
@@ -115,14 +115,14 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     }
 
     /**
-     * @dev See {IERC2410-allowance}.
+     * @dev See {IERC7254-allowance}.
      */
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
     /**
-     * @dev See {IERC2410-approve}.
+     * @dev See {IERC7254-approve}.
      *
      * NOTE: If `amount` is the maximum `uint256`, the allowance is not updated on
      * `transferFrom`. This is semantically equivalent to an infinite approval.
@@ -138,10 +138,10 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     }
 
     /**
-     * @dev See {IERC2410-transferFrom}.
+     * @dev See {IERC7254-transferFrom}.
      *
      * Emits an {Approval} event indicating the updated allowance. This is not
-     * required by the EIP. See the note at the beginning of {ERC2410}.
+     * required by the EIP. See the note at the beginning of {ERC7254}.
      *
      * NOTE: Does not update the allowance if the current allowance
      * is the maximum `uint256`.
@@ -168,7 +168,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      * @dev Atomically increases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {IERC2410-approve}.
+     * problems described in {IERC7254-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -186,7 +186,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      * @dev Atomically decreases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {IERC2410-approve}.
+     * problems described in {IERC7254-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -199,7 +199,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         address owner = _msgSender();
         uint256 currentAllowance = allowance(owner, spender);
-        require(currentAllowance >= subtractedValue, "ERC2410: decreased allowance below zero");
+        require(currentAllowance >= subtractedValue, "ERC7254: decreased allowance below zero");
         unchecked {
             _approve(owner, spender, currentAllowance - subtractedValue);
         }
@@ -227,13 +227,13 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
         address to,
         uint256 amount
     ) internal virtual {
-        require(from != address(0), "ERC2410: transfer from the zero address");
-        require(to != address(0), "ERC2410: transfer to the zero address");
+        require(from != address(0), "ERC7254: transfer from the zero address");
+        require(to != address(0), "ERC7254: transfer to the zero address");
 
         _beforeTokenTransfer(from, to, amount);
 
         uint256 fromBalance = _balances[from];
-        require(fromBalance >= amount, "ERC2410: transfer amount exceeds balance");
+        require(fromBalance >= amount, "ERC7254: transfer amount exceeds balance");
         unchecked {
             _balances[from] = fromBalance - amount;
             // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
@@ -260,7 +260,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      * - `account` cannot be the zero address.
      */
     function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "ERC2410: mint to the zero address");
+        require(account != address(0), "ERC7254: mint to the zero address");
 
         _beforeTokenTransfer(address(0), account, amount);
 
@@ -289,12 +289,12 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      * - `account` must have at least `amount` tokens.
      */
     function _burn(address account, uint256 amount) internal virtual {
-        require(account != address(0), "ERC2410: burn from the zero address");
+        require(account != address(0), "ERC7254: burn from the zero address");
 
         _beforeTokenTransfer(account, address(0), amount);
 
         uint256 accountBalance = _balances[account];
-        require(accountBalance >= amount, "ERC2410: burn amount exceeds balance");
+        require(accountBalance >= amount, "ERC7254: burn amount exceeds balance");
         unchecked {
             _balances[account] = accountBalance - amount;
             // Overflow not possible: amount <= accountBalance <= totalSupply.
@@ -325,8 +325,8 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
         address spender,
         uint256 amount
     ) internal virtual {
-        require(owner != address(0), "ERC2410: approve from the zero address");
-        require(spender != address(0), "ERC2410: approve to the zero address");
+        require(owner != address(0), "ERC7254: approve from the zero address");
+        require(spender != address(0), "ERC7254: approve to the zero address");
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -347,7 +347,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     ) internal virtual {
         uint256 currentAllowance = allowance(owner, spender);
         if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC2410: insufficient allowance");
+            require(currentAllowance >= amount, "ERC7254: insufficient allowance");
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
@@ -411,7 +411,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
     function updateReward(uint256 amount) public virtual override returns(uint256) {
         address owner = _msgSender();
         if(totalSupply() != 0){
-            IERC2410(_tokenReward).transferFrom(owner, address(this), amount);
+            IERC7254(_tokenReward).transferFrom(owner, address(this), amount);
             rewardPerShare = rewardPerShare + amount * 1e18/ totalSupply();
         }      
         emit UpdateReward(owner, amount);
@@ -440,7 +440,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
         uint256 reward = _balances[owner] * rewardPerShare + user.inReward - user.withdraw - user.outReward;
         _withdraw(owner, reward);
         if(reward / 1e18 > 0){
-            IERC2410(_tokenReward).transfer(owner, reward / 1e18);
+            IERC7254(_tokenReward).transfer(owner, reward / 1e18);
         }  
         emit GetReward(owner, reward);
         return reward;
@@ -451,7 +451,7 @@ contract ERC2410 is Context, IERC2410, IERC2410Metadata {
      *
      */
     function _withdraw(address owner, uint256 reward) internal virtual {
-        require(owner != address(0), "ERC2410: withdraw from the zero address");
+        require(owner != address(0), "ERC7254: withdraw from the zero address");
         UserInformation storage user = userInformation[owner];
         user.withdraw += reward;
     }
