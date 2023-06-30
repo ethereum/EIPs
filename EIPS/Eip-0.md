@@ -33,7 +33,7 @@ Products: tickets, games with and through people, data broakerage (geo location,
 
 ## Specification
 
-Mainnet (ID: 1) should be halted. In this case, no existing DApp will be served.
+Mainnet (ID: 1) should be halted. In this case, no existing DApp will be served. Every node (localised EVM) needs to stop broadcasting the chain and eventually delete the data, after having returned it to the rightful owners. 
 
 IPFS ends, Swarm, Whisper
 
