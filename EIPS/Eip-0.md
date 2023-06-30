@@ -25,7 +25,7 @@ This standard provides basic functionality to transfer tokens, as well as allow 
 
 ## Motivation
 
-The past four years have been desatrous for the persons, community, and ecosystem affected by the Ethereum project.
+The past four years have been disastrous for the persons, community, and ecosystem affected by the Ethereum project. While the a wide range of people have contributed to the Ethereum project, many of them with probably good intentions at heart, the end result is and was mostly that some people and companies profitted from the whole ecosystem. I have observed, experienced, and contributed to the ecosystem over the past four years. Comparing it to the time before a broader audience started contributing to the project in 2016 (and again 2019) breaks my heart. Most of the life in the ecosystem has been drained and dried up, just so commercial interest could be cattered to.  
 
 ## Specification
 
