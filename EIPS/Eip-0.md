@@ -10,7 +10,7 @@ created: 2023-06-30
 
 ## Simple Summary
 
-A standard interface for tokens.
+Hard halt.
 
 
 ## Abstract
@@ -21,8 +21,7 @@ This standard provides basic functionality to transfer tokens, as well as allow 
 
 ## Motivation
 
-A standard interface allows any tokens on Ethereum to be re-used by other applications: from wallets to decentralized exchanges.
-
+The past four years have been desatrous for the persons, community, and ecosystem affected by the Ethereum project.
 
 ## Specification
 
