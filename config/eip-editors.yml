@@ -1,41 +1,22 @@
 governance:
-  - lightclient
-  - axic
-  - gcolvin
-  - SamWilsn
-  - Pandapip1
-core:
-  - lightclient
-  - axic
-  - gcolvin
-  - SamWilsn
-  - Pandapip1
-  - g11tech
+  - ProphetXZ
+  core:
+  - ProphetXZ
 erc:
-  - axic
-  - SamWilsn
-  - Pandapip1
-  - xinbenlv
+  - ProphetXZ
 networking:
-  - lightclient
-  - axic
-  - SamWilsn
+  - ProphetXZ
 interface:
   - lightclient
   - axic
   - SamWilsn
   - Pandapip1
 meta:
-  - lightclient
-  - axic
-  - gcolvin
-  - SamWilsn
-  - Pandapip1
-  - xinbenlv
+  - X
 informational:
   - lightclient
   - axic
   - gcolvin
   - SamWilsn
   - Pandapip1
-  - xinbenlv
+  - g11tech
