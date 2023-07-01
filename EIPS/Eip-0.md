@@ -38,6 +38,8 @@ Mainnet (ID: 1) should be halted. In this case, no existing DApp will be served.
 
 IPFS ends, Swarm, Whisper
 
+devp2p (EIP-8)
+
 Any existing smart contracts won't be served.
 
 Oracle connections will be ended.
