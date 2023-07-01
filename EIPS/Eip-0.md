@@ -48,7 +48,7 @@ Development of Solidity will most likely be abandoned completely and replaced by
 
 ## Transport
 
-Transport p2p to original owner.
+All packages SHOULD be transfered via p2p to the original owner.
 
 ## Token
 #### transferFrom
