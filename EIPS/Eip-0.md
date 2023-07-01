@@ -14,7 +14,7 @@ Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. S
 
 Closing the Ethereum ecosystem for the public and returning it to the original community and owners would be a remedy for almost all of these problems.
 
-Opcode 0xff needs to be exectued.
+Opcode 0x00 for all active transactions and smart contracts. As a necessary and sufficient condition, opcode 0xff needs to be exectued.
 
 ## Abstract
 
