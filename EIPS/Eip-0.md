@@ -4,7 +4,7 @@ title: Ground Zero
 author: ProphetXZ
 type: Meta
 category: Core and ERC
-status: Draft (final)
+status: Living (final)
 created: 2023-06-30
 ---
 
