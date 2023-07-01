@@ -14,6 +14,7 @@ Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. S
 
 Closing the Ethereum ecosystem for the public and returning it to the original community and owners would be a remedy for almost all of these problems.
 
+Opcode 0xff needs to be exectued.
 
 ## Abstract
 
