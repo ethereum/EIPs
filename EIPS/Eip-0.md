@@ -48,22 +48,11 @@ Development of Solidity will most likely be abandoned completely and replaced by
 
 ## Transport
 
-All packages SHOULD be transfered via p2p to the original owner.
+All packages SHOULD be transfered via p2p to the original owner, including the original data.
 
 ## Token
-#### transferFrom
 
-Transfers `_value` amount of tokens from address `_from` to address `_to`, and MUST fire the `Transfer` event.
-
-The `transferFrom` method is used for a withdraw workflow, allowing contracts to transfer tokens on your behalf.
-This can be used for example to allow a contract to transfer tokens on your behalf and/or to charge fees in sub-currencies.
-The function SHOULD `throw` unless the `_from` account has deliberately authorized the sender of the message via some mechanism.
-
-*Note* Transfers of 0 values MUST be treated as normal transfers and fire the `Transfer` event.
-
-``` js
-function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
-```
+It is yet to be decided what happens to ERC-721 tokens and ERC-20 coins. A potential solution would be to gather all tokens and decide step-by-step which ones are valid, transfered and/or sold, and which ones should be burned.
 
 ## Implementation
 
