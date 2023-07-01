@@ -45,9 +45,9 @@ jobs:
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
 
       - name: Install Ruby
-        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf
         with:
-          ruby-version: 2.6.0
+          ruby-version: 3.1.4 # 3.2 fails, see https://github.com/github/pages-gem/issues/879
           bundler-cache: true
 
       - name: Build Website
@@ -56,8 +56,7 @@ jobs:
           bundle exec jekyll build
 
       - name: HTML Proofer
-        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
-
+        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
       - name: DNS Validator
         run: bundle exec github-pages health-check
 
