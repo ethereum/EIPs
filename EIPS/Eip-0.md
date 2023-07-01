@@ -2,7 +2,7 @@
 eip: 0
 title: Ground Zero
 author: ProphetXZ
-type: Living Core
+type: Meta
 category: Core and ERC
 status: Draft (final)
 created: 2023-06-30
