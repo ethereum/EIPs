@@ -28,7 +28,7 @@ This standard provides basic functionality to transfer tokens, as well as allow 
 
 DISASTROUS DECISIONS, ENOUGH!!!!!
 
-The past four years have been disastrous for the persons, community, and ecosystem affected by the Ethereum project. While the a wide range of people have contributed to the Ethereum project, many of them with probably good intentions at heart, the end result is and was mostly that some people and companies profitted from the whole ecosystem. I have observed, experienced, and contributed to the ecosystem over the past four years. Comparing it to the time before a broader audience started contributing to the project in 2016 (and again 2019) breaks my heart. Most of the life in the ecosystem has been drained and dried up, just so commercial interest could be cattered to.
+The past four years have been disastrous for the persons, community, and ecosystem affected by the Ethereum project. While the a wide range of people have contributed to the Ethereum project, many of them with probably good intentions at heart, the end result is and mostly was that some people and companies profited from the whole ecosystem. I have observed, experienced, and contributed to the ecosystem over the past four years. Comparing it to the time before a broader audience started contributing to the project in 2016 (and again 2019) breaks my heart. Most of the life in the ecosystem has been drained and dried up, just so commercial interest could be cattered to.
 
 Products: tickets, games with and through people, data broakerage (geo location, personal data, i.e., financial, health, relationships, personal views and profiles), deletion of personal data, theft (audio recordings), illegal contracts, fraud.
 
