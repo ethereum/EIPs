@@ -1,4 +1,5 @@
 ---
+eip: TBD
 title: Ethereum Access Token
 description: A protocol for authorizing function calls from an off-chain service
 author: Chris Chung (@0xpApaSmURf), Raphael Roullet (@ra-phael)
@@ -7,16 +8,16 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2023-07-03
-requires: EIP-712
+requires: 712
 ---
 
 ## Abstract
 
-An Ethereum Access Token (EAT) is an [EIP-712](./eip-712.md) conformant, signed message, used by off-chain services to grant Ethereum accounts access to specific on-chain resources. EATs share similarities with JWTs; both are used for short-lived authorizations. However Ethereum Access Tokens are specifically designed to be verified on-chain and tailored to authorize smart contract function calls.
+An Ethereum Access Token (EAT) is an [ERC-712](./eip-712.md) conformant, signed message, used by off-chain services to grant Ethereum accounts access to specific on-chain resources. EATs share similarities with JWTs; both are used for short-lived authorizations. However Ethereum Access Tokens are specifically designed to be verified on-chain and tailored to authorize smart contract function calls.
 
 ## Motivation
 
-While other proposals tackle authentication ([EIP-4361](./eip-4361.md)) or authorization in a more narrow way ([EIP-2612](./eip-2612.md)), this specification allows developers to add a layer of access control to any function they create with minimal changes. It is best suited for use cases where end users should only be able to access specific on-chain resources themselves directly, by way of sending a transaction, provided they have been granted authorization by an off-chain service first. Examples of such scenarios include an off-chain verifier assessing eligibility requirements (e.g by verifying verifiable credentials) to mint a token or to interact with a smart contract that requires a certain compliance status.
+While other proposals tackle authentication ([ERC-4361](./eip-4361.md)) or authorization in a more narrow way ([ERC-2612](./eip-2612.md)), this specification allows developers to add a layer of access control to any function they create with minimal changes. It is best suited for use cases where end users should only be able to access specific on-chain resources themselves directly, by way of sending a transaction, provided they have been granted authorization by an off-chain service first. Examples of such scenarios include an off-chain verifier assessing eligibility requirements (e.g by verifying verifiable credentials) to mint a token or to interact with a smart contract that requires a certain compliance status.
 Therefore, this proposal enables off-chain systems to authenticate the controller of an Ethereum account in any way they want, before granting an authorization bound to said account.
 
 This specification is intended to improve interoperability in the Ethereum ecosystem, by providing a consistent machine-readable message format to achieve improved user experiences.
