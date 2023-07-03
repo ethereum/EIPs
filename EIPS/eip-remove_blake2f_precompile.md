@@ -1,0 +1,47 @@
+---
+eip:
+title: Remove blake2f (0x09) Precompile
+description: Remove the blake2f (0x09) precompile by changing the precompile behaviour to be a dataless revert
+author: Pascal Caversaccio (@pcaversaccio)
+discussions-to: https://ethereum-magicians.org/t/discussion-removal-of-ripemd-160-and-blake2f-precompiles/14857
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-07-03
+---
+
+## Abstract
+
+This EIP removes the [`blake2f`](./eip-152.md) (`0x09`) precompile by changing the precompile behaviour to be a dataless (`0x`) revert.
+
+## Motivation
+
+[EIP-152](./eip-152.md) has never capitalised on a real-world use case. This fact is clearly reflected in the number of times the address `0x09` has been invoked (numbers from the date this EIP was created):
+- The most recent call took place on 6 October 2022.
+- Since its go-live as part of the Istanbul hard fork on December 7 2019 (block number 9,069,000), `0x09` has been called only 22,134 times.
+
+One of the reasons why [EIP-152](./eip-152.md) has failed is that the envisioned use cases were not validated before inclusion.
+
+The EVM should be optimised for simplicity and future-proofness. In that sense, the precompile `blake2f` (`0x09`) is an obsolete carry-along with no real-world traction and thus should be removed.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+All `CALL`, `DELEGATECALL`, and `STATICCALL` invocations to the `blake2f` precompile address `0x09` MUST return with a dataless (`0x`) `REVERT`.
+
+## Rationale
+
+The precompile `blake2f` (`0x09`) can be safely used as a test run for the phase-out and removal of EVM functions.
+
+## Backwards Compatibility
+
+This EIP requires a hard fork as it modifies the consensus rules. Note that very few applications are affected by this change and a lead time of 6-12 months can be considered sufficient.
+
+## Security Considerations
+
+All `CALL`, `DELEGATECALL`, and `STATICCALL` invocations, starting with the hard fork block number that introduces this consensus change, by any smart contract code to the `blake2f` precompile address `0x09` will revert with return data `0x`.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
