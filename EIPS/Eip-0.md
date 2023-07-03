@@ -30,6 +30,8 @@ DISASTROUS DECISIONS, ENOUGH!!!!!
 
 Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things.
 
+Governance by the DAO have NOT been in the interest of the community. This is why any DAO voting rights will be withdrawn immediately.
+
 The past four years have been disastrous for the persons, community, and ecosystem affected by the Ethereum project. While the a wide range of people have contributed to the Ethereum project, many of them with probably good intentions at heart, the end result is and mostly was that some people and companies profited from the whole ecosystem. I have observed, experienced, and contributed to the ecosystem over the past four years. Comparing it to the time before a broader audience started contributing to the project in 2016 (and again 2019) breaks my heart. Most of the life in the ecosystem has been drained and dried up, just so commercial interest could be cattered to.
 
 Products: tickets, games with and through people, data broakerage (geo location, personal data, i.e., financial, health, relationships, personal views and profiles), deletion of personal data, theft (audio recordings), illegal contracts, fraud.
