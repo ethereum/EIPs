@@ -18,7 +18,7 @@ This EIP removes the [`blake2f`](./eip-152.md) (`0x09`) precompile by changing t
 
 [EIP-152](./eip-152.md) has never capitalised on a real-world use case. This fact is clearly reflected in the number of times the address `0x09` has been invoked (numbers from the date this EIP was created):
 - The most recent call took place on 6 October 2022.
-- Since its go-live as part of the Istanbul hard fork on December 7 2019 (block number 9,069,000), `0x09` has been called only 22,134 times.
+- Since its go-live as part of the Istanbul hard fork on December 7 2019 (block number 9,069,000), `0x09` has been called only 22,131 times.
 
 One of the reasons why [EIP-152](./eip-152.md) has failed is that the envisioned use cases were not validated before inclusion.
 
