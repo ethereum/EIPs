@@ -9,6 +9,12 @@ category: ERC
 created: 2023-06-26
 ---
 
+# TODO
+- Requires singleton
+- Specify sanity solution check
+- Show example of submitting solution
+- Security considerations
+
 ## Abstract
 
 [Quantum supremacy](https://en.wikipedia.org/wiki/Quantum_supremacy) indicates the earliest sign where an adversary can bypass current Etherium cryptography standards. To protect one's funds on Etherium, it would be useful to watch a trigger that activates when quantum supremacy has been achieved.
