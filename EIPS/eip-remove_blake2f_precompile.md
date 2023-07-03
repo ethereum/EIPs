@@ -28,7 +28,7 @@ The EVM should be optimised for simplicity and future-proofness. In that sense, 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-All `CALL`, `DELEGATECALL`, and `STATICCALL` invocations to the `blake2f` precompile address `0x09` MUST return with a dataless (`0x`) `REVERT`.
+All `CALL`, `CALLCODE`, `DELEGATECALL`, and `STATICCALL` invocations to the `blake2f` precompile address `0x09` MUST return with a dataless (`0x`) `REVERT`.
 
 ## Rationale
 
@@ -40,7 +40,7 @@ This EIP requires a hard fork as it modifies the consensus rules. Note that very
 
 ## Security Considerations
 
-All `CALL`, `DELEGATECALL`, and `STATICCALL` invocations, starting with the hard fork block number that introduces this consensus change, by any smart contract code to the `blake2f` precompile address `0x09` will revert with return data `0x`.
+All `CALL`, `CALLCODE`, `DELEGATECALL`, and `STATICCALL` invocations, starting with the hard fork block number that introduces this consensus change, by any smart contract code to the `blake2f` precompile address `0x09` will revert with return data `0x`.
 
 ## Copyright
 
