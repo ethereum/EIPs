@@ -161,20 +161,20 @@ contract ERC7092 is IERC7092, BondStorage {
         _decreaseAllowance(_owner, _spender, _amount);
     }
 
-    function transfer(address _to, uint256 _amount, bytes calldata _data) external {
+    function transfer(address _to, uint256 _amount, bytes calldata _data) external returns(bool) {
         address _from = msg.sender;
 
         _transfer(_from, _to, _amount, _data);
     }
 
-    function transferAll(address _to, bytes calldata _data) external {
+    function transferAll(address _to, bytes calldata _data) external returns(bool) {
         address _from = msg.sender;
         uint256 _amount = _principals[_from];
 
         _transfer(_from, _to, _amount, _data);
     }
 
-    function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external {
+    function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool) {
         address _spender = msg.sender;
 
         _spendApproval(_from, _spender, _amount);
@@ -182,7 +182,7 @@ contract ERC7092 is IERC7092, BondStorage {
         _transfer(_from, _to, _amount, _data);
     }
 
-    function transferAllFrom(address _from, address _to, bytes calldata _data) external {
+    function transferAllFrom(address _from, address _to, bytes calldata _data) external returns(bool) {
         address _spender = msg.sender;
         uint256 _amount = _principals[_from];
 
@@ -253,6 +253,8 @@ contract ERC7092 is IERC7092, BondStorage {
         emit Transferred(_from, _to, _amount, _data);
 
         _afterBondTransfer(_from, _to, _amount, _data);
+
+        return true;
     }
 
    function  _spendApproval(address _from, address _spender, uint256 _amount) internal virtual {
