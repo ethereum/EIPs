@@ -10,7 +10,7 @@ created: 2023-06-30
 
 ## Simple Summary
 
-Protocol and governance change
+Protocol and governance change, switch from permisionless to permissioned
 
 Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
 
