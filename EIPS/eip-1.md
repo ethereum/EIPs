@@ -213,7 +213,7 @@ Which renders to:
 Permitted Execution Client Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^(https://github.com/ethereum/execution-specs/blob/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
+^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
 ### Consensus Layer Specifications
@@ -231,7 +231,7 @@ Which renders to:
 Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
+^https://github.com/ethereum/consensus-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### Networking Specifications
@@ -249,7 +249,81 @@ Which renders as:
 Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
+### World Wide Web Consortium (W3C)
+
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
+
+```markdown
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+```
+
+Which renders as:
+
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+
+Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
+
+```regex
+^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
+```
+
+### Web Hypertext Application Technology Working Group (WHATWG)
+
+Links to WHATWG specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+```
+
+Which renders as:
+
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+
+Permitted WHATWG specification URLs must anchor to a specification defined in the `spec` subdomain (idea specifications are not allowed) and to a commit snapshot, and so must match this regular expression:
+
+```regex
+^https:\/\/[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$
+```
+
+Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
+
+### Internet Engineering Task Force (IETF)
+
+Links to an IETF Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+```
+
+Which renders as:
+
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+
+Permitted IETF specification URLs MUST anchor to a specification with an assigned RFC number (meaning cannot reference internet drafts), and so MUST match this regular expression:
+
+```regex
+^https:\/\/www.rfc-editor.org\/rfc\/.*$
+```
+
+### Bitcoin Improvement Proposal
+
+Links to Bitcoin Improvement Proposals may be included using normal markdown syntax, such as:
+
+```markdown
+[BIP 38](https://github.com/bitcoin/bips/blob/3db736243cd01389a4dfd98738204df1856dc5b9/bip-0038.mediawiki)
+```
+
+Which renders to:
+
+[BIP 38](https://github.com/bitcoin/bips/blob/3db736243cd01389a4dfd98738204df1856dc5b9/bip-0038.mediawiki)
+
+Permitted Bitcoin Improvement Proposal URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki)$
 ```
 
 ### Digital Object Identifier System
