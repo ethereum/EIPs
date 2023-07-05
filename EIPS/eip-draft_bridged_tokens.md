@@ -1,5 +1,5 @@
 ---
-title: Bridged Token Standard (xERC20)
+title: Bridged Token Standard
 description: An interface for creating fungible representations of tokens bridged across domains.
 author: Shaito (@0xShaito), Excalibor (@excaliborr), Arjun Bhuptani (@arjunbhuptani)
 discussions-to: <URL> (TODO)
