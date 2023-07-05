@@ -1,7 +1,7 @@
 ---
 eip: X
 title: Quantum Supremacy Puzzle
-author: Nicholas Papadopoulos (@nikojpapa)
+author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan 
 discussions-to: 
 status: Draft
 type: Standards Track
@@ -13,7 +13,6 @@ requires: [ERC-2470]
 # TODO
 - Specify sanity solution check
 - Show example of submitting solution
-- Security considerations
 
 ## Abstract
 
@@ -31,7 +30,7 @@ Etherium accounts can then using custom verification schemes, such as those base
 ### Requirements
 
 - The paper [
-  Efficient Accumulators without Trapdoor Extended Abstract](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) by Tomas Sander proves that difficult to factor numbers without a known factorization can be generated. Using logic based on that described by [Anoncoin](https://anoncoin.github.io/RSA_UFO/), this contract shall generate 120 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
+  Efficient Accumulators without Trapdoor Extended Abstract](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) by Tomas Sander proves that difficult to factor numbers without a known factorization, called an RSA-UFO, can be generated. Using logic based on that described by [Anoncoin](https://anoncoin.github.io/RSA_UFO/), this contract shall generate 120 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
 - This contract shall accept funds from any account without restriction.
 - This contract shall allow someone to provide a factorization of one of the integers. If it is the correct solution and is the last integer to be solved, then this contract shall send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
 
@@ -82,7 +81,22 @@ https://github.com/nikojpapa/etherium-quantum-bounty/blob/44a1c80eb3bb21c8f5edf6
 https://github.com/nikojpapa/etherium-quantum-bounty/blob/44a1c80eb3bb21c8f5edf6fec26b2d25e7ac8351/contracts/bounty-fallback-account/BountyFallbackAccount.sol
 
 ## Security Considerations
+### Choosing the puzzle
+Different puzzles were considered before landing on the current implementation.
+
+#### Sign a message given a public key
+Given a random public key, the solver would need to sign a message, which the contract would verify to have been correctly signed by the public key. The downside to this approach is that the contract would act less like a canary to secure ETH funds as by the time the puzzle is solved, the ability to forge signatures will have already been achieved. The current puzzle of factoring integers is expected to be the first problem that quantum computers will solve, so it should act as a better canary.
+
+#### Factor a product of large, generated primes
+Instead of generating an RSA-UFO, the contract could implement current RSA key generation protocols and first generate two large primes to produces the product of the primes. This method has the flaw that the miner or minter has the capability to see the primes, and therefore some level of trust would need to be given that the minter would throw the values away.
+
+#### Powers of Tau
+This also has a trust factor, albeit very small. It requires that at least one person in the party is honest.
+
+
+### Front running
 - By requiring one day between commit and reveal, it is infeasible to front run because the cost required to keep a reveal transaction in the mempool for a full day is greater than all the Eth in existence.
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
