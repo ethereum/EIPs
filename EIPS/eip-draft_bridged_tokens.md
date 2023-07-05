@@ -2,7 +2,7 @@
 title: Bridged Token Standard (xERC20)
 description: An interface for creating fungible representations of tokens bridged across domains.
 author: Shaito (@0xShaito), Excalibor (@excaliborr), Arjun Bhuptani (@arjunbhuptani)
-discussions-to: <URL>
+discussions-to: <URL> (TODO)
 status: Draft
 type: Standards Track
 category: ERC
@@ -64,32 +64,18 @@ interface IXERC20 {
   /**
    * @notice Emits when a limit is set
    *
-   * @param _newLimit The updated limit we are setting to the bridge
+   * @param _mintingLimit The updated minting limit we are setting to the bridge
+   * @param _burningLimit The updated burning limit we are setting to the bridge
    * @param _bridge The address of the bridge we are setting the limit too
    */
 
-  event BridgeLimitsSet(uint256 _newLimit, address indexed _bridge);
-
-  /**
-   * @notice Emits when a limit is set
-   *
-   * @param _newLimit The updated limit we are setting to the bridge
-   * @param _burner The address of the bridge we are setting the limit too
-   */
-
-  event BurnerLimitsSet(uint256 _newLimit, address indexed _burner);
+  event BridgeLimitsSet(uint256 _mintingLimit, uint256 _burningLimit, address indexed _bridge);
 
   /**
    * @notice Reverts when a user with too low of a limit tries to call mint/burn
    */
 
   error IXERC20_NotHighEnoughLimits();
-
-  /**
-   * @notice Reverts when caller is not the factory
-   */
-
-  error IXERC20_NotFactory();
 
   struct Bridge {
     BridgeParameters minterParams;
@@ -246,14 +232,6 @@ Lockboxes SHOULD additionally implement the following alternative `deposit` func
 
 
 ## Rationale
-
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
 
 The proposed standard attempts to satisfy the following conditions for bridged tokens regardless of where and how they are bridged:
 
