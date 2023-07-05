@@ -266,7 +266,7 @@ The proposed standard attempts to satisfy the following conditions for bridged t
 
 The core problem that this standard tackles is the **********************fungibility********************** of tokens bridged across domains against the “canonical” token on that domain. (Note: which token is “canonical” is dictated by the token issuer and is sometimes, but not always, the token minted by a given domain’s enshrined bridge - e.g. a rollup bridge).
 
-!https://s3-us-west-2.amazonaws.com/secure.notion-static.com/524e6503-835b-4833-82f4-9640806ec438/fragmentation.png
+![](../assets/eip-draft_bridged_tokens/fragmentation.png)
 
 It is not enough to simply allow multiple bridges to mint the same representation on a remote domain if liquidity is locked into bridges on the home domain. To illustrate this, consider an example where two bridges control minting rights of canonical USDT on an L2:
 
@@ -281,7 +281,7 @@ The core property that this example illustrates is that locking tokens across mu
 
 This proposal specifically solves for the above problem in cases where tokens do not already have a mint/burn interface. Tokens on the source chain are locked into a Lockbox, which mints corresponding xERC20-compatible tokens that can be sent to bridges.
 
-!https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1b11d689-a130-443a-8458-2db7da03198e/xERC20.png
+![](../assets/eip-draft_bridged_tokens/xERC20.png)
 
 1. A given ERC20 is wrapped into its xERC20 representation.
 2. The xERC20 can then be transferred to any approved bridge. The bridge should check rate limits for the token and then `burn` the token.
