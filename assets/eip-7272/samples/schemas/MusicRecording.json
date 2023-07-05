@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MusicRecording",
+  "type": "object",
+  "properties": {
+    "byArtist": {
+      "oneOf": [
+        { "$ref": "#/definitions/MusicGroup" },
+        { "$ref": "#/definitions/Person" }
+      ],
+      "description": "The artist that performed this album or recording."
+    },
+    "duration": {
+      "type": "string",
+      "description": "The duration of the item (movie, audio recording, event, etc.) in ISO 8601 date format."
+    },
+    "inAlbum": {
+      "$ref": "#/definitions/MusicAlbum",
+      "description": "The album to which this recording belongs."
+    },
+    "inPlaylist": {
+      "$ref": "#/definitions/MusicPlaylist",
+      "description": "The playlist to which this recording belongs."
+    },
+    "isrcCode": {
+      "type": "string",
+      "description": "The International Standard Recording Code for the recording."
+    },
+    "recordingOf": {
+      "$ref": "#/definitions/MusicComposition",
+      "description": "The composition this track is a recording of."
+    }
+  },
+  "definitions": {
+    "MusicGroup": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "genre": { "type": "string" },
+        "members": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Person" }
+        }
+      }
+    },
+    "Person": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "birthDate": { "type": "string", "format": "date" },
+        "nationality": { "type": "string" }
+      }
+    },
+    "MusicAlbum": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "releaseDate": { "type": "string", "format": "date" },
+        "byArtist": { "$ref": "#/definitions/MusicGroup" }
+      }
+    },
+    "MusicPlaylist": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "numberOfTracks": { "type": "integer" },
+        "tracks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/MusicRecording" }
+        }
+      }
+    },
+    "MusicComposition": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "composer": { "$ref": "#/definitions/Person" },
+        "dateComposed": { "type": "string", "format": "date" }
+      }
+    }
+  }
+}

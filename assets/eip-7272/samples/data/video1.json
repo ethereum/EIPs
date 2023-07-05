@@ -1,0 +1,17 @@
+{
+  "@context": "http://schema.org",
+  "@type": "VideoObject",
+  "name": "FIFTY FIFTY (피프티피프티) - 'Cupid'  Official MV",
+  "description": "The video is a song lyrics expressing feelings of loneliness and longing for love. The speaker questions why they are feeling lonely and desires to be held and loved. They mention giving Cupid a second chance and feeling foolish for believing in love. The speaker practices love in their dreams and wants someone to share their feelings with. They express their willingness to wait and not give up on love. The text ends with the speaker calling themselves a fool for love and giving Cupid another chance despite feeling stupid. The text suggests that Cupid is not intelligent and is giving the reader one final opportunity.",
+  "thumbnailUrl": "https://i.ytimg.com/vi/Qc7_zRjH808/maxresdefault.jpg",
+  "uploadDate": "2023-02-23T13:00:10Z",
+  "duration": "PT3M23S",
+  "contentUrl": "https://www.youtube.com/watch?v=Qc7_zRjH808",
+  "embedUrl": "https://www.youtube.com/embed/Qc7_zRjH808",
+  "interactionStatistic": {
+    "@type": "InteractionCounter",
+    "userInteractionCount": "100219440"
+  },
+  "commentCount": "76810",
+  "regionsAllowed": "Worldwide"
+}

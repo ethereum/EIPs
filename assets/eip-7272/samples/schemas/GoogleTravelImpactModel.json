@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "flightEmissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "flight": {
+            "type": "object",
+            "properties": {
+              "origin": {
+                "type": "string"
+              },
+              "destination": {
+                "type": "string"
+              },
+              "operatingCarrierCode": {
+                "type": "string"
+              },
+              "flightNumber": {
+                "type": "integer"
+              },
+              "departureDate": {
+                "type": "object",
+                "properties": {
+                  "year": {
+                    "type": "integer"
+                  },
+                  "month": {
+                    "type": "integer"
+                  },
+                  "day": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["year", "month", "day"]
+              }
+            },
+            "required": [
+              "origin",
+              "destination",
+              "operatingCarrierCode",
+              "flightNumber",
+              "departureDate"
+            ]
+          },
+          "emissionsGramsPerPax": {
+            "type": "object",
+            "properties": {
+              "first": {
+                "type": "integer"
+              },
+              "business": {
+                "type": "integer"
+              },
+              "premiumEconomy": {
+                "type": "integer"
+              },
+              "economy": {
+                "type": "integer"
+              }
+            },
+            "required": ["first", "business", "premiumEconomy", "economy"]
+          }
+        },
+        "required": ["flight", "emissionsGramsPerPax"]
+      }
+    },
+    "modelVersion": {
+      "type": "object",
+      "properties": {
+        "major": {
+          "type": "integer"
+        },
+        "minor": {
+          "type": "integer"
+        },
+        "patch": {
+          "type": "integer"
+        },
+        "dated": {
+          "type": "string"
+        }
+      },
+      "required": ["major", "minor", "patch", "dated"]
+    }
+  },
+  "required": ["flightEmissions", "modelVersion"]
+}

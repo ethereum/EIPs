@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VideoObject",
+  "type": "object",
+  "properties": {
+    "actor": {
+      "type": "string",
+      "description": "An actor, e.g. in TV, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip."
+    },
+    "caption": {
+      "type": "string",
+      "description": "The caption for this object. For downloadable machine formats (closed caption, subtitles etc.) use MediaObject and indicate the encodingFormat."
+    },
+    "director": {
+      "type": "string",
+      "description": "A director of e.g. TV, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip."
+    },
+    "embeddedTextCaption": {
+      "type": "string",
+      "description": "Represents textual captioning from a MediaObject, e.g. text of a 'meme'."
+    },
+    "musicBy": {
+      "type": "string",
+      "description": "The composer of the soundtrack."
+    },
+    "transcript": {
+      "type": "string",
+      "description": "If this MediaObject is an AudioObject or VideoObject, the transcript of that object."
+    },
+    "videoFrameSize": {
+      "type": "string",
+      "description": "The frame size of the video."
+    },
+    "videoQuality": {
+      "type": "string",
+      "description": "The quality of the video."
+    }
+  },
+  "required": [
+    "actor",
+    "caption",
+    "director",
+    "embeddedTextCaption",
+    "musicBy",
+    "transcript",
+    "videoFrameSize",
+    "videoQuality"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "MusicRecording",
+  "name": "Cupid",
+  "byArtist": {
+    "@type": "MusicGroup",
+    "name": "Fifty Fifty",
+    "memberOf": [
+      {
+        "@type": "Person",
+        "name": "Aran"
+      },
+      {
+        "@type": "Person",
+        "name": "Keena"
+      },
+      {
+        "@type": "Person",
+        "name": "Saena"
+      },
+      {
+        "@type": "Person",
+        "name": "Sio"
+      }
+    ]
+  },
+  "datePublished": "2023-02-24",
+  "inLanguage": "Korean",
+  "producer": {
+    "@type": "Person",
+    "name": "Siahn"
+  },
+  "recordLabel": {
+    "@type": "Organization",
+    "name": "Attrakt",
+    "foundingDate": "2021",
+    "location": {
+      "@type": "Country",
+      "name": "South Korea"
+    }
+  },
+  "recordingOf": {
+    "@type": "MusicComposition",
+    "composer": [
+      {
+        "@type": "Person",
+        "name": "Adam von Mentzer"
+      },
+      {
+        "@type": "Person",
+        "name": "Mac Felländer-Tsai"
+      },
+      {
+        "@type": "Person",
+        "name": "Louise Udin"
+      }
+    ],
+    "lyricist": [
+      {
+        "@type": "Person",
+        "name": "Keena"
+      },
+      {
+        "@type": "Person",
+        "name": "Ahin"
+      }
+    ],
+    "musicArrangement": [
+      {
+        "@type": "Person",
+        "name": "Adam von Mentzer"
+      },
+      {
+        "@type": "Person",
+        "name": "Mac Felländer-Tsai"
+      },
+      {
+        "@type": "Person",
+        "name": "Louise Udin"
+      }
+    ],
+    "timeRequired": "PT3M",
+    "inLanguage": "Korean",
+    "description": "Its lyrics describe a young woman's unrequited crush and her feeling dumb for falling in love. In the song's chorus, the group sings, 'I gave a second chance to Cupid/I believed you, I'm so stupid/Let me show you, my secret love, is it real?/Cupid is so dumb.' The group harmonizes on the song, while the latter half of the song includes a key change and a rap verse performed by Keena. The instrumental features synths and guitars."
+  },
+  "duration": "PT3M",
+  "genre": "K-pop, Disco-pop, Synth-pop, Bubblegum",
+  "inAlbum": {
+    "@type": "MusicAlbum",
+    "name": "The Beginning: Cupid",
+    "datePublished": "2023-02-24"
+  },
+  "position": "1",
+  "description": "\"Cupid\" is a single by South Korean girl group Fifty Fifty, released on February 24, 2023. The song achieved significant international success, charting in numerous countries including the United States."
+}
