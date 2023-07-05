@@ -1,0 +1,94 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
+
+jobs:
+  save-pr:
+    name: Save PR Number
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p ./pr
+          echo $PR_NUMBER > ./pr/pr_number
+          echo $PR_SHA > ./pr/pr_sha
+          echo $MERGE_SHA > ./pr/merge_sha
+
+      - name: Upload PR Number
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr_number
+          path: pr/
+
+  htmlproofer:
+    name: HTMLProofer
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      
+      - name: Install OpenSSL
+        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
+    
+      - name: Install Ruby
+        uses: ruby/setup-ruby@08245253a76fa4d1e459b7809579c62bd9eb718a
+        with:
+          ruby-version: 2.6.0
+          bundler-cache: true
+        
+      - name: Build Website
+        run: |
+          bundle exec jekyll doctor
+          bundle exec jekyll build
+      
+      - name: HTML Proofer
+        run: bundle exec htmlproofer ./_site --check-html --check-opengraph --report-missing-names --log-level=:debug --assume-extension --empty-alt-ignore --timeframe=6w --disable-external
+      
+      - name: DNS Validator
+        run: bundle exec github-pages health-check
+
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+      
+      - name: Delete Unchanged Files
+        uses: Pandapip1/delete-unchanged-files@2c27069573bbeb6703790ac5c872e9b1a100d96c
+
+      - name: Run CodeSpell
+        uses: codespell-project/actions-codespell@2391250ab05295bddd51e36a8c6295edb6343b0e
+        with:
+          check_filenames: true
+          ignore_words_file: config/.codespell-whitelist
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+          only_warn: 1
+
+  eipw-validator:
+    name: EIP Walidator
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: ethereum/eipw-action@dist
+        id: eipw
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          unchecked: 1, 5069
