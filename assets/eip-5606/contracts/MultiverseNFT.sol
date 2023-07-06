@@ -75,8 +75,6 @@ interface IMultiverseNFT {
         address contractAddress;
         uint256 tokenId;
         uint256 quantity;
-        bool isBundled;
-        address ownerAddress;
     }
 
     /**
@@ -118,8 +116,7 @@ interface IMultiverseNFT {
      */
     function bundle(
         DelegateData[] memory delegateData,
-        uint256 multiverseTokenID,
-        address ownerAddress
+        uint256 multiverseTokenID
     ) external;
 
     /**
@@ -141,11 +138,6 @@ abstract contract MultiverseNFT is
     bytes32 public constant BUNDLER_ROLE = keccak256("BUNDLER_ROLE");
 
     uint256 currentMultiverseTokenID;
-
-    struct RemainingQuantity {
-        uint256 multiverseTokenID;
-        address contractAddress;
-    }
 
     mapping(uint256 => DelegateData[]) public multiverseNFTDelegateData;
     mapping(uint256 => mapping(address => mapping(uint256 => uint256)))
@@ -185,19 +177,14 @@ abstract contract MultiverseNFT is
 
     function bundle(
         DelegateData[] memory delegateData,
-        uint256 multiverseTokenID,
-        address ownerAddress
+        uint256 multiverseTokenID
     ) external {
         require(
             hasRole(BUNDLER_ROLE, msg.sender) ||
                 ownerOf(multiverseTokenID) == msg.sender,
             "msg.sender neither have bundler role nor multiversetoken owner"
         );
-        require(
-            ownerOf(multiverseTokenID) == ownerAddress,
-            "ownerAddress is not an owner of multiversetoken"
-        );
-        _bundle(delegateData, multiverseTokenID, ownerAddress);
+        _bundle(delegateData, multiverseTokenID);
     }
 
     function unbundle(
@@ -224,10 +211,6 @@ abstract contract MultiverseNFT is
                 "quantity exceeds balance"
             );
             require(
-                _ensureDelegateCanUnbundled(delegateData[i], multiverseTokenID),
-                "delegate cannot be unbundled"
-            );
-            require(
                 _ensureMultiverseContractOwnsDelegate(delegateData[i]),
                 "delegate not owned by contract"
             );
@@ -236,16 +219,7 @@ abstract contract MultiverseNFT is
             uint256 tokenId = delegateData[i].tokenId;
             uint256 quantity = delegateData[i].quantity;
 
-            uint256 remainingBalance = _updateDelegateBalances(
-                delegateData[i],
-                multiverseTokenID
-            );
-            if (remainingBalance == 0) {
-                _updateDelegateStatusToUnbundled(
-                    delegateData[i],
-                    multiverseTokenID
-                );
-            }
+            _updateDelegateBalances(delegateData[i], multiverseTokenID);
 
             if (_isERC721(contractAddress)) {
                 ERC721Full erc721Instance = ERC721Full(contractAddress);
@@ -259,8 +233,6 @@ abstract contract MultiverseNFT is
                     quantity,
                     ""
                 );
-            } else {
-                revert("unable to identify ERC std");
             }
         }
         emit Unbundled(multiverseTokenID, delegateData);
@@ -279,8 +251,7 @@ abstract contract MultiverseNFT is
 
     function _bundle(
         DelegateData[] memory delegateData,
-        uint256 multiverseTokenID,
-        address ownerAddress
+        uint256 multiverseTokenID
     ) internal {
         for (uint256 i = 0; i < delegateData.length; i = i.add(1)) {
             require(
@@ -308,13 +279,6 @@ abstract contract MultiverseNFT is
                 quantity
             );
 
-            _updateDelegateStatusAndOwner(
-                delegateData[i],
-                ownerAddress,
-                true,
-                multiverseTokenID
-            );
-
             if (_isERC721(contractAddress)) {
                 require(
                     quantity == 1,
@@ -331,11 +295,13 @@ abstract contract MultiverseNFT is
                     quantity,
                     ""
                 );
-            } else {
-                revert("unable to identify ERC std");
             }
         }
-        emit Bundled(multiverseTokenID, delegateData, ownerAddress);
+        emit Bundled(
+            multiverseTokenID,
+            delegateData,
+            ownerOf(multiverseTokenID)
+        );
     }
 
     function _ensureDelegateBelongsToMultiverseNFT(
@@ -382,26 +348,6 @@ abstract contract MultiverseNFT is
         return false;
     }
 
-    function _ensureDelegateCanUnbundled(
-        DelegateData memory delegateData,
-        uint256 multiverseTokenID
-    ) internal view returns (bool) {
-        DelegateData[] memory storedData = multiverseNFTDelegateData[
-            multiverseTokenID
-        ];
-        for (uint256 i = 0; i < storedData.length; i = i.add(1)) {
-            if (
-                delegateData.contractAddress == storedData[i].contractAddress &&
-                delegateData.tokenId == storedData[i].tokenId &&
-                storedData[i].isBundled &&
-                msg.sender == storedData[i].ownerAddress
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     function _ensureDelegateQuantityLimitForMMultiverseNFT(
         DelegateData memory delegateData,
         uint256 multiverseTokenID
@@ -425,49 +371,6 @@ abstract contract MultiverseNFT is
                 return false;
             }
         }
-
-        return false;
-    }
-
-    function _updateDelegateStatusAndOwner(
-        DelegateData memory delegateData,
-        address ownerAddress,
-        bool status,
-        uint256 multiverseTokenID
-    ) internal returns (bool) {
-        DelegateData[] storage storedData = multiverseNFTDelegateData[
-            multiverseTokenID
-        ];
-        for (uint256 i = 0; i < storedData.length; i = i.add(1)) {
-            if (
-                delegateData.contractAddress == storedData[i].contractAddress &&
-                delegateData.tokenId == storedData[i].tokenId
-            ) {
-                storedData[i].isBundled = status;
-                storedData[i].ownerAddress = ownerAddress;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function _updateDelegateStatusToUnbundled(
-        DelegateData memory delegateData,
-        uint256 multiverseTokenID
-    ) internal returns (bool) {
-        DelegateData[] storage storedData = multiverseNFTDelegateData[
-            multiverseTokenID
-        ];
-        for (uint256 i = 0; i < storedData.length; i = i.add(1)) {
-            if (
-                delegateData.contractAddress == storedData[i].contractAddress &&
-                delegateData.tokenId == storedData[i].tokenId
-            ) {
-                storedData[i].isBundled = false;
-                return true;
-            }
-        }
-        return false;
     }
 
     function _updateDelegateBalances(
@@ -502,18 +405,6 @@ abstract contract MultiverseNFT is
         bytes calldata data
     ) external pure override returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
-    }
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721Full) {
-        DelegateData[] storage storedData = multiverseNFTDelegateData[tokenId];
-        for (uint256 i = 0; i < storedData.length; i = i.add(1)) {
-            storedData[i].ownerAddress = to;
-        }
-        ERC721Full._beforeTokenTransfer(from, to, tokenId);
     }
 
     function _isERC1155(address contractAddress) internal view returns (bool) {
