@@ -192,7 +192,7 @@ A targeted address list for PBM unwrapping must be specified. This list can be s
 through the initialization function as part of a composite contract that contains various business logic elements,
 or it can be coded directly as a state variable within a PBM smart contract
 
-<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
+<!-- mirrors assets/eip-pbmrc1/contracts/IPBM_AddressList.sol  -->
 
 ```solidity
 pragma solidity ^0.8.0;
@@ -230,18 +230,12 @@ interface IPBMAddressList {
 
 This interface contains the essential functions required to implement a pre-loaded PBM.
 
-<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC1.sol  -->
+<!-- mirrors assets/eip-pbmrc1/contracts/IPBMRC1.sol  -->
 
 ```solidity
 pragma solidity ^0.8.0;
 
-// TBD: go through each function params and adopt _param name standard?
-// TBD: check the parameters of each functions. are they necessary? does it need to be an array?
 /// LIST OF EVENTS TO BE EMITTED
-// TBD: check the parameters of the events
-// TBD: consider these events to be added into safeMint functions if they are going to wrap an underlying eRC20tokens
-// TBD: consider other events to be EMITTED
-// TBD: event logs emitted by the smart contract will provide enough data to create an accurate record of all current token balances.
 // A database or explorer may listen to events and be able to provide indexed and categorized searches
 
 /// @title PBM Specification interface
@@ -510,7 +504,7 @@ The **Non Preloaded** PBM extension is OPTIONAL for compliant smart contracts. T
 
 Compliant contract **MUST** implement the following interface:
 
-<!-- TBD Copy from assets/eip-pbmrc1/contracts/IPBMRC2.sol  -->
+<!-- mirrors assets/eip-pbmrc1/contracts/IPBMRC2.sol  -->
 
 ```solidity
 pragma solidity ^0.8.0;
