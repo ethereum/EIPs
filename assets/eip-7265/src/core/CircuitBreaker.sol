@@ -339,11 +339,13 @@ contract CircuitBreaker is ICircuitBreaker {
         address _recipient,
         uint256 _amount
     ) internal {
-        if (_token == NATIVE_ADDRESS_PROXY) {
-            (bool success, ) = _recipient.call{value: _amount}("");
-            if (!success) revert NativeTransferFailed();
-        } else {
-            IERC20(_token).safeTransfer(_recipient, _amount);
+        if (_amount > 0 {
+            if (_token == NATIVE_ADDRESS_PROXY) {
+                (bool success, ) = _recipient.call{value: _amount}("");
+                if (!success) revert NativeTransferFailed();
+            } else {
+                IERC20(_token).safeTransfer(_recipient, _amount);
+            }
         }
     }
 }
