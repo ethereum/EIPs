@@ -1,5 +1,5 @@
 ---
-eip: eip-.md
+eip: eip-7292.md
 title: Purpose bound money
 description: An interface extending ERC-1155 to implement purpose-bound money, a hybrid form of programmable payment and money.
 author: Orchid-Dev (@proj-orchid-straitsx), Victor Liew (@alcedo), Wong Tse Jian (@wongtsejian), Chin Sin Ong (@chinsinong)
