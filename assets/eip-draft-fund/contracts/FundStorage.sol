@@ -33,4 +33,6 @@ contract FundStorage {
     uint256 public dividendCycle;
     uint256 public issueDate;
     uint256 public iRR;
+
+    uint256[31] private __gap;
 }

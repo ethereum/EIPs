@@ -59,4 +59,6 @@ contract AgentRoleFund is OwnableUpgradeable, AccessControlUpgradeable {
         _revokeRole(Agent_Role, _user);
         emit AgentRemoved(_user);
     }
+
+    uint256[50] private __gap;
 }
