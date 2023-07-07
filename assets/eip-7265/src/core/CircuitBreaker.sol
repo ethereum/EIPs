@@ -20,9 +20,11 @@ contract CircuitBreaker is ICircuitBreaker {
     /**
      * @notice Funds locked if rate limited reached
      */
-    mapping(address recipient => mapping(address asset => uint256 amount)) public lockedFunds;
+    mapping(address recipient => mapping(address asset => uint256 amount))
+        public lockedFunds;
 
-    mapping(address account => bool protectionActive) public isProtectedContract;
+    mapping(address account => bool protectionActive)
+        public isProtectedContract;
 
     address public admin;
 
@@ -124,7 +126,10 @@ contract CircuitBreaker is ICircuitBreaker {
     /**
      * @dev Give protected contracts one function to call for convenience
      */
-    function onTokenInflow(address _token, uint256 _amount) external onlyProtected onlyOperational {
+    function onTokenInflow(
+        address _token,
+        uint256 _amount
+    ) external onlyProtected onlyOperational {
         _onTokenInflow(_token, _amount);
     }
 
@@ -137,7 +142,9 @@ contract CircuitBreaker is ICircuitBreaker {
         _onTokenOutflow(_token, _amount, _recipient, _revertOnRateLimit);
     }
 
-    function onNativeAssetInflow(uint256 _amount) external onlyProtected onlyOperational {
+    function onNativeAssetInflow(
+        uint256 _amount
+    ) external onlyProtected onlyOperational {
         _onTokenInflow(NATIVE_ADDRESS_PROXY, _amount);
     }
 
@@ -145,7 +152,12 @@ contract CircuitBreaker is ICircuitBreaker {
         address _recipient,
         bool _revertOnRateLimit
     ) external payable onlyProtected onlyOperational {
-        _onTokenOutflow(NATIVE_ADDRESS_PROXY, msg.value, _recipient, _revertOnRateLimit);
+        _onTokenOutflow(
+            NATIVE_ADDRESS_PROXY,
+            msg.value,
+            _recipient,
+            _revertOnRateLimit
+        );
     }
 
     /**
@@ -153,7 +165,10 @@ contract CircuitBreaker is ICircuitBreaker {
      * use address(1) for native token claims
      */
 
-    function claimLockedFunds(address _asset, address _recipient) external onlyOperational {
+    function claimLockedFunds(
+        address _asset,
+        address _recipient
+    ) external onlyOperational {
         if (lockedFunds[_recipient][_asset] == 0) revert NoLockedFunds();
         if (isRateLimited) revert RateLimited();
 
@@ -177,7 +192,9 @@ contract CircuitBreaker is ICircuitBreaker {
 
     function overrideExpiredRateLimit() external {
         if (!isRateLimited) revert NotRateLimited();
-        if (block.timestamp - lastRateLimitTimestamp < rateLimitCooldownPeriod) {
+        if (
+            block.timestamp - lastRateLimitTimestamp < rateLimitCooldownPeriod
+        ) {
             revert CooldownPeriodNotReached();
         }
 
@@ -211,20 +228,27 @@ contract CircuitBreaker is ICircuitBreaker {
         gracePeriodEndTimestamp = lastRateLimitTimestamp + WITHDRAWAL_PERIOD;
     }
 
-    function addProtectedContracts(address[] calldata _ProtectedContracts) external onlyAdmin {
+    function addProtectedContracts(
+        address[] calldata _ProtectedContracts
+    ) external onlyAdmin {
         for (uint256 i = 0; i < _ProtectedContracts.length; i++) {
             isProtectedContract[_ProtectedContracts[i]] = true;
         }
     }
 
-    function removeProtectedContracts(address[] calldata _ProtectedContracts) external onlyAdmin {
+    function removeProtectedContracts(
+        address[] calldata _ProtectedContracts
+    ) external onlyAdmin {
         for (uint256 i = 0; i < _ProtectedContracts.length; i++) {
             isProtectedContract[_ProtectedContracts[i]] = false;
         }
     }
 
-    function startGracePeriod(uint256 _gracePeriodEndTimestamp) external onlyAdmin {
-        if (_gracePeriodEndTimestamp <= block.timestamp) revert InvalidGracePeriodEnd();
+    function startGracePeriod(
+        uint256 _gracePeriodEndTimestamp
+    ) external onlyAdmin {
+        if (_gracePeriodEndTimestamp <= block.timestamp)
+            revert InvalidGracePeriodEnd();
         gracePeriodEndTimestamp = _gracePeriodEndTimestamp;
         emit GracePeriodStarted(_gracePeriodEndTimestamp);
     }
@@ -239,7 +263,9 @@ contract CircuitBreaker is ICircuitBreaker {
         address _token,
         uint256 _tickTimestamp
     ) external view returns (uint256 nextTimestamp, int256 amount) {
-        LiqChangeNode storage node = tokenLimiters[_token].listNodes[_tickTimestamp];
+        LiqChangeNode storage node = tokenLimiters[_token].listNodes[
+            _tickTimestamp
+        ];
         nextTimestamp = node.nextTimestamp;
         amount = node.amount;
     }
@@ -265,12 +291,20 @@ contract CircuitBreaker is ICircuitBreaker {
             if (_assets[i] == NATIVE_ADDRESS_PROXY) {
                 uint256 amount = address(this).balance;
                 if (amount > 0) {
-                    _safeTransferIncludingNative(_assets[i], _recoveryRecipient, amount);
+                    _safeTransferIncludingNative(
+                        _assets[i],
+                        _recoveryRecipient,
+                        amount
+                    );
                 }
             } else {
                 uint256 amount = IERC20(_assets[i]).balanceOf(address(this));
                 if (amount > 0) {
-                    _safeTransferIncludingNative(_assets[i], _recoveryRecipient, amount);
+                    _safeTransferIncludingNative(
+                        _assets[i],
+                        _recoveryRecipient,
+                        amount
+                    );
                 }
             }
         }
@@ -339,7 +373,7 @@ contract CircuitBreaker is ICircuitBreaker {
         address _recipient,
         uint256 _amount
     ) internal {
-        if (_amount > 0 {
+        if (_amount > 0) {
             if (_token == NATIVE_ADDRESS_PROXY) {
                 (bool success, ) = _recipient.call{value: _amount}("");
                 if (!success) revert NativeTransferFailed();
