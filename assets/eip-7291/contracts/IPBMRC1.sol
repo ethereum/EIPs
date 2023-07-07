@@ -1,13 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.0;
 
-// TBD: go through each function params and adopt _param name standard?
-// TBD: check the parameters of each functions. are they necessary? does it need to be an array?
 /// LIST OF EVENTS TO BE EMITTED
-// TBD: check the parameters of the events 
-// TBD: consider these events to be added into safeMint functions if they are going to wrap an underlying eRC20tokens
-// TBD: consider other events to be EMITTED 
-// TBD: event logs emitted by the smart contract will provide enough data to create an accurate record of all current token balances.
 // A database or explorer may listen to events and be able to provide indexed and categorized searches
 
 /// @title PBM Specification interface 
