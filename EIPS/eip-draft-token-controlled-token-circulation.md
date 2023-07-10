@@ -1,4 +1,5 @@
 ---
+eip: 7303
 title: Token-Controlled Token Circulation 
 description: Access control scheme based on token ownership.
 author: Ko Fujimura (@kofujimura)
