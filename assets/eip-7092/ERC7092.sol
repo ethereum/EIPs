@@ -139,6 +139,8 @@ contract ERC7092 is IERC7092, BondStorage {
         address _owner = msg.sender;
 
         _approve(_owner, _spender, _amount);
+
+        return true;
     }
 
     function approveAll(address _spender) external external returns(bool) {
@@ -146,12 +148,16 @@ contract ERC7092 is IERC7092, BondStorage {
         uint256 _amount = _principals[_owner];
 
         _approve(_owner, _spender, _amount);
+
+        return true;
     }
 
     function decreaseAllowance(address _spender, uint256 _amount) external returns(bool) {
         address _owner = msg.sender;
 
         _decreaseAllowance(_owner, _spender, _amount);
+
+        return true;
     }
 
     function decreaseAllowanceForAll(address _spender) external returns(bool) {
@@ -159,12 +165,16 @@ contract ERC7092 is IERC7092, BondStorage {
         uint256 _amount = _principals[_owner];
 
         _decreaseAllowance(_owner, _spender, _amount);
+
+        return true;
     }
 
     function transfer(address _to, uint256 _amount, bytes calldata _data) external returns(bool) {
         address _from = msg.sender;
 
         _transfer(_from, _to, _amount, _data);
+
+        return true;
     }
 
     function transferAll(address _to, bytes calldata _data) external returns(bool) {
@@ -172,6 +182,8 @@ contract ERC7092 is IERC7092, BondStorage {
         uint256 _amount = _principals[_from];
 
         _transfer(_from, _to, _amount, _data);
+
+        return true;
     }
 
     function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool) {
@@ -180,6 +192,8 @@ contract ERC7092 is IERC7092, BondStorage {
         _spendApproval(_from, _spender, _amount);
 
         _transfer(_from, _to, _amount, _data);
+
+        return true;
     }
 
     function transferAllFrom(address _from, address _to, bytes calldata _data) external returns(bool) {
@@ -189,6 +203,8 @@ contract ERC7092 is IERC7092, BondStorage {
         _spendApproval(_from, _spender, _amount);
 
         _transfer(_from, _to, _amount, _data);
+
+        return true;
     }
 
     function _approve(address _owner, address _spender, uint256 _amount) internal virtual {
@@ -208,8 +224,6 @@ contract ERC7092 is IERC7092, BondStorage {
         _approvals[_owner][_spender]  = _approval + _amount;
 
         emit Approved(_owner, _spender, _amount);
-
-        return true;
     }
 
     function _decreaseAllowance(address _owner, address _spender, uint256 _amount) internal virtual {
@@ -228,8 +242,6 @@ contract ERC7092 is IERC7092, BondStorage {
         _approvals[_owner][_spender]  = _approval - _amount;
 
         emit AllowanceDecreased(_owner, _spender, _amount);
-
-        return true;
     }
 
     function _transfer(address _from, address _to, uint256 _amount, bytes calldata _data) internal virtual {
@@ -257,8 +269,6 @@ contract ERC7092 is IERC7092, BondStorage {
         emit Transferred(_from, _to, _amount, _data);
 
         _afterBondTransfer(_from, _to, _amount, _data);
-
-        return true;
     }
 
    function  _spendApproval(address _from, address _spender, uint256 _amount) internal virtual {
