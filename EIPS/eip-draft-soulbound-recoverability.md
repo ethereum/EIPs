@@ -1,7 +1,7 @@
 ---
 title: Soulbounds with recoverability
 description: Soulbounds token with the possibility of recovering the token in case of loss of the private key.
-author: Omar Garcia <ogarciarevett>
+author: Omar Garcia @ogarciarevett <oumar.eth@gmail.com>
 discussions-to: https://ethereum-magicians.org/t/token-soulbound-with-recoverability/15033
 status: Draft
 type: Standards Track
