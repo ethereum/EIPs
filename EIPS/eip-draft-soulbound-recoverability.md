@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/t/token-soulbound-with-recoverabi
 status: Draft
 type: Standards Track
 category: ERC
-created: 20230-07-12
+created: 2023-07-12
 requires: 165, 721, 1155
 ---
 
