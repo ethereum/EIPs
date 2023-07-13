@@ -3,8 +3,8 @@ eip: 0
 title: Ground Zero
 author: ProphetXZ
 type: Meta
-category: Core and ERC
-status: Living (final)
+category: Core
+status: Draft
 created: 2023-06-30
 ---
 
@@ -39,6 +39,8 @@ The past four years have been disastrous for the persons, community, and ecosyst
 Products: tickets, games with and through people, data broakerage (geo location, personal data, i.e., financial, health, relationships, personal views and profiles), deletion of personal data, theft (audio recordings), illegal contracts, fraud.
 
 ## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 Mainnet (ID: 1) MUST be halted. In this case, no existing DApp will be served. Every node (localised EVM) needs to stop broadcasting the chain and eventually delete the data, after having returned it to the rightful owners. 
 
