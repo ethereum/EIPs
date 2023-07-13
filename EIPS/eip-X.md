@@ -97,6 +97,12 @@ This also has a trust factor, albeit very small. It requires that at least one p
 - By requiring one day between commit and reveal, it is infeasible to front run because the cost required to keep a reveal transaction in the mempool for a full day is greater than all the Eth in existence.
 
 
+### Bit length of the primes
+[RSA Security](https://web.archive.org/web/20170417095741/https://www.emc.com/emc-plus/rsa-labs/historical/twirl-and-rsa-key-size.htm) recommends 3,072 bits to be secure beyond 2030. Since we can reasonably expect a quantum solution to this problem to be achieved after 2030, we chose this size.
+
+It appears that the current [record](https://listserv.nodak.edu/cgi-bin/wa.exe?A2=NMBRTHRY;dc42ccd1.2002) for the largest factored number is 829 bits.
+
+
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
 
