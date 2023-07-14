@@ -10,13 +10,7 @@ created: 2023-06-30
 
 ## Simple Summary
 
-Protocol and governance change, switch from permisionless to permissioned
-
-Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
-
-Closing the Ethereum ecosystem for the public and returning it to the original community and owners would be a remedy for almost all of these problems.
-
-Opcode 0x00 for all active transactions and smart contracts. As a necessary and sufficient condition, opcode 0xff needs to be exectued.
+This EIP ("Ground Zero") suggests to switch the mainnet chain to permissioned. The adjustment requires protcol and governance changes. 
 
 ## Abstract
 
@@ -30,17 +24,23 @@ This standard provides basic functionality to transfer tokens, as well as allow 
 
 DISASTROUS DECISIONS, ENOUGH!!!!!
 
-Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things.
+Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
+
+Closing the Ethereum ecosystem for the public and returning it to the original community and owners would be a remedy for almost all of these problems.
 
 Unfortunately, governance by the DAO has NOT been in the interest of the community. This is why any DAO voting rights will be withdrawn immediately. The state of the Ethereum ecosystem will be analysed and step-by-step decided which parts deserve a future and which parts will be deleted.
 
 The past four years have been disastrous for the persons, community, and ecosystem affected by the Ethereum project. While the a wide range of people have contributed to the Ethereum project, many of them with probably good intentions at heart, the end result is and mostly was that some people and companies profited from the whole ecosystem. I have observed, experienced, and contributed to the ecosystem over the past four years. Comparing it to the time before a broader audience started contributing to the project in 2016 (and again 2019) breaks my heart. Most of the life in the ecosystem has been drained and dried up, just so commercial interest could be cattered to.
+
+Opcode 0x00 for all active transactions and smart contracts. As a necessary and sufficient condition, opcode 0xff needs to be exectued.
 
 Products: tickets, games with and through people, data broakerage (geo location, personal data, i.e., financial, health, relationships, personal views and profiles), deletion of personal data, theft (audio recordings), illegal contracts, fraud.
 
 ## Specification
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+Fork
 
 Mainnet (ID: 1) MUST be halted. In this case, no existing DApp will be served. Every node (localised EVM) needs to stop broadcasting the chain and eventually delete the data, after having returned it to the rightful owners. 
 
