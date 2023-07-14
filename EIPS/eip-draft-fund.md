@@ -2,8 +2,8 @@
 eip:
 title: Private Equity
 description: A private equity fund Contract distributes dividends of a private equity fund in stable coins or in fund tokens as per the user's choice.
-author: 
-discussions-to: https://ethereum-magicians.org/
+author: Oasis Pro Markets(@opm-tokenization)
+discussions-to: https://ethereum-magicians.org/t/a-proposal-for-private-equity-and-funds-smart-contract/14681
 status: Draft
 type: Standards Track
 category: ERC
@@ -24,7 +24,6 @@ When it comes to compensation, private equity funds typically charge a managemen
 
 Dividend Distribution
 During the life of the fund, the general partner may occasionally distribute interim dividends to the limited partners, who are the investors in the fund. These interim dividends are typically funded by profits generated from the portfolio companies or from the sale of certain investments. However, the primary focus remains on generating capital gains rather than distributing regular dividends. These dividend distributions can be via stable coin transfer, token minting, or via fiat currency. These distributions are handled within the smart contract itself.
-
 
 Waterfall Distributions
 The waterfall distribution is a common method used in private equity and venture capital funds to allocate profits among the fund's investors, particularly the general partner (GP) and limited partners (LPs). The term "waterfall" refers to the sequential manner in which profits are distributed. Once the GP has caught up to its specified share, the remaining profits are typically shared between the GP and LPs based on a pre-determined split ratio. Common ratios include the 80/20 or 70/30 splits, favoring the LPs.
