@@ -28,7 +28,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Mainnet (ID: 1) MUST be switched to permissioned. In part, this may be achieved by halting IPFS, Swarm, and Whisper, after a successfull testnet version has been deployed. This will affect existing DApps, but almost none of these have been used in the past by the community anyway. So the impact of this protocol change should be minor. For active transactions and smart contracts, opcode 0x00 SHOULD be executed. As a necessary and sufficient condition, opcode 0xff for the zero address SHALL be exectued as well.
 
-Potentially, an adjustment to devp2p (EIP-8) would be required as well and Oracle connections should be switched.
+Potentially, an adjustment to devp2p, EIP-8, would be required as well and Oracle connections should be switched.
 
 ## Implementation
 
