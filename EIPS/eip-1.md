@@ -110,7 +110,7 @@ An EIP Author marks an EIP as ready for and requesting Peer Review.  An Editor w
 
 #### Last Call
 
-This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
+This is the final review window for an EIP before moving to `Final`. An EIP Author may request `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
 
 *If this period results in necessary normative changes it will revert the EIP to `Review`.*
 
