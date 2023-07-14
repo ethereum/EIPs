@@ -26,29 +26,17 @@ Halting the IPFS and Swarm storage process, which enabled and multiplied above p
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-Fork
+Mainnet (ID: 1) MUST be switched to permissioned. In part, this may be achieved by halting IPFS, Swarm, and Whisper, after a successfull testnet version has been deployed. This will affect existing DApps, but almost none of these have been used in the past by the community anyway. So the impact of this protocol change should be minor. For active transactions and smart contracts, opcode 0x00 SHOULD be executed. As a necessary and sufficient condition, opcode 0xff for the zero address SHALL be exectued as well.
 
-Mainnet (ID: 1) MUST be halted. In this case, no existing DApp will be served. Every node (localised EVM) needs to stop broadcasting the chain and eventually delete the data, after having returned it to the rightful owners. 
-
-IPFS ends, Swarm, Whisper
-
-Opcode 0x00 for active transactions and smart contracts. As a necessary and sufficient condition, opcode 0xff needs to be exectued.
-
-devp2p (EIP-8)
-
-Any existing smart contracts won't be served.
-
-Oracle connections will be ended.
-
-Development of Solidity will most likely be abandoned completely and replaced by an actual programming language, adhering to common and widely adopted programming language principles.
+Potentially, an adjustment to devp2p (EIP-8) would be required as well and Oracle connections should be switched.
 
 ## Transport
 
-All packages SHOULD be transfered via p2p to the original owner, including the original data.
+Before switching All packages SHOULD be transfered via p2p to the original owner, including the original data.
 
 ## Token
 
-It is yet to be decided what happens to ERC-721 tokens and ERC-20 coins. A potential solution would be to gather all tokens and decide step-by-step which ones are valid, transfered and/or sold, and which ones should be burned.
+Since for some existing dApps, token holdings would likely be exposed to such a protocol change, it is REQUIRED to decide what happens to ERC-721 tokens and ERC-20 coins. A potential solution would be to gather all tokens and decide step-by-step which ones would still be valid, could be transfered and/or sold to benefit the community, and which ones should be burned.
 
 ## Implementation
 
