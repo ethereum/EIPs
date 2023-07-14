@@ -1,8 +1,7 @@
 ---
 eip: TBD
 title: ERC/EIP Repository split
-description: Split the ERC specifications out of the EIP repository into a new
-repository, so that only core protocol EIPs remain
+description: Split the ERC specifications out of the EIP repository into a new repository, so that only core protocol EIPs remain
 author: Lightclient (@lightclient), Danno Ferrin (@shemnon)
 discussions-to: https://discord.com/channels/595666850260713488/746566142700814426 (Eth R&D Discord #eip-editing channel)
 status: Draft
