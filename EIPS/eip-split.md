@@ -1,13 +1,12 @@
 ---
-eip: TBD
+eip: 7329
 title: ERC/EIP Repository split
 description: Split the ERC specifications out of the EIP repository into a new repository, so that only core protocol EIPs remain
 author: Lightclient (@lightclient), Danno Ferrin (@shemnon)
-discussions-to: https://discord.com/channels/595666850260713488/746566142700814426 (Eth R&D Discord #eip-editing channel)
 status: Draft
 type: Meta
 created: 2023-07-13
-requires: 1, 7230
+requires: 1
 ---
 
 ## Abstract
@@ -188,7 +187,7 @@ Is an animal weakened when cells split and specialize into different tasks? It
 is this very act of division and specialization that allows it to accomplish t
 things that would be impossible as a single uniform cell.
 
-### Objection: This should be an EIP-1 proposal
+### Objection: This should be an  [EIP-1](./eip-1.md) proposal
 
 Since this is directly impacting the ERC process it should be documented
 in  [EIP-1](./eip-1.md) first.
