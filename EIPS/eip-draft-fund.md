@@ -230,7 +230,6 @@ interface IFund {
 }
 ```
 
-
 ## Security Considerations
 
 We have considered and used several security measures to our contract standard like access control with different roles along with multi-sig functionality. 
