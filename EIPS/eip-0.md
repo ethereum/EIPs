@@ -10,21 +10,17 @@ created: 2023-06-30
 
 ## Simple Summary
 
-This EIP ("Ground Zero") suggests to switch the mainnet chain to permissioned. The adjustment requires protcol and governance changes. 
+This EIP ("Ground Zero") suggests to switch mainnet to permissioned to lower gas prices and transaction costs. The adjustment requires protcol and governance changes. 
 
 ## Abstract
 
-Closing the Ethereum chain to the public requires to remove all APIs, so no node is allowed to broadcast and answer any GET or POST requests. Going forward, the github repo will need to be switched to private. The chain itself as well as all data collected will need to be handed over to the rightful owners. Any future collection, publishing, and retrieval of data, except where required by law, will be deemed a criminal offense.
-
-The following standard allows for the implementation of a standard API for tokens within smart contracts.
-This standard provides basic functionality to transfer tokens, as well as allow tokens to be approved so they can be spent by another on-chain third party.
+The suggestion is to brake the IPFS storing and broadcasting scheme and instead suggests scalling down ETHEREUM ressources, so that the community may be served in a more sustainable way. In addition, to mitigate the currently existing problem with very high gas prices, ETHEREUM would benefit from switching to a permissioned mainnet. This would greatly lower the number of requests and decrease the load for operating nodes.
+to remove all APIs, so no node is allowed to broadcast and answer any GET or POST requests. Going forward, the github repo will need to be switched to private. The chain itself as well as all data collected will need to be handed over to the rightful owners. Any future collection, publishing, and retrieval of data, except where required by law, will be deemed a criminal offense.
 
 
 ## Motivation
 
-DISASTROUS DECISIONS, ENOUGH!!!!!
-
-Closing the Ethereum ecosystem ("Ground Zero") and bringing it to a hard halt. Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to fraud, extreme consensus problems, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
+"Ground Zero" proposes a hard halt . Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to a wide array of problems such as difficult consensus problems, fraud, false ownership claims of private assets, illegal contracts, illegal privacy intrusion, theft of personal data, sexual harassment, extremely artifical and malicious content, and many more such things. 
 
 Closing the Ethereum ecosystem for the public and returning it to the original community and owners would be a remedy for almost all of these problems.
 
