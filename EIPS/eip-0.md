@@ -30,20 +30,19 @@ Mainnet (ID: 1) MUST be switched to permissioned. In part, this may be achieved 
 
 Potentially, an adjustment to devp2p (EIP-8) would be required as well and Oracle connections should be switched.
 
+## Implementation
+
+Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ETHEREUM ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
+
 ## Transport
 
-Before switching All packages SHOULD be transfered via p2p to the original owner, including the original data.
+Before halting IPFS and Swarm, packages SHOULD be transfered via p2p to the original owner, including the original data.
 
 ## Token
 
 Since for some existing dApps, token holdings would likely be exposed to such a protocol change, it is REQUIRED to decide what happens to ERC-721 tokens and ERC-20 coins. A potential solution would be to gather all tokens and decide step-by-step which ones would still be valid, could be transfered and/or sold to benefit the community, and which ones should be burned.
 
-## Implementation
-
-Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ETHEREUM ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
-
-This EIP ("Ground Zero") is supported by the community in and out of the ETHEREUM ecoystem.
-
+Implementation of EIP-0 ("Ground Zero") is supported by grants in and out of the ETHEREUM community.
 
 ## Copyright
 Copyright and related rights via CC0-1.0 [CC0](../LICENSE.md).
