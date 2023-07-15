@@ -75,7 +75,13 @@ Once the idea has been vetted, your next responsibility will be to present (by m
 
 ### Core EIPs
 
-For Core EIPs, given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP.
+*Core EIPs are the responsibility of the Core Developers.*  The Editors treat them as an independent Working Group, and therefore act primarilily as publishers.
+
+As such, we don't specify very much about the format of the document -- e.g. required sections, notations, references, etc. -- or the associated workflow.  Our job is to accept proposals as Drafts, keep them under source control, and work with the authors to ensure that Final EIPs meet the standards of style and usage laid out here.
+
+Editorially, a **Final EIP** must be just that: "in a state of finality."  For Core EIPs that happens when they actually go live on the Ethereum mainnet -- after that the network can't be changed without another fork.
+
+So given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP.
 
 The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue](https://github.com/ethereum/pm/issues).  
 
@@ -90,9 +96,11 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ### EIP Process
 
-The following is the standardization process for all EIPs in all tracks:
+The following is the overall standardization process for all EIPs in all tracks.  The diagram shows all of the states a document can be in and the transitions beteen those states. 
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
+
+*Note: For Core EIPs only Draft, Withdrawn, and Final are used.  In between them, the Core Developers are responsible for their own process.*
 
 #### Idea
 
@@ -142,6 +150,8 @@ Core EIPs are intensely scrutinized by the client teams and other developers for
 
 ### EIP Sections
 
+*Note that Core EIPs may have additional sections at the Core WG's discretion, as may any EIP at the Editors' discretion.*
+
 Each EIP should have the following sections:
 
 #### Preamble
@@ -160,7 +170,7 @@ A motivation section is critical for EIPs that want to change the Ethereum proto
 
 The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 
-#### Rationale
+#### Rationale *(optional)*
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 
@@ -182,11 +192,7 @@ All EIPs must contain a section that discusses the security implications/conside
 
 #### References
 
-**Normative References**
-
-**Informative References**
-
-Complete references for each external resource must be included in one of these two sections, as specified below.  
+Complete references for each external resource must be included in this section, as specified below.  
 
 #### Copyright Waiver
 
@@ -223,6 +229,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 `requires`: *EIP number(s)* (Optional field)
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
+
+Working Groups can introduce their own headers, which should come last.
 
 Headers that permit lists must separate elements with commas.
 
@@ -282,7 +290,7 @@ The process governing permitted external resources is described in [EIP-5757](./
 
 External resources not so permitted **MAY** be included *at the Editors' discretion*.
 
-A complete reference to every external resource **MUST** be included in a Normative or Informative References section.
+A complete reference to every external resource **MUST** be included in the References section.
 
 We take several precautions to ensure the continued accessibility of all external resources.  First, we follow the requirements of the [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html): references **MUST** be full citations, including author(s), title, and publication information -- URLs are acceptable, but **MUST NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", short quotations from referenced works are encouraged, as embedded quotations will not change. 
 
