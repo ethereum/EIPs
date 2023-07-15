@@ -44,10 +44,6 @@ contract Fund is Initializable, IFund, AgentRoleFund, FundStorage {
         }
     }
 
-    // function setStableCoin(address _stableCoin) public onlyAgent{
-    //     stableCoin = _stableCoin;
-    // }
-
     function _addUserDividend(address _address, uint256 _dividend, uint8 _key) internal{
             if(_key == 0){
                 dividend[_address].Token = _dividend;

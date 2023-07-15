@@ -21,7 +21,6 @@ contract FundStorage {
     address public fundManagerAddress;
     address public token;
     address public apiConsumer;
-    address public stableCoin;
     address public factory;
 
     uint256 public assetType;
