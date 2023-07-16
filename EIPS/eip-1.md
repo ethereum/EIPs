@@ -57,7 +57,7 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 ## Working Groups
 
-Many proposals will come into EIP process via working groups who take responsibility for their specification and technical quality.  The stages of Working Group workflow, the formatting and notational requirements for their Specifications, all of these are WG concerns.
+Many proposals will come into EIP process via working groups who take responsibility for their specification and technical quality.  Working Group concerns include the technical quality of their proposals, the formatting and notations for their Specifications, the workflow for their documents, and addditional repos for tracking their work.
 
 * Working group proposals first enter the EIP process as **Drafts**.
 * While WG proposals are **Drafts** their Specification belongs to the WG, including their workflow, formatting, notation, and relationship to other Ethereum Specifications.
@@ -67,11 +67,11 @@ Currently, only the Core Developers are organized enough to already be doing thi
 
 ### Core EIPs
 
-***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent working group.
+***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent Working Group.
 
 ## Editorial Services
 
-The Editors' job, for indivitual authors and for working group, is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage, and to provide administrative and publication services.  
+The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage, and to provide administrative and publication services.  
 
 ## EIP Work Flow
 
@@ -104,7 +104,7 @@ The following is the full, default standardization process for all EIPs in all t
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-***For Working Groups only Draft, Final, and Withdrawn are used in the Preamble.  While a document is a Draft the working group is responsible for its process.***
+***For Working Groups only Draft, Final, and Withdrawn are used as a `status` in the Preamble.  While a document is a Draft the working group is responsible for its process.***
 
 All other proposals will move through all stages of this process.
 
@@ -156,7 +156,7 @@ Core EIPs are intensely scrutinized by the client teams and other developers for
 
 ### EIP Sections
 
-*Note that Core EIPs may have additional sections at the Core WG's discretion, as may any EIP at the Editors' discretion.*
+*Note that Working Group EIPs may have additional sections at the WG's discretion, as may any EIP at the Editors' discretion.*
 
 Each EIP should have the following sections:
 
@@ -235,6 +235,10 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 `requires`: *EIP number(s)* (Optional field)
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
+ 
+`working-group:`: *The name of the Working Group responsible for this EIP* (Optional, if any.)
+
+`working-group-status:`: *The status of this EIP in the Working Group workflow.* (Optional, if any.)
 
 Working Groups can introduce their own headers, which should come last.
 
