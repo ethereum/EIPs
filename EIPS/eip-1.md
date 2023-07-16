@@ -57,11 +57,11 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 ## Working Groups
 
-Many proposals will come into EIP process via working groups who take responsibility for their specification and technical quality.  Working Group concerns include the technical quality of their proposals, the formatting and notations for their Specifications, the workflow for their documents, and addditional repos for tracking their work.
+Many proposals will come into EIP process via working groups who take responsibility for their specifications.  Working Group concerns include the technical quality, formatting and notations for their specifications, coordination with other specifications, the workflow for their tasks and documents, and addditional repos for tracking their work.
 
-* Working group proposals first enter the EIP process as **Drafts**.
-* While WG proposals are **Drafts** their Specification belongs to the WG, including their workflow, formatting, notation, and relationship to other Ethereum Specifications.
-* WG EIPs reenter the EIP process to become **Final**, that is, to describe what actually goes live on the Ethereum mainnet. (After that the network can't be changed without another fork.)
+* Working group proposals first enter the EIP process (see below) as **Drafts**.
+* While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
+* WG EIPs reenter the EIP process to become **Final**.
 
 Currently, only the Core Developers are organized enough to already be doing this job.
 
@@ -69,9 +69,9 @@ Currently, only the Core Developers are organized enough to already be doing thi
 
 ***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent Working Group.
 
-## Editorial Services
+### Editorial Services
 
-The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage, and to provide administrative and publication services.  
+The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that Final EIPs meet all standards of quality, format, style, and usage, and to provide administrative and publication services for EIPs and related digital assets.  
 
 ## EIP Work Flow
 
@@ -104,7 +104,7 @@ The following is the full, default standardization process for all EIPs in all t
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-***For Working Groups only Draft, Final, and Withdrawn are used as a `status` in the Preamble.  While a document is a Draft the working group is responsible for its process.***
+***For Working Groups only Draft, Final, and Withdrawn are used in the Preamble as a `status`.  While a document is a Draft the working group is responsible for its process, which the group can track as `working-group-status`.***
 
 All other proposals will move through all stages of this process.
 
@@ -176,6 +176,8 @@ A motivation section is critical for EIPs that want to change the Ethereum proto
 
 The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 
+Working groups MAY specify additional requirements, including on the form of the Specification and the implementation of the technology.
+
 #### Rationale *(optional)*
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
@@ -236,7 +238,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
  
-`working-group:`: *The name of the Working Group responsible for this EIP* (Optional, if any.)
+`working-group:`: *The name of the Working Group responsible for this EIP* (If any.)
 
 `working-group-status:`: *The status of this EIP in the Working Group workflow.* (Optional, if any.)
 
