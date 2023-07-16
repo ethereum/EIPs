@@ -55,13 +55,23 @@ It is highly recommended that a single EIP contain a single key proposal or new 
 
 An EIP must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-## Core EIP Specifications
+## Working Groups
 
-***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent Working Group.
+Many proposals will come into EIP process via working groups who take responsibility for their specification and technical quality.  The stages of Working Group workflow, the formatting and notational requirements for their Specifications, all of these are WG concerns.
 
-Core EIPs first enter EIP source control as **Drafts**.  While they are **Drafts** they belong to the Core WG workflow.  The stages of Core document workflow, the formatting and notational requirements for Core EIP Specifications and their relationship to the Executable Specifications, all of these are Core Developer concerns.
+* Working group proposals first enter the EIP process as **Drafts**.
+* While WG proposals are **Drafts** their Specification belongs to the WG, including their workflow, formatting, notation, and relationship to other Ethereum Specifications.
+* WG EIPs reenter the EIP process to become **Final**, that is, to describe what actually goes live on the Ethereum mainnet. (After that the network can't be changed without another fork.)
 
-Core EIPs reenter the EIP workflow to become **Final** when they describe what actually goes live on the Ethereum mainnet (after that the network can't be changed without another fork.)  The Editors' responsibility is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage.  
+Currently, only the Core Developers are organized enough to already be doing this job.
+
+### Core EIPs
+
+***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent working group.
+
+## Editorial Services
+
+The Editors' job, for indivitual authors and for working group, is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage, and to provide administrative and publication services.  
 
 ## EIP Work Flow
 
@@ -90,11 +100,13 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ### EIP Process
 
-The following is the overall standardization process for all EIPs in all tracks.  The diagram shows all of the states a document can be in and the transitions beteen those states. 
+The following is the full, default standardization process for all EIPs in all tracks.  The diagram shows all of the  stages a document can be in and the transitions beteen those states. 
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-*Note: For Core EIPs only Draft, Withdrawn, and Final are used in the Preamble.  In between them, the Core Developers are responsible for their own process.*
+***For Working Groups only Draft, Final, and Withdrawn are used in the Preamble.  While a document is a Draft the working group is responsible for its process.***
+
+All other proposals will move through all stages of this process.
 
 #### Idea
 
