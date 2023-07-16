@@ -55,13 +55,13 @@ It is highly recommended that a single EIP contain a single key proposal or new 
 
 An EIP must meet certain minimum criteria. It must be a clear and complete description of the proposed enhancement. The enhancement must represent a net improvement. The proposed implementation, if applicable, must be solid and must not complicate the protocol unduly.
 
-### Special requirements for Core EIPs
+## Core EIP Specifications
 
-If a **Core** EIP mentions or proposes changes to the EVM (Ethereum Virtual Machine), it should refer to the instructions by their mnemonics and define the opcodes of those mnemonics at least once. A preferred way is the following:
+***The Specification of Core EIPs is the responsibility of the Core Developers***, who the Editors treat as an independent Working Group.
 
-```
-REVERT (0xfe)
-```
+Core EIPs first enter EIP source control as **Drafts**.  While they are **Drafts** they belong to the Core WG workflow.  The stages of Core document workflow, the formatting and notational requirements for Core EIP Specifications and their relationship to the Executable Specifications, all of these are Core Developer concerns.
+
+Core EIPs reenter the EIP workflow to become **Final** when they describe what actually goes live on the Ethereum mainnet (after that the network can't be changed without another fork.)  The Editors' responsibility is to work with the authors to ensure that Final EIPs meet all standards of format, style, and usage.  
 
 ## EIP Work Flow
 
@@ -73,15 +73,9 @@ Before you begin writing a formal EIP, you should vet your idea. Ask the Ethereu
 
 Once the idea has been vetted, your next responsibility will be to present (by means of an EIP) the idea to the reviewers and all interested parties, invite editors, developers, and the community to give feedback on the aforementioned channels. You should try and gauge whether the interest in your EIP is commensurate with both the work involved in implementing it and how many parties will have to conform to it. For example, the work required for implementing a Core EIP will be much greater than for an ERC and the EIP will need sufficient interest from the Ethereum client teams. Negative community feedback will be taken into consideration and may prevent your EIP from moving past the Draft stage.
 
-### Core EIPs
+#### Core EIPs
 
-*Core EIPs are the responsibility of the Core Developers.*  The Editors treat them as an independent Working Group, and therefore act primarilily as publishers.
-
-As such, we don't specify very much about the format of the document -- e.g. required sections, notations, references, etc. -- or the associated workflow.  Our job is to accept proposals as Drafts, keep them under source control, and work with the authors to ensure that Final EIPs meet the standards of style and usage laid out here.
-
-Editorially, a **Final EIP** must be just that: "in a state of finality."  For Core EIPs that happens when they actually go live on the Ethereum mainnet -- after that the network can't be changed without another fork.
-
-So given that they require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP.
+Given that Core EIPs require client implementations to be considered **Final** (see "EIPs Process" below), you will need to either provide an implementation for clients or convince clients to implement your EIP.
 
 The best way to get client implementers to review your EIP is to present it on an AllCoreDevs call. You can request to do so by posting a comment linking your EIP on an [AllCoreDevs agenda GitHub Issue](https://github.com/ethereum/pm/issues).  
 
@@ -100,7 +94,7 @@ The following is the overall standardization process for all EIPs in all tracks.
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-*Note: For Core EIPs only Draft, Withdrawn, and Final are used.  In between them, the Core Developers are responsible for their own process.*
+*Note: For Core EIPs only Draft, Withdrawn, and Final are used in the Preamble.  In between them, the Core Developers are responsible for their own process.*
 
 #### Idea
 
@@ -144,7 +138,7 @@ A special status for EIPs that are designed to be continually updated and not re
 
 ### Technical Peers
 
-Core EIPs are intensely scrutinized by the client teams and other developers for technical soundness, but the EIP Editors may still lack relevant expertise. And the numerous ERCs cover a wide and growing range of applications that are even more likely to be outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, the Editors *at their discretion* may require Technical Peers with the relevant expertise who can review the Author's Idea and work with the Author to ensure a technically sound proposal.
+Core EIPs are intensely scrutinized by the client teams and other developers for technical soundness, but the EIP Editors may still lack relevant expertise. And the numerous ERCs cover a wide and growing range of applications that are even more likely to be outside the expertise of any Editor.  Historically, this has put a strain on the Editors' responsibility to maintain quality.  Therefore, the Editors *at their discretion* may designate Technical Peers with the relevant expertise who can work with the Author to ensure a technically sound proposal.
 
 ## What belongs in a successful EIP?
 
@@ -190,7 +184,7 @@ An optional section that contains a reference/example implementation that people
 
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
-#### References
+#### References *(if any)*
 
 Complete references for each external resource must be included in this section, as specified below.  
 
@@ -292,7 +286,7 @@ External resources not so permitted **MAY** be included *at the Editors' discret
 
 A complete reference to every external resource **MUST** be included in the References section.
 
-We take several precautions to ensure the continued accessibility of all external resources.  First, we follow the requirements of the [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html): references **MUST** be full citations, including author(s), title, and publication information -- URLs are acceptable, but **MUST NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", short quotations from referenced works are encouraged, as embedded quotations will not change. 
+We take several precautions to ensure the continued accessibility of all external resources.  First, following [RFC 7322 RFC Style Guide](https://www.rfc-editor.org/rfc/rfc7322.html), references **MUST** be full citations, including author(s), title, and publication information; URLs are acceptable, but **SHOULD NOT** be the sole information provided for a reference.  In addition, Links **SHOULD** meet the Requirements for Origins in [EIP-5757](./eip-5757.md), and a Digital Object Identifier (DOI), where available, **MUST** be included. Within "fair use", short quotations from referenced works are encouraged, as embedded quotations will not change or disappear. 
 
 According to the IESG Statement on [Normative and Informative References](https://www.ietf.org/about/groups/iesg/statements/normative-informative-references/), Normative references "specify documents that must be read to understand or implement the technology" whereas an Informative reference "only provides additional information".  The Specification section of an EIP **MUST NOT** contain Informative references, and **SHOULD** contain all necessary Normative references. Motivation and Rationale sections **MAY** include Informative references.
 
