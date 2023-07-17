@@ -79,7 +79,7 @@ The following is the standardization process for all EIPs in all tracks:
 
 **Review** - An EIP Author marks an EIP as ready for and requesting Peer Review.
 
-**Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later.
+**Last Call** - This is the final review window for an EIP before moving to `Final`. An EIP editor will assign `Last Call` status and set a review end date (`last-call-deadline`), typically 14 days later. If 6 months pass after the `last-call-deadline`, it is moved back into `Review`.
 
 If this period results in necessary normative changes it will revert the EIP to `Review`.
 
@@ -87,7 +87,7 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
 
-**Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
+**Stagnant** - Any EIP with a status of `Draft` or `Review`, if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
 
