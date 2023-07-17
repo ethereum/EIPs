@@ -1,10 +1,10 @@
 ---
-eip: 
+eip: 7344
 title: Contract Name Service
 description: Assign contract addresses to names
 author: Theo (@theo-for-you)
 discussions-to: 
-status: Idea
+status: Draft
 type: Standards Track
 category: ERC
 created: 2023-07-17
