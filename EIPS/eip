@@ -1,0 +1,56 @@
+
+---
+eip: 
+title: Contract Name Service
+description: Assign contract addresses to names
+author: Theo (@theo-for-you)
+discussions-to: 
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-07-17
+---
+
+## Abstract 
+ 
+Gives contract developers an ability to claim names and assign addresses to them to keep their contracts available
+
+## Motivation 
+ 
+Developing: after deployment contract receives a unique address, assigning the most relevant address to one name saves time from copy pasting the addresses to code
+
+Proxy: if you need change your contract after deployment, you deploy a new one and change the name assignment. Keeping the same name and abi everyone may access the contract without any adjustments  
+
+ABI: storing them in code takes place, on blockchain you could access them fast and easy from code
+
+## Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119. 
+
+
+## Specification  
+
+```
+interface ERC {
+
+	/// @notice Sets a new address to the name
+	/// @param _name Your name you want to change the assignment to
+	/// @param _to Address of your new contract
+	function setAddress(string _name, address _to) external;
+
+	/// @notice Get the address assigned to a name
+	/// @param _name The name you want to know the address of
+	/// @return The address assigned to the name by the owner
+	function getAddress(string _name) external veiw returns (address);
+}
+```
+
+## Security Considerations 
+
+One person could take too much names under their control 
+
+Malicious changes might be brought into contact without disclosure 
+
+## Copyright 
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
