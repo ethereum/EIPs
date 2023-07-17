@@ -4,7 +4,7 @@ title: Contract Name Service
 description: Assign contract addresses to names
 author: Theo (@theo-for-you)
 discussions-to: 
-status: Draft
+status: Idea
 type: Standards Track
 category: ERC
 created: 2023-07-17
