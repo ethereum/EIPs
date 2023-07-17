@@ -1,4 +1,3 @@
-
 ---
 eip: 
 title: Contract Name Service
