@@ -18,9 +18,9 @@ Gives contract developers an ability to claim names and assign addresses to them
  
 Developing: after deployment contract receives a unique address, assigning the most relevant address to one name saves time from copy pasting the addresses to code
 
-Proxy: if you need change your contract after deployment, you deploy a new one and change the name assignment. Keeping the same name and abi everyone may access the contract without any adjustments  
+Proxy: if you need to change your contract after deployment, you deploy a new one and change the name assignment. Keeping the same name and abi in code everyone may access the contract without any adjustments  
 
-ABI: storing them in code takes place, on blockchain you could access them fast and easy from code
+ABI: storing them in code takes place, on blockchain you could access them fast and easy from code by contract name above
 
 ## Specification
 
