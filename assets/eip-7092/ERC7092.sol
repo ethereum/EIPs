@@ -38,7 +38,7 @@ contract ERC7092 is IERC7092, BondStorage {
             uint256 _denomination = _bondInfo.denomination;
             
             require(investor != address(0), "ERC7092: ZERO_ADDRESS_INVESTOR");
-            require(principal != 0 && principal % _denomination == 0, "ERC: INVALID_PRINCIPAL_AMOUNT");
+            require(principal != 0 && (principal * _denomination) % _denomination == 0, "ERC: INVALID_PRINCIPAL_AMOUNT");
 
             volume += principal;
             _principals[investor] = principal;
