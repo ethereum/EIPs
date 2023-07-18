@@ -1,0 +1,66 @@
+---
+title: ERC-721 Metadata Hash Extension with Decentralized Validation
+description: The EIP proposes an extension to the ERC721 standard, aiming to associate each token ID with a cryptographically secure, collision-resistant metadata hash. Additionally, a decentralized mechanism for validating the consistency of off-chain metadata is introduced, improving data security and reducing on-chain storage requirements.
+author: Irving Ulises Puga Gutiérrez (@pugakn)
+type: Standards Track
+category: ERC
+status: Draft
+created: 2023-07-18
+requires: 721
+---
+
+
+## Abstract
+The proposed extension pairs a tokenId with a metadataHash to facilitate secure off-chain metadata storage and a mechanism for consistency checks. The proposal addresses potential challenges related to metadata reconstruction, off-chain storage security, owner/operator dependence, and data privacy.
+
+## Motivation
+The ERC721 standard requires a more secure and efficient way to handle metadata, particularly when large or sensitive. By introducing a method to pair each tokenId with a metadataHash, and providing a decentralized mechanism for metadata consistency validation, we can enhance data security and reduce on-chain storage needs.
+
+## Specification
+**MetadataHash**
+This function returns a cryptographic, collision-resistant hash of the metadata for a given tokenId.
+
+```solidity
+function metadataHash(uint256 tokenId) external view returns (bytes32);
+```
+
+**SetMetadataHash**
+This function sets the metadataHash for a given tokenId. This function is only callable by the contract owner or an approved operator. The function also emits a MetadataHashSet event.
+
+```solidity
+function setMetadataHash(uint256 tokenId, bytes32 hash) external;
+```
+
+**MetadataHashValidator**
+This function allows any user to validate the consistency of the metadata against its hash. This function facilitates decentralization and reduces dependence on the token's owner or approved operator.
+
+```solidity
+function metadataHashValidator(uint256 tokenId, bytes metadata) external view returns (bool);
+```
+
+**Event**
+This event is emitted when the metadataHash of a tokenId is set or updated.
+
+```solidity
+event MetadataHashSet(uint256 indexed tokenId, bytes32 metadataHash);
+```
+
+## Rationale
+The proposal introduces functions for unique hash value generation for each tokenId, secure metadata hash setting by contract owner or operator, and metadata consistency validation by any user. These mechanisms enhance data security and promote decentralization.
+
+## Backwards Compatibility
+This EIP is fully backward compatible as it extends the existing ERC721 standard. The base functionality of ERC721 tokens is not modified or impacted.
+
+## Test Cases
+Test cases will be added where the new functions and event are tested to ensure they function as expected.
+
+## Reference Implementation
+A reference implementation will be provided when this EIP moves to the "Final" stage.
+
+## Security Considerations
+This EIP improves the integrity of off-chain metadata and the overall security of the ERC721 token standard. However, the quality of this security depends on the implementation of hash functions, the safety of off-chain storage, and the proper use of the MetadataHashValidator function. It's recommended for token owners, operators, and users to follow best practices in these areas.
+
+## Data Privacy Considerations
+The privacy of off-chain metadata should be ensured through appropriate data protection measures during storage and transmission. The hash function should be selected so that reverse-engineering the metadata from the hash is computationally unfeasible.
+
+This proposal should encourage community discussion around improving the handling and security of metadata in the ERC721 standard. It aims to address multiple concerns and strikes a balance between on-chain and off-chain storage, security, and the decentralization of validation.
