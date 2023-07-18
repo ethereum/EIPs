@@ -169,7 +169,9 @@ RFC 822 style headers containing metadata about the EIP, including the EIP numbe
 
 A multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 
-#### Motivation *(optional)*
+#### Motivation
+
+This section is optional.
 
 A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.
 
@@ -179,19 +181,27 @@ The technical specification should describe the syntax and semantics of any new 
 
 Working groups MAY specify additional requirements, including on the form of the Specification and the implementation of the technology.
 
-#### Rationale *(optional)*
+#### Rationale
+
+This section is optional.
 
 The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.
 
-#### Backwards Compatibility *(optional)*
+#### Backwards Compatibility
+
+This section is optional for all EIPs except those with a status of `Last Call` or `Final`.
 
 All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.
 
-#### Test Cases *(optional)*
+#### Test Cases
+
+This section is optional for all non-Core EIPs.
 
 Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.
 
-#### Reference Implementation *(optional)*
+#### Reference Implementation
+
+This section is optional.
 
 An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification. This section may be omitted for many EIPs.  Most ERCs should include an implementation. Final Core EIPs should link to the relevant Execution Client or Consensus Client commits that implement the EIP.
 
@@ -199,7 +209,9 @@ An optional section that contains a reference/example implementation that people
 
 All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
-#### References *(if any)*
+#### References
+
+This section is optional if there are no references.
 
 Complete references for each external resource must be included in this section, as specified below.  
 
