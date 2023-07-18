@@ -1,10 +1,10 @@
 ---
-title: ERC-721 Metadata Hash Extension with Decentralized Validation
-description: The EIP proposes an extension to the ERC721 standard, aiming to associate each token ID with a cryptographically secure, collision-resistant metadata hash. Additionally, a decentralized mechanism for validating the consistency of off-chain metadata is introduced, improving data security and reducing on-chain storage requirements.
+title: Metadata Hash with Decentralized Validation
+description: Associates each token ID with a metadata hash. Additionally, a mechanism for validating the consistency of off-chain metadata is introduced
 author: Irving Ulises Puga Gutiérrez (@pugakn)
+status: Draft
 type: Standards Track
 category: ERC
-status: Draft
 created: 2023-07-18
 requires: 721
 ---
@@ -14,7 +14,7 @@ requires: 721
 The proposed extension pairs a tokenId with a metadataHash to facilitate secure off-chain metadata storage and a mechanism for consistency checks. The proposal addresses potential challenges related to metadata reconstruction, off-chain storage security, owner/operator dependence, and data privacy.
 
 ## Motivation
-The ERC721 standard requires a more secure and efficient way to handle metadata, particularly when large or sensitive. By introducing a method to pair each tokenId with a metadataHash, and providing a decentralized mechanism for metadata consistency validation, we can enhance data security and reduce on-chain storage needs.
+The ERC-721 standard requires a more secure and efficient way to handle metadata, particularly when large or sensitive. By introducing a method to pair each tokenId with a metadataHash, and providing a decentralized mechanism for metadata consistency validation, we can enhance data security and reduce on-chain storage needs.
 
 ## Specification
 **MetadataHash**
@@ -49,7 +49,7 @@ event MetadataHashSet(uint256 indexed tokenId, bytes32 metadataHash);
 The proposal introduces functions for unique hash value generation for each tokenId, secure metadata hash setting by contract owner or operator, and metadata consistency validation by any user. These mechanisms enhance data security and promote decentralization.
 
 ## Backwards Compatibility
-This EIP is fully backward compatible as it extends the existing ERC721 standard. The base functionality of ERC721 tokens is not modified or impacted.
+This EIP is fully backward compatible as it extends the existing ERC-721 standard. The base functionality of ERC-721 tokens is not modified or impacted.
 
 ## Test Cases
 Test cases will be added where the new functions and event are tested to ensure they function as expected.
@@ -58,9 +58,14 @@ Test cases will be added where the new functions and event are tested to ensure 
 A reference implementation will be provided when this EIP moves to the "Final" stage.
 
 ## Security Considerations
-This EIP improves the integrity of off-chain metadata and the overall security of the ERC721 token standard. However, the quality of this security depends on the implementation of hash functions, the safety of off-chain storage, and the proper use of the MetadataHashValidator function. It's recommended for token owners, operators, and users to follow best practices in these areas.
+This EIP improves the integrity of off-chain metadata and the overall security of the ERC-721 token standard. However, the quality of this security depends on the implementation of hash functions, the safety of off-chain storage, and the proper use of the MetadataHashValidator function. It's recommended for token owners, operators, and users to follow best practices in these areas.
 
-## Data Privacy Considerations
+**Data Privacy Considerations**
 The privacy of off-chain metadata should be ensured through appropriate data protection measures during storage and transmission. The hash function should be selected so that reverse-engineering the metadata from the hash is computationally unfeasible.
 
-This proposal should encourage community discussion around improving the handling and security of metadata in the ERC721 standard. It aims to address multiple concerns and strikes a balance between on-chain and off-chain storage, security, and the decentralization of validation.
+This proposal should encourage community discussion around improving the handling and security of metadata in the ERC-721 standard. It aims to address multiple concerns and strikes a balance between on-chain and off-chain storage, security, and the decentralization of validation.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
