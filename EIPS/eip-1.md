@@ -60,7 +60,7 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 Many proposals will come into EIP process via working groups who take responsibility for their specifications.  Working Group concerns include the technical quality, formatting and notations for their specifications, coordination with other specifications, the workflow for their tasks and documents, and addditional repos for tracking their work.
 
-* Working group proposals first enter the EIP process (see below) as **Drafts**.
+* Working Group proposals first enter the EIP process (see below) as **Drafts**.
 * While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
 * WG EIPs reenter the EIP process to become **Final**.
 
@@ -241,6 +241,8 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
  
 `working-group:`: *The name of the Working Group responsible for this EIP* (If any.)
 
+`working-group-draft:`: *A link to the Working Group draft of this EIP if not in etherem/EIP/EIPs.* (Optional, if any.)
+
 `working-group-status:`: *The status of this EIP in the Working Group workflow.* (Optional, if any.)
 
 Working Groups can introduce their own headers, which should come last.
@@ -301,7 +303,7 @@ Other than the specific exceptions listed below, links to external resources **S
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
-External resources not so permitted **MAY** be included *at the Editors' discretion*.
+External resources not so permitted **MAY** be included *at the Editors' or Working Groups' discretion*.
 
 A complete reference to every external resource **MUST** be included in the References section.
 
