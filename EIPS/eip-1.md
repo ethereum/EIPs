@@ -24,7 +24,7 @@ There are three types of EIP: Standards Track, Meta and Informational.
 
 ### Standards Track EIP
 
-Describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [formal specification](https://github.com/ethereum/execution-specs). Furthermore, Standards Track EIPs can be broken down into Core, Networking, Interface, and ERC.
+Describes any change that affects most or all Ethereum implementations, such as a change to the network protocol; a change in block or transaction validity rules; proposed application standards/conventions; or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts: a design document, an implementation, and (if applicable) an update to the [formal specification](https://github.com/ethereum/execution-specs). Furthermore, Standards Track EIPs can be broken down into four categories: Core, Networking, Interface, and ERC.
 
 #### Core
 
