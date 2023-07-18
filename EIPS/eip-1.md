@@ -572,7 +572,7 @@ For each new EIP that comes in, an editor does the following:
 * The title should accurately describe the content.
 * Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
 
-If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions and possibly a request for review by Technical Peers. 
+If the EIP isn't ready, the editor will send it back to the author with instructions for revision and possibly a request for review by Technical Peers. 
 
 Once the EIP is ready for the repository, the EIP editor will:
 
