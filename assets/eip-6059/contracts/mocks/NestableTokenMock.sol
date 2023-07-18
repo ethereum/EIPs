@@ -29,8 +29,9 @@ contract NestableTokenMock is NestableToken {
     function nestTransfer(
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bytes calldata data
     ) public virtual {
-        nestTransferFrom(_msgSender(), to, tokenId, destinationId, "");
+        nestTransferFrom(_msgSender(), to, tokenId, destinationId, data);
     }
 }
