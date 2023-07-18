@@ -532,23 +532,23 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 
 The current EIP editors are
 
-- Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
-- Greg Colvin (@gcolvin)
-- Matt Garnett (@lightclient)
-- Sam Wilson (@SamWilsn)
-- Zainan Victor Zhou (@xinbenlv)
-- Gajinder Singh (@g11tech)
+* Alex Beregszaszi (@axic)
+* Gavin John (@Pandapip1)
+* Greg Colvin (@gcolvin)
+* Matt Garnett (@lightclient)
+* Sam Wilson (@SamWilsn)
+* Zainan Victor Zhou (@xinbenlv)
+* Gajinder Singh (@g11tech)
 
 Emeritus EIP editors are
 
-- Casey Detrio (@cdetrio)
-- Hudson Jameson (@Souptacular)
-- Martin Becze (@wanderer)
-- Micah Zoltu (@MicahZoltu)
-- Nick Johnson (@arachnid)
-- Nick Savers (@nicksavers)
-- Vitalik Buterin (@vbuterin)
+* Casey Detrio (@cdetrio)
+* Hudson Jameson (@Souptacular)
+* Martin Becze (@wanderer)
+* Micah Zoltu (@MicahZoltu)
+* Nick Johnson (@arachnid)
+* Nick Savers (@nicksavers)
+* Vitalik Buterin (@vbuterin)
 
 If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md).
 
@@ -556,17 +556,17 @@ If you would like to become an EIP editor, please check [EIP-5069](./eip-5069.md
 
 For each new EIP that comes in, an editor does the following:
 
-- Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
-- The title should accurately describe the content.
-- Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
+* Read the EIP to check if it is ready: sound and complete. The ideas must make technical sense, even if they don't seem likely to get to final status.
+* The title should accurately describe the content.
+* Check the EIP for language (spelling, grammar, sentence structure, etc.), markup (GitHub flavored Markdown), code style
 
 If the EIP isn't ready, the editor will send it back to the author for revision, with specific instructions and possibly a request for review by Technical Peers. 
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number, but the decision is with the editors)
-- Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
-- Send a message back to the EIP author with the next step.
+* Assign an EIP number (generally the PR number, but the decision is with the editors)
+* Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
+* Send a message back to the EIP author with the next step.
 
 Many EIPs are written and maintained by developers with write access to the Ethereum codebase. The EIP editors monitor EIP changes, and correct any structure, grammar, spelling, or markup mistakes we see.
 
@@ -578,15 +578,15 @@ The editors don't pass judgment on EIPs. We merely do the administrative & edito
 
 The `title` field in the preamble:
 
-- Should not include the word "standard" or any variation thereof; and
-- Should not include the EIP's number.
+* Should not include the word "standard" or any variation thereof; and
+* Should not include the EIP's number.
 
 ### Descriptions
 
 The `description` field in the preamble:
 
-- Should not include the word "standard" or any variation thereof; and
-- Should not include the EIP's number.
+* Should not include the word "standard" or any variation thereof; and
+* Should not include the EIP's number.
 
 ### EIP numbers
 
