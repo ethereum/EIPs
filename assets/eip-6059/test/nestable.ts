@@ -987,7 +987,7 @@ describe('NestableToken', function () {
       expect(await child.balanceOf(parent.address)).to.equal(1);
 
       // Transfers token parentId to (parent.address, token grandParentId)
-      await parent.connect(firstOwner).nestTransfer(parent.address, parentId, grandParentId, "0x");
+      await parent.connect(firstOwner).nestTransfer(parent.address, parentId, grandParentId);
 
       // Balances unchanged since root owner is the same
       expect(await parent.balanceOf(firstOwner.address)).to.equal(1);
@@ -1018,7 +1018,7 @@ describe('NestableToken', function () {
       expect(await child.balanceOf(parent.address)).to.equal(1);
 
       // firstOwner calls parent to transfer parent token parent
-      await parent.connect(firstOwner).nestTransfer(parent.address, parentId, grandParentId, "0x");
+      await parent.connect(firstOwner).nestTransfer(parent.address, parentId, grandParentId);
 
       // Balances update
       expect(await parent.balanceOf(firstOwner.address)).to.equal(0);
@@ -1052,33 +1052,33 @@ describe('NestableToken', function () {
       const otherParentId = 2;
       await parent.mint(firstOwner.address, otherParentId);
       // We send it to the parent first
-      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId, "0x");
+      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId);
       // We can no longer nest transfer it, even if we are the root owner:
       await expect(
-        child.connect(firstOwner).nestTransfer(parent.address, childId1, otherParentId, "0x"),
+        child.connect(firstOwner).nestTransfer(parent.address, childId1, otherParentId),
       ).to.be.revertedWithCustomError(child, 'NotApprovedOrDirectOwner');
     });
 
     it('cannot nest tranfer to same NFT', async function () {
       // We can no longer nest transfer it, even if we are the root owner:
       await expect(
-        child.connect(firstOwner).nestTransfer(child.address, childId1, childId1, "0x"),
+        child.connect(firstOwner).nestTransfer(child.address, childId1, childId1),
       ).to.be.revertedWithCustomError(child, 'NestableTransferToSelf');
     });
 
     it('cannot nest tranfer a descendant same NFT', async function () {
       // We can no longer nest transfer it, even if we are the root owner:
-      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId, "0x");
+      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId);
       const grandChildId = 999;
       await child.nestMint(child.address, grandChildId, childId1);
       // Ownership is now parent->child->granChild
       // Cannot send parent to grandChild
       await expect(
-        parent.connect(firstOwner).nestTransfer(child.address, parentId, grandChildId, "0x"),
+        parent.connect(firstOwner).nestTransfer(child.address, parentId, grandChildId),
       ).to.be.revertedWithCustomError(child, 'NestableTransferToDescendant');
       // Cannot send parent to child
       await expect(
-        parent.connect(firstOwner).nestTransfer(child.address, parentId, childId1, "0x"),
+        parent.connect(firstOwner).nestTransfer(child.address, parentId, childId1),
       ).to.be.revertedWithCustomError(child, 'NestableTransferToDescendant');
     });
 
@@ -1091,27 +1091,27 @@ describe('NestableToken', function () {
       // Ownership is now parent->child->child->child->child...->lastChild
       // Cannot send parent to lastChild
       await expect(
-        parent.connect(firstOwner).nestTransfer(child.address, parentId, lastId, "0x"),
+        parent.connect(firstOwner).nestTransfer(child.address, parentId, lastId),
       ).to.be.revertedWithCustomError(child, 'NestableTooDeep');
     });
 
     it('cannot nest tranfer if not owner', async function () {
       const notOwner = addrs[3];
       await expect(
-        child.connect(notOwner).nestTransfer(parent.address, childId1, parentId, "0x"),
+        child.connect(notOwner).nestTransfer(parent.address, childId1, parentId),
       ).to.be.revertedWithCustomError(child, 'NotApprovedOrDirectOwner');
     });
 
     it('cannot nest tranfer to address 0', async function () {
       await expect(
-        child.connect(firstOwner).nestTransfer(ADDRESS_ZERO, childId1, parentId, "0x"),
+        child.connect(firstOwner).nestTransfer(ADDRESS_ZERO, childId1, parentId),
       ).to.be.revertedWithCustomError(child, 'ERC721TransferToTheZeroAddress');
     });
 
     it('cannot nest tranfer to a non contract', async function () {
       const newOwner = addrs[2];
       await expect(
-        child.connect(firstOwner).nestTransfer(newOwner.address, childId1, parentId, "0x"),
+        child.connect(firstOwner).nestTransfer(newOwner.address, childId1, parentId),
       ).to.be.revertedWithCustomError(child, 'IsNotContract');
     });
 
@@ -1120,12 +1120,12 @@ describe('NestableToken', function () {
       const nonNestable = await ERC721.deploy('Non receiver', 'NR');
       await nonNestable.deployed();
       await expect(
-        child.connect(firstOwner).nestTransfer(nonNestable.address, childId1, parentId, "0x"),
+        child.connect(firstOwner).nestTransfer(nonNestable.address, childId1, parentId),
       ).to.be.revertedWithCustomError(child, 'NestableTransferToNonNestableImplementer');
     });
 
     it('can nest tranfer to IERC6059 contract', async function () {
-      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId, "0x");
+      await child.connect(firstOwner).nestTransfer(parent.address, childId1, parentId);
       expect(await child.ownerOf(childId1)).to.eql(firstOwner.address);
       expect(await child.directOwnerOf(childId1)).to.eql([parent.address, bn(parentId), true]);
     });
@@ -1133,7 +1133,7 @@ describe('NestableToken', function () {
     it('cannot nest tranfer to non existing parent token', async function () {
       const notExistingParentId = 9999;
       await expect(
-        child.connect(firstOwner).nestTransfer(parent.address, childId1, notExistingParentId, "0x"),
+        child.connect(firstOwner).nestTransfer(parent.address, childId1, notExistingParentId),
       ).to.be.revertedWithCustomError(parent, 'ERC721InvalidTokenId');
     });
   });

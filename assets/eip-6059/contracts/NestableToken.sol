@@ -196,7 +196,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
         address to,
         uint256 tokenId,
         uint256 destinationId,
-        bytes calldata data
+        bytes memory data
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
         _nestTransfer(from, to, tokenId, destinationId, data);
     }

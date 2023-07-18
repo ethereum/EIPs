@@ -108,6 +108,6 @@ interface IERC6059 {
         address to,
         uint256 tokenId,
         uint256 destinationId,
-        bytes calldata data
+        bytes memory data
     ) external;
 }
