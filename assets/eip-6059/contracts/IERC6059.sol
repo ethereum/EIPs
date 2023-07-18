@@ -4,11 +4,6 @@ pragma solidity ^0.8.16;
 
 
 interface IERC6059 {
-    struct Child {
-        uint256 tokenId;
-        address contractAddress;
-    }
-
     struct DirectOwner {
         uint256 tokenId;
         address ownerAddress;
@@ -46,6 +41,11 @@ interface IERC6059 {
         bool fromPending,
         bool toZero
     );
+
+    struct Child {
+        uint256 tokenId;
+        address contractAddress;
+    }
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
 
