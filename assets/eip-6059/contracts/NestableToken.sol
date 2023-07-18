@@ -1099,7 +1099,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC6059 {
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            to == address(0)
         );
         _afterTransferChild(
             tokenId,

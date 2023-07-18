@@ -587,7 +587,7 @@ describe('NestableToken', function () {
           .transferChild(parentId, tokenOwner.address, 0, 0, child.address, childId1, false, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, false);
+        .withArgs(parentId, 0, child.address, childId1, false, false);
 
       await checkChildMovedToRootOwner();
     });
@@ -600,7 +600,7 @@ describe('NestableToken', function () {
           .transferChild(parentId, toOwnerAddress, 0, 0, child.address, childId1, false, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, false);
+        .withArgs(parentId, 0, child.address, childId1, false, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
@@ -624,7 +624,7 @@ describe('NestableToken', function () {
           ),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, false);
+        .withArgs(parentId, 0, child.address, childId1, false, false);
 
       expect(await child.ownerOf(childId1)).to.eql(newOwnerAddress);
       expect(await child.directOwnerOf(childId1)).to.eql([parent.address, bn(newParentId), true]);
@@ -747,7 +747,7 @@ describe('NestableToken', function () {
           .transferChild(parentId, tokenOwner.address, 0, 0, child.address, childId1, true, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, true);
+        .withArgs(parentId, 0, child.address, childId1, true, false);
 
       await checkChildMovedToRootOwner();
     });
@@ -760,7 +760,7 @@ describe('NestableToken', function () {
           .transferChild(parentId, toOwnerAddress, 0, 0, child.address, childId1, true, '0x'),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, true);
+        .withArgs(parentId, 0, child.address, childId1, true, false);
 
       await checkChildMovedToRootOwner(toOwnerAddress);
     });
@@ -784,7 +784,7 @@ describe('NestableToken', function () {
           ),
       )
         .to.emit(parent, 'ChildTransferred')
-        .withArgs(parentId, 0, child.address, childId1, true);
+        .withArgs(parentId, 0, child.address, childId1, true, false);
 
       expect(await child.ownerOf(childId1)).to.eql(newOwnerAddress);
       expect(await child.directOwnerOf(childId1)).to.eql([parent.address, bn(newParentId), true]);
