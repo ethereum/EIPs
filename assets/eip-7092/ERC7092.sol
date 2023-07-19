@@ -131,6 +131,18 @@ contract ERC7092 is IERC7092, BondStorage {
         return _principals[_account];
     }
 
+    function balanceOf(address _account) public view returns(uint256) {
+        require(_bondStatus = BondStatus.ISSUED, "ERC7092: NOT_ISSUED_OR_REDEEMED");
+
+        return _principals[_account] / _bond[bondISIN].denomination;
+    }
+
+    function totalSupply() public view returns(uint256) {
+        require(_bondStatus = BondStatus.ISSUED, "ERC7092: NOT_ISSUED_OR_REDEEMED");
+
+        return _bond[bondISIN].issueVolume / _bond[bondISIN].denomination;
+    }
+
     function approval(address _owner, address _spender) external view returns(uint256) {
         return _approvals[_owner][_spender];
     }
