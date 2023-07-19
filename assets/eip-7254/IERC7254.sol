@@ -42,9 +42,20 @@ interface IERC7254 {
     event GetReward(address indexed owner, uint256 value);
 
     /**
+    * @dev Emitted when `token` tokens reward is added.
+    * 
+    */
+    event Add(address token);
+    
+    /**
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
+
+    /**
+    * @dev Returns max token reward.
+    */
+    function maxTokenReward() external view returns(uint256);
 
     /**
      * @dev Returns the amount of tokens owned by `account`.
@@ -52,15 +63,29 @@ interface IERC7254 {
     function balanceOf(address account) external view returns (uint256);
 
     /**
-     * @dev Returns user information by `account`.
+     * @dev Returns list user information by `account`.
      */
-    function informationOf(address account) external view  returns (UserInformation memory);
+    function informationOfBatch(address account) external view  returns (UserInformation[] memory);
 
     /**
-     * @dev Returns token reward.
-     */
-    function tokenReward() external view returns (address);
+    * @dev Returns user information by `token reward` and `account`.
+    */
+    function informationOf(address token, address account) external view returns(UserInformation memory);
 
+    /**
+    * @dev Returns list token reward.
+    */
+    function tokenReward() external view returns (address[] memory);
+
+    /**
+    * @dev Returns reward per share.
+    */
+    function getRewardPerShare(address token) external view returns (uint256);
+
+    /**
+     * @dev Indicates whether token exist.
+     */
+    function existsTokenReward(address token) external view returns (bool);
 
     /**
      * @dev Moves `amount` tokens from the caller's account to `to`.
@@ -111,19 +136,17 @@ interface IERC7254 {
      *
      * Emits a {UpdateReward} event.
      */
-    function updateReward(uint256 amount) external returns(uint256);
+    function updateReward(address[] memory token, uint256[] memory amount) external;
 
     /**
      * @dev Returns the amount of reward by `account`.
      */
-    function viewReward(address account) external returns (uint256);
+    function viewReward(address account) external returns (uint256[] memory);
 
     /**
      * @dev Moves reward to caller.
      *
-     * Returns a amount value of reward.
-     *
      * Emits a {GetReward} event.
      */
-    function getReward() external returns(uint256);
+    function getReward(address[] memory token) external;
 }
