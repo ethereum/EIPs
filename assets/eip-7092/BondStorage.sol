@@ -38,12 +38,10 @@ contract BondStorage {
     enum BondStatus {UNREGISTERED, SUBMITTED, ISSUED, REDEEMED}
 
     mapping(string => Bond) internal _bond;
-    mapping(address => uint256) public balanceOf;
     mapping(string => Issuer) internal _issuer;
     mapping(address => uint256) internal _principals;
     mapping(address => mapping(address => uint256)) internal _approvals;
 
-    uint256 public totalSupply;
     string internal bondISIN;
     string internal _countryOfIssuance;
 
