@@ -58,13 +58,15 @@ An EIP must meet certain minimum criteria. It must be a clear and complete descr
 
 ## Working Groups
 
-Many proposals will come into EIP process via working groups who take responsibility for their specifications.  Working Group concerns include the technical quality, formatting and notations for their specifications, coordination with other specifications, the workflow for their tasks and documents, and addditional repos for tracking their work.
+Many proposals will come into EIP process via working groups who take responsibility for their specifications.  Working Group concerns include the technical quality, formatting and notations for their specifications, coordination with other specifications, the workflow for their tasks and documents.  And, of course, their own governance.
 
 * Working Group proposals first enter the EIP process (see below) as **Drafts**.
 * While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
 * WG EIPs reenter the EIP process to become **Final**.
 
-Currently, only the Core Developers are organized enough to already be doing this job.
+A Working Group fully governs its own EIPs.  To ensure this, at least one WG member should serve as an Editor with the power -- within the governance of the WG -- to merge PRs to EIPs/EIPS over the objections of other Editors.
+
+Currently, only the Core Developers are organized enough to do this job.
 
 ### Core EIPs
 
@@ -72,7 +74,7 @@ Currently, only the Core Developers are organized enough to already be doing thi
 
 ### Editorial Services
 
-The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that Final EIPs meet all standards of quality, format, style, and usage, and to provide administrative and publication services for EIPs and related digital assets.  
+The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that proposals merged to EIPs/EIPS meet standards of quality, format, style, and usage, and to provide administrative and publication services for EIPs and related digital assets.
 
 ## EIP Work Flow
 
