@@ -1,4 +1,4 @@
----
+—-
 eip: 1
 title: EIP Purpose and Guidelines
 status: Living
@@ -6,7 +6,6 @@ type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 discussions-to: https://ethereum-magicians.org/t/update-eip-1-eip-pain-relief-7230/15082
 created: 2015-10-27
----
 
 ## What is an EIP?
 
@@ -64,7 +63,7 @@ Many proposals will come into EIP process via working groups who take responsibi
 * While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
 * WG EIPs reenter the EIP process to become **Final**.
 
-A Working Group fully governs its own EIPs.  To ensure this, at least one WG member should serve as an Editor with the power -- within the governance of the WG -- to merge PRs to EIPs/EIPS over the objections of other Editors.
+A Working Group fully governs its own EIPs.  To ensure this, at least one WG member should serve as an Editor with the power — within the governance of the WG — to merge PRs to EIPs/EIPS over the objections of the Github tooling or the other Editors.
 
 Currently, only the Core Developers are organized enough to do this job.
 
@@ -241,23 +240,23 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `status`: *Draft, Review, Last Call, Final, Stagnant, Withdrawn, Living*
 
-`last-call-deadline`: *The date last call period ends on* (Optional field, only needed when status is `Last Call`)
+`last-call-deadline`: *The date last call period ends on*  — This header is only needed when the status is `Last Call`.
 
 `type`: *One of `Standards Track`, `Meta`, or `Informational`*
 
-`category`: *One of `Core`, `Networking`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
+`category`: *One of `Core`, `Networking`, `Interface`, or `ERC`*  — This header is only needed for `Standards Track` EIPs.
 
 `created`: *Date the EIP was created on*
 
-`requires`: *EIP number(s)* (Optional field)
+`requires`: *EIP number(s)* — This header is optional.
 
-`withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
+`withdrawal-reason`: *A sentence explaining why the EIP was withdrawn* — This header is only needed when the status is `Withdrawn`.
  
-`working-group:`: *The name of the Working Group responsible for this EIP* (If any.)
+`working-draft`: *A link to the working draft of this EIP* — This header is not needed if the draft is under etherem/EIP/EIPs.
 
-`working-group-draft:`: *A link to the Working Group draft of this EIP if not in etherem/EIP/EIPs.* (Optional, if any.)
+`working-group`: *The name of the Working Group* — This header is only needed when a Working Group is responsible for this EIP.
 
-`working-group-status:`: *The status of this EIP in the Working Group workflow.* (Optional, if any.)
+`working-group-status`: *The status of this EIP in the Working Group workflow* — This header is optional, and only for use by the responsible Working Group.
 
 Working Groups can introduce their own headers, which should come last.
 
@@ -490,8 +489,8 @@ This is a sentence with a footnote.[^1]
 
 Which renders to:
 
-<!-- markdownlint-capture -->
-<!-- markdownlint-disable code-block-style -->
+<!— markdownlint-capture —>
+<!— markdownlint-disable code-block-style —>
 
 This is a sentence with a footnote.[^1]
 
@@ -522,7 +521,7 @@ This is a sentence with a footnote.[^1]
     }
     ```
 
-<!-- markdownlint-restore -->
+<!— markdownlint-restore —>
 
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
