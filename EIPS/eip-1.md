@@ -64,7 +64,7 @@ Many proposals will come into EIP process via working groups who take responsibi
 * While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
 * WG EIPs reenter the EIP process to become **Final**.
 
-A Working Group fully governs its own EIPs.  To ensure this, at least one WG member should serve as an Editor with the power — within the governance of the WG — to merge PRs to EIPs/EIPS over the objections of the Github tooling or the other Editors.
+***A Working Group fully governs its own EIPs.***  To ensure this, at least one WG member should serve as an Editor with the power — within the governance of the WG — to merge PRs to EIPs/EIPS over the objections of the Github tooling or the other Editors.
 
 Currently, only the Core Developers are organized enough to do this job.
 
@@ -490,8 +490,8 @@ This is a sentence with a footnote.[^1]
 
 Which renders to:
 
-<!— markdownlint-capture —>
-<!— markdownlint-disable code-block-style —>
+<!--- markdownlint-capture --->
+<!--- markdownlint-disable code-block-style --->
 
 This is a sentence with a footnote.[^1]
 
@@ -522,7 +522,7 @@ This is a sentence with a footnote.[^1]
     }
     ```
 
-<!— markdownlint-restore —>
+<!--- markdownlint-restore --->
 
 See the [Citation Style Language Schema](https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json) for the supported fields. In addition to passing validation against that schema, references must include a DOI and at least one URL.
 
