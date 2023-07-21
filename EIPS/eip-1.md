@@ -1,4 +1,4 @@
-—-
+---
 eip: 1
 title: EIP Purpose and Guidelines
 status: Living
