@@ -6,6 +6,7 @@ type: Meta
 author: Martin Becze <mb@ethereum.org>, Hudson Jameson <hudson@ethereum.org>, et al.
 discussions-to: https://ethereum-magicians.org/t/update-eip-1-eip-pain-relief-7230/15082
 created: 2015-10-27
+---
 
 ## What is an EIP?
 
