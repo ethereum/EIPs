@@ -64,7 +64,7 @@ Many proposals will come into EIP process via working groups who take responsibi
 * While WG proposals are **Drafts** their Specification and workflow belongs to the WG.
 * WG EIPs reenter the EIP process to become **Final**.
 
-***A Working Group fully governs its own EIPs.***  To ensure this, at least one WG member should serve as an Editor with the power — within the governance of the WG — to merge PRs to EIPs/EIPS over the objections of the Github tooling or the other Editors.
+A Working Group fully governs its own EIPs.  To ensure this, at least one WG member should serve as an Editor with the power — within the governance of the WG — to merge PRs to EIPs/EIPS over the objections of the Github tooling or the other Editors.
 
 Currently, only the Core Developers are organized enough to do this job.
 
