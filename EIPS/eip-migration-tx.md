@@ -1,0 +1,125 @@
+---
+title: Migration Transaction
+description: Allow EOAs to send a one-time transaction which deploys code at their account.
+author: lightclient (@lightclient), Sam Wilson (@samwilsn), Ansgar Dietrichs (@adietrichs)
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-migration-transaction/15144
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-07-21
+requires: 170, 1559
+---
+
+## Abstract
+
+Introduce a new [EIP-2718](./eip-2718.md) transaction type with the format `0x04 || rlp([chainId, nonce, maxFeePerGas, maxPriorityFeePerGas, gasLimit, codePtr, storageTuples, data, value, accessList, yParity, r, s])` which sets the sending account's `code` field in the state trie to the `code` value at `codePtr` and applies the storage tuples to the sender's storage trie.
+
+## Motivation
+
+For as long as Ethereum has existed, so have complaints about the user experience of the platform.
+
+Ethereum was designed to be an abstract platform, limited only by the mind of the developers who deploy to it. Smart contract wallets were expected to placate unhappy users. Unfortunately, many years into this journey, the tension is still here.
+
+The ecosystem looks different than it did when when the first smart contract wallets were written. Several application-level standards have mitigated some of the issues. There are large standardization efforts around smart contract wallets, and a big push to make them the default on layer two chains. Everything seems to be moving in the right direction.
+
+One significant problems that hasn't been resolved though is what to do about the EOA users of *today*. Manually migrating assets from an EOA is not a tenable path to converting Ethereum's user base to smart contract wallets. We must provide a mechanism, embedded in the protocol, to migrate. This EIP proposes such mechanism.
+
+## Specification
+
+At the fork block `X`, introduce the MigrationTransaction transaction type.
+
+## MigrationTransaction
+
+### Definition
+
+| field                  | type      |
+|------------------------|-----------|
+| `chainId`              | `int256`  |
+| `nonce`                | `uint64`  |
+| `maxFeePerGas`         | `int256`  |
+| `maxPriorityFeePerGas` | `int256`  |
+| `gasLimit`             | `uint64`  |
+| `codePtr`              | `address` |
+| `storage`              | `List[Tuple[uint256, uint256]]` |
+| `data`                 | `bytes`   |
+| `value`                | `int256`  |
+| `accessList`           | `List[Tuple[address, List[uint256]]]` |
+| `yParity`              | `uint8`   |
+| `v`                    | `uint256` |
+| `r`                    | `uint256` |
+
+The EIP-2718 `TransactionType` is `0x04` and the `TransactionPayload` is `rlp([chainId, nonce, maxFeePerGas, maxPriorityFeePerGas, gasLimit, codePtr, storageTuples, data, value, accessList, yParity, r, s])`.
+
+The transaction's signature hash is `keccak256(0x04 || rlp([chainId, nonce, maxFeePerGas, maxPriorityFeePerGas, gasLimit, codePtr, storageTuples, data, value, accessList])`
+
+## Validation
+
+A MigrationTransaction is considered valid if the follow properties hold:
+* all EIP-1559 properties, unless specified otherwise
+* the code at `codePtr` is less than the EIP-170 limit of `24576`
+* the code at `codePtr` must not have size `0`
+
+The intrinsic gas calculation modified from EIP-1559 to be `21000 + 16 * non-zero calldata bytes + 4 * zero calldata bytes + 1900 * access list storage key count + 2400 * access list address count + 15000 * length of storage`.
+
+## Processing
+
+Execution a MigrationTransaction transaction has two parts.
+
+### Contract Deployment
+
+Unlike standard contract deployment, the MigrationTransaction directly specifies what `code` value of the sender's account should be set to.
+
+As the first step of processing the transaction, set the sender's `code` value equal to `state[tx.codePtr].code`. Next, iterate through each tuple in `tx.storage` and in the sender's storage trie, set `storage[t.first] = t.second`.
+
+### Transaction Execution
+
+Now instantiate an EVM call into the sender's account using the same rules as EIP-1559 and set the transaction's origin to be `keccak256(sender)[0..20]`.
+
+## Rationale
+
+### No `to` address field
+
+This transaction is only good for one time use to migrate an EOA to a smart contract. It is designed to immediately call the deployed contract, which is at the sender's address, after deployment to allow the sender to do any kind of further processing.
+
+### Code pointer for deployment
+
+Naively, one could design the migration transaction to have a field `code` that is just bytes. The outcome of this is that there would be substantial duplication of code calldata, since many users will want to deploy the exact same thing (a wallet). Using a pointer instead acknowledges the overwhelming use case for the transaction type, and exploits it as an optimization.
+
+### Cheaper storage
+
+Sometimes it's better to lead with a carrot instead of a stick.
+
+### Intrinsic does not account for contract deployment
+
+This is takes advantage of the fact that clients tend to single, unique copies of code. Therefore, the only operation here is changing a pointer in the state trie to desired code's pointer.
+
+Additionally, the EOA already exists because it has enough balance for the MigrationTransaction to be considered valid. Therefore, we don't need to pay a premium for adding a new account into the state trie.
+
+### Manipulating transaction origin
+
+Many applications have a security check `caller == origin` to verify the caller is an EOA. This is done to "protect" assets. While it is usually more of a bandage than an actual fix, we attempt to placate these projects by modifying the origin of the transaction so the check will continue performing it's duty.
+
+### One-time migration
+
+There is no technical reason we couldn't allow EOAs to change their code at anytime with this transaction type. The only inhibitor at the moment is EIP-3607 which will cause migration transactions to be considered invalid if they come from an account with code already deployed. A functional reason for retaining this behavior though is that it makes it simpler to reason about contracts and their upgradability.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+TBD
+
+## Reference Implementation
+
+TBD
+
+## Security Considerations
+
+As with all sufficiently sophisticated account designs, if a user can be convinced to sign an arbitrary message, that message could be MigrationTransaction which is owned by a malicious actor instead of the user. This can generally be avoided if wallets treat these transactions with *extreme* care and create as much friction and verification as possible before completing the signature.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
