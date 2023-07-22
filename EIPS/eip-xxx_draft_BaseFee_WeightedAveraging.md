@@ -1,10 +1,10 @@
 ---
 title: Add time-weighted averaging to the base fee mechanism
 description: Using geometric weights to average past block sizes into consideration
-author: Guy Goren <guy.nahsholim@gmail.com>
+author: Guy Goren (@guy-goren) <guy.nahsholim@gmail.com>
 discussions-to: https://ethereum-magicians.org/t/add-time-weighted-averaging-to-the-base-fee-mechanism/15142
 status: Draft
-type: Standard Track
+type: Standards Track
 category: Core
 created: 2023-07-22
 # requires: <EIP number(s)> Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
