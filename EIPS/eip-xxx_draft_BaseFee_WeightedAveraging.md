@@ -1,4 +1,5 @@
 ---
+eip: 7378
 title: Add time-weighted averaging to the base fee mechanism
 description: Using geometric weights to average past block sizes into consideration
 author: Guy Goren (@guy-goren) <guy.nahsholim@gmail.com>
