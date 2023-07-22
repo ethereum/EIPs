@@ -23,13 +23,13 @@ jobs:
     steps:
       - name: Write PR Number - PR Target
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
         env:
           PR_NUMBER: ${{ github.event.number }}
 
       - name: Write PR Number - PR Review
         run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && !endsWith(github.event.sender, '-bot') && !endsWith(github.event.sender, '[bot]')
+        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
 
@@ -46,13 +46,13 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number }}
       
       - name: Check File Existence
-        uses: andstor/file-existence-action@f02338908d150e00a4b8bebc2dad18bd9e5229b0
+        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
         id: check_pr_number_exists
         with:
           files: pr-number.txt
 
       - name: Save PR Number
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8
+        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
         if: steps.check_pr_number_exists.outputs.files_exists == 'true'
         with:
           name: pr-number

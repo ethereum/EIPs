@@ -4,7 +4,7 @@
 
 pragma solidity ^0.8.16;
 
-import "./INestable.sol";
+import "./IERC6059.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -46,7 +46,7 @@ error UnexpectedNumberOfChildren();
  * @dev This contract is hierarchy agnostic and can support an arbitrary number of nested levels up and down, as long as
  *  gas limits allow it.
  */
-contract NestableToken is Context, IERC165, IERC721, INestable {
+contract NestableToken is Context, IERC165, IERC721, IERC6059 {
     using Address for address;
 
     uint256 private constant _MAX_LEVELS_TO_CHECK_FOR_INHERITANCE_LOOP = 100;
@@ -76,7 +76,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
     // Mapping of child token address to child token ID to whether they are pending or active on any token
     // We might have a first extra mapping from token ID, but since the same child cannot be nested into multiple tokens
     //  we can strip it for size/gas savings.
-    mapping(address => mapping(uint256 => uint256)) private _childIsInActive;
+    mapping(address => mapping(uint256 => uint256)) internal _childIsInActive;
 
     // -------------------------- MODIFIERS ----------------------------
 
@@ -133,7 +133,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC721Metadata).interfaceId ||
-            interfaceId == type(INestable).interfaceId;
+            interfaceId == type(IERC6059).interfaceId;
     }
 
     /**
@@ -255,7 +255,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
         _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
 
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, 0, to, false);
+        _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
@@ -291,7 +291,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
         // Destination contract checks:
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert IsNotContract();
-        if (!IERC165(to).supportsInterface(type(INestable).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
             revert NestableTransferToNonNestableImplementer();
         _checkForInheritanceLoop(tokenId, to, destinationId);
 
@@ -304,7 +304,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
             tokenId
         );
         _balances[from] -= 1;
-        _updateOwnerAndClearApprovals(tokenId, destinationId, to, true);
+        _updateOwnerAndClearApprovals(tokenId, destinationId, to);
         _balances[to] += 1;
 
         // Sending to NFT:
@@ -331,7 +331,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
         uint256 tokenId,
         bytes memory data
     ) private {
-        INestable destContract = INestable(to);
+        IERC6059 destContract = IERC6059(to);
         destContract.addChild(destinationId, tokenId, data);
         _afterTokenTransfer(from, to, tokenId);
         _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
@@ -359,7 +359,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
                 address nextOwner,
                 uint256 nextOwnerTokenId,
                 bool isNft
-            ) = INestable(targetContract).directOwnerOf(targetId);
+            ) = IERC6059(targetContract).directOwnerOf(targetId);
             // If there's a final address, we're good. There's no loop.
             if (!isNft) {
                 return;
@@ -449,7 +449,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
     ) internal virtual {
         // It seems redundant, but otherwise it would revert with no error
         if (!to.isContract()) revert IsNotContract();
-        if (!IERC165(to).supportsInterface(type(INestable).interfaceId))
+        if (!IERC165(to).supportsInterface(type(IERC6059).interfaceId))
             revert MintToNonNestableImplementer();
 
         _innerMint(to, tokenId, destinationId);
@@ -482,8 +482,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
         _balances[to] += 1;
         _directOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: destinationId != 0
+            tokenId: destinationId
         });
     }
 
@@ -501,20 +500,19 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
      */
     function ownerOf(
         uint256 tokenId
-    ) public view virtual override(INestable, IERC721) returns (address) {
+    ) public view virtual override(IERC6059, IERC721) returns (address) {
         (address owner, uint256 ownerTokenId, bool isNft) = directOwnerOf(
             tokenId
         );
         if (isNft) {
-            owner = INestable(owner).ownerOf(ownerTokenId);
+            owner = IERC6059(owner).ownerOf(ownerTokenId);
         }
         return owner;
     }
 
     /**
      * @notice Used to retrieve the immediate owner of the given token.
-     * @dev In the event the NFT is owned by an externally owned account, `tokenId` will be `0` and `isNft` will be
-     *  `false`.
+     * @dev In the event the NFT is owned by an externally owned account, `tokenId` will be `0`.
      * @param tokenId ID of the token for which the immediate owner is being retrieved
      * @return address Address of the immediate owner. If the token is owned by an externally owned account, its address
      *  will be returned. If the token is owned by another token, the parent token's collection smart contract address
@@ -529,7 +527,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
         DirectOwner memory owner = _directOwners[tokenId];
         if (owner.ownerAddress == address(0)) revert ERC721InvalidTokenId();
 
-        return (owner.ownerAddress, owner.tokenId, owner.isNft);
+        return (owner.ownerAddress, owner.tokenId, owner.tokenId != 0);
     }
 
     ////////////////////////////////////////
@@ -622,7 +620,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
             // We substract one to the next level to count for the token being burned, then add it again on returns
             // This is to allow the behavior of 0 recursive burns meaning only the current token is deleted.
             totalChildBurns +=
-                INestable(children[i].contractAddress).burn(
+                IERC6059(children[i].contractAddress).burn(
                     children[i].tokenId,
                     pendingRecursiveBurns - 1
                 ) +
@@ -713,19 +711,15 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
      * @param tokenId ID of the token being updated
      * @param destinationId ID of the token to receive the given token
      * @param to Address of account to receive the token
-     * @param isNft A boolean value signifying whether the new owner is a token (`true`) or externally owned account
-     *  (`false`)
      */
     function _updateOwnerAndClearApprovals(
         uint256 tokenId,
         uint256 destinationId,
-        address to,
-        bool isNft
+        address to
     ) internal {
         _directOwners[tokenId] = DirectOwner({
             ownerAddress: to,
-            tokenId: destinationId,
-            isNft: isNft
+            tokenId: destinationId
         });
 
         // Clear approvals from the previous owner
@@ -1090,7 +1084,7 @@ contract NestableToken is Context, IERC165, IERC721, INestable {
                 );
             } else {
                 // Destination is an NFT
-                INestable(child.contractAddress).nestTransferFrom(
+                IERC6059(child.contractAddress).nestTransferFrom(
                     address(this),
                     to,
                     child.tokenId,

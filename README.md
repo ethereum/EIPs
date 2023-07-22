@@ -27,11 +27,11 @@ Consider any document not published at <https://eips.ethereum.org/> as a working
 
 All pull requests in this repository must pass automated checks before they can be automatically merged:
 
-- [EIP-Bot](https://github.com/ethereum/EIP-Bot/) determines when PRs can be automatically merged [^1]
+- [eip-review-bot](https://github.com/ethereum/eip-review-bot/) determines when PRs can be automatically merged [^1]
 - EIP-1 rules are enforced using [`eipw`](https://github.com/ethereum/eipw)[^2]
 - HTML formatting and broken links are enforced using [HTMLProofer](https://github.com/gjtorikian/html-proofer)[^2]
 - Spelling is enforced with [CodeSpell](https://github.com/codespell-project/codespell)[^2]
-- False positives sometimes occur. When this happens, please submit a PR editing [.codespell-whitelist](https://github.com/ethereum/EIPs/blob/master/config/.codespell-whitelist).
+  - False positives sometimes occur. When this happens, please submit a PR editing [.codespell-whitelist](https://github.com/ethereum/EIPs/blob/master/config/.codespell-whitelist) and **ONLY** .codespell-whitelist
 - Markdown best practices are checked using [markdownlint](https://github.com/DavidAnson/markdownlint)[^2]
 
 [^1]: https://github.com/ethereum/EIPs/blob/master/.github/workflows/auto-review-bot.yml
@@ -50,13 +50,13 @@ eipv <INPUT FILE / DIRECTORY>
 
 1. Open Terminal.
 
-2. Check whether you have Ruby 2.1.0 or higher installed:
+2. Check whether you have Ruby 3.1.4 installed. Later [versions are not supported](https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror).
 
    ```sh
    ruby --version
    ```
 
-3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+3. If you don't have Ruby installed, install Ruby 3.1.4.
 
 4. Install Bundler:
 
@@ -78,6 +78,6 @@ eipv <INPUT FILE / DIRECTORY>
    bundle exec jekyll serve
    ```
 
-2. Preview your local Jekyll site in your web browser at <http://localhost:4000>.
+2. Preview your local Jekyll site in your web browser at `http://localhost:4000`.
 
 More information on Jekyll and GitHub Pages [here](https://docs.github.com/en/enterprise/2.14/user/articles/setting-up-your-github-pages-site-locally-with-jekyll).

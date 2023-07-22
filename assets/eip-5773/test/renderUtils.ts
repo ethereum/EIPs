@@ -1,19 +1,23 @@
-import { BigNumber } from 'ethers';
-import { ethers } from 'hardhat';
-import { expect } from 'chai';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { MultiAssetTokenMock, MultiAssetRenderUtils } from '../typechain-types';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { BigNumber } from "ethers";
+import { ethers } from "hardhat";
+import { expect } from "chai";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { MultiAssetTokenMock, MultiAssetRenderUtils } from "../typechain-types";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 function bn(x: number): BigNumber {
   return BigNumber.from(x);
 }
 
 async function assetsFixture() {
-  const multiassetFactory = await ethers.getContractFactory('MultiAssetTokenMock');
-  const renderUtilsFactory = await ethers.getContractFactory('MultiAssetRenderUtils');
+  const multiassetFactory = await ethers.getContractFactory(
+    "MultiAssetTokenMock"
+  );
+  const renderUtilsFactory = await ethers.getContractFactory(
+    "MultiAssetRenderUtils"
+  );
 
-  const multiasset = await multiassetFactory.deploy('Chunky', 'CHNK');
+  const multiasset = await multiassetFactory.deploy("Chunky", "CHNK");
   await multiasset.deployed();
 
   const renderUtils = await renderUtilsFactory.deploy();
@@ -22,7 +26,7 @@ async function assetsFixture() {
   return { multiasset, renderUtils };
 }
 
-describe('Render Utils', async function () {
+describe("Render Utils", async function () {
   let owner: SignerWithAddress;
   let multiasset: MultiAssetTokenMock;
   let renderUtils: MultiAssetRenderUtils;
@@ -41,10 +45,10 @@ describe('Render Utils', async function () {
 
     tokenId = 1;
     await multiasset.mint(owner.address, tokenId);
-    await multiasset.addAssetEntry(resId, 'ipfs://res1.jpg');
-    await multiasset.addAssetEntry(resId2, 'ipfs://res2.jpg');
-    await multiasset.addAssetEntry(resId3, 'ipfs://res3.jpg');
-    await multiasset.addAssetEntry(resId4, 'ipfs://res4.jpg');
+    await multiasset.addAssetEntry(resId, "ipfs://res1.jpg");
+    await multiasset.addAssetEntry(resId2, "ipfs://res2.jpg");
+    await multiasset.addAssetEntry(resId3, "ipfs://res3.jpg");
+    await multiasset.addAssetEntry(resId4, "ipfs://res4.jpg");
     await multiasset.addAssetToToken(tokenId, resId, 0);
     await multiasset.addAssetToToken(tokenId, resId2, 0);
     await multiasset.addAssetToToken(tokenId, resId3, resId);
@@ -55,32 +59,36 @@ describe('Render Utils', async function () {
     await multiasset.setPriority(tokenId, [10, 5]);
   });
 
-  describe('Render Utils MultiAsset', async function () {
-    it('can get active assets', async function () {
-      expect(await renderUtils.getActiveAssets(multiasset.address, tokenId)).to.eql([
-        [resId, 10, 'ipfs://res1.jpg'],
-        [resId2, 5, 'ipfs://res2.jpg'],
+  describe("Render Utils MultiAsset", async function () {
+    it("can get active assets", async function () {
+      expect(
+        await renderUtils.getActiveAssets(multiasset.address, tokenId)
+      ).to.eql([
+        [resId, BigNumber.from(10), "ipfs://res1.jpg"],
+        [resId2, BigNumber.from(5), "ipfs://res2.jpg"],
       ]);
     });
-    it('can get pending assets', async function () {
-      expect(await renderUtils.getPendingAssets(multiasset.address, tokenId)).to.eql([
-        [resId4, bn(0), bn(0), 'ipfs://res4.jpg'],
-        [resId3, bn(1), resId, 'ipfs://res3.jpg'],
+    it("can get pending assets", async function () {
+      expect(
+        await renderUtils.getPendingAssets(multiasset.address, tokenId)
+      ).to.eql([
+        [resId4, bn(0), bn(0), "ipfs://res4.jpg"],
+        [resId3, bn(1), resId, "ipfs://res3.jpg"],
       ]);
     });
 
-    it('can get top asset by priority', async function () {
-      expect(await renderUtils.getTopAssetMetaForToken(multiasset.address, tokenId)).to.eql(
-        'ipfs://res2.jpg',
-      );
+    it("can get top asset by priority", async function () {
+      expect(
+        await renderUtils.getTopAssetMetaForToken(multiasset.address, tokenId)
+      ).to.eql("ipfs://res2.jpg");
     });
 
-    it('cannot get top asset if token has no assets', async function () {
+    it("cannot get top asset if token has no assets", async function () {
       const otherTokenId = 2;
       await multiasset.mint(owner.address, otherTokenId);
       await expect(
-        renderUtils.getTopAssetMetaForToken(multiasset.address, otherTokenId),
-      ).to.be.revertedWith('Token has no assets');
+        renderUtils.getTopAssetMetaForToken(multiasset.address, otherTokenId)
+      ).to.be.revertedWith("Token has no assets");
     });
   });
 });
