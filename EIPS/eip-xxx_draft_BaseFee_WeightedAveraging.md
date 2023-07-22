@@ -8,11 +8,10 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2023-07-22
-# requires: <EIP number(s)> Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
 
 ## Abstract
-The current formula for setting the base fee follows the original EIP-1559:
+The current formula for setting the base fee follows the original [EIP-1559](./eip-1559.md):
 $$b[i+1]\triangleq  b[i] \cdot \left( 1+\frac{1}{8} \cdot \frac{s[i]-s^* }{s^* }\right)$$ where $i$ enumerates the blocks, $s^*$ is a predetremined block size (the "desired" size, aka gas amount), $b[i]$ is the base fee at block $i$, and $s[i]$ is the size of the block at height $i$. This formula considers only the last block size $s[i]$. This mechanism might lead to incentives for users to bribe miners in order to reduce the base fee, or (in analogous manner) for miners to intiate a collusion with sophisticated users for the benefit of both. (See Motivation section.)
 
 We propose to consider the history of block sizes via a past wheighted average with a geometric sequence as the weights. In particular, we suggest the following update rule:
@@ -44,19 +43,21 @@ An intuitive option for the Transaction Fee Mechanism (TFM) that adjusts supply 
 
 The change is based on [this work](https://arxiv.org/abs/2304.11478) that described a rational strategy in which bribes are profitabe. Choosing to average based on a geometric series weights results in two desired properties: (i) the computation and space complexity are both in O(1), and (ii) the average gradually phases out the impact of a single outlier block without causing significant future fluctuations in the base fee.
 
-## Backwards Compatibility
-This change requires a hard fork since the base fee is enforced (for blocks to be considerd valid).
 
-## Test Cases
-Too early to say
 
-## Incentive Considerations
+### Incentive Considerations
 The proposal is designed to improve the incentive compatability of the TFM. A [game theoretic analysys](https://arxiv.org/abs/2304.11478) shows that a TFM based on EIP-1559 encourages bribes. Roughly, because the base fee in the next block depends on the size of the the current block, a miner that creates an empty block reduces the base fee of the next block by a factor of $\frac{1}{8}$. The opportunity cost for mining an empty block instead of a normal block is only the tips it contains. Thus, the cost of bribing a miner is only compansating it for the lost tips. In case the base fee is significantly larger than the tips, the bribing user gains a siginificant reduction in the base fees of the next block, making the bribe profitable. 
 
 One of the main goals of EIP-1559 was to simplify the bidding for users. It was articulated [theoreticaly by Roughgarden](https://timroughgarden.org/papers/eip1559.pdf) as users bidding their honest valuations being an optimal strategy. In contrast, when using first price auctions for the TFM (as done by Bitcoin and previously in Ethereum), it is typically sub-optimal for a user to bid its honest valuation. In other words, a TFM that encourages users to not fully reveal their preferences is considerd less good. However, one may argue that a TFM that encourages bribes is worse than a TFM that encourages not revealing one's full preferences.
 
 Although a first price auction is a safe bet regarding TFMs, the Ethereum network chose to use EIP-1559 and burn transaction fees (perhaps for reasons other than game-theoretic ones). We therefore suggest to mitigate the current incentives for bribes using the above proposal.
 
+
+## Backwards Compatibility
+This change requires a hard fork since the base fee is enforced (for blocks to be considerd valid).
+
+## Test Cases
+Too early to say
 
 ## Security Considerations
 Needs discussion.
