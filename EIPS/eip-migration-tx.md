@@ -56,11 +56,11 @@ The transaction's signature hash is `keccak256(0x04 || rlp([chainId, nonce, maxF
 ## Validation
 
 A MigrationTransaction is considered valid if the follow properties hold:
-* all EIP-1559 properties, unless specified otherwise
-* the code at `codePtr` is less than the EIP-170 limit of `24576`
+* all [EIP-1559](./eip-1559.md) properties, unless specified otherwise
+* the code at `codePtr` is less than the [EIP-170](./eip-170) limit of `24576`
 * the code at `codePtr` must not have size `0`
 
-The intrinsic gas calculation modified from EIP-1559 to be `21000 + 16 * non-zero calldata bytes + 4 * zero calldata bytes + 1900 * access list storage key count + 2400 * access list address count + 15000 * length of storage`.
+The intrinsic gas calculation modified from [EIP-1559](./eip-1559) to be `21000 + 16 * non-zero calldata bytes + 4 * zero calldata bytes + 1900 * access list storage key count + 2400 * access list address count + 15000 * length of storage`.
 
 ## Processing
 
@@ -74,7 +74,7 @@ As the first step of processing the transaction, set the sender's `code` value e
 
 ### Transaction Execution
 
-Now instantiate an EVM call into the sender's account using the same rules as EIP-1559 and set the transaction's origin to be `keccak256(sender)[0..20]`.
+Now instantiate an EVM call into the sender's account using the same rules as [EIP-1559](./eip-1559) and set the transaction's origin to be `keccak256(sender)[0..20]`.
 
 ## Rationale
 
@@ -102,7 +102,7 @@ Many applications have a security check `caller == origin` to verify the caller 
 
 ### One-time migration
 
-There is no technical reason we couldn't allow EOAs to change their code at anytime with this transaction type. The only inhibitor at the moment is EIP-3607 which will cause migration transactions to be considered invalid if they come from an account with code already deployed. A functional reason for retaining this behavior though is that it makes it simpler to reason about contracts and their upgradability.
+There is no technical reason we couldn't allow EOAs to change their code at anytime with this transaction type. The only inhibitor at the moment is [EIP-3607](./eip-3607) which will cause migration transactions to be considered invalid if they come from an account with code already deployed. A functional reason for retaining this behavior though is that it makes it simpler to reason about contracts and their upgradability.
 
 ## Backwards Compatibility
 
