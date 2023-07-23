@@ -31,12 +31,12 @@ library CouponMath {
         address _bondContract
     ) external view returns(uint256) {
         uint256 couponRate = IERC7092(_bondContract).couponRate();
-        uint256 couponDenomination = IERC7092(_bondContract).denomination();
+        uint256 denomination = IERC7092(_bondContract).denomination();
         uint256 principal = IERC7092(_bondContract).principalOf(_investor);
         uint256 frequency = IERC7092(_bondContract).couponFrequency();
         uint256 numberOfDays = _numberOfDays(_bondContract);
 
-        return principal * couponDenomination * couponRate * _duration / (frequency * numberOfDays);
+        return principal * denomination * couponRate * _duration / (frequency * numberOfDays);
     }
 
     /**
