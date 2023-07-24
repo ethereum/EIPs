@@ -150,10 +150,10 @@ Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd)
 
 There are a few paths to receiving an EIP number:
 
-* The bot may automatically assign a temporary mnemonic while the EIP is still a PR. Before the PR is merged, an EIP number may be assigned by the bot.
-* EIP editors can manually assign EIP numbers sequentially.
-* With the approval of half of all governing EIP editors (rounded up), any EIP number can be assigned.
-  * If the EIP fixes an existing Final EIP, only one EIP editor (governing or non-governing) is needed to assign an EIP number.
+- The bot may automatically assign a temporary mnemonic while the EIP is still a PR. Before the PR is merged, an EIP number may be assigned by the bot.
+- EIP editors can manually assign EIP numbers sequentially.
+- With the approval of half of all governing EIP editors (rounded up), any EIP number can be assigned.
+  - If the EIP fixes an existing Final EIP, only one EIP editor (governing or non-governing) is needed to assign an EIP number.
 
 If more than one EIP number is assigned, authors may pick any assigned EIP number. If the EIP number assignment is subsequently retracted by any governing EIP editor or the editor that assigned the number, the EIP may not use that number anymore. The only remaining EIP number cannot be retracted; a new one must be assigned first.
 
