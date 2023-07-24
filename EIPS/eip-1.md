@@ -118,7 +118,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
-`eip`: *EIP number* (this is determined by the EIP editor)
+`eip`: *EIP number*
 
 `title`: *The EIP title is a few words, not a complete sentence*
 
@@ -145,6 +145,17 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 Headers that permit lists must separate elements with commas.
 
 Headers requiring dates will always do so in the format of ISO 8601 (yyyy-mm-dd).
+
+### `eip` header
+
+There are a few paths to receiving an EIP number:
+
+* The bot may automatically assign a temporary mnemonic while the EIP is still a PR. Before the PR is merged, an EIP number may be assigned by the bot.
+* EIP editors can manually assign EIP numbers sequentially.
+* With the approval of half of all governing EIP editors (rounded up), any EIP number can be assigned.
+  * If the EIP fixes an existing Final EIP, only one EIP editor (governing or non-governing) is needed to assign an EIP number.
+
+If more than one EIP number is assigned, authors may pick any assigned EIP number. If the EIP number assignment is subsequently retracted by any governing EIP editor or the editor that assigned the number, the EIP may not use that number anymore. The only remaining EIP number cannot be retracted; a new one must be assigned first.
 
 ### `author` header
 
@@ -451,7 +462,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number, but the decision is with the editors)
+- Assign an EIP number
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
 - Send a message back to the EIP author with the next step.
 
