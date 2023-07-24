@@ -306,7 +306,7 @@ You can change the contract's owner (and so the writer) by calling `transferOwne
 
 The premium is to be determined by the writer, so that he's free to choose how to calculate the option's. We assume that many premiums will be determined by the *Black-Scholes model*, and computing this off-chain is better for gas costs purposes.
 
-This ERC is intended to represent **vanilla** options. However, exotic options can be built from this ERC.
+This ERC is intended to represent **vanilla** options. However, exotic options can be built on top of this ERC.
 
 ## Reference Implementation
 
@@ -322,14 +322,6 @@ For American option, this is even worse.\
 Once again, we advise writers to frequently check the underlying token price, and take the best decision for them.
 
 **Improvement idea:** if two users agreed for an option off-chain and they want to create it on-chain, there is a risk that between the creation of the contract and the purchase by the second user via the function `buy`, an on-chain user has already bought the contract. So it could be an improvement to add the possibility to directly set a buyer.
-
-## Implementation
-
-This standard can be implemented in Solidity and integrated into smart contracts managing options contracts. Developers can deploy their own options contracts that conform to this standard or build applications on top of existing options platforms that implement this ERC.
-
-## References
-
-- Related EIPs and standards: ERC-20, ERC-721
 
 ## Conclusion
 
