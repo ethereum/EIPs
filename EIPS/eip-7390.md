@@ -71,16 +71,19 @@ At creation time, user must provide the following parameters:
 ### State Variable Descriptions
 
 #### `side`
+
 **Type: `enum`**
 
 Side of the option. Can take the value `Call` or `Put`.
 
 #### `underlyingToken`
+
 **Type: `address` (`IERC20`)**
 
 Underlying token.
 
 #### `amount`
+
 **Type: `uint256`**
 
 Amount of the underlying token.
@@ -88,11 +91,13 @@ Amount of the underlying token.
 > Be aware of token decimals!
 
 #### `strikeToken`
+
 **Type: `address` (`IERC20`)**
 
 Token used as a reference to determine the strike price.
 
 #### `strike`
+
 **Type: `uint256`**
 
 Strike price.
@@ -100,23 +105,27 @@ Strike price.
 > Be aware of token decimals!
 
 #### `expiration`
+
 **Type: `uint256`**\
 **Format: _timestamp as seconds since unix epoch_**
 
 Date of the expiration.
 
 #### `exerciseDuration`
+
 **Type: `uint256`**\
 **Format: _seconds_**
 
 Duration during which the buyer may exercise the option. This period start at the `expiration`'s date. After this time range, buyer can't exercise and writer can retrieve his collateral.
 
 #### `premiumToken`
+
 **Type: `address` (`IERC20`)**
 
 Premium token.
 
 #### `premium`
+
 **Type: `uint256`**
 
 Premium price.
@@ -124,21 +133,25 @@ Premium price.
 > Be aware of token decimals!
 
 #### `type`
+
 **Type: `enum`**
 
 Type of the option. Can take the value `European` or `American`.
 
 #### `writer`
+
 **Type: `address`**
 
 Writer's address. Since the contract inherit from `Ownable`, `writer` is `owner`.
 
 #### `buyer`
+
 **Type: `address`**
 
 Buyer's address.
 
 #### `state`
+
 **Type: `enum`**
 
 State of the option. Can take the value `Invalid` (at creation), `Created` (when collateral received), `Bought`, `Exercised`, `Expired` or `Canceled`.
@@ -146,9 +159,11 @@ State of the option. Can take the value `Invalid` (at creation), `Created` (when
 ### Function Descriptions
 
 #### `create`
+
 ```solidity
 function create() external returns (bool);
 ```
+
 Allows the writer to validate the option by transferring the collateral to the contract.\
 
 > Previously, the writer has to allow the spend of amount `strike`/`amount` of token `strikeToken`/`underlyingToken` depending if the option is of type `Call` or `Put`. These funds will go to the contract and will be used as a *<u>collateral</u>* to be sure the necessary tokens are available if the buyer decides to exercise.
@@ -156,17 +171,21 @@ Allows the writer to validate the option by transferring the collateral to the c
 *Returns a boolean depending on whether or not the function was successfully executed.*
 
 #### `buy`
+
 ```solidity
 function buy() external returns (bool);
 ```
+
 Allows the user to buy the option. The buyer has to previously allow the spend to pay for the premium in the specified token. During the call of the function, the premium is be directly send to the writer.
 
 *Returns a boolean depending on whether or not the function was successfully executed.*
 
 #### `exercise`
+
 ```solidity
 function exercise() external returns (bool);
 ```
+
 Allows the buyer to exercise his option.
 
 - If the option is a call, buyer pays writer at the specified strike price and gets the specified underlying token(s).
@@ -177,17 +196,21 @@ In all case, the buyer has to previously allow the spend of either `strikeToken`
 *Returns a boolean depending on whether or not the function was successfully executed.*
 
 #### `retrieveExpiredTokens`
+
 ```solidity
 function retrieveExpiredTokens() external returns (bool);
 ```
+
 Allows the writer to retrieve the token(s) he locked (used as collateral). Writer can only execute this function after the period `exerciseDuration` happening/starting right after `expiration`.
 
 *Returns a boolean depending on whether or not the function was successfully executed.*
 
 #### `cancel`
+
 ```solidity
 function cancel() external returns (bool);
 ```
+
 Allows the writer to cancel the option and retrieve his/its locked token(s) (used as collateral). Writer can only execute this function if the option hasn't been bought.
 
 *Returns a boolean depending on whether or not the function was successfully executed.*
@@ -195,33 +218,43 @@ Allows the writer to cancel the option and retrieve his/its locked token(s) (use
 ### Events
 
 #### `Created`
+
 ```solidity
 event Created(uint256 timestamp);
 ```
+
 Emitted when the writer has given the collateral to the contract. Provides information about the transaction's `timestamp`.
 
 #### `Bought`
+
 ```solidity
 event Bought(address indexed buyer, uint256 timestamp);
 ```
+
 Emitted when the option has been bought. Provides information about the `buyer` and the transaction's `timestamp`.
 
 #### `Exercised`
+
 ```solidity
 event Exercised(uint256 timestamp);
 ```
+
 Emitted when the option has been exercised. Provides information about the transaction's `timestamp`.
 
 #### `Expired`
+
 ```solidity
 event Expired(uint256 timestamp);
 ```
+
 Emitted when the option has been expired. Provides information about the transaction's `timestamp`.
 
 #### `Canceled`
+
 ```solidity
 event Canceled(uint256 timestamp);
 ```
+
 Emitted when the option has been canceled. Provides information about the transaction's `timestamp`.
 
 ### Concrete Example
@@ -304,11 +337,6 @@ You can change the contract's owner (and so the writer) by calling `transferOwne
 The premium is to be determined by the writer, so that he's free to choose how to calculate the option's. We assume that many premiums will be determined by the *Black-Scholes model*, and computing this off-chain is better for gas costs purposes.
 
 This ERC is intended to represent **vanilla** options. However, exotic options can be built on top of this ERC.
-
-## Reference Implementation
-
-[See an implementation of this ERC here.](https://github.com/Xeway/ERC/blob/main/contracts/Option.sol)\
-The code's foundation is inspired by [Tobias](https://github.com/TobiasBK)'s work.
 
 ## Security Considerations
 
