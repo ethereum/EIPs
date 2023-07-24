@@ -1,7 +1,7 @@
 ---
 eip: 7390
-title: Vanilla Option Standard
-description: A Standard Interface for Vanilla Options on the Ethereum Blockchain
+title: Vanilla Options
+description: An Interface for Vanilla Options
 author: Ewan Humbert (@Xeway) <xeway@protonmail.com>
 discussions-to: https://ethereum-magicians.org
 status: Draft
@@ -11,13 +11,9 @@ created: 2022-09-02
 requires: 20
 ---
 
-## Simple Summary
-
-This proposal introduces a standard interface for creating and interacting with vanilla options contracts on the Ethereum blockchain. The ERC option standard provides a consistent way to represent and trade options, enabling interoperability between different decentralized applications (dApps) and platforms.
-
 ## Abstract
 
-This ERC defines a set of functions and events that allow for the creation, management, and exercising of options contracts on Ethereum. This standard ensures that options contracts conform to a common interface, facilitating the development of robust options trading platforms and enabling interoperability between dApps and protocols.
+This ERC defines a comprehensive set of functions and events facilitating seamless interactions (creation, management, exercising, etc.) for vanilla options. This standard ensures that options contracts conform to a common interface, facilitating the development of robust options trading platforms and enabling interoperability between dApps and protocols.
 
 ## Motivation
 
@@ -323,10 +319,6 @@ For American option, this is even worse.\
 Once again, we advise writers to frequently check the underlying token price, and take the best decision for them.
 
 **Improvement idea:** if two users agreed for an option off-chain and they want to create it on-chain, there is a risk that between the creation of the contract and the purchase by the second user via the function `buy`, an on-chain user has already bought the contract. So it could be an improvement to add the possibility to directly set a buyer.
-
-## Conclusion
-
-The ERC option standard proposes a common interface for options contracts on Ethereum, promoting interoperability and facilitating the development of decentralized options platforms. By adopting this standard, developers can build applications that seamlessly interact with options contracts, enhancing the user experience and expanding the options trading ecosystem on Ethereum. Community feedback and further discussion are encouraged to refine and improve this proposal.
 
 ## Copyright
 
