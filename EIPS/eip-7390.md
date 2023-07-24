@@ -3,7 +3,7 @@ eip: 7390
 title: Vanilla Option Standard
 description: A Standard Interface for Vanilla Options on the Ethereum Blockchain
 author: Ewan Humbert (@Xeway) <xeway@protonmail.com>
-discussions-To: [Ethereum Magicians](https://ethereum-magicians.org/)
+discussions-to: https://ethereum-magicians.org
 status: Draft
 type: Standards Track
 category: ERC
