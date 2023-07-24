@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 7390
 title: Vanilla Option Standard
 description: A Standard Interface for Vanilla Options on the Ethereum Blockchain
 author: Ewan Humbert (@Xeway) <xeway@protonmail.com>
@@ -8,6 +8,7 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2022-09-02
+requires: 20
 ---
 
 ## Simple Summary
