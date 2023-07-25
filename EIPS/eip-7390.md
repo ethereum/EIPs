@@ -166,7 +166,7 @@ function create() external returns (bool);
 
 Allows the writer to validate the option by transferring the collateral to the contract.\
 
-> Previously, the writer has to allow the spend of amount `strike`/`amount` of token `strikeToken`/`underlyingToken` depending if the option is of type `Call` or `Put`. These funds will go to the contract and will be used as a *<u>collateral</u>* to be sure the necessary tokens are available if the buyer decides to exercise.
+> Previously, the writer has to allow the spend of amount `strike`/`amount` of token `strikeToken`/`underlyingToken` depending if the option is of type `Call` or `Put`. These funds will go to the contract and will be used as a ***collateral*** to be sure the necessary tokens are available if the buyer decides to exercise.
 
 *Returns a boolean depending on whether or not the function was successfully executed.*
 
