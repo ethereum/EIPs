@@ -3,7 +3,7 @@
 pragma solidity ^0.8.16;
 
 
-interface XYZ {
+interface IERC7401 {
     struct DirectOwner {
         uint256 tokenId;
         address ownerAddress;
