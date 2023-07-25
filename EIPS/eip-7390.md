@@ -107,14 +107,14 @@ Strike price.
 #### `expiration`
 
 **Type: `uint256`**\
-**Format: _timestamp as seconds since unix epoch_**
+**Format: *timestamp as seconds since unix epoch***
 
 Date of the expiration.
 
 #### `exerciseDuration`
 
 **Type: `uint256`**\
-**Format: _seconds_**
+**Format: *seconds***
 
 Duration during which the buyer may exercise the option. This period start at the `expiration`'s date. After this time range, buyer can't exercise and writer can retrieve his collateral.
 
