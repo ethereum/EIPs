@@ -1,5 +1,5 @@
 ---
-eip: 5289
+eip: 9
 title: Ethereum Notary Interface
 description: Allows Smart Contracts to be Legally Binding Off-Chain
 author: Gavin John (@Pandapip1)
