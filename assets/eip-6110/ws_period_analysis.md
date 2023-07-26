@@ -1,4 +1,4 @@
-Modified version of a [script](https://gist.github.com/adiasg/3aceab409b36aa9a9d9156c1baa3c248) shows the following changes in the WS period computations with increase of a number of deposits per epoch (deviations are highlighted):
+[Modified version](./eth2_ws_calc.py) of a [script](https://gist.github.com/adiasg/3aceab409b36aa9a9d9156c1baa3c248) shows the following changes in the WS period computations with increase of a number of deposits per epoch (deviations are highlighted):
 
 | Safety Decay | Avg. Val. Balance (ETH) | Val. Count | WS (Epochs), `16` deposits per slot | WS (Epochs), `1024` deposits per slot |
 | ---- | ---- | ---- | ---- | ---- |
