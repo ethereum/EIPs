@@ -40,7 +40,7 @@ describe("EmotableRepository", async function () {
     repository = await loadFixture(emotableRepositoryFixture);
   });
 
-  it("can support IERCXYZ", async function () {
+  it("can support IERC7409", async function () {
     expect(await repository.supportsInterface("0x1b3327ab")).to.equal(true);
   });
 

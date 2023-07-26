@@ -2,17 +2,17 @@
 
 pragma solidity ^0.8.16;
 
-import "./IERCXYZ.sol";
+import "./IERC7409.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 error BulkParametersOfUnequalLength();
 error ExpiredPresignedEmote();
 error InvalidSignature();
 
-contract EmotableRepository is IERCXYZ {
+contract EmotableRepository is IERC7409 {
     bytes32 public immutable DOMAIN_SEPARATOR = keccak256(
         abi.encode(
-            "ERC-XYZ: Public Non-Fungible Token Emote Repository",
+            "ERC-7409: Public Non-Fungible Token Emote Repository",
             "1",
             block.chainid,
             address(this)
@@ -326,7 +326,7 @@ contract EmotableRepository is IERCXYZ {
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IERCXYZ).interfaceId ||
+            interfaceId == type(IERC7409).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }
