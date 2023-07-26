@@ -26,6 +26,7 @@ interface:
   - axic
   - SamWilsn
   - Pandapip1
+  - bumblefudge
 meta:
   - lightclient
   - axic
