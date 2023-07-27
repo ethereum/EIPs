@@ -175,4 +175,9 @@ contract ClusteredNFT is IERC7108, ERC721 {
   function getInterfaceId() external pure virtual returns(bytes4) {
     return type(IERC7108).interfaceId;
   }
+
+  function supplyWithin(uint256 clusterId) external view override returns (uint256) {
+    return clusters[clusterId].nextTokenId - clusters[clusterId].firstTokenId;
+  }
+
 }

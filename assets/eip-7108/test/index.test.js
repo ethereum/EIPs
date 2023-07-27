@@ -14,7 +14,7 @@ describe.only("ClusteredNFT", function () {
     clusteredNFT = await ClusteredNFT.deploy("ClusteredNFT", "cNFT");
     await clusteredNFT.deployed();
 
-    expect(await clusteredNFT.getInterfaceId()).equal("0x4d676ad4");
+    expect(await clusteredNFT.getInterfaceId()).equal("0xf777e584");
 
     ClusteredNFTEnumerable = await ethers.getContractFactory("ClusteredNFTEnumerable");
     clusteredNFTEnumerable = await ClusteredNFTEnumerable.deploy("ClusteredNFT", "cNFT");
