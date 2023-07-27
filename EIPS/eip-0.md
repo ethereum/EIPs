@@ -26,7 +26,9 @@ The idea is to record the contract address here after the deployment of the cont
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 The Token Converter system comprises two main parts:
-- Converter contract 
+
+- Converter contract
+
 - [ERC-223](./eip-223.md) wrapper contract for each [ERC-20](./eip-20.md) token
 
 Converter contract can deploy new [ERC-223](./eip-223.md) wrapper contracts for any [ERC-20](./eip-20.md) token that does not have a [ERC-223](./eip-223.md) wrapper currently. There MUST be exactly one [ERC-223](./eip-223.md) wrapper for each [ERC-20](./eip-20.md) token.
