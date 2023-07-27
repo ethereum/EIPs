@@ -1,8 +1,8 @@
 ---
-title: Token Standard Converter
-description: Smart-contract service that converts token of one standard to another
+title: Token Converter
+description: Smart-contract service that converts token of one version to another
 author: Dexaran (@Dexaran) <dexaran@ethereumclassic.org>
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/token-standard-converter/15252
 status: Draft
 type: Standards Track
 category: ERC
@@ -163,7 +163,6 @@ This service is the first of its kind and therefore does not have any backwards 
     function tokenReceived(address _from, uint _value, bytes memory _data) public override returns (bytes4)
     {
         require(erc20Origins[msg.sender] != address(0), "ERROR: The received token is not a ERC-223 Wrapper for any ERC-20 token.");
-        //IERC20(erc20Origins[msg.sender]).transfer(_from, _value);
         safeTransfer(erc20Origins[msg.sender], _from, _value);
 
         erc20Supply[erc20Origins[msg.sender]] -= _value;
@@ -186,8 +185,6 @@ This service is the first of its kind and therefore does not have any backwards 
 
     function convertERC20toERC223(address _ERC20token, uint256 _amount) public returns (bool)
     {
-        //require(address(erc223Wrappers[_ERC20token]) != address(0), "ERROR: ERC-223 wrapper for this ERC-20 token does not exist yet.");
-
         // If there is no active wrapper for a token that user wants to wrap
         // then create it.
         if(address(erc223Wrappers[_ERC20token]) == address(0))
@@ -195,8 +192,6 @@ This service is the first of its kind and therefore does not have any backwards 
             createERC223Wrapper(_ERC20token);
         }
         uint256 _converterBalance = IERC20(_ERC20token).balanceOf(address(this)); // Safety variable.
-
-        //IERC20(_ERC20token).transferFrom(msg.sender, address(this), _amount);
         safeTransferFrom(_ERC20token, msg.sender, address(this), _amount);
         
         erc20Supply[_ERC20token] += _amount;
