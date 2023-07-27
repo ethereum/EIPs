@@ -1,18 +1,19 @@
 ---
-title: Token Converter
-description: Smart-contract service that converts token of one version to another
+eip: ?
+title: Token Standard Converter
+description: Smart-contract service that converts token of one standard to another
 author: Dexaran (@Dexaran) <dexaran@ethereumclassic.org>
 discussions-to: https://ethereum-magicians.org/t/token-standard-converter/15252
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-7-27
+created: 2023-07-27
 requires: 20, 165, 223
 ---
 
 ## Abstract
 
-There are multiple token standards on Ethereum chain currently. This EIP introduces a concept of cross-standard interoperability by creating a service that allows ERC-20 tokens to be upgraded to ERC-223 tokens anytime. ERC-223 tokens can be converted back to ERC-20 version without any restrictions to avoid any problems with backwards compatibility and allow different standards to co-exist and become interoperable and interchangeable.
+There are multiple token standards on Ethereum chain currently. This EIP introduces a concept of cross-standard interoperability by creating a service that allows [ERC-20](./eip-20.md) tokens to be upgraded to [ERC-223](./eip-223.md) tokens anytime. [ERC-223](./eip-223.md) tokens can be converted back to [ERC-20](./eip-20.md) version without any restrictions to avoid any problems with backwards compatibility and allow different standards to co-exist and become interoperable and interchangeable.
 
 ## Motivation
 
@@ -26,13 +27,13 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The Token Converter system comprises two main parts:
 - Converter contract
-- ERC-223 wrapper contract for each ERC-20 token
+- [ERC-223](./eip-223.md) wrapper contract for each [ERC-20](./eip-20.md) token
 
-Converter contract can deploy new ERC-223 wrapper contracts for any ERC-20 token that does not have a ERC-223 wrapper currently. There MUST be exactly one ERC-223 wrapper for each ERC-20 token.
+Converter contract can deploy new [ERC-223](./eip-223.md) wrapper contracts for any [ERC-20](./eip-20.md) token that does not have a [ERC-223](./eip-223.md) wrapper currently. There MUST be exactly one [ERC-223](./eip-223.md) wrapper for each [ERC-20](./eip-20.md) token.
 
-Converter contract MUST accept deposits of ERC-20 tokens and send ERC-223 tokens to the depositor at 1:1 ratio. Upon depositing 1234 units of `ERC-20 token_A` the depositor MUST receive exactly 1234 units of `ERC-223 token_A`. This is done by issuing new ERC-223 tokens at the moment of ERC-20 deposit. The original ERC-20 tokens MUST be frozen in the Converter contract and available for claiming back.
+Converter contract MUST accept deposits of [ERC-20](./eip-20.md) tokens and send [ERC-223](./eip-223.md) tokens to the depositor at 1:1 ratio. Upon depositing 1234 units of `[ERC-20](./eip-20.md) token_A` the depositor MUST receive exactly 1234 units of `[ERC-223](./eip-223.md) token_A`. This is done by issuing new [ERC-223](./eip-223.md) tokens at the moment of [ERC-20](./eip-20.md) deposit. The original [ERC-20](./eip-20.md) tokens MUST be frozen in the Converter contract and available for claiming back.
 
-Converter contract MUST accept deposits of ERC-223 tokens and send ERC-20 tokens to the depositor at 1:1 ratio. This is done by releasing the original ERC-20 tokens at the moment of ERC-223 deposit. The deposited ERC-223 tokens must be burned.
+Converter contract MUST accept deposits of [ERC-223](./eip-223.md) tokens and send [ERC-20](./eip-20.md) tokens to the depositor at 1:1 ratio. This is done by releasing the original [ERC-20](./eip-20.md) tokens at the moment of [ERC-223](./eip-223.md) deposit. The deposited [ERC-223](./eip-223.md) tokens must be burned.
 
 ### Token Converter contract specification
 
@@ -42,7 +43,7 @@ Converter contract MUST accept deposits of ERC-223 tokens and send ERC-20 tokens
 function getWrapperFor(address _erc20Token) public view returns (address)
 ```
 
-Returns the address of the ERC-223 wrapper for a given ERC-20 original token. Returns `0x0` if there is no ERC-223 version for the provided ERC-20 token address. There MUST be exactly one wrapper for any given ERC-20 token address created by the Token Converter contract.
+Returns the address of the [ERC-223](./eip-223.md) wrapper for a given [ERC-20](./eip-20.md) original token. Returns `0x0` if there is no [ERC-223](./eip-223.md) version for the provided [ERC-20](./eip-20.md) token address. There MUST be exactly one wrapper for any given [ERC-20](./eip-20.md) token address created by the Token Converter contract.
 
 ##### `getOriginFor`
 
@@ -50,7 +51,7 @@ Returns the address of the ERC-223 wrapper for a given ERC-20 original token. Re
 function getOriginFor(address _erc223Token) public view returns (address)
 ```
 
-Returns the address of the original ERC-20 token for a given ERC-223 wrapper. Returns `0x0` if the provided `_erc223Token` is not an address of any ERC-223 wrapper created by the Token Converter contract.
+Returns the address of the original [ERC-20](./eip-20.md) token for a given [ERC-223](./eip-223.md) wrapper. Returns `0x0` if the provided `_erc223Token` is not an address of any [ERC-223](./eip-223.md) wrapper created by the Token Converter contract.
 
 ##### `createERC223Wrapper`
 
@@ -58,7 +59,7 @@ Returns the address of the original ERC-20 token for a given ERC-223 wrapper. Re
 function createERC223Wrapper(address _erc20Token) public returns (address)
 ```
 
-Creates a new ERC-223 wrapper for a given `_erc20Token` if it does not exist yet. Reverts the transaction if the wrapper already exist. Returns the address of the new wrapper token contract on success.
+Creates a new [ERC-223](./eip-223.md) wrapper for a given `_erc20Token` if it does not exist yet. Reverts the transaction if the wrapper already exist. Returns the address of the new wrapper token contract on success.
 
 ##### `convertERC20toERC223`
 
@@ -66,11 +67,11 @@ Creates a new ERC-223 wrapper for a given `_erc20Token` if it does not exist yet
 function convertERC20toERC223(address _erc20token, uint256 _amount) public returns (bool)
 ```
 
-Withdraws `_amount` of ERC-20 token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of ERC-223 wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success.
+Withdraws `_amount` of [ERC-20](./eip-20.md) token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of [ERC-223](./eip-223.md) wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success.
 
-If there is no ERC-223 wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
+If there is no [ERC-223](./eip-223.md) wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
 
-If the provided `_erc20token` address is an address of a ERC-223 wrapper reverts the transaction.
+If the provided `_erc20token` address is an address of a [ERC-223](./eip-223.md) wrapper reverts the transaction.
 
 ##### `convertERC20toERC223`
 
@@ -78,11 +79,11 @@ If the provided `_erc20token` address is an address of a ERC-223 wrapper reverts
 function convertERC20toERC223(address _erc20token, uint256 _amount) public returns (bool)
 ```
 
-Withdraws `_amount` of ERC-20 token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of ERC-223 wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success. The Token Converter must keep record of the amount of ERC-20 tokens that were deposited with `convertERC20toERC223` function because it is possible to deposit ERC-20 tokens to any contract by directly sending them with `transfer` function.
+Withdraws `_amount` of [ERC-20](./eip-20.md) token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of [ERC-223](./eip-223.md) wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success. The Token Converter must keep record of the amount of [ERC-20](./eip-20.md) tokens that were deposited with `convertERC20toERC223` function because it is possible to deposit [ERC-20](./eip-20.md) tokens to any contract by directly sending them with `transfer` function.
 
-If there is no ERC-223 wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
+If there is no [ERC-223](./eip-223.md) wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
 
-If the provided `_erc20token` address is an address of a ERC-223 wrapper reverts the transaction.
+If the provided `_erc20token` address is an address of a [ERC-223](./eip-223.md) wrapper reverts the transaction.
 
 ##### `tokenReceived`
 
@@ -90,13 +91,13 @@ If the provided `_erc20token` address is an address of a ERC-223 wrapper reverts
 function tokenReceived(address _from, uint _value, bytes memory _data) public override returns (bytes4)
 ```
 
-This is a standard ERC-223 transaction handler function and it is called by the ERC-223 token contract when `_from` is sending `_value` of ERC-223 tokens to `address(this)` address. In the scope of this function `msg.sender` is the address of the ERC-223 token contract and `_from` is the initiator of the transaction.
+This is a standard [ERC-223](./eip-223.md) transaction handler function and it is called by the [ERC-223](./eip-223.md) token contract when `_from` is sending `_value` of [ERC-223](./eip-223.md) tokens to `address(this)` address. In the scope of this function `msg.sender` is the address of the [ERC-223](./eip-223.md) token contract and `_from` is the initiator of the transaction.
 
-If `msg.sender` is an address of ERC-223 wrapper created by the Token Converter then `_value` of ERC-20 original token must be sent to the `_from` address.
+If `msg.sender` is an address of [ERC-223](./eip-223.md) wrapper created by the Token Converter then `_value` of [ERC-20](./eip-20.md) original token must be sent to the `_from` address.
 
-If `msg.sender` is not an address of any ERC-223 wrapper known to the Token Converter then revert the transaction thus returning any `ERC-223` tokens back to the sender.
+If `msg.sender` is not an address of any [ERC-223](./eip-223.md) wrapper known to the Token Converter then revert the transaction thus returning any `[ERC-223](./eip-223.md)` tokens back to the sender.
 
-This is the function that MUST be used to convert ERC-223 wrapper tokens back to original ERC-20 tokens. This function is automatically executed when ERC-223 tokens are sent to the address of the Token Converter. If any arbitrary ERC-223 token is sent to the Token Converter it will be rejected.
+This is the function that MUST be used to convert [ERC-223](./eip-223.md) wrapper tokens back to original [ERC-20](./eip-20.md) tokens. This function is automatically executed when [ERC-223](./eip-223.md) tokens are sent to the address of the Token Converter. If any arbitrary [ERC-223](./eip-223.md) token is sent to the Token Converter it will be rejected.
 
 Returns `0x8943ec02`.
 
@@ -106,21 +107,21 @@ Returns `0x8943ec02`.
 function rescueERC20(address _token) external
 ```
 
-This function allows to extract the ERC-20 tokens that were directly deposited to the contract with `transfer` function to prevent users who may send tokens by mistake from permanently freezing their assets. Since the Token Converter calculates the amount of tokens that were deposited legitimately with `convertERC20toERC223` function it is always possible to calculate the amount of "accidentally deposited tokens" by subtracting the recorded amount from the returned value of the `balanceOf( address(this) )` function called on the ERC-20 token contract.
+This function allows to extract the [ERC-20](./eip-20.md) tokens that were directly deposited to the contract with `transfer` function to prevent users who may send tokens by mistake from permanently freezing their assets. Since the Token Converter calculates the amount of tokens that were deposited legitimately with `convertERC20toERC223` function it is always possible to calculate the amount of "accidentally deposited tokens" by subtracting the recorded amount from the returned value of the `balanceOf( address(this) )` function called on the [ERC-20](./eip-20.md) token contract.
 
-### Converting ERC-20 tokens to ERC-223
+### Converting [ERC-20](./eip-20.md) tokens to [ERC-223](./eip-223.md)
 
-In order to convert ERC-20 tokens to ERC-223 the token holder should:
+In order to convert [ERC-20](./eip-20.md) tokens to [ERC-223](./eip-223.md) the token holder should:
 
-1. Call the `approve` function of the ERC-20 token and allow Token Converter to withdraw tokens from the token holders address via `transferFrom` function.
+1. Call the `approve` function of the [ERC-20](./eip-20.md) token and allow Token Converter to withdraw tokens from the token holders address via `transferFrom` function.
 2. Wait for the transaction with `approve` to be submitted to the blockchain.
 3. Call the `convertERC20toERC223` function of the Token Converter contract.
 
-### Converting ERC-223 tokens back to ERC-20
+### Converting [ERC-223](./eip-223.md) tokens back to [ERC-20](./eip-20.md)
 
-In order to convert ERC-20 tokens to ERC-223 the token holder should:
+In order to convert [ERC-20](./eip-20.md) tokens to [ERC-223](./eip-223.md) the token holder should:
 
-1. Send ERC-223 tokens to the address of the Token Converter contract via `transfer` function of the ERC-223 token contract.
+1. Send [ERC-223](./eip-223.md) tokens to the address of the Token Converter contract via `transfer` function of the [ERC-223](./eip-223.md) token contract.
 
 ## Rationale
 
@@ -146,7 +147,7 @@ This service is the first of its kind and therefore does not have any backwards 
 
     address public ownerMultisig;
 
-    mapping (address => ERC223WrapperToken) public erc223Wrappers; // A list of token wrappers. First one is ERC-20 origin, second one is ERC-223 version.
+    mapping (address => ERC223WrapperToken) public erc223Wrappers; // A list of token wrappers. First one is [ERC-20](./eip-20.md) origin, second one is [ERC-223](./eip-223.md) version.
     mapping (address => address) public erc20Origins;
     mapping (address => uint256) public erc20Supply; // Token => how much was deposited.
 
@@ -162,7 +163,8 @@ This service is the first of its kind and therefore does not have any backwards 
 
     function tokenReceived(address _from, uint _value, bytes memory _data) public override returns (bytes4)
     {
-        require(erc20Origins[msg.sender] != address(0), "ERROR: The received token is not a ERC-223 Wrapper for any ERC-20 token.");
+        require(erc20Origins[msg.sender] != address(0), "ERROR: The received token is not a [ERC-223](./eip-223.md) Wrapper for any [ERC-20](./eip-20.md) token.");
+        //IERC20(erc20Origins[msg.sender]).transfer(_from, _value);
         safeTransfer(erc20Origins[msg.sender], _from, _value);
 
         erc20Supply[erc20Origins[msg.sender]] -= _value;
@@ -174,7 +176,7 @@ This service is the first of its kind and therefore does not have any backwards 
     function createERC223Wrapper(address _erc20Token) public returns (address)
     {
         require(address(erc223Wrappers[_erc20Token]) == address(0), "ERROR: Wrapper already exists.");
-        require(getOriginFor(_erc20Token) == address(0), "ERROR: Cannot convert ERC-223 to ERC-223.");
+        require(getOriginFor(_erc20Token) == address(0), "ERROR: Cannot convert [ERC-223](./eip-223.md) to [ERC-223](./eip-223.md).");
 
         ERC223WrapperToken _newERC223Wrapper     = new ERC223WrapperToken(_erc20Token);
         erc223Wrappers[_erc20Token]              = _newERC223Wrapper;
@@ -185,6 +187,8 @@ This service is the first of its kind and therefore does not have any backwards 
 
     function convertERC20toERC223(address _ERC20token, uint256 _amount) public returns (bool)
     {
+        //require(address(erc223Wrappers[_ERC20token]) != address(0), "ERROR: [ERC-223](./eip-223.md) wrapper for this [ERC-20](./eip-20.md) token does not exist yet.");
+
         // If there is no active wrapper for a token that user wants to wrap
         // then create it.
         if(address(erc223Wrappers[_ERC20token]) == address(0))
@@ -192,6 +196,8 @@ This service is the first of its kind and therefore does not have any backwards 
             createERC223Wrapper(_ERC20token);
         }
         uint256 _converterBalance = IERC20(_ERC20token).balanceOf(address(this)); // Safety variable.
+
+        //IERC20(_ERC20token).transferFrom(msg.sender, address(this), _amount);
         safeTransferFrom(_ERC20token, msg.sender, address(this), _amount);
         
         erc20Supply[_ERC20token] += _amount;
@@ -233,11 +239,11 @@ This service is the first of its kind and therefore does not have any backwards 
 
 ## Security Considerations
 
-1. While it is possible to implement a service that converts any token standard to any other standard - it is better to keep different standard convertors separate from one another as different standards may contain specific logic. Therefore this proposal focuses on ERC-20 to ERC-223 conversion methods.
-2. ERC-20 tokens can be deposited to any contract directly with `transfer` function. This may result in a permanent loss of tokens because it is not possible to recognize this transaction on the recipients side. `rescueERC20` function is implemented to address this problem.
-3. Token Converter relies on ERC-20 `approve` & `transferFrom` method of depositing assets. Any related issues must be taken into account. `approve` and `transferFrom` are two separate transactions so it is required to make sure `approval` was successful before relying on `transferFrom`.
+1. While it is possible to implement a service that converts any token standard to any other standard - it is better to keep different standard convertors separate from one another as different standards may contain specific logic. Therefore this proposal focuses on [ERC-20](./eip-20.md) to [ERC-223](./eip-223.md) conversion methods.
+2. [ERC-20](./eip-20.md) tokens can be deposited to any contract directly with `transfer` function. This may result in a permanent loss of tokens because it is not possible to recognize this transaction on the recipients side. `rescueERC20` function is implemented to address this problem.
+3. Token Converter relies on [ERC-20](./eip-20.md) `approve` & `transferFrom` method of depositing assets. Any related issues must be taken into account. `approve` and `transferFrom` are two separate transactions so it is required to make sure `approval` was successful before relying on `transferFrom`.
 4. This is a common practice for UI services to prompt a user to issue unlimited `approval` on any contract that may withdraw tokens from the user. This puts users funds at high risk and therefore not recommended.
-5. It is possible to artificially construct a token that will pretend it is a ERC-20 token that implements `approve & transferFrom` but at the same time implements ERC-223 logic of transferring via `transfer` function in its internal logic. It can be possible to create a ERC-223 wrapper for this ERC-20-ERC-223 hybrid implementation in the Token Converter. This doesn't pose any threat for the workflow of the Token Converter but it must be taken into account that if a token has ERC-223 wrapper in the Token Converter it does not automatically mean the origin is fully compatible with the ERC-20 standard and methods of introspection must be used to determine the origins compatibility with any existing standard.
+5. It is possible to artificially construct a token that will pretend it is a [ERC-20](./eip-20.md) token that implements `approve & transferFrom` but at the same time implements [ERC-223](./eip-223.md) logic of transferring via `transfer` function in its internal logic. It can be possible to create a [ERC-223](./eip-223.md) wrapper for this [ERC-20](./eip-20.md)-[ERC-223](./eip-223.md) hybrid implementation in the Token Converter. This doesn't pose any threat for the workflow of the Token Converter but it must be taken into account that if a token has [ERC-223](./eip-223.md) wrapper in the Token Converter it does not automatically mean the origin is fully compatible with the [ERC-20](./eip-20.md) standard and methods of introspection must be used to determine the origins compatibility with any existing standard.
 
 ## Copyright
 
