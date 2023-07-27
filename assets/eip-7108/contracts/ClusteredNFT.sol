@@ -21,6 +21,7 @@ contract ClusteredNFT is IERC7108, ERC721 {
   error SizeTooLarge();
   error ClusterFull();
   error ClusterNotFound();
+  error TokenDoesNotExist();
 
   struct Cluster {
     address owner;
@@ -132,6 +133,12 @@ contract ClusteredNFT is IERC7108, ERC721 {
 
   function rangeOf(uint256 clusterId) public view override returns (uint256, uint256) {
     return (clusters[clusterId].firstTokenId, clusters[clusterId].firstTokenId + clusters[clusterId].size - 1);
+  }
+
+  function ownerOfWithin(uint256 normalizedTokenId_, uint256 clusterId) external view returns (address) {
+    if (clusters[clusterId].owner == address(0)) revert ClusterNotFound();
+    if (normalizedTokenId_ > clusters[clusterId].size) revert TokenDoesNotExist();
+    return ownerOf(clusters[clusterId].firstTokenId + normalizedTokenId_ - 1);
   }
 
   function clusterOwner(uint256 clusterId) public view override returns (address) {

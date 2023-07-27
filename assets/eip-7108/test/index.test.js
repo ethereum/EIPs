@@ -14,7 +14,7 @@ describe.only("ClusteredNFT", function () {
     clusteredNFT = await ClusteredNFT.deploy("ClusteredNFT", "cNFT");
     await clusteredNFT.deployed();
 
-    expect(await clusteredNFT.getInterfaceId()).equal("0xf777e584");
+    expect(await clusteredNFT.getInterfaceId()).equal("0xf4343724");
 
     ClusteredNFTEnumerable = await ethers.getContractFactory("ClusteredNFTEnumerable");
     clusteredNFTEnumerable = await ClusteredNFTEnumerable.deploy("ClusteredNFT", "cNFT");
@@ -76,6 +76,8 @@ describe.only("ClusteredNFT", function () {
       expect(await clusteredNFT.normalizedTokenId(2223)).equal(1);
       expect(await clusteredNFT.normalizedTokenId(2224)).equal(2);
       expect(await clusteredNFT.normalizedTokenId(2225)).equal(3);
+
+      expect(await clusteredNFT.ownerOfWithin(1, 0)).equal(bob.address);
 
       expect(await clusteredNFT.tokenURI(2224)).equal("https://bud-token.cc/meta/2");
 
