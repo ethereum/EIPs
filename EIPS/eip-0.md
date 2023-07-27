@@ -87,7 +87,7 @@ This is a standard [ERC-223](./eip-223.md) transaction handler function and it i
 
 If `msg.sender` is an address of [ERC-223](./eip-223.md) wrapper created by the Token Converter then `_value` of [ERC-20](./eip-20.md) original token must be sent to the `_from` address.
 
-If `msg.sender` is not an address of any [ERC-223](./eip-223.md) wrapper known to the Token Converter then revert the transaction thus returning any `[ERC-223](./eip-223.md)` tokens back to the sender.
+If `msg.sender` is not an address of any [ERC-223](./eip-223.md) wrapper known to the Token Converter then revert the transaction thus returning any `ERC-223` tokens back to the sender.
 
 This is the function that MUST be used to convert [ERC-223](./eip-223.md) wrapper tokens back to original [ERC-20](./eip-20.md) tokens. This function is automatically executed when [ERC-223](./eip-223.md) tokens are sent to the address of the Token Converter. If any arbitrary [ERC-223](./eip-223.md) token is sent to the Token Converter it will be rejected.
 
