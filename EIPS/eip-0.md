@@ -139,7 +139,9 @@ This service is the first of its kind and therefore does not have any backwards 
 
     address public ownerMultisig;
 
-    mapping (address => ERC223WrapperToken) public erc223Wrappers; // A list of token wrappers. First one is [ERC-20](./eip-20.md) origin, second one is [ERC-223](./eip-223.md) version.
+    mapping (address => ERC223WrapperToken) public erc223Wrappers; // A list of token wrappers.
+                                                                   // First one is [ERC-20](./eip-20.md) origin,
+                                                                   // second one is [ERC-223](./eip-223.md) version.
     mapping (address => address) public erc20Origins;
     mapping (address => uint256) public erc20Supply; // Token => how much was deposited.
 
@@ -156,7 +158,6 @@ This service is the first of its kind and therefore does not have any backwards 
     function tokenReceived(address _from, uint _value, bytes memory _data) public override returns (bytes4)
     {
         require(erc20Origins[msg.sender] != address(0), "ERROR: The received token is not a [ERC-223](./eip-223.md) Wrapper for any [ERC-20](./eip-20.md) token.");
-        //IERC20(erc20Origins[msg.sender]).transfer(_from, _value);
         safeTransfer(erc20Origins[msg.sender], _from, _value);
 
         erc20Supply[erc20Origins[msg.sender]] -= _value;
@@ -179,8 +180,6 @@ This service is the first of its kind and therefore does not have any backwards 
 
     function convertERC20toERC223(address _ERC20token, uint256 _amount) public returns (bool)
     {
-        //require(address(erc223Wrappers[_ERC20token]) != address(0), "ERROR: [ERC-223](./eip-223.md) wrapper for this [ERC-20](./eip-20.md) token does not exist yet.");
-
         // If there is no active wrapper for a token that user wants to wrap
         // then create it.
         if(address(erc223Wrappers[_ERC20token]) == address(0))
@@ -188,8 +187,6 @@ This service is the first of its kind and therefore does not have any backwards 
             createERC223Wrapper(_ERC20token);
         }
         uint256 _converterBalance = IERC20(_ERC20token).balanceOf(address(this)); // Safety variable.
-
-        //IERC20(_ERC20token).transferFrom(msg.sender, address(this), _amount);
         safeTransferFrom(_ERC20token, msg.sender, address(this), _amount);
         
         erc20Supply[_ERC20token] += _amount;
