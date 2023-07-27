@@ -69,18 +69,6 @@ Creates a new [ERC-223](./eip-223.md) wrapper for a given `_erc20Token` if it do
 function convertERC20toERC223(address _erc20token, uint256 _amount) public returns (bool)
 ```
 
-Withdraws `_amount` of [ERC-20](./eip-20.md) token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of [ERC-223](./eip-223.md) wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success.
-
-If there is no [ERC-223](./eip-223.md) wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
-
-If the provided `_erc20token` address is an address of a [ERC-223](./eip-223.md) wrapper reverts the transaction.
-
-##### `convertERC20toERC223`
-
-```solidity
-function convertERC20toERC223(address _erc20token, uint256 _amount) public returns (bool)
-```
-
 Withdraws `_amount` of [ERC-20](./eip-20.md) token from the transaction senders balance with `transferFrom` function. Sends the `_amount` of [ERC-223](./eip-223.md) wrapper tokens to the sender of the transaction. Stores the original tokens at the balance of the Token Converter contract for future claims. Returns `true` on success. The Token Converter must keep record of the amount of [ERC-20](./eip-20.md) tokens that were deposited with `convertERC20toERC223` function because it is possible to deposit [ERC-20](./eip-20.md) tokens to any contract by directly sending them with `transfer` function.
 
 If there is no [ERC-223](./eip-223.md) wrapper for the `_ERC20token` then creates it by calling a `createERC223Wrapper(_erc20toke)` function.
