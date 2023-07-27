@@ -1,5 +1,5 @@
 ---
-eip: draft_token_standard
+eip: 0
 title: Token Converter
 description: Smart-contract service that converts token of one ERC version to another
 author: Dexaran (@Dexaran) <dexaran@ethereumclassic.org>
