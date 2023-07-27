@@ -33,7 +33,7 @@ The Token Converter system comprises two main parts:
 
 Converter contract can deploy new [ERC-223](./eip-223.md) wrapper contracts for any [ERC-20](./eip-20.md) token that does not have a [ERC-223](./eip-223.md) wrapper currently. There MUST be exactly one [ERC-223](./eip-223.md) wrapper for each [ERC-20](./eip-20.md) token.
 
-Converter contract MUST accept deposits of [ERC-20](./eip-20.md) tokens and send [ERC-223](./eip-223.md) tokens to the depositor at 1:1 ratio. Upon depositing 1234 units of `[ERC-20](./eip-20.md) token_A` the depositor MUST receive exactly 1234 units of `[ERC-223](./eip-223.md) token_A`. This is done by issuing new [ERC-223](./eip-223.md) tokens at the moment of [ERC-20](./eip-20.md) deposit. The original [ERC-20](./eip-20.md) tokens MUST be frozen in the Converter contract and available for claiming back.
+Converter contract MUST accept deposits of [ERC-20](./eip-20.md) tokens and send [ERC-223](./eip-223.md) tokens to the depositor at 1:1 ratio. Upon depositing 1234 units of `ERC-20 token_A` the depositor MUST receive exactly 1234 units of `ERC-223 token_A`. This is done by issuing new [ERC-223](./eip-223.md) tokens at the moment of [ERC-20](./eip-20.md) deposit. The original [ERC-20](./eip-20.md) tokens MUST be frozen in the Converter contract and available for claiming back.
 
 Converter contract MUST accept deposits of [ERC-223](./eip-223.md) tokens and send [ERC-20](./eip-20.md) tokens to the depositor at 1:1 ratio. This is done by releasing the original [ERC-20](./eip-20.md) tokens at the moment of [ERC-223](./eip-223.md) deposit. The deposited [ERC-223](./eip-223.md) tokens must be burned.
 
