@@ -1,6 +1,7 @@
 ---
+eip:
 title: On-Demand Offchain Data Retrieval
-description: A standard to construct multicalls with prepended verifiable off-chain data
+description: A method to construct multicalls with prepended verifiable off-chain data
 author: Noah Litvin (@noahlitvin), db (@dbeal-eth)
 discussions-to: <URL>
 status: Draft
@@ -21,7 +22,7 @@ Cross-chain bridges are being developed, adhering to standards such as [ERC-6170
 
 With standards for both writing and reading cross-chain data, protocol developers will be able to create abstractions for asynchronicity (a topic thoroughly explored in other software engineering contexts). This will enable the development of highly sophisticated protocols that do not suffer from scaling constraints.
 
-[EIP-3668](./eip-3668.md) introduced the use of reverts for requiring off-chain data, but there are various challenges introduced by the specifics of that standard which are outlined in the _Rationale_ section below. By leveraging multicalls rather than callback functions, the standard proposed here is able to overcome some of these constraints.
+[ERC-3668](./eip-3668.md) introduced the use of reverts for requiring off-chain data, but there are various challenges introduced by the specifics of that standard which are outlined in the _Rationale_ section below. By leveraging multicalls rather than callback functions, the standard proposed here is able to overcome some of these constraints.
 
 ## Specification
 
@@ -31,7 +32,7 @@ A contract implementing this standard MUST revert with the following error whene
 error OracleDataRequired(bytes32 oracleId, bytes oracleQuery, address oracleContract)
 ```
 
-`oracleId` is a unique identifier that references the decentralized oracle network that generates the desired signed off-chain data. Oracle IDs would be analogous to Chain IDs in the Ethereum ecosystem.
+`oracleId` is a unique identifier that references the decentralized oracle network that generates the desired signed off-chain data. Oracle IDs would be analogous to Chain IDs in the Ethereum ecosystem. Clients are expected to resolve a gateway that corresponds to an Oracle ID, similar to how clients are expected to resolve an RPC endpoint based on a Chain ID.
 
 `oracleQuery` specifies the off-chain data that is being required. Valid data formats for this parameter are specific to the oracle ID used. This might include chain id, contract address, function signature, payload, and timestamp/"latest" for cross-chain reads. For price feeds, it could include a ticker symbol and timestamp/"latest".
 
@@ -39,15 +40,23 @@ error OracleDataRequired(bytes32 oracleId, bytes oracleQuery, address oracleCont
 
 ```solidity
 interface IOracleContract {
-  function fulfillOracleData(bytes oracleQuery, bytes signedOffchainData);
+  function fulfillOracleData(bytes oracleQuery, bytes signedOffchainData) payable external;
 }
 ```
 
+The contract implementing the `IOracleContract` interface MUST revert with the following error message if it requires payment to fulfill the oracle data query:
+
+```solidity
+error OracleFeeRequired(uint feeAmount)
+```
+
+`feeAmount` specifies the amount of native gas tokens required to execute the `fulfillOracleData` function, denominated in wei. This error MUST be resolved if the caller provides sufficient gas such that the fee amount can be collected by the oracle contract. The contract MAY NOT return gas tokens if they are provided in excess of the `feeAmount`. In practice, we would expect the fee amount to remain relatively stable, if not constant.
+
 ## Rationale
 
-This proposal is essentially an alternative to [EIP-3668](./eip-3668.md) with a few important distinctions:
+This proposal is essentially an alternative to [ERC-3668](./eip-3668.md) with a few important distinctions:
 
-- EIP-3668 requires URIs to be encoded on-chain. While this can work well for static assets (such as IPFS hashes for assets related to NFTs and merkle trees), it is not ideal for retrieving data that must be fresh like cross-chain data retrieval or price feeds.
+- ERC-3668 requires URIs to be encoded on-chain. While this can work well for static assets (such as IPFS hashes for assets related to NFTs and merkle trees), it is not ideal for retrieving data that must be fresh like cross-chain data retrieval or price feeds. Although dynamic data can be referenced with an HTTP URL, this increases centralization and maintenance-related risks.
 - By relying on a multicall rather than callbacks, it is much simpler to handle situations in which nested calls require different off-chain data. By the standard proposed here, end users (including those using clients that implement account abstraction) always need to simply sign a transaction, regardless of the complexity of the internal structure of the call being executed. The client can automatically prepend any necessary off-chain data to the transaction for the call to succeed.
 - The error is very simple to construct. Developers implementing this standard only need to have awareness of the oracle network they choose to rely on, the form of the query accepted by this network, and the contract from which they expect to retrieve the data.
 
@@ -56,6 +65,8 @@ With this standard, not only can oracle providers scalably support an unlimited 
 Another major advantage of this standard is that oracles can charge fees in the form of native gas tokens during the on-chain verification of the data. This creates an economic incentive where fees can be collected from data consumers and provided to node operators in the decentralized oracle network.
 
 To prevent data becoming too stale for a request between the simulation and a call's execution, ideally a contract could also emit the following event: `event OracleDataUsed(bytes32 oracleId, bytes oracleQuery, address oracleContract, uint expirationTime)` Here, `expirationTime` is the time after which the `OracleDataRequired` error would be thrown by the contract. (This would typically be a calculation involving a staleness tolerance and `block.timestamp`). Client applications that implement this standard would be able to recognize this event during simulation and estimate if an additional update will still be necessary, taking into account the speed of the chain. For example, the oracle query may request the latest quote available for a particular price feed and the expiration time may signal that the price cannot be older than three seconds prior to the current timestamp recognized by the blockchain. This has been omitted from the standard because there isn't a practical way to retrieve event data during transaction simulations on most JSON-RPC APIs at this time.
+
+It is the responsibility of the client to decide how to construct the multicall. Wallets that support account abstraction (per [ERC-4337](./eip-4337.md)) should already have the ability to generate atomic multi-operations. For EOA support, a multicall contract may be used. This may need to be a protocol-specific multicall proxy contract if the function being called references `msg.sender`. Here, the protocol should honor the reported `msg.sender` value passed from the multicall proxy contract.
 
 ## Reference Implementation
 
@@ -94,7 +105,7 @@ contract OracleContract is IOracleContract {
   uint public constant STALENESS_TOLERANCE = 86400; // One day
   mapping(bytes32 => bytes) public latestVerifiedData;
 
-  function fulfillOracleData(bytes calldata oracleQuery, bytes calldata signedOffchainData) public {
+  function fulfillOracleData(bytes calldata oracleQuery, bytes calldata signedOffchainData) payable external {
     _verify(signedOffchainData);
     latestVerifiedData[keccak256(oracleQuery)] = signedOffchainData;
   }
@@ -110,7 +121,7 @@ contract OracleContract is IOracleContract {
     return response;
   }
 
-  function _verify(bytes memory signedOffchainData) {
+  function _verify(bytes memory signedOffchainData) payable internal {
     // ... insert verification code here ...
   }
 
@@ -141,7 +152,7 @@ Cross-chain functions like this could also be leveraged to avoid O(n) (and great
 
 ## Security Considerations
 
-This standard has similar security considerations to [EIP-3668](./eip-3668.md). However, regarding HTTP requests, it is more secure as the client is not expected to query an arbitrary HTTP endpoint specified by the contract. It is instead the responsibility of the client to decide which gateway should be used to connect to the decentralized oracle network specified in the error data.
+This standard has similar security considerations to [ERC-3668](./eip-3668.md). However, regarding HTTP requests, it is more secure as the client is not expected to query an arbitrary HTTP endpoint specified by the contract. It is instead the responsibility of the client to decide which gateway should be used to connect to the decentralized oracle network specified in the error data.
 
 One potential risk introduced by this standard is that its reliance on multicalls could obfuscate transaction data in wallet applications that do not have more sophisticated transaction decoding functionality. This is an existing challenge being addressed by wallet application developers, as multicalls are increasingly common in protocol development outside of this standard.
 
