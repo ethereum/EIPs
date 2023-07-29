@@ -1,13 +1,13 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: Tokenized Reserve
+description: Proposed method to replicate a 
+author: Jimmy Debe (@jimstir)
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
+category: 
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+requires: ERC4626, ERC20
 ---
 
 <!--
@@ -24,6 +24,7 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
+A proposal for a tokenized reserve mechanism. The reservse is allows an audit of on-chain actions of the owner of the reserve. Using ERC4626, stakeholders can create shares to show support for actions in the reserve.
 <!--
   The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
 
@@ -31,6 +32,8 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 -->
 
 ## Motivation
+
+Tokenized reserves are an extension of tokenized vaults. The goal is to create a reserve similar to a reserve an entity creates in the real world as a backup when regualr funds run low. In the real world, an entity will have certain cretria to access reserve funds. In a decentraiized envirnoment, an entity can incorporate stakeholders into the cretria. Hopefully this will help enities that participate in decentrailzed envirnoments to traspanet for every stakeholder. 
 
 <!--
   This section is optional.
@@ -43,6 +46,15 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 -->
 
 ## Specification
+
+Definitions:
+	- owner: The creator of the reserve.
+	- user: Stakeholders of specific proposals
+	- reserve: The tokenized reserve contract
+	- proposal : Occurs when the owner wants a withdrawal from contract
+
+ 
+
 
 <!--
   The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
