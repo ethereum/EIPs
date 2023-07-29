@@ -35,8 +35,9 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 	- rAuth: Primary authorized user
 	- rOwner: Owner of the Reserve
  
+ 
  ```solidity
-   
+ 
  interface TokenReserve{
 	// @dev proposals event
 	event proposals(
@@ -143,9 +144,9 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
     	* @param amount number of assets being deposited
     	*/
     	function depositReserve(address token, address sender, uint256 amount) external virtual;
-      
-   }
-   ```
+
+}
+```
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
