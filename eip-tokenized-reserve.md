@@ -20,17 +20,20 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 ## Specification
 
 ### Definitions:
+
 	- owner: The creator of the reserve.
 	- user: Stakeholders of specific proposals
 	- reserve: The tokenized reserve contract
 	- proposal: Occurs when the owner wants a withdrawal from contract
  ### Constructor:
+ 
  	- name: ERC20 token name
   	- ticker: ERC20 ticker
    	- asset: ERC4626 underlying ERC20 address
     	- rAuth: Primary authorized user
      	- rOwner: Owner of the Reserve
 ```solidity
+
 interface TokenReserve{
 	// @dev proposals event
 	event proposals(
@@ -145,16 +148,20 @@ interface TokenReserve{
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ## Rationale
+
 The reserve is designed to be a basic implementation of the reserve interface. Other non specified conditions should be addressed on case by case instances. Reserves use ERC20 for shares and ERC4626 for creations of shares within proposals. All accounting measures are designed to enforce audit practices based on use case. 
 
 ## Backwards Compatibility
+
 Tokenized reserves are made compatible with ERC20 and ERC4626.
 
 
 ## Reference Implementation
+
 A reference implementation is located [here](https://github.com/jimstir/Reserve-Vault).
 
 ## Security Considerations
+
 Needs discussion.
 
 ## Copyright
