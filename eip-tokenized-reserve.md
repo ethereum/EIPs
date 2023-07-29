@@ -17,6 +17,7 @@ A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-
 ## Motivation
 
 Tokenized reserves are an extension of tokenized vaults. The goal is to create a reserve similar to a real world reserve an entity has as a backup incase regular funds run low. In the real world, an entity will have certain criteria to access reserve funds. In a decentralized environment, an entity can incorporate stakeholders into their criteria. Hopefully this will help entities who participate in decentralized environments to be more transparent with stakeholders.
+
 ## Specification
 
 ### Definitions:
@@ -25,13 +26,15 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 	- user: Stakeholders of specific proposals
 	- reserve: The tokenized reserve contract
 	- proposal: Occurs when the owner wants a withdrawal from contract
- ### Constructor:
+ 
+### Constructor:
  
  	- name: ERC20 token name
   	- ticker: ERC20 ticker
    	- asset: ERC4626 underlying ERC20 address
-    	- rAuth: Primary authorized user
-     	- rOwner: Owner of the Reserve
+	- rAuth: Primary authorized user
+	- rOwner: Owner of the Reserve
+ 
 ```solidity
 
 interface TokenReserve{
