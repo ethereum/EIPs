@@ -34,7 +34,9 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
    	- asset: ERC4626 underlying ERC20 address
 	- rAuth: Primary authorized user
 	- rOwner: Owner of the Reserve
- ```solidity	
+ 
+ ```solidity
+   
  interface TokenReserve{
 	// @dev proposals event
 	event proposals(
