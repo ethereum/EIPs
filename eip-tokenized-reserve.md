@@ -35,7 +35,9 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 	- rAuth: Primary authorized user
 	- rOwner: Owner of the Reserve
  
-   ```solidity
+ ### Interface
+ 
+ ```solidity
 
 interface TokenReserve{
 // @dev proposals event
