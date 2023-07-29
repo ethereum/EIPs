@@ -1,23 +1,22 @@
 ---
 title: Tokenized Reserve
-description: Proposed method to replicate a 
+description: Replicate real world reservse with added user auditing
 author: Jimmy Debe (@jimstir)
-discussions-to: <URL>
+discussions-to: 
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category: 
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+type: Standards Track
+category: EIP
+created: 2023-06-30
 requires: ERC4626, ERC20
 ---
 
 ## Abstract
 
-A proposal for a tokenized reserve mechanism. The reservse allows an audit of on-chain actions of the owner a reserve. Using ERC4626, stakeholders can create shares to show support for actions in the reserve.
+A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-chain actions of the owner a reserve. Using ERC4626, stakeholders can create shares to show support for actions in the reserve.
 
 ## Motivation
 
-Tokenized reserves are an extension of tokenized vaults. The goal is to create a reserve similar to a real world reserve an entity has as a backup incase regular funds run low. In the real world, an entity will have certain cretria to access reserve funds. In a decentraiized envirnoment, an entity can incorporate stakeholders into their cretria. Hopefully this will help enities that participate in decentrailzed envirnoments to more traspanet for every stakeholder. 
-
+Tokenized reserves are an extension of tokenized vaults. The goal is to create a reserve similar to a real world reserve an entity has as a backup incase regular funds run low. In the real world, an entity will have certain criteria to access reserve funds. In a decentralized environment, an entity can incorporate stakeholders into their criteria. Hopefully this will help entities who participate in decentralized environments to be more transparent with stakeholders.
 ## Specification
 
 ### Definitions:
@@ -25,7 +24,7 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 	- user: Stakeholders of specific proposals
 	- reserve: The tokenized reserve contract
 	- proposal: Occurs when the owner wants a withdrawal from contract
- ### Contructor:
+ ### Constructor:
  	- name: ERC20 token name
   	- ticker: ERC20 ticker
    	- _asset: ERC4626 underlying ERC20 address
@@ -85,7 +84,7 @@ interface TokenReserve{
 	* NOTE: using the deposit() will cause shares to not be accounted for in a proposal
 	* @param assets amount being deposited
 	* @param receiver address of depositor
-	* @param proposal number assciated proposal
+	* @param proposal number associated proposal
 	*/
 	function proposalDeposit(uint256 assets, address receiver, uint256 proposal) external virtual returns (uint256);
 	/**
@@ -95,7 +94,7 @@ interface TokenReserve{
 	* NOTE: using the mint() will cause shares to not be accounted for in a proposal
 	* @param shares amount being deposited
 	* @param receiver address of depositor
-	* @param proposal number asscoiated proposal
+	* @param proposal number associated proposal
 	*/
 	function proposalMint(uint256 shares, address receiver, uint256 proposal) external virtual returns(uint256);
 	/**
@@ -117,7 +116,7 @@ interface TokenReserve{
 	* - MUST account for amount withdrawn 
 	* @param token address of ERC20 token
 	* @param amount token amount being withdrawn
-	* @param receiver address of token recipent
+	* @param receiver address of token recipient
 	*/
 	function proposalOpen(address token, uint256 amount, address receiver) external virtual returns (uint256);
 	/**
@@ -146,29 +145,16 @@ interface TokenReserve{
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ## Rationale
-
+The reserve is designed to be a basic implementation of the reserve interface. Other non specified conditions should be addressed on case by case instances. Reserves use ERC20 for shares and ERC4626 for creations of shares within proposals. All accounting measures are designed to enforce audit practices based on use case. 
 
 ## Backwards Compatibility
-
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-No backward compatibility issues found.
+Tokenized reserves are made compatible with ERC20 and ERC4626.
 
 
 ## Reference Implementation
-A reference implementation is located here.
+A reference implementation is located [here](https://github.com/jimstir/Reserve-Vault).
 
 ## Security Considerations
-
 Needs discussion.
 
 ## Copyright
