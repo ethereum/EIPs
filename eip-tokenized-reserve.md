@@ -35,22 +35,22 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
 	- rAuth: Primary authorized user
 	- rOwner: Owner of the Reserve
  
- 
- ```solidity			
- interface TokenReserve{
+   ```solidity
+
+interface TokenReserve{
 // @dev proposals event
 event proposals(
 	address indexed token,
- 	uint256 indexed proposalNum,
- 	uint256 indexed amount,
- 	address recipient
+	uint256 indexed proposalNum,
+	uint256 indexed amount,
+	address recipient
  );
 /// @dev owner deposit event
 event depositR(
- 	address indexed token,
- 	uint256 indexed amount,
- 	uint256 indexed time,
- 	uint256 count
+	address indexed token,
+	uint256 indexed amount,
+	uint256 indexed time,
+	uint256 count
  );
 /** @dev Owner accounting struct
 * @param time Deposit time
