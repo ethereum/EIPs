@@ -12,7 +12,7 @@ requires: ERC4626, ERC20
 
 ## Abstract
 
-A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-chain actions of the owner a reserve. Using ERC4626, stakeholders can create shares to show support for actions in the reserve.
+A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-chain actions of the owner. Using ERC4626, stakeholders can create shares to show support for actions in the reserve.
 
 ## Motivation
 
