@@ -29,9 +29,9 @@ Tokenized reserves are an extension of tokenized vaults. The goal is to create a
  
 ### Constructor:
  
- 	- name: ERC20 token name
-  	- ticker: ERC20 ticker
-   	- asset: ERC4626 underlying ERC20 address
+ 	- name: ERC-20 token name
+  	- ticker: ERC-20 ticker
+   	- asset: ERC-4626 underlying ERC-20 address
 	- rAuth: Primary authorized user
 	- rOwner: Owner of the Reserve
  
@@ -55,7 +55,7 @@ event depositR(
  );
 /** @dev Owner accounting struct
 * @param time Deposit time
-* @param token Address of ERC20 token
+* @param token Address of ERC-20 token
 * @param deposit Amount of owner deposit
 */
 struct ownerAccount{
@@ -74,7 +74,7 @@ struct ownerAccount{
 	uint256 withdrew;
  }
 /** @dev Proposal accounting struct
-* @param token Address of ERC20 token
+* @param token Address of ERC-20 token
 * @param withdrew Amount withdrawn
 * @param received Amount received
 */
@@ -113,14 +113,14 @@ function proposalWithdraw(uint256 assets, address receiver, address owner, uint2
 * @dev Burn shares, receive 1 to 1 value of assets
 * - MUST have open proposal number
 * - MUST have user deposit greater than or equal to user withdrawal
-* NOTE: using ERC 4626 redeem() will not account for proposalWithdrawal
+* NOTE: using ERC-4626 redeem() will not account for proposalWithdrawal
 */
 function proposalRedeem(uint256 shares, address receiver, address owner, uint256 proposal) external virtual returns(uint256);
 /**
 * @dev Issue new proposal
 * - MUST create new proposal number
 * - MUST account for amount withdrawn 
-* @param token address of ERC20 token
+* @param token address of ERC-20 token
 * @param amount token amount being withdrawn
 * @param receiver address of token recipient
 */
@@ -129,7 +129,7 @@ function proposalOpen(address token, uint256 amount, address receiver) external 
 * @dev Close an opened proposal
  * - MUST account for amount received
  * - MUST proposal must be greater than current proposal
- * @param token address of ERC20 token
+ * @param token address of ERC-20 token
  * @param proposal number of desired proposal to close
  * @param amount number assets being received
  */
@@ -138,7 +138,7 @@ function proposalOpen(address token, uint256 amount, address receiver) external 
 * @dev Optional accounting for tokens deposited by owner
  * - MUST be contract owner
  * NOTE: No shares are issued, funds can not be redeemed. Only withdrawn from proposalOpen
- * @param token address of ERC20 token
+ * @param token address of ERC-20 token
  * @param sender address of where tokens from
  * @param amount number of assets being deposited
  */
@@ -155,7 +155,7 @@ The reserve is designed to be a basic implementation of the reserve interface. O
 
 ## Backwards Compatibility
 
-Tokenized reserves are made compatible with ERC20 and ERC4626.
+Tokenized reserves are made compatible with ERC-20 and ERC-4626.
 
 
 ## Reference Implementation
