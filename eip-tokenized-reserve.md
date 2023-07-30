@@ -1,6 +1,6 @@
 ---
 title: Tokenized Reserve
-description: Reservses with user auditing
+description: Reserves with user auditing
 author: Jimmy Debe (@jimstir)
 discussions-to: 
 status: Draft
