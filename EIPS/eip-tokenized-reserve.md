@@ -1,18 +1,18 @@
 ---
-title: Tokenized Reserve
-description: Reserves with user auditing
+title: EIP Tokenized Reserve
+description: Reserve with user auditing
 author: Jimmy Debe (@jimstir)
 discussions-to: 
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-06-30
-requires: 20, 4626
+requires: EIP-20, EIP-4626
 ---
 
 ## Abstract
 
-A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-chain actions of the owner. Using [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626), stakeholders can create shares to show support for actions in the reserve.
+A proposal for a tokenized reserve mechanism. The reserve allows an audit of on-chain actions of the owner. Using [ERC-4626](../eip-4626.md), stakeholders can create shares to show support for actions in the reserve.
 
 ## Motivation
 
@@ -151,16 +151,16 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Rationale
 
-The reserve is designed to be a basic implementation of the reserve interface. Other non specified conditions should be addressed on case by case instances. Reserves use [ERC-20](https://eips.ethereum.org/EIPS/eip-20) for shares and [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626) for creations of shares within proposals. All accounting measures are designed to enforce audit practices based on use case. 
+The reserve is designed to be a basic implementation of the reserve interface. Other non specified conditions should be addressed on case by case instances. Reserves use [ERC-20](../eip-20.md) for shares and [ERC-4626](../eip-4626.md) for creations of shares within proposals. All accounting measures are designed to enforce audit practices based on use case. 
 
 ## Backwards Compatibility
 
-Tokenized reserves are made compatible with [ERC-20](https://eips.ethereum.org/EIPS/eip-20) and [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626).
+Tokenized reserves are made compatible with [ERC-20](../eip-20.md) and [ERC-4626](../eip-4626.md).
 
 
 ## Reference Implementation
 
-A reference implementation is located [here](https://github.com/jimstir/Reserve-Vault).
+A reference implementation is located https://github.com/jimstir/Reserve-Vault.
 
 ## Security Considerations
 
