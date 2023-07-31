@@ -1,5 +1,5 @@
 ---
-title: EIP Tokenized Reserve
+title: Tokenized Reserve
 description: Reserve with user auditing
 author: Jimmy Debe (@jimstir)
 status: Draft
