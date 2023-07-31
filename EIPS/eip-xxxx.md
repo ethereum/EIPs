@@ -12,7 +12,7 @@ created: 2023-07-16
 
 ## Abstract
 
-Upgrades block proposer election mechanism Whisk, a single secret leader election (SSLE) protocol. Currently block proposers are publicly known in advance, sufficiently to allow sequential DoS attacks that could disable Ethereum. This upgrade makes the next block proposer unknown until its block is published.
+Upgrades block proposer election mechanism to Whisk, a single secret leader election (SSLE) protocol. Currently block proposers are publicly known sufficiently in advance to allow sequential DoS attacks that could disable Ethereum. This upgrade makes the next block proposer unknown until its block is published.
 
 ## Motivation
 
