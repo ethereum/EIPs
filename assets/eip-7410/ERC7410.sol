@@ -11,13 +11,13 @@ contract ERC7410 is ERC20, IERC7410 {
         string memory symbol_
     ) ERC20(name_, symbol_) {}
 
-    function approveBySpender(
+    function decreaseAllowanceBySpender(
         address _owner,
         uint256 _value
     ) public override(ERC20, IERC7410) returns (bool success) {
         address spender = _msgSender();
         require(allowance(_owner, spender) >= _value, "Not enough allowance");
-        _approve(_owner, spender, _value);
+        _approve(_owner, spender, allowance(_owner, spender) - _value);
         return true;
     }
 
