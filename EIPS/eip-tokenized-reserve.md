@@ -2,12 +2,11 @@
 title: EIP Tokenized Reserve
 description: Reserve with user auditing
 author: Jimmy Debe (@jimstir)
-discussions-to: 
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-06-30
-requires: EIP-20, EIP-4626
+requires: 20, 4626
 ---
 
 ## Abstract
@@ -156,11 +155,6 @@ The reserve is designed to be a basic implementation of the reserve interface. O
 ## Backwards Compatibility
 
 Tokenized reserves are made compatible with [ERC-20](../eip-20.md) and [ERC-4626](../eip-4626.md).
-
-
-## Reference Implementation
-
-A reference implementation is located https://github.com/jimstir/Reserve-Vault.
 
 ## Security Considerations
 
