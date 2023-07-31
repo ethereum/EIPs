@@ -33,15 +33,15 @@ The protocol can be summarized in the following concurrent steps:
 - Each validator registers a tracker on their first proposal after the fork
 - At the start of a shuffling phase a list of candidate trackers is selected using public randomness from RANDAO
 - During the shuffling phase each proposer shuffles a subset of the candidate trackers using private randomness
-- After one shuffling phase an ordered list of proposer trackers is selected from the candidate set using RANDAO
+- After the shuffling phase an ordered list of proposer trackers is selected from the candidate set using RANDAO
 
 Specification of the proposed change can be found in [`/_features/whisk/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/a39abe388bc2d1abd5b4fd62fd18aed497956b30/specs/_features/whisk/beacon-chain.md).. In summary:
 
-- Update `BeaconState` with fields needed track validator trackers, commitments and the two rounds of candidates election.
+- Update `BeaconState` with fields needed to track validator trackers, commitments and the two rounds of candidates election.
 - Add `select_whisk_candidate_trackers` to compute the next vector of candidates from the validator set.
 - Add `select_whisk_proposer_trackers` to compute the next vector of proposers from current candidates.
-- Add `process_whisk_updates` to epoch processing logic.
-- Add `process_whisk_opening_proof` to validate block proposer has knowledge of this slot's elected tracker.
+- Add `process_whisk_updates` to the epoch processing logic.
+- Add `process_whisk_opening_proof` to check that the block proposer has knowledge of this slot's elected tracker.
 - Modify `process_block_header` to not assert proposer election with `get_beacon_proposer_index`, instead assert valid opening proof.
 - Update `BeaconBlockBody` with fields to submit opening proof, shuffled trackers with proof, and tracker registration with proof.
 - Add `get_shuffle_indices` to compute pre-shuffle candidate selection
@@ -93,7 +93,7 @@ The anonymity set in Whisk equals `WHISK_CANDIDATE_TRACKERS_COUNT - WHISK_PROPOS
 
 ### RANDAO biasing
 
-Whisk uses RANDAO in the candidate selection and proposer selection events, and is susceptible to potential RANDAO biasing attacks by malicious proposers. Whisk security could be made identical to the status quo by spreading the selection events over and entire shuffling period. However, status quo security is not ideal either and it would complicate the protocol further.
+Whisk uses RANDAO in the candidate selection and proposer selection events, and is susceptible to potential RANDAO biasing attacks by malicious proposers. Whisk security could be made identical to the status quo by spreading the selection events over the entire shuffling period. However, doing so would complicate the Whisk protocol further, and status quo security is not ideal either.
 
 ## Copyright
 
