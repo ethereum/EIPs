@@ -2,6 +2,7 @@
 title: Tokenized Reserve
 description: Reserve with user auditing
 author: Jimmy Debe (@jimstir)
+discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
