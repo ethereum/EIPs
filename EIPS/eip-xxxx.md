@@ -2,12 +2,12 @@
 eip: 0000
 title: Upgrade block proposer election to Whisk SSLE
 description: Allow elected block proposers to remain private until block publishing, to prevent DoS attacks
-author: TBD
+author: George Kadianakis (@asn-d6), Justin Drake (@JustinDrake), dapplion (@dapplion)
 discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Core
-created: 2023-07-16
+created: 2023-09-01
 ---
 
 ## Abstract
