@@ -57,13 +57,13 @@ Whisk requires appending one tracker `(rG,krG)` and one commitment `kG` per vali
 
 Trackers are registered with a randomized base `(rG,krG)` to make it harder for adversaries to track them through shuffling gates. It can become an issue if the set of honest shufflers is small.
 
-Each tracker must be bound to a validator's identity to prevent multiple parties to claim the same proposer slot. Otherwise, it would allow proposers to sell their proposer slot, and cause fork-choice issues if two competing blocks appear.
-
 ### Identity binding
+
+Each tracker must be bound to a validator's identity to prevent multiple parties to claim the same proposer slot. Otherwise, it would allow proposers to sell their proposer slot, and cause fork-choice issues if two competing blocks appear.
 
 Whisk does identity binding by storing a commitment to the tracker's secret `kG` in the validator record. Storing the commitment also ensures the uniqueness of `k`.
 
-Identity binding can be achieved by forcing the hash prefix of `hash(kG)` to match its validator index. However, validators would have to brute force `k` making bootstrap of the system harder for participants with fewer computational resources.
+Alternatively, identity binding can be achieved by forcing the hash prefix of `hash(kG)` to match its validator index. However, validators would have to brute force `k` making bootstrap of the system harder for participants with fewer computational resources.
 
 Identity binding can also be achieved by setting `k = hash(nonce + pubkey)`. However, proposers will need to reveal `k` and be de-anonymized for repeated proposals on adjacent shuffling phases.
 
