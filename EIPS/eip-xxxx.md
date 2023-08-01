@@ -12,7 +12,7 @@ created: 2023-07-16
 
 ## Abstract
 
-Upgrades block proposer election mechanism to Whisk, a single secret leader election (SSLE) protocol. Currently block proposers are publicly known sufficiently in advance to allow sequential DoS attacks that could disable Ethereum. This upgrade makes the next block proposer unknown until its block is published.
+Upgrades the block proposer election mechanism to Whisk, a single secret leader election (SSLE) protocol. Currently, block proposers are publicly known in advance, sufficiently to allow sequential DoS attacks that could disable Ethereum. This upgrade makes the next block proposer unknown until its block is published.
 
 ## Motivation
 
@@ -30,18 +30,18 @@ This requires no changes to the Execution Layer.
 
 The protocol can be summarized in the following concurrent steps:
 
-- Each validator registers a tracker on their first proposal after the fork
+- Validators register a tracker on their first proposal after the fork
 - At the start of a shuffling phase a list of candidate trackers is selected using public randomness from RANDAO
-- During the shuffling phase each proposer shuffles a subset of the candidate trackers using private randomness
-- After the shuffling phase an ordered list of proposer trackers is selected from the candidate set using RANDAO
+- During one shuffling phase each proposer shuffles a subset of the candidate trackers using private randomness
+- After one shuffling phase an ordered list of proposer trackers is selected from the candidate set using RANDAO
 
-Specification of the proposed change can be found in [`/_features/whisk/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/a39abe388bc2d1abd5b4fd62fd18aed497956b30/specs/_features/whisk/beacon-chain.md).. In summary:
+The full specification of the proposed change can be found in [`/_features/whisk/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/a39abe388bc2d1abd5b4fd62fd18aed497956b30/specs/_features/whisk/beacon-chain.md). In summary:
 
-- Update `BeaconState` with fields needed to track validator trackers, commitments and the two rounds of candidates election.
+- Update `BeaconState` with fields needed to track validator trackers, commitments, and the two rounds of candidate election.
 - Add `select_whisk_candidate_trackers` to compute the next vector of candidates from the validator set.
 - Add `select_whisk_proposer_trackers` to compute the next vector of proposers from current candidates.
-- Add `process_whisk_updates` to the epoch processing logic.
-- Add `process_whisk_opening_proof` to check that the block proposer has knowledge of this slot's elected tracker.
+- Add `process_whisk_updates` to epoch processing logic.
+- Add `process_whisk_opening_proof` to validate block proposer has knowledge of this slot's elected tracker.
 - Modify `process_block_header` to not assert proposer election with `get_beacon_proposer_index`, instead assert valid opening proof.
 - Update `BeaconBlockBody` with fields to submit opening proof, shuffled trackers with proof, and tracker registration with proof.
 - Add `get_shuffle_indices` to compute pre-shuffle candidate selection
@@ -53,47 +53,47 @@ Specification of the proposed change can be found in [`/_features/whisk/beacon-c
 
 ### Fields per validator
 
-Whisk requires to append one tracker `(rG,krG)` and one commitment `kG` per validator. Both are updated at max once through a validator's lifetime.
+Whisk requires appending one tracker `(rG,krG)` and one commitment `kG` per validator. Both are updated at max once through a validator's lifetime.
 
 Trackers are registered with a randomized base `(rG,krG)` to make it harder for adversaries to track them through shuffling gates. It can become an issue if the set of honest shufflers is small.
 
-Each tracker must be binded to a validator's identity to prevent multiple parties to claim the same proposer slot. Otherwise it would allow proposers to sell their proposer slot, and cause fork-choice issues if two competing blocks appear.
+Each tracker must be bound to a validator's identity to prevent multiple parties to claim the same proposer slot. Otherwise, it would allow proposers to sell their proposer slot, and cause fork-choice issues if two competing blocks appear.
 
 ### Identity binding
 
-Whisk does identity binding by storing a commitment to the tracker's secret `kG` in the validator record. Storing the commitment also allows to ensures the uniqueness of `k`.
+Whisk does identity binding by storing a commitment to the tracker's secret `kG` in the validator record. Storing the commitment also ensures the uniqueness of `k`.
 
-Identity binding can be achieved by forcing the hash prefix of `hash(kG)` to match its validator index. However, validators would have to brute force `k` making bootstrap of the system harder to participants with less computational resources.
+Identity binding can be achieved by forcing the hash prefix of `hash(kG)` to match its validator index. However, validators would have to brute force `k` making bootstrap of the system harder for participants with fewer computational resources.
 
-Identity binding can also be achieved by setting `k = hash(nonce + pubkey)`. However, proposers will need to reveal `k` and be de-anonimized for repeated proposals on adjacent shuffling phases.
+Identity binding can also be achieved by setting `k = hash(nonce + pubkey)`. However, proposers will need to reveal `k` and be de-anonymized for repeated proposals on adjacent shuffling phases.
 
 ### Alternative: non-single secret election
 
-Secret non-single leader election is based on protocol engineering rather than cryptography, thus much simpler and cheap than Whisk. However it complicates the fork-choice and opens it up to potential MEV time-buying attacks, making it an unsuitable option at the time of writing.
+Secret non-single leader election is based on protocol engineering rather than cryptography, thus much simpler and cheap than Whisk. However, it complicates the fork-choice and opens it up to potential MEV time-buying attacks, making it an unsuitable option at the time of writing.
 
 ### Alternative: network anonymity
 
-Privacy-preserving networking protocols like Dandelion or Dandelion++ increase the privacy of network participants but not sufficiently for Ethereum's usecase.
+Privacy-preserving networking protocols like Dandelion or Dandelion++ increase the privacy of network participants but not sufficiently for Ethereum's use case.
 
 SASSAFRAS is a simpler alternative SSLE protocol consensus-wise, but it relies on a network anonymity layer. Its specific trade-offs do not fit Ethereum's overall threat model better than Whisk.
 
 ## Backwards Compatibility
 
-This EIP introduces backwards incompatible changes to the block validation rule set on the consensus layer and must be accompanied by a hard fork.
+This EIP introduces backward incompatible changes to the block validation rule set on the consensus layer and must be accompanied by a hard fork.
 
 PBS participants (e.g. builders) will not know the next proposer validator index to use a specific pre-registered fee recipient; unless the proposer chooses to reveal itself ahead of time. Block explorers and tooling will not be able to attribute missing slots to a specific validator index.
 
 ## Security Considerations
 
-The shuffling strategy is analyzed in a companion paper and considered sufficiently safe for Whisk's usecase. Data and computational complexity of this EIP is significant but constant, thus does not open new DoS vectors. 
+The shuffling strategy is analyzed in a companion paper and considered sufficiently safe for Whisk's use case. The data and computational complexity of this EIP are significant but constant, thus does not open new DoS vectors. 
 
 ### Anonymity set
 
-The anonymity set in Whisk equals `WHISK_CANDIDATE_TRACKERS_COUNT - WHISK_PROPOSER_TRACKERS_COUNT` (8,192) which are the candidates that did not get selected as proposers. That count of validators correspond to a smaller number of p2p nodes. Assuming a Pareto principle where "20% of the nodes run 80% of the validators" the anonymity corresponds to 2,108 nodes on average. A bigger candidate pool could make the shuffling strategy unsafe, while shuffling more trackers per round would increase the cost of the ZK proofs.
+The anonymity set in Whisk equals `WHISK_CANDIDATE_TRACKERS_COUNT - WHISK_PROPOSER_TRACKERS_COUNT` (8,192) which are the candidates that did not get selected as proposers. That count of validators corresponds to a smaller number of p2p nodes. Assuming a Pareto principle where "20% of the nodes run 80% of the validators" the anonymity corresponds to 2,108 nodes on average. A bigger candidate pool could make the shuffling strategy unsafe while shuffling more trackers per round would increase the cost of the ZK proofs.
 
 ### RANDAO biasing
 
-Whisk uses RANDAO in the candidate selection and proposer selection events, and is susceptible to potential RANDAO biasing attacks by malicious proposers. Whisk security could be made identical to the status quo by spreading the selection events over the entire shuffling period. However, doing so would complicate the Whisk protocol further, and status quo security is not ideal either.
+Whisk uses RANDAO in the candidate selection and proposer selection events, and is susceptible to potential RANDAO biasing attacks by malicious proposers. Whisk security could be made identical to the status quo by spreading the selection events over an entire shuffling period. However, status quo security is not ideal either and it would complicate the protocol further.
 
 ## Copyright
 
