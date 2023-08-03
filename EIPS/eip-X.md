@@ -49,9 +49,8 @@ Ethereum accounts can then, using custom verification schemes such as those base
 - This scheme shall require one day between commit and reveal per lock, but allow simultaneous commits and reveals for different locks.
 
 ### Bounty funds
-#TODO
-
-Funds covering 6,000,000 gas for each unsolved lock shall be sent to the contract as a bounty. The funds must be updated to cover this amount as the value of gas increases.
+Funds covering 50,000 gas for each unsolved lock shall be sent to the contract as a bounty.
+The funds must be updated to cover this amount as the value of gas increases.
 The contract shall accept any additional funds from any account as a donation to the bounty.
 
 ### Providing the Final Solution
@@ -61,7 +60,7 @@ Upon solving the final solution, all funds in the contract shall be sent to the 
 ## Rationale
 
 - The reason to split up the lock generation and solving into many calls is to avoid hitting the gas limit of a transaction in any one call.
-- #TODO It is estimated that less than 5,000,000 gas will be required to provide a solution for a single lock.
+- It is estimated that less than 50,000 gas will be required to provide a solution for a single lock.
   The funds awarded to the solver must cover this cost with a margin of error and provide an additional reward to the solver as an incentive.
 
 ## Backwards Compatibility
