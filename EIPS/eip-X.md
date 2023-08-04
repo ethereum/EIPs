@@ -69,17 +69,17 @@ Does not apply as there are no past versions of a Quantum Supremacy contract bei
 
 ## Test Cases
 
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/75eea4126d52b5f1dc7e5bb80cab5e971ace1fdb/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-accumulator.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/75eea4126d52b5f1dc7e5bb80cab5e971ace1fdb/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-bounty-with-lock-generation.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/75eea4126d52b5f1dc7e5bb80cab5e971ace1fdb/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-predetermined-locks/order-finding-bounty-with-predetermined-locks.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/ac7cdbb32a74649f061a4012c9221ecf00b0ab32/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-accumulator.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/ac7cdbb32a74649f061a4012c9221ecf00b0ab32/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-bounty-with-lock-generation.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/ac7cdbb32a74649f061a4012c9221ecf00b0ab32/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-predetermined-locks/order-finding-bounty-with-predetermined-locks.test.ts
 
 ## Reference Implementation
 
 ### Quantum Supremacy Contract
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/75eea4126d52b5f1dc7e5bb80cab5e971ace1fdb/contracts/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/OrderFindingBountyWithLockGeneration.sol
+https://github.com/nikojpapa/ethereum-quantum-bounty/blob/ac7cdbb32a74649f061a4012c9221ecf00b0ab32/contracts/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/OrderFindingBountyWithLockGeneration.sol
 
 ### Example Proof-of-concept Account Having a Quantum Secure Verification Scheme After Quantum Supremacy Trigger
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/75eea4126d52b5f1dc7e5bb80cab5e971ace1fdb/contracts/bounty-fallback-account/BountyFallbackAccount.sol
+https://github.com/nikojpapa/ethereum-quantum-bounty/blob/ac7cdbb32a74649f061a4012c9221ecf00b0ab32/contracts/bounty-fallback-account/BountyFallbackAccount.sol
 
 ## Security Considerations
 
