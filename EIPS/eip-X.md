@@ -10,23 +10,36 @@ created: 2023-06-26
 requires: [ERC-2470]
 ---
 
-# TODO
-- Show example of submitting solution
-
 ## Abstract
 
-[Quantum supremacy](https://en.wikipedia.org/wiki/Quantum_supremacy) indicates the earliest sign where an adversary can bypass current Ethereum cryptography standards.
-To protect one's funds on Ethereum, it would be useful to watch a trigger that activates when quantum supremacy has been achieved.
-This ERC serves to both show proof of a stricter quantum supremacy (one that is strong enough to indicate concerns in RSA security) and trigger quantum-secure signature verification schemes on Ethereum assets.
-Previous attempts have been made to demonstrate quantum supremacy, e.g. [Kim](https://www.nature.com/articles/s41586-023-06096-3), [Arute](https://www.nature.com/articles/s41586-019-1666-5) and [Morvan](https://arxiv.org/abs/2304.11119), but they have been refuted or at least claimed to have no practical benefit, e.g. [Begusic and Chan](https://arxiv.org/pdf/2306.16372.pdf), [Pednault](https://arxiv.org/pdf/1910.09534.pdf), and a quote from Sebastian Weidt in [The Telegraph](https://thequantuminsider.com/2023/07/04/google-claims-latest-quantum-experiment-would-take-decades-on-classical-computer/).
-This contract will prevent any notion of cheating by generating a classically impossible problem on chain, to which even the creator does not know the solution.
+This proposal introduces a smart contract containing an intractable puzzle that is expected to only be able to be solved
+using quantum computers.
 The contract will be funded with ETH, which can only be retrieved by solving the problem.
-Ethereum accounts can then, using custom verification schemes such as those based on [ERC-4337](./eip-4337.md), watch this contract and fall back to a quantum secure signature verification scheme if and when it is solved. 
+Ethereum accounts can then, using custom verification schemes such as those based on [ERC-4337](./eip-4337.md), watch this contract and fall back to a quantum secure signature verification scheme if and when it is solved.
+
+The contract, then, serves the two purposes of (1) showing proof of a strict [quantum supremacy] that is strong enough to 
+indicate concerns in RSA and ECDSA security, and (2) acting as a leading indicator to protect Ethereum assets by triggering quantum-secure 
+signature verification schemes.
 
 ## Motivation
 
-- Defining a point in time when quantum-secure protection of Ethereum assets should be used
-- Proving practical quantum supremacy using blockchain verifiable methods
+[Quantum supremacy] "is the goal of demonstrating that a programmable quantum computer can solve a problem that no classical computer can solve in any feasible amount of time".
+Previous attempts have been made to demonstrate quantum supremacy, e.g. [Kim](https://www.nature.com/articles/s41586-023-06096-3), [Arute](https://www.nature.com/articles/s41586-019-1666-5) and [Morvan](https://arxiv.org/abs/2304.11119), 
+but they have been refuted or at least claimed to have no practical benefit, e.g. [Begusic and Chan](https://arxiv.org/pdf/2306.16372.pdf), [Pednault](https://arxiv.org/pdf/1910.09534.pdf), 
+and a quote from Sebastian Weidt in [The Telegraph](https://thequantuminsider.com/2023/07/04/google-claims-latest-quantum-experiment-would-take-decades-on-classical-computer/).
+Quantum supremacy, by its current definition, is "irrespective of the usefulness of the problem".
+This proposal, however, focuses on a stricter definition of a problem that indicates the earliest sign where an adversary may soon bypass current Ethereum cryptography standards.
+This contract will serve as trustless, unbiased proof of this strong quantum supremacy by generating a classically intractable problem on chain, 
+to which even the creator does not know the solution.
+
+Since quantum computers are [expected](https://www.nature.com/articles/d41586-023-00017-0) to break current security standards,
+Ethereum assets are at risk. However, implementing quantum-secure
+[protocols](https://csrc.nist.gov/News/2022/pqc-candidates-to-be-standardized-and-round-4) can be costly and complicated.
+In order to delay unnecessary costs, Ethereum assets can continue using current cryptographic standards and only fall back
+to a quantum-secure scheme when there is reasonable risk of security failure due to quanutm computers.
+Therefore, this contract can server to protect one's funds on Ethereum by acting as a trigger that activates when 
+strong quantum supremacy has been achieved by solving the classically intractable puzzle.
+
 
 ## Specification
 
@@ -118,3 +131,4 @@ This also has a trust factor, albeit very small. It requires that at least one p
 Copyright and related rights waived via [CC0](../LICENSE.md).
 
 [ERC-2470]: ./eip-2470.md
+[Quantum supremacy]: https://en.wikipedia.org/wiki/Quantum_supremacy
