@@ -1,6 +1,6 @@
 ---
 eip: X
-title: Quantum Supremacy Puzzle
+title: Quantum Supremacy Contract
 author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan 
 discussions-to: 
 status: Draft
