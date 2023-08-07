@@ -43,32 +43,49 @@ strong quantum supremacy has been achieved by solving the classically intractabl
 
 ## Specification
 
+### Puzzle
+
+The puzzle that this contract will generate is one of [order-finding](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine),
+where given a positive integer _n_ and an integer _a_ coprime to _n_, the objective is to find the smallest positive integer
+_k_ such that _a_ ^ _k_ = 1 (mod _n_).
+This has a known, efficient, quantum [solution](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine)
+but is intractable for classical computers.
+
+Fewer [qubits](https://en.wikipedia.org/wiki/Qubit) are required to solve this problem compared to the amount needed to
+break current cryptographic standards,
+so this is expected to be solvable before current security standards are breakable. In this was, the contract can act as
+a leading indicator and signal a safe moment of concern to switch to quantum-secure cryptographic schemes.
+
 ### Requirements
 
-- This contract shall generate 1 integer, the modulus, of exactly 784 bits. 
-  It shall then generate another integer, the base, of <= 784 bits and reduce it modulo the first generated integer.
-- This contract shall accept funds from any account without restriction.
-- This contract shall allow someone to provide the [order](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine) of the base with the modulus.
-  If it is the correct solution, then this contract shall send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
+- This contract SHALL generate 1 integer, the modulus, of exactly 784 random bits. 
+  It SHALL then generate another integer, the base, of <= 784 bits and reduce it modulo the first generated integer.
+- This contract MUST accept funds from any account without restriction.
+- This contract MUST allow someone to provide the [multiplicative order](https://en.wikipedia.org/wiki/Multiplicative_order) of the base with the modulus.
+  If it is the correct solution, then this contract MUST send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
 
-### Deployment Method
+### Deployment method
 
-- The contract will be deployed as a [Singleton][ERC-2470]
-- After deploying the contract with parameters of 1 locks having a 784-bit modulus, the contract's `triggerLockAccumulation()` method will be called repeatedly until all bits have been generated.
+- The contract MUST be deployed as a [Singleton][ERC-2470]
+- After deploying the contract with parameters of 1 lock having a 784-bit modulus, the contract's `triggerLockAccumulation()` method SHALL be called repeatedly until all bits have been generated.
 
 ### Providing solutions
 
-- Providing solutions will follow a [commit-reveal](https://medium.com/swlh/exploring-commit-reveal-schemes-on-ethereum-c4ff5a777db8) scheme to prevent [front running](https://solidity-by-example.org/hacks/front-running/.)
-- This scheme shall require one day between commit and reveal per lock, but allow simultaneous commits and reveals for different locks.
+- Providing solutions MUST follow a [commit-reveal](https://medium.com/swlh/exploring-commit-reveal-schemes-on-ethereum-c4ff5a777db8) scheme to prevent [front running](https://solidity-by-example.org/hacks/front-running/.).
+- This scheme MUST require one day between commit and reveal.
 
 ### Bounty funds
-Funds covering 50,000 gas for each unsolved lock shall be sent to the contract as a bounty.
-The funds must be updated to cover this amount as the value of gas increases.
-The contract shall accept any additional funds from any account as a donation to the bounty.
 
-### Providing the Final Solution
+- Funds covering 50,000 gas for each unsolved lock SHALL be sent to the contract as a bounty.
+  The funds must be updated to cover this amount as the value of gas increases.
+- The contract MUST accept any additional funds from any account as a donation to the bounty.
 
-Upon solving the final solution, all funds in the contract shall be sent to the solver, the `solved` flag shall be marked `true`, and no further attempts to commit, reveal, or add funds to the contract shall be allowed.
+### Rewarding the solver
+
+Upon solving the final solution,
+  - All funds in the contract MUST be sent to the solver
+  - The `solved` flag shall be marked `true`
+  - Subsequent transactions to commit, reveal, or add funds to the contract MUST be reverted.
 
 ## Rationale
 
