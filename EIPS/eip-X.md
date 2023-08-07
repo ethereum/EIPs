@@ -48,18 +48,13 @@ strong quantum supremacy has been achieved by solving the classically intractabl
 The puzzle that this contract will generate is one of [order-finding](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine),
 where given a positive integer _n_ and an integer _a_ coprime to _n_, the objective is to find the smallest positive integer
 _k_ such that _a_ ^ _k_ = 1 (mod _n_).
-This has a known, efficient, quantum [solution](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine)
-but is intractable for classical computers.
 
-Fewer [qubits](https://en.wikipedia.org/wiki/Qubit) are required to solve this problem compared to the amount needed to
-break current cryptographic standards,
-so this is expected to be solvable before current security standards are breakable. In this was, the contract can act as
-a leading indicator and signal a safe moment of concern to switch to quantum-secure cryptographic schemes.
 
 ### Requirements
 
 - This contract SHALL generate 1 integer, the modulus, of exactly 784 random bits. 
   It SHALL then generate another integer, the base, of <= 784 bits and reduce it modulo the first generated integer.
+- If the base is equal to 1 or -1 mod _n_ or is coprime to the modulus, it MUST be thrown out and another base MUST be generated.
 - This contract MUST accept funds from any account without restriction.
 - This contract MUST allow someone to provide the [multiplicative order](https://en.wikipedia.org/wiki/Multiplicative_order) of the base with the modulus.
   If it is the correct solution, then this contract MUST send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
@@ -76,7 +71,7 @@ a leading indicator and signal a safe moment of concern to switch to quantum-sec
 
 ### Bounty funds
 
-- Funds covering 50,000 gas for each unsolved lock SHALL be sent to the contract as a bounty.
+- Funds of at least 50,000 gas SHALL be sent to the contract as a bounty.
   The funds must be updated to cover this amount as the value of gas increases.
 - The contract MUST accept any additional funds from any account as a donation to the bounty.
 
@@ -84,18 +79,32 @@ a leading indicator and signal a safe moment of concern to switch to quantum-sec
 
 Upon solving the final solution,
   - All funds in the contract MUST be sent to the solver
-  - The `solved` flag shall be marked `true`
+  - The `solved` flag MUST be set to `true`
   - Subsequent transactions to commit, reveal, or add funds to the contract MUST be reverted.
 
 ## Rationale
 
-- The reason to split up the lock generation and solving into many calls is to avoid hitting the gas limit of a transaction in any one call.
-- It is estimated that less than 50,000 gas will be required to provide a solution for a single lock.
-  The funds awarded to the solver must cover this cost with a margin of error and provide an additional reward to the solver as an incentive.
+### Puzzle
+
+Order-finding has a known, efficient, quantum [solution](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine)
+but is intractable for classical computers. This will then reliably serve as a test for strong quantum supremacy, since
+having a solution to this problem should only be doable by a quantum computer.
+
+Fewer [qubits](https://en.wikipedia.org/wiki/Qubit) are required to solve this problem compared to the amount needed to
+break current cryptographic standards,
+so this is expected to be solvable before current security standards are breakable. In this was, the contract can act as
+a leading indicator and signal a safe moment of concern to switch to quantum-secure cryptographic schemes.
+
+### Bounty Funds
+
+Given a random, 783-bit base and a random, 784-bit modulus, 196 random solutions of byte size equal to its iteration were sent to the contract.
+The gas cost for all of these never exceeded 44,305 gas. Therefore, we expect a bounty of 50,000 gas to reliably cover the
+cost for a solver to provide a solution.
+
 
 ## Backwards Compatibility
 
-Does not apply as there are no past versions of a Quantum Supremacy contract being used.
+Backwards compatibility does not apply as there are no past versions of a contract of this sort.
 
 ## Test Cases
 
@@ -122,27 +131,35 @@ The lower bound given in the paper shows us, then, that a 782-bit modulus is nec
 To make this cheaper and easier, we make this 784 in order to be a whole number of bytes, namely 98 bytes.
 
 ### Choosing the puzzle
-Different puzzles were considered before landing on the current implementation.
+The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
 
 #### Sign a message given a public key
-Given a random public key, the solver would need to sign a message, which the contract would verify to have been correctly signed by the public key. The downside to this approach is that the contract would act less like a canary to secure ETH funds as by the time the puzzle is solved, the ability to forge signatures will have already been achieved. The current puzzle of factoring integers is expected to be the first problem that quantum computers will solve, so it should act as a better canary.
+Given a random public key, the solver would need to sign a message, which the contract would verify to have been 
+correctly signed by the public key. 
+The downside to this approach is that the contract would act less like a leading indicator to secure ETH funds 
+as by the time the puzzle is solved, the ability to forge signatures will have already been achieved. 
 
 #### Factor many large, randomly generated numbers
-The paper [Efficient Accumulators without Trapdoor Extended Abstract](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) by Tomas Sander proves that difficult to factor numbers without a known factorization, called an RSA-UFO, can be generated. 
+[Sander](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated. 
 Using [logic](https://anoncoin.github.io/RSA_UFO/) based on that described by Anoncoin, one could generate 120 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
 [RSA Security](https://web.archive.org/web/20170417095741/https://www.emc.com/emc-plus/rsa-labs/historical/twirl-and-rsa-key-size.htm) recommends 3,072-bit key sizes for RSA to be secure beyond 2030, 
 but [Alwen](https://wickr.com/the-bit-security-of-cryptographic-primitives-2/) claims that it is only considered secure for the next 2-3 decades.
 Therefore, while this method requires no trust, the cost of generating this problem would be large, and it would not serve as much of a leading indicator since if a quantum computer could solve this, they could already break current cryptographic security standards.
 
 #### Factor a product of large, generated primes
-Instead of generating an RSA-UFO, the contract could implement current RSA key generation protocols and first generate two large primes to produces the product of the primes. This method has the flaw that the miner or minter has the capability to see the primes, and therefore some level of trust would need to be given that the minter would throw the values away.
+Instead of generating an RSA-UFO, the contract could implement current RSA key generation protocols and first generate 
+two large primes to produces the product of the primes. 
+This method has the flaw that the minter has the capability to see the primes, 
+and therefore some level of trust would need to be given that the minter would throw the values away.
 
 #### Powers of Tau
 This also has a trust factor, albeit very small. It requires that at least one person in the party is honest.
 
 
 ### Front running
-- By requiring one day between commit and reveal, it is infeasible to front run because the cost required to keep a reveal transaction in the mempool for a full day is greater than all the Eth in existence.
+
+By requiring one day between commit and reveal, it is infeasible to front run because the cost required to keep a reveal transaction in the mempool for a full day is greater than all the ETH in existence.
+
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
