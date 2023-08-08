@@ -1,5 +1,5 @@
 {
-  "name": "erc-7401",
+  "name": "erc-7059",
   "dependencies": {
     "@openzeppelin/contracts": "^4.6.0"
   },
