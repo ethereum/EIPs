@@ -15,8 +15,8 @@ interface IERC7410 is IERC20, IERC165 {
      * Emits an {IERC20-Approval} event.
      *
      * Requirements:
-     * - `owner` cannot be the caller.
-     * - `subtractedValue` should be less than or equal to current allowance of `owner` for caller.
+     * - when `subtractedValue` is equal or higher than current allowance of spender the new allowance is set to 0.
+     * Nullification also MUST be reflected for current allowance being type(uint256).max.
      */
     function decreaseAllowanceBySpender(address owner, uint256 subtractedValue) external;
 

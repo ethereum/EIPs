@@ -16,8 +16,12 @@ contract ERC7410 is ERC20, IERC7410 {
         uint256 _value
     ) public override(ERC20, IERC7410) returns (bool success) {
         address spender = _msgSender();
-        require(allowance(_owner, spender) >= _value, "Not enough allowance");
-        _approve(_owner, spender, allowance(_owner, spender) - _value);
+        if (allowance(_owner, spender) > _value) {
+            _spendAllowance(_owner, spender, _value);
+        } else {
+            _approve(_owner, spender, 0);
+        }
+        
         return true;
     }
 
