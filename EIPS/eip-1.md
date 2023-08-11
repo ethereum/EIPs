@@ -74,7 +74,7 @@ Currently, only the Core Developers are organized enough to do this job.
 
 ### Editorial Services
 
-The Editors' job, for individual authors and for working groups, is to work with the authors to ensure that proposals merged to EIPs/EIPS meet standards of quality, format, style, and usage, and to provide administrative and publication services for EIPs and related digital assets.
+The editors' job, for individual authors and for working groups, is to work with the authors to ensure that proposals merged to EIPs/EIPS meet standards of quality, format, style, and usage, and to provide administrative and publication services for EIPs and related digital assets.
 
 ## EIP Work Flow
 
@@ -103,13 +103,13 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ### EIP Process
 
-The following is the full, default standardization process for all EIPs in all tracks.  The diagram shows all of the  stages a document can be in and the transitions beteen those states. 
+The following is the full, default standardization process for all EIPs in all tracks. The diagram shows all of the  stages a document can be in and the transitions between those states. 
 
 ![EIP Status Diagram](../assets/eip-1/EIP-process-update.jpg)
 
-***For Working Groups only Draft, Final, and Withdrawn are used in the Preamble as a `status`.  While a document is a Draft the working group is responsible for its process, which the group can track as `working-group-status`.***
+***For Working Groups only Draft, Final, and Withdrawn are used in the Preamble as a `status`. While a document is a Draft the working group is responsible for its process, which the group can track as `working-group-status`.***
 
-All other proposals will move through all stages of this process.
+All other proposals can move through all stages of this process.
 
 #### Idea
 
