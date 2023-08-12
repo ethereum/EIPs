@@ -35,11 +35,13 @@ A new opcode is introduced, `GAS_TO_ETH` (`0xfa`), which:
 - Endows the address `addr` with `wei_val` wei.
 - Pushes `wei_val` onto the stack.
 
-The proposed cost of this opcode is identical to the recently proposed `PAY` opcode. Currently, that is:
+The proposed cost of this opcode is similar to the recently proposed `PAY` opcode, but changing the base cost from `9000` to `5000`. That is:
 
-> base cost of this opcode is the additional cost of having a nonzero `msg.value` in a `CALL` opcode (currently `9000`). If `addr` is not the zero address, the [EIP-2929](./eip-2929.md) account access costs for `addr` (but NOT the current account) are also incurred: 100 gas for a warm account, 2600 gas for a cold account, and 25000 gas for a new account. If any of these costs are changed, the pricing for the `GAS_TO_ETH` opcode must also be changed.
+- The base cost of this opcode is `5000`. This is priced the same as a cold `SSTORE`.
+- If `addr` is not the zero address, the [EIP-2929](./eip-2929.md) account access costs for `addr` (but NOT the current account) are also incurred: 100 gas for a warm account, 2600 gas for a cold account, and 25000 gas for a new account.
+- If any of these costs are changed, the pricing for the `GAS_TO_ETH` opcode must also be changed.
 
-Note that the `CALL2` EIP eliminates the extra gas cost for value transfer. If that proposal is accepted into the EVM, the pricing for `GAS_TO_ETH` should be updated to commensurately reduce or remove the `9000` gas value transfer cost.
+Note that the `CALL2` EIP eliminates the extra gas cost for value transfer. If that proposal is accepted into the EVM, the pricing for `GAS_TO_ETH` should be updated to commensurately reduce or remove the `5000` gas value transfer cost.
 
 ## Rationale
 
