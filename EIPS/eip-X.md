@@ -122,12 +122,15 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed397
 ## Security Considerations
 
 ### Bit length of the modulus
-[Cleve](https://arxiv.org/abs/quant-ph/9911124) details a lower bound for the query complexity on the general order-finding problem and defines 
+[Cleve] details a lower bound for the query complexity on the general order-finding problem and defines 
 how the quantum solution used in [Shor's](https://api.semanticscholar.org/CorpusID:15291489) algorithm fits into it. 
 
 We would like 256-bit [security](https://api.semanticscholar.org/CorpusID:209527904), which is satisfied if we hit a 2^256 lower bound on the query complexity.
 The lower bound given in the paper shows us, then, that a 782-bit modulus is necessary to achieve this.
 To make this cheaper and easier, we make this 784 in order to be a whole number of bytes, namely 98 bytes.
+This would require 1568 qubits, as the order is bounded by twice the modulus ([Cleve]).
+
+Breaking 256-bit elliptic curve encryption is [expected](https://arxiv.org/abs/1706.06752) to require 2330 qubits, although with current fault-tolerant regime, it is [expected](https://avs.scitation.org/doi/10.1116/5.0073075) that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
 
 ### Choosing the puzzle
 The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
@@ -163,5 +166,6 @@ By requiring one day between commit and reveal, it is infeasible to front run be
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
 
+[Cleve]: https://arxiv.org/abs/quant-ph/9911124
 [ERC-2470]: ./eip-2470.md
 [Quantum supremacy]: https://en.wikipedia.org/wiki/Quantum_supremacy
