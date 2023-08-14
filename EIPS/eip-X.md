@@ -12,8 +12,7 @@ requires: [ERC-2470]
 
 ## Abstract
 
-This proposal introduces a smart contract containing an intractable puzzle that is expected to only be able to be solved
-using quantum computers.
+This proposal introduces a smart contract containing a classically intractable puzzle that is expected to only be able to be solved using quantum computers.
 The contract will be funded with ETH, which can only be retrieved by solving the problem.
 Ethereum accounts can then, using custom verification schemes such as those based on [ERC-4337](./eip-4337.md), watch this contract and fall back to a quantum secure signature verification scheme if and when it is solved.
 
@@ -108,17 +107,17 @@ Backwards compatibility does not apply as there are no past versions of a contra
 
 ## Test Cases
 
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/9bb65ea0d7b7b315321575c4896da1ffdf90de36/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-accumulator.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/9bb65ea0d7b7b315321575c4896da1ffdf90de36/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-bounty-with-lock-generation.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/9bb65ea0d7b7b315321575c4896da1ffdf90de36/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-predetermined-locks/order-finding-bounty-with-predetermined-locks.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed3972e7cc9ce8443ecbff2/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-accumulator.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed3972e7cc9ce8443ecbff2/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-bounty-with-lock-generation.test.ts
+- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed3972e7cc9ce8443ecbff2/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-predetermined-locks/order-finding-bounty-with-predetermined-locks.test.ts
 
 ## Reference Implementation
 
 ### Quantum Supremacy Contract
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/9bb65ea0d7b7b315321575c4896da1ffdf90de36/contracts/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/OrderFindingBountyWithLockGeneration.sol
+https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed3972e7cc9ce8443ecbff2/contracts/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/OrderFindingBountyWithLockGeneration.sol
 
 ### Example Proof-of-concept Account Having a Quantum Secure Verification Scheme After Quantum Supremacy Trigger
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/9bb65ea0d7b7b315321575c4896da1ffdf90de36/contracts/bounty-fallback-account/BountyFallbackAccount.sol
+https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed3972e7cc9ce8443ecbff2/contracts/bounty-fallback-account/BountyFallbackAccount.sol
 
 ## Security Considerations
 
