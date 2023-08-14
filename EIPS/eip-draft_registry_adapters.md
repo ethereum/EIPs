@@ -1,8 +1,9 @@
 ---
+eip: 7484
 title: Registry Adapters for Smart Accounts
 description: Adapters that allow modular smart contract accounts to verify the security of modules using a module registry
 author: Konrad Kopp (@kopy-kat), zeroknots (@zeroknots)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/erc-7484-registry-adapters-for-smart-accounts/15434
 status: Draft
 type: Standards Track
 category: ERC
