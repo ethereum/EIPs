@@ -1,0 +1,238 @@
+---
+title: Registry Adapters for Smart Accounts
+description: Adapters that allow modular smart contract accounts to verify the security of modules using a module registry
+author: Konrad Kopp (@kopy-kat), zeroknots (@zeroknots)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-08-14
+requires: 4337
+---
+
+## Abstract
+
+This proposal standardises a registry adapter for modular smart contract accounts. This adapter allows the account to query and verify security attestations about a module through an attestation registry. The adapter is responsible for querying the registry and correctly handling the return values.
+
+## Motivation
+
+[ERC-4337](./eip-4337.md) standardises the execution flow of contract accounts and [ERC-6900](./eip-6900.md) aims to standardise the modular implementation of these accounts, allowing any developer to build modules for these modular accounts (hereafter smart accounts). However, adding third-party modules into smart accounts unchecked opens up a wide range of attack vectors on these accounts.
+
+A proposed solution to these security considerations is a permission framework that allows module developers to define the permissions that their modules require. The counterpiece of these permissions are attestations that assert statements about the security of modules and can be queried onchain.
+
+This proposal is independent of the exact implementation of the permissioning system and could even be used across different kinds of permissioning systems. Instead, the goal of this proposal is to outline a standard, but flexible, way to create onchain attestations and standardise how these attestations are queried by the smart account during module installation or execution.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+### Definitions
+
+- **Smart account** - An ERC-4337 compliant smart contract account that has a modular architecture.
+- **Module** - Self-contained smart account functionality.
+- **Attestation** - Onchain assertions made about the security of a module.
+- **Registry** - An onchain list of attestations about modules.
+- **Adapter** - Smart account functionality that handles the fetching and validation of attestations from the registry.
+- **Attester** - An entity that makes an attestation about a module.
+
+### Overview
+
+![Adapter flow](../assets/eip-draft_registry_adapters/flow.png)
+
+An Adapter is a piece of functionality that allows smart accounts to query the module registry before using a module. In order to be compatible with this proposal, a smart account MUST implement the adapter either natively in the account or as a default module that is installed during account deployment.
+
+The adapter:
+
+- MUST query the registry at least once before calling a module for the first time.
+- MUST use one of the functions on the IRegistry interface when querying the registry.
+- Is RECOMMENDED to query the registry before module installation.
+- MAY query the registry before module execution.
+
+### Interfaces
+
+#### IRegistry.sol
+
+##### `check`
+
+Checks the attestation of a given module address and attestations made by a single attester.
+
+Returns two timestamps. `listedAt` is a `uint48` timestamp of when the attestation was made.
+The second return parameter `revokedAt` is a `uint48` timestamp of when an attestation was revoked.
+
+**NOTE**:
+
+- `listedAt` of 0 MUST be treated as a security risk.
+- `revokedAt` of non-0 MUST be treated as a security risk.
+
+```solidity
+function check(
+        address module,
+        address attester
+    )
+        public
+        view
+        returns (uint48 listedAt, uint48 revokedAt);
+```
+
+##### `verify`
+
+Verifies the attestations of a given module and multiple attesters. Additionally a threshold can be provided.
+
+Returns a boolean value `verified` if threshold `>=` the number of attesters that attested to this module without revoking the attestation.
+
+_EXAMPLE_: If threshold of 2 is set and 5 attesters are queried, the function will return `true` if 2 or more of the selected attesters have issued an attestation that has not been revoked.
+
+**NOTE**:
+
+- `verified` of false MUST be treated as a security risk.
+
+```solidity
+function verify(
+        address module,
+        address[] memory attesters,
+        uint256 threshold
+    )
+        external
+        view
+        returns (bool verified);
+```
+
+### Additional registries
+
+The reference implementation registry below is designed to be a singleton that is a public good, maximally flexible and gas efficient (see `Rationale`). While it is NOT RECOMMENDED to use a custom registry, there might still exist cases in which the benefits of creating a custom registry outweigh the downsides. In this case, the registry MUST implement the interface above in order to be compatible with adapters. Further, it is RECOMMENDED that an alternate registry also exposes a function that allows an adapter to read the entire data of the attestation (see `findAttestation` in `Reference Implementation`).
+
+## Rationale
+
+### Attestations
+
+Attestations are onchain assertions made about a module. These assertions could pertain to the security of a module (similar to a regular smart contract audit), whether a module adheres to a certain standard or any other kinds of statements about these modules. While some of these assertions can feasibly be verified onchain, the majority of them cannot be.
+
+One example of this would be determining what storage slots a specific module can write to, which might be useful if a smart account uses DELEGATECALL to invoke the module. This assertion is practically infeasible to verify onchain, but can easily be verified off-chain. Thus, an attester could perform this check off-chain and publish an attestation onchain that attests to the fact that a given module can only write to its designated storage slots.
+
+While attestations are always certain kinds of assertions made about a module, this proposal purposefully allows the attestation data to be any kind of data, packed into a `bytes` object (see `Reference Implementation`). This ensures that any kind of data can be used as an assertion, from a simple boolean flag specifying that a module is secure to a complex proof of runtime module behaviour.
+
+### Registry
+
+In order for attestations to be queryable onchain, they need to be stored in some sort of list in a smart contract. This proposal includes the reference implementation of a singleton registry that functions as the source of truth for attestations. This proposed registry is a public good that is permissionless, ownerless and immutable.
+
+The reasons for proposing a singleton registry are the following:
+
+**Security**: A singleton registry creates greater security by focusing account integrations into a single source of truth where a maximum number of security entities are attesting. This has a number of benefits: a) it increases the maximum potential quantity and type of attestations per module and b) removes the need for accounts to verify the authenticity and security of different registries, focusing trust delegation to the onchain entities making attestations. The result is that accounts are able to query multiple attesters with lower gas overhead in order to increase security guarantees and there is no additional work required by accounts to verify the security of different registries.
+
+**Interoperability**: A singleton registry not only creates a greater level of “attestation liquidity”, but it also increases module liquidity and ensures a greater level of module interoperability. Developers need only deploy their module to one place to receive attestations and maximise module distribution to all integrated accounts. Attesters can also benefit from previous auditing work by chaining attestations and deriving ongoing security from these chains of dependencies. This allows for benefits such as traversing through the history of attestations or version control by the developer.
+
+However, there are obviously tradeoffs for using a singleton. A singleton registry creates a single point of failure that, if exploited, could lead to serious consequences for smart accounts. The most serious attack vector of these would be the ability for an attacker to attest to a malicious module on behalf of a trusted attester. One tradeoff here is that using multiple registries, changes in security attestations (for example a vulnerability is found and an attestation is revoked) are slower to propagate across the ecosystem, giving attackers an opportunity to exploit vulnerabilities for longer or even find and exploit them after seeing an issue pointed out in a specific registry but not in others.
+
+Due to being a singleton, the registry needs to be very flexible and thus likely less computationally efficient in comparison to a narrow, optimised registry. This means that querying a singleton registry is likely to be more computationally (and by extension gas) intensive than querying a more narrow registry. The tradeoff here is that a singleton makes it cheaper to query attestations from multiple parties simultaneously. So, depending on the registry architectures, there is an amount of attestations to query (N) after which using a flexible singleton is actually computationally cheaper than querying N narrow registries. However, the reference implementation has also been designed with gas usage in mind and it is unlikely that specialised registries will be able to significantly decrease gas beyond the reference implementations benchmarks.
+
+### Adapter
+
+In order for smart accounts to increase security guarantees when adding modules, they must be able to securely query the module registry and handle the return data correctly. In order to achieve this, this proposal aims to provide a standardised interface that may be implemented by smart accounts irrespective of their architecture, execution flows and security assumptions.
+
+### Related work
+
+The reference implementation of the registry is heavily inspired by the Ethereum Attestation Service. The specific use-case of this proposal, however, required some custom modifications and additions to EAS, meaning that using the existing EAS contracts as the module registry was sub-optimal.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Reference Implementation
+
+### IAttestation.sol
+
+```solidity
+/**
+ * @dev A struct representing the arguments of the attestation request.
+ */
+struct AttestationRequestData {
+    address subject; // The module that is the subject of the attestation.
+    uint48 expirationTime; // The time when the attestation expires (Unix timestamp).
+    bool revocable; // Whether the attestation is revocable.
+    bool propagateable; // Whether the attestation is propagateable to L2s.
+    bytes32 refUID; // The UID of the related attestation.
+    bytes data; // Custom attestation data.
+    uint256 value; // An explicit ETH amount to send to the resolver. This is important to prevent accidental user errors.
+}
+
+/**
+ * @dev A struct representing the full arguments of the attestation request.
+ */
+struct AttestationRequest {
+    bytes32 schema; // The unique identifier of the schema.
+    AttestationRequestData data; // The arguments of the attestation request.
+}
+
+/**
+ * @dev A struct representing a record for a submitted schema.
+ * Inspired by schema definitions of EAS (Ethereum Attestation Service)
+ */
+struct SchemaRecord {
+    bytes32 uid; // The unique identifier of the schema.
+    ISchemaResolver resolver; // Optional schema resolver.
+    bool revocable; // Whether the schema allows revocations explicitly.
+    string schema; // Custom specification of the schema (e.g., an ABI).
+    address schemaOwner; // The address of the account used to register the schema.
+    address[] bridges; // bridges that must be used for L2 propagation
+}
+```
+
+### Adapter.sol
+
+```solidity
+contract Adapter {
+    IRegistry registry;
+
+    function checkModule(address module, address trustedAttester) internal {
+       // check module implementation address on registry
+        (uint48 listedAt, uint48 flaggedAt) = registry.check(module, trustedAttester);
+
+        // revert if module was ever flagged or was never attested to
+        require(listedAt != 0 && flaggedAt == 0, "Module is insecure");
+    }
+
+    function verifyModule(address module, address[] memory attesters, uint256 threshold) internal {
+        // check module implementation address on registry
+        bool verified = registry.verify(module, attesters, threshold);
+
+        // revert if module is not verified by enough attesters
+        require(verified, "Module is insecure");
+    }
+}
+```
+
+### Account.sol
+
+**Note**: This is a specific example that complies to the `Specification` above, but this implementation is not binding.
+
+```solidity
+contract Account is Adapter {
+    ...
+
+    // installs a module
+    function installModule(address module, address trustedAttester) public {
+       checkModule(module, trustedAttester);
+        ...
+    }
+
+    // executes a module
+    function executeTransactionFromModule(address module, address[] memory attesters, uint256 threshold) public {
+        verifyModule(module, attesters, threshold);
+        ...
+    }
+
+    ...
+}
+```
+
+### Registry
+
+See `https://github.com/rhinestonewtf/registry/`
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
