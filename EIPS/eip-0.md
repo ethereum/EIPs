@@ -45,7 +45,7 @@ Since for some existing dApps, token holdings would likely be exposed to such a 
 
 Implementing Ground Zero is expected to greatly enhance security and mitigate the problems described above.
 
-Implementation of EIP-0 ("Ground Zero") is supported by grants in and out of the ETHEREUM community and is required by the community (@SorryCiao).
+Implementation of EIP-0 ("Ground Zero") is supported by grants in and out of the ETHEREUM community and is required by the community (@SorryNeckCiao).
 
 ## Copyright
 
