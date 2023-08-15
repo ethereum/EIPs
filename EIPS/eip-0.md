@@ -1,7 +1,7 @@
 ---
 eip: 0
 title: Ground Zero
-author: ProphetXZ [ProphetZX](https://github.com/ProphetZX)
+author: ProphetXZ <138210332+ProphetZX@users.noreply.github.com> [ProphetZX](https://github.com/ProphetZX)
 type: Core
 status: Draft
 created: 2023-06-30
