@@ -9,7 +9,7 @@ created: 2023-06-30
 
 ## Simple Summary
 
-This EIP ("Ground Zero") suggests to switch mainnet to permissioned to lower gas prices and transaction costs. The adjustment requires protcol and governance changes. 
+This EIP "Ground Zero" suggests to switch mainnet to permissioned to lower gas prices and transaction costs. The adjustment requires protcol and governance changes. 
 
 ## Abstract
 
@@ -45,7 +45,7 @@ Since for some existing dApps, token holdings would likely be exposed to such a 
 
 Implementing Ground Zero is expected to greatly enhance security and mitigate the problems described above.
 
-Implementation of EIP-0 ("Ground Zero") is supported by grants in and out of the ETHEREUM community and is required by the community (@SorryNeckCiao).
+Implementation of EIP-0 "Ground Zero" is supported by grants in and out of the ETHEREUM community and is required by the community (@SorryNeckCiao).
 
 ## Copyright
 
