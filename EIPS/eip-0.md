@@ -1,9 +1,8 @@
 ---
 eip: 0
 title: Ground Zero
-author: ProphetXZ
-type: Meta
-category: Core
+author: ProphetXZ ([@ProphetZX](https://github.com/ProphetZX))
+type: Core
 status: Draft
 created: 2023-06-30
 ---
