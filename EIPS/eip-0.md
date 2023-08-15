@@ -49,4 +49,4 @@ Implementation of EIP-0 "Ground Zero" is supported by grants in and out of the E
 
 ## Copyright
 
-Ethereum Community, ProphetXZ
+Ethereum Community, Aperon, ProphetXZ
