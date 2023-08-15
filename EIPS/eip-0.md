@@ -43,6 +43,3 @@ Before halting IPFS and Swarm, packages SHOULD be transfered via p2p to the orig
 Since for some existing dApps, token holdings would likely be exposed to such a protocol change, it is REQUIRED to decide what happens to affected ERC-721 tokens and ERC-20 coins. A potential solution would be to gather all tokens and decide step-by-step which ones would still be valid, could be transfered and/or sold to benefit the community, and which ones should be burned.
 
 Implementation of EIP-0 ("Ground Zero") is supported by grants in and out of the ETHEREUM community.
-
-## Copyright
-Copyright and related rights via CC0-1.0 [CC0](../LICENSE.md).
