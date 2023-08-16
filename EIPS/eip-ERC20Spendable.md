@@ -3,7 +3,7 @@ eip: not yet assigned
 title: ERC20Spendable
 description: An extension of the ERC20 standard, allowing ERC20 token transfers to trigger contract events and receive returned values.
 author: Omnus Sunmo (@omnus)
-discussions-to:
+discussions-to: https://ethereum-magicians.org/t/eip-pending-erc20spendable/
 status: Draft
 type: Standards Track
 category: ERC
@@ -25,7 +25,7 @@ This allows contract interations that are currently performed with the approve -
 Any ERC20 interaction beyond a simple transfer requires the user to authorise a contract to their token then make a call on this contract. This has two main disadvantages:
 
 1. The holder of the ERC20 token must make two contract calls for a single operation. This increases friction and gas cost.
-2. The holder gives permission to transfer tokens (in some cases for all of their holding), to another address. This has obvious security implications, and is the root cause of many stoken tokens.
+2. The holder gives permission to transfer tokens (in some cases for all of their holding), to another address. This has obvious security implications, and is the root cause of many stolen tokens.
 
 ## Specification
 
