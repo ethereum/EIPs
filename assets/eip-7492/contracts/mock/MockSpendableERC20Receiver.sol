@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity 0.8.19;
 
 import {ERC20SpendableReceiver, IERC20SpendableReceiver} from "../ERC20SpendableReceiver.sol";

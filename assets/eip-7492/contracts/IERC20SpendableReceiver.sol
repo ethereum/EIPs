@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 // Omnus Contracts v3
 // https://omn.us/spendable
 // https://github.com/omnus/ERC20Spendable
