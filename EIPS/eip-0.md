@@ -1,7 +1,7 @@
 ---
 eip: 7488
 title: Ground Zero
-author: ProphetXZ [ProphetZX](@ProphetXZ)
+author: ProphetXZ (@ProphetXZ)
 type: StandardsTrack or Core
 status: Draft
 created: 2023-06-30
