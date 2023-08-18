@@ -19,7 +19,7 @@ The EIP idea is to brake the IPFS and Swarm store and broadcasting and instead s
 
 Since its humble beginnings, the ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such an open ecosystem design leads to a wide array of problems such as ongoing consensus problems, increasingly high transaction costs, cases of fraud, false ownership claims of assets such as the [DAO hack and resulting fork](https://www.coindesk.com/learn/understanding-the-dao-attack/), illegal contracts and privacy intrusion, data theft, artifical and malicious content, and many more such things. 
 
-Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ETHEREUM ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
+Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ethereum ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
 
 ## Specification
 
