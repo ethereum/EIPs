@@ -13,7 +13,7 @@ This EIP "Ground Zero" suggests to switch mainnet to permissioned to lower gas p
 
 ## Abstract
 
-The EIP idea is braking the IPFS and Swarm store and broadcasting and instead suggests scalling down ethereum ressources, so that the community may be served in a more **sustainable way** in the future. In addition, to mitigate the currently existing problem with increasingly high gas prices, ethereum would benefit from switching to a permissioned mainnet (after successfully deploying a testnet version). This would greatly lower the number of requests and decrease the load for operating nodes. A further improvement would be to remove legacy APIs, so nodes no longer answer unnecessary public API requests. 
+The EIP idea is braking and stopping the IPFS and Swarm store and broadcasting and instead suggests scalling down ethereum ressources, so that the community may be served in a more **sustainable way** in the future. In addition, to mitigate the currently existing problem with increasingly high gas prices, ethereum would benefit from switching to a permissioned mainnet (after successfully deploying a testnet version). This would greatly lower the number of requests and decrease the load for operating nodes. A further improvement would be to remove legacy APIs, so nodes no longer answer unnecessary public API requests. 
 
 ## Rationale
 
