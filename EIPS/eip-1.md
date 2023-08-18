@@ -138,8 +138,6 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `created`: *Date the EIP was created on*
 
-`bib`: *Bibliography* (Optional if not applicable)
-
 `withdrawal-reason`: *A sentence explaining why the EIP was withdrawn.* (Optional field, only needed when status is `Withdrawn`)
 
 Headers that permit lists must separate elements with commas.
@@ -185,44 +183,6 @@ The `category` header specifies the EIP's category. This is required for standar
 ### `created` header
 
 The `created` header records the date that the EIP was assigned a number. Both headers should be in yyyy-mm-dd format, e.g. 2001-08-14.
-
-### `bib` header
-
-EIPs may have a `bib` header, which is a machine-readable bibliography.
-
-The format of the `bib` header is a YAML-formatted list of `BibEntry` objects:
-
-```typescript
-interface BibEntry {
-  id: any; // References must be allowed by EIP-5757. Any valid input for any of the following citation.js parsers, in the following order:
-  /*
-    Builtin (CSL-JSON)                    [schema](https://github.com/citation-style-language/schema/blob/master/schemas/input/csl-data.json)
-    Custiom EIP format                    Format: `EIP-<number>` or `ERC-<number>`
-    Custom RFC format                     Format: `RFC <number>`
-    Custom W3C format                     Regex: ^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
-    Custom WHATWG format                  Regex: ^https:\/\/[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$
-    Custom BIP format                     Format: `BIP <number>`
-    @citation-js/plugin-doi               [documentation](https://www.npmjs.com/package/@citation-js/plugin-doi)
-    @citation-js/plugin-software-formats  [documentation](https://www.npmjs.com/package/@citation-js/plugin-software-formats)
-    @citation-js/plugin-bibtex            [documentation](https://www.npmjs.com/package/@citation-js/plugin-bibtex)
-  */
-  normative: boolean; // Whether the reference is normative
-}
-```
-
-For example:
-
-```yaml
-eip: example0
-...
-bib:
-  - id: EIP-example1
-    normative: false
-  - id: ERC-example2
-    normative: true
-  - id: 10.7717/peerj-cs.214
-    normative: false
-```
 
 ## Linking to External Resources
 
