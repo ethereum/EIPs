@@ -13,11 +13,11 @@ This EIP "Ground Zero" suggests to switch mainnet to permissioned to lower gas p
 
 ## Abstract
 
-The EIP idea is to brake the IPFS and Swarm store and broadcasting and instead suggests scalling down ETHEREUM ressources, so that the community may be served in a more sustainable way. In addition, to mitigate the currently existing problem with increasingly high gas prices, ETHEREUM would benefit from switching to a permissioned mainnet (after successfully deploying a testnet version). This would greatly lower the number of requests and decrease the load for operating nodes. A further improvement would be to remove legacy APIs, so nodes no longer answer unnecessary public API requests. 
+The EIP idea is to brake the IPFS and Swarm store and broadcasting and instead suggests scalling down ethereum ressources, so that the community may be served in a more sustainable way. In addition, to mitigate the currently existing problem with increasingly high gas prices, ethereum would benefit from switching to a permissioned mainnet (after successfully deploying a testnet version). This would greatly lower the number of requests and decrease the load for operating nodes. A further improvement would be to remove legacy APIs, so nodes no longer answer unnecessary public API requests. 
 
 ## Rationale
 
-Since its humble beginnings, the Ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such a p.p. open ecosystem design leads to a wide array of problems such as ongoing consensus problems, increasingly high transaction costs, cases of fraud, false ownership claims of assets such as the [DAO hack and resulting fork](https://www.coindesk.com/learn/understanding-the-dao-attack/), illegal contracts and privacy intrusion, data theft, artifical and malicious content, and many more such things. 
+Since its humble beginnings, the ethereum project has been open to the public and seen many contributions. The past years, however, have made it clear that such a p.p. open ecosystem design leads to a wide array of problems such as ongoing consensus problems, increasingly high transaction costs, cases of fraud, false ownership claims of assets such as the [DAO hack and resulting fork](https://www.coindesk.com/learn/understanding-the-dao-attack/), illegal contracts and privacy intrusion, data theft, artifical and malicious content, and many more such things. 
 
 Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ETHEREUM ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
 
@@ -31,7 +31,7 @@ Potentially, an adjustment to devp2p, EIP-8, would be required as well and Oracl
 
 ## Implementation
 
-Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ETHEREUM ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
+Halting the IPFS and Swarm storage process, which enabled and multiplied above problems, as well as historically drained the ethereum ecosystem and infrastructure of important ressources and instead developing use cases for the original community would be a remedy for almost all of these problems.
 
 ## Transport
 
@@ -45,7 +45,7 @@ Since for some existing dApps, token holdings would likely be exposed to such a 
 
 Implementing Ground Zero is expected to greatly enhance security and mitigate the problems described above.
 
-Implementation of EIP-0 "Ground Zero" is supported by grants in and out of the ETHEREUM community and is required by the community (@SorryNeckCiao).
+Implementation of EIP "Ground Zero" is supported by grants in and out of the ethereum community and is required by the community.
 
 ## Copyright
 
