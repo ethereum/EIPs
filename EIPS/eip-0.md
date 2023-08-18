@@ -25,7 +25,7 @@ Halting the IPFS and Swarm storage process, which enabled and multiplied above p
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-Mainnet (ID: 1) MUST be switched to permissioned. In part, this may be achieved by halting IPFS, Swarm, and Whisper, after a successfull testnet version has been deployed. Switching to a permissioned chain will affect existing DApps, but almost none of these have been used in the past by the community anyway. So the impact of this protocol change should be minor. For affecteactive transactions and smart contracts, opcode 0x00 SHOULD be executed. As a necessary and sufficient condition, opcode 0xff for the zero address SHALL be exectued as well.
+Mainnet (ID: 1) MUST be switched to permissioned. The permissioned ethereum blockchain then either applies proof-of-authority consensus (see ./eip-225.md), or alternatively, a new consensus mechanism. In part, this may be achieved by halting IPFS, Swarm, and Whisper, after a successfull testnet version has been deployed, for which Goerli or Sepolia may provide blue prints to some degree. Switching to a permissioned chain will affect existing DApps, but almost none of these have been used in the past by the community anyway. So the impact of this governance and protocol change should be minor. For affected smart contracts and transactions, opcode 0x00 SHOULD be executed. As a necessary and sufficient condition, opcode 0xff for the zero address SHALL be exectued as well.
 
 Potentially, an adjustment to devp2p, EIP-8, would be required as well and Oracle connections should be switched.
 
