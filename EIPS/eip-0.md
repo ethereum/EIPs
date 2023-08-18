@@ -7,7 +7,7 @@ status: Draft
 created: 2023-06-30
 ---
 
-## Simple Summary
+## Description
 
 This EIP "Ground Zero" suggests to switch mainnet to permissioned to lower gas prices, transaction costs, and improve privacy. The adjustment requires protcol and governance changes. 
 
