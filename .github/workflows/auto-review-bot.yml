@@ -1,19 +1,9 @@
 on:
-  pull_request_target:
-  pull_request_review:
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: Pull Request Number
-        type: string
-        required: true
-  issue_comment:
+  workflow_run:
+    workflows:
+      - Auto Review Bot Trigger
     types:
-      - created
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+      - completed
 
 name: Auto Review Bot
 jobs:
@@ -21,35 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Run
     steps:
-      - name: Write PR Number - PR Target
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_target' && ((!endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')) || github.event.sender.login == 'renovate[bot]')
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-
-      - name: Write PR Number - PR Review
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'pull_request_review' && !endsWith(github.event.sender.login, '-bot') && !endsWith(github.event.sender.login, '[bot]')
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-
-      - name: Write PR Number - Workflow Dispatch
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          PR_NUMBER: ${{ inputs.pr_number }}
-
-      - name: Write PR Number - Comment Retrigger
-        run: echo $PR_NUMBER > pr-number.txt
-        if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@eth-bot rerun')
-        env:
-          PR_NUMBER: ${{ github.event.issue.number }}
-      
-      - name: Check File Existence
-        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
-        id: check_pr_number_exists
+      - name: Fetch PR Number
+        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
-          files: pr-number.txt
+          name: pr-number
+          workflow: auto-review-trigger.yml
+          run_id: ${{ github.event.workflow_run.id }}
 
       - name: Save PR Number
         id: save-pr-number
