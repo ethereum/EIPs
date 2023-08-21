@@ -7,7 +7,7 @@
         "@typechain/ethers-v5": "^10.2.0",
         "@typechain/hardhat": "^2.3.1",
         "@types/chai": "^4.3.0",
-        "@types/mocha": "^9.1.0",
+        "@types/mocha": "^10.0.1",
         "@types/node": "^12.20.47",
         "chai": "^4.3.6",
         "ethers": "^5.6.1",
