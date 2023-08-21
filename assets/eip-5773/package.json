@@ -11,7 +11,7 @@
     "@openzeppelin/test-helpers": "^0.5.15",
     "@primitivefi/hardhat-dodoc": "^0.2.3",
     "@typechain/ethers-v5": "^10.1.0",
-    "@typechain/hardhat": "^6.1.2",
+    "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.0",
     "@types/node": "^18.0.3",
