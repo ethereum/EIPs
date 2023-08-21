@@ -24,7 +24,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-promise": "^6.0.0",
-    "ethers": "^5.6.9",
+    "ethers": "^6.6.7",
     "hardhat": "^2.12.2",
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-gas-reporter": "^1.0.8",
