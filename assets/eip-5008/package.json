@@ -10,7 +10,7 @@
         "@types/mocha": "^10.0.1",
         "@types/node": "^12.20.47",
         "chai": "^4.3.6",
-        "ethers": "^5.6.1",
+        "ethers": "^6.6.7",
         "hardhat": "^2.9.2",
         "solhint": "^3.3.7",        
         "ts-node": "^10.8.1",
