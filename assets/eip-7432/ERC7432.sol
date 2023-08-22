@@ -41,17 +41,22 @@ contract ERC7432 is IERC7432 {
         address _tokenAddress,
         uint256 _tokenId,
         address _grantor,
-        address _grantee,
-        bool _supportsMultipleAssignments
+        address _grantee
+    ) external view returns (bool) {
+        return roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate > block.timestamp;
+    }
+
+    function hasUniqueRole(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee
     ) external view returns (bool) {
         bool isValid = roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate >
             block.timestamp;
 
-        if (_supportsMultipleAssignments) {
-            return isValid;
-        } else {
-            return isValid && lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] == _grantee;
-        }
+        return isValid && lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] == _grantee;
     }
 
     function roleData(

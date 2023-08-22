@@ -7,7 +7,7 @@ import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol
 
 /// @title ERC-7432 Non-Fungible Token Roles
 /// @dev See https://eips.ethereum.org/EIPS/eip-7432
-/// Note: the ERC-165 identifier for this interface is 0x851f3b3f.
+/// Note: the ERC-165 identifier for this interface is 0xeec2fffb.
 interface IERC7432 is IERC165 {
     struct RoleData {
         uint64 expirationDate;
@@ -76,14 +76,26 @@ interface IERC7432 is IERC165 {
     /// @param _tokenId The token identifier.
     /// @param _grantor The role creator.
     /// @param _grantee The user that receives the role.
-    /// @param _supportsMultipleAssignments if false, will return true only if account is the last role grantee.
     function hasRole(
         bytes32 _role,
         address _tokenAddress,
         uint256 _tokenId,
         address _grantor,
-        address _grantee,
-        bool _supportsMultipleAssignments
+        address _grantee
+    ) external view returns (bool);
+
+    /// @notice Checks if a user has a unique role.
+    /// @param _role The role identifier.
+    /// @param _tokenAddress The token address.
+    /// @param _tokenId The token identifier.
+    /// @param _grantor The role creator.
+    /// @param _grantee The user that receives the role.
+    function hasUniqueRole(
+      bytes32 _role,
+      address _tokenAddress,
+      uint256 _tokenId,
+      address _grantor,
+      address _grantee
     ) external view returns (bool);
 
     /// @notice Returns the custom data of a role assignment.
