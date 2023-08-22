@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC0-1.0
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9; 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -28,7 +28,7 @@ contract ERC7254 is ERC20 {
     mapping(address => uint256) private rewardPerShare;
     mapping(address => bool) private isTokenReward;
     address[] private _tokenReward;
-   
+    uint256 public constant MAX = 2**128;
     /**
     * @dev Emitted when the add reward  of a `contributor` is set by
     * a call to {approve}.
@@ -117,7 +117,7 @@ contract ERC7254 is ERC20 {
         for( uint256 i = 0; i < _tokenReward.length; ++i){
             UserInformation memory user = informationOf(_tokenReward[i], account);
             uint256 reward = balanceOf(account) * rewardPerShare[_tokenReward[i]] + user.inReward - user.withdraw - user.outReward;
-            rewardOf[i] = reward/1e18;
+            rewardOf[i] = reward / MAX;
         }
         return rewardOf;
     }
@@ -134,7 +134,7 @@ contract ERC7254 is ERC20 {
             for( uint256 i = 0; i < token.length; ++i){
                 require(isTokenReward[token[i]], "ERC7254: token reward is not approved");
                 IERC20(token[i]).transferFrom(owner, address(this), amount[i]);
-                rewardPerShare[token[i]] = rewardPerShare[token[i]] + amount[i] * 1e18/ totalSupply();
+                rewardPerShare[token[i]] = rewardPerShare[token[i]] + amount[i] * MAX / totalSupply();
                 emit UpdateReward(owner, amount[i]);
             }
             
@@ -153,35 +153,11 @@ contract ERC7254 is ERC20 {
             UserInformation storage user = userInformation[token[i]][owner];
             uint256 reward =  balanceOf(owner) * rewardPerShare[token[i]] + user.inReward - user.withdraw - user.outReward;
             _withdraw(token[i],owner, reward);
-            if(reward / 1e18 > 0){
-                IERC20(token[i]).transfer(owner, reward / 1e18);
+            if(reward / MAX > 0){
+                IERC20(token[i]).transfer(owner, reward / MAX);
             }  
             emit GetReward(owner, reward);
         }
-    }
-
-    /**
-    * @dev Moves `amount` of tokens from `from` to `to`.
-    * Add inReward of `from` and add outReward of `to` with amount.
-    * This internal function is equivalent to {transfer}, and can be used to
-    * e.g. implement automatic token fees, slashing mechanisms, etc.
-    *
-    * Emits a {Transfer} event.
-    *
-    * Requirements:
-    *
-    * - `from` cannot be the zero address.
-    * - `to` cannot be the zero address.
-    * - `from` must have a balance of at least `amount`.
-    */
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override virtual {
-        super._transfer(from, to, amount);
-        _inReward(from, amount);
-        _outReward(to, amount);
     }
 
     /**
@@ -204,36 +180,6 @@ contract ERC7254 is ERC20 {
             UserInformation storage userTo = userInformation[_tokenReward[i]][user];
             userTo.outReward +=  amount * rewardPerShare[_tokenReward[i]];
         }
-    }
-
-    /** @dev Creates `amount` tokens and assigns them to `account`, increasing
-    * the total supply.
-    * Add outReward of `account` with amount.
-    * Emits a {Transfer} event with `from` set to the zero address.
-    *
-    * Requirements:
-    *
-    * - `account` cannot be the zero address.
-    */
-    function _mint(address account, uint256 amount) internal override virtual {
-        super._mint(account, amount);
-        _outReward(account, amount);
-    }
-
-    /**
-    * @dev Destroys `amount` tokens from `account`, reducing the
-    * total supply.
-    * Add inReward of `account` with amount.
-    * Emits a {Transfer} event with `to` set to the zero address.
-    *
-    * Requirements:
-    *
-    * - `account` cannot be the zero address.
-    * - `account` must have at least `amount` tokens.
-    */
-    function _burn(address account, uint256 amount) internal override virtual {
-        super._burn(account, amount);
-        _inReward(account, amount);
     }
     
 
@@ -259,6 +205,19 @@ contract ERC7254 is ERC20 {
             _tokenReward.push(token[i]);
             isTokenReward[token[i]] = true;
             emit Add(token[i]);
+        }
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override {
+        if (from != address(0)) {
+            _inReward(from, amount);
+        }
+        if (to != address(0)) {
+            _outReward(to, amount);
         }
     }
 }
