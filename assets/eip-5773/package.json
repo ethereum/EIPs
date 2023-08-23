@@ -13,7 +13,7 @@
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.0",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.0.3",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^5.30.6",
