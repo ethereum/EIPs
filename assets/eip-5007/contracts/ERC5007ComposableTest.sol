@@ -9,16 +9,18 @@ contract ERC5007ComposableTest is ERC5007Composable  {
 
     /// @notice mint a new root time NFT
     /// @param to_  The owner of the new token
-    /// @param id_  The id of the new token
+    /// @param tokenId_  The id of the new token
+    /// @param assetId_  The asset id of the new token
     /// @param startTime_  The start time of the new token
     /// @param endTime_  The end time of the new token
     function mint(
         address to_,
-        uint256 id_,
-        int64 startTime_,
-        int64 endTime_
+        uint256 tokenId_,
+        uint256 assetId_,
+        uint64 startTime_,
+        uint64 endTime_
     ) public {
-        super._mintTimeNft(to_, id_, startTime_, endTime_);
+        _mintTimeNftWithAssetId(to_, tokenId_, assetId_, startTime_, endTime_);
     }
 
     /**

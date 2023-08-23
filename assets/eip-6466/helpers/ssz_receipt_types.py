@@ -1,7 +1,8 @@
 from os import path as os_path
 from sys import path
-path.append(os_path.dirname(os_path.dirname(os_path.realpath(__file__))))
-path.append('../../eip-6475')
+current_dir = os_path.dirname(os_path.dirname(os_path.realpath(__file__)))
+path.append(current_dir)
+path.append(current_dir + '/../eip-6475')
 
 from optional import Optional
 from remerkleable.basic import uint8, uint64, uint256
