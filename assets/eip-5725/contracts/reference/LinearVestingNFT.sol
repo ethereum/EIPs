@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: CC0-1.0
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.17;
 
 import "../ERC5725.sol";
@@ -63,13 +63,10 @@ contract LinearVestingNFT is ERC5725 {
     /**
      * @dev See {IERC5725}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
-        public
-        view
-        override(ERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function vestedPayoutAtTime(
+        uint256 tokenId,
+        uint256 timestamp
+    ) public view override(ERC5725) validToken(tokenId) returns (uint256 payout) {
         if (timestamp < _cliff(tokenId)) {
             return 0;
         }
