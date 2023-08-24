@@ -1,0 +1,92 @@
+---
+title: Zero-Knowledge Wormholes - Privacy Extension for Ethereum
+description: Enable minting of secretly burnt Ethers as a native privacy solution for Ethereum
+author: Keyvan Kambakhsh (@keyvank), Hamid Bateni (@irnb), Nobitex Labs <labs@nobitex.ir>
+discussions-to: https://ethereum-magicians.org/t/private-proof-of-burn-ppob-call-free-smart-contract-interactions/15456
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-08-14
+---
+
+## Abstract
+
+While researching on privacy solutions and applications of ZKP, we discovered a technique, 
+by which people can burn their digital asset (E.g ETH) by sending it to an unspendable address, 
+and later build a ZK proof showing that some amount of tokens has been burnt in a transaction 
+in an older block, without revealing the transaction. The EIP proposes to add a minting 
+functionality to Ethereum, so that people can re-mint Ethers that they have purposefully burnt.
+This will make an anonymity pool of the size of the entire Ethereum blockchain without much hassle.
+
+## Specification
+
+In Elliptic-Curve based digital signatures, normally there is a secret scalar $s$, from which 
+a public-key is deriven (By multiplying the generator point with the scalar: $s \times G$)
+
+A public-key is spendable if and only if its corresponding private-key $s$ exists. We can
+generate unspendable public-keys by generating random points on the curve. But how can other 
+people be sure that a point is indeed random and not the result of calculating $s \times G$?
+We can generate points that are very unlikely to be spendable by using fancy-looking patterns 
+in their $x$ coordinate. E.g: In case of Secp256k1 we can pick $x=123456789$ and calculate 
+$y$ by putting it in the curve equation:
+
+$y^2=x^3+7$
+
+Because of the discrete logarithm problem, it's practically impossible to calculate $s$ where 
+$s \times G$ is equal with our point.
+
+Let's say $R$ is an unspendable public-key (Let's call it the reference unspendable public-key). 
+People can publicly burn their tokens by sending them to $R$, after doing so, others can indeed 
+conclude that they have burnt their tokens, because they can all see the transactions and they 
+know that $R$ is unspendable.
+
+***We can derive infinitely many provably-unspendable public-keys from a reference unspendable public-key***
+
+Let's pick a random secret value $t$ and calculate a new point $D=R + t \times G$. We can prove 
+that $D$ is also unspendable, because $log_G(D)=log_G(R + t \times G)=log_G(R) + t$, and since 
+we can't calculate $log_G(R)$, the public-key $D$ is also unspendable.
+
+Obviously, $D$ is a completely new point that does not seem unspendable. We can convince others 
+that $D$ is unspendable by revealing $t$, because then people can verify that $D$ is the result 
+of adding some other point to $R$.
+
+***Using the help of Zero-Knowledge proofs, we can hide the value of $t$***
+
+We just need to prove that we know a secret value $t$ where $R + t \times G == D$. We can go even 
+further. We can prove that some EOA-to-EOA transaction has happened in the history of 
+blockchain, which has burnt some amount of ETH. By revealing this to the Ethereum blockchain and 
+providing something like a nullifier (E.g. hash of the secret value $t$ so that double minting of 
+same burnt tokens are not possible), we can add a new ***minting*** functionality for ETH so that
+people can migrate they secretly burnt tokens to a completely new address, without any trace on 
+the blockchain. This will make an anonymity pool of the size of the entire Ethereum blockchain 
+without much hassle.
+
+## Rationale
+
+
+
+## Backwards Compatibility
+
+The Ethers generated using the mint function should not have any difference with original Ethers.
+People should be able to use those minted Ethers for paying the gas fees.
+
+## Reference Implementation
+
+A reference implementation is not ready yet, but during our 
+
+The R1CS Zero-Knowledge-proof circuit of such system includes:
+
+1- A 5-block (5*136 bytes) Keccak256 (~750k constraints) for block-hash calculation.
+2- 3x 4-block (4*136 bytes) Keccak256 (~600k constraints) for Merkle-Patricia-Trie proofs.
+3- Another Keccak256 instance for hashing the EOA-to-EOA transfer
+4- Checking if EOA-to-EOA transaction is valid
+
+Our approximation is that all these will need at most 3m constraints.
+
+## Security Considerations
+
+In case of faulty implementation of this EIP, people may mint infinite amount of ETH, collapsing the price of Ethereum.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
