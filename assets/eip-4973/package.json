@@ -40,6 +40,6 @@
     "ethers": "5.7.2"
   },
   "devDependencies": {
-    "ava": "5.2.0"
+    "ava": "5.3.1"
   }
 }
