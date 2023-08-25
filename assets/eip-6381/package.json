@@ -19,7 +19,7 @@
     "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.1",
     "chai": "^4.3.6",
-    "ethers": "^5.6.9",
+    "ethers": "^6.7.0",
     "hardhat": "^2.12.2",
     "ts-node": "^10.8.2",
     "typechain": "^8.1.0",
