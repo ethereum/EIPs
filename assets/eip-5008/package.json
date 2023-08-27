@@ -14,7 +14,7 @@
         "hardhat": "^2.9.2",
         "solhint": "^3.3.7",        
         "ts-node": "^10.8.1",
-        "typechain": "^5.2.0",        
+        "typechain": "^8.3.1",        
         "typescript": "^5.1.6"
     }
 }
