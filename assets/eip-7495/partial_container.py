@@ -1,15 +1,17 @@
 from dataclasses import fields, is_dataclass
 import io
-from typing import BinaryIO, Dict, Optional, TypeVar, Type, Union as PyUnion, get_args, get_origin
+from typing import BinaryIO, Dict, List as PyList, Optional, TypeVar, Type, Union as PyUnion, \
+    get_args, get_origin
 from textwrap import indent
 from remerkleable.bitfields import Bitvector
-from remerkleable.complex import ComplexView, encode_offset
+from remerkleable.complex import ComplexView, FieldOffset, decode_offset, encode_offset
 from remerkleable.core import View, ViewHook, OFFSET_BYTE_LENGTH
 from remerkleable.tree import NavigationError, Node, PairNode, \
     get_depth, subtree_fill_to_contents, zero_node
 
 T = TypeVar('T')
 N = TypeVar('N')
+P = TypeVar('P', bound="PartialContainer")
 
 PartialFields = Dict[str, tuple[Type[View], bool]]
 
@@ -86,6 +88,30 @@ class PartialContainer(ComplexView):
             ret[fkey] = (ftyp, fopt)
         return ret
 
+    @classmethod
+    def is_fixed_byte_length(cls) -> bool:
+        return False
+
+    @classmethod
+    def min_byte_length(cls) -> int:
+        total = Bitvector[cls.N].type_byte_length()
+        for _, (ftyp, fopt) in cls.fields().items():
+            if fopt:
+                continue
+            if not ftyp.is_fixed_byte_length():
+                total += OFFSET_BYTE_LENGTH
+            total += ftyp.min_byte_length()
+        return total
+
+    @classmethod
+    def max_byte_length(cls) -> int:
+        total = Bitvector[cls.N].type_byte_length()
+        for _, (ftyp, _) in cls.fields().items():
+            if not ftyp.is_fixed_byte_length():
+                total += OFFSET_BYTE_LENGTH
+            total += ftyp.max_byte_length()
+        return total
+
     def active_fields(self) -> Bitvector:
         active_fields_node = super().get_backing().get_right()
         return Bitvector[self.__class__.N].view_from_backing(active_fields_node)
@@ -128,6 +154,52 @@ class PartialContainer(ComplexView):
     @classmethod
     def type_repr(cls) -> str:
         return f"PartialContainer[{cls.T.__name__}, {cls.N}]"
+
+    @classmethod
+    def deserialize(cls: Type[P], stream: BinaryIO, scope: int) -> P:
+        num_prefix_bytes = Bitvector[cls.N].type_byte_length()
+        if scope < num_prefix_bytes:
+            raise ValueError("scope too small, cannot read PartialContainer active fields")
+        active_fields = Bitvector[cls.N].deserialize(stream, num_prefix_bytes)
+        scope = scope - num_prefix_bytes
+
+        max_findex = 0
+        field_values: Dict[str, Optional[View]] = {}
+        dyn_fields: PyList[FieldOffset] = []
+        fixed_size = 0
+        for findex, (fkey, (ftyp, _)) in enumerate(cls.fields().items()):
+            max_findex = findex
+            if not active_fields.get(findex):
+                field_values[fkey] = None
+                continue
+            if ftyp.is_fixed_byte_length():
+                fsize = ftyp.type_byte_length()
+                field_values[fkey] = ftyp.deserialize(stream, fsize)
+                fixed_size += fsize
+            else:
+                dyn_fields.append(FieldOffset(
+                    key=fkey, typ=ftyp, offset=int(decode_offset(stream))))
+                fixed_size += OFFSET_BYTE_LENGTH
+        if len(dyn_fields) > 0:
+            if dyn_fields[0].offset < fixed_size:
+                raise Exception(f"first offset {dyn_fields[0].offset} is "
+                                f"smaller than expected fixed size {fixed_size}")
+            for i, (fkey, ftyp, foffset) in enumerate(dyn_fields):
+                next_offset = dyn_fields[i + 1].offset if i + 1 < len(dyn_fields) else scope
+                if foffset > next_offset:
+                    raise Exception(f"offset {i} is invalid: {foffset} "
+                                    f"larger than next offset {next_offset}")
+                fsize = next_offset - foffset
+                f_min_size, f_max_size = ftyp.min_byte_length(), ftyp.max_byte_length()
+                if not (f_min_size <= fsize <= f_max_size):
+                    raise Exception(f"offset {i} is invalid, size out of bounds: "
+                                    f"{foffset}, next {next_offset}, implied size: {fsize}, "
+                                    f"size bounds: [{f_min_size}, {f_max_size}]")
+                field_values[fkey] = ftyp.deserialize(stream, fsize)
+        for findex in range(max_findex + 1, cls.N):
+            if active_fields.get(findex):
+                raise Exception(f"unknown field index {findex}")
+        return cls(**field_values)  # type: ignore
 
     def serialize(self, stream: BinaryIO) -> int:
         active_fields = self.active_fields()
