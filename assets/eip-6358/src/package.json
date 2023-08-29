@@ -15,7 +15,7 @@
     "eccrypto": "^1.1.6",
     "keccak256": "^1.0.6",
     "secp256k1": "^4.0.3",
-    "web3": "^1.8.0"
+    "web3": "^4.0.3"
   },
   "devDependencies": {},
   "scripts": {
