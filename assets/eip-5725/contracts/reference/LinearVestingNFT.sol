@@ -63,13 +63,10 @@ contract LinearVestingNFT is ERC5725 {
     /**
      * @dev See {IERC5725}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
-        public
-        view
-        override(ERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function vestedPayoutAtTime(
+        uint256 tokenId,
+        uint256 timestamp
+    ) public view override(ERC5725) validToken(tokenId) returns (uint256 payout) {
         if (timestamp < _cliff(tokenId)) {
             return 0;
         }
