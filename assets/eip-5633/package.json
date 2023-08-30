@@ -2,7 +2,7 @@
   "name": "eip-5633",
   "devDependencies": {
     "@ethersproject/providers": "^5.7.0",
-    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.1",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
     "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
