@@ -23,6 +23,6 @@
     "hardhat": "^2.12.2",
     "ts-node": "^10.8.2",
     "typechain": "^8.1.0",
-    "typescript": "^4.7.4"
+    "typescript": "^5.1.6"
   }
 }
