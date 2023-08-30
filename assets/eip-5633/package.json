@@ -2,16 +2,16 @@
   "name": "eip-5633",
   "devDependencies": {
     "@ethersproject/providers": "^5.7.0",
-    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.1",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
-    "@nomicfoundation/hardhat-toolbox": "^1.0.2",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@openzeppelin/contracts": "^4.7.3",
-    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/ethers-v5": "^11.1.1",
     "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.3",
-    "@types/mocha": "^9.1.1",
+    "@types/mocha": "^10.0.1",
     "chai": "^4.3.6",
     "ethers": "^6.6.7",
     "hardhat": "^2.11.0",
@@ -19,6 +19,6 @@
     "solidity-coverage": "^0.8.0",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",
-    "typescript": "^4.8.3"
+    "typescript": "^5.1.6"
   }
 }

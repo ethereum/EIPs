@@ -19,7 +19,7 @@
     "@typescript-eslint/parser": "^5.30.6",
     "chai": "^4.3.6",
     "eslint": "^8.27.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.0.0",
