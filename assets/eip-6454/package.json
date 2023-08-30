@@ -15,7 +15,7 @@
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.1",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
-    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/ethers-v5": "^11.1.1",
     "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.1",
     "chai": "^4.3.6",
