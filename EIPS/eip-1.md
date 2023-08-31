@@ -118,7 +118,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
-`eip`: *EIP number* (this is determined by the EIP editor)
+`eip`: *EIP number*
 
 `title`: *The EIP title is a few words, not a complete sentence*
 
@@ -451,7 +451,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number, but the decision is with the editors)
+- Assign an EIP number (generally incremental; editors can reassign if number sniping is suspected)
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
 - Send a message back to the EIP author with the next step.
 
