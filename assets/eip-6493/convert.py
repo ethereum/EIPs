@@ -20,7 +20,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip4844_sig_hash(pre))
 
         return SignedTransaction(
-            payload=PartialContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
+            payload=StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.max_fee_per_gas,
                 gas=pre.gas_limit,
@@ -35,7 +35,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 max_fee_per_blob_gas=pre.max_fee_per_blob_gas,
                 blob_versioned_hashes=pre.blob_versioned_hashes,
             ),
-            signature=PartialContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
+            signature=StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
                 type_=TRANSACTION_TYPE_EIP4844,
@@ -55,7 +55,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip1559_sig_hash(pre))
 
         return SignedTransaction(
-            payload=PartialContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
+            payload=StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.max_fee_per_gas,
                 gas=pre.gas_limit,
@@ -68,7 +68,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 ) for access_tuple in pre.access_list],
                 max_priority_fee_per_gas=pre.max_priority_fee_per_gas,
             ),
-            signature=PartialContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
+            signature=StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
                 type_=TRANSACTION_TYPE_EIP1559,
@@ -88,7 +88,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip2930_sig_hash(pre))
 
         return SignedTransaction(
-            payload=PartialContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
+            payload=StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.gasPrice,
                 gas=pre.gasLimit,
@@ -100,7 +100,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                     storage_keys=access_tuple[1]
                 ) for access_tuple in pre.accessList],
             ),
-            signature=PartialContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
+            signature=StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
                 type_=TRANSACTION_TYPE_EIP2930,
@@ -120,7 +120,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_legacy_sig_hash(pre))
 
         return SignedTransaction(
-            payload=PartialContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
+            payload=StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS](
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.gasprice,
                 gas=pre.startgas,
@@ -128,7 +128,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 value=pre.value,
                 input_=pre.data,
             ),
-            signature=PartialContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
+            signature=StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS](
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
                 type_=TRANSACTION_TYPE_LEGACY if (pre.v not in (27, 28)) else None,
