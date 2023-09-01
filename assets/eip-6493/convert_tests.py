@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from convert import *
 
 @dataclass

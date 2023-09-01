@@ -1,4 +1,3 @@
-from dataclasses import fields, is_dataclass
 import io
 from typing import BinaryIO, Dict, List as PyList, Optional, TypeVar, Type, Union as PyUnion, \
     get_args, get_origin
@@ -9,7 +8,6 @@ from remerkleable.core import View, ViewHook, OFFSET_BYTE_LENGTH
 from remerkleable.tree import NavigationError, Node, PairNode, \
     get_depth, subtree_fill_to_contents, zero_node
 
-T = TypeVar('T')
 N = TypeVar('N')
 S = TypeVar('S', bound="StableContainer")
 
@@ -26,7 +24,7 @@ class StableContainer(ComplexView):
         for fkey, (ftyp, fopt) in cls.fields().items():
             if fkey not in kwargs:
                 if not fopt:
-                    raise AttributeError(f"Field '{fkey}' is required in {cls.T}")
+                    raise AttributeError(f"Field '{fkey}' is required in {cls}")
                 kwargs[fkey] = None
 
         input_nodes = []
@@ -47,7 +45,7 @@ class StableContainer(ComplexView):
             input_nodes.append(fnode)
 
         if len(kwargs) > 0:
-            raise AttributeError(f'The field names [{"".join(kwargs.keys())}] are not defined in {cls.T}')
+            raise AttributeError(f'The field names [{"".join(kwargs.keys())}] are not defined in {cls}')
 
         backing = PairNode(
             left=subtree_fill_to_contents(input_nodes, get_depth(cls.N)),
@@ -57,20 +55,15 @@ class StableContainer(ComplexView):
     def __init_subclass__(cls, *args, **kwargs):
         super().__init_subclass__(*args, **kwargs)
         cls._field_indices = {
-            fkey: (i, ftyp, fopt) for i, (fkey, (ftyp, fopt)) in enumerate(cls.fields().items())}
-        if len(cls._field_indices) == 0:
-            raise Exception(f"StableContainer {cls.__name__} must have at least one field!")
+            fkey: (i, ftyp, fopt)
+            for i, (fkey, (ftyp, fopt)) in enumerate(cls.fields().items())
+        }
 
-    def __class_getitem__(cls, params) -> Type["StableContainer"]:
-        t, n = params
-
-        if not is_dataclass(t):
-            raise Exception(f"StableContainer doesn't wrap `@dataclass`: {t}")
+    def __class_getitem__(cls, n) -> Type["StableContainer"]:
         if n <= 0:
             raise Exception(f"invalid stablecontainer capacity: {n}")
 
         class StableContainerView(StableContainer):
-            T = t
             N = n
 
         StableContainerView.__name__ = StableContainerView.type_repr()
@@ -78,13 +71,12 @@ class StableContainer(ComplexView):
 
     @classmethod
     def fields(cls) -> Dict[str, tuple[Type[View], bool]]:
-        ret = {}
-        for field in fields(cls.T):
-            fkey = field.name
-            fopt = get_origin(field.type) == PyUnion and type(None) in get_args(field.type)
-            ftyp = get_args(field.type)[0] if fopt else field.type
-            ret[fkey] = (ftyp, fopt)
-        return ret
+        fields = {}
+        for k, v in cls.__annotations__.items():
+            fopt = get_origin(v) == PyUnion and type(None) in get_args(v)
+            ftyp = get_args(v)[0] if fopt else v
+            fields[k] = (ftyp, fopt)
+        return fields
 
     @classmethod
     def is_fixed_byte_length(cls) -> bool:
@@ -151,7 +143,7 @@ class StableContainer(ComplexView):
 
     @classmethod
     def type_repr(cls) -> str:
-        return f"StableContainer[{cls.T.__name__}, {cls.N}]"
+        return f"StableContainer[{cls.N}]"
 
     @classmethod
     def deserialize(cls: Type[S], stream: BinaryIO, scope: int) -> S:

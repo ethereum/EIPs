@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Optional
 from remerkleable.basic import uint16, uint32, uint64, uint256
 from remerkleable.bitfields import Bitvector
@@ -6,26 +5,20 @@ from remerkleable.byte_arrays import ByteList
 from remerkleable.complex import Container
 from stable_container import StableContainer
 
-@dataclass
-class Foo:
+class Foo(StableContainer[32]):
     a: uint64
     b: Optional[uint32]
     c: Optional[uint16]
     d: Optional[ByteList[4]]
     e: ByteList[4]
 
-class Wrapper(Container):
-    x: StableContainer[Foo, 32]
-
 # Test serialization
-value = Wrapper(
-    x=StableContainer[Foo, 32](a=64, b=None, c=16, d=None, e=ByteList[4]([0x42]))
-)
-expected_bytes = bytes.fromhex("0400000015000000400000000000000010000e00000042")
+value = Foo(a=64, b=None, c=16, d=None, e=ByteList[4]([0x42]))
+expected_bytes = bytes.fromhex("15000000400000000000000010000e00000042")
 assert value.encode_bytes() == expected_bytes
 
 # Test deserialization
-assert Wrapper.decode_bytes(expected_bytes) == value
+assert Foo.decode_bytes(expected_bytes) == value
 
 # Test merkleization
 class Bar(Container):
@@ -62,12 +55,12 @@ class Bar(Container):
     ph1e: uint256
     ph1f: uint256
 
-class Baz(Container):
+class Wrapper(Container):
     data: Bar
     active_fields: Bitvector[32]
 
-expected = Baz(
-    data=Bar(a=value.x.a, c=value.x.c, e=value.x.e),
+expected = Wrapper(
+    data=Bar(a=value.a, c=value.c, e=value.e),
     active_fields=Bitvector[32]([True, False, True, False, True] + [False] * 27)
 )
 assert value.hash_tree_root() == expected.hash_tree_root()
