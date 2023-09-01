@@ -1,10 +1,10 @@
-from partial_container import PartialContainer
 from dataclasses import dataclass
 from typing import Optional
 from remerkleable.basic import uint16, uint32, uint64, uint256
 from remerkleable.bitfields import Bitvector
 from remerkleable.byte_arrays import ByteList
 from remerkleable.complex import Container
+from stable_container import StableContainer
 
 @dataclass
 class Foo:
@@ -15,11 +15,11 @@ class Foo:
     e: ByteList[4]
 
 class Wrapper(Container):
-    x: PartialContainer[Foo, 32]
+    x: StableContainer[Foo, 32]
 
 # Test serialization
 value = Wrapper(
-    x=PartialContainer[Foo, 32](a=64, b=None, c=16, d=None, e=ByteList[4]([0x42]))
+    x=StableContainer[Foo, 32](a=64, b=None, c=16, d=None, e=ByteList[4]([0x42]))
 )
 expected_bytes = bytes.fromhex("0400000015000000400000000000000010000e00000042")
 assert value.encode_bytes() == expected_bytes

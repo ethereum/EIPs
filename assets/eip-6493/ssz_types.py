@@ -7,12 +7,12 @@ path.append(current_dir + '/../eip-7495')
 from dataclasses import dataclass
 from typing import Optional
 from eth_hash.auto import keccak
-from partial_container import PartialContainer
 from remerkleable.basic import boolean, uint8, uint64, uint256
 from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32
 from remerkleable.complex import Container, List
 from rlp_types import Hash32
 from secp256k1 import ECDSA, PublicKey
+from stable_container import StableContainer
 
 class TransactionType(uint8):
     pass
@@ -69,8 +69,8 @@ class TransactionSignature:
     type_: Optional[TransactionType]
 
 class SignedTransaction(Container):
-    payload: PartialContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS]
-    signature: PartialContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS]
+    payload: StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS]
+    signature: StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS]
 
 def check_transaction_supported(tx: SignedTransaction):
     if tx.payload.max_fee_per_blob_gas is not None:
@@ -186,5 +186,5 @@ class ReceiptPayload:
     # EIP-658
     status: Optional[boolean]
 
-class Receipt(PartialContainer[ReceiptPayload, MAX_RECEIPT_FIELDS]):
+class Receipt(StableContainer[ReceiptPayload, MAX_RECEIPT_FIELDS]):
     pass

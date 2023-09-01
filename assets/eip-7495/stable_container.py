@@ -11,11 +11,9 @@ from remerkleable.tree import NavigationError, Node, PairNode, \
 
 T = TypeVar('T')
 N = TypeVar('N')
-P = TypeVar('P', bound="PartialContainer")
+S = TypeVar('S', bound="StableContainer")
 
-PartialFields = Dict[str, tuple[Type[View], bool]]
-
-class PartialContainer(ComplexView):
+class StableContainer(ComplexView):
     _field_indices: Dict[str, tuple[int, Type[View], bool]]
     __slots__ = '_field_indices'
 
@@ -61,25 +59,25 @@ class PartialContainer(ComplexView):
         cls._field_indices = {
             fkey: (i, ftyp, fopt) for i, (fkey, (ftyp, fopt)) in enumerate(cls.fields().items())}
         if len(cls._field_indices) == 0:
-            raise Exception(f"PartialContainer {cls.__name__} must have at least one field!")
+            raise Exception(f"StableContainer {cls.__name__} must have at least one field!")
 
-    def __class_getitem__(cls, params) -> Type["PartialContainer"]:
+    def __class_getitem__(cls, params) -> Type["StableContainer"]:
         t, n = params
 
         if not is_dataclass(t):
-            raise Exception(f"partialcontainer doesn't wrap `@dataclass`: {t}")
+            raise Exception(f"StableContainer doesn't wrap `@dataclass`: {t}")
         if n <= 0:
-            raise Exception(f"invalid partialcontainer capacity: {n}")
+            raise Exception(f"invalid stablecontainer capacity: {n}")
 
-        class PartialContainerView(PartialContainer):
+        class StableContainerView(StableContainer):
             T = t
             N = n
 
-        PartialContainerView.__name__ = PartialContainerView.type_repr()
-        return PartialContainerView
+        StableContainerView.__name__ = StableContainerView.type_repr()
+        return StableContainerView
 
     @classmethod
-    def fields(cls) -> PartialFields:
+    def fields(cls) -> Dict[str, tuple[Type[View], bool]]:
         ret = {}
         for field in fields(cls.T):
             fkey = field.name
@@ -153,13 +151,13 @@ class PartialContainer(ComplexView):
 
     @classmethod
     def type_repr(cls) -> str:
-        return f"PartialContainer[{cls.T.__name__}, {cls.N}]"
+        return f"StableContainer[{cls.T.__name__}, {cls.N}]"
 
     @classmethod
-    def deserialize(cls: Type[P], stream: BinaryIO, scope: int) -> P:
+    def deserialize(cls: Type[S], stream: BinaryIO, scope: int) -> S:
         num_prefix_bytes = Bitvector[cls.N].type_byte_length()
         if scope < num_prefix_bytes:
-            raise ValueError("scope too small, cannot read PartialContainer active fields")
+            raise ValueError("scope too small, cannot read StableContainer active fields")
         active_fields = Bitvector[cls.N].deserialize(stream, num_prefix_bytes)
         scope = scope - num_prefix_bytes
 
