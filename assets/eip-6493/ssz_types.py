@@ -4,7 +4,6 @@ current_dir = os_path.dirname(os_path.realpath(__file__))
 path.append(current_dir)
 path.append(current_dir + '/../eip-7495')
 
-from dataclasses import dataclass
 from typing import Optional
 from eth_hash.auto import keccak
 from remerkleable.basic import boolean, uint8, uint64, uint256
@@ -41,8 +40,7 @@ class AccessTuple(Container):
     address: ExecutionAddress
     storage_keys: List[Hash32, MAX_ACCESS_LIST_STORAGE_KEYS]
 
-@dataclass
-class TransactionPayload:
+class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
     nonce: uint64
     max_fee_per_gas: uint256
     gas: uint64
@@ -60,8 +58,7 @@ class TransactionPayload:
     max_fee_per_blob_gas: Optional[uint256]
     blob_versioned_hashes: Optional[List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]]
 
-@dataclass
-class TransactionSignature:
+class TransactionSignature(StableContainer[MAX_TRANSACTION_SIGNATURE_FIELDS]):
     from_: ExecutionAddress
     ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
 
@@ -69,8 +66,8 @@ class TransactionSignature:
     type_: Optional[TransactionType]
 
 class SignedTransaction(Container):
-    payload: StableContainer[TransactionPayload, MAX_TRANSACTION_PAYLOAD_FIELDS]
-    signature: StableContainer[TransactionSignature, MAX_TRANSACTION_SIGNATURE_FIELDS]
+    payload: TransactionPayload
+    signature: TransactionSignature
 
 def check_transaction_supported(tx: SignedTransaction):
     if tx.payload.max_fee_per_blob_gas is not None:
@@ -175,8 +172,7 @@ class Log(Container):
     topics: List[Bytes32, MAX_TOPICS_PER_LOG]
     data: ByteList[MAX_LOG_DATA_SIZE]
 
-@dataclass
-class ReceiptPayload:
+class Receipt(StableContainer[MAX_RECEIPT_FIELDS]):
     root: Optional[Hash32]
     gas_used: uint64
     contract_address: Optional[ExecutionAddress]
@@ -185,6 +181,3 @@ class ReceiptPayload:
 
     # EIP-658
     status: Optional[boolean]
-
-class Receipt(StableContainer[ReceiptPayload, MAX_RECEIPT_FIELDS]):
-    pass
