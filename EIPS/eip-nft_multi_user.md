@@ -1,7 +1,7 @@
 ---
 title: Multi-User NFT Extension
-description: An extension of EIP-721 to allow multiple users to a token with restricted permissions.
-author: Zheng Han <robin@comoco.xyz>, Ming Jiang <ming@comoco.xyz>, Fan Yang <jack@comoco.xyz>
+description: An extension of ERC-721 to allow multiple users to a token with restricted permissions.
+author: Ming Jiang (@minkyn), Zheng Han (@hanbsd), Fan Yang (@fayang)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
@@ -11,13 +11,13 @@ created: 2023-08-24
 
 ## Abstract
 
-This standard is an extension of EIP-721. It proposes a new role `user` in addition to `owner` for a token. A token can have multiple users under separate expiration time. It allows the subscription model where an NFT can be subscribed non-exclusively by different users.
+This standard is an extension of [ERC-721](./eip-721.md). It proposes a new role `user` in addition to `owner` for a token. A token can have multiple users under separate expiration time. It allows the subscription model where an NFT can be subscribed non-exclusively by different users.
 
 ## Motivation
 
 Some NFTs represent IP assets, and IP assets have the need to be licensed for access without transferring ownership. The subscription model is a very common practice for IP licensing where multiple users can subscribe to an NFT to obtain access. Each subscription is usually time limited and will thus be recorded with an expiration time.
 
-Existing [EIP-4907](https://eips.ethereum.org/EIPS/eip-4907) introduces a similar feature, but does not allow for more than one user. It is more suitable in the rental scenario where a user gains an exclusive right of use to an NFT before the next user. This rental model is common for NFTs representing physical assets like in games, but not very useful for shareable IP assets.
+Existing [ERC-4907](./eip-4907.md) introduces a similar feature, but does not allow for more than one user. It is more suitable in the rental scenario where a user gains an exclusive right of use to an NFT before the next user. This rental model is common for NFTs representing physical assets like in games, but not very useful for shareable IP assets.
 
 ## Specification
 
@@ -44,7 +44,7 @@ interface IUtilizable {
 
 ## Rationale
 
-This standard complements [EIP-4907](https://eips.ethereum.org/EIPS/eip-4907) to support multi-user feature. Therefore the proposed interface tries to keep consistent using the same naming for functions and parameters.
+This standard complements [ERC-4907](./eip-4907.md) to support multi-user feature. Therefore the proposed interface tries to keep consistent using the same naming for functions and parameters.
 
 However, we didn't include the corresponding `usersOf(uint256 tokenId)` function as that would imply the implemention has to support enumerability over multiple users. It is not always necessary, for example, in the case of open subscription. So we decide not to add it to the interface and leave the choice up to the implementers.
 
@@ -66,4 +66,4 @@ No security considerations found.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://github.com/ethereum/EIPs/blob/master/LICENSE.md).
+Copyright and related rights waived via [CC0](../LICENSE.md).
