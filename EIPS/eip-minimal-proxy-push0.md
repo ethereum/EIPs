@@ -12,7 +12,7 @@ requires: 7, 211, 1167, 3855
 
 ## Simple Summary
 
-With the newly introduced `PUSH0` opcode ([eip-3855](https://eips.ethereum.org/EIPS/eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([eip-1167](https://eips.ethereum.org/EIPS/eip-1167)) by 200 gas at deployment and 5 gas at runtime, while remain the same functionalities.
+With the newly introduced `PUSH0` opcode ([eip-3855](https://eips.ethereum.org/EIPS/eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([eip-1167](https://eips.ethereum.org/EIPS/eip-1167)) by 200 gas at deployment and 5 gas at runtime, while retaining same functionalities.
 
 ## Abstract
 
