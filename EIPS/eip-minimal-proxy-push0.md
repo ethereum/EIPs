@@ -17,7 +17,7 @@ With the newly introduced `PUSH0` opcode ([EIP-3855](./eip-3855)) at Shanghai Up
 
 ## Motivation
 
-This standard trys to mimnimize the Minimal Proxy Contract with the newly added `PUSH0` opcodes. The main motivations are:
+This standard tries to optimize the Minimal Proxy Contract with the newly added `PUSH0` opcodes. The main motivations are:
 
 1. Reduce the contract bytecode size by `1` byte by removing a redundant `SWAP` opcode.
 2. Reduce the runtime gas by replacing two `DUP` (cost `3` gas each) to two `PUSH0` (cost `2` gas each).
@@ -197,7 +197,7 @@ In the end, we arrived at the runtime code for Minimal Proxy Contract with `PUSH
 365f5f375f5f365f73bebebebebebebebebebebebebebebebebebebebe5af43d5f5f3e5f3d91602a57fd5bf3
 ```
 
-The length of the runtime code is `44` bytes, which reduced `1` byte from the previous Minimal Proxy Contract. Moreover, it replaced the `RETURNDATASIZE` and `DUP` operations with `PUSH0`, which saves gas and increase the readability of the code. In summary, the new Minimal Proxy Contract reduce `200` gas at deployment and `5` gas at runtime, while remain the same functionalities as the old one.
+The length of the runtime code is `44` bytes, which reduced `1` byte from the previous Minimal Proxy Contract. Moreover, it replaced the `RETURNDATASIZE` and `DUP` operations with `PUSH0`, which saves gas and increase the readability of the code. In summary, the new Minimal Proxy Contract reduce `200` gas at deployment and `5` gas at runtime, while remaining same functionalities as the old one.
 
 ##  Backwards Compatibility
 
