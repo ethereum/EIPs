@@ -2,7 +2,7 @@
 eip: TBD
 title: Onchain Representation for Audits
 description: Proposal to define a contract parseable representation of Audit reports.
-author: Richard Meissner - Safe (@rmeissner), Robert Chen - OtterSec, Matthias Egli - ChainSecurity, Jan Kalivoda - Ackee, Michael Lewellen - OpenZeppelin , Shay Zluf - Hats Finance (@shayzluf)
+author: Richard Meissner - Safe (@rmeissner), Robert Chen - OtterSec (@chen-robert), Matthias Egli - ChainSecurity (@MatthiasEgli), Jan Kalivoda - Ackee (@jaczkal), Michael Lewellen - OpenZeppelin (@cylon56) , Shay Zluf - Hats Finance (@shayzluf)
 discussions-to: TBD
 status: Draft
 type: Standards Track
