@@ -1,5 +1,5 @@
 ---
-eip: 7509
+eip: minimal-proxy-push0
 title: Minimal Proxy Contract with `PUSH0`
 description: Optimize the previous Minimal Proxy Contract (eip-3855) with newly introduced `PUSH0` opcode
 author: 0xAA (@AmazingAng)
@@ -13,7 +13,7 @@ requires: 7, 211, 1167, 3855
 
 ## Simple Summary
 
-With the newly introduced `PUSH0` opcode ([eip-3855](./eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([eip-1167](./eip-1167)) by 200 gas at deployment and 5 gas at runtime, while retaining same functionalities.
+With the newly introduced `PUSH0` opcode ([EIP-3855](./eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([EIP-1167](./eip-1167)) by 200 gas at deployment and 5 gas at runtime, while retaining same functionalities.
 
 ## Abstract
 
@@ -226,7 +226,7 @@ GitHub Repo: Minimal-Proxy-PUSH0
 
 ## Security Considerations
 
-The new proxy contract standard is identical to the previous one (eip-1167). Here are the security considerations when using minimal proxy contracts:
+The new proxy contract standard is identical to the previous one (EIP-1167). Here are the security considerations when using minimal proxy contracts:
 
 1. **Non-Upgradability**: Minimal Proxy Contracts delegate their logic to another contract (often termed the "implementation" or "logic" contract). This delegation is fixed upon deployment, meaning you can't change which implementation contract the proxy delegates to after its creation.
    
@@ -243,10 +243,10 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 
 ## Reference
 
-1. Peter Murray (@yarrumretep), Nate Welch (@flygoing), Joe Messerman (@JAMesserman), "ERC-1167: Minimal Proxy Contract," Ethereum Improvement Proposals, no. 1167, June 2018. [Online serial].
+Peter Murray (@yarrumretep), Nate Welch (@flygoing), Joe Messerman (@JAMesserman), "ERC-1167: Minimal Proxy Contract," Ethereum Improvement Proposals, no. 1167, June 2018. [Online serial].
 
-2. Alex Beregszaszi (@axic), Hugo De la cruz (@hugo-dc), Paweł Bylica (@chfast), "EIP-3855: PUSH0 instruction," Ethereum Improvement Proposals, no. 3855, February 2021. [Online serial].
+Alex Beregszaszi (@axic), Hugo De la cruz (@hugo-dc), Paweł Bylica (@chfast), "EIP-3855: PUSH0 instruction," Ethereum Improvement Proposals, no. 3855, February 2021. [Online serial].
 
-3. Martin Abbatemarco, Deep dive into the Minimal Proxy contract
+Martin Abbatemarco, Deep dive into the Minimal Proxy contract
 
-4. 0age, The More-Minimal Proxy
+0age, The More-Minimal Proxy
