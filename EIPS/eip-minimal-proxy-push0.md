@@ -1,7 +1,7 @@
 ---
 eip: minimal-proxy-push0
 title: Minimal Proxy Contract with `PUSH0`
-description: Optimize the previous Minimal Proxy Contract (EIP-1167) with newly introduced `PUSH0` opcode
+description: Optimize the previous Minimal Proxy Contract (ERC-1167) with newly introduced `PUSH0` opcode
 author: 0xAA (@AmazingAng)
 discussions-to: https://ethereum-magicians.org/t/proposal-for-a-new-eip-minimal-proxy-contract-with-push0/15662
 status: Draft
@@ -236,9 +236,3 @@ The new proxy contract standard is identical to the previous one (ERC-1167). Her
 ## Copyright
 
 Copyright and related rights waived via [CC0](../LICENSE.md).
-
-## Reference
-
-Martin Abbatemarco, Deep dive into the Minimal Proxy contract
-
-0age, The More-Minimal Proxy
