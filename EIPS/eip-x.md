@@ -3,7 +3,7 @@ eip: XYZ
 title: Dynamic On-Chain Token Attributes Repository
 description: React to any Non-Fungible Tokens using Unicode emojis.
 author: Steven Pineda (@steven2308), Jan Turk (@ThunderDeliverer)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/dynamic-on-chain-token-attributes-repository/15667
 status: Draft
 type: Standards Track
 category: ERC
