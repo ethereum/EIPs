@@ -25,14 +25,14 @@ This ERC introduces new utilities for [ERC-721](./eip-721.md) and [ERC-1155](./e
 
 - [Cross-Collection interactivity](#cross-collection-interactivity)
 - [Perpetual Store of Attributes](#perpetual-store-of-attributes)
-- [Token Evoultion](#token-evolution)
+- [Token Evolution](#token-evolution)
 - [Dynamic State Tracking](#dynamic-state-tracking)
 
 ### Cross-Collection Interactivity
 
 Storing attibutes on-chain in a predictable format allows for cross-collection interactivity. This means that the attributes of a token can be used by any external smart contract without the need for the token to be aware of the external smart contract.
 
-For example, a token can represent a game character with its set of attributes and can be used in an unrealted game with the same stats without the need for retrieving this arributes from an off-chain source. This ensures that the data the game is using is legitimate and not tampered with in order to gain an advantage.
+For example, a token can represent a game character with its set of attributes and can be used in an unrelated game with the same stats without the need for retrieving this arributes from an off-chain source. This ensures that the data the game is using is legitimate and not tampered with in order to gain an advantage.
 
 ### Perpetual Store of Attributes
 
