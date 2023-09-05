@@ -1,7 +1,7 @@
 ---
 eip: minimal-proxy-push0
 title: Minimal Proxy Contract with `PUSH0`
-description: Optimize the previous Minimal Proxy Contract (eip-3855) with newly introduced `PUSH0` opcode
+description: Optimize the previous Minimal Proxy Contract (EIP-1167) with newly introduced `PUSH0` opcode
 author: 0xAA (@AmazingAng)
 discussions-to: https://ethereum-magicians.org/t/proposal-for-a-new-eip-minimal-proxy-contract-with-push0/15662
 status: Draft
@@ -11,13 +11,9 @@ created: 2023-09-04
 requires: 7, 211, 1167, 3855
 ---
 
-## Simple Summary
-
-With the newly introduced `PUSH0` opcode ([EIP-3855](./eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([EIP-1167](./eip-1167)) by 200 gas at deployment and 5 gas at runtime, while retaining same functionalities.
-
 ## Abstract
 
-Use `PUSH0` opcode to minimize gas cost of the previous Minimal Proxy Contract, which simply and cheaply clone contract functionality in an immutable way.
+With the newly introduced `PUSH0` opcode ([EIP-3855](./eip-3855)) at Shanghai Upgrade, we minimized the previous Minimal Proxy Contract ([ERC-1167](./eip-1167)) by 200 gas at deployment and 5 gas at runtime, while retaining same functionalities.
 
 ## Motivation
 
@@ -226,7 +222,7 @@ GitHub Repo: Minimal-Proxy-PUSH0
 
 ## Security Considerations
 
-The new proxy contract standard is identical to the previous one (EIP-1167). Here are the security considerations when using minimal proxy contracts:
+The new proxy contract standard is identical to the previous one (ERC-1167). Here are the security considerations when using minimal proxy contracts:
 
 1. **Non-Upgradability**: Minimal Proxy Contracts delegate their logic to another contract (often termed the "implementation" or "logic" contract). This delegation is fixed upon deployment, meaning you can't change which implementation contract the proxy delegates to after its creation.
    
@@ -242,10 +238,6 @@ The new proxy contract standard is identical to the previous one (EIP-1167). Her
 Copyright and related rights waived via [CC0](../LICENSE.md).
 
 ## Reference
-
-Peter Murray (@yarrumretep), Nate Welch (@flygoing), Joe Messerman (@JAMesserman), "ERC-1167: Minimal Proxy Contract," Ethereum Improvement Proposals, no. 1167, June 2018. [Online serial].
-
-Alex Beregszaszi (@axic), Hugo De la cruz (@hugo-dc), Paweł Bylica (@chfast), "EIP-3855: PUSH0 instruction," Ethereum Improvement Proposals, no. 3855, February 2021. [Online serial].
 
 Martin Abbatemarco, Deep dive into the Minimal Proxy contract
 
