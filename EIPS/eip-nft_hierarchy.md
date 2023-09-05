@@ -23,6 +23,8 @@ Existing [ERC-6150](./eip-6150.md) introduces a similar feature, but it only bui
 
 ## Specification
 
+Solidity interface available at [IERCXXXX.sol](../assets/eip-nft_hierarchy/contracts/IERCXXXX.sol):
+
 ```solidity
 /// @notice The struct used to reference a token in an NFT contract
 struct Token {
@@ -30,7 +32,7 @@ struct Token {
     uint256 id;
 }
 
-interface IDerivable {
+interface IERCXXXX {
 
     /// @notice Emitted when the parent tokens for an NFT is updated
     event UpdateParentTokens(uint256 indexed tokenId);
@@ -61,11 +63,180 @@ No backwards compatibility issues found.
 
 ## Test Cases
 
-Test cases available in the repository: [comoco-labs/laicense-contracts](https://github.com/comoco-labs/laicense-contracts)
+Test cases available available at: [ERCXXXX.test.ts](../assets/eip-nft_hierarchy/test/ERCXXXX.test.ts):
+
+```typescript
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { expect } from "chai";
+import { ethers } from "hardhat";
+
+const NAME = "NAME";
+const SYMBOL = "SYMBOL";
+const TOKEN_ID = 1234;
+
+const PARENT_1_COLLECTION = "0xDEAdBEEf00000000000000000123456789ABCdeF";
+const PARENT_1_ID = 8888;
+const PARENT_1_TOKEN = { collection: PARENT_1_COLLECTION, id: PARENT_1_ID };
+
+const PARENT_2_COLLECTION = "0xBaDc0ffEe0000000000000000123456789aBCDef";
+const PARENT_2_ID = 9999;
+const PARENT_2_TOKEN = { collection: PARENT_2_COLLECTION, id: PARENT_2_ID };
+
+describe("ERCXXXX", function () {
+
+  async function deployContractFixture() {
+    const [deployer, owner] = await ethers.getSigners();
+
+    const contract = await ethers.deployContract("ERCXXXX", [NAME, SYMBOL], deployer);
+    await contract.mint(owner, TOKEN_ID);
+
+    return { contract, owner };
+  }
+
+  describe("Functions", function () {
+    it("Should not set parent tokens if not owner or approved", async function () {
+      const { contract } = await loadFixture(deployContractFixture);
+
+      await expect(contract.setParentTokens(TOKEN_ID, [PARENT_1_TOKEN]))
+        .to.be.revertedWith("ERCXXXX: caller is not owner or approved");
+    });
+
+    it("Should correctly query token without parents", async function () {
+      const { contract } = await loadFixture(deployContractFixture);
+
+      expect(await contract.parentTokensOf(TOKEN_ID)).to.have.lengthOf(0);
+
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.equal(false);
+    });
+
+    it("Should set parent tokens and then update", async function () {
+      const { contract, owner } = await loadFixture(deployContractFixture);
+
+      await contract.connect(owner).setParentTokens(TOKEN_ID, [PARENT_1_TOKEN]);
+
+      let parentTokens = await contract.parentTokensOf(TOKEN_ID);
+      expect(parentTokens).to.have.lengthOf(1);
+      expect(parentTokens[0].collection).to.equal(PARENT_1_COLLECTION);
+      expect(parentTokens[0].id).to.equal(PARENT_1_ID);
+
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.equal(true);
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.equal(false);
+
+      await contract.connect(owner).setParentTokens(TOKEN_ID, [PARENT_2_TOKEN]);
+
+      parentTokens = await contract.parentTokensOf(TOKEN_ID);
+      expect(parentTokens).to.have.lengthOf(1);
+      expect(parentTokens[0].collection).to.equal(PARENT_2_COLLECTION);
+      expect(parentTokens[0].id).to.equal(PARENT_2_ID);
+
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.equal(false);
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.equal(true);
+    });
+
+    it("Should burn and clear parent tokens", async function () {
+      const { contract, owner } = await loadFixture(deployContractFixture);
+
+      await contract.connect(owner).setParentTokens(TOKEN_ID, [PARENT_1_TOKEN, PARENT_2_TOKEN]);
+      await contract.burn(TOKEN_ID);
+
+      await expect(contract.parentTokensOf(TOKEN_ID)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
+      await expect(contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
+      await expect(contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
+
+      await contract.mint(owner, TOKEN_ID);
+
+      expect(await contract.parentTokensOf(TOKEN_ID)).to.have.lengthOf(0);
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.equal(false);
+      expect(await contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.equal(false);
+    });
+  });
+
+  describe("Events", function () {
+    it("Should emit event when set parent tokens", async function () {
+      const { contract, owner } = await loadFixture(deployContractFixture);
+
+      await expect(contract.connect(owner).setParentTokens(TOKEN_ID, [PARENT_1_TOKEN, PARENT_2_TOKEN]))
+        .to.emit(contract, "UpdateParentTokens").withArgs(TOKEN_ID);
+    });
+  });
+
+});
+```
 
 ## Reference Implementation
 
-Reference implementation available in the repository: [comoco-labs/laicense-contracts](https://github.com/comoco-labs/laicense-contracts)
+Reference implementation available at: [ERCXXXX.sol](../assets/eip-nft_hierarchy/contracts/ERCXXXX.sol):
+
+```solidity
+// SPDX-License-Identifier: CC0-1.0
+
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+import "./IERCXXXX.sol";
+
+contract ERCXXXX is ERC721, IERCXXXX {
+
+    mapping(uint256 => Token[]) private _parentTokens;
+    mapping(uint256 => mapping(address => mapping(uint256 => bool))) private _isParentToken;
+
+    constructor(
+        string memory name, string memory symbol
+    ) ERC721(name, symbol) {}
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override returns (bool) {
+        return interfaceId == type(IERCXXXX).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    function parentTokensOf(
+        uint256 tokenId
+    ) public view virtual override returns (Token[] memory) {
+        require(_exists(tokenId), "ERCXXXX: query for nonexistent token");
+        return _parentTokens[tokenId];
+    }
+
+    function isParentToken(
+        uint256 tokenId,
+        Token memory otherToken
+    ) public view virtual override returns (bool) {
+        require(_exists(tokenId), "ERCXXXX: query for nonexistent token");
+        return _isParentToken[tokenId][otherToken.collection][otherToken.id];
+    }
+
+    function setParentTokens(
+        uint256 tokenId, Token[] memory parentTokens
+    ) public virtual {
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERCXXXX: caller is not owner or approved");
+        _clear(tokenId);
+        for (uint256 i = 0; i < parentTokens.length; i++) {
+            _parentTokens[tokenId].push(parentTokens[i]);
+            _isParentToken[tokenId][parentTokens[i].collection][parentTokens[i].id] = true;
+        }
+        emit UpdateParentTokens(tokenId);
+    }
+
+    function _burn(
+        uint256 tokenId
+    ) internal virtual override {
+        super._burn(tokenId);
+        _clear(tokenId);
+    }
+
+    function _clear(
+        uint256 tokenId
+    ) private {
+        Token[] storage parentTokens = _parentTokens[tokenId];
+        for (uint256 i = 0; i < parentTokens.length; i++) {
+            delete _isParentToken[tokenId][parentTokens[i].collection][parentTokens[i].id];
+        }
+        delete _parentTokens[tokenId];
+    }
+
+}
+```
 
 ## Security Considerations
 
