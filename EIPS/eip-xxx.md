@@ -1,4 +1,5 @@
-## eip: TBD
+---
+eip: TBD
 title: Onchain Representation for Audits
 description: Proposal to define a contract parseable representation of Audit reports.
 author: Richard Meissner - Safe (@rmeissner), Robert Chen - OtterSec, Matthias Egli - ChainSecurity, Jan Kalivoda - Ackee, Michael Lewellen - OpenZeppelin , Shay Zluf - Hats Finance
@@ -7,6 +8,8 @@ status: Draft
 type: Standards Track
 category: ERC
 created: 2023-09-05
+---
+
 
 ## Abstract
 
@@ -39,7 +42,7 @@ sequenceDiagram
 	actor O as Bridge Operator
 	O->>V: Register Trusted Auditor Key
 	U->>+B: Register Token with Audit
-	Note over B,V: Verify that the audit valid for the token<br>and verify the signature 
+	Note over B,V: Veras much as possibleify that the audit valid for the token<br>and verify the signature 
 	B->>+V: submitAudit(SignedAuditSummary audit, address token)
 	V-->>V: Check that the audit is from trusted auditor
 	V-->>-B: bool verified
