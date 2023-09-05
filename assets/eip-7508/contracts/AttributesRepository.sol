@@ -6,18 +6,18 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-import "./IERCXYZ.sol";
+import "./IERC7508.sol";
 
 /**
- * @title ERC-XYZ Public On-Chain NFT Attributes Repository
+ * @title ERC-7508 Public On-Chain NFT Attributes Repository
  * @author Steven Pineda, Jan Turk
- * @notice Implementation smart contract of the ERC-XYZ Public On-Chain NFT Attributes Repository
+ * @notice Implementation smart contract of the ERC-7508 Public On-Chain NFT Attributes Repository
  */
-contract AttributesRepository is IERCXYZ {
+contract AttributesRepository is IERC7508 {
     bytes32 public immutable DOMAIN_SEPARATOR =
         keccak256(
             abi.encode(
-                "ERC-XYZ: Public On-Chain NFT Attributes Repository",
+                "ERC-7508: Public On-Chain NFT Attributes Repository",
                 "1",
                 block.chainid,
                 address(this)
@@ -104,7 +104,7 @@ contract AttributesRepository is IERCXYZ {
     error ExpiredDeadline();
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function registerAccessControl(
         address collection,
@@ -139,7 +139,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function manageAccessControl(
         address collection,
@@ -156,7 +156,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function manageCollaborators(
         address collection,
@@ -182,7 +182,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function isCollaborator(
         address collaborator,
@@ -192,7 +192,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function isSpecificAddress(
         address specificAddress,
@@ -312,7 +312,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getStringTokenAttribute(
         address collection,
@@ -326,7 +326,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getUintTokenAttribute(
         address collection,
@@ -337,7 +337,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getBoolTokenAttribute(
         address collection,
@@ -348,7 +348,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getAddressTokenAttribute(
         address collection,
@@ -359,7 +359,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getBytesTokenAttribute(
         address collection,
@@ -370,7 +370,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getTokenAttributes(
         address collection,
@@ -415,7 +415,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getStringTokenAttributes(
         address collection,
@@ -446,7 +446,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getUintTokenAttributes(
         address collection,
@@ -471,7 +471,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getBoolTokenAttributes(
         address collection,
@@ -496,7 +496,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getAddressTokenAttributes(
         address collection,
@@ -525,7 +525,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function getBytesTokenAttributes(
         address collection,
@@ -552,7 +552,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function prepareMessageToPresignUintAttribute(
         address collection,
@@ -576,7 +576,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function prepareMessageToPresignStringAttribute(
         address collection,
@@ -600,7 +600,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function prepareMessageToPresignBoolAttribute(
         address collection,
@@ -624,7 +624,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function prepareMessageToPresignBytesAttribute(
         address collection,
@@ -648,7 +648,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function prepareMessageToPresignAddressAttribute(
         address collection,
@@ -672,7 +672,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setUintAttribute(
         address collection,
@@ -685,7 +685,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setStringAttribute(
         address collection,
@@ -700,7 +700,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setBoolAttribute(
         address collection,
@@ -713,7 +713,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setBytesAttribute(
         address collection,
@@ -726,7 +726,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setAddressAttribute(
         address collection,
@@ -739,7 +739,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setStringAttributes(
         address collection,
@@ -763,7 +763,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setUintAttributes(
         address collection,
@@ -787,7 +787,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setBoolAttributes(
         address collection,
@@ -811,7 +811,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setAddressAttributes(
         address collection,
@@ -835,7 +835,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setBytesAttributes(
         address collection,
@@ -859,7 +859,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function setTokenAttributes(
         address collection,
@@ -947,7 +947,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function presignedSetUintAttribute(
         address setter,
@@ -991,7 +991,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function presignedSetStringAttribute(
         address setter,
@@ -1037,7 +1037,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function presignedSetBoolAttribute(
         address setter,
@@ -1081,7 +1081,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function presignedSetBytesAttribute(
         address setter,
@@ -1125,7 +1125,7 @@ contract AttributesRepository is IERCXYZ {
     }
 
     /**
-     * @inheritdoc IERCXYZ
+     * @inheritdoc IERC7508
      */
     function presignedSetAddressAttribute(
         address setter,
@@ -1217,7 +1217,7 @@ contract AttributesRepository is IERCXYZ {
         bytes4 interfaceId
     ) public view virtual returns (bool) {
         return
-            interfaceId == type(IERCXYZ).interfaceId ||
+            interfaceId == type(IERC7508).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
 }

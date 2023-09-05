@@ -5,11 +5,11 @@ pragma solidity ^0.8.21;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
- * @title ERC-XYZ Public On-Chain NFT Attributes Repository
+ * @title ERC-7508 Public On-Chain NFT Attributes Repository
  * @author Steven Pineda, Jan Turk
  * @notice Interface smart contract of Dynamic On-Chain Token Attributes Repository
  */
-interface IERCXYZ is IERC165 {
+interface IERC7508 is IERC165 {
     /**
      * @notice A list of supported access types.
      * @return The `Issuer` type, where only the issuer can manage the parameter.

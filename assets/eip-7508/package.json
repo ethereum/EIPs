@@ -1,5 +1,5 @@
 {
-  "name": "eip-XYZ",
+  "name": "eip-7508",
   "scripts": {
     "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain",
