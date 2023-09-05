@@ -1,7 +1,7 @@
 ---
 eip: X
 title: Quantum Supremacy Contract
-author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan 
+author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan (@djrtwo)
 discussions-to: 
 status: Draft
 type: Standards Track
