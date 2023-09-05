@@ -16,7 +16,7 @@ With the newly introduced `PUSH0` opcode ([eip-3855](https://eips.ethereum.org/E
 
 ## Abstract
 
-Use `PUSH0` opcode minimize gas cost of the previous Minimal Proxy Contract, which simply and cheaply clone contract functionality in an immutable way.
+Use `PUSH0` opcode to minimize gas cost of the previous Minimal Proxy Contract, which simply and cheaply clone contract functionality in an immutable way.
 
 ## Motivation
 
