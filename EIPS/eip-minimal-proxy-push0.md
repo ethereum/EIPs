@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2023-09-04
-requires: eip-7, eip-211, eip1167, eip-3855
+requires: 7, 211, 1167, 3855
 ---
 
 ## Simple Summary
