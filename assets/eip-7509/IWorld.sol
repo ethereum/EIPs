@@ -1,39 +1,4 @@
----
-eip: 7508
-title: Ethereum Entity Component System
-description: A minimal Entity Component System framework built on Ethereum
-author: Rickey (@HelloRickey)
-discussions-to: https://ethereum-magicians.org/t/a-new-proposal-of-entity-component-system/15665
-status: Draft
-type: Standards Track
-category: ERC
-created: 2023-09-05
----
-
-## Abstract
-
-This proposal defines a minimal Entity Component System, which will help developers clean and easy to use the Entity Component System framework on Ethereum.
-
-## Motivation   
-
-ECS is a design pattern that improves code reusability by separating data from behavior. It is often used in game development.A minimal ECS consists of   
-**Entity**: a unique identifier.   
-**Component**: a reusable data container attached to an entity.   
-**System**: the logic for operating entity components.   
-**World**: a container for an entity component system.   
-This proposal uses smart contracts to implement an easy-to-use minimal ECS, eliminates unnecessary complexity, and makes some functional improvements that are consistent with contract interaction behavior. You can combine components and systems easily and freely. And make it upgradable through state management. It will help you quickly launch your full-chain game or application.
-
-
-## Specification
-
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
-
-### Interfaces
-
-**IWorld.sol**
-
-```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity >=0.8.0;
 
 interface IWorld {
@@ -64,7 +29,7 @@ interface IWorld {
      * Set the state of an entity.
      * @dev Entity MUST exist.
      * @param _entityId is the Id of the entity.
-     * @param _entityState is the state of the entity.
+     * @param _entityState is the state of the entity, true means available, false means unavailable.
      */
     function setEntityState(uint256 _entityId, bool _entityState) external;
 
@@ -202,100 +167,3 @@ interface IWorld {
         view
         returns (bool);
 }
-```
-
-**IComponent.sol**
-
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0;
-import "./Types.sol";
-
-interface IComponent {
-    /**
-     * The world contract address registered by the component.
-     * @return world contract address.
-     */
-    function world() external view returns (address);
-
-    /**
-     *Get the data type and get() parameter type of the component
-     * @dev SHOULD Import Types Library, which is an enumeration Library containing all data types.
-     * Entity data can be stored according to the data type.
-     * The get() parameter data type can be used to get entity data.
-     * @return the data type array of the entity
-     * @return get parameter data type array
-     */
-    function types()
-        external
-        view
-        returns (Types.Type[] memory, Types.Type[] memory);
-
-    /**
-     *Store entity data.
-     * @dev entity MUST be available. The system that operates on it MUST be available.
-     * The entity has the component attached.
-     * @param _entityId is the Id of the entity.
-     * @param _data is the data to be stored.
-     */
-    function set(uint256 _entityId, bytes memory _data) external;
-
-    /**
-     *Get the data of the entity according to the entity Id.
-     * @param _entityId is the Id of the entity.
-     * @return Entity data.
-     */
-    function get(uint256 _entityId) external view returns (bytes memory);
-
-    /** Get the data of the entity according to the entity Id and parameters.
-     * @param _entityId is the Id of the entity.
-     * @param _params is an extra parameter, it SHOULD depend on whether you need it.
-     * @return Entity data.
-     */
-    function get(uint256 _entityId, bytes memory _params)
-        external
-        view
-        returns (bytes memory);
-}
-```
-
-## Rationale
-
-World contracts are containers for entities, component contracts, and system contracts. Its core principle is to establish the relationship between entities and component contracts, and different entities will attach different components. And use the system contract to dynamically change the data of the entity in the component.
-Usual workflow when building ECS-based programs
-
-1. Implement the `IWorld` interface to create a world contract.
-2. Call `createEntity()` of the world contract to create an entity.
-3. Implement the `IComponent` interface to create a Component contract.
-4. Call `registerComponent()` of the world contract to register the component contract.
-5. Call `addComponent()` of the world contract to attach the component to the entity.
-6. Create a system contract, which is a contract without interface restrictions, and you can define any function in the system contract.
-7. Call `registerSystem()` of the world contract to register the system contract.
-8. Run the system.
-
-## Reference Implementation
-
-See [Ethereum ECS Example](../assets/eip-7508)
-
-## Security Considerations
-
-Unless you want to implement special functions, do not provide the following methods directly to ordinary users, they should be set by the contract owner.   
-`createEntity()`,
-`setEntityState()`,
-`addComponent()`,
-`removeComponent()`,
-`registerComponent()`,
-`setComponentState()`,
-`registerSystem()`,
-`setSystemState()`
-
-Do not provide functions that modify entities other than set() in the component contract. And add a check in `set()` to check whether the entity is available and whether the operating system is available.   
-
-After the system is registered in the world, it will be able to operate the component data of all entities in the world. It is necessary to check and audit the code security of all system contracts before registering it in the world.
-
-If the new version has deprecated some entities, component contracts and system contracts. They need to be disabled in time using `setEntityState()`, `setComponentState()`, and `setSystemState()`.
-
-## Copyright
-
-Copyright and related rights waived via [CC0](../LICENSE.md).
-
