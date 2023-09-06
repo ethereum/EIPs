@@ -8,7 +8,7 @@ struct Token {
     uint256 id;
 }
 
-interface IERCXXXX {
+interface IERC7510 {
 
     /// @notice Emitted when the parent tokens for an NFT is updated
     event UpdateParentTokens(uint256 indexed tokenId);

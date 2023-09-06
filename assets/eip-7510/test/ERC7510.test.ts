@@ -14,12 +14,12 @@ const PARENT_2_COLLECTION = "0xBaDc0ffEe0000000000000000123456789aBCDef";
 const PARENT_2_ID = 9999;
 const PARENT_2_TOKEN = { collection: PARENT_2_COLLECTION, id: PARENT_2_ID };
 
-describe("ERCXXXX", function () {
+describe("ERC7510", function () {
 
   async function deployContractFixture() {
     const [deployer, owner] = await ethers.getSigners();
 
-    const contract = await ethers.deployContract("ERCXXXX", [NAME, SYMBOL], deployer);
+    const contract = await ethers.deployContract("ERC7510", [NAME, SYMBOL], deployer);
     await contract.mint(owner, TOKEN_ID);
 
     return { contract, owner };
@@ -30,7 +30,7 @@ describe("ERCXXXX", function () {
       const { contract } = await loadFixture(deployContractFixture);
 
       await expect(contract.setParentTokens(TOKEN_ID, [PARENT_1_TOKEN]))
-        .to.be.revertedWith("ERCXXXX: caller is not owner or approved");
+        .to.be.revertedWith("ERC7510: caller is not owner or approved");
     });
 
     it("Should correctly query token without parents", async function () {
@@ -71,9 +71,9 @@ describe("ERCXXXX", function () {
       await contract.connect(owner).setParentTokens(TOKEN_ID, [PARENT_1_TOKEN, PARENT_2_TOKEN]);
       await contract.burn(TOKEN_ID);
 
-      await expect(contract.parentTokensOf(TOKEN_ID)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
-      await expect(contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
-      await expect(contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.be.revertedWith("ERCXXXX: query for nonexistent token");
+      await expect(contract.parentTokensOf(TOKEN_ID)).to.be.revertedWith("ERC7510: query for nonexistent token");
+      await expect(contract.isParentToken(TOKEN_ID, PARENT_1_TOKEN)).to.be.revertedWith("ERC7510: query for nonexistent token");
+      await expect(contract.isParentToken(TOKEN_ID, PARENT_2_TOKEN)).to.be.revertedWith("ERC7510: query for nonexistent token");
 
       await contract.mint(owner, TOKEN_ID);
 

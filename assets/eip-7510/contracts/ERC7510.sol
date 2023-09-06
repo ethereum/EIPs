@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-import "./IERCXXXX.sol";
+import "./IERC7510.sol";
 
-contract ERCXXXX is ERC721, IERCXXXX {
+contract ERC7510 is ERC721, IERC7510 {
 
     mapping(uint256 => Token[]) private _parentTokens;
     mapping(uint256 => mapping(address => mapping(uint256 => bool))) private _isParentToken;
@@ -18,13 +18,13 @@ contract ERCXXXX is ERC721, IERCXXXX {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override returns (bool) {
-        return interfaceId == type(IERCXXXX).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC7510).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function parentTokensOf(
         uint256 tokenId
     ) public view virtual override returns (Token[] memory) {
-        require(_exists(tokenId), "ERCXXXX: query for nonexistent token");
+        require(_exists(tokenId), "ERC7510: query for nonexistent token");
         return _parentTokens[tokenId];
     }
 
@@ -32,14 +32,14 @@ contract ERCXXXX is ERC721, IERCXXXX {
         uint256 tokenId,
         Token memory otherToken
     ) public view virtual override returns (bool) {
-        require(_exists(tokenId), "ERCXXXX: query for nonexistent token");
+        require(_exists(tokenId), "ERC7510: query for nonexistent token");
         return _isParentToken[tokenId][otherToken.collection][otherToken.id];
     }
 
     function setParentTokens(
         uint256 tokenId, Token[] memory parentTokens
     ) public virtual {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERCXXXX: caller is not owner or approved");
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC7510: caller is not owner or approved");
         _clear(tokenId);
         for (uint256 i = 0; i < parentTokens.length; i++) {
             _parentTokens[tokenId].push(parentTokens[i]);

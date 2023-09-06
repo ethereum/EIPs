@@ -1,7 +1,7 @@
 {
-  "name": "eip-xxxx",
+  "name": "eip-7510",
   "version": "1.0.0",
-  "description": "Reference implementation and test cases for EIP-XXXX",
+  "description": "Reference implementation and test cases for EIP-7510",
   "author": "Comoco Labs",
   "license": "CC0-1.0",
   "devDependencies": {
