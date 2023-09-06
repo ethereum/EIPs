@@ -25,7 +25,6 @@ repository: ethereum/EIPs
 header_pages:
  - all.html
  - core.html
- - networking.html
  - interface.html
  - erc.html
  - meta.html
