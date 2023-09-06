@@ -1,8 +1,8 @@
 ---
-eip: <Number>
+# eip: <Number>
 title: NFT-Bound Modularized Contract
-author: MJ <tsngmj@gmail.com>
-discussions-to: <URL>
+author: TsengMJ <tsngmj@gmail.com>
+# discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: ERC
@@ -207,24 +207,6 @@ This proposal aims to ensure the highest possible compatibility with the existin
 
 For all SmartNFTs, the EIP standard only mandates the provision of the `execute` function. This means that existing proxy contracts need to focus solely on this interface, making integration of SmartNFTs more straightforward and streamlined.
 
-## Security Considerations
-
-- **Malicious Validator**
-
-  All activities involving human intervention inherently carry the risk of malicious behavior. In this protocol, during the verification phase of SmartNFTs, external validators provide guarantees. However, this structure raises concerns about the possibility of malicious validators intentionally endorsing Malicious SmartNFTs. To mitigate this risk, it's necessary to implement stricter validation mechanisms, filtering of validators, punitive measures, or even more stringent consensus standards.
-
-- **Unexpected Verification Error**
-
-  Apart from the issue of Malicious Validators, there's the possibility of missed detection during the verification phase due to factors like overly complex SmartNFT implementations or vulnerabilities in the Solidity compiler. This protocol addresses such scenarios with designed interfaces for appropriate handling, but its effectiveness relies on the responsiveness and vigilance of Validators.
-
-- **Improper SmartNFT Implementation**
-
-  This protocol defines that when a SmartNFT executes `execute`, it should first trigger `validatePermission` to query the SmartManager's `isAccessForUser` interface, determining whether the user can use the SmartNFT. However, potential implementation errors by developers could lead to several issues:
-
-  - Users who possess the SmartNFT might not be able to execute its functionalities properly.
-  - Users who don't possess the SmartNFT might be able to execute its functionalities improperly.
-  - Unverified SmartNFTs could be used by users to execute their functionalities improperly.
-
 ## Reference Implementation
 
 - **Code**
@@ -320,10 +302,10 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
     }
     ```
 
-  - **ERC20Transfer SmartNFT**
+  - **[ERC-20](./eip-20)Transfer SmartNFT**
 
     ```solidity
-    // ERC20 smartNFT, used for `transfer`
+    // ERC-20 smartNFT, used for `transfer`
     contract ERC20Transfer is ISmartNFT  {
 
         address immutable _author;
@@ -355,10 +337,10 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
     }
     ```
 
-  - **ERC20Approve SmartNFT**
+  - **[ERC-20](./eip-20)Approve SmartNFT**
 
     ```solidity
-    //ERC20 SmartNFT, used for `approve`
+    //ERC-20 SmartNFT, used for `approve`
     contract ERC20Approve is ISmartNFT  {
 
         address immutable _author;
@@ -509,7 +491,7 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
 
   - **Advanced Usage - Combination SmartNFT**
 
-    Because SmartNFTs are fundamentally smart contracts, these smart contracts can also possess other NFTs, which subsequently allows SmartNFTs to own other SmartNFTs. This characteristic enables the realization of compositional SmartNFT applications. For instance, SmartNFT A might implement an ERC20 token approval, while SmartNFT B facilitates a Swap operation with a DEX. If a SmartNFT C possesses both SmartNFT A and SmartNFT B, then SmartNFT C can sequentially invoke SmartNFT A and SmartNFT B to effectively accomplish the functionality of approving before executing a swap.
+    Because SmartNFTs are fundamentally smart contracts, these smart contracts can also possess other NFTs, which subsequently allows SmartNFTs to own other SmartNFTs. This characteristic enables the realization of compositional SmartNFT applications. For instance, SmartNFT A might implement an [ERC-20](./eip-20) token approval, while SmartNFT B facilitates a Swap operation with a DEX. If a SmartNFT C possesses both SmartNFT A and SmartNFT B, then SmartNFT C can sequentially invoke SmartNFT A and SmartNFT B to effectively accomplish the functionality of approving before executing a swap.
 
     ![](../assets/eip-NFT_Bound_Modularized_Contract/combination_nft.png)
 
@@ -524,6 +506,24 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
     Taking a DEX (Decentralized Exchange) as an example, if there's a need to add or remove liquidity and perform swaps, you'd only need SmartNFTs that provide functionalities like adding liquidity, removing liquidity, and swapping.
 
     This design also proves advantageous for future upgrades. If upgrades are required for certain interfaces, you would only need to acquire new SmartNFTs and remove the old ones, simplifying the upgrade process.
+
+## Security Considerations
+
+- **Malicious Validator**
+
+  All activities involving human intervention inherently carry the risk of malicious behavior. In this protocol, during the verification phase of SmartNFTs, external validators provide guarantees. However, this structure raises concerns about the possibility of malicious validators intentionally endorsing Malicious SmartNFTs. To mitigate this risk, it's necessary to implement stricter validation mechanisms, filtering of validators, punitive measures, or even more stringent consensus standards.
+
+- **Unexpected Verification Error**
+
+  Apart from the issue of Malicious Validators, there's the possibility of missed detection during the verification phase due to factors like overly complex SmartNFT implementations or vulnerabilities in the Solidity compiler. This protocol addresses such scenarios with designed interfaces for appropriate handling, but its effectiveness relies on the responsiveness and vigilance of Validators.
+
+- **Improper SmartNFT Implementation**
+
+  This protocol defines that when a SmartNFT executes `execute`, it should first trigger `validatePermission` to query the SmartManager's `isAccessForUser` interface, determining whether the user can use the SmartNFT. However, potential implementation errors by developers could lead to several issues:
+
+  - Users who possess the SmartNFT might not be able to execute its functionalities properly.
+  - Users who don't possess the SmartNFT might be able to execute its functionalities improperly.
+  - Unverified SmartNFTs could be used by users to execute their functionalities improperly.
 
 ## Copyright
 
