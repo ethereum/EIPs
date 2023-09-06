@@ -16,10 +16,6 @@ erc:
   - SamWilsn
   - Pandapip1
   - xinbenlv
-networking:
-  - lightclient
-  - axic
-  - SamWilsn
 interface:
   - lightclient
   - axic
