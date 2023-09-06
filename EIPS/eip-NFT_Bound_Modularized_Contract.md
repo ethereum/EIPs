@@ -25,7 +25,7 @@ The purpose of this protocol is to address the following challenges present with
 
   In the current blockchain environment, accomplishing more complex tasks is often unfriendly for ordinary users. This stems from two main factors.
 
-  ![Streamline_Operation_Image](https://imgur.com/PUxHJal.png)
+  ![](../assets/eip-NFT_Bound_Modularized_Contract/streamline_operation.png)
 
   Firstly, average users lack the coding proficiency required for intricate operations. Advanced/complexed functionalities realized through smart contracts, such as flash loans or conditional orders, appear to be the realm of developers, scientists, or hackers, making them seem like privileges.
 
@@ -55,7 +55,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
   Additionally, it provides insights into advanced usage scenarios. For instance, users can independently arrange and combine trusted SmartNFTs to achieve more complex operations. Furthermore, it provides a novel solution for contract upgrades without altering the existing contracts.
 
-  ![Architecture_Image](https://imgur.com/1WqedvP.png)
+  ![](../assets/eip-NFT_Bound_Modularized_Contract/architecture.png)
 
 - **SmartNFT Interface**
 
@@ -500,7 +500,7 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
 
   - **SmartNFT for Customizable Interactions**
 
-    ![Interoperation_Image](https://imgur.com/AN75O6n.png)
+    ![](../assets/eip-NFT_Bound_Modularized_Contract/interoperation.png)
 
     The diagram illustrates the suboptimal user experience when interacting with multiple DEFI protocols compared to the ideal interaction. With the thriving blockchain ecosystem, including blockchain games and social applications, a mix of existing and new protocols has led to intricate and complex interactions. When users must perform multiple actions to complete a transaction, it results in inefficiency for the user.
 
@@ -510,11 +510,11 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
 
     Because SmartNFTs are fundamentally smart contracts, these smart contracts can also possess other NFTs, which subsequently allows SmartNFTs to own other SmartNFTs. This characteristic enables the realization of compositional SmartNFT applications. For instance, SmartNFT A might implement an ERC20 token approval, while SmartNFT B facilitates a Swap operation with a DEX. If a SmartNFT C possesses both SmartNFT A and SmartNFT B, then SmartNFT C can sequentially invoke SmartNFT A and SmartNFT B to effectively accomplish the functionality of approving before executing a swap.
 
-    ![Combination_NFT_Image](https://imgur.com/UWgjVX3.png)
+    ![](../assets/eip-NFT_Bound_Modularized_Contract/combination_nft.png)
 
     Another scenario for compositional use is when a single Proxy holds multiple SmartNFTs. The Proxy can then selectively invoke SmartNFTs in the desired sequence according to its requirements. This approach can achieve the same effect as the example mentioned earlier.
 
-    ![Proxy_Hold_NFT_Image](https://imgur.com/YnNQswQ.png)
+    ![](../assets/eip-NFT_Bound_Modularized_Contract/proxy_hold_nft.png)
 
   - **Advanced Usage - Modularization of DAPP Functionality**
 
