@@ -51,7 +51,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 - **Overview**
 
-  This protocol establishes standardized implementation and invocation interfaces for SmartNFTs. It builds upon the ERC1155 standard by introducing a universal extension, transforming ERC1155 into a vessel for smart contract. Moreover, the protocol defines registration and verification interfaces for SmartNFTs.
+  This protocol establishes standardized implementation and invocation interfaces for SmartNFTs. It builds upon the ERC-1155 standard by introducing a universal extension, transforming ERC-1155 into a vessel for smart contract. Moreover, the protocol defines registration and verification interfaces for SmartNFTs.
 
   Additionally, it provides insights into advanced usage scenarios. For instance, users can independently arrange and combine trusted SmartNFTs to achieve more complex operations. Furthermore, it provides a novel solution for contract upgrades without altering the existing contracts.
 
@@ -104,7 +104,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 - **SmartManager Interface**
 
-  Under this protocol definition, where owning a SmartNFT equates to possessing functional value, striking a balance between maximizing SmartNFT reusability and managing usage rights, the ERC1155 protocol is adopted as the vessel for SmartNFTs. Additionally, extensions are introduced to the ERC1155 protocol to create a SmartManager, encompassing functionalities like SmartNFT registration and verification. The interface definitions are as follows:
+  Under this protocol definition, where owning a SmartNFT equates to possessing functional value, striking a balance between maximizing SmartNFT reusability and managing usage rights, the ERC-1155 protocol is adopted as the vessel for SmartNFTs. Additionally, extensions are introduced to the ERC-1155 protocol to create a SmartManager, encompassing functionalities like SmartNFT registration and verification. The interface definitions are as follows:
 
   - `register`: This function facilitates the registration of a SmartNFT into the SmartManager. At this point, the SmartNFT **SHOULD** ideally be marked as uncertain.
   - `verificationStatus`: The function **MUST** returns the current verification stage of the specified SmartNFT. The verification process is divided into three stages: UNCERTAIN, VERIFIED, and MALICIOUS.
@@ -170,7 +170,7 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
 - **Register SmartNFT**
 
-  For the generation and successful registration of a SmartNFT, the developer **SHOULD** first deploy a logic contract that adheres to the interface design. Following that, a transaction **MUST** be initiated towards the SmartManager to perform the "register" action, binding the logic contract from the previous step with the ERC1155 TokenID.
+  For the generation and successful registration of a SmartNFT, the developer **SHOULD** first deploy a logic contract that adheres to the interface design. Following that, a transaction **MUST** be initiated towards the SmartManager to perform the "register" action, binding the logic contract from the previous step with the ERC-1155 TokenID.
 
   During this binding process, the developer's address is **RECOMMENDED** being recorded. As this address cannot be directly obtained from the logic contract's deployer, it is uniformly acquired from the SmartNFT's "creator" function. Upon completing the entire process, an unverified SmartNFT is successfully registered.
 
@@ -200,9 +200,9 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 
   Since the Factory itself cannot verify whether the SmartNFT being deployed adheres to the recommended interface restrictions of the protocol, and with a commitment to maximizing code reusability, we aim for any SmartNFT to be registrable on different SmartNFTManagers. Therefore, the presence or absence of a Factory is not a crucial issue in this context.
 
-## Backward Compatibility
+## Backwards Compatibility
 
-This proposal aims to ensure the highest possible compatibility with the existing ERC1155 protocol. All functionalities present in ERC1155, including ERC165 detection and SmartNFT support, are retained. This encompasses compatibility with current NFT trading platforms.
+This proposal aims to ensure the highest possible compatibility with the existing ERC-1155 protocol. All functionalities present in ERC-1155, including ERC165 detection and SmartNFT support, are retained. This encompasses compatibility with current NFT trading platforms.
 
 For all SmartNFTs, the EIP standard only mandates the provision of the `execute` function. This means that existing proxy contracts need to focus solely on this interface, making integration of SmartNFTs more straightforward and streamlined.
 
@@ -224,7 +224,7 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
   - Users who don't possess the SmartNFT might be able to execute its functionalities improperly.
   - Unverified SmartNFTs could be used by users to execute their functionalities improperly.
 
-## References
+## Reference Implementation
 
 - **Code**
 
@@ -496,7 +496,7 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
 
     In game-fi, mods are often one of the reasons for a game's popularity. Users can create their own mods to enhance the game's entertainment value. For example, in games like "The Elder Scrolls V: Skyrim," players can develop mods that add new elements and enhance the overall gameplay experience.
 
-    Developers can create mods as SmartNFTs within blockchain games and sell them as ERC1155 tokens, thereby generating revenue. This approach allows developers to monetize their creativity and contributions to the gaming ecosystem, while players benefit from enhanced gaming experiences through these unique and customizable modifications.
+    Developers can create mods as SmartNFTs within blockchain games and sell them as ERC-1155 tokens, thereby generating revenue. This approach allows developers to monetize their creativity and contributions to the gaming ecosystem, while players benefit from enhanced gaming experiences through these unique and customizable modifications.
 
   - **SmartNFT for Customizable Interactions**
 
@@ -526,4 +526,4 @@ For all SmartNFTs, the EIP standard only mandates the provision of the `execute`
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://github.com/ethereum/EIPs/blob/master/LICENSE.md).
+Copyright and related rights waived via [CC0](../LICENSE.md).
