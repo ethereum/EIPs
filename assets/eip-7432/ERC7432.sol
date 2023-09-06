@@ -122,7 +122,7 @@ contract ERC7432 is IERC7432 {
         bool _isApproved
     ) external override {
         operatorApprovals[msg.sender][_tokenAddress][_operator] = _isApproved;
-        emit ApprovalForAll(msg.sender, _tokenAddress, _operator, _isApproved);
+        emit RoleApprovalForAll(msg.sender, _tokenAddress, _operator, _isApproved);
     }
 
     function approveRole(
@@ -132,7 +132,7 @@ contract ERC7432 is IERC7432 {
         bool _approved
     ) external override {
         tokenApprovals[msg.sender][_tokenAddress][_tokenId][_operator] = _approved;
-        emit Approval(msg.sender, _tokenAddress, _tokenId, _operator, _approved);
+        emit RoleApproval(msg.sender, _tokenAddress, _tokenId, _operator, _approved);
     }
 
     function getApprovedRole(

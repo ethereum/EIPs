@@ -51,7 +51,7 @@ interface IERC7432 is IERC165 {
     /// @param _operator The user that can grant the role.
     /// @param _tokenAddress The token address.
     /// @param _isApproved The approval status.
-    event ApprovalForAll(
+    event RoleApprovalForAll(
         address indexed _grantor,
         address indexed _operator,
         address indexed _tokenAddress,
@@ -64,7 +64,7 @@ interface IERC7432 is IERC165 {
     /// @param _tokenId The token identifier.
     /// @param _operator The user that can grant the role.
     /// @param _isApproved The approval status.
-    event Approval(
+    event RoleApproval(
         address indexed _grantor,
         address indexed _tokenAddress,
         uint256 indexed _tokenId,
