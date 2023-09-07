@@ -12,3 +12,7 @@ Usual workflow when building ECS-based programs
 7. Call `registerSystem()` of the world contract to register the system contract.
 8. Run the system.
 
+- [`System.sol`](./System.sol)
+- [`Types.sol`](./Types.sol)
+- [`World.sol`](./World.sol)
+- [`Component.sol`](./Component.sol)
