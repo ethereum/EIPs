@@ -25,16 +25,61 @@ contract ERC7432 is IERC7432 {
         address _grantee,
         uint64 _expirationDate,
         bytes calldata _data
-    ) external validExpirationDate(_expirationDate) {
-        roleAssignments[msg.sender][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
-        lastRoleAssignment[msg.sender][_tokenAddress][_tokenId][_role] = _grantee;
-        emit RoleGranted(_role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data);
+    ) external {
+        _grantRole(_role, _tokenAddress, _tokenId, msg.sender, _grantee, _expirationDate, _data);
+    }
+    function grantRoleFrom(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee,
+        uint64 _expirationDate,
+        bytes calldata _data
+    ) external override {
+        require(isRoleApprovedForAll(_grantor, msg.sender, _tokenAddress) || getApprovedRole(_grantor, _tokenAddress, _tokenId, msg.sender), "RolesRegistry: sender must be approved");
+        _grantRole(_role, _tokenAddress, _tokenId, _grantor, _grantee, _expirationDate, _data);
+    }
+
+    function _grantRole(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee,
+        uint64 _expirationDate,
+        bytes calldata _data
+    ) internal validExpirationDate(_expirationDate) {
+        roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
+        lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
+        emit RoleGranted(_grantor, _role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data); // TODO: We should change event to receive grantor as parameter
     }
 
     function revokeRole(bytes32 _role, address _tokenAddress, uint256 _tokenId, address _grantee) external {
-        delete roleAssignments[msg.sender][_grantee][_tokenAddress][_tokenId][_role];
-        delete lastRoleAssignment[msg.sender][_tokenAddress][_tokenId][_role];
-        emit RoleRevoked(_role, _tokenAddress, _tokenId, _grantee);
+        _revokeRole(_role, _tokenAddress, _tokenId, msg.sender, _grantee);
+    }
+
+    function revokeRoleFrom(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _revoker,
+        address _grantee
+    ) external override {
+        require(isRoleApprovedForAll(_revoker, msg.sender, _tokenAddress) || getApprovedRole(_revoker, _tokenAddress, _tokenId, msg.sender), "RolesRegistry: sender must be approved");
+        _revokeRole(_role, _tokenAddress, _tokenId, _revoker, _grantee);
+    }
+
+    function _revokeRole(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee
+    ) internal {
+        delete roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role];
+        delete lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role];
+        emit RoleRevoked(_grantor, _role, _tokenAddress, _tokenId, _grantee); // TODO: We should change event to receive grantor as parameter
     }
 
     function hasRole(
@@ -86,39 +131,9 @@ contract ERC7432 is IERC7432 {
         return interfaceId == type(IERC7432).interfaceId;
     }
 
-    function grantRoleFrom(
-        bytes32 _role,
-        address _tokenAddress,
-        uint256 _tokenId,
-        address _grantor,
-        address _grantee,
-        uint64 _expirationDate,
-        bytes calldata _data
-    ) external override validExpirationDate(_expirationDate) {
-        require(tokenApprovals[_grantor][_tokenAddress][_tokenId][msg.sender] || operatorApprovals[_grantor][_tokenAddress][msg.sender], "RolesRegistry: sender must be approved");
-
-        roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
-        lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
-        emit RoleGranted(_grantor, _role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data); // TODO: We should change event to receive grantor as parameter
-    }
-
-    function revokeRoleFrom(
-        bytes32 _role,
-        address _tokenAddress,
-        uint256 _tokenId,
-        address _grantor,
-        address _grantee
-    ) external override {
-        require(tokenApprovals[_grantor][_tokenAddress][_tokenId][msg.sender] || operatorApprovals[_grantor][_tokenAddress][msg.sender], "RolesRegistry: sender must be approved");
-        
-        delete roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role];
-        delete lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role];
-        emit RoleRevoked(_grantor, _role, _tokenAddress, _tokenId, _grantee); // TODO: We should change event to receive grantor as parameter
-    }
-
     function setRoleApprovalForAll(
-        address _operator,
         address _tokenAddress,
+        address _operator,
         bool _isApproved
     ) external override {
         operatorApprovals[msg.sender][_tokenAddress][_operator] = _isApproved;
@@ -135,20 +150,20 @@ contract ERC7432 is IERC7432 {
         emit RoleApproval(msg.sender, _tokenAddress, _tokenId, _operator, _approved);
     }
 
-    function getApprovedRole(
-        address _grantor,
+    function isRoleApprovedForAll(
         address _tokenAddress,
-        uint256 _tokenId,
+        address _grantor,
         address _operator
-    ) external view override returns (bool) {
-        return tokenApprovals[_grantor][_tokenAddress][_tokenId][_operator];
+    ) public view override returns (bool) {
+        return operatorApprovals[_grantor][_tokenAddress][_operator];
     }
 
-    function isRoleApprovedForAll(
+    function getApprovedRole(
+        address _tokenAddress,
+        uint256 _tokenId,
         address _grantor,
-        address _operator,
-        address _tokenAddress
-    ) external view override returns (bool) {
-        return operatorApprovals[_grantor][_tokenAddress][_operator];
+        address _operator
+    ) public view override returns (bool) {
+        return tokenApprovals[_grantor][_tokenAddress][_tokenId][_operator];
     }
 }
