@@ -22,9 +22,8 @@ For Ethereum implementers, EIPs are a convenient way to track the progress of th
 There are three types of EIP:
 
 - A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
-  - **Core**: improvements to the [Execution Layer](https://github.com/ethereum/execution-specs) (e.g. [EIP-1559](./eip-1559.md)), [Consensus Layer](https://github.com/ethereum/consensus-specs) (e.g. [EIP-3675](./eip-3675.md)), or [devp2p](https://github.com/ethereum/devp2p) (e.g. [EIP-2481](./eip-2481.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (e.g. [EIP-90](./eip-90.md)). 
-  - **Interface**: includes improvements around language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html).
-  - **ERC**: application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
+  - **Core**: Proposals that focus on the foundational layers of the Ethereum network, including the Execution, Consensus, and Networking layers. These proposals encompass enhancements, maintenance, and changes that may or may not be consensus-critical but are pertinent to the ongoing development and stability of the Ethereum core infrastructure. This category includes, but is not limited to, improvements to the way transactions are processed, consensus mechanisms, and node-to-node networking protocols.
+  - **ERC**: Proposals that establish standards and interfaces for the broader Ethereum ecosystem, whether or not they interact directly with the Ethereum network. This includes guidelines for dApps, wallets, JSON-RPC interfaces, contract standards, naming conventions, URI schemes, and other tools or protocols that developers and users might utilize within the Ethereum environment.
 
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
 
@@ -133,7 +132,7 @@ Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style
 
 `type`: *One of `Standards Track`, `Meta`, or `Informational`*
 
-`category`: *One of `Core`, `Interface`, or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
+`category`: *One of `Core` or `ERC`* (Optional field, only needed for `Standards Track` EIPs)
 
 `created`: *Date the EIP was created on*
 
@@ -175,7 +174,7 @@ The preferred discussion URL is a topic on [Ethereum Magicians](https://ethereum
 
 ### `type` header
 
-The `type` header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core, interface, or ERC).
+The `type` header specifies the type of EIP: Standards Track, Meta, or Informational. If the track is Standards please include the subcategory (core or ERC).
 
 ### `category` header
 
