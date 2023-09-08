@@ -28,6 +28,7 @@ contract ERC7432 is IERC7432 {
     ) external {
         _grantRole(_role, _tokenAddress, _tokenId, msg.sender, _grantee, _expirationDate, _data);
     }
+
     function grantRoleFrom(
         bytes32 _role,
         address _tokenAddress,
