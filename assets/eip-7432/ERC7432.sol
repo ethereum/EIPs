@@ -53,7 +53,7 @@ contract ERC7432 is IERC7432 {
     ) internal validExpirationDate(_expirationDate) {
         roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
         lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
-        emit RoleGranted(_grantor, _role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data); // TODO: We should change event to receive grantor as parameter
+        emit RoleGranted(_grantor, _role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data);
     }
 
     function revokeRole(bytes32 _role, address _tokenAddress, uint256 _tokenId, address _grantee) external {
@@ -80,7 +80,7 @@ contract ERC7432 is IERC7432 {
     ) internal {
         delete roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role];
         delete lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role];
-        emit RoleRevoked(_grantor, _role, _tokenAddress, _tokenId, _grantee); // TODO: We should change event to receive grantor as parameter
+        emit RoleRevoked(_grantor, _role, _tokenAddress, _tokenId, _grantee);
     }
 
     function hasRole(
