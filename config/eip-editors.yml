@@ -16,11 +16,6 @@ erc:
   - SamWilsn
   - Pandapip1
   - xinbenlv
-interface:
-  - lightclient
-  - axic
-  - SamWilsn
-  - Pandapip1
 meta:
   - lightclient
   - axic
