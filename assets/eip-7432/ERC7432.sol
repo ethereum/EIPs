@@ -11,10 +11,25 @@ contract ERC7432 is IERC7432 {
         public roleAssignments;
 
     // grantor => tokenAddress => tokenId => role => grantee
-    mapping(address => mapping(address => mapping(uint256 => mapping(bytes32 => address)))) public lastRoleAssignment;
+    mapping(address => mapping(address => mapping(uint256 => mapping(bytes32 => address)))) public latestGrantee;
+
+    // grantor => tokenAddress => tokenId => operator => isApproved
+    mapping(address => mapping(address => mapping(uint256 => mapping(address => bool)))) public tokenIdApprovals;
+
+    // grantor => operator => tokenAddress => isApproved
+    mapping(address => mapping(address => mapping(address => bool))) public tokenApprovals;
 
     modifier validExpirationDate(uint64 _expirationDate) {
         require(_expirationDate > block.timestamp, "ERC7432: expiration date must be in the future");
+        _;
+    }
+
+    modifier onlyApproved(address _tokenAddress, uint256 _tokenId, address _grantor) {
+        require(
+            isRoleApprovedForAll(_tokenAddress, _grantor, msg.sender) ||
+                getApprovedRole(_tokenAddress, _tokenId, _grantor, msg.sender),
+            "ERC7432: sender must be approved"
+        );
         _;
     }
 
@@ -25,16 +40,60 @@ contract ERC7432 is IERC7432 {
         address _grantee,
         uint64 _expirationDate,
         bytes calldata _data
-    ) external validExpirationDate(_expirationDate) {
-        roleAssignments[msg.sender][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
-        lastRoleAssignment[msg.sender][_tokenAddress][_tokenId][_role] = _grantee;
-        emit RoleGranted(_role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data);
+    ) external {
+        _grantRole(_role, _tokenAddress, _tokenId, msg.sender, _grantee, _expirationDate, _data);
+    }
+
+    function grantRoleFrom(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee,
+        uint64 _expirationDate,
+        bytes calldata _data
+    ) external override onlyApproved(_tokenAddress, _tokenId, _grantor) {
+        _grantRole(_role, _tokenAddress, _tokenId, _grantor, _grantee, _expirationDate, _data);
+    }
+
+    function _grantRole(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _grantee,
+        uint64 _expirationDate,
+        bytes calldata _data
+    ) internal validExpirationDate(_expirationDate) {
+        roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
+        latestGrantee[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
+        emit RoleGranted( _role, _tokenAddress, _tokenId, _grantor, _grantee, _expirationDate, _data);
     }
 
     function revokeRole(bytes32 _role, address _tokenAddress, uint256 _tokenId, address _grantee) external {
-        delete roleAssignments[msg.sender][_grantee][_tokenAddress][_tokenId][_role];
-        delete lastRoleAssignment[msg.sender][_tokenAddress][_tokenId][_role];
-        emit RoleRevoked(_role, _tokenAddress, _tokenId, _grantee);
+        _revokeRole(_role, _tokenAddress, _tokenId, msg.sender, _grantee);
+    }
+
+    function revokeRoleFrom(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _revoker,
+        address _grantee
+    ) external override onlyApproved(_tokenAddress, _tokenId, _revoker) {
+        _revokeRole(_role, _tokenAddress, _tokenId, _revoker, _grantee);
+    }
+
+    function _revokeRole(
+        bytes32 _role,
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _revoker,
+        address _grantee
+    ) internal {
+        delete roleAssignments[_revoker][_grantee][_tokenAddress][_tokenId][_role];
+        delete latestGrantee[_revoker][_tokenAddress][_tokenId][_role];
+        emit RoleRevoked(_role, _tokenAddress, _tokenId, _revoker, _grantee);
     }
 
     function hasRole(
@@ -54,10 +113,8 @@ contract ERC7432 is IERC7432 {
         address _grantor,
         address _grantee
     ) external view returns (bool) {
-        bool isValid = roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate >
+        return  latestGrantee[_grantor][_tokenAddress][_tokenId][_role] == _grantee && roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate >
             block.timestamp;
-
-        return isValid && lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] == _grantee;
     }
 
     function roleData(
@@ -86,42 +143,12 @@ contract ERC7432 is IERC7432 {
         return interfaceId == type(IERC7432).interfaceId;
     }
 
-    function grantRoleFrom(
-        bytes32 _role,
-        address _tokenAddress,
-        uint256 _tokenId,
-        address _grantor,
-        address _grantee,
-        uint64 _expirationDate,
-        bytes calldata _data
-    ) external override validExpirationDate(_expirationDate) {
-        require(tokenApprovals[_grantor][_tokenAddress][_tokenId][msg.sender] || operatorApprovals[_grantor][_tokenAddress][msg.sender], "RolesRegistry: sender must be approved");
-
-        roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
-        lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
-        emit RoleGranted(_grantor, _role, _tokenAddress, _tokenId, _grantee, _expirationDate, _data); // TODO: We should change event to receive grantor as parameter
-    }
-
-    function revokeRoleFrom(
-        bytes32 _role,
-        address _tokenAddress,
-        uint256 _tokenId,
-        address _grantor,
-        address _grantee
-    ) external override {
-        require(tokenApprovals[_grantor][_tokenAddress][_tokenId][msg.sender] || operatorApprovals[_grantor][_tokenAddress][msg.sender], "RolesRegistry: sender must be approved");
-        
-        delete roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role];
-        delete lastRoleAssignment[_grantor][_tokenAddress][_tokenId][_role];
-        emit RoleRevoked(_grantor, _role, _tokenAddress, _tokenId, _grantee); // TODO: We should change event to receive grantor as parameter
-    }
-
     function setRoleApprovalForAll(
-        address _operator,
         address _tokenAddress,
+        address _operator,
         bool _isApproved
     ) external override {
-        operatorApprovals[msg.sender][_tokenAddress][_operator] = _isApproved;
+        tokenApprovals[msg.sender][_tokenAddress][_operator] = _isApproved;
         emit RoleApprovalForAll(msg.sender, _tokenAddress, _operator, _isApproved);
     }
 
@@ -131,24 +158,24 @@ contract ERC7432 is IERC7432 {
         address _operator,
         bool _approved
     ) external override {
-        tokenApprovals[msg.sender][_tokenAddress][_tokenId][_operator] = _approved;
-        emit RoleApproval(msg.sender, _tokenAddress, _tokenId, _operator, _approved);
-    }
-
-    function getApprovedRole(
-        address _grantor,
-        address _tokenAddress,
-        uint256 _tokenId,
-        address _operator
-    ) external view override returns (bool) {
-        return tokenApprovals[_grantor][_tokenAddress][_tokenId][_operator];
+        tokenIdApprovals[msg.sender][_tokenAddress][_tokenId][_operator] = _approved;
+        emit RoleApproval( _tokenAddress, _tokenId, msg.sender, _operator, _approved);
     }
 
     function isRoleApprovedForAll(
+        address _tokenAddress,
         address _grantor,
-        address _operator,
-        address _tokenAddress
-    ) external view override returns (bool) {
-        return operatorApprovals[_grantor][_tokenAddress][_operator];
+        address _operator
+    ) public view override returns (bool) {
+        return tokenApprovals[_grantor][_tokenAddress][_operator];
+    }
+
+    function getApprovedRole(
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _grantor,
+        address _operator
+    ) public view override returns (bool) {
+        return tokenIdApprovals[_grantor][_tokenAddress][_tokenId][_operator];
     }
 }
