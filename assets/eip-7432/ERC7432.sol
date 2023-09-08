@@ -11,7 +11,7 @@ contract ERC7432 is IERC7432 {
         public roleAssignments;
 
     // grantor => tokenAddress => tokenId => role => grantee
-    mapping(address => mapping(address => mapping(uint256 => mapping(bytes32 => address)))) public latestGrantee;
+    mapping(address => mapping(address => mapping(uint256 => mapping(bytes32 => address)))) public latestGrantees;
 
     // grantor => tokenAddress => tokenId => operator => isApproved
     mapping(address => mapping(address => mapping(uint256 => mapping(address => bool)))) public tokenIdApprovals;
@@ -66,7 +66,7 @@ contract ERC7432 is IERC7432 {
         bytes calldata _data
     ) internal validExpirationDate(_expirationDate) {
         roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role] = RoleData(_expirationDate, _data);
-        latestGrantee[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
+        latestGrantees[_grantor][_tokenAddress][_tokenId][_role] = _grantee;
         emit RoleGranted( _role, _tokenAddress, _tokenId, _grantor, _grantee, _expirationDate, _data);
     }
 
@@ -92,7 +92,7 @@ contract ERC7432 is IERC7432 {
         address _grantee
     ) internal {
         delete roleAssignments[_revoker][_grantee][_tokenAddress][_tokenId][_role];
-        delete latestGrantee[_revoker][_tokenAddress][_tokenId][_role];
+        delete latestGrantees[_revoker][_tokenAddress][_tokenId][_role];
         emit RoleRevoked(_role, _tokenAddress, _tokenId, _revoker, _grantee);
     }
 
@@ -113,7 +113,7 @@ contract ERC7432 is IERC7432 {
         address _grantor,
         address _grantee
     ) external view returns (bool) {
-        return  latestGrantee[_grantor][_tokenAddress][_tokenId][_role] == _grantee && roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate >
+        return  latestGrantees[_grantor][_tokenAddress][_tokenId][_role] == _grantee && roleAssignments[_grantor][_grantee][_tokenAddress][_tokenId][_role].expirationDate >
             block.timestamp;
     }
 
@@ -149,7 +149,7 @@ contract ERC7432 is IERC7432 {
         bool _isApproved
     ) external override {
         tokenApprovals[msg.sender][_tokenAddress][_operator] = _isApproved;
-        emit RoleApprovalForAll(msg.sender, _tokenAddress, _operator, _isApproved);
+        emit RoleApprovalForAll(_tokenAddress, _operator, _isApproved);
     }
 
     function approveRole(
@@ -159,7 +159,7 @@ contract ERC7432 is IERC7432 {
         bool _approved
     ) external override {
         tokenIdApprovals[msg.sender][_tokenAddress][_tokenId][_operator] = _approved;
-        emit RoleApproval( _tokenAddress, _tokenId, msg.sender, _operator, _approved);
+        emit RoleApproval( _tokenAddress, _tokenId, _operator, _approved);
     }
 
     function isRoleApprovedForAll(
