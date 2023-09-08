@@ -50,12 +50,10 @@ interface IERC7432 is IERC165 {
 
     /// @notice Emitted when a user is approved to manage any role on behalf of another user.
     /// @param _tokenAddress The token address.
-    /// @param _approver The user approving the operator.
     /// @param _operator The user approved to grant and revoke roles.
     /// @param _isApproved The approval status.
     event RoleApprovalForAll(
         address indexed _tokenAddress,
-        address indexed _approver,
         address indexed _operator,
         bool _isApproved
     );
@@ -63,13 +61,11 @@ interface IERC7432 is IERC165 {
     /// @notice Emitted when a user is approved to manage the roles of an NFT on behalf of another user.
     /// @param _tokenAddress The token address.
     /// @param _tokenId The token identifier.
-    /// @param _approver The user approving the operator.
     /// @param _operator The user approved to grant and revoke roles.
     /// @param _isApproved The approval status.
     event RoleApproval(
         address indexed _tokenAddress,
         uint256 indexed _tokenId,
-        address indexed _approver,
         address _operator,
         bool _isApproved
     );
