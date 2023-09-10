@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 7515
 title: NFT Alternative Text in Metadata
 description: Populate alternative text field in NFT Metadata with image description for screen reader.
 author: Mona Rassouli (@DecoratedWings)
@@ -8,10 +8,6 @@ status: Draft
 type: Informational
 created: 2023-08-15
 ---
-
-## Simple Summary
-
-Best Practice recommendation for including an `alt` field within NFT metadata for screen reader accessibility. 
 
 ## Abstract
 
