@@ -1,5 +1,5 @@
 ---
-# eip: TBD
+eip: TBD
 title: NFT Alternative Text in Metadata
 description: Populate alternative text field in NFT Metadata with image description for screen reader.
 author: Mona Rassouli (@DecoratedWings)
@@ -68,8 +68,9 @@ While this EIP does not introduce a protocol-level change to existing ERC standa
 
 * For NFTs that have already been minted but possess non-frozen (modifiable) metadata, updates can be made to introduce or adjust the alternative text as deemed appropriate.
 
+## Test Cases
 
-## Best Practices For Alternative Text
+### Best Practices For Alternative Text
 
 The guidelines below are derived from the established Web Content Accessibility Guide (WCAG) standards.
 
@@ -89,16 +90,17 @@ The guidelines below are derived from the established Web Content Accessibility 
 
 8. <b>Human Review</b>: Always have the content reviewed to ensure its accuracy.
 
+### Note On Audio or Video Content
+* While this EIP centers on alternative text for static images, the significance of captions for video or music-based NFTs should not be overlooked. It's crucial to adhere to captioning best practices for such content.
+
+* When applicable, captions should be embedded directly within the video or music content, separate from the metadata. Refer to WCAG for comprehensive guidelines and resources on proper captioning.
+
 ## Security Considerations
 
 A primary concern is cross-site scripting (XSS) since the process involves fetching and displaying text. Some frameworks, like React, mitigate this risk by default through automatic content escaping. To bolster security, implement proper XSS mitigation strategies, which include both sanitizing input and escaping output.
 
 
 It is worth noting that this potential vulnerability isn't limited to alternative text but extends to any text data sourced from metadata.
-
-## Note on Audio Content
-
-While this EIP centers on alternative text for static images, the significance of captions for video or music-based NFTs should not be overlooked. It's crucial to adhere to captioning best practices for such content. When applicable, captions should be embedded directly within the video or music content, separate from the metadata. Refer to WCAG for comprehensive guidelines and resources on proper captioning.
 
 ## Copyright
 
