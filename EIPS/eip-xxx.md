@@ -2,7 +2,7 @@
 # eip: TBD
 title: NFT Alternative Text in Metadata
 description: Populate alternative text field in NFT Metadata with image description for screen reader.
-author: Mona Rassouli <mona@hapticsdao.com>
+author: Mona Rassouli (@DecoratedWings)
 discussions-to: https://ethereum-magicians.org/t/proposal-for-informational-eip-simple-accessibility-recommendation/14639
 status: Draft
 type: Informational
