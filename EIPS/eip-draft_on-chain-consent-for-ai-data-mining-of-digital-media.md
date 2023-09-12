@@ -1,0 +1,112 @@
+---
+eip: TBD
+title: On-Chain Consent for AI Data Mining of Digital Media
+description: Bridging the gap between AI workflows and digital asset permissions through a unified blockchain standard.
+author: Bofu Chen (@bafu), Tammy Yang (@tammyyang)
+discussions-to: https://ethereum-magicians.org/t/<subject>/9999
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-09-12
+---
+
+## Abstract
+
+This EIP proposes a standardized approach to declaring mining preferences for digital media assets on the EVM-compatible blockchains. This extends digital media metadata standards like ERC-7053 and NFT metadata standards like ERC-721 and ERC-1155, allowing asset creators to specify how their assets are used in data mining, AI training, and machine learning workflows.
+
+## Motivation
+
+As digital assets become increasingly utilized in AI and machine learning workflows, it is critical that the rights and preferences of asset creators and license owners are respected, and the AI/ML creators can check and collect data easily and safely. This proposal aims to create a standardized method of declaring these preferences, giving the creators on both sides of AI/ML can communicate data utilization and build a sustainable data mining and AI/ML environment.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+This EIP introduces a new property, `miningPreference`, to the metadata standards which signify the choices made by the asset creators or license owners regarding the suitability of their asset for inclusion in data mining or AI/ML training workflows. miningPreference is an array that can include one or more specific conditions.
+
+* `dataMining`: Allow the asset to be used in data mining for determining "patterns, trends, and correlations".
+* `aiInference`: Allow the asset to be used as input to a trained AI/ML model for inferring a result.
+* `aiGenerativeTraining`: Allow the asset to be used as training data for an AI/ML model that could produce derivative assets.
+* `aiGenerativeTrainingWithAuthorship`: Same as `aiGenerativeTraining`, but requires that the authorship is disclosed.
+* `aiTraining`: Allow the asset to be used as training data for generative and non-generative AI/ML models.
+* `aiTrainingWithAuthorship`: Same as `aiTraining`, but requires that the authorship is disclosed.
+
+### Schema
+
+```json
+{
+    "type": "object",
+    "properties": {
+        "allowed": {
+            "enum": [ "dataMining", "aiTraining", "aiTrainingWithAuthorship", "aiGenerativeTraining", "aiGenerativeTrainingWithAuthorship", "aiInference" ],
+            "description": "The asset may be used for training an AI/ML model or mined for its data (or both)."
+        },
+        "constrainted": {
+            "enum": [ "dataMining", "aiTraining", "aiTrainingWithAuthorship", "aiGenerativeTraining", "aiGenerativeTrainingWithAuthorship", "aiInference" ],
+            "description": "The asset may be used for training an AI/ML model or mined for its data (or both) followed the license."
+        },
+        "notAllowed": {
+            "enum": [ "dataMining", "aiTraining", "aiTrainingWithAuthorship", "aiGenerativeTraining", "aiGenerativeTrainingWithAuthorship", "aiInference" ],
+            "description": "The asset may not be used for training an AI/ML model or mined for its data (or both)."
+        }
+    },
+    "required": [ "allowed", "constrainted", "notAllowed" ]
+}
+```
+
+### Examples
+
+The mining preference example for not allowing generative AI training:
+
+```json
+{
+    "miningPreference": {
+        "allowed": [ "dataMining", "aiTrainingWithAuthorship", "aiInference" ],
+        "contrained": [],
+        "notAllowed": [ "aiGenerativeTraining" ]
+    }
+}
+```
+
+The mining preference example for only allowing for AI inference:
+
+```json
+{
+    "miningPreference": {
+        "allowed": [ "aiInference" ],
+        "contrained": [],
+        "notAllowed": [ "aiTraining", "aiGenerativeTraining" ]
+    }
+}
+```
+
+The mining preference example for allowing generative AI training if mentioning authorship and follow license:
+
+```json
+{
+    "miningPreference": {
+        "allowed": [ "dataMining", "aiTrainingWithAuthorship", "aiInference" ],
+        "contrained": [ "aiGenerativeTrainingWithAuthorship" ],
+        "notAllowed": []
+    }
+}
+```
+
+## Rationale
+
+The introduction of the `miningPreference` property in digital asset metadata covers the considerations including
+
+Accessibility: A clear and easily accessible method with human-readibility and machine-readibility for digital asset creators and license owners to express their preferences for how their assets are used in data mining and AI/ML training workflows. The AI/ML creators can check and collect data systematically.
+Adoption: To leverage the transparent metadata registration and representation EIPs, and the industrial metadata standards including C2PA (Coalation for Content Provenance and Authenticity).
+
+## Security Considerations
+
+When adopting this EIP, it’s essential to address several security aspects to ensure the safety and integrity of adoption:
+
+* Data Integrity: Since this EIP facilitates the declaration of mining preferences for digital media assets, the integrity of the data should be assured. Any tampering with the miningPreference property can lead to unauthorized data mining usage. Blockchain's immutability will play a significant role here, but additional security layers, such as cryptographic signatures, can further ensure data integrity.
+* Verifiable Authenticity: Ensure that the individual or entity setting the miningPreference is the legitimate owner or authorized representative of the digital asset. Unauthorized changes to preferences can lead to data misuse. Cross-checking asset provenance and ownership becomes paramount. Services or smart contracts should be implemented to verify the authenticity of assets before trusting the miningPreference.
+* Data Privacy: Ensure that the process of recording preferences doesn't inadvertently expose sensitive information about the asset creators or owners. Although the Ethereum blockchain is public, careful consideration is required to ensure no unintended data leakage.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
