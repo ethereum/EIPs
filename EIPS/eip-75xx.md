@@ -1,4 +1,5 @@
 ---
+eip: 7516
 title: BLOBBASEFEE opcode
 description: Opcode that returns the current data-blob base-fee
 author: Carl Beekhuizen (@carlbeek)
