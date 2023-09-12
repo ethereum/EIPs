@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import { expect } from 'chai'
-import { increaseTime } from './helpers/time'
+import { time } from '@nomicfoundation/hardhat-network-helpers'
 // typechain
 import {
   ERC20Mock__factory,
@@ -56,7 +56,7 @@ describe('LinearVestingNFT', function () {
     // TODO: More extensive testing of linear vesting functionality
     const totalPayout = await linearVestingNFT.vestedPayoutAtTime(0, unlockTime)
     expect(await linearVestingNFT.vestedPayout(0)).to.equal(0)
-    await increaseTime(testValues.totalLock)
+    await time.increase(testValues.totalLock)
     expect(await linearVestingNFT.vestedPayout(0)).to.equal(totalPayout)
   })
 
