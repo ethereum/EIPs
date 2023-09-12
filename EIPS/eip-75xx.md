@@ -1,8 +1,8 @@
 ---
-eip: 75xx
 title: BLOBBASEFEE opcode
+description: Opcode that returns the current data-blob base-fee
 author: Carl Beekhuizen (@carlbeek)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-75xx-blobbasefee/15761
 status: Draft
 type: Standards Track
 category: Core
@@ -10,13 +10,9 @@ created: 2023-09-11
 requires: 3198, 4844
 ---
 
-## Simple Summary
-
-Adds an opcode that gives the EVM access to the block's blob base-fee.
-
 ## Abstract
 
-Add a `BLOBBASEFEE (0x49)` that returns the value of the blob base-fee of the current block it is executing in. It is the identical to EIP-3198 (`BASEFEE` opcode) except that it returns the blob base-fee as per EIP-4844.
+Add a `BLOBBASEFEE (0x49)` that returns the value of the blob base-fee of the current block it is executing in. It is the identical to [EIP-3198](./eip-3198.md) (`BASEFEE` opcode) except that it returns the blob base-fee as per [EIP-4844](./eip-4844.md).
 
 ## Motivation
 
@@ -38,7 +34,7 @@ Add a `BLOBBASEFEE` opcode at `(0x49)`, with gas cost `G_base`.
 ### Gas cost
 
 The value of the blob base-fee is needed to process data-blob transactions. That means its value is already available before running the EVM code.
-The opcode does not add extra complexity and additional read/write operations, hence the choice of `G_base` gas cost. This is also identical to EIP-3198 (`BASEFEE` opcode)'s cost and it does the same thing.
+The opcode does not add extra complexity and additional read/write operations, hence the choice of `G_base` gas cost. This is also identical to [EIP-3198](./eip-3198.md) (`BASEFEE` opcode)'s cost as it just makes available data that is in the header.
 
 ## Backwards Compatibility
 
