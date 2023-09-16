@@ -1,4 +1,5 @@
 ---
+eip: TBD
 title: Atomic Storage Operations - SCREDIT and SDEBIT
 description: Add atomic operations for incrementing and decrementing storage slots
 author: Danno Ferrin (@shemnon)
