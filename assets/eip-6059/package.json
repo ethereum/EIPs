@@ -10,7 +10,7 @@
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@openzeppelin/test-helpers": "^0.5.15",
     "@primitivefi/hardhat-dodoc": "^0.2.3",
-    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/ethers-v5": "^11.1.1",
     "@typechain/hardhat": "^8.0.3",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^10.0.1",
