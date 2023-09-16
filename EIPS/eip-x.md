@@ -155,12 +155,20 @@ Keeping the cost the same makes implementations of gas charging vert simple.
 
 This most important use case fot this EIP asset balances and not general
 concurrency controls. Hence, only enabling credit and debit operations on
-storage
-slots (which persist across transactions). Parallel execution within a
+storage slots (which persist across transactions). Parallel execution within a
 transaction and more generic tools like locks and semaphores have very limited
 utility within this scope. The lack of in-transaction parallel execution also
 precludes the use of such primitives against transient storage (as define in
 [EIP-1153](./eip-1153.md)).
+
+### Opcode Instead of System Contract
+
+One alternative, particularly viable for Layer 2 chains, would be to implement
+SCREDIT and SDEBIT as system contracts. The primary objection to system
+contracts for other operations is the gas cost overhead of constructing a call.
+Because a SSTORE is always greater than the cost of a call it would be possible
+to build in a discount. However, there is no such accomodation that can be made
+for the code size needed to invoke such a call.
 
 ## Backwards Compatibility
 
