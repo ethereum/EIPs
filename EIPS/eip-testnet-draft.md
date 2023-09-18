@@ -3,7 +3,7 @@ eip: TBD
 title: Automatically Reset Tesnet
 description: A testnet network that periodically rolls back to genesis
 author: Mário Havel (@taxmeifyoucan), pk910 (@pk910), Rémy Roy (@remyroy)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/automatically-reset-testnet/15825
 status: Draft
 type: Standards Track
 category: Core
