@@ -4,13 +4,13 @@ pragma solidity 0.8.9;
 
 import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
-
 /// @title ERC-7432 Non-Fungible Token Roles
 /// @dev See https://eips.ethereum.org/EIPS/eip-7432
-/// Note: the ERC-165 identifier for this interface is 0xd7e151ef.
+/// Note: the ERC-165 identifier for this interface is 0x25be10b2.
 interface IERC7432 is IERC165 {
     struct RoleData {
         uint64 expirationDate;
+        bool revocable;
         bytes data;
     }
 
@@ -23,6 +23,7 @@ interface IERC7432 is IERC165 {
     /// @param _grantor The user assigning the role.
     /// @param _grantee The user receiving the role.
     /// @param _expirationDate The expiration date of the role.
+    /// @param _revocable Whether the role is revocable or not.
     /// @param _data Any additional data about the role.
     event RoleGranted(
         bytes32 indexed _role,
@@ -31,6 +32,7 @@ interface IERC7432 is IERC165 {
         address _grantor,
         address _grantee,
         uint64 _expirationDate,
+        bool _revocable,
         bytes _data
     );
 
@@ -78,6 +80,7 @@ interface IERC7432 is IERC165 {
     /// @param _tokenId The token identifier.
     /// @param _grantee The user receiving the role.
     /// @param _expirationDate The expiration date of the role.
+    /// @param _revocable Whether the role is revocable or not.
     /// @param _data Any additional data about the role.
     function grantRole(
         bytes32 _role,
@@ -85,6 +88,7 @@ interface IERC7432 is IERC165 {
         uint256 _tokenId,
         address _grantee,
         uint64 _expirationDate,
+        bool _revocable,
         bytes calldata _data
     ) external;
 
@@ -107,6 +111,7 @@ interface IERC7432 is IERC165 {
     /// @param _grantor The user assigning the role.
     /// @param _grantee The user that receives the role.
     /// @param _expirationDate The expiration date of the role.
+    /// @param _revocable Whether the role is revocable or not.
     /// @param _data Any additional data about the role.
     function grantRoleFrom(
         bytes32 _role,
@@ -115,6 +120,7 @@ interface IERC7432 is IERC165 {
         address _grantor,
         address _grantee,
         uint64 _expirationDate,
+        bool _revocable,
         bytes calldata _data
     ) external;
 
@@ -233,5 +239,4 @@ interface IERC7432 is IERC165 {
         address _grantor,
         address _operator
     ) external view returns (bool);
-
 }
