@@ -15,7 +15,7 @@ contract ERC7432 is IERC7432 {
     // grantor => tokenAddress => tokenId => operator => isApproved
     mapping(address => mapping(address => mapping(uint256 => mapping(address => bool)))) public tokenIdApprovals;
 
-    // grantor => operator => tokenAddress => isApproved
+    // grantor => tokenAddress => operator => isApproved
     mapping(address => mapping(address => mapping(address => bool))) public tokenApprovals;
 
     modifier validExpirationDate(uint64 _expirationDate) {
