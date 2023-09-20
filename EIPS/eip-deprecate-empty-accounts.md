@@ -25,6 +25,8 @@ By prohibiting empty accounts on post-merge networks, this EIP frees designers a
 
 ### Specification
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
 An empty account is an account with has **no code** and **zero nonce** and **zero balance**. This is the same as the definition in [EIP-161](./eip-161.md).
 
 On networks that undergo the merge transition, the pre state of the merge block may not contain any empty accounts. For networks that are merged at genesis, none of the genesis accounts may be empty accounts.
@@ -54,3 +56,7 @@ As EIP does not change any behaviour that can occur outside the testsuite, it ha
 ### Security Considerations
 
 The validity of this EIP is dependent on the assertion that all empty accounts on Ethereum Mainnet were cleared prior to the merge. This should be subject to appropriate verification.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
