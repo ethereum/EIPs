@@ -36,12 +36,12 @@ contract ERC7254 is ERC20 {
     event UpdateReward(address indexed contributor, uint256 value);
 
     /**
-    * @dev Emitted when `value` tokens reward to
+    * @dev Emitted when `value` tokens reward to another (`to`) from caller
     * `caller`.
     *
     * Note that `value` may be zero.
     */
-    event GetReward(address indexed owner, uint256 value);
+    event GetReward(address indexed owner, address indexed to, uint256 value);
 
     /**
     * @dev Emitted when `token` tokens reward is added.
@@ -127,36 +127,36 @@ contract ERC7254 is ERC20 {
     *
     * Emits a {UpdateReward} event.
     */
-    function updateReward(address[] memory token, uint256[] memory amount) public virtual {
+    function updateReward(address[] memory token, uint256[] memory amount) public virtual {   
         require(token.length == amount.length, "ERC7254: token and amount length mismatch");
         address owner = _msgSender();
         if(totalSupply() != 0){
             for( uint256 i = 0; i < token.length; ++i){
                 require(isTokenReward[token[i]], "ERC7254: token reward is not approved");
                 IERC20(token[i]).transferFrom(owner, address(this), amount[i]);
-                rewardPerShare[token[i]] = rewardPerShare[token[i]] + amount[i] * MAX / totalSupply();
+                _updateRewardPerShare(token[i], amount[i]);
                 emit UpdateReward(owner, amount[i]);
             }
             
-        }      
+        }    
     }
 
     /**
-    * @dev Moves reward to caller.
+    * @dev Moves reward to another (`to`) from caller.
     *
     *
     * Emits a {GetReward} event.
     */
-    function getReward(address[] memory token) public virtual {
+    function getReward(address[] memory token, address to) public virtual {
         address owner = _msgSender();
         for( uint256 i = 0; i < token.length; ++i){
             UserInformation storage user = userInformation[token[i]][owner];
             uint256 reward =  balanceOf(owner) * rewardPerShare[token[i]] + user.inReward - user.withdraw - user.outReward;
-            _withdraw(token[i],owner, reward);
+            _withdraw(token[i], owner, reward);
             if(reward / MAX > 0){
-                IERC20(token[i]).transfer(owner, reward / MAX);
+                IERC20(token[i]).transfer(to, reward / MAX);
             }  
-            emit GetReward(owner, reward);
+            emit GetReward(owner, to, reward);
         }
     }
 
@@ -191,6 +191,16 @@ contract ERC7254 is ERC20 {
         require(owner != address(0), "ERC7254: withdraw from the zero address");
         UserInformation storage user = userInformation[token][owner];
         user.withdraw += reward;
+    }
+
+    /**
+    * @dev Update reward per share.
+    *
+    */
+    function _updateRewardPerShare(address token, uint256 amount) internal virtual {
+        require(token != address(0), "ERC7254: token the zero address");
+        require(totalSupply() != 0, "ERC7254: totalSupply is zero");
+        rewardPerShare[token] = rewardPerShare[token] + amount * MAX / totalSupply();
     }
 
     /**

@@ -1,4 +1,4 @@
- // SPDX-License-Identifier: CC0-1.0
+ // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -34,12 +34,11 @@ interface IERC7254 {
     event UpdateReward(address indexed contributor, uint256 value);
 
     /**
-     * @dev Emitted when `value` tokens reward to
-     * `caller`.
+     * @dev Emitted when `value` tokens reward to another (`to`).
      *
      * Note that `value` may be zero.
      */
-    event GetReward(address indexed owner, uint256 value);
+    event GetReward(address indexed owner, address indexed to, uint256 value);
 
     /**
     * @dev Emitted when `token` tokens reward is added.
@@ -144,9 +143,9 @@ interface IERC7254 {
     function viewReward(address account) external returns (uint256[] memory);
 
     /**
-     * @dev Moves reward to caller.
+     * @dev Moves reward to another (`to`) from caller.
      *
      * Emits a {GetReward} event.
      */
-    function getReward(address[] memory token) external;
+    function getReward(address[] memory token, address to) external;
 }
