@@ -44,34 +44,34 @@ contract AttributesRepository is IERC7508 {
             "setAddressAttribute(address collection,uint256 tokenId,string memory key,address value)"
         );
 
-    mapping(address => mapping(uint256 => AccessType))
+    mapping(address collection => mapping(uint256 keyId => AccessType accessType))
         private _parameterAccessType;
-    mapping(address => mapping(uint256 => address))
+    mapping(address collection => mapping(uint256 keyId => address specificAddress))
         private _parameterSpecificAddress;
-    mapping(address => IssuerSetting) private _issuerSettings;
-    mapping(address => mapping(address => bool)) private _collaborators;
+    mapping(address collection => IssuerSetting issuerSetting) private _issuerSettings;
+    mapping(address collection => mapping(address collaborator => bool isCollaborator)) private _collaborators;
 
     // For keys, we use a mapping from strings to IDs.
     // The purpose is to store unique string keys only once, since they are more expensive.
-    mapping(string => uint256) private _keysToIds;
+    mapping(string key => uint256 keyId) private _keysToIds;
     uint256 private _totalAttributes;
 
     // For strings, we also use a mapping from strings to IDs, together with a reverse mapping
     // The purpose is to store unique string values only once, since they are more expensive,
     // and storing only IDs.
-    mapping(address => uint256) private _totalStringValues;
-    mapping(address => mapping(string => uint256)) private _stringValueToId;
-    mapping(address => mapping(uint256 => string)) private _stringIdToValue;
-    mapping(address => mapping(uint256 => mapping(uint256 => uint256)))
+    mapping(address collection => uint256 numberOfStringValues) private _totalStringValues;
+    mapping(address collection => mapping(string stringValue => uint256 stringId)) private _stringValueToId;
+    mapping(address collection => mapping(uint256 stringId => string stringValue)) private _stringIdToValue;
+    mapping(address collection => mapping(uint256 tokenId => mapping(uint256 stringKeyId => uint256 stringValueId)))
         private _stringValueIds;
 
-    mapping(address => mapping(uint256 => mapping(uint256 => address)))
+    mapping(address collection => mapping(uint256 tokenId => mapping(uint256 addressKeyId => address addressValue)))
         private _addressValues;
-    mapping(address => mapping(uint256 => mapping(uint256 => bytes)))
+    mapping(address collection => mapping(uint256 tokenId => mapping(uint256 bytesKeyId => bytes bytesValue)))
         private _bytesValues;
-    mapping(address => mapping(uint256 => mapping(uint256 => uint256)))
+    mapping(address collection => mapping(uint256 tokenId => mapping(uint256 uintKeyId => uint256 uintValue)))
         private _uintValues;
-    mapping(address => mapping(uint256 => mapping(uint256 => bool)))
+    mapping(address collection => mapping(uint256 tokenId => mapping(uint256 boolKeyId => bool boolValue)))
         private _boolValues;
 
     struct IssuerSetting {
