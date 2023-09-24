@@ -1,8 +1,8 @@
 ---
 eip: 9001
-title: PLUME: Pseudonymously Linked Unique Message Entities
+title: Pseudonymously Linked Unique Message Entities (PLUME) Signature in Wallets 
 description: A new signature scheme for existing Ethereum keypairs that allows for anonymous "nullifiers" to enable unique anonymity and ideas like zk voting.
-author: Yush G (@yush_g), Kobi Gurkan (@kobigurk), Richard Liu (@richardyliu), Vivek Bhupatiraju (@viv_boop), Barry Whitehat (@barrywhitehat) 
+author: Yush G (@yush_g) <Divide-By-0>, Kobi Gurkan (@kobigurk), Richard Liu (@richardyliu), Vivek Bhupatiraju (@viv_boop), Barry Whitehat (@barrywhitehat) 
 discussions-to: https://ethereum-magicians.org/
 status: Draft
 type: Standards Track
@@ -13,36 +13,34 @@ requires:
 
 ## Abstract
 
-*Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.*
+<!-- *Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.* -->
 
 ZK-SNARKs have enabled ideation for new identity applications based on anonymous proof-of-ownership. One of the primary technologies that would enable the jump from existing apps to systems that require anonymous uniqueness is the development of verifiably deterministic signatures. Because we are on ECDSA, there is no way right now for someone to verify that a signature is generated deterministically, even with ‘deterministic’ ECDSA signatures: a ZK-SNARK proof would need someone’s private key to do so, and some hardware wallets do not even allow viewing of a private key. Broadly, we don’t want to export/copy-paste the private key into a SNARK to be an intended user behavior, and most hardware wallets will not be able to run SNARK arithmetization inside a secure enclave for existing schemes (and nor do we want to standardize an entire proof system inside a wallet right now when they emerge and evolve almost every year). Thus we are left to select a new algorithm. 
 
-One specific example of how such a signature can lead to unique pseudonymity is that we prove it was generated correctly in a ZK-SNARK that only reveals publicly the hash(signature), and the SNARK additionally proves some property the public key has (i.e. is in some anonymity set, has executed some set of actions on chain, etc). This proof is the only thing that is ever seen by other people, and so the hash(signature) can be used as a “nullifier”: a public commitment to a specific anonymous account, to forbid actions like double spending, or allow a consistent identity between anonymous actions. We aim to standardize a new verifiably deterministic signature algorithm that both uniquely identifies the keypair, and keeps the account identity secret, where verification does not require a secret key. The specific signature function is $hash(message, public key) ^ {secret key}$.
+One specific example of how such a signature can lead to unique pseudonymity is that we prove it was generated correctly in a ZK-SNARK that only reveals publicly the hash(signature), and the SNARK additionally proves some property the public key has (i.e. is in some anonymity set, has executed some set of actions on chain, etc). This proof is the only thing that is ever seen by other people, and so the hash(signature) can be used as a “nullifier”: a public commitment to a specific anonymous account, to forbid actions like double spending, or allow a consistent identity between anonymous actions. We aim to standardize a new verifiably deterministic signature algorithm that both uniquely identifies the keypair, and keeps the account identity secret, where verification does not require a secret key. The specific signature function is $hash(message, public\ key) ^ {secret\ key}$.
 
 ## Motivation
 
-*Motivation (optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.*
+<!-- *Motivation (optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.* -->
 
 - Existing ZK applications have the advantage that there is no uniqueness constraint on the provers: that is, allowing the same wallet to prove itself as a member more than once is intended. However, many applications require a maximum of one action per user, especially protocols that desire Sybil resistance. Such protocols are not natively possible on Ethereum right now without mapping each address into an opt-in mapping that also maps a user’s private key to a new system, which adds complexity, loses atomicity, and does not benefit from the rich on-chain history of Ethereum accounts.
 - Specific applications that require this tech include:
+    - zk voting, where each account in some set has one vote
     - pseudonymously claiming an airdrop like Stealthdrop
     - moderating a pseudonymous forum, where people can prove that they are the same identity elsewhere in the forum
-    - zk voting, where each account in some set has one vote
     - zk proof of solvency — if you want two exchanges to prove they know a set of private keys that hold some balance, you need a way to ensure that two exchanges aren’t both claiming the same address, while keeping it private
     
-    As such, a deterministic value based on the Ethereum account’s ECDSA keypair is a necessary component of ensuring one action per user and enables all these applications on Ethereum.
+As such, a deterministic value based on the Ethereum account’s ECDSA keypair is a necessary component of ensuring one action per user and enables all these applications on Ethereum.
     
 
 ## Specification
 
-*Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://ethereum.org/en/developers/docs/nodes-and-clients).*
-
-(Derived from [https://hackmd.io/uZQbMHrVSbOHvoI_HrJJlw](https://hackmd.io/uZQbMHrVSbOHvoI_HrJJlw))
+<!-- *Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://ethereum.org/en/developers/docs/nodes-and-clients).* -->
 
 We propose a new signature standard that offers the following properties, to be implemented for standard ECDSA keys within wallets:
 
 1. It produces signatures that contain a deterministic component and a nondeterministic component. The deterministic component may be used as a *nullifier*, as explained in Appendix I.
-2. Signers can use existing secpk256k1 keypairs, such as those in hardware wallets that support Ethereum accounts. As a consequence, secret keys can remain in secure enclaves.
+2. Signers can use existing secpk256k1 keypairs, such as those in hardware wallets that support Ethereum accounts. As a consequence, secret keys can remain in secure enclaves if there is a generator point multiplication API into the enclave (which Ledger for instance has).
 
 ### Parameters
 
@@ -52,7 +50,7 @@ We use the following notation to refer to the parameters of this curve:
 
 - $g$: the base point (also called the generator) of the curve.
 - $p$: the order of the curve.
-    - $F_p$: the finite field whose order is $p$.
+- $F_p$: the finite field whose order is $p$.
 
 Note we use exponential notation to denote elliptic curve scalar multiplications.
 
@@ -166,13 +164,14 @@ $c == \text{hash}(\text{nul}, g^r, h^r)$
 
 Due to SHA-256 being a native [precompile](https://ethereum.github.io/execution-specs/autoapi/ethereum/istanbul/vm/precompiled_contracts/sha256/index.html) on Ethereum, this operation will still be efficient for smart contract verifiers.
 
-### Version 3: TODO
+### Version 3: 
+
+There may be a more efficient V3 in the future.
 
 ## Rationale
 
-*Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.*
+<!-- *Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP. (i.e. rationalize tech decisions)* -->
 
-(i.e. rationalize tech decisions)
 
 We will define a few specific properties we are looking for in a candidate algorithm, then define a few other intuitive algorithms and explain why they don’t actually work.
 
@@ -191,36 +190,27 @@ We will define a few specific properties we are looking for in a candidate algor
     - We don’t want users copy-pasting secret keys anywhere, and we need to choose a function such that the enclave calculation is simple enough for hardware wallets.
     - Because the nullifier is non-interactive, we are able to uniquely identify the key pair without revealing the account identity.
 
-For a few possible simpler algorithm designs that were considered, see [https://blog.aayushg.com/posts/nullifier](https://blog.aayushg.com/posts/nullifier) > ‘**One address <-> one nullifier’** section. We based the final design off of BLS signatures, Chaum-Pederson EQDL, and Goh-Jarecki’s EDL paper, but to work on secp256k1. 
+For a few possible simpler algorithm designs that were considered, see [https://blog.aayushg.com/posts/nullifier](https://blog.aayushg.com/posts/nullifier) > ‘**One address <-> one nullifier’** section. We based the final design off of BLS signatures, Chaum-Pederson EQDL, and Goh-Jarecki’s EDL paper, but to work on secp256k1.
 
-## ~~Backwards Compatibility~~
-
-*~~Backwards Compatibility (optional) - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.~~*
-
-~~There are no backwards compatibility issues. There are other types of <signing schemes> that are not compatible with this one. They will not be compliant with this standard, so we expect wallets to need to implement the new signature standard inside the wallet.~~
-
-- ~~What happens if we want to change the hash function? Would that be back compatible with our existing choice?~~
-
-## ~~Test Cases~~
-
-*~~Test Cases (optional) - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.~~*
-
-~~The repository with the reference implementation contains all the test cases for this proposal.~~
 
 ## Reference Implementation
 
-*Reference Implementation (optional) - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.* This section may be omitted for all EIPs.
+<!-- *Reference Implementation (optional) - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.* This section may be omitted for all EIPs. -->
 
-The GitHub repository `plume-sig/zk-nuliifier-sig` contains the [reference implementation](https://github.com/plume-sig/zk-nullifier-sig/).
+The GitHub repository `plume-sig/zk-nuliifier-sig` contains the [reference implementation](https://github.com/plume-sig/zk-nullifier-sig/) in several languages including Rust and Javascript. There is a sample PR to Metamask Core as well.
 
 ## Security Considerations
 
-*Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the “Security Considerations” section will be rejected. An EIP cannot proceed to status “Final” without a Security Considerations discussion deemed sufficient by the reviewers.*
-
-*Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](/LICENSE).`*
+<!-- *Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the “Security Considerations” section will be rejected. An EIP cannot proceed to status “Final” without a Security Considerations discussion deemed sufficient by the reviewers.* -->
 
 There are formal proofs of this specific algorithm’s cryptography here: [https://eprint.iacr.org/2022/1255](https://eprint.iacr.org/2022/1255). The implementations have not been formally verified or audited yet, although empirically they correctly conform to the spec laid out. We invite folks in our discussion thread to help surface more possible ways the scheme can be misused in practice.
 
+## Copyright
+
+<!-- *Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](/LICENSE).`* -->
+
+Copyright and related rights waived via [CC0](/LICENSE).
+## Appendix 1
 **The Interactivity-Quantum Secrecy Tradeoff**
 
 Note that in the far future, once quantum computers can break ECDSA keypair security, most Ethereum keypairs will be broken, but migration to a quantum-resistant keypair in advance will keep active funds safe. Specifically, people can merely sign messages committing to new quantum-resistant keypairs (or just higher-bit keypairs on similar algorithms), and the canonical chain can fork to make such keypairs valid. ZK-SNARKs become forgeable, but yet secret data in past proofs still cannot ever be revealed. In the best case, the chain should be able to continue without a hitch.
