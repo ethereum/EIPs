@@ -1,0 +1,244 @@
+---
+eip: 9001
+title: PLUME: Pseudonymously Linked Unique Message Entities
+description: A new signature scheme for existing Ethereum keypairs that allows for anonymous "nullifiers" to enable unique anonymity and ideas like zk voting.
+author: Yush G (@yush_g), Kobi Gurkan (@kobigurk), Richard Liu (@richardyliu), Vivek Bhupatiraju (@viv_boop), Barry Whitehat (@barrywhitehat) 
+discussions-to: https://ethereum-magicians.org/
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-09-24
+requires: 
+---
+
+## Abstract
+
+*Abstract - Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.*
+
+ZK-SNARKs have enabled ideation for new identity applications based on anonymous proof-of-ownership. One of the primary technologies that would enable the jump from existing apps to systems that require anonymous uniqueness is the development of verifiably deterministic signatures. Because we are on ECDSA, there is no way right now for someone to verify that a signature is generated deterministically, even with ‘deterministic’ ECDSA signatures: a ZK-SNARK proof would need someone’s private key to do so, and some hardware wallets do not even allow viewing of a private key. Broadly, we don’t want to export/copy-paste the private key into a SNARK to be an intended user behavior, and most hardware wallets will not be able to run SNARK arithmetization inside a secure enclave for existing schemes (and nor do we want to standardize an entire proof system inside a wallet right now when they emerge and evolve almost every year). Thus we are left to select a new algorithm. 
+
+One specific example of how such a signature can lead to unique pseudonymity is that we prove it was generated correctly in a ZK-SNARK that only reveals publicly the hash(signature), and the SNARK additionally proves some property the public key has (i.e. is in some anonymity set, has executed some set of actions on chain, etc). This proof is the only thing that is ever seen by other people, and so the hash(signature) can be used as a “nullifier”: a public commitment to a specific anonymous account, to forbid actions like double spending, or allow a consistent identity between anonymous actions. We aim to standardize a new verifiably deterministic signature algorithm that both uniquely identifies the keypair, and keeps the account identity secret, where verification does not require a secret key. The specific signature function is $hash(message, public key) ^ {secret key}$.
+
+## Motivation
+
+*Motivation (optional) - A motivation section is critical for EIPs that want to change the Ethereum protocol. It should clearly explain why the existing protocol specification is inadequate to address the problem that the EIP solves. This section may be omitted if the motivation is evident.*
+
+- Existing ZK applications have the advantage that there is no uniqueness constraint on the provers: that is, allowing the same wallet to prove itself as a member more than once is intended. However, many applications require a maximum of one action per user, especially protocols that desire Sybil resistance. Such protocols are not natively possible on Ethereum right now without mapping each address into an opt-in mapping that also maps a user’s private key to a new system, which adds complexity, loses atomicity, and does not benefit from the rich on-chain history of Ethereum accounts.
+- Specific applications that require this tech include:
+    - pseudonymously claiming an airdrop like Stealthdrop
+    - moderating a pseudonymous forum, where people can prove that they are the same identity elsewhere in the forum
+    - zk voting, where each account in some set has one vote
+    - zk proof of solvency — if you want two exchanges to prove they know a set of private keys that hold some balance, you need a way to ensure that two exchanges aren’t both claiming the same address, while keeping it private
+    
+    As such, a deterministic value based on the Ethereum account’s ECDSA keypair is a necessary component of ensuring one action per user and enables all these applications on Ethereum.
+    
+
+## Specification
+
+*Specification - The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (cpp-ethereum, go-ethereum, parity, ethereumJ, ethereumjs-lib, [and others](https://ethereum.org/en/developers/docs/nodes-and-clients).*
+
+(Derived from [https://hackmd.io/uZQbMHrVSbOHvoI_HrJJlw](https://hackmd.io/uZQbMHrVSbOHvoI_HrJJlw))
+
+We propose a new signature standard that offers the following properties, to be implemented for standard ECDSA keys within wallets:
+
+1. It produces signatures that contain a deterministic component and a nondeterministic component. The deterministic component may be used as a *nullifier*, as explained in Appendix I.
+2. Signers can use existing secpk256k1 keypairs, such as those in hardware wallets that support Ethereum accounts. As a consequence, secret keys can remain in secure enclaves.
+
+### Parameters
+
+This scheme uses the secp256k1 curve, defined in [SEC 2: Recommended Elliptic Curve Domain Parameters](https://www.secg.org/sec2-v2.pdf), page 9.
+
+We use the following notation to refer to the parameters of this curve:
+
+- $g$: the base point (also called the generator) of the curve.
+- $p$: the order of the curve.
+    - $F_p$: the finite field whose order is $p$.
+
+Note we use exponential notation to denote elliptic curve scalar multiplications.
+
+### Public key encoding functions
+
+### SEC1
+
+This scheme uses the SEC1 elliptic curve point encoding scheme defined in [SEC 1: Elliptic Curve Cryptography](https://www.secg.org/sec1-v2.pdf). Point compression is used. We use the notation $\mathsf{sec1}(pk)$ to denote the compressed encoding of secp256k1 curve point $pk$ as a bytestring of length 33.
+
+### Hash functions
+
+**SHA256**
+
+This scheme uses the SHA256 hash function defined in [RFC4634](https://datatracker.ietf.org/doc/html/rfc4634).
+
+In this document, we use the notation $\mathsf{sha256}(a_1,.. a_n)$ to denote the sha256 digest of the concatentation of $n$ values $a_1, ..., a_n$. The digest should then be interpreted as a big-endian value in the secp256k1 scalar field.
+
+### Hash-to-curve
+
+We use the notation $\mathsf{htc}([a_1, ..., a_n])$ to denote the elliptic curve point which is the result of the `[secp256k1_XMD:SHA-256_SSWU_RO_](https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-16.html#appendix-J.8.1)` hash-to-curve algorithm over the concatentation of $n$ values $a_1, ..., a_n$.
+
+### Key generation
+
+A *keypair* comprises of $(sk, pk)$, defined as such:
+
+- $sk$: The user's secret key, which is a cryptographically secure random scalar in the field $F_p$.
+- $pk$: The user's public key, defined as $g^{sk}$, which is a point on the secp256k1 curve.
+
+### Signature generation
+
+This scheme builds upon the [Chaum-Pedersen](https://link.springer.com/content/pdf/10.1007/3-540-48071-4_7.pdf) signature scheme. Given a 32-byte message $m$ and a keypair $(sk, pk)$, a  user may generate a signature as such:
+
+1. Pick a random $r$ from $F_p$.
+2. Compute $h = \mathsf{htc}([m, \mathsf{sec1}(pk)])$.
+3. Compute $z = h ^ r$.
+4. Compute the nullifier $\mathsf{nul} = h^{sk}$.
+5. Compute $c = \mathsf{sha256}([g, pk, h, \mathsf{nul}, g^r, z]])$.
+6. Compute $s = r + sk \cdot c$.
+
+The signature is $(z, s, g^r, c, \mathsf{nul})$.
+
+The length of the input to $\mathsf{htc}$ is always 65 bytes.
+
+Note that in this scheme, we compute $h$ as the hash of the message and $pk$, not the message and $r$. This is to make our scheme deterministic.
+
+### Signature verification
+
+### Non-ZK
+
+********************Note: Non-ZK signature verification is not part of the proposal but relevant for an intuitive understanding of the ZK signature verification.********************
+
+In a situation where the verifier knows $g$, $m$, the signer's public key $pk$, and the signature $(z, s, g^r, c, \mathsf{nul})$, they may perform the following checks to determine if the signature is valid:
+
+1. Compute $h = \mathsf{htc}([m, \mathsf{sec1}(pk)])$.
+2. Compute $c' = \mathsf{sha256}([g, pk, h, \mathsf{nul}, g^r, z])$.
+3. Reject if any of the following is false:
+a. $g^{s} \cdot pk^{-c} \stackrel{?}{=} g^r$
+b. $h^s \cdot \mathsf{nul}^{-c} \stackrel{?}{=} z$
+c. $c \stackrel{?}{=} c'$
+4. Accept if all of the above is true.
+
+### In ZK
+
+In a situation where there is a verifier who must *not* know the signer's $pk$, but the signer must nevertheless prove that they know $sk$ corresponding to the signature given $m$, a zero-knowledge proof is required.
+
+The following verification function may be described via a circuit as part of a non-interactive zero-knowledge proving system, such as Groth16. To create a proof, the prover supplies the following inputs:
+
+**Public**: $\mathsf{nul}$, $c$
+**Private**: $pk$, $r$, $s$, $z$, $g^r$, $hash[m, g^sk]$ (included to save constraints)
+
+The circuit performs the following computations:
+
+1. Compute $h = \mathsf{htc}([m, \mathsf{sec1}(pk)])$.
+2. Compute $pk = g^{sk}$.
+3. Compute $c' = \mathsf{sha256}([g, pk, h, \mathsf{nul}, g^r, z]])$.
+4. Compute $g^{s} \cdot pk^{-c}$.
+5. Compute $g^r$.
+6. Compute $h^s \cdot \mathsf{nul}^{-c}$.
+
+It also establishes the following constraints:
+
+- $g^{s} \cdot pk^{-c} = g^r$
+- $h^s \cdot \mathsf{nul}^{-c} = z$
+- $c = c'$
+
+### Version 2: Computing hashes outside the circuit
+
+Currently, SHA-256 hashing operations are particularly expensive with groth16 proofs in the browser. In the context of PLUME, the computation of $c$ is a bottleneck for efficient proof times, so one modification suggested by the Poseidon team was to move this computation outside the circuit in the verifier.
+
+To do this, we make $z$ and $g^r$ public signals in the circuit and update the definition of $c$ to $c = \text{sha256}([\text{nul}, g^r, z])$. The updated protocol is as follows.
+
+**************Public:************** $\mathsf{nul}$, $c$, $g^r$, $z$
+**************Private:************** $pk$, $r$, $s$, $hash[m, g^sk]$
+
+The circuit performs the following computations:
+
+1. Compute $h = \mathsf{htc}([m, \mathsf{sec1}(pk)])$.
+2. Compute $pk = g^{sk}$.
+3. Compute $g^{s} \cdot pk^{-c}$.
+4. Compute $g^r$.
+5. Compute $h^s \cdot \mathsf{nul}^{-c}$.
+
+The circuit establishes the following constraints:
+
+- $g^{s} \cdot pk^{-c} = g^r$
+- $h^s \cdot \mathsf{nul}^{-c} = z$
+
+In addition to verifying the zk-SNARK, the PLUME verifier performs the following check.
+
+$c == \text{hash}(\text{nul}, g^r, h^r)$
+
+Due to SHA-256 being a native [precompile](https://ethereum.github.io/execution-specs/autoapi/ethereum/istanbul/vm/precompiled_contracts/sha256/index.html) on Ethereum, this operation will still be efficient for smart contract verifiers.
+
+### Version 3: TODO
+
+## Rationale
+
+*Rationale - The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. The rationale should discuss important objections or concerns raised during discussion around the EIP.*
+
+(i.e. rationalize tech decisions)
+
+We will define a few specific properties we are looking for in a candidate algorithm, then define a few other intuitive algorithms and explain why they don’t actually work.
+
+- Noninteractivity
+    - The importance of noninteractivity in ZK ID systems is that it enables a large anonymity set from the start, making it resistant to sybil attacks and spam, which would be possible if there was an interactive phase. This allows for new use cases such as ZK airdrops.
+    - Noninteractivity enables the full set of eligible users to be part of the anonymity set, without requiring any interaction. This is possible if the zk proof can verify the set membership in the Merkle tree, the message via the signature, and the unique nullifier. Interactive nullifiers, such as tornado.cash's, require updating the anonymity set Merkle tree with each new user,
+- Uniqueness
+    - If we want to forbid actions like double spending or double claiming, we need them to be verifiably unique per account.
+    - For example: Because ECDSA signatures are nondeterministic, signatures don’t suffice; we need a new deterministic function, verifiable with only the public key. We want the nullifier to be non-interactive, to uniquely identify the keypair yet keep the account identity secret.
+    - The key insight is that such nullifiers can be used as a public commitment to a specific anonymous account to provide us with a uniqueness guarantee.
+- Deterministic
+    - We want each account to only generate one such signature, and generate it exactly the same over time into the future.
+- Verifiable without a secret key
+    - In cases where signatures are nondeterministic (like ECDSA) the signature alone is not sufficient for verification.
+    - We want a new, deterministic function verifiable only with the public key
+    - We don’t want users copy-pasting secret keys anywhere, and we need to choose a function such that the enclave calculation is simple enough for hardware wallets.
+    - Because the nullifier is non-interactive, we are able to uniquely identify the key pair without revealing the account identity.
+
+For a few possible simpler algorithm designs that were considered, see [https://blog.aayushg.com/posts/nullifier](https://blog.aayushg.com/posts/nullifier) > ‘**One address <-> one nullifier’** section. We based the final design off of BLS signatures, Chaum-Pederson EQDL, and Goh-Jarecki’s EDL paper, but to work on secp256k1. 
+
+## ~~Backwards Compatibility~~
+
+*~~Backwards Compatibility (optional) - All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their consequences. The EIP must explain how the author proposes to deal with these incompatibilities. This section may be omitted if the proposal does not introduce any backwards incompatibilities, but this section must be included if backward incompatibilities exist.~~*
+
+~~There are no backwards compatibility issues. There are other types of <signing schemes> that are not compatible with this one. They will not be compliant with this standard, so we expect wallets to need to implement the new signature standard inside the wallet.~~
+
+- ~~What happens if we want to change the hash function? Would that be back compatible with our existing choice?~~
+
+## ~~Test Cases~~
+
+*~~Test Cases (optional) - Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Tests should either be inlined in the EIP as data (such as input/expected output pairs, or included in `../assets/eip-###/<filename>`. This section may be omitted for non-Core proposals.~~*
+
+~~The repository with the reference implementation contains all the test cases for this proposal.~~
+
+## Reference Implementation
+
+*Reference Implementation (optional) - An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.* This section may be omitted for all EIPs.
+
+The GitHub repository `plume-sig/zk-nuliifier-sig` contains the [reference implementation](https://github.com/plume-sig/zk-nullifier-sig/).
+
+## Security Considerations
+
+*Security Considerations - All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life-cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the “Security Considerations” section will be rejected. An EIP cannot proceed to status “Final” without a Security Considerations discussion deemed sufficient by the reviewers.*
+
+*Copyright Waiver - All EIPs must be in the public domain. The copyright waiver MUST link to the license file and use the following wording: `Copyright and related rights waived via [CC0](/LICENSE).`*
+
+There are formal proofs of this specific algorithm’s cryptography here: [https://eprint.iacr.org/2022/1255](https://eprint.iacr.org/2022/1255). The implementations have not been formally verified or audited yet, although empirically they correctly conform to the spec laid out. We invite folks in our discussion thread to help surface more possible ways the scheme can be misused in practice.
+
+**The Interactivity-Quantum Secrecy Tradeoff**
+
+Note that in the far future, once quantum computers can break ECDSA keypair security, most Ethereum keypairs will be broken, but migration to a quantum-resistant keypair in advance will keep active funds safe. Specifically, people can merely sign messages committing to new quantum-resistant keypairs (or just higher-bit keypairs on similar algorithms), and the canonical chain can fork to make such keypairs valid. ZK-SNARKs become forgeable, but yet secret data in past proofs still cannot ever be revealed. In the best case, the chain should be able to continue without a hitch.
+
+However, if people rely on any type of deterministic nullifier like our construction, their anonymity is immediately broken: someone can merely derive the secret keys for the whole anonymity set, calculate all the nullifiers, and see which ones match. This problem will exist for any deterministic nullifier algorithm on ECDSA, since revealing the secret key reveals the only source of “randomness” that guarantees anonymity in a deterministic protocol.
+
+If people want to keep post-quantum secrecy of data, they have to give up at least one of our properties: the easiest one is probably non-interactivity. For example, for the zero-knowledge airdrop, each account in the anonymity set publicly signs a commitment to a new semaphore id commitment (effectively address pk publishes $hash[randomness\ |\ external\ nullifier\ |\ pk]$). Then to claim, they reveal their external nullifier and ZK prove it came from one of the semaphore ids in the anonymity set. This considerably shrinks the anonymity set to everyone who has opted in to a semaphore commitment prior to that account claiming. As a result, there probably needs to be a separate signup phase where people commit to nullifiers in order to seed the anonymity set. This interactivity requirement makes applications such as the zk airdrop or nicer tornado cash construction (in the use cases section) much harder. However, since hashes (as far as we currently know) are still hard with quantum computers, it’s unlikely that people will be able to ever de-anonymize you.
+
+A recent approximation of $2n^2$ qubits needed to solve discrete log via quantum annealing that failed to work on larger than $n$ = 6-bit primes shows that we are likely several decades from this becoming a reality, and the $n^2$ qubits needed to solve RSA having predictions 30-40 years out suggest that it will likely take longer than that to solve discrete log. For a complete mental model of quantum x blockchains, we wrote an [overview post here](https://hackmd.io/vXWmu5QsSOGVSz9N03LXuQ).
+
+We hope that people will choose the appropriate algorithm for their chosen point on the interactivity-quantum secrecy tradeoff for their application, and hope that including this information helps folks make the right choice for themselves. Folks prioritizing shorter-term secrecy, like DAO voting or confessions of the young who will likely no longer care when they’re old, might prioritize this document’s nullifier construction, but whistleblowers or journalists might want to consider the semaphore construction instead.
+
+### Additional Reading
+
+[Original Thesis Paper](https://aayushg.com/thesis.pdf)
+
+[PLUME Blog Post](https://blog.aayushg.com/posts/plume)
+
+[PLUME Slide Deck](http://slides.plume.run)
+
+[PLUME Presentation at ZKSummit](https://www.youtube.com/watch?v=6ajBnMdJGoY)
