@@ -84,7 +84,7 @@ TBD
 
 TODO: a yellow paper with proofs of strategy dominance will be included in the assets; this is being finalised.
 
-Summary ratopma;e for the draft: the risk of take-back in the event of no royalty being paid is only a rational decision if the same entity controls both addresses; i.e. a change in beneficial owner of the token results in a payment but transfer between one's own addresses doesn't require royalty payment. The auto-listing window ensures *truthful* revelation of the value of the token.
+Summary rationale for the draft: the risk of take-back in the event of no royalty being paid is only a rational decision if the same entity controls both addresses; i.e. a change in beneficial owner of the token results in a payment but transfer between one's own addresses doesn't require royalty payment. The auto-listing window ensures *truthful* revelation of the value of the token.
 
 ## Backwards Compatibility
 
