@@ -1,0 +1,157 @@
+---
+eip: tmp
+title: Expire state of the inactive accounts
+description: Expire the status of inactive accounts after a certain period.
+author: Dan Park (@coldpak) <dan@over.network>, Jade Shin <jade@over.network>, et al.
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-09-25
+---
+
+## Abstract
+
+In the Execution Layer, accounts that have been inactive for a certain period are expired. The expired state can be recovered through a special transaction for restoration. This significantly lowers the entry barrier for node operation by maintaining only the minimal required state for validation.
+
+## Motivation
+
+According to our analysis, we have observed that 95% of the accounts in Execution Layer have been inactive for at least one month. The inactive accounts refer to those that have not been in engaged or affected by any transactions.
+
+In other words, this means that only a mere 5% of the data is utilized when validating the data in the current Execution Layer. In most situations, historical data is not essential and just serves to significantly burden the system.
+
+This EIP enhances node efficiency by keeping data only for active accounts (referred to as hot accounts) needed for data verification. This approach optimizes node operations and reduces the burden of managing inactive accounts by expiring them periodically.
+
+## Specification
+
+### State Data Management
+
+The data that was previously managed in a single database is divided and managed separately for accounts and the rest. To facilitate ease of deletion, trie data structure is stored in the database, separated for each epoch.
+
+If data for a certain epoch is not needed, instead of going through the process of traversing the trie, you can simply delete the file corresponding to that epoch.
+
+### Sweep
+
+A config called `SWEEP_EPOCH` is added to specify how often to expire inactive accounts. `SWEEP_EPOCH` refers to the period of performing sweeps, and sweeps are executed every epoch corresponding to the value specified here.
+
+The state trie stores the activities of each account every epoch. At each checkpoint block, the previously created trie become closable and then it starts from an empty trie. We call the frozen trie a checkpoint trie.
+
+During the subsequent epochs, when the state of any account needs to be updated, if the account is not in the current trie, we perform a process to find information about the account from the previous checkpoint trie and add it to the current trie. If the account is already in the current trie, the update is performed immediately.
+
+In this process, the account-related state is stored in the DB handling the account data mentioned earlier. The sweep is only conducted for account-related data, and does not apply to things like storage data.
+
+### Restoration Data
+
+We define the data format needed for recovery. The recovery data includes the following:
+
+`[chain_id, expire_epoch, target, target_epoch, fee, fee_recipient, signature_y_parity, signature_r, signature_s]`
+
+- `chain_id`: The identifier information of the chain where the recovery transaction will be executed.
+- `expire_epoch`: The epoch limit for which this data is valid.
+- `target`: The account address to be recovered.
+- `target_epoch`: The minimum epoch point to be recovered.
+- `fee`: The fee to be paid for the recovery to `fee_recipient`.
+- `fee_recipient`: The account address to receive the recovery fee.
+- `signature_y_parity`, `signature_r`, `signature_s`: The signature for the recovery data. The account that generated this signature is the one that actually pays the fee.
+
+This structure provides a mechanism that rewards the archive nodes that provide the data needed for recovery, and allows another account to pay the fee in case the fee required for recovery is insufficient.
+
+### Restoration Transaction
+
+For recovery purposes, we need recovery data, and this data should be included in transactions. To achieve this, we introduce a new [EIP-2718](../EIPS/eip-2718.md) transaction specifically for recovery.
+
+The format of this transaction with the addition of the `restore_data` field to [EIP-1559](../EIPS/eip-1559) is as follows:
+
+`[chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination, amount, data, access_list, restore_data, signature_y_parity, signature_r, signature_s]`
+
+### Account State Change
+
+When an account is expired, the nonce value of that address is actually reset to 0. When the nonce is reset, it can no longer serve to prevent replay attacks. To prevent such issues, we additionally store in the account state the `restored_epoch`, which is information about the epoch when it was restored. By checking not only the nonce but also the `restored_epoch` when executing a transaction, we prevent old transactions from being executed again.
+
+The `restored_epoch` not only plays a role similar to the nonce during the restoration process, but also makes it possible to selectively determine the point of restoration, eliminating the need to verify the state from the genesis block. This also resolves cost or size issues by allowing the restoration to be carried out over multiple transactions.
+
+Additionally, it plays a crucial role in contract creation, helping to avoid regeneration of the same address.
+
+### Restoration Process
+
+```python
+def restore_account(account, proofs):
+	restored_epoch = account.restored_epoch
+
+  for proof in proofs:
+		root_hash = get_last_checkpoint_block_by_epoch(restored_epoch).state_root
+
+		if is_accurate_merkle_proof(root_hash, account, proof): # Proof is non-void proof
+        restored_account = extract_account(merkle_proof)
+        account.restored_epoch = restored_account.restored_epoch
+        account.balance += restored_account.balance
+				account.nonce += restored_account.nonce
+    elif is_accurate_void_proof(root_hash, account, proof): # Proof is void proof
+        restored_epoch -= 1
+    else: # Proof is invalid
+        raise Exception("Inaccurate proof")
+```
+
+### Restoration Cost
+
+| Operation | Cost (Gwei) |
+| --- | --- |
+| read restoredEpoch | 20 |
+| read nonce | 20 |
+| read balance | 20 |
+| Keccak256 | 100 |
+| Ecrecover | 3000 |
+| CallValueTransfer | 9000 |
+| CallNewAccount | 25000 |
+| read header for every epoch | dynamic |
+| RLP decoding on every non-void epoch | dynamic |
+| verifyProof for every epoch | dynamic |
+| RLP decoding on input data | dynamic |
+
+Dynamic cost refers to the cost that varies with each epoch and is proportional to the length of the input.
+
+The cost incurred in each epoch consists of 1 **`verifyProof`** and 1 **`read header`** operation. If the epoch is non-void, it also includes 1 **`RLP decoding`** operation. These operations incur a cost of approximately 900 Gwei per epoch.
+
+The cost that varies with the length of the input consists of 1 **`RLP decoding`** and 1 **`verifyProof`** operation, both proportional to the size of the input. These operations incur a cost of 3 Gwei per word.
+
+The total recovery cost is as follows:
+
+$$
+\text{Total Restoration Cost} = 37000 + 900\times{Epoch} + 3\times{words} + \text{Memory Cost}
+$$
+
+## Rationale
+
+The rationale behind this EIP is anchored on enhancing network efficiency, scalability, and accessibility to the network.
+
+### Reduction of Storage Requirements
+
+By expiring inactive accounts, we can reduce the storage requirements for nodes significantly.  This makes the network more accessible for participants and improving decentralization.
+
+### Node Modes
+
+There will be two modes for nodes: archive mode, which stores all data, and compact mode, which retains data only for active accounts. Archive mode operates the same as before, while the compact mode node can validate the transaction data of the active accounts it maintains. The compact mode node is sufficient for most situations. If historical data is needed, it can be recovered with the help of archive nodes.
+
+### Ensuring Data Accessibility
+
+It's important to note that this EIP does not propose discarding any data. Instead, data related to inactive accounts will be moved to archive nodes and can be accessed when necessary.
+
+For the restoration of historical data, it is necessary to maintain a sufficient number of nodes operating in archive mode. To encourage this, we need to establish incentives for nodes to run in archive mode. Nodes operating in this mode would earn fees in exchange for supplying the data required for restoration. These fees would be determined based on principle of supply and demand.
+
+### Enhanced Network Efficiency
+
+By focusing on a smaller set of active accounts, the overall efficiency of the network improves. This enhancement can also potentially speed up block validation times and reduce propagation times, leading to better network performance.
+
+## Backwards Compatibility
+
+With the implementation of this EIP, a new field is added to the account state and this field is used in the calculation of the nonce. This means that the nonce can increase by a value other than 1 during the sweep or restoration process. In other words, the Tx Pool should no longer assume that the nonce increases by 1.
+
+Since the nonce alone cannot sufficiently fulfill its role, it is safe to use the `restored_epoch` together with the nonce in other parts where the nonce was used.
+
+## Security Considerations
+
+If this proposal is applied, there is a possibility that some core contracts, such as deposit contracts used for staking, could be swept. If such contracts are swept, it could lead to a problem where the core functions of the chain cannot be used. It is necessary to respond by methods such as reflecting these contracts into the trie at each epoch.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
