@@ -1,9 +1,9 @@
 ---
-eip: tmp
+eip: 7525
 title: Expire state of the inactive accounts
 description: Expire the status of inactive accounts after a certain period.
 author: Dan Park (@coldpak) <dan@over.network>, Jade Shin <jade@over.network>, et al.
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/add-eip-expire-state-of-the-inactive-accounts/15904
 status: Draft
 type: Standards Track
 category: Core
