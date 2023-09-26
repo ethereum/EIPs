@@ -45,11 +45,11 @@ describe('Compile: Test charity donation configuration ', function() {
 
     it("User: custom rate for default charity ", async function () {
         expect(await charity.connect(user).specificDefaultAddress()).to.equal('0x0000000000000000000000000000000000000000',"The address isn't set yet it should be 0x0000000000000000000000000000000000000000 ");
-        //console.log("default charity adress" , await charity.connect(user).specificDefaultAddress());
+        //console.log("default charity address" , await charity.connect(user).specificDefaultAddress());
         //set
         await charity.connect(user).setSpecificDefaultAddressAndRate(charity1.address,20); //rate is set to 2% for charity1
         expect(await charity.connect(user).specificDefaultAddress()).to.equal(charity1.address,"The address isn't set to charity1 ");
-        //console.log("default charity adress" , await charity.connect(user).specificDefaultAddress());
+        //console.log("default charity address" , await charity.connect(user).specificDefaultAddress());
     });
 
     it("Fails: User Whitelist a charity address that is not whitelisted ", async function () {
