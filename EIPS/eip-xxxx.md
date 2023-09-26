@@ -1,154 +1,467 @@
 ---
 eip: xxxx
-title: Batch Calls JSON Schema
-description: Give the details of each call to the wallet
+title: Public Cross Port
+description: Help to Connect all EVM chains
 author: George (@JXRow)
-discussions-to: https://ethereum-magicians.org/t/batch-calls-json-schema/13935
+discussions-to: https://ethereum-magicians.org/t/connect-all-l2s
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-04-24
+created: 2023-09-18
 ---
 
 
 ## Abstract
 
-Batch Calls JSON Schema aims to define a JSON from apps to wallet.
+The objective of Public Cross Port (PCP) is to securely and efficiently connect various EVM chains, significantly reducing the number of cross-chain bridges and gas cost, and enhancing security. It aims to unite all EVM chains and establish a powerful, decentralized EVM cross-chain network. To achieve this goal, it is necessary for cross-chain bridge projects to utilize the standardized SendPort contract and IReceivePort interface. As more cross-chain bridge projects are built on PCP, the overall security increases, making the establishment of a decentralized EVM cross-chain network possible. DApps that utilize this cross-chain network will benefit from highly secure and free cross-chain services.
 
 
 ## Motivation
 
-Batch calls we use oftenly, like approve then swap, approve then transferFrom, user needs to confirm twice or more in wallet, we put the calls into a JSON, so that the wallet can deal the calls automatic in just one confirm.
+Currently, there are official cross-chain bridges between L2 and L1, but not between L2s. If there are 10 L2 chains that need to cross-chain with each other, it would require 10 x 9 = 90 cross-chain bridges. However, if a pull mechanism is used to merge messages from the other 9 chains into one transaction synchronized to its own chain, only 10 cross-chain bridges would be needed. This significantly reduces the number of cross-chain bridges required and minimizes gas cost.
+
+This implementation, with the participation of multiple cross-chain bridge projects, would greatly enhance security. There is currently a considerable amount of redundant construction of cross-chain bridges, which does not contribute to improved security. By using a standardized SendPort contract, if the same cross-chain message is being transported by multiple redundant bridges, the validation on the target chain's IReceivePort should yield the same result. This result, confirmed by multiple cross-chain bridge projects, provides much higher security than relying on a single confirmation. The purpose of this EIP is to encourage more cross-chain bridge projects to participate, transforming redundant construction into enhanced security.
+
+To attract cross-chain bridge projects to participate, aside from reducing the number of bridges and gas cost, the use of the Hash MerkleTree data structure in the SendPort ensures that adding cross-chain messages does not increase the overhead of the bridges. Only a small-sized root is required for the transportation of cross-chain bridges, further saving gas.
 
 
 ### Use case
 
-This JSON Schema is a suggetion to apps and wallet, it dosen't modify smart contracts or RPC-JSON. Just give the details of each call to the wallet.
+This EIP divides the cross-chain ecosystem into three layers and defines the SendPort contract and IReceivePort interface at the foundational layer. The implementation of the other layers is left to ecosystem project participants.
 
-- The total spend(that’s what user really care about) can be calculated before submit.
-- It's much useful for Smart Contract Wallet (Account Abstraction), which can batch calls into one Tx.
-- RPC info is given, user needn't to manual connect wallet or switch RPC, it can be automatic done by wallet.
-- The data transfer is one direction, wallet needn't return data back to the apps, all user operations can be done in a QR code, scan and confirm.
+![](../assets/eip-draft_Public_Cross_Port/0.png)
+
+Under this EIP, an official SendPort contract is deployed on each chain as a unique entity. It is responsible for collecting cross-chain messages on that chain and packaging them. SendPort operates as a public, permissionless, administrator-free, and automatic system. Cross-chain bridge operators retrieve cross-chain messages from the SendPort and transport it to the target chain to complete the cross-chain messaging process.
+
+On top of cross-chain messaging, various types of cross-chain applications can be developed, such as Token cross-chain, NFT cross-chain, and Cross-chain swap.
+
+Cross-chain messaging bridges can be combined with Token cross-chain functionality, as shown in the code example at Reference Implementation. Alternatively, they can be separated. Taking the example of an NFT cross-chain application, it can reuse the messaging bridge of Tokens, and even leverage multiple messaging bridges. Reusing multiple bridges for message verification can significantly enhance security without incurring additional costs for cross-chain and verification services.
 
 
 ## Specification
 
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-A simple Batch Calls JSON Schema is:
+### `ISendPort` Interface and `SendPort` Implementation
 
 ```solidity
-{
-    rpc: {
-        name: 'Scroll_Alpha',
-        url: 'https://alpha-rpc.scroll.io/l2',
-        chainId: 534353
-    },
-    calls: [
-        {
-            to: '0x67aE69Fd63b4fc8809ADc224A9b82Be976039509',
-            value: '0',
-            abi: 'function transfer(address to, uint256 amount)',
-            params: [
-                '0xE44081Ee2D0D4cbaCd10b44e769A14Def065eD4D',
-                '1000000'
-            ]
-        },
-        {
-            to: '0xE44081Ee2D0D4cbaCd10b44e769A14Def065eD4D',
-            value: '1000000000000000',
-            abi: '',
-            params: []
-        }
-    ]
-}
-```
+pragma solidity ^0.8.0;
 
-- `rpc` : REQUIRED
-  - `name` : OPTIONAL, wallet SHALL use its stored RPC info instead.
-  - `url` : OPTIONAL, wallet SHALL use its stored RPC info instead.
-  - `chainId` : REQUIRED
-- `calls` : REQUIRED, the calls array.
-  - `to` : REQUIRED, smart contract address or wallet address
-  - `value` : REQUIRED, ETH amount (wei)
-  - `abi` : REQUIRED, The abi MAY be a JSON string or the parsed Object (using JSON.parse) which is emitted by the [Solidity compiler](https://solidity.readthedocs.io/en/v0.6.0/using-the-compiler.html#output-description) (or compatible languages).<br>
-  The abi MAY also be a [Human-Readable](https://blog.ricmoo.com/human-readable-contract-abis-in-ethers-js-141902f4d917) Abi, which is a format the Ethers created to simplify manually typing the ABI into the source and so that a Contract ABI can also be referenced easily within the same source file.<br>
-  The abi SHOULD be empty string if it's not a contract call.
-  - `params` : REQUIRED, the params to this contract function call.
-  The params SHOULD be empty array if it's not a contract call.
+interface ISendPort {
+    event MsgHashAdded(uint indexed packageIndex, address sender, bytes32 msgHash, uint toChainId, bytes32 leaf);
 
+    event Packed(uint indexed packageIndex, uint indexed packTime, bytes32 root);
 
-## Example
-
-A complex example is:
-
-```javascript
-const { BigNumber, utils } = require('ethers')
-
-let swapData = utils.defaultAbiCoder.encode(
-    ['address', 'address', 'uint8'],
-    [USDC_ADDRESS, WALLET_ADDRESS, 1] // tokenIn, to, withdraw mode
-)
-
-let json = {
-    rpc: {
-        name: 'Scroll_Alpha',
-        url: 'https://alpha-rpc.scroll.io/l2',
-        chainId: 534353
-    },
-    calls: [
-        {
-            to: USDC_ADDRESS,
-            value: '0',
-            abi: 'function approve(address spender, uint256 amount)',
-            params: [
-                ROUTER_ADDRESS, 
-                '1000000'
-            ]
-        },
-        {
-            to: ROUTER_ADDRESS,
-            value: '0',
-            abi: 'function swap(tuple(tuple(address pool, bytes data, address callback, bytes callbackData)[] steps, address tokenIn, uint256 amountIn)[] paths, uint amountOutMin, uint deadline) returns (uint amountOut)',
-            params: [
-                [{
-                    steps: [{
-                        pool: POOL_ADDRESS,
-                        data: swapData,
-                        callback: ZERO_ADDRESS,
-                        callbackData: '0x',
-                    }],
-                    tokenIn: USDC_ADDRESS,
-                    amountIn: '1000000',
-                }],    
-                0,
-                BigNumber.from(Math.floor(Date.now() / 1000)).add(1800)
-            ]
-        }
-    ]
-}
-```
-
-The encode function is:
-
-```javascript
-for (let call of json.calls) {
-    if (call.abi != '') {
-        let interface = new utils.Interface([call.abi])
-        let funcName = call.abi.slice(9, call.abi.indexOf('('))
-        let data = interface.encodeFunctionData(funcName, call.params)
-    } else {
-        let data = '0x'
+    struct Package {
+        uint packageIndex;
+        bytes32 root;
+        bytes32[] leaves;
+        uint createTime;
+        uint packTime;
     }
-    //sign the data..
+
+    function addMsgHash(bytes32 msgHash, uint toChainId) external;
+
+    function pack() external;
+
+    function getPackage(uint packageIndex) external view returns (Package memory);
+
+    function getPendingPackage() external view returns (Package memory);
 }
 ```
+
+Let:
+- `Package` collects cross-chain messages within a certain period and bundles them into a single `Package`.
+  - `packageIndex`: The index of the `Package`, starting from 0.
+  - `root`: The root generated by the MerkleTree from the `leaves`, representing the bundled package.
+  - `leaves`: Each leaf represents a cross-chain message, and it is a hash calculated from `msgHash`, `sender`, and `toChainId`.
+    - `msgHash`: The hash of the message, passed in from an external contract.
+    - `sender`: The address of the external contract, no need to pass it in explicitly.
+    - `toChainId`: The chain ID of the target chain, passed in from an external contract.
+  - `createTime`: The timestamp when the `Package` started collecting messages. It is also the timestamp when the previous `Package` was bundled.
+  - `packTime`: The timestamp when the `Package` was bundled. After bundling, no more leaves can be added.
+- `addMsgHash`: The external contract sends cross-chain messages to the SendPort.
+- `pack`: Manually triggers the bundling process. Typically, it is automatically triggered when the last submitter submits their message. If waiting for the last submitter takes too long, the bundling process can be manually triggered.
+- `getPackage`: Retrieves each `Package` in the SendPort, including both bundled and pending packages.
+- `getPendingPackage`: Retrieves the pending package in the SendPort.
+
+```solidity
+pragma solidity ^0.8.0;
+
+import "./ISendPort.sol";
+
+contract SendPort is ISendPort {
+    uint public constant PACK_INTERVAL = 6000;
+    uint public constant MAX_PACKAGE_MESSAGES = 100;
+
+    uint public pendingIndex = 0;
+
+    mapping(uint => Package) public packages;
+
+    constructor() {
+        packages[0] = Package(0, bytes32(0), new bytes32[](0), block.timestamp, 0);
+    }
+
+    function addMsgHash(bytes32 msgHash, uint toChainId) public {
+        bytes32 leaf = keccak256(
+            abi.encodePacked(msgHash, msg.sender, toChainId)
+        );
+        Package storage pendingPackage = packages[pendingIndex];
+        pendingPackage.leaves.push(leaf);
+
+        emit MsgHashAdded(pendingPackage.packageIndex, msg.sender, msgHash, toChainId, leaf);
+
+        if (pendingPackage.leaves.length >= MAX_PACKAGE_MESSAGES) {
+            console.log("MAX_PACKAGE_MESSAGES", pendingPackage.leaves.length);
+            _pack();
+            return;
+        }
+
+        // console.log("block.timestamp", block.timestamp);
+        if (pendingPackage.createTime + PACK_INTERVAL <= block.timestamp) {
+            console.log("PACK_INTERVAL", pendingPackage.createTime, block.timestamp);
+            _pack();
+        }
+    }
+
+    function pack() public {
+        require(packages[pendingIndex].createTime + PACK_INTERVAL <= block.timestamp, "SendPort::pack: pack interval too short");
+
+       _pack();
+    }
+
+    function getPackage(uint packageIndex) public view returns (Package memory) {
+        return packages[packageIndex];
+    }
+
+    function getPendingPackage() public view returns (Package memory) {
+        return packages[pendingIndex];
+    }
+
+    function _pack() internal {
+        Package storage pendingPackage = packages[pendingIndex];
+        bytes32[] memory _leaves = pendingPackage.leaves;
+        while (_leaves.length > 1) {
+            _leaves = _computeLeaves(_leaves);
+        }
+        pendingPackage.root = _leaves[0];
+        pendingPackage.packTime = block.timestamp;
+
+        emit Packed(pendingPackage.packageIndex, pendingPackage.packTime, pendingPackage.root);
+
+        pendingIndex = pendingPackage.packageIndex + 1;
+        packages[pendingIndex] = Package(pendingIndex, bytes32(0), new bytes32[](0), pendingPackage.packTime, 0);
+    }
+
+    function _computeLeaves(bytes32[] memory _leaves) pure internal returns (bytes32[] memory _nextLeaves) {
+        if (_leaves.length % 2 == 0) {
+            _nextLeaves = new bytes32[](_leaves.length / 2);
+            bytes32 computedHash;
+            for (uint i = 0; i + 1 < _leaves.length; i += 2) {
+                computedHash = _hashPair(_leaves[i], _leaves[i + 1]);
+                _nextLeaves[i / 2] = computedHash;
+            }
+
+        } else {
+            bytes32 lastLeaf = _leaves[_leaves.length - 1];
+            _nextLeaves = new bytes32[]((_leaves.length / 2 + 1));
+            bytes32 computedHash;
+            for (uint i = 0; i + 1 < _leaves.length; i += 2) {
+                computedHash = _hashPair(_leaves[i], _leaves[i + 1]);
+                _nextLeaves[i / 2] = computedHash;
+            }
+            _nextLeaves[_nextLeaves.length - 1] = lastLeaf;
+        }
+    }
+
+    function _hashPair(bytes32 a, bytes32 b) private pure returns (bytes32) {
+        return a < b ? _efficientHash(a, b) : _efficientHash(b, a);
+    }
+
+    function _efficientHash(bytes32 a, bytes32 b) private pure returns (bytes32 value) {
+        /// @solidity memory-safe-assembly
+        assembly {
+            mstore(0x00, a)
+            mstore(0x20, b)
+            value := keccak256(0x00, 0x40)
+        }
+    }
+}
+```
+
+External featrues:
+
+- `PACK_INTERVAL`: The minimum time interval between two consecutive packaging operations. If this interval is exceeded, a new packaging operation can be initiated.
+- `MAX_PACKAGE_MESSAGES`: Once `MAX_PACKAGE_MESSAGES` messages are collected, a packaging operation is triggered immediately. This takes precedence over the `PACK_INTERVAL` setting.
+
+### `IReceivePort` Interface
+
+```solidity
+pragma solidity ^0.8.0;
+
+interface IReceivePort {
+    event PackageReceived(uint indexed fromChainId, uint indexed packageIndex, bytes32 root);
+
+    struct Package {
+        uint fromChainId;
+        uint packageIndex;
+        bytes32 root;
+    }
+
+    function receivePackages(Package[] calldata packages) external;
+
+    function getRoot(uint fromChainId, uint packageIndex) external view returns (bytes32);
+
+    function verify(
+        uint fromChainId,
+        uint packageIndex,
+        bytes32[] memory proof,
+        bytes32 msgHash,
+        address sender
+    ) external view returns (bool);
+}
+```
+
+Let:
+- `Package`: Collects cross-chain messages within a certain period and bundles them into a single `Package`.
+  - `fromChainId`: The chain from which the `Package` originates.
+  - `packageIndex`: The index of the `Package`, starting from 0.
+  - `root`: The root generated by the MerkleTree from the `leaves`, representing the bundled package.
+- `receivePackages`: Transfers multiple roots from different source chains to the target chain.
+- `getRoot`: Retrieves a specific root from a particular chain.
+- `verify`: Verifies if the message on the source chain was sent by the sender.
+
+
+## Rationale
+
+The essence of cross-chain is to inform the target chain about events happening on the source chain. This process can be divided into 3 steps. The following diagram illustrates the overall principle:
+
+![](../assets/eip-draft_Public_Cross_Port/1.png)
+
+### 1.Add cross-chain msg
+
+The SendPort contract is unique on each chain and is responsible for collecting events (i.e., cross-chain messages) that occur on that chain and packaging them into a MerkleTree. For example, let's consider a scenario where a Bridge contract receives a user's USDT deposit. It can send the hash of this event and the ID of the target chain to the SendPort contract. SendPort adds this information, along with the hash of the sender's address (i.e., the Bridge contract's address), as a leaf in an array. After collecting a certain number of leaves for a period of time (e.g., 1 minute), SendPort automatically packages them into a MerkleTree and begins the next collection phase. SendPort's role is solely focused on event collection and packaging. It operates autonomously without the need for management.
+
+The `SendPort.addMsgHash()` function can be called by different cross-chain bridge projects or any other contract. The function does not require permission, which means that there is a possibility of incorrect or fraudulent messages being sent. To prevent fraud, SendPort includes the sender's address in the packaging process. This indicates that the `sender` intends to send the information `msgHash` to the `toChainId` chain. When this information is decoded on the target chain, it can help prevent fraudulent activities.
+
+### 2.Pull roots & Set roots
+
+Upon the completion of packaging a new MerkleTree, the message carrier (usually the cross-chain bridge project) pulls the root from multiple chains and stores it in the IReceivePort contract of each chain. It is important to note that the traditional approach involves using a push method, as depicted in the following diagram:
+
+![](../assets/eip-draft_Public_Cross_Port/2.png)
+
+If there are six chains, each chain needs to push to the other five chains, resulting in the requirement of 30 cross-chain bridges, as shown in the diagram below:
+
+![](../assets/eip-draft_Public_Cross_Port/3.png)
+
+When N chains require cross-chain communication with each other, the number of cross-chain bridges needed is calculated as: num = N * (N - 1).
+
+Using the pull approach allows the consolidation of cross-chain messages from five chains into a single transaction, significantly reducing the number of required cross-chain bridges, as illustrated in the following diagram:
+
+![](../assets/eip-draft_Public_Cross_Port/4.png)
+
+If each chain pulls messages from the other five chains onto its own chain, only six cross-chain bridges are necessary. For N chains requiring cross-chain communication, the number of cross-chain bridges needed is: num = N.
+
+Thus, the pull approach can greatly reduce the number of cross-chain bridges.
+
+The MerkleTree data structure efficiently compresses the size of cross-chain messages. Regardless of the number of cross-chain messages, they can be compressed into a single root, represented as a byte32 value. The message carrier only needs to transport the root, resulting in low gas consumption.
+
+A root contains messages from multiple cross-chain bridges, as well as messages intended for various target chains. For the message carrier, the root may not contain relevant messages or may not include messages intended for a specific target chain. Therefore, the message carrier has the discretion to decide whether or not to transport the root to a particular target chain, based on its relevance.
+
+Hence, the IReceivePort contract is not unique and is implemented by the message carrier based on the IReceivePort interface. With multiple message carriers, there will be multiple IReceivePort contracts.
+
+### 3.Verify cross-chain message
+
+The IReceivePort contract stores the roots of each chain, allowing it to verify the authenticity of messages when provided with the complete message. It is important to note that the root itself cannot be used to decipher the message; it can only be used to validate its authenticity. The complete message can be retrieved from the SendPort contract on the source chain.
+
+Since the roots originate from the same SendPort, the roots in different IReceivePort contracts should be identical. In other words, if a message is authentic, it should be able to be verified as authentic across different IReceivePort contracts. This significantly enhances security. It is similar to the principle of multi-signature, where if the majority of IReceivePort contracts verify a message as authentic, it is likely to be true. Conversely, any IReceivePort contracts that verify the message as false may indicate a potential hacker attack or a failure in the corresponding cross-chain bridge. This decentralized participation model ensures that the security of the system is not compromised by single points of failure. It transforms redundant construction into an improvement in security.
 
 
 ## Backwards Compatibility
 
-This EIP is backward compatible with EOA Wallet and Smart Contract Wallet. 
+This EIP does not change the consensus layer, so there are no backwards compatibility issues for Ethereum as a whole. 
 
+
+## Reference Implementation
+
+Below is an example contract for a cross-chain bridge:
+
+ReceivePort.sol (for example)
+```solidity
+pragma solidity ^0.8.0;
+
+import "./IReceivePort.sol";
+
+abstract contract ReceivePort is IReceivePort {
+
+    //fromChainId => packageIndex => root
+    mapping(uint => mapping(uint => bytes32)) public roots;
+
+    constructor() {}
+
+    function receivePackages(Package[] calldata packages) public {
+        for (uint i = 0; i < packages.length; i++) {
+            Package calldata p = packages[i];
+            require(roots[p.fromChainId][p.packageIndex] == bytes32(0), "ReceivePort::receivePackages: package already exist");
+            roots[p.fromChainId][p.packageIndex] = p.root;
+
+            emit PackageReceived(p.fromChainId, p.packageIndex, p.root);
+        }
+    }
+
+    function getRoot(uint fromChainId, uint packageIndex) public view returns (bytes32) {
+        return roots[fromChainId][packageIndex];
+    }
+
+    function verify(
+        uint fromChainId,
+        uint packageIndex,
+        bytes32[] memory proof,
+        bytes32 msgHash,
+        address sender
+    ) public view returns (bool) {
+        bytes32 leaf = keccak256(
+            abi.encodePacked(msgHash, sender, block.chainid)
+        );
+        return _processProof(proof, leaf) == roots[fromChainId][packageIndex];
+    }
+
+    function _processProof(bytes32[] memory proof, bytes32 leaf) internal pure returns (bytes32) {
+        bytes32 computedHash = leaf;
+        for (uint256 i = 0; i < proof.length; i++) {
+            computedHash = _hashPair(computedHash, proof[i]);
+        }
+        return computedHash;
+    }
+
+    function _hashPair(bytes32 a, bytes32 b) private pure returns (bytes32) {
+        return a < b ? _efficientHash(a, b) : _efficientHash(b, a);
+    }
+
+    function _efficientHash(bytes32 a, bytes32 b) private pure returns (bytes32 value) {
+        /// @solidity memory-safe-assembly
+        assembly {
+            mstore(0x00, a)
+            mstore(0x20, b)
+            value := keccak256(0x00, 0x40)
+        }
+    }
+}
+```
+
+BridgeExample.sol (for example)
+```solidity
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./ISendPort.sol";
+import "./ReceivePort.sol";
+
+contract BridgeExample is ReceivePort, Ownable {
+    using SafeERC20 for IERC20;
+
+    ISendPort public sendPort;
+
+    mapping(bytes32 => bool) public usedMsgHashes;
+
+    mapping(uint => address) public trustBridges;
+
+    mapping(address => address) public crossPairs;
+
+    constructor(address sendPortAddr) {
+        sendPort = ISendPort(sendPortAddr);
+    }
+
+    function setTrustBridge(uint chainId, address bridge) public onlyOwner {
+        trustBridges[chainId] = bridge;
+    }
+
+    function setCrossPair(address fromTokenAddr, address toTokenAddr) public onlyOwner {
+        crossPairs[fromTokenAddr] = toTokenAddr;
+    }
+
+    function getLeaves(uint packageIndex, uint start, uint num) view public returns(bytes32[] memory) {
+        ISendPort.Package memory p = sendPort.getPackage(packageIndex);
+        bytes32[] memory result = new bytes32[](num);
+        for (uint i = 0; i < p.leaves.length && i < num; i++) {
+            result[i] = p.leaves[i + start];
+        }
+        return result;
+    }
+
+    function transferTo(
+        uint toChainId,
+        address fromTokenAddr,
+        uint amount,
+        address receiver
+    ) public {
+        bytes32 msgHash = keccak256(
+            abi.encodePacked(toChainId, fromTokenAddr, amount, receiver)
+        );
+        sendPort.addMsgHash(msgHash, toChainId);
+
+        IERC20(fromTokenAddr).safeTransferFrom(msg.sender, address(this), amount);
+    }
+
+    function transferFrom(
+        uint fromChainId,
+        uint packageIndex,
+        bytes32[] memory proof,
+        address fromTokenAddr,
+        uint amount,
+        address receiver
+    ) public {
+        bytes32 msgHash = keccak256(
+            abi.encodePacked(block.chainid, fromTokenAddr, amount, receiver)
+        );
+
+        require(!usedMsgHashes[msgHash], "transferFrom: Used msgHash");
+
+        require(
+            verify(
+                fromChainId,
+                packageIndex,
+                proof,
+                msgHash,
+                trustBridges[fromChainId]
+            ),
+            "transferFrom: verify failed"
+        );
+
+        usedMsgHashes[msgHash] = true;
+
+        address toTokenAddr = crossPairs[fromTokenAddr];
+        require(toTokenAddr != address(0), "transferFrom: fromTokenAddr is not crossPair");
+        IERC20(toTokenAddr).safeTransfer(receiver, amount);
+    }
+}
+```
+
+
+## Security Considerations
+
+Regarding competition and double spending among cross-chain bridges:
+
+The SendPort is responsible for one task: packaging the messages to be cross-chain transferred. The transmission and verification of messages are implemented independently by each cross-chain bridge project. The objective is to ensure that the cross-chain messages obtained by different cross-chain bridges on the source chain are consistent. Therefore, there is no need for competition among cross-chain bridges for the right to transport or validate roots. Each bridge operates independently. If a cross-chain bridge has bugs in its implementation, it poses a risk to itself but does not affect other cross-chain bridges.
+
+RECOMMENDED:
+1. Each cross-chain bridge should transport its own roots and not rely on other carriers to transport them to their respective IReceivePort contracts.
+2. When performing verification, store the verified leaves to avoid double spending during subsequent verifications.
+3. Do not trust all senders in the MerkleTree.
+
+Regarding the forgery of cross-chain messages:
+
+Since the SendPort is a public contract without usage restrictions, anyone can send arbitrary cross-chain messages to it. The SendPort includes the `msg.sender` in the packaging process. If a hacker attempts to forge a cross-chain message, the hacker's address will be included in the packaging along with the forged message. During verification, the hacker's address can be identified. This is why it is recommended to not trust all senders in the MerkleTree.
+
+Regarding the order of messages:
+
+While the SendPort sorts received cross-chain messages by time, there is no guarantee of order during verification. For example, if a user performs a cross-chain transfer of 10 ETH and then 20 USDT, on the target chain, they may withdraw the 20 USDT first and then the 10 ETH, or vice versa. The specific order depends on the implementation of the IReceivePort.
+
+Regarding data integrity:
+
+The SendPort retains all roots and continuous index numbers without deletion or modification. The IReceivePort contracts of each cross-chain bridge should also follow this approach.
 
 
 ## Copyright
