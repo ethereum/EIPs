@@ -159,7 +159,7 @@ describe("NestableToken", function () {
       const childId1 = 99;
       await child.nestMint(parent.address, childId1, parentId);
 
-      // owner is the same adress
+      // owner is the same address
       expect(await parent.ownerOf(parentId)).to.equal(tokenOwner.address);
       expect(await child.ownerOf(childId1)).to.equal(tokenOwner.address);
 
