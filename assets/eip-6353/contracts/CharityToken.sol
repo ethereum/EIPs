@@ -7,7 +7,7 @@ import "./ERC20Charity.sol";
 *@title ERC720 charity Token
 *@dev Extension of ERC720 Token that can be partially donated to a charity project
 *
-*This extensions keeps track of donations to charity addresses. The  whitelisted adress are from a another contract (Reserve)
+*This extensions keeps track of donations to charity addresses. The  whitelisted address are from a another contract (Reserve)
  */
 
 contract CharityToken is ERC20Charity{
