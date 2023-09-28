@@ -14,7 +14,7 @@
     "config": "^3.3.8",
     "eccrypto": "^1.1.6",
     "keccak256": "^1.0.6",
-    "secp256k1": "^4.0.3",
+    "secp256k1": "^5.0.0",
     "web3": "^4.0.3"
   },
   "devDependencies": {},

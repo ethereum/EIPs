@@ -4,7 +4,7 @@
     "@openzeppelin/contracts": "^4.6.0"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^1.0.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
