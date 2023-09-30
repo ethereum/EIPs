@@ -14,13 +14,13 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
 ## Abstract
 
-This proposal defines a system which inbeds a Function Oracle that can wrap fungible tokens to non-fungible token and unwrap the non-fungible back to fungible tokens. The presetted Function Oracle provides its own Automated Market Maker(AMM) so that it guarantees the liquidity of the NFT's credit.
+This proposal defines a system which embeds a Function Oracle that can wrap fungible tokens to non-fungible token and unwrap the non-fungible back to fungible tokens. The preset Function Oracle provides its own Automated Market Maker(AMM) so that it standardize the process of a creating pool for the issuer of vouchers.
 
 ## Motivation
 
-The motivation behind a wrapping system with inbeded Function Oracle AMM is to provide decentralized credit endorsement and thus quantifiable decentralized credit assets with liquidity. This creates an applicable infrastructure for credit creation, transmission, and oracle in payment, social, and financial context. Decentralized credit voucher can be implemented in the form of Non-fungible tokens, compatible with current Ethereum environment, which also expands its application scenarios. The concept of decentralized credit is highly integrated with dApps development. It aims to foster a more trustless environment.
-Under current framework of pool, it is hard for user to define how to manage the pool without coding. However, we believe it should be more accessible for users to define and create their own pools to energize the market. Through employing FTs as premium for NFTs under a customizable framework, such an approach standardize the process of creating a pool and allows users to gain the ability to "do it yourself."
+The motivation behind a wrapping system with embedded Function Oracle AMM is to provide decentralized credit endorsement and thus quantifiable decentralized credit assets with liquidity. This creates an applicable infrastructure for credit creation, transmission, and oracle in payment, social, and financial context. Decentralized credit voucher can be implemented in the form of Non-fungible tokens, compatible with current Ethereum environment, which also expands its application scenarios. The concept of decentralized credit is highly integrated with dApps development. It aims to foster a more trustless environment.
 
+Under current framework of pool, it is hard for user to define how to manage the pool without coding. However, we believe it should be more accessible for users to define and create their own pools to energize the market. Through employing FTs as premium for NFTs under a customizable framework, such an approach standardize the process of creating a pool and allows users to gain the ability to "do it yourself."
 
 ## Specification
 
@@ -171,6 +171,7 @@ interface IERC7Agency{
  }
 ```
 
+## Rationale
 
 ## Backwards Compatibility
 
