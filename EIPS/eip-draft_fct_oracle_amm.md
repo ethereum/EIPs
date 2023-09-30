@@ -3,7 +3,7 @@ title: Token Bound Function Oracle AMM Contract
 description: A Standard Interface System which wrap/unwrap betweem fungible tokens and non-fungible token based on an inbeded Function Oracle AMM to achieve decentralized credit endorsement.
 
 author: Lanyin Zhang(lz8aj@virginia.edu), Jerry(jerrymindflow@gmail.com), FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
-discussions-to: <URL>
+discussions-to: <https://ethereum-magicians.org/t/eip-7797-token-bound-function-oracle-amm-contract/15950>
 status: Draft
 type: Standards Track
 category: ERC
