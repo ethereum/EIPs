@@ -35,7 +35,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 The interface is defined as follows:
 
 ```solidity
-// ERC165 interfaceId 0x6b61a747
 interface IERCxyz {
   // It MUST revert if the token is not staked
   function ownerOf(address tokenAddress, uint256 tokenId) external view returns(address);
