@@ -1,7 +1,7 @@
 ---
 eip: xyz
 title: Resolving Staked ERC721 Ownership Recognition
-description: A gas-efficient approach to lockable ERC-721 tokens
+description: An interface for recognizing original NFT ownership when staked to unsupported contracts.
 author: Francesco Sullo (@sullof)
 discussions-to: https://ethereum-magicians.org/t/eip-xxxx-resolving-staked-erc721-ownership-recognition/15967
 status: Draft
@@ -15,9 +15,18 @@ requires: 165, 721
 The ownership of ERC721 tokens when staked in a pool presents challenges, particularly when it involves older, non-lockable NFTs like, for example, Crypto Punks or Bored Ape Yacht Club (BAYC) tokens. This proposal introduces an interface to address these challenges by allowing staked NFTs to be recognized by their original owners, even after they've been staked.
 
 ## Motivation 
-Recent solutions involve retaining the ownership of the NFT while "locking" it. However, this presupposes that all NFTs are "lockable". For vintage or previously minted NFTs, like BAYC, this poses an issue. Once staked in a pool, the NFT's ownership transfers to the staking pool, preventing, for example, original owners from accessing privileges or club memberships associated with those NFTs.
+Recent solutions involve retaining NFT ownership while "locking" the token when staked. However, this requires the NFT contract to implement lockable functionality. Many early vintage NFTs like CryptoPunks or Bored Ape Yacht Club were not originally designed as lockable.
 
-To circumvent this limitation, we propose an interface that retains a record of the original owner even after the token is staked, thus providing a way for other apps and contracts to recognize the original owner.
+When these non-lockable NFTs are staked, ownership transfers fully to the staking pool contract. This prevents the original owner from accessing valuable privileges and benefits associated with their NFTs.
+
+For example:
+
+A BAYC holder would lose access to the BAYC Yacht Club and member events when staked.
+A CryptoPunks holder may miss out on special airdrops or displays only available to verified owners.
+Owners of other early NFTs like EtherRocks would lose the social status of provable ownership when staked.
+By maintaining a record of the original owner, the proposed interface allows these original perks to remain accessible even when the NFT is staked elsewhere. This compatibility is critical for vintage NFT projects lacking native locking mechanisms.
+
+The interface provides a simple, elegant way to extend staking compatibility to legacy NFTs without affecting their core functionality or benefits of ownership.
 
 ## Specification
 
@@ -28,7 +37,7 @@ The interface is defined as follows:
 ```solidity
 // ERC165 interfaceId 0x6b61a747
 interface IERCxyz {
-  
+  // It MUST revert if the token is not staked
   function ownerOf(address tokenAddress, uint256 tokenId) external view returns(address);
 }
 ```
@@ -43,11 +52,13 @@ This standard is fully backwards compatible with existing [ERC-721](./eip-721.md
 
 ## Security Considerations
 
-This EIP does not introduce any known security considerations.
+A potential risk is that a staking pool could improperly assign ownership to a different wallet through this interface. This would allow that wallet to potentially access privileges associated with the NFT.
 
-## Conclusion
+However, this is a much lower risk than transferring full legal ownership of the NFT to the staking pool initially. The interface only enables recognizing the staker, not replacing the actual owner on-chain.
 
-The proposed interface offers a streamlined solution for recognizing the ownership of staked NFTs, especially those that are non-lockable. Adopting this proposal will ensure that NFT holders do not lose out on associated benefits when they stake their tokens.
+Overall, improper use of this interface poses some risk of inaccurate ownership records. But this is an inherent issue with any staking arrangement, and is reduced by the owner retaining custody rather than transferring ownership.
+
+As with any privilege granting NFT, consumers should evaluate staking providers carefully for signs of mismanagement or fraud. The interface itself does not enable any new manipulation capabilities, but prudent caution is always warranted.
 
 ## Copyright
 
