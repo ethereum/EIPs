@@ -33,7 +33,7 @@ The TXT record MUST adhere to the following schema:
 
 - `HOST`: `chain_id`-`record_number`._domaincontracts
 - `TTL`: auto
-- `VALUE`: "\<\integer number of TXT records referencing smart contract addresses on this domain\>""<address 1>""<address 2>"`...`
+- `VALUE`: "\<integer number of TXT records referencing smart contract addresses on this domain\>""<address 1>""<address 2>"`...`
 
 This `HOST` naming scheme is designed to mimic the [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail#Verification) naming convention. Additionally, this naming scheme makes it simple to programmatically ascertain if any smart contracts are associated with the domain on a given blockchain network. The value of `chain_id` is simply the integer associated with the target network (i.e. `1` for Ethereum mainnet or `42` for Polygon). The `record_number` acts as a page number to allow for multiple TXT records to be created if the quantity of referenced contracts cannot fit in a single record. Additionally, `record_number` is used in conjunction with the first integer given in the `VALUE` field which denotes the total number of relevant TXT records. So, a typical `HOST`  might be: `1-1._domainContracts`, `1-2._domainContracts`, etc.
 
