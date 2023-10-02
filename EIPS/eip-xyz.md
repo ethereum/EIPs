@@ -37,13 +37,15 @@ The interface is defined as follows:
 ```solidity
 interface IERCxyz {
   // It MUST revert if the token is not staked
-  function ownerOf(address tokenAddress, uint256 tokenId) external view returns(address);
+  function ownerOfToken(address tokenAddress, uint256 tokenId) external view returns(address);
 }
 ```
 
+The function name could have been simply `ownerOf` but nothing stops a standard [ERC-721](./eip-721.md) from staking another [ERC-721](./eip-721.md), and in that case the function's name would conflict with the standard `ownerOf` function, forcing the caller of the second to specify the signature to distinguish between the two functions. That may break existing apps that expect that an [ERC-721](./eip-721.md) contract has only one `ownerOf` function.
+
 ## Rationale
 
-This approach provides a workaround for the challenges posed by non-lockable NFTs. By maintaining a record of the original owner and exposing this through the `ownerOf` method, we ensure that staking does not hinder the utility or privileges tied to certain NFTs.
+This approach provides a workaround for the challenges posed by non-lockable NFTs. By maintaining a record of the original owner and exposing this through the `ownerOfToken` method, we ensure that staking does not hinder the utility or privileges tied to certain NFTs.
 
 ## Backwards Compatibility
 
