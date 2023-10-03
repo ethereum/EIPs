@@ -1,42 +1,42 @@
 ---
-eip: EIP-7808
+eip: 7808
 title: ETH (Native Asset) Address Convention
-description: An address placeholder for ETH when used in the same context as an ERC-20
+description: An address placeholder for ETH when used in the same context as an EIP-20 token.
 author: Joey Santoro (@joeysantoro)
 discussions-to: https://ethereum-magicians.org/t/eip-7808-eth-native-asset-address-convention/15989
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-10-03
-requires: EIP-20, EIP-4626
+requires: [EIP-20](https://eips.ethereum.org/EIPS/eip-20), [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626)
 ---
 
 ## Abstract
 
-The following standard proposes a convention for using the address 0x000000000000000000000000000000000000000E (0xe) in all contexts where ETH is used in the same capacity as an [EIP-20 token](https://eips.ethereum.org/EIPS/eip-20).
+The following standard proposes a convention for using the address 0x000000000000000000000000000000000000000E (0xe) in all contexts where ETH is used in the same capacity as an [EIP-20](https://eips.ethereum.org/EIPS/eip-20) token.
 
 This sandard generalizes to other EVM chains where the native asset is not ETH.
 
 ## Motivation
 
-ETH, being a fungible unit of value, often behaves similarly to [EIP-20](https://eips.ethereum.org/EIPS/eip-20) tokens. Protocols tend to implement a standard interface for EIP-20 tokens, and want the ETH implementation to closely mirror the EIP-20 implementations.
+ETH, being a fungible unit of value, often behaves similarly to [EIP-20](https://eips.ethereum.org/EIPS/eip-20) tokens. Protocols tend to implement a standard interface for EIP-20 tokens, and want the ETH implementation to closely mirror the [EIP-20](https://eips.ethereum.org/EIPS/eip-20) implementations.
 
-In many cases, protocols will opt to use Wrapped ETH ([WETH](https://etherscan.io/token/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2)) for EIP-20 compliance, however not all protocols do this. Some reasons not to include gas considerations, or the requirement of using native ETH such as in the case of a Liquid Staking Token.
+In many cases, protocols will opt to use Wrapped ETH ([WETH](https://etherscan.io/token/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2)) for [EIP-20](https://eips.ethereum.org/EIPS/eip-20) compliance, however not all protocols do this. Some reasons not to include gas considerations, or the requirement of using native ETH such as in the case of a Liquid Staking Token.
 
-One intended use case for the standard is EIP-4626 compliant LSTs which use ETH as the `asset`. This extends the benefits and tooling of EIP-4626 to LSTs and integrating protocols.
+One intended use case for the standard is [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) compliant LSTs which use ETH as the `asset`. This extends the benefits and tooling of [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) to LSTs and integrating protocols.
 
-This standard allows protocols and off-chain data infrastructure to  coordinate around a shared understanding that any time 0xe is used as an address in an EIP-20 context, it means ETH.
+This standard allows protocols and off-chain data infrastructure to  coordinate around a shared understanding that any time 0xe is used as an address in an [EIP-20](https://eips.ethereum.org/EIPS/eip-20) context, it means ETH.
 
 ## Specification
 
-This standard applies for all smart contract systems which generalize from both ETH and EIP-20. The usage of the term Token below means ETH or an EIP-20 in this context.
+This standard applies for all smart contract systems which generalize from both ETH and [EIP-20](https://eips.ethereum.org/EIPS/eip-20). The usage of the term Token below means ETH or an [EIP-20](https://eips.ethereum.org/EIPS/eip-20) in this context.
 
-Any fields where an EIP-20 address is stored, yet the underlying Token is ETH, the address field MUST return `0x000000000000000000000000000000000000000E`
+Any fields where an [EIP-20](https://eips.ethereum.org/EIPS/eip-20) address is stored, yet the underlying Token is ETH, the address field MUST return `0x000000000000000000000000000000000000000E`
 
-0x000000000000000000000000000000000000000E MUST NOT be used as a precompile address in a future hard fork, unless this precompile specifies an enshrined EIP-20 implementation for ETH.
+0x000000000000000000000000000000000000000E MUST NOT be used as a precompile address in a future hard fork, unless this precompile specifies an enshrined [EIP-20](https://eips.ethereum.org/EIPS/eip-20) implementation for ETH.
 
 ## Rationale
-Smart Contract Systems which use both ETH and EIP-20 in the same context should have a single address convention for the ETH case. 
+Smart Contract Systems which use both ETH and [EIP-20](https://eips.ethereum.org/EIPS/eip-20) in the same context should have a single address convention for the ETH case. 
 
 ### Considered alternative addresses
 Many existing implementations of the same use case as this standard use addresses such as 0x0, 0x1, and 0xeeee...eeee. Let us discuss the pros and cons of these:
@@ -49,9 +49,9 @@ Many existing implementations of the same use case as this standard use addresse
 
 ## Backwards Compatibility
 
-EIP-7808 is backward compatible with the EIP-4626 standard by using `0x000000000000000000000000000000000000000E` the `asset` field when the Token is ETH. This would be technically non-compliant as `asset` is required to be an EIP-20 token contract, however either the 4626 standard can be edited for this edge case, or a new ETH specific standard can be written with maximum backward compatibility otherwise.
+This standard is backward compatible with the [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) standard by using `0x000000000000000000000000000000000000000E` the `asset` field when the Token is ETH. This would be technically non-compliant as `asset` is required to be an [EIP-20](https://eips.ethereum.org/EIPS/eip-20) token contract, however either the 4626 standard can be edited for this edge case, or a new ETH specific standard can be written with maximum backward compatibility otherwise.
 
-EIP-7808 has no known compatibility issues with other standards.
+This standard has no known compatibility issues with other standards.
 
 ## Security Considerations
 
