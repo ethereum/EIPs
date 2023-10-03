@@ -1,9 +1,9 @@
 ---
-eip: <TODO>
+eip: EIP-7808
 title: ETH (Native Asset) Address Convention
 description: An address placeholder for ETH when used in the same context as an ERC-20
 author: Joey Santoro (@joeysantoro)
-discussions-to: <TODO>
+discussions-to: https://ethereum-magicians.org/t/eip-7808-eth-native-asset-address-convention/15989
 status: Draft
 type: Standards Track
 category: ERC
@@ -49,9 +49,9 @@ Many existing implementations of the same use case as this standard use addresse
 
 ## Backwards Compatibility
 
-EIP-X is backward compatible with the EIP-4626 standard by using `0x000000000000000000000000000000000000000E` the `asset` field when the Token is ETH. This would be technically non-compliant as `asset` is required to be an EIP-20 token contract, however either the 4626 standard can be edited for this edge case, or a new ETH specific standard can be written with maximum backward compatibility otherwise.
+EIP-7808 is backward compatible with the EIP-4626 standard by using `0x000000000000000000000000000000000000000E` the `asset` field when the Token is ETH. This would be technically non-compliant as `asset` is required to be an EIP-20 token contract, however either the 4626 standard can be edited for this edge case, or a new ETH specific standard can be written with maximum backward compatibility otherwise.
 
-EIP-X has no known compatibility issues with other standards.
+EIP-7808 has no known compatibility issues with other standards.
 
 ## Security Considerations
 
