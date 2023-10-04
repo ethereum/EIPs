@@ -1,7 +1,7 @@
 ---
 title: EVM Profile for Type 3 ZK Rollups
 description: EVM Profile for ZK Rollups
-author: Peter Robinson (@drinkcoffee) <peter.robinson@immutable.com>
+author: Peter Robinson (@drinkcoffee)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
