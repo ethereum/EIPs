@@ -257,7 +257,7 @@ interface IERC7092 {
     * @param _from the account that owns bonds
     * @param _to the account that receives the bond
     * @param _amount amount of bond tokens to be transferred
-    * @param _destinationChainID The unique ID that identifies the destination Chain.
+    * @param _destinationChainID The unique ID that identifies the destination Chain
     */
     event CrossChainTransfer(address _from, address _to, uint256 _amount, uint64 _destinationChainID);
 
@@ -273,11 +273,10 @@ interface IERC7092 {
     * @notice MUST be emitted when an account is approved cross-chain
     * @param _owner the bonds owner
     * @param _spender the account to be allowed to spend bonds
-    * @param _amount amount of bond tokens allowed by _owner to be spent by _spender.
-    * @param _destinationChainID The unique ID that identifies the destination Chain.
-    * @param _destinationContract The smart contract to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
+    * @param _amount amount of bond tokens allowed by _owner to be spent by _spender
+    * @param _destinationChainID The unique ID that identifies the destination Chain
     */
-    event CrossChainApproval(address _owner, address _spender, uint256 _amount);
+    event CrossChainApproval(address _owner, address _spender, uint256 _amount, uint64 _destinationChainID);
 
     /**
     * @notice MUST be emmitted when the `_owner` decreases allowance from `_sepnder` by quantity `_amount`
@@ -292,8 +291,7 @@ interface IERC7092 {
     * @param _owner the bonds owner
     * @param _spender the account that has been allowed to spend bonds
     * @param _amount amount of bond tokens to disapprove
-    * @param _destinationChainID The unique ID that identifies the destination Chain.
-    * @param _destinationContract The smart contract to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
+    * @param _destinationChainID The unique ID that identifies the destination Chain
     */
-    event CrossChainDecreaseApproval(address _owner, address _spender, uint256 _amount);
+    event CrossChainDecreaseApproval(address _owner, address _spender, uint256 _amount, uint64 _destinationChainID);
 }
