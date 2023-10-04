@@ -23,7 +23,7 @@ A TXT pointer coupled with an appropriate smart contract interface (described in
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-### How Smart Contracts are Discovered
+### Contract Pointers in TXT Records 
 
 The owner of a domain name MUST create a TXT record in their DNS settings that serves as a pointer to all relevant smart contracts they wish to associate with their domain. 
 
@@ -31,29 +31,25 @@ The owner of a domain name MUST create a TXT record in their DNS settings that s
 
 The TXT record MUST adhere to the following schema:
 
-- `HOST`: `chain_id`-`record_number`._domaincontracts
+- `HOST`: EIPXXXX.`chain_id`-`record_number`._domaincontracts
 - `TTL`: auto
-- `VALUE`: "\<integer number of TXT records referencing smart contract addresses on this domain\>""<address 1>""<address 2>"`...`
+- `VALUE`: \<integer number of TXT records referencing smart contract addresses on this domain\>,\<address 1\>,\<address 2\>,...
 
-This `HOST` naming scheme is designed to mimic the [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail#Verification) naming convention. Additionally, this naming scheme makes it simple to programmatically ascertain if any smart contracts are associated with the domain on a given blockchain network. The value of `chain_id` is simply the integer associated with the target network (i.e. `1` for Ethereum mainnet or `42` for Polygon). The `record_number` acts as a page number to allow for multiple TXT records to be created if the quantity of referenced contracts cannot fit in a single record. Additionally, `record_number` is used in conjunction with the first integer given in the `VALUE` field which denotes the total number of relevant TXT records. So, a typical `HOST`  might be: `1-1._domainContracts`, `1-2._domaincontracts`, etc.
+This `HOST` naming scheme is designed to mimic the [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail#Verification) naming convention. Additionally, this naming scheme makes it simple to programmatically ascertain if any smart contracts are associated with the domain on a given blockchain network. Prepending with "EIPXXXX" (XXXX to be replaced with assigned number) will prevent naming collisions. The value of `chain_id` is simply the integer associated with the target network (i.e. `1` for Ethereum mainnet or `42` for Polygon). The `record_number` acts as a page number to allow for multiple TXT records to be created if the quantity of referenced contracts cannot fit in a single record. Additionally, `record_number` is used in conjunction with the first integer given in the `VALUE` field which denotes the total number of relevant TXT records. So, a typical `HOST`  might be: `EIPXXXX.1-1._domainContracts`, `EIPXXXX.1-2._domaincontracts`, etc.
 
-A user can check the propagation of their TXT record from the command line via [`dig`](https://linux.die.net/man/1/dig):
+It is RECOMMENDED that EVM address strings adhere to [EIP-1191](https://eips.ethereum.org/EIPS/eip-1191) so that the browser client can checksum the validity of the address and its target network before making an RPC call. 
 
-```
-dig -t txt 1-1._domaincontracts.example.com
-```
-
-or leverage DoH in the browser console with [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch):
+A user can check the propagation of their TXT record from the browser console with [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch):
 
 ```
-await fetch("https://cloudflare-dns.com/dns-query?name=1-1._domaincontracts.example.com&type=TXT", {
+await fetch("https://cloudflare-dns.com/dns-query?name=EIPXXXX.1-1._domaincontracts.example.com&type=TXT", {
   headers: {
     Accept: "application/dns-json"
   }
 })
 ```
 
-### Verifying Smart Contract Association Against a Domain Reference
+### Smart Contract Association with a Domain 
 
 Any smart contract MAY implement this ERC to provide a verification mechanism of smart contract addresses listed in a compatible TXT record.
 
@@ -69,7 +65,17 @@ A smart contract need only store one new member variable, `domains`, which is an
 }
 ```
 
+### Client-side Verification
+
 The user client MUST verify that the eTLD+1 of the TXT record matches an entry in the `domains` list of the smart contract.
+
+The client working with the smart contract is protected by cross-checking that two independent sources of information agree with each other. As long as the `addDomain` and `removeDomain` calls on the smart contract are properly authenticated (as shown if the reference implementation), the values in the domains field must have been set by a controller of the contract. The contract addresses in the TXT records can only be set by the owner of the domain. For these two values to align the same organization must control both resources.
+
+Example 1:
+A user visits bigbrand.com. The owners of bigbrand.com have previously released an NFT collection which utilizes this ERC standard and was airdropped to a number of wallet addresses. If the user was one of the recipients, a wallet leveraging this ERC could automatically detect that the user is an owner of a digital asset associated with the site and customize the user experience accordingly. 
+
+Example 2: 
+A user visits nftmarketplace.io to buy a limited release NFT from theirfavoritebrand.com. The marketplace app can leverage this ERC to allow the user to search by domain name and also indicate to the user that an NFT of interest is indeed an authentic asset associated with theirfavoritebrand.com. 
 
 ## Rationale
 
@@ -131,7 +137,7 @@ function removeDomain(
   }
 ```
 
-**NOTE**: It is important that appropriate account authentication be applied to `addDomain` and `removeDomain` so that only authorized users may update the `domains` list.
+**NOTE**: It is important that appropriate account authentication be applied to `addDomain` and `removeDomain` so that only authorized users may update the `domains` list. In the given reference implementation the `onlyRole` modifier is used to restrict call privileges to accounts with the `DEFAULT_ADMIN_ROLE` which can be added to any contract with the OpenZeppelin access control library. 
 
 ## Security Considerations
 
