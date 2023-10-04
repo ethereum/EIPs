@@ -30,7 +30,7 @@ The purpose of this EIP is to define a standard set of opcodes and precompiles m
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 ### Hardfork Reference Point
-The baseline for the opcodes and precompiles defined in this specification is the Shanghai Hark Fork (see [Ethereum Execution Layer Specification (EELS))](https://ethereum.github.io/execution-specs/autoapi/ethereum/shanghai/index.html)). All opcodes and precompiles not specified in the sections below MUST be fully supported.
+The baseline for the opcodes and precompiles defined in this specification is the [Shanghai Hark Fork](https://github.com/ethereum/execution-specs/blob/8b8c7c1a7437510f614272392275855de26209d3/network-upgrades/mainnet-upgrades/shanghai.md). All opcodes and precompiles not specified in the sections below MUST be fully supported.
 
 ### Opcodes with Changed Behaviour
 
