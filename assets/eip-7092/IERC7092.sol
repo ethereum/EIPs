@@ -339,14 +339,6 @@ interface IERC7092 {
     event Transfer(address _from, address _to, uint256 _amount);
 
     /**
-    * @notice MUST be emitted when a batch of bond tokens are transferred, issued or redeemed, except during contract creation
-    * @param _from bond token's owner
-    * @param _to array of accounts that receives the bond
-    * @param _amount array of amount of bond tokens to be transferred
-    */
-    event TransferBatch(address _from, address[] _to, uint256[] _amount);
-
-    /**
     * @notice MUST be emitted when bond tokens are transferred or redeemed cross-chain
     * @param _from the account that owns bonds
     * @param _to the account that receives the bond
@@ -354,6 +346,14 @@ interface IERC7092 {
     * @param _destinationChainID The unique ID that identifies the destination Chain
     */
     event CrossChainTransfer(address _from, address _to, uint256 _amount, uint64 _destinationChainID);
+
+    /**
+    * @notice MUST be emitted when a batch of bond tokens are transferred, issued or redeemed, except during contract creation
+    * @param _from bond token's owner
+    * @param _to array of accounts that receives the bond
+    * @param _amount array of amount of bond tokens to be transferred
+    */
+    event TransferBatch(address _from, address[] _to, uint256[] _amount);
 
     /**
     * @notice MUST be emitted when a batch of bond tokens are transferred or redeemed cross-chain
