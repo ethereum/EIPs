@@ -6,12 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract ERC20Mock is ERC20 {
     uint8 private _decimals;
 
-    constructor(
-        uint256 supply_,
-        uint8 decimals_,
-        string memory name_,
-        string memory symbol_
-    ) ERC20(name_, symbol_) {
+    constructor(uint256 supply_, uint8 decimals_, string memory name_, string memory symbol_) ERC20(name_, symbol_) {
         _mint(msg.sender, supply_);
         _decimals = decimals_;
     }
