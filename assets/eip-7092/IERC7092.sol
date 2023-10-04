@@ -230,12 +230,21 @@ interface IERC7092 {
     function crossChainTransfer(address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
 
     /**
+    * @notice Moves each amount of bond tokens in `_amount` to address corresponding address `_to`.
+    * @param _to array of addresses to send the bonds to
+    * @param _amount array of amount of bond tokens to transfer
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present.
+    */
+    function batchTransfer(address[] calldata _to, uint256[] calldata _amount) external returns(bool);
+
+    /**
     * @notice Moves `_amount` bonds to address `_to`. This methods also allows to attach data to the token that is being transferred
     * @param _to array of addresses to send the bonds to
     * @param _amount array of amount of bond tokens to transfer
     * @param _data array of additional information provided by the token holder
     *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to decrease the token allowance cross-chain.
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present.
     */
     function batchTransfer(address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
 
@@ -289,10 +298,21 @@ interface IERC7092 {
     *         This methods also allows to attach data to the token that is being transferred
     * @param _from array of bondholder addresses
     * @param _to array of addresses to transfer bond tokens to
+    * @param _amount array of amount of bond tokens to transfer
+    *
+    ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present.
+    */
+    function batchTransferFrom(address[] calldata _from, address[] calldata _to, uint256[] calldata _amount) external returns(bool);
+
+    /**
+    * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function
+    *         This methods also allows to attach data to the token that is being transferred
+    * @param _from array of bondholder addresses
+    * @param _to array of addresses to transfer bond tokens to
     * @param _amount array of amount of bond tokens to transfer.
     * @param _data array of additional information provided by the token holder
     *
-    ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
+    ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present.
     */
     function batchTransferFrom(address[] calldata _from, address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
 
