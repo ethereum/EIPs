@@ -21,7 +21,7 @@ A TXT pointer coupled with an appropriate smart contract interface (described in
 
 **Example 1**:
 
-A user visits merchant.com who accepts payments via paymentprocessor.com. The business behind paymentprocessor.com has previously released a stable coin for easier cross-border payments which adheres to this ERC. On the checkout page, paymentprocessor.com is mounted as an iframe component. If the user has installed a browser-plugin wallet compatible with this standard, then the wallet can detect the domain of the iframe, cross-reference it with the payment processors stable coin, and automatically prompt to complete the purchase in paymentprocessor.com's stable coin. 
+A user visits merchant.com who accepts payments via paymentprocessor.com. The business behind paymentprocessor.com has previously released a stable coin for easier cross-border payments which adheres to this ERC. On the checkout page, paymentprocessor.com is mounted as an iframe component. If the user has installed a browser-extension wallet compatible with this standard, then the wallet can detect the domain of the iframe in the context of the checkout page, discover and verify the stable coin's association with paymentprocessor.com, and automatically prompt to complete the purchase in paymentprocessor.com's stable coin. 
 
 **Example 2**:
 
