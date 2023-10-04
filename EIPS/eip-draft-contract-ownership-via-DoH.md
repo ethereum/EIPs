@@ -146,7 +146,9 @@ function removeDomain(
 
 ## Security Considerations
 
-Due to the reliance on traditional DNS systems, this ERC is susceptible to attacks on this technology, such as [domain hijacking](https://en.wikipedia.org/wiki/Domain_hijacking). Additionally, it is the responsibility of the smart contract author to ensure that `addDomain` and `removeDomain` are authenticated properly, otherwise an attacker could associate their smart contract with an undesirable domain. 
+Due to the reliance on traditional DNS systems, this ERC is susceptible to attacks on this technology, such as [domain hijacking](https://en.wikipedia.org/wiki/Domain_hijacking). Additionally, it is the responsibility of the smart contract author to ensure that `addDomain` and `removeDomain` are authenticated properly, otherwise an attacker could associate their smart contract with an undesirable domain, which would simply break the ability to verify association with the proper domain. 
+
+It is worth noting that for an attacker to falsy verify a contract against a domain would require them to compromise both the DNS settings **and** the smart contract itself. In this scenario, the attacker has likely also compromised the business' email domains as well. 
 
 ## Copyright
 
