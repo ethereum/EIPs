@@ -174,7 +174,7 @@ interface IERC7092 {
     * @param _amount amount of bond tokens to transfer
     * @param _data additional information provided by the token holder
     */
-    function transferWithData(address _to, uint256 _amount, bytes calldata _data) external returns(bool);
+    function transfer(address _to, uint256 _amount, bytes calldata _data) external returns(bool);
 
     /**
     * @notice Moves `_amount` bond tokens to address `_to` from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
@@ -198,7 +198,7 @@ interface IERC7092 {
     *
     * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
     */
-    function crossChainTransferWithData(address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
+    function crossChainTransfer(address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
 
     /**
     * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function
@@ -216,7 +216,7 @@ interface IERC7092 {
     * @param _amount amount of bond tokens to transfer.
     * @param _data additional information provided by the token holder
     */
-    function transferFromWithData(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool);
+    function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool);
 
     /**
     * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function, from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
@@ -242,10 +242,10 @@ interface IERC7092 {
     *
     ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
     */
-    function crossChainTransferFromWithData(address _from, address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
+    function crossChainTransferFrom(address _from, address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
 
     /**
-    * @notice MUST be emitted when bond tokens are transferred
+    * @notice MUST be emitted when bond tokens are transferred, issued or redeemed, except during contract creation
     * @param _from the account that owns bonds
     * @param _to the account that receives the bond
     * @param _amount amount of bond tokens to be transferred
@@ -253,34 +253,13 @@ interface IERC7092 {
     event Transfer(address _from, address _to, uint256 _amount);
 
     /**
-    * @notice MUST be emitted when bond tokens are transferred with additional data
-    * @param _from the account that owns bonds
-    * @param _to the account that receives the bond
-    * @param _amount amount of bond tokens to be transferred
-    * @param _data additional information provided by the token holder
-    */
-    event TransferWithData(address _from, address _to, uint256 _amount, bytes _data);
-
-    /**
-    * @notice MUST be emitted when bond tokens are transferred cross-chain
+    * @notice MUST be emitted when bond tokens are transferred or redeemed cross-chain
     * @param _from the account that owns bonds
     * @param _to the account that receives the bond
     * @param _amount amount of bond tokens to be transferred
     * @param _destinationChainID The unique ID that identifies the destination Chain.
-    * @param _destinationContract The smart contract to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
     */
-    event CrossChainTransfer(address _from, address _to, uint256 _amount, uint64 _destinationChainID, address _destinationContract);
-
-    /**
-    * @notice MUST be emitted when bond tokens are transferred cross-chain with additional data
-    * @param _from the account that owns bonds
-    * @param _to the account that receives the bond
-    * @param _amount amount of bond tokens to be transferred
-    * @param _data additional information provided by the token holder
-    * @param _destinationChainID The unique ID that identifies the destination Chain.
-    * @param _destinationContract The smart contract to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
-    */
-    event CrossChainTransferWithData(address _from, address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract);
+    event CrossChainTransfer(address _from, address _to, uint256 _amount, uint64 _destinationChainID);
 
     /**
     * @notice MUST be emitted when an account is approved
