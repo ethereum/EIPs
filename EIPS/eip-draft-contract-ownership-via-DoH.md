@@ -17,7 +17,15 @@ The introduction of [DNS over HTTPS](https://en.wikipedia.org/wiki/DNS_over_HTTP
 
 As mainstream businesses begin to adopt public blockchain and digital asset technologies more rapidly, there is a growing need for a discovery/search mechanism (compatible with conventional browser resources) of smart contracts associated with a known business domain as well as reasonable assurance that the smart contract does indeed belong to the business owner of the DNS domain. The relatively recent introduction and widespread support of DoH means it is possible to make direct queries of DNS records straight from the browser context and thus leverage a simple TXT record as a pointer to an on-chain smart contract. 
 
-A TXT pointer coupled with an appropriate smart contract interface (described in this ERC) yields a simple, yet flexible and robust mechanism for the client-side detection and reasonably secure verification of on-chain logic and digital assets associated with a the owner of a domain name. For example, a stablecoin issuer might leverage this standard to provide a method for an end user or web-based end user client to ensure that the asset their wallet is interacting with is indeed the contract issued or controlled by the owner or administrator of a well known DNS domain. 
+A TXT pointer coupled with an appropriate smart contract interface (described in this ERC) yields a simple, yet flexible and robust mechanism for the client-side detection and reasonably secure verification of on-chain logic and digital assets associated with a the owner of a domain name. For example, a stablecoin issuer might leverage this standard to provide a method for an end user or web-based end user client to ensure that the asset their wallet is interacting with is indeed the contract issued or controlled by the owner or administrator of a well known DNS domain.
+
+**Example 1**:
+
+A user visits bigbrand.com. The owners of bigbrand.com have previously released an NFT collection which is compatible with this ERC standard and was airdropped to a number of wallet addresses. If the user was one of the recipients, a wallet leveraging this ERC could automatically detect that the user is an owner of a digital asset associated with the site and customize the user experience accordingly. 
+
+**Example 2**: 
+
+A user visits nftmarketplace.io to buy a limited release NFT from theirfavoritebrand.com. The marketplace app can leverage this ERC to allow the user to search by domain name and also indicate to the user that an NFT of interest is indeed an authentic asset associated with theirfavoritebrand.com. 
 
 ## Specification
 
@@ -69,19 +77,15 @@ A smart contract need only store one new member variable, `domains`, which is an
 
 The user client MUST verify that the eTLD+1 of the TXT record matches an entry in the `domains` list of the smart contract.
 
-The client working with the smart contract is protected by cross-checking that two independent sources of information agree with each other. As long as the `addDomain` and `removeDomain` calls on the smart contract are properly authenticated (as shown if the reference implementation), the values in the domains field must have been set by a controller of the contract. The contract addresses in the TXT records can only be set by the owner of the domain. For these two values to align the same organization must control both resources.
+When a client detects a compatible TXT record, loop through each listed contract address and, via an appropriate RPC provider, fetch the `domains` array from each contract in the list. The client should detect an eTLD+1 entry in the contract's `domains` array that exactly matches (DNS domains are not case-senstive) the eTLD+1 of the TXT record. 
 
-**Example 1**:
-
-A user visits bigbrand.com. The owners of bigbrand.com have previously released an NFT collection which utilizes this ERC standard and was airdropped to a number of wallet addresses. If the user was one of the recipients, a wallet leveraging this ERC could automatically detect that the user is an owner of a digital asset associated with the site and customize the user experience accordingly. 
-
-**Example 2**: 
-
-A user visits nftmarketplace.io to buy a limited release NFT from theirfavoritebrand.com. The marketplace app can leverage this ERC to allow the user to search by domain name and also indicate to the user that an NFT of interest is indeed an authentic asset associated with theirfavoritebrand.com. 
+Alternatively, if a client is inspecting a contract that implements this ERC, the client can collect the `domains` array from the contract and then attempt to fetch TXT records from all listed eTLD+1 domains to ascertain its association or authenticity. 
 
 ## Rationale
 
 According to [Cloudflare](https://www.cloudflare.com/learning/dns/dns-records/dns-txt-record/), the two most common use cases of TXT records today are email spam prevention (via [SPF](https://www.cloudflare.com/learning/dns/dns-records/dns-spf-record/), [DKIM](https://www.cloudflare.com/learning/dns/dns-records/dns-dkim-record/), and [DMARC](https://www.cloudflare.com/learning/dns/dns-records/dns-dmarc-record/) TXT records) and domain ownership verification. The use case considered here for on-chain smart contract discovery and verification is essentially analogous. Now that DoH is supported by most major DNS providers, it is easy to leverage TXT records directly in wallets, dApps, and other web applications without relying on a proprietary vendor API to provide DNS information and thus gain the same benefits afforded to email and domain verification with digital assets and on-chain logic. 
+
+The client working with the smart contract is protected by cross-checking that two independent sources of information agree with each other. As long as the `addDomain` and `removeDomain` calls on the smart contract are properly authenticated (as shown if the reference implementation), the values in the domains field must have been set by a controller of the contract. The contract addresses in the TXT records can only be set by the owner of the domain. For these two values to align the same organization must control both resources.
 
 ## Backwards Compatibility
 
