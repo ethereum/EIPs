@@ -77,9 +77,9 @@ A smart contract need only store one new member variable, `domains`, which is an
 
 The user client MUST verify that the eTLD+1 of the TXT record matches an entry in the `domains` list of the smart contract.
 
-When a client detects a compatible TXT record, loop through each listed contract address and, via an appropriate RPC provider, fetch the `domains` array from each contract in the list. The client should detect an eTLD+1 entry in the contract's `domains` array that exactly matches (DNS domains are not case-senstive) the eTLD+1 of the TXT record. 
+When a client detects a compatible TXT record listed on an eTLD+1, it MUST loop through each listed contract address and, via an appropriate RPC provider, collect the `domains` array from each contract in the list. The client should detect an eTLD+1 entry in the contract's `domains` array that exactly matches (DNS domains are not case-sensitive) the eTLD+1 of the TXT record. 
 
-Alternatively, if a client is inspecting a contract that implements this ERC, the client can collect the `domains` array from the contract and then attempt to fetch TXT records from all listed eTLD+1 domains to ascertain its association or authenticity. 
+Alternatively, if a client is inspecting a contract that implements this ERC, the client SHOULD collect the `domains` array from the contract and then attempt to fetch TXT records from all listed eTLD+1 domains to ascertain its association or authenticity. The client MUST confirm that the contract address is contained in a TXT record's `VALUE` field of the eTLD+1 pointed to by the contract's `domains` array. 
 
 ## Rationale
 
