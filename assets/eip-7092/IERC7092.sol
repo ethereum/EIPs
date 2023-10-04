@@ -80,7 +80,7 @@ interface IERC7092 {
     /**
     * @notice Returns the coupon frequency, i.e. the number of times coupons are paid in a year.
     *
-    * * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used to improve usability.
+    * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used to improve usability.
     */
     function couponFrequency() external view returns(uint256);
 
@@ -144,6 +144,26 @@ interface IERC7092 {
     function crossChainApprove(address _spender, uint256 _amount, uint64 _destinationChainID, address _destinationContract) external returns(bool);
 
     /**
+    * @notice Authorizes several spenders account to manage `_amount`of their bond tokens
+    * @param _spender array of addresses to be authorized by the bondholder
+    * @param _amount array of amount of bond tokens to approve
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used to improve usability.
+    */
+    function batchApprove(address[] calldata _spender, uint256[] calldata _amount) external returns(bool);
+
+    /**
+    * @notice Authorizes several spender accounts to manage `_amount`of their bond tokens in the destination Chain
+    * @param _spender array of addresses to be authorized by the bondholder
+    * @param _amount array of amount of bond tokens to approve
+    * @param _destinationChainID array of unique IDs that identifies the destination Chain.
+    * @param _destinationContract array of smart contracts to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to approve tokens cross-chain.
+    */
+    function batchCrossChainApprove(address[] calldata _spender, uint256[] calldata _amount, uint64[] calldata _destinationChainID, address[] calldata _destinationContract) external returns(bool);
+
+    /**
     * @notice Lowers the allowance of `_spender` by `_amount`
     * @param _spender the address to be authorized by the bondholder
     * @param _amount amount of bond tokens to remove from allowance
@@ -162,6 +182,26 @@ interface IERC7092 {
     function crossChainDecreaseAllowance(address _spender, uint256 _amount, uint64 _destinationChainID, address _destinationContract) external;
 
     /**
+    * @notice Lowers the allowance of several spenders by corresponding amount in `_amount`
+    * @param _spender array of addresses to be authorized by the bondholder
+    * @param _amount array of amount of bond tokens to remove from allowance
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to decrease token allowance.
+    */
+    function batchDecreaseAllowance(address[] calldata _spender, uint256[] calldata _amount) external;
+
+    /**
+    * @notice Lowers the allowance of `_spender` by `_amount` in the destination Chain
+    * @param _spender array of addresses to be authorized by the bondholder
+    * @param _amount array of amount of bond tokens to remove from allowance
+    * @param _destinationChainID array of unique IDs that identifies the destination Chain.
+    * @param _destinationContract array of smart contracts to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to decrease the token allowance cross-chain.
+    */
+    function batchCrossChainDecreaseAllowance(address[] calldata _spender, uint256[] calldata _amount, uint64[] calldata _destinationChainID, address[] calldata _destinationContract) external;
+
+    /**
     * @notice Moves `_amount` bonds to address `_to`
     * @param _to the address to send the bonds to
     * @param _amount amount of bond tokens to transfer
@@ -175,16 +215,6 @@ interface IERC7092 {
     * @param _data additional information provided by the token holder
     */
     function transfer(address _to, uint256 _amount, bytes calldata _data) external returns(bool);
-
-    /**
-    * @notice Moves `_amount` bonds to address `_to`. This methods also allows to attach data to the token that is being transferred
-    * @param _to array of addresses to send the bonds to
-    * @param _amount array of amount of bond tokens to transfer
-    * @param _data array of additional information provided by the token holder
-    *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to decrease the token allowance cross-chain.
-    */
-    function batchTransfer(address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
 
     /**
     * @notice Moves `_amount` bond tokens to address `_to` from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
@@ -209,6 +239,16 @@ interface IERC7092 {
     * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
     */
     function crossChainTransfer(address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
+
+    /**
+    * @notice Moves `_amount` bonds to address `_to`. This methods also allows to attach data to the token that is being transferred
+    * @param _to array of addresses to send the bonds to
+    * @param _amount array of amount of bond tokens to transfer
+    * @param _data array of additional information provided by the token holder
+    *
+    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to decrease the token allowance cross-chain.
+    */
+    function batchTransfer(address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
 
     /**
     * @notice Moves `_amount` bonds to address `_to` from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon).
@@ -242,16 +282,6 @@ interface IERC7092 {
     function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool);
 
     /**
-    * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function
-    *         This methods also allows to attach data to the token that is being transferred
-    * @param _from array of bondholder addresses
-    * @param _to array of addresses to transfer bond tokens to
-    * @param _amount array of amount of bond tokens to transfer.
-    * @param _data array of additional information provided by the token holder
-    */
-    function batchTransferFrom(address[] calldata _from, address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
-
-    /**
     * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function, from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
     * @param _from the bondholder address
     * @param _to the address to transfer bonds to
@@ -278,6 +308,18 @@ interface IERC7092 {
     function crossChainTransferFrom(address _from, address _to, uint256 _amount, bytes calldata _data, uint64 _destinationChainID, address _destinationContract) external returns(bool);
 
     /**
+    * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function
+    *         This methods also allows to attach data to the token that is being transferred
+    * @param _from array of bondholder addresses
+    * @param _to array of addresses to transfer bond tokens to
+    * @param _amount array of amount of bond tokens to transfer.
+    * @param _data array of additional information provided by the token holder
+    *
+    ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
+    */
+    function batchTransferFrom(address[] calldata _from, address[] calldata _to, uint256[] calldata _amount, bytes[] calldata _data) external returns(bool);
+
+    /**
     * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function, from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
     *         This methods also allows to attach data to the token that is being transferred
     * @param _from array of bondholder addresses
@@ -300,6 +342,14 @@ interface IERC7092 {
     event Transfer(address _from, address _to, uint256 _amount);
 
     /**
+    * @notice MUST be emitted when a batch of bond tokens are transferred, issued or redeemed, except during contract creation
+    * @param _from array of accounts that owns bonds
+    * @param _to array of accounts that receives the bond
+    * @param _amount array of amount of bond tokens to be transferred
+    */
+    event TransferBatch(address[] _from, address[] _to, uint256[] _amount);
+
+    /**
     * @notice MUST be emitted when bond tokens are transferred or redeemed cross-chain
     * @param _from the account that owns bonds
     * @param _to the account that receives the bond
@@ -307,6 +357,15 @@ interface IERC7092 {
     * @param _destinationChainID The unique ID that identifies the destination Chain
     */
     event CrossChainTransfer(address _from, address _to, uint256 _amount, uint64 _destinationChainID);
+
+    /**
+    * @notice MUST be emitted when a batch of bond tokens are transferred or redeemed cross-chain
+    * @param _from the account that owns bonds
+    * @param _to the account that receives the bond
+    * @param _amount amount of bond tokens to be transferred
+    * @param _destinationChainID The unique ID that identifies the destination Chain
+    */
+    event CrossChainTransfer(address[] _from, address[] _to, uint256[] _amount, uint64[] _destinationChainID);
 
     /**
     * @notice MUST be emitted when an account is approved
