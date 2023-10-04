@@ -71,10 +71,12 @@ The user client MUST verify that the eTLD+1 of the TXT record matches an entry i
 
 The client working with the smart contract is protected by cross-checking that two independent sources of information agree with each other. As long as the `addDomain` and `removeDomain` calls on the smart contract are properly authenticated (as shown if the reference implementation), the values in the domains field must have been set by a controller of the contract. The contract addresses in the TXT records can only be set by the owner of the domain. For these two values to align the same organization must control both resources.
 
-Example 1:
+**Example 1**:
+
 A user visits bigbrand.com. The owners of bigbrand.com have previously released an NFT collection which utilizes this ERC standard and was airdropped to a number of wallet addresses. If the user was one of the recipients, a wallet leveraging this ERC could automatically detect that the user is an owner of a digital asset associated with the site and customize the user experience accordingly. 
 
-Example 2: 
+**Example 2**: 
+
 A user visits nftmarketplace.io to buy a limited release NFT from theirfavoritebrand.com. The marketplace app can leverage this ERC to allow the user to search by domain name and also indicate to the user that an NFT of interest is indeed an authentic asset associated with theirfavoritebrand.com. 
 
 ## Rationale
