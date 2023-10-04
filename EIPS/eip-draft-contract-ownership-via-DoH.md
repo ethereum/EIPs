@@ -25,10 +25,6 @@ A user visits merchant.com who accepts payments via paymentprocessor.com. The bu
 
 **Example 2**:
 
-A user visits bigbrand.com. The owners of bigbrand.com have previously released an NFT collection which is compatible with this ERC standard and was airdropped to a number of wallet addresses. If the user was one of the recipients, a wallet leveraging this ERC could automatically detect that the user is an owner of a digital asset associated with the site and customize the user experience accordingly. 
-
-**Example 3**: 
-
 A user visits nftmarketplace.io to buy a limited release NFT from theirfavoritebrand.com. The marketplace app can leverage this ERC to allow the user to search by domain name and also indicate to the user that an NFT of interest is indeed an authentic asset associated with theirfavoritebrand.com. 
 
 ## Specification
