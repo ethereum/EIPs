@@ -215,17 +215,6 @@ interface IERC7092 {
     * @param _data additional information provided by the token holder
     */
     function transfer(address _to, uint256 _amount, bytes calldata _data) external returns(bool);
-
-    /**
-    * @notice Moves `_amount` bond tokens to address `_to` from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
-    * @param _to the address to send the bonds to
-    * @param _amount amount of bond tokens to transfer
-    * @param _destinationChainID The unique ID that identifies the destination Chain.
-    * @param _destinationContract The smart contract to interact with in the destination Chain in order to Deposit or Mint tokens that are transferred.
-    *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
-    */
-    function crossChainTransfer(address _to, uint256 _amount, uint64 _destinationChainID, address _destinationContract) external returns(bool);
    
     /**
     * @notice Moves `_amount` bonds to address `_to` from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon).
@@ -280,18 +269,6 @@ interface IERC7092 {
     * @param _data additional information provided by the token holder
     */
     function transferFrom(address _from, address _to, uint256 _amount, bytes calldata _data) external returns(bool);
-
-    /**
-    * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function, from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
-    * @param _from the bondholder address
-    * @param _to the address to transfer bonds to
-    * @param _amount amount of bond tokens to transfer
-    * @param _data additional information provided by the token holder
-    * @param _destinationChainID The unique ID that identifies the destination Chain
-    *
-    ** OPTIONAL - interfaces and other contracts MUST NOT expect this function to be present. The method is used to transfer tokens cross-chain.
-    */
-    function crossChainTransferFrom(address _from, address _to, uint256 _amount, uint64 _destinationChainID, address _destinationContract) external returns(bool);
     
     /**
     * @notice Moves `_amount` bonds from an account that has authorized the caller through the approve function, from the current Chain to another Chain (Ex: move tokens from Ethereum to Polygon)
