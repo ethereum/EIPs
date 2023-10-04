@@ -320,11 +320,11 @@ interface IERC7092 {
 
     /**
     * @notice MUST be emitted when a batch of bond tokens are transferred, issued or redeemed, except during contract creation
-    * @param _from array of accounts that owns bonds
+    * @param _from bond token's owner
     * @param _to array of accounts that receives the bond
     * @param _amount array of amount of bond tokens to be transferred
     */
-    event TransferBatch(address[] _from, address[] _to, uint256[] _amount);
+    event TransferBatch(address _from, address[] _to, uint256[] _amount);
 
     /**
     * @notice MUST be emitted when bond tokens are transferred or redeemed cross-chain
@@ -337,16 +337,16 @@ interface IERC7092 {
 
     /**
     * @notice MUST be emitted when a batch of bond tokens are transferred or redeemed cross-chain
-    * @param _from the account that owns bonds
-    * @param _to the account that receives the bond
-    * @param _amount amount of bond tokens to be transferred
-    * @param _destinationChainID The unique ID that identifies the destination Chain
+    * @param _from the bond token's owner
+    * @param _to array of accounts that receive the bond
+    * @param _amount array of amount of bond tokens to be transferred
+    * @param _destinationChainID array of unique IDs that identify the destination Chain
     */
-    event CrossChainTransfer(address[] _from, address[] _to, uint256[] _amount, uint64[] _destinationChainID);
+    event CrossChainTransferBatch(address _from, address[] _to, uint256[] _amount, uint64[] _destinationChainID);
 
     /**
     * @notice MUST be emitted when an account is approved
-    * @param _owner the bonds owner
+    * @param _owner bond token's owner
     * @param _spender the account to be allowed to spend bonds
     * @param _amount amount of bond tokens allowed by _owner to be spent by _spender.
     */
@@ -360,6 +360,23 @@ interface IERC7092 {
     * @param _destinationChainID The unique ID that identifies the destination Chain
     */
     event CrossChainApproval(address _owner, address _spender, uint256 _amount, uint64 _destinationChainID);
+
+    /**
+    * @notice MUST be emitted when a batch of accounts are approved
+    * @param _owner bond token's owner
+    * @param _spender array of accounts to be allowed to spend bonds
+    * @param _amount array of amount of bond tokens allowed by _owner to be spent by _spender.
+    */
+    event ApprovalBatch(address _owner, address[] _spender, uint256[] _amount);
+
+    /**
+    * @notice MUST be emitted when a batch of accounts are approved cross-chain
+    * @param _owner bond token's owner
+    * @param _spender array of accounts to be allowed to spend bonds
+    * @param _amount array of amount of bond tokens allowed by _owner to be spent by _spender
+    * @param _destinationChainID array of unique IDs that identify the destination Chain
+    */
+    event CrossChainApprovalBatch(address _owner, address[] _spender, uint256[] _amount, uint64[] _destinationChainID);
 
     /**
     * @notice MUST be emmitted when the `_owner` decreases allowance from `_sepnder` by quantity `_amount`
@@ -377,4 +394,21 @@ interface IERC7092 {
     * @param _destinationChainID The unique ID that identifies the destination Chain
     */
     event CrossChainDecreaseApproval(address _owner, address _spender, uint256 _amount, uint64 _destinationChainID);
+
+    /**
+    * @notice MUST be emmitted when  `_owner` decreases allowance from several sepnders by corresponding quantity in the array `_amount`
+    * @param _owner the bonds owner
+    * @param _spender array of accounts that had been allowed to spend bonds
+    * @param _amount array of amount of bond tokens to disapprove
+    */
+    event DecreaseApprovalBatch(address _owner, address[] _spender, uint256[] _amount);
+
+    /**
+    * @notice MUST be emmitted when the `_owner` decreases allowance from several sepnders by corresponding quantity in `_amount` cross-chain
+    * @param _owner the bonds owner
+    * @param _spender array of accounts that have been allowed to spend bonds
+    * @param _amount array of amount of bond tokens to disapprove
+    * @param _destinationChainID array of unique IDs that identify the destination Chain
+    */
+    event CrossChainDecreaseApprovalBatch(address _owner, address _spender[], uint256 _amount[], uint64 _destinationChainID[]);
 }
