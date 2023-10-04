@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["traits"],
+  "properties": {
+    "traits": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["dataType"],
+        "properties": {
+          "displayName": {
+            "type": ["string"],
+            "description": "The user-facing display name for the trait."
+          },
+          "dataType": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "string" },
+                  "acceptableValues": {
+                    "type": "array",
+                    "description": "An exclusive list of possible string values that can be set for the trait. If this is not specified, the trait can be set to any reasonable string value. If `valueMappings` is specified, this list must be the `mappedValue`s.",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "maxLength": {
+                    "type": "number",
+                    "description": "The maximum length of the string value that can be set for the trait (inclusive). If this is not specified, the trait can be set to any reasonable string length."
+                  },
+                  "minLength": {
+                    "type": "number",
+                    "description": "The minimum length of the string value that can be set for the trait (inclusive). If this is not specified, it is assumed to be 0."
+                  },
+                  "valueMappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "A dictionary mapping of `traitValue`s returned from the contract to values that an offchain indexer should display. The keys to the dictionary are the onchain values and the dictionary values are the offchain values. Useful when longer than the 32 ASCII characters that bytes32 allows for."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "number" },
+                  "maxValue": {
+                    "type": "number",
+                    "description": "The maximum value of the string value that can be set for the trait (inclusive). If this is not specified, it is assumed to be the int256 max value."
+                  },
+                  "minValue": {
+                    "type": "number",
+                    "description": "The minimum value of the string value that can be set for the trait (inclusive). If this is not specified, it is assumed to be the int256 min value."
+                  },
+                  "decimals": {
+                    "type": "number",
+                    "description": "The number of decimal places that the trait value is returned with onchain. If this is not specified, it is assumed to be 0 (i.e. an integer value)."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "boolean" },
+                  "acceptableValues": {
+                    "type": "array",
+                    "description": "An exclusive list of possible boolean values that can be set for the trait.",
+                    "items": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "date-time" }
+                },
+                "description": "TODO: Define the format for this."
+              }
+            ],
+            "description": "The data type definition of the trait. See the `Metadata Data Types` section for more information."
+          },
+          "tokenOwnerCanUpdateValue": {
+            "type": "boolean",
+            "description": "Whether the token owner is able to set the trait value directly. If this isn't specified, it is assumed to be false."
+          }
+        }
+      }
+    }
+  }
+}
