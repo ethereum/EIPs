@@ -1,12 +1,13 @@
 ---
-title: DNS over HTTPS for Contract Discovery and eTLD+1 Association
-description: A simple standard leveraging TXT Records to discover and verify association of a smart contract with the owner of a DNS domain. 
-author: Todd Chapman (@tthebc01), Charlie Sibbach (charlie@cwsoftware.com), Sean Sing (@seansing)
-discussions-to: <URL>
+eip: XXXX
+title: DNS for Contract Discovery and eTLD+1 Association
+description: A simple method for leveraging TXT Records to discover, verify and associate a smart contract with the owner of a DNS domain.
+author: Todd Chapman (@tthebc01), Charlie Sibbach <charlie@cwsoftware.com>, Sean Sing (@seansing)
+discussions-to: https://ethereum-magicians.org/t/add-eip-dns-over-https-for-contract-discovery-and-etld-1-association/15996
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-9-30
+created: 2023-09-30
 requires: 1191
 ---
 
@@ -36,18 +37,18 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The owner of a domain name MUST create a TXT record in their DNS settings that serves as a pointer to all relevant smart contracts they wish to associate with their domain. 
 
-[TXT records](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.14) are not intended (nor permitted by most DNS servers) to store large amounts of data. Every DNS provider has their own vendor-specific character limits (see [Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTformat-limits) and [Namecheap](https://www.namecheap.com/support/knowledgebase/article.aspx/10058/10/namecheap-dns-limits/#:~:text=For%20TXT%20records%2C%20the%20limit,dots%2C%20for%20example%2C%201.2.) for typical limits). However, an EVM-compatible address string is 42 characters, so most DNS providers will allow for dozens of contract addresses to be stored under a single record. 
+[TXT records](https://datatracker.ietf.org/doc/html/rfc1035#section-3.3.14) are not intended (nor permitted by most DNS servers) to store large amounts of data. Every DNS provider has their own vendor-specific character limits. However, an EVM-compatible address string is 42 characters, so most DNS providers will allow for dozens of contract addresses to be stored under a single record. 
 
 The TXT record MUST adhere to the following schema:
 
 - `HOST`: EIPXXXX.`chain_id`-`record_number`._domaincontracts
 - `VALUE`: \<integer number of TXT records referencing smart contract addresses on this domain\>,\<address 1\>,\<address 2\>,...
 
-This `HOST` naming scheme is designed to mimic the [DKIM](https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail#Verification) naming convention. Additionally, this naming scheme makes it simple to programmatically ascertain if any smart contracts are associated with the domain on a given blockchain network. Prepending with "EIPXXXX" (XXXX to be replaced with assigned number) will prevent naming collisions. The value of `chain_id` is simply the integer associated with the target network (i.e. `1` for Ethereum mainnet or `42` for Polygon). The `record_number` acts as a page number to allow for multiple TXT records to be created if the quantity of referenced contracts cannot fit in a single record. Additionally, `record_number` is used in conjunction with the first integer given in the `VALUE` field which denotes the total number of relevant TXT records. So, a typical `HOST`  might be: `EIPXXXX.1-1._domainContracts`, `EIPXXXX.1-2._domaincontracts`, etc.
+This `HOST` naming scheme is designed to mimic the [DKIM](https://datatracker.ietf.org/doc/html/rfc6376) naming convention. Additionally, this naming scheme makes it simple to programmatically ascertain if any smart contracts are associated with the domain on a given blockchain network. Prepending with "EIPXXXX" (XXXX to be replaced with assigned number) will prevent naming collisions. The value of `chain_id` is simply the integer associated with the target network (i.e. `1` for Ethereum mainnet or `42` for Polygon). The `record_number` acts as a page number to allow for multiple TXT records to be created if the quantity of referenced contracts cannot fit in a single record. Additionally, `record_number` is used in conjunction with the first integer given in the `VALUE` field which denotes the total number of relevant TXT records. So, a typical `HOST`  might be: `EIPXXXX.1-1._domainContracts`, `EIPXXXX.1-2._domaincontracts`, etc.
 
-It is RECOMMENDED that EVM address strings adhere to [EIP-1191](https://eips.ethereum.org/EIPS/eip-1191) so that the browser client can checksum the validity of the address and its target network before making an RPC call. 
+It is RECOMMENDED that EVM address strings adhere to [ERC-1191](./eip-1191.md) so that the browser client can checksum the validity of the address and its target network before making an RPC call. 
 
-A user can check the propagation of their TXT record from the browser console with [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch):
+A user can check the propagation of their TXT record from the browser console with `fetch`:
 
 ```
 await fetch("https://cloudflare-dns.com/dns-query?name=EIPXXXX.1-1._domaincontracts.example.com&type=TXT", {
@@ -61,7 +62,7 @@ await fetch("https://cloudflare-dns.com/dns-query?name=EIPXXXX.1-1._domaincontra
 
 Any smart contract MAY implement this ERC to provide a verification mechanism of smart contract addresses listed in a compatible TXT record.
 
-A smart contract need only store one new member variable, `domains`, which is an array of all unique [eTLD+1](https://developer.mozilla.org/en-US/docs/Glossary/eTLD) domains associated with the contract. This member variable can be written to with the external functions `addDomain` and `removeDomain`.
+A smart contract need only store one new member variable, `domains`, which is an array of all unique eTLD+ domains associated with the contract. This member variable can be written to with the external functions `addDomain` and `removeDomain`.
 
 ```solidity
 {
@@ -83,7 +84,7 @@ Alternatively, if a client is inspecting a contract that implements this ERC, th
 
 ## Rationale
 
-According to [Cloudflare](https://www.cloudflare.com/learning/dns/dns-records/dns-txt-record/), the two most common use cases of TXT records today are email spam prevention (via [SPF](https://www.cloudflare.com/learning/dns/dns-records/dns-spf-record/), [DKIM](https://www.cloudflare.com/learning/dns/dns-records/dns-dkim-record/), and [DMARC](https://www.cloudflare.com/learning/dns/dns-records/dns-dmarc-record/) TXT records) and domain ownership verification. The use case considered here for on-chain smart contract discovery and verification is essentially analogous. Now that DoH is supported by most major DNS providers, it is easy to leverage TXT records directly in wallets, dApps, and other web applications without relying on a proprietary vendor API to provide DNS information and thus gain the same benefits afforded to email and domain verification with digital assets and on-chain logic. 
+According to Cloudflare, the two most common use cases of TXT records today are email spam prevention (via [SPF](https://datatracker.ietf.org/doc/html/rfc7208), DKIM, and [DMARC]([https://www.cloudflare.com/learning/dns/dns-records/dns-dmarc-record/](https://datatracker.ietf.org/doc/html/rfc7489)) TXT records) and domain ownership verification. The use case considered here for on-chain smart contract discovery and verification is essentially analogous. Now that DoH is supported by most major DNS providers, it is easy to leverage TXT records directly in wallets, dApps, and other web applications without relying on a proprietary vendor API to provide DNS information and thus gain the same benefits afforded to email and domain verification with digital assets and on-chain logic. 
 
 The client working with the smart contract is protected by cross-checking that two independent sources of information agree with each other. As long as the `addDomain` and `removeDomain` calls on the smart contract are properly authenticated (as shown if the reference implementation), the values in the domains field must have been set by a controller of the contract. The contract addresses in the TXT records can only be set by the owner of the domain. For these two values to align the same organization must control both resources.
 
@@ -147,7 +148,7 @@ function removeDomain(
 
 ## Security Considerations
 
-Due to the reliance on traditional DNS systems, this ERC is susceptible to attacks on this technology, such as [domain hijacking](https://en.wikipedia.org/wiki/Domain_hijacking). Additionally, it is the responsibility of the smart contract author to ensure that `addDomain` and `removeDomain` are authenticated properly, otherwise an attacker could associate their smart contract with an undesirable domain, which would simply break the ability to verify association with the proper domain. 
+Due to the reliance on traditional DNS systems, this ERC is susceptible to attacks on this technology, such as domain hijacking. Additionally, it is the responsibility of the smart contract author to ensure that `addDomain` and `removeDomain` are authenticated properly, otherwise an attacker could associate their smart contract with an undesirable domain, which would simply break the ability to verify association with the proper domain. 
 
 It is worth noting that for an attacker to falsy verify a contract against a domain would require them to compromise both the DNS settings **and** the smart contract itself. In this scenario, the attacker has likely also compromised the business' email domains as well. 
 
