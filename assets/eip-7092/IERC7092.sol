@@ -19,8 +19,6 @@ interface IERC7092 {
     * @notice Returns the bond symbol
     *         It is RECOMMENDED to represent the symbol as a combination of the issuer Issuer'shorter name and the maturity date
     *         Ex: If a company named Green Energy issues bonds that will mature on october 25, 2030, the bond symbol could be `GE30` or `GE2030` or `GE102530`
-    *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used to improve usability.
     */
     function symbol() external view returns(string memory);
 
