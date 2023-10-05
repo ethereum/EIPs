@@ -1,5 +1,5 @@
 ---
-eip: xyz
+eip: 7817
 title: Resolving Staked ERC721 Ownership Recognition
 description: An interface for recognizing original NFT ownership when staked to unsupported contracts.
 author: Francesco Sullo (@sullof)
@@ -35,7 +35,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 The interface is defined as follows:
 
 ```solidity
-interface IERCxyz {
+interface IERC7817 {
   // It MUST revert if the token is not staked
   function holderOfRightsFor(
     address tokenAddress,
