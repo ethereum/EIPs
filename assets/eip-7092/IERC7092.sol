@@ -53,14 +53,6 @@ interface IERC7092 {
     function issueVolume() external view returns(uint256);
 
     /**
-    * @notice Returns the total token supply
-    *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used in case a bond needs to be represented as en ERC20 token.
-    *            If not implemented, the total supply is equal to the ratio => issueVolume / denomination.
-    */
-    function totalSupply() external view returns(uint256);
-
-    /**
     * @notice Returns the bond interest rate. It is RECOMMENDED to express the interest rate in basis point unit.
     *         1 basis point = 0.01% = 0.0001
     *         ex: if interest rate = 5%, then coupon() => 500 basis points
@@ -106,14 +98,6 @@ interface IERC7092 {
     * @param _account account address
     */
     function principalOf(address _account) external view returns(uint256);
-
-    /**
-    * @notice returns the balance of `_account`
-    *
-    * OPTIONAL - interfaces and other contracts MUST NOT expect these values to be present. The method is used in case a bond needs to be represented as en ERC20 token.
-    *            If not implemented, the balance of an account is equal to the ratio => principalOf(account) / denomination.
-    */
-    function balanceOf(address _account) external view returns(uint256);
 
     /**
     * @notice Returns the amount of tokens the `_spender` account has been authorized by the `_owner``
