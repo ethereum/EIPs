@@ -1,4 +1,5 @@
 ---
+eip: 7530
 title: EVM Profile for Type 3 ZK Rollups
 description: EVM Profile for ZK Rollups
 author: Peter Robinson (@drinkcoffee)
