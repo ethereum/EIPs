@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 /**
 * @title ERC-7092 Financial Bonds tandard
+* This interface implements only functions that are REQUIRED for the ERC7092 standard.
+* OPTIONAL and INTEROPERABLE functions may be added to allow further functionalities and interoperability of bonds
 */
 interface IERC7092 {
     /**
