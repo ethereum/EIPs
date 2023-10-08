@@ -21,7 +21,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 A generation is defined as a period of 64 epochs. Generations MAY be aligned with the beacon chain genesis, but can be used as a term to describe any sequential 64 epochs with any start epoch.
 
-For measuring generations from genesis the start value MUST be 0. To determine the generation of a specific slot, you SHOULD divide the current slot by 2048 or you MAY devide the current epoch by 32, following this division you MUST round down the the lowest integer.
+For measuring generations from genesis the start value MUST be 0. To determine the generation of a specific slot, you SHOULD divide the current slot by 2048 or you MAY devide the current epoch by 64, following this division you MUST round down the the lowest integer.
 
 
 ## Rationale
