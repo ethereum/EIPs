@@ -1,0 +1,15 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/ethereum/go-ethereum/core/vm
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20770	     57970 ns/op	      3450 gas/op	        59.51 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20899	     57769 ns/op	      3450 gas/op	        59.71 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20780	     57343 ns/op	      3450 gas/op	        60.16 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20870	     57740 ns/op	      3450 gas/op	        59.74 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20911	     57411 ns/op	      3450 gas/op	        60.09 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20874	     58423 ns/op	      3450 gas/op	        59.04 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20736	     57552 ns/op	      3450 gas/op	        59.94 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   19700	     58235 ns/op	      3450 gas/op	        59.24 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20814	     57681 ns/op	      3450 gas/op	        59.80 mgas/s	    1560 B/op	      33 allocs/op
+BenchmarkPrecompiledP256Verify/p256Verify-Gas=3450-8         	   20736	     58806 ns/op	      3450 gas/op	        58.66 mgas/s	    1560 B/op	      33 allocs/op
+PASS
+ok  	github.com/ethereum/go-ethereum/core/vm	18.491s
