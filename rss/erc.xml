@@ -13,7 +13,7 @@ layout: null
     {% for eip in eips %}
       {% if eip.category == "ERC" %}
       {% capture description %}
-        <p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in the {{ eip.category }} category of type {{ eip.type }} and was just updated.</p>
+        <p><strong>{{ eip.title }}</strong> is in the {{ eip.category }} category of type {{ eip.type }} and was just updated.</p>
         {% if eip.discussions-to %}
           <p>The author has requested that discussions happen at the following URL: <a href="{{ eip.discussions-to }}">{{ eip.discussions-to }}</a></p>
         {% endif %}
