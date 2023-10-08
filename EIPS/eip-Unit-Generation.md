@@ -2,10 +2,10 @@
 title: New unit, The Generation
 description: A Generation is a scale version of an epoch.
 author: JKincorperated (@JKincorperated)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/another-eip-a-new-unit-the-generation/16024
 status: Draft
 type: Informational
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: 2023-10-08
 requires: <EIP number(s)>
 ---
 
