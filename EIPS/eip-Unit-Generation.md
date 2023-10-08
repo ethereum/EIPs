@@ -6,7 +6,6 @@ discussions-to: https://ethereum-magicians.org/t/another-eip-a-new-unit-the-gene
 status: Draft
 type: Informational
 created: 2023-10-08
-requires: <EIP number(s)>
 ---
 
 ## Abstract
