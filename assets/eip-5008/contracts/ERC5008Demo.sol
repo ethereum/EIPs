@@ -15,4 +15,8 @@ contract ERC5008Demo is ERC5008{
     function mint(address to, uint256 tokenId) public {
        _mint(to, tokenId);
     }
+
+    function getInterfaceId() public pure returns (bytes4) {
+        return type(IERC5008).interfaceId;
+    }
 }
