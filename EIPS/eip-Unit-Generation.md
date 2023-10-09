@@ -1,5 +1,6 @@
 ---
-title: New unit, The Generation
+eip: 7532
+title: Generation unit (64 epochs)
 description: A Generation is a scale version of an epoch.
 author: JKincorperated (@JKincorperated)
 discussions-to: https://ethereum-magicians.org/t/another-eip-a-new-unit-the-generation/16024
