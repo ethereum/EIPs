@@ -87,7 +87,9 @@ The above theorem means​ for any transaction started by invoking $\mathrm{f}$ 
   TODO: Remove this comment before submitting
 -->
 
-TBD
+While numerous projects delve into runtime verification, our approach is distinctly tailored to focus solely on transactions. By so doing, we anticipate a tangible reduction in the overhead typically associated with blanket verification mechanisms. Further, by synthesizing the merits of runtime verification with symbolic proof, our methodology stands out in ensuring both the provability and verifiability of theorems, setting a benchmark in efficacy and reliability. 
+
+Conventional approaches predominantly resort to specialized tools and the expertise of domain professionals to detect and address known vulnerabilities or bugs, targeting the prevention of unintended contract behaviors. While these methods have their merits, empirical evidence suggests a palpable shortfall in ensuring comprehensive safety features. In contrast, our application of TCT brings forth a robust security guarantee, markedly elevating the safety standards compared to the traditional strategies.  
 
 ## Backwards Compatibility
 
@@ -102,7 +104,7 @@ TBD
   TODO: Remove this comment before submitting
 -->
 
-No backward compatibility issues found.
+The incompatibilities might occur since TCT might reject some transactions which violate the theorem. In this case, the network might be forked due to the difference of states. Therefore, we suggest we first run a testnet like `Goeril` to test the effectiveness, stability of TCT.
 
 ## Test Cases
 
@@ -283,7 +285,7 @@ We have build a MVP version of TCT mechanism in the [demo repo](https://github.c
   TODO: Remove this comment before submitting
 -->
 
-Needs discussion.
+- We might have security issues on the theorem repository.
 
 ## Copyright
 
