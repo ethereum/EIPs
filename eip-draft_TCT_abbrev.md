@@ -5,7 +5,7 @@ author: <a comma separated list of the author's or authors' name + GitHub userna
 title: TCT
 description: TCT combines the benefits of runtime checking and symbolic proof. The unique design of TCT ensures that the theorems are provable and checkable in an efficient manner.
 author: Shuo Chen (@cs0317), Nikolaj Bjørner (@NikolajBjorner), Tzu-Han Hsu (@tzuhancs), Ashley Chen (@ash-jyc), Nanqing Luo (@Billy1900)
-discussions-to: <URL>
+discussions-to: https://discord.gg/WJKNcsudR9
 status: Draft
 type: <Standards Track, Meta, or Informational>
 category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
@@ -36,6 +36,8 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
   TODO: Remove this comment before submitting
 -->
 
+Smart contracts are crucial elements of decentralized technologies, but they face significant obstacles to trustworthiness due to security bugs and trapdoors. To address the core issue, we propose a technology that enables programmers to focus on design-level properties rather than specific low-level attack patterns. Our proposed technology, called Theorem-Carrying-Transaction (TCT), combines the benefits of runtime checking and symbolic proof. Under the TCT protocol, every transaction must carry a theorem that proves its adherence to the safety properties in the invoked contracts, and the blockchain checks the proof before executing the transaction. The unique design of TCT ensures that the theorems are provable and checkable in an efficient manner. We believe that TCT holds a great promise for enabling provably secure smart contracts in the future.
+
 ## Motivation
 
 <!--
@@ -47,6 +49,8 @@ requires: <EIP number(s)> # Only required when you reference an EIP in the `Spec
 
   TODO: Remove this comment before submitting
 -->
+
+This proposal is necessary since the Ethereum protocol does not ensure the safety features on the design level.
 
 ## Specification
 
@@ -108,6 +112,8 @@ No backward compatibility issues found.
 
   TODO: Remove this comment before submitting
 -->
+
+We have build a MVP version of TCT mechanism in the [demo repo](https://github.com/TCT-web3/demo). What's more, We have integrated TCT mechanism into current Geth in the [TCT-Geth](https://github.com/TCT-web3/TCT-Geth).
 
 ## Security Considerations
 
