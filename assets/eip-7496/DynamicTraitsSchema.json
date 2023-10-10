@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["traits"],
+  "properties": {
+    "traits": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["dataType"],
+        "properties": {
+          "displayName": {
+            "type": ["string"],
+            "description": "The user-facing display name for the trait."
+          },
+          "consumptionValidationOnSale": {
+            "enum": ["none", "requireEq", "requireUintGte", "requireUintLte"],
+            "description": "Whether the trait value should be validated when the token is sold. If this isn't specified, it is assumed to be `none`."
+          },
+          "tokenOwnerCanUpdateValue": {
+            "type": "boolean",
+            "description": "Whether the token owner is able to set the trait value directly by calling `setTrait`. If this isn't specified, it is assumed to be false."
+          },
+          "dataType": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "string" },
+                  "acceptableValues": {
+                    "type": "array",
+                    "description": "An exclusive list of possible string values that can be set for the trait. If this is not specified, the trait can be set to any reasonable string value. If `valueMappings` is specified, this list must be the `mappedValue`s.",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "maxLength": {
+                    "type": "number",
+                    "description": "The maximum length of the string value that can be set for the trait (inclusive). If this is not specified, the trait can be set to any reasonable string length."
+                  },
+                  "minLength": {
+                    "type": "number",
+                    "description": "The minimum length of the string value that can be set for the trait (inclusive). If this is not specified, it is assumed to be 0."
+                  },
+                  "valueMappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": "A dictionary mapping of `traitValue`s returned from the contract to values that an offchain indexer should display. The keys to the dictionary are the onchain values and the dictionary values are the offchain values. Useful when longer than the 32 ASCII characters that bytes32 allows for."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "decimal" },
+                  "signed": {
+                    "type": "boolean",
+                    "description": "Whether the trait value being returned is signed. If this is not specified, it is assumed to be false."
+                  },
+                  "bits": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 256,
+                    "description": "The number of bits that the trait value is returned with onchain. If this is not specified, it is assumed to be 256."
+                  },
+                  "decimals": {
+                    "type": "integer",
+                    "description": "The number of decimal places that the trait value is returned with onchain. If this is not specified, it is assumed to be 0 (i.e. an integer value)."
+                  },
+                  "minValue": {
+                    "type": "number",
+                    "description": "The minimum value that the trait value can be set to (inclusive). If this is not specified, it is assumed to be the minimum value of the `signed`, `bits` and `decimals`."
+                  },
+                  "maxValue": {
+                    "type": "number",
+                    "description": "The maximum value that the trait value can be set to (inclusive). If this is not specified, it is assumed to be the maximum value of the `signed`, `bits` and `decimals`."
+                  },
+                  "valueMappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": "A dictionary mapping of `traitValue`s returned from the contract to values that an offchain indexer should display. The keys to the dictionary are the onchain values and the dictionary values are the offchain values. Useful for default values of 0x0 and large or magic numbers."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "boolean" },
+                  "valueMappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "oneOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": "A dictionary mapping of `traitValue`s returned from the contract to values that an offchain indexer should display. The keys to the dictionary are the onchain values and the dictionary values are the offchain values. Useful for default values of 0x0 and magic numbers."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": { "const": "epochSeconds" },
+                  "valueMappings": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "oneOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "description": "A dictionary mapping of `traitValue`s returned from the contract to values that an offchain indexer should display. The keys to the dictionary are the onchain values and the dictionary values are the offchain values. Useful for default values of 0x0 and magic numbers."
+                  }
+                },
+                "description": "A datetime type that is the number of seconds since the Unix epoch (January 1, 1970 00:00:00 UTC). Must return an integer value."
+              }
+            ],
+            "description": "The data type definition of the trait."
+          }
+        }
+      }
+    }
+  }
+}
