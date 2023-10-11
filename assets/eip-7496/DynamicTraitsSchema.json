@@ -13,7 +13,7 @@
             "type": ["string"],
             "description": "The user-facing display name for the trait."
           },
-          "consumptionValidationOnSale": {
+          "validateOnSale": {
             "enum": ["none", "requireEq", "requireUintGte", "requireUintLte"],
             "description": "Whether the trait value should be validated when the token is sold. If this isn't specified, it is assumed to be `none`."
           },
