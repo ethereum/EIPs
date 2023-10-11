@@ -48,7 +48,7 @@ While numerous projects delve into runtime verification, our approach is distinc
 
 
 ## Backwards Compatibility
-The biggest incompatibility is that the fork might occur. Since TCT might reject some transactions which violate the theorem while original Ethereum might accept those transactions. In this case, the network might be forked due to the difference of Block states. Therefore, we suggest we first run a testnet like `Goeril` to test the effectiveness, stability of TCT.
+The primary concern lies in the potential for incompatibility, particularly with regards to the occurrence of a fork. The Theorem-Carrying-Transaction (TCT) system may reject certain transactions that violate the theorem, while the original Ethereum network may accept these transactions. This discrepancy in transaction acceptance could lead to a network fork, resulting in divergent block states. To address this issue, we propose conducting a comprehensive evaluation of TCT's effectiveness and stability by initially deploying it on a testnet such as `Goeril`.
 
 ## Test Cases
 We extract a token contract from this [blog](https://blog.chain.link/reentrancy-attacks-and-the-dao-hack/) as shown below:
@@ -202,7 +202,7 @@ More test cases can be refer to this [video](https://www.youtube.com/watch?v=Gsi
 We have build a MVP version of TCT mechanism in the [demo repo](https://github.com/TCT-web3/demo). What's more, We have integrated TCT mechanism into current Geth in the [TCT-Geth](https://github.com/TCT-web3/TCT-Geth).
 
 ## Security Considerations
-We might have security issues on the theorem repository. Since we plan to put the theorems on IPFS, if the theorem repository is poisoned, then this could lead to security incident.
+In the current construct of our theorem repository, potential security vulnerabilities may exist. Given our intention to migrate the theorems to the InterPlanetary File System (IPFS), a compromised repository could precipitate a significant security breach.
 
 ## Copyright
 Copyright and related rights waived via [CC0](../LICENSE.md).
