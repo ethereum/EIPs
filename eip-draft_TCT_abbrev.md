@@ -22,10 +22,15 @@ This proposal is necessary since the Ethereum protocol does not ensure the safet
 
 First, we give several terminology:
 - $\tau$: it denotes the theorem. Every transaction must carry a theorem that proves its adherence to the specified safety properties in the invoked contracts.
+  
 - $\mathrm{f}$: it denotes the entry function of transaction.
+  
 - $\varphi(\mathrm{V}, \mathrm{s})$: $\varphi$ denotes hypothesis which defined over input parameter $\mathrm{V}$ and blockchain state $\mathrm{s}$.
+  
 - $\mathrm{h}$: code path hash which is used for execution path match.
+  
 - Invariant: contract invariants like the ones are ensured before and after every transaction. They contain quantifiers, sum of map, etc., so are difficult to check concretely.
+  
 - behavioral subtyping: Unlike the conventional notion of OOP subtyping, which underpins today’s smart contracts and many other real-world systems, behavioral subtyping ensures that a derived class cannot violate properties defined in a base class.
 
 For each transaction which is executed, it SHOULD satisfies the following theorem:
@@ -178,6 +183,7 @@ contract Demo {
 Note that we have provided the invariant for the entry functions above `abstract contract StandardToken`. Since TCT enables behavioral subtyping for smart contract, it still delivers its children contract such as `MultiVulnToken`.
 
 For the contract `MultiVun`, we have provided a theorem for the entry function of transaction as below
+
 ```json
 {
 	"entry-for-test":"MultiVulnToken::clear(address)",
