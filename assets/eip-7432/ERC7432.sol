@@ -62,9 +62,9 @@ contract ERC7432 is IERC7432 {
     }
 
     function _getApprovedCaller(address _tokenAddress, address _revoker, address _grantee) internal view returns (address) {
-        if(isRoleApprovedForAll(_tokenAddress, _grantee, msg.sender)){
+        if (isRoleApprovedForAll(_tokenAddress, _grantee, msg.sender)) {
             return _grantee;
-        } else if(isRoleApprovedForAll(_tokenAddress, _revoker, msg.sender)){
+        } else if (isRoleApprovedForAll(_tokenAddress, _revoker, msg.sender)) {
             return _revoker;
         } else {
             revert("ERC7432: sender must be approved");

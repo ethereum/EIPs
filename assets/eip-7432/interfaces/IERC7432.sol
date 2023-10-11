@@ -172,10 +172,10 @@ interface IERC7432 is IERC165 {
         address _operator
     ) external view returns (bool);
 
-    /// @notice Returns the last grantee of a role.
-    /// @param _role The role.
+    /// @notice Returns the last user to receive a role.
+    /// @param _role The role identifier.
     /// @param _tokenAddress The token address.
-    /// @param _tokenId The token ID.
+    /// @param _tokenId The token identifier.
     /// @param _grantor The user that granted the role.
     function lastGrantee(
         bytes32 _role,
