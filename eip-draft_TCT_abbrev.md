@@ -46,7 +46,9 @@ The above theorem means​ for any transaction started by invoking $\mathrm{f}$ 
 Conventional approaches predominantly resort to specialized tools and the expertise of domain professionals to detect and address known vulnerabilities or bugs, targeting the prevention of unintended contract behaviors. While these methods have their merits, empirical evidence suggests a palpable shortfall in ensuring comprehensive safety features. In contrast, our application of TCT brings forth a robust security guarantee via runtime verification, markedly elevating the safety standards compared to the traditional strategies.  
 
 While numerous projects delve into runtime verification, our approach is distinctly tailored to focus solely on transactions which has several merits:
+
 - **Minimal runtime overhead**: By so doing, we anticipate a tangible reduction in the overhead typically associated with blanket verification mechanisms.
+
 - **Concolic testing**: Further, by synthesizing the merits of runtime verification with symbolic proof, our methodology stands out in ensuring both the provability and verifiability of theorems, setting a benchmark in efficacy and reliability. 
 
 
