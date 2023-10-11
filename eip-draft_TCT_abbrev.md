@@ -12,64 +12,26 @@ category: <Core, Networking, Interface, or ERC> # Only required for Standards Tr
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 type: Standards Track
 category: Core
-created: 2023-10-04
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+created: 2023-10-12
 ---
 
-<!--
-  READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
-
-  This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
-
-  Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-  The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category.
-
-  TODO: Remove this comment before submitting
--->
 
 ## Abstract
-
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
-
 Smart contracts are crucial elements of decentralized technologies, but they face significant obstacles to trustworthiness due to security bugs and trapdoors. To address the core issue, we propose a technology that enables programmers to focus on design-level properties rather than specific low-level attack patterns. Our proposed technology, called Theorem-Carrying-Transaction (TCT), combines the benefits of runtime checking and symbolic proof. Under the TCT protocol, every transaction must carry a theorem that proves its adherence to the safety properties in the invoked contracts, and the blockchain checks the proof before executing the transaction. The unique design of TCT ensures that the theorems are provable and checkable in an efficient manner. We believe that TCT holds a great promise for enabling provably secure smart contracts in the future.
 
 ## Motivation
-
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
-
 This proposal is necessary since the Ethereum protocol does not ensure the safety features on the design level. It stems from the recognition of the significant obstacles faced by smart contracts in terms of trustworthiness due to security bugs and trapdoors. While smart contracts are crucial elements of decentralized technologies, their vulnerabilities pose a challenge to their widespread adoption. Conventional smart contract verification and auditing helps a lot, but it only tries to find as many vulnerabilities as possible in the development and testing phases. However, in real cases, we suffer from the unintentional vulnerabilities and logical trapdoors which lead to lack of transparency and trustworthiness of smart contract.
 
 ## Specification
-
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
-
-  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
--->
-
 First, we give several terminology:
 - $\tau$: it denotes the theorem. Every transaction must carry a theorem that proves its adherence to the specified safety properties in the invoked contracts.
 - $\mathrm{f}$: it denotes the entry function of transaction.
 - $\varphi(\mathrm{V}, \mathrm{s})$: $\varphi$ denotes hypothesis which defined over input parameter $\mathrm{V}$ and blockchain state $\mathrm{s}$.
 - $\mathrm{h}$: code path hash which is used for execution path match.
 - Invariant: contract invariants like the ones are ensured before and after every transaction. They contain quantifiers, sum of map, etc., so are difficult to check concretely.
+- behavioral subtyping: Unlike the conventional notion of OOP subtyping, which underpins today’s smart contracts and many other real-world systems, behavioral subtyping ensures that a derived class cannot violate properties defined in a base class.
+
+For each transaction which is executed, it SHOULD satisfies the following theorem:
 
 $$
 \tau::=(\mathrm{f}, \varphi(\mathrm{V}, \mathrm{s}), \mathrm{h})
@@ -78,45 +40,17 @@ $$
 The above theorem means​ for any transaction started by invoking $\mathrm{f}$ when $\varphi$ is satisfied, if it is completed (i.e., not reverted by EVM) and the hash of the code path equals $\mathrm{h}$, then all the assertions along the code path are guaranteed to hold. ​
 
 ## Rationale
+Conventional approaches predominantly resort to specialized tools and the expertise of domain professionals to detect and address known vulnerabilities or bugs, targeting the prevention of unintended contract behaviors. While these methods have their merits, empirical evidence suggests a palpable shortfall in ensuring comprehensive safety features. In contrast, our application of TCT brings forth a robust security guarantee via runtime verification, markedly elevating the safety standards compared to the traditional strategies.  
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+While numerous projects delve into runtime verification, our approach is distinctly tailored to focus solely on transactions which has several merits:
+- **Minimal runtime overhead**: By so doing, we anticipate a tangible reduction in the overhead typically associated with blanket verification mechanisms.
+- **Concolic testing**: Further, by synthesizing the merits of runtime verification with symbolic proof, our methodology stands out in ensuring both the provability and verifiability of theorems, setting a benchmark in efficacy and reliability. 
 
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-While numerous projects delve into runtime verification, our approach is distinctly tailored to focus solely on transactions. By so doing, we anticipate a tangible reduction in the overhead typically associated with blanket verification mechanisms. Further, by synthesizing the merits of runtime verification with symbolic proof, our methodology stands out in ensuring both the provability and verifiability of theorems, setting a benchmark in efficacy and reliability. 
-
-Conventional approaches predominantly resort to specialized tools and the expertise of domain professionals to detect and address known vulnerabilities or bugs, targeting the prevention of unintended contract behaviors. While these methods have their merits, empirical evidence suggests a palpable shortfall in ensuring comprehensive safety features. In contrast, our application of TCT brings forth a robust security guarantee, markedly elevating the safety standards compared to the traditional strategies.  
 
 ## Backwards Compatibility
-
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-The incompatibilities might occur since TCT might reject some transactions which violate the theorem. In this case, the network might be forked due to the difference of states. Therefore, we suggest we first run a testnet like `Goeril` to test the effectiveness, stability of TCT.
+The biggest incompatibility is that the fork might occur. Since TCT might reject some transactions which violate the theorem while original Ethereum might accept those transactions. In this case, the network might be forked due to the difference of Block states. Therefore, we suggest we first run a testnet like `Goeril` to test the effectiveness, stability of TCT.
 
 ## Test Cases
-
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
-
 We extract a token contract from this [blog](https://blog.chain.link/reentrancy-attacks-and-the-dao-hack/) as shown below:
 
 ```solidity
@@ -183,7 +117,7 @@ contract MultiVulnToken is StandardToken {
     }
 }
 
-//========================================================
+
 contract reentrancy_attack {
     MultiVulnToken public multiVulnToken; 
     address _to;
@@ -262,31 +196,13 @@ For the contract `MultiVun`, we have provided a theorem for the entry function o
 
 If attacker’s obligation to prove the theorem, the attempt would be doomed to fail.​
 
+More test cases can be refer to this [video](https://www.youtube.com/watch?v=GsiQdJrbl80).
+
 ## Reference Implementation
-
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
-
 We have build a MVP version of TCT mechanism in the [demo repo](https://github.com/TCT-web3/demo). What's more, We have integrated TCT mechanism into current Geth in the [TCT-Geth](https://github.com/TCT-web3/TCT-Geth).
 
 ## Security Considerations
-
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-- We might have security issues on the theorem repository. Since we plan to put the theorems on IPFS, if the theorem repo is poisoned, then this could lead to security incident.
+We might have security issues on the theorem repository. Since we plan to put the theorems on IPFS, if the theorem repository is poisoned, then this could lead to security incident.
 
 ## Copyright
-
 Copyright and related rights waived via [CC0](../LICENSE.md).
