@@ -21,6 +21,7 @@ This proposal is necessary since the Ethereum protocol does not ensure the safet
 ### Specification
 
 First, we give several terminology:
+
 - $\tau$: it denotes the theorem. Every transaction must carry a theorem that proves its adherence to the specified safety properties in the invoked contracts.
   
 - $\mathrm{f}$: it denotes the entry function of transaction.
