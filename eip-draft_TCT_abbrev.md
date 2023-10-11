@@ -285,7 +285,7 @@ We have build a MVP version of TCT mechanism in the [demo repo](https://github.c
   TODO: Remove this comment before submitting
 -->
 
-- We might have security issues on the theorem repository.
+- We might have security issues on the theorem repository. Since we plan to put the theorems on IPFS, if the theorem repo is poisoned, then this could lead to security incident.
 
 ## Copyright
 
