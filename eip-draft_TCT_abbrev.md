@@ -1,15 +1,9 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
 title: TCT
 description: TCT combines the benefits of runtime checking and symbolic proof. The unique design of TCT ensures that the theorems are provable and checkable in an efficient manner.
 author: Shuo Chen (@cs0317), Nikolaj Bjørner (@NikolajBjorner), Tzu-Han Hsu (@tzuhancs), Ashley Chen (@ash-jyc), Nanqing Luo (@Billy1900)
 discussions-to: https://discord.gg/WJKNcsudR9
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 type: Standards Track
 category: Core
 created: 2023-10-12
