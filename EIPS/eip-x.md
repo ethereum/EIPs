@@ -1,9 +1,9 @@
 ---
-eip: <TODO>
+eip: 7535
 title: ETH (Native Asset) Tokenized Vault
 description: ERC-4626 Tokenized Vaults with ETH as the underlying asset
 author: Joey Santoro (@joeysantoro)
-discussions-to: <TODO>
+discussions-to: https://ethereum-magicians.org/t/eip-7535-eth-native-asset-tokenized-vault/16068
 status: Draft
 type: Standards Track
 category: ERC
@@ -15,7 +15,7 @@ requires: 4626, 7528
 
 The following standard allows for the implementation of a standard API for Tokenized Vaults that use ETH as the underlying asset.
 
-This standard is an extension of the ERC-4626 spec with an identical interface and behavioral overrides for handling ETH as the underlying.
+This standard is an extension of the [ERC-4626](./eip-4626.md) spec with an identical interface and behavioral overrides for handling ETH as the underlying.
 
 ## Motivation
 
@@ -25,7 +25,7 @@ Maintaining the same exact interface as ERC-4626 further amplifies the benefits 
 
 ## Specification
 
-All EIP-X tokenized Vaults MUST implement ERC-4626 with behavioral overrides for the methods `asset`, `deposit`, and `mint` specified below.
+All EIP-7535 tokenized Vaults MUST implement ERC-4626 with behavioral overrides for the methods `asset`, `deposit`, and `mint` specified below.
 
 ### Methods
 
