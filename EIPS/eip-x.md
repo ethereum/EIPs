@@ -1,0 +1,141 @@
+---
+eip: <TODO>
+title: ETH (Native Asset) Tokenized Vault
+description: ERC-4626 Tokenized Vaults with ETH as the underlying asset
+author: Joey Santoro (@joeysantoro)
+discussions-to: <TODO>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-10-12
+requires: 4626, 7528
+---
+
+## Abstract
+
+The following standard allows for the implementation of a standard API for Tokenized Vaults that use ETH as the underlying asset.
+
+This standard is an extension of the ERC-4626 spec with an identical interface and behavioral overrides for handling ETH as the underlying.
+
+## Motivation
+
+A standard for tokenized ETH Vaults has the same benefits as [ERC-4626](./eip-4626.md), particularly in the case of Liquid Staking Tokens, (i.e. fungible ERC-20 wrappers around ETH staking). 
+
+Maintaining the same exact interface as ERC-4626 further amplifies the benefits as the standard will be maximally compatible with existing ERC-4626 tooling and protocols.
+
+## Specification
+
+All EIP-X tokenized Vaults MUST implement ERC-4626 with behavioral overrides for the methods `asset`, `deposit`, and `mint` specified below.
+
+### Methods
+
+#### asset
+
+MUST return `0x000000000000000000000000000000000000000E` per EIP-7528 (TODO add link once merged).
+
+```yaml
+- name: asset
+  type: function
+  stateMutability: view
+
+  inputs: []
+
+  outputs:
+    - name: assetTokenAddress
+      type: address
+```
+
+#### deposit
+
+Mints `shares` Vault shares to `receiver` by depositing exactly `msg.value` of Ether.
+
+MUST have state mutability of `payable`.
+
+MUST use `msg.value` as the primary input parameter for calculating the `shares` output. MAY ignore `assets` parameter as an input.
+
+MUST emit the `Deposit` event.
+
+MUST revert if all of `msg.value` cannot be deposited (due to deposit limit being reached, slippage, etc).
+
+```yaml
+- name: deposit
+  type: function
+  stateMutability: payable
+
+  inputs:
+    - name: assets
+      type: uint256
+    - name: receiver
+      type: address
+
+  outputs:
+    - name: shares
+      type: uint256
+```
+
+#### mint
+
+Mints exactly `shares` Vault shares to `receiver` by depositing `assets` of ETH.
+
+MUST have state mutability of `payable`.
+
+MUST emit the `Deposit` event.
+
+MUST revert if all of `shares` cannot be minted (due to deposit limit being reached, slippage, the user not sending a large enough `msg.value` of Ether to the Vault contract, etc).
+
+```yaml
+- name: mint
+  type: function
+  stateMutability: payable
+
+  inputs:
+    - name: shares
+      type: uint256
+    - name: receiver
+      type: address
+
+  outputs:
+    - name: assets
+      type: uint256
+```
+
+
+### Events
+The event usage MUST be identical to ERC-4626.
+
+## Rationale
+
+This standard was designed to maximize compatibility with ERC-4626 while minimizing additional opinionated details on the interface. Examples of this decision rationale are described below:
+* maintaining the redundant `assets` input to the `deposit` function while making its usage optional
+* not enforcing a relationship between `msg.value` and `assets` in a `mint` call
+* not enforcing any behaviors or lack thereof for `fallback`/`__default__` methods, payability on additional vault functions, or handling ETH forcibly sent to the contract
+
+## Backwards Compatibility
+
+EIP-X is fully backward compatible with ERC-4626 at the function interface level. Certain implementation behaviors are different due to the fact that ETH is not ERC-20 compliant, such as the priority of `msg.value` over `assets`.
+
+It has no known compatibility issues with other standards.
+
+## Reference Implementation
+
+TODO / WIP
+
+## Security Considerations
+
+In addition to all security considerations of [ERC-4626](./eip-4626.md), there are security implications of having ETH as the Vault asset.
+
+### `call` vs `send`
+Contracts should take care when using `call` to transfer ETH, as this allows additional reentrancy vulnerabilities and arbitrary code execution beyond what is possible with trusted ERC-20 tokens.
+
+It is safer to simply `send` ETH with a small gas stipend. 
+
+Implementers should take extra precautions when deciding how to transfer ETH.
+
+### Forceful ETH transfers
+ETH can be forced into any Vault through the `SELFDESTRUCT` opcode. Implementers should validate that this does not disrupt Vault accounting in any way.
+
+Similarly, any additional `payable` methods should be checked to ensure they do not disrupt Vault accounting.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
