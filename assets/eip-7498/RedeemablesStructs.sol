@@ -9,8 +9,13 @@ struct CampaignParams {
     uint32 maxCampaignRedemptions;
     address manager;
     address signer;
+    CampaignRequirements[] requirements;
+}
+
+struct CampaignRequirements {
     OfferItem[] offer;
     ConsiderationItem[] consideration;
+    TraitRedemption[] traitRedemptions;
 }
 
 struct TraitRedemption {
@@ -20,8 +25,4 @@ struct TraitRedemption {
     bytes32 traitKey;
     bytes32 traitValue;
     bytes32 substandardValue;
-}
-
-struct RedemptionContext {
-    SpentItem[] spent;
 }
