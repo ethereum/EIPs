@@ -7,9 +7,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import "./Erc7015.sol";
+import "./EIP7015.sol";
 
-contract DelegatedErc721 is ERC7015, ERC721, ERC721URIStorage, Ownable {
+contract DelegatedErc721 is EIP7015, ERC721, ERC721URIStorage, Ownable {
   error AlreadyMinted();
 
   uint256 private _nextTokenId;

@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-abstract contract ERC7015 is EIP712 {
+abstract contract EIP7015 is EIP712 {
   error Invalid_Signature();
   event CreatorAttribution(
     bytes32 structHash,
