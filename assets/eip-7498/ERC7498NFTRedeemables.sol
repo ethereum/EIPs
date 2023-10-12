@@ -7,8 +7,8 @@ import {IERC1155} from "openzeppelin-contracts/contracts/interfaces/IERC1155.sol
 import {OfferItem, ConsiderationItem, SpentItem} from "seaport-types/src/lib/ConsiderationStructs.sol";
 import {ItemType} from "seaport-types/src/lib/ConsiderationEnums.sol";
 import {DynamicTraits} from "shipyard-core/src/dynamic-traits/DynamicTraits.sol";
-import {IERC7498} from "../interfaces/IERC7498.sol";
-import {IRedemptionMintable} from "../interfaces/IRedemptionMintable.sol";
+import {IERC7498} from "./IERC7498.sol";
+import {IRedemptionMintable} from "./IRedemptionMintable.sol";
 import {RedeemablesErrors} from "./RedeemablesErrors.sol";
 import {CampaignParams, CampaignRequirements, TraitRedemption} from "./RedeemablesStructs.sol";
 
