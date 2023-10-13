@@ -1,35 +1,21 @@
-# ERC-x: Asynchronous Tokenized Vaults
+---
+eip: TODO
 title: Asynchronous Tokenized Vaults
-description: Extension of EIP-4626 with asynchronous deposit and redemption support
-author: `TBD`
-discussions-to: `TBD`
+description: Extension of ERC-4626 with asynchronous deposit and redemption support
+author: Jeroen Offerijns (@hieronx), Alina Sinelnikova (@ilinzweilin), Vikram Arun (@vikramarun), Joey Santoro (@joeysantoro)
+discussions-to: TODO
 status: Draft
 type: Standards Track
 category: ERC
-created: `TBD`
-requires: [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626)
+created: TODO
+requires: 20, 4626
+---
 
 ## Abstract
-
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
 
 The following standard extends [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) by adding support for asynchronous deposit and redemption flows. New methods are added to submit, cancel, and view requests. The existing deposit, mint, withdraw and redeem methods are re-used for claiming executed requests. Implementations can choose to make either deposit or redemption flows asynchronous, or both.
 
 ## Motivation
-
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
 
 The Tokenized Vaults standard has helped to make yield bearing tokens more composable across decentralized finance. The standard has a key assumption built in: that any deposit or redemption can be executed atomically up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
 
@@ -200,53 +186,17 @@ interface IERC4626Async is IERC4626 {
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-TBD
+TODO
 
 ## Backwards Compatibility
-
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
 
 The interface is fully backwards compatible with [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` method is different as described in [Specification](##Specification).
 
 ## Reference Implementation
 
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
-
 Centrifuge has been developing [an implementation](https://github.com/centrifuge/liquidity-pools/blob/72f1ddddf3493db5e166f6c3317a6a5c27675eeb/src/LiquidityPool.sol) that can provide a reference.
 
 ## Security Considerations
-
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
 
 The methods `userDepositRequest` and `userRedeemRequest` are estimates useful for display purposes, and can be outdated due to the asynchronicity.
 
