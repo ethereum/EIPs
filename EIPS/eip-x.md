@@ -46,9 +46,9 @@ All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the follow
 
 ### Methods
 #### requestDeposit
-Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from EIP-4626 can be used to receive `shares`.
+Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
 
-MUST support EIP-20 `approve` / `transferFrom` on `asset` as a deposit flow.
+MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
 
 The `shares` that will be received on `deposit` or `mint` MAY NOT be equivalent to the current value of `convertToShares(assets)`, as the price can change between request and execution.
 
@@ -67,13 +67,13 @@ MUST emit the `RequestDeposit` event.
 ```
 
 #### requestRedeem
-Locks `shares` into the Vault and submits a request to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from EIP-4626 can be used to receive `assets`.
+Locks `shares` into the Vault and submits a request to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the current value of `convertToAssets(shares)`, as the price can change between request and execution.
 
 MUST support a redeem request flow where the shares are transferred from `owner` directly where `owner` is `msg.sender`.
 
-MUST support a redeem request flow where the shares are transferred from `owner` directly where `msg.sender` has EIP-20 approval over the shares of `owner`.
+MUST support a redeem request flow where the shares are transferred from `owner` directly where `msg.sender` has ERC-20 approval over the shares of `owner`.
 
 SHOULD check `msg.sender` can spend owner funds using allowance.
 
@@ -92,7 +92,7 @@ MUST emit the `RequestRedeem` event.
 ```
 
 #### cancelDepositRequest
-Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from EIP-4626 can be used to receive `assets` that were previously locked for deposit.
+Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets` that were previously locked for deposit.
 
 MUST emit the `CancelDepositRequest` event.
 
@@ -103,7 +103,7 @@ MUST emit the `CancelDepositRequest` event.
 ```
 
 #### cancelRedeemRequest
-Submits an order to cancel the outstanding redeem request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from EIP-4626 can be used to receive `shares` that were previously locked for redemption.
+Submits an order to cancel the outstanding redeem request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from ERC-4626 can be used to receive `shares` that were previously locked for redemption.
 
 MUST emit the `CancelRedeemRequest` event.
 
@@ -155,48 +155,6 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
       type: uint256
 ```
 
-### Interface
-:::info
-:bulb: To be removed before publication
-:::
-
-```solidity=
-interface IERC4626Async is IERC4626 {
-    event DepositRequest(address indexed sender, address indexed owner, uint256 assets);
-    event RedeemRequest(address indexed sender, address indexed owner, uint256 shares);
-    event CancelDepositRequest(address indexed owner);
-    event CancelRedeemRequest(address indexed owner);
-
-    // 1. Increases the deposit/redeem request
-
-    /// @dev user requests to deposit assets and mint shares to owner
-    /// @notice same as deposit, but emits DepositRequest
-    function requestDeposit(uint256 assets) external; 
-
-    /// @dev user requests to burn shares from owner send underlying tokens to owner
-    /// @notice same as redeem, but emits WithdrawRequest
-    function requestRedeem(uint256 shares, address owner) external;
-
-    // 2. Cancels the outstanding deposit/redeem request
-
-    /// @dev user reduces outstanding request to deposit assets and mint shares to owner to 0
-    /// @notice emits CancelDepositRequest
-    function cancelDepositRequest() external;
-
-    /// @dev user reduces outstanding request to burn shares from owner send underlying tokens to owner to 0
-    /// @notice emits CancelWithdrawRequest
-    function cancelRedeemRequest() external;
-
-    // 3. Retrieve the outstanding deposit/redeem request
-
-    /// @dev view the total amount the user has requested to deposit but hasn't been yet
-    function pendingDepositRequest(address owner) external view returns (uint256 assets);
-
-    /// @dev view the total amount the user has requested to redeem but hasn't been yet
-    function pendingRedeemRequest(address owner) external view returns (uint256 shares);
-}
-```
-
 ## Rationale
 
 ### Symmetry and Non-inclusion of requestWithdraw and requestMint
@@ -221,7 +179,7 @@ The standard is flexible enough to support a wide range of interaction patterns 
 
 ## Backwards Compatibility
 
-The interface is fully backwards compatible with [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` method is different as described in [Specification](##Specification).
+The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` method is different as described in [Specification](##Specification).
 
 ## Reference Implementation
 
