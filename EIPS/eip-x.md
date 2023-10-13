@@ -13,23 +13,34 @@ requires: 20, 4626
 
 ## Abstract
 
-The following standard extends [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) by adding support for asynchronous deposit and redemption flows. New methods are added to submit, cancel, and view requests. The existing deposit, mint, withdraw and redeem methods are re-used for claiming executed requests. Implementations can choose to make either deposit or redemption flows asynchronous, or both.
+The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called "Requests".
+
+New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw and redeem ERC-4626 methods are used for executing fulfilled Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
 
 ## Motivation
 
-The Tokenized Vaults standard has helped to make yield bearing tokens more composable across decentralized finance. The standard has a key assumption built in: that any deposit or redemption can be executed atomically up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
+The ERC-4626 Tokenized Vaults standard has helped to make yield bearing tokens more composable across decentralized finance. The standard is optimized for atomic deposits and reedemptions up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
 
-This limitation does not work well for undercollateralized lending protocols, real world asset protocols, or cross-chain lending protocols. An extension is required which enables users to lock deposit or redemption requests, to be executed asynchronously, and later collected by the existing deposit, mint, withdraw and redeem methods.
+This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequesite for interfacing with the Vault (e.g. undercollateralized lending protocols, real world asset protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
+
+This standard expands the utility of 4626 Vaults for asynchronous use cases. The existing Vault interface (deposit/withdraw/mint/redeem) is fully utilized to fulfill asynchronous Requests.
 
 ## Specification
-EIP-X asynchronous tokenized vaults MAY implement asynchronous deposit and redemption flows, or make only one of either asynchronous and use the EIP-4626 standard synchronous flow for the other. Therefore, all methods below are optional. If `requestDeposit` is included,  `pendingDepositRequest` is also required. If `requestRedeem` is included, `pendingRedeemRequest` is also required.
-
-All EIP-X asynchronous tokenized vaults MUST implement EIP-4626, with two exceptions:
-1. The `deposit` and`mint` methods in asynchronous tokenized vaults differ from the the EIP-4626 defined standard in that there is no transfer of `asset` to the vault, because this already happened on `requestDeposit`.
-2. The `redeem` and `withdraw` methods in asynchronous tokenized vaults differ from the the EIP-4626 defined standard in that there is no transfer of `shares` to the vault, because this already happened on `requestRedeem`. Also, `owner` must be `msg.sender` for the same reason.
 
 ### Definitions:
-The existing definitions from [EIP-4626](https://eips.ethereum.org/EIPS/eip-4626) apply.
+The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
+- request: a function call which initiates an asynchronous deposit/redemption flow
+- asynchronous deposit Vault: a Vault which implements asynchronous requests for deposit flows
+- asynchronous redemption Vault: a Vault which implements asynchronous redemption flows
+- fully asynchronous Vault: a vault which implements asynchronous requests for both deposit and redemption
+
+### Request Flows
+EIP-X vaults MUST implement one or both of asynchronous deposit and redemption request flows. If either flow is not implemented in a request pattern, it MUST use the ERC-4626 standard synchronous interaction pattern. 
+
+All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the following overrides for request flows:
+1. In asynchronous deposit Vaults, the `deposit` and`mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
+2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
+3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non owner.
 
 ### Methods
 #### requestDeposit
@@ -198,7 +209,7 @@ Centrifuge has been developing [an implementation](https://github.com/centrifuge
 
 ## Security Considerations
 
-The methods `userDepositRequest` and `userRedeemRequest` are estimates useful for display purposes, and can be outdated due to the asynchronicity.
+The methods `pendingDepositRequest` and `pendingRedeemRequest` are estimates useful for display purposes, and can be outdated due to the asynchronicity.
 
 ## Copyright
 
