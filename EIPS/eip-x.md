@@ -30,6 +30,8 @@ This standard expands the utility of 4626 Vaults for asynchronous use cases. The
 ### Definitions:
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
 - request: a function call which initiates an asynchronous deposit/redemption flow
+- fulfill: the corresponding Vault method to complete a request (e.g. `deposit` fulfills `requestDeposit`)
+- pending request: the state where a request has been made but not yet fulfilled
 - asynchronous deposit Vault: a Vault which implements asynchronous requests for deposit flows
 - asynchronous redemption Vault: a Vault which implements asynchronous redemption flows
 - fully asynchronous Vault: a vault which implements asynchronous requests for both deposit and redemption
@@ -197,7 +199,25 @@ interface IERC4626Async is IERC4626 {
 
 ## Rationale
 
-TODO
+### Symmetry and Non-inclusion of requestWithdraw and requestMint
+
+In ERC-4626, the spec was written to be fully symmetrical with respect to converting assets and shares by including deposit/withdraw and mint/redeem.
+
+Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`. The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise the redemption request flow cannot work with a `withdraw` call.
+
+### Parameter Choices for request vs fulfillment
+
+Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and fullfillment adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
+
+### Optionality of flows and cancels
+
+Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example for an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however deposits can be fully synchronous.
+
+In many cases, cancelling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases such as those involving off-chain (real world) assets.
+
+### Request Implementation flexibility
+
+The standard is flexible enough to support a wide range of interaction patterns for request flows. Pending requests can be handled via internal accounting, globally or on per user levels, use ERC-20 or [ERC-721](./eip-721.md), etc.
 
 ## Backwards Compatibility
 
