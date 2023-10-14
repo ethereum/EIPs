@@ -114,7 +114,7 @@ MUST emit the `CancelRedeemRequest` event.
 ```
 
 #### pendingDepositRequest
-The amount of assets that the owner has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
+The amount of `assets` that the owner has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -135,7 +135,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 ```
 
 #### pendingRedeemRequest
-The amount of shares that the owner has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
+The amount of `shares` that the owner has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -151,7 +151,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
       type: address
 
   outputs:
-    - name: assets
+    - name: shares
       type: uint256
 ```
 
@@ -161,7 +161,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 
 In ERC-4626, the spec was written to be fully symmetrical with respect to converting assets and shares by including deposit/withdraw and mint/redeem.
 
-Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`. The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise the redemption request flow cannot work with a `withdraw` call.
+Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise the redemption request flow cannot work with a `withdraw` call.
 
 ### Parameter Choices for request vs fulfillment
 
