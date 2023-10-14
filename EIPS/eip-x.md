@@ -21,7 +21,7 @@ New methods are added to submit, cancel, and view pending Requests. The existing
 
 The ERC-4626 Tokenized Vaults standard has helped to make yield bearing tokens more composable across decentralized finance. The standard is optimized for atomic deposits and reedemptions up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
 
-This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequesite for interfacing with the Vault (e.g. undercollateralized lending protocols, real world asset protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
+This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequesite for interfacing with the Vault (e.g. real world asset protocols, undercollateralized lending protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
 
 This standard expands the utility of 4626 Vaults for asynchronous use cases. The existing Vault interface (deposit/withdraw/mint/redeem) is fully utilized to fulfill asynchronous Requests.
 
@@ -171,7 +171,7 @@ Keeping track of parameters more complex than a single quantity such as `assets`
 
 Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example for an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however deposits can be fully synchronous.
 
-In many cases, cancelling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases such as those involving off-chain (real world) assets.
+In many cases, cancelling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
 
 ### Request Implementation flexibility
 
