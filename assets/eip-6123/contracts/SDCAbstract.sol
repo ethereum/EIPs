@@ -8,7 +8,7 @@ import "./ERC20Settlement.sol";
 
 
 /**
- * @title Reference Implementation of ERC6123 - Abstract Class
+ * @title Reference Implementation of ERC6123 - Abstract Class for OTC Derivatives
  * @notice This reference implementation is based on a finite state machine with predefined trade and process states (see enums below)
  * Some comments on the implementation:
  * - trade and process states are used in modifiers to check which function is able to be called at which state
@@ -18,7 +18,7 @@ import "./ERC20Settlement.sol";
  * - upon termination all remaining 'locked' amounts will be transferred back to the counterparties
 */
 
-abstract contract SDC is ISDC {
+abstract contract SDCAbstract is ISDC {
     /*
      * Trade States
      */

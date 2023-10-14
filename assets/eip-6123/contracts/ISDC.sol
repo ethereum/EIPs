@@ -7,9 +7,10 @@ pragma solidity >=0.7.0 <0.9.0;
  * @title ERC6123 Smart Derivative Contract
  * @dev Interface specification for a Smart Derivative Contract, which specifies the post-trade live cycle of an OTC financial derivative in a completely deterministic way.
  *
- * A Smart Derivative Contract (SDC) is a deterministic settlement protocol which aims is to remove many inefficiencies in (collateralized) financial transactions and removes settlement and counterparty credit risk by construction.
+ * A Smart Derivative Contract (SDC) is a deterministic settlement protocol which aims is to remove many inefficiencies in (collateralized) financial transactions.
+ * Settlement (Delivery versus payment) and Counterparty Credit Risk are removed by construction.
  *
- * Example OTC-Derivatives: In case of a collateralized OTC derivative the SDC nets  contract-based and collateral flows . As result, the SDC generates a stream of
+ * Special Case OTC-Derivatives: In case of a collateralized OTC derivative the SDC nets contract-based and collateral flows . As result, the SDC generates a stream of
  * reflecting the settlement of a referenced underlying. The settlement cash flows may be daily (which is the standard frequency in traditional markets)
  * or at higher frequencies.
  * With each settlement flow the change is the (discounting adjusted) net present value of the underlying contract is exchanged and the value of the contract is reset to zero.
@@ -90,17 +91,17 @@ interface ISDC {
     event TradeTerminated(string cause);
 
     /**
-     * @dev Emitted when funding phase is initiated
+     * @dev Emitted when Settlement phase is initiated
      */
     event TradeSettlementPhase();
 
     /**
-     * @dev Emitted when margin balance was updated and sufficient funding is provided
+     * @dev Emitted when settlement process has been finished
      */
     event TradeSettled();
 
     /**
-     * @dev Emitted when a valuation and settlement is requested
+     * @dev Emitted when a settlement gets requested
      * @param tradeData holding the stored trade data
      * @param lastSettlementData holding the settlementdata from previous settlement (next settlement will be the increment of next valuation compared to former valuation)
      */
@@ -120,6 +121,10 @@ interface ISDC {
      */
     event TradeTerminationConfirmed(address cpAddress, string tradeId);
 
+    /**
+     * @dev Emitted when trade processing is halted
+     * @param message of what has happened
+     */
     event ProcessHalted(string message);
 
     /*------------------------------------------- FUNCTIONALITY ---------------------------------------------------------------------------------------*/
@@ -127,7 +132,7 @@ interface ISDC {
     /// Trade Inception
 
     /**
-     * @notice Handles trade inception, stores trade data
+     * @notice Incepts a trade, stores trade data
      * @dev emits a {TradeIncepted} event
      * @param _withParty is the party the inceptor wants to trade with
      * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
@@ -138,7 +143,7 @@ interface ISDC {
     function inceptTrade(address _withParty, string memory _tradeData, int _position, int256 _paymentAmount, string memory _initialSettlementData) external;
 
     /**
-     * @notice Performs a matching of provided trade data and settlement data
+     * @notice Performs a matching of provided trade data and settlement data of a previous trade inception
      * @dev emits a {TradeConfirmed} event if trade data match
      * @param _withParty is the party the confirmer wants to trade with
      * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
@@ -158,7 +163,7 @@ interface ISDC {
     function initiateSettlement() external;
 
     /**
-     * @notice Called from outside to trigger according settlement on chain-balances callback for initiateSettlement() event handler
+     * @notice Called to trigger according settlement on chain-balances callback for initiateSettlement() event handler
      * @dev perform settlement checks, may initiate transfers and emits {TradeSettlementPhase}
      * @param settlementAmount the settlement amount. If settlementAmount > 0 then receivingParty receives this amount from other party. If settlementAmount < 0 then other party receives -settlementAmount from receivingParty.
      * @param settlementData. the tripple (product, previousSettlementData, settlementData) determines the settlementAmount.
@@ -167,7 +172,7 @@ interface ISDC {
 
 
     /**
-     * @notice Called from outside to to finish a transfer (callback). Maybe the trade if success = false.
+     * @notice May get called from outside to to finish a transfer (callback). The trade decides on how to proceed based on success flag
      * @param success tells the protocol whether transfer was successful
      * @dev may emit a {TradeSettled} event  or a {TradeTerminated} event
      */
@@ -184,7 +189,7 @@ interface ISDC {
     function requestTradeTermination(string memory tradeId, int256 _terminationPayment) external;
 
     /**
-     * @notice Called from a counterparty to confirm a termination, which will triggers a final settlement before trade gets inactive
+     * @notice Called from a party to confirm an incepted termination, which might trigger a final settlement before trade gets closed
      * @dev emits a {TradeTerminationConfirmed}
      * @param tradeId the trade identifier of the trade which is supposed to be terminated
      */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./SDC.sol";
+import "./SDCAbstract.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./ERC20Settlement.sol";
@@ -35,7 +35,7 @@ import "./ERC20Settlement.sol";
  *-------------------------------------*
 */
 
-contract SDCPledgedBalance is SDC {
+contract SDCPledgedBalance is SDCAbstract {
 
     struct MarginRequirement {
         uint256 buffer;
@@ -51,7 +51,7 @@ contract SDCPledgedBalance is SDC {
         address _settlementToken,
         uint256 _initialBuffer, // m
         uint256 _initalTerminationFee // p
-    ) SDC(_party1,_party2,_settlementToken) {
+    ) SDCAbstract(_party1,_party2,_settlementToken) {
         marginRequirements[party1] = MarginRequirement(_initialBuffer, _initalTerminationFee);
         marginRequirements[party2] = MarginRequirement(_initialBuffer, _initalTerminationFee);
     }
