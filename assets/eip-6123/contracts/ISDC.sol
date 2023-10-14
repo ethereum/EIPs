@@ -6,22 +6,20 @@ pragma solidity >=0.7.0 <0.9.0;
 /**
  * @title ERC6123 Smart Derivative Contract
  * @dev Interface specification for a Smart Derivative Contract, which specifies the post-trade live cycle of an OTC financial derivative in a completely deterministic way.
- * Counterparty Risk is removed by construction.
  *
- * A Smart Derivative Contract is a deterministic settlement protocol which has economically the same behaviour as a collateralized OTC financial derivative.
- * It aims is to remove many inefficiencies in collateralized OTC transactions and remove counterparty credit risk by construction.
+ * A Smart Derivative Contract (SDC) is a deterministic settlement protocol which aims is to remove many inefficiencies in (collateralized) financial transactions and removes settlement and counterparty credit risk by construction.
  *
- * In contrast to a collateralized derivative contract based and collateral flows are netted. As result, the smart derivative contract generates a stream of
+ * Example OTC-Derivatives: In case of a collateralized OTC derivative the SDC nets  contract-based and collateral flows . As result, the SDC generates a stream of
  * reflecting the settlement of a referenced underlying. The settlement cash flows may be daily (which is the standard frequency in traditional markets)
  * or at higher frequencies.
  * With each settlement flow the change is the (discounting adjusted) net present value of the underlying contract is exchanged and the value of the contract is reset to zero.
  *
- * To automatically process settlement, counterparties need to provide sufficient prefunded margin amounts and termination fees at the
+ * To automatically process settlement, parties need to provide sufficient initial funding and termination fees at the
  * beginning of each settlement cycle. Through a settlement cycle the margin amounts are locked. Simplified, the contract reverts the classical scheme of
  * 1) underlying valuation, then 2) funding of a margin call to
  * 1) pre-funding of a margin buffer (a token), then 2) settlement.
  *
- * A SDC automatically terminates the derivatives contract if there is insufficient pre-funding or if the settlement amount exceeds a
+ * A SDC may automatically terminates the financial contract if there is insufficient pre-funding or if the settlement amount exceeds a
  * prefunded margin balance. Beyond mutual termination is also intended by the function specification.
  *
  * Events and Functionality specify the entire live cycle: TradeInception, TradeConfirmation, TradeTermination, Margin-Account-Mechanics, Valuation and Settlement.
@@ -32,7 +30,7 @@ pragma solidity >=0.7.0 <0.9.0;
  *  </li>
  *  <li>
  *      The process runs in cycles. Let i = 0,1,2,... denote the index of the cycle. Within each cycle there are times
- *      T_{i,0}, T_{i,1}, T_{i,2}, T_{i,3} with T_{i,1} = pre-funding of the Smart Contract, T_{i,2} = request valuation from oracle, T_{i,3} = perform settlement on given valuation, T_{i+1,0} = T_{i,3}.
+ *      T_{i,0}, T_{i,1}, T_{i,2}, T_{i,3} with T_{i,1} = The Activation of the Trade (initial funding provided), T_{i,1} = request valuation from oracle, T_{i,2} = perform settlement on given valuation, T_{i+1,0} = T_{i,3}.
  *  </li>
  *  <li>
  *      Given this time discretization the states are assigned to time points and time intervalls:
@@ -43,16 +41,16 @@ pragma solidity >=0.7.0 <0.9.0;
  *          <dt>Initiation</dt>
  *          <dd>T* < t < T_{0}, where T* is time of incept and T_{0} = T_{0,0}</dd>
  *
- *          <dt>AwaitingFunding</dt>
+ *          <dt>InTransfer (Initiation Phase)</dt>
  *          <dd>T_{i,0} < t < T_{i,1}</dd>
  *
- *          <dt>Funding</dt>
+ *          <dt>Settled</dt>
  *          <dd>t = T_{i,1}</dd>
  *
- *          <dt>AwaitingSettlement</dt>
+ *          <dt>ValuationAndSettlement</dt>
  *          <dd>T_{i,1} < t < T_{i,2}</dd>
  *
- *          <dt>ValuationAndSettlement</dt>
+ *          <dt>InTransfer (Settlement Phase)</dt>
  *          <dd>T_{i,2} < t < T_{i,3}</dd>
  *
  *          <dt>Settled</dt>
@@ -94,24 +92,19 @@ interface ISDC {
     /**
      * @dev Emitted when funding phase is initiated
      */
-    event ProcessAwaitingFunding();
+    event TradeSettlementPhase();
 
     /**
      * @dev Emitted when margin balance was updated and sufficient funding is provided
      */
-    event ProcessFunded();
+    event TradeSettled();
 
     /**
      * @dev Emitted when a valuation and settlement is requested
      * @param tradeData holding the stored trade data
      * @param lastSettlementData holding the settlementdata from previous settlement (next settlement will be the increment of next valuation compared to former valuation)
      */
-    event ProcessSettlementRequest(string tradeData, string lastSettlementData);
-
-    /**
-     * @dev Emitted when a settlement was processed succesfully
-     */
-    event ProcessSettled();
+    event TradeSettlementRequest(string tradeData, string lastSettlementData);
 
     /**
      * @dev Emitted when a counterparty proactively requests an early termination of the underlying trade
@@ -127,6 +120,8 @@ interface ISDC {
      */
     event TradeTerminationConfirmed(address cpAddress, string tradeId);
 
+    event ProcessHalted(string message);
+
     /*------------------------------------------- FUNCTIONALITY ---------------------------------------------------------------------------------------*/
 
     /// Trade Inception
@@ -134,43 +129,50 @@ interface ISDC {
     /**
      * @notice Handles trade inception, stores trade data
      * @dev emits a {TradeIncepted} event
+     * @param _withParty is the party the inceptor wants to trade with
      * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
+     * @param _position is the position the inceptor has in that trade
+     * @param _paymentAmount is the paymentamount which can be positive or negative
      * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
-     * @param _upfrontPayment provides an initial payment amount upfront
      */
-    function inceptTrade(string memory _tradeData, string memory _initialSettlementData, int256 _upfrontPayment) external;
+    function inceptTrade(address _withParty, string memory _tradeData, int _position, int256 _paymentAmount, string memory _initialSettlementData) external;
 
     /**
      * @notice Performs a matching of provided trade data and settlement data
      * @dev emits a {TradeConfirmed} event if trade data match
-     * @param _tradeData a description of the trade in sdc.xml, e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
+     * @param _withParty is the party the confirmer wants to trade with
+     * @param _tradeData a description of the trade specification e.g. in xml format, suggested structure - see assets/eip-6123/doc/sample-tradedata-filestructure.xml
+     * @param _position is the position the inceptor has in that trade
+     * @param _paymentAmount is the paymentamount which can be positive or negative
      * @param _initialSettlementData the initial settlement data (e.g. initial market data at which trade was incepted)
      */
-    function confirmTrade(string memory _tradeData, string memory _initialSettlementData) external;
+     function confirmTrade(address _withParty, string memory _tradeData, int _position, int256 _paymentAmount, string memory _initialSettlementData) external;
 
-    /// Settlement Cycle: Prefunding
-
-    /**
-     * @notice Called from outside to check and secure pre-funding. Terminate the trade if prefunding fails.
-     * @dev emits a {ProcessFunded} event if prefunding check is successful or a {TradeTerminated} event if prefunding check fails
-     */
-    function initiatePrefunding() external;
 
     /// Settlement Cycle: Settlement
 
     /**
      * @notice Called to trigger a (maybe external) valuation of the underlying contract and afterwards the according settlement process
-     * @dev emits a {ProcessSettlementRequest}
+     * @dev emits a {TradeSettlementRequest}
      */
     function initiateSettlement() external;
 
     /**
      * @notice Called from outside to trigger according settlement on chain-balances callback for initiateSettlement() event handler
-     * @dev emits a {ProcessSettled} if settlement is successful or {TradeTerminated} if settlement fails
+     * @dev perform settlement checks, may initiate transfers and emits {TradeSettlementPhase}
      * @param settlementAmount the settlement amount. If settlementAmount > 0 then receivingParty receives this amount from other party. If settlementAmount < 0 then other party receives -settlementAmount from receivingParty.
      * @param settlementData. the tripple (product, previousSettlementData, settlementData) determines the settlementAmount.
      */
     function performSettlement(int256 settlementAmount, string memory settlementData) external;
+
+
+    /**
+     * @notice Called from outside to to finish a transfer (callback). Maybe the trade if success = false.
+     * @param success tells the protocol whether transfer was successful
+     * @dev may emit a {TradeSettled} event  or a {TradeTerminated} event
+     */
+    function afterTransfer(uint256 transactionHash, bool success) external;
+
 
     /// Trade termination
 
@@ -179,13 +181,12 @@ interface ISDC {
      * @dev emits a {TradeTerminationRequest}
      * @param tradeId the trade identifier which is supposed to be terminated
      */
-    function requestTradeTermination(string memory tradeId) external;
+    function requestTradeTermination(string memory tradeId, int256 _terminationPayment) external;
 
     /**
      * @notice Called from a counterparty to confirm a termination, which will triggers a final settlement before trade gets inactive
      * @dev emits a {TradeTerminationConfirmed}
      * @param tradeId the trade identifier of the trade which is supposed to be terminated
      */
-    function confirmTradeTermination(string memory tradeId) external;
+    function confirmTradeTermination(string memory tradeId, int256 _terminationPayment) external;
 }
-
