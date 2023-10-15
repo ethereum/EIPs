@@ -52,6 +52,8 @@ Requests have 3 steps:
 
 The unexecuted deposit request is defined by `pendingDepositRequest - maxDeposit` and the unexecuted redemption request is defined by `pendingRedeemRequest - maxRedeem`.
 
+Note that for redemption requests, yield can accrue on the `shares` until after step 1 or until after step 2, depending on the Vault implementation.
+
 ### Methods
 #### requestDeposit
 Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
