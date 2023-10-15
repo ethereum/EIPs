@@ -50,13 +50,15 @@ Requests have 3 steps:
 2. Executing a pending request. This can be an implicit step, such as after a timelock has passed a request is automatically considered executed. Or it can be an explicit Vault action triggered by an external action. After execution, `maxDeposit` and `maxRedeem` are set to the executed but unfulfilled amount.
 3. Fulfilling a request using `deposit`, `mint`, `redeem` or `withdraw`. This removes the pending request.
 
+Requests MUST NOT skip step 2 and be automaticaly fulfilled, due to the ambiguity this creates for integrators. Instead there can be router contracts which atomically check for claimable amounts immediately upon request.
+
 The unexecuted deposit request is defined by `pendingDepositRequest - maxDeposit` and the unexecuted redemption request is defined by `pendingRedeemRequest - maxRedeem`.
 
 Note that for redemption requests, whether yield still accrues on shares that are pending a redemption request, or only on shares that are pending a redemption request and have not been executed, is up to the Vault implementation.
 
 ### Methods
 #### requestDeposit
-Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
+Locks `assets` from `msg.sender` into the Vault and submits a request by `operator` to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
 
 MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
 
@@ -74,10 +76,12 @@ MUST emit the `RequestDeposit` event.
   inputs:
     - name: assets
       type: uint256
+    - name: operator
+      type: address
 ```
 
 #### requestRedeem
-Locks `shares` into the Vault and submits a request to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
+Locks `shares` from `owner` into the Vault and submits a request by `operator` to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the current value of `convertToAssets(shares)`, as the price can change between request and execution.
 
@@ -97,6 +101,8 @@ MUST emit the `RequestRedeem` event.
   inputs:
     - name: shares
       type: uint256
+    - name: operator
+      type: address
     - name: owner
       type: address
 ```
