@@ -3,10 +3,10 @@ eip: <to be assigned>
 title: Multi-edition NFT Distribution
 description: A specification on the distribution of multiple editions of child NFTs with different rules and privileges.
 author: Henry Yeung (@henrywfyeung)<henry@didhub.com>, Xiaoba <xiaoba@didhub.com>
-discussions-to: <URL>
+discussions-to: 
 status: Draft
 type: Standards Track
-category (*only required for Standards Track): ERC
+category: ERC
 created: 2023-09-01
 requires (*optional): 165, 721
 ---
@@ -191,7 +191,7 @@ Actions may give the child tokens the following characteristics:
 
 ### External or Internal Implementation of the Validator Interface 
 
-The Validator Interface can be implemented externally as an independent contract, or internally as part of the contract that issues the child token. The former approach is more upgrade-friendly, i.e., validation contracts can be easily swapped to a higher version, while still maintaining compatibility to past versions. More it permits multiple different validators to coexists at the same time. The latter one is less composable, but more secure, as it does not depend on third-party code. This is prefered if the validated rules are unlikely to change in the future.
+The Validator Interface can be implemented externally as an independent contract, or internally as part of the contract that issues the child token. The former approach is more upgrade-friendly, i.e., validation contracts can be easily swapped to a higher version, while still maintaining compatibility to past versions. More it permits multiple different validators to coexist at the same time. The latter one is less composable, but more secure, as it does not depend on third-party code. This is prefered if the validated rules are unlikely to change in the future.
 
 ### Flexible Implementation of Validation Rules
 
@@ -210,7 +210,7 @@ This standard is compatible with [EIP-721](./eip-721.md).
 
 ## Reference Implementation
 
-The reference implementation is given in  `../assets/eip-####/`.
+The reference implementation is given in  `../assets/eip-distributor/`.
 
 ## Security Considerations
 The current design permits the use of an external validator contract which may not implement secure logic and may potentially be malicious. The distributor contract could whitelist a subset of trusted validators. Moreover, an ERC721 contract may at the same time implement both the distributor and the validator interfaces to remove the dependency on external contracts.
