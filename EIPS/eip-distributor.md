@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 7853
 title: Multi-edition NFT Distribution
 description: A specification on the distribution of multiple editions of child NFTs with different rules and privileges.
 author: Henry Yeung (@henrywfyeung) <henry@didhub.com>, Xiaoba <xiaoba@didhub.com>
