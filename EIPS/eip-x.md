@@ -15,13 +15,13 @@ requires: 20, 4626
 
 The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called "Requests".
 
-New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw and redeem ERC-4626 methods are used for executing fulfilled Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
+New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing fulfilled Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
 
 ## Motivation
 
-The ERC-4626 Tokenized Vaults standard has helped to make yield bearing tokens more composable across decentralized finance. The standard is optimized for atomic deposits and reedemptions up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
+The ERC-4626 Tokenized Vaults standard has helped to make yield-bearing tokens more composable across decentralized finance. The standard is optimized for atomic deposits and redemptions up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
 
-This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequesite for interfacing with the Vault (e.g. real world asset protocols, undercollateralized lending protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
+This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequisite for interfacing with the Vault (e.g. real-world asset protocols, undercollateralized lending protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
 
 This standard expands the utility of 4626 Vaults for asynchronous use cases. The existing Vault interface (deposit/withdraw/mint/redeem) is fully utilized to fulfill asynchronous Requests.
 
@@ -29,21 +29,21 @@ This standard expands the utility of 4626 Vaults for asynchronous use cases. The
 
 ### Definitions:
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
-- request: a function call which initiates an asynchronous deposit/redemption flow
+- request: a function call that initiates an asynchronous deposit/redemption flow
 - execute: the Vault's step of executing the request and enabling the user to fulfill the request
 - fulfill: the corresponding Vault method to complete a request (e.g. `deposit` fulfills `requestDeposit`)
 - pending request: the state where a request has been made but not yet fulfilled
-- asynchronous deposit Vault: a Vault which implements asynchronous requests for deposit flows
-- asynchronous redemption Vault: a Vault which implements asynchronous redemption flows
-- fully asynchronous Vault: a vault which implements asynchronous requests for both deposit and redemption
+- asynchronous deposit Vault: a Vault that implements asynchronous requests for deposit flows
+- asynchronous redemption Vault: a Vault that implements asynchronous redemption flows
+- fully asynchronous Vault: a vault that implements asynchronous requests for both deposit and redemption
 
 ### Request Flows
 EIP-X vaults MUST implement one or both of asynchronous deposit and redemption request flows. If either flow is not implemented in a request pattern, it MUST use the ERC-4626 standard synchronous interaction pattern. 
 
 All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the following overrides for request flows:
-1. In asynchronous deposit Vaults, the `deposit` and`mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
+1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
-3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non owner.
+3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a nonowner.
 
 Requests have 3 steps:
 1. Submitting a new request using `requestDeposit` or `requestRedeem`. This creates the pending request.
@@ -56,7 +56,7 @@ Note that for redemption requests, whether yield still accrues on shares that ar
 
 ### Methods
 #### requestDeposit
-Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
+Locks `assets` into the Vault and submits a request to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
 
 MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
 
@@ -77,7 +77,7 @@ MUST emit the `RequestDeposit` event.
 ```
 
 #### requestRedeem
-Locks `shares` into the Vault and submits a request to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
+Locks `shares` into the Vault and submits a request to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the current value of `convertToAssets(shares)`, as the price can change between request and execution.
 
@@ -102,7 +102,7 @@ MUST emit the `RequestRedeem` event.
 ```
 
 #### cancelDepositRequest
-Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets` that were previously locked for deposit.
+Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets` that were previously locked for deposit.
 
 MUST emit the `CancelDepositRequest` event.
 
@@ -113,7 +113,7 @@ MUST emit the `CancelDepositRequest` event.
 ```
 
 #### cancelRedeemRequest
-Submits an order to cancel the outstanding redeem request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased and `deposit` or `mint` from ERC-4626 can be used to receive `shares` that were previously locked for redemption.
+Submits an order to cancel the outstanding redemption request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares` that were previously locked for redemption.
 
 MUST emit the `CancelRedeemRequest` event.
 
@@ -188,9 +188,9 @@ MUST be emitted when a deposit request is submitted using the `requestDeposit` m
 
 #### RedeemRequest
 
-`sender` has locked `shares`, owned by `owner`, in the Vault to request a redeption.
+`sender` has locked `shares`, owned by `owner`, in the Vault to request a redemption.
 
-MUST be emitted when a redeption request is submitted using the `requestRedeem` method.
+MUST be emitted when a redemption request is submitted using the `requestRedeem` method.
 
 ```yaml
 - name: RedeemRequest
@@ -252,25 +252,25 @@ MUST be emitted when a cancel redemption request is submitted using the `cancelR
 
 In ERC-4626, the spec was written to be fully symmetrical with respect to converting assets and shares by including deposit/withdraw and mint/redeem.
 
-Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise the redemption request flow cannot work with a `withdraw` call.
+Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise, the redemption request flow cannot work with a `withdraw` call.
 
 ### Parameter Choices for request vs fulfillment
 
-Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and fullfillment adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
+Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and fulfillment adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
 
 ### Optionality of flows and cancels
 
-Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example for an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however deposits can be fully synchronous.
+Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example of an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however, deposits can be fully synchronous.
 
-In many cases, cancelling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
+In many cases, canceling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
 
 ### Request Implementation flexibility
 
-The standard is flexible enough to support a wide range of interaction patterns for request flows. Pending requests can be handled via internal accounting, globally or on per user levels, use ERC-20 or [ERC-721](./eip-721.md), etc.
+The standard is flexible enough to support a wide range of interaction patterns for request flows. Pending requests can be handled via internal accounting, globally or on per-user levels, use ERC-20 or [ERC-721](./eip-721.md), etc.
 
 ## Backwards Compatibility
 
-The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` method is different as described in [Specification](##Specification).
+The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](##Specification).
 
 ## Reference Implementation
 
