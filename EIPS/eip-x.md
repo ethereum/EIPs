@@ -52,7 +52,7 @@ Requests have 3 steps:
 
 The unexecuted deposit request is defined by `pendingDepositRequest - maxDeposit` and the unexecuted redemption request is defined by `pendingRedeemRequest - maxRedeem`.
 
-Note that for redemption requests, yield can accrue on the `shares` until after step 1 or until after step 2, depending on the Vault implementation.
+Note that for redemption requests, whether yield still accrues on shares that are pending a redemption request, or only on shares that are pending a redemption request and have not been executed, is up to the Vault implementation.
 
 ### Methods
 #### requestDeposit
