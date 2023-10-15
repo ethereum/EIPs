@@ -165,6 +165,87 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
       type: uint256
 ```
 
+### Events
+
+#### DepositRequest
+
+`sender` has locked `assets` in the Vault to request a deposit.
+
+MUST be emitted when a deposit request is submitted using the `requestDeposit` method.
+
+```yaml
+- name: DepositRequest
+  type: event
+
+  inputs:
+    - name: sender
+      indexed: true
+      type: address
+    - name: assets
+      indexed: false
+      type: uint256
+```
+
+#### RedeemRequest
+
+`sender` has locked `shares`, owned by `owner`, in the Vault to request a redeption.
+
+MUST be emitted when a redeption request is submitted using the `requestRedeem` method.
+
+```yaml
+- name: RedeemRequest
+  type: event
+
+  inputs:
+    - name: sender
+      indexed: true
+      type: address
+    - name: owner
+      indexed: true
+      type: address
+    - name: assets
+      indexed: false
+      type: uint256
+```
+
+#### CancelDepositRequest
+
+`sender` has requested to cancel the pending deposit request.
+
+MUST be emitted when a cancel deposit request is submitted using the `cancelDepositRequest` method.
+
+```yaml
+- name: CancelDepositRequest
+  type: event
+
+  inputs:
+    - name: sender
+      indexed: true
+      type: address
+    - name: assets
+      indexed: false
+      type: uint256
+```
+
+#### CancelRedeemRequest
+
+`sender` has requested to cancel the pending redemption request.
+
+MUST be emitted when a cancel redemption request is submitted using the `cancelRedeemRequest` method.
+
+```yaml
+- name: CancelRedeemRequest
+  type: event
+
+  inputs:
+    - name: sender
+      indexed: true
+      type: address
+    - name: assets
+      indexed: false
+      type: uint256
+```
+
 ## Rationale
 
 ### Symmetry and Non-inclusion of requestWithdraw and requestMint
