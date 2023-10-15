@@ -30,6 +30,7 @@ This standard expands the utility of 4626 Vaults for asynchronous use cases. The
 ### Definitions:
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
 - request: a function call which initiates an asynchronous deposit/redemption flow
+- execute: the Vault's step of executing the request and enabling the user to fulfill the request
 - fulfill: the corresponding Vault method to complete a request (e.g. `deposit` fulfills `requestDeposit`)
 - pending request: the state where a request has been made but not yet fulfilled
 - asynchronous deposit Vault: a Vault which implements asynchronous requests for deposit flows
@@ -43,6 +44,13 @@ All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the follow
 1. In asynchronous deposit Vaults, the `deposit` and`mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non owner.
+
+Requests have 3 steps:
+1. Submitting a new request using `requestDeposit` or `requestRedeem`. This creates the pending request.
+2. Executing a pending request. This can be an implicit step, such as after a timelock has passed a request is automatically considered executed. Or it can be an explicit Vault action triggered by an external action. After execution, `maxDeposit` and `maxRedeem` are set to the executed but unfulfilled amount.
+3. Fulfilling a request using `deposit`, `mint`, `redeem` or `withdraw`. This removes the pending request.
+
+The unexecuted deposit request is defined by `pendingDepositRequest - maxDeposit` and the unexecuted redemption request is defined by `pendingRedeemRequest - maxRedeem`.
 
 ### Methods
 #### requestDeposit
