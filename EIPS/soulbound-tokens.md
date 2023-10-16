@@ -1,18 +1,16 @@
 ---
-eip: <to be assigned>
+eip: soulbound-tokens
 title: Soulbound Tokens
 author: Omar Garcia (@ogarciarevett)
+description: A token that is attached to a "soul" at mint time and cannot be transferred after that.
 discussions-to: https://ethereum-magicians.org/t/soulbound-tokens-daos-and-web3-games/16104
 status: Draft
 type: Standards Track
 category: ERC
-requires: 712, 1155
 created: 2023-10-15
+requires: 712, 1155
+
 ---
-
-## Simple Summary
-
-Introducing the concept of "Soulbound Tokens" with explicit modifiers to restrict token transferability, enhancing security and control in blockchain applications or blockchain games.
 
 ## Abstract
 
@@ -64,9 +62,9 @@ interface IERCSoulBound {
 
 The explicit approach to Soulbound Tokens empowers developers with a robust and flexible solution for token ownership and transferability. The explicit modifiers in this EIP enhance the security and trustworthiness of blockchain applications.
 
-## Examples
+#### Examples
 
-### Example 1: Using Soulbound Tokens with ERC721
+##### Example 1: Using Soulbound Tokens with ERC721
 
 ```solidity
 contract Mock721Soulbound is ERC721, ERCSoulbound {
@@ -100,7 +98,7 @@ contract Mock721Soulbound is ERC721, ERCSoulbound {
 
 In this example, the Mock721Soulbound contract utilizes the ERCSoulbound contract to manage the soul bounding of tokens. The mint function is used to mint new tokens and soul bound them. The _beforeTokenTransfer function ensures that only soulbound tokens can be transferred.
 
-### Example 2: Using Soulbound Tokens with ERC1155
+##### Example 2: Using Soulbound Tokens with ERC1155
 
 ```solidity
 contract Mock1155Soulbound is ERC1155Burnable, ERCSoulbound {
