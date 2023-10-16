@@ -175,7 +175,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 
 #### DepositRequest
 
-`sender` has locked `assets` in the Vault to request a deposit.
+`sender` has locked `assets` in the Vault to request a deposit. `operator` controls this request.
 
 MUST be emitted when a deposit request is submitted using the `requestDeposit` method.
 
@@ -187,6 +187,9 @@ MUST be emitted when a deposit request is submitted using the `requestDeposit` m
     - name: sender
       indexed: true
       type: address
+    - name: operator
+      indexed: true
+      type: address
     - name: assets
       indexed: false
       type: uint256
@@ -194,7 +197,7 @@ MUST be emitted when a deposit request is submitted using the `requestDeposit` m
 
 #### RedeemRequest
 
-`sender` has locked `shares`, owned by `owner`, in the Vault to request a redemption.
+`sender` has locked `shares`, owned by `owner`, in the Vault to request a redemption. `operator` controls this request.
 
 MUST be emitted when a redemption request is submitted using the `requestRedeem` method.
 
@@ -204,6 +207,9 @@ MUST be emitted when a redemption request is submitted using the `requestRedeem`
 
   inputs:
     - name: sender
+      indexed: true
+      type: address
+    - name: operator
       indexed: true
       type: address
     - name: owner
