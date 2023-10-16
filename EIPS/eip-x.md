@@ -41,9 +41,10 @@ The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this
 EIP-X vaults MUST implement one or both of asynchronous deposit and redemption request flows. If either flow is not implemented in a request pattern, it MUST use the ERC-4626 standard synchronous interaction pattern. 
 
 All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the following overrides for request flows:
-1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
-2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
-3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a nonowner.
+1. In asynchronous deposit vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
+2. In asynchronous redemption vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
+3. In asynchronous redemption vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a nonowner.
+4. In asynchronous vaults, it must be possible to `cancelDepositRequest` and `cancelRedeemRequest`, which reduces the `pendingDepositRequest` or `pendingRedeemRequest` to 0 and increases the `maxDeposit` and `maxRedeem` to the previous pendingRequest, allowing the user to withdraw tokens or vault shares from the initial request.
 
 ### Request Lifecycle
 After submission, Requests go through Pending, Claimable, and Claimed stages. An example lifecycle for a deposit request is visualized in the table below.
@@ -59,6 +60,14 @@ The requested amount is defined by `pendingDepositRequest + maxDeposit`.
 Requests MUST NOT skip step 2 and be automatically claimed, due to the ambiguity this creates for integrators. Instead there can be router contracts which atomically check for claimable amounts immediately upon request.
 
 Note that for redemption requests, whether yield still accrues on shares that are pending a redemption request, or only on shares that are pending a redemption request and have not been executed, is up to the Vault implementation.
+
+Cancellation requests also go through the same Pending, Claimable, and Claimed stages. An example lifecycle for a cancelled deposit request is visualized in the table below. 
+
+| **State**    | **User**                       | **Vault** |
+| ------------:|:------------------------------ | ---------:|
+| Pending      | cancelDepositRequest()           |          |
+| Claimable    |                                | <i>Internal request fulfillment</i><br>maxRedeem[msg.sender] += pendingDepositRequest[msg.sender]<br>pendingDepositRequest[msg.sender] = 0<br> |
+| Claimed      | redeem(assets, receiver)       | maxRedeem[msg.sender] -= vault.redeem[assets] |
 
 ### Methods
 #### requestDeposit
