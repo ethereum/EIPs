@@ -134,7 +134,7 @@ MUST emit the `CancelRedeemRequest` event.
 ```
 
 #### pendingDepositRequest
-The amount of `assets` that the owner has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
+The amount of `assets` that the operator has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -146,7 +146,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
   stateMutability: view
 
   inputs:
-    - name: owner
+    - name: operator
       type: address
 
   outputs:
@@ -155,7 +155,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 ```
 
 #### pendingRedeemRequest
-The amount of `shares` that the owner has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
+The amount of `shares` that the operator has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -167,7 +167,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
   stateMutability: view
 
   inputs:
-    - name: owner
+    - name: operator
       type: address
 
   outputs:
