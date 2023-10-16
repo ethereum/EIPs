@@ -52,7 +52,7 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
     mapping(uint256 => uint64[]) internal _activeAssets;
 
     //mapping of tokenId to an array of asset priorities
-    mapping(uint256 => uint16[]) internal _activeAssetPriorities;
+    mapping(uint256 => uint64[]) internal _activeAssetPriorities;
 
     //Double mapping of tokenId to active assets
     mapping(uint256 => mapping(uint64 => bool)) private _tokenAssets;
@@ -71,7 +71,7 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
 
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         return
-            interfaceId == type(IMultiAsset).interfaceId ||
+            interfaceId == type(IERC5773).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC165).interfaceId;
     }
@@ -447,7 +447,7 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
         } else {
             // We use the current size as next priority, by default priorities would be [0,1,2...]
             _activeAssetPriorities[tokenId].push(
-                uint16(_activeAssets[tokenId].length)
+                uint64(_activeAssets[tokenId].length)
             );
             _activeAssets[tokenId].push(assetId);
             replacesId = uint64(0);
@@ -514,7 +514,7 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
 
     function setPriority(
         uint256 tokenId,
-        uint16[] memory priorities
+        uint64[] memory priorities
     ) external virtual {
         uint256 length = priorities.length;
         require(
@@ -547,7 +547,7 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
 
     function getActiveAssetPriorities(
         uint256 tokenId
-    ) public view virtual returns (uint16[] memory) {
+    ) public view virtual returns (uint64[] memory) {
         return _activeAssetPriorities[tokenId];
     }
 
@@ -674,11 +674,11 @@ contract MultiAssetToken is Context, IERC721, IERC5773 {
 
     function _beforeSetPriority(
         uint256 tokenId,
-        uint16[] memory priorities
+        uint64[] memory priorities
     ) internal virtual {}
 
     function _afterSetPriority(
         uint256 tokenId,
-        uint16[] memory priorities
+        uint64[] memory priorities
     ) internal virtual {}
 }

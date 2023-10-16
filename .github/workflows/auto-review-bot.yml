@@ -12,7 +12,7 @@ jobs:
     name: Run
     steps:
       - name: Fetch PR Number
-        uses: dawidd6/action-download-artifact@6765a42d86407a3d532749069ac03705ad82ebc6
+        uses: dawidd6/action-download-artifact@246dbf436b23d7c49e21a7ab8204ca9ecd1fe615
         with:
           name: pr-number
           workflow: auto-review-trigger.yml
@@ -24,20 +24,9 @@ jobs:
 
       - name: Auto Review Bot
         id: auto-review-bot
-        uses: ethereum/eip-review-bot@dist
+        uses: ethereum/eip-review-bot@3e9905fcb72cf81ae9ed732df429c28b17e155b1
+        continue-on-error: true
         with:
           token: ${{ secrets.TOKEN }}
           config: config/eip-editors.yml
           pr_number: ${{ steps.save-pr-number.outputs.pr }}
-
-      - name: Enable Auto-Merge
-        uses: reitermarkus/automerge@a25ea0de41019ad13380d22e01db8f5638f1bcdc
-        with:
-          token: ${{ secrets.TOKEN }}
-          pull-request: ${{ steps.save-pr-number.outputs.pr }}
-
-      - name: Submit Approval
-        uses: hmarr/auto-approve-action@24ec4c8cc344fe1cdde70ff37e55ace9e848a1d8
-        with:
-          github-token: ${{ secrets.TOKEN }}
-          pull-request-number: ${{ steps.save-pr-number.outputs.pr }}

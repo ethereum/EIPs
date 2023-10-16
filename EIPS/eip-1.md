@@ -24,7 +24,7 @@ There are three types of EIP:
 - A **Standards Track EIP** describes any change that affects most or all Ethereum implementations, such as—a change to the network protocol, a change in block or transaction validity rules, proposed application standards/conventions, or any change or addition that affects the interoperability of applications using Ethereum. Standards Track EIPs consist of three parts—a design document, an implementation, and (if warranted) an update to the [formal specification](https://github.com/ethereum/yellowpaper). Furthermore, Standards Track EIPs can be broken down into the following categories:
   - **Core**: improvements requiring a consensus fork (e.g. [EIP-5](./eip-5.md), [EIP-101](./eip-101.md)), as well as changes that are not necessarily consensus critical but may be relevant to [“core dev” discussions](https://github.com/ethereum/pm) (for example, [EIP-90], and the miner/node strategy changes 2, 3, and 4 of [EIP-86](./eip-86.md)).
   - **Networking**: includes improvements around [devp2p](https://github.com/ethereum/devp2p/blob/readme-spec-links/rlpx.md) ([EIP-8](./eip-8.md)) and [Light Ethereum Subprotocol](https://ethereum.org/en/developers/docs/nodes-and-clients/#light-node), as well as proposed improvements to network protocol specifications of [whisper](https://github.com/ethereum/go-ethereum/issues/16013#issuecomment-364639309) and [swarm](https://github.com/ethereum/go-ethereum/pull/2959).
-  - **Interface**: includes improvements around client [API/RPC](https://github.com/ethereum/execution-apis#README) specifications and standards, and also certain language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html). The label “interface” aligns with the [interfaces repo] and discussion should primarily occur in that repository before an EIP is submitted to the EIPs repository.
+  - **Interface**: includes improvements around language-level standards like method names ([EIP-6](./eip-6.md)) and [contract ABIs](https://docs.soliditylang.org/en/develop/abi-spec.html).
   - **ERC**: application-level standards and conventions, including contract standards such as token standards ([ERC-20](./eip-20.md)), name registries ([ERC-137](./eip-137.md)), URI schemes, library/package formats, and wallet formats.
 
 - A **Meta EIP** describes a process surrounding Ethereum or proposes a change to (or an event in) a process. Process EIPs are like Standards Track EIPs but apply to areas other than the Ethereum protocol itself. They may propose an implementation, but not to Ethereum's codebase; they often require community consensus; unlike Informational EIPs, they are more than recommendations, and users are typically not free to ignore them. Examples include procedures, guidelines, changes to the decision-making process, and changes to the tools or environment used in Ethereum development. Any meta-EIP is also considered a Process EIP.
@@ -85,6 +85,8 @@ If this period results in necessary normative changes it will revert the EIP to 
 
 **Final** - This EIP represents the final standard. A Final EIP exists in a state of finality and should only be updated to correct errata and add non-normative clarifications.
 
+A PR moving an EIP from Last Call to Final SHOULD contain no changes other than the status update. Any content or editorial proposed change SHOULD be separate from this status-updating PR and committed prior to it.
+
 **Stagnant** - Any EIP in `Draft` or `Review` or `Last Call` if inactive for a period of 6 months or greater is moved to `Stagnant`. An EIP may be resurrected from this state by Authors or EIP Editors through moving it back to `Draft` or it's earlier status. If not resurrected, a proposal may stay forever in this status.
 
 >*EIP Authors are notified of any algorithmic change to the status of their EIP*
@@ -116,7 +118,7 @@ EIPs should be written in [markdown](https://github.com/adam-p/markdown-here/wik
 
 Each EIP must begin with an [RFC 822](https://www.ietf.org/rfc/rfc822.txt) style header preamble, preceded and followed by three hyphens (`---`). This header is also termed ["front matter" by Jekyll](https://jekyllrb.com/docs/front-matter/). The headers must appear in the following order.
 
-`eip`: *EIP number* (this is determined by the EIP editor)
+`eip`: *EIP number*
 
 `title`: *The EIP title is a few words, not a complete sentence*
 
@@ -196,9 +198,27 @@ Other than the specific exceptions listed below, links to external resources **S
 
 The process governing permitted external resources is described in [EIP-5757](./eip-5757.md).
 
+### Execution Client Specifications
+
+Links to the Ethereum Execution Client Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specifications](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specifications](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+
+Permitted Execution Client Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
+```
+
 ### Consensus Layer Specifications
 
-Links to the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
+Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
 
 ```markdown
 [Beacon Chain](https://github.com/ethereum/consensus-specs/blob/26695a9fdb747ecbe4f0bb9812fedbc402e5e18c/specs/sharding/beacon-chain.md)
@@ -211,12 +231,12 @@ Which renders to:
 Permitted Consensus Layer Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/consensus-specs/blob/[0-9a-f]{40}/.*$
+^https://github.com/ethereum/consensus-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### Networking Specifications
 
-Links to the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
+Links to specific commits of files within the Ethereum Networking Specifications may be included using normal markdown syntax, such as:
 
 ```markdown
 [Ethereum Wire Protocol](https://github.com/ethereum/devp2p/blob/40ab248bf7e017e83cc9812a4e048446709623e8/caps/eth.md)
@@ -229,8 +249,94 @@ Which renders as:
 Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
 
 ```regex
-^https://github.com/ethereum/devp2p/blob/[0-9a-f]{40}/.*$
+^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
 ```
+
+### World Wide Web Consortium (W3C)
+
+Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
+
+```markdown
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+```
+
+Which renders as:
+
+[Secure Contexts](https://www.w3.org/TR/2021/CRD-secure-contexts-20210918/)
+
+Permitted W3C recommendation URLs MUST anchor to a specification in the technical reports namespace with a date, and so MUST match this regular expression:
+
+```regex
+^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$
+```
+
+### Web Hypertext Application Technology Working Group (WHATWG)
+
+Links to WHATWG specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+```
+
+Which renders as:
+
+[HTML](https://html.spec.whatwg.org/commit-snapshots/578def68a9735a1e36610a6789245ddfc13d24e0/)
+
+Permitted WHATWG specification URLs must anchor to a specification defined in the `spec` subdomain (idea specifications are not allowed) and to a commit snapshot, and so must match this regular expression:
+
+```regex
+^https:\/\/[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$
+```
+
+Although not recommended by WHATWG, EIPs must anchor to a particular commit so that future readers can refer to the exact version of the living standard that existed at the time the EIP was finalized. This gives readers sufficient information to maintain compatibility, if they so choose, with the version referenced by the EIP and the current living standard.
+
+### Internet Engineering Task Force (IETF)
+
+Links to an IETF Request For Comment (RFC) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+```
+
+Which renders as:
+
+[RFC 8446](https://www.rfc-editor.org/rfc/rfc8446)
+
+Permitted IETF specification URLs MUST anchor to a specification with an assigned RFC number (meaning cannot reference internet drafts), and so MUST match this regular expression:
+
+```regex
+^https:\/\/www.rfc-editor.org\/rfc\/.*$
+```
+
+### Bitcoin Improvement Proposal
+
+Links to Bitcoin Improvement Proposals may be included using normal markdown syntax, such as:
+
+```markdown
+[BIP 38](https://github.com/bitcoin/bips/blob/3db736243cd01389a4dfd98738204df1856dc5b9/bip-0038.mediawiki)
+```
+
+Which renders to:
+
+[BIP 38](https://github.com/bitcoin/bips/blob/3db736243cd01389a4dfd98738204df1856dc5b9/bip-0038.mediawiki)
+
+Permitted Bitcoin Improvement Proposal URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki)$
+```
+
+### National Vulnerability Database (NVD)
+
+Links to the Common Vulnerabilities and Exposures (CVE) system as published by the National Institute of Standards and Technology (NIST) may be included, provided they are qualified by the date of the most recent change, using the following syntax:
+
+```markdown
+[CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
+```
+
+Which renders to:
+
+[CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
 
 ### Digital Object Identifier System
 
@@ -357,7 +463,7 @@ If the EIP isn't ready, the editor will send it back to the author for revision,
 
 Once the EIP is ready for the repository, the EIP editor will:
 
-- Assign an EIP number (generally the PR number, but the decision is with the editors)
+- Assign an EIP number (generally incremental; editors can reassign if number sniping is suspected)
 - Merge the corresponding [pull request](https://github.com/ethereum/EIPs/pulls)
 - Send a message back to the EIP author with the next step.
 

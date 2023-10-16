@@ -1,5 +1,5 @@
 {
-  "name": "emotable-tokens",
+  "name": "emotable-repository",
   "scripts": {
     "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain",

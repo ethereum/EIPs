@@ -178,7 +178,7 @@ interface IERC725X is IERC165 {
      * Emits an {Executed} event, when a call is made with `operationType` 0 (CALL), 3 (STATICCALL) or 4 (DELEGATECALL)
      * Emits a {ContractCreated} event, when deploying a contract with `operationType` 1 (CREATE) or 2 (CREATE2)
      */
-    function execute(
+    function executeBatch(
         uint256[] memory operationsType,
         address[] memory targets,
         uint256[] memory values,
@@ -187,7 +187,7 @@ interface IERC725X is IERC165 {
 }
 
 // ERC165 INTERFACE IDs
-bytes4 constant _INTERFACEID_ERC725X = 0x570ef073;
+bytes4 constant _INTERFACEID_ERC725X = 0x7545acac;
 
 // ERC725X OPERATION TYPES
 uint256 constant OPERATION_0_CALL = 0;
@@ -278,7 +278,7 @@ contract ERC725X is ERC173, ERC165, IERC725X {
     /**
      * @inheritdoc IERC725X
      */
-    function execute(
+    function executeBatch(
         uint256[] memory operationsType,
         address[] memory targets,
         uint256[] memory values,
@@ -536,7 +536,7 @@ interface IERC725Y is IERC165 {
      * @param dataKeys The array of keys which values to retrieve
      * @return dataValues The array of data stored at multiple keys
      */
-    function getData(bytes32[] memory dataKeys)
+    function getDataBatch(bytes32[] memory dataKeys)
         external
         view
         returns (bytes[] memory dataValues);
@@ -559,12 +559,12 @@ interface IERC725Y is IERC165 {
      *
      * Emits a {DataChanged} event.
      */
-    function setData(bytes32[] memory dataKeys, bytes[] memory dataValues)
+    function setDataBatch(bytes32[] memory dataKeys, bytes[] memory dataValues)
         external;
 }
 
 // ERC165 INTERFACE IDs
-bytes4 constant _INTERFACEID_ERC725Y = 0x714df77c;
+bytes4 constant _INTERFACEID_ERC725Y = 0x629aa694;
 
 /**
  * @dev reverts when there is not the same number of elements in the lists of data keys and data values
@@ -615,7 +615,7 @@ contract ERC725Y is ERC173, ERC165, IERC725Y {
     /**
      * @inheritdoc IERC725Y
      */
-    function getData(bytes32[] memory dataKeys)
+    function getDataBatch(bytes32[] memory dataKeys)
         public
         view
         virtual
@@ -644,7 +644,7 @@ contract ERC725Y is ERC173, ERC165, IERC725Y {
     /**
      * @inheritdoc IERC725Y
      */
-    function setData(bytes32[] memory dataKeys, bytes[] memory dataValues)
+    function setDataBatch(bytes32[] memory dataKeys, bytes[] memory dataValues)
         public
         virtual
         onlyOwner

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 
-import "../IMultiAsset.sol";
+import "../IERC5773.sol";
 
 pragma solidity ^0.8.15;
 
@@ -9,11 +9,11 @@ pragma solidity ^0.8.15;
  */
 
 contract MultiAssetRenderUtils {
-    uint16 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
+    uint64 private constant _LOWEST_POSSIBLE_PRIORITY = 2 ** 16 - 1;
 
     struct ActiveAsset {
         uint64 id;
-        uint16 priority;
+        uint64 priority;
         string metadata;
     }
 
@@ -28,10 +28,10 @@ contract MultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) public view virtual returns (ActiveAsset[] memory) {
-        IMultiAsset target_ = IMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
 
         uint64[] memory assets = target_.getActiveAssets(tokenId);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
+        uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint256 len = assets.length;
         if (len == 0) {
             revert("Token has no assets");
@@ -57,7 +57,7 @@ contract MultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) public view virtual returns (PendingAsset[] memory) {
-        IMultiAsset target_ = IMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
 
         uint64[] memory assets = target_.getPendingAssets(tokenId);
         uint256 len = assets.length;
@@ -99,7 +99,7 @@ contract MultiAssetRenderUtils {
         uint256 tokenId,
         uint64[] calldata assetIds
     ) public view virtual returns (string[] memory) {
-        IMultiAsset target_ = IMultiAsset(target);
+        IERC5773 target_ = IERC5773(target);
         uint256 len = assetIds.length;
         string[] memory assets = new string[](len);
         for (uint256 i; i < len; ) {
@@ -118,18 +118,18 @@ contract MultiAssetRenderUtils {
         address target,
         uint256 tokenId
     ) external view returns (string memory) {
-        IMultiAsset target_ = IMultiAsset(target);
-        uint16[] memory priorities = target_.getActiveAssetPriorities(tokenId);
+        IERC5773 target_ = IERC5773(target);
+        uint64[] memory priorities = target_.getActiveAssetPriorities(tokenId);
         uint64[] memory assets = target_.getActiveAssets(tokenId);
         uint256 len = priorities.length;
         if (len == 0) {
             revert("Token has no assets");
         }
 
-        uint16 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
+        uint64 maxPriority = _LOWEST_POSSIBLE_PRIORITY;
         uint64 maxPriorityAsset;
         for (uint64 i; i < len; ) {
-            uint16 currentPrio = priorities[i];
+            uint64 currentPrio = priorities[i];
             if (currentPrio < maxPriority) {
                 maxPriority = currentPrio;
                 maxPriorityAsset = assets[i];

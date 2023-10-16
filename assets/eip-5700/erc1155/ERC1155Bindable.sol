@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.20;
 
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 import {ERC1155} from "./ERC1155.sol";
 import {IERC1155Bindable} from "../interfaces/IERC1155Bindable.sol";
-import {IERC1155Binder} from "../interfaces/IERC1155Binder.sol";
 
 /// @title ERC-1155 Bindable Reference Implementation.
-/// @dev Only supports the "delegated" binding mode.
 contract ERC1155Bindable is ERC1155, IERC1155Bindable {
 
     /// @notice Tracks the bound balance of an asset for a specific token type.
-    mapping(address => mapping(uint256 => mapping(uint256 => uint256))) public boundBalanceOf; 
+    mapping(address => mapping(uint256 => mapping(uint256 => uint256))) public boundBalanceOf;
 
     /// @dev  EIP-165 identifiers for all supported interfaces.
     bytes4 private constant _ERC165_INTERFACE_ID = 0x01ffc9a7;
@@ -42,101 +41,88 @@ contract ERC1155Bindable is ERC1155, IERC1155Bindable {
     /// @inheritdoc IERC1155Bindable
     function bind(
         address from,
-        address to,
-        uint256 tokenId,
-		uint256 amount,
-        uint256 bindId,
         address bindAddress,
-        bytes calldata data
+        uint256 bindId,
+        uint256 tokenId,
+        uint256 amount
     ) public {
         if (msg.sender != from && !isApprovedForAll[from][msg.sender]) {
             revert SenderUnauthorized();
         }
 
-		IERC1155Binder binder = IERC1155Binder(bindAddress);
-		if (to != bindAddress) {
-			revert BinderInvalid();
-		}
+        if (IERC721(bindAddress).ownerOf(bindId) == address(0)) {
+            revert BindInvalid();
+        }
 
         boundBalanceOf[bindAddress][bindId][tokenId] += amount;
         _balanceOf[from][tokenId] -= amount;
-        _balanceOf[to][tokenId] += amount;
-		
-        emit Bind(msg.sender, from, bindAddress, tokenId, amount, bindId, bindAddress);
-		emit TransferSingle(msg.sender, from, bindAddress, tokenId, amount);
+        _balanceOf[bindAddress][tokenId] += amount;
 
-        if (
-            binder.onERC1155Bind(msg.sender, from, to, tokenId, amount, bindId, data)
-            !=
-            IERC1155Binder.onERC1155Bind.selector
-        ) {
-            revert BindInvalid();
-        } 
+		emit TransferSingle(msg.sender, from, bindAddress, tokenId, amount);
+        emit Bind(msg.sender, from, bindAddress, bindId, tokenId, amount);
 
     }
 
-    /// @inheritdoc IERC1155Bindable
+    /// @notice Binds `amounts` tokens of `tokenIds` to NFT `bindId` at address `bindAddress`.
+    /// @param from The owner address of the unbound tokens.
+    /// @param bindAddress The contract address of the NFTs being bound to.
+    /// @param bindId The identifiers of the NFT being bound to.
+    /// @param tokenIds The identifiers of the binding token types.
+    /// @param amounts The number of tokens per type binding to the NFTs.
     function batchBind(
         address from,
-        address to,
-        uint256[] calldata tokenIds,
-        uint256[] calldata amounts,
-        uint256[] calldata bindIds,
         address bindAddress,
-        bytes calldata data
+        uint256 bindId,
+        uint256[] calldata tokenIds,
+        uint256[] calldata amounts
     ) public {
         if (msg.sender != from && !isApprovedForAll[from][msg.sender]) {
             revert SenderUnauthorized();
         }
 
-		IERC1155Binder binder = IERC1155Binder(bindAddress);
-		if (to != bindAddress) {
-			revert BinderInvalid();
-		}
+        if (IERC721(bindAddress).ownerOf(bindId) == address(0)) {
+            revert BindInvalid();
+        }
 
-        if (tokenIds.length != amounts.length || tokenIds.length != bindIds.length) {
+        if (tokenIds.length != amounts.length) {
             revert ArityMismatch();
         }
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-
-            boundBalanceOf[bindAddress][bindIds[i]][tokenIds[i]] += amounts[i];
             _balanceOf[from][tokenIds[i]] -= amounts[i];
-            _balanceOf[to][tokenIds[i]] += amounts[i];
+            _balanceOf[bindAddress][tokenIds[i]] += amounts[i];
+            boundBalanceOf[bindAddress][bindId][tokenIds[i]] += amounts[i];
         }
-		
-        emit BindBatch(msg.sender, from, bindAddress, tokenIds, amounts, bindIds, bindAddress);
-		emit TransferBatch(msg.sender, from, bindAddress, tokenIds, amounts);
 
-        if (
-            binder.onERC1155BatchBind(msg.sender, from, to, tokenIds, amounts, bindIds, data)
-            !=
-            IERC1155Binder.onERC1155Bind.selector
-        ) {
-            revert BindInvalid();
-        } 
+		emit TransferBatch(msg.sender, from, bindAddress, tokenIds, amounts);
+        emit BindBatch(msg.sender, from, bindAddress, bindId, tokenIds, amounts);
 
     }
 
-    /// @inheritdoc IERC1155Bindable
+    /// @notice Unbinds `amount` tokens of `tokenId` from NFT `bindId` at address `bindAddress`.
+    /// @param from The owner address of the NFT the tokens are bound to.
+    /// @param to The address of the unbound tokens' new owner.
+    /// @param bindAddress The contract address of the NFT being unbound from.
+    /// @param bindId The identifier of the NFT being unbound from.
+    /// @param tokenId The identifier of the unbinding token type.
+    /// @param amount The number of tokens unbinding from the NFT.
     function unbind(
         address from,
         address to,
-        uint256 tokenId,
-		uint256 amount,
-		uint256 bindId,
         address bindAddress,
-        bytes calldata data
+        uint256 bindId,
+        uint256 tokenId,
+        uint256 amount
     ) public {
-		IERC1155Binder binder = IERC1155Binder(bindAddress);
-        if (
-			binder.ownerOf(bindId) != from
-		) {
-            revert BinderInvalid();
+        IERC721 binder = IERC721(bindAddress);
+
+        if (binder.ownerOf(bindId) != from) {
+            revert OwnerInvalid();
         }
 
         if (
             msg.sender != from &&
+            msg.sender != binder.getApproved(tokenId) &&
             !binder.isApprovedForAll(from, msg.sender)
         ) {
             revert SenderUnauthorized();
@@ -147,19 +133,11 @@ contract ERC1155Bindable is ERC1155, IERC1155Bindable {
         }
 
 		_balanceOf[to][tokenId] += amount;
-		_balanceOf[from][tokenId] -= amount;
+		_balanceOf[bindAddress][tokenId] -= amount;
         boundBalanceOf[bindAddress][bindId][tokenId] -= amount;
 
-        emit Bind(msg.sender, bindAddress, to, tokenId, amount, bindId, bindAddress);
+        emit Unbind(msg.sender, bindAddress, to, bindAddress, bindId, tokenId, amount);
 		emit TransferSingle(msg.sender, bindAddress, to, tokenId, amount);
-
-        if (
-            binder.onERC1155Unbind(msg.sender, from, to, tokenId, amount, bindId, data)
-            !=
-            IERC1155Binder.onERC1155Unbind.selector
-        ) {
-            revert BindInvalid();
-        } 
 
 		if (
 			to.code.length != 0 &&
@@ -169,57 +147,54 @@ contract ERC1155Bindable is ERC1155, IERC1155Bindable {
 		) {
 			revert SafeTransferUnsupported();
         }
-
     }
 
-    /// @inheritdoc IERC1155Bindable
+    /// @notice Unbinds `amount` tokens of `tokenId` from NFT `bindId` at address `bindAddress`.
+    /// @param from The owner address of the unbound tokens.
+    /// @param to The address of the unbound tokens' new owner.
+    /// @param bindAddress The contract address of the NFTs being unbound from.
+    /// @param bindId The identifiers of the NFT being unbound from.
+    /// @param tokenIds The identifiers of the unbinding token types.
+    /// @param amounts The number of tokens per type unbinding from the NFTs.
     function batchUnbind(
         address from,
         address to,
+        address bindAddress,
+        uint256 bindId,
         uint256[] calldata tokenIds,
-        uint256[] calldata amounts,
-		uint256[] calldata bindIds,
-		address bindAddress,
-        bytes calldata data
+        uint256[] calldata amounts
     ) public {
-		IERC1155Binder binder = IERC1155Binder(bindAddress);
+        IERC721 binder = IERC721(bindAddress);
+
+        if (binder.ownerOf(bindId) != from) {
+            revert OwnerInvalid();
+        }
 
         if (
             msg.sender != from &&
+            msg.sender != binder.getApproved(bindId) &&
             !binder.isApprovedForAll(from, msg.sender)
         ) {
             revert SenderUnauthorized();
+        }
+
+        if (tokenIds.length != amounts.length) {
+            revert ArityMismatch();
         }
 
         if (to == address(0)) {
             revert ReceiverInvalid();
         }
 
-        if (tokenIds.length != amounts.length || tokenIds.length != bindIds.length) {
-            revert ArityMismatch();
-        }
-
         for (uint256 i = 0; i < tokenIds.length; i++) {
 
-            if (binder.ownerOf(bindIds[i]) != from) { 
-                revert BinderInvalid(); 
-            }
-
             _balanceOf[to][tokenIds[i]] += amounts[i];
-            _balanceOf[from][tokenIds[i]] -= amounts[i];
-            boundBalanceOf[bindAddress][bindIds[i]][tokenIds[i]] -= amounts[i];
+            _balanceOf[bindAddress][tokenIds[i]] -= amounts[i];
+            boundBalanceOf[bindAddress][bindId][tokenIds[i]] -= amounts[i];
         }
-		
-        emit UnbindBatch(msg.sender, from, bindAddress, tokenIds, amounts, bindIds, bindAddress);
-		emit TransferBatch(msg.sender, from, bindAddress, tokenIds, amounts);
 
-        if (
-            binder.onERC1155BatchUnbind(msg.sender, from, to, tokenIds, amounts, bindIds, data)
-            !=
-            IERC1155Binder.onERC1155BatchUnbind.selector
-        ) {
-            revert BindInvalid();
-        } 
+        emit UnbindBatch(msg.sender, from, to, bindAddress, bindId, tokenIds, amounts);
+		emit TransferBatch(msg.sender, from, bindAddress, tokenIds, amounts);
 
 		if (
 			to.code.length != 0 &&
@@ -230,7 +205,6 @@ contract ERC1155Bindable is ERC1155, IERC1155Bindable {
 			revert SafeTransferUnsupported();
         }
     }
-
 
     function supportsInterface(bytes4 id) public pure override(ERC1155, IERC165) returns (bool) {
         return super.supportsInterface(id) || id == _ERC1155_BINDABLE_INTERFACE_ID;

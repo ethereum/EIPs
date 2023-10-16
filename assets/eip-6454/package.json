@@ -1,5 +1,5 @@
 {
-  "name": "non-transferable-tokens",
+  "name": "transferable-tokens",
   "scripts": {
     "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain",

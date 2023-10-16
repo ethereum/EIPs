@@ -50,13 +50,13 @@ eipv <INPUT FILE / DIRECTORY>
 
 1. Open Terminal.
 
-2. Check whether you have Ruby 2.1.0 or higher installed:
+2. Check whether you have Ruby 3.1.4 installed. Later [versions are not supported](https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror).
 
    ```sh
    ruby --version
    ```
 
-3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+3. If you don't have Ruby installed, install Ruby 3.1.4.
 
 4. Install Bundler:
 
