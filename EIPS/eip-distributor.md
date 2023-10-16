@@ -1,5 +1,5 @@
 ---
-eip: 7853
+eip: 9527
 title: Multi-edition NFT Distribution
 description: A specification on the distribution of multiple editions of child NFTs with different rules and privileges.
 author: Henry Yeung (@henrywfyeung) <henry@didhub.com>, Xiaoba <xiaoba@didhub.com>
@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/t/eip-idea-multi-edition-nft-dist
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-09-01
+created: 2023-10-15
 requires: 165, 721
 ---
 
@@ -188,6 +188,7 @@ Actions may give the child tokens the following characteristics:
 - extendable: NFT is valid over a duration and requires extension. This is suitable for recurring memberships.
 - updateable: Allows the child token holder to update the tokenUri when the parent token is updated
 - vote: Child token holder can vote if the vote action bit is set
+- external contract actions: An externally deployed contract that implements functions with permissions controlled by the action bits in the contract with the Distributor interface
 
 ### External or Internal Implementation of the Validator Interface 
 
