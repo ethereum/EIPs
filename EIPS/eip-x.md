@@ -66,6 +66,14 @@ Requests MUST NOT skip or otherwise short-circuit the claim step. In other words
 
 For asynchronous request vaults, the exchange rate between shares and assets including fees and yield is up to the vault implementation. In other words, pending redemption requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
 
+Cancellation requests also go through the same Pending, Claimable, and Claimed stages. An example lifecycle for a cancelled deposit request is visualized in the table below. 
+
+| **State**    | **User**                       | **Vault** |
+| ------------:|:------------------------------ | ---------:|
+| Pending      | cancelDepositRequest()           |          |
+| Claimable    |                                | <i>Internal request fulfillment</i><br>maxRedeem[msg.sender] += pendingDepositRequest[msg.sender]<br>pendingDepositRequest[msg.sender] = 0<br> |
+| Claimed      | redeem(assets, receiver)       | maxRedeem[msg.sender] -= vault.previewRedeem[assets] |
+
 ### Methods
 #### requestDeposit
 Locks `assets` from `msg.sender` into the Vault and submits a request by `operator` to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
