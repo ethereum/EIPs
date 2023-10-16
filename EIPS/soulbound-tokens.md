@@ -1,0 +1,166 @@
+---
+eip: <to be assigned>
+title: Soulbound Tokens
+author: Omar Garcia (@ogarciarevett)
+discussions-to: https://ethereum-magicians.org/t/soulbound-tokens-daos-and-web3-games/16104
+status: Draft
+type: Standards Track
+category: ERC
+requires: 712, 1155
+created: 2023-10-15
+---
+
+## Simple Summary
+
+Introducing the concept of "Soulbound Tokens" with explicit modifiers to restrict token transferability, enhancing security and control in blockchain applications or blockchain games.
+
+## Abstract
+
+This Ethereum Improvement Proposal (EIP) outlines a framework for implementing "Soulbound Tokens" to explicitly restrict the transfer of tokens, token batches, and addresses. This explicit approach enhances the security and transparency of blockchain applications, particularly in use cases such as NFTs, gaming assets, and governance tokens.
+
+## Motivation
+
+In the blockchain space, the ownership and transfer of tokens are fundamental concepts. However, there are scenarios where explicit control over transferability is required. For these situations, explicit restrictions offer a more secure, clear, and flexible approach compared to implicit solutions.
+
+This EIP aims to standardize the implementation of Soulbound Tokens, offering a framework for token binding and explicit control. It provides developers with a versatile solution to secure token ownership.
+
+## Specification
+
+This proposal introduces the following key components:
+
+1. `ERCSoulbound` Contract:
+   - Maintains essential mappings for Soulbound Tokens, Addresses, and Bounds.
+   - Offers a set of modifiers for explicit control over token transfers.
+   - Supports the binding of tokens, addresses, and token batches.
+
+2. Modifiers:
+   - `soulboundTokenCheck`: Ensures that a specific token is Soulbound, thereby preventing its transfer.
+   - `soulboundAddressCheck`: Ensures that an address is Soulbound, restricting its participation in token transfers.
+   - `soulboundCheck`: Enforces Soulbound restrictions for individual tokens.
+   - `soulboundCheckBatch`: Enforces Soulbound restrictions for multiple tokens within a batch.
+   - `syncSoulboundToken`: Synchronizes the state of a Soulbound token.
+   - `syncSoulbound`: Synchronizes the state of a Soulbound token for a specific address.
+   - `syncBatchSoulbound`: Synchronizes the state of multiple Soulbound tokens within a batch.
+
+```solidity
+interface IERCSoulBound {
+    event SoulboundToken(uint256 indexed tokenId);
+    event SoulboundAddress(address indexed to);
+    event Soulbound(address indexed to, uint256 indexed tokenId, uint256 amount);
+    event SoulboundBatch(address indexed to, uint256[] indexed tokenIds, uint256[] indexed amounts);
+
+    function isSoulboundToken(uint256 tokenId) external view returns (bool);
+    function soulboundBalance(address to, uint256 tokenId) external view returns (uint256);
+    function isSoulboundAddress(address to) external view returns (bool);
+
+    function _soulbound(address to, uint256 tokenId, uint256 amount) external;
+    function _soulboundBatch(address to, uint256[] memory tokenIds, uint256[] memory amounts) external;
+    function _soulboundAddress(address to) external;
+}
+
+```
+
+## Rationale
+
+The explicit approach to Soulbound Tokens empowers developers with a robust and flexible solution for token ownership and transferability. The explicit modifiers in this EIP enhance the security and trustworthiness of blockchain applications.
+
+## Examples
+
+### Example 1: Using Soulbound Tokens with ERC721
+
+```solidity
+contract Mock721Soulbound is ERC721, ERCSoulbound {
+
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+
+    constructor() ERC721("Mock721SoulBoundToken", "M721SBT") {}
+
+    function mint(address to) public  {
+        _tokenIdCounter.increment();
+         uint256 tokenId = _tokenIdCounter.current();
+        _safeMint(to, tokenId);
+        _soulboundToken(tokenId);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 batch
+    ) internal override(ERC721) soulboundTokenCheck(tokenId) {
+        super._beforeTokenTransfer(from, to, tokenId, batch);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+}
+```
+
+In this example, the Mock721Soulbound contract utilizes the ERCSoulbound contract to manage the soul bounding of tokens. The mint function is used to mint new tokens and soul bound them. The _beforeTokenTransfer function ensures that only soulbound tokens can be transferred.
+
+### Example 2: Using Soulbound Tokens with ERC1155
+
+```solidity
+contract Mock1155Soulbound is ERC1155Burnable, ERCSoulbound {
+    constructor() ERC1155("lol://lol/{id}") {}
+
+    // optional soulBound minting
+    function mint(
+        address to,
+        uint256 id,
+        uint256 amount,
+        bool soulBound
+    ) public virtual {
+        _mint(to, id, amount, "");
+        if(soulBound) {
+            _soulbound(to, id, amount);
+        }
+    }
+
+    // optional soulBound batch minting
+    function mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bool soulBound
+    ) public virtual {
+        _mintBatch(to, ids, amounts, "");
+        if(soulBound) {
+            _soulboundBatch(to, ids, amounts);
+        }
+    }
+
+    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _amount, bytes memory _data) soulboundCheck(_from, _id, _amount) public virtual override {
+        super.safeTransferFrom(_from, _to, _id, _amount, _data);
+    }
+
+    function safeBatchTransferFrom(address _from, address _to, uint256[] memory _ids, uint256[] memory _amounts, bytes memory _data) soulboundCheckBatch(_from, _ids, _amounts) public virtual override {
+        super.safeBatchTransferFrom(_from, _to, _ids, _amounts, _data);
+    }
+
+    function burn(address to, uint256 tokenId, uint256 amount) public virtual override syncSoulbound(tokenId, amount) {
+        _burn(to, tokenId, amount);
+    }
+
+    function burnBatch(address to, uint256[] memory tokenIds, uint256[] memory amounts) public virtual override syncBatchSoulbound(tokenIds, amounts) {
+        _burnBatch(to, tokenIds, amounts);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC1155) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+}
+
+```
+
+In this example, the Mock1155Soulbound contract is an ERC1155-based Soulbound token. It offers more flexibility by allowing the minting of tokens with an optional soulbound flag. It also ensures that only soulbound tokens can be transferred or burned.
+
+## Security Considerations
+Explicit control over token transferability is a security feature, enhancing the trustworthiness of blockchain applications.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
+
