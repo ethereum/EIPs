@@ -142,8 +142,8 @@ contract SDCPledgedBalance is SDC {
         return (settlementPayer,transferAmount);
     }
 
-
-    function afterTransfer(uint256 transactionHash, bool success) external override onlyWhenInTransfer  {
+    function afterTransfer(uint256 /* transactionHash */, bool success) external override onlyWhenInTransfer  {
+        // Note: parameter transactionHash currenty unused
         emit TradeSettled();
         _processAfterTransfer(success);
     }
