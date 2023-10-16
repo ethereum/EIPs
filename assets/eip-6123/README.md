@@ -19,37 +19,36 @@ We provide the essential steps to compile the contracts and run the provided uni
 - `ethers`: This is a popular Ethereum client library. It allows you to interface with blockchains that implement the Ethereum API.
 - `solidity-coverage`: This library gives you coverage reports on unit tests with the help of Istanbul.
 
-### Running the provided Unit Tests
+### Compile and run tests with hardhat
 
-Make sure to run the hardhat node before executing unit tests!
+We provide the essential steps to compile the contracts and run provided unit tests
+Check that you have the latest version of npm and node via `npm -version` (should be better than 8.5.0) and `node -v` (should be better than 16.14.2).
 
-Install dependencies:
+1. Check out project
+2. Within this folder initialise a new npm project (a basic `package.json` file be created):
 ```shell
 npm i
 ```
-
-Compile contracts (artefacts and cache will be created):
+3. Install Hardhat as local solidity dev environment. When prompted select following option: *Create an empty hardhat.config.js*
 ```shell
-npx hardhat compile
+npx hardhat init
 ```
-
-Run in another terminal to establish a local Ethereum node on localhost (json-rpc server):
+4. Install Hardhat as a development dependency, install further testing dependencies, install open zeppelin contracts.
 ```shell
-npx hardhat node
+npm install --save-dev hardhat
+npm install --save-dev @nomiclabs/hardhat-waffle @nomiclabs/hardhat-ethers ethereum-waffle chai  ethers solidity-coverage
+npm install @openzeppelin/contracts
 ```
-
-Go back to the previous terminal to run all tests:
-```shell
-npx hardhat test
+5. Edit your `hardhat.config.ts` (set version to 0.8.20 and add dependencies):
 ```
-
-Alternatively, run unit tests separately using the script tag:
-```shell
-npm run test-unit
-```
-
-Run to see a list of available custom tasks (besides the default tasks, read-number, write-number, and hello should be available according to tasks/SampleContractTasks.js):
-```shell
-npx hardhat
-```
+/** @type import('hardhat/config').HardhatUserConfig */
+module.exports = {
+  solidity: "0.8.20",
+};
+require("@nomiclabs/hardhat-waffle"); 
+require('solidity-coverage');
+``` 
+7. run `npx hardhat compile`
+8. run `npx hardhat test`
+9. run `npx hardhat coverage` (optionally)
 
