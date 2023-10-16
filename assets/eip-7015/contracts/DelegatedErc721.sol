@@ -9,8 +9,9 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "./EIP7015.sol";
 
-contract DelegatedErc721 is EIP7015, ERC721, ERC721URIStorage, Ownable {
+contract DelegatedErc721 is ERC7015, ERC721, ERC721URIStorage, Ownable {
   error AlreadyMinted();
+  error NotAuthorized();
 
   uint256 private _nextTokenId;
 
@@ -28,34 +29,30 @@ contract DelegatedErc721 is EIP7015, ERC721, ERC721URIStorage, Ownable {
     address to,
     string memory uri,
     uint256 nonce,
+    address creator,
     bytes calldata signature
   ) external {
     uint256 tokenId = _nextTokenId++;
+
+    if (!isAuthorizedToCreate(creator)) revert NotAuthorized();
 
     // validate that the nonce has not been used
     if (minted[nonce]) revert AlreadyMinted();
     minted[nonce] = true;
 
-    bytes32 structHash = makeAttributionStructHash(uri, nonce);
+    bytes32 structHash = keccak256(
+      abi.encode(TYPEHASH, keccak256(bytes(uri)), nonce)
+    );
 
-    _validateSignature(structHash, signature);
+    _validateSignature(structHash, creator, signature);
 
     _safeMint(to, tokenId);
     _setTokenURI(tokenId, uri);
   }
 
   // override required function to define if a signer is authorized to create
-  function isAuthorizedToCreate(
-    address signer
-  ) internal view override returns (bool) {
+  function isAuthorizedToCreate(address signer) internal view returns (bool) {
     return signer == owner();
-  }
-
-  function makeAttributionStructHash(
-    string memory uri,
-    uint256 nonce
-  ) public pure returns (bytes32) {
-    return keccak256(abi.encode(TYPEHASH, keccak256(bytes(uri)), nonce));
   }
 
   // The following functions are overrides required by Solidity.
