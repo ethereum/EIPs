@@ -15,7 +15,7 @@ requires: 20, 4626
 
 The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called "Requests".
 
-New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing fulfilled Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
+New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
 
 ## Motivation
 
@@ -23,16 +23,16 @@ The ERC-4626 Tokenized Vaults standard has helped to make yield-bearing tokens m
 
 This limitation does not work well for any smart contract system with asynchronous actions or delays as a prerequisite for interfacing with the Vault (e.g. real-world asset protocols, undercollateralized lending protocols, cross-chain lending protocols, liquid staking tokens, or insurance safety modules). 
 
-This standard expands the utility of 4626 Vaults for asynchronous use cases. The existing Vault interface (deposit/withdraw/mint/redeem) is fully utilized to fulfill asynchronous Requests.
+This standard expands the utility of 4626 Vaults for asynchronous use cases. The existing Vault interface (deposit/withdraw/mint/redeem) is fully utilized to claim asynchronous Requests.
 
 ## Specification
 
 ### Definitions:
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
 - request: a function call that initiates an asynchronous deposit/redemption flow
-- execute: the Vault's step of executing the request and enabling the user to fulfill the request
-- fulfill: the corresponding Vault method to complete a request (e.g. `deposit` fulfills `requestDeposit`)
-- pending request: the state where a request has been made but not yet fulfilled
+- fulfill: the Vault's step of executing the request and enabling the user to claim the outcome of the request
+- claim: the corresponding Vault method to complete a request (e.g. `deposit` claims `shares` from `requestDeposit`)
+- pending request: the state where a request has been made but is not yet claimable
 - asynchronous deposit Vault: a Vault that implements asynchronous requests for deposit flows
 - asynchronous redemption Vault: a Vault that implements asynchronous redemption flows
 - fully asynchronous Vault: a vault that implements asynchronous requests for both deposit and redemption
@@ -45,14 +45,18 @@ All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the follow
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a nonowner.
 
-Requests have 3 steps:
-1. Submitting a new request using `requestDeposit` or `requestRedeem`. This creates the pending request.
-2. Executing a pending request. This can be an implicit step, such as after a timelock has passed a request is automatically considered executed. Or it can be an explicit Vault action triggered by an external action. After execution, `maxDeposit` and `maxRedeem` are set to the executed but unfulfilled amount.
-3. Fulfilling a request using `deposit`, `mint`, `redeem` or `withdraw`. This removes the pending request.
+### Request Lifecycle
+After submission, Requests go through Pending, Claimable, and Claimed stages. An example lifecycle for a deposit request is visualized in the table below.
 
-Requests MUST NOT skip step 2 and be automaticaly fulfilled, due to the ambiguity this creates for integrators. Instead there can be router contracts which atomically check for claimable amounts immediately upon request.
+| **State** | **User**                         |                                                                                                                **Vault** |
+| ---------:|:-------------------------------- | ------------------------------------------------------------------------------------------------------------------------:|
+|   Pending | requestDeposit(assets, operator) |                               asset.transferFrom(msg.sender, vault, assets)<br>pendingDepositRequest[operator] += assets |
+| Claimable |                                  | <i>Internal request fulfillment</i><br>pendingDepositRequest[msg.sender] -= assets<br>maxDeposit[operator] += assets<br> |
+|   Claimed | deposit(assets, receiver)        |                                                  maxDeposit[msg.sender] -= assets<br>vault.balanceOf[receiver] += shares |
 
-The unexecuted deposit request is defined by `pendingDepositRequest - maxDeposit` and the unexecuted redemption request is defined by `pendingRedeemRequest - maxRedeem`.
+The requested amount is defined by `pendingDepositRequest + maxDeposit`.
+
+Requests MUST NOT skip step 2 and be automatically claimed, due to the ambiguity this creates for integrators. Instead there can be router contracts which atomically check for claimable amounts immediately upon request.
 
 Note that for redemption requests, whether yield still accrues on shares that are pending a redemption request, or only on shares that are pending a redemption request and have not been executed, is up to the Vault implementation.
 
@@ -266,9 +270,9 @@ In ERC-4626, the spec was written to be fully symmetrical with respect to conver
 
 Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise, the redemption request flow cannot work with a `withdraw` call.
 
-### Parameter Choices for request vs fulfillment
+### Parameter Choices for request vs claiming
 
-Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and fulfillment adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
+Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and claiming adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
 
 ### Optionality of flows and cancels
 
