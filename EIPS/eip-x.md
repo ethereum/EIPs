@@ -274,6 +274,10 @@ In many cases, canceling a request may not be straightforward or even technicall
 
 The standard is flexible enough to support a wide range of interaction patterns for request flows. Pending requests can be handled via internal accounting, globally or on per-user levels, use ERC-20 or [ERC-721](./eip-721.md), etc.
 
+### Operator function parameter on requestDeposit and requestRedeem
+
+To support flows where a smart contract manages the request lifecycle on behalf of a user, the `operator` parameter is included in the `requestDeposit` and `requestRedeem` functions. This is not called `owner` because the `assets` or `shares` are not transferred from this account on request submission, unlike the behaviour of an `owner` on `redeem`. It is also not called `receiver` because the `shares` or `assets` are not necessarily transferred on claiming the request, this can be chosen by the operator when they call `deposit`, `mint`, `redeem`, or `withdraw`.
+
 ## Backwards Compatibility
 
 The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](##Specification).
