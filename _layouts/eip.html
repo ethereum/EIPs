@@ -2,59 +2,109 @@
 layout: default
 ---
 
-{% if page.status == "Draft" %}
-  <div class="draft">
-    ⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
-  </div>
-{% elsif page.status == "Review" %}
-  <div class="review">
-    📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
-  </div>
-{% elsif page.status == "Last Call" %}
-  <div class="lastcall">
-    📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
-  </div>
-{% elsif page.status == "Stagnant" %}
-  <div class="stagnant">
-    🚧 This EIP had no activity for at least 6 months.
-  </div>
-{% elsif page.status == "Withdrawn" %}
-  <div class="withdrawn">
-    🛑 This EIP has been withdrawn.
-  </div>
-{% endif %}
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="bi-megaphone-fill" fill="currentColor" viewBox="0 0 16 16">
+    <title>Alert</title>
+    <path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-11zm-1 .724c-2.067.95-4.539 1.481-7 1.656v6.237a25.222 25.222 0 0 1 1.088.085c2.053.204 4.038.668 5.912 1.56V3.224zm-8 7.841V4.934c-.68.027-1.399.043-2.008.053A2.02 2.02 0 0 0 0 7v2c0 1.106.896 1.996 1.994 2.009a68.14 68.14 0 0 1 .496.008 64 64 0 0 1 1.51.048zm1.39 1.081c.285.021.569.047.85.078l.253 1.69a1 1 0 0 1-.983 1.187h-.548a1 1 0 0 1-.916-.599l-1.314-2.48a65.81 65.81 0 0 1 1.692.064c.327.017.65.037.966.06z"/>
+  </symbol>
+  <symbol id="bi-code" fill="currentColor" viewBox="0 0 16 16">
+    <title>Source</title>
+    <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/>
+  </symbol>
+  <svg id="bi-chat" fill="currentColor" viewBox="0 0 16 16">
+    <title>Discuss</title>
+    <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+  </svg>
+</svg>
 
 <div class="home">
+  <span class="h5">
+    {% if page.status == "Stagnant" %}
+      <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP had no activity for at least 6 months. This EIP should not be used.">🚧 Stagnant</span>
+    {% endif %}
+    {% if page.status == "Withdrawn" %}
+      <span class="badge text-light bg-danger" data-bs-toggle="tooltip" data-bs-title="This EIP has been withdrawn, and should not be used.">🛑 Withdrawn</span>
+    {% endif %}
+    {% if page.status == "Draft" or	page.status == "Review" %}
+      <span class="badge text-light bg-warning" data-bs-toggle="tooltip" data-bs-title="This EIP is not yet recommended for general use or implementation, as it is subject to normative (breaking) changes.">⚠️ {{ page.status }}</span>
+    {% endif %}
+    {% if page.status == "Last Call" %}
+      <span class="badge text-light bg-success" data-bs-toggle="tooltip" data-bs-title="This EIP is in the last call for review stage. The authors wish to finalize the EIP and ask you to provide feedback.">📢 Last Call</span>
+    {% endif %}
+    {% if page.category == "ERC" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Application-level standards and conventions, including contract standards such as token standards, name registries, URI schemes, library/package formats, and wallet formats." href="../erc">Standards Track: ERC</a>
+    {% elsif page.category == "Interface" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements around client API/RPC specifications and standards, and also certain language-level standards like method names and contract ABIs." href="../interface">Standards Track: Interface</a>
+    {% elsif page.category == "Networking" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements around devp2p and Light Ethereum Subprotocol, as well as proposed improvements to network protocol specifications of whisper and swarm." href="../networking">Standards Track: Networking</a>
+    {% elsif page.category == "Core" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Improvements requiring a consensus fork, as well as changes that are not necessarily consensus critical but may be relevant to “core dev” discussions." href="../core">Standards Track: Core</a>
+    {% elsif page.type == "Informational" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Describes an Ethereum design issue, or provides general guidelines or information to the Ethereum community, but does not propose a new feature. Informational EIPs do not necessarily represent Ethereum community consensus or a recommendation, so users and implementers are free to ignore Informational EIPs or follow their advice." href="../informational">Informational</a>
+    {% elsif page.type == "Meta" %}
+      <a class="badge text-light bg-primary" data-bs-toggle="tooltip" data-bs-title="Describes a process surrounding Ethereum or proposes a change to (or an event in) a process. " href="../meta">Meta</a>
+    {% endif %}
+  </span>
   <h1 class="page-heading">
-    EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
-    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z"/></svg></a>
+    {% if page.category == "ERC" %}
+      ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% elsif page.category != "ERC" %}
+      EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}
+    {% endif %}
+    <a href="{{ page.discussions-to | uri_escape }}" class="no-underline">
+      <svg role="img" aria-label="Discuss" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <use xlink:href="#bi-chat"/>
+      </svg>
+    </a>
+    <a href="{{site.github.repository_url}}/blob/master/{{page.path}}" class="no-underline">
+      <svg role="img" aria-label="Source" class="inline-svg" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <use xlink:href="#bi-code"/>
+      </svg>
+    </a>
   </h1>
   <h3>{{ page.description | xml_escape }}</h3>
-  <table>
-    <tr><th>Author</th><td>{% include authorlist.html authors=page.author %}</td></tr>
-    {% if page["discussions-to"] != undefined %}
-      <tr><th>Discussions-To</th><td><a href="{{ page["discussions-to"] | uri_escape }}">{{ page["discussions-to"] | xml_escape }}</a></td></tr>
-    {% endif %}
-    <tr><th>Status</th><td>{{ page.status | xml_escape }}
-    {% if page.last-call-deadline != undefined %}
-      <tr><th>Last Call Deadline</th><td>{{ page.last-call-deadline | xml_escape }}</td></tr>
-    {% endif %}
-    </td></tr>
-    <tr><th>Type</th><td>{{ page.type | xml_escape }}</td></tr>
-    {% if page.category != undefined %}
-      <tr><th>Category</th><td>{{ page.category | xml_escape }}</td></tr>
-    {% endif %}
-    <tr><th>Created</th><td>{{ page.created | xml_escape }}</td></tr>
-    {% if page.updated != undefined %}
-    <tr><th>Updated</th><td>{{ page.updated | xml_escape }}</td></tr>
-    {% endif %}
-    {% if page.requires != undefined %}
-      <tr><th>Requires</th><td>{% include eipnums.html eips=page.requires %}</td></tr>
-    {% endif %}
-    {% if page["withdrawal-reason"] != undefined %}
-      <tr><th>Withdrawal reason</th><td>{{ page["withdrawal-reason"] | xml_escape }}</td></tr>
-    {% endif %}
+  <table class="table table-borderless preamble">
+    <tbody>
+      <tr>
+        <th scope="row">Authors</th>
+        <td>{% include authorlist.html authors=page.author %}</td>
+      </tr>
+      {% if page.created != undefined %}
+        <tr>
+          <th scope="row">Created</th>
+          <td>{{ page.created }}</td>
+        </tr>
+      {% endif %}
+      {% if page.last-call-deadline != undefined %}
+        <tr>
+          <th scope="row">Last Call Deadline</th>
+          <td>{{ page.last-call-deadline }}</td>
+        </tr>
+      {% endif %}
+      {% if page.status != "Review" and page.status != "Last Call" and page.status != "Final" and page.discussions-to != undefined %}
+        <tr>
+          <th scope="row">Discussion Link</th>
+          <td><a href="{{ page.discussions-to | uri_escape }}" target="__blank">{{ page.discussions-to | xml_escape }}</a></td>
+        </tr>
+      {% endif %}
+      {% if page.requires != undefined %}
+        <tr>
+          <th scope="row">Requires</th>
+          <td>{% include eipnums.html eips=page.requires %}</td>
+        </tr>
+      {% endif %}
+    </tbody>
   </table>
+  <br/>
+
+  {% if page.status == "Review" or page.status == "Last Call" %}
+    <div class="alert alert-primary d-flex align-items-center" role="alert">
+      <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:" style="width:2.5em;height:2.5em;"><use xlink:href="#bi-megaphone-fill"/></svg>
+      <div class="text-center w-100">
+        <a href="{{ page.discussions-to | uri_escape }}" target="__blank">This EIP is in the process of being peer-reviewed. If you are interested in this EIP, please participate using this discussion link.</a>
+      </div>
+    </div>
+  {% endif %}
 
   <div class="toc">
     <h2>Table of Contents</h2>
@@ -69,7 +119,7 @@ layout: default
   IEEE specification for reference formatting:
   https://ieee-dataport.org/sites/default/files/analysis/27/IEEE%20Citation%20Guidelines.pdf
   {% endcomment %}
-  <p>{% include authorlist.html authors=page.author %}, "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
+  <p>{% include authorlist.html authors=page.author %}, "{% if page.category == "ERC" %}ERC{% else %}EIP{% endif %}-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}," <em>Ethereum Improvement Proposals</em>, no. {{ page.eip | xml_escape }}, {{ page.created | date: "%B %Y" }}. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-{{ page.eip | xml_escape }}.</p>
 </div>
 {% comment %}
 Article schema specification:
@@ -79,28 +129,21 @@ https://schema.org/TechArticle
   {
     "@context": "http://schema.org",
     "@type": "TechArticle",
+    {% if page.category == "ERC" %}
+    "headline": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
+    "name": "ERC-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
+    {% else %}
     "headline": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
-    "author": "{{ page.author }}",
     "name": "EIP-{{ page.eip | xml_escape }}: {{ page.title | xml_escape }}{% if page.status == "Draft" or page.status == "Stagnant" or page.status == "Withdrawn" or page.status == "Review" or page.status == "Last Call" %} [DRAFT]{% endif %}",
+    {% endif %}
+    "author": "{{ page.author }}",
     "dateCreated": "{{ page.created | date: "%Y-%m-%d" }}",
     "datePublished": "{{ page.created | date: "%Y-%m-%d" }}",
-{% if page["discussions-to"] != undefined %}
-    "discussionUrl": "{{ page["discussions-to"] | uri_escape }}",
-{% endif %}    
+    {% if page.discussions-to != undefined %}
+    "discussionUrl": "{{ page.discussions-to | uri_escape }}",
+    {% endif %}
     "inLanguage": "en-US",
     "license": "#copyright",
     "copyrightYear": "{{ page.created | date: "%Y" }}"
   }
-</script>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha512-bzXk9PaBIjgXcM+0Z7wbOE4AAMnmMoecyB8zX3irP4IRUDNGMmWXoLiRvEDeeq0RfhLA0eOFvB3wPFzBvWcVdw==" crossorigin="anonymous">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [["$", "$"]],
-      displayMath: [["$$", "$$"]],
-      processEscapes: true
-    },
-    asciimath2jax: {
-      delimiters: [] // Disable asciimath
-    }
-  });
 </script>

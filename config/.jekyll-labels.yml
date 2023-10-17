@@ -23,15 +23,6 @@ s-withdrawn: this?.new?.status == "Withdrawn"
 
 #### PR Classification ####
 
-c-new: this?.new?.eip && !this?.old?.eip
-c-update: this?.new?.eip && this?.old?.eip && this?.new?.status == this?.old?.status
-c-status: this?.new?.eip && this?.old?.eip && this?.new?.status != this?.old?.status
-
-#### Waiting Labels ###
-
-# Generic
-
-# EIP Author
-
-# EIP Editor
-e-number: isNaN(this?.new?.eip) && this?.new?.eip
+c-new: this?.new?.status && !this?.old?.status
+c-update: this?.new?.status && this?.old?.status && this?.new?.status == this?.old?.status
+c-status: this?.new?.status && this?.old?.status && this?.new?.status != this?.old?.status

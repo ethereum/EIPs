@@ -6,19 +6,18 @@ import "./interfaces/IERC5289Library.sol";
 
 contract ERC5289Library is IERC165, IERC5289Library {
     uint16 private counter = 0;
-    mapping(uint16 => bytes) private multihashes;
+    mapping(uint16 => string) private uris;
     mapping(uint16 => mapping(address => uint64)) signedAt;
-    mapping(uint16 => mapping(address => bytes)) signatures;
 
     constructor() { }
 
-    function registerDocument(bytes memory multihash) public returns (uint16) {
-        multihashes[counter] = multihash;
+    function registerDocument(string memory uri) public returns (uint16) {
+        uris[counter] = uri;
         return counter++;
     }
 
-    function legalDocument(uint16 documentId) public view returns (bytes memory) {
-        return multihashes[documentId];
+    function legalDocument(uint16 documentId) public view returns (string uri) {
+        return uris[documentId];
     }
 
     function documentSigned(address user, uint16 documentId) public view returns (bool isSigned) {
@@ -29,11 +28,10 @@ contract ERC5289Library is IERC165, IERC5289Library {
         return signedAt[documentId][user];
     }
 
-    function signDocument(address signer, uint16 documentId, bytes memory signature) public {
+    function signDocument(address signer, uint16 documentId) public {
         require(signer == msg.sender, "invalid user");
 
         signedAt[documentId][msg.sender] = uint64(block.timestamp);
-        signatures[documentId][msg.sender] = signature;
 
         emit DocumentSigned(msg.sender, documentId);
     }

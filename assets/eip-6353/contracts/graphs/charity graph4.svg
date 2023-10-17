@@ -1,0 +1,378 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="677pt" height="886pt" viewBox="0.00 0.00 676.89 886.00">
+<g id="graph0" class="graph" transform="translate(57.91674322097464,758.1904745232969) scale(0.757858283255199)" data-name="G">
+
+<polygon fill="#2e3e56" stroke="transparent" points="-4,4 -4,-882 672.89,-882 672.89,4 -4,4" style=""/>
+<g id="clust1" class="cluster" data-name="clusterERC20Charity">
+
+<path fill="#445773" stroke="#445773" d="M20,-8C20,-8 648.89,-8 648.89,-8 654.89,-8 660.89,-14 660.89,-20 660.89,-20 660.89,-721 660.89,-721 660.89,-727 654.89,-733 648.89,-733 648.89,-733 20,-733 20,-733 14,-733 8,-727 8,-721 8,-721 8,-20 8,-20 8,-14 14,-8 20,-8" style=""/>
+<text text-anchor="middle" x="334.45" y="-716.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ERC20Charity</text>
+</g>
+<g id="clust2" class="cluster" data-name="cluster_01">
+
+<polygon fill="#2e3e56" stroke="black" points="91.34,-741 91.34,-870 535.78,-870 535.78,-741 91.34,-741" style=""/>
+<text text-anchor="middle" x="313.56" y="-853.4" font-family="Times,serif" font-size="14.00" style="">Legend</text>
+</g>
+<!-- ERC20Charity.supportsInterface -->
+<g id="node1" class="node" pointer-events="visible" data-name="ERC20Charity.supportsInterface">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="164.34" cy="-682" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-677.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- ERC20Charity.type -->
+<g id="node16" class="node" pointer-events="visible" data-name="ERC20Charity.type">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-682" rx="27.83" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-677.8" font-family="Times,serif" font-size="14.00" style="">type</text>
+</g>
+<!-- ERC20Charity.supportsInterface&#45;&gt;ERC20Charity.type -->
+<g id="edge1" class="edge" data-name="ERC20Charity.supportsInterface-&gt;ERC20Charity.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M238.73,-676.3C308.32,-674.55 409.94,-674.99 463.56,-677.61" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="463.44,-681.11 473.62,-678.16 463.83,-674.12 463.44,-681.11" style=""/>
+</g>
+<!-- ERC20Charity.supportsInterface&#45;&gt;ERC20Charity.type -->
+<g id="edge2" class="edge" data-name="ERC20Charity.supportsInterface-&gt;ERC20Charity.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M238.73,-687.7C308.32,-689.45 409.94,-689.01 463.56,-686.39" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="463.83,-689.88 473.62,-685.84 463.44,-682.89 463.83,-689.88" style=""/>
+</g>
+<!-- ERC20Charity._defaultRate -->
+<g id="node2" class="node" pointer-events="visible" data-name="ERC20Charity._defaultRate">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-520" rx="60.25" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-515.8" font-family="Times,serif" font-size="14.00" style="">_defaultRate</text>
+</g>
+<!-- ERC20Charity._feeDenominator -->
+<g id="node3" class="node" pointer-events="visible" data-name="ERC20Charity._feeDenominator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-304" rx="78.71" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-299.8" font-family="Times,serif" font-size="14.00" style="">_feeDenominator</text>
+</g>
+<!-- ERC20Charity.addToWhitelist -->
+<g id="node4" class="node" pointer-events="visible" data-name="ERC20Charity.addToWhitelist">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-574" rx="71.22" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-569.8" font-family="Times,serif" font-size="14.00" style="">addToWhitelist</text>
+</g>
+<!-- ERC20Charity.addToWhitelist&#45;&gt;ERC20Charity._defaultRate -->
+<g id="edge3" class="edge" data-name="ERC20Charity.addToWhitelist-&gt;ERC20Charity._defaultRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M224.74,-564.41C284.45,-554.77 376.13,-539.96 437.01,-530.14" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="437.94,-533.53 447.25,-528.48 436.82,-526.62 437.94,-533.53" style=""/>
+</g>
+<!-- ERC20Charity.AddedToWhitelist -->
+<g id="node17" class="node" pointer-events="visible" data-name="ERC20Charity.AddedToWhitelist">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-574" rx="82.82" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-569.8" font-family="Times,serif" font-size="14.00" style="">AddedToWhitelist</text>
+</g>
+<!-- ERC20Charity.addToWhitelist&#45;&gt;ERC20Charity.AddedToWhitelist -->
+<g id="edge4" class="edge" data-name="ERC20Charity.addToWhitelist-&gt;ERC20Charity.AddedToWhitelist">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M235.45,-574C285.38,-574 353,-574 407.34,-574" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="407.68,-577.5 417.68,-574 407.68,-570.5 407.68,-577.5" style=""/>
+</g>
+<!-- ERC20Charity.deleteFromWhitelist -->
+<g id="node5" class="node" pointer-events="visible" data-name="ERC20Charity.deleteFromWhitelist">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-628" rx="90.34" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-623.8" font-family="Times,serif" font-size="14.00" style="">deleteFromWhitelist</text>
+</g>
+<!-- ERC20Charity.RemovedFromWhitelist -->
+<g id="node18" class="node" pointer-events="visible" data-name="ERC20Charity.RemovedFromWhitelist">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-628" rx="104.25" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-623.8" font-family="Times,serif" font-size="14.00" style="">RemovedFromWhitelist</text>
+</g>
+<!-- ERC20Charity.deleteFromWhitelist&#45;&gt;ERC20Charity.RemovedFromWhitelist -->
+<g id="edge5" class="edge" data-name="ERC20Charity.deleteFromWhitelist-&gt;ERC20Charity.RemovedFromWhitelist">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M254.96,-628C295.27,-628 343.3,-628 386.1,-628" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="386.28,-631.5 396.28,-628 386.28,-624.5 386.28,-631.5" style=""/>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddress -->
+<g id="node6" class="node" pointer-events="visible" data-name="ERC20Charity.setSpecificDefaultAddress">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-412" rx="114.02" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-407.8" font-family="Times,serif" font-size="14.00" style="">setSpecificDefaultAddress</text>
+</g>
+<!-- ERC20Charity.DonnationAddressChanged -->
+<g id="node19" class="node" pointer-events="visible" data-name="ERC20Charity.DonnationAddressChanged">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-358" rx="117.56" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-353.8" font-family="Times,serif" font-size="14.00" style="">DonnationAddressChanged</text>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddress&#45;&gt;ERC20Charity.DonnationAddressChanged -->
+<g id="edge6" class="edge" data-name="ERC20Charity.setSpecificDefaultAddress-&gt;ERC20Charity.DonnationAddressChanged">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M244.6,-399.2C293.94,-391.24 357.58,-380.96 408.96,-372.66" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="409.75,-376.08 419.06,-371.03 408.63,-369.17 409.75,-376.08" style=""/>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddressAndRate -->
+<g id="node7" class="node" pointer-events="visible" data-name="ERC20Charity.setSpecificDefaultAddressAndRate">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-520" rx="148.17" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-515.8" font-family="Times,serif" font-size="14.00" style="">setSpecificDefaultAddressAndRate</text>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddressAndRate&#45;&gt;ERC20Charity._defaultRate -->
+<g id="edge8" class="edge" data-name="ERC20Charity.setSpecificDefaultAddressAndRate-&gt;ERC20Charity._defaultRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M313,-520C353.76,-520 396.09,-520 430.12,-520" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="430.41,-523.5 440.41,-520 430.41,-516.5 430.41,-523.5" style=""/>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddressAndRate&#45;&gt;ERC20Charity._feeDenominator -->
+<g id="edge7" class="edge" data-name="ERC20Charity.setSpecificDefaultAddressAndRate-&gt;ERC20Charity._feeDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M287.71,-509.86C296.87,-505.55 305.37,-500.04 312.67,-493 365.79,-441.83 295.44,-382.05 348.67,-331 365.84,-314.54 389.4,-306.27 412.82,-302.49" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="413.38,-305.94 422.82,-301.13 412.44,-299.01 413.38,-305.94" style=""/>
+</g>
+<!-- ERC20Charity.DonnationAddressAndRateChanged -->
+<g id="node20" class="node" pointer-events="visible" data-name="ERC20Charity.DonnationAddressAndRateChanged">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-466" rx="152.22" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-461.8" font-family="Times,serif" font-size="14.00" style="">DonnationAddressAndRateChanged</text>
+</g>
+<!-- ERC20Charity.setSpecificDefaultAddressAndRate&#45;&gt;ERC20Charity.DonnationAddressAndRateChanged -->
+<g id="edge9" class="edge" data-name="ERC20Charity.setSpecificDefaultAddressAndRate-&gt;ERC20Charity.DonnationAddressAndRateChanged">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M254.52,-505.6C299.32,-498.37 353.75,-489.58 399.95,-482.12" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="400.66,-485.55 409.97,-480.5 399.54,-478.64 400.66,-485.55" style=""/>
+</g>
+<!-- ERC20Charity.setSpecificRate -->
+<g id="node8" class="node" pointer-events="visible" data-name="ERC20Charity.setSpecificRate">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-466" rx="71.2" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-461.8" font-family="Times,serif" font-size="14.00" style="">setSpecificRate</text>
+</g>
+<!-- ERC20Charity.setSpecificRate&#45;&gt;ERC20Charity._defaultRate -->
+<g id="edge11" class="edge" data-name="ERC20Charity.setSpecificRate-&gt;ERC20Charity._defaultRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M224.74,-475.59C284.45,-485.23 376.13,-500.04 437.01,-509.86" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="436.82,-513.38 447.25,-511.52 437.94,-506.47 436.82,-513.38" style=""/>
+</g>
+<!-- ERC20Charity.setSpecificRate&#45;&gt;ERC20Charity._feeDenominator -->
+<g id="edge10" class="edge" data-name="ERC20Charity.setSpecificRate-&gt;ERC20Charity._feeDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M235.25,-467.79C262.21,-465.03 291.57,-457.33 312.67,-439 350.87,-405.82 310.4,-364.09 348.67,-331 366.23,-315.82 389.34,-307.84 412.18,-303.92" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="412.9,-307.36 422.29,-302.44 411.89,-300.43 412.9,-307.36" style=""/>
+</g>
+<!-- ERC20Charity.ModifiedCharityRate -->
+<g id="node21" class="node" pointer-events="visible" data-name="ERC20Charity.ModifiedCharityRate">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-412" rx="93.78" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-407.8" font-family="Times,serif" font-size="14.00" style="">ModifiedCharityRate</text>
+</g>
+<!-- ERC20Charity.setSpecificRate&#45;&gt;ERC20Charity.ModifiedCharityRate -->
+<g id="edge12" class="edge" data-name="ERC20Charity.setSpecificRate-&gt;ERC20Charity.ModifiedCharityRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M224.74,-456.41C278.6,-447.71 358.46,-434.82 418.27,-425.16" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="419.13,-428.57 428.44,-423.52 418.01,-421.66 419.13,-428.57" style=""/>
+</g>
+<!-- ERC20Charity.SpecificDefaultAddress -->
+<g id="node9" class="node" pointer-events="visible" data-name="ERC20Charity.SpecificDefaultAddress">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-358" rx="103.06" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-353.8" font-family="Times,serif" font-size="14.00" style="">SpecificDefaultAddress</text>
+</g>
+<!-- ERC20Charity.charityInfo -->
+<g id="node10" class="node" pointer-events="visible" data-name="ERC20Charity.charityInfo">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-304" rx="53.87" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-299.8" font-family="Times,serif" font-size="14.00" style="">charityInfo</text>
+</g>
+<!-- ERC20Charity.DeleteDefaultAddress -->
+<g id="node11" class="node" pointer-events="visible" data-name="ERC20Charity.DeleteDefaultAddress">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="164.34" cy="-250" rx="96.68" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-245.8" font-family="Times,serif" font-size="14.00" style="">DeleteDefaultAddress</text>
+</g>
+<!-- ERC20Charity.DeleteDefaultAddress&#45;&gt;ERC20Charity.DonnationAddressChanged -->
+<g id="edge13" class="edge" data-name="ERC20Charity.DeleteDefaultAddress-&gt;ERC20Charity.DonnationAddressChanged">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M257.33,-255.24C276.73,-259.43 296.27,-266.21 312.67,-277 336.77,-292.86 324.54,-315.2 348.67,-331 359.51,-338.1 371.68,-343.47 384.29,-347.52" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="383.41,-350.92 394,-350.37 385.38,-344.2 383.41,-350.92" style=""/>
+</g>
+<!-- ERC20Charity._returnRate -->
+<g id="node12" class="node" pointer-events="visible" data-name="ERC20Charity._returnRate">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-142" rx="56.74" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-137.8" font-family="Times,serif" font-size="14.00" style="">_returnRate</text>
+</g>
+<!-- ERC20Charity.transfer -->
+<g id="node13" class="node" pointer-events="visible" data-name="ERC20Charity.transfer">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="164.34" cy="-196" rx="40.55" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-191.8" font-family="Times,serif" font-size="14.00" style="">transfer</text>
+</g>
+<!-- ERC20Charity.transfer&#45;&gt;ERC20Charity._feeDenominator -->
+<g id="edge16" class="edge" data-name="ERC20Charity.transfer-&gt;ERC20Charity._feeDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M205.03,-195.08C236.6,-196.16 280.63,-201.91 312.67,-223 336.77,-238.86 324.54,-261.2 348.67,-277 367.43,-289.28 390.17,-296.41 412.26,-300.44" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="411.91,-303.93 422.34,-302.08 413.04,-297.02 411.91,-303.93" style=""/>
+</g>
+<!-- ERC20Charity.transfer&#45;&gt;ERC20Charity._returnRate -->
+<g id="edge15" class="edge" data-name="ERC20Charity.transfer-&gt;ERC20Charity._returnRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M202.73,-189.96C260.2,-180.68 370.81,-162.82 439.64,-151.71" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="440.59,-155.1 449.9,-150.05 439.47,-148.19 440.59,-155.1" style=""/>
+</g>
+<!-- ERC20Charity._msgSender -->
+<g id="node22" class="node" pointer-events="visible" data-name="ERC20Charity._msgSender">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-88" rx="58.56" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-83.8" font-family="Times,serif" font-size="14.00" style="">_msgSender</text>
+</g>
+<!-- ERC20Charity.transfer&#45;&gt;ERC20Charity._msgSender -->
+<g id="edge14" class="edge" data-name="ERC20Charity.transfer-&gt;ERC20Charity._msgSender">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M205.03,-196.92C236.6,-195.84 280.63,-190.09 312.67,-169 336.77,-153.14 324.54,-130.8 348.67,-115 373.1,-99.01 404.29,-91.76 431.98,-88.7" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="432.38,-92.17 442.01,-87.75 431.72,-85.2 432.38,-92.17" style=""/>
+</g>
+<!-- ERC20Charity._transfer -->
+<g id="node23" class="node" pointer-events="visible" data-name="ERC20Charity._transfer">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-250" rx="45.21" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-245.8" font-family="Times,serif" font-size="14.00" style="">_transfer</text>
+</g>
+<!-- ERC20Charity.transfer&#45;&gt;ERC20Charity._transfer -->
+<g id="edge17" class="edge" data-name="ERC20Charity.transfer-&gt;ERC20Charity._transfer">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M204.69,-197.81C266.72,-204.99 387,-224.31 453.24,-237.64" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="452.89,-241.14 463.39,-239.72 454.3,-234.28 452.89,-241.14" style=""/>
+</g>
+<!-- ERC20Charity.transfer&#45;&gt;ERC20Charity._transfer -->
+<g id="edge18" class="edge" data-name="ERC20Charity.transfer-&gt;ERC20Charity._transfer">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M198.63,-205.62C256.42,-217.97 375.81,-237.54 445.66,-246.39" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="445.24,-249.86 455.59,-247.62 446.1,-242.92 445.24,-249.86" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom -->
+<g id="node14" class="node" pointer-events="visible" data-name="ERC20Charity.transferFrom">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="164.34" cy="-142" rx="61.41" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-137.8" font-family="Times,serif" font-size="14.00" style="">transferFrom</text>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._feeDenominator -->
+<g id="edge22" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._feeDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M225.22,-139.39C254.7,-141.21 288.92,-148.37 312.67,-169 350.87,-202.18 310.4,-243.91 348.67,-277 366.23,-292.18 389.34,-300.16 412.18,-304.08" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="411.89,-307.57 422.29,-305.56 412.9,-300.64 411.89,-307.57" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._returnRate -->
+<g id="edge21" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._returnRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M225.9,-142C284.62,-142 373.46,-142 433.92,-142" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="434.11,-145.5 444.11,-142 434.11,-138.5 434.11,-145.5" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._msgSender -->
+<g id="edge19" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._msgSender">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M218.7,-133.38C278.53,-123.72 375.4,-108.08 438.35,-97.92" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="439.22,-101.32 448.53,-96.28 438.1,-94.41 439.22,-101.32" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._transfer -->
+<g id="edge24" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._transfer">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M219.56,-133.95C249.18,-135.17 285.3,-141.99 312.67,-160 336.77,-175.86 324.54,-198.2 348.67,-214 377.92,-233.15 416.87,-239.77 447.9,-242.87" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="447.81,-246.38 458.09,-243.81 448.45,-239.41 447.81,-246.38" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._transfer -->
+<g id="edge25" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._transfer">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M219.91,-149.85C249.47,-153.22 285.41,-160.06 312.67,-178 336.77,-193.86 324.54,-216.2 348.67,-232 378.62,-251.61 418.74,-258.08 450.11,-258.49" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="450.42,-261.99 460.39,-258.41 450.36,-254.99 450.42,-261.99" style=""/>
+</g>
+<!-- ERC20Charity._spendAllowance -->
+<g id="node24" class="node" pointer-events="visible" data-name="ERC20Charity._spendAllowance">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-196" rx="80.45" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-191.8" font-family="Times,serif" font-size="14.00" style="">_spendAllowance</text>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._spendAllowance -->
+<g id="edge20" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._spendAllowance">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M224.36,-146.24C284.22,-153.99 376.51,-168.86 437.51,-180.55" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="436.91,-184 447.4,-182.47 438.25,-177.13 436.91,-184" style=""/>
+</g>
+<!-- ERC20Charity.transferFrom&#45;&gt;ERC20Charity._spendAllowance -->
+<g id="edge23" class="edge" data-name="ERC20Charity.transferFrom-&gt;ERC20Charity._spendAllowance">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M210.44,-154.07C262.74,-164.65 350.07,-179.14 415.14,-188.29" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="414.99,-191.8 425.38,-189.71 415.96,-184.87 414.99,-191.8" style=""/>
+</g>
+<!-- ERC20Charity.approve -->
+<g id="node15" class="node" pointer-events="visible" data-name="ERC20Charity.approve">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="164.34" cy="-88" rx="42.28" ry="18" style=""/>
+<text text-anchor="middle" x="164.34" y="-83.8" font-family="Times,serif" font-size="14.00" style="">approve</text>
+</g>
+<!-- ERC20Charity.approve&#45;&gt;ERC20Charity._feeDenominator -->
+<g id="edge29" class="edge" data-name="ERC20Charity.approve-&gt;ERC20Charity._feeDenominator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M205.75,-84.13C238.82,-83.32 284.58,-87.94 312.67,-115 365.79,-166.17 295.44,-225.95 348.67,-277 365.84,-293.46 389.4,-301.73 412.82,-305.51" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="412.44,-308.99 422.82,-306.87 413.38,-302.06 412.44,-308.99" style=""/>
+</g>
+<!-- ERC20Charity.approve&#45;&gt;ERC20Charity._returnRate -->
+<g id="edge28" class="edge" data-name="ERC20Charity.approve-&gt;ERC20Charity._returnRate">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M204.03,-94.25C261.93,-103.6 371.58,-121.3 439.88,-132.33" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="439.63,-135.83 450.06,-133.97 440.75,-128.92 439.63,-135.83" style=""/>
+</g>
+<!-- ERC20Charity.approve&#45;&gt;ERC20Charity._msgSender -->
+<g id="edge26" class="edge" data-name="ERC20Charity.approve-&gt;ERC20Charity._msgSender">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M206.68,-88C262.95,-88 364.36,-88 431.88,-88" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="432,-91.5 442,-88 432,-84.5 432,-91.5" style=""/>
+</g>
+<!-- ERC20Charity._approve -->
+<g id="node25" class="node" pointer-events="visible" data-name="ERC20Charity._approve">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="500.78" cy="-34" rx="46.93" ry="18" style=""/>
+<text text-anchor="middle" x="500.78" y="-29.8" font-family="Times,serif" font-size="14.00" style="">_approve</text>
+</g>
+<!-- ERC20Charity.approve&#45;&gt;ERC20Charity._approve -->
+<g id="edge27" class="edge" data-name="ERC20Charity.approve-&gt;ERC20Charity._approve">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M199.87,-78.12C257.57,-65.87 374.11,-46.76 443.71,-37.86" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="444.55,-41.28 454.04,-36.57 443.68,-34.33 444.55,-41.28" style=""/>
+</g>
+<!-- ERC20Charity.approve&#45;&gt;ERC20Charity._approve -->
+<g id="edge30" class="edge" data-name="ERC20Charity.approve-&gt;ERC20Charity._approve">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M206.35,-85.99C268.52,-78.71 386.34,-59.78 452.19,-46.57" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="453.2,-49.94 462.3,-44.5 451.8,-43.08 453.2,-49.94" style=""/>
+</g>
+<!-- key -->
+<g id="node26" class="node" pointer-events="visible" data-name="key">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="229.34,-837 99.34,-837 99.34,-749 229.34,-749 229.34,-837" style=""/>
+<text text-anchor="start" x="148.97" y="-818.4" font-family="Times,serif" font-size="14.00" style="">Internal Call</text>
+<text text-anchor="start" x="145.08" y="-798.4" font-family="Times,serif" font-size="14.00" style="">External Call</text>
+<text text-anchor="start" x="122.54" y="-778.4" font-family="Times,serif" font-size="14.00" style="">Defined Contract</text>
+<text text-anchor="start" x="108.94" y="-758.4" font-family="Times,serif" font-size="14.00" style="">Undefined Contract</text>
+</g>
+<!-- key2 -->
+<g id="node27" class="node" pointer-events="visible" data-name="key2">
+
+<polygon fill="#edad56" stroke="transparent" stroke-width="3" points="527.78,-837 473.78,-837 473.78,-749 527.78,-749 527.78,-837" style=""/>
+<text text-anchor="start" x="490.78" y="-818.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<text text-anchor="start" x="490.78" y="-798.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="#445773" stroke="transparent" points="488.78,-773 488.78,-793 513.78,-793 513.78,-773 488.78,-773" style=""/>
+<text text-anchor="start" x="490.78" y="-778.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="none" stroke="#e8726d" points="490.78,-755 490.78,-771 511.78,-771 511.78,-755 490.78,-755" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge31" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M222.34,-823C336.86,-823 368,-823 477.64,-823" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="477.78,-826.5 487.78,-823 477.78,-819.5 477.78,-826.5" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge32" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="white" stroke-width="2" d="M222.34,-803C336.86,-803 368,-803 477.64,-803" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="477.78,-806.5 487.78,-803 477.78,-799.5 477.78,-806.5" style=""/>
+</g>
+</g>
+</svg>

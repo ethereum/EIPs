@@ -26,15 +26,15 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
         uint256 oldTokenId,
         uint256 newTokenId,
         address newTokenOwner,
-        uint64 newTokenStartTime
+        int64 newTokenStartTime
     ) public virtual override {
         require(
             _isApprovedOrOwner(_msgSender(), oldTokenId),
             "ERC5007: caller is not owner nor approved"
         );
 
-        uint64 oldTokenStartTime = _timeNftMapping[oldTokenId].startTime;
-        uint64 oldTokenEndTime = _timeNftMapping[oldTokenId].endTime;
+        int64 oldTokenStartTime = _timeNftMapping[oldTokenId].startTime;
+        int64 oldTokenEndTime = _timeNftMapping[oldTokenId].endTime;
         require(
             oldTokenStartTime < newTokenStartTime &&
                 newTokenStartTime <= oldTokenEndTime,
@@ -42,7 +42,7 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
         );
 
         _timeNftMapping[oldTokenId].endTime = newTokenStartTime - 1;
-        uint64 newTokenEndTime = oldTokenEndTime;
+        int64 newTokenEndTime = oldTokenEndTime;
 
         _mintTimeNftWithRootId(
             newTokenOwner,
@@ -105,8 +105,8 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
         address to_,
         uint256 tokenId_,
         uint256 rootId_,
-        uint64 startTime_,
-        uint64 endTime_
+        int64 startTime_,
+        int64 endTime_
     ) internal virtual {
         require(_exists(rootId_), "ERC5007: invalid rootId_");
         super._mintTimeNft(to_, tokenId_, startTime_, endTime_);
@@ -125,8 +125,8 @@ abstract contract ERC5007Composable is ERC5007, IERC5007Composable {
     function _mintTimeNft(
         address to_,
         uint256 tokenId_,
-        uint64 startTime_,
-        uint64 endTime_
+        int64 startTime_,
+        int64 endTime_
     ) internal virtual override {
         super._mintTimeNft(to_, tokenId_, startTime_, endTime_);
 

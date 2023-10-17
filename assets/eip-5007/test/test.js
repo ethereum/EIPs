@@ -26,7 +26,7 @@ contract("test ERC5007", async accounts => {
         assert.equal(inputStartTime1.comparedTo(outputStartTime1) == 0  && inputEndTime1.comparedTo(outputEndTime1) == 0, true, "wrong data");
 
 
-        console.log("InterfaceId:", await demo.getInterfaceId())
+        console.log("IERC5007 InterfaceId:", await demo.getInterfaceId())
         let isSupport = await demo.supportsInterface('0x7a0cdf92');
         assert.equal(isSupport, true , "supportsInterface error");
         
@@ -87,8 +87,8 @@ contract("test ERC5007", async accounts => {
         assert.equal(token3RootId == id1, true, 'wrong rootId');
         assert.equal(token3Owner == Carl, true, 'wrong owner');
 
-        console.log("InterfaceId:", await demo.getInterfaceId())
-        let isSupport = await demo.supportsInterface('0xafeaab26');
+        console.log("IERC5007Composable InterfaceId:", await demo.getInterfaceId())
+        let isSupport = await demo.supportsInterface('0x620063db');
         assert.equal(isSupport, true , "supportsInterface error");
     });
 

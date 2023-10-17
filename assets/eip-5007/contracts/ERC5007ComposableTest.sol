@@ -15,8 +15,8 @@ contract ERC5007ComposableTest is ERC5007Composable  {
     function mint(
         address to_,
         uint256 id_,
-        uint64 startTime_,
-        uint64 endTime_
+        int64 startTime_,
+        int64 endTime_
     ) public {
         super._mintTimeNft(to_, id_, startTime_, endTime_);
     }
