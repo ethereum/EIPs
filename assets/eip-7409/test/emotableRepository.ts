@@ -18,14 +18,14 @@ async function tokenFixture() {
 }
 
 async function emotableRepositoryFixture() {
-  const factory = await ethers.getContractFactory("EmotableRepository");
+  const factory = await ethers.getContractFactory("EmoteRepository");
   const repository = await factory.deploy();
   await repository.deployed();
 
   return repository;
 }
 
-describe("EmotableRepository", async function () {
+describe("EmoteRepository", async function () {
   let token: ERC721Mock;
   let repository: EmotableRepository;
   let owner: SignerWithAddress;
