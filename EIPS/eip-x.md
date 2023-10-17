@@ -15,7 +15,7 @@ requires: 20, 4626
 
 The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called Requests.
 
-New methods are added to asynchronously Request a deposit or redemption, and view the pending status of the Request. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing Claimable Requests. 
+New methods are added to asynchronously Request a deposit or redemption, and view the pending status of the Request. The existing `deposit`, `mint`, `withdraw`, and `redeem` ERC-4626 methods are used for executing Claimable Requests. 
 
 Implementations can choose to whether to add asynchronous flows for deposits, redemptions, or both. 
 
@@ -52,7 +52,8 @@ All EIP-X asynchronous tokenized Vaults MUST implement ERC-4626, with the follow
 1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the Vault, because this already happened on `requestDeposit`.
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the Vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
-4. The preview* functions for async flows MUST revert for all callers and inputs
+4. In asynchronous deposit Vaults `previewDeposit` and `previewMint` MUST revert for all callers and inputs
+4. In asynchronous redemption Vaults `previewRedeem` and `previewWithdraw` MUST revert for all callers and inputs
 
 ### Request Lifecycle
 
@@ -110,7 +111,7 @@ MUST emit the `RequestDeposit` event.
 
 #### pendingDepositRequest
 
-The amount of requested `assets` in pending state for the `operator` to `deposit` or `mint`.
+The amount of requested `assets` in Pending state for the `operator` to `deposit` or `mint`.
 
 MUST NOT include any `assets` in Claimable state for `deposit` or `mint`.
 
@@ -138,11 +139,11 @@ Assumes control of `shares` from `owner` and submits a Request for asynchronous 
 
 MAY support either a locking or a burning mechanism for `shares` depending on the Vault implemention. 
 
+If a Vault uses a locking mechanism for `shares`, those `shares` MUST be burned from the Vault balance before or upon claiming the Request.
+
 MUST support a redeem Request flow where the control of `shares` is taken from `owner` directly where `msg.sender` has EIP-20 approval over the `shares` of `owner`.
 
 When the Request is Claimable, `maxRedeem` and `maxWithdraw` will be increased for the case where the `owner` input is the `operator`. `redeem` or `withdraw` can subsequently be called by `operator` to receive `assets`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
-
-If a Vault uses a locking mechanism for `shares`, those `shares` MUST be burned from the Vault balance before or upon claiming the Request.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the value of `convertToAssets(shares)` at time of Request, as the price can change between Pending and Claimed.
 
@@ -168,7 +169,7 @@ MUST emit the `RequestRedeem` event.
 
 #### pendingRedeemRequest
 
-The amount of requested `shares` in pending state for the `operator` to `redeem` or `withdraw`.
+The amount of requested `shares` in Pending state for the `operator` to `redeem` or `withdraw`.
 
 MUST NOT include any `shares` in Claimable state for `redeem` or `withdraw`.
 
@@ -281,6 +282,14 @@ The Requests could also output a timestamp representing the minimum amount of ti
 ### No Event for Claimable state
 
 The state transition of a Request from Pending to Claimable happens at the Vault implementation level and is not specified in the standard. Requests may be batched into the Claimable state, or the state may transition automatically after a timestamp has passed. It is impractical to require an event to emit after a Request becomes Claimable at the user or batch level.
+
+### Reversion of Preview Functions in Async Request Flows
+
+The preview functions do not take an address parameter, therefore the only way to discriminate discrepancies in exchange rate are via the `msg.sender`. However, this could lead to integration/implementation complexities where support contracts cannot determine the output of a claim on behalf of an `operator`.
+
+In addition, there is no on-chain benefit to previewing the Claim step as the only valid state transition is to Claim anyway. If the output of a Claim is undesirable for any reason, the calling contract can revert on the output of that function call.
+
+It reduces code and implementation complexity at little to no cost to simply mandate reversion for the preview functions of an async flow.
 
 ## Backwards Compatibility
 
