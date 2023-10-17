@@ -149,7 +149,7 @@ The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivale
 
 SHOULD check `msg.sender` can spend owner funds using allowance.
 
-MUST revert if all of shares cannot be redeemed (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+MUST revert if all of `shares` cannot be requested for `redeem` / `withdraw` (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
 
 MUST emit the `RequestRedeem` event.
 
