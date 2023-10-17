@@ -76,7 +76,7 @@ For asynchronous Vaults, the exchange rate between `shares` and `assets` includi
 
 Transfers `assets` from `msg.sender` into the Vault and submits a Request for asynchronous `deposit/mint`. This places the Request in Pending state, with a corresponding increase in `pendingDepositRequest` for the amount `assets`.
 
-When the Request is Claimable, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` can be called by `operator` to receive `shares`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
+When the Request is Claimable, `maxDeposit` and `maxMint` will be increased for the case where the `receiver` input is the `operator`. `deposit` or `mint` can subsequently be called by `operator` to receive `shares`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
 
 The `shares` that will be received on `deposit` or `mint` MAY NOT be equivalent to the value of `convertToShares(assets)` at the time of Request, as the price can change between Request and Claim.
 
@@ -132,7 +132,7 @@ MAY support either a locking or a burning mechanism for `shares` depending on th
 
 MUST support a redeem Request flow where the control of `shares` is taken from `owner` directly where `msg.sender` has EIP-20 approval over the `shares` of `owner`.
 
-When the Request is Claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be called by `operator` to receive `assets`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
+When the Request is Claimable, `maxRedeem` and `maxWithdraw` will be increased for the case where the `owner` input is the `operator`. `redeem` or `withdraw` can subsequently be called by `operator` to receive `assets`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
 
 If a Vault uses a locking mechanism for `shares`, those `shares` MUST be burned from the Vault balance before or upon claiming the Request.
 
