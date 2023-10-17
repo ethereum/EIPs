@@ -39,7 +39,7 @@ The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this
 - pending request: the state where a request has been made but is not yet claimable
 - claimable: the Vault's step of processing the request and enabling the user to claim corresponding shares (for async deposit) or assets (for async redeem)
 - claim: the corresponding Vault method to complete a request (e.g. `deposit` claims `shares` from `requestDeposit`)
-- operator: the ethereum account specified by the requester which has has the right to claim a given request once it is claimable
+- operator: the account specified by the sender of the request which has has the right to claim a given request once it is claimable
 - asynchronous deposit Vault: a Vault that implements asynchronous requests for deposit flows
 - asynchronous redemption Vault: a Vault that implements asynchronous redemption flows
 - fully asynchronous Vault: a vault that implements asynchronous requests for both deposit and redemption
