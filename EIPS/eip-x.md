@@ -135,15 +135,17 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 
 #### requestRedeem
 
-Burns exactly `shares` from `owner` and submits a request for asynchronous `redeem/withdraw`. This places the Request in Pending state, with a corresponding increase in `pendingRedeemRequest` for the amount `shares`.
+Assumes control of `shares` from `owner` and submits a request for asynchronous `redeem/withdraw`. This places the Request in Pending state, with a corresponding increase in `pendingRedeemRequest` for the amount `shares`. 
+
+MAY support either a locking or a burning mechanism for `shares` depending on the vault implemention. 
+
+MUST support a redeem Request flow where the `shares` control of shares is taken from `owner` directly where `msg.sender` has EIP-20 approval over the `shares` of `owner`.
 
 When the Request is claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be called by `operator` to receive `assets`. A Request MAY transition straight to claimable state but MUST NOT skip the claimable state.
 
+If a Vault uses a locking mechanism for `shares`, those shares MUST be burned from the vault balance upon claiming the Request.
+
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the value of `convertToAssets(shares)` at time of Request, as the price can change between request and claim.
-
-MUST support a redeem Request flow where the shares are burned from owner directly where owner is msg.sender.
-
-MUST support a redeem Request flow where the shares are burned from owner directly where msg.sender has EIP-20 approval over the shares of owner.
 
 SHOULD check `msg.sender` can spend owner funds using allowance.
 
