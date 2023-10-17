@@ -51,7 +51,9 @@ All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the follow
 1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
-4. the `owner` field of preview*, max* and claimable step for async flows SHOULD be renamed to `operator`
+4. The `receiver` field of the max* methods for asynchronous flows SHOULD be renamed to `operator`.
+5. The `owner` field of the `redeem` and `withdraw` methods for async flows SHOULD be renamed to `operator`.
+6. The preview* functions treat the `msg.sender` as the `operator`.
 
 ### Request Lifecycle
 
