@@ -329,7 +329,7 @@ Centrifuge has been developing [an implementation](https://github.com/centrifuge
 
 The methods `pendingDepositRequest` and `pendingRedeemRequest` are estimates useful for display purposes, and can be outdated due to the asynchronicity.
 
-In general, asynchronicity concerns make state transitions in the vault much more complex and vulnerable to security risks. Access control on vault operations, clear documentation of state transitioning and invariant checks should all be performed to mitigate these risks.
+In general, asynchronicity concerns make state transitions in the vault much more complex and vulnerable to security risks. Access control on vault operations, clear documentation of state transitioning, and invariant checks should all be performed to mitigate these risks.
 
 It is worth highlighting again here that the claim functions for any asynchronous flows MUST enforce that `msg.sender == operator/owner` to prevent theft of claimable `assets` or `shares`
 
