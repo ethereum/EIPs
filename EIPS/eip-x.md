@@ -91,7 +91,7 @@ The `shares` that will be received on `deposit` or `mint` MAY NOT be equivalent 
 
 MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit Request flow.
 
-MUST revert if all of assets cannot be deposited (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
+MUST revert if all of `assets` cannot be requested for `deposit`/`mint` (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
 
 Note that most implementations will require pre-approval of the Vault with the Vault's underlying `asset` token.
 
