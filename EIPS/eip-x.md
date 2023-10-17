@@ -264,6 +264,12 @@ Instead there can be router contracts which atomically check for Claimable amoun
 
 To support flows where a smart contract manages the Request lifecycle on behalf of a user, the `operator` parameter is included in the `requestDeposit` and `requestRedeem` functions. This is not called `owner` because the `assets` or `shares` are not transferred from this account on Request submission, unlike the behaviour of an `owner` on `redeem`. It is also not called `receiver` because the `shares` or `assets` are not necessarily transferred on claiming the Request, this can be chosen by the operator when they call `deposit`, `mint`, `redeem`, or `withdraw`.
 
+### No Outputs for Request functions
+
+`requestDeposit` and `requestRedeem` may not have a known exchange rate that will happen when the Request becomes Claimed. Returning the corresponding `assets` or `shares` could not work in this case.
+
+The Requests could also output a timestamp representing the minimum amount of time expected for the Request to become Claimable, however not all Vaults will be able to return a reliable timestamp.
+
 ## Backwards Compatibility
 
 The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](#specification).
