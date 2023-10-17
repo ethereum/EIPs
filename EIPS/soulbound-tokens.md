@@ -1,5 +1,5 @@
 ---
-eip: 1
+eip: 7524
 title: Soulbound Tokens
 description: A token that is attached to a "soul" at mint time and cannot be transferred after that.
 author: Omar Garcia (@ogarciarevett)
@@ -63,7 +63,7 @@ The explicit approach to Soulbound Tokens empowers developers with a robust and 
 
 #### Examples
 
-##### Example 1: Using Soulbound Tokens with ERC 721
+##### Example 1: Using Soulbound Tokens with ERC-721
 
 ```solidity
 contract Mock721Soulbound is ERC721, ERCSoulbound {
@@ -95,9 +95,9 @@ contract Mock721Soulbound is ERC721, ERCSoulbound {
 }
 ```
 
-In this example, the Mock721Soulbound contract utilizes the ERCSoulbound contract to manage the soul bounding of tokens. The mint function is used to mint new tokens and soul bound them. The _beforeTokenTransfer function ensures that only soulbound tokens can be transferred.
+In this example, the Mock721Soulbound contract utilizes the `ERCSoulbound` contract to manage the soul bounding of tokens. The mint function is used to mint new tokens and soul bound them. The _beforeTokenTransfer function ensures that only soulbound tokens can be transferred.
 
-##### Example 2: Using Soulbound Tokens with ERC 1155
+##### Example 2: Using Soulbound Tokens with ERC-1155
 
 ```solidity
 contract Mock1155Soulbound is ERC1155Burnable, ERCSoulbound {
@@ -152,7 +152,7 @@ contract Mock1155Soulbound is ERC1155Burnable, ERCSoulbound {
 
 ```
 
-In this example, the Mock1155Soulbound contract is an ERC 1155 based Soulbound token. It offers more flexibility by allowing the minting of tokens with an optional soulbound flag. It also ensures that only soulbound tokens can be transferred or burned.
+In this example, the Mock1155Soulbound contract is an ERC-1155 based Soulbound token. It offers more flexibility by allowing the minting of tokens with an optional soulbound flag. It also ensures that only soulbound tokens can be transferred or burned.
 
 ## Security Considerations
 Explicit control over token transferability is a security feature, enhancing the trustworthiness of blockchain applications.
