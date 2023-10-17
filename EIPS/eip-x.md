@@ -17,7 +17,7 @@ The following standard extends [ERC-4626](./eip-4626.md) by adding support for a
 
 New methods are added to asynchronously request a deposit or redemption, and view the pending status of the request. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. 
 
-Implementations can choose to whether to add asynchronous flows for deposit,  redeem, or both. 
+Implementations can choose to whether to add asynchronous flows for deposits, redemptions, or both. 
 
 Cancelling a pending Request is also defined as an optional feature that asynchronous Vaults can implement.
 
