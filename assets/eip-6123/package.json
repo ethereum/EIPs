@@ -1,0 +1,41 @@
+{
+  "name": "@finmath.net/sdc",
+  "version": "0.3.1",
+  "description": "Solidity Smart Derivative Contracts",
+  "author": "Christian Fries, Peter Kohl-Landgraf, Alexandros Korpis",
+  "license": "ISC",
+  "homepage": "https://github.com/finmath/finmath-smart-derivative-contract#readme",
+  "main": "index.js",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "chai": "^4.3.10",
+    "ethereum-waffle": "^4.0.10",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.18.1",
+    "solidity-coverage": "^0.8.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finmath/finmath-smart-derivative-contract.git"
+  },
+  "keywords": [
+    "Smart Derivative Contract",
+    "SDC",
+    "EIP-6123"
+  ],
+  "bugs": {
+    "url": "https://github.com/finmath/finmath-smart-derivative-contract/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
