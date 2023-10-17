@@ -242,7 +242,8 @@ Due to the asynchronous nature of requests, the vault can only operate with cert
 
 Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example of an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however, deposits can be fully synchronous.
 
-### Non Inclusion of a Request Cancellation Flow
+### Non Inclusion of a Request Cancelation Flow
+
 In many cases, canceling a request may not be straightforward or even technically feasible. The state transition of cancellations could be synchronous or asynchronous, and the way to claim a cancelation interfaces with the remaining vault functionality in complex ways.
 
 A separate EIP should be developed to standardize behavior of cancelling a Pending request. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
