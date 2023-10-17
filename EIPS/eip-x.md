@@ -246,7 +246,7 @@ Certain use cases are only asynchronous on one flow but not the other between re
 
 In many cases, canceling a request may not be straightforward or even technically feasible. The state transition of cancelations could be synchronous or asynchronous, and the way to claim a cancelation interfaces with the remaining vault functionality in complex ways.
 
-A separate EIP should be developed to standardize behavior of cancelling a Pending request. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
+A separate EIP should be developed to standardize behavior of cancelling a pending Request. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
 
 ### Request Implementation flexibility
 
