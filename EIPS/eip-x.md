@@ -143,7 +143,7 @@ MUST support a redeem Request flow where the `shares` control of shares is taken
 
 When the Request is claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be called by `operator` to receive `assets`. A Request MAY transition straight to claimable state but MUST NOT skip the claimable state.
 
-If a Vault uses a locking mechanism for `shares`, those shares MUST be burned from the vault balance upon claiming the Request.
+If a Vault uses a locking mechanism for `shares`, those `shares` MUST be burned from the vault balance before or upon claiming the Request.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the value of `convertToAssets(shares)` at time of Request, as the price can change between request and claim.
 
