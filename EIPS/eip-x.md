@@ -246,7 +246,7 @@ MUST be emitted when a redemption request is submitted using the `requestRedeem`
 
 #### CancelDepositRequest
 
-`sender` has requested to cancel the pending deposit request.
+`operator` has requested to cancel the pending deposit request.
 
 MUST be emitted when a cancel deposit request is submitted using the `cancelDepositRequest` method.
 
@@ -255,17 +255,14 @@ MUST be emitted when a cancel deposit request is submitted using the `cancelDepo
   type: event
 
   inputs:
-    - name: sender
+    - name: operator
       indexed: true
       type: address
-    - name: assets
-      indexed: false
-      type: uint256
 ```
 
 #### CancelRedeemRequest
 
-`sender` has requested to cancel the pending redemption request.
+`operator` has requested to cancel the pending redemption request.
 
 MUST be emitted when a cancel redemption request is submitted using the `cancelRedeemRequest` method.
 
@@ -274,12 +271,9 @@ MUST be emitted when a cancel redemption request is submitted using the `cancelR
   type: event
 
   inputs:
-    - name: sender
+    - name: operator
       indexed: true
       type: address
-    - name: assets
-      indexed: false
-      type: uint256
 ```
 
 ## Rationale
