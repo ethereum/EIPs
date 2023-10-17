@@ -19,8 +19,6 @@ New methods are added to asynchronously request a deposit or redemption, and vie
 
 Implementations can choose to whether to add asynchronous flows for deposits, redemptions, or both. 
 
-Cancelling a pending Request is also defined as an optional feature that asynchronous Vaults can implement.
-
 ## Motivation
 
 The ERC-4626 Tokenized Vaults standard has helped to make yield-bearing tokens more composable across decentralized finance. The standard is optimized for atomic deposits and redemptions up to a limit. If the limit is reached, no new deposits or redemptions can be submitted.
@@ -65,19 +63,11 @@ After submission, Requests go through Pending, Claimable, and Claimed stages. An
 | Claimable |                                  | <i>Internal request fulfillment</i><br>pendingDepositRequest[msg.sender] -= assets<br>maxDeposit[operator] += assets<br> |
 |   Claimed | deposit(assets, receiver)        |                                                  maxDeposit[msg.sender] -= assets<br>vault.balanceOf[receiver] += shares |
 
-An important vault inequality is that following a request(s), the cumulative requested quantity MUST be more than `pendingDepositRequest + maxDeposit - claimed`. The sources of inequality are fees and cancellation requests, otherwise this would be a strict equality.
+An important vault inequality is that following a request(s), the cumulative requested quantity MUST be more than `pendingDepositRequest + maxDeposit - claimed`. The inequality may come from fees or other state transitions outside implemented by vault logic such as cancellation of a request, otherwise this would be a strict equality.
 
 Requests MUST NOT skip or otherwise short-circuit the claim step. In other words, to initiate and claim a request, a user MUST call both request* and the corresponding claim function separately, even in the same block.
 
 For asynchronous request vaults, the exchange rate between shares and assets including fees and yield is up to the vault implementation. In other words, pending redemption requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
-
-Cancellation requests also go through the same Pending, Claimable, and Claimed stages. An example lifecycle for a cancelled deposit request is visualized in the table below. 
-
-| **State**    | **User**                       | **Vault** |
-| ------------:|:------------------------------ | ---------:|
-| Pending      | cancelDepositRequest()           |          |
-| Claimable    |                                | <i>Internal request fulfillment</i><br>maxRedeem[msg.sender] += pendingDepositRequest[msg.sender]<br>pendingDepositRequest[msg.sender] = 0<br> |
-| Claimed      | redeem(assets, receiver)       | maxRedeem[msg.sender] -= vault.previewRedeem[assets] |
 
 ### Methods
 
@@ -191,34 +181,6 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
       type: uint256
 ```
 
-#### cancelDepositRequest
-
-Submits a Request to cancel all pending deposit Requests. 
-
-When the cancel deposit request is claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be used to receive `assets` that were previously pending deposit.
-
-MUST emit the `CancelDepositRequest` event.
-
-```yaml
-- name: cancelDepositRequest
-  type: function
-  stateMutability: nonpayable
-```
-
-#### cancelRedeemRequest
-
-Submits a Request to cancel all pending redemption Requests. 
-
-When the cancel redemption request is claimable, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` can be used to receive `shares` that were previously pending redemption.
-
-MUST emit the `CancelRedeemRequest` event.
-
-```yaml
-- name: cancelRedeemRequest
-  type: function
-  stateMutability: nonpayable
-```
-
 ### Events
 
 #### DepositRequest
@@ -268,38 +230,6 @@ MUST be emitted when a redemption request is submitted using the `requestRedeem`
       type: uint256
 ```
 
-#### CancelDepositRequest
-
-`operator` has requested to cancel the pending deposit request.
-
-MUST be emitted when a cancel deposit request is submitted using the `cancelDepositRequest` method.
-
-```yaml
-- name: CancelDepositRequest
-  type: event
-
-  inputs:
-    - name: operator
-      indexed: true
-      type: address
-```
-
-#### CancelRedeemRequest
-
-`operator` has requested to cancel the pending redemption request.
-
-MUST be emitted when a cancel redemption request is submitted using the `cancelRedeemRequest` method.
-
-```yaml
-- name: CancelRedeemRequest
-  type: event
-
-  inputs:
-    - name: operator
-      indexed: true
-      type: address
-```
-
 ## Rationale
 
 ### Symmetry and Non-inclusion of requestWithdraw and requestMint
@@ -308,11 +238,14 @@ In ERC-4626, the spec was written to be fully symmetrical with respect to conver
 
 Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise, the redemption request flow cannot work with a `withdraw` call.
 
-### Optionality of flows and cancels
+### Optionality of flows
 
 Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example of an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however, deposits can be fully synchronous.
 
-In many cases, canceling a request may not be straightforward or even technically feasible, therefore cancel operations are optional. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
+### Non Inclusion of a Request Cancellation Flow
+In many cases, canceling a request may not be straightforward or even technically feasible. The state transition of cancellations could be synchronous or asynchronous, and the way to claim a cancelation interfaces with the remaining vault functionality in complex ways.
+
+A separate EIP should be developed to standardize behavior of cancelling a Pending request. Defining the cancel flow is still important for certain classes of use cases for which the fulfillment of a Request can take a considerable amount of time.
 
 ### Request Implementation flexibility
 
