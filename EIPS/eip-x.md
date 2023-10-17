@@ -278,6 +278,10 @@ To support flows where a smart contract manages the Request lifecycle on behalf 
 
 The Requests could also output a timestamp representing the minimum amount of time expected for the Request to become Claimable, however not all Vaults will be able to return a reliable timestamp.
 
+### No Event for Claimable state
+
+The state transition of a Request from Pending to Claimable happens at the Vault implementation level and is not specified in the standard. Requests may be batched into the Claimable state, or the state may transition automatically after a timestamp has passed. It is impractical to require an event to emit after a Request becomes Claimable at the user or batch level.
+
 ## Backwards Compatibility
 
 The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](#specification).
