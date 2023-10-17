@@ -32,7 +32,9 @@ This standard expands the utility of 4626 Vaults for asynchronous use cases. The
 ## Specification
 
 ### Definitions:
+
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
+
 - request: a function call that initiates an asynchronous deposit/redemption flow
 - pending request: the state where a request has been made but is not yet claimable
 - claimable: the Vault's step of processing the request and enabling the user to claim corresponding shares (for async deposit) or assets (for async redeem)
@@ -43,15 +45,18 @@ The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this
 - fully asynchronous Vault: a vault that implements asynchronous requests for both deposit and redemption
 
 ### Request Flows
+
 EIP-X vaults MUST implement one or both of asynchronous deposit and redemption request flows. If either flow is not implemented in a request pattern, it MUST use the ERC-4626 standard synchronous interaction pattern. 
 
 All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the following overrides for request flows:
+
 1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
 4. the `owner` field of preview*, max* and claimable step for async flows SHOULD be renamed to `operator`
 
 ### Request Lifecycle
+
 After submission, Requests go through Pending, Claimable, and Claimed stages. An example lifecycle for a deposit request is visualized in the table below.
 
 | **State** | **User**                         |                                                                                                                **Vault** |
@@ -75,7 +80,9 @@ Cancellation requests also go through the same Pending, Claimable, and Claimed s
 | Claimed      | redeem(assets, receiver)       | maxRedeem[msg.sender] -= vault.previewRedeem[assets] |
 
 ### Methods
+
 #### requestDeposit
+
 Locks `assets` from `msg.sender` into the Vault and submits a request by `operator` to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
 
 MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
@@ -99,6 +106,7 @@ MUST emit the `RequestDeposit` event.
 ```
 
 #### requestRedeem
+
 Locks `shares` from `owner` into the Vault and submits a request by `operator` to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the current value of `convertToAssets(shares)`, as the price can change between request and execution.
@@ -126,6 +134,7 @@ MUST emit the `RequestRedeem` event.
 ```
 
 #### cancelDepositRequest
+
 Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets` that were previously locked for deposit.
 
 MUST emit the `CancelDepositRequest` event.
@@ -137,6 +146,7 @@ MUST emit the `CancelDepositRequest` event.
 ```
 
 #### cancelRedeemRequest
+
 Submits an order to cancel the outstanding redemption request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares` that were previously locked for redemption.
 
 MUST emit the `CancelRedeemRequest` event.
@@ -148,6 +158,7 @@ MUST emit the `CancelRedeemRequest` event.
 ```
 
 #### pendingDepositRequest
+
 The amount of `assets` that the operator has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
 
 MUST NOT show any variations depending on the caller.
@@ -169,6 +180,7 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
 ```
 
 #### pendingRedeemRequest
+
 The amount of `shares` that the operator has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
 
 MUST NOT show any variations depending on the caller.
@@ -307,7 +319,7 @@ To support flows where a smart contract manages the request lifecycle on behalf 
 
 ## Backwards Compatibility
 
-The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](##Specification).
+The interface is fully backwards compatible with [ERC-4626](https://eips.ethereum.org/EIPS/eip-4626). The specification of the `deposit`, `mint`, `redeem`, and `withdraw` methods is different as described in [Specification](#specification).
 
 ## Reference Implementation
 
