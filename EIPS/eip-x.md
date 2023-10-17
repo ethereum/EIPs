@@ -83,11 +83,15 @@ Cancellation requests also go through the same Pending, Claimable, and Claimed s
 
 #### requestDeposit
 
-Locks `assets` from `msg.sender` into the Vault and submits a request by `operator` to receive `shares` Vault shares. When the request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares`.
+Locks `assets` from `msg.sender` into the Vault and submits a Request for asynchronous `deposit/mint`. This places the Request in Pending state, with a corresponding increase in `pendingDepositRequest` for the amount `assets`.
 
-MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit flow.
+When the Request is claimable, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` can be called by `operator` to receive `shares`. A Request MAY transition straight to claimable state but MUST NOT skip the claimable state.
 
-The `shares` that will be received on `deposit` or `mint` MAY NOT be equivalent to the current value of `convertToShares(assets)`, as the price can change between request and execution.
+The `shares` that will be received on `deposit` or `mint` MAY NOT be equivalent to the value of `convertToShares(assets)` at the time of Request, as the price can change between request and claim.
+
+MUST support ERC-20 `approve` / `transferFrom` on `asset` as a deposit Request flow.
+
+MUST revert if all of assets cannot be deposited (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
 
 Note that most implementations will require pre-approval of the Vault with the Vault's underlying `asset` token.
 
@@ -105,61 +109,11 @@ MUST emit the `RequestDeposit` event.
       type: address
 ```
 
-#### requestRedeem
-
-Locks `shares` from `owner` into the Vault and submits a request by `operator` to receive `assets` of underlying tokens. When the request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets`.
-
-The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the current value of `convertToAssets(shares)`, as the price can change between request and execution.
-
-MUST support a redeem request flow where the shares are transferred from `owner` directly where `owner` is `msg.sender`.
-
-MUST support a redeem request flow where the shares are transferred from `owner` directly where `msg.sender` has ERC-20 approval over the shares of `owner`.
-
-SHOULD check `msg.sender` can spend owner funds using allowance.
-
-MUST emit the `RequestRedeem` event.
-
-```yaml
-- name: requestRedeem
-  type: function
-  stateMutability: nonpayable
-
-  inputs:
-    - name: shares
-      type: uint256
-    - name: operator
-      type: address
-    - name: owner
-      type: address
-```
-
-#### cancelDepositRequest
-
-Submits an order to cancel the outstanding deposit request. When the cancel deposit request is fulfilled, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` from ERC-4626 can be used to receive `assets` that were previously locked for deposit.
-
-MUST emit the `CancelDepositRequest` event.
-
-```yaml
-- name: cancelDepositRequest
-  type: function
-  stateMutability: nonpayable
-```
-
-#### cancelRedeemRequest
-
-Submits an order to cancel the outstanding redemption request. When the cancel redemption request is fulfilled, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` from ERC-4626 can be used to receive `shares` that were previously locked for redemption.
-
-MUST emit the `CancelRedeemRequest` event.
-
-```yaml
-- name: cancelRedeemRequest
-  type: function
-  stateMutability: nonpayable
-```
-
 #### pendingDepositRequest
 
-The amount of `assets` that the operator has requested to deposit but is not ready to be claimed using `deposit` or `mint`.
+The amount of requested `assets` in pending state for the `operator` to `deposit` or `mint`.
+
+MUST NOT include any assets in claimable state for `deposit` or `mint`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -179,9 +133,43 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
       type: uint256
 ```
 
+#### requestRedeem
+
+Burns exactly `shares` from `owner` and submits a request for asynchronous `redeem/withdraw`. This places the Request in Pending state, with a corresponding increase in `pendingRedeemRequest` for the amount `shares`.
+
+When the Request is claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be called by `operator` to receive `assets`. A Request MAY transition straight to claimable state but MUST NOT skip the claimable state.
+
+The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the value of `convertToAssets(shares)` at time of Request, as the price can change between request and claim.
+
+MUST support a redeem Request flow where the shares are burned from owner directly where owner is msg.sender.
+
+MUST support a redeem Request flow where the shares are burned from owner directly where msg.sender has EIP-20 approval over the shares of owner.
+
+SHOULD check `msg.sender` can spend owner funds using allowance.
+
+MUST revert if all of shares cannot be redeemed (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+
+MUST emit the `RequestRedeem` event.
+
+```yaml
+- name: requestRedeem
+  type: function
+  stateMutability: nonpayable
+
+  inputs:
+    - name: shares
+      type: uint256
+    - name: operator
+      type: address
+    - name: owner
+      type: address
+```
+
 #### pendingRedeemRequest
 
-The amount of `shares` that the operator has requested to redeem but is not ready to be claimed using `redeem` or `withdraw`.
+The amount of requested `shares` in pending state for the `operator` to `redeem` or `withdraw`.
+
+MUST NOT include any `shares` in claimable state for `redeem` or `withdraw`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -199,6 +187,34 @@ MUST NOT revert unless due to integer overflow caused by an unreasonably large i
   outputs:
     - name: shares
       type: uint256
+```
+
+#### cancelDepositRequest
+
+Submits a Request to cancel all pending deposit Requests. 
+
+When the cancel deposit request is claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be used to receive `assets` that were previously pending deposit.
+
+MUST emit the `CancelDepositRequest` event.
+
+```yaml
+- name: cancelDepositRequest
+  type: function
+  stateMutability: nonpayable
+```
+
+#### cancelRedeemRequest
+
+Submits a Request to cancel all pending redemption Requests. 
+
+When the cancel redemption request is claimable, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` can be used to receive `shares` that were previously pending redemption.
+
+MUST emit the `CancelRedeemRequest` event.
+
+```yaml
+- name: cancelRedeemRequest
+  type: function
+  stateMutability: nonpayable
 ```
 
 ### Events
