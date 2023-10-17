@@ -15,7 +15,7 @@ requires: 20, 4626
 
 The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called "Requests".
 
-New methods are added to asynchronously request a deposit or redeem call, and view the pending status of the request. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. 
+New methods are added to asynchronously request a deposit or redemption, and view the pending status of the request. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. 
 
 Implementations can choose to whether to add asynchronous flows for deposit,  redeem, or both. 
 
