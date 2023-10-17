@@ -15,7 +15,11 @@ requires: 20, 4626
 
 The following standard extends [ERC-4626](./eip-4626.md) by adding support for asynchronous deposit and redemption flows. The async flows are called "Requests".
 
-New methods are added to submit, cancel, and view pending Requests. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. Implementations can choose to add asynchronous flows for deposit and/or redemption. Cancelling a pending Request is also optionally defined in the spec.
+New methods are added to asynchronously request a deposit or redemption, and view the pending status of the request. The existing deposit, mint, withdraw, and redeem ERC-4626 methods are used for executing claimable Requests. 
+
+Implementations can choose to whether to add asynchronous flows for deposits, redemptions, or both. 
+
+Cancelling a pending Request is also defined as an optional feature that asynchronous Vaults can implement.
 
 ## Motivation
 
@@ -32,9 +36,10 @@ This standard expands the utility of 4626 Vaults for asynchronous use cases. The
 The existing definitions from [ERC-4626](./eip-4626.mn) apply. In addition, this spec defines:
 
 - request: a function call that initiates an asynchronous deposit/redemption flow
-- fulfill: the Vault's step of executing the request and enabling the user to claim the outcome of the request
-- claim: the corresponding Vault method to complete a request (e.g. `deposit` claims `shares` from `requestDeposit`)
 - pending request: the state where a request has been made but is not yet claimable
+- claimable: the Vault's step of processing the request and enabling the user to claim corresponding shares (for async deposit) or assets (for async redeem)
+- claim: the corresponding Vault method to complete a request (e.g. `deposit` claims `shares` from `requestDeposit`)
+- operator: the account specified by the sender of the request which has has the right to claim a given request once it is claimable
 - asynchronous deposit Vault: a Vault that implements asynchronous requests for deposit flows
 - asynchronous redemption Vault: a Vault that implements asynchronous redemption flows
 - fully asynchronous Vault: a vault that implements asynchronous requests for both deposit and redemption
@@ -45,9 +50,10 @@ EIP-X vaults MUST implement one or both of asynchronous deposit and redemption r
 
 All EIP-X asynchronous tokenized vaults MUST implement ERC-4626, with the following overrides for request flows:
 
-1. In asynchronous deposit vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
-2. In asynchronous redemption vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
-3. In asynchronous redemption vaults, the `owner` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a nonowner.
+1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the vault, because this already happened on `requestDeposit`.
+2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the vault, because this already happened on `requestRedeem`. 
+3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
+4. the `owner` field of preview*, max* and claimable step for async flows SHOULD be renamed to `operator`
 
 ### Request Lifecycle
 
@@ -59,11 +65,11 @@ After submission, Requests go through Pending, Claimable, and Claimed stages. An
 | Claimable |                                  | <i>Internal request fulfillment</i><br>pendingDepositRequest[msg.sender] -= assets<br>maxDeposit[operator] += assets<br> |
 |   Claimed | deposit(assets, receiver)        |                                                  maxDeposit[msg.sender] -= assets<br>vault.balanceOf[receiver] += shares |
 
-The requested amount is defined by `pendingDepositRequest + maxDeposit`.
+An important vault inequality is that following a request(s), the cumulative requested quantity MUST be more than `pendingDepositRequest + maxDeposit - claimed`. The sources of inequality are fees and cancellation requests, otherwise this would be a strict equality.
 
-Requests MUST NOT skip step 2 and be automatically claimed, due to the ambiguity this creates for integrators. Instead there can be router contracts which atomically check for claimable amounts immediately upon request.
+Requests MUST NOT skip or otherwise short-circuit the claim step. In other words, to initiate and claim a request, a user MUST call both request* and the corresponding claim function separately, even in the same block.
 
-Note that for redemption requests, whether yield still accrues on shares that are pending a redemption request, or only on shares that are pending a redemption request and have not been executed, is up to the Vault implementation.
+For asynchronous request vaults, the exchange rate between shares and assets including fees and yield is up to the vault implementation. In other words, pending redemption requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
 
 Cancellation requests also go through the same Pending, Claimable, and Claimed stages. An example lifecycle for a cancelled deposit request is visualized in the table below. 
 
@@ -284,10 +290,6 @@ In ERC-4626, the spec was written to be fully symmetrical with respect to conver
 
 Due to the asynchronous nature of requests, the vault can only operate with certainty on the quantity that is fully known at the time of the request (`assets` for `deposit` and `shares` for `redeem`). The deposit request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the request. Likewise, the redemption request flow cannot work with a `withdraw` call.
 
-### Parameter Choices for request vs claiming
-
-Keeping track of parameters more complex than a single quantity such as `assets` or `shares` between request and claiming adds significant complexity to implementations for asynchronous vaults. Therefore, there is no `receiver` parameter in `requestDeposit` or `requestRedeem`.
-
 ### Optionality of flows and cancels
 
 Certain use cases are only asynchronous on one flow but not the other between request and redeem. A good example of an asynchronous redemption vault is a liquid staking token. The unstaking period necessitates support for asynchronous withdrawals, however, deposits can be fully synchronous.
@@ -297,6 +299,13 @@ In many cases, canceling a request may not be straightforward or even technicall
 ### Request Implementation flexibility
 
 The standard is flexible enough to support a wide range of interaction patterns for request flows. Pending requests can be handled via internal accounting, globally or on per-user levels, use ERC-20 or [ERC-721](./eip-721.md), etc.
+
+Likewise yield on redemption requests can accrue or not, and the exchange rate of any request may be fixed or variable depending on the implementation.
+
+### Not allowing short-circuiting for claims
+If claims can short circuit, this creates ambiguity for integrators and  complicates the interface with overloaded behavior on request functions.
+
+Instead there can be router contracts which atomically check for claimable amounts immediately upon request. Frontends can dynamically route requests in this way depending on the state and implementation of the vault.
 
 ### Operator function parameter on requestDeposit and requestRedeem
 
@@ -313,6 +322,10 @@ Centrifuge has been developing [an implementation](https://github.com/centrifuge
 ## Security Considerations
 
 The methods `pendingDepositRequest` and `pendingRedeemRequest` are estimates useful for display purposes, and can be outdated due to the asynchronicity.
+
+In general, asynchronicity concerns make state transitions in the vault much more complex and vulnerable to security risks. Access control on vault operations, clear documentation of state transitioning, and invariant checks should all be performed to mitigate these risks.
+
+It is worth highlighting again here that the claim functions for any asynchronous flows MUST enforce that `msg.sender == operator/owner` to prevent theft of claimable `assets` or `shares`
 
 ## Copyright
 
