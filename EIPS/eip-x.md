@@ -65,7 +65,7 @@ After submission, Requests go through Pending, Claimable, and Claimed stages. An
 | Claimable |                                  | <i>Internal request fulfillment</i><br>pendingDepositRequest[msg.sender] -= assets<br>maxDeposit[operator] += assets<br> |
 |   Claimed | deposit(assets, receiver)        |                                                  maxDeposit[msg.sender] -= assets<br>vault.balanceOf[receiver] += shares |
 
-An important vault invariant is that following a request(s), the cumulative requested quantity MUST equal `pendingDepositRequest + maxDeposit - claimed`. The previous invariant assumes there are no cancel requests, whose behavior is discussed below.
+An important vault inequality is that following a request(s), the cumulative requested quantity MUST be more than `pendingDepositRequest + maxDeposit - claimed`. The previous inequality assumes there are no cancel requests, whose behavior is discussed below.
 
 Requests MUST NOT skip or otherwise short-circuit the claim step. In other words, to initiate and claim a request, a user MUST call both request* and the corresponding claim function separately, even in the same block.
 
