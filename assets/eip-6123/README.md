@@ -2,9 +2,9 @@
 
 ## Description
 
-The reference SDC implementation can be unit tested with hardhat to understand the trade process logic.
+The reference SDC implementation can be unit tested with Hardhat to understand the trade process logic.
 
-### Compile and run tests with hardhat
+### Compile and run tests with Hardhat
 
 We provide the essential steps to compile the contracts and run the provided unit tests.
 
@@ -24,17 +24,17 @@ We provide the essential steps to compile the contracts and run the provided uni
 - `ethers`: This is a popular Ethereum client library. It allows you to interface with blockchains that implement the Ethereum API.
 - `solidity-coverage`: This library gives you coverage reports on unit tests with the help of Istanbul.
 
-### Compile and run tests with hardhat
+### Compile and run tests with Hardhat
 
-We provide the essential steps to compile the contracts and run provided unit tests
+We provide the essential steps to compile the contracts and run the provided unit tests
 Check that you have the latest version of npm and node via `npm -version` (should be better than 8.5.0) and `node -v` (should be better than 16.14.2).
 
 1. Check out project
-2. Within this folder initialise a new npm project (a basic `package.json` file be created):
+2. Within this folder, initialise a new npm project (a basic `package.json` file be created):
 ```shell
 npm i
 ```
-3. Install Hardhat as local solidity dev environment. When prompted select following option: *Create an empty hardhat.config.js*
+3. Install Hardhat as a local solidity dev environment. When prompted, select the following option: *Create an empty hardhat.config.js*
 ```shell
 npx hardhat init
 ```
@@ -56,4 +56,3 @@ require('solidity-coverage');
 7. run `npx hardhat compile`
 8. run `npx hardhat test`
 9. run `npx hardhat coverage` (optionally)
-
