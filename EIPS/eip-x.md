@@ -68,13 +68,13 @@ An important Vault inequality is that following a Request(s), the cumulative req
 
 Requests MUST NOT skip or otherwise short-circuit the Claim state. In other words, to initiate and claim a Request, a user MUST call both request* and the corresponding Claim function separately, even in the same block.
 
-For asynchronous Vaults, the exchange rate between shares and assets including fees and yield is up to the Vault implementation. In other words, pending redemption Requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
+For asynchronous Vaults, the exchange rate between `shares` and `assets` including fees and yield is up to the Vault implementation. In other words, pending redemption Requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
 
 ### Methods
 
 #### requestDeposit
 
-Locks `assets` from `msg.sender` into the Vault and submits a Request for asynchronous `deposit/mint`. This places the Request in Pending state, with a corresponding increase in `pendingDepositRequest` for the amount `assets`.
+Transfers `assets` from `msg.sender` into the Vault and submits a Request for asynchronous `deposit/mint`. This places the Request in Pending state, with a corresponding increase in `pendingDepositRequest` for the amount `assets`.
 
 When the Request is Claimable, `maxDeposit` and `maxMint` will be increased, and `deposit` or `mint` can be called by `operator` to receive `shares`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
 
@@ -104,7 +104,7 @@ MUST emit the `RequestDeposit` event.
 
 The amount of requested `assets` in pending state for the `operator` to `deposit` or `mint`.
 
-MUST NOT include any assets in Claimable state for `deposit` or `mint`.
+MUST NOT include any `assets` in Claimable state for `deposit` or `mint`.
 
 MUST NOT show any variations depending on the caller.
 
@@ -130,7 +130,7 @@ Assumes control of `shares` from `owner` and submits a Request for asynchronous 
 
 MAY support either a locking or a burning mechanism for `shares` depending on the Vault implemention. 
 
-MUST support a redeem Request flow where the `shares` control of shares is taken from `owner` directly where `msg.sender` has EIP-20 approval over the `shares` of `owner`.
+MUST support a redeem Request flow where the control of `shares` is taken from `owner` directly where `msg.sender` has EIP-20 approval over the `shares` of `owner`.
 
 When the Request is Claimable, `maxRedeem` and `maxWithdraw` will be increased, and `redeem` or `withdraw` can be called by `operator` to receive `assets`. A Request MAY transition straight to Claimable state but MUST NOT skip the Claimable state.
 
@@ -138,7 +138,7 @@ If a Vault uses a locking mechanism for `shares`, those `shares` MUST be burned 
 
 The `assets` that will be received on `redeem` or `withdraw` MAY NOT be equivalent to the value of `convertToAssets(shares)` at time of Request, as the price can change between Pending and Claimed.
 
-SHOULD check `msg.sender` can spend owner funds using allowance.
+SHOULD check `msg.sender` can spend `owner` funds using allowance.
 
 MUST revert if all of `shares` cannot be requested for `redeem` / `withdraw` (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
 
@@ -235,7 +235,7 @@ MUST be emitted when a redemption Request is submitted using the `requestRedeem`
 
 ### Symmetry and Non-inclusion of requestWithdraw and requestMint
 
-In ERC-4626, the spec was written to be fully symmetrical with respect to converting assets and shares by including deposit/withdraw and mint/redeem.
+In ERC-4626, the spec was written to be fully symmetrical with respect to converting `assets` and `shares` by including deposit/withdraw and mint/redeem.
 
 Due to the asynchronous nature of Requests, the Vault can only operate with certainty on the quantity that is fully known at the time of the Request (`assets` for `deposit` and `shares` for `redeem`). The deposit Request flow cannot work with a `mint` call, because the amount of `assets` for the requested `shares` amount may fluctuate before the fulfillment of the Request. Likewise, the redemption Request flow cannot work with a `withdraw` call.
 
