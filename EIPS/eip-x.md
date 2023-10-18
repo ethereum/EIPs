@@ -36,7 +36,7 @@ The existing definitions from [ERC-4626](./eip-4626.md) apply. In addition, this
 - Request: a function call that initiates an asynchronous deposit/redemption flow
 - Pending: the state where a Request has been made but is not yet Claimable
 - Claimable: the state where a Request is processed by the Vault enabling the user to claim corresponding `shares` (for async deposit) or `assets` (for async redeem)
-- Claimed: the state where a Request is finalized by the user and the user receives the output token (e.g. `assets` for a deposit Request)
+- Claimed: the state where a Request is finalized by the user and the user receives the output token (e.g. `shares` for a deposit Request)
 - Claim function: the corresponding Vault method to bring a Request to Claimed state (e.g. `deposit` or `mint` claims `shares` from `requestDeposit`). Lower case claim always describes the verb action of calling a Claim function.
 - operator: the account specified by the sender of the Request which has has the right to claim a given Request once it is Claimable
 - asynchronous deposit Vault: a Vault that implements asynchronous Requests for deposit flows
