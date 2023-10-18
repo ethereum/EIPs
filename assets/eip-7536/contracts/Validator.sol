@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import './Distributor.sol';
-import './interfaces/IERCXXXXValidator.sol';
+import './interfaces/IEIP7536Validator.sol';
 
 // interface IERC721 {
 //     function ownerOf(uint256 tokenId) external view returns (address owner);

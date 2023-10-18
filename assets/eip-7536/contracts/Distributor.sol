@@ -3,8 +3,8 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 
-import './interfaces/IERCXXXXDistributor.sol';
-import './interfaces/IERCXXXXValidator.sol';
+import './interfaces/IEIP7536Distributor.sol';
+import './interfaces/IEIP7536Validator.sol';
 
 import 'hardhat/console.sol';
 
