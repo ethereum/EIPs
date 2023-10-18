@@ -258,6 +258,7 @@ The standard is flexible enough to support a wide range of interaction patterns 
 Likewise yield on redemption Requests can accrue or not, and the exchange rate of any Request may be fixed or variable depending on the implementation.
 
 ### Not allowing short-circuiting for claims
+
 If claims can short circuit, this creates ambiguity for integrators and  complicates the interface with overloaded behavior on Request functions.
 
 Instead there can be router contracts which atomically check for Claimable amounts immediately upon Request. Frontends can dynamically route Requests in this way depending on the state and implementation of the Vault.
