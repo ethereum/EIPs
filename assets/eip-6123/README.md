@@ -31,7 +31,7 @@ npm test
 
 Run all tests with coverage (alternatively):
 ```shell
-npm test:coverage
+npm run coverage
 ```
 
 ### Configuration files
