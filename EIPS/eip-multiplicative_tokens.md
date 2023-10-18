@@ -2,7 +2,7 @@
 title: Multiplicative Tokens
 description: Incorporates a multiplier field to ERC-20 and ERC-1155 for fractional token values
 author: Gavin John (@Pandapip1)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/multiplicative-tokens/16149
 status: Draft
 type: Standards Track
 category: ERC
