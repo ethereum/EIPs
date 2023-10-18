@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.19;
 
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
