@@ -47,13 +47,18 @@ The existing definitions from [ERC-4626](./eip-4626.md) apply. In addition, this
 
 EIP-X Vaults MUST implement one or both of asynchronous deposit and redemption Request flows. If either flow is not implemented in a Request pattern, it MUST use the ERC-4626 standard synchronous interaction pattern. 
 
-All EIP-X asynchronous tokenized Vaults MUST implement ERC-4626, with the following overrides for Request flows:
+All EIP-X asynchronous tokenized Vaults MUST implement ERC-4626 with overrides for certain behavior described below.
 
-1. In asynchronous deposit Vaults, the `deposit` and `mint` methods do not transfer  `asset` to the Vault, because this already happened on `requestDeposit`.
-2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the Vault, because this already happened on `requestRedeem`. 
-3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
-4. In asynchronous deposit Vaults `previewDeposit` and `previewMint` MUST revert for all callers and inputs
-5. In asynchronous redemption Vaults `previewRedeem` and `previewWithdraw` MUST revert for all callers and inputs
+Asynchronous deposit Vaults MUST override the ERC-4626 specification as follows:
+
+1. The `deposit` and `mint` methods do not transfer  `asset` to the Vault, because this already happened on `requestDeposit`.
+2. `previewDeposit` and `previewMint` MUST revert for all callers and inputs.
+
+Asynchronous redeem Vaults MUST override the ERC-4626 specification as follows:
+
+1. The `redeem` and `withdraw` methods do not transfer `shares` to the Vault, because this already happened on `requestRedeem`. 
+2. The `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
+3. `previewRedeem` and `previewWithdraw` MUST revert for all callers and inputs.
 
 ### Request Lifecycle
 
