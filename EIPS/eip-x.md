@@ -53,7 +53,7 @@ All EIP-X asynchronous tokenized Vaults MUST implement ERC-4626, with the follow
 2. In asynchronous redemption Vaults, the `redeem` and `withdraw` methods do not transfer `shares` to the Vault, because this already happened on `requestRedeem`. 
 3. In asynchronous redemption Vaults, the `owner/operator` field of `redeem` and `withdraw` MUST be `msg.sender` to prevent the theft of requested redemptions by a non-owner/operator.
 4. In asynchronous deposit Vaults `previewDeposit` and `previewMint` MUST revert for all callers and inputs
-4. In asynchronous redemption Vaults `previewRedeem` and `previewWithdraw` MUST revert for all callers and inputs
+5. In asynchronous redemption Vaults `previewRedeem` and `previewWithdraw` MUST revert for all callers and inputs
 
 ### Request Lifecycle
 
