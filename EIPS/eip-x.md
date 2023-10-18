@@ -71,13 +71,6 @@ Requests MUST NOT skip or otherwise short-circuit the Claim state. In other word
 
 For asynchronous Vaults, the exchange rate between `shares` and `assets` including fees and yield is up to the Vault implementation. In other words, pending redemption Requests MAY NOT be yield bearing and MAY NOT have a fixed exchange rate.
 
-The view function relationship is summarized in the below table where the Request input amount is 1000 and pending/max view function input is the `operator`:
-
-| **State**   | **Pending View Output** | **Max View Output** |
-|-------------|-------------------------|--------------------|
-| Pending     | 1000                    | 0                  |
-| Claimable   | 0                       | 1000               |
-| Claimed     | 0                       | 0                  |
 
 ### Methods
 
