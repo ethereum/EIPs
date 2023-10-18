@@ -1,0 +1,59 @@
+---
+title: Multiplicative Tokens
+description: Incorporates a multiplier field to ERC-20 and ERC-1155 for fractional token values
+author: Gavin John (@Pandapip1)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2023-10-18
+requires: 20, 1046, 1155
+---
+
+## Abstract
+
+This EIP extends [ERC-1046](./eip-1046.md)-compatible token types (notably, [ERC-20](./eip-20.md) and [ERC-1155](./eip-1155.md) by introducing a `multiplier` field to the metadata schema, altering how user-facing balances are displayed.
+
+## Motivation
+
+Many projects necessitate the creation of various types of tokens, both fungible and non-fungible. While certain standards are ideal for this purpose, they lack support for fractional tokens. Additionally, some tokens may require built-in inflation or deflation mechanisms, or may wish to allow transfers in unconventional increments, such as `0.5`.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+The `MultiplierMetadata` interface MUST be implemented in the resolved ERC-1046 `tokenURI` of tokens that use a `multiplier`:
+
+```typescript
+interface MultiplierMetadata {
+    /**
+     * The positive multiplier for generating user-facing representation.
+     * Defaults to 1 if undefined.
+     * This is an EXACT VALUE, base 10. Beware of floating-point error!
+     **/
+    multiplier: string | undefined;
+
+    /**
+     * Decimals are no longer supported
+     **/
+    decimals: never;
+}
+```
+
+Token contracts MUST NOT have a method named `decimals` if a `multiplier` is used.
+
+## Rationale
+
+Employing strings for numerical representation offers enhanced precision when needed. The use of a multiplier instead of decimals facilitates increments other than powers of 10, and ensures seamless handling of inflation or deflation. Utilizing ERC-1046 promotes gas efficiency in the majority of cases.
+
+## Backwards Compatibility
+
+This EIP is incompatible with any method named `decimals` in ERC-1046-compatible token standards or the ERC-1046 `decimals` field.
+
+## Security Considerations
+
+Improper handling of the `multiplier` field may lead to rounding errors, potentially exploitable by malicious actors. Contracts MUST process multipliers accurately to avoid such issues. The multiplier MUST be positive (‘0’ is not positive) to avert display issues. Particularly large or small multipliers MAY pose display challenges, yet wallets SHOULD endeavor to display the full number without causing UI/UX or additional security issues.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
