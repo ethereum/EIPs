@@ -68,10 +68,10 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
     mapping(uint256 => DirectOwner) private _directOwners;
 
     // Mapping of tokenId to array of active children structs
-    mapping(uint256 => Child[]) private _activeChildren;
+    mapping(uint256 => Child[]) internal _activeChildren;
 
     // Mapping of tokenId to array of pending children structs
-    mapping(uint256 => Child[]) private _pendingChildren;
+    mapping(uint256 => Child[]) internal _pendingChildren;
 
     // Mapping of child token address to child token ID to whether they are pending or active on any token
     // We might have a first extra mapping from token ID, but since the same child cannot be nested into multiple tokens
@@ -132,7 +132,6 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         return
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
             interfaceId == type(IERC7401).interfaceId;
     }
 
@@ -156,7 +155,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         address to,
         uint256 tokenId
     ) public virtual onlyApprovedOrDirectOwner(tokenId) {
-        _transfer(from, to, tokenId);
+        _transfer(from, to, tokenId, "");
     }
 
     /**
@@ -225,7 +224,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        _transfer(from, to, tokenId);
+        _transfer(from, to, tokenId, data);
         if (!_checkOnERC721Received(from, to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
@@ -241,28 +240,30 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @param from Address of the account currently owning the given token
      * @param to Address to transfer the token to
      * @param tokenId ID of the token to transfer
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function _transfer(
         address from,
         address to,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
         if (immediateOwner != from) revert ERC721TransferFromIncorrectOwner();
         if (to == address(0)) revert ERC721TransferToTheZeroAddress();
 
         _beforeTokenTransfer(from, to, tokenId);
-        _beforeNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
+        _beforeNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
 
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, 0, to);
         _balances[to] += 1;
 
         emit Transfer(from, to, tokenId);
-        emit NestTransfer(immediateOwner, to, parentId, 0, tokenId);
+        emit NestTransfer(from, to, parentId, 0, tokenId);
 
         _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(immediateOwner, to, parentId, 0, tokenId);
+        _afterNestedTokenTransfer(from, to, parentId, 0, tokenId, data);
     }
 
     /**
@@ -301,7 +302,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             to,
             parentId,
             destinationId,
-            tokenId
+            tokenId,
+            data
         );
         _balances[from] -= 1;
         _updateOwnerAndClearApprovals(tokenId, destinationId, to);
@@ -333,11 +335,19 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
     ) private {
         IERC7401 destContract = IERC7401(to);
         destContract.addChild(destinationId, tokenId, data);
-        _afterTokenTransfer(from, to, tokenId);
-        _afterNestedTokenTransfer(from, to, parentId, destinationId, tokenId);
 
         emit Transfer(from, to, tokenId);
         emit NestTransfer(from, to, parentId, destinationId, tokenId);
+
+        _afterTokenTransfer(from, to, tokenId);
+        _afterNestedTokenTransfer(
+            from,
+            to,
+            parentId,
+            destinationId,
+            tokenId,
+            data
+        );
     }
 
     /**
@@ -383,20 +393,6 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
     ////////////////////////////////////////
 
     /**
-     * @notice Used to safely mint a token to a specified address.
-     * @dev Requirements:
-     *
-     *  - `tokenId` must not exist.
-     *  - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
-     * @dev Emits a {Transfer} event.
-     * @param to Address to which to safely mint the gven token
-     * @param tokenId ID of the token to mint to the specified address
-     */
-    function _safeMint(address to, uint256 tokenId) internal virtual {
-        _safeMint(to, tokenId, "");
-    }
-
-    /**
      * @notice Used to safely mint the token to the specified address while passing the additional data to contract
      *  recipients.
      * @param to Address to which to mint the token
@@ -408,7 +404,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         uint256 tokenId,
         bytes memory data
     ) internal virtual {
-        _mint(to, tokenId);
+        _mint(to, tokenId, data);
         if (!_checkOnERC721Received(address(0), to, tokenId, data))
             revert ERC721TransferToNonReceiverImplementer();
     }
@@ -421,17 +417,23 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  - `tokenId` must not exist.
      *  - `to` cannot be the zero address.
      * @dev Emits a {Transfer} event.
+     * @dev Emits a {NestTransfer} event.
      * @param to Address to mint the token to
      * @param tokenId ID of the token to mint
+     * @param data Additional data with no specified format, sent in call to `to`
      */
-    function _mint(address to, uint256 tokenId) internal virtual {
-        _innerMint(to, tokenId, 0);
+    function _mint(
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) internal virtual {
+        _innerMint(to, tokenId, 0, data);
 
         emit Transfer(address(0), to, tokenId);
         emit NestTransfer(address(0), to, 0, 0, tokenId);
 
         _afterTokenTransfer(address(0), to, tokenId);
-        _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId);
+        _afterNestedTokenTransfer(address(0), to, 0, 0, tokenId, data);
     }
 
     /**
@@ -452,7 +454,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         if (!IERC165(to).supportsInterface(type(IERC7401).interfaceId))
             revert MintToNonNestableImplementer();
 
-        _innerMint(to, tokenId, destinationId);
+        _innerMint(to, tokenId, destinationId, data);
         _sendToNFT(address(0), to, 0, destinationId, tokenId, data);
     }
 
@@ -466,18 +468,27 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @param to Address of the collection smart contract of the token into which to mint the child token
      * @param tokenId ID of the token to mint
      * @param destinationId ID of the token into which to mint the new token
+     * @param data Additional data with no specified format, sent in call to `to`
      */
     function _innerMint(
         address to,
         uint256 tokenId,
-        uint256 destinationId
+        uint256 destinationId,
+        bytes memory data
     ) private {
         if (to == address(0)) revert ERC721MintToTheZeroAddress();
         if (_exists(tokenId)) revert ERC721TokenAlreadyMinted();
-        if (tokenId == 0) revert IdZeroForbidden();
+        if (tokenId == uint256(0)) revert IdZeroForbidden();
 
         _beforeTokenTransfer(address(0), to, tokenId);
-        _beforeNestedTokenTransfer(address(0), to, 0, destinationId, tokenId);
+        _beforeNestedTokenTransfer(
+            address(0),
+            to,
+            0,
+            destinationId,
+            tokenId,
+            data
+        );
 
         _balances[to] += 1;
         _directOwners[tokenId] = DirectOwner({
@@ -536,6 +547,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
 
     /**
      * @notice Used to burn a given token.
+     * @dev In case the token has any child tokens, the execution will be reverted.
      * @param tokenId ID of the token to burn
      */
     function burn(uint256 tokenId) public virtual {
@@ -572,25 +584,26 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @dev Emits a {NestTransfer} event.
      * @param tokenId ID of the token to burn
      * @param maxChildrenBurns Maximum children to recursively burn
-     * @return uint256 The number of recursive burns it took to burn all of the children
+     * @return The number of recursive burns it took to burn all of the children
      */
     function _burn(
         uint256 tokenId,
         uint256 maxChildrenBurns
     ) internal virtual returns (uint256) {
         (address immediateOwner, uint256 parentId, ) = directOwnerOf(tokenId);
-        address owner = ownerOf(tokenId);
-        _balances[immediateOwner] -= 1;
+        address rootOwner = ownerOf(tokenId);
 
-        _beforeTokenTransfer(owner, address(0), tokenId);
+        _beforeTokenTransfer(immediateOwner, address(0), tokenId);
         _beforeNestedTokenTransfer(
             immediateOwner,
             address(0),
             parentId,
             0,
-            tokenId
+            tokenId,
+            ""
         );
 
+        _balances[immediateOwner] -= 1;
         _approve(address(0), tokenId);
         _cleanApprovals(tokenId);
 
@@ -598,7 +611,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
 
         delete _activeChildren[tokenId];
         delete _pendingChildren[tokenId];
-        delete _tokenApprovals[tokenId][owner];
+        delete _tokenApprovals[tokenId][rootOwner];
 
         uint256 pendingRecursiveBurns;
         uint256 totalChildBurns;
@@ -632,16 +645,18 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         // Can't remove before burning child since child will call back to get root owner
         delete _directOwners[tokenId];
 
-        _afterTokenTransfer(owner, address(0), tokenId);
+        emit Transfer(immediateOwner, address(0), tokenId);
+        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
+
+        _afterTokenTransfer(immediateOwner, address(0), tokenId);
         _afterNestedTokenTransfer(
             immediateOwner,
             address(0),
             parentId,
             0,
-            tokenId
+            tokenId,
+            ""
         );
-        emit Transfer(owner, address(0), tokenId);
-        emit NestTransfer(immediateOwner, address(0), parentId, 0, tokenId);
 
         return totalChildBurns;
     }
@@ -744,7 +759,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  - `tokenId` must exist.
      * @param spender Address that is being checked for approval
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token
+     * @return A boolean value indicating whether the `spender` is approved to manage the given token
      */
     function _isApprovedOrOwner(
         address spender,
@@ -760,7 +775,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @notice Used to check whether the account is approved to manage the token or its direct owner.
      * @param spender Address that is being checked for approval or direct ownership
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value indicating whether the `spender` is approved to manage the given token or its
+     * @return A boolean value indicating whether the `spender` is approved to manage the given token or its
      *  direct owner
      */
     function _isApprovedOrDirectOwner(
@@ -794,7 +809,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @notice Used to check whether the given token exists.
      * @dev Tokens start existing when they are minted (`_mint`) and stop existing when they are burned (`_burn`).
      * @param tokenId ID of the token being checked
-     * @return bool The boolean value signifying whether the token exists
+     * @return A boolean value signifying whether the token exists
      */
     function _exists(uint256 tokenId) internal view virtual returns (bool) {
         return _directOwners[tokenId].ownerAddress != address(0);
@@ -807,7 +822,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @param to Yarget address that will receive the tokens
      * @param tokenId ID of the token to be transferred
      * @param data Optional data to send along with the call
-     * @return bool Boolean value signifying whether the call correctly returned the expected magic value
+     * @return Boolean value signifying whether the call correctly returned the expected magic value
      */
     function _checkOnERC721Received(
         address from,
@@ -826,7 +841,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             returns (bytes4 retval) {
                 return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
-                if (reason.length == 0) {
+                if (reason.length == uint256(0)) {
                     revert ERC721TransferToNonReceiverImplementer();
                 } else {
                     /// @solidity memory-safe-assembly
@@ -872,7 +887,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             tokenId: childId
         });
 
-        _beforeAddChild(parentId, childAddress, childId);
+        _beforeAddChild(parentId, childAddress, childId, data);
 
         uint256 length = pendingChildrenOf(parentId).length;
 
@@ -885,7 +900,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         // Previous length matches the index for the new child
         emit ChildProposed(parentId, length, childAddress, childId);
 
-        _afterAddChild(parentId, childAddress, childId);
+        _afterAddChild(parentId, childAddress, childId, data);
     }
 
     /**
@@ -916,6 +931,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *
      *  - `tokenId` must exist
      *  - `index` must be in range of the pending children array
+     * @dev Emits ***ChildAccepted*** event.
      * @param parentId ID of the parent token for which the child token is being accepted
      * @param childIndex Index of a child tokem in the given parent's pending children array
      * @param childAddress Address of the collection smart contract of the child token expected to be located at the
@@ -929,9 +945,6 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         address childAddress,
         uint256 childId
     ) internal virtual {
-        if (pendingChildrenOf(parentId).length <= childIndex)
-            revert PendingChildIndexOutOfRange();
-
         Child memory child = pendingChildOf(parentId, childIndex);
         _checkExpectedChild(child, childAddress, childId);
         if (_childIsInActive[childAddress][childId] != 0)
@@ -958,7 +971,10 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  rootOwner of the previous parent.
      * @param tokenId ID of the parent token for which to reject all of the pending tokens
      */
-    function rejectAllChildren(uint256 tokenId, uint256 maxRejections) public virtual onlyApprovedOrOwner(tokenId) {
+    function rejectAllChildren(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) public virtual onlyApprovedOrOwner(tokenId) {
         _rejectAllChildren(tokenId, maxRejections);
     }
 
@@ -970,14 +986,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @dev Requirements:
      *
      *  - `tokenId` must exist
+     * @dev Emits ***AllChildrenRejected*** event.
      * @param tokenId ID of the parent token for which to reject all of the pending tokens.
-     * @param maxRejections Maximum number of expected children to reject, used to prevent from
-     *  rejecting children which arrive just before this operation.
+     * @param maxRejections Maximum number of expected children to reject, used to prevent from rejecting children which
+     *  arrive just before this operation.
      */
-    function _rejectAllChildren(uint256 tokenId, uint256 maxRejections)
-        internal
-        virtual
-    {
+    function _rejectAllChildren(
+        uint256 tokenId,
+        uint256 maxRejections
+    ) internal virtual {
         if (_pendingChildren[tokenId].length > maxRejections)
             revert UnexpectedNumberOfChildren();
 
@@ -1024,8 +1041,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
 
     /**
      * @notice Used to transfer a child token from a given parent token.
-     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of `to`
-     *  being the `0x0` address.
+     * @dev When transferring a child token, the owner of the token is set to `to`, or is not updated in the event of
+     *  `to` being the `0x0` address.
      * @dev Requirements:
      *
      *  - `tokenId` must exist.
@@ -1037,8 +1054,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  pending array)
      * @param childAddress Address of the child token's collection smart contract.
      * @param childId ID of the child token in its own collection smart contract.
-     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of the
-     *  parent token (`true`) or in the active array (`false`)
+     * @param isPending A boolean value indicating whether the child token being transferred is in the pending array of
+     *  the parent token (`true`) or in the active array (`false`)
      * @param data Additional data with no specified format, sent in call to `_to`
      */
     function _transferChild(
@@ -1064,7 +1081,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
 
         if (isPending) {
@@ -1075,7 +1093,7 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         }
 
         if (to != address(0)) {
-            if (destinationId == 0) {
+            if (destinationId == uint256(0)) {
                 IERC721(childAddress).safeTransferFrom(
                     address(this),
                     to,
@@ -1107,10 +1125,22 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             childIndex,
             childAddress,
             childId,
-            isPending
+            isPending,
+            data
         );
     }
 
+    /**
+     * @notice Used to verify that the child being accessed is the intended child.
+     * @dev The Child struct consists of the following values:
+     *  [
+     *      tokenId,
+     *      contractAddress
+     *  ]
+     * @param child A Child struct of a child being accessed
+     * @param expectedAddress The address expected to be the one of the child
+     * @param expectedId The token ID expected to be the one of the child
+     */
     function _checkExpectedChild(
         Child memory child,
         address expectedAddress,
@@ -1180,7 +1210,8 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
         uint256 parentId,
         uint256 index
     ) public view virtual returns (Child memory) {
-        if (childrenOf(parentId).length <= index) revert ChildIndexOutOfRange();
+        if (childrenOf(parentId).length <= index)
+            revert ChildIndexOutOfRange();
         Child memory child = _activeChildren[parentId][index];
         return child;
     }
@@ -1205,20 +1236,6 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
             revert PendingChildIndexOutOfRange();
         Child memory child = _pendingChildren[parentId][index];
         return child;
-    }
-
-    /**
-     * @notice Used to verify that the given child tokwn is included in an active array of a token.
-     * @param childAddress Address of the given token's collection smart contract
-     * @param childId ID of the child token being checked
-     * @return bool A boolean value signifying whether the given child token is included in an active child tokens array
-     *  of a token (`true`) or not (`false`)
-     */
-    function childIsInActive(
-        address childAddress,
-        uint256 childId
-    ) public view virtual returns (bool) {
-        return _childIsInActive[childAddress][childId] != 0;
     }
 
     // HOOKS
@@ -1269,13 +1286,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @param fromTokenId ID of the token from which the given token is being transferred
      * @param toTokenId ID of the token to which the given token is being transferred
      * @param tokenId ID of the token being transferred
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _beforeNestedTokenTransfer(
         address from,
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1286,13 +1305,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      * @param fromTokenId ID of the token from which the given token was transferred
      * @param toTokenId ID of the token to which the given token was transferred
      * @param tokenId ID of the token that was transferred
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _afterNestedTokenTransfer(
         address from,
         address to,
         uint256 fromTokenId,
         uint256 toTokenId,
-        uint256 tokenId
+        uint256 tokenId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1308,11 +1329,13 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  specified index of the given parent token's pending children array
      * @param childId ID of the child token expected to be located at the specified index of the given parent token's
      *  pending children array
+     * @param data Additional data with no specified format
      */
     function _beforeAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1328,11 +1351,13 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  specified index of the given parent token's pending children array
      * @param childId ID of the child token expected to be located at the specified index of the given parent token's
      *  pending children array
+     * @param data Additional data with no specified format
      */
     function _afterAddChild(
         uint256 tokenId,
         address childAddress,
-        uint256 childId
+        uint256 childId,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1395,13 +1420,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  token's children array
      * @param isPending A boolean value signifying whether the child token is being transferred from the pending child
      *  tokens array (`true`) or from the active child tokens array (`false`)
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _beforeTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual {}
 
     /**
@@ -1420,13 +1447,15 @@ contract NestableToken is Context, IERC165, IERC721, IERC7401 {
      *  token's children array
      * @param isPending A boolean value signifying whether the child token was transferred from the pending child tokens
      *  array (`true`) or from the active child tokens array (`false`)
+     * @param data Additional data with no specified format, sent in the addChild call
      */
     function _afterTransferChild(
         uint256 tokenId,
         uint256 childIndex,
         address childAddress,
         uint256 childId,
-        bool isPending
+        bool isPending,
+        bytes memory data
     ) internal virtual {}
 
     /**
