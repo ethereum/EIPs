@@ -37,7 +37,7 @@ def execute_block(block: Block) -> None:
 		coinbase_reward += tx.fee - refund 
 
 	# apply coinbase reward at the end of the block
-	coinbase.balance += coinbase_reward
+	coinbase(block).balance += coinbase_reward
 ```
 
 ## Rationale
