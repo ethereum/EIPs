@@ -1,6 +1,7 @@
 ---
 eip: ????
-title: "eth/69 - available-blocks-extended protocol handshake"
+title: eth/69 - available-blocks-extended protocol
+description: Adds more info in the handshake about available block range and adds message types to request block ranges and the send them
 author: Ahmad Bitar <smartprogrammer93>
 discussions-to: https://ethereum-magicians.org/t/eip-eth-69-available-blocks-extended-protocol-handshake/16188
 status: Draft
