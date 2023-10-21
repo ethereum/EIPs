@@ -37,10 +37,13 @@ This also can count as a step towards implementing [EIP-4444](./eip-4444.md).
 
 Upon connecting using `eth/69`, nodes should exchange the `Status` message. Afterwards, they can use the `RequestBlockRange` and `SendBlockRange` messages to keep informed about peer block range changes.
 
+Nodes must retain connections regardless of a peer's available block range, with an exception, if a node's peer slots are full and it lacks connections to peers with the necessary block range, it may disconnect to seek such peers.
+
 ## Rationale
 
 Including the available block range in the `eth` handshake allows for immediate understanding of peer capabilities. This can lead to more efficient networking as nodes can prioritize connections based on the data they need.
 The new message types are introduced to allow nodes to reuqest updated available block range from other nodes since the range can change by the node syncing or pruning blocks.
+Maintaining connections with peers that dont have the desired range ensures network resilience, while the exception facilitates efficient block sync under full peer capacity.
 
 ## Backwards Compatibility
 
