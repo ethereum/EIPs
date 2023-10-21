@@ -1,5 +1,5 @@
 ---
-eip: ????
+eip: <to be assigned>
 title: eth/69 - available-blocks-extended protocol
 description: Adds more info in the handshake about available block range and adds message types to request block ranges and the send them
 author: Ahmad Bitar (@smartprogrammer93) <smartprogrammer@windowslive.com>
