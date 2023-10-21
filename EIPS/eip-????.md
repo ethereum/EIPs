@@ -1,0 +1,60 @@
+---
+eip: ????
+title: "eth/69: available-blocks-extended protocol handshake"
+author: Ahmad Bitar <smartprogrammer@windowslive.com>
+discussions-to: <Url>
+status: Draft
+type: Standards Track
+category: Networking
+created: 2023-10-21
+requires: 5793
+---
+## Abstract
+
+The purpose of this EIP is to introduce a method that allows an Ethereum node to communicate the range of blocks it has available. By knowing the block range a node can serve, peers can make more informed decisions when choosing whom to connect to, especially when looking for specific block ranges. This can lead to more efficient network behavior.
+
+This EIP proposes extending the Ethereum wire protocol (`eth`) handshake, introducing a new version, `eth/69`, which will contain information regarding the block range a node can serve. Furthermore, it extends the protocol with 2 new message types to share the updated block ranges when requested.
+
+## Motivation
+
+There are scenarios where nodes might be interested in specific block ranges, such as when syncing historical data or analyzing past transactions. Currently, nodes need to connect to peers and request specific blocks to determine if a peer has the required data. This can be inefficient, leading to unnecessary data requests and wasting both bandwidth and time.
+
+This also can count as a step towards implementing EIP-4444.
+
+## Specification
+
+- Advertise a new `eth` protocol capability (version) at `eth/69`.
+  - The old `eth/68` protocol should still be kept alive side-by-side, until `eth/69` is sufficiently adopted by implementors.
+- Modify the `Status (0x00)` message for `eth/69` to add an additional `blockRange` field right after the `forkid`:
+  - Current packet for `eth/64`: `[protocolVersion, networkId, td, bestHash, genesisHash, forkid]`
+  - New packet for `eth/69`: `[protocolVersion, networkId, td, bestHash, genesisHash, forkid, blockRange]`,
+  where `blockRange` is `[startBlock: uint64, endBlock: uint64]`.
+
+- Introduce two new message types:
+  - `RequestBlockRange (0x0b)` - A message from a node to request the current block range of a peer.
+  - `SendBlockRange (0x0c): [startBlock: uint64, endBlock: uint64]` - The response to `RequestBlockRange`, informing the requesting node of the current available block range of the peer.
+
+Upon connecting using `eth/69`, nodes should exchange the `Status` message. Afterwards, they can use the `RequestBlockRange` and `SendBlockRange` messages to keep informed about peer block range changes.
+
+## Rationale
+
+Including the available block range in the `eth` handshake allows for immediate understanding of peer capabilities. This can lead to more efficient networking as nodes can prioritize connections based on the data they need.
+The new message types are introduced to allow nodes to reuqest updated available block range from other nodes since the range can change by the node syncing or pruning blocks.
+
+## Backwards Compatibility
+
+This EIP extends the `eth` protocol handshake in a backwards incompatible manner and proposes the introduction of a new version, `eth/69`. However, `devp2p` allows for multiple versions of the same wire protocol to run concurrently. Hence, nodes that have not been updated can continue using older versions like `eth/68` or `eth/67`.
+
+This EIP doesn't affect the consensus engine and doesn't necessitate a hard fork.
+
+## Test Cases
+
+Testing will involve ensuring that nodes can correctly communicate and understand the block range information during the handshake. Additionally, it will involve ensuring nodes can correcly request and share updated block range when requested.
+
+## Implementation
+
+Implementations will be provided once the draft is accepted and initial discussions have concluded.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
