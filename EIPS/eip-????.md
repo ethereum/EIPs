@@ -1,8 +1,8 @@
 ---
 eip: ????
-title: "eth/69: available-blocks-extended protocol handshake"
-author: Ahmad Bitar <smartprogrammer@windowslive.com>
-discussions-to: <Url>
+title: "eth/69 - available-blocks-extended protocol handshake"
+author: Ahmad Bitar <smartprogrammer93>
+discussions-to: https://ethereum-magicians.org/t/eip-eth-69-available-blocks-extended-protocol-handshake/16188
 status: Draft
 type: Standards Track
 category: Networking
@@ -19,7 +19,7 @@ This EIP proposes extending the Ethereum wire protocol (`eth`) handshake, introd
 
 There are scenarios where nodes might be interested in specific block ranges, such as when syncing historical data or analyzing past transactions. Currently, nodes need to connect to peers and request specific blocks to determine if a peer has the required data. This can be inefficient, leading to unnecessary data requests and wasting both bandwidth and time.
 
-This also can count as a step towards implementing EIP-4444.
+This also can count as a step towards implementing [EIP-4444](./eip-4444.md).
 
 ## Specification
 
@@ -57,4 +57,4 @@ Implementations will be provided once the draft is accepted and initial discussi
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+Copyright and related rights waived via [CC0](../LICENSE.md).
