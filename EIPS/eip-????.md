@@ -47,6 +47,10 @@ This EIP extends the `eth` protocol handshake in a backwards incompatible manner
 
 This EIP doesn't affect the consensus engine and doesn't necessitate a hard fork.
 
+## Security Considerations
+
+None
+
 ## Test Cases
 
 Testing will involve ensuring that nodes can correctly communicate and understand the block range information during the handshake. Additionally, it will involve ensuring nodes can correcly request and share updated block range when requested.
