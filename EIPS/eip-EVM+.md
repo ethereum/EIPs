@@ -12,7 +12,7 @@ created: 2023-10-22
 
 ## Abstract
 
-This EIP adds *decimal fixed* OPCODEs for arithmetic (DECADD, DECNEG, DECMUL, DECINV) and expression of all elementary functions (DECEXP, DECLN, DECSIN). All decimal values upto the maximal precision allowed by a int256 coefficient and exponent are represented exactly, as c*10^q. All implemented algorithms converge for all inputs given enough precision, as chosen by the user. All calculations are deterministic and gas is embedded bottom-up. Allowing high precision decimal elementary functions invites the worlds of mathematical finance, machine learning, science, digital art, games and others to Ethereum.
+This EIP adds *decimal fixed* OPCODEs for arithmetic (DECADD, DECNEG, DECMUL, DECINV) and expression of all elementary functions (DECEXP, DECLN, DECSIN). All decimal values upto the maximal precision allowed by a int256 coefficient and exponent are represented exactly, as c*10^q. All implemented algorithms converge for all inputs given enough precision, as chosen by the user. All calculations are deterministic and gas is embedded bottom-up. Allowing high precision decimal elementary functions invites the worlds of mathematical finance, machine learning, science, digital art, games and others to Ethereum. The implementation is functional.
 
 ## Motivation
 
