@@ -41,6 +41,33 @@ The EVM is a virtual machine and thereby not restricted by hardware. Usually, as
 
 ## Specification
 
+### Decimal
+
+A decimal is defined as
+
+c * 10^q
+
+where c and q are int256.
+
+Notationwise:
+a = ac * 10^aq
+b = bc * 10^bq
+etc.
+
+### OPCODE defs
+
+0xd0 DECADD a+b -> c    : (ac, aq, bc, bq, precision) -> (cc, cq)
+0xd1 DECNEG  -a -> b    : (ac, aq) -> (bc, bq)
+0xd2 DECMUL a*b -> c    : (ac, aq, bc, bq, precision) -> (cc, cq)
+0xd3 DECINV 1/a -> b    : (ac, aq, precision) -> (bc, bq)
+0xd4 DECEXP exp(a) -> b : (ac, aq, precision, steps) -> (bc, bq)
+0xd5 DECLN   ln(a) -> b : (ac, aq, precision, steps) -> (bc, bq)
+0xd6 DECSIN sin(a) -> b : (ac, aq, precision, steps) -> (bc, bq)
+
+precision is the # of digits kept during all calculations. steps for DECEXP and DECSIN are the # of Taylor expansion steps. steps for DECLN is the depth of the continued fractions expansion.
+
+### Why these functions?
+
 The proposed functions (+,-,*,/,exp,ln,sin) form a small set that combined enable all calculation of all elementary functions, which includes the sets of sums, products, roots and compositions of finitely many polynomial, rational, trigonometric, hyperbolic, and exponential functions, including their inverse functions.
 
 a^b = exp(b * ln(a)) gives us powers and polynomials.
@@ -56,7 +83,13 @@ For the same reason, we have DECINV instead of DECDIV.
 DECSUB(a,b) = DECADD(a,DECNEG(b))
 DECDIV(a,b) = DECMUL(a,DECINV(b))
 
-### 
+### DECEXP, DECSIN via Taylor series
+
+The Taylor series of exp and sin converge everywhere and fast. The error falls as fast as the factorial of steps.
+
+### DECLN via continued fractions
+
+Ln converges fast using continued fractions within the interval ]0,2]. The implementation scales the input into this interval and scales the result back correctly.
 
 ### math/big
 
