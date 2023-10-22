@@ -141,11 +141,11 @@ No backward compatibility issues found.
 
 ## Reference Implementation
 
-The following is a view of the complete and functional implementation:
+The following is a view of the complete and functional implementation in golang:
 https://github.com/ethereum/go-ethereum/compare/master...1m1-github:go-ethereum-plus:main
 The main file is: core/vm/decimal_fixed.go
 
-I see that external links are not allowed, I hope github is internal, as I else do not know how to show it inline.
+If the community likes this EIP by trying it out using the above implementation, I could then formalize the "Reference Implementation" abstractly for other clients to follow.
 
 ## Security Considerations
 
