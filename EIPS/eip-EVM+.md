@@ -12,9 +12,22 @@ created: 2023-10-22
 
 ## Abstract
 
-This EIP adds *decimal fixed* OPCODEs for arithmetic (DECADD, DECNEG, DECMUL, DECINV) and expression of all elementary functions (DECEXP, DECLN, DECSIN). All decimal values upto the maximal precision allowed by a int256 coefficient and exponent are represented exactly, as c*10^q. All implemented algorithms converge for all inputs given enough precision, as chosen by the user. All calculations are deterministic and gas is embedded bottom-up.
+This EIP adds *decimal fixed* OPCODEs for arithmetic (DECADD, DECNEG, DECMUL, DECINV) and expression of all elementary functions (DECEXP, DECLN, DECSIN). All decimal values upto the maximal precision allowed by a int256 coefficient and exponent are represented exactly, as c*10^q. All implemented algorithms converge for all inputs given enough precision, as chosen by the user. All calculations are deterministic and gas is embedded bottom-up. Allowing high precision decimal elementary functions invites the worlds of mathematical finance, machine learning, science, digital art, games and others to Ethereum.
 
 ## Motivation
+
+Currently, to take a power, a^b, of non integer values, requires vast amounts of Solidity code.
+The simplest task in trading e.g. is to convert volatilities from yearly to daily, which involves taking the 16th root.
+
+Giving users/devs the same ability that scientific calculators have allows for the creation of apps with higher complexity.
+
+### Why decimal?
+A simple value like 0.1 cannot be represented finitely in binary. Decimal types are much closer to the vast majority of numerical calculations run by humans.
+
+### eVm
+
+The EVM is a virtual machine and thereby not restricted by hardware. Usually, assembly languages provide OPCODES that are mimic the ability of hardware. In a virtual machine, we have no such limitations and nothing stops us from adding more complex OPCODEs, as long as fair gas is provided. At the same time, we do not want to clutter the OPCODEs library. EXP, LN and SIN are universal functions that open the path to: powers, trigonometry, integrals, differential equations, machine learning, digital art, etc.
+
 
 <!--
   This section is optional.
@@ -28,6 +41,35 @@ This EIP adds *decimal fixed* OPCODEs for arithmetic (DECADD, DECNEG, DECMUL, DE
 
 ## Specification
 
+The proposed functions (+,-,*,/,exp,ln,sin) form a small set that combined enable all calculation of all elementary functions, which includes the sets of sums, products, roots and compositions of finitely many polynomial, rational, trigonometric, hyperbolic, and exponential functions, including their inverse functions.
+
+a^b = exp(b * ln(a)) gives us powers and polynomials.
+cos(a) = sin(tau/4-a), tan(a)=sin(a)/cos(a), etc., gives us all of trigonometry.
+
+together with arithmetic, we get all elementary functions.
+
+### DECNEG instead of DECSUB
+
+Negation is a more general operation vs subtraction. OPCODEs should be as fundamental as possible and as complex as desirable.
+For the same reason, we have DECINV instead of DECDIV.
+
+DECSUB(a,b) = DECADD(a,DECNEG(b))
+DECDIV(a,b) = DECMUL(a,DECINV(b))
+
+### 
+
+### math/big
+
+The implementation allows arbitrary precision, in theory. In practice, resources are always finite.
+
+The implementation uses the same lib as used for the stack (uint256).
+Using math/big would allow for arbitrary[*] intermediate precision. That version is also functional, on another branch.
+Even tho using math/big, input and output values have to fit into the stack.
+Using uint256 is much faster, natural for the stack and still allows for far more precision that most applications need.
+
+
+
+
 <!--
   The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
 
@@ -40,64 +82,41 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+### gas
 
-  The current placeholder is acceptable for a draft.
+all the above OPCODEs are deterministic, hence the gas cost can be determined. at the same time, the calculations are complex and depend on the input.
 
-  TODO: Remove this comment before submitting
--->
+it is crucial to have accurate gas costs to avoid energy attacks on nodes.
 
-TBD
+to this end, i have wrapped the underlying uint256 lib with gas accumulation (https://github.com/1m1-github/go-ethereum-plus/blob/main/core/vm/uint256_wrapped.go). this gives a bottom-up approach to calculating gas, by running the OPCODE.
+
+because the EVM interprator expects the gas cost before actually running the OPCODE, we are running the OPCODE twice. the first run, identical to the second, is to get the bottom-up gas cost, which is then doubled to account for the actual run plus the gas calculation. on top, we add a fixed emulation cost.
+
+this gives an embedded gas calcuation, which works well for complex OPCODEs (see gasEVMPlusEmulate in https://github.com/1m1-github/go-ethereum-plus/blob/main/core/vm/gas_table.go).
+
+to remove the double gas, a future EIP would suggest the following: allow contract code to run whilst accumulating gas (at runtime) and panicking in case of limit breach, without requiring the cost in advance. this only works for contract code that is local, defined as code that only depends on the user input and the inner bytecode of the contract. local contracts cannot use state from the chain, nor make calls to other contracts. pure mathematical functions would e.g. be local contracts. local contracts are fully deterministic given the input, allowing a user to estimate gas costs offline (cheaper) and the EVM to panic at runtime, without knowing gas in advance.
+
+since the costs depend on the input, a fuzzing would give us close to the worst cases (TODO).
 
 ## Backwards Compatibility
-
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
 
 No backward compatibility issues found.
 
 ## Test Cases
 
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
+../assets/eip-EVM+/decimal_fixed_test.go
 
 ## Reference Implementation
 
-<!--
-  This section is optional.
+The following is a view of the complete and functional implementation:
+https://github.com/ethereum/go-ethereum/compare/master...1m1-github:go-ethereum-plus:main
 
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
+I see that external links are not allowed, I hope github is internal, as I else do not know how to show it inline.
 
-  TODO: Remove this comment before submitting
--->
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-Needs discussion.
+There are no security considerations, as long as numerical correctness is guaranteed and gas is collected fairly.
 
 ## Copyright
 
