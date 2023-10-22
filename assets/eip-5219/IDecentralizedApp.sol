@@ -13,5 +13,5 @@ interface IDecentralizedApp {
     /// @return statusCode          The HTTP status code (e.g. 200)
     /// @return body                The body of the response
     /// @return headers             A list of header names (e.g. [{ key: "Content-Type", value: "application/json" }])
-    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint8 statusCode, string memory body, KeyValue[] headers);
+    function request(string[] memory resource, KeyValue[] memory params) external view returns (uint16 statusCode, string memory body, KeyValue[] headers);
 }

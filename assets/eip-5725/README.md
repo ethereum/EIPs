@@ -1,5 +1,5 @@
 # EIP-5725: Transferrable Vesting NFT - Reference Implementation
-This repository serves as a reference implementation for **EIP-5725 Transferrable Vesting NFT Standard**. A Non-Fungible Token (NFT) standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve.
+This repository serves as a reference implementation for **EIP-5725 Transferrable Vesting NFT Standard**. A Non-Fungible Token (NFT) standard used to vest ERC-20 tokens over a vesting release curve.
 
 ## Contents
 - [EIP-5725 Specification](./contracts/IERC5725.sol): Interface and definitions for the EIP-5725 specification.
