@@ -1,7 +1,7 @@
 ---
 eip: 7543
-title: EVM+
-description: Decimal math in the EVM
+title: EVM+: Decimal math in the EVM
+description: OPCODEs to allow high precision decimal calculation of all elementary functions.
 author: 1m1 (@1m1-github)
 discussions-to: https://ethereum-magicians.org/t/decimal-math-on-evm/16194
 status: Draft
