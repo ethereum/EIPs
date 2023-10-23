@@ -1,4 +1,5 @@
 ---
+eip: 7543
 title: EVM+
 description: Decimal math in the EVM
 author: 1m1 (@1m1-github)
