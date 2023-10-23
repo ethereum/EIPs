@@ -49,15 +49,8 @@ object "Neuron" {
                 mstore(0, yc)
                 mstore(32, yq)
 
-                //debug
-                // sstore(12, num_inputs)
-                // sstore(13, precision)
-                // sstore(14, steps)
-                // sstore(15, yc)
-                // sstore(16, yq)
                 log0(0, 32) // yc
                 log0(32, 32) // yq
-                //debug
 
                 return(0, 64)
             }
@@ -73,15 +66,7 @@ object "Neuron" {
 
             function neuron(num_inputs, precision, steps) -> yc, yq {
                 let xc, xq := weighted_sum(num_inputs, precision, steps)
-                yc, yq := sigmoid(xc, xq, precision, steps)
-
-                //debug
-                // sstore(15, xc)
-                // sstore(16, xq)
-                // sstore(17, yc)
-                // sstore(18, yq)
-                //debug
-                
+                yc, yq := sigmoid(xc, xq, precision, steps)                
             }
 
             function weighted_sum(num_inputs, precision, steps) -> total_c, total_q {
@@ -103,19 +88,6 @@ object "Neuron" {
                     let product_c, product_q := dec_mul(weight_c, weight_q, input_c, input_q, precision)
 
                     total_c, total_q := dec_add(total_c, total_q, product_c, product_q, precision)
-
-                    //debug
-                    // sstore(add(mul(i,10),30), index_address)
-                    // sstore(add(mul(i,10),31), memory_address)
-                    // sstore(add(mul(i,10),32), input_c)
-                    // sstore(add(mul(i,10),33), input_q)
-                    // sstore(add(mul(i,10),34), weight_c)
-                    // sstore(add(mul(i,10),35), weight_q)
-                    // sstore(add(mul(i,10),36), product_c)
-                    // sstore(add(mul(i,10),37), product_q)
-                    // sstore(add(mul(i,10),38), total_c)
-                    // sstore(add(mul(i,10),39), total_q)
-                    //debug
                 }
             }
 
@@ -198,172 +170,3 @@ object "Neuron" {
         }
     }
 }
-
-
-// // BlackScholes
-// // S: underlying price
-// // K: strike
-// // r: interest
-// // s: volatility
-// // T: time
-
-// function r_s2_T() {
-//     let precision := mload(320)
-
-//     let sc := mload(192)
-//     let sq := mload(224)
-//     let s_sqr_c, s_sqr_q := dec_sqr(sc, sq, precision)
-
-//     let sigma_sqr_half_c, sigma_sqr_half_q := dec_div(s_sqr_c, s_sqr_q, 2, 0, precision)
-    
-//     let rc := mload(128)
-//     let rq := mload(160)
-//     let r_p_s_c, r_p_s_q := dec_add(sigma_sqr_half_c, sigma_sqr_half_q, rc, rq, precision)
-
-//     let Tc := mload(256)
-//     let Tq := mload(288)
-//     let r_s2_T_c, r_s2_T_q := dec_mul(r_p_s_c, r_p_s_q, Tc, Tq, precision)
-
-//     mstore(384, r_s2_T_c)
-//     mstore(416, r_s2_T_q)
-// }
-
-// function ln_S_K() {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     let Sc := mload(0)
-//     let Sq := mload(32)
-//     let Kc := mload(64)
-//     let Kq := mload(96)
-//     let S_K_c, S_K_q := dec_div(Sc, Sq, Kc, Kq, precision)
-//     let ln_S_K_c, ln_S_K_q := dec_ln(S_K_c, S_K_q, precision, steps)
-
-//     mstore(448, ln_S_K_c)
-//     mstore(480, ln_S_K_q)
-// }
-// function d_plus_s_T() {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     let sc := mload(192)
-//     let sq := mload(224)
-//     let Tc := mload(256)
-//     let Tq := mload(288)
-//     let sqrt_T_c, sqrt_T_q := dec_sqrt(Tc, Tq, precision, steps)
-//     let s_sqrt_T_c, s_sqrt_T_q := dec_mul(sc, sq, sqrt_T_c, sqrt_T_q, precision)
-
-//     mstore(384, s_sqrt_T_c)
-//     mstore(416, s_sqrt_T_q)
-// }
-// function d_plus() {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     r_s2_T()
-//     let r_s2_T_c := mload(384)
-//     let r_s2_T_q := mload(416)
-//     ln_S_K()
-//     let ln_S_K_c := mload(448)
-//     let ln_S_K_q := mload(480)
-//     let ln_S_K_p_r_s2_T_c, ln_S_K_p_r_s2_T_q := dec_add(ln_S_K_c,ln_S_K_q, r_s2_T_c, r_s2_T_q, precision)
-    
-//     d_plus_s_T()
-//     let s_sqrt_T_c := mload(384)
-//     let s_sqrt_T_q := mload(416)
-
-//     let d_plus_c, d_plus_q := dec_div(ln_S_K_p_r_s2_T_c, ln_S_K_p_r_s2_T_q, s_sqrt_T_c, s_sqrt_T_q, precision)
-    
-//     mstore(448, d_plus_c)
-//     mstore(480, d_plus_q)
-// }
-// function d_minus() {
-//     let precision := mload(320)
-
-//     let d_plus_c := mload(448)
-//     let d_plus_q := mload(480)
-//     let s_sqrt_T_c := mload(384)
-//     let s_sqrt_T_q := mload(416)
-//     let d_minus_c, d_minus_q := dec_sub(d_plus_c, d_plus_q, s_sqrt_T_c, s_sqrt_T_q, precision)
-    
-//     mstore(384, d_minus_c)
-//     mstore(416, d_minus_q)
-// }
-// // approximation
-// // 1/(1+dec_exp(-1.65451*a))
-// function CDF(ac, aq) -> bc, bq {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     let C := 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd79b5 // -165451
-//     let MINUS_FIVE := 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffb // -5
-
-//     let b1_c, b1_q := dec_mul(C, MINUS_FIVE, ac, aq, precision)
-//     let b2_c, b2_q := dec_exp(b1_c, b1_q, precision, steps)
-//     let b3_c, b3_q := dec_add(b2_c, b2_q, 1, 0, precision)
-//     bc, bq := dec_inv(b3_c, b3_q, precision)
-// }
-// function cdf_dp_S() {
-//     let precision := mload(320)
-    
-//     let d_plus_c := mload(448)
-//     let d_plus_q := mload(480)
-//     let cdf_dp_c, cdf_dp_q := CDF(d_plus_c, d_plus_q)
-    
-//     let Sc := mload(0)
-//     let Sq := mload(32)
-//     let cdf_dp_S_c, cdf_dp_S_q := dec_mul(Sc, Sq, cdf_dp_c, cdf_dp_q, precision)
-
-//     mstore(448, cdf_dp_S_c)
-//     mstore(480, cdf_dp_S_q)
-// }
-// function cdf_dm_K_exp_r_T() {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     let rc := mload(128)
-//     let rq := mload(160)
-//     let r_n_c, r_n_q := dec_neg(rc, rq)
-//     let Tc := mload(256)
-//     let Tq := mload(288)
-//     let r_T_c, r_T_q := dec_mul(r_n_c, r_n_q, Tc, Tq, precision)
-//     let exp_r_T_c, exp_r_T_q := dec_exp(r_T_c, r_T_q, precision, steps)
-//     let Kc := mload(64)
-//     let Kq := mload(96)
-//     let K_exp_r_T_c, K_exp_r_T_q := dec_mul(Kc, Kq, exp_r_T_c, exp_r_T_q, precision)
-
-//     mstore(384, K_exp_r_T_c)
-//     mstore(416, K_exp_r_T_q)
-// }
-// function cdf_dm_K() {
-//     let precision := mload(320)
-//     let steps := mload(352)
-
-//     let d_minus_c := mload(384)
-//     let d_minus_q := mload(416)
-    
-//     cdf_dm_K_exp_r_T()
-//     let K_exp_r_T_c := mload(384)
-//     let K_exp_r_T_q := mload(416)
-
-//     let cdf_dm_c, cdf_dm_q := CDF(d_minus_c, d_minus_q)
-//     let cdf_dm_K_c, cdf_dm_K_q := dec_mul(cdf_dm_c, cdf_dm_q, K_exp_r_T_c, K_exp_r_T_q, precision)
-    
-//     mstore(384, cdf_dm_K_c)
-//     mstore(416, cdf_dm_K_q)
-// }
-// function callprice() -> ac, aq {
-//     let precision := mload(320)
-    
-//     d_plus()
-//     d_minus()
-//     cdf_dp_S()
-//     cdf_dm_K()
-
-//     let cdf_dm_K_c := mload(384)
-//     let cdf_dm_K_q := mload(416)
-//     let cdf_dp_S_c := mload(448)
-//     let cdf_dp_S_q := mload(480)
-
-//     ac, aq := dec_sub(cdf_dp_S_c, cdf_dp_S_q, cdf_dm_K_c, cdf_dm_K_q, precision)
-// }
