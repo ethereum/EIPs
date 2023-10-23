@@ -121,11 +121,11 @@ all the above OPCODEs are deterministic, hence the gas cost can be determined. a
 
 it is crucial to have accurate gas costs to avoid energy attacks on nodes.
 
-to this end, i have wrapped the underlying uint256 lib with gas accumulation (https://github.com/1m1-github/go-ethereum-plus/blob/main/core/vm/uint256_wrapped.go). this gives a bottom-up approach to calculating gas, by running the OPCODE.
+to this end, i have wrapped the underlying uint256 lib with gas accumulation, as found in the reference implementation in ../assets/eip-EVM+/uint256_wrapped.go. this gives a bottom-up approach to calculating gas, by running the OPCODE.
 
 because the EVM interprator expects the gas cost before actually running the OPCODE, we are running the OPCODE twice. the first run, identical to the second, is to get the bottom-up gas cost, which is then doubled to account for the actual run plus the gas calculation. on top, we add a fixed emulation cost.
 
-this gives an embedded gas calcuation, which works well for complex OPCODEs (see gasEVMPlusEmulate in https://github.com/1m1-github/go-ethereum-plus/blob/main/core/vm/gas_table.go).
+this gives an embedded gas calcuation, which works well for complex OPCODEs (see gasEVMPlusEmulate in ../assets/eip-EVM+/gasEVMPlusEmulate.go).
 
 to remove the double gas, a future EIP would suggest the following: allow contract code to run whilst accumulating gas (at runtime) and panicking in case of limit breach, without requiring the cost in advance. this only works for contract code that is local, defined as code that only depends on the user input and the inner bytecode of the contract. local contracts cannot use state from the chain, nor make calls to other contracts. pure mathematical functions would e.g. be local contracts. local contracts are fully deterministic given the input, allowing a user to estimate gas costs offline (cheaper) and the EVM to panic at runtime, without knowing gas in advance.
 
@@ -141,11 +141,7 @@ No backward compatibility issues found.
 
 ## Reference Implementation
 
-The following is a view of the complete and functional implementation in golang:
-https://github.com/ethereum/go-ethereum/compare/master...1m1-github:go-ethereum-plus:main
-The main file is: core/vm/decimal_fixed.go
-
-If the community likes this EIP by trying it out using the above implementation, I could then formalize the "Reference Implementation" abstractly for other clients to follow.
+The reference implementation is found in ../assets/eip-EVM+/decimal_fixed.go
 
 ## Security Considerations
 
