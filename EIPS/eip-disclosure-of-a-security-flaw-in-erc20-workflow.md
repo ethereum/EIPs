@@ -1,6 +1,6 @@
 ---
 eip: ?
-title: Disclosure of a security flaw in ERC-20 transferring workflow
+title: Security flaw disclosure in ERC-20 workflow
 description: Disclosure of a security flaw in ERC-20 transferring method that caused a loss of $201,690,741 as of 17.08.2023.
 author: Dexaran (@Dexaran) <dexaran@ethereumclassic.org>, Vladimir Vencálek <vladimir@callisto.network>, Yuriy Kharytoshin (@yuriy77k) <yuriy@callisto.network>, Laurent Riche (@spatialiste) <tonton@callisto.network>
 discussions-to: https://ethereum-magicians.org/t/disclosure-of-a-security-flaw-in-erc-20-transferring-workflow/16249
