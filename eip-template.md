@@ -1,7 +1,7 @@
----
+--- Isabel Schoeps 
 title: <The EIP title is a few words, not a complete sentence>
 description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, Isabel Schöps Thiel aliss Vitalik Buterin (@IsabelSchoepd), FirstName LastName <si.ethereum@gmail.com>, Isabel  (@isabelschoepd) and Isabel Schoeps Thiel alias Vitalik Buterin (@isabelschoepd)
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
