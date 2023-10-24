@@ -4,13 +4,13 @@ title: Disclosure of a security flaw in ERC-20 transferring workflow
 status: Draft
 type: Informational
 author: Dexaran (@Dexaran) <dexaran@ethereumclassic.org>, Vladimir Vencálek <vladimir@callisto.network>, Yuriy Kharytoshin (@yuriy77k) <yuriy@callisto.network>, Laurent Riche (@spatialiste) <tonton@callisto.network>
-discussions-to: https://ethereum-magicians.org/t/erc-223-token-standard/12894
+discussions-to: https://ethereum-magicians.org/t/disclosure-of-a-security-flaw-in-erc-20-transferring-workflow/16249
 created: 2023-10-24
 ---
 
 ## Abstract
 
-The following describes a security flaw in the transferring workflow of [ERC-20](./eip-20.md) token standard. It must be taken into account that all token standards that declare full backwards compatibility with [ERC-20](./eip-20.md) also inherit this security flaw, for example [ERC-1363](./eip-1363.md].
+The following describes a security flaw in the transferring workflow of [ERC-20](./eip-20.md) token standard. It must be taken into account that all token standards that declare full backwards compatibility with [ERC-20](./eip-20.md) also inherit this security flaw, for example [ERC-1363](./eip-1363.md).
 
 ## Motivation
 
