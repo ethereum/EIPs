@@ -3,10 +3,10 @@ from ssz_types import *
 
 def recover_legacy_transaction(tx: SignedTransaction,
                                chain_id: ChainId) -> LegacySignedTransaction:
-    assert tx.signature.type_ == TRANSACTION_TYPE_LEGACY or tx.signature.type_ is None
+    assert tx.payload.type_ == TRANSACTION_TYPE_LEGACY or tx.payload.type_ is None
 
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
-    if tx.signature.type_ == TRANSACTION_TYPE_LEGACY:  # EIP-155
+    if tx.payload.type_ == TRANSACTION_TYPE_LEGACY:  # EIP-155
         v = uint256(1 if y_parity else 0) + 35 + chain_id * 2
     else:
         v = uint256(1 if y_parity else 0) + 27
@@ -25,7 +25,7 @@ def recover_legacy_transaction(tx: SignedTransaction,
 
 def recover_eip2930_transaction(tx: SignedTransaction,
                                 chain_id: ChainId) -> Eip2930SignedTransaction:
-    assert tx.signature.type_ == TRANSACTION_TYPE_EIP2930
+    assert tx.payload.type_ == TRANSACTION_TYPE_EIP2930
 
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
@@ -48,7 +48,7 @@ def recover_eip2930_transaction(tx: SignedTransaction,
 
 def recover_eip1559_transaction(tx: SignedTransaction,
                                 chain_id: ChainId) -> Eip1559SignedTransaction:
-    assert tx.signature.type_ == TRANSACTION_TYPE_EIP1559
+    assert tx.payload.type_ == TRANSACTION_TYPE_EIP1559
 
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
@@ -72,7 +72,7 @@ def recover_eip1559_transaction(tx: SignedTransaction,
 
 def recover_eip4844_transaction(tx: SignedTransaction,
                                 chain_id: ChainId) -> Eip4844SignedTransaction:
-    assert tx.signature.type_ == TRANSACTION_TYPE_EIP4844
+    assert tx.payload.type_ == TRANSACTION_TYPE_EIP4844
 
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
@@ -98,7 +98,7 @@ def recover_eip4844_transaction(tx: SignedTransaction,
 
 def compute_sig_hash(tx: SignedTransaction,
                      chain_id: ChainId) -> Hash32:
-    type_ = tx.signature.type_
+    type_ = tx.payload.type_
 
     if type_ == TRANSACTION_TYPE_SSZ:
         return compute_ssz_sig_hash(tx.payload, chain_id)
@@ -123,7 +123,7 @@ def compute_sig_hash(tx: SignedTransaction,
 
 def compute_tx_hash(tx: SignedTransaction,
                     chain_id: ChainId) -> Hash32:
-    type_ = tx.signature.type_
+    type_ = tx.payload.type_
 
     if type_ == TRANSACTION_TYPE_SSZ:
         return compute_ssz_tx_hash(tx.payload, chain_id)
