@@ -7,7 +7,7 @@ discussions-to: https://ethereum-magicians.org/t/disclosure-of-a-security-flaw-i
 status: Draft
 type: Informational
 created: 2023-10-24
-requires: [ERC-20](./eip-20.md), [ERC-1363](./eip-1363.md)
+requires: 20, 1363
 ---
 
 ## Abstract
