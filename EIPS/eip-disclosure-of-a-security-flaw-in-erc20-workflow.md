@@ -14,10 +14,6 @@ requires: 20, 1363
 
 The following describes a security flaw in the transferring workflow of [ERC-20](./eip-20.md) token standard. It must be taken into account that all token standards that declare full backwards compatibility with [ERC-20](./eip-20.md) also inherit this security flaw, for example [ERC-1363](./eip-1363.md).
 
-## Rationale
-
-Security flaw disclosures are an important part of software development. Increasing awareness of the problem helps the development community to implement solutions and minimize the damage that a particular flaw can deal to the users.
-
 ## Specification
 
 ### [ERC-20](./eip-20.md) design overview
@@ -34,10 +30,14 @@ Security flaw disclosures are an important part of software development. Increas
 
 As of 17.08.2023 $201,690,741 worth of [ERC-20](./eip-20.md) tokens were lost in top 50 (measured by transactions count) token contracts due to the described problem of the standard.
 
+## Rationale
+
+Security flaw disclosures are an important part of software development. Increasing awareness of the problem helps the development community to implement solutions and minimize the damage that a particular flaw can deal to the users.
+
 ## Security Considerations
 
 - The best option is to avoid using [ERC-20](./eip-20.md) tokens and to upgrade the ecosystem to a more secure token standard that (1) **properly supports error handling and notifies recipients** of incoming transfers, (2) **automatically determines the transferring method** if token transfers to externally owned accounts and to contracts are performed differently without prompring a user to make any decisions that can potentially push the contract in incorrect state or result in any errors, (3) **abstracts the user from the internal logic of the contract**.
-- It could be possible to apply a patch on [ERC-20](./eip-20.md) standard by disallowing the use of `transfer` function to deposit tokens to contracts. This would introduce a breaking change to the "final" [EIP-20](./eip-20.md) and therefore is not possible according to EIP process.
+- It could be possible to apply a patch on [ERC-20](./eip-20.md) standard by disallowing the use of `transfer` function to deposit tokens to contracts. This would introduce a breaking change to the "final" standard and therefore is not possible according to EIP process.
 - Any implementor of a [ERC-20](./eip-20.md) token must be aware of the issue and describe it in the most visible form. Developers and users MUST be notified of an issue.
 - Any developer of a UI that operates with tokens MUST perform additional checks when a user is transferring tokens via `transfer` function. If the recipient is a contract then the user must receive a wraning message stating that he/she is transferring tokens to a contract directly and it can result in tokens being stuck there without an option to recover them. It is a common user mistake that (for some reason) can't be prevented on the contract level. Ideally the UI must also check if the recipient is a contract that is known to not be intended to receive tokens such as a contract of another token, ENS contract or most other contracts except multisigs.
 - Any contract deployed on Ethereum mainnet MUST expect that there would be "stuck" ERC-20 tokens accidentally deposited to the contract address. A special function to withdraw tokens MUST be implemented.
