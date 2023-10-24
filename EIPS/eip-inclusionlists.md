@@ -1,4 +1,5 @@
----
+# [DRAFT] Inclusion list EIP 
+
 eip: not assigned
 title: Inclusion lists
 description: Add an inclusion list mechanism to allow forced inclusion.
@@ -9,7 +10,6 @@ type: Standards Track
 category: Core
 created: 2023-10-24
 requires: None
----
 
 ## Abstract
 
@@ -132,7 +132,7 @@ class BeaconBlockBody(Container):
 
 ## Rationale
 
-We consider a few design tradeoffs in this EIP. 
+We consider a few design decisions present in this EIP. 
 1. `ReducedSummary` versus `Summary`
     - The original proposal tries to improve data efficiency by using a `ReducedSummary` and a `Rebuilder`. This allows the full summary to be reconstructed. 
     - This adds a lot of complexity to the spec, so in this initial version, we should consider just using the regular `Summary` and including that in the subsequent block.
@@ -140,17 +140,17 @@ We consider a few design tradeoffs in this EIP.
     - One consideration is whether the inclusion list should have a gas limit or use the block’s gas limit.
     - Having a separate gas limit simplifies complexity but opens up the possibility for validators to outsource their inclusion list construction for side payments (e.g., if a block is full, the proposer could auction off space in the inclusion list for guaranteed inclusion in the subsequent block).
     - Alternatively, inclusion lists could be part of the block gas limit and only satisfied if the block gas limit is not full. However, this could lead to situations where the next block proposer intentionally fills up the block to ignore the inclusion list, albeit at the potential expense of paying to waste the gas.
-4. Inclusion List Ordering:
+4. Inclusion list ordering.
     - We assume that the inclusion list is processed at the top of the `slot N` block. Transactions in the inclusion list are evaluated for the pre-state of `slot N` but are only guaranteed to be included in `slot N+1`.
-3. Inclusion List Transaction Exclusion:
+3. Inclusion list transaction exclusion.
     - Inclusion list transactions proposed at `slot N` may be satisfied in the same slot (e.g., by being included in the `ExecutionPayload`). This is a side effect of validators using `mev-boost` because they don’t know the contents of the block they propose.
     - Due to this, there exists an exclusion field, a node looks at each transaction in the payload’s `inclusion_list_exclusion` field and makes sure it matches with a transaction in the current inclusion list. When there’s a match, we remove that transaction from the inclusion list summary.
-4. `mev-boost` Compatibility:
+4. `mev-boost` compatibility.
     - There are no significant changes to `mev-boost`. Like any other hard fork, `mev-boost`, relays, and builders must adjust their beacon nodes.
     - Builders must know that execution payloads that don’t satisfy the inclusion list summary will be invalid.
     - Relays may have additional duties to verify such constraints before passing them to validators for signing.
     - When receiving the header, validators can check that the `inclusion_list_summary_root` matches their local version and skip building a block if there’s a mismatch, using the local block instead.
-5. Syncing using by range or by root:
+5. Syncing using by range or by root.
     - To consider a block valid, a node syncing to the latest head must also have an inclusion list.
     - A block without an inclusion list cannot be processed during syncing.
     - To address this, there is a parameter called `MIN_SLOTS_FOR_INCLUSION_LIST_REQUEST`. A node can skip inclusion list checks if the block’s slot plus this parameter is lower than the current slot.
