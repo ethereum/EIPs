@@ -1,13 +1,13 @@
 ---
-title: Upgradeable Clone Standard (UCS)
-description: A versatile proxy standard with easy cloning and function-based upgradability.
+title: Upgradeable Clone
+description: An extendible and cheaper proxy pattern.
 author: Shogo Ochiai (@shogochiai) <shogo.ochiai@pm.me>, Kai Hiroi (@KaiHiroi) <kai.hiroi@pm.me>
-discussions-to: *
+discussions-to: https://ethereum-magicians.org/t/XXXXX
 status: Draft
 type: Standards Track
 category: ERC
 created: 2023-10-25
-requires: ERC-165, ERC-1967, ERC-7201
+requires: 165, 1967, 7201
 ---
 
 ## Abstract
@@ -174,7 +174,7 @@ For instance, the Dictionary address is stored in accordance with the method def
   6. When Function-level Upgradeability is needed, and the Factory is also required, This ***Upgradeable Clone Standard*** is convenient to use.
 
 
-## Reference Implementations
+## Reference Implementation
 There are reference implementations and tests as a foundry project.
 
 It includes the following contents:
