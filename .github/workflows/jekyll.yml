@@ -44,9 +44,9 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
           mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/* $GITHUB_WORKSPACE/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/* $GITHUB_WORKSPACE/EIPS
-          cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/assets
+          cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
           cd $GITHUB_WORKSPACE/EIPS
           find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
           cd $GITHUB_WORKSPACE/assets
