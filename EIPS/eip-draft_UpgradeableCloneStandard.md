@@ -1,12 +1,12 @@
 ---
 title: Upgradeable Clone Standard (UCS)
-description: A versatile proxy standard with easy cloning and feature-based upgradability.
+description: A versatile proxy standard with easy cloning and function-based upgradability.
 author: Shogo Ochiai (shogo.ochiai@pm.me), Kai Hiroi (kai.hiroi@pm.me)
 discussions-to: https://ethereum-magicians.org/t/XXXXX
 status: Draft
 type: Standards Track
 category: ERC
-created: 2023-10-16
+created: 2023-10-25
 requires: ERC-165, ERC-1967, ERC-7201
 ---
 
