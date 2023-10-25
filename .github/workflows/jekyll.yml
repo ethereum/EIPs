@@ -31,8 +31,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout EIPs
         uses: actions/checkout@v3
+        with:
+          path: ''
+      - name: Checkout ERCs
+        uses: actions/checkout@v3
+        with:
+          repository: https://github.com/ethereum/ercs
+          path: ERCs
+      - name: Merge Repos
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
+          mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/* $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/* $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/assets
+          cd $GITHUB_WORKSPACE/EIPS
+          find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+          cd $GITHUB_WORKSPACE/assets
+          find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+          cd $GITHUB_WORKSPACE
       - name: Setup Ruby
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
