@@ -38,7 +38,7 @@ jobs:
       - name: Checkout ERCs
         uses: actions/checkout@v4
         with:
-          repository: https://github.com/ethereum/ercs
+          repository: ethereum/ERCs
           path: ERCs
       - name: Merge Repos
         run: |
