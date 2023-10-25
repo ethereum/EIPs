@@ -104,7 +104,7 @@ To allow external contracts to ascertain the Proxy's behavior, the Dictionary an
 
 ##### 3.1.1 Dictionary:
 ###### 3.1.1.1 `supportsInterface`
-`supportsInterface(bytes4 interfaceID)` as defined in ERC-165.
+`supportsInterface(bytes4 interfaceID)` as defined in [ERC-165](https://eips.ethereum.org/EIPS/eip-165).
 ###### 3.1.1.2 `supportsInterfaces`
 Implement `supportsInterfaces()` to return a list of registered interfaceIDs.
 ```solidity
@@ -131,7 +131,7 @@ Storage MUST be managed properly. The matter of storage management techniques ha
 
 It is RECOMMENDED to choose the storage management method that is considered most appropriate at the time.
 
-For instance, the Dictionary address is stored in accordance with the method defined in ***ERC-1967: Proxy Storage Slots***, as follows, and other storage is arranged according to useful storage layout patterns, such as ***ERC-7201: Namespaced Storage Layout***.
+For instance, the Dictionary address is stored in accordance with the method defined in ***[ERC-1967: Proxy Storage Slots](https://eips.ethereum.org/EIPS/eip-1967)***, as follows, and other storage is arranged according to useful storage layout patterns, such as ***[ERC-7201: Namespaced Storage Layout](https://eips.ethereum.org/EIPS/eip-7201)***.
 
 
 ## Rationale
@@ -163,19 +163,19 @@ For instance, the Dictionary address is stored in accordance with the method def
 
   1. When Upgradeability is not needed, and the Factory is not also required, ***Regular smart contract deployment*** suffices.
 
-  2. When Upgradeability is not needed, but the Factory is required; ***ERC-1167: Minimal Proxy Contract*** can be used.
+  2. When Upgradeability is not needed, but the Factory is required; ***[ERC-1167: Minimal Proxy Contract](https://eips.ethereum.org/EIPS/eip-1167)*** can be used.
 
-  3. When Contract-level Upgradeability is needed, but the Factory is not required, ***ERC-1822: Universal Upgradeable Proxy Standard (UUPS)*** is available.
+  3. When Contract-level Upgradeability is needed, but the Factory is not required, ***[ERC-1822: Universal Upgradeable Proxy Standard (UUPS)](https://eips.ethereum.org/EIPS/eip-1822)*** is available.
 
-  4. When Contract-level Upgradeability is needed, and the Factory is also required, ***The Beacon defined in ERC-1967: Proxy Storage Slots*** can be utilized.
+  4. When Contract-level Upgradeability is needed, and the Factory is also required, ***[The Beacon defined in ERC-1967: Proxy Storage Slots](https://eips.ethereum.org/EIPS/eip-1967)*** can be utilized.
 
-  5. When Function-level Upgradeability is needed, but the Factory is not required, ***ERC-2535: Diamonds, Multi-Facet Proxy*** is available.
+  5. When Function-level Upgradeability is needed, but the Factory is not required, ***[ERC-2535: Diamonds, Multi-Facet Proxy](https://eips.ethereum.org/EIPS/eip-2535)*** is available.
 
   6. When Function-level Upgradeability is needed, and the Factory is also required, This ***Upgradeable Clone Standard*** is convenient to use.
 
 
 ## Reference Implementations & Test Cases
-[Here](../assets/eip-draft/) are reference implementations and tests as a foundry project.
+There are reference implementations and tests as a foundry project.
 
 It includes the following contents:
 - Reference Implementations
