@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: ERCs
-      - name: Merge Repos =
+      - name: Merge Repos
         run: |
           cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/EIPS
           cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/assets
