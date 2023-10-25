@@ -1,4 +1,5 @@
 ---
+eip: 0000
 title: Upgradeable Clone
 description: An extendible and cheaper proxy pattern.
 author: Shogo Ochiai (@shogochiai) <shogo.ochiai@pm.me>, Kai Hiroi (@KaiHiroi) <kai.hiroi@pm.me>
