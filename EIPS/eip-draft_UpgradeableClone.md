@@ -2,7 +2,7 @@
 title: Upgradeable Clone
 description: An extendible and cheaper proxy pattern.
 author: Shogo Ochiai (@shogochiai) <shogo.ochiai@pm.me>, Kai Hiroi (@KaiHiroi) <kai.hiroi@pm.me>
-discussions-to: https://ethereum-magicians.org/t/[%5E/]+/[0-9]+$%60
+discussions-to: https://ethereum-magicians.org/t/eip-0000-upgradeable-clone/16256
 status: Draft
 type: Standards Track
 category: ERC
