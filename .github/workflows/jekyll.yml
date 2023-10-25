@@ -31,8 +31,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout EIPs
         uses: actions/checkout@v3
+        with:
+          path: ''
+      - name: Checkout ERCs
+        uses: actions/checkout@v3
+        with:
+          path: ERCs
+      - name: Merge Repos =
+        run: |
+          cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/assets/* $GITHUB_WORKSPACE/assets
       - name: Setup Ruby
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
