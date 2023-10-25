@@ -32,11 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIPs
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ''
       - name: Checkout ERCs
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: https://github.com/ethereum/ercs
           path: ERCs
