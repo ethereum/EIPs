@@ -1,5 +1,5 @@
 ---
-eip: eip-eip-Upgradeable_Clone.md.md
+eip: eip-UpgradeableClone
 title: Upgradeable Clone
 description: An extendible and cheaper proxy pattern.
 author: Shogo Ochiai (@shogochiai) <shogo.ochiai@pm.me>, Kai Hiroi (@KaiHiroi) <kai.hiroi@pm.me>
