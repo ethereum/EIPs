@@ -52,6 +52,7 @@ jobs:
           cd $GITHUB_WORKSPACE/assets
           find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
           cd $GITHUB_WORKSPACE
+          rm -rf ERCs
       - name: Setup Ruby
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
