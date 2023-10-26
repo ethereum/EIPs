@@ -1,0 +1,80 @@
+---
+title: Verkle proof verification precompile
+description: Add a precompile to help dapps verify verkle proofs
+author: Guillaume Ballet (@gballet), ...
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2023-10-13
+---
+
+## Abstract
+
+<!--
+  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
+
+  TODO: Remove this comment before submitting
+-->
+    
+This EIP proposes the addition of a precompiled contract to provide up-to-date state proof verification capabilities to smart contracts in a stateless Ethereum context.
+
+## Motivation
+
+The proposed proof systems for stateless Ethereum require an upgrade to many tools and applications, that need a simple path to keep their proving systems up-to-date, without having to develop and deploy new proving libraries each time another proof format must be supported.
+
+## Specification
+    
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+    
+A precompiled contract is added at address 0x21, wrapping the stateless ethereum proof verification function.
+    
+The precompile requites 4 inputs, tightly encoded:
+
+  * `version` specifies which version of the stateless proof verification function should be used
+  * `proof_data_location` is a memory address where the start of the proof data can be found
+  * `proof_data_size` specifies the length of the proof data.
+  * `state_root` specifies the state root that the proof is proving against.
+
+Pseudo-code behavior of the precompile:
+    
+```python
+def proof_verification_precompile(version, loc, size, root):
+    if version == 0:
+        proof = deserialize_proof(root, memory[loc:loc+size])
+        return verify_multiproof_pcs(proof)
+    
+    return 0
+```
+
+If `version` is `0` then the proof is expected to follow the SSZ format described in "the verge" proposal in the consensus spec.
+    
+If the precompile returns `1` if it was able to verify the proof, and `0` otherwise.
+
+## Rationale
+
+Stateless Ethereum relies on proofs using advanced mathematical concepts and tools from a fast-moving area of cryptography. As a result, a soft-fork approach is currently favored in the choice of the proof format: proofs are going to be distributed outside of consensus, and in the future, stateless clients will be able to chose their favorite proof format.
+    
+This introduces a burden on several application, e.g. bridges, as they will potentially need to support proof formats designed after the release of the bridge contract.
+    
+Delegating the proof verification burden to a version-aware precompile will ensure that these applications can support newer proving primitives without having to upgrade their contracts.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+TODO
+
+## Reference Implementation
+
+TODO
+
+## Security Considerations
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
