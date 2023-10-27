@@ -27,6 +27,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 to=ExecutionAddress(pre.destination),
                 value=pre.amount,
                 input_=pre.data,
+                type_=TRANSACTION_TYPE_EIP4844,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -38,7 +39,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
             signature=TransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
-                type_=TRANSACTION_TYPE_EIP4844,
             ),
         )
 
@@ -62,6 +62,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 to=ExecutionAddress(pre.destination) if len(pre.destination) > 0 else None,
                 value=pre.amount,
                 input_=pre.data,
+                type_=TRANSACTION_TYPE_EIP1559,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -71,7 +72,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
             signature=TransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
-                type_=TRANSACTION_TYPE_EIP1559,
             ),
         )
 
@@ -95,6 +95,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                 value=pre.value,
                 input_=pre.data,
+                type_=TRANSACTION_TYPE_EIP2930,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -103,7 +104,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
             signature=TransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
-                type_=TRANSACTION_TYPE_EIP2930,
             ),
         )
 
@@ -127,11 +127,11 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
                 to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                 value=pre.value,
                 input_=pre.data,
+                type_=TRANSACTION_TYPE_LEGACY if (pre.v not in (27, 28)) else None,
             ),
             signature=TransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
-                type_=TRANSACTION_TYPE_LEGACY if (pre.v not in (27, 28)) else None,
             ),
         )
 
