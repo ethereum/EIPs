@@ -3,7 +3,7 @@
 eip: not assigned
 title: Inclusion lists
 description: Add an inclusion list mechanism to allow forced inclusion.
-author: mike (@michaelneuder), Terence (@terencechain), Vitalik (@vbuterin), Francesco (@fradamt)
+author: mike (@michaelneuder), Terence (@terencechain), Vitalik (@vbuterin), Francesco (@fradamt), potuz (@potuz), Manav (@manav2401)
 discussions-to: not assigned
 status: Draft
 type: Standards Track
