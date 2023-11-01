@@ -36,6 +36,7 @@ jobs:
       - name: Checkout EIPs
         uses: actions/checkout@v4
         with:
+          repository: ethereum/EIPs
           path: ''
       - name: Checkout ERCs
         uses: actions/checkout@v4
