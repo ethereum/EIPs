@@ -46,7 +46,7 @@ This EIP introduces a versioning scheme for [Standards Track](https://eips.ether
 
 EIP specifications often receive increasing modifications as more people review them, which is generally the case as client teams start implementing the specifications and the community gains a better understanding of their interaction with the rest of the protocol. These changes can be difficult to track. In particular, as EVM reference tests are often not maintained (and generally not released) by client teams or the EIP's authors, it can be difficult to ascertain whether a release of reference tests (for example from ethereum/tests or ethereum/execution-spec-tests) is sufficient, or even valid, to test the latest version of an EIP's specifications or the specification as currently implemented by a client.
 
-This EIP proposes a semantic versioning scheme for the Specification section and an addition of a CHANGELOG section for EIPs that allows the community to easily track changes, their impact on current client implementations and reference tests and maintain a clear history.
+This EIP proposes a semantic versioning scheme for the Specification section and an addition of a CHANGELOG section for EIPs that allows the community to easily track changes, their impact on current client and test implementations and maintain a clear history.
 
 ## Specification
 
@@ -60,24 +60,26 @@ This EIP proposes a semantic versioning scheme for the Specification section and
   TODO: Remove this comment before submitting
 -->
 
-Once an EIP has moved out of Draft status, it MUST use the EIP versioning scheme outlined below. It MAY already use the versioning scheme in Draft status, which could be useful if the specification is already being implemented.
+Once an EIP has moved out of "Draft" status, it MUST use the EIP versioning scheme outlined below. It MAY already use the versioning scheme in "Draft" status, which could be useful if the specification is actively being implemented. If more than one team is implementing the specification, it is RECOMMENDED to change the EIP's status to "Review".
 
 The EIP versioning scheme MUST follow a semantic versioning scheme of `MAJOR.MINOR.PATCH`, which is applied as follows:
 
-1. `MAJOR`: A breaking change to the specifications that requires an implementation change and change to the reference tests.
+1. `MAJOR`: A breaking change to the specifications that requires an implementation change and a change to the reference tests.
 2. `MINOR`: An addition to the specifications that does not require changing an existing implementation, but requires additional implementation and additional test coverage to be added to the reference tests.
-3. `PATCH`: A cosmetic change to or reformulation of the specifications text without specification change.
+3. `PATCH`: Any cosmetic change to, or a reformulation of, the EIP without specification change.
 
-Before the EIP has moved out of Draft status, the version number MUST have `MAJOR` version `0` and upon moving to `Review` status, the version number MUST be updated to `1.0.0`.
+Before the EIP has moved out of Draft status and is being versioned, the version number MUST initially have `MAJOR` version `0`.
 
-For every iteration of changes made to an EIP in a PR made to ethereum/EIPs, the PR author MUST add a new entry to the CHANGELOG section of the EIP that outlines the changes made within the PR. This CHANGELOG entry MUST include the following:
+For every change made to an EIP via a PR made to ethereum/EIPs, the PR author MUST add a new entry to the CHANGELOG section of the EIP that outlines the changes made within the PR. This CHANGELOG entry MUST include the following:
 
 1. A new version number that follows the semantic versioning scheme outlined above.
 2. The date when the changes where introduced.
 3. A link to the ethereum/EIPs PR that implements the changes.
 4. A line for each change made to the EIP's specifications that includes a short description of the change.
 
-Additionally, the updated version must be added to the metadata header of the EIP's markdown file, so that it may be programmatically parsed.
+Additionally, the new version MUST be added to the metadata header of the EIP's markdown file (to a new "version" field), so that it may be easily parsed.
+
+Tooling SHOULD be added to the ethereum/EIPs repository that checks that the CHANGELOG is updated and that the version number in the metadata header matches the latest version number in the CHANGELOG.
 
 ## Rationale
 
@@ -93,7 +95,72 @@ A semantic versioning scheme enables clearer communication within the community 
 
 Making the version available in the EIP's metadata header additionally allows for programmatic parsing of the version number by tooling used in reference tests or by client teams. Currently, the ethereum/execution-spec-tests repository implements a rudimentary EIP version checker: EIP spec tests are required to declare the EIP's markdown file digest SHA that the test implementation was based on. The current value of the digest SHA is then polled via the Github API to verify that no changes have occurred since the test implementation. While this provides a warning to test implementers that the EIP has changed, it is clearly of limited use.
 
-The semantic versioning scheme can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can also contain the version they implement in generated tests as metadata. This would allow a test runner to mark tests to xfail (expectedly fail) and issue a warning if they don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation.
+A richer versioning scheme, as defined by this EIP, can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can specify the version they implement in generated tests as metadata. This allows a test runner to mark tests to xfail (expectedly fail) and issue a warning if the `MAJOR` or `MINOR` versions don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation, although given the pace of Ethereum development, this will likely be impractical to maintain and track multiple versions of tests.
+
+```mermaid
+---
+title: How EIP Versioning Could be Used Within the Ethereum Execution Specs Testing Toolchain
+---
+flowchart LR
+  style t8n  stroke:#333,stroke-width:2px
+  style hive stroke:#F9A825,stroke-width:2px
+  style blocktest_direct stroke:#F9A825,stroke-width:2px
+  
+  subgraph ethereum/EIPs
+    EIP-123(<code>EIPS/EIP-123.md</code>\n<code>version: 2.2.4</code>)
+    EIP-321(<code>EIPS/EIP-321.md</code>\n<code>version: 4.5.1</code>)
+  end
+
+  subgraph "ethereum/execution-spec-tests"
+    subgraph "JSON Test Filler Framework"
+        subgraph "Test source code"
+          tests-EIP-123(<code>./tests/EIP-123/**/*.py</code>\n<code>version: 2.2.4</code>\nPython Test Cases)
+          tests-EIP-321(<code>./tests/EIP-321/**/*.py</code>\n<code>version: 4.5.1</code>\nPython Test Cases)
+        end
+        fill(<code>$ fill ./tests/</code>\nPython \ pytest\n- xfail/skip if EIP not supported by client\n- warning: if ethereum/EIPs and test source versions mismatch\n- warning: if t8n and test source versions mismatch)
+    end
+    subgraph "Runner for Test Fixture Consumers"
+      consume(<code>$ consume  --evm-bin=blocktest</code>\nPython \ pytest\n- xfail/skip + warning if EIP not supported by client\n- warning: if ethereum/EIPs and test fixture versions mismatch\n- warning: if blocktest and test fixture versions mismatch)
+    end
+  end
+
+  subgraph "EVM Transition Tool"
+    t8n(<code>evm t8n</code>\nexternal executable\n<code>EIP-123 version: 2.2.1</code>\n<code>EIP-321 version: None</code>)
+  end
+
+  subgraph "EVM Test Fixture Consumer (Module Test)"
+    blocktest(<code>evm blocktest</code>\nexternal executable\n<code>EIP-123 version: 2.1.0</code>\n<code>EIP-321 version: 4.4.0</code>)
+  end
+  
+  subgraph "Test Fixture Consumers"
+    subgraph "ethereum/hive (System Test)"
+        hive(<code>$ hive ...</code>\nGo Client Testing Environment)
+    end
+    subgraph "Runner for Test Fixture Consumer"
+      subgraph "Test Fixture Consumer (Module Test)"
+        blocktest_direct(Client executable)
+      end
+    end
+  end
+
+fixtures(<code>./fixtures/**/*.json</code>\nJSON Test Fixtures parametrized per fork\nIncluding test metadata:\n- <code>t8n: evmone-t8n 0.11.0-dev+commit.634d7068</code>\n- <code>test-source: eip-123:v2.2.4</code>\n- <code>test-source: eip-321:v4.5.1</code>)
+
+test_report(<code>./test_report.xml</code>\nJUnit XML)
+
+
+
+EIP-123       <-.-> fill
+EIP-321       <-.-> |retrieve latest spec version\nvia Github API| fill
+t8n           <-.-> fill
+tests-EIP-123   --> fill
+tests-EIP-321   --> fill
+fill            --> |output| fixtures
+blocktest     <-.-> consume
+fixtures        --> |input| hive
+fixtures        --> |input| blocktest_direct
+fixtures        --> |input| consume
+consume         --> |output| test_report
+```
 
 ## Backwards Compatibility
 
@@ -118,7 +185,7 @@ This section explores how the versioning scheme would be applied to existing EIP
 
 ### EIP-4788
 
-The history of [EIP-4788] included many (necessary) breaking changes to its specification. Unfortunately, as of 2023-11-01, the EIP still has status "Draft"; this case study assumes that the EIP moved to status "Review" as of [#????](https://github.com/ethereum/EIPs/pull/???), tagged as per versioning scheme with version 1.0.0.
+The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) included many (necessary) breaking changes to its specification. Unfortunately, as of 2023-11-01, the EIP still has status "Draft"; this case study assumes that the EIP moved to status "Review" as of [#????](https://github.com/ethereum/EIPs/pull/???), tagged as per versioning scheme with a new major version X.Y.Z.
 
 #### Changelog
 
