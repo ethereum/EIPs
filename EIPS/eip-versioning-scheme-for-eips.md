@@ -1,5 +1,3 @@
-# DRAFT: EIP-X - Versioning Scheme for EIPs
-
 ---
 title: Versioning Scheme for EIPs
 description: Use a versioning scheme for EIPs based on changes made to their Specification section.
@@ -44,7 +42,7 @@ This EIP introduces a versioning scheme for [Standards Track](https://eips.ether
   TODO: Remove this comment before submitting
 -->
 
-EIP specifications often receive increasing modifications as more people review them, which is generally the case as client teams start implementing the specifications and the community gains a better understanding of their interaction with the rest of the protocol. These changes can be difficult to track. In particular, as EVM reference tests are often not maintained (and generally not released) by client teams or the EIP's authors, it can be difficult to ascertain whether a release of reference tests (for example from ethereum/tests or ethereum/execution-spec-tests) is sufficient, or even valid, to test the latest version of an EIP's specifications or the specification as currently implemented by a client.
+EIP specifications often receive increasing modifications as more people review them, which is generally the case as client teams start implementing the specifications and the community gains a better understanding of their interaction with the rest of the protocol. These changes can be difficult to track. In particular, as EVM reference tests are often not maintained (and generally not released) by client teams or the EIP's authors, it can be difficult to ascertain whether a release of reference tests (for example from [ethereum/tests](https://github.com/ethereum/tests) or [ethereum/execution-spec-tests](https://github.com/ethereum/execution-spec-tests)) is sufficient, or even valid, to test the latest version of an EIP's specifications or the specification as currently implemented by a client.
 
 This EIP proposes a semantic versioning scheme for the Specification section and an addition of a CHANGELOG section for EIPs that allows the community to easily track changes, their impact on current client and test implementations and maintain a clear history.
 
@@ -81,6 +79,8 @@ Additionally, the new version MUST be added to the metadata header of the EIP's 
 
 Tooling SHOULD be added to the ethereum/EIPs repository that checks that the CHANGELOG is updated and that the version number in the metadata header matches the latest version number in the CHANGELOG.
 
+EIPS that have dependencies on other EIPS SHOULD include the version of the dependency in the metadata "requires" field.
+
 ## Rationale
 
 <!--
@@ -93,9 +93,11 @@ Tooling SHOULD be added to the ethereum/EIPs repository that checks that the CHA
 
 A semantic versioning scheme enables clearer communication within the community about EIP status and allows the impact of a change to be ascertained at first glance.
 
-Making the version available in the EIP's metadata header additionally allows for programmatic parsing of the version number by tooling used in reference tests or by client teams. Currently, the ethereum/execution-spec-tests repository implements a rudimentary EIP version checker: EIP spec tests are required to declare the EIP's markdown file digest SHA that the test implementation was based on. The current value of the digest SHA is then polled via the Github API to verify that no changes have occurred since the test implementation. While this provides a warning to test implementers that the EIP has changed, it is clearly of limited use.
+Making the version available in the EIP's metadata header additionally allows for programmatic parsing of the version number by tooling used in reference tests or by client teams. Currently, the [ethereum/execution-spec-tests](https://github.com/ethereum/execution-spec-tests) repository implements a rudimentary [EIP version checker](https://ethereum.github.io/execution-spec-tests/main/writing_tests/reference_specification/): EIP spec tests are required to declare the EIP's markdown file digest SHA that the test implementation was based on. The current value of the digest SHA is then polled via the Github API to verify that no changes have occurred since the test implementation. While this provides a warning to test implementers that the EIP has changed, it is clearly of limited use.
 
-A richer versioning scheme, as defined by this EIP, can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can specify the version they implement in generated tests as metadata. This allows a test runner to mark tests to xfail (expectedly fail) and issue a warning if the `MAJOR` or `MINOR` versions don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation, although given the pace of Ethereum development, this will likely be impractical to maintain and track multiple versions of tests.
+A richer versioning scheme, as defined by this EIP, can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can specify the version they implement in generated tests as metadata. This allows a test runner to mark tests to xfail (expectedly fail) and issue a warning if the `MAJOR` or `MINOR` versions don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation, although given the pace of Ethereum development, it will likely be impractical to maintain and track multiple versions of tests.
+
+Mermaid rendered at https://gist.github.com/danceratopz/93913d5b3b74a181c8511d886bbf5736.
 
 ```mermaid
 ---
