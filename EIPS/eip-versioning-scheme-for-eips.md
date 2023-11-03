@@ -1,7 +1,7 @@
 ---
 title: Versioning Scheme for EIPs
 description: Use a versioning scheme for EIPs based on changes made to their Specification section.
-author: <!-- a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername) -->
+author: Danceratopz (@danceratopz), Ahmad Bitar (smartprogrammer93)
 discussions-to: https://ethereum-magicians.org/t/XXXX
 status: Draft
 type: Meta
@@ -28,7 +28,7 @@ created: 2023-11-XX
   TODO: Remove this comment before submitting
 -->
 
-This EIP introduces a versioning scheme for [Standards Track](https://eips.ethereum.org/EIPS/eip-1#eip-types) EIPs by applying [Semantic Versioning](https://semver.org/) to the EIP's Specification section once its status has changed from `Draft` to `Review`.
+This EIP introduces a versioning scheme for [Standards Track](https://eips.ethereum.org/EIPS/eip-1#eip-types) EIPs by applying [Semantic Versioning](https://semver.org/) based on changes made to the EIP's Specification section once its status has changed from `Draft` to `Review`.
 
 ## Motivation
 
