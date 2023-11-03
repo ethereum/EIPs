@@ -122,7 +122,7 @@ func TestSignedCmp(t *testing.T) {
 	// a := uint256.NewInt(23)
 	a := new(uint256.Int).Neg(uint256.NewInt(14))
 	b := new(uint256.Int).Neg(uint256.NewInt(15))
-	c := SignedCmp(a, b, &gas)
+	c := signedCmp(a, b, &gas)
 	fmt.Println(c)
 }
 
