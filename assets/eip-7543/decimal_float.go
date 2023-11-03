@@ -1,4 +1,4 @@
-// math based on https://github.com/JuliaMath/Decimals.jl
+// arithmetic based on https://github.com/JuliaMath/Decimals.jl
 
 package vm
 
@@ -21,7 +21,7 @@ func createDecimal(_c, _q *int256, gas *uint64) *Decimal {
 }
 
 // CONSTANTS
-var GLOBAL_GAS uint64
+var GLOBAL_GAS uint64 // not needed, only once per node start, just as an argument into New and createDecimal
 
 var MINUS_ONE_INT256 = new(int256).Neg(ONE_INT256)
 var ZERO_INT256 = New(0, &GLOBAL_GAS)
@@ -45,9 +45,10 @@ func (out *Decimal) Add(a, b *Decimal, precision *int256, gas *uint64) *Decimal 
 
 	ca := add_helper(a, b, gas)
 	cb := add_helper(b, a, gas)
-
 	Add(&ca, &cb, &out.c, gas)
-	Set(min(&a.q, &b.q, gas), &out.q, gas)
+
+	q := signedMin(&a.q, &b.q, gas)
+	Set(q, &out.q, gas)
 
 	out.normalize(out, precision, false, gas)
 
@@ -78,7 +79,7 @@ func (out *Decimal) Inv(a *Decimal, precision *int256, gas *uint64) *Decimal {
 
 	var precision_m_aq int256
 	Sub(precision, &a.q, &precision_m_aq, gas)
-	if SignedCmp(&precision_m_aq, ZERO_INT256, gas) == -1 {
+	if signedCmp(&precision_m_aq, ZERO_INT256, gas) == -1 {
 		panic("precision_m_aq NEGATIVE")
 	}
 
@@ -262,9 +263,9 @@ func DecSin(ac, aq, precision, steps *int256, gas *uint64) (bc, bq *int256) {
 
 // -1 if a <  b
 //
-//	0 if a == b
-//	1 if b <  a
-func SignedCmp(a, b *int256, gas *uint64) int {
+// 0 if a == b
+// 1 if b <  a
+func signedCmp(a, b *int256, gas *uint64) int {
 	c := a.Cmp(b)
 
 	if c == 0 { // a == b
@@ -297,9 +298,9 @@ func SignedCmp(a, b *int256, gas *uint64) int {
 	}
 }
 
-// min(a, b)
-func min(a, b *int256, gas *uint64) (c *int256) {
-	if SignedCmp(a, b, gas) == -1 {
+// signedMin(a, b)
+func signedMin(a, b *int256, gas *uint64) (c *int256) {
+	if signedCmp(a, b, gas) == -1 {
 		return a
 	} else {
 		return b
@@ -344,7 +345,7 @@ func (a *Decimal) lessThan(b *Decimal, precision *int256, gas *uint64) bool {
 func signedDiv(numerator, denominator, out *int256, gas *uint64) *int256 {
 	sn := Sign(numerator, gas)
 	sd := Sign(denominator, gas)
-	if sn == 0 && sd == 0 {
+	if sn == 0 && sd == 0 { // TODO correct? xor just sd == 0 ?
 		out = nil
 		return nil
 	}
@@ -372,18 +373,18 @@ func signedDiv(numerator, denominator, out *int256, gas *uint64) *int256 {
 	return out
 }
 
-// c = (-1)^d1.s * d1.c * 10^max(d1.q - d2.q, 0)
-func add_helper(d1, d2 *Decimal, gas *uint64) (c int256) {
+// out = {c: d1.c, q: 10^max(d1.q - d2.q, 0)}
+func add_helper(d1, d2 *Decimal, gas *uint64) (out int256) {
 	var exponent_diff int256
 	Sub(&d1.q, &d2.q, &exponent_diff, gas)
 	if Sign(&exponent_diff, gas) == -1 {
 		exponent_diff = *ZERO_INT256 // shallow copy ok
 	}
 
-	Exp(TEN_INT256, &exponent_diff, &c, gas)
-	Mul(&d1.c, &c, &c, gas)
+	Exp(TEN_INT256, &exponent_diff, &out, gas)
+	Mul(&d1.c, &out, &out, gas)
 
-	return c
+	return out
 }
 
 // remove trailing zeros from coefficient
@@ -440,7 +441,7 @@ func (out *Decimal) round(a *Decimal, precision *int256, normal bool, gas *uint6
 	var shift, ten_power int256
 	Add(precision, &a.q, &shift, gas)
 
-	if SignedCmp(&shift, ZERO_INT256, gas) == 1 || SignedCmp(&shift, &a.q, gas) == -1 {
+	if signedCmp(&shift, ZERO_INT256, gas) == 1 || signedCmp(&shift, &a.q, gas) == -1 {
 		if normal {
 			Set(&a.c, &out.c, gas)
 			Set(&a.q, &out.q, gas)
