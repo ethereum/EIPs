@@ -286,7 +286,7 @@ class Receipt(StableContainer[MAX_RECEIPT_FIELDS]):
     # EIP-658
     status: Optional[boolean]
 
-class LegacyReceipt(Variant[Receipt]):
+class HomesteadReceipt(Variant[Receipt]):
     root: Hash32
     gas_used: uint64
     contract_address: Optional[ExecutionAddress]
@@ -306,4 +306,4 @@ class AnyReceipt(OneOf[Receipt]):
         if value.status is not None:
             return BasicReceipt
 
-        return LegacyReceipt
+        return HomesteadReceipt

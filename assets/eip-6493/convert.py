@@ -197,7 +197,7 @@ def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
         )
 
     root = pre.post_state_or_status
-    return LegacyReceipt(
+    return HomesteadReceipt(
         root=root,
         gas_used=pre.cumulative_gas_used - prev_cumulative_gas_used,
         contract_address=compute_contract_address(
