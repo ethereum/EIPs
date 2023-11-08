@@ -195,7 +195,7 @@ This also has a trust factor, albeit very small. It requires that at least one p
 
 ### Front running and censorship
 
-Commitments have one day to reveal. It is largely infeasible to censor an economically viable transaction for such a period of time.
+One day is required before one can reveal a commitment. It is largely infeasible to censor an economically viable transaction for such a period of time.
 
 Assuming the reveal transaction is willing to pay market rate for transaction fees, the 1559 fee mechanism and its exponential adjustment makes it infeasible for an economic attacker to spam costly transactions to artifically increase the base-fee for extended period of time.
 
