@@ -47,6 +47,18 @@ strong quantum supremacy has been achieved by solving the classically intractabl
 
 ## Specification
 
+### Parameters
+
+- In this contract, a "lock" refers to a generated puzzle for which a solution must be provided 
+in order to withdraw funds and mark the contract as solved.
+
+| Parameter                 | Value    |
+|---------------------------|----------|
+| `EIP_X_SINGLETON_ADDRESS` | `TBD`    |
+| `MINIMUM_GAS_PAYOUT`      | `50,000` |
+| `MODULUS_BIT_SIZE`        | `784`    |
+| `NUMBER_OF_LOCKS`         | `1`      |
+
 ### Puzzle
 
 The puzzle that this contract generates is one of order-finding,
@@ -58,9 +70,10 @@ _k_ such that _a_ ^ _k_ = 1 (mod _n_).
 
 ### Requirements
 
-- This contract SHALL generate 1 integer, the modulus, of exactly 784 random bits. 
-  It SHALL then generate another integer, the base, of <= 784 bits and reduce it modulo the first generated integer.
-- If the base is equal to 1 or -1 mod _n_ or is coprime to the modulus, it MUST be thrown out and another base MUST be generated.
+- Generating locks, (one for each `NUMBER_OF_LOCKS`)
+  - This contract SHALL generate 1 integer, the modulus, of exactly `MODULUS_BIT_SIZE` random bits. 
+    It SHALL then generate another integer, the base, of <= `MODULUS_BIT_SIZE` bits and reduce it modulo the first generated integer.
+  - If the base is equal to 1 or -1 mod _n_ or is coprime to the modulus, it MUST be thrown out and another base MUST be generated.
 - This contract MUST accept funds from any account without restriction.
 - This contract MUST allow someone to provide the multiplicative order of the base with the modulus.
   If it is the correct solution, then this contract MUST send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
@@ -70,7 +83,7 @@ _k_ such that _a_ ^ _k_ = 1 (mod _n_).
 ### Deployment method
 
 - The contract MUST be deployed as a [Singleton][ERC-2470]
-- After deploying the contract with parameters of 1 lock having a 784-bit modulus, the contract's `triggerLockAccumulation()` method SHALL be called repeatedly until all bits have been generated.
+- After deploying the contract with parameters of `NUMBER_OF_LOCKS` lock having a `MODULUS_BIT_SIZE`-bit modulus, the contract's `triggerLockAccumulation()` method SHALL be called repeatedly until `generationIsDone == true`, i.e. all bits have been generated.
 
 ### Providing solutions
 
@@ -82,7 +95,7 @@ _k_ such that _a_ ^ _k_ = 1 (mod _n_).
 
 ### Bounty funds
 
-- Funds of at least 50,000 gas SHALL be sent to the contract as a bounty.
+- Funds of at least `MINIMUM_GAS_PAYOUT` gas SHALL be sent to the contract as a bounty.
   The funds must be updated to cover this amount as the value of gas increases.
 - The contract MUST accept any additional funds from any account as a donation to the bounty.
 
