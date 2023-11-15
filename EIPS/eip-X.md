@@ -1,7 +1,7 @@
 ---
 eip: X
 title: Quantum Supremacy Contract
-author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan 
+author: Nicholas Papadopoulos (@nikojpapa), Danny Ryan (@djrtwo)
 discussions-to: 
 status: Draft
 type: Standards Track
@@ -13,8 +13,9 @@ requires: [ERC-2470]
 ## Abstract
 
 This proposal introduces a smart contract containing a classically intractable puzzle that is expected to only be able to be solved using quantum computers.
-The contract will be funded with ETH, which can only be retrieved by solving the problem.
-Ethereum accounts can then, using custom verification schemes such as those based on [ERC-4337](./eip-4337.md), watch this contract and fall back to a quantum secure signature verification scheme if and when it is solved.
+The contract is funded with ETH, which can only be retrieved by solving the problem.
+On-chain applications can then watch this contract to be aware of the quantum advantage milestone of solving this puzzle.
+For example, Ethereum accounts can, using custom verification schemes such as those based on [ERC-4337](./eip-4337.md), watch this contract and fall back to a quantum secure signature verification scheme if and when it is solved.
 
 The contract, then, serves the two purposes of (1) showing proof of a strict [quantum supremacy] that is strong enough to 
 indicate concerns in RSA and ECDSA security, and (2) acting as a leading indicator to protect Ethereum assets by triggering quantum-secure 
@@ -25,28 +26,34 @@ signature verification schemes.
 [Quantum supremacy] "is the goal of demonstrating that a programmable quantum computer can solve a problem that no classical computer can solve in any feasible amount of time".
 Previous attempts have been made to demonstrate quantum supremacy, e.g. [Kim](https://www.nature.com/articles/s41586-023-06096-3), [Arute](https://www.nature.com/articles/s41586-019-1666-5) and [Morvan](https://arxiv.org/abs/2304.11119), 
 but they have been refuted or at least claimed to have no practical benefit, e.g. [Begusic and Chan](https://arxiv.org/pdf/2306.16372.pdf), [Pednault](https://arxiv.org/pdf/1910.09534.pdf), 
-and a quote from Sebastian Weidt in [The Telegraph](https://thequantuminsider.com/2023/07/04/google-claims-latest-quantum-experiment-would-take-decades-on-classical-computer/).
+and a quote from Sebastian Weidt in The Telegraph.
 Quantum supremacy, by its current definition, is "irrespective of the usefulness of the problem".
 This proposal, however, focuses on a stricter definition of a problem that indicates the earliest sign where an adversary may soon bypass current Ethereum cryptography standards.
-This contract will serve as trustless, unbiased proof of this strong quantum supremacy by generating a classically intractable problem on chain, 
+This contract serves as trustless, unbiased proof of this strong quantum supremacy by generating a classically intractable problem on chain, 
 to which even the creator does not know the solution.
+
+[The Telegraph Link]: https://thequantuminsider.com/2023/07/04/google-claims-latest-quantum-experiment-would-take-decades-on-classical-computer/
 
 Since quantum computers are [expected](https://www.nature.com/articles/d41586-023-00017-0) to break current security standards,
 Ethereum assets are at risk. However, implementing quantum-secure
-[protocols](https://csrc.nist.gov/News/2022/pqc-candidates-to-be-standardized-and-round-4) can be costly and complicated.
+protocols can be costly and complicated.
 In order to delay unnecessary costs, Ethereum assets can continue using current cryptographic standards and only fall back
 to a quantum-secure scheme when there is reasonable risk of security failure due to quanutm computers.
 Therefore, this contract can server to protect one's funds on Ethereum by acting as a trigger that activates when 
 strong quantum supremacy has been achieved by solving the classically intractable puzzle.
+
+[protocols Link]: https://csrc.nist.gov/News/2022/pqc-candidates-to-be-standardized-and-round-4
 
 
 ## Specification
 
 ### Puzzle
 
-The puzzle that this contract will generate is one of [order-finding](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine),
+The puzzle that this contract generates is one of order-finding,
 where given a positive integer _n_ and an integer _a_ coprime to _n_, the objective is to find the smallest positive integer
 _k_ such that _a_ ^ _k_ = 1 (mod _n_).
+
+[order-finding Link]: https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine
 
 
 ### Requirements
@@ -55,8 +62,10 @@ _k_ such that _a_ ^ _k_ = 1 (mod _n_).
   It SHALL then generate another integer, the base, of <= 784 bits and reduce it modulo the first generated integer.
 - If the base is equal to 1 or -1 mod _n_ or is coprime to the modulus, it MUST be thrown out and another base MUST be generated.
 - This contract MUST accept funds from any account without restriction.
-- This contract MUST allow someone to provide the [multiplicative order](https://en.wikipedia.org/wiki/Multiplicative_order) of the base with the modulus.
+- This contract MUST allow someone to provide the multiplicative order of the base with the modulus.
   If it is the correct solution, then this contract MUST send all of its funds to the solver and mark a flag to indicate that this contract has been solved.
+
+[multiplicative order Link]: https://en.wikipedia.org/wiki/Multiplicative_order
 
 ### Deployment method
 
@@ -65,8 +74,11 @@ _k_ such that _a_ ^ _k_ = 1 (mod _n_).
 
 ### Providing solutions
 
-- Providing solutions MUST follow a [commit-reveal](https://medium.com/swlh/exploring-commit-reveal-schemes-on-ethereum-c4ff5a777db8) scheme to prevent [front running](https://solidity-by-example.org/hacks/front-running/.).
+- Providing solutions MUST follow a commit-reveal scheme to prevent front running.
 - This scheme MUST require one day between commit and reveal.
+
+[commit-reveal Link]: https://medium.com/swlh/exploring-commit-reveal-schemes-on-ethereum-c4ff5a777db8
+[front running Link]: https://solidity-by-example.org/hacks/front-running/
 
 ### Bounty funds
 
@@ -85,14 +97,19 @@ Upon solving the final solution,
 
 ### Puzzle
 
-Order-finding has a known, efficient, quantum [solution](https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine)
-but is intractable for classical computers. This will then reliably serve as a test for strong quantum supremacy, since
+Order-finding has a known, efficient, quantum solution
+but is intractable for classical computers. This then reliably serves as a test for strong quantum supremacy, since
 having a solution to this problem should only be doable by a quantum computer.
 
-Fewer [qubits](https://en.wikipedia.org/wiki/Qubit) are required to solve this problem compared to the amount needed to
+[solution Link]: https://en.wikipedia.org/wiki/Shor%27s_algorithm#Quantum_order-finding_subroutine
+
+Fewer qubits are required to solve this problem compared to the amount needed to
 break current cryptographic standards,
-so this is expected to be solvable before current security standards are breakable. In this was, the contract can act as
+so this is expected to be solvable before current security standards are breakable. In this way, the contract can act as
 a leading indicator and signal a safe moment of concern to switch to quantum-secure cryptographic schemes.
+
+[qubits Link]: https://en.wikipedia.org/wiki/Qubit
+
 
 ### Bounty Funds
 
@@ -125,12 +142,14 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/d27f6822808efb9f9ed397
 [Cleve] details a lower bound for the query complexity on the general order-finding problem and defines 
 how the quantum solution used in [Shor's](https://api.semanticscholar.org/CorpusID:15291489) algorithm fits into it. 
 
-We would like 256-bit [security](https://api.semanticscholar.org/CorpusID:209527904), which is satisfied if we hit a 2^256 lower bound on the query complexity.
+We would like 256-bit security, which is satisfied if we hit a 2^256 lower bound on the query complexity.
 The lower bound given in the paper shows us, then, that a 782-bit modulus is necessary to achieve this.
 To make this cheaper and easier, we make this 784 in order to be a whole number of bytes, namely 98 bytes.
 This would require 1568 qubits, as the order is bounded by twice the modulus ([Cleve]).
 
 Breaking 256-bit elliptic curve encryption is [expected](https://arxiv.org/abs/1706.06752) to require 2330 qubits, although with current fault-tolerant regime, it is [expected](https://avs.scitation.org/doi/10.1116/5.0073075) that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
+
+[security Link]: https://api.semanticscholar.org/CorpusID:209527904
 
 ### Choosing the puzzle
 The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
@@ -143,10 +162,13 @@ as by the time the puzzle is solved, the ability to forge signatures will have a
 
 #### Factor many large, randomly generated numbers
 [Sander](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated. 
-Using [logic](https://anoncoin.github.io/RSA_UFO/) based on that described by Anoncoin, one could generate 120 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
+Using logic based on that described by Anoncoin, one could generate 120 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
 [RSA Security](https://web.archive.org/web/20170417095741/https://www.emc.com/emc-plus/rsa-labs/historical/twirl-and-rsa-key-size.htm) recommends 3,072-bit key sizes for RSA to be secure beyond 2030, 
 but [Alwen](https://wickr.com/the-bit-security-of-cryptographic-primitives-2/) claims that it is only considered secure for the next 2-3 decades.
 Therefore, while this method requires no trust, the cost of generating this problem would be large, and it would not serve as much of a leading indicator since if a quantum computer could solve this, they could already break current cryptographic security standards.
+
+[logic Link]: https://anoncoin.github.io/RSA_UFO/
+
 
 #### Factor a product of large, generated primes
 Instead of generating an RSA-UFO, the contract could implement current RSA key generation protocols and first generate 
