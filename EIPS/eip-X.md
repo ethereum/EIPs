@@ -109,7 +109,7 @@ Order-finding can be reduced[9] to factoring, and vice-versa. Since it is cheape
 ### Bounty Funds
 
 To simulate expected gas costs -- given a random 783-bit base and a random 784-bit modulus, 196 random solutions of byte size equal to its iteration were sent to the contract.
-The gas cost for all of these simulations never exceeded 44,305 gas. Therefore, we expect a minimum bount covering a cost 50,000 gas in even extreme gas markets (e.g. 1000 Gwei / gas) to reliably cover the
+The gas cost for all of these simulations never exceeded 44,305 gas. Therefore, we expect a minimum bounty covering a cost of 50,000 gas in even extreme gas markets (e.g. 1000 Gwei / gas) to reliably cover the
 cost for a solver to provide a solution.
 
 
@@ -134,7 +134,7 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e48
 ## Security Considerations
 
 ### Bit length of the modulus
-Order-finding [reduces](https://doi.org/10.1016/0890-5401(87)90030-7) to integer factoring, therefore
+Order-finding reduces[9] to integer factoring, therefore
 the modulus must also be difficult to factor.
 
 [Sander](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
@@ -142,11 +142,11 @@ Using logic based on that described by Anoncoin, one could generate 119 integers
 
 #### Predicted security
 ##### Classical
-[RSA Security](https://web.archive.org/web/20170417095741/https://www.emc.com/emc-plus/rsa-labs/historical/twirl-and-rsa-key-size.htm) recommends 3,072-bit key sizes for RSA to be secure beyond 2030,
-but [Alwen](https://wickr.com/the-bit-security-of-cryptographic-primitives-2/) claims that it is only considered secure for the next 2-3 decades.
+Burt Kaliski and RSA Laboratories (2003, "TWIRL and RSA Key Size") recommends 3,072-bit key sizes for RSA to be secure beyond 2030,
+although Joël Alwen (Wickr, 2017, "The Bit-Security of Cryptographic Primitives") claims that it is only considered secure for the next 2-3 decades.
 
 ##### Quantum
-Breaking 256-bit elliptic curve encryption is [expected](https://arxiv.org/abs/1706.06752) to require 2,330 qubits, although with current fault-tolerant regime, it is [expected](https://avs.scitation.org/doi/10.1116/5.0073075) that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
+Breaking 256-bit elliptic curve encryption is expected[10] to require 2,330 qubits, although with current fault-tolerant regime, it is expected[11] that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
 
 ### Choosing the puzzle
 The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
@@ -373,5 +373,34 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       },
       "URL": "https://doi.org/10.1016/0890-5401(87)90030-7"
     ```
-[Cleve]: https://arxiv.org/abs/quant-ph/9911124
+[10]:
+```csl-json
+    {
+      "type": "misc"
+      "id": 10,
+      "author"=[{"family": "Roetteler", "given": "Martin"}, {"family": "Naehrig", "given": "Michael"}, {"family": "Svore", "given": "Krysta M."}, {"family": "Lauter", "given": "Kristin"}],
+      "DOI": "10.48550/arXiv.1706.06752",
+      "title": "Quantum resource estimates for computing elliptic curve discrete logarithms", 
+      "original-date": {
+        "date-parts": [
+          [2017, 08, 31]
+        ]
+      },
+      "URL": "https://doi.org/10.48550/arXiv.1706.06752"
+    ```
+[11]:
+```csl-json
+    {
+      "type": "article"
+      "id": 11,
+      "author"=[{"family": "Webber", "given": "Mark"}, {"family": "Elfving", "given": "Vincent"}, {"family": "Weidt", "given": "Sebastian"}, {"family": "Hensinger", "given": "Winfried K."}],
+      "DOI": "10.1116/5.0073075",
+      "title": "The impact of hardware specifications on reaching quantum advantage in the fault tolerant regime", 
+      "original-date": {
+        "date-parts": [
+          [2022, 01, 15]
+        ]
+      },
+      "URL": "https://doi.org/10.1116/5.0073075"
+    ```
 [ERC-2470]: ./eip-2470.md
