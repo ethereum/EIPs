@@ -26,7 +26,7 @@ signature verification schemes.
 Quantum supremacy[1] "is the goal of demonstrating that a programmable quantum computer can solve a problem that no classical computer can solve in any feasible amount of time".
 Previous attempts have been made to demonstrate quantum supremacy, e.g. Kim[2], Arute[3] and Morvan[4], 
 but they have been refuted or at least claimed to have no practical benefit, e.g. Begusic and Chan[5], Pednault[6], 
-and a quote from Sebastian Weidt in The Telegraph.
+and a quote from Sebastian Weidt (The Telegraph, "Supercomputer makes calculations in blink of an eye that take rivals 47 years", 2023).
 Quantum supremacy, by its current definition, is "irrespective of the usefulness of the problem".
 This proposal, however, focuses on a stricter definition of a problem that indicates the earliest sign where an adversary may soon bypass current Ethereum cryptography standards.
 This contract serves as trustless, unbiased proof of this strong quantum supremacy by generating a classically intractable problem on chain, 
@@ -137,16 +137,16 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e48
 Order-finding reduces[9] to integer factoring, therefore
 the modulus must also be difficult to factor.
 
-[Sander](https://link.springer.com/chapter/10.1007/978-3-540-47942-0_21) proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
+Sander[10] proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
 Using logic based on that described by Anoncoin, one could generate 119 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
 
 #### Predicted security
 ##### Classical
-Burt Kaliski and RSA Laboratories (2003, "TWIRL and RSA Key Size") recommends 3,072-bit key sizes for RSA to be secure beyond 2030,
-although Joël Alwen (Wickr, 2017, "The Bit-Security of Cryptographic Primitives") claims that it is only considered secure for the next 2-3 decades.
+Burt Kaliski and RSA Laboratories ("TWIRL and RSA Key Size", 2003) recommends 3,072-bit key sizes for RSA to be secure beyond 2030,
+although Joël Alwen (Wickr, "The Bit-Security of Cryptographic Primitives", 2017) claims that it is only considered secure for the next 2-3 decades.
 
 ##### Quantum
-Breaking 256-bit elliptic curve encryption is expected[10] to require 2,330 qubits, although with current fault-tolerant regime, it is expected[11] that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
+Breaking 256-bit elliptic curve encryption is expected[11] to require 2,330 qubits, although with current fault-tolerant regime, it is expected[12] that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
 
 ### Choosing the puzzle
 The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
@@ -376,8 +376,27 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [10]:
 ```csl-json
     {
-      "type": "misc"
+      "type": "inproceedings"
       "id": 10,
+      "author"=[{"family": "Sander", "given": "Tomas"}],
+      "DOI": "10.1007/978-3-540-47942-0_21",
+      "title": "Efficient Accumulators without Trapdoor Extended Abstract", 
+      "original-date": {
+        "date-parts": [
+          [1999, 09, 11]
+        ]
+      },
+      "custom": {
+        "additional-urls": [
+          "https://doi.org/10.1007/978-3-540-47942-0_21"
+        ]
+      }
+    ```
+[11]:
+```csl-json
+    {
+      "type": "misc"
+      "id": 11,
       "author"=[{"family": "Roetteler", "given": "Martin"}, {"family": "Naehrig", "given": "Michael"}, {"family": "Svore", "given": "Krysta M."}, {"family": "Lauter", "given": "Kristin"}],
       "DOI": "10.48550/arXiv.1706.06752",
       "title": "Quantum resource estimates for computing elliptic curve discrete logarithms", 
@@ -388,11 +407,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       },
       "URL": "https://doi.org/10.48550/arXiv.1706.06752"
     ```
-[11]:
+[12]:
 ```csl-json
     {
       "type": "article"
-      "id": 11,
+      "id": 12,
       "author"=[{"family": "Webber", "given": "Mark"}, {"family": "Elfving", "given": "Vincent"}, {"family": "Weidt", "given": "Sebastian"}, {"family": "Hensinger", "given": "Winfried K."}],
       "DOI": "10.1116/5.0073075",
       "title": "The impact of hardware specifications on reaching quantum advantage in the fault tolerant regime", 
