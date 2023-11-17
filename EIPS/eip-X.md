@@ -111,6 +111,7 @@ number of prime factors of a 3072-bit integer is less than 12.
 
 Deploying a contract with 119 locks of a provided 3072-bit integer having 16 factors then providing that solution for
 each of them resulted in a cost of 583,338,223 gas. Providing a solution for a single lock cost 4,959,717 gas.
+The majority of the cost comes from verifying that the provided factors are indeed prime with the Miller-Rabin primality test.
 
 Since the number of factors is greater than the expected[9] number of factors of any integer, this may serve as an initial estimate of the cost to verify the solutions for randomly generated integers. Therefore, since the total cost is less than
 `MINIMUM_GAS_PAYOUT` gas, a bounty covering at least `MINIMUM_GAS_PAYOUT` should be funded to the contract.
