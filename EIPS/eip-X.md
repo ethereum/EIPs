@@ -101,9 +101,6 @@ Prime factorization has a known, efficient, quantum solution[8]
 but is believed to be intractable for classical computers. This then reliably serves as a test for strong quantum supremacy, since
 finding a solution to this problem should only be doable by a quantum computer.
 
-Sander[11] proves that difficult to factor numbers without a known factorization, called an RSA-UFO, can be generated. 
-Using logic based on that described by Anoncoin using this method, this contract shall generate `NUMBER_OF_LOCKS` integers of `BIT_SIZE_OF_PRIMES` bits each to achieve a one in a billion chance of being insecure.
-
 
 ### Bounty Funds
 
@@ -115,7 +112,7 @@ number of prime factors of a 3072-bit integer is less than 12.
 Deploying a contract with 119 locks of a provided 3072-bit integer having 16 factors then providing that solution for
 each of them resulted in a cost of 583,338,223 gas. Providing a solution for a single lock cost 4,959,717 gas.
 
-Since the number of factors is greater than the expected number of factors of any integer, this may serve as an initial estimate of the cost to verify the solutions for randomly generated integers. Therefore, since the total cost is less than
+Since the number of factors is greater than the expected[9] number of factors of any integer, this may serve as an initial estimate of the cost to verify the solutions for randomly generated integers. Therefore, since the total cost is less than
 `MINIMUM_GAS_PAYOUT` gas, a bounty covering at least `MINIMUM_GAS_PAYOUT` should be funded to the contract.
 
 
@@ -139,12 +136,12 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e48
 
 ## Security Considerations
 
-### Bit length of the modulus
+### Bit-length of the integers
 Order-finding reduces[10] to integer factoring, therefore
 the modulus must also be difficult to factor.
 
-Sander[11] proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
-Using logic based on that described by Anoncoin, one could generate 119 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
+Sander[11] proves that difficult to factor numbers without a known factorization, called an RSA-UFO, can be generated.
+Using logic based on that described by Anoncoin using this method, this contract shall generate `NUMBER_OF_LOCKS` integers of `BIT_SIZE_OF_PRIMES` bits each to achieve a one in a billion chance of being insecure.
 
 #### Predicted security
 ##### Classical
@@ -166,7 +163,7 @@ Order-finding can be reduced[10] to factoring, and vice-versa. Since it is cheap
 
 - need to generate hard to factor modulus
 - cost estimation (deploy)
-- cost estimation (solve) (Cleve[9])
+- cost estimation (solve) (Cleve[14])
 
 To simulate expected gas costs -- given a random 3071-bit base and a random 3072-bit modulus, 196 random solutions of byte size equal to its iteration were sent to the contract.
 The gas cost for all of these simulations never exceeded 44,305 gas. Therefore, we expect a minimum bounty covering a cost of 50,000 gas in even extreme gas markets (e.g. 1000 Gwei / gas) to reliably cover the
@@ -384,20 +381,20 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [9]:
 ```csl-json
     {
-      "type": "misc"
-      "id": 9,
-      "author"=[{"family": "Cleve", "given": "Richard"}],
-      "DOI": "10.1016/j.ic.2004.04.001",
-      "title": "The query complexity of order-finding", 
+      "type": "article"
+      "id": 10,
+      "author"=[{"family": "Erdös", "given": "P."}, {"family": "Kac", "given": "M."}],
+      "DOI": "10.2307/2371483",
+      "title": "The Gaussian Law of Errors in the Theory of Additive Number Theoretic Functions", 
       "original-date": {
         "date-parts": [
-          [1999, 11, 30]
+          [1940, 04]
         ]
       },
-      "URL": "https://doi.org/10.1016/j.ic.2004.04.001"
+      "URL": "https://www.semanticscholar.org/paper/The-Gaussian-Law-of-Errors-in-the-Theory-of-Number-Erd%C3%B6s-Kac/261864821aa770542be65dbe16640684ab786fa9",
       "custom": {
         "additional-urls": [
-          "https://doi.org/10.48550/arXiv.quant-ph/9911124"
+          "https://doi.org/10.2307/2371483"
         ]
       }
     ```
@@ -405,7 +402,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 ```csl-json
     {
       "type": "article"
-      "id": 10,
+      "id": 11,
       "author"=[{"family": "Woll", "given": "Heather"}],
       "DOI": "10.1016/0890-5401(87)90030-7",
       "title": "Reductions among number theoretic problems", 
@@ -420,7 +417,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 ```csl-json
     {
       "type": "inproceedings"
-      "id": 11,
+      "id": 9,
       "author"=[{"family": "Sander", "given": "Tomas"}],
       "DOI": "10.1007/978-3-540-47942-0_21",
       "title": "Efficient Accumulators without Trapdoor Extended Abstract", 
@@ -439,7 +436,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 ```csl-json
     {
       "type": "misc"
-      "id": 12,
+      "id": 13,
       "author"=[{"family": "Roetteler", "given": "Martin"}, {"family": "Naehrig", "given": "Michael"}, {"family": "Svore", "given": "Krysta M."}, {"family": "Lauter", "given": "Kristin"}],
       "DOI": "10.48550/arXiv.1706.06752",
       "title": "Quantum resource estimates for computing elliptic curve discrete logarithms", 
@@ -454,7 +451,7 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 ```csl-json
     {
       "type": "article"
-      "id": 13,
+      "id": 14,
       "author"=[{"family": "Webber", "given": "Mark"}, {"family": "Elfving", "given": "Vincent"}, {"family": "Weidt", "given": "Sebastian"}, {"family": "Hensinger", "given": "Winfried K."}],
       "DOI": "10.1116/5.0073075",
       "title": "The impact of hardware specifications on reaching quantum advantage in the fault tolerant regime", 
@@ -464,5 +461,25 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         ]
       },
       "URL": "https://doi.org/10.1116/5.0073075"
+    ```
+[14]:
+```csl-json
+    {
+      "type": "misc"
+      "id": 12,
+      "author"=[{"family": "Cleve", "given": "Richard"}],
+      "DOI": "10.1016/j.ic.2004.04.001",
+      "title": "The query complexity of order-finding", 
+      "original-date": {
+        "date-parts": [
+          [1999, 11, 30]
+        ]
+      },
+      "URL": "https://doi.org/10.1016/j.ic.2004.04.001"
+      "custom": {
+        "additional-urls": [
+          "https://doi.org/10.48550/arXiv.quant-ph/9911124"
+        ]
+      }
     ```
 [ERC-2470]: ./eip-2470.md
