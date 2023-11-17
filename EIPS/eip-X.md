@@ -23,7 +23,7 @@ signature verification schemes.
 
 ## Motivation
 
-Quantum supremacy[1] "is the goal of demonstrating that a programmable quantum computer can solve a problem that no classical computer can solve in any feasible amount of time".
+Quantum supremacy[1] would be a demonstration of a quantum computer solving a problem that would take a classical computer an infeasible amount of time to solve.
 Previous attempts have been made to demonstrate quantum supremacy, e.g. Kim[2], Arute[3] and Morvan[4], 
 but they have been refuted or at least claimed to have no practical benefit, e.g. Begusic and Chan[5], Pednault[6], 
 and a quote from Sebastian Weidt (The Telegraph, "Supercomputer makes calculations in blink of an eye that take rivals 47 years", 2023).
@@ -48,45 +48,37 @@ strong quantum supremacy has been achieved by solving the classically intractabl
 - In this contract, a "lock" refers to a generated puzzle for which a solution must be provided 
 in order to withdraw funds and mark the contract as solved.
 
-| Parameter                 | Value    |
-|---------------------------|----------|
-| `EIP_X_SINGLETON_ADDRESS` | `TBD`    |
-| `MINIMUM_GAS_PAYOUT`      | `50,000` |
-| `MODULUS_BIT_SIZE`        | `3072`   |
-| `NUMBER_OF_LOCKS`         | `119`    |
+| Parameter                 | Value         |
+|---------------------------|---------------|
+| `BIT_SIZE_OF_PRIMES`      | `3072`        |
+| `EIP_X_SINGLETON_ADDRESS` | `TBD`         |
+| `MINIMUM_GAS_PAYOUT`      | `600,000,000` |
+| `NUMBER_OF_LOCKS`         | `119`         |
 
 ### Puzzle
 
-The puzzles that this contract generates are of order-finding,
-where given a positive integer _n_ and an integer _a_ coprime to _n_, the objective is to find the smallest positive integer
-_k_ such that _a_ ^ _k_ = 1 (mod _n_).
+The puzzles that this contract generates are of prime factorization,
+where given a positive integer _n_, the objective is to find a list of prime numbers whose product is equal to _n_.
 
 
 ### Requirements
 
-- Generating locks, (one for each `NUMBER_OF_LOCKS`)
-  - This contract SHALL generate an integer, the modulus, of exactly `MODULUS_BIT_SIZE` random bits. 
-    It SHALL then generate another integer, the base, of <= `MODULUS_BIT_SIZE` bits and reduce it modulo the first generated integer.
-  - If the base is equal to 1 or -1 mod _n_ or is coprime to the modulus, it MUST be thrown out and another base MUST be generated.
+- This contract MUST generate each of the `NUMBER_OF_LOCKS` locks by generating an integer of exactly `BIT_SIZE_OF_PRIMES` random bits.
 - This contract MUST accept ETH from any account without restriction.
-- This contract MUST allow someone to provide the multiplicative order of the base with the modulus for each lock.
+- This contract MUST allow someone to provide the prime factorization of any lock.
   If it is the correct solution and solves the last unsolved lock, then this contract MUST send all of its ETH to the solver and mark a flag to indicate that this contract has been solved.
 
 ### Deployment method
 
 - The contract MUST be deployed as a Singleton ([ERC-2470]).
-- After deploying the contract with parameters of `NUMBER_OF_LOCKS` lock having a `MODULUS_BIT_SIZE`-bit modulus, the contract's `triggerLockAccumulation()` method SHALL be called repeatedly until `generationIsDone == true`, i.e. all bits have been generated.
+- After deploying the contract with parameters of `NUMBER_OF_LOCKS` locks, each probabilistically generating an integer composed
+  of at least two `BIT_SIZE_OF_PRIMES`-bit primes, the contract's `triggerLockAccumulation()` method SHALL be called repeatedly until `generationIsDone == true`, i.e. all bits have been generated.
 
 ### Providing solutions
 
+- The solution for each lock SHALL be provided separately.
 - Providing solutions MUST follow a commit-reveal scheme to prevent front running.
 - This scheme MUST require one day between commit and reveal.
-
-### Bounty funds
-
-- Funds covering at least `MINIMUM_GAS_PAYOUT` gas SHALL be sent to the contract as a bounty.
-  The funds must be updated to cover this amount as the value of gas increases.
-- The contract MUST accept any additional funds from any account as a donation to the bounty.
 
 ### Rewarding the solver
 
@@ -95,22 +87,36 @@ Upon solving the final solution,
   - The `solved` flag MUST be set to `true`
   - Subsequent transactions to commit, reveal, or add funds to the contract MUST be reverted.
 
+### Bounty funds
+
+- Funds covering at least `MINIMUM_GAS_PAYOUT` gas SHALL be sent to the contract as a bounty.
+  The funds must be updated to cover this amount as the value of gas increases.
+- The contract MUST accept any additional funds from any account as a donation to the bounty.
+
 ## Rationale
 
 ### Puzzle
 
-Order-finding has a known, efficient, quantum solution[8]
-but is intractable for classical computers. This then reliably serves as a test for strong quantum supremacy, since
+Prime factorization has a known, efficient, quantum solution[8]
+but is believed to be intractable for classical computers. This then reliably serves as a test for strong quantum supremacy, since
 finding a solution to this problem should only be doable by a quantum computer.
 
-Order-finding can be reduced[9] to factoring, and vice-versa. Since it is cheaper to verify an order-finding solution than a factorization solution, the puzzle is generated by first generating hard-to-factor numbers with high probability as a modulus and then generating a random number coprime to that modulus.
+Sander[11] proves that difficult to factor numbers without a known factorization, called an RSA-UFO, can be generated. 
+Using logic based on that described by Anoncoin using this method, this contract shall generate `NUMBER_OF_LOCKS` integers of `BIT_SIZE_OF_PRIMES` bits each to achieve a one in a billion chance of being insecure.
 
 
 ### Bounty Funds
 
-To simulate expected gas costs -- given a random 783-bit base and a random 784-bit modulus, 196 random solutions of byte size equal to its iteration were sent to the contract.
-The gas cost for all of these simulations never exceeded 44,305 gas. Therefore, we expect a minimum bounty covering a cost of 50,000 gas in even extreme gas markets (e.g. 1000 Gwei / gas) to reliably cover the
-cost for a solver to provide a solution.
+The solver SHALL be reimbursed at least the cost of verifying the puzzle solutions. Therefore, to estimate the cost, an estimate
+can be calculated by providing the solution of a known factorization. 
+The expected number of prime factors is log(log(_n_)), so the expected
+number of prime factors of a 3072-bit integer is less than 12. 
+
+Deploying a contract with 119 locks of a provided 3072-bit integer having 16 factors then providing that solution for
+each of them resulted in a cost of 583,338,223 gas. Providing a solution for a single lock cost 4,959,717 gas.
+
+Since the number of factors is greater than the expected number of factors of any integer, this may serve as an initial estimate of the cost to verify the solutions for randomly generated integers. Therefore, since the total cost is less than
+`MINIMUM_GAS_PAYOUT` gas, a bounty covering at least `MINIMUM_GAS_PAYOUT` should be funded to the contract.
 
 
 ## Backwards Compatibility
@@ -134,10 +140,10 @@ https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e48
 ## Security Considerations
 
 ### Bit length of the modulus
-Order-finding reduces[9] to integer factoring, therefore
+Order-finding reduces[10] to integer factoring, therefore
 the modulus must also be difficult to factor.
 
-Sander[10] proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
+Sander[11] proves that difficult to factor numbers without a known factorization, called RSA-UFOs, can be generated.
 Using logic based on that described by Anoncoin, one could generate 119 integers of 3,072 bits each to achieve a one in a billion chance of being insecure.
 
 #### Predicted security
@@ -146,10 +152,25 @@ Burt Kaliski and RSA Laboratories ("TWIRL and RSA Key Size", 2003) recommends 3,
 although Joël Alwen (Wickr, "The Bit-Security of Cryptographic Primitives", 2017) claims that it is only considered secure for the next 2-3 decades.
 
 ##### Quantum
-Breaking 256-bit elliptic curve encryption is expected[11] to require 2,330 qubits, although with current fault-tolerant regime, it is expected[12] that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
+Breaking 256-bit elliptic curve encryption is expected[12] to require 2,330 qubits, although with current fault-tolerant regime, it is expected[13] that 13 * 10^6 physical qubits would be required to break 256-bit elliptic curve encryption within one day.
 
 ### Choosing the puzzle
 The following are other options that were considered as the puzzle to be used along with the reasoning for not using them.
+
+#### Order-finding
+
+where given a positive integer _n_ and an integer _a_ coprime to _n_, the objective is to find the smallest positive integer
+_k_ such that _a_ ^ _k_ = 1 (mod _n_).
+
+Order-finding can be reduced[10] to factoring, and vice-versa. Since it is cheaper to verify an order-finding solution than a factorization solution, the puzzle is generated by first generating hard-to-factor numbers with high probability as a modulus and then generating a random number coprime to that modulus.
+
+- need to generate hard to factor modulus
+- cost estimation (deploy)
+- cost estimation (solve) (Cleve[9])
+
+To simulate expected gas costs -- given a random 3071-bit base and a random 3072-bit modulus, 196 random solutions of byte size equal to its iteration were sent to the contract.
+The gas cost for all of these simulations never exceeded 44,305 gas. Therefore, we expect a minimum bounty covering a cost of 50,000 gas in even extreme gas markets (e.g. 1000 Gwei / gas) to reliably cover the
+cost for a solver to provide a solution.
 
 #### Sign a message given a public key
 Given a random public key, the solver would need to sign a message, which the contract would verify to have been 
@@ -163,8 +184,10 @@ two large primes to produces the product of the primes.
 This method has the flaw that the minter has the capability to see the primes, 
 and therefore some level of trust would need to be given that the minter would throw the values away.
 
-#### Powers of Tau
-This also has a trust factor, albeit very small. It requires that at least one person in the party is honest.
+#### Decentralized trusted setup
+This inherently has a trust factor, albeit very small. It requires that at least one person in the party is honest.
+A fully trustless setup is preferred. However, further investigation may be done to potentially uncover a valid puzzle that uses a 
+decentralized setup and has an advantage (perhaps with a lower cost or a greater leading indicator) worth the additional trust.
 
 
 ### Front running and censorship
@@ -361,8 +384,28 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
 [9]:
 ```csl-json
     {
-      "type": "article"
+      "type": "misc"
       "id": 9,
+      "author"=[{"family": "Cleve", "given": "Richard"}],
+      "DOI": "10.1016/j.ic.2004.04.001",
+      "title": "The query complexity of order-finding", 
+      "original-date": {
+        "date-parts": [
+          [1999, 11, 30]
+        ]
+      },
+      "URL": "https://doi.org/10.1016/j.ic.2004.04.001"
+      "custom": {
+        "additional-urls": [
+          "https://doi.org/10.48550/arXiv.quant-ph/9911124"
+        ]
+      }
+    ```
+[10]:
+```csl-json
+    {
+      "type": "article"
+      "id": 10,
       "author"=[{"family": "Woll", "given": "Heather"}],
       "DOI": "10.1016/0890-5401(87)90030-7",
       "title": "Reductions among number theoretic problems", 
@@ -373,11 +416,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       },
       "URL": "https://doi.org/10.1016/0890-5401(87)90030-7"
     ```
-[10]:
+[11]:
 ```csl-json
     {
       "type": "inproceedings"
-      "id": 10,
+      "id": 11,
       "author"=[{"family": "Sander", "given": "Tomas"}],
       "DOI": "10.1007/978-3-540-47942-0_21",
       "title": "Efficient Accumulators without Trapdoor Extended Abstract", 
@@ -392,11 +435,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
         ]
       }
     ```
-[11]:
+[12]:
 ```csl-json
     {
       "type": "misc"
-      "id": 11,
+      "id": 12,
       "author"=[{"family": "Roetteler", "given": "Martin"}, {"family": "Naehrig", "given": "Michael"}, {"family": "Svore", "given": "Krysta M."}, {"family": "Lauter", "given": "Kristin"}],
       "DOI": "10.48550/arXiv.1706.06752",
       "title": "Quantum resource estimates for computing elliptic curve discrete logarithms", 
@@ -407,11 +450,11 @@ Copyright and related rights waived via [CC0](../LICENSE.md).
       },
       "URL": "https://doi.org/10.48550/arXiv.1706.06752"
     ```
-[12]:
+[13]:
 ```csl-json
     {
       "type": "article"
-      "id": 12,
+      "id": 13,
       "author"=[{"family": "Webber", "given": "Mark"}, {"family": "Elfving", "given": "Vincent"}, {"family": "Weidt", "given": "Sebastian"}, {"family": "Hensinger", "given": "Winfried K."}],
       "DOI": "10.1116/5.0073075",
       "title": "The impact of hardware specifications on reaching quantum advantage in the fault tolerant regime", 
