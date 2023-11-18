@@ -123,4 +123,5 @@ When implementing the 'Time Capsule' encryption mechanism using Verifiable Delay
 By addressing these security considerations, the 'Time Capsule' mechanism can provide a robust and secure method for time-delayed encryption and decryption of content on the Ethereum blockchain.
 
 ## Copyright
+
 Copyright and related rights waived via CC0.
