@@ -1,120 +1,126 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
-discussions-to: <URL>
+title: Time Capsule Encryption via VDF
+description: Introduces on-chain content encryption with a time-locked decryption mechanism using Verifiable Delay Functions.
+author: Hojay (@hojayxyz), Igor (@igorperic17), Branko (@saicoder), Ivan (@IvanLudvig)
+discussions-to: https://ethereum-magicians.org/t/eip-for-time-capsule-encryption-via-verifiable-delay-functions-vdfs/16682
 status: Draft
-type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+type: Standards Track
+category: Core
+created: 2023-11-18
+requires: N/A
 ---
-
-<!--
-  READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
-
-  This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
-
-  Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-  The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category.
-
-  TODO: Remove this comment before submitting
--->
 
 ## Abstract
 
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
+This Ethereum Improvement Proposal introduces a 'Time Capsule' mechanism to securely encrypt content on the Ethereum blockchain with a pre-defined time delay for decryption, using Verifiable Delay Functions (VDFs). It allows users to upload encrypted content (text or files) and ensures that decryption occurs only after the specified delay, irrespective of computing power advancements, thereby enhancing Ethereum's data handling capabilities for time-sensitive applications.
 
 ## Motivation
 
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
+The current Ethereum ecosystem lacks a mechanism for time-bound data confidentiality. This EIP proposes a solution to securely encrypt and store content on-chain, which remains inaccessible until a predetermined future time. This functionality is crucial for various applications like sealed bidding, time-locked messages, and secure digital inheritance, enhancing Ethereum's utility in handling time-sensitive information.
 
 ## Specification
 
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  TODO: Remove this comment before submitting
--->
-
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+The 'Time Capsule' encryption mechanism operates as follows:
+
+1. **Encryption and Time Delay Setting:**
+   - Users MUST encrypt their content using a specified encryption algorithm (e.g., AES-256).
+   - During encryption, users MUST set a time delay for decryption, specified in blocks or time units (e.g., days, hours).
+   - The encrypted content and time delay information MUST be encapsulated in a smart contract deployed on the Ethereum blockchain.
+
+2. **Verifiable Delay Function Integration:**
+   - A Verifiable Delay Function (VDF) MUST be employed to ensure that the decryption process adheres to the specified time delay.
+   - The VDF MUST be designed so that its execution time is predictable and linearly dependent on the number of operations, and it MUST NOT be susceptible to acceleration through parallel processing.
+   - Upon completion of the VDF execution, a decryption key or mechanism SHALL be made available.
+
+3. **Decryption Process:**
+   - Once the set time delay has elapsed, as determined by the VDF, nodes on the Ethereum network MAY begin the decryption process.
+   - The decryption process MUST ensure that only after the specified time delay has elapsed, the content becomes accessible.
+   - A self-validation mechanism MUST be included to verify the integrity and authenticity of the decrypted content.
+
+4. **On-Chain Verification and Interaction:**
+   - Smart contracts involved in the 'Time Capsule' mechanism MUST include functions to verify the status of the time delay and to initiate the decryption process post delay.
+   - Users and recipients MUST be able to interact with the smart contract to retrieve the status of the encrypted content and access it post the time delay.
+
+5. **Gas and Transaction Fee Management:**
+   - The smart contract MUST handle the transaction and gas fees required for deploying the contract, performing the VDF, and executing the decryption process.
+   - It MUST specify the fee structure and rewards for nodes participating in the decryption process.
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-TBD
+The use of VDFs ensures a guaranteed time delay for decryption, immune to acceleration by computational power increases. This approach ensures that encrypted content remains secure until the predefined time, addressing the need for reliable time-locked encryption on the blockchain.
 
 ## Backwards Compatibility
-
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
 
 No backward compatibility issues found.
 
 ## Test Cases
 
-<!--
-  This section is optional for non-Core EIPs.
+The following test cases are designed to validate the core functionalities of the 'Time Capsule' encryption mechanism using Verifiable Delay Functions (VDFs). Implementations of this EIP MUST pass all the following tests:
 
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
+1. **Encryption and Time Delay Setting Test:**
+   - Verify that content can be encrypted and a time delay for decryption can be set correctly.
+   - Encrypt a sample text or file using the specified encryption algorithm.
+   - Set a specific time delay for decryption.
+   - Store the encrypted content and time delay information in a smart contract.
+   - The smart contract accurately reflects the encrypted content and the set time delay.
 
-  TODO: Remove this comment before submitting
--->
+2. **Verifiable Delay Function Execution Test:**
+   - Ensure that the VDF adheres to the specified time delay and cannot be expedited.
+   - Initiate the VDF with a predefined number of operations correlating to the set time delay.
+   - Attempt to process the VDF using varying computational resources.
+   - The VDF takes the same amount of time to complete regardless of computational resources, adhering strictly to the set time delay.
+
+3. **Decryption Post Time Delay Test:**
+   - Validate that decryption occurs only after the specified time delay.
+   - After the time delay set in the VDF has elapsed, initiate the decryption process.
+   - Verify the integrity and authenticity of the decrypted content.
+   - Decryption is successful and accurate only after the VDF has completed, and the content matches the original pre-encryption data.
+
+4. **Smart Contract Interaction Test:**
+   - Confirm that users and recipients can interact with the smart contract as intended.
+   - Query the smart contract for the status of the encrypted content and time delay.
+   - After the time delay, access the decrypted content via the smart contract.
+   - The smart contract responds correctly to queries and allows access to decrypted content post time delay.
 
 ## Reference Implementation
 
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
+https://github.com/igorperic17/memento/
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
+When implementing the 'Time Capsule' encryption mechanism using Verifiable Delay Functions (VDFs), several security considerations must be taken into account to ensure the integrity, confidentiality, and availability of the encrypted content:
 
-  The current placeholder is acceptable for a draft.
+1. **Encryption Strength:**
+   - The encryption algorithm chosen MUST be strong enough to withstand modern cryptographic attacks. It is RECOMMENDED to use well-established encryption standards like AES-256.
+   - Regular security audits and updates are REQUIRED to ensure the encryption method remains secure against emerging threats.
 
-  TODO: Remove this comment before submitting
--->
+2. **VDF Implementation:**
+   - The VDF MUST be implemented in a manner that prevents acceleration through parallel processing or other optimization techniques.
+   - The security of the VDF implementation MUST be evaluated to ensure it behaves predictably and consistently across different platforms and environments.
 
-Needs discussion.
+3. **Smart Contract Security:**
+   - Smart contracts used in the 'Time Capsule' mechanism MUST undergo thorough security audits to identify and rectify vulnerabilities such as reentrancy attacks, overflow/underflow bugs, and improper access control.
+   - It is RECOMMENDED to follow established best practices for smart contract development, including the use of well-reviewed code patterns and libraries.
+
+4. **Time Manipulation Resistance:**
+   - The mechanism MUST be resistant to time manipulation attacks where an adversary might attempt to alter the system clock or block timestamp to prematurely decrypt the content.
+   - Robustness against such attacks can be ensured by relying on block numbers or VDF completion, rather than timestamps, for determining decryption eligibility.
+
+5. **Access Control:**
+   - Proper access control mechanisms MUST be implemented to ensure that only authorized entities can initiate the encryption and decryption processes.
+   - Careful consideration is REQUIRED to prevent unauthorized access to the encrypted content, especially during the decryption phase.
+
+6. **Denial of Service (DoS) Risks:**
+   - The system SHOULD be designed to resist DoS attacks, particularly those targeting the decryption process or the smart contract’s functionality.
+   - Considerations include limiting the rate of decryption requests and ensuring the system can handle a high volume of concurrent encryption/decryption operations.
+
+7. **Key Management:**
+   - Secure handling and storage of encryption and decryption keys are CRITICAL. Exposure of these keys poses a significant risk to the confidentiality of the encrypted content.
+   - Implementations SHOULD include mechanisms for secure key generation, storage, and destruction, following industry best practices.
+
+By addressing these security considerations, the 'Time Capsule' mechanism can provide a robust and secure method for time-delayed encryption and decryption of content on the Ethereum blockchain.
 
 ## Copyright
-
-Copyright and related rights waived via [CC0](../LICENSE.md).
+Copyright and related rights waived via CC0.
