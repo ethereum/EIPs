@@ -7,7 +7,6 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2023-11-18
-requires: N/A
 ---
 
 ## Abstract
