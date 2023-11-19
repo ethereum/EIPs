@@ -4,6 +4,7 @@ governance:
   - gcolvin
   - SamWilsn
   - Pandapip1
+  - bumblefudge
 core:
   - lightclient
   - axic
@@ -25,6 +26,7 @@ interface:
   - axic
   - SamWilsn
   - Pandapip1
+  - bumblefudge
 meta:
   - lightclient
   - axic
@@ -32,6 +34,7 @@ meta:
   - SamWilsn
   - Pandapip1
   - xinbenlv
+  - bumblefudge
 informational:
   - lightclient
   - axic
@@ -39,3 +42,4 @@ informational:
   - SamWilsn
   - Pandapip1
   - xinbenlv
+  - bumblefudge
