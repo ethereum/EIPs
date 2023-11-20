@@ -1,0 +1,914 @@
+[[modifiers]]
+kind = "set-default-annotation"
+name = "status"
+value = "Stagnant"
+annotation_type = "warning"
+
+[[modifiers]]
+kind = "set-default-annotation"
+name = "status"
+value = "Withdrawn"
+annotation_type = "warning"
+
+[lints.preamble-refs-title]
+kind = "preamble-proposal-ref"
+name = "title"
+
+[lints.preamble-discussions-to]
+kind = "preamble-url"
+name = "discussions-to"
+
+[lints.preamble-re-title]
+kind = "preamble-regex"
+name = "title"
+mode = "excludes"
+pattern = '(?i)standar\w*\b'
+message = "preamble header `title` should not contain `standard` (or similar words.)"
+
+[lints.preamble-refs-description]
+kind = "preamble-proposal-ref"
+name = "description"
+
+[lints.preamble-date-created]
+kind = "preamble-date"
+name = "created"
+
+[lints.preamble-requires-ref-description]
+kind = "preamble-require-referenced"
+name = "description"
+requires = "requires"
+
+[lints.markdown-html-comments]
+kind = "markdown-html-comments"
+name = "status"
+warn_for = [
+    "Draft",
+    "Withdrawn",
+]
+
+[lints.markdown-re-erc-dash]
+kind = "markdown-regex"
+mode = "excludes"
+pattern = '(?i)erc[\s]*[0-9]+'
+message = "proposals must be referenced with the form `ERC-N` (not `ERCN` or `ERC N`)"
+
+[lints.markdown-link-first]
+kind = "markdown-link-first"
+pattern = "(?i)(?:eip|erc)-[0-9]+"
+
+[lints.markdown-refs]
+kind = "markdown-proposal-ref"
+
+[lints.preamble-enum-status]
+kind = "preamble-one-of"
+name = "status"
+values = [
+    "Draft",
+    "Review",
+    "Last Call",
+    "Final",
+    "Stagnant",
+    "Withdrawn",
+    "Living",
+]
+
+[lints.preamble-req]
+kind = "preamble-required"
+names = [
+    "eip",
+    "title",
+    "description",
+    "author",
+    "discussions-to",
+    "status",
+    "type",
+    "created",
+]
+
+[lints.preamble-requires-status]
+kind = "preamble-requires-status"
+requires = "requires"
+status = "status"
+flow = [
+    [
+    "Draft",
+    "Stagnant",
+],
+    ["Review"],
+    ["Last Call"],
+    [
+    "Final",
+    "Withdrawn",
+    "Living",
+    "Moved",
+],
+]
+
+[lints.markdown-req-section]
+kind = "markdown-section-required"
+sections = [
+    "Abstract",
+    "Specification",
+    "Rationale",
+    "Security Considerations",
+    "Copyright",
+]
+
+[lints.markdown-order-section]
+kind = "markdown-section-order"
+sections = [
+    "Abstract",
+    "Motivation",
+    "Specification",
+    "Rationale",
+    "Backwards Compatibility",
+    "Test Cases",
+    "Reference Implementation",
+    "Security Considerations",
+    "Copyright",
+]
+
+[lints.preamble-re-description-erc-dash]
+kind = "preamble-regex"
+name = "description"
+mode = "excludes"
+pattern = '(?i)erc[\s]*[0-9]+'
+message = "proposals must be referenced with the form `ERC-N` (not `ERCN` or `ERC N`)"
+
+[lints.preamble-req-withdrawal-reason]
+kind = "preamble-required-if-eq"
+when = "status"
+equals = "Withdrawn"
+then = "withdrawal-reason"
+
+[lints.markdown-rel-links]
+kind = "markdown-relative-links"
+exceptions = [
+    '^https://(www\.)?github\.com/ethereum/consensus-specs/blob/[a-f0-9]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/consensus-specs/commit/[a-f0-9]{40}$',
+    '^https://(www\.)?github\.com/ethereum/devp2p/blob/[0-9a-f]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/devp2p/commit/[0-9a-f]{40}$',
+    '^https://(www\.)?github\.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki$',
+    '^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$',
+    '^https://[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$',
+    '^https://www\.rfc-editor\.org/rfc/.*$',
+]
+
+[lints.preamble-requires-ref-title]
+kind = "preamble-require-referenced"
+name = "title"
+requires = "requires"
+
+[lints.markdown-link-status]
+kind = "markdown-link-status"
+status = "status"
+flow = [
+    [
+    "Draft",
+    "Stagnant",
+],
+    ["Review"],
+    ["Last Call"],
+    [
+    "Final",
+    "Withdrawn",
+    "Living",
+    "Moved",
+],
+]
+
+[lints.preamble-file-name]
+kind = "preamble-file-name"
+name = "eip"
+prefix = "eip-"
+suffix = ".md"
+
+[lints.preamble-req-category]
+kind = "preamble-required-if-eq"
+when = "type"
+equals = "Standards Track"
+then = "category"
+
+[lints.preamble-author]
+kind = "preamble-author"
+name = "author"
+
+[lints.preamble-no-dup]
+kind = "preamble-no-duplicates"
+
+[lints.markdown-re-eip-dash]
+kind = "markdown-regex"
+mode = "excludes"
+pattern = '(?i)eip[\s]*[0-9]+'
+message = "proposals must be referenced with the form `EIP-N` (not `EIPN` or `EIP N`)"
+
+[lints.preamble-date-last-call-deadline]
+kind = "preamble-date"
+name = "last-call-deadline"
+
+[lints.preamble-re-title-eip-dash]
+kind = "preamble-regex"
+name = "title"
+mode = "excludes"
+pattern = '(?i)eip[\s]*[0-9]+'
+message = "proposals must be referenced with the form `EIP-N` (not `EIPN` or `EIP N`)"
+
+[lints.preamble-re-description]
+kind = "preamble-regex"
+name = "description"
+mode = "excludes"
+pattern = '(?i)standar\w*\b'
+message = "preamble header `description` should not contain `standard` (or similar words.)"
+
+[lints.preamble-len-requires]
+kind = "preamble-length"
+name = "requires"
+min = 1
+
+[lints.preamble-len-title]
+kind = "preamble-length"
+name = "title"
+min = 2
+max = 44
+
+[lints.preamble-re-title-colon]
+kind = "preamble-regex"
+name = "title"
+mode = "excludes"
+pattern = ":"
+message = "preamble header `title` should not contain `:`"
+
+[lints.preamble-re-title-erc-dash]
+kind = "preamble-regex"
+name = "title"
+mode = "excludes"
+pattern = '(?i)erc[\s]*[0-9]+'
+message = "proposals must be referenced with the form `ERC-N` (not `ERCN` or `ERC N`)"
+
+[lints.preamble-len-description]
+kind = "preamble-length"
+name = "description"
+min = 2
+max = 140
+
+[lints.preamble-order]
+kind = "preamble-order"
+names = [
+    "eip",
+    "title",
+    "description",
+    "author",
+    "discussions-to",
+    "status",
+    "last-call-deadline",
+    "type",
+    "category",
+    "created",
+    "requires",
+    "withdrawal-reason",
+]
+
+[lints.preamble-enum-type]
+kind = "preamble-one-of"
+name = "type"
+values = [
+    "Standards Track",
+    "Meta",
+    "Informational",
+]
+
+[lints.preamble-re-discussions-to]
+kind = "preamble-regex"
+name = "discussions-to"
+mode = "includes"
+pattern = "^https://ethereum-magicians.org/t/[^/]+/[0-9]+$"
+message = "preamble header `discussions-to` should point to a thread on ethereum-magicians.org"
+
+[lints.preamble-list-requires]
+kind = "preamble-list"
+name = "requires"
+
+[lints.preamble-enum-category]
+kind = "preamble-one-of"
+name = "category"
+values = [
+    "Core",
+    "Networking",
+    "Interface",
+]
+
+[lints.preamble-list-author]
+kind = "preamble-list"
+name = "author"
+
+[lints.preamble-trim]
+kind = "preamble-trim"
+
+[lints.preamble-eip]
+kind = "preamble-uint"
+name = "eip"
+
+[lints.preamble-re-description-colon]
+kind = "preamble-regex"
+name = "description"
+mode = "excludes"
+pattern = ":"
+message = "preamble header `description` should not contain `:`"
+
+[lints.markdown-json-cite]
+kind = "markdown-json-schema"
+language = "csl-json"
+additional_schemas = [[
+    "https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json",
+    """
+{
+  \"description\": \"JSON schema for CSL input data\",
+  \"$schema\": \"http://json-schema.org/draft-07/schema#\",
+  \"$id\": \"https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json\",
+  \"type\": \"array\",
+  \"items\": {
+    \"type\": \"object\",
+    \"properties\": {
+      \"type\": {
+        \"type\": \"string\",
+        \"enum\": [
+          \"article\",
+          \"article-journal\",
+          \"article-magazine\",
+          \"article-newspaper\",
+          \"bill\",
+          \"book\",
+          \"broadcast\",
+          \"chapter\",
+          \"classic\",
+          \"collection\",
+          \"dataset\",
+          \"document\",
+          \"entry\",
+          \"entry-dictionary\",
+          \"entry-encyclopedia\",
+          \"event\",
+          \"figure\",
+          \"graphic\",
+          \"hearing\",
+          \"interview\",
+          \"legal_case\",
+          \"legislation\",
+          \"manuscript\",
+          \"map\",
+          \"motion_picture\",
+          \"musical_score\",
+          \"pamphlet\",
+          \"paper-conference\",
+          \"patent\",
+          \"performance\",
+          \"periodical\",
+          \"personal_communication\",
+          \"post\",
+          \"post-weblog\",
+          \"regulation\",
+          \"report\",
+          \"review\",
+          \"review-book\",
+          \"software\",
+          \"song\",
+          \"speech\",
+          \"standard\",
+          \"thesis\",
+          \"treaty\",
+          \"webpage\"
+        ]
+      },
+      \"id\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"citation-key\": {
+        \"type\": \"string\"
+      },
+      \"categories\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"type\": \"string\"
+        }
+      },
+      \"language\": {
+        \"type\": \"string\"
+      },
+      \"journalAbbreviation\": {
+        \"type\": \"string\"
+      },
+      \"shortTitle\": {
+        \"type\": \"string\"
+      },
+      \"author\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"chair\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"collection-editor\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"compiler\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"composer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"container-author\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"contributor\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"curator\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"director\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"editor\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"editorial-director\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"executive-producer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"guest\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"host\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"interviewer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"illustrator\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"narrator\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"organizer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"original-author\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"performer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"producer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"recipient\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"reviewed-author\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"script-writer\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"series-creator\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"translator\": {
+        \"type\": \"array\",
+        \"items\": {
+          \"$ref\": \"#/definitions/name-variable\"
+        }
+      },
+      \"accessed\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"available-date\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"event-date\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"issued\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"original-date\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"submitted\": {
+        \"$ref\": \"#/definitions/date-variable\"
+      },
+      \"abstract\": {
+        \"type\": \"string\"
+      },
+      \"annote\": {
+        \"type\": \"string\"
+      },
+      \"archive\": {
+        \"type\": \"string\"
+      },
+      \"archive_collection\": {
+        \"type\": \"string\"
+      },
+      \"archive_location\": {
+        \"type\": \"string\"
+      },
+      \"archive-place\": {
+        \"type\": \"string\"
+      },
+      \"authority\": {
+        \"type\": \"string\"
+      },
+      \"call-number\": {
+        \"type\": \"string\"
+      },
+      \"chapter-number\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"citation-number\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"citation-label\": {
+        \"type\": \"string\"
+      },
+      \"collection-number\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"collection-title\": {
+        \"type\": \"string\"
+      },
+      \"container-title\": {
+        \"type\": \"string\"
+      },
+      \"container-title-short\": {
+        \"type\": \"string\"
+      },
+      \"dimensions\": {
+        \"type\": \"string\"
+      },
+      \"division\": {
+        \"type\": \"string\"
+      },
+      \"DOI\": {
+        \"type\": \"string\"
+      },
+      \"edition\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"event\": {
+        \"description\": \"[Deprecated - use 'event-title' instead. Will be removed in 1.1]\",
+        \"type\": \"string\"
+      },
+      \"event-title\": {
+        \"type\": \"string\"
+      },
+      \"event-place\": {
+        \"type\": \"string\"
+      },
+      \"first-reference-note-number\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"genre\": {
+        \"type\": \"string\"
+      },
+      \"ISBN\": {
+        \"type\": \"string\"
+      },
+      \"ISSN\": {
+        \"type\": \"string\"
+      },
+      \"issue\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"jurisdiction\": {
+        \"type\": \"string\"
+      },
+      \"keyword\": {
+        \"type\": \"string\"
+      },
+      \"locator\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"medium\": {
+        \"type\": \"string\"
+      },
+      \"note\": {
+        \"type\": \"string\"
+      },
+      \"number\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"number-of-pages\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"number-of-volumes\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"original-publisher\": {
+        \"type\": \"string\"
+      },
+      \"original-publisher-place\": {
+        \"type\": \"string\"
+      },
+      \"original-title\": {
+        \"type\": \"string\"
+      },
+      \"page\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"page-first\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"part\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"part-title\": {
+        \"type\": \"string\"
+      },
+      \"PMCID\": {
+        \"type\": \"string\"
+      },
+      \"PMID\": {
+        \"type\": \"string\"
+      },
+      \"printing\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"publisher\": {
+        \"type\": \"string\"
+      },
+      \"publisher-place\": {
+        \"type\": \"string\"
+      },
+      \"references\": {
+        \"type\": \"string\"
+      },
+      \"reviewed-genre\": {
+        \"type\": \"string\"
+      },
+      \"reviewed-title\": {
+        \"type\": \"string\"
+      },
+      \"scale\": {
+        \"type\": \"string\"
+      },
+      \"section\": {
+        \"type\": \"string\"
+      },
+      \"source\": {
+        \"type\": \"string\"
+      },
+      \"status\": {
+        \"type\": \"string\"
+      },
+      \"supplement\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"title\": {
+        \"type\": \"string\"
+      },
+      \"title-short\": {
+        \"type\": \"string\"
+      },
+      \"URL\": {
+        \"type\": \"string\"
+      },
+      \"version\": {
+        \"type\": \"string\"
+      },
+      \"volume\": {
+        \"type\": [\"string\", \"number\"]
+      },
+      \"volume-title\": {
+        \"type\": \"string\"
+      },
+      \"volume-title-short\": {
+        \"type\": \"string\"
+      },
+      \"year-suffix\": {
+        \"type\": \"string\"
+      },
+      \"custom\": {
+        \"title\": \"Custom key-value pairs.\",
+        \"type\": \"object\",
+        \"description\": \"Used to store additional information that does not have a designated CSL JSON field. The custom field is preferred over the note field for storing custom data, particularly for storing key-value pairs, as the note field is used for user annotations in annotated bibliography styles.\",
+        \"examples\": [
+          {
+            \"short_id\": \"xyz\",
+            \"other-ids\": [\"alternative-id\"]
+          },
+          {
+            \"metadata-double-checked\": true
+          }
+        ]
+      }
+    },
+    \"required\": [\"type\", \"id\"],
+    \"additionalProperties\": false
+  },
+  \"definitions\": {
+    \"name-variable\": {
+      \"anyOf\": [
+        {
+          \"properties\": {
+            \"family\": {
+              \"type\": \"string\"
+            },
+            \"given\": {
+              \"type\": \"string\"
+            },
+            \"dropping-particle\": {
+              \"type\": \"string\"
+            },
+            \"non-dropping-particle\": {
+              \"type\": \"string\"
+            },
+            \"suffix\": {
+              \"type\": \"string\"
+            },
+            \"comma-suffix\": {
+              \"type\": [\"string\", \"number\", \"boolean\"]
+            },
+            \"static-ordering\": {
+              \"type\": [\"string\", \"number\", \"boolean\"]
+            },
+            \"literal\": {
+              \"type\": \"string\"
+            },
+            \"parse-names\": {
+              \"type\": [\"string\", \"number\", \"boolean\"]
+            }
+          },
+          \"additionalProperties\": false
+        }
+      ]
+    },
+    \"date-variable\": {
+      \"title\": \"Date content model.\",
+      \"description\": \"The CSL input model supports two different date representations: an EDTF string (preferred), and a more structured alternative.\",
+      \"anyOf\": [
+        {
+          \"properties\": {
+            \"date-parts\": {
+              \"type\": \"array\",
+              \"items\": {
+                \"type\": \"array\",
+                \"items\": {
+                  \"type\": [\"string\", \"number\"]
+                },
+                \"minItems\": 1,
+                \"maxItems\": 3
+              },
+              \"minItems\": 1,
+              \"maxItems\": 2
+            },
+            \"season\": {
+              \"type\": [\"string\", \"number\"]
+            },
+            \"circa\": {
+              \"type\": [\"string\", \"number\", \"boolean\"]
+            },
+            \"literal\": {
+              \"type\": \"string\"
+            },
+            \"raw\": {
+              \"type\": \"string\"
+            }
+          },
+          \"additionalProperties\": false
+        }
+      ]
+    }
+  }
+}
+""",
+]]
+schema = """
+{
+  \"$id\": \"https://eips.ethereum.org/assets/eip-1/schema/json/citation.json\",
+  \"description\": \"Citation format for EIPs\",
+  \"$schema\": \"http://json-schema.org/draft-07/schema#\",
+  \"allOf\": [
+    {
+        \"$ref\": \"https://resource.citationstyles.org/schema/v1.0/input/json/csl-data.json#/items\"
+    },
+    {
+      \"required\": [
+        \"DOI\",
+        \"URL\"
+      ],
+      \"properties\": {
+        \"URL\": {
+            \"format\": \"uri\"
+        },
+        \"custom\": {
+          \"properties\": {
+            \"additional-urls\": {
+              \"type\": \"array\",
+              \"items\": {
+                \"format\": \"uri\"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
+"""
+help = "see https://github.com/ethereum/eipw/blob/master/eipw-lint/src/lints/markdown/json_schema/citation.json"
+
+[lints.preamble-uint-requires]
+kind = "preamble-uint-list"
+name = "requires"
+
+[lints.preamble-req-last-call-deadline]
+kind = "preamble-required-if-eq"
+when = "status"
+equals = "Last Call"
+then = "last-call-deadline"
+
+[lints.preamble-re-description-eip-dash]
+kind = "preamble-regex"
+name = "description"
+mode = "excludes"
+pattern = '(?i)eip[\s]*[0-9]+'
+message = "proposals must be referenced with the form `EIP-N` (not `EIPN` or `EIP N`)"
+
+
