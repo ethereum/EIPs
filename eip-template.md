@@ -1,4 +1,4 @@
----
+---MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvA7rh7wpx1f5cR3AkmyV pvGNro5oSWwQq+Rrkrblc7lJs4Y9GbZPW8U2+6lygBlnI5EYcyvtvt+MyI+QjxnN cJ5ShIoxAi1uCoJwQAq6AZOBbmyDjtp3BwmFn7YUhKA4fQewhCKln6kt7I0IwJZ6 9IMnJS3iMvC97PTzEBcG7xDI4YW4o59dvZn/dBcTwmPFo5SeH1LCtWd1JVHx6OcQ vZ0c6apWYZR6dkZGBQcxVS2j01YbUKZqYCckgyuCYl6APzeuk3oP6Fj7x4SGC+jO Od22bmXpJP2cUPAS2EYRgg0KglszicDS6fiS4fHh/vK2ZnRFYkAu05Q8ftidG0nS cQIDAQAB -----END PUBLIC KEY-----
 title: <The EIP title is a few words, not a complete sentence>
 description: <Description is one full (short) sentence>
 author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
