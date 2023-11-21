@@ -48,6 +48,9 @@ class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
 
+    # EIP-2718
+    type_: Optional[TransactionType]
+
     # EIP-2930
     access_list: Optional[List[AccessTuple, MAX_ACCESS_LIST_SIZE]]
 
@@ -61,9 +64,6 @@ class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
 class TransactionSignature(StableContainer[MAX_TRANSACTION_SIGNATURE_FIELDS]):
     from_: ExecutionAddress
     ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
-
-    # EIP-2718
-    type_: Optional[TransactionType]
 
 class SignedTransaction(Container):
     payload: TransactionPayload
@@ -80,15 +80,15 @@ def check_transaction_supported(tx: SignedTransaction):
     if tx.payload.max_priority_fee_per_gas is not None:
         assert tx.payload.access_list is not None
 
-    if tx.signature.type_ != TRANSACTION_TYPE_SSZ:
+    if tx.payload.type_ != TRANSACTION_TYPE_SSZ:
         if tx.payload.max_fee_per_blob_gas is not None:
-            assert tx.signature.type_ == TRANSACTION_TYPE_EIP4844
+            assert tx.payload.type_ == TRANSACTION_TYPE_EIP4844
         elif tx.payload.max_priority_fee_per_gas is not None:
-            assert tx.signature.type_ == TRANSACTION_TYPE_EIP1559
+            assert tx.payload.type_ == TRANSACTION_TYPE_EIP1559
         elif tx.payload.access_list is not None:
-            assert tx.signature.type_ == TRANSACTION_TYPE_EIP2930
+            assert tx.payload.type_ == TRANSACTION_TYPE_EIP2930
         else:
-            assert tx.signature.type_ == TRANSACTION_TYPE_LEGACY or tx.signature.type_ is None
+            assert tx.payload.type_ == TRANSACTION_TYPE_LEGACY or tx.payload.type_ is None
 
 class Root(Bytes32):
     pass
@@ -120,7 +120,7 @@ def compute_ssz_sig_hash(payload: TransactionPayload, chain_id: ChainId) -> Hash
     ).hash_tree_root())
 
 def compute_ssz_tx_hash(tx: SignedTransaction) -> Hash32:
-    assert tx.signature.type_ == TRANSACTION_TYPE_SSZ
+    assert tx.payload.type_ == TRANSACTION_TYPE_SSZ
     return Hash32(tx.hash_tree_root())
 
 def ecdsa_pack_signature(y_parity: bool,
