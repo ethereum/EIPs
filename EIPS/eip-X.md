@@ -123,17 +123,16 @@ Backwards compatibility does not apply as there are no past versions of a contra
 
 ## Test Cases
 
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e4885d373e2489332ef95/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-accumulator.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e4885d373e2489332ef95/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/order-finding-bounty-with-lock-generation.test.ts
-- https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e4885d373e2489332ef95/test/bounty-contracts/order-finding-bounty/order-finding-bounty-with-predetermined-locks/order-finding-bounty-with-predetermined-locks.test.ts
+- [Random Bytes Accumulator](../assets/eip-X/test/bounty-contracts/support/random-bytes-accumulator.test.ts)
+- [RSA UFO Generation](../assets/eip-X/test/bounty-contracts/prime-factoring-bounty/prime-factoring-bounty-with-rsa-ufo/prime-factoring-bounty-with-rsa-ufo.test.ts)
+- [Prime Factoring Bounty](../assets/eip-X/test/bounty-contracts/prime-factoring-bounty/prime-factoring-bounty-with-predetermined-locks/prime-factoring-bounty-with-predetermined-locks.test.ts)
 
 ## Reference Implementation
 
-### Quantum Supremacy Contract
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e4885d373e2489332ef95/contracts/bounty-contracts/order-finding-bounty/order-finding-bounty-with-lock-generation/OrderFindingBountyWithLockGeneration.sol
+- [Quantum Supremacy Contract](../assets/eip-X/contracts/bounty-contracts/prime-factoring-bounty/prime-factoring-bounty-with-rsa-ufo/PrimeFactoringBountyWithRsaUfo.sol)
 
-### Example Proof-of-concept Account Having a Quantum Secure Verification Scheme After Quantum Supremacy Trigger
-https://github.com/nikojpapa/ethereum-quantum-bounty/blob/8a27c190021928a0be6e4885d373e2489332ef95/contracts/bounty-fallback-account/BountyFallbackAccount.sol
+- Example proof-of-concept [Account](../assets/eip-X/contracts/bounty-fallback-account/BountyFallbackAccount.sol) 
+  having a quantum secure verification scheme after quantum supremacy trigger
 
 ## Security Considerations
 
