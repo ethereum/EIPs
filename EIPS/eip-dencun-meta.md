@@ -17,15 +17,15 @@ This Meta EIP lists the EIPs included in the Dencun network upgrade across both 
 
 ### Included EIPs 
 
-* [EIP-1153](./1153): Transient storage opcodes
-* [EIP-4788](./4788): Beacon block root in the EVM
-* [EIP-4844](./4844): Shard Blob Transactions 
-* [EIP-5656](./5656): MCOPY - Memory copying instruction
-* [EIP-6780](./6780): SELFDESTRUCT only in same transaction
-* [EIP-7044](./7044): Perpetually Valid Signed Voluntary Exits
-* [EIP-7045](./7045): Increase Max Attestation Inclusion Slot
-* [EIP-7514](./7514): Add Max Epoch Churn Limit
-* [EIP-7516](./7516): BLOBBASEFEE opcode
+* [EIP-1153](./eip-1153): Transient storage opcodes
+* [EIP-4788](./eip-4788): Beacon block root in the EVM
+* [EIP-4844](./eip-4844): Shard Blob Transactions 
+* [EIP-5656](./eip-5656): MCOPY - Memory copying instruction
+* [EIP-6780](./eip-6780): SELFDESTRUCT only in same transaction
+* [EIP-7044](./eip-7044): Perpetually Valid Signed Voluntary Exits
+* [EIP-7045](./eip-7045): Increase Max Attestation Inclusion Slot
+* [EIP-7514](./eip-7514): Add Max Epoch Churn Limit
+* [EIP-7516](./eip-7516): BLOBBASEFEE opcode
 
 ### Full Specifications 
 
