@@ -59,7 +59,7 @@ The set of EIPs included in Paris are specified in the [`paris.md`](https://gith
 
 ### Shapella 
 
-The Shapella upgrade was the first upgrade to activate at the same time on both the execution and consensus layers. To enable this, the upgrade activation mechanism on the execution layer was changed to use timestamps instead of blocks. This is described in [EIP-6953](./6953) and [EIP-6122](./6122).
+The Shapella upgrade was the first upgrade to activate at the same time on both the execution and consensus layers. To enable this, the upgrade activation mechanism on the execution layer was changed to use timestamps instead of blocks. This is described in [EIP-6953](./eip-6953) and [EIP-6122](./eip-6122).
 
 #### Shanghai [EL]
 
