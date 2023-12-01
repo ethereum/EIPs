@@ -2,7 +2,7 @@
 title: Hardfork Meta Backfill, from Berlin to Shapella
 description: Pointers to specifications used for the network upgrades from Berlin to Shapella.
 author: Tim Beiko (@timbeiko)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/hardfork-meta-backfill/1692
 status: Draft
 type: Meta
 created: 2023-12-01
@@ -23,7 +23,7 @@ The network upgrades below are listed in order of activation. Upgrades to Ethere
 
 ### Beacon Chain Launch - Serenity Phase 0 [CL]
 
-The full specifications for the Beacon Chain at launch can be found in the [`v1.0.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.0.0). Additionally, [EIP-2982](./eip-2982.md) provides context on the Beacon Chain design and rationale for its mainnet parameterization. 
+The full specifications for the Beacon Chain at launch can be found in the [`v1.0.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.0.0). Additionally, [EIP-2982](./eip-2982.md) provides context on the Beacon Chain design and rationale for its mainnet parametrization. 
 
 ### Berlin [EL]
 
@@ -35,7 +35,7 @@ The set of EIPs included in London are specified in the [`london.md`](https://gi
 
 ### Altair [CL]
 
-The full specfications for the Altair network upgrade can be found in the [`v1.1.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.1.0).
+The full specifications for the Altair network upgrade can be found in the [`v1.1.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.1.0).
 
 ### Arrow Glacier [EL]
 
@@ -51,7 +51,7 @@ The Merge was the first upgrade to require coordination between the execution an
 
 #### Bellatrix [CL]
 
-The full specfications for the Bellatrix network upgrade can be found in the [`v1.2.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.2.0).
+The full specifications for the Bellatrix network upgrade can be found in the [`v1.2.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.2.0).
 
 #### Paris [EL]
 
@@ -67,7 +67,7 @@ The set of EIPs included in Shanghai are specified in the[`shanghai.md`](https:/
 
 #### Capella [CL]
 
-The full specfications for the Capella network upgrade can be found in the [`v1.3.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.3.0).
+The full specifications for the Capella network upgrade can be found in the [`v1.3.0` release of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/v1.3.0).
 
 
 ## Rationale
@@ -76,7 +76,7 @@ The EIP repository is well known within the Ethereum community, and Meta EIPs ha
 
 While the specification process for the execution and consensus layers differ, there is value in having a single, harmonized, list of EIPs included in each upgrade, and for the lists for both layers to be part of the same repository.
 
-Re-introducing Hardfork Meta EIPs enables this, and allows for deduplication in cases where an EIP affects both the execution and consensus layer of Ethereum. This EIP covers the upgrades which did not use a Hardfork Meta EIP. 
+Re-introducing Hardfork Meta EIPs enables this, and allows for de-duplication in cases where an EIP affects both the execution and consensus layer of Ethereum. This EIP covers the upgrades which did not use a Hardfork Meta EIP. 
 
 ## Backwards Compatibility
 
