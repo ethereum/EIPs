@@ -1,5 +1,5 @@
 ---
-title: Hardfork Meta: Dencun
+title: Hardfork Meta - Dencun
 description: EIPs included in the Deneb/Cancun Ethereum network upgrade.
 author: Tim Beiko (@timbeiko)
 discussions-to: https://ethereum-magicians.org/t/dencun-hardfork-meta/16924
@@ -31,7 +31,7 @@ This Meta EIP lists the EIPs included in the Dencun network upgrade across both 
 
 #### Consensus Layer
 
-EIPs 4788, 4844, 7044, 7045 and 7514 require changes to Ethereum's consensus layer. These are specified in the [`deneb` folder of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/dev/specs/deneb). 
+EIPs 4788, 4844, 7044, 7045 and 7514 require changes to Ethereum's consensus layer. These are specified in the `deneb` folder of the `ethereum/consensus-specs` repository.
 
 #### Execution Layer
 
