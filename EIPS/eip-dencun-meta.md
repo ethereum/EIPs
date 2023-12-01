@@ -1,0 +1,61 @@
+---
+title: Hardfork Meta: Dencun
+description: EIPs included in the Deneb/Cancun Ethereum network upgrade.
+author: Tim Beiko (@timbeiko)
+discussions-to: <URL>
+status: Draft
+type: Meta
+created: 2023-12-01
+requires: 1153, 4788, 4844, 5656, 6780, 7044, 7045, 7514, 7516
+---
+
+## Abstract
+
+This Meta EIP lists the EIPs included in the Dencun network upgrade across both Ethereum's execution and consensus layers. 
+
+## Specification
+
+### Included EIPs 
+
+* [EIP-1153](./1153): Transient storage opcodes
+* [EIP-4788](./4788): Beacon block root in the EVM
+* [EIP-4844](./4844): Shard Blob Transactions 
+* [EIP-5656](./5656): MCOPY - Memory copying instruction
+* [EIP-6780](./6780): SELFDESTRUCT only in same transaction
+* [EIP-7044](./7044): Perpetually Valid Signed Voluntary Exits
+* [EIP-7045](./7045): Increase Max Attestation Inclusion Slot
+* [EIP-7514](./7514): Add Max Epoch Churn Limit
+* [EIP-7516](./7516): BLOBBASEFEE opcode
+
+### Full Specifications 
+
+#### Consensus Layer
+
+EIPs 4788, 4844, 7044, 7045 and 7514 require changes to Ethereum's consensus layer. These are specified in the [`deneb` folder of the `ethereum/consensus-specs` repository](https://github.com/ethereum/consensus-specs/blob/dev/specs/deneb). 
+
+#### Execution Layer
+
+EIPs 1153, 4788, 4844, 5656, 6780 and 7526 require changes to Ethereum's execution layer. The EIPs fully specify the changes. 
+
+### Activation 
+
+| Network Name     | Activation Epoch | Activation Timestamp |
+|------------------|------------------|----------------------|
+| Goerli           |                  |                      |
+| Sepolia          |                  |                      |
+| Holesky          |                  |                      |
+| Mainnet          |                  |                      |
+
+**Note**: rows in the table above will be filled as actiation times are decided by client teams. 
+
+## Rationale
+
+This Meta EIP provides a global view of all changes included in the Dencun network upgrade, as well as links to full specification. 
+
+## Security Considerations
+
+None.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
