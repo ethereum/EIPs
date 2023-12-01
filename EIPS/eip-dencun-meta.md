@@ -2,7 +2,7 @@
 title: Hardfork Meta: Dencun
 description: EIPs included in the Deneb/Cancun Ethereum network upgrade.
 author: Tim Beiko (@timbeiko)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/dencun-hardfork-meta/16924
 status: Draft
 type: Meta
 created: 2023-12-01
