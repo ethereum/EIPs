@@ -1,7 +1,7 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: <Wer ist die Vitalik Buterin>
+description: <noBot, noVirus, noGosth noBug, noMALEWAR, but 100% woman and 1% FEMALEWARE>
+author: <@IsabelSchoepd (Isabel Schoeps Thiel), Ms. Isabel Schoeps Thiel (in angle brackets).  Example, FirstName LastName (@IsabelSchoepd), Isabel Schoeps Thiel <foo@bar.com>, Isabel (@IsabelSchoepd) and IsabelSchoepd (@github)>
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
