@@ -3,13 +3,14 @@ from typing import BinaryIO, Dict, List as PyList, Optional, TypeVar, Type, Unio
     get_args, get_origin
 from textwrap import indent
 from remerkleable.bitfields import Bitvector
-from remerkleable.complex import ComplexView, FieldOffset, decode_offset, encode_offset
+from remerkleable.complex import ComplexView, Container, FieldOffset, \
+    decode_offset, encode_offset
 from remerkleable.core import View, ViewHook, OFFSET_BYTE_LENGTH
 from remerkleable.tree import NavigationError, Node, PairNode, \
     get_depth, subtree_fill_to_contents, zero_node
 
 N = TypeVar('N')
-S = TypeVar('S', bound="StableContainer")
+S = TypeVar('S', bound="ComplexView")
 
 class StableContainer(ComplexView):
     _field_indices: Dict[str, tuple[int, Type[View], bool]]
@@ -123,6 +124,35 @@ class StableContainer(ComplexView):
             fnode = data.getter(2**get_depth(self.__class__.N) + findex)
             return ftyp.view_from_backing(fnode)
 
+    def __setattr__(self, key, value):
+        if key[0] == '_':
+            super().__setattr__(key, value)
+        else:
+            try:
+                (findex, ftyp, fopt) = self.__class__._field_indices[key]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {key}")
+
+            next_backing = self.get_backing()
+
+            assert value is not None or fopt
+            active_fields = self.active_fields()
+            active_fields.set(findex, value is not None)
+            next_backing = next_backing.rebind_right(active_fields.get_backing())
+
+            if value is not None:
+                if isinstance(value, ftyp):
+                    fnode = value.get_backing()
+                else:
+                    fnode = ftyp.coerce_view(value).get_backing()
+            else:
+                fnode = zero_node(0)
+            data = next_backing.get_left()
+            next_data = data.setter(2**get_depth(self.__class__.N) + findex)(fnode)
+            next_backing = next_backing.rebind_left(next_data)
+
+            self.set_backing(next_backing)
+
     def _get_field_val_repr(self, fkey: str, ftyp: Type[View], fopt: bool) -> str:
         field_start = '  ' + fkey + ': ' + (
             ('Optional[' if fopt else '') + ftyp.__name__ + (']' if fopt else '')
@@ -216,3 +246,81 @@ class StableContainer(ComplexView):
         stream.write(temp_dyn_stream.read(num_data_bytes))
 
         return num_prefix_bytes + num_data_bytes
+
+class Variant(ComplexView):
+    def __new__(cls, backing: Optional[Node] = None, hook: Optional[ViewHook] = None, **kwargs):
+        if backing is not None:
+            if len(kwargs) != 0:
+                raise Exception("cannot have both a backing and elements to init fields")
+            return super().__new__(cls, backing=backing, hook=hook, **kwargs)
+
+        extra_kwargs = kwargs.copy()
+        for fkey, (ftyp, fopt) in cls.fields().items():
+            if fkey in extra_kwargs:
+                extra_kwargs.pop(fkey)
+            elif not fopt:
+                raise AttributeError(f"Field '{fkey}' is required in {cls}")
+            else:
+                pass
+        if len(extra_kwargs) > 0:
+            raise AttributeError(f'The field names [{"".join(extra_kwargs.keys())}] are not defined in {cls}')
+
+        value = cls.S(backing, hook, **kwargs)
+        return cls(backing=value.get_backing())
+
+    def __class_getitem__(cls, s) -> Type["Variant"]:
+        if not issubclass(s, StableContainer):
+            raise Exception(f"invalid variant container: {s}")
+
+        class VariantView(Variant, s):
+            S = s
+
+            @classmethod
+            def fields(cls) -> Dict[str, tuple[Type[View], bool]]:
+                return s.fields()
+
+        VariantView.__name__ = VariantView.type_repr()
+        return VariantView
+
+    @classmethod
+    def type_repr(cls) -> str:
+        return f"Variant[{cls.S.__name__}]"
+
+    @classmethod
+    def deserialize(cls: Type[S], stream: BinaryIO, scope: int) -> S:
+        value = cls.S.deserialize(stream, scope)
+        return cls(backing=value.get_backing())
+
+class OneOf(ComplexView):
+    def __class_getitem__(cls, s) -> Type["OneOf"]:
+        if not issubclass(s, StableContainer) and not issubclass(s, Container):
+            raise Exception(f"invalid oneof container: {s}")
+
+        class OneOfView(OneOf, s):
+            S = s
+
+            @classmethod
+            def fields(cls):
+                return s.fields()
+
+        OneOfView.__name__ = OneOfView.type_repr()
+        return OneOfView
+
+    @classmethod
+    def type_repr(cls) -> str:
+        return f"OneOf[{cls.S}]"
+
+    @classmethod
+    def decode_bytes(cls: Type[S], bytez: bytes, *args, **kwargs) -> S:
+        stream = io.BytesIO()
+        stream.write(bytez)
+        stream.seek(0)
+        return cls.deserialize(stream, len(bytez), *args, **kwargs)
+
+    @classmethod
+    def deserialize(cls: Type[S], stream: BinaryIO, scope: int, *args, **kwargs) -> S:
+        value = cls.S.deserialize(stream, scope)
+        v = cls.select_variant(value, *args, **kwargs)
+        if not issubclass(v.S, cls.S):
+            raise Exception(f"unsupported select_variant result: {v}")
+        return v(backing=value.get_backing())
