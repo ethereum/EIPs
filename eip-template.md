@@ -139,6 +139,7 @@ function updateTokenURI(address user, string memory tokenURI) public onlyOwner
 function safeTransferFrom(adress _from, address _to, uint256 _tokenId) public virtual oveerid
 
 }
+
 ```
 Through this process, obtaining SBT is the only means of authentication, and the possession of SBT subsequently serves as a method for identity verification.
 
