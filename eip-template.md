@@ -74,7 +74,7 @@ NFT metadata structured by the official ERC721 metadata standard or the Enjin Me
 
 ```jsx
 {
-   "description":“University bachelor KYC",
+   "description":"University bachelor KYC",
    "external_url":"https://api.kor.credential/metadata/1/1",
    "home_url":"https://app.kor.credential/token/1",
    "image_url":"https://www.poap.xyz/events/badges/ethdenver-19.png",
@@ -87,14 +87,14 @@ In addition to the existing NFT metadata standards, a new standard for identity 
 
 ```jsx
 {
-   "description":“University bachelor KYC",
+   "description":"University bachelor KYC",
    "external_url":"https://api.kor.credential/metadata/1/1",
    "home_url":"https://app.kor.credential/token/1",
    "image_url":"https://www.poap.xyz/events/badges/ethdenver-19.png",
    "name":" KOREA KYC",
    "attributes" : { ... },
-   **"Iusser" : { ...},**
-   "**credentialNumber" : { ... },**
+   "Iusser" : { ...},
+   "credentialNumber" : { ... },
  }
 ```
 
