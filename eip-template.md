@@ -2,7 +2,7 @@
 title: Authentication SBT using Credential
 description: verifying a User's DID/credential and issuing SBT
 author: Geunyoung Kim (@c1ick), JaeCheol Ryou <jcryou@home.cnu.ac.kr
-discussions-to: URL
+discussions-to: TBD
 status: Draft
 type: Standards Track
 category: ERC
