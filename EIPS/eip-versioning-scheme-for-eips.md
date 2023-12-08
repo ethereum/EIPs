@@ -107,31 +107,43 @@ This section explores how the versioning scheme would be applied to existing EIP
 
 ### EIP-4788
 
-The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) included many (necessary) breaking changes to its specification. As of 2023-11-01, the EIP still had status "Draft"; this case study assumes that the EIP moved to status "Review" as of [#????](https://github.com/ethereum/EIPs/pull/???), tagged as per versioning scheme with a new major version X.Y.Z.
+The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) contains many changes to its specification. EIP-4788 was updated to status "Review" on 2023-11-28, [#7992](https://github.com/ethereum/EIPs/pull/7992). This case study assumes, however, that the EIP moved to status "Review" as of [#6859](https://github.com/ethereum/EIPs/pull/6859) and updated to version 1.0.0 due to the start of a client team implementation.
 
 #### Changelog
 
-- 2023-09-26 Update ring buffer size rationale for new ring buffer size [#7786](https://github.com/ethereum/EIPs/pull/7786).
-- 2023-09-26 Post audit tweaks [#7532](https://github.com/ethereum/EIPs/pull/7532).
-- 2023-08-28 4788 cleanups [#7532](https://github.com/ethereum/EIPs/pull/7532).
-- 2023-08-24 Initial stab at v2 [#7456](https://github.com/ethereum/EIPs/pull/7456).
-- 2023-08-01 Mention genesis block with no existing beacon block root case [#7445](https://github.com/ethereum/EIPs/pull/7445).
-- 2023-07-07 Explicitly specify header schema [#7297](https://github.com/ethereum/EIPs/pull/7297).
-- 2023-07-07 Fix typo [#7293](https://github.com/ethereum/EIPs/pull/7293).
-- 2023-07-05 Bound precompile storage [#7178](https://github.com/ethereum/EIPs/pull/7178).
-- 2023-06-13 Clarify header and validity sections [#7179](https://github.com/ethereum/EIPs/pull/7179).
-- 2023-06-12 Update precompile address. [#7173](https://github.com/ethereum/EIPs/pull/7173).
-- 2023-05-31 Key beacon roots by root [#7107](https://github.com/ethereum/EIPs/pull/7107).
-- 2023-05-24 Favor stateful precompile over opcode [#7065](https://github.com/ethereum/EIPs/pull/7065).
-- 2023-05-17 send current slot from CL to avoid timestamp conversions [#7037](https://github.com/ethereum/EIPs/pull/7037).
-- 2023-05-15 Fix typo [#7005](https://github.com/ethereum/EIPs/pull/7005).
-- 2023-05-03 Update eip-4788.md [#6980](https://github.com/ethereum/EIPs/pull/6980).
-- 2023-04-13 minor nits [#6870](https://github.com/ethereum/EIPs/pull/6870).
-- 2023-04-11 Move to Draft [#6859](https://github.com/ethereum/EIPs/pull/6859).
-- 2023-02-04 0.1.3 Updating EIPS/eip-4788.md to status "Stagnant" [#6432](https://github.com/ethereum/EIPs/pull/6432).
-- 2022-06-29 0.1.2 Rename "beacon block root" to "beacon state root" [#5090](https://github.com/ethereum/EIPs/pull/5090).
-- 2022-05-06 0.1.1 Pandapip1 Force usage of included LICENSE file [#5055](https://github.com/ethereum/EIPs/pull/5055).
-- 2022-02-17 0.1.0 Add EIP-4788: Beacon state root in EVM [#4788](https://github.com/ethereum/EIPs/pull/4788).
+- 9.0.1 - 2023-09-26: Update ring buffer size rationale for new ring buffer size [#7786](https://github.com/ethereum/EIPs/pull/7786).
+- 9.0.0 - 2023-09-26: Post audit tweaks [#7672](https://github.com/ethereum/EIPs/pull/7672).
+  - Verify timestamp is non-zero.
+  - Make `HISTORY_BUFFER_LENGTH` prime (8191).
+  - Load calldata once.
+  - Update `BEACON_ROOTS_ADDRESS`.
+- 8.0.1 - 2023-08-28: 4788 cleanups [#7532](https://github.com/ethereum/EIPs/pull/7532).
+- 8.0.0 - 2023-08-24: Initial stab at v2 [#7456](https://github.com/ethereum/EIPs/pull/7456).
+  - Require timestamp input to be exactly 32 bytes.
+  - Revert if timestamp input does not match stored value (instead of returning zeroed word).
+  - Remove precompile concept, use regular smart contract with provided bytecode.
+- 7.0.3 - 2023-08-01: Mention genesis block with no existing beacon block root case [#7445](https://github.com/ethereum/EIPs/pull/7445).
+- 7.0.2 - 2023-07-07: Explicitly specify header schema [#7297](https://github.com/ethereum/EIPs/pull/7297).
+- 7.0.1 - 2023-07-07: Fix typo [#7293](https://github.com/ethereum/EIPs/pull/7293).
+- 7.0.0 - 2023-07-05: Bound precompile storage [#7178](https://github.com/ethereum/EIPs/pull/7178).
+- 6.0.1 - 2023-06-13: Clarify header and validity sections [#7179](https://github.com/ethereum/EIPs/pull/7179).
+- 6.0.0 - 2023-06-12: Update precompile address. [#7173](https://github.com/ethereum/EIPs/pull/7173).
+- 5.0.0 - 2023-05-31: Key beacon roots by root [#7107](https://github.com/ethereum/EIPs/pull/7107).
+- 4.0.0 - 2023-05-24: Favor stateful precompile over opcode [#7065](https://github.com/ethereum/EIPs/pull/7065).
+- 3.0.0 - 2023-05-17: Send current slot from CL to avoid timestamp conversions [#7037](https://github.com/ethereum/EIPs/pull/7037).
+- 2.0.1 - 2023-05-15: Fix typo [#7005](https://github.com/ethereum/EIPs/pull/7005).
+- 2.0.0 - 2023-05-03: Update opcode to avoid clash [#6980](https://github.com/ethereum/EIPs/pull/6980).
+- 1.0.1 - 2023-04-13: Minor nits [#6870](https://github.com/ethereum/EIPs/pull/6870).
+- 1.0.0 - 2023-04-11: Use block roots; update to status "Draft" [#6859](https://github.com/ethereum/EIPs/pull/6859).
+  - Update to "Draft" due to client implementation ([NethermindEth/nethermind#5476](https://github.com/NethermindEth/nethermind/pull/5476)).
+  - Use block roots instead of state roots.
+  - Roots are stored keyed by slot.
+  - Use of ring buffer in state.
+  - Use header timestamps to derive slot numbers, rather than consume additional header space.
+- 0.2.1 - 2023-02-04:  Update to status "Stagnant" [#6432](https://github.com/ethereum/EIPs/pull/6432).
+- 0.2.0 - 2022-06-29:  Rename "beacon block root" to "beacon state root" [#5090](https://github.com/ethereum/EIPs/pull/5090).
+- 0.1.1 - 2022-05-06: Force usage of included LICENSE file [#5055](https://github.com/ethereum/EIPs/pull/5055).
+- 0.1.0 - 2022-02-17: Add EIP-4788: Beacon state root in EVM [#4788](https://github.com/ethereum/EIPs/pull/4788).
 
 ## Reference Implementation
 
@@ -146,15 +158,7 @@ The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) 
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-Needs discussion.
+TBD
 
 ## Copyright
 
