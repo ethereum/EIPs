@@ -97,89 +97,9 @@ Making the version available in the EIP's metadata header additionally allows fo
 
 A richer versioning scheme, as defined by this EIP, can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can specify the version they implement in generated tests as metadata. This allows a test runner to mark tests to xfail (expectedly fail) and issue a warning if the `MAJOR` or `MINOR` versions don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation, although given the pace of Ethereum development, it will likely be impractical to maintain and track multiple versions of tests.
 
-Mermaid rendered at https://gist.github.com/danceratopz/93913d5b3b74a181c8511d886bbf5736.
-
-```mermaid
----
-title: How EIP Versioning Could be Used Within the Ethereum Execution Specs Testing Toolchain
----
-flowchart LR
-  style t8n  stroke:#333,stroke-width:2px
-  style hive stroke:#F9A825,stroke-width:2px
-  style blocktest_direct stroke:#F9A825,stroke-width:2px
-  
-  subgraph ethereum/EIPs
-    EIP-123(<code>EIPS/EIP-123.md</code>\n<code>version: 2.2.4</code>)
-    EIP-321(<code>EIPS/EIP-321.md</code>\n<code>version: 4.5.1</code>)
-  end
-
-  subgraph "ethereum/execution-spec-tests"
-    subgraph "JSON Test Filler Framework"
-        subgraph "Test source code"
-          tests-EIP-123(<code>./tests/EIP-123/**/*.py</code>\n<code>version: 2.2.4</code>\nPython Test Cases)
-          tests-EIP-321(<code>./tests/EIP-321/**/*.py</code>\n<code>version: 4.5.1</code>\nPython Test Cases)
-        end
-        fill(<code>$ fill ./tests/</code>\nPython \ pytest\n- xfail/skip if EIP not supported by client\n- warning: if ethereum/EIPs and test source versions mismatch\n- warning: if t8n and test source versions mismatch)
-    end
-    subgraph "Runner for Test Fixture Consumers"
-      consume(<code>$ consume  --evm-bin=blocktest</code>\nPython \ pytest\n- xfail/skip + warning if EIP not supported by client\n- warning: if ethereum/EIPs and test fixture versions mismatch\n- warning: if blocktest and test fixture versions mismatch)
-    end
-  end
-
-  subgraph "EVM Transition Tool"
-    t8n(<code>evm t8n</code>\nexternal executable\n<code>EIP-123 version: 2.2.1</code>\n<code>EIP-321 version: None</code>)
-  end
-
-  subgraph "EVM Test Fixture Consumer (Module Test)"
-    blocktest(<code>evm blocktest</code>\nexternal executable\n<code>EIP-123 version: 2.1.0</code>\n<code>EIP-321 version: 4.4.0</code>)
-  end
-  
-  subgraph "Test Fixture Consumers"
-    subgraph "ethereum/hive (System Test)"
-        hive(<code>$ hive ...</code>\nGo Client Testing Environment)
-    end
-    subgraph "Runner for Test Fixture Consumer"
-      subgraph "Test Fixture Consumer (Module Test)"
-        blocktest_direct(Client executable)
-      end
-    end
-  end
-
-fixtures(<code>./fixtures/**/*.json</code>\nJSON Test Fixtures parametrized per fork\nIncluding test metadata:\n- <code>t8n: evmone-t8n 0.11.0-dev+commit.634d7068</code>\n- <code>test-source: eip-123:v2.2.4</code>\n- <code>test-source: eip-321:v4.5.1</code>)
-
-test_report(<code>./test_report.xml</code>\nJUnit XML)
-
-
-
-EIP-123       <-.-> fill
-EIP-321       <-.-> |retrieve latest spec version\nvia Github API| fill
-t8n           <-.-> fill
-tests-EIP-123   --> fill
-tests-EIP-321   --> fill
-fill            --> |output| fixtures
-blocktest     <-.-> consume
-fixtures        --> |input| hive
-fixtures        --> |input| blocktest_direct
-fixtures        --> |input| consume
-consume         --> |output| test_report
-```
-
 ## Backwards Compatibility
 
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
 It is not necessary to retroactively add a CHANGELOG or versions for versions of the EIP prior to the introduction of this EIP. Upon the next change to the EIP's Specification section, the author MUST introduce a CHANGELOG section and a version number that follows the semantic versioning scheme outlined above.
-
-~~## Test Cases~~
 
 ## Case Study
 
@@ -187,7 +107,7 @@ This section explores how the versioning scheme would be applied to existing EIP
 
 ### EIP-4788
 
-The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) included many (necessary) breaking changes to its specification. Unfortunately, as of 2023-11-01, the EIP still has status "Draft"; this case study assumes that the EIP moved to status "Review" as of [#????](https://github.com/ethereum/EIPs/pull/???), tagged as per versioning scheme with a new major version X.Y.Z.
+The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) included many (necessary) breaking changes to its specification. As of 2023-11-01, the EIP still had status "Draft"; this case study assumes that the EIP moved to status "Review" as of [#????](https://github.com/ethereum/EIPs/pull/???), tagged as per versioning scheme with a new major version X.Y.Z.
 
 #### Changelog
 
@@ -212,15 +132,6 @@ The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) 
 - 2022-06-29 0.1.2 Rename "beacon block root" to "beacon state root" [#5090](https://github.com/ethereum/EIPs/pull/5090).
 - 2022-05-06 0.1.1 Pandapip1 Force usage of included LICENSE file [#5055](https://github.com/ethereum/EIPs/pull/5055).
 - 2022-02-17 0.1.0 Add EIP-4788: Beacon state root in EVM [#4788](https://github.com/ethereum/EIPs/pull/4788).
-
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
 
 ## Reference Implementation
 
