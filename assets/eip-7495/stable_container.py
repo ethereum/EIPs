@@ -124,6 +124,35 @@ class StableContainer(ComplexView):
             fnode = data.getter(2**get_depth(self.__class__.N) + findex)
             return ftyp.view_from_backing(fnode)
 
+    def __setattr__(self, key, value):
+        if key[0] == '_':
+            super().__setattr__(key, value)
+        else:
+            try:
+                (findex, ftyp, fopt) = self.__class__._field_indices[key]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {key}")
+
+            next_backing = self.get_backing()
+
+            assert value is not None or fopt
+            active_fields = self.active_fields()
+            active_fields.set(findex, value is not None)
+            next_backing = next_backing.rebind_right(active_fields.get_backing())
+
+            if value is not None:
+                if isinstance(value, ftyp):
+                    fnode = value.get_backing()
+                else:
+                    fnode = ftyp.coerce_view(value).get_backing()
+            else:
+                fnode = zero_node(0)
+            data = next_backing.get_left()
+            next_data = data.setter(2**get_depth(self.__class__.N) + findex)(fnode)
+            next_backing = next_backing.rebind_left(next_data)
+
+            self.set_backing(next_backing)
+
     def _get_field_val_repr(self, fkey: str, ftyp: Type[View], fopt: bool) -> str:
         field_start = '  ' + fkey + ': ' + (
             ('Optional[' if fopt else '') + ftyp.__name__ + (']' if fopt else '')
