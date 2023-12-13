@@ -97,22 +97,9 @@ The history of [EIP-4788](./eip-4788.md) contains many changes to its specificat
 
 It is not necessary to retroactively add a CHANGELOG or versions for versions of the EIP prior to the introduction of this EIP. Upon the next change to the EIP's Specification section, the author MUST introduce a CHANGELOG section and a version number that follows the semantic versioning scheme outlined above.
 
-## Reference Implementation
-
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
-
-Required tooling for the ethereum/EIPs repo TBD.
-
 ## Security Considerations
 
-TBD.
+None.
 
 ## Copyright
 
