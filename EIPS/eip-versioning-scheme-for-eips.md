@@ -1,62 +1,24 @@
 ---
 title: Versioning Scheme for EIPs
 description: Use a versioning scheme for EIPs based on changes made to their Specification section.
-author: Danceratopz (@danceratopz), Ahmad Bitar (smartprogrammer93)
+author: danceratopz (@danceratopz), Ahmad Bitar (@smartprogrammer93)
 discussions-to: https://ethereum-magicians.org/t/XXXX
 status: Draft
 type: Meta
-created: 2023-11-XX
+created: 2023-12-13
 ---
-
-<!--
-  READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
-
-  This is the suggested template for new EIPs. After you have filled in the requisite fields, please delete these comments.
-
-  Note that an EIP number will be assigned by an editor. When opening a pull request to submit your EIP, please use an abbreviated title in the filename, `eip-draft_title_abbrev.md`.
-
-  The title should be 44 characters or less. It should not repeat the EIP number in title, irrespective of the category.
-
-  TODO: Remove this comment before submitting
--->
 
 ## Abstract
 
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
-
-This EIP introduces a versioning scheme for [Standards Track](https://eips.ethereum.org/EIPS/eip-1#eip-types) EIPs by applying [Semantic Versioning](https://semver.org/) based on changes made to the EIP's Specification section once its status has changed from `Draft` to `Review`.
+This EIP introduces a versioning scheme for [Standards Track](./eip-1.md#eip-types) EIPs by applying [Semantic Versioning](https://semver.org/) based on changes made to the EIP's Specification section once its status has changed from `Draft` to `Review`.
 
 ## Motivation
 
-<!--
-  This section is optional.
-
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
-
 EIP specifications often receive increasing modifications as more people review them, which is generally the case as client teams start implementing the specifications and the community gains a better understanding of their interaction with the rest of the protocol. These changes can be difficult to track. In particular, as EVM reference tests are often not maintained (and generally not released) by client teams or the EIP's authors, it can be difficult to ascertain whether a release of reference tests (for example from [ethereum/tests](https://github.com/ethereum/tests) or [ethereum/execution-spec-tests](https://github.com/ethereum/execution-spec-tests)) is sufficient, or even valid, to test the latest version of an EIP's specifications or the specification as currently implemented by a client.
 
-This EIP proposes a semantic versioning scheme for the Specification section and an addition of a CHANGELOG section for EIPs that allows the community to easily track changes, their impact on current client and test implementations and maintain a clear history.
+This EIP proposes a semantic versioning scheme and an addition of a CHANGELOG section for EIPs that allows the community to easily track changes, their impact on current client and test implementations and maintain a clear history.
 
 ## Specification
-
-<!--
-  The Specification section should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (besu, erigon, ethereumjs, go-ethereum, nethermind, or others).
-
-  It is recommended to follow RFC 2119 and RFC 8170. Do not remove the key word definitions if RFC 2119 and RFC 8170 are followed.
-
-  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
-
-  TODO: Remove this comment before submitting
--->
 
 Once an EIP has moved out of "Draft" status, it MUST use the EIP versioning scheme outlined below. It MAY already use the versioning scheme in "Draft" status, which could be useful if the specification is actively being implemented. If more than one team is implementing the specification, it is RECOMMENDED to change the EIP's status to "Review".
 
@@ -83,14 +45,6 @@ EIPS that have dependencies on other EIPS SHOULD include the version of the depe
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
 A semantic versioning scheme enables clearer communication within the community about EIP status and allows the impact of a change to be ascertained at first glance.
 
 Making the version available in the EIP's metadata header additionally allows for programmatic parsing of the version number by tooling used in reference tests or by client teams. Currently, the [ethereum/execution-spec-tests](https://github.com/ethereum/execution-spec-tests) repository implements a rudimentary [EIP version checker](https://ethereum.github.io/execution-spec-tests/main/writing_tests/reference_specification/): EIP spec tests are required to declare the EIP's markdown file digest SHA that the test implementation was based on. The current value of the digest SHA is then polled via the Github API to verify that no changes have occurred since the test implementation. While this provides a warning to test implementers that the EIP has changed, it is clearly of limited use.
@@ -107,7 +61,7 @@ This section explores how the versioning scheme would be applied to existing EIP
 
 ### EIP-4788
 
-The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](https://eips.ethereum.org/EIPS/eip-4788) contains many changes to its specification. EIP-4788 was updated to status "Review" on 2023-11-28, [#7992](https://github.com/ethereum/EIPs/pull/7992). This case study assumes, however, that the EIP moved to status "Review" as of [#6859](https://github.com/ethereum/EIPs/pull/6859) and updated to version 1.0.0 due to the start of a client team implementation.
+The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](./eip-4788.md) contains many changes to its specification. EIP-4788 was updated to status "Review" on 2023-11-28, [#7992](https://github.com/ethereum/EIPs/pull/7992). This case study assumes, however, that the EIP moved to status "Review" as of [#6859](https://github.com/ethereum/EIPs/pull/6859) and updated to version 1.0.0 due to the start of a client team implementation.
 
 #### Changelog
 
@@ -156,9 +110,11 @@ The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) 
   TODO: Remove this comment before submitting
 -->
 
+Required tooling for the ethereum/EIPs repo TBD.
+
 ## Security Considerations
 
-TBD
+TBD.
 
 ## Copyright
 
