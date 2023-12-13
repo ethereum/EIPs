@@ -51,17 +51,11 @@ Making the version available in the EIP's metadata header additionally allows fo
 
 A richer versioning scheme, as defined by this EIP, can provide a lot of value to the testing toolchain. Client teams can provide an interface that reports the EIP version currently implemented and reference tests can specify the version they implement in generated tests as metadata. This allows a test runner to mark tests to xfail (expectedly fail) and issue a warning if the `MAJOR` or `MINOR` versions don't match. It would even be possible to automatically select the correct version of the reference tests to run against a client implementation, although given the pace of Ethereum development, it will likely be impractical to maintain and track multiple versions of tests.
 
-## Backwards Compatibility
+### Case Study
 
-It is not necessary to retroactively add a CHANGELOG or versions for versions of the EIP prior to the introduction of this EIP. Upon the next change to the EIP's Specification section, the author MUST introduce a CHANGELOG section and a version number that follows the semantic versioning scheme outlined above.
+This section explores how the versioning scheme would be applied to an existing EIPs recently under active development at the time of writing as an example.
 
-## Case Study
-
-This section explores how the versioning scheme would be applied to existing EIPs recently under active development at the time of writing.
-
-### EIP-4788
-
-The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) of [EIP-4788](./eip-4788.md) contains many changes to its specification. EIP-4788 was updated to status "Review" on 2023-11-28, [#7992](https://github.com/ethereum/EIPs/pull/7992). This case study assumes, however, that the EIP moved to status "Review" as of [#6859](https://github.com/ethereum/EIPs/pull/6859) and updated to version 1.0.0 due to the start of a client team implementation.
+The history of [EIP-4788](./eip-4788.md) contains many changes to its specification. EIP-4788 was updated to status "Review" on 2023-11-28, [#7992](https://github.com/ethereum/EIPs/pull/7992). This case study assumes, however, that the EIP moved to status "Review" as of [#6859](https://github.com/ethereum/EIPs/pull/6859) and updated to version 1.0.0 due to the start of a client team implementation.
 
 #### Changelog
 
@@ -98,6 +92,10 @@ The [history](https://github.com/ethereum/EIPs/commits/master/EIPS/eip-4788.md) 
 - 0.2.0 - 2022-06-29:  Rename "beacon block root" to "beacon state root" [#5090](https://github.com/ethereum/EIPs/pull/5090).
 - 0.1.1 - 2022-05-06: Force usage of included LICENSE file [#5055](https://github.com/ethereum/EIPs/pull/5055).
 - 0.1.0 - 2022-02-17: Add EIP-4788: Beacon state root in EVM [#4788](https://github.com/ethereum/EIPs/pull/4788).
+
+## Backwards Compatibility
+
+It is not necessary to retroactively add a CHANGELOG or versions for versions of the EIP prior to the introduction of this EIP. Upon the next change to the EIP's Specification section, the author MUST introduce a CHANGELOG section and a version number that follows the semantic versioning scheme outlined above.
 
 ## Reference Implementation
 
