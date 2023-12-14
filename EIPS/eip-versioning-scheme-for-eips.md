@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 7577
 title: Versioning Scheme for EIPs
 description: Use a versioning scheme for EIPs based on changes made to their Specification section.
 author: danceratopz (@danceratopz), Ahmad Bitar (@smartprogrammer93)
