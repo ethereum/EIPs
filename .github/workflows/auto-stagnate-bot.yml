@@ -12,7 +12,7 @@ jobs:
     name: Auto Stagnant Bot
     steps:
       - name: Checkout
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - name: Setup Node.js Environment
         uses: actions/setup-node@d98fa1113850e562f83c7fc3a89c0ecd7a87fbed
         with:

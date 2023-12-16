@@ -91,7 +91,7 @@ jobs:
     
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
         
       - name: Link Checker
         uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Get Changed Files
         id: changed
@@ -134,7 +134,7 @@ jobs:
 
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - uses: ethereum/eipw-action@b8de7ea9ad5cb842301e63898afb996c451c18cf
         id: eipw
@@ -148,7 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout EIP Repository
-        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Get Changed Files
         id: changed
