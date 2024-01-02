@@ -2,7 +2,7 @@
 eip: 75xx
 title: Reserve Precompile Address range for RIPs/L2s
 author: Carl Beekhuizen (@carlbeek), Ansgar Dietrichs (@adietrichs), Danny Ryan (@djrtwo), Tim Beiko (@timbeiko)
-discussions-to: 
+discussions-to: https://ethereum-magicians.org/t/eip-75xx-reserve-precompile-address-range-for-rips-l2s/
 status: Draft
 type: Informational
 created: 2023-12-21
