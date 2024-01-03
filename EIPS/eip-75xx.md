@@ -19,7 +19,7 @@ As L2s begin to deploy RIPs, it is necessary to reserve an address range for use
 
 ## Specification
 
-The address range between `0x00000000000000000000000000000000000000ff` and `0x00000000000000000000000000000000000001ff` is reserved for use by the RIP process.
+The address range between `0x0000000000000000000000000000000000000100` and `0x00000000000000000000000000000000000001ff` is reserved for use by the RIP process.
 
 ## Rationale
 
