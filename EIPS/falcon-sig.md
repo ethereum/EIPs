@@ -2,6 +2,7 @@
 title: Precompile for Falcon Signature Verification
 description: This EIP aims to bring quantum resistance to Ethereum through support for Falcon digital signatures.
 author: Po-Chun Kuo <pk@btq.com>, Chen-Mou Cheng <cheng@btq.com>, Chris Tam (@christam96)
+discussions-to: https://ethereum-magicians.org/t/draft-eip-falcon-signature-verification/18053
 status: Draft
 type: Standards Track
 category: Core
@@ -9,7 +10,7 @@ created: 2023-12-27
 ---
 
 ## Abstract
-Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see [EIP-7212](/eip-7212.md) for support of mobile devices and [ERC-2494](/eip-2494.md) for zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
+Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see [EIP-7212](./EIP/eip-7212.md) for support of mobile devices and [ERC-2494](/eip-2494.md) for zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
 
 ## Motivation
 
