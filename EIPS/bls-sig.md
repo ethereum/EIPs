@@ -33,7 +33,7 @@ The transaction type will have the following format:
 
 with `sender` being the BLS public key of an account with address `address = [0:20](keccak256(sender))`.
 
-The signature value `signature` is calculated by constructing a secp256k1 signature over the following digest:
+The signature value `signature` is calculated by constructing a BLS signature over the following digest:
 
 `tx_hash = keccak256(BLOB_TX_TYPE || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, to, value, data, access_list, sender]))`.
 
