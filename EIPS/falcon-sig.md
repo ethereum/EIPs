@@ -1,8 +1,7 @@
 ---
 title: Precompile for Falcon Signature Verification
 description: This EIP aims to bring quantum resistance to Ethereum through support for Falcon digital signatures.
-author: Po-Chun Kuo <pk@btq.com>, Chen-Mou Cheng <cheng@btq.com>, Chris Tam <chris@btq.com>
-discussions-to: <URL>
+author: Po-Chun Kuo <pk@btq.com>, Chen-Mou Cheng <cheng@btq.com>, Chris Tam (christam96)
 status: Draft
 type: Standards Track
 category: Core
