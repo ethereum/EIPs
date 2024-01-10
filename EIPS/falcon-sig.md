@@ -1,7 +1,7 @@
 ---
 title: Precompile for Falcon Signature Verification
 description: This EIP aims to bring quantum resistance to Ethereum through support for Falcon digital signatures.
-author: Po-Chun Kuo <pk@btq.com>, Chen-Mou Cheng <cheng@btq.com>, Chris Tam (christam96)
+author: Po-Chun Kuo <pk@btq.com>, Chen-Mou Cheng <cheng@btq.com>, Chris Tam (@christam96)
 status: Draft
 type: Standards Track
 category: Core
@@ -9,11 +9,11 @@ created: 2023-12-27
 ---
 
 ## Abstract
-Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see [EIP-7212](https://eips.ethereum.org/EIPS/eip-7212) for support of mobile devices and [ERC-2494](https://eips.ethereum.org/EIPS/eip-2494) for zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
+Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see [EIP-7212](/eip-7212.md) for support of mobile devices and [ERC-2494](/eip-2494.md) for zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
 
 ## Motivation
 
-Ethereum's public key infrastructure heavily relies on the Elliptic Curve Digital Signature Algorithm (ECDSA), an algorithm whose security is rooted in the assumed complexity of the discrete logarithm problem. In 1994, Peter Shor introduced [Shor's algorithm](https://en.wikipedia.org/wiki/Shor%27s_algorithm), capable of solving the discrete logarithm problem in polylogarithmic time, implying that ECDSA will no longer be safe in the face of a quantum adversary. While it may be such that there is not a general purpose quantum computer capable of breaking ECC today, this will likely not be the case tomorrow. This urgency underscores the pressing need to explore alternative cryptographic solutions to safeguard Ethereum's infrastructure. [Falcon](https://falcon-sign.info/) is a cryptographic signature algorithm submitted to the [NIST Post-Quantum Cryptography Project](https://csrc.nist.gov/projects/post-quantum-cryptography) and is [set to be standardized](https://www.nist.gov/news-events/news/2022/07/pqc-standardization-process-announcing-four-candidates-be-standardized-plus#standardization) in 2024. Of the digital signatures to be standardized by NIST, Falcon wields a signature size a full order of magnitude smaller than it's contemporaries. The addition of a precompiled contract for Falcon signature verification would:
+Ethereum's public key infrastructure heavily relies on the Elliptic Curve Digital Signature Algorithm (ECDSA), an algorithm whose security is rooted in the assumed complexity of the discrete logarithm problem. In 1994, Peter Shor introduced Shor's algorithm, capable of solving the discrete logarithm problem in polylogarithmic time, implying that ECDSA will no longer be safe in the face of a quantum adversary. While it may be such that there is not a general purpose quantum computer capable of breaking ECC today, this will likely not be the case tomorrow. This urgency underscores the pressing need to explore alternative cryptographic solutions to safeguard Ethereum's infrastructure. Falcon is a cryptographic signature algorithm submitted to the NIST Post-Quantum Cryptography Project and is set to be standardized in 2024. Of the digital signatures to be standardized by NIST, Falcon wields a signature size a full order of magnitude smaller than it's contemporaries. The addition of a precompiled contract for Falcon signature verification would:
 
    1. Open the door to quantum-safe wallets using signature abstraction to replace ECDSA with Falcon
    2. Allow for efficient verification of Falcon transactions
