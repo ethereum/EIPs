@@ -11,7 +11,7 @@ created: 2023-12-27
 ---
 
 ## Abstract
-Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see EIP-7212 for support of mobile devices and ERC-2494 for zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
+Pre-compiles for additional signatures are common-place to enable new functionality on blockchains (see EIPs for support of mobile devices and zero-knowledge compatibility). This EIP aims to bring quantum resistance ******to Ethereum through support for Falcon digital signatures.
 
 ## Motivation
 
