@@ -1,5 +1,7 @@
 # Ethereum Improvement Proposals (EIPs)
 
+> **_ATTENTION_**: The EIPs repository has recently [undergone](https://github.com/ethereum/EIPs/pull/7206) a separation of ERCs and EIPs. ERCs are now accessible at [https://github.com/ethereum/ercs](https://github.com/ethereum/ercs). All new ERCs and updates to existing ones must be directed at this new repository. The editors apologize for this inconvenience.
+
 The goal of the EIP project is to standardize and provide high-quality documentation for Ethereum itself and conventions built upon it. This repository tracks past and ongoing improvements to Ethereum in the form of Ethereum Improvement Proposals (EIPs). [EIP-1](https://eips.ethereum.org/EIPS/eip-1) governs how EIPs are published.
 
 The [status page](https://eips.ethereum.org/) tracks and lists EIPs, which can be divided into the following categories:
@@ -50,13 +52,13 @@ eipv <INPUT FILE / DIRECTORY>
 
 1. Open Terminal.
 
-2. Check whether you have Ruby 2.1.0 or higher installed:
+2. Check whether you have Ruby 3.1.4 installed. Later [versions are not supported](https://stackoverflow.com/questions/14351272/undefined-method-exists-for-fileclass-nomethoderror).
 
    ```sh
    ruby --version
    ```
 
-3. If you don't have Ruby installed, install Ruby 2.1.0 or higher.
+3. If you don't have Ruby installed, install Ruby 3.1.4.
 
 4. Install Bundler:
 

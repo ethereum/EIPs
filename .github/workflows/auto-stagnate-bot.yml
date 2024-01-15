@@ -2,6 +2,7 @@ on:
   schedule:
     # A job that runs every sunday at 00:00
     - cron:  '0 0 * * 0'
+  workflow_dispatch:
 
 name: Auto Stagnant Bot
 jobs:
@@ -17,7 +18,7 @@ jobs:
         with:
           node-version: '14'
       - name: auto-stagnant-bot
-        uses: ethereum/EIP-Bot@fe4c395bd8bd1f006c353f9b04e694da890ad69a # mark-eips-stale
+        uses: ethereum/EIP-Bot@b3ac0ba3600aea27157fc68d1e36c08cc5a6db77 # mark-eips-stale
         id: auto-stagnant-bot
         with:
           GITHUB-TOKEN: ${{ secrets.TOKEN }}
