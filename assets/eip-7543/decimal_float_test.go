@@ -118,8 +118,6 @@ func benchmarkOpDec(b *testing.B, intArgs []*uint256.Int, op executionFunc) {
 func TestSignedCmp(t *testing.T) {
 	var gas uint64
 
-	// b := uint256.NewInt(15)
-	// a := uint256.NewInt(23)
 	a := new(uint256.Int).Neg(uint256.NewInt(14))
 	b := new(uint256.Int).Neg(uint256.NewInt(15))
 	c := signedCmp(a, b, &gas)
@@ -143,8 +141,6 @@ func TestDecAdd(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Add(&tt.a, &tt.b, PRECISION, &gas)
-		fmt.Println(gas)
-		// fmt.Println("a", showDecimal(&tt.a), "b", showDecimal(&tt.b), "out", showDecimal(&out), "c", showDecimal(&tt.c))
 
 		if !out.eq(&tt.c, PRECISION, &gas) {
 			t.Fatal(tt.a, tt.b, out, tt.c)
@@ -166,10 +162,6 @@ func TestDecNeg(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Neg(&tt.a, &gas)
-		fmt.Println(gas)
-		// fmt.Println("a", showDecimal(&tt.a))
-		// fmt.Println("b", showDecimal(&tt.b))
-		// fmt.Println("out", showDecimal(&out))
 
 		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, tt.b, out)
@@ -194,7 +186,7 @@ func TestDecMul(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Mul(&tt.a, &tt.b, PRECISION, &gas)
-		fmt.Println(gas)
+
 		if !out.eq(&tt.c, PRECISION, &gas) {
 			t.Fatal(tt.a, tt.b, out, tt.c)
 		}
@@ -218,8 +210,6 @@ func TestDecInv(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Inv(&tt.a, PRECISION, &gas)
-		fmt.Println(gas)
-		// fmt.Println("a", showDecimal(&tt.a), "out", showDecimal(&out), "b", showDecimal(&tt.b))
 
 		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, out, tt.b)
@@ -238,9 +228,7 @@ func TestDecNormalize(t *testing.T) {
 
 	NEG_45 := new(uint256.Int).Neg(uint256.NewInt(45))
 	NEG_55 := new(uint256.Int).Neg(uint256.NewInt(55))
-	// NEG_77 := new(uint256.Int).Neg(uint256.NewInt(77))
 	NEG_75 := new(uint256.Int).Neg(uint256.NewInt(75))
-	// NEG_76 := new(uint256.Int).Neg(uint256.NewInt(76))
 
 	var TEN_48, FIVE_48, MINUS_FIVE_48 uint256.Int
 	TEN_48.Exp(uint256.NewInt(10), uint256.NewInt(48))
@@ -265,8 +253,6 @@ func TestDecNormalize(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.normalize(&tt.a, PRECISION, tt.rounded, &gas)
-		fmt.Println(gas)
-		// fmt.Println("normalize", tt.a.String(), out.String(), tt.b.String())
 
 		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, out, tt.b)
@@ -290,8 +276,6 @@ func TestDecExp(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Exp(&tt.a, PRECISION, &tt.steps, &gas)
-		fmt.Println(gas)
-		// fmt.Println(out.String())
 
 		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, out, tt.b)
@@ -315,11 +299,10 @@ func TestDecLn(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Ln(&tt.a, PRECISION, &tt.steps, &gas)
-		fmt.Println(gas)
-		// fmt.Println(out.String())
-		// if !out.eq(&tt.b, PRECISION) {
-		// 	t.Fatal(tt.a, out, tt.b)
-		// }
+
+		if !out.eq(&tt.b, PRECISION) {
+			t.Fatal(tt.a, out, tt.b)
+		}
 	}
 }
 
@@ -337,8 +320,7 @@ func TestDecSin(t *testing.T) {
 		var out Decimal
 		gas = 0
 		out.Sin(&tt.a, PRECISION, &tt.steps, &gas)
-		fmt.Println(gas)
-		// fmt.Println(out.String())
+
 		if !out.eq(&tt.b, PRECISION, &gas) {
 			t.Fatal(tt.a, out, tt.b)
 		}
