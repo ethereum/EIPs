@@ -3,11 +3,12 @@ eip: XXXX
 title: Hardfork Meta - Prague/Electra
 description: EIPs included in the Prague/Electra Ethereum network upgrade.
 author: Tim Beiko (@timbeiko)
-discussions-to: TBA
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-hardfork-meta-prague-electra/18205
 status: Review
 type: Meta
 created: 2024-01-18
 requires: 2537, 6110, 7002, 7569
+---
 
 ## Abstract
 
