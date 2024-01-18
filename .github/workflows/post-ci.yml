@@ -38,7 +38,7 @@ jobs:
             Please inspect the [Run Summary](https://github.com/ethereum/EIPs/pull/${{ steps.save-pr-data.outputs.pr_number }}/files) for details.
 
       - name: Add Waiting Label
-        uses: actions-ecosystem/action-add-labels@288072f1a3b596f4350fe135bcfe381a23abadef
+        uses: actions-ecosystem/action-add-labels@1a9c3715c0037e96b97bb38cb4c4b56a1f1d4871
         if: ${{ github.event.workflow_run.conclusion == 'failure' }}
         with:
           labels: w-ci
