@@ -1,7 +1,8 @@
 ---
-title: Ethereum Mixing Transaction Supervision Standard
-description: Standardizing the monitoring and regulation of mixing transactions on the Ethereum blockchain.
-author: Li Hainan@Evelynlhn
+title: Ethereum Mixing Transaction Supervision
+description: Monitoring and regulating mixing transactions on the Ethereum blockchain.
+author: Evelyn@Evelynlhn
+discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
