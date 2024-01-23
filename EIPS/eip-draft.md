@@ -1,0 +1,69 @@
+---
+title: Ethereum Mixing Transaction Supervision Standard
+description: Standardizing the monitoring and regulation of mixing transactions on the Ethereum blockchain.
+author: Li Hainan@Evelynlhn
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-01-14
+---
+
+## Abstract
+
+This EIP proposes a standard for monitoring and regulating mixing transactions on the Ethereum blockchain, aiming to address the challenges associated with privacy-enhanced transactions and potential misuse in illegal activities.
+
+## Motivation
+
+The increasing use of mixing transactions, also known as coin mixing or coin tumbling, poses risks related to compliance and legal regulations. This EIP aims to establish a standard approach to monitor and regulate mixing transactions on the Ethereum blockchain, addressing concerns related to illegal activities such as money laundering, tax evasion, and smuggling.
+
+## Specification
+
+The Ethereum Mixing Transaction Supervision Standard introduces a set of rules and guidelines for tracking mixing transactions. It leverages heuristic rules to reduce the anonymity set size and enhance the accuracy of transaction tracing. The specification includes detailed steps for utilizing time intervals, heuristic rules application, generating a list of suspicious addresses, and assessing the suspiciousness of these addresses.
+
+Step One: Reduce Anonymous Set Size
+
+- Address Reuse (Heuristic Rule One):Discard addresses with identical deposit and withdrawal locations.
+
+- Time Analysis (Heuristic Rule Two):Discard addresses with withdrawal times significantly earlier than the deposit time range.
+
+Step Two: Generate Suspicious Address Set
+
+- Multiple Denominations (Heuristic Rule Three):Recognize associations between addresses depositing and withdrawing from the same pools.
+
+- Contract Addresses (Heuristic Rule Four):Establish associations between deposit and withdrawal addresses involving contracts.
+
+- On-Chain Transactions (Heuristic Rule Five):Recognize associations between addresses with direct or indirect on-chain transactions.
+
+- Gas Prices (Heuristic Rule Six):Establish associations based on identical gas prices in transactions.
+
+Step Three: Suspicious Address Set Assessment
+
+- Combine Heuristic Rules:Apply a combination of heuristic rules to generate a consolidated suspicious address set.
+
+- Suspicion Value Assessment:Utilize weight coefficients for deposit-withdrawal amount difference, time range, and frequency to assess suspicion.
+
+This streamlined specification outlines the key heuristic rules, providing a concise overview of the process for tracing mixed-currency transactions on Ethereum.
+
+## Rationale
+
+The rationale behind this standard is to provide a comprehensive framework for monitoring mixing transactions, balancing the need for privacy for regular users and the necessity to prevent criminal misuse. Detailed design motivations and alternative considerations will be provided in subsequent versions of this EIP.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+TBD
+
+## Reference Implementation
+
+TBD
+
+## Security Considerations
+
+The security considerations of this standard are under discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
