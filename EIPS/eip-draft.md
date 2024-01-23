@@ -1,8 +1,9 @@
 ---
+eip:8888
 title: Ethereum Mixing Transaction Supervision
 description: Monitoring and regulating mixing transactions on the Ethereum blockchain.
-author: Evelyn@Evelynlhn
-discussions-to: <URL>
+author: Evelyn (@Evelynlhn)
+discussions-to: https://github.com/Evelynlhn/EIPs/blob/proposal/mixing-transaction-supervision/EIPS/eip-draft.md
 status: Draft
 type: Standards Track
 category: Core
