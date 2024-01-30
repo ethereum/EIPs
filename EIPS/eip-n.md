@@ -1,7 +1,7 @@
 ---
 eip: 1234
-title: Increase block gas limit and increase nonzero calldata pricing
-description: Increase gas limit while decreasing the maximum block size
+title: Increase nonzero calldata pricing
+description: Increase calldata price for decreasing the maximum block size
 author: Toni Wahrstätter (@nerolation), Ansgar Dietrichs (@adietrichs)
 discussions-to: https://ethereum-magicians.org/t/tbd/tbd
 type: Standards Track
