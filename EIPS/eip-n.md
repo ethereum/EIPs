@@ -14,7 +14,7 @@ created: 2024-01-26
 
 ## Abstract
 
-This EIP proposes an adjustment in the Ethereum block gas limit to accommodate higher transaction throughput while maintaining the current maximum block size. 
+This EIP proposes an adjustment in the Ethereum calldata price to accommodate higher transaction throughput while maintaining the current maximum block size. 
 This is achieved through adjusting calldata pricing, particularly for nonzero bytes, aligning with emerging data storage practices in the network, especially in the context of EIP-4844.
 
 
@@ -23,9 +23,9 @@ This is achieved through adjusting calldata pricing, particularly for nonzero by
 The block gas hasn't been increased since EIP-1559, while the average size of blocks has continuously increased due to the growing number of rollups posting data to Layer 1. 
 EIP-4844 introduces blobs as a preferred method for data availability, signaling a shift away from calldata-dependent strategies. 
 This transition demands a reevaluation of calldata pricing. 
-By increasing the gas costs for nonzero calldata bytes, the proposal aims to balance the need for higher block gas limits with the necessity of reducing the maximum block size to make room for adding more blobs. The move from using calldata for data availability to blobks further strenghens the multidimensional fee market by incentivicing blob space.
+By increasing the gas costs for nonzero calldata bytes, the proposal aims to balance the need for higher block gas limits with the necessity of reducing the maximum block size to make room for adding more blobs. The move from using calldata for data availability to blobs further strenghens the multidimensional fee market by incentivicing blob space.
 
-Increasing calldata costs to 42.0 gas saves ~0.75 MB, the equivalent of 6 blobs.
+Increasing calldata costs to 42.0 gas saves a maximum of ~0.75 MB, the equivalent of 6 blobs. Realistically, this figure is much smaller.
 
 
 
@@ -34,10 +34,6 @@ Increasing calldata costs to 42.0 gas saves ~0.75 MB, the equivalent of 6 blobs.
 | Parameter | Value |
 | - | - |
 | `NEW_CALLDATA_GAS_COST` | `42` |
-| `NEW_BLOCK_GAS_LIMIT` | `45_000_000` |
-| `NEW_BLOCK_GAS_TARGET` | `22_500_000` |
-
-The proposed changes include an increase in the block gas limit to `NEW_BLOCK_GAS_LIMIT` and setting the EIP-1559 target to `NEW_BLOCK_GAS_TARGET`.
 
 
 ## Rationale
