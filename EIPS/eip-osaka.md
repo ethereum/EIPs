@@ -1,4 +1,4 @@
---
+---
 eip: XXXX
 title: Hardfork Meta - Osaka
 description: EIPs included in the Osaka Ethereum network upgrade.
