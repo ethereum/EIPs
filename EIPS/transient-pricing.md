@@ -22,21 +22,22 @@ One of the most important use cases that EIP-1153 enables is cheap reentrancy pr
 
 Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with the physical database.
 
-This EIP proposes a quadratic pricing model, which is cheaper for common cases (fewer than 33 slots are written per contract), while making DoS using transient storage prohibitively expensive.
-
+This EIP proposes a pricing model which charges additional per allocation, which is cheaper for common cases (fewer than 33 slots are written per contract), while making DoS using transient storage prohibitively expensive.
 
 ## Specification
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-The gas cost for TLOAD is proposed to be 9 gas. The gas cost for TSTORE is proposed to be 15 gas + `expansion_cost`, where expansion cost is calculated as 3 gas * the number of transient slots already allocated for this contract.
+The gas cost for TLOAD is proposed to be 5 gas. The gas cost for TSTORE is proposed to be 8 gas + `expansion_cost`, where expansion cost is calculated as 3 gas * `len(transient storage mapping)` if the key is not yet in the transient storage mapping, and otherwise 0 gas.
 
-The maximum number of transient slots which can be allocated on a single contract given 30m gas is approximately 4,471 (solution to `x(x-1)/2*3 + 3*x = 30_000_000`), which totals 143KB.
+The maximum number of transient slots which can be allocated on a single contract given 30m gas is approximately 4,470 (solution to `x(x-1)/2*3 + 8*x = 30_000_000`), which totals 143KB.
 
 The maximum number of transient slots which can be allocated in a transaction if you use the strategy of calling a new contract (also designed to maximize transient storage allocation) once the cost of TSTORE is more than the cost of calling a cold contract (2600 gas) is roughly 23,068, which totals 722KB.
 
 ## Rationale
 
-TBD
+### Gas
+
+In benchmarking, `TLOAD` was found to cost a similar amount of CPU time as `MUL`, while `TSTORE` was found to cost about 1.5x that. The values `G_low` and `G_mid` were therefore chosen for `TLOAD` and `TSTORE`, respectively.
 
 ## Backwards Compatibility
 
