@@ -20,7 +20,7 @@ EIP-1153 introduces a new storage region, termed "transient storage", which beha
 
 One of the most important use cases that EIP-1153 enables is cheap reentrancy protection. In fact, if transient storage is cheap enough for the first few slots, reentrancy protection can be enabled by default at the language level without too much burden to users, while simultaneously preventing the largest - and most expensive! - class of smart contract vulnerabilities.
 
-Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with the journaling of the physical storage database.
+Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with the physical database.
 
 This EIP proposes a quadratic pricing model, which is cheaper for common cases (fewer than 33 slots are written per contract), while making DoS using transient storage prohibitively expensive.
 
