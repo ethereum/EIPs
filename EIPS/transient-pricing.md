@@ -2,7 +2,7 @@
 title: Decrease TLOAD/TSTORE pricing for common cases
 description: Improve the efficiency of TLOAD/TSTORE by introducing a quadratic(?) pricing model.
 author: @charles-cooper, @prestwich, @brockelmore
-discussions-to: none yet
+discussions-to: https://ethereum-magicians.org/t/eip-8158-reduce-transient-storage-pricing/18435
 status: Draft
 type: Standards Track
 category: Core
