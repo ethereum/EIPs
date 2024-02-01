@@ -1,7 +1,7 @@
 ---
 title: Decrease TLOAD/TSTORE pricing for common cases
 description: Improve the efficiency of TLOAD/TSTORE by introducing a quadratic(?) pricing model.
-author: @charles-cooper, @prestwich, @brockelmore, ...(?)
+author: @charles-cooper, @prestwich, @brockelmore
 discussions-to: none yet
 status: Draft
 type: Standards Track
@@ -12,7 +12,7 @@ requires: 1153
 
 ## Abstract
 
-Increase the efficiency of TLOAD/TSTORE for common use cases, while providing a quadratic pricing model to prevent DoS vectors.
+Increase the efficiency of TLOAD/TSTORE for common use cases, while providing a pricing model to prevent DoS vectors.
 
 ## Motivation
 
@@ -20,18 +20,15 @@ EIP-1153 introduces a new storage region, termed "transient storage", which beha
 
 One of the most important use cases that EIP-1153 enables is cheap reentrancy protection. In fact, if transient storage is cheap enough for the first few slots, reentrancy protection can be enabled by default at the language level without too much burden to users, while simultaneously preventing the largest - and most expensive! - class of smart contract vulnerabilities.
 
-Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with database journaling.
+Furthermore, it seems that transient storage is fundamentally overpriced. Its pricing does not interact with refunds, it only requires a new allocation on contract load (as opposed to memory, which requires a fresh allocation on every call), and has no interaction with the journaling of the physical storage database.
 
 This EIP proposes a quadratic pricing model, which is cheaper for common cases (fewer than 33 slots are written per contract), while making DoS using transient storage prohibitively expensive.
-
-XXX: probably go with 9 gas per tload and 15 gas per tstore.
-Does that make transient storage easier to memory dos than warm storage?
 
 
 ## Specification
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-The gas cost for TLOAD is proposed to be 3 gas. The gas cost for TSTORE is proposed to be 3 gas + `expansion_cost`, where expansion cost is calculated as 3x the number of transient slots allocated for this contract.
+The gas cost for TLOAD is proposed to be 9 gas. The gas cost for TSTORE is proposed to be 15 gas + `expansion_cost`, where expansion cost is calculated as 3 gas * the number of transient slots already allocated for this contract.
 
 The maximum number of transient slots which can be allocated on a single contract given 30m gas is approximately 4,471 (solution to `x(x-1)/2*3 + 3*x = 30_000_000`), which totals 143KB.
 
