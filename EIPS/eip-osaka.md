@@ -3,7 +3,7 @@ eip: XXXX
 title: Hardfork Meta - Osaka
 description: EIPs included in the Osaka Ethereum network upgrade.
 author: Tim Beiko (@timbeiko)
-discussions-to: TBA 
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-osaka-meta-eip/18439 
 status: Draft
 type: Meta
 created: 2024-02-01
