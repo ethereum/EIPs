@@ -3,7 +3,7 @@ eip: TBD
 title: Revert creation in case of non-empty storage
 description: Revert contract creation if address already has the non-empty storage
 author: Gary Rong (@rjl493456442), Martin Holst Swende (@holiman)
-discussions-to: TBD
+discussions-to: https://ethereum-magicians.org/t/eip-revert-creation-in-case-of-non-empty-storage/18452
 status: Draft
 type: Standards Track
 category: Core
