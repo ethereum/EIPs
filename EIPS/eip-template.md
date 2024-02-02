@@ -1,4 +1,4 @@
----
+eip: 7612
 title: State storage transition using an overlay tree
 description: Describes the use of an overlay tree to use the verkle tree structure, while leaving the historical state untouched.
 author: Guillaume Ballet (@gballet), Ansgar Dietrichs (@), Ignacio Hagopian (@jsign), Gottfried Herold (@GottfriedHerold), Jamie (@), Tanishq Jasoria (@tanishqjasoria), Parithosh Jayanthi (@parithosh), Gabriel Rocheleau (@gabrocheleau), Karim Taam (@matkt)
