@@ -144,13 +144,13 @@ then = "withdrawal-reason"
 [lints.markdown-rel-links]
 kind = "markdown-relative-links"
 exceptions = [
-    '^https://(www\.)?github\.com/ethereum/consensus-specs/blob/[a-f0-9]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/consensus-specs/(blob|tree)/[a-f0-9]{40}/.+$',
     '^https://(www\.)?github\.com/ethereum/consensus-specs/commit/[a-f0-9]{40}$',
-    '^https://(www\.)?github\.com/ethereum/execution-specs/blob/[a-f0-9]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/execution-specs/(blob|tree)/[a-f0-9]{40}/.+$',
     '^https://(www\.)?github\.com/ethereum/execution-specs/commit/[a-f0-9]{40}$',
-    '^https://(www\.)?github\.com/ethereum/devp2p/blob/[0-9a-f]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/devp2p/(blob|tree)/[0-9a-f]{40}/.+$',
     '^https://(www\.)?github\.com/ethereum/devp2p/commit/[0-9a-f]{40}$',
-    '^https://(www\.)?github\.com/bitcoin/bips/blob/[0-9a-f]{40}/bip-[0-9]+\.mediawiki$',
+    '^https://(www\.)?github\.com/bitcoin/bips/(blob|tree)/[0-9a-f]{40}/bip-[0-9]+\.mediawiki$',
     '^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$',
     '^https://[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$',
     '^https://www\.rfc-editor\.org/rfc/.*$',
