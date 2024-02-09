@@ -1,4 +1,4 @@
-# Set of test vectors to perform benchmarking of EIP-7213
+# Set of test vectors to perform benchmarking of EIP-7619
 
 ## Inlined vectors
 
