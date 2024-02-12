@@ -27,8 +27,7 @@ This transition demands a reevaluation of calldata pricing, especially with rega
 By increasing the gas costs for nonzero calldata bytes for transactions that are mainly using Ethereum for Data Availability (DA), the proposal aims to balance the need for block space with the necessity of reducing the maximum block size to make room for adding more blobs. The move from using calldata for DA to blobs further strengthens the multidimensional fee market by incentivizing blob space.
 
 Increasing calldata costs to 42.0 gas for transactions that do not spend more gas on EVM operations than a certain threshold, significantly reduces the maximum possible block size by lowering the number of huge, pure-DA transactions that fit into one block.
-However, the calldata price is kept at 16 gas per nonzero byte for those transactions that also spend enough (2.6 gas per calldata byte) on EVM computation, such that nothing changes for those users.
-
+However, the calldata price is kept at 16 gas per nonzero byte for those transactions that also spend enough (2.6 gas per calldata byte) on EVM computation, such that nothing changes for those users. Consequently, this approach safeguards users whose needs encompass extensive calldata usage alongside EVM computations, ensuring they are not adversely affected by the new pricing model.
 
 
 ## Specification
