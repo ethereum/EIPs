@@ -15,7 +15,7 @@ created: 2024-02-12
 ## Abstract
 
 The current calldata pricing allows for significantly large blocks of up to 2.7 MB while the average block size is much smaller at 125 KB. 
-This EIP proposes an adjustment in the Ethereum calldata price to accommodate higher transaction throughput while reducing the current maximum block size. 
+This EIP proposes an adjustment in the Ethereum calldata price to handle higher transaction throughput while reducing the current maximum block size. 
 This is achieved through adjusting calldata pricing, particularly for nonzero bytes, aligning with emerging data storage practices in the network, especially in the context of EIP-4844.
 
 
@@ -34,12 +34,12 @@ However, the calldata price is kept at 16 gas per nonzero byte for those transac
 
 | Parameter | Value |
 | - | - |
-| `OLD_CALLDATA_COST` | `16` |
-| `NEW_CALLDATA_COST` | `42` |
+| `OLD_TOKEN_COST`    |  `4` |
+| `NEW_TOKEN_COST`    |  `17` |
+
 
 Let `tokens_in_calldata = zero_bytes_in_calldata + nonzero_bytes_in_calldata * 4`.
-Let `OLD_TOKEN_COST = 4`.
-Let `NEW_TOKEN_COST = 17`.
+
 
 The current formula for determining the gas used per transaction is:
 
@@ -68,7 +68,7 @@ tx.gasused = (
 The maximum block size currently stands at ~1.79 MB (`30_000_000/16`), increasing to ~2.54 MB with EIP-4844 going live. 
 With the implementation of EIP-4844, calldata may stop being the best candidate for publishing data.
 With this proposal, by repricing nonzero calldata bytes to 68 gas, we aim to reduce the maximum possible block size to approximately 0.42 MB or even lower.
-This reduction makes room for increasing the number of blobs, while ensuring network security and efficiency. 
+This reduction makes room for increasing the block gas limit or the number of blobs, while ensuring network security and efficiency. 
 Importantly, regular users (sending ETH/tokens/NFTs, engaging in DeFi, social media, restaking, etc.) who do not use Ethereum exclusively for DA, may remain unaffected.
 
 
