@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
       - name: Setup Node.js Environment
-        uses: actions/setup-node@d98fa1113850e562f83c7fc3a89c0ecd7a87fbed
+        uses: actions/setup-node@25b062c917b0c75f8b47d8469aff6c94ffd89abb
         with:
           node-version: '14'
       - name: auto-stagnant-bot
