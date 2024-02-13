@@ -2,7 +2,7 @@
 eip: 1234
 title: Increase calldata pricing
 description: Increase calldata price to decrease the maximum block size
-author: Toni Wahrstätter (@nerolation)
+author: Toni Wahrstätter (@nerolation), Vitalik Buterin (@vbuterin)
 discussions-to: https://ethereum-magicians.org/t/tbd/tbd
 type: Standards Track
 category: Core
@@ -24,30 +24,52 @@ This is achieved through adjusting calldata pricing, particularly for nonzero by
 The block gas limit hasn't been increased since EIP-1559, while the average size of blocks has continuously increased due to the growing number of rollups posting data to Layer 1. 
 EIP-4844 introduces blobs as a preferred method for data availability, signaling a shift away from calldata-dependent strategies. 
 This transition demands a reevaluation of calldata pricing, especially with regards to mitigating the inefficiency between the average block size in bytes and the maximum one possible.
-By increasing the gas costs for nonzero calldata bytes for transactions that are mainly using Ethereum for Data Availability (DA), the proposal aims to balance the need for block space with the necessity of reducing the maximum block size to make room for adding more blobs. The move from using calldata for DA to blobs further strengthens the multidimensional fee market by incentivizing blob space.
+By increasing the gas cost for nonzero calldata bytes for transactions that are mainly using Ethereum for Data Availability (DA), the proposal aims to balance the need for block space with the necessity of reducing the maximum block size to make room for adding more blobs. The move from using calldata for DA to blobs further strengthens the multidimensional fee market by incentivizing blob space.
 
-Increasing calldata costs to 42.0 gas for transactions that do not spend more gas on EVM operations than a certain threshold, significantly reduces the maximum possible block size by lowering the number of huge, pure-DA transactions that fit into one block.
-However, the calldata price is kept at 16 gas per nonzero byte for those transactions that also spend enough (2.6 gas per calldata byte) on EVM computation, such that nothing changes for those users. Consequently, this approach safeguards users whose needs encompass extensive calldata usage alongside EVM computations, ensuring they are not adversely affected by the new pricing model.
+Increasing calldata cost to 68 gas for transactions that do not spend more gas on EVM operations than a certain threshold, significantly reduces the maximum possible block size by lowering the number of huge, pure-DA transactions that fit into one block.
+However, the calldata price is kept at 16 gas per nonzero byte for those transactions that also spend enough on EVM computation, such that nothing changes for those users. Consequently, this approach safeguards users who depend on extensive calldata usage alongside EVM computations, ensuring they are not adversely affected by the new pricing model.
 
 
 ## Specification
 
 | Parameter | Value |
 | - | - |
-| `LEGACY_CALLDATA_COSTS` | `16` |
-| `NEW_CALLDATA_COSTS` | `42` |
+| `OLD_CALLDATA_COST` | `16` |
+| `NEW_CALLDATA_COST` | `42` |
+
+Let `tokens_in_calldata = zero_bytes_in_calldata + nonzero_bytes_in_calldata * 4`.
+Let `OLD_TOKEN_COST = 4`.
+Let `NEW_TOKEN_COST = 17`.
+
+The current formula for determining the gas used per transaction is:
+
+```python
+tx.gasused = (
+    21000 +
+    OLD_TOKEN_COST * tokens_in_calldata +
+    evm_gas_used
+)
+```
 
 The formula for determining the gas used per transaction changes to:
 
-`tx.gasused = max(21000 + NEW_CALLDATA_COSTS * calldata, 21000 + LEGACY_CALLDATA_COSTS * calldata + evm_gas_used)`
+```python
+tx.gasused = (
+    21000 +
+    max(
+        NEW_TOKEN_COST * tokens_in_calldata, 
+        OLD_TOKEN_COST * tokens_in_calldata + evm_gas_used
+    )
+)
+```
 
 ## Rationale
 
 The maximum block size currently stands at ~1.79 MB (`30_000_000/16`), increasing to ~2.54 MB with EIP-4844 going live. 
 With the implementation of EIP-4844, calldata may stop being the best candidate for publishing data.
-With this proposal, by repricing nonzero calldata bytes to 42 gas, we aim to reduce the maximum possible block size to approximately 1 MB or even lower.
+With this proposal, by repricing nonzero calldata bytes to 68 gas, we aim to reduce the maximum possible block size to approximately 0.42 MB or even lower.
 This reduction makes room for increasing the number of blobs, while ensuring network security and efficiency. 
-Importantly, regular users (sending ETH/tokens/NFTs, engaging in DeFi, social media, restaking) who do not use Ethereum exclusively for DA, may remain unaffected.
+Importantly, regular users (sending ETH/tokens/NFTs, engaging in DeFi, social media, restaking, etc.) who do not use Ethereum exclusively for DA, may remain unaffected.
 
 
 
