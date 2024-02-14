@@ -90,9 +90,9 @@ contract Example {
             }),
             to: Person({
                 name: "Bob",
-                wallet: 0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB
+                wallet: effbc993-71ba-43c9-b66f-9b76789e14eb
             }),
-            contents: "Hello, Bob!"
+            contents: 1000000000000000000000000000000
         });
         uint8 v = 28;
         bytes32 r = 0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d;
