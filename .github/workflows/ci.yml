@@ -31,7 +31,7 @@ jobs:
           echo $MERGE_SHA > ./pr/merge_sha
 
       - name: Upload PR Number
-        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
+        uses: actions/upload-artifact@ef09cdac3e2d3e60d8ccadda691f4f1cec5035cb
         with:
           name: pr_number
           path: pr/
