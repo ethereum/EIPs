@@ -451,7 +451,6 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 The current EIP editors are
 
 - Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
 - Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
@@ -461,6 +460,7 @@ The current EIP editors are
 Emeritus EIP editors are
 
 - Casey Detrio (@cdetrio)
+- Gavin John (@Pandapip1)
 - Hudson Jameson (@Souptacular)
 - Martin Becze (@wanderer)
 - Micah Zoltu (@MicahZoltu)
