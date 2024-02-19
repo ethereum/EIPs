@@ -356,22 +356,6 @@ Permitted Yellow Paper URLs must anchor to a specific commit, and so must match 
 ^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
 ```
 
-### PQClean
-
-Links to PQClean (clean implementations of the post-quantum schemes that are in the NIST post-quantum project) may be included using normal markdown syntax, such as:
-
-```markdown
-[PQClean-Falcon-512](https://github.com/PQClean/PQClean/commit/8e220a87308154d48fdfac40abbb191ac7fce06a)
-```
-
-Which renders to:
-[PQClean-Falcon-512](https://github.com/PQClean/PQClean/commit/8e220a87308154d48fdfac40abbb191ac7fce06a)
-
-Permitted PQClean reference implementation URLs must anchor to a specific commit, and so must match this regular expression:
-
-```regex
-^(https://github.com/PQClean/PQClean/commit/[0-9a-f]{40})$
-```
 
 ### Digital Object Identifier System
 
