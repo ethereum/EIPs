@@ -338,6 +338,25 @@ Which renders to:
 
 [CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
 
+### Ethereum Yellow Paper
+
+Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/9c601d6a58c44928d4f2b837c0350cec9d9259ed/paper.pdf)
+```
+
+Which renders to:
+
+[Ethereum Yellow Paper](https://github.com/ethereum/yellowpaper/blob/9c601d6a58c44928d4f2b837c0350cec9d9259ed/paper.pdf)
+
+Permitted Yellow Paper URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
+```
+
+
 ### Digital Object Identifier System
 
 Links qualified with a Digital Object Identifier (DOI) may be included using the following syntax:
@@ -432,7 +451,6 @@ If you are interested in assuming ownership of an EIP, send a message asking to 
 The current EIP editors are
 
 - Alex Beregszaszi (@axic)
-- Gavin John (@Pandapip1)
 - Greg Colvin (@gcolvin)
 - Matt Garnett (@lightclient)
 - Sam Wilson (@SamWilsn)
@@ -442,6 +460,7 @@ The current EIP editors are
 Emeritus EIP editors are
 
 - Casey Detrio (@cdetrio)
+- Gavin John (@Pandapip1)
 - Hudson Jameson (@Souptacular)
 - Martin Becze (@wanderer)
 - Micah Zoltu (@MicahZoltu)
