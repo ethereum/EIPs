@@ -350,6 +350,12 @@ Which renders to:
 
 [CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
 
+Permitted Chain Agnostic URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ChainAgnostic/CAIPs/blob/[0-9a-f]{40}/CAIPs/caip-[0-9]+\.md)$
+```
+
 ### Ethereum Yellow Paper
 
 Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
