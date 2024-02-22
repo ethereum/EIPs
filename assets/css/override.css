@@ -1,5 +1,6 @@
 .site-nav .page-link {
   color: var(--bs-pagination-color);
+  text-align: left;
 }
 
 .footer-col-wrapper, table, table th {
