@@ -33,6 +33,7 @@ Client Name / Version [/Build Version]
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
 
+
 ## Rationale
 
 The choice of a structured string for the "client" entry balances between flexibility, ease of parsing, and providing sufficient detail for practical use cases. Including both human-readable and build-specific versions enables not only identification of the software but also facilitates tracking of bugs or incompatibilities down to specific builds.
