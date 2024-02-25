@@ -1,4 +1,5 @@
 ---
+eip: 7636
 title: Extension of EIP-778 for "client" ENR Entry
 description: Add an additional "client" entry in ENRs to improve network health.
 author: James Kempton (@JKincorperated)
