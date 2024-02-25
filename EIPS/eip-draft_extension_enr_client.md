@@ -3,7 +3,7 @@ eip: 7636
 title: Extension of EIP-778 for "client" ENR Entry
 description: Add an additional "client" entry in ENRs to improve network health.
 author: James Kempton (@JKincorperated)
-discussions-to: https://ethereum-magicians.org/t/draft-eip-extension-of-eip-778-for-client-enr-entry
+discussions-to: https://ethereum-magicians.org/t/eip7636-extension-of-eip-778-for-client-enr-entry/18935
 status: Draft
 type: Standards Track
 category: Networking
