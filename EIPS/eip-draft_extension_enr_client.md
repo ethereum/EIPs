@@ -22,6 +22,8 @@ Understanding the landscape of client software in the Ethereum network is crucia
 
 The "client" entry is proposed to be added to ENR following the specifications in EIP-778. This entry is optional and can be omitted by clients that choose not to disclose such information. The key for this entry is `"client"`.
 
+This string must be encoded using the ASCII standard.
+
 The value for this entry follows the structured string format:
 ```
 Client Name / Version [/Build Version]
