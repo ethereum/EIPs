@@ -1,0 +1,84 @@
+---
+eip: x
+title: EXTCODEHASH optimize
+description: Modify the output value of a situation in EXTCODEHASH
+author: Jame (@ZWJKFLC)
+discussions-to: https://ethereum-magicians.org/t/tbd/tbd
+type: Standards Track
+category: Core
+status: Draft
+created: 2024-02-26
+---
+
+
+
+## Abstract
+
+This EIP proposal is an optimization for [EIP-1052](https://eips.ethereum.org/EIPS/eip-1052),
+For addresses with balance but the code is still 0x, the codehash should still be 0x.
+
+
+## Motivation
+
+`EIP-1052` was proposed to save gas fees.
+In order to include the role of `BALANCE`, let the codehash of the address without balance be 0x, and the codehash of the address with balance be hash(0x).
+The contract address can be calculated in advance. Whether it is create or create2, it is possible that the contract is not created but has a balance. For security, you can actually only use keccak256(add.code) == keccak256(bytes(" ")) instead of add.codehash == 0, which makes the original intention of EIP-1052 meaningless.
+For example, uniswap V2 uses stored addresses to determine whether a contract exists. If this `EXTCODEHASH` is optimized, can save a huge amount of gas.
+
+If someone uses a codehash of 0x to determine whether a contract has been created, due to intuition and the lack of details in many documents, they will not think that the codehash of an address with a balance will change from 0x to hash (0x). If someone maliciously attacks at this time, it will cause some bad effects.
+
+
+
+## Specification
+The behaviour of `EXTCODEHASH` is changed in the following way:
+
+1. When calling EXTCODEHASH, the codehash of the address with balance is still 0x
+
+## Rationale
+Change [go-ethereum](https://github.com/rjl493456442/go-ethereum/blob/master/core/vm/instructions.go#L539) code
+
+After modification
+```go
+func opExtCodeHash(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
+	slot := callContext.stack.peek()
+	address := common.BigToAddress(slot)
+
+    codeHash := interpreter.evm.StateDB.GetCodeHash(address).Bytes()
+    // hash(0x)=c5d246...
+    targetCodeHash := common.HexToHash("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470")
+    if bytes.Equal(codeHash, targetCodeHash[:]) {
+        slot.SetUint64(0)
+    } else {
+        slot.SetBytes(codeHash)
+    }
+	return nil, nil
+}
+```
+
+Source code
+```go
+func opExtCodeHash(pc *uint64, interpreter *EVMInterpreter, callContext *callCtx) ([]byte, error) {
+	slot := callContext.stack.peek()
+	address := common.BigToAddress(slot)
+	if interpreter.evm.StateDB.Empty(address) {
+		slot.SetUint64(0)
+	} else {
+		slot.SetBytes(interpreter.evm.StateDB.GetCodeHash(address).Bytes())
+	}
+	return nil, nil
+}
+```
+
+
+
+## Backwards Compatibility
+Needs discussion.
+It is unclear whether there is a situation where codehash is actually used to determine whether an address has a balance and the codehash is hash(0x).
+
+## Security Considerations
+Needs discussion.
+It is unclear whether there is a situation where codehash is actually used to determine whether an address has a balance and the codehash is hash(0x).
+
+## Copyright
+Copyright and related rights waived via [CC0](../LICENSE.md).
+ 
