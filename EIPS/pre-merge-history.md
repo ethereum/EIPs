@@ -2,7 +2,7 @@
 title: Cease serving history before PoS
 description: Execution layer clients will no longer serve block data before Paris over p2p.
 author: lightclient (@lightclient)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/cease-serving-history-before-pos/18991
 status: Draft
 type: Standards Track
 category: Network
