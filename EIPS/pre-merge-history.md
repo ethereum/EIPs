@@ -1,11 +1,11 @@
 ---
-title: Cease serving pre-merge history
+title: Cease serving history before PoS
 description: Execution layer clients will no longer serve block data before Paris over p2p.
 author: lightclient (@lightclient)
 discussions-to: <URL>
 status: Draft
 type: Standards Track
-category: Core
+category: Network
 created: 2024-02-13
 ---
 
@@ -16,74 +16,64 @@ block data before the Paris upgrade.
 
 ## Motivation
 
-TODO disk size.
+As of 2024, historical data in clients has grown to around 500 GB. Nearly 400 GB
+of that is from block data before PoS was activated in the Paris upgrade. Long
+term, Ethereum plans to bound the amount of data nodes must store. This EIP
+proposes the first steps to achieve such goal.
 
 ## Specification
 
-Clients must not make or respond to p2p queries about blocks before Paris.
+Clients must not make or respond to p2p queries about blocks before block 15537393.
 
-### History Accumulator
+### Header Accumulator
+
+The header accumulator commits to the set of pre-merge headers and their
+associated total difficulty. The format for this data is defined as:
+
+```python
+EPOCH_SIZE = 8192 # blocks
+MAX_HISTORICAL_EPOCHS = 131072  # 2**17
+
+# An individual record for a historical header.
+HeaderRecord = Container[block_hash: bytes32, total_difficulty: uint256]
+
+# The records of the headers from within a single epoch
+EpochRecord = List[HeaderRecord, max_length=EPOCH_SIZE]
+
+Accumulator = Container[
+    historical_epochs: List[bytes32, max_length=MAX_HISTORICAL_EPOCHS],
+    current_epoch: EpochRecord,
+]
+```
+
+The hash tree root of `Accumulator` for data before block 15537393 is
+`0xec8e040fd6c557b41ca8ddd38f7e9d58a9281918dc92bdb72342a38fb085e701`.
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+### Only Pre-PoS data
 
-  The current placeholder is acceptable for a draft.
+One might ask why the distinction between pre and post PoS data is made in this
+EIP. The simple answer is that the at the moment of the merge, the block
+structure changed substantially. Although execution layer client software today
+continues on with block data on disk which remains similar to per-PoS data, the
+beacon chain is now the canoncial chain definition. Therefore, a beacon block
+can be used to both record historical data for execution layer and beacon layer.
+Additionally, the beacon chain already has the concept of a history accumulator
+via the `historical_roots` field in the state.
 
-  TODO: Remove this comment before submitting
--->
-
-TBD
+Over the long term, the distinctions of "execution layer" and "consensus layer"
+may matter less. This EIP tries to be agnostic to client architecture and
+instead focuses on the shape of the data.
 
 ## Backwards Compatibility
 
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-No backward compatibility issues found.
-
-## Test Cases
-
-<!--
-  This section is optional for non-Core EIPs.
-
-  The Test Cases section should include expected input/output pairs, but may include a succinct set of executable tests. It should not include project build files. No new requirements may be be introduced here (meaning an implementation following only the Specification section should pass all tests here.)
-  If the test suite is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed
-
-  TODO: Remove this comment before submitting
--->
-
-## Reference Implementation
-
-<!--
-  This section is optional.
-
-  The Reference Implementation section should include a minimal implementation that assists in understanding or implementing this specification. It should not include project build files. The reference implementation is not a replacement for the Specification section, and the proposal should still be understandable without it.
-  If the reference implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. External links will not be allowed.
-
-  TODO: Remove this comment before submitting
--->
+After this EIP is activated, nodes will no longer be able to full sync from the
+devp2p network. To continue doing so, they must retrieve the data out-of-band.
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-Needs discussion.
+TBD
 
 ## Copyright
 
