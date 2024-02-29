@@ -3,7 +3,7 @@ eip: 7640
 title: Transaction Revert Protection
 description: Defines a new transaction type which rejects reverted transactions
 author: Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj), Boyma Fahnbulleh (@boymanjor)
-discussions-to: https://ethereum-magicians.org/t/eip-transaction-revert-protection/19000
+discussions-to: https://ethereum-magicians.org/t/eip-7640-transaction-revert-protection/19000
 status: Draft
 type: Standards Track
 category: Core
