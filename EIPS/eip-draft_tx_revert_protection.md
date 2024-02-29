@@ -1,24 +1,21 @@
 ---
+eip: TBD
 title: Transaction Revert Protection
-description: "Defines a new transaction type which rejects reverted
-transactions"
-author: "Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj),
-Boyma Fahnbulleh (@boymanjor)"
+description: Defines a new transaction type which rejects reverted transactions
+author: Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj), Boyma Fahnbulleh (@boymanjor)
 discussions-to: https://ethereum-magicians.org/t/eip-transaction-revert-protection/19000
 status: Draft
 type: Standards Track
 category: Core
-created: 2024-02-20
+created: 2024-02-28
 requires: 140, 141, 658, 2718, 2930, 1559
 ---
 
-## Simple Summary
+## Abstract
 
 A consensus rule to flag a reverted transaction as invalid, i.e., ineligible for
 block inclusion, providing consensus layer assurance that users do not pay gas
 fees for unsuccessful transaction execution.
-
-## Abstract
 
 [EIP-658](./eip-658.md) designates a transaction as "failed" if its receipt
 contains a status code of `0x0`. This status code indicates that execution of
@@ -70,7 +67,7 @@ condition is met. For example, one can construct a "Fill-or-Kill" transaction
 which does not get built in a block unless the "Fill" condition is met. This
 brings the concept of "intents" to Ethereum's mempool.
 
-The fee payment for [EIP-4337](./eip-4337.md) Account Abstraction builders
+The fee payment for [ERC-4337](./eip-4337.md) Account Abstraction builders
 provide greater assurance of successful transaction execution. This makes it so
 that Account Abstraction users do not need to rely upon a single builder to
 build their transactions, as fee accounting would be atomically always paid in
@@ -178,14 +175,14 @@ This proposal, however, does not provide for any secrecy of transaction data
 before transaction broadcast. It instead allows for pending transactions to be
 relayed in a more broad manner without the need for trusted builders.
 
-This proposal is expected to be compatible with [EIP-4337](./eip-4337.md).
+This proposal is expected to be compatible with [ERC-4337](./eip-4337.md).
 Bundlers without this change could provide trusted assurance that they are not
 including reverted transactions. However, to take advantage of this change,
-[EIP-4337](./eip-4337.md) bundlers can construct two transactions: one with
+[ERC-4337](./eip-4337.md) bundlers can construct two transactions: one with
 transactions where reverts are permitted and one where transactions do not
 include any reverts.
 
-This may also be contributive for [EIP-4337](./eip-4337.md) bundlers, as their
+This may also be contributive for [ERC-4337](./eip-4337.md) bundlers, as their
 relayed transaction bundles are currently at the mercy of block builders. The
 latter group currently has the ability to attack the bundle by altering the
 network state thereby invalidating a bundled transaction.
@@ -195,7 +192,7 @@ consensus (and the bundler would not bear the cost of an unsuccessful reverted
 bundled transaction).
 
 When `revert_protect` is enabled, the EVM opcode of `0xfc` is treated as a
-no-op for use cases such as [EIP-4337](./eip-4337.md), where users can send
+no-op for use cases such as [ERC-4337](./eip-4337.md), where users can send
 Account Abstraction transactions to bundlers while ensuring that the bundler
 MUST include it in a non-revertible transaction type for their transaction to
 be successfully included in a block. An opcode is used instead of a precompile
