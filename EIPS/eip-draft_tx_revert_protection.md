@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 7640
 title: Transaction Revert Protection
 description: Defines a new transaction type which rejects reverted transactions
 author: Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj), Boyma Fahnbulleh (@boymanjor)
