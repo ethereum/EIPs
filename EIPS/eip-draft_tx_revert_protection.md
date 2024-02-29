@@ -118,9 +118,10 @@ set to `0x01` MUST elicit the following behavior:
   gas cost of 6 during transaction execution.
 
 Network clients SHOULD NOT relay a pending transaction with a `TransactionType`
-of `0x04` AND the `revert_protect` field, nor list it as available to peers on
-the default Ethereum Transaction Exchange mempool network. Alternative mempools
-MAY relay the pending transaction, even if the pending transaction is invalid.
+of `0x04` AND the `revert_protect` field set to `0x01`, nor list it as
+available to peers on the default Ethereum Transaction Exchange mempool
+network. Alternative mempools MAY relay the pending transaction, even if the
+pending transaction is invalid.
 
 If a network client receives on the default Ethereum Transaction Exchange
 mempool a pending transaction data with a `TransactionType` of `0x04` AND the
