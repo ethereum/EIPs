@@ -63,19 +63,22 @@ Receiving nodes will be able to recompute the bloom filter based on the logs.
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+After the merge, the `TD` field of the `Status` message became meaningless since the difficulty of post-merge blocks are 0.
+It could in theory be used to distinguish synced with unsynced nodes, 
+but the same thing can be accomplished with the forkid as well. 
+It is not used in the go-ethereum codebase in any way.
 
-  The current placeholder is acceptable for a draft.
+After the merge, the `NewBlock` and `NewBlockHashes` messages have not been used for block propagation, 
+since block propagation post-merge happens solely on the consensus layer. 
+These message types error out in the go-ethereum implementation.
+Getting rid of them would allow us to disconnect non-mainnet peers earlier.
 
-  TODO: Remove this comment before submitting
--->
-
-TBD
+Removing the bloom filters from the `Receipt` message reduces the cpu load of serving nodes as well as the bandwith significantly. The receiving nodes will need to recompute the bloom filter. The recomputation is not very CPU intensive. 
+The bandwith gains amount to roughly 530GB per syncing node or XGB snappy compressed. 
 
 ## Backwards Compatibility
 
-Since this EIP removes the `NewBlock` and `NewBlockHashes
+Since this EIP removes the `NewBlock` and `NewBlockHashes` messages, private networks or forks that use them to distribute blocks can not update to this version. All private networks or forks that use a mechanism similar to ethereum mainnet, where the consensus layer takes care of block distribution can update to `eth/70`.
 
 This EIP changes the eth protocol and requires rolling out a new version, `eth/70`. Supporting multiple versions of a wire protocol is possible. Rolling out a new version does not break older clients immediately, since they can keep using protocol version `eth/68`.
 
