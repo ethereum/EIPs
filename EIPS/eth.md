@@ -1,4 +1,5 @@
 ---
+eip: 7642
 title: eth/70 - Drop pre-merge fields
 description: Drop unnecessary fields after the merge
 author: Marius van der Wijden (@MariusVanDerWijden)
