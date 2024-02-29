@@ -8,7 +8,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2024-02-28
-requires: 140, 141, 658, 2718, 2930, 1559
+requires: 140, 141, 658, 1559, 2718, 2930
 ---
 
 ## Abstract
@@ -204,7 +204,7 @@ transactions.
 This change has no effect on contracts created in the past unless they contain
 the opcode `0xfc` as an `INVALID` instruction AND the `revert_protect` is
 enabled. Contracts should not have used `0xfc` as `INVALID` in the past, as the
-proper and expected opcode to use for `INVVALID` is `0xfe`.
+proper and expected opcode to use for `INVALID` is `0xfe`.
 
 ## Security Considerations
 
