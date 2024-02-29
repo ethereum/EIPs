@@ -1,5 +1,5 @@
 ---
-title: eth/70: Drop pre-merge fields from eth protocol
+title: eth/70 - Drop pre-merge fields from eth protocol
 description: Drop unnecessary fields after the merge
 author: Marius van der Wijden (@MariusVanDerWijden)
 status: Draft
