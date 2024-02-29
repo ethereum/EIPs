@@ -1,0 +1,230 @@
+---
+title: Transaction Revert Protection
+description: "Defines a new transaction type which rejects reverted
+transactions"
+author: "Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj),
+Boyma Fahnbulleh (@boymanjor)"
+discussions-to: http
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-02-20
+requires: 140, 141, 658, 2718, 2930, 1559
+---
+
+## Simple Summary
+
+A consensus rule to flag a reverted transaction as invalid, i.e., ineligible for
+block inclusion, providing consensus layer assurance that users do not pay gas
+fees for unsuccessful transaction execution.
+
+## Abstract
+
+[EIP-658](./eip-658.md) designates a transaction as "failed" if its receipt
+contains a status code of `0x0`. This status code indicates that execution of
+the transaction resulted in error, and the proposed state updates were
+reverted. However, the transaction was still included in a block, and the
+sender paid gas fees for a transaction that had no meaningful effect on the
+state of the network.
+
+We introduce a new [EIP-2718](./eip-2718.md) transaction type, with the format
+`0x04 || rlp([revert_protect, chain_id, nonce, max_priority_fee_per_gas,
+max_fee_per_gas, gas_limit, destination, amount, data, access_list,
+signature_y_parity, signature_r, signature_s])`.
+
+Under the proposed rule, if a transaction's `revert_protect` field is set to
+`0x01`, an error during execution invalidates the transaction. Network clients
+must reject the transaction, as well as any block that includes it. As a policy
+rule, _any_ transaction which has the `revert_protect` field set to `0x01` is
+neither propagated nor accepted on the default Ethereum mempool p2p network.
+
+The transaction format is otherwise identical to the [EIP-1559](./eip-1559.md)
+transaction format and behaves accordingly.
+
+## Motivation
+
+Ethereum has historically charged gas for execution of EVM bytecode regardless
+of the transaction's failure ("revert") status. This was implemented as a
+simple means of DoS protection. Unfortunately, this has significant
+implications for potentially valid transactions which are, by happenstance,
+produced in a block in tandem with a temporarily incompatible network state. If
+such a transaction is propagated throughout the Ethereum p2p mempool network,
+it is almost always charged gas fees despite its non-execution.
+
+Currently, block building services which provide revert protection are trusted
+systems which provide no consensus enforcement. The absence of a consensus rule
+enforcing revert protection results in any service or network with similar
+functionality being necessarily centralized. Without a new consensus rule,
+builders and Proposer-Builder-Seperation are necessarily trusted centralized
+authorities as that is the only way a fee market can form from transactions
+with significant contention (many transactions want to change the same state
+record, where only one is successful).
+
+New trust-minimized mempool propagation protocols can be devised where
+revert-protected transactions propagate without concern for transactions
+eventually getting into a block and the user paying for reverts.
+
+By providing consensus layer revert protection, new use cases can be enabled
+where an otherwise reverted transaction can remain pending until a certain
+condition is met. For example, one can construct a "Fill-or-Kill" transaction
+which does not get built in a block unless the "Fill" condition is met. This
+brings the concept of "intents" to Ethereum's mempool.
+
+The fee payment for [EIP-4337](./eip-4337.md) Account Abstraction builders
+provide greater assurance of successful transaction execution. This makes it so
+that Account Abstraction users do not need to rely upon a single builder to
+build their transactions, as fee accounting would be atomically always paid in
+the bundled transaction when the Account Abstraction bundler, even if the
+builder is not the same as the block builder. Without this change, Account
+Abstraction contracts would either need to specify a designated bundler or to
+use centralized builder services, as it would otherwise be too risky to be
+paying revertable transactions on any public mempool with open
+gossip/propagation.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+As of `FORK_BLOCK_NUMBER`, a new [EIP-2718](./eip-2718.md) transaction is
+introduced with a `TransactionType` of `0x04` (4).
+
+A transaction with a `TransactionType` of `0x04` MUST have the following
+properties:
+
+* An [EIP-2718](./eip-2718.md) `TransactionPayload` format of
+  `rlp([revert_protect, chain_id, nonce, max_priority_fee_per_gas,
+  max_fee_per_gas, gas_limit, destination, amount, data, access_list,
+  signature_y_parity, signature_r, signature_s])`.
+* A `revert_protect` field set to `0x00` or `0x01`. Network clients MUST
+  consider any other values invalid. If `revert_protect` is set to `0x00`,
+  transaction revert protection is disabled, and transaction execution MUST
+  follow the behavior specified by [EIP-1559](./eip-1559.md). If
+  `revert_protect` is set to `0x01`, transaction revert protection is enabled.
+* `signature_y_parity`, `signature_r`, and `signature_s` fields representing a
+  secp256k1 signature over the following hash: `keccak256(0x05 || rlp([chain_id,
+  nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination,
+  amount, data, access_list]))`.
+* An [EIP-2718](./eip-2718.md) `ReceiptPayload` format as specified in
+  [EIP-1559](./eip-1559.md).
+
+A transaction with a `TransactionType` of `0x04` AND the `revert_protect` field
+set to `0x01` MUST elicit the following behavior:
+
+* If transaction execution results in an error, network clients MUST consider
+  the transaction invalid and network clients MUST NOT include it in a block.
+* Network clients MUST consider the `0xfc` opcode a no-op when evaluated with a
+  gas cost of 6 during transaction execution.
+
+Network clients SHOULD NOT relay a pending transaction with a `TransactionType`
+of `0x04` AND the `revert_protect` field, nor list it as available to peers on
+the default Ethereum Transaction Exchange mempool network. Alternative mempools
+MAY relay the pending transaction, even if the pending transaction is invalid.
+
+If a network client receives on the default Ethereum Transaction Exchange
+mempool a pending transaction data with a `TransactionType` of `0x04` AND the
+`revert_protect` field set to `0x01`, the network client SHOULD consider the
+pending transaction invalid and handle the peer accordingly. However, the
+pending transaction MAY be propagated and accepted on using alternative
+mempools, methods, or protocols.
+
+## Rationale
+
+Transactions may depend upon contract states which were valid at the time of
+broadcast but are no longer valid at the time of block assembly, causing a
+revert.
+
+Without `revert_protect` enabled, anyone with access to an unprotected
+transaction could then relay it to a party who includes it in a block as a
+reverted transaction. Providing revert protection increases the ability to
+match the functionality of centralized builders.
+
+Due to the obvious DoS concerns, it is necessary to avoid relay of
+reverted-protected transactions on the default Ethereum p2p mempool.
+Transactions can easily be constructed to use a large amount of gas for no
+payment, and can likewise be constructed such that they will *never*
+successfully execute.
+
+Alternate relay systems can be built on top of this change (where it would not
+have been possible before). While existing RPC servers/services could provide
+transaction revert protection with trust minimization, it is possible to
+construct more decentralized designs and explore novel propagation policies.
+
+For example, an alternate p2p mempool strictly for `revert_protect` could be
+constructed where only 100 messages per second can be sent prioritized by the
+amount of ETH staked with a socially agreed timeout for these transactions
+(e.g. 10 minutes). More exotic constructions can constructed via accounting of
+staked ETH relative to the amount of transactions/gas used over a period of
+time. It is presumed that these alternative mempools may be free to gossip
+invalid transactions (but only build blocks with valid transactions when
+`revert_protect` is set).
+
+Various implementations can be done in an opt-in manner much like how mev-boost
+is an opt-in change. These alternate relay systems can instead exist in an
+fully decentralized open system which do not rely upon a single provider
+promising not to redistribute the transaction before it being built in a block.
+Nodes on the alternative p2p mempool network may gossip any transactions they
+see to other untrusted nodes. Whereas without revert protection, gossip of
+invalid transactions is risky and potentially costly as it may be included in a
+block by any third party builder or proposer.
+
+This could also enable future opportunities for decentralized bundling and
+other protocol changes as well. These types of functions are treated as outside
+the scope of this proposal.
+
+This proposal, however, does not provide for any secrecy of transaction data
+before transaction broadcast. It instead allows for pending transactions to be
+relayed in a more broad manner without the need for trusted builders.
+
+This proposal is expected to be compatible with [EIP-4337](./eip-4337.md).
+Bundlers without this change could provide trusted assurance that they are not
+including reverted transactions. However, to take advantage of this change,
+[EIP-4337](./eip-4337.md) bundlers can construct two transactions: one with
+transactions where reverts are permitted and one where transactions do not
+include any reverts.
+
+This may also be contributive for [EIP-4337](./eip-4337.md) bundlers, as their
+relayed transaction bundles are currently at the mercy of block builders. The
+latter group currently has the ability to attack the bundle by altering the
+network state thereby invalidating a bundled transaction.
+
+With revert protection, the transaction would not be included in the block by
+consensus (and the bundler would not bear the cost of an unsuccessful reverted
+bundled transaction).
+
+When `revert_protect` is enabled, the EVM opcode of `0xfc` is treated as a
+no-op for use cases such as [EIP-4337](./eip-4337.md), where users can send
+Account Abstraction transactions to bundlers while ensuring that the bundler
+MUST include it in a non-revertible transaction type for their transaction to
+be successfully included in a block. An opcode is used instead of a precompile
+as it could be a very frequently accessed opcode in Account Abstraction
+transactions.
+
+## Backwards Compatibility
+
+This change has no effect on contracts created in the past unless they contain
+the opcode `0xfc` as an `INVALID` instruction AND the `revert_protect` is
+enabled. Contracts should not have used `0xfc` as `INVALID` in the past, as the
+proper and expected opcode to use for `INVVALID` is `0xfe`.
+
+## Security Considerations
+
+If `revert_protect` is enabled, network clients should not relay the
+transaction on the current default p2p mempool network.  If a revert-protected
+transaction is received, clients should treat it as an invalid transaction,
+e.g., a transaction with an invalid signature or other malformed transaction
+properties.
+
+If one is designing a method to propagate revert-protected transactions, it is
+necessary to consider the implications of DoS attacks. It may also be necessary
+to set up flow controls (whether it be per-transaction or only accepting the
+highest-value transactions, etc), see Rationale section for examples.
+
+Users should take into account the possibility of nonce gaps when using
+`revert_protect`. If a transaction fails, subsequent transactions may need to
+reuse the nonce.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
