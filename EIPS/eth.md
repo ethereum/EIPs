@@ -1,19 +1,20 @@
 ---
-title: eth/70 - Drop pre-merge fields from eth protocol
+title: eth/70 - Drop pre-merge fields
 description: Drop unnecessary fields after the merge
 author: Marius van der Wijden (@MariusVanDerWijden)
+discussions-to: https://ethereum-magicians.org/t/eth-70-drop-pre-merge-fields-from-eth-protocol/19005
 status: Draft
 type: Standards Track
 category: Networking
 created: 2024-02-29
-requires: EIP-5793
+requires: 5793
 ---
 
 
 ## Abstract
 
-After the merge a few fields and messages in the networking protocol became obsolete.
-This EIP modifies the networking messages such that these fields are not send anymore.
+After the merge a few fields (`td`) and messages (`NewBlockHashes`, `NewBlock`) in the networking protocol became obsolete.
+This EIP modifies the networking messages such that these fields are not sent anymore.
 Additionally we propose to remove the `Bloom` field from the receipts networking messages.
 
 ## Motivation
