@@ -4,7 +4,7 @@ description: "Defines a new transaction type which rejects reverted
 transactions"
 author: "Joseph Poon (@josephpoon), Christopher Jeffrey (@chjj),
 Boyma Fahnbulleh (@boymanjor)"
-discussions-to: http
+discussions-to: https://ethereum-magicians.org/t/eip-transaction-revert-protection/19000
 status: Draft
 type: Standards Track
 category: Core
