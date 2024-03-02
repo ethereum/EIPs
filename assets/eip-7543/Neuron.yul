@@ -157,13 +157,13 @@ object "Neuron" {
                 cc, cq := dec_exp(cc, cq, precision, steps)
             }
 
-            // dec_sqrt(a) = a^(1/2)
+            // dec_sqrt(a) = a^(1/2) = a^(5*10(-1))
             function dec_sqrt(ac, aq, precision, steps) -> bc, bq {
                 let MINUS_ONE := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff // -1
                 bc, bq := pow(ac, aq, 5, MINUS_ONE, precision, steps)
             }
 
-            // dec_sqr(a) = a^2
+            // dec_sqr(a) = a*a
             function dec_sqr(ac, aq, precision) -> bc, bq {
                 bc, bq := dec_mul(ac, aq, ac, aq, precision)
             }
