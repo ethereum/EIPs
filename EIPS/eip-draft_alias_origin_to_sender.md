@@ -18,9 +18,9 @@ This EIP proposes aliasing the ORIGIN opcode to the SENDER opcode within the Eth
 
 The ORIGIN opcode in Ethereum returns the address of the account that started the transaction chain, differing from the SENDER (or CALLER) opcode, which returns the address of the direct caller. The use of ORIGIN has been discouraged and deemed deprecated since mid-2016 due to the security problems it introduces, such as susceptibility to phishing attacks and other vulnerabilities where the distinction between the original sender and the immediate sender can be exploited.
 
-For instance, if an [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) bundler has tokens or other authority in a smart contract determined by ORIGIN, any of the transactions it bundles can hijack this authority since ORIGIN remains the bundler address throughout each child transaction.
+For instance, if an [ERC-4337](./eip-4337.md) bundler has tokens or other authority in a smart contract determined by ORIGIN, any of the transactions it bundles can hijack this authority since ORIGIN remains the bundler address throughout each child transaction.
 
-More apropos in the current context of EVM evolution, the differentiation between the ORIGIN and SENDER opcodes presents a challenge for all account abstraction efforts, such as those outlined in [EIP-7377](https://eips.ethereum.org/EIPS/eip-7377) and [EIP-3074](https://eips.ethereum.org/EIPS/eip-3074), because any move towards account abstraction must address the ORIGIN opcode's role, either by modifying or completely bypassing it. Without addressing this, the ORIGIN opcode stands as a barrier to the evolution of Ethereum's account model towards greater flexibility and functionality.
+More apropos in the current context of EVM evolution, the differentiation between the ORIGIN and SENDER opcodes presents a challenge for all account abstraction efforts, such as those outlined in [EIP-7377](./eip-7377.md) and [EIP-3074](./eip-3074.md), because any move towards account abstraction must address the ORIGIN opcode's role, either by modifying or completely bypassing it. Without addressing this, the ORIGIN opcode stands as a barrier to the evolution of Ethereum's account model towards greater flexibility and functionality.
 
 ## Specification
 
