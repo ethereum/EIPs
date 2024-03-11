@@ -48,8 +48,17 @@ Using UniswapV2 `swap()` function as an example:
 ```
     // this low-level function should be called from a contract which performs important safety checks
     function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
-        prefetch_storage token0, token1, reserve0, reserve1    // add keys of token0, token1, reserve0, reserve1 to `accessed_storage_keys`
-        prefetch_contract token0, token1                       // add the contracts of token0 and token1 to `accessed_addresses`
+        prefetch {
+             token0.slot,
+             token1.slot,
+             reserve0.slot,
+             price0CumulativeLast.slot,
+             price1CumulativeLast.slot,
+        } // add the storage keys `accessed_storage_keys`
+        prefetch {
+             token0,
+             token1,
+        } // add the contracts of token0 and token1 to `accessed_addresses`
         ...
     }
 ```
