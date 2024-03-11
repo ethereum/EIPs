@@ -14,7 +14,7 @@ requires: 2929, 2930
 
 We introduce a new precompile named `prefetch`, which accepts an `accessList`.
 
-The `accessList` specifies a list of addresses and storage keys; these addresses and storage keys are added into the `accessed_addresses` and `accessed_storage_keys` global sets (introduced in [EIP-2929](./eip-2929.md)). Similar to [EIP-2930](./eip-2930.md), prefetching data through this precompile incurs a gas charge, albeit at a reduced rate compared to accesses made outside of this list.
+The `accessList` specifies a list of addresses and local storage keys; these addresses and local storage keys are added into the `accessed_addresses` and `accessed_storage_keys` global sets (introduced in [EIP-2929](./eip-2929.md)). Similar to [EIP-2930](./eip-2930.md), prefetching data through this precompile incurs a gas charge, albeit at a reduced rate compared to accesses made outside of this list.
 
 ## Motivation
 
@@ -35,10 +35,24 @@ The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SH
 As of `FORK_BLOCK_NUMBER`, a new precompile is deployed at `PREFETCH_PRECOMPILE_ADDRESS`.  The encoding of the precompile input is the following:
 
 ```text
-[32 bytes for storage key length n][n * 32 bytes storage keys][32 bytes for address length m][m * 32 bytes addresses]
+[32 bytes for local storage key length n][n * 32 bytes local storage keys][32 bytes for address length m][m * 32 bytes addresses]
 ```
 
-At the beginning of the call, we will charge `2100 * (N + CONCURRENCY - 1) // CONCURRENCY + 2600 * (M + CONCURRENCY - 1) // CONCURRENCY`, where `//` is the integer division operator, `N` is the number of storage keys not in `accessed_storage_keys` global set, and `M` is the number of addresses not in `accessed_addresses` global set. The client should concurrently read the keys and addresses and put the keys and addresses into the `accessed_addresses` and `accessed_storage_keys` global sets.  The following read cost of the storage keys and addresses obeys `WARM_STORAGE_READ_COST` as defined in [EIP-2929](./eip-2929.md).
+At the beginning of the call, we will charge `2100 * (N + CONCURRENCY - 1) // CONCURRENCY + 2600 * (M + CONCURRENCY - 1) // CONCURRENCY`, where `//` is the integer division operator, `N` is the number of local storage keys not in `accessed_storage_keys` global set, and `M` is the number of addresses not in `accessed_addresses` global set. The client should concurrently read the keys and addresses and put the keys and addresses into the `accessed_addresses` and `accessed_storage_keys` global sets.  The following read cost of the storage keys and addresses obeys `WARM_STORAGE_READ_COST` as defined in [EIP-2929](./eip-2929.md).
+
+
+### Examples
+
+Using UniswapV2 `swap()` function as an example:
+
+```
+    // this low-level function should be called from a contract which performs important safety checks
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+        prefetch_storage token0, token1, reserve0, reserve1    // add keys of token0, token1, reserve0, reserve1 to `accessed_storage_keys`
+        prefetch_contract token0, token1                       // add the contracts of token0 and token1 to `accessed_addresses`
+        ...
+    }
+```
 
 ## Rationale
 
@@ -52,7 +66,7 @@ Similar to EIP-2930, we allow duplicates in the list to maximize simplicity.
 
 ### No storage keys for external contract
 
-Unlike EIP-2930, the `prefetch` precompile only accepts local storage keys and addresses. Allowing reading data of the storage keys of external contracts assumes that the contract knows the storage layout of an external contract, which may not be a good practice. To better employ the concurrency of a node, the precompile may accept a list of static calls of external contracts together with the calldata.  This work may be done in the future EIP.
+Unlike EIP-2930, the `prefetch` precompile only accepts local storage keys and addresses. Prefetching the data of the storage keys of external contracts assumes that the contract knows the storage layout of an external contract, which may not be a good practice. To better employ the concurrency of a node, the precompile may accept a list of static calls of external contracts together with the calldata.  This work may be done in the future EIP.
 
 ## Backwards Compatibility
 
