@@ -1,0 +1,67 @@
+---
+eip: tbd
+title: Programmable access lists
+author: Qi Zhou (@qizhou), Zhiqiang Xu (@zhiqiangxu)
+discussions-to: tbd
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-03-10
+requires: 2929, 2930
+---
+
+## Abstract
+
+We introduce a new precompile named `prefetch`, which accepts an `accessList`.
+
+The `accessList` specifies a list of addresses and storage keys; these addresses and storage keys are added into the `accessed_addresses` and `accessed_storage_keys` global sets (introduced in [EIP-2929](./eip-2929.md)). Similar to [EIP-2930](./eip-2930.md), prefetching data through this precompile incurs a gas charge, albeit at a reduced rate compared to accesses made outside of this list.
+
+## Motivation
+
+The primary goal of this EIP is to enhance EIP-2930 by enabling contracts to create access lists programmatically. The advantage of implementing this precompile within a contract is the sustained reduction in gas costs for data access operations, leveraging the concurrent computing and IOs that most nodes have.
+
+## Specification
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+
+### Parameters
+
+| Constant                      | Value |
+| ----------------------------- | ----- |
+| `FORK_BLOCK_NUMBER`                 | `TBD` |
+| `PREFETCH_PRECOMPILE_ADDRESS` | `TBD` |
+| `CONCURRENCY`                 | `TBD` |
+
+As of `FORK_BLOCK_NUMBER`, a new precompile is deployed at `PREFETCH_PRECOMPILE_ADDRESS`.  The encoding of the precompile input is the following:
+
+```text
+[32 bytes for storage key length n][n * 32 bytes storage keys][32 bytes for address length m][m * 32 bytes addresses]
+```
+
+At the beginning of the call, we will charge `2100 * (N + CONCURRENCY - 1) // CONCURRENCY + 2600 * (M + CONCURRENCY - 1) // CONCURRENCY`, where `//` is the integer division operator, `N` is the number of storage keys not in `accessed_storage_keys` global set, and `M` is the number of addresses not in `accessed_addresses` global set. The client should concurrently read the keys and addresses and put the keys and addresses into the `accessed_addresses` and `accessed_storage_keys` global sets.  The following read cost of the storage keys and addresses obeys `WARM_STORAGE_READ_COST` as defined in [EIP-2929](./eip-2929.md).
+
+## Rationale
+
+### Charging less for accesses in the access list
+
+Similar to EIP-2930, we encourage contract developers to use the `prefetch` precompile as much as possible, especially assuming the nodes have some decent concurrent capabilities (e.g., some cores and IO bandwidth).
+
+### Allowing duplicates
+
+Similar to EIP-2930, we allow duplicates in the list to maximize simplicity.
+
+### No storage keys for external contract
+
+Unlike EIP-2930, the `prefetch` precompile only accepts local storage keys and addresses. Allowing reading data of the storage keys of external contracts assumes that the contract knows the storage layout of an external contract, which may not be a good practice. To better employ the concurrency of a node, the precompile may accept a list of static calls of external contracts together with the calldata.  This work may be done in the future EIP.
+
+## Backwards Compatibility
+
+If the EIP is not yet implemented, a contract calling the precompile should result in no operation.
+
+## Security Considerations
+
+No security considerations were found.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
