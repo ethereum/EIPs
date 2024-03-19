@@ -361,12 +361,12 @@ Permitted Yellow Paper URLs must anchor to a specific commit, and so must match 
 Links to the Ethereum Execution Client Specification Tests may be included using normal markdown syntax, such as:
 
 ```markdown
-[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
 ```
 
 Which renders to:
 
-[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-specs/blob/9a1f22311f517401fed6c939a159b55600c454af/README.md)
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
 
 Permitted Execution Client Specification Tests URLs must anchor to a specific commit, and so must match this regular expression:
 
