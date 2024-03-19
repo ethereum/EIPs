@@ -356,6 +356,23 @@ Permitted Yellow Paper URLs must anchor to a specific commit, and so must match 
 ^(https://github\.com/ethereum/yellowpaper/blob/[0-9a-f]{40}/paper\.pdf)$
 ```
 
+### Execution Client Specification Tests
+
+Links to the Ethereum Execution Client Specification Tests may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Client Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/d5a3188f122912e137aa2e21ed2a1403e806e424/README.md)
+
+Permitted Execution Client Specification Tests URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ethereum/execution-spec-tests/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-spec-tests/tree/[0-9a-f]{40}/.*)$
+```
 
 ### Digital Object Identifier System
 
