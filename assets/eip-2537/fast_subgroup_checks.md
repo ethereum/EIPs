@@ -13,7 +13,7 @@ Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d8
 
 ## G1 endomorphism - phi
 
-The endomorphism `phi` transform the point from `[x,y]` to `[Beta*x, y]` where `Beta` is a precomputed cube root of unity modulo p given above in parameters sections:
+The endomorphism `phi` transform the point from `[x,y]` to `[Beta*x, y]` where `Beta` is a precomputed cube root of unity modulo `p` given above in parameters sections:
 
 `phi(P[x,y]) := P[Beta*x, y]`
 
