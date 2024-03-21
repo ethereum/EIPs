@@ -17,9 +17,9 @@ Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d8
 
 # The G1 case
 
-Before accepting a point `P` as input that purports to be a member of G1 subject the input to the following endomorphism test: `phi(P) + u^2*P = 0`
+Before accepting a point `P` as input that purports to be a member of G1 subject the input to the following endomorphism test: `phi(P) + x^2*P = 0`
 
 
 # The G2 case
 
-Before accepting a point `P` as input that purports to be a member of G2 subject the input to the following endomorphism test:
+Before accepting a point `P` as input that purports to be a member of G2 subject the input to the following endomorphism test: `psi(P) + x^*P = 0`
