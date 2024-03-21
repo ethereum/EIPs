@@ -13,6 +13,8 @@ Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d8
 
 ## G1 endomorphism - phi
 
+phi(P[x,y]) = P[Beta*x, y]
+
 ## G2 endomorphism - psi
 
 # The G1 case
