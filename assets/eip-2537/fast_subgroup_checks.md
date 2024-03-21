@@ -13,4 +13,9 @@ Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d8
 
 ## The G1 case
 
+Before accepting a point P(x,y) as input that purports to be a member of G1 to the following endomorphism test:
+
+
 ## The G2 case
+
+Before accepting a point P(x,y) as input that purports to be a member of G2 to the following endomorphism test:
