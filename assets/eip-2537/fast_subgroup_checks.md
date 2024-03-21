@@ -22,7 +22,7 @@ Before accepting a point `P` as input that purports to be a member of G1 subject
 
 # The G2 case
 
-Before accepting a point `P` as input that purports to be a member of G2 subject the input to the following endomorphism test: `psi(P) + x^*P = 0`
+Before accepting a point `P` as input that purports to be a member of G2 subject the input to the following endomorphism test: `psi(P) + x*P = 0`
 
 # Resources
 
