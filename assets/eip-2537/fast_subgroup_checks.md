@@ -24,7 +24,7 @@ s = 2973677408986561043442465346520108879172042883009249989176415018091420807192
 
 ## Helper function to compute the conjugate over Fp2 - `conjugate`
 
-`phi(conjugate(c0 + c1 * v)) := c0 - c1 * v`
+`conjugate(c0 + c1 * v) := c0 - c1 * v`
 
 ## G1 endomorphism - `phi`
 
