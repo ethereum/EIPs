@@ -34,6 +34,8 @@ The endomorphism `phi` transform the point from `(x,y)` to `(Beta*x,y)` where `B
 
 ## G2 endomorphism - `psi`
 
+`psi((x,y)) := (conjugate(x)*r,conjugate(y)*s)`
+
 # The G1 case
 
 Before accepting a point `P` as input that purports to be a member of G1 subject the input to the following endomorphism test: `phi(P) + x^2*P = 0`
