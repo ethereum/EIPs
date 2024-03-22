@@ -20,13 +20,13 @@ x is negative = true
 Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d89759ad4897d29650fb85f9b409427eb4f49fffd8bfd00000000aaac
 ```
 
-## G1 endomorphism - 'phi'
+## G1 endomorphism - `phi`
 
 The endomorphism `phi` transform the point from `(x,y)` to `(Beta*x,y)` where `Beta` is a precomputed cube root of unity modulo `p` given above in parameters sections:
 
 `phi((x,y)) := (Beta*x,y)`
 
-## G2 endomorphism - 'psi'
+## G2 endomorphism - `psi`
 
 # The G1 case
 
