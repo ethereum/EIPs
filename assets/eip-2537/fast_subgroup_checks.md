@@ -22,7 +22,7 @@ Cube root of unity modulo p - Beta = 0x1a0111ea397fe699ec02408663d4de85aa0d857d8
 
 ## Helper function to compute the conjugate over Fp2 - `conjugate`
 
-'phi(conjugate(c0 + c1 * v)) := c0 - c1 * v`
+`phi(conjugate(c0 + c1 * v)) := c0 - c1 * v`
 
 ## G1 endomorphism - `phi`
 
