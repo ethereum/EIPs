@@ -1,5 +1,14 @@
 # Fast subgroup checks used by EIP 2537
 
+### Fields and Groups
+
+Field Fp is defined as the finite field of size `p` with elements represented as integers between 0 and p-1 (both inclusive). 
+
+Field Fp2 is defined as `Fp[X]/(X^2-nr2)` with elements  `el = c0 + c1 * v`, where `v` is the formal square root of `nr2` represented as integer pairs `(c0,c1)`.
+ 
+Group G1 is defined as a set of Fp pairs (points) `(x,y)` such that either `(x,y)` is  `(0,0)` or `x,y` satisfy the curve Fp equation.
+
+Group G2 is defined as a set of Fp2 pairs (points) `(x',y')` such that either `(x,y)` is `(0,0)` or `(x',y')` satisfy the curve Fp2 equation.
 
 ## Curve parameters
 
