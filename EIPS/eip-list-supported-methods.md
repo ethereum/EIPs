@@ -1,7 +1,8 @@
 ---
-title: Create `eth_checkMethodSupport` for JSON-RPC.
+eip: TBD
+title: New `eth_checkMethodSupport` for JSON-RPC
 description: List supported JSON-RPC methods of an endpoint by quering `eth_checkMethodSupport`.
-author: Raphaël Deknop (@0xSileo) <github@sileo.dev> 
+author: Raphaël Deknop (@0xSileo) <github@sileo.dev>
 discussions-to: https://ethereum-magicians.org/t/eip-create-an-eth-supportsmethod-method-for-json-rpc/19247
 status: Draft
 type: Standards Track
@@ -20,7 +21,7 @@ As of now, there is no easy way to know which JSON-RPC methods are supported (un
 
 1. Some calls require signing a transaction, thus paying a fee
 2. Ususally an example query has to be written, increasing the amount of data transmitted
-3. The error code -32603, per [its JSON-RPC specification](https://www.jsonrpc.org/specification#error_object) says nothing about what went wrong in the code, and there's no standard among Ethereum RPC providers for this. 
+3. The error code -32603, per its JSON-RPC specification, says nothing about what went wrong in the code, and there's no standard among Ethereum RPC providers for this. 
 
 This also allows for easier development of tools comparing endpoints and constitutes a first step towards a modular node architecture.
 
