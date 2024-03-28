@@ -338,6 +338,24 @@ Which renders to:
 
 [CVE-2023-29638 (2023-10-17T10:14:15)](https://nvd.nist.gov/vuln/detail/CVE-2023-29638)
 
+### Chain Agnostic Improvement Proposals (CAIPs)
+
+Links to a Chain Agnostic Improvement Proposals (CAIPs) specification may be included using normal markdown syntax, such as:
+
+```markdown
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+```
+
+Which renders to:
+
+[CAIP 10](https://github.com/ChainAgnostic/CAIPs/blob/5dd3a2f541d399a82bb32590b52ca4340b09f08b/CAIPs/caip-10.md)
+
+Permitted Chain Agnostic URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^(https://github.com/ChainAgnostic/CAIPs/blob/[0-9a-f]{40}/CAIPs/caip-[0-9]+\.md)$
+```
+
 ### Ethereum Yellow Paper
 
 Links to the Ethereum Yellow Paper may be included using normal markdown syntax, such as:
