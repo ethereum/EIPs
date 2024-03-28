@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
         
       - name: Link Checker
-        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
+        uses: gaurav-nelson/github-action-markdown-link-check@25b2c436c653f0d4500d3c2df86e5c14e71e44e1
         with:
           config-file: config/mlc_config.json
           use-quiet-mode: no
