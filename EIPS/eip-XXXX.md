@@ -1,5 +1,5 @@
 ---
-eip: XXXX
+eip: 7664
 title: Access-Key opcode
 description: The access-key opcode enables contracts to read inputs that are statically declared in access-lists.
 author: Diederik Loerakker (@protolambda)
