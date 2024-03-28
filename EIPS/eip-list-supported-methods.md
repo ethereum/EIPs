@@ -1,9 +1,9 @@
 ---
-eip: TBD
+eip: 7663
 title: New `eth_checkMethodSupport` for JSON-RPC
 description: List supported JSON-RPC methods of an endpoint by quering `eth_checkMethodSupport`.
 author: Raphaël Deknop (@0xSileo) <github@sileo.dev>
-discussions-to: https://ethereum-magicians.org/t/eip-create-an-eth-supportsmethod-method-for-json-rpc/19247
+discussions-to: https://ethereum-magicians.org/t/eip-7663-create-an-eth-supportsmethod-method-for-json-rpc/19247
 status: Draft
 type: Standards Track
 category: Interface
