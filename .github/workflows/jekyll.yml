@@ -11,7 +11,7 @@ on:
   push:
     branches: ["master"]
   schedule:
-    - cron: "*/15 * * * *" # Every 15 minutes
+    - cron: "*/1523 * *" # Every 15 minutes
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
