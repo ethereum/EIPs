@@ -2,11 +2,11 @@
 title: RAF - Reduced Attestation Format
 description: <Description is one full (short) sentence>
 author: Giulio Rebuffo (@Giulio2002)
-discussions-to: https://ethresear.ch/t/reduced-attestation-format-for-gossiping-attestations
+discussions-to: https://ethereum-magicians.org/t/reduced-attestation-format-for-gossiping-attestations/19458
 status: Draft
 type: Standards Track
 category: Core
-created: 2024-3-31
+created: 2024-03-31
 ---
 
 ## Abstract
