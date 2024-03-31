@@ -1,4 +1,5 @@
 ---
+eip: xxxx
 title: RAF - Reduced Attestation Format
 description: <Description is one full (short) sentence>
 author: Giulio Rebuffo (@Giulio2002)
