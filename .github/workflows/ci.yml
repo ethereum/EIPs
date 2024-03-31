@@ -36,7 +36,7 @@ jobs:
           name: pr_number
           path: pr/
 
- htmlproofer:
+  htmlproofer:
     name: HTMLProofer
     runs-on: ubuntu-20.04
 
@@ -56,24 +56,22 @@ jobs:
         with:
           repository: ethereum/RIPs
           path: RIPs
-          
       - name: Merge Repos
         run: |
           mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
           mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
+          mkdir -p $GITHUB_WORKSPACE/ERCs/RIPS
           cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
           cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/RIPS/. $GITHUB_WORKSPACE/EIPS
           cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
-          cp -rp $GITHUB_WORKSPACE/RIPs/RIPS/. $GITHUB_WORKSPACE/RIPS
+          cp -rp $GITHUB_WORKSPACE/RIPs/assets/. $GITHUB_WORKSPACE/assets
           cd $GITHUB_WORKSPACE/EIPS
           find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
           cd $GITHUB_WORKSPACE/assets
           find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
-          cd $GITHUB_WORKSPACE/RIPS
-          find . -name "rip-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/rip/eip/)"' _ {} \; | sh
           cd $GITHUB_WORKSPACE
           rm -rf ERCs
-          rm -rf RIPs
       - name: Setup Ruby
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
