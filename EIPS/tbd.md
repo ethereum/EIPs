@@ -13,12 +13,11 @@ requires:
 
 ## Abstract
 
-This proposal introduces a new opcode, `EXTSELFDESTRUCT`, enabling smart contracts to initiate the destruction of other contracts that utilize more than a specified number of storage slots. This mechanism aims to encourage efficient storage use on the Ethereum blockchain and introduces a system where users can gain points by clearing unnecessary contracts, thereby contributing to the network's overall efficiency.
-
+This proposal introduces a new opcode, `EXTSELFDESTRUCT`, enabling smart contracts to initiate the destruction of other contracts that utilize more than a specified number of storage slots. This mechanism aims to encourage efficient storage use on the Ethereum blockchain and introduces a system where contracts can gain points by clearing unnecessary contracts, thereby contributing to the network's overall efficiency.
 
 ## Motivation
 
-The persistent growth in the number of smart contracts on Ethereum has raised concerns about bloated storage and the long-term scalability of the network. Contracts with excessive storage utilization not only increase the state size, but also contribute to network congestion and higher gas prices. Introducing `EXTSELFDESTRUCT` provides an incentive for developers to manage storage efficiently and offers a method to mitigate storage bloat actively.
+The persistent growth in the number of smart contracts on Ethereum has raised concerns about bloated storage and the long-term scalability of the network. Contracts with excessive storage utilization not only increase the state size, but also contribute to network congestion and higher gas prices. Introducing `EXTSELFDESTRUCT` provides an incentive for devs to manage storage efficiently and offers a method to mitigate storage bloat actively.
 
 ## Specification
 
@@ -47,6 +46,7 @@ When invoked, the number of slots used by `target` is summed up and compared to 
 When the sum is greater than or equal to `N` (TBD), the operation will delete the account's code and storage from the state trie. Note: this means the nonce will remain unchanged, which will disallow metamorphic contract deployments. At the end, the accumulated points will value will be pushed back onto the stack.
 
 If the sum is less than `N` (TBD), the operation will fail, nothing will be deleted, and a `0` points value will be assigned to the stack.
+
 ### Gas Costs
 
 The base cost of the instruction is `10000` gas. Each slot in the sum adds an additional `500` gas to the total.
@@ -57,15 +57,12 @@ Conditions: A contract can invoke `EXTSELFDESTRUCT` on another contract if the t
 
 The contract invoking `EXTSELFDESTRUCT` receives points based on the storage size of the target contract and the total number of contracts it has successfully purged.
 
-$$
-\exp(A(\text{slots used by target} - N)) + i \cdot B \cdot \text{Total contracts purged}
-$$
-
-```
-Points awarded = A * (Storage slots used by target - N) + B * (Total contracts purged by initiator)
+```math
+Points awarded = \exp(A(\text{slots used by target} - N)) + i \cdot B \cdot \text{Total contracts purged}
 ```
 
-A and B are constants to be defined.
+
+A and B are constants to be defined. i is the imaginary unit that is required as points aren't real.
 
 This equation aims to incentivize the purging of larger contracts and of contracts that actively participate in cleaning the network.
 
