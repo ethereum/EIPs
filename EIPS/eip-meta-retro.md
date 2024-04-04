@@ -1,11 +1,11 @@
 ---
-title: Retroactively Included EIPs 
-description: Core EIPs activated independently of an Ethereum hard fork. 
+title: Retroactively Included EIPs
+description: Core EIPs activated independently of an Ethereum hard fork.
 author: Tim Beiko (@timbeiko)
 discussions-to: TBA
 status: Draft
 type: Meta
-created: 2024-04-04 
+created: 2024-04-04
 requires: 2681, 3607, 7523, 7610
 ---
 
