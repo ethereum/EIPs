@@ -1,8 +1,9 @@
 ---
+eip: TBD
 title: EOF - Prepare for Address Space Extension
 description: Update EOF opcodes so addresses are not trimmed durring execution
 author: Danno Ferrin (@shemnon)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/eof-prepare-for-address-space-extension/19537
 status: Draft
 type: Standards Track
 category: Core
@@ -18,11 +19,11 @@ bytes need to be zero or an exceptional halt is raised.
 
 ## Motivation
 
-There have been propsals to extend Ethereum Addresses from 160 bytes to 256, such as one that
-would [use the extra bits for state expiry](https://ethereum-magicians.org/t/increasing-address-size-from-20-to-32-bytes/5485).
-One issue ground this work to a halt: EVM opcodes that accept Addresses trim all but the lowest 20
-bytes out fo the operand before processing. EVM Reference
-tests [verify this behavior](https://github.com/ethereum/tests/blob/develop/src/GeneralStateTestsFiller/stBadOpcode/invalidAddrFiller.yml).
+There have been propsals to extend Ethereum Addresses from 160 bytes to 256, such as one that would
+use the extra bits for state expiry (such ethereum magicians fourm topic "Increasing the addres
+sisze from 20 to 32 bytes"). One issue ground this work to a halt: EVM opcodes that accept Addresses
+trim all but the lowest 20 bytes out fo the operand before processing. EVM Reference tests verify
+this behavior in the 'stBadOpcode/invalidAddr.json' tests.
 
 The EVM Object Framework presents an opportunity to remove this address masking in a backwards
 compatible way, by baking it into the format definition from the start.
@@ -41,11 +42,12 @@ The `BALANCE` operation, when invoked in code in an EOF container, will reauire 
 the operand to be zero.
 
 If `BALANCE` is invoked with any of the high 12 bytes set to a non-zero value the operation will
-cause an exceptional halt as though the invalid operation (`0xfe`) were processed. All gas will be
-consumed.
+cause an exceptional halt. All gas in the current frame will be consumed on failure, no gas schedule
+change is needed.
 
-Any operation that is un-banned from EOF will have the same behavior as `BALANCE` when it comes to
-address operations.
+Any new operation with an address operand on the stack, or any operation that is un-banned from EOF
+that has an address operand on the stack will have the same behavior as `BALANCE` when validating
+the address operand.
 
 ## Rationale
 
@@ -68,9 +70,8 @@ in only one mode.
 
 ## Test Cases
 
-Test cases similar to
-the [Invalid Address](https://github.com/ethereum/tests/blob/develop/src/GeneralStateTestsFiller/stBadOpcode/invalidAddrFiller.yml)
-tests in the standard reference tests will need to be written for the EOF tests.
+Test cases similar to `invalidAddr.json`  tests in the standard reference tests will need to be
+written for the EOF tests, except they would check for halts on invalid addresses.
 
 ## Reference Implementation
 
