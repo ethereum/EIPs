@@ -39,7 +39,7 @@ kramdown:
   parse_block_html: false
   # This is the default, but be explicit as some EIPs depend on it
   auto_ids: true
-  # This is to ensure more determistic behaviour
+  # This is to ensure more deterministic behaviour
   auto_id_stripping: true
   syntax_highlighter: rouge
 
