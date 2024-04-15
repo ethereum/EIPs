@@ -4,17 +4,18 @@ from remerkleable.bitfields import Bitvector
 from remerkleable.complex import Container
 from stable_container import OneOf, StableContainer, Variant
 
-# Serialization and merkleization format
+# Defines the common merkleization format and a portable serialization format across variants
 class Shape(StableContainer[4]):
     side: Optional[uint16]
     color: uint8
     radius: Optional[uint16]
 
-# Valid variants
+# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Square(Variant[Shape]):
     side: uint16
     color: uint8
 
+# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Circle(Variant[Shape]):
     radius: uint16
     color: uint8
@@ -39,169 +40,168 @@ class ShapeRepr(Container):
     active_fields: Bitvector[4]
 
 # Square tests
-shape1 = Shape(side=0x42, color=1, radius=None)
-square_bytes = bytes.fromhex("03420001")
-square1 = Square(side=0x42, color=1)
-square2 = Square(backing=shape1.get_backing())
-square3 = Square(backing=square1.get_backing())
-assert shape1 == square1 == square2 == square3
+square_bytes_stable = bytes.fromhex("03420001")
+square_bytes_variant = bytes.fromhex("420001")
+square_root = ShapeRepr(
+    value=ShapePayload(side=0x42, color=1, radius=0),
+    active_fields=Bitvector[4](True, True, False, False),
+).hash_tree_root()
+shapes = [Shape(side=0x42, color=1, radius=None)]
+squares = [Square(side=0x42, color=1)]
+squares.extend(list(Square(backing=shape.get_backing()) for shape in shapes))
+shapes.extend(list(Shape(backing=shape.get_backing()) for shape in shapes))
+shapes.extend(list(Shape(backing=square.get_backing()) for square in squares))
+squares.extend(list(Square(backing=square.get_backing()) for square in squares))
+assert len(set(shapes)) == 1
+assert len(set(squares)) == 1
+assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
+assert all(square.encode_bytes() == square_bytes_variant for square in squares)
 assert (
-    shape1.encode_bytes() == square1.encode_bytes() ==
-    square2.encode_bytes() == square3.encode_bytes() ==
-    square_bytes
+    Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
+    Square.decode_bytes(square_bytes_variant) ==
+    AnyShape.decode_bytes(square_bytes_stable) ==
+    AnyShape.decode_bytes(square_bytes_stable, circle_allowed = True)
 )
-assert (
-    Shape.decode_bytes(square_bytes) ==
-    Square.decode_bytes(square_bytes) ==
-    AnyShape.decode_bytes(square_bytes) ==
-    AnyShape.decode_bytes(square_bytes, circle_allowed = True)
-)
-assert (
-    shape1.hash_tree_root() == square1.hash_tree_root() ==
-    square2.hash_tree_root() == square3.hash_tree_root() ==
-    ShapeRepr(
-        value=ShapePayload(side=0x42, color=1, radius=0),
-        active_fields=Bitvector[4](True, True, False, False),
-    ).hash_tree_root()
-)
+assert all(shape.hash_tree_root() == square_root for shape in shapes)
+assert all(square.hash_tree_root() == square_root for square in squares)
 try:
     circle = Circle(side=0x42, color=1)
     assert False
 except:
     pass
-try:
-    circle = Circle(backing=shape1.get_backing())
-    assert False
-except:
-    pass
-try:
-    circle = Circle.decode_bytes(square_bytes)
-    assert False
-except:
-    pass
-shape1.side = 0x1337
-square1.side = 0x1337
-square2.side = 0x1337
-square3.side = 0x1337
-square_bytes = bytes.fromhex("03371301")
-assert shape1 == square1 == square2 == square3
+for shape in shapes:
+    try:
+        circle = Circle(backing=shape.get_backing())
+        assert False
+    except:
+        pass
+for square in squares:
+    try:
+        circle = Circle(backing=square.get_backing())
+        assert False
+    except:
+        pass
+for shape in shapes:
+    shape.side = 0x1337
+for square in squares:
+    square.side = 0x1337
+square_bytes_stable = bytes.fromhex("03371301")
+square_bytes_variant = bytes.fromhex("371301")
+square_root = ShapeRepr(
+    value=ShapePayload(side=0x1337, color=1, radius=0),
+    active_fields=Bitvector[4](True, True, False, False),
+).hash_tree_root()
+assert len(set(shapes)) == 1
+assert len(set(squares)) == 1
+assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
+assert all(square.encode_bytes() == square_bytes_variant for square in squares)
 assert (
-    shape1.encode_bytes() == square1.encode_bytes() ==
-    square2.encode_bytes() == square3.encode_bytes() ==
-    square_bytes
+    Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
+    Square.decode_bytes(square_bytes_variant) ==
+    AnyShape.decode_bytes(square_bytes_stable) ==
+    AnyShape.decode_bytes(square_bytes_stable, circle_allowed = True)
 )
-assert (
-    Shape.decode_bytes(square_bytes) ==
-    Square.decode_bytes(square_bytes) ==
-    AnyShape.decode_bytes(square_bytes) ==
-    AnyShape.decode_bytes(square_bytes, circle_allowed = True)
-)
-assert (
-    shape1.hash_tree_root() == square1.hash_tree_root() ==
-    square2.hash_tree_root() == square3.hash_tree_root() ==
-    ShapeRepr(
-        value=ShapePayload(side=0x1337, color=1, radius=0),
-        active_fields=Bitvector[4](True, True, False, False),
-    ).hash_tree_root()
-)
-try:
-    square1.radius = 0x1337
-    assert False
-except:
-    pass
-try:
-    square1.side = None
-    assert False
-except:
-    pass
+assert all(shape.hash_tree_root() == square_root for shape in shapes)
+assert all(square.hash_tree_root() == square_root for square in squares)
+for square in squares:
+    try:
+        square.radius = 0x1337
+        assert False
+    except:
+        pass
+for square in squares:
+    try:
+        square.side = None
+        assert False
+    except:
+        pass
 
 # Circle tests
-shape2 = Shape(side=None, color=1, radius=0x42)
-circle_bytes = bytes.fromhex("06014200")
-circle1 = Circle(radius=0x42, color=1)
-circle2 = Circle(backing=shape2.get_backing())
-circle3 = Circle(backing=circle1.get_backing())
-circle4 = shape1
-circle4.side = None
-circle4.radius = 0x42
-assert shape2 == circle1 == circle2 == circle3 == circle4
+circle_bytes_stable = bytes.fromhex("06014200")
+circle_bytes_variant = bytes.fromhex("420001")
+circle_root = ShapeRepr(
+    value=ShapePayload(side=0, color=1, radius=0x42),
+    active_fields=Bitvector[4](False, True, True, False),
+).hash_tree_root()
+modified_shape = shapes[0]
+modified_shape.side = None
+modified_shape.radius = 0x42
+shapes = [Shape(side=None, color=1, radius=0x42), modified_shape]
+circles = [Circle(radius=0x42, color=1)]
+circles.extend(list(Circle(backing=shape.get_backing()) for shape in shapes))
+shapes.extend(list(Shape(backing=shape.get_backing()) for shape in shapes))
+shapes.extend(list(Shape(backing=circle.get_backing()) for circle in circles))
+circles.extend(list(Circle(backing=circle.get_backing()) for circle in circles))
+assert len(set(shapes)) == 1
+assert len(set(circles)) == 1
+assert all(shape.encode_bytes() == circle_bytes_stable for shape in shapes)
+assert all(circle.encode_bytes() == circle_bytes_variant for circle in circles)
 assert (
-    shape2.encode_bytes() == circle1.encode_bytes() ==
-    circle2.encode_bytes() == circle3.encode_bytes() ==
-    circle4.encode_bytes() ==
-    circle_bytes
+    Circle(backing=Shape.decode_bytes(circle_bytes_stable).get_backing()) ==
+    Circle.decode_bytes(circle_bytes_variant) ==
+    AnyShape.decode_bytes(circle_bytes_stable, circle_allowed = True)
 )
-assert (
-    Shape.decode_bytes(circle_bytes) ==
-    Circle.decode_bytes(circle_bytes) ==
-    AnyShape.decode_bytes(circle_bytes, circle_allowed = True)
-)
-assert (
-    shape2.hash_tree_root() == circle1.hash_tree_root() ==
-    circle2.hash_tree_root() == circle3.hash_tree_root() ==
-    circle4.hash_tree_root() ==
-    ShapeRepr(
-        value=ShapePayload(side=0, color=1, radius=0x42),
-        active_fields=Bitvector[4](False, True, True, False),
-    ).hash_tree_root()
-)
+assert all(shape.hash_tree_root() == circle_root for shape in shapes)
+assert all(circle.hash_tree_root() == circle_root for circle in circles)
 try:
     square = Square(radius=0x42, color=1)
     assert False
 except:
     pass
+for shape in shapes:
+    try:
+        square = Square(backing=shape.get_backing())
+        assert False
+    except:
+        pass
+for circle in circles:
+    try:
+        square = Square(backing=circle.get_backing())
+        assert False
+    except:
+        pass
 try:
-    square = Square(backing=shape2.get_backing())
-    assert False
-except:
-    pass
-try:
-    square = Square.decode_bytes(circle_bytes)
-    assert False
-except:
-    pass
-try:
-    circle = AnyShape.decode_bytes(circle_bytes, circle_allowed = False)
+    circle = AnyShape.decode_bytes(circle_bytes_stable, circle_allowed = False)
     assert False
 except:
     pass
 
 # Unsupported tests
-shape3 = Shape(side=None, color=1, radius=None)
-shape3_bytes = bytes.fromhex("0201")
-assert shape3.encode_bytes() == shape3_bytes
-assert Shape.decode_bytes(shape3_bytes) == shape3
+shape = Shape(side=None, color=1, radius=None)
+shape_bytes = bytes.fromhex("0201")
+assert shape.encode_bytes() == shape_bytes
+assert Shape.decode_bytes(shape_bytes) == shape
 try:
-    shape = Square.decode_bytes(shape3_bytes)
+    shape = Square.decode_bytes(shape_bytes)
     assert False
 except:
     pass
 try:
-    shape = Circle.decode_bytes(shape3_bytes)
+    shape = Circle.decode_bytes(shape_bytes)
     assert False
 except:
     pass
 try:
-    shape = AnyShape.decode_bytes(shape3_bytes)
+    shape = AnyShape.decode_bytes(shape_bytes)
     assert False
 except:
     pass
-shape4 = Shape(side=0x42, color=1, radius=0x42)
-shape4_bytes = bytes.fromhex("074200014200")
-assert shape4.encode_bytes() == shape4_bytes
-assert Shape.decode_bytes(shape4_bytes) == shape4
+shape = Shape(side=0x42, color=1, radius=0x42)
+shape_bytes = bytes.fromhex("074200014200")
+assert shape.encode_bytes() == shape_bytes
+assert Shape.decode_bytes(shape_bytes) == shape
 try:
-    shape = Square.decode_bytes(shape4_bytes)
-    assert False
-except:
-    pass
-try:
-    shape = Circle.decode_bytes(shape4_bytes)
+    shape = Square.decode_bytes(shape_bytes)
     assert False
 except:
     pass
 try:
-    shape = AnyShape.decode_bytes(shape4_bytes)
+    shape = Circle.decode_bytes(shape_bytes)
+    assert False
+except:
+    pass
+try:
+    shape = AnyShape.decode_bytes(shape_bytes)
     assert False
 except:
     pass
@@ -215,3 +215,47 @@ try:
     assert False
 except:
     pass
+try:
+    square = Square(radius=0x42, color=1)
+    assert False
+except:
+    pass
+try:
+    circle = Circle(side=0x42, color=1)
+    assert False
+except:
+    pass
+
+# Surrounding container tests
+class ShapeContainer(Container):
+    shape: Shape
+    square: Square
+    circle: Circle
+
+class ShapeContainerRepr(Container):
+    shape: ShapeRepr
+    square: ShapeRepr
+    circle: ShapeRepr
+
+container = ShapeContainer(
+    shape=Shape(side=0x42, color=1, radius=0x42),
+    square=Square(side=0x42, color=1),
+    circle=Circle(radius=0x42, color=1),
+)
+container_bytes = bytes.fromhex("0a000000420001420001074200014200")
+assert container.encode_bytes() == container_bytes
+assert ShapeContainer.decode_bytes(container_bytes) == container
+assert container.hash_tree_root() == ShapeContainerRepr(
+    shape=ShapeRepr(
+        value=ShapePayload(side=0x42, color=1, radius=0x42),
+        active_fields=Bitvector[4](True, True, True, False),
+    ),
+    square=ShapeRepr(
+        value=ShapePayload(side=0x42, color=1, radius=0),
+        active_fields=Bitvector[4](True, True, False, False),
+    ),
+    circle=ShapeRepr(
+        value=ShapePayload(side=0, color=1, radius=0x42),
+        active_fields=Bitvector[4](False, True, True, False),
+    ),
+).hash_tree_root()
