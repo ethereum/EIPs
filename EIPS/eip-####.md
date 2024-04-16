@@ -1,0 +1,127 @@
+---
+title: Union Lock
+description: Union Lock based on TSTORE/TLOAD can avoid flash loan attacks.
+author: Elon Lee (@1999321)
+discussions-to: https://ethereum-magicians.org/t/union-lock-based-on-tstore-tload-can-avoid-flash-loan-attacks/19676
+status: Draft
+type: Standards Track
+category: ERC
+created: 2024-04-16
+requires: 8000
+---
+
+## Abstract
+
+The feature of Union Lock can query the number of calls of other contracts and the number of calls of other contract functions in the same Ethereum transaction, thereby realizing the cross-contract locking function.
+
+Union Lock is based on  [EIP-1153](./eip-1153.md) , it can make DApps avoid flash loan attacks.
+
+## Motivation
+
+Since the losses caused by flash loan attacks are as high as tens of millions of dollars, it would be meaningful if a design could be provided to enable DApps to avoid flash loan attacks.
+
+## Specification
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.25;
+
+interface IERC8000 {
+
+    function getFunctionCallTimes(bytes4 selector) external view returns (uint256);
+
+    function getContractCallTimes() external view returns (uint256);
+}
+```
+
+`getFunctionCallTimes`: Allows cross-contract acquisition of the number of times a function is called in a transaction.
+
+`getContractCallTimes`: Allows cross-contract acquisition of the number of times a contract is called in a transaction.
+
+## Rationale
+
+The attack principle of flash loan is to inject a large amount of assets into a contract that a DApp relies on to change the data of the contract, so that the DApp can be lent or obtained more assets. 
+
+The main attack modes of flash loans are:
+
+1. Lending a large amount of assets at low interest rates, and then injecting funds into the data contract (group), which is the dependency of the attacked contract (group).
+2. Obtain a large amount of funds from the attacked contract (group). The contract (group) being attacked may be a data contract + other contracts that produce funds. For example, in an exchange, first inject borrowed assets into the exchange to lower/increase the price of an asset, then attack other contracts that depend on it, and finally obtain the previously borrowed assets from the exchange.
+3. After the attack is completed, repay the obtained assets to the flash loan.
+
+For example, in the example of a lending DApp that relies on the current price of a decentralized exchange, the attacker borrows assets through flash loans, injects them into the decentralized exchange to change the price, and then borrows another asset from the DApp based on the mortgage asset. Then the price on the decentralized exchange is restored, and the loaned asset portion will be lower than the mortgage asset portion, thereby realizing flash loan attack arbitrage.
+
+The reasons why flash loans can be attacked are:
+
+1. A function does not know the number of times any other function is called in a transaction
+2. A contract will not know the number of times any other contract has been called in a transaction.
+
+Union Lock can solve this problem.
+
+Union Lock allows counting the number of any function calls in a transaction. In the above example, when the injected function of the decentralized exchange obtained is not 0, the transaction can be rejected to avoid flash loan attacks.
+
+This is all based on the fact that Union Lock can count the number of contract calls and function calls with TSTORE, and if it is accessed across contracts in the same transaction, it will be automatically reset to zero in the next transaction.
+
+## Backwards Compatibility
+
+This EIP requires the implementation of [EIP-1153](./eip-1153.md).
+
+Since this EIP does not change behavior of any existing opcodes, it is backwards compatible with all existing smart contracts.
+
+## Test Cases
+
+[Here](https://github.com/1999321/Union-Lock).
+
+## Reference Implementation
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.25;
+
+contract ERC8000 is IERC8000 {
+
+    function addFunctionCallTimes(bytes4 selector) internal {
+        assembly {
+            let i := tload(selector)
+            i := add(i, 1)
+            tstore(selector, i)
+        }
+    }
+
+    function addContractCallTimes() internal {
+        address self = address(this);
+
+        assembly {
+            let i := tload(self)
+            i := add(i, 1)
+            tstore(self, i)
+        }
+    }
+
+    function getFunctionCallTimes(bytes4 selector) external view override returns (uint256 i) {
+
+        assembly {
+            i := tload(selector)
+        }
+    }
+
+    function getContractCallTimes() external view override returns (uint256 i) {
+        address self = address(this);
+
+        assembly {
+            i := tload(self)
+        }
+    }
+}
+```
+
+
+
+## Security Considerations
+
+The compiler (0.8.25) will prompt: "Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe."
+
+Union Lock only counts function calls and contract calls to avoid flash loan attacks. No other uses are recommended.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
