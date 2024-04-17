@@ -1,5 +1,5 @@
 ---
-eip: tbd
+eip: 7691
 title: Blob throughput increase
 description: Increase the number of blobs to reach a new target of x blobs per block, to be defined by performing tests.
 author: Parithosh Jayanthi (@parithosh), Toni Wahrstätter (@nerolation), Sam Calder-Mason (@samcm), Andrew Davis (@savid)
