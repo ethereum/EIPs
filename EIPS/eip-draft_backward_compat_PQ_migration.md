@@ -1,4 +1,5 @@
 ---
+eip: <to be assigned>
 title: Backward-Compatible Post-Quantum Migration
 description: This EIP aims to bring quantum resistance to Ethereum through a novel backward-compatible approach.
 author: Teik Guan Tan <teikguan@pqcee.com>, Nicholas Ho <nicholasho@pqcee.com>, Xinxin Fan (@cryptoxfan), Xueping Yang (@ququzone)
@@ -6,7 +7,8 @@ discussions-to: https://ethereum-magicians.org/t/xxxxx
 status: Draft
 type: Standards Track
 category: Core
-created: 2024-mm-dd
+created: 2024-04-17
+
 ---
 
 <!--
