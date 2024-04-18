@@ -41,7 +41,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The digital signing system is typically made up of 3 operations:
 
-- Key Generation: This is performed in the wallet, where a sequence of mnemonic words (or seed phrase) $W$ are randomly generated, and computationally derived through a hashing process to obtain a private key $K_{prv}$, a public key $K_{pub} = \textsf{ECDSA}_{pubkey}(K_{prv})$ and wallet address $Addr = \textsf{Hash}(K_{pub})$. $K_{prv}$ needs to be stored securely by the wallet while $K_{pub}$ and $Addr$ can be subsequently derived from $K_{prv}$.
+- Key Generation: This is performed in the wallet, where a sequence of mnemonic words (or seed phrase) $W$ are randomly generated, and computationally derived through a hashing process to obtain a private key $K_{prv}$, a public key $`K_{pub} = \textsf{ECDSA}_{pubkey}(K_{prv})`$ and wallet address $Addr = \textsf{Hash}(K_{pub})$. $K_{prv}$ needs to be stored securely by the wallet while $K_{pub}$ and $Addr$ can be subsequently derived from $K_{prv}$.
 - Signature Generation: This is performed in the wallet. Given the transaction, $T$, the wallet computes digital signature $\delta = \textsf{ECDSA}_{sign}(T,K_{prv})$ as proof-of-possession of $K_{prv}$. The package sent by the wallet to effect the transaction includes $T$, $\delta$, $K_{pub}$.
 - Signature Verification: Signature verification is perform on the Ethereum node to check that the requested transaction is valid. The node computes $\textsf{ECDSA}_{verify}(T,\delta,K_{pub})$ to confirm that $T$ was never modified from the point it was digitally signed, and the private signing key used corresponds to the public key $K_{pub}$ and address $\textsf{Hash}(K_{pub})$.
 
