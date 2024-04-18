@@ -45,17 +45,17 @@ The digital signing system is typically made up of 3 operations:
 - Signature Generation: This is performed in the wallet. Given the transaction, $`T`$, the wallet computes digital signature $`\delta = \textsf{ECDSA}_{sign}(T,K_{prv})`$ as proof-of-possession of $`K_{prv}`$. The package sent by the wallet to effect the transaction includes $`T`$, $`\delta`$, $`K_{pub}`$.
 - Signature Verification: Signature verification is perform on the Ethereum node to check that the requested transaction is valid. The node computes $`\textsf{ECDSA}_{verify}(T,\delta,K_{pub})`$ to confirm that $`T`$ was never modified from the point it was digitally signed, and the private signing key used corresponds to the public key $`K_{pub}`$ and address $`\textsf{Hash}(K_{pub})`$.
 
-We assume that in the future, an attacker with a CRQC will be able to know all $`K_{prv}`$ when given $`K_{pub}`$. Yet, we also know that hashing is resistant to CRQC attacks which means that the attacker will not be able to compute $`W`$, given $`K_{prv}`$, as long as $`W`$ is sufficiently large (i.e. 16-20 words).
+We assume that in the future, an attacker with a CRQC will be able to know all $`K_{prv}`$ when given $`K_{pub}`$. Yet, we also know that hashing is resistant to CRQC attacks which means that the attacker will not be able to compute $`W`$, given $`K_{prv}`$, as long as $`W`$ is sufficiently large (i.e., 16-20 words).
 
 We therefore propose to enhance the digital signing system for Ethereum to include a quantum-safe proof-of-knowledge ($`\textsf{QSPoK}`$) of $`W`$ to ensure that the security of the transactions cannot be compromised by a quantum computer. The digital signing system is to be updated as follows:
 
 - Key Generation: No change to the Key Generation process. However, $`W`$ is stored in addition to $`K_{prv}`$.
 - Signature Generation: We propose that the digital signature will now comprise of 2 parts:
- i) Digital signing. This is unchanged, i.e. $`\delta = \textsf{ECDSA}_{sign}(T,K_{prv})`$.
+ i) Digital signing. This is unchanged, i.e., $`\delta = \textsf{ECDSA}_{sign}(T,K_{prv})`$.
  ii) Proof generation. We propose a quantum-safe zero-knowledge proof system $`\pi = \textsf{QSPoK}_{prove}(T,W)`$ as proof-of-knowledge of $`W`$. This proof $`\pi`$ is unique with respect to $`T`$ and $`W`$, and forms part of the quantum-safe signature process.
 - Signature Verification: The signature verification is also performed in two steps
- i) ECDSA Signature verification is unchanged, i.e. $`\textsf{ECDSA}_{verify}(T,\delta,K_{pub})`$
- ii) Proof validation to confirm that the signer knows the value of $`W`$ is added, i.e. $`\textsf{QSPoK}_{validate}(T,\pi,\delta,K_{pub})`$.
+ i) ECDSA Signature verification is unchanged, i.e., $`\textsf{ECDSA}_{verify}(T,\delta,K_{pub})`$
+ ii) Proof validation to confirm that the signer knows the value of $`W`$ is added, i.e., $`\textsf{QSPoK}_{validate}(T,\pi,\delta,K_{pub})`$.
 
 ### Quantum-safe Proof-of-Knowledge
 
@@ -83,7 +83,7 @@ To be compatible to existing wallet standards ([BIP-32](https://github.com/bitco
 We propose 2 authentication proof circuits to be supported:
 
 - $`\textit{SHA512-compatible}`$. This is for users whose wallets are still based on the BIP0039 seed phrase, and require to authenticate their transactions to the verifying nodes. These users will will continue to use the $`\textsf{ECDSA}(trunc(\textsf{SHA512}(secret)),message)`$ proof-circuit. Preliminary proof size estimates for this circuit using MPCitH is 850KBytes. We expect the proof size for zkSTARK to be similar.
-- $`\textit{qsECDSA}`$. This is for users who have generated their seed phrase after the upgrade. We can use an optimized proof-circuit to reduce the computational overheads and proof size. A possibility would be to use a zero-knowledge proof-friendly hash such as [MiMC](https://eprint.iacr.org/2016/492.pdf) (or [rescue](https://eprint.iacr.org/2020/948.pdf)) in place of SHA512. e.g. $`\textsf{ECDSA}(trunc(\textsf{MiMC}(secret)),message)`$
+- $`\textit{qsECDSA}`$. This is for users who have generated their seed phrase after the upgrade. We can use an optimized proof-circuit to reduce the computational overheads and proof size. A possibility would be to use a zero-knowledge proof-friendly hash such as [MiMC](https://eprint.iacr.org/2016/492.pdf) (or [rescue](https://eprint.iacr.org/2020/948.pdf)) in place of SHA512. e.g., $`\textsf{ECDSA}(trunc(\textsf{MiMC}(secret)),message)`$
 
 ## Migration Approaches
 
@@ -95,7 +95,7 @@ Our first proposal is to introduce new transaction types that augments each exis
 
 ![The Process of Augmented Legacy Transactions](../assets/eip-N/legacy_augmented_transactions.png)
 
-- A user generates a post-quantum secure zero-knowledge proof for the statement that he/she knows a secret (e.g., a mnemonic phrase) which can be used to generate the user's Ethereum wallet address by following a specified address derivation process (e.g. [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)).
+- A user generates a post-quantum secure zero-knowledge proof for the statement that he/she knows a secret (e.g., a mnemonic phrase) which can be used to generate the user's Ethereum wallet address by following a specified address derivation process (e.g., [BIP-39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)).
 - The user stores the generated $`\textbf{proof}`$ to a selected storage provider and obtains a publicly accessible URI $`\textbf{proofUri}`$.
 - The user creates a transaction by augmenting a legacy transaction with $`\textbf{proofUri}`$ and sends it to the mempool of a validator.
 - Upon receiving a new transaction in the mempool, a validator first verifies the ECDSA signature in the transaction, followed by retrieving the $`\textbf{proof}`$ from the storage provider with $`\textbf{proofUri}`$ and verifying its validity. A transaction is considered as valid if both signature and proof verification succeed, besides other sanity checks.
@@ -185,7 +185,7 @@ We aim to minimally achieve the Quantum Level 1 Security as defined by [NIST](ht
 
 For MPCitH zero-knowledge proof, we propose the use of [Katz-Kolesnikov-Wang](https://dl.acm.org/doi/pdf/10.1145/3243734.3243805) with parameters $`N=16`$, $`M=250`$, $`\tau=36`$ to achieve NIST Quantum Level 1 security.
 
-Since zkSTARK computations do not happen over a finite field (such as zkSNARKS), it is generally accepted that zkSTARK proofs are quantum-safe, as long as the hash used primitive is collapsing and is large enough, e.g. 256-bit key strength, to prevent a brute-force attack using Grover's algorithm.
+Since zkSTARK computations do not happen over a finite field (such as zkSNARKS), it is generally accepted that zkSTARK proofs are quantum-safe, as long as the hash used primitive is collapsing and is large enough, e.g., 256-bit key strength, to prevent a brute-force attack using Grover's algorithm.
 
 Our design has not yet taken into account how it affects Multi-Party Computation (MPC) wallets.
 
