@@ -46,7 +46,7 @@ jobs:
           PR_NUMBER: ${{ github.event.issue.number }}
       
       - name: Check File Existence
-        uses: andstor/file-existence-action@20b4d2e596410855db8f9ca21e96fbe18e12930b
+        uses: andstor/file-existence-action@31a502724c77ada11ba0b3442e34757182ccdbd3
         id: check_pr_number_exists
         with:
           files: pr-number.txt
