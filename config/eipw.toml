@@ -155,6 +155,7 @@ exceptions = [
     '^https://(www\.)?github\.com/ethereum/devp2p/(blob|tree)/[0-9a-f]{40}/.+$',
     '^https://(www\.)?github\.com/ethereum/devp2p/commit/[0-9a-f]{40}$',
     '^https://(www\.)?github\.com/bitcoin/bips/(blob|tree)/[0-9a-f]{40}/bip-[0-9]+\.mediawiki$',
+    '^https://chainagnostic\.org/final/caip-[0-9]{1,5}$',
     '^https://www\.w3\.org/TR/[0-9][0-9][0-9][0-9]/.*$',
     '^https://[a-z]*\.spec\.whatwg\.org/commit-snapshots/[0-9a-f]{40}/$',
     '^https://www\.rfc-editor\.org/rfc/.*$',
