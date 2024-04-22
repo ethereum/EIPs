@@ -1,4 +1,4 @@
-# Fast subgroup checks used by EIP 2537
+# Fast subgroup checks used by EIP-2537
 
 ### Fields and Groups
 
