@@ -216,6 +216,28 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
+
 ### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
