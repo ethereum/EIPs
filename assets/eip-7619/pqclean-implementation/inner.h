@@ -428,7 +428,7 @@ int PQCLEAN_FALCON512_CLEAN_verify_recover(uint16_t *h,
  *   fpr fpr_mtwo63m1          -(2^63-1)
  *   fpr fpr_ptwo63            2^63
  */
-#include "fpr.h"
+#include "normalizer.h"
 
 /* ==================================================================== */
 /*
