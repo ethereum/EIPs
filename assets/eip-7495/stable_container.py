@@ -22,6 +22,26 @@ def all_fields(cls) -> Dict[str, Tuple[Type[View], bool]]:
     return fields
 
 
+def field_val_repr(self, fkey: str, ftyp: Type[View], fopt: bool) -> str:
+    field_start = '  ' + fkey + ': ' + (
+        ('Optional[' if fopt else '') + ftyp.__name__ + (']' if fopt else '')
+    ) + ' = '
+    try:
+        field_repr = repr(getattr(self, fkey))
+        if '\n' in field_repr:  # if multiline, indent it, but starting from the value.
+            i = field_repr.index('\n')
+            field_repr = field_repr[:i+1] + indent(field_repr[i+1:], ' ' * len(field_start))
+        return field_start + field_repr
+    except NavigationError:
+        return f"{field_start} *omitted*"
+
+
+def repr(self) -> str:
+    return f"{self.__class__.type_repr()}:\n" + '\n'.join(
+        indent(field_val_repr(self, fkey, ftyp, fopt), '  ')
+        for fkey, (ftyp, fopt) in self.__class__.fields().items())
+
+
 class StableContainer(ComplexView):
     _field_indices: Dict[str, Tuple[int, Type[View], bool]]
     __slots__ = '_field_indices'
@@ -158,23 +178,8 @@ class StableContainer(ComplexView):
 
             self.set_backing(next_backing)
 
-    def _get_field_val_repr(self, fkey: str, ftyp: Type[View], fopt: bool) -> str:
-        field_start = '  ' + fkey + ': ' + (
-            ('Optional[' if fopt else '') + ftyp.__name__ + (']' if fopt else '')
-        ) + ' = '
-        try:
-            field_repr = repr(getattr(self, fkey))
-            if '\n' in field_repr:  # if multiline, indent it, but starting from the value.
-                i = field_repr.index('\n')
-                field_repr = field_repr[:i+1] + indent(field_repr[i+1:], ' ' * len(field_start))
-            return field_start + field_repr
-        except NavigationError:
-            return f"{field_start} *omitted from partial*"
-
     def __repr__(self):
-        return f"{self.__class__.type_repr()}:\n" + '\n'.join(
-            indent(self._get_field_val_repr(fkey, ftyp, fopt), '  ')
-            for fkey, (ftyp, fopt) in self.__class__.fields().items())
+        return repr(self)
 
     @classmethod
     def type_repr(cls) -> str:
@@ -348,6 +353,63 @@ class Variant(ComplexView):
                 optional_fields.set(oindex, active_fields.get(findex))
                 oindex += 1
         return optional_fields
+
+    def __getattr__(self, item):
+        if item[0] == '_':
+            return super().__getattribute__(item)
+        else:
+            try:
+                (ftyp, fopt) = self.__class__.fields()[item]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {item}")
+            try:
+                (findex, _, _) = self.__class__.S._field_indices[item]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {item} in base")
+
+            if not self.active_fields().get(findex):
+                assert fopt
+                return None
+
+            data = super().get_backing().get_left()
+            fnode = data.getter(2**get_depth(self.__class__.S.N) + findex)
+            return ftyp.view_from_backing(fnode)
+
+    def __setattr__(self, key, value):
+        if key[0] == '_':
+            super().__setattr__(key, value)
+        else:
+            try:
+                (ftyp, fopt) = self.__class__.fields()[key]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {key}")
+            try:
+                (findex, _, _) = self.__class__.S._field_indices[key]
+            except KeyError:
+                raise AttributeError(f"unknown attribute {key} in base")
+
+            next_backing = self.get_backing()
+
+            assert value is not None or fopt
+            active_fields = self.active_fields()
+            active_fields.set(findex, value is not None)
+            next_backing = next_backing.rebind_right(active_fields.get_backing())
+
+            if value is not None:
+                if isinstance(value, ftyp):
+                    fnode = value.get_backing()
+                else:
+                    fnode = ftyp.coerce_view(value).get_backing()
+            else:
+                fnode = zero_node(0)
+            data = next_backing.get_left()
+            next_data = data.setter(2**get_depth(self.__class__.S.N) + findex)(fnode)
+            next_backing = next_backing.rebind_left(next_data)
+
+            self.set_backing(next_backing)
+
+    def __repr__(self):
+        return repr(self)
 
     @classmethod
     def type_repr(cls) -> str:
