@@ -69,5 +69,10 @@ for i in range(len(tests)):
     validate_transaction(transactions[i], chain_id)
     assert compute_tx_hash(transactions[i], chain_id) == tests[i].rlp_tx_hash
     assert transactions[i].hash_tree_root() == tests[i].ssz_tx_root
-    assert transactions[i].encode_bytes() == tests[i].ssz_tx_bytes
-    assert receipts[i].encode_bytes() == tests[i].ssz_receipt_bytes
+
+    stable_transaction = SignedTransaction(backing=transactions[i].get_backing())
+    assert stable_transaction.encode_bytes() == tests[i].ssz_tx_bytes
+    assert stable_transaction.hash_tree_root() == tests[i].ssz_tx_root
+
+    stable_receipt = Receipt(backing=receipts[i].get_backing())
+    assert stable_receipt.encode_bytes() == tests[i].ssz_receipt_bytes
