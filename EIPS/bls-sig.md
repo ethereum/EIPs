@@ -1,5 +1,5 @@
 ---
-eip: TBD
+eip: 7591
 title: BLS signed transactions
 description: Introduces a new transaction type signed with BLS signatures
 author: Marius van der Wijden (@MariusVanDerWijden)
