@@ -18,7 +18,7 @@ An adjustment in the Ethereum calldata cost reduces the maximum possible block s
 
 Larger blocks take longer to propagate through the network. 
 In this way, the maximium potential block size is constraining the block gas limit.
-Therefore, in order to safely increasae the block gas limit, the calldata gas must be increased.
+Therefore, in order to safely increase the block gas limit, the calldata gas must be increased.
 
 ## Specification
 
