@@ -1,0 +1,43 @@
+---
+eip: <tbd>
+title: Increase calldata cost
+description: Increase calldata cost to decrease the maximum block size
+author: William Morriss (@wjmelements)
+discussions-to: <tbd>
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-05-07
+---
+
+## Abstract
+
+An adjustment in the Ethereum calldata cost reduces the maximum possible block size and allows a higher block gas limit.
+
+## Motivation
+
+Larger blocks take longer to propagate through the network. 
+In this way, the maximium potential block size is constraining the block gas limit.
+Therefore, in order to safely increasae the block gas limit, the calldata gas must be increased.
+
+## Specification
+
+* Increase `G_CALLDATAZERO` from 4 to 16.
+* Increase `G_CALLDATANONZERO` from 16 to 64.
+
+## Rationale
+
+Quadrupling the gas cost of calldata reduces the maximimum possible block size by a factor of four.
+
+## Backwards Compatibility
+
+Activation can cause some transactions to revert due to the increased gas costs.
+Ahead of activation, `eth_estimateGas` could be calculated using the new parameters in order to provide results viable for activation, avoiding out-of-gas reverts.
+
+## Security Considerations
+
+No security issues have been found.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
