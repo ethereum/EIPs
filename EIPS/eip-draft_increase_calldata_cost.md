@@ -3,7 +3,7 @@ eip: <tbd>
 title: Increase calldata cost
 description: Increase calldata cost to decrease the maximum block size
 author: William Morriss (@wjmelements)
-discussions-to: <tbd>
+discussions-to: https://ethereum-magicians.org/t/eip-increase-calldata-cost/19933
 status: Draft
 type: Standards Track
 category: Core
