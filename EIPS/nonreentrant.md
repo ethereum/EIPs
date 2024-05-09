@@ -2,7 +2,7 @@
 title: NONREENTRANT and REENTRANT opcodes
 description: Opcodes to mark a contract as nonreentrant
 author: Charles Cooper (@charles-cooper)
-discussions-to: tbd
+discussions-to: https://ethereum-magicians.org/t/eip-for-nonreentrant-opcodes/19957
 status: Draft
 type: Standards Track
 category: Core
