@@ -27,7 +27,7 @@ def field_val_repr(self, fkey: str, ftyp: Type[View], fopt: bool) -> str:
         ('Optional[' if fopt else '') + ftyp.__name__ + (']' if fopt else '')
     ) + ' = '
     try:
-        field_repr = repr(getattr(self, fkey))
+        field_repr = getattr(self, fkey).__repr__()
         if '\n' in field_repr:  # if multiline, indent it, but starting from the value.
             i = field_repr.index('\n')
             field_repr = field_repr[:i+1] + indent(field_repr[i+1:], ' ' * len(field_start))
@@ -518,6 +518,9 @@ class OneOf(ComplexView):
 
         OneOfView.__name__ = OneOfView.type_repr()
         return OneOfView
+
+    def __repr__(self):
+        return repr(self)
 
     @classmethod
     def type_repr(cls) -> str:
