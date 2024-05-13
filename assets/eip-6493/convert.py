@@ -3,14 +3,11 @@ from rlp import decode
 from rlp_types import *
 from ssz_types import *
 
-def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
-                                   chain_id: ChainId) -> AnySignedTransaction:
+def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
     type_ = pre_bytes[0]
 
     if type_ == 0x03:  # EIP-4844
         pre = decode(pre_bytes[1:], Eip4844SignedRlpTransaction)
-        assert pre.chain_id == chain_id
-
         assert pre.signature_y_parity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signature_y_parity != 0,
@@ -45,8 +42,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
     if type_ == 0x02:  # EIP-1559
         pre = decode(pre_bytes[1:], Eip1559SignedRlpTransaction)
-        assert pre.chain_id == chain_id
-
         assert pre.signature_y_parity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signature_y_parity != 0,
@@ -79,8 +74,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
     if type_ == 0x01:  # EIP-2930
         pre = decode(pre_bytes[1:], Eip2930SignedRlpTransaction)
-        assert pre.chainId == chain_id
-
         assert pre.signatureYParity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signatureYParity != 0,
@@ -112,9 +105,6 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
     if 0xc0 <= type_ <= 0xfe:  # Legacy
         pre = decode(pre_bytes, LegacySignedRlpTransaction)
-
-        if pre.v not in (27, 28):  # EIP-155
-            assert pre.v in (2 * chain_id + 35, 2 * chain_id + 36)
         ecdsa_signature = ecdsa_pack_signature(
             (pre.v & 0x1) == 0,
             pre.r,
@@ -122,7 +112,8 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         )
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_legacy_sig_hash(pre))
 
-        if (pre.v not in (27, 28)):
+        if (pre.v not in (27, 28)):  # EIP-155
+            chain_id = ((pre.v - 35) >> 1)
             return LegacySignedTransaction(
                 payload=LegacyTransactionPayload(
                     type_=TRANSACTION_TYPE_LEGACY,
@@ -218,7 +209,6 @@ def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
     )
 
 def upgrade_rlp_receipts_to_ssz(pre_bytes_list: PyList[bytes],
-                                chain_id: ChainId,
                                 transactions: PyList[AnySignedTransaction]) -> PyList[AnyReceipt]:
     receipts = []
     cumulative_gas_used = 0

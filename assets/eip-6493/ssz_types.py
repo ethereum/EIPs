@@ -7,7 +7,7 @@ path.append(current_dir + '/../eip-7495')
 from typing import Optional, Type
 from eth_hash.auto import keccak
 from remerkleable.basic import boolean, uint8, uint64, uint256
-from remerkleable.byte_arrays import ByteList, ByteVector, Bytes32
+from remerkleable.byte_arrays import ByteList, ByteVector, Bytes4, Bytes32
 from remerkleable.complex import Container, List
 from rlp_types import Hash32
 from secp256k1 import ECDSA, PublicKey
@@ -213,30 +213,22 @@ class AnySignedTransaction(OneOf[SignedTransaction]):
 class Root(Bytes32):
     pass
 
-class Domain(Bytes32):
+class DomainType(Bytes4):
     pass
 
 class ChainId(uint256):
     pass
 
-class TransactionDomainData(Container):
-    type_: TransactionType
-    chain_id: ChainId
+DOMAIN_TRANSACTION_SSZ = DomainType('0x04000080')
 
-def compute_ssz_transaction_domain(chain_id: ChainId) -> Domain:
-    return Domain(TransactionDomainData(
-        type_=TRANSACTION_TYPE_SSZ,
-        chain_id=chain_id,
-    ).hash_tree_root())
-
-class SigningData(Container):
+class ExecutionSigningData(Container):
     object_root: Root
-    domain: Domain
+    domain_type: DomainType
 
-def compute_ssz_sig_hash(payload: TransactionPayload, chain_id: ChainId) -> Hash32:
-    return Hash32(SigningData(
+def compute_ssz_sig_hash(payload: TransactionPayload) -> Hash32:
+    return Hash32(ExecutionSigningData(
         object_root=payload.hash_tree_root(),
-        domain=compute_ssz_transaction_domain(chain_id),
+        domain=DOMAIN_TRANSACTION_SSZ,
     ).hash_tree_root())
 
 def compute_ssz_tx_hash(tx: SignedTransaction) -> Hash32:
@@ -272,12 +264,11 @@ def ecdsa_recover_from_address(signature: ByteVector[ECDSA_SIGNATURE_SIZE],
 
 from tx_hashes import compute_sig_hash, compute_tx_hash
 
-def validate_transaction(tx: AnySignedTransaction,
-                         chain_id: ChainId):
+def validate_transaction(tx: AnySignedTransaction):
     ecdsa_validate_signature(tx.signature.ecdsa_signature)
     assert tx.signature.from_ == ecdsa_recover_from_address(
         tx.signature.ecdsa_signature,
-        compute_sig_hash(tx, chain_id),
+        compute_sig_hash(tx),
     )
 
 BYTES_PER_LOGS_BLOOM = uint64(2**8)
