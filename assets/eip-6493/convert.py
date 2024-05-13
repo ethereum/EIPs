@@ -21,13 +21,14 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
         return Eip4844SignedTransaction(
             payload=Eip4844TransactionPayload(
+                type_=TRANSACTION_TYPE_EIP4844,
+                chain_id=pre.chain_id,
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.max_fee_per_gas,
                 gas=pre.gas_limit,
                 to=ExecutionAddress(pre.destination),
                 value=pre.amount,
                 input_=pre.data,
-                type_=TRANSACTION_TYPE_EIP4844,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -56,13 +57,14 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
         return Eip1559SignedTransaction(
             payload=Eip1559TransactionPayload(
+                type_=TRANSACTION_TYPE_EIP1559,
+                chain_id=pre.chain_id,
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.max_fee_per_gas,
                 gas=pre.gas_limit,
                 to=ExecutionAddress(pre.destination) if len(pre.destination) > 0 else None,
                 value=pre.amount,
                 input_=pre.data,
-                type_=TRANSACTION_TYPE_EIP1559,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -89,13 +91,14 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
         return Eip2930SignedTransaction(
             payload=Eip2930TransactionPayload(
+                type_=TRANSACTION_TYPE_EIP2930,
+                chain_id=pre.chainId,
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.gasPrice,
                 gas=pre.gasLimit,
                 to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                 value=pre.value,
                 input_=pre.data,
-                type_=TRANSACTION_TYPE_EIP2930,
                 access_list=[AccessTuple(
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
@@ -122,13 +125,14 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
         if (pre.v not in (27, 28)):
             return LegacySignedTransaction(
                 payload=LegacyTransactionPayload(
+                    type_=TRANSACTION_TYPE_LEGACY,
+                    chain_id=chain_id,
                     nonce=pre.nonce,
                     max_fee_per_gas=pre.gasprice,
                     gas=pre.startgas,
                     to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                     value=pre.value,
                     input_=pre.data,
-                    type_=TRANSACTION_TYPE_LEGACY,
                 ),
                 signature=TransactionSignature(
                     from_=from_,
@@ -138,6 +142,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes,
 
         return ReplayableSignedTransaction(
             payload=ReplayableTransactionPayload(
+                type_=TRANSACTION_TYPE_LEGACY,
                 nonce=pre.nonce,
                 max_fee_per_gas=pre.gasprice,
                 gas=pre.startgas,
