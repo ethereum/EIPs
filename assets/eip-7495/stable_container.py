@@ -259,7 +259,7 @@ class StableContainer(ComplexView):
         return num_prefix_bytes + num_data_bytes
 
 
-class MerkleizeAs(ComplexView):
+class Profile(ComplexView):
     _o: int
 
     def __new__(cls, backing: Optional[Node] = None, hook: Optional[ViewHook] = None, **kwargs):
@@ -290,15 +290,15 @@ class MerkleizeAs(ComplexView):
                 cls._o += 1
         assert cls._o == 0 or issubclass(cls.B, StableContainer)
 
-    def __class_getitem__(cls, b) -> Type["MerkleizeAs"]:
+    def __class_getitem__(cls, b) -> Type["Profile"]:
         if not issubclass(b, StableContainer) and not issubclass(b, Container):
-            raise Exception(f"invalid MerkleizeAs base: {b}")
+            raise Exception(f"invalid Profile base: {b}")
 
-        class MerkleizeAsView(MerkleizeAs, b):
+        class ProfileView(Profile, b):
             B = b
 
-        MerkleizeAsView.__name__ = MerkleizeAsView.type_repr()
-        return MerkleizeAsView
+        ProfileView.__name__ = ProfileView.type_repr()
+        return ProfileView
 
     @classmethod
     def fields(cls) -> Dict[str, Tuple[Type[View], bool]]:
@@ -318,7 +318,7 @@ class MerkleizeAs(ComplexView):
         if cls.is_fixed_byte_length():
             return cls.min_byte_length()
         else:
-            raise Exception("dynamic length MerkleizeAs does not have a fixed byte length")
+            raise Exception("dynamic length Profile does not have a fixed byte length")
 
     @classmethod
     def min_byte_length(cls) -> int:
@@ -424,14 +424,14 @@ class MerkleizeAs(ComplexView):
 
     @classmethod
     def type_repr(cls) -> str:
-        return f"MerkleizeAs[{cls.B.__name__}]"
+        return f"Profile[{cls.B.__name__}]"
 
     @classmethod
     def deserialize(cls: Type[B], stream: BinaryIO, scope: int) -> B:
         if cls._o > 0:
             num_prefix_bytes = Bitvector[cls._o].type_byte_length()
             if scope < num_prefix_bytes:
-                raise ValueError("scope too small, cannot read MerkleizeAs optional fields")
+                raise ValueError("scope too small, cannot read Profile optional fields")
             optional_fields = Bitvector[cls._o].deserialize(stream, num_prefix_bytes)
             scope = scope - num_prefix_bytes
 

@@ -2,11 +2,11 @@ from rlp_types import *
 from ssz_types import *
 
 def recover_replayable_rlp_transaction(
-        tx: ReplayableSignedTransaction) -> LegacySignedRlpTransaction:
+        tx: ReplayableTransaction) -> LegacyRlpTransaction:
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
     v = uint64(1 if y_parity else 0) + 27
 
-    return LegacySignedRlpTransaction(
+    return LegacyRlpTransaction(
         nonce=tx.payload.nonce,
         gasprice=tx.payload.max_fee_per_gas,
         startgas=tx.payload.gas,
@@ -19,11 +19,11 @@ def recover_replayable_rlp_transaction(
     )
 
 def recover_legacy_rlp_transaction(
-        tx: LegacySignedTransaction) -> LegacySignedRlpTransaction:
+        tx: LegacyTransaction) -> LegacyRlpTransaction:
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
     v = uint64(1 if y_parity else 0) + 35 + tx.payload.chain_id * 2
 
-    return LegacySignedRlpTransaction(
+    return LegacyRlpTransaction(
         nonce=tx.payload.nonce,
         gasprice=tx.payload.max_fee_per_gas,
         startgas=tx.payload.gas,
@@ -36,10 +36,10 @@ def recover_legacy_rlp_transaction(
     )
 
 def recover_eip2930_rlp_transaction(
-        tx: Eip2930SignedTransaction) -> Eip2930SignedRlpTransaction:
+        tx: Eip2930Transaction) -> Eip2930RlpTransaction:
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
-    return Eip2930SignedRlpTransaction(
+    return Eip2930RlpTransaction(
         chainId=tx.payload.chain_id,
         nonce=tx.payload.nonce,
         gasPrice=tx.payload.max_fee_per_gas,
@@ -57,10 +57,10 @@ def recover_eip2930_rlp_transaction(
     )
 
 def recover_eip1559_rlp_transaction(
-        tx: Eip1559SignedTransaction) -> Eip1559SignedRlpTransaction:
+        tx: Eip1559Transaction) -> Eip1559RlpTransaction:
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
-    return Eip1559SignedRlpTransaction(
+    return Eip1559RlpTransaction(
         chain_id=tx.payload.chain_id,
         nonce=tx.payload.nonce,
         max_priority_fee_per_gas=tx.payload.max_priority_fee_per_gas,
@@ -78,10 +78,10 @@ def recover_eip1559_rlp_transaction(
         signature_s=s,
     )
 
-def recover_eip4844_rlp_transaction(tx: Eip4844SignedTransaction) -> Eip4844SignedRlpTransaction:
+def recover_eip4844_rlp_transaction(tx: Eip4844Transaction) -> Eip4844RlpTransaction:
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
-    return Eip4844SignedRlpTransaction(
+    return Eip4844RlpTransaction(
         chain_id=tx.payload.chain_id,
         nonce=tx.payload.nonce,
         max_priority_fee_per_gas=tx.payload.max_priority_fee_per_gas,
@@ -101,56 +101,56 @@ def recover_eip4844_rlp_transaction(tx: Eip4844SignedTransaction) -> Eip4844Sign
         signature_s=s,
     )
 
-def compute_sig_hash(tx: AnySignedTransaction) -> Hash32:
+def compute_sig_hash(tx: AnyTransaction) -> Hash32:
     if (
-        isinstance(tx, BasicSignedTransaction) or
-        isinstance(tx, BlobSignedTransaction)
+        isinstance(tx, BasicTransaction) or
+        isinstance(tx, BlobTransaction)
     ):
         return compute_ssz_sig_hash(tx.payload)
 
-    if isinstance(tx, Eip4844SignedTransaction):
+    if isinstance(tx, Eip4844Transaction):
         pre = recover_eip4844_rlp_transaction(tx)
         return compute_eip4844_sig_hash(pre)
 
-    if isinstance(tx, Eip1559SignedTransaction):
+    if isinstance(tx, Eip1559Transaction):
         pre = recover_eip1559_rlp_transaction(tx)
         return compute_eip1559_sig_hash(pre)
 
-    if isinstance(tx, Eip2930SignedTransaction):
+    if isinstance(tx, Eip2930Transaction):
         pre = recover_eip2930_rlp_transaction(tx)
         return compute_eip2930_sig_hash(pre)
 
-    if isinstance(tx, LegacySignedTransaction):
+    if isinstance(tx, LegacyTransaction):
         pre = recover_legacy_rlp_transaction(tx)
         return compute_legacy_sig_hash(pre)
 
-    assert isinstance(tx, ReplayableSignedTransaction)
+    assert isinstance(tx, ReplayableTransaction)
     pre = recover_replayable_rlp_transaction(tx)
     return compute_legacy_sig_hash(pre)
 
-def compute_tx_hash(tx: AnySignedTransaction) -> Hash32:
+def compute_tx_hash(tx: AnyTransaction) -> Hash32:
     if (
-        isinstance(tx, BasicSignedTransaction) or
-        isinstance(tx, BlobSignedTransaction)
+        isinstance(tx, BasicTransaction) or
+        isinstance(tx, BlobTransaction)
     ):
         return compute_ssz_tx_hash(tx.payload)
 
-    if isinstance(tx, Eip4844SignedTransaction):
+    if isinstance(tx, Eip4844Transaction):
         pre = recover_eip4844_rlp_transaction(tx)
         return compute_eip4844_tx_hash(pre)
 
-    if isinstance(tx, Eip1559SignedTransaction):
+    if isinstance(tx, Eip1559Transaction):
         pre = recover_eip1559_rlp_transaction(tx)
         return compute_eip1559_tx_hash(pre)
 
-    if isinstance(tx, Eip2930SignedTransaction):
+    if isinstance(tx, Eip2930Transaction):
         pre = recover_eip2930_rlp_transaction(tx)
         return compute_eip2930_tx_hash(pre)
 
-    if isinstance(tx, LegacySignedTransaction):
+    if isinstance(tx, LegacyTransaction):
         pre = recover_legacy_rlp_transaction(tx)
         return compute_legacy_tx_hash(pre)
 
-    assert isinstance(tx, ReplayableSignedTransaction)
+    assert isinstance(tx, ReplayableTransaction)
     pre = recover_replayable_rlp_transaction(tx)
     return compute_legacy_tx_hash(pre)
