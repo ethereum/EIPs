@@ -3,11 +3,11 @@ from rlp import decode
 from rlp_types import *
 from ssz_types import *
 
-def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
+def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
     type_ = pre_bytes[0]
 
     if type_ == 0x03:  # EIP-4844
-        pre = decode(pre_bytes[1:], Eip4844SignedRlpTransaction)
+        pre = decode(pre_bytes[1:], Eip4844RlpTransaction)
         assert pre.signature_y_parity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signature_y_parity != 0,
@@ -16,7 +16,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip4844_sig_hash(pre))
 
-        return Eip4844SignedTransaction(
+        return Eip4844Transaction(
             payload=Eip4844TransactionPayload(
                 type_=TRANSACTION_TYPE_EIP4844,
                 chain_id=pre.chain_id,
@@ -41,7 +41,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
 
     if type_ == 0x02:  # EIP-1559
-        pre = decode(pre_bytes[1:], Eip1559SignedRlpTransaction)
+        pre = decode(pre_bytes[1:], Eip1559RlpTransaction)
         assert pre.signature_y_parity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signature_y_parity != 0,
@@ -50,7 +50,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip1559_sig_hash(pre))
 
-        return Eip1559SignedTransaction(
+        return Eip1559Transaction(
             payload=Eip1559TransactionPayload(
                 type_=TRANSACTION_TYPE_EIP1559,
                 chain_id=pre.chain_id,
@@ -73,7 +73,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
 
     if type_ == 0x01:  # EIP-2930
-        pre = decode(pre_bytes[1:], Eip2930SignedRlpTransaction)
+        pre = decode(pre_bytes[1:], Eip2930RlpTransaction)
         assert pre.signatureYParity in (0, 1)
         ecdsa_signature = ecdsa_pack_signature(
             pre.signatureYParity != 0,
@@ -82,7 +82,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
         from_ = ecdsa_recover_from_address(ecdsa_signature, compute_eip2930_sig_hash(pre))
 
-        return Eip2930SignedTransaction(
+        return Eip2930Transaction(
             payload=Eip2930TransactionPayload(
                 type_=TRANSACTION_TYPE_EIP2930,
                 chain_id=pre.chainId,
@@ -104,7 +104,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
         )
 
     if 0xc0 <= type_ <= 0xfe:  # Legacy
-        pre = decode(pre_bytes, LegacySignedRlpTransaction)
+        pre = decode(pre_bytes, LegacyRlpTransaction)
         ecdsa_signature = ecdsa_pack_signature(
             (pre.v & 0x1) == 0,
             pre.r,
@@ -114,7 +114,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
 
         if (pre.v not in (27, 28)):  # EIP-155
             chain_id = ((pre.v - 35) >> 1)
-            return LegacySignedTransaction(
+            return LegacyTransaction(
                 payload=LegacyTransactionPayload(
                     type_=TRANSACTION_TYPE_LEGACY,
                     chain_id=chain_id,
@@ -131,7 +131,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnySignedTransaction:
                 ),
             )
 
-        return ReplayableSignedTransaction(
+        return ReplayableTransaction(
             payload=ReplayableTransactionPayload(
                 type_=TRANSACTION_TYPE_LEGACY,
                 nonce=pre.nonce,
@@ -164,7 +164,7 @@ def compute_contract_address(from_: ExecutionAddress,
 
 def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
                                prev_cumulative_gas_used: uint64,
-                               transaction: AnySignedTransaction) -> AnyReceipt:
+                               transaction: AnyTransaction) -> AnyReceipt:
     type_ = pre_bytes[0]
 
     if type_ in (0x03, 0x02, 0x01):  # EIP-4844, EIP-1559, EIP-2930
@@ -209,7 +209,7 @@ def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
     )
 
 def upgrade_rlp_receipts_to_ssz(pre_bytes_list: PyList[bytes],
-                                transactions: PyList[AnySignedTransaction]) -> PyList[AnyReceipt]:
+                                transactions: PyList[AnyTransaction]) -> PyList[AnyReceipt]:
     receipts = []
     cumulative_gas_used = 0
     for i, pre_bytes in enumerate(pre_bytes_list):

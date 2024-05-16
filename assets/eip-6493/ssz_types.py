@@ -11,7 +11,7 @@ from remerkleable.byte_arrays import ByteList, ByteVector, Bytes4, Bytes32
 from remerkleable.complex import Container, List
 from rlp_types import Hash32
 from secp256k1 import ECDSA, PublicKey
-from stable_container import OneOf, StableContainer, Variant, Variant
+from stable_container import OneOf, Profile, StableContainer
 
 class TransactionType(uint8):
     pass
@@ -74,11 +74,11 @@ class TransactionSignature(StableContainer[MAX_TRANSACTION_SIGNATURE_FIELDS]):
     from_: ExecutionAddress
     ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
 
-class SignedTransaction(Container):
+class Transaction(Container):
     payload: TransactionPayload
     signature: TransactionSignature
 
-class ReplayableTransactionPayload(Variant[TransactionPayload]):
+class ReplayableTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     nonce: uint64
     max_fee_per_gas: FeePerGas
@@ -87,11 +87,11 @@ class ReplayableTransactionPayload(Variant[TransactionPayload]):
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
 
-class ReplayableSignedTransaction(SignedTransaction):
+class ReplayableTransaction(Container):
     payload: ReplayableTransactionPayload
     signature: TransactionSignature
 
-class LegacyTransactionPayload(Variant[TransactionPayload]):
+class LegacyTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
@@ -101,11 +101,11 @@ class LegacyTransactionPayload(Variant[TransactionPayload]):
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
 
-class LegacySignedTransaction(SignedTransaction):
+class LegacyTransaction(Container):
     payload: LegacyTransactionPayload
     signature: TransactionSignature
 
-class Eip2930TransactionPayload(Variant[TransactionPayload]):
+class Eip2930TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
@@ -116,11 +116,11 @@ class Eip2930TransactionPayload(Variant[TransactionPayload]):
     input_: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
 
-class Eip2930SignedTransaction(SignedTransaction):
+class Eip2930Transaction(Container):
     payload: Eip2930TransactionPayload
     signature: TransactionSignature
 
-class Eip1559TransactionPayload(Variant[TransactionPayload]):
+class Eip1559TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
@@ -132,11 +132,11 @@ class Eip1559TransactionPayload(Variant[TransactionPayload]):
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
     max_priority_fee_per_gas: FeePerGas
 
-class Eip1559SignedTransaction(SignedTransaction):
+class Eip1559Transaction(Container):
     payload: Eip1559TransactionPayload
     signature: TransactionSignature
 
-class Eip4844TransactionPayload(Variant[TransactionPayload]):
+class Eip4844TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
@@ -150,12 +150,11 @@ class Eip4844TransactionPayload(Variant[TransactionPayload]):
     max_fee_per_blob_gas: FeePerGas
     blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
 
-class Eip4844SignedTransaction(SignedTransaction):
+class Eip4844Transaction(Container):
     payload: Eip4844TransactionPayload
     signature: TransactionSignature
 
-class BasicTransactionPayload(Variant[TransactionPayload]):
-    type_: TransactionType
+class BasicTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fee_per_gas: FeePerGas
@@ -166,12 +165,11 @@ class BasicTransactionPayload(Variant[TransactionPayload]):
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
     max_priority_fee_per_gas: FeePerGas
 
-class BasicSignedTransaction(SignedTransaction):
+class BasicTransaction(Container):
     payload: BasicTransactionPayload
     signature: TransactionSignature
 
-class BlobTransactionPayload(Variant[TransactionPayload]):
-    type_: TransactionType
+class BlobTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
     max_fee_per_gas: FeePerGas
@@ -184,31 +182,31 @@ class BlobTransactionPayload(Variant[TransactionPayload]):
     max_fee_per_blob_gas: FeePerGas
     blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
 
-class BlobSignedTransaction(SignedTransaction):
+class BlobTransaction(Container):
     payload: BlobTransactionPayload
     signature: TransactionSignature
 
-class AnySignedTransaction(OneOf[SignedTransaction]):
+class AnyTransaction(OneOf[Transaction]):
     @classmethod
-    def select_variant(cls, value: SignedTransaction) -> Type[SignedTransaction]:
-        if value.payload.type_ == TRANSACTION_TYPE_SSZ:
+    def select_from_base(cls, value: Transaction) -> Type[Transaction]:
+        if value.payload.type_ is None:
             if value.payload.blob_versioned_hashes is not None:
-                return BlobSignedTransaction
-            return BasicSignedTransaction
+                return BlobTransaction
+            return BasicTransaction
 
         if value.payload.type_ == TRANSACTION_TYPE_EIP4844:
-            return Eip4844SignedTransaction
+            return Eip4844Transaction
 
         if value.payload.type_ == TRANSACTION_TYPE_EIP1559:
-            return Eip1559SignedTransaction
+            return Eip1559Transaction
 
         if value.payload.type_ == TRANSACTION_TYPE_EIP2930:
-            return Eip2930SignedTransaction
+            return Eip2930Transaction
 
         if value.payload.chain_id is not None:
-            return LegacySignedTransaction
+            return LegacyTransaction
 
-        return ReplayableSignedTransaction
+        return ReplayableTransaction
 
 class Root(Bytes32):
     pass
@@ -231,7 +229,7 @@ def compute_ssz_sig_hash(payload: TransactionPayload) -> Hash32:
         domain=DOMAIN_TRANSACTION_SSZ,
     ).hash_tree_root())
 
-def compute_ssz_tx_hash(tx: SignedTransaction) -> Hash32:
+def compute_ssz_tx_hash(tx: Transaction) -> Hash32:
     assert tx.payload.type_ == TRANSACTION_TYPE_SSZ
     return Hash32(tx.hash_tree_root())
 
@@ -264,7 +262,7 @@ def ecdsa_recover_from_address(signature: ByteVector[ECDSA_SIGNATURE_SIZE],
 
 from tx_hashes import compute_sig_hash, compute_tx_hash
 
-def validate_transaction(tx: AnySignedTransaction):
+def validate_transaction(tx: AnyTransaction):
     ecdsa_validate_signature(tx.signature.ecdsa_signature)
     assert tx.signature.from_ == ecdsa_recover_from_address(
         tx.signature.ecdsa_signature,
@@ -292,14 +290,14 @@ class Receipt(StableContainer[MAX_RECEIPT_FIELDS]):
     # EIP-658
     status: Optional[boolean]
 
-class HomesteadReceipt(Variant[Receipt]):
+class HomesteadReceipt(Profile[Receipt]):
     root: Hash32
     gas_used: uint64
     contract_address: Optional[ExecutionAddress]
     logs_bloom: ByteVector[BYTES_PER_LOGS_BLOOM]
     logs: List[Log, MAX_LOGS_PER_RECEIPT]
 
-class BasicReceipt(Variant[Receipt]):
+class BasicReceipt(Profile[Receipt]):
     gas_used: uint64
     contract_address: Optional[ExecutionAddress]
     logs_bloom: ByteVector[BYTES_PER_LOGS_BLOOM]
@@ -308,7 +306,7 @@ class BasicReceipt(Variant[Receipt]):
 
 class AnyReceipt(OneOf[Receipt]):
     @classmethod
-    def select_variant(cls, value: Receipt) -> Type[Receipt]:
+    def select_from_base(cls, value: Receipt) -> Type[Receipt]:
         if value.status is not None:
             return BasicReceipt
 
