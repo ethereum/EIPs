@@ -1,3 +1,16 @@
+---
+eip: xxx
+title: Deterministic AA wallet
+description: Propose a non-custodial interface for service providers to provide AA accounts.
+author: Jinseok Park (@mellowcroc), Jaehun Kim (@jaehunkim), DrKeccak (@drkeccak)
+discussions-to: 
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-05-17
+requires: 4337
+---
+
 # Abstract
 
 Propose a non-custodial interface for service providers to provide AA accounts.
