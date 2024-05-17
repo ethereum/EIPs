@@ -1,0 +1,49 @@
+---
+eip: X
+title: ETH-transferring calls emit a log
+description: ETH-transferring calls emit a log
+author: Vitalik Buterin (@vbuterin), Peter Davies (@petertdavies)
+discussions-to: https://ethereum-magicians.org/t/eip-all-value-transferring-calls-create-a-log/20034
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-05-17
+---
+
+## Abstract
+
+All ETH-transferring calls emit a log.
+
+## Motivation
+
+Logs are often used to track when balance changes of assets on Ethereum. Logs work for [ERC-20](./eip-20.md) tokens, but they do not work for ETH. ETH transfers from EOAs can be read from the transaction list in the block, but ETH transfers from smart contract wallets are not automatically logged anywhere. This has already led to problems in the past, eg. early exchanges would often not properly support deposits from smart contract wallets, or only support them with a much longer delay. This EIP proposes that we automatically generate a log every time a value-transferring CALL or SELFDESTRUCT happens.
+
+## Specification
+
+### Parameters
+
+* `MAGIC`: `TBD`
+
+### Functionality
+
+Whenever a nonzero-value CALL or SELFDESTRUCT takes place, issue a log, identical to a LOG3, with three topics: (i) `MAGIC`, (ii) the sender address, (iii) the recipient address. The log data is a big-endian 32-byte encoding of the transfer value.
+
+## Rationale
+
+This is the simplest possible implementation that ensures that all ETH transfers are implemented in some kind of record that can be easily accessed through making RPC calls into a node, or through asking for a Merkle branch that is hashed into the block root. The log type is compatible with the ERC20 token standard, but does not introduce any overly-specific ERC20 features (eg. ABI encodings) into the specification.
+
+## Backwards Compatibility
+
+No backward compatibility issues found.
+
+## Test Cases
+
+TODO
+
+## Security Considerations
+
+ETH transfers already cost a minimum of 6700 gas, which is much more expensive than the LOG3 opcode (1500 gas). Hence, this EIP does not increase the worst-case number of logs that can be put into a block. It will somewhat increase the average number of logs.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
