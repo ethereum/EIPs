@@ -8,7 +8,7 @@ def recover_replayable_rlp_transaction(
 
     return LegacyRlpTransaction(
         nonce=tx.payload.nonce,
-        gasprice=tx.payload.max_fee_per_gas,
+        gasprice=tx.payload.max_fees_per_gas.regular,
         startgas=tx.payload.gas,
         to=bytes(tx.payload.to if tx.payload.to is not None else []),
         value=tx.payload.value,
@@ -25,7 +25,7 @@ def recover_legacy_rlp_transaction(
 
     return LegacyRlpTransaction(
         nonce=tx.payload.nonce,
-        gasprice=tx.payload.max_fee_per_gas,
+        gasprice=tx.payload.max_fees_per_gas.regular,
         startgas=tx.payload.gas,
         to=bytes(tx.payload.to if tx.payload.to is not None else []),
         value=tx.payload.value,
@@ -42,7 +42,7 @@ def recover_eip2930_rlp_transaction(
     return Eip2930RlpTransaction(
         chainId=tx.payload.chain_id,
         nonce=tx.payload.nonce,
-        gasPrice=tx.payload.max_fee_per_gas,
+        gasPrice=tx.payload.max_fees_per_gas.regular,
         gasLimit=tx.payload.gas,
         to=bytes(tx.payload.to if tx.payload.to is not None else []),
         value=tx.payload.value,
@@ -63,8 +63,8 @@ def recover_eip1559_rlp_transaction(
     return Eip1559RlpTransaction(
         chain_id=tx.payload.chain_id,
         nonce=tx.payload.nonce,
-        max_priority_fee_per_gas=tx.payload.max_priority_fee_per_gas,
-        max_fee_per_gas=tx.payload.max_fee_per_gas,
+        max_priority_fee_per_gas=tx.payload.max_priority_fees_per_gas.regular,
+        max_fee_per_gas=tx.payload.max_fees_per_gas.regular,
         gas_limit=tx.payload.gas,
         destination=bytes(tx.payload.to if tx.payload.to is not None else []),
         amount=tx.payload.value,
@@ -79,13 +79,14 @@ def recover_eip1559_rlp_transaction(
     )
 
 def recover_eip4844_rlp_transaction(tx: Eip4844Transaction) -> Eip4844RlpTransaction:
+    assert tx.payload.max_priority_fees_per_gas.blob == FeePerGas(0)
     y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
 
     return Eip4844RlpTransaction(
         chain_id=tx.payload.chain_id,
         nonce=tx.payload.nonce,
-        max_priority_fee_per_gas=tx.payload.max_priority_fee_per_gas,
-        max_fee_per_gas=tx.payload.max_fee_per_gas,
+        max_priority_fee_per_gas=tx.payload.max_priority_fees_per_gas.regular,
+        max_fee_per_gas=tx.payload.max_fees_per_gas.regular,
         gas_limit=tx.payload.gas,
         to=tx.payload.to,
         value=tx.payload.value,
@@ -94,7 +95,7 @@ def recover_eip4844_rlp_transaction(tx: Eip4844Transaction) -> Eip4844RlpTransac
             access_tuple.address,
             access_tuple.storage_keys,
         ) for access_tuple in tx.payload.access_list],
-        max_fee_per_blob_gas=tx.payload.max_fee_per_blob_gas,
+        max_fee_per_blob_gas=tx.payload.max_fees_per_gas.blob,
         blob_versioned_hashes=tx.payload.blob_versioned_hashes,
         signature_y_parity=1 if y_parity else 0,
         signature_r=r,
