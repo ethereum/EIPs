@@ -39,8 +39,15 @@ MAX_ACCESS_LIST_STORAGE_KEYS = uint64(2**19)
 MAX_ACCESS_LIST_SIZE = uint64(2**19)
 MAX_BLOB_COMMITMENTS_PER_BLOCK = uint64(2**12)
 ECDSA_SIGNATURE_SIZE = 32 + 32 + 1
+MAX_FEES_PER_GAS_FIELDS = uint64(2**4)
 MAX_TRANSACTION_PAYLOAD_FIELDS = uint64(2**5)
 MAX_TRANSACTION_SIGNATURE_FIELDS = uint64(2**4)
+
+class FeesPerGas(StableContainer[MAX_FEES_PER_GAS_FIELDS]):
+    regular: Optional[FeePerGas]
+
+    # EIP-4844
+    blob: Optional[FeePerGas]
 
 class AccessTuple(Container):
     address: ExecutionAddress
@@ -48,40 +55,46 @@ class AccessTuple(Container):
 
 class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
     # EIP-2718
-    type_: TransactionType
+    type_: Optional[TransactionType]
 
     # EIP-155
     chain_id: Optional[ChainId]
 
-    nonce: uint64
-    max_fee_per_gas: FeePerGas
-    gas: uint64
+    nonce: Optional[uint64]
+    max_fees_per_gas: Optional[FeesPerGas]
+    gas: Optional[uint64]
     to: Optional[ExecutionAddress]
-    value: uint256
+    value: Optional[uint256]
     input_: ByteList[MAX_CALLDATA_SIZE]
 
     # EIP-2930
     access_list: Optional[List[AccessTuple, MAX_ACCESS_LIST_SIZE]]
 
     # EIP-1559
-    max_priority_fee_per_gas: Optional[FeePerGas]
+    max_priority_fees_per_gas: Optional[FeesPerGas]
 
     # EIP-4844
-    max_fee_per_blob_gas: Optional[FeePerGas]
     blob_versioned_hashes: Optional[List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]]
 
 class TransactionSignature(StableContainer[MAX_TRANSACTION_SIGNATURE_FIELDS]):
-    from_: ExecutionAddress
-    ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
+    from_: Optional[ExecutionAddress]
+    ecdsa_signature: Optional[ByteVector[ECDSA_SIGNATURE_SIZE]]
 
 class Transaction(Container):
     payload: TransactionPayload
     signature: TransactionSignature
 
+class BasicFeesPerGas(Profile[FeesPerGas]):
+    regular: FeePerGas
+
+class BlobFeesPerGas(Profile[FeesPerGas]):
+    regular: FeePerGas
+    blob: FeePerGas
+
 class ReplayableTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BasicFeesPerGas
     gas: uint64
     to: Optional[ExecutionAddress]
     value: uint256
@@ -95,7 +108,7 @@ class LegacyTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BasicFeesPerGas
     gas: uint64
     to: Optional[ExecutionAddress]
     value: uint256
@@ -109,7 +122,7 @@ class Eip2930TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BasicFeesPerGas
     gas: uint64
     to: Optional[ExecutionAddress]
     value: uint256
@@ -124,13 +137,13 @@ class Eip1559TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BasicFeesPerGas
     gas: uint64
     to: Optional[ExecutionAddress]
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fee_per_gas: FeePerGas
+    max_priority_fees_per_gas: BasicFeesPerGas
 
 class Eip1559Transaction(Container):
     payload: Eip1559TransactionPayload
@@ -140,14 +153,13 @@ class Eip4844TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BlobFeesPerGas
     gas: uint64
     to: ExecutionAddress
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fee_per_gas: FeePerGas
-    max_fee_per_blob_gas: FeePerGas
+    max_priority_fees_per_gas: BlobFeesPerGas
     blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
 
 class Eip4844Transaction(Container):
@@ -157,13 +169,13 @@ class Eip4844Transaction(Container):
 class BasicTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BasicFeesPerGas
     gas: uint64
     to: Optional[ExecutionAddress]
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fee_per_gas: FeePerGas
+    max_priority_fees_per_gas: BasicFeesPerGas
 
 class BasicTransaction(Container):
     payload: BasicTransactionPayload
@@ -172,14 +184,13 @@ class BasicTransaction(Container):
 class BlobTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
     nonce: uint64
-    max_fee_per_gas: FeePerGas
+    max_fees_per_gas: BlobFeesPerGas
     gas: uint64
     to: ExecutionAddress
     value: uint256
     input_: ByteList[MAX_CALLDATA_SIZE]
     access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fee_per_gas: FeePerGas
-    max_fee_per_blob_gas: FeePerGas
+    max_priority_fees_per_gas: BlobFeesPerGas
     blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
 
 class BlobTransaction(Container):

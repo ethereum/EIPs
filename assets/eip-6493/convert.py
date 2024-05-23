@@ -21,7 +21,10 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                 type_=TRANSACTION_TYPE_EIP4844,
                 chain_id=pre.chain_id,
                 nonce=pre.nonce,
-                max_fee_per_gas=pre.max_fee_per_gas,
+                max_fees_per_gas=BlobFeesPerGas(
+                    regular=pre.max_fee_per_gas,
+                    blob=pre.max_fee_per_blob_gas,
+                ),
                 gas=pre.gas_limit,
                 to=ExecutionAddress(pre.destination),
                 value=pre.amount,
@@ -30,8 +33,10 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
                 ) for access_tuple in pre.access_list],
-                max_priority_fee_per_gas=pre.max_priority_fee_per_gas,
-                max_fee_per_blob_gas=pre.max_fee_per_blob_gas,
+                max_priority_fees_per_gas=BlobFeesPerGas(
+                    regular=pre.max_priority_fee_per_gas,
+                    blob=FeePerGas(0),
+                ),
                 blob_versioned_hashes=pre.blob_versioned_hashes,
             ),
             signature=TransactionSignature(
@@ -55,7 +60,9 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                 type_=TRANSACTION_TYPE_EIP1559,
                 chain_id=pre.chain_id,
                 nonce=pre.nonce,
-                max_fee_per_gas=pre.max_fee_per_gas,
+                max_fees_per_gas=BasicFeesPerGas(
+                    regular=pre.max_fee_per_gas,
+                ),
                 gas=pre.gas_limit,
                 to=ExecutionAddress(pre.destination) if len(pre.destination) > 0 else None,
                 value=pre.amount,
@@ -64,7 +71,9 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     address=access_tuple[0],
                     storage_keys=access_tuple[1]
                 ) for access_tuple in pre.access_list],
-                max_priority_fee_per_gas=pre.max_priority_fee_per_gas,
+                max_priority_fees_per_gas=BasicFeesPerGas(
+                    regular=pre.max_priority_fee_per_gas,
+                ),
             ),
             signature=TransactionSignature(
                 from_=from_,
@@ -87,7 +96,9 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                 type_=TRANSACTION_TYPE_EIP2930,
                 chain_id=pre.chainId,
                 nonce=pre.nonce,
-                max_fee_per_gas=pre.gasPrice,
+                max_fees_per_gas=BasicFeesPerGas(
+                    regular=pre.gasPrice,
+                ),
                 gas=pre.gasLimit,
                 to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                 value=pre.value,
@@ -119,7 +130,9 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     type_=TRANSACTION_TYPE_LEGACY,
                     chain_id=chain_id,
                     nonce=pre.nonce,
-                    max_fee_per_gas=pre.gasprice,
+                    max_fees_per_gas=BasicFeesPerGas(
+                        regular=pre.gasprice,
+                    ),
                     gas=pre.startgas,
                     to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                     value=pre.value,
@@ -135,7 +148,9 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
             payload=ReplayableTransactionPayload(
                 type_=TRANSACTION_TYPE_LEGACY,
                 nonce=pre.nonce,
-                max_fee_per_gas=pre.gasprice,
+                max_fees_per_gas=BasicFeesPerGas(
+                    regular=pre.gasprice,
+                ),
                 gas=pre.startgas,
                 to=ExecutionAddress(pre.to) if len(pre.to) > 0 else None,
                 value=pre.value,
