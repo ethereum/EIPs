@@ -12,11 +12,11 @@ requires: 712
 
 ## Abstract
 
-A special type `box` is defined for EIP-712 messages. A `box` value is a value of an arbitrary struct type whose underlying type is encapsulated from the containing struct, but transparent and type-checkable by the wallet, and thus able to be fully inspected by the user prior to signing. A verifying contract can be made agnostic to the underlying type of a `box` value, but this type is not erased and can be verified on-chain if necessary.
+A special type `box` is defined for [EIP-712](./eip-712.md) messages. A `box` value is a value of an arbitrary struct type whose underlying type is encapsulated from the containing struct, but transparent and type-checkable by the wallet, and thus able to be fully inspected by the user prior to signing. A verifying contract can be made agnostic to the underlying type of a `box` value, but this type is not erased and can be verified on-chain if necessary.
 
 ## Motivation
 
-[EIP-712](./eip-712.md) signatures have become a widely used primitive for users to express and authorize intents off-chain. Wide-ranging applications are able to define parameterized messages for users to sign in their wallet through a general-purpose interface that clearly surfaces the type, parameters, and domain of authorization. This crucially applies to hardware wallets as a last line of defense.
+EIP-712 signatures have become a widely used primitive for users to express and authorize intents off-chain. Wide-ranging applications are able to define parameterized messages for users to sign in their wallet through a general-purpose interface that clearly surfaces the type, parameters, and domain of authorization. This crucially applies to hardware wallets as a last line of defense.
 
 The general-purpose nature of EIP-712 is key to its success, but in addition wallets are able to develop special-purpose interfaces and capabilities for specific types of messages as they become more widely used. For example, [ERC-2612](./eip-2612.md) Permits are a well-known EIP-712 message that wallets display to the user in a special way that clearly surfaces the known implications and risks of signing.
 
