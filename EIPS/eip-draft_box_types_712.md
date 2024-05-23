@@ -64,7 +64,38 @@ A boxed value is encoded as its underlying *unboxed value*, i.e., `hashStruct(va
 
 ### `signTypedData` schema
 
-A signature request for an EIP-712 message that involves a boxed member shall include the unboxed type as a part of the message object. A boxed value must be an object with properties `value`, `primaryType`, and `types`, with semantics similar to that of an EIP-712 message itself. The value shall be type-checked and encoded according to the values of `primaryType` and `types`. The `types` defined by the message outside of the boxed value shall not be in scope for the encoding of a boxed value.
+A signature request for an EIP-712 message that involves a boxed member shall include the unboxed type as a part of the message object. A boxed value must be an object with properties `value`, `primaryType`, and `types`. The `value` shall be type-checked and encoded according to `primaryType` and `types`, analogously to an EIP-712 message (though without the `\x19` prefix). The `types` defined in the message outside of the boxed value shall not be in scope for the encoding of a boxed value.
+
+For example, a message for the `Envelope` type above may be represented as:
+
+```js
+{
+    domain: ...,
+    primaryType: 'Envelope',
+    types: {
+        Envelope: [
+            { name: 'account', type: 'address' },
+            { name: 'contents', type: 'box' }
+        ]
+    },
+    message: {
+        account: '0x...',
+        contents: {
+            primaryType: 'Mail',
+            types: {
+                Mail: [
+                    { name: 'greeting', type: 'string' }
+                ]
+            },
+            value: {
+                greeting: 'Hello world'
+            }
+        },
+    }
+}
+```
+
+#### JSON Schema of a boxed value
 
 ```js
 {
