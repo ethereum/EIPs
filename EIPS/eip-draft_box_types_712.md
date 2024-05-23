@@ -1,7 +1,7 @@
 ---
 title: Box types for EIP-712 messages
 description: A mechanism for EIP-712 messages to contain parameters of arbitrary type
-author: Francisco Giordano <fg@frang.io>
+author: Francisco Giordano <@frangio>
 discussions-to: https://ethereum-magicians.org/t/eip-box-types-for-eip-712-messages/20092
 status: Draft
 type: Standards Track
