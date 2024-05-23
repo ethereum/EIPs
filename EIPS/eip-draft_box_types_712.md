@@ -1,4 +1,5 @@
 ---
+eip: 7713
 title: Box types for EIP-712 messages
 description: A mechanism for EIP-712 messages to contain parameters of arbitrary type
 author: Francisco Giordano <@frangio>
