@@ -45,7 +45,7 @@ EIP-712 is extended as follows:
 
 A struct type may contain a *boxed member* by declaring it with type `box`. Example:
 
-```
+```solidity
 struct Envelope {
     address account;
     box contents;
