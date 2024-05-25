@@ -1,13 +1,14 @@
 import io
-from typing import BinaryIO, Dict, List as PyList, Optional, Tuple, TypeVar, Type, Union as PyUnion, \
+from typing import Any, BinaryIO, Dict, List as PyList, Optional, Tuple, TypeVar, Type, Union as PyUnion, \
     get_args, get_origin
 from textwrap import indent
 from remerkleable.bitfields import Bitvector
 from remerkleable.complex import ComplexView, Container, FieldOffset, \
     decode_offset, encode_offset
 from remerkleable.core import View, ViewHook, OFFSET_BYTE_LENGTH
-from remerkleable.tree import NavigationError, Node, PairNode, \
-    get_depth, subtree_fill_to_contents, zero_node
+from remerkleable.tree import Gindex, NavigationError, Node, PairNode, \
+    get_depth, subtree_fill_to_contents, zero_node, \
+    RIGHT_GINDEX
 
 N = TypeVar('N')
 B = TypeVar('B', bound="ComplexView")
@@ -132,6 +133,11 @@ class StableContainer(ComplexView):
     def active_fields(self) -> Bitvector:
         active_fields_node = super().get_backing().get_right()
         return Bitvector[self.__class__.N].view_from_backing(active_fields_node)
+
+    def __getattribute__(self, item):
+        if item == 'N':
+            raise AttributeError(f"use .__class__.{item} to access {item}")
+        return object.__getattribute__(self, item)
 
     def __getattr__(self, item):
         if item[0] == '_':
@@ -258,6 +264,22 @@ class StableContainer(ComplexView):
 
         return num_prefix_bytes + num_data_bytes
 
+    @classmethod
+    def navigate_type(cls, key: Any) -> Type[View]:
+        if key == '__active_fields__':
+            return Bitvector[cls.N]
+        (_, ftyp, fopt) = cls._field_indices[key]
+        if fopt:
+            return Optional[ftyp]
+        return ftyp
+
+    @classmethod
+    def key_to_static_gindex(cls, key: Any) -> Gindex:
+        if key == '__active_fields__':
+            return RIGHT_GINDEX
+        (findex, _, _) = cls._field_indices[key]
+        return 2**get_depth(cls.N) * 2 + findex
+
 
 class Profile(ComplexView):
     _o: int
@@ -294,7 +316,7 @@ class Profile(ComplexView):
         if not issubclass(b, StableContainer) and not issubclass(b, Container):
             raise Exception(f"invalid Profile base: {b}")
 
-        class ProfileView(Profile, b):
+        class ProfileView(Profile):
             B = b
 
         ProfileView.__name__ = ProfileView.type_repr()
@@ -357,6 +379,11 @@ class Profile(ComplexView):
                 optional_fields.set(oindex, active_fields.get(findex))
                 oindex += 1
         return optional_fields
+
+    def __getattribute__(self, item):
+        if item == 'B':
+            raise AttributeError(f"use .__class__.{item} to access {item}")
+        return object.__getattribute__(self, item)
 
     def __getattr__(self, item):
         if item[0] == '_':
@@ -522,6 +549,28 @@ class Profile(ComplexView):
         stream.write(temp_dyn_stream.read(num_data_bytes))
 
         return num_prefix_bytes + num_data_bytes
+
+    @classmethod
+    def navigate_type(cls, key: Any) -> Type[View]:
+        if key == '__active_fields__':
+            return Bitvector[cls.B.N]
+        (ftyp, fopt) = cls.fields()[key]
+        if fopt:
+            return Optional[ftyp]
+        return ftyp
+
+    @classmethod
+    def key_to_static_gindex(cls, key: Any) -> Gindex:
+        if key == '__active_fields__':
+            return RIGHT_GINDEX
+        (_, _) = cls.fields()[key]
+        if issubclass(cls.B, StableContainer):
+            (findex, _, _) = cls.B._field_indices[key]
+            return 2**get_depth(cls.B.N) * 2 + findex
+        else:
+            findex = cls.B._field_indices[key]
+            n = len(cls.B.fields())
+            return 2**get_depth(n) + findex
 
 
 class OneOf(ComplexView):

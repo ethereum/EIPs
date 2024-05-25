@@ -1,7 +1,7 @@
 from typing import Optional, Type
-from remerkleable.basic import uint8, uint16
+from remerkleable.basic import uint8, uint16, uint32, uint64
 from remerkleable.bitfields import Bitvector
-from remerkleable.complex import Container
+from remerkleable.complex import Container, List
 from stable_container import OneOf, Profile, StableContainer
 
 # Defines the common merkleization format and a portable serialization format
@@ -455,3 +455,56 @@ stable_container_tests = [
 for test in stable_container_tests:
     assert test['value'].encode_bytes().hex() == test['serialized']
     assert test['value'].hash_tree_root().hex() == test['hash_tree_root']
+
+class StableFields(StableContainer[8]):
+    foo: Optional[uint32]
+    bar: Optional[uint64]
+    quix: Optional[uint64]
+    more: Optional[uint32]
+
+class FooFields(Profile[StableFields]):
+    foo: uint32
+    more: Optional[uint32]
+
+class BarFields(Profile[StableFields]):
+    bar: uint64
+    quix: uint64
+    more: Optional[uint32]
+
+assert issubclass((StableFields / '__active_fields__').navigate_type(), Bitvector)
+assert (StableFields / '__active_fields__').navigate_type().vector_length() == 8
+assert (StableFields / '__active_fields__').gindex() == 0b11
+assert (StableFields / 'foo').navigate_type() == Optional[uint32]
+assert (StableFields / 'foo').gindex() == 0b10000
+assert (StableFields / 'bar').navigate_type() == Optional[uint64]
+assert (StableFields / 'bar').gindex() == 0b10001
+assert (StableFields / 'quix').navigate_type() == Optional[uint64]
+assert (StableFields / 'quix').gindex() == 0b10010
+assert (StableFields / 'more').navigate_type() == Optional[uint32]
+assert (StableFields / 'more').gindex() == 0b10011
+
+assert issubclass((FooFields / '__active_fields__').navigate_type(), Bitvector)
+assert (FooFields / '__active_fields__').navigate_type().vector_length() == 8
+assert (FooFields / '__active_fields__').gindex() == 0b11
+assert (FooFields / 'foo').navigate_type() == uint32
+assert (FooFields / 'foo').gindex() == 0b10000
+assert (FooFields / 'more').navigate_type() == Optional[uint32]
+assert (FooFields / 'more').gindex() == 0b10011
+try:
+    (FooFields / 'bar').navigate_type()
+    assert False
+except KeyError:
+    pass
+
+assert issubclass((BarFields / '__active_fields__').navigate_type(), Bitvector)
+assert (BarFields / '__active_fields__').navigate_type().vector_length() == 8
+assert (BarFields / '__active_fields__').gindex() == 0b11
+assert (BarFields / 'bar').navigate_type() == uint64
+assert (BarFields / 'bar').gindex() == 0b10001
+assert (BarFields / 'more').navigate_type() == Optional[uint32]
+assert (BarFields / 'more').gindex() == 0b10011
+try:
+    (BarFields / 'foo').navigate_type()
+    assert False
+except KeyError:
+    pass
