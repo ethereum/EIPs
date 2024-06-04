@@ -1,37 +1,31 @@
-from typing import Optional, Type
+from typing import Optional
 from remerkleable.basic import uint8, uint16, uint32, uint64
 from remerkleable.bitfields import Bitvector
 from remerkleable.complex import Container, List
 from stable_container import Profile, StableContainer
 
-# Defines the common merkleization format and a portable serialization format
 class Shape(StableContainer[4]):
     side: Optional[uint16]
     color: Optional[uint8]
     radius: Optional[uint16]
 
-# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Square(Profile[Shape]):
     side: uint16
     color: uint8
 
-# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Circle(Profile[Shape]):
     color: uint8
     radius: uint16
 
-# Defines a container with immutable scheme that contains two `StableContainer`
 class ShapePair(Container):
     shape_1: Shape
     shape_2: Shape
 
-# Inherits merkleization format from `ShapePair`, and serializes more compactly
-class SquarePair(Profile[ShapePair]):
+class SquarePair(Container):
     shape_1: Square
     shape_2: Square
 
-# Inherits merkleization format from `ShapePair`, and serializes more compactly
-class CirclePair(Profile[ShapePair]):
+class CirclePair(Container):
     shape_1: Circle
     shape_2: Circle
 
@@ -40,6 +34,7 @@ class ShapePayload(Container):
     side: uint16
     color: uint8
     radius: uint16
+
 class ShapeRepr(Container):
     value: ShapePayload
     active_fields: Bitvector[4]
