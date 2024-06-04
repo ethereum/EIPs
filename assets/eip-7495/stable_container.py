@@ -410,10 +410,10 @@ class Profile(ComplexView):
                 fields_base = ftyp_base.fields()
                 if len(fields) != len(fields_base):
                     return False
-                for fkey, t in fields.items():
-                    if fkey not in fields_base:
+                for (fkey, t), (fkey_b, t_b) in zip(fields.items(), fields_base.items()):
+                    if fkey != fkey_b:
                         return False
-                    if not has_compatible_merkleization(t, fields_base[fkey]):
+                    if not has_compatible_merkleization(t, t_b):
                         return False
                 return True
             if issubclass(ftyp, StableContainer):
@@ -425,10 +425,10 @@ class Profile(ComplexView):
                 fields_base = ftyp_base.fields()
                 if len(fields) != len(fields_base):
                     return False
-                for fkey, t in fields.items():
-                    if fkey not in fields_base:
+                for (fkey, t), (fkey_b, t_b) in zip(fields.items(), fields_base.items()):
+                    if fkey != fkey_b:
                         return False
-                    if not has_compatible_merkleization(t, fields_base[fkey]):
+                    if not has_compatible_merkleization(t, t_b):
                         return False
                 return True
             if issubclass(ftyp, Profile):
@@ -442,11 +442,10 @@ class Profile(ComplexView):
                 fields_base = ftyp_base.fields()
                 if len(fields) != len(fields_base):
                     return False
-                for fkey, (t, _) in fields.items():
-                    if fkey not in fields_base:
+                for (fkey, (t, _)), (fkey_b, (t_b, _)) in zip(fields.items(), fields_base.items()):
+                    if fkey != fkey_b:
                         return False
-                    (t_base, _) = fields_base[fkey]
-                    if not has_compatible_merkleization(t, t_base):
+                    if not has_compatible_merkleization(t, t_b):
                         return False
                 return True
             return False
