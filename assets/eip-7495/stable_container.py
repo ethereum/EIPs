@@ -346,6 +346,7 @@ class Profile(ComplexView):
                     raise TypeError(f'Cannot override `B` inside `{cls.__name__}`')
                 cls._field_indices = {}
                 cls._o = 0
+                last_findex = -1
                 for (fkey, t) in cls.__annotations__.items():
                     if fkey not in cls.B._field_indices:
                         raise TypeError(
@@ -357,6 +358,12 @@ class Profile(ComplexView):
                     else:
                         findex = cls.B._field_indices[fkey]
                         ftyp = cls.B.fields()[fkey]
+                    if findex <= last_findex:
+                        raise TypeError(
+                            f'`{cls.__name__}` fields must have the same order as in the base type '
+                            f'but `{fkey}` is defined earlier than in `{cls.B.__name__}`'
+                        )
+                    last_findex = findex
                     fopt = (
                         get_origin(t) == PyUnion
                         and len(get_args(t)) == 2
