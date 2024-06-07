@@ -252,6 +252,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
+### Portal Specifications
+
+Links to specific commits of files within the Ethereum Portal Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+```
+
+Which renders as:
+
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/portal-network-specs/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
 ### World Wide Web Consortium (W3C)
 
 Links to a W3C "Recommendation" status specification may be included using normal markdown syntax. For example, the following link would be allowed:
