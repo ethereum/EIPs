@@ -11,7 +11,7 @@ from remerkleable.byte_arrays import ByteList, ByteVector, Bytes4, Bytes32
 from remerkleable.complex import Container, List
 from rlp_types import Hash32
 from secp256k1 import ECDSA, PublicKey
-from stable_container import OneOf, Profile, StableContainer
+from stable_container import Profile, StableContainer
 
 class TransactionType(uint8):
     pass
@@ -65,7 +65,7 @@ class TransactionPayload(StableContainer[MAX_TRANSACTION_PAYLOAD_FIELDS]):
     gas: Optional[uint64]
     to: Optional[ExecutionAddress]
     value: Optional[uint256]
-    input_: ByteList[MAX_CALLDATA_SIZE]
+    input_: Optional[ByteList[MAX_CALLDATA_SIZE]]
 
     # EIP-2930
     access_list: Optional[List[AccessTuple, MAX_ACCESS_LIST_SIZE]]
@@ -91,6 +91,10 @@ class BlobFeesPerGas(Profile[FeesPerGas]):
     regular: FeePerGas
     blob: FeePerGas
 
+class EcdsaTransactionSignature(Profile[TransactionSignature]):
+    from_: Optional[ExecutionAddress]
+    ecdsa_signature: Optional[ByteVector[ECDSA_SIGNATURE_SIZE]]
+
 class ReplayableTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     nonce: uint64
@@ -102,7 +106,7 @@ class ReplayableTransactionPayload(Profile[TransactionPayload]):
 
 class ReplayableTransaction(Container):
     payload: ReplayableTransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class LegacyTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -116,7 +120,7 @@ class LegacyTransactionPayload(Profile[TransactionPayload]):
 
 class LegacyTransaction(Container):
     payload: LegacyTransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class Eip2930TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -131,7 +135,7 @@ class Eip2930TransactionPayload(Profile[TransactionPayload]):
 
 class Eip2930Transaction(Container):
     payload: Eip2930TransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class Eip1559TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -147,7 +151,7 @@ class Eip1559TransactionPayload(Profile[TransactionPayload]):
 
 class Eip1559Transaction(Container):
     payload: Eip1559TransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class Eip4844TransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -164,7 +168,7 @@ class Eip4844TransactionPayload(Profile[TransactionPayload]):
 
 class Eip4844Transaction(Container):
     payload: Eip4844TransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class BasicTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
@@ -179,7 +183,7 @@ class BasicTransactionPayload(Profile[TransactionPayload]):
 
 class BasicTransaction(Container):
     payload: BasicTransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
 class BlobTransactionPayload(Profile[TransactionPayload]):
     chain_id: ChainId
@@ -195,29 +199,27 @@ class BlobTransactionPayload(Profile[TransactionPayload]):
 
 class BlobTransaction(Container):
     payload: BlobTransactionPayload
-    signature: TransactionSignature
+    signature: EcdsaTransactionSignature
 
-class AnyTransaction(OneOf[Transaction]):
-    @classmethod
-    def select_from_base(cls, value: Transaction) -> Type[Transaction]:
-        if value.payload.type_ is None:
-            if value.payload.blob_versioned_hashes is not None:
-                return BlobTransaction
-            return BasicTransaction
+def select_transaction_profile(value: Transaction) -> Type[Profile]:
+    if value.payload.type_ is None:
+        if value.payload.blob_versioned_hashes is not None:
+            return BlobTransaction
+        return BasicTransaction
 
-        if value.payload.type_ == TRANSACTION_TYPE_EIP4844:
-            return Eip4844Transaction
+    if value.payload.type_ == TRANSACTION_TYPE_EIP4844:
+        return Eip4844Transaction
 
-        if value.payload.type_ == TRANSACTION_TYPE_EIP1559:
-            return Eip1559Transaction
+    if value.payload.type_ == TRANSACTION_TYPE_EIP1559:
+        return Eip1559Transaction
 
-        if value.payload.type_ == TRANSACTION_TYPE_EIP2930:
-            return Eip2930Transaction
+    if value.payload.type_ == TRANSACTION_TYPE_EIP2930:
+        return Eip2930Transaction
 
-        if value.payload.chain_id is not None:
-            return LegacyTransaction
+    if value.payload.chain_id is not None:
+        return LegacyTransaction
 
-        return ReplayableTransaction
+    return ReplayableTransaction
 
 class Root(Bytes32):
     pass
@@ -273,7 +275,7 @@ def ecdsa_recover_from_address(signature: ByteVector[ECDSA_SIGNATURE_SIZE],
 
 from tx_hashes import compute_sig_hash, compute_tx_hash
 
-def validate_transaction(tx: AnyTransaction):
+def validate_transaction(tx):
     ecdsa_validate_signature(tx.signature.ecdsa_signature)
     assert tx.signature.from_ == ecdsa_recover_from_address(
         tx.signature.ecdsa_signature,
@@ -293,10 +295,10 @@ class Log(Container):
 
 class Receipt(StableContainer[MAX_RECEIPT_FIELDS]):
     root: Optional[Hash32]
-    gas_used: uint64
+    gas_used: Optional[uint64]
     contract_address: Optional[ExecutionAddress]
-    logs_bloom: ByteVector[BYTES_PER_LOGS_BLOOM]
-    logs: List[Log, MAX_LOGS_PER_RECEIPT]
+    logs_bloom: Optional[ByteVector[BYTES_PER_LOGS_BLOOM]]
+    logs: Optional[List[Log, MAX_LOGS_PER_RECEIPT]]
 
     # EIP-658
     status: Optional[boolean]
@@ -315,10 +317,8 @@ class BasicReceipt(Profile[Receipt]):
     logs: List[Log, MAX_LOGS_PER_RECEIPT]
     status: boolean
 
-class AnyReceipt(OneOf[Receipt]):
-    @classmethod
-    def select_from_base(cls, value: Receipt) -> Type[Receipt]:
-        if value.status is not None:
-            return BasicReceipt
+def select_receipt_profile(value: Receipt) -> Type[Profile]:
+    if value.status is not None:
+        return BasicReceipt
 
-        return HomesteadReceipt
+    return HomesteadReceipt
