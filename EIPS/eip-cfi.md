@@ -2,7 +2,7 @@
 title: Network Upgrade Inclusion Stages
 description: Overview of the various stages Core EIPs go through before their activation in network upgrades. 
 author: Tim Beiko <@timbeiko>
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/eip-xxxx-network-upgrade-inclusion-stages/20281
 status: Draft
 type: Meta
 created: 2024-06-12
