@@ -1,8 +1,9 @@
 ---
+eip: 7723
 title: Network Upgrade Inclusion Stages
 description: Overview of the various stages Core EIPs go through before their activation in network upgrades.
 author: Tim Beiko (@timbeiko)
-discussions-to: https://ethereum-magicians.org/t/eip-xxxx-network-upgrade-inclusion-stages/20281
+discussions-to: https://ethereum-magicians.org/t/eip-7723-network-upgrade-inclusion-stages/20281
 status: Draft
 type: Meta
 created: 2024-06-12
@@ -34,7 +35,7 @@ Before the Upgrade Meta EIP is moved to `Final`, the `Scheduled for Inclusion` s
 
 ### Proposed for Inclusion
 
-To formally propose the inclusion of a Core EIP in a network upgrade, someone **MUST** open a pull request against the Upgrade Meta EIP to add the EIP in the `Proposed for Inclusion` section. The pull request **SHOULD** be merged in a timely fashion by the Upgrade Meta EIP author.  
+To formally propose the inclusion of a Core EIP in a network upgrade, someone **MUST** open a pull request against the Upgrade Meta EIP to add the EIP in the `Proposed for Inclusion` section. Reasonable pull requests **SHOULD** be merged in a timely fashion by the Upgrade Meta EIP author.  
 
 At this stage, implementation teams **SHOULD** review the EIP in the context of including it in the next upgrade. 
 
@@ -44,14 +45,13 @@ Note that EIPs must be `Proposed for Inclusion` for each network upgrade. In oth
 
 Once client developers have reviewed an EIP which was `Proposed for Inclusion`, they **MAY** move it to the `Considered for Inclusion` stage. Once a decision is made by client teams to move an EIP to `Considered for Inclusion`, the Upgrade Meta EIP **MUST** be updated to reflect this.
 
-`Considered for Inclusion` signals that client developers are generally positive towards the EIP, and that, assuming it meets all the requirements for mainnet deployment, it **MAY** be included in the network upgrade. This stage is similar to "concept ACK" in other open source projects, and is not sufficient to result in deployment to mainnet. 
+`Considered for Inclusion` signals that client developers are generally positive towards the EIP, and that, assuming it meets all the requirements for mainnet deployment, it **MAY** be included in the network upgrade. This stage is similar to "concept ACK" in other open source projects, and is not sufficient to result in deployment to mainnet. An EIP **MAY** be removed from `Considered for Inclusion` if client teams are generally against including the EIP in the network upgrade. 
 
 ### Scheduled for Inclusion 
 
 When client developers decide to work on an EIP as part of a network upgrade, the EIP **SHOULD** move to the `Scheduled for Inclusion` stage, and the Upgrade Meta EIP **MUST** be updated to reflect this. 
 
-
-`Scheduled for Inclusion` signals that implementation and testing work are underway, and that, assuming no issues arise as part of this process, the EIP **SHOULD** be included in the network upgrade.  
+`Scheduled for Inclusion` signals that implementation and testing work are underway, and that, assuming no issues arise as part of this process, the EIP **SHOULD** be included in the network upgrade. An EIP **MAY** be removed from `Scheduled for Inclusion` if client teams are generally against including the EIP in the network upgrade. 
 
 ### Included
 
