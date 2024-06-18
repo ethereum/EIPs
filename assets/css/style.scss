@@ -2,7 +2,17 @@
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
 
+$content-width: 1152px;
+
 @import 'minima';
+
+.site-header {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
 
 .page-content {
   a.anchor-link {
@@ -16,47 +26,74 @@
   }
 }
 
-main.page-content {
-  div.wrapper {
-    max-width: unset;
+.footer-col-wrapper {
+  color: #111;
+}
+
+.table-borderless, .table-borderless * {
+  border-style : hidden !important; // !important To override Jekyll styling
+  background-color: rgba(0,0,0,0) !important;
+}
+
+table.preamble > tbody > tr > :not(:first-child) {
+  width: 100%;
+}
+
+table.preamble > tbody > tr > :first-child {
+  white-space: nowrap;
+}
+
+a, a:link {
+  color: #726E97;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #8E6680;
+}
+
+a:hover, a:active {
+  color: #7F557D;
+  text-decoration: underline;
+}
+
+.site-footer, .site-footer * {
+  box-sizing: content-box !important; // !important To override bootstrap styling
+}
+
+.no-underline {
+  text-decoration: none !important; // !important To override previous <a> styling
+}
+
+.badge:hover {
+  filter: brightness(75%);
+  transition: all 0.25s ease;
+}
+
+h1 {
+  vertical-align: middle;
+}
+
+h1 a {
+  height: 1em;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.inline-svg {
+  display: inline-block;
+  vertical-align: bottom;
+  fill: currentColor;
+  width: 1.5ex;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media print {
+
+  header,
+  footer {
+    display: none;
   }
 }
 
-.status {
-  border-radius: 6px;
-  line-height: 18px;
-  overflow: hidden;
-  padding: 12px;
-  display: inline-block;
-  margin-bottom: 15px;
-}
-
-.draft {
-  @extend .status;
-  background-color: #fffbea;
-  border: solid 1px #f1c40f;
-}
-
-.review {
-  @extend .status;
-  background-color: #f0f7fb;
-  border: solid 1px #3498db;
-}
-
-.lastcall {
-  @extend .status;
-  background-color: #e7f6f0;
-  border: solid 1px #27ae60;
-}
-
-.stagnant {
-  @extend .status;
-  background-color: #ffdead;
-  border: solid 1px #ff6700;
-}
-
-.withdrawn {
-  @extend .status;
-  background-color: #f9e7e5;
-  border: solid 1px #c0392b;
-}

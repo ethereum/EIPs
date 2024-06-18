@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":disableDependencyDashboard"
+  ],
+  "prConcurrentLimit": 100,
+  "ignorePaths": [
+    "**/assets/**"
+  ],
+  "ignoreDeps": [
+    "Pandapip1/jekyll-label-action",
+    "ethereum/eipw-action",
+    "ethereum/eip-review-bot",
+    "ethereum/EIP-Bot"
+  ],
+  "enabled": false
+}

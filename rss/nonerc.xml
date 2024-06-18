@@ -1,0 +1,35 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ethereum EIPs</title>
+    <description>All EIPs that are not ERCs</description>
+    <link>{{ site.url }}</link>
+    <atom:link href="{{ site.url }}/rss/last-call.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>{{ site.time | date_to_rfc822 }}</lastBuildDate>
+    {% assign eips = site.pages | sort: 'eip' %}
+    {% for eip in eips %}
+      {% unless eip.category == "ERC" %}
+      {% if eip.status == "Last Call" %}
+      {% capture description %}
+        <p><strong>EIP #{{ eip.eip }} - {{eip.title }}</strong> is in Last Call status. It is authored by {{ eip.author }} and was originally created {{ eip.created }}. It is in the {{ eip.category }} category of type {{ eip.type }}. Please review and note any changes that should block acceptance.</p>
+        {% if eip.discussions-to %}
+          <p>The author has requested that discussions happen at the following URL: <a href="{{ eip.discussions-to }}">{{ eip.discussions-to }}</a></p>
+        {% endif %}
+        <hr />
+        {{ eip.content }}
+      {% endcapture %}
+      <item>
+        <title>{{ eip.title | xml_escape }}</title>
+        <description>{{ description | xml_escape }}</description>
+        <pubDate>{{ eip.created | date_to_rfc822 }}</pubDate>
+        <link>{{ site.url }}/{{ eip.url }}</link>
+        <guid isPermaLink="true">{{ site.url }}/{{ eip.url }}</guid>
+      </item>
+      {% endif %}
+      {% endunless %}
+    {% endfor %}
+  </channel>
+</rss>

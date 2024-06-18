@@ -1,0 +1,15 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/ethereum/go-ethereum/core/vm
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23295	     50034 ns/op	      3000 gas/op	        59.95 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23734	     50558 ns/op	      3000 gas/op	        59.33 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23823	     50586 ns/op	      3000 gas/op	        59.30 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23913	     50049 ns/op	      3000 gas/op	        59.94 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23721	     50299 ns/op	      3000 gas/op	        59.64 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23760	     51160 ns/op	      3000 gas/op	        58.63 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23151	     50818 ns/op	      3000 gas/op	        59.03 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23744	     53451 ns/op	      3000 gas/op	        56.12 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   22837	     50315 ns/op	      3000 gas/op	        59.62 mgas/s	     800 B/op	       7 allocs/op
+BenchmarkPrecompiledEcrecover/-Gas=3000-8         	   23823	     50401 ns/op	      3000 gas/op	        59.52 mgas/s	     800 B/op	       7 allocs/op
+PASS
+ok  	github.com/ethereum/go-ethereum/core/vm	17.687s
