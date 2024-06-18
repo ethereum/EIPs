@@ -1,0 +1,170 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  save-pr:
+    name: Save PR Number
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Save PR number
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p ./pr
+          echo $PR_NUMBER > ./pr/pr_number
+          echo $PR_SHA > ./pr/pr_sha
+          echo $MERGE_SHA > ./pr/merge_sha
+
+      - name: Upload PR Number
+        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
+        with:
+          name: pr_number
+          path: pr/
+
+  htmlproofer:
+    name: HTMLProofer
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout EIPs
+        uses: actions/checkout@v4
+        with:
+          repository: ethereum/EIPs
+          path: ''
+      - name: Checkout ERCs
+        uses: actions/checkout@v4
+        with:
+          repository: ethereum/ERCs
+          path: ERCs
+      - name: Merge Repos
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/ERCs/ERCS
+          mkdir -p $GITHUB_WORKSPACE/ERCs/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/ERCS/. $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/EIPS/. $GITHUB_WORKSPACE/EIPS
+          cp -rp $GITHUB_WORKSPACE/ERCs/assets/. $GITHUB_WORKSPACE/assets
+          cd $GITHUB_WORKSPACE/EIPS
+          find . -name "erc-*.md" -type f -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+          cd $GITHUB_WORKSPACE/assets
+          find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
+          cd $GITHUB_WORKSPACE
+          rm -rf ERCs
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        with:
+          ruby-version: '3.1' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          cache-version: 0 # Increment this number if you need to re-download cached gems
+      - name: Build with Jekyll
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+          
+      - name: Build Website
+        run: |
+          bundle exec jekyll doctor
+          bundle exec jekyll build
+
+      - name: HTML Proofer
+        run: bundle exec htmlproofer --allow-missing-href --disable-external --assume-extension '.html' --log-level=:info --cache='{"timeframe":{"external":"6w"}}' --checks 'Links,Images,Scripts,OpenGraph' --no-check-sri --ignore-empty-alt --no-enforce_https ./_site
+      - name: DNS Validator
+        run: bundle exec github-pages health-check
+
+  link-check:
+    name: Link Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+        
+      - name: Link Checker
+        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec
+        with:
+          config-file: config/mlc_config.json
+          use-quiet-mode: no
+          use-verbose-mode: yes
+          check-modified-files-only: yes
+
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+
+      - name: Get Changed Files
+        id: changed
+        continue-on-error: true
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | sed -e 's|$|,|' | xargs -i echo "{}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run CodeSpell
+        uses: codespell-project/actions-codespell@57beb9f38f49d773d641ac555d1565c3b6a59938
+        if: steps.changed.outcome == 'success'
+        with:
+          check_filenames: true
+          ignore_words_file: config/.codespell-whitelist
+          path: ${{ env.CHANGED_FILES }}
+          skip: .git,Gemfile.lock,**/*.png,**/*.gif,**/*.jpg,**/*.svg,.codespell-whitelist,vendor,_site,_config.yml,style.css
+
+  eipw-validator:
+    name: EIP Walidator
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+
+      - uses: ethereum/eipw-action@b8de7ea9ad5cb842301e63898afb996c451c18cf
+        id: eipw
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          unchecked: 1, 5069, 5757
+          options-file: config/eipw.toml
+
+  markdownlint:
+    name: Markdown Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout EIP Repository
+        uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+
+      - name: Get Changed Files
+        id: changed
+        continue-on-error: true
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          gh pr diff ${{ github.event.number }} --name-only | grep -E -x '[^/]+\.md|EIPS/eip-[0-9]+\.md' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint
+        uses: DavidAnson/markdownlint-cli2-action@f5cf187ef11bd3a68a127321b794aa252ff23019
+        if: steps.changed.outcome == 'success'
+        with:
+          command: config
+          globs: |
+            config/.markdownlint.yaml
+            ${{ env.CHANGED_FILES }}

@@ -6,7 +6,6 @@ status: Final
 type: Standards Track
 category: Core
 created: 2015-11-22
-superseded-by: 211
 ---
 
 ### Abstract
