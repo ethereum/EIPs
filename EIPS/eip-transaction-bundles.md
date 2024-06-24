@@ -2,16 +2,17 @@
 title: EVM Transaction Bundles
 description: Enable EVM support for transaction bundles without revert protections.
 author: Lily Johnson (@lilyjjo)
+discussions-to: https://ethereum-magicians.org/t/eip-for-evm-native-bundles/20322 
 status: Draft
-type: Standards
+type: Standards Track
 category: Core
 created: 2024-06-24
-requires: EIP-2781
+requires: 2781
 ---
 
 ## Abstract
 
-This EIP introduces two new [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) transaction types and one new opcode, enabling smart contracts and transactions to delegate their local sequencing rights to an off-chain entity. These new transaction types work together to create EVM-native 'bundles', which are similar but weaker than the PBS bundles offered by builders to searchers.
+This EIP introduces two new [EIP-2718](./eip-2718.md) transaction types and one new opcode, enabling smart contracts and transactions to delegate their local sequencing rights to an off-chain entity. These new transaction types work together to create EVM-native 'bundles', which are similar but weaker than the PBS bundles offered by builders to searchers.
 
 One of the EIP-2718 transactions is an extended normal transaction that supports:
 
@@ -41,7 +42,7 @@ Currently, a single block builder has unrestricted control over the final sequen
 
 ### New Transaction Payload Types
 
-Two new [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) transactions with types `DELEGATED_TX_TYPE` and `BUNDLE_TX_TYPE` are introduced at `FORK_BLOCK`.
+Two new [EIP-2718](./eip-2718.md) transactions with types `DELEGATED_TX_TYPE` and `BUNDLE_TX_TYPE` are introduced at `FORK_BLOCK`.
 
 For the `DELEGATED_TX_TYPE`, the transaction payload should be interpreted as:
 
@@ -151,7 +152,7 @@ The `DELEGATED_TX_TYPE` follows typical gas costing rules.
 
 ### ReceiptPayload Definitions
 
-For `DELEGATED_TX_TYPE` transaction that are able to begin execution, their [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) receipt payload should be interpreted as:
+For `DELEGATED_TX_TYPE` transaction that are able to begin execution, their [EIP-2718](./eip-2718.md) receipt payload should be interpreted as:
 
 ```go
 rlp([status, cumulativeGasUsed, logsBloom, logs])
@@ -159,7 +160,7 @@ rlp([status, cumulativeGasUsed, logsBloom, logs])
 
 `DELEGATED_TX_TYPE` transactions that are invalid do not get transaction receipts.
 
-The `BUNDLE_TX_TYPE` transaction’s  [EIP-2718](https://eips.ethereum.org/EIPS/eip-2718) receipt payload should be interpreted as:
+The `BUNDLE_TX_TYPE` transaction’s  [EIP-2718](./eip-2718.md) receipt payload should be interpreted as:
 
 ```go
 rlp([statusArray, cumulativeGasUsed])
@@ -224,6 +225,4 @@ Similarly, smart contracts that restrict functionality to transactions signed by
 
 Copyright and related rights waived via CC0.
 
-## Citation
 
-TBD
