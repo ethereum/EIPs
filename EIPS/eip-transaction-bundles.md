@@ -1,9 +1,9 @@
 ---
-eip: <to be assigned>
+eip: 7727
 title: EVM Transaction Bundles
 description: Enable EVM support for transaction bundles without revert protections.
 author: Lily Johnson (@lilyjjo)
-discussions-to: https://ethereum-magicians.org/t/eip-for-evm-native-bundles/20322
+discussions-to: https://ethereum-magicians.org/t/eip-7727-evm-transaction-bundles/20322
 status: Draft
 type: Standards Track
 category: Core
