@@ -79,7 +79,6 @@ For the `BUNDLE_TX_TYPE`, the transaction payload should be interpreted as:
 	chainId, 
 	nonce, 
 	gasPrice, 
-	gasLimit, 
 	transactionList
 	signatureYParity, 
 	signatureR, 
@@ -102,7 +101,7 @@ An example would of the `transactionList` would be:
 The `signatureYParity`, `signatureR`, `signatureS` elements of the `BUNDLE_TX_TYPE` represent a secp256k1 signature over:
 
 ```go
-keccak256(0x06 || rlp([bundleSigner, blockNumber, chainId, nonce, gasPrice, gasLimit, transactionList]))
+keccak256(0x06 || rlp([bundleSigner, blockNumber, chainId, nonce, gasPrice, transactionList]))
 ```
 
 We’ll refer to address resolved by this signature the bundle transaction’s signer. 
