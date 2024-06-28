@@ -41,9 +41,18 @@ All pull requests in this repository must pass automated checks before they can 
 
 It is possible to run the EIP validator locally:
 
+Make sure to add cargo's `bin` directory to your environment (typically `$HOME/.cargo/bin` in your `PATH` environment variable)
+
 ```sh
 cargo install eipv
 eipv <INPUT FILE / DIRECTORY>
+```
+
+Or a more thorough linter:
+
+```sh
+cargo install eipw
+eipw <INPUT FILE / DIRECTORY>
 ```
 
 ## Build the status page locally
