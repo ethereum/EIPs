@@ -52,7 +52,7 @@ Or a more thorough linter:
 
 ```sh
 cargo install eipw
-eipw <INPUT FILE / DIRECTORY>
+eipw --config ./config/eipw.toml <INPUT FILE / DIRECTORY>
 ```
 
 ## Build the status page locally
