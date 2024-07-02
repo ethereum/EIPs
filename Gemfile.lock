@@ -238,6 +238,8 @@ GEM
     minitest (5.19.0)
     nokogiri (1.14.3-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.14.3-x64-mingw-ucrt)
+      racc (~> 1.4)
     nokogiri (1.14.3-x86_64-linux)
       racc (~> 1.4)
     octokit (4.25.1)
@@ -281,16 +283,20 @@ GEM
       ethon (>= 0.9.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2024.1)
+      tzinfo (>= 1.0.0)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (1.8.0)
+    wdm (0.1.1)
     webrick (1.8.1)
     yell (2.2.2)
     zeitwerk (2.6.7)
 
 PLATFORMS
   arm64-darwin-22
+  x64-mingw-ucrt
   x86_64-linux
 
 DEPENDENCIES
@@ -299,6 +305,7 @@ DEPENDENCIES
   html-proofer (>= 5.0.7)
   minima (~> 2.0)
   tzinfo-data
+  wdm (~> 0.1.1)
   webrick (~> 1.8)
 
 BUNDLED WITH
