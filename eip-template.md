@@ -117,4 +117,4 @@ Needs discussion.
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](../LICENSE.md).
+Copyright and related rights waived via [CC0](https://github.com/ethereum/EIPs/blob/master/LICENSE.md).
