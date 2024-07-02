@@ -154,6 +154,8 @@ exceptions = [
     '^https://(www\.)?github\.com/ethereum/yellowpaper/commit/[a-f0-9]{40}$',
     '^https://(www\.)?github\.com/ethereum/devp2p/(blob|tree)/[0-9a-f]{40}/.+$',
     '^https://(www\.)?github\.com/ethereum/devp2p/commit/[0-9a-f]{40}$',
+    '^https://(www\.)?github\.com/ethereum/portal-network-specs/(blob|tree)/[0-9a-f]{40}/.+$',
+    '^https://(www\.)?github\.com/ethereum/portal-network-specs/commit/[0-9a-f]{40}$',
     '^https://(www\.)?github\.com/bitcoin/bips/(blob|tree)/[0-9a-f]{40}/bip-[0-9]+\.mediawiki$',
     '^https://(www\.)?github\.com/ChainAgnostic/CAIPs/(blob|tree)/[a-f0-9]{40}/.+$',
     '^https://(www\.)?github\.com/ChainAgnostic/CAIPs/commit/[0-9a-f]{40}$',
