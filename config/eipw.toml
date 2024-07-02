@@ -13,8 +13,6 @@ annotation_type = "warning"
 [lints.preamble-refs-title]
 kind = "preamble-proposal-ref"
 name = "title"
-prefix = "eip-"
-suffix = ".md"
 
 [lints.preamble-discussions-to]
 kind = "preamble-url"
@@ -30,8 +28,6 @@ message = "preamble header `title` should not contain `standard` (or similar wor
 [lints.preamble-refs-description]
 kind = "preamble-proposal-ref"
 name = "description"
-prefix = "eip-"
-suffix = ".md"
 
 [lints.preamble-date-created]
 kind = "preamble-date"
@@ -62,8 +58,6 @@ pattern = "(?i)(?:eip|erc)-[0-9]+"
 
 [lints.markdown-refs]
 kind = "markdown-proposal-ref"
-prefix = "eip-"
-suffix = ".md"
 
 [lints.preamble-enum-status]
 kind = "preamble-one-of"
@@ -109,8 +103,6 @@ flow = [
     "Moved",
 ],
 ]
-prefix = "eip-"
-suffix = ".md"
 
 [lints.markdown-req-section]
 kind = "markdown-section-required"
@@ -176,8 +168,6 @@ name = "title"
 requires = "requires"
 
 [lints.markdown-link-status]
-prefix = "eip-"
-suffix = ".md"
 kind = "markdown-link-status"
 status = "status"
 flow = [
@@ -928,3 +918,5 @@ name = "description"
 mode = "excludes"
 pattern = '(?i)eip[\s]*[0-9]+'
 message = "proposals must be referenced with the form `EIP-N` (not `EIPN` or `EIP N`)"
+
+
