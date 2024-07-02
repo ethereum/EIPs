@@ -1,5 +1,5 @@
 ---
-title: EIP 158 deactivation
+title: EIP-158 deactivation
 description: Deactivates EIP-158 in order to avoid conflicts in a context in which statelessness and EIP-7702 are active
 author: Guillaume Ballet (@gballet)
 discussions-to: https://ethereum-magicians.org/t/eip-158-deactivation/20445
@@ -7,7 +7,7 @@ status: Draft
 type: Standards Track
 category: Core
 created: 2024-07-02
-requires: 158
+requires: 158, 7702
 ---
 
 ## Abstract
@@ -36,7 +36,7 @@ Once stateless ethereum is active, it becomes impossible to delete accounts, sin
 
 ETP-158, designed as a temporary solution against a problem that was since mitigated, need to be deactivated as well.
 
-The deactivation should happen in Prague, for alternative methods to [EIP-76i12](./eip-7612.md) to be valid. If EIP-7612 is accepted, then nothing opposes its inclusion in Osaka instead.
+The deactivation should happen in Prague, for alternative methods to [EIP-7612](./eip-7612.md) to be valid. If EIP-7612 is accepted, then nothing opposes its inclusion in Osaka instead.
 
 ## Backwards Compatibility
 
