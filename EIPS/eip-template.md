@@ -1,6 +1,6 @@
 ---
 eip: 7733
-title: EIP-158 deactivation
+title: Deactivate EIP-158
 description: Deactivates EIP-158 in order to avoid conflicts in a context in which statelessness and EIP-7702 are active
 author: Guillaume Ballet (@gballet)
 discussions-to: https://ethereum-magicians.org/t/eip-158-deactivation/20445
