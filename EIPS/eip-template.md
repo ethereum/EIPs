@@ -1,4 +1,5 @@
 ---
+eip: 7733
 title: EIP-158 deactivation
 description: Deactivates EIP-158 in order to avoid conflicts in a context in which statelessness and EIP-7702 are active
 author: Guillaume Ballet (@gballet)
