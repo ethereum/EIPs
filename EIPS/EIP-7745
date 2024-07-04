@@ -1,9 +1,11 @@
 ---
 eip: 7745
 title: Gas Fee Sponsorship
-author: Toni Dumančić ( toni.dumancic3@gmail.com, tonidev.xyz )
+author: Toni Dumančić
 status: Draft
 type: Standards Track
+description: A proposal to enable one Ethereum address (Address A) to sponsor the gas fees for another address (Address B) by authorizing and co-signing transactions.
+discussions-to: https://crypto.ba/t/eip-7745/7765
 category: Core
 created: 2024-07-04
 ---
