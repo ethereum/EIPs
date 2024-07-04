@@ -3,7 +3,7 @@ eip: 7745
 title: Gas Fee Sponsorship
 description: Enable one Ethereum address to sponsor gas fees for another by authorizing and co-signing transactions.
 author: Toni Dumančić (@githubusername)
-discussions-to: https://ethereum-magicians.org/t/ethereum-improvement-proposal-all-info/12326/2
+discussions-to: https://ethereum-magicians.org/t/eip-7745/7765
 status: Draft
 type: Standards Track
 category: Core
@@ -65,3 +65,7 @@ The implementation will involve:
 Key security considerations include:
 - Secure transmission and verification of signatures.
 - Preventing unauthorized use of gas sponsorship.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://tonidev.xyz).
