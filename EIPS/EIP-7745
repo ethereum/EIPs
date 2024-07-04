@@ -1,0 +1,65 @@
+---
+eip: 7745
+title: Gas Fee Sponsorship
+author: Toni Dumančić ( toni.dumancic3@gmail.com, tonidev.xyz )
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-07-04
+---
+
+## Simple Summary
+
+A proposal to enable one Ethereum address (Address A) to sponsor the gas fees for another address (Address B) by authorizing and co-signing transactions.
+
+## Abstract
+
+This EIP introduces a mechanism for gas fee sponsorship, where Address A can pay the gas fees for transactions initiated by Address B. This mechanism is particularly beneficial for use cases such as payment processors, Web3 games, and decentralized applications (DApps), where the main address can handle gas fees for multiple addresses, reducing overall gas consumption and simplifying the transaction process.
+
+## Motivation
+
+Currently, in scenarios like payment processing:
+1. Tokens are received at an invoice address.
+2. Ethereum is sent to the invoice address to cover gas fees.
+3. Tokens and leftover ETH are sent back to the main address.
+
+This process is cumbersome and incurs additional gas fees. The proposed method streamlines the process by allowing the main address to approve gas fees off-chain and the invoice address to execute transactions with gas paid by the main address. This can significantly simplify operations for payment processors, facilitate smoother user experiences in Web3 games, and enhance the usability of DApps.
+
+## Specification
+
+### Off-chain Process
+1. **Gas Approval:**
+   - Main address (Address A) approves the gas by signing the transaction details off-chain.
+2. **Signature Transmission:**
+   - The signature data is sent to the invoice address (Address B).
+
+### On-chain Process
+1. **Transaction Execution:**
+   - Invoice address (Address B) sends the transaction on-chain, utilizing the approved signature from Address A to redeem gas from Address A's balance.
+
+## Rationale
+
+This approach reduces the number of on-chain transactions required, thereby saving gas. It simplifies the transaction process for decentralized applications, payment processors, and Web3 games, making it easier to manage gas fees and enhancing the overall user experience.
+
+## Backwards Compatibility
+
+This proposal does not interfere with existing transaction processes and remains fully compatible with current Ethereum standards.
+
+## Test Cases
+
+Detailed scenarios demonstrating the gas sponsorship process, including:
+- Off-chain gas approval.
+- Signature transmission.
+- On-chain transaction execution with gas fee redemption.
+
+## Implementation
+
+The implementation will involve:
+- Modifications to the Ethereum protocol to support gas fee sponsorship.
+- Development of smart contracts for handling gas fee approval, signature verification, and gas redemption.
+
+## Security Considerations
+
+Key security considerations include:
+- Secure transmission and verification of signatures.
+- Preventing unauthorized use of gas sponsorship.
