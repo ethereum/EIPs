@@ -102,7 +102,7 @@ def recover_eip4844_rlp_transaction(tx: Eip4844Transaction) -> Eip4844RlpTransac
         signature_s=s,
     )
 
-def compute_sig_hash(tx: AnyTransaction) -> Hash32:
+def compute_sig_hash(tx) -> Hash32:
     if (
         isinstance(tx, BasicTransaction) or
         isinstance(tx, BlobTransaction)
@@ -129,7 +129,7 @@ def compute_sig_hash(tx: AnyTransaction) -> Hash32:
     pre = recover_replayable_rlp_transaction(tx)
     return compute_legacy_sig_hash(pre)
 
-def compute_tx_hash(tx: AnyTransaction) -> Hash32:
+def compute_tx_hash(tx) -> Hash32:
     if (
         isinstance(tx, BasicTransaction) or
         isinstance(tx, BlobTransaction)

@@ -3,7 +3,7 @@ from rlp import decode
 from rlp_types import *
 from ssz_types import *
 
-def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
+def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes):
     type_ = pre_bytes[0]
 
     if type_ == 0x03:  # EIP-4844
@@ -39,7 +39,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                 ),
                 blob_versioned_hashes=pre.blob_versioned_hashes,
             ),
-            signature=TransactionSignature(
+            signature=EcdsaTransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
             ),
@@ -75,7 +75,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     regular=pre.max_priority_fee_per_gas,
                 ),
             ),
-            signature=TransactionSignature(
+            signature=EcdsaTransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
             ),
@@ -108,7 +108,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     storage_keys=access_tuple[1]
                 ) for access_tuple in pre.accessList],
             ),
-            signature=TransactionSignature(
+            signature=EcdsaTransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
             ),
@@ -138,7 +138,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                     value=pre.value,
                     input_=pre.data,
                 ),
-                signature=TransactionSignature(
+                signature=EcdsaTransactionSignature(
                     from_=from_,
                     ecdsa_signature=ecdsa_signature,
                 ),
@@ -156,7 +156,7 @@ def upgrade_rlp_transaction_to_ssz(pre_bytes: bytes) -> AnyTransaction:
                 value=pre.value,
                 input_=pre.data,
             ),
-            signature=TransactionSignature(
+            signature=EcdsaTransactionSignature(
                 from_=from_,
                 ecdsa_signature=ecdsa_signature,
             ),
@@ -179,7 +179,7 @@ def compute_contract_address(from_: ExecutionAddress,
 
 def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
                                prev_cumulative_gas_used: uint64,
-                               transaction: AnyTransaction) -> AnyReceipt:
+                               transaction):
     type_ = pre_bytes[0]
 
     if type_ in (0x03, 0x02, 0x01):  # EIP-4844, EIP-1559, EIP-2930
@@ -224,7 +224,7 @@ def upgrade_rlp_receipt_to_ssz(pre_bytes: bytes,
     )
 
 def upgrade_rlp_receipts_to_ssz(pre_bytes_list: PyList[bytes],
-                                transactions: PyList[AnyTransaction]) -> PyList[AnyReceipt]:
+                                transactions: PyList) -> PyList:
     receipts = []
     cumulative_gas_used = 0
     for i, pre_bytes in enumerate(pre_bytes_list):

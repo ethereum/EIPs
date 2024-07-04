@@ -75,3 +75,19 @@ for i in range(len(tests)):
 
     stable_receipt = Receipt(backing=receipts[i].get_backing())
     assert stable_receipt.encode_bytes() == tests[i].ssz_receipt_bytes
+
+transactions_stable = [Transaction(backing=transaction.get_backing()) for transaction in transactions]
+assert select_transaction_profile(transactions_stable[0]) is ReplayableTransaction
+assert select_transaction_profile(transactions_stable[1]) is ReplayableTransaction
+assert select_transaction_profile(transactions_stable[2]) is LegacyTransaction
+assert select_transaction_profile(transactions_stable[3]) is Eip2930Transaction
+assert select_transaction_profile(transactions_stable[4]) is Eip1559Transaction
+assert select_transaction_profile(transactions_stable[5]) is Eip1559Transaction
+
+receipts_stable = [Receipt(backing=receipt.get_backing()) for receipt in receipts]
+assert select_receipt_profile(receipts_stable[0]) is HomesteadReceipt
+assert select_receipt_profile(receipts_stable[1]) is BasicReceipt
+assert select_receipt_profile(receipts_stable[2]) is BasicReceipt
+assert select_receipt_profile(receipts_stable[3]) is BasicReceipt
+assert select_receipt_profile(receipts_stable[4]) is BasicReceipt
+assert select_receipt_profile(receipts_stable[5]) is BasicReceipt

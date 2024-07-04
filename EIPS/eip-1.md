@@ -216,6 +216,28 @@ Permitted Execution Client Specifications URLs must anchor to a specific commit,
 ^(https://github.com/ethereum/execution-specs/(blob|commit)/[0-9a-f]{40}/.*|https://github.com/ethereum/execution-specs/tree/[0-9a-f]{40}/.*)$
 ```
 
+### Execution Specification Tests
+
+Links to the Ethereum Execution Specification Tests (EEST) may be included using normal markdown syntax, such as:
+
+```markdown
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+```
+
+Which renders to:
+
+[Ethereum Execution Specification Tests](https://github.com/ethereum/execution-spec-tests/blob/c9b9307ff320c9bb0ecb9a951aeab0da4d9d1684/README.md)
+
+Permitted Execution Specification Tests URLs must anchor to a specific commit, and so must match one of these regular expressions:
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/(blob|tree)/[a-f0-9]{40}/.+$
+```
+
+```regex
+^https://(www\.)?github\.com/ethereum/execution-spec-tests/commit/[a-f0-9]{40}$
+```
+
 ### Consensus Layer Specifications
 
 Links to specific commits of files within the Ethereum Consensus Layer Specifications may be included using normal markdown syntax, such as:
@@ -250,6 +272,24 @@ Permitted Networking Specifications URLs must anchor to a specific commit, and s
 
 ```regex
 ^https://github.com/ethereum/devp2p/(blob|commit)/[0-9a-f]{40}/.*$
+```
+
+### Portal Specifications
+
+Links to specific commits of files within the Ethereum Portal Specifications may be included using normal markdown syntax, such as:
+
+```markdown
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+```
+
+Which renders as:
+
+[Portal Wire Protocol](https://github.com/ethereum/portal-network-specs/blob/5e321567b67bded7527355be714993c24371de1a/portal-wire-protocol.md)
+
+Permitted Networking Specifications URLs must anchor to a specific commit, and so must match this regular expression:
+
+```regex
+^https://github.com/ethereum/portal-network-specs/(blob|commit)/[0-9a-f]{40}/.*$
 ```
 
 ### World Wide Web Consortium (W3C)
