@@ -2,11 +2,11 @@
 title: Leaf-level state expiry in verkle trees
 description: Simple state expiry scheme in which only "extension-and-suffix trees" are expired.
 author: Guillaume Ballet (@gballet), Wei Han Ng (weiihann)
-discussions-to: <URL>
+discussions-to: https://ethereum-magicians.org/t/leaf-level-state-expiry-in-verkle-trees/20474/1
 status: Draft
 type: Standards Track
 category: Core
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
+created: 2024-07-05
 requires: 6800
 ---
 
