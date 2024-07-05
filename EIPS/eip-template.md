@@ -1,8 +1,9 @@
 ---
+eip: 7736
 title: Leaf-level state expiry in verkle trees
 description: Simple state expiry scheme in which only "extension-and-suffix trees" are expired.
-author: Guillaume Ballet (@gballet), Wei Han Ng (weiihann)
-discussions-to: https://ethereum-magicians.org/t/leaf-level-state-expiry-in-verkle-trees/20474/1
+author: Guillaume Ballet (@gballet), Wei Han Ng (@weiihann)
+discussions-to: https://ethereum-magicians.org/t/eip-7736-leaf-level-state-expiry-in-verkle-trees/20474
 status: Draft
 type: Standards Track
 category: Core
@@ -96,7 +97,7 @@ Where:
  * `stem` is used to find the location in the tree, so that the node can be recreated;
  * `last_epoch` and `values` are the items that were deleted;
 
-At the start of the validation, charge the costs using constants defined in [EIP-4672](./eip-4762.md):
+At the start of the validation, charge the costs using constants defined in [EIP-4762](./eip-4762.md):
 
 ```python
 def resurrect_gas_cost(values) -> int:
