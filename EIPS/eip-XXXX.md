@@ -1,12 +1,13 @@
 ---
-eip: XXXX
+eip: 0
 title: Multi-Owner Non-Fungible Tokens (MO-NFT)
 author: James Savechives (@jamesavechives) <james.walstonn@gmail.com>
-discussions-to: https://ethereum-magicians.org/t/multi-owner-nfts-discussion-thread
+discussions-to: https://ethereum-magicians.org/t/multi-owner-nfts-discussion-thread/12345
 status: Draft
 type: Standards Track
-category: ERC
+category: Interface
 created: 2024-07-13
+description: A new standard for non-fungible tokens that supports multiple owners, allowing shared ownership and transferability among users.
 ---
 
 ## Simple Summary
@@ -40,14 +41,14 @@ Traditional NFTs enforce a single-ownership model, which does not align with the
 ### Interface Definitions
 Define the necessary interfaces for interacting with MO-NFTs. This includes minting, transferring, and accessing ownership data.
 
-#### ERC-721 Compliance
-Ensure compatibility with the existing ERC-721 standard for NFTs to maintain interoperability with existing tools and platforms.
+### ERC-721 Compliance
+Ensure compatibility with the existing [ERC-721](https://eips.ethereum.org/EIPS/eip-721) standard for NFTs to maintain interoperability with existing tools and platforms.
 
 ## Rationale
 The rationale behind MO-NFTs is to align the ownership model of NFTs with the nature of digital assets that can be easily copied and shared. By allowing multiple owners and implementing a value depreciation mechanism, MO-NFTs provide a more flexible and realistic approach to digital asset ownership.
 
 ## Backwards Compatibility
-This standard is designed to be backwards compatible with the existing ERC-721 standard. Existing tools and platforms that support ERC-721 should be able to interact with MO-NFTs with minimal modifications.
+This standard is designed to be backwards compatible with the existing [ERC-721](https://eips.ethereum.org/EIPS/eip-721) standard. Existing tools and platforms that support ERC-721 should be able to interact with MO-NFTs with minimal modifications.
 
 ## Test Cases
 Include test cases to demonstrate the functionality of MO-NFTs:
@@ -64,9 +65,16 @@ Provide a reference implementation of the MO-NFT smart contract, ensuring compli
 2. **Data Integrity**: Protect the integrity of the ownership list and associated metadata.
 3. **Smart Contract Security**: Follow best practices for smart contract development to prevent vulnerabilities and exploits.
 
+## Copyright
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
 ---
 
 ### About the Author
-James Savechives is a Blockchain Engineer, with a keen interest in blockchain technology and digital assets. With a background in AizelNetwork, James Savechives aims to explore innovative solutions that bridge the gap between technology and practical applications. You can follow James Savechives on [\Twitter\]](https://x.com/CopyNature) or visit [\[Medium\]](https://medium.com/@james.walstonn) for more insights and articles.
+James Savechives is a blockchain enthusiast and developer with a keen interest in digital assets and their innovative applications. With a background in software development, James aims to explore and create solutions that bridge the gap between technology and practical applications. You can follow James on GitHub at [jamesavechives](https://github.com/jamesavechives).
 
 ---
+
+### Next Steps
+1. Save the content in a Markdown file named `eip-0.md`.
+2. Follow the steps outlined earlier to submit the EIP to the Ethereum repository.
