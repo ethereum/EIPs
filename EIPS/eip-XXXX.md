@@ -1,7 +1,7 @@
 ---
 eip: XXXX
 title: Multi-Owner Non-Fungible Tokens (MO-NFT)
-author: James Savechives <james.walstonn@gmail.com> (jamesavechives)
+author: James Savechives (@jamesavechives) <james.walstonn@gmail.com>
 discussions-to: https://ethereum-magicians.org/t/multi-owner-nfts-discussion-thread
 status: Draft
 type: Standards Track
