@@ -43,8 +43,18 @@ A set of validators is selected from the beacon committee to become IL committee
 
 ## Rationale
 
-Core properties:
+#### Main Functions:
+- Aggregation
+- Evaluation
+- Validation
 
+#### Core properties:
+- Committee-based
+- Fork-choice enforced (mention IL equivocation)
+- Conditional
+- Anywhere-in-block
+- Same-slot 
+- Account Abstraction compatibility
 
 <!--
   The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
@@ -58,7 +68,7 @@ TBD
 
 ## Backwards Compatibility
 
-This EIP introduces backward incompatible changes to the block validation rule set on the consensus layer and must be accompanied by a hard fork. These changes do not break anything related to current user activity and experience.
+This EIP introduces backward incompatible changes to the block validation rule set on the consensus layer, as well as execution  and must be accompanied by a hard fork. These changes do not break anything related to current user activity and experience.
 
 ## Security Considerations
 
