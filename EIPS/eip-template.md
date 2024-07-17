@@ -1,12 +1,12 @@
 ---
-title: <New log filter data structure>
-description: <An efficient and light client friendly replacement for block header bloom filters>
-author: <Zsolt Felföldi (@zsfelfoldi)>
-discussions-to: <URL>
+title: New log filter data structure
+description: An efficient and light client friendly replacement for block header bloom filters
+author: Zsolt Felföldi (@zsfelfoldi)
+discussions-to: https://ethereum-magicians.org/t/new-log-filter-data-structure/20580
 status: Draft
-type: <Standards Track>
-category: <Core>
-created: <2024-07-17>
+type: Standards Track
+category: Core
+created: 2024-07-17
 ---
 
 ## Abstract
