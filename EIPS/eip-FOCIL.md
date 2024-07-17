@@ -68,7 +68,7 @@ TBD
 
 ## Backwards Compatibility
 
-This EIP introduces backward incompatible changes to the block validation rule set on the consensus layer, as well as execution  and must be accompanied by a hard fork. These changes do not break anything related to current user activity and experience.
+This EIP introduces backward incompatible changes to the block validation rule set on the consensus layer and must be accompanied by a hard fork. These changes do not break anything related to current user activity and experience.
 
 ## Security Considerations
 
