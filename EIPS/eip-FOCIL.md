@@ -7,7 +7,7 @@ discussions-to: <URL>
 status: Draft
 type: Standards Track
 category: Core
-created: 2024-07-03
+created: 2024-07-??
 ---
 
 ## Abstract
@@ -43,28 +43,17 @@ A set of validators is selected from the beacon committee to become IL committee
 
 ## Rationale
 
-#### Main Functions:
-- Aggregation
-- Evaluation
-- Validation
-
 #### Core properties:
-- Committee-based
-- Fork-choice enforced (mention IL equivocation)
-- Conditional
-- Anywhere-in-block
-- Same-slot 
-- Account Abstraction compatibility
+- Committee-based: FOCIL relies on a committee of multiple validators, rather than a single proposer, to construct and broadcast 
+inclusion lists. This approach imposes stricter constraints on creating the aggregate list and significantly reduces the surface for bribing and extortion attacks. For instance, instead of bribing a single party to exclude a particular transaction from the IL, attackers would instead need to bribe the entire IL committee, substantially increasing the cost of such attacks.
+- Fork-choice enforced: By including the IL aggregate in `block B`, satisfying its entries by including the corresponding transactions in the payload becomes a new block validity condition enforced by all attesters. This allows reliance on a large set of participants to check the IL and block validity and addresses concerns around IL equivocation in EIP-7547. In FOCIL, an IL equivocation would result in a block equivocation, which is a known, slashable offense from the protocol's perspective.
+- Same-slot: By having FOCIL run in parallel with block building during `slot N−1`, we can impose constraints on `block B` by including transactions submitted during the same slot in local ILs. This property implies that a transaction in the IL aggregate can’t be invalidated because of a transaction in the previous block, which represents a strict improvement over forward IL designs like EIP-7547. Same-slot censorship resistance might also prove particularly useful for time-sensitive transactions that might be censored for MEV reasons.
+- Conditional and anywhere-in-block: Transactions satisfying entries in the IL aggregate share blockspace with the payload, can only being included if the block isn’t full (i.e., has reached the gas limit), and can be ordered arbitrarily by the block producer. These choices were made to reduce the risk of sophisticated block producers using side channels to circumvent an overly rigid mechanism, imposing a specific order or strictly limiting the size of the IL.
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
-    eaea
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-TBD
+#### Main FOCIL Functions:
+- `Agg`: Transactions from local ILs broadcast before the Local IL freeze deadline during `slot N` should be collected, deterministically aggregated and deduplicated to construct an IL aggregate.
+- `Eval`: `Slot N` attesters assess the quality of the IL aggregate included in `block B` by using the `Agg` function to generate their own aggregate from all local ILs observed in their view, and compare it to the IL aggregate included by the proposer. The `Eval` function can be defined so that the proposer’s IL aggregate is considered valid if it includes a sufficient proportion of transactions observed by the attesters, as defined by a parameter Δ.
+- `Valid`: This function encodes whether the IL aggregate conforms to pre-defined core IL properties defined in the above section (e.g., conditional, anywhere-in-block, etc..)
 
 ## Backwards Compatibility
 
