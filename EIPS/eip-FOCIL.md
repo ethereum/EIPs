@@ -1,7 +1,7 @@
 ---
-title: <Committee-based, Fork-choice enforced Inclusion Lists (FOCIL)>
-description: <Allow a committee of validators to force-include a set of transactions in every block>
-author: Thomas (@soispoke), Barnabé (@barnabemonnot), Francesco (@fradamt), Julian (@_julianma)
+title: Committee-based, Fork-choice enforced Inclusion Lists (FOCIL)
+description: Allow a committee of validators to force-include a set of transactions in every block
+author: Thomas Thiery (@soispoke), Barnabé Monnot (@barnabemonnot), Francesco D'Amato (@fradamt), Julian Ma (@_julianma)
 
 discussions-to: <URL>
 status: Draft
