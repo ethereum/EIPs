@@ -3,7 +3,7 @@ eip: PENDING
 title: State conversion to Verkle Tree
 description: Describes a state conversion procedure to migrate key-values from the Merkle Patricia Tree to the Verkle Tree.
 author: Guillaume Ballet (@gballet), Ignacio Hagopian (@jsign), Gajinder Singh (@g11tech), Ansgar Dietrichs (@adietrichs), Gottfried Herold (@GottfriedHerold), Jamie Lokier (@jlokier), Tanishq Jasoria (@tanishqjasoria), Parithosh Jayanthi (@parithosh), Gabriel Rocheleau (@gabrocheleau), Karim Taam (@matkt)
-discussions-to: TODO when having EIP number
+discussions-to: https://ethereum-magicians.org/t/eip-state-conversion-to-verkle-tree/20625
 status: Draft
 type: Standards Track
 category: Core
