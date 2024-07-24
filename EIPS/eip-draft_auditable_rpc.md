@@ -1,12 +1,12 @@
 ---
 title: Auditable RPC API Specification
 description: Extending the existing RPC specification to be auditable at the request-response lifecycle.
-author: Joe Habel (blockjoe), Cristopher Ortega (crisog), Pablo Ocampo (pablocampogo)
+author: Joe Habel (@blockjoe), Cristopher Ortega (@crisog), Pablo Ocampo (@pablocampogo)
 discussions-to: <URL>
 status: Draft
-type: Standards
+type: Standards Track
 category: Interface
-created: 2024-07-23>
+created: 2024-07-23
 ---
 
 ## Abstract
