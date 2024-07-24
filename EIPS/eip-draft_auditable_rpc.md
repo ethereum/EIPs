@@ -1,5 +1,5 @@
 ---
-title: Auditable RPC API Specification
+title: Auditable JSON-RPC API Specification
 description: Extending the existing RPC specification to be auditable at the request-response lifecycle.
 author: Joe Habel (@blockjoe), Cristopher Ortega (@crisog), Pablo Ocampo (@pablocampogo)
 discussions-to: <URL>
