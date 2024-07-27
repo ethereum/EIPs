@@ -61,6 +61,18 @@ This EIP introduces backward incompatible changes to the block validation rule s
 
 ## Security Considerations
 
+### Consensus Liveness
+
+The builder or proposer of slot `n+1` cannot construct a canonical block without the inclusion lists and inclusion list aggregate of slot `n`. This protocol relies on proposers being sufficiently peered with the inclusion list committee. Builders (if using MEV-boost) are sufficiently peered with the inclusion list aggregation network.
+
+### Block Construction Time
+
+The builder or proposer of slot `n+1` depends on the inclusion list aggregate of slot `n`. If the inclusion list aggregate appears at the `9s` mark, the builder will have `3s` to update the final block to ensure it meets the requirements. It's crucial for the protocol that `3s` is enough for a solo proposer.
+
+### Builder Block Fails to Satisfy Inclusion List Aggregate
+
+When using MEV-boost, a proposer signs a blind block. Due to the nature of a blind block, a proposer cannot verify whether the builder satisfies the inclusion list aggregate, similar to how a proposer cannot verify the validity of blind transactions. This is consistent with the current security assumptions.
+
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
