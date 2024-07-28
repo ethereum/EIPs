@@ -61,6 +61,16 @@ This EIP introduces backward incompatible changes to the block validation rule s
 
 ## Security Considerations
 
+### Consensus Liveness
+
+The builder or proposer of slot `n+1` cannot construct a canonical block without seeing local ILs and the IL aggregate broadcast during slot `n`. This implies the block producer (e.g., a proposer or a proposer builder pair needs to be sufficiently peered with the IL committee members. The parameter Δ also needs to be set to prevent liveness issues from accidental disparities between the proposer view and attesters' views.
+
+### Block Construction Time
+
+It is important to ensure there is enough time between the local IL freeze deadline (`t=9` during slot `n`) and the moment at which the block producer has to broadcast `block B` including the IL aggregate, so that:
+- There is enough time to update `block B`'s execution payload according to the IL aggregate constraints.
+- The proposer has enough time to collect and include all local ILs before broadcasting the IL aggregate.
+
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
 
