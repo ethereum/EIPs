@@ -34,7 +34,7 @@ FOCIL is a simple committee-based design improving upon previous IL mechanisms o
 
 A set of validators is selected from the beacon committee to become IL committee members for `slot N`.
 
-- **`Slot N`, `t=6`**: The IL committee of `slot N+1` releases local ILs, knowing the contents of `block N`. Local ILs are sets of transactions pending in the public mempool represented as (`from_address`, `gas_limit`) pairs.
+- **`Slot N`, `t=6`**: The IL committee of `slot N+1` releases local ILs, knowing the contents of `block N`. Local ILs are sets of full transactions pending in the public mempool.
 - **`Slot N`, `t=9`**: Local IL freeze deadline, after which all attesters of `slot N+1` lock their view of the observed local ILs. The `slot N+1` proposer broadcasts a signed IL aggregate constructed by deduplicating and taking the union of transactions from collected local ILs. Every IL aggregate (`from_address`, `gas_limit`) is associated with a `bitlist` field indicating which IL committee member included a given transaction.
 - **`Slot N+1`, `t=0`**: The block producer of `slot N+1` releases its `block B`, which contains both the payload and the IL aggregate.
 - **`Slot N+1`, `t=4`**: The attesters of `slot N+1` vote on `block B`. `Block B` is considered valid if:
