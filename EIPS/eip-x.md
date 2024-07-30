@@ -1,14 +1,14 @@
 ---
 eip: XXXX
-title: Add wallet_signIntendedValidatorData JSON-RPC
-description: A new RPC method to sign data with an intended validator address according to EIP-191 version 0x00.
+title: Add wallet_signIntendedValidatorData method
+description: A new RPC method to sign data with an intended validator address according to ERC-191 version 0x00.
 author: Yamen Merhi (@YamenMerhi)
 discussions-to: TBD
 status: Draft
 type: Standards Track
 category: Interface
 created: 2024-06-21
-requires: EIP-191 - EIP-712
+requires: 191 - 712
 ---
 
 ## Abstract
