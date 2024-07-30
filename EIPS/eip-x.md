@@ -12,7 +12,7 @@ requires: EIP-191 - EIP-712
 
 ## Abstract
 
-This EIP introduces a new JSON-RPC method, `wallet_signIntendedValidatorData`, which allows signing data with an intended validator address using EIP-191 version 0x00 with this format:
+This EIP introduces a new JSON-RPC method, `wallet_signIntendedValidatorData`, which allows signing data with an intended validator address using [ERC-191](https://github.com/ethereum/ercs/blob/master/ERCS/erc-191.md) version 0x00 with this format:
 
 ```bash
 0x19 <0x00> <intended validator address> <data to sign>
@@ -20,16 +20,16 @@ This EIP introduces a new JSON-RPC method, `wallet_signIntendedValidatorData`, w
 
 ## Motivation
 
-Currently, signing messages relies heavily on EIP-191 version 0x45 (`eth_sign`) and EIP-712 (`eth_signTypedData`). While EIP-712 provides a more structured approach, it is often seen as complex. On the other hand, EIP-191 version 0x45 is widely used but poses significant phishing risks due to the lack of data parsing.
+Currently, signing messages relies heavily on ERC-191 version 0x45 (`eth_sign`) and EIP-712 (`eth_signTypedData`). While EIP-712 provides a more structured approach, it is often seen as complex. On the other hand, ERC-191 version 0x45 is widely used but poses significant phishing risks due to the lack of data parsing.
 
-EIP-191 defines three versions: 0x45, 0x01, and 0x00. This proposal aims to fully support EIP-191 by introducing the rpc call for 0x00 version, which enables signing data with an intended validator address. This new method will:
+ERC-191 defines three versions: 0x45, 0x01, and 0x00. This proposal aims to fully support EIP-191 by introducing the rpc call for 0x00 version, which enables signing data with an intended validator address. This new method will:
 
-- Enable more dApps to use EIP-191 version 0x00 without using raw signing methods which might be dangerous and restricted in few wallets.
+- Enable more dApps to use ERC-191 version 0x00 without using raw signing methods which might be dangerous and restricted in few wallets.
 - Enhance security by parsing data and displaying the intended validator address, reducing phishing risks.
 - Provide a simpler alternative to EIP-712, offering a balance between usability and security.
 - Be particularly relevant for smart contract accounts, allowing signing with a specific intended validator address.
 
-With the rise of smart contract accounts and the reliance on signatures to improve UX, the need for supporting EIP-191 version 0x00 increases, especially given the prevalence of verifier smart contracts, such as Entry Points, Smart Contract Accounts, Key Managers, etc.
+With the rise of smart contract accounts and the reliance on signatures to improve UX, the need for supporting ERC-191 version 0x00 increases, especially given the prevalence of verifier smart contracts, such as Entry Points, Smart Contract Accounts, Key Managers, etc.
 
 ## Specification
 
@@ -84,7 +84,7 @@ curl -X POST --data '{"jsonrpc":"2.0","method":"wallet_signIntendedValidatorData
 
 ## Rationale
 
-The `wallet_signIntendedValidatorData` method aims to bridge the gap between the simplicity of EIP-191 version 0x45 and the structured approach of EIP-712. By specifying the intended validator address, it reduces phishing risks and provides a more secure signing method for smart contract accounts and other use cases requiring a specific validator address.
+The `wallet_signIntendedValidatorData` method aims to bridge the gap between the simplicity of ERC-191 version 0x45 and the structured approach of EIP-712. By specifying the intended validator address, it reduces phishing risks and provides a more secure signing method for smart contract accounts and other use cases requiring a specific validator address.
 
 ## Backwards Compatibility
 
