@@ -66,6 +66,10 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 :warning: The EIPs process and AllCoreDevs call were not designed to address contentious non-technical issues, but, due to the lack of other ways to address these, often end up entangled in them. This puts the burden on client implementers to try and gauge community sentiment, which hinders the technical coordination function of EIPs and AllCoreDevs calls. If you are shepherding an EIP, you can make the process of building community consensus easier by making sure that [the Ethereum Magicians forum](https://ethereum-magicians.org/) thread for your EIP includes or links to as much of the community discussion as possible and that various stakeholders are well-represented.
 
+##### Formalized Core EIP Impact Assessment
+
+After achieving consensus, and before a Core EIP can be made **Final**, the broader impact of Core EIPs must be considered through a formal Impact Assessment phase to thoroughly evaluate potential effects on the network and ecosystem. This phase aims to enhance decision-making, mitigate risks, and ensure the long-term health of the Ethereum network by incorporating feedback mechanisms and addressing post-finalization issues. Please refer to the [Impact Assessment Template](../core-eip-template.md) for detailed guidelines.
+
 _In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea._
 
 ### EIP Process
