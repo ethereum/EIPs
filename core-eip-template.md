@@ -1,7 +1,7 @@
 ---
 title: Core EIP Impact Assessment Template
 description: Template for assessing the impact of Core EIPs
-author: Ethereum Improvement Proposals
+author: Core EIP Review Committee
 discussions-to: <URL>
 status: Draft
 type: Meta
