@@ -68,9 +68,20 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ##### Formalized Core EIP Impact Assessment
 
-After achieving consensus, the broader impact of Core EIPs must be considered through a formal Impact Assessment phase to thoroughly evaluate potential effects on the network and ecosystem. This phase aims to enhance decision-making, mitigate risks, and ensure the long-term health of the Ethereum network by incorporating feedback mechanisms and addressing post-finalization issues. Please refer to the [Impact Assessment Template](../core-eip-template.md) for detailed guidelines.
+After achieving consensus, and before a Core EIP can be made **Final**, the broader impact of Core EIPs must be considered through a formal Impact Assessment phase to thoroughly evaluate potential effects on the network and ecosystem. This phase aims to enhance decision-making, mitigate risks, and ensure the long-term health of the Ethereum network by incorporating feedback mechanisms and addressing potential post-finalization issues. The impact assessment is submitted by Core EIP Authors and evaluated by a volunteer Review Committee made up of experts with diverse expertise including security, economics, network architecture, and Ethereum protocol development.
 
-_In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea._
+The Review Committee roles and responsibilities are:
+
+- Evaluation: Review the Impact Assessments submitted by EIP authors and provide feedback.
+- Recommendations: Offer recommendations for improvements or modifications to address identified risks.
+- Approval: Decide whether an EIP is ready to proceed to the Final stage based on the assessment results.
+- Conflict Resolution: Mediate disputes and ensure assessments are objective and unbiased.
+
+The review committee is made up of members from the Ethereum Foundation, academic institutions, engineers, developers, at large community members, end users, and industry experts. The committee maintains a rotating membership to maintain fresh perspectives and avoid stagnation.
+
+Please refer to the [Impact Assessment Template](../core-eip-template.md) for detailed guidelines.
+
+_Your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea._
 
 ### EIP Process
 
