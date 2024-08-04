@@ -68,7 +68,7 @@ These calls generally result in a "rough consensus" around what EIPs should be i
 
 ##### Formalized Core EIP Impact Assessment
 
-After achieving consensus, and before a Core EIP can be made **Final**, the broader impact of Core EIPs must be considered through a formal Impact Assessment phase to thoroughly evaluate potential effects on the network and ecosystem. This phase aims to enhance decision-making, mitigate risks, and ensure the long-term health of the Ethereum network by incorporating feedback mechanisms and addressing post-finalization issues. Please refer to the [Impact Assessment Template](../core-eip-template.md) for detailed guidelines.
+After achieving consensus, the broader impact of Core EIPs must be considered through a formal Impact Assessment phase to thoroughly evaluate potential effects on the network and ecosystem. This phase aims to enhance decision-making, mitigate risks, and ensure the long-term health of the Ethereum network by incorporating feedback mechanisms and addressing post-finalization issues. Please refer to the [Impact Assessment Template](../core-eip-template.md) for detailed guidelines.
 
 _In short, your role as the champion is to write the EIP using the style and format described below, shepherd the discussions in the appropriate forums, and build community consensus around the idea._
 
