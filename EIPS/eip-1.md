@@ -1,4 +1,4 @@
-# Note: This is just a test - not an actual PR
+# Note: This is just a test - not an actual PR.
 
 ---
 
