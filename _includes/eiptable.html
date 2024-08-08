@@ -7,6 +7,16 @@
     width: 33%;
   }
 </style>
+
+{% assign statuses = include.eips | map: "status" %}
+{% for status in statuses %}
+  {% if forloop.last %}
+    <a href="#{{status|slugify}}">{{status}}</a><br><br>
+  {% else %}
+    <a href="#{{status|slugify}}">{{status}}</a> |&nbsp;
+  {% endif %}
+{% endfor %}
+
 {% for status in site.data.statuses %}
   {% assign eips = include.eips|where:"status",status|sort:"eip" %}
   {% assign count = eips|size %}
