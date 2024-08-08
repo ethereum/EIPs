@@ -11,6 +11,3 @@ vendor
 
 # Secrets
 .vercel
-
-# Other - to avoid PRs into real repo merging in GH Action tweaks
-.github
