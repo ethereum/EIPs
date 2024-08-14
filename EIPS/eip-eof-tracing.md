@@ -1,6 +1,7 @@
 ---
 eip: TBD
 title: EOF/EVM Trace Specification
+description: Updates EIP-3155 tracing to add EOF support
 author: Martin Holst Swende (@holiman), Marius van der Wijden (@MariusVanDerWijden), Danno Ferrin (@shemnon)
 discussions-to: TBD
 status: Draft
@@ -11,11 +12,11 @@ created: 2024-08-13
 
 ## Abstract
 
-Updates the EIP-3155 JSON tracing specification to support EOF features and light tracing.
+Updates the [EIP-3155](./eip-3155.md) JSON tracing specification to support EOF features and light tracing.
 
 ## Motivation
 
-[EIP-3155](./eip-3155.md) defined a tracing standard for Legacy EVM operations. However, the EVM Object Format ([EIP-7692](./eip-7692.md)) adds a number of features that need to be reflected in debugging traces.
+EIp-3155 defined a tracing standard for Legacy EVM operations. However, the EVM Object Format ([EIP-7692](./eip-7692.md)) adds a number of features that need to be reflected in debugging traces.
 
 The use of these traces has also moved out from state testing, including live block tracing and differential fuzzing, increasing the need to keep tracing up to date.
 
@@ -49,24 +50,24 @@ To promote clarity and provide a cohesive specification, the entire tracing spec
 
 Each object contains the following members.
 
-| Name         | Type       | Required    | Explanation                              |
-|--------------|------------|-------------|------------------------------------------|
-| `pc`         | Number     | Yes         | Program Counter                          |
-| `section`    | Number     | Yes if EOF  | EOF Code Section                         |
-| `op`         | Number     | Yes         | Opcode                                   |
-| `immediate`  | Hex-String | *see below* | Immediate argument of the Opcode         |
-| `gas`        | Hex-Number | Yes         | Gas left before executing this operation |
-| `gasCost`    | Hex-Number | No          | Gas cost of this operation               |
-| `memory`     | Array      | No          | Array of all allocated values            |
-| `memSize`    | Number     | Yes         | Size of memory array                     |
-| `stack`      | Array      | Yes         | Array of all values on the stack         |
-| `depth`      | Number     | Yes         | Depth of the call stack                  |
-| `fdepth`     | Number     | Yes if EOF  | Depth of the EIP-4750 return stack       |
-| `returnData` | Hex-String | No          | Data returned by function call           |
-| `refund`     | Hex-Number | Yes         | Amount of **global** gas refunded        |
-| `opName`     | String     | No          | Name of the operation                    |
-| `error`      | Hex-String | No          | Description of an error or revert data   |
-| `storage`    | Map        | No          | Array of all stored values               |
+| Name         | Type       | Required    | Explanation                                         |
+|--------------|------------|-------------|-----------------------------------------------------|
+| `pc`         | Number     | Yes         | Program Counter                                     |
+| `section`    | Number     | Yes if EOF  | EOF Code Section                                    |
+| `op`         | Number     | Yes         | Opcode                                              |
+| `immediate`  | Hex-String | *see below* | Immediate argument of the Opcode                    |
+| `gas`        | Hex-Number | Yes         | Gas left before executing this operation            |
+| `gasCost`    | Hex-Number | No          | Gas cost of this operation                          |
+| `memory`     | Array      | No          | Array of all allocated values                       |
+| `memSize`    | Number     | Yes         | Size of memory array                                |
+| `stack`      | Array      | Yes         | Array of all values on the stack                    |
+| `depth`      | Number     | Yes         | Depth of the call stack                             |
+| `fdepth`     | Number     | Yes if EOF  | Depth of the [EIP-4750](./eip-4750.md) return stack |
+| `returnData` | Hex-String | No          | Data returned by function call                      |
+| `refund`     | Hex-Number | Yes         | Amount of **global** gas refunded                   |
+| `opName`     | String     | No          | Name of the operation                               |
+| `error`      | Hex-String | No          | Description of an error or revert data              |
+| `storage`    | Map        | No          | Array of all stored values                          |
 
 
 - The `pc` value is zero indexed either from the beginning of the contract when the contract is not in an EOF container, or from the beginning of the code section when it is a contract contained in an EOF container.
