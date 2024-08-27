@@ -56,6 +56,18 @@ jobs:
           find . -name "erc-*" -type d -exec sh -c 'echo mv "$1" "$(echo "$1" | sed s/erc/eip/)"' _ {} \; | sh
           cd $GITHUB_WORKSPACE
           rm -rf ERCs
+      - name: EIP Board
+        uses: gaudren/eip-board@86ebe551e53a64b731a66449f51530c88fbc4d36
+        with:
+          path: ./eips-queue.md
+          extra_args: --markdown
+          repository: ethereum/EIPs
+      - name: ERC Board
+        uses: gaudren/eip-board@86ebe551e53a64b731a66449f51530c88fbc4d36
+        with:
+          path: ./erc-queue.md
+          extra_args: --markdown
+          repository: ethereum/ERCs
       - name: Setup Ruby
         uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
         with:
