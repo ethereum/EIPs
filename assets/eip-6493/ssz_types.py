@@ -92,8 +92,8 @@ class BlobFeesPerGas(Profile[FeesPerGas]):
     blob: FeePerGas
 
 class EcdsaTransactionSignature(Profile[TransactionSignature]):
-    from_: Optional[ExecutionAddress]
-    ecdsa_signature: Optional[ByteVector[ECDSA_SIGNATURE_SIZE]]
+    from_: ExecutionAddress
+    ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
 
 class ReplayableTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
