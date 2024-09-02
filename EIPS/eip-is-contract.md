@@ -1,4 +1,5 @@
 ---
+eip: 7761
 title: IS_CONTRACT instruction
 description: Introduce IS_CONTRACT instruction
 author: Andrei Maiboroda (@gumb0), Piotr Dobaczewski (@pdobacz), Danno Ferrin (@shemnon)
@@ -12,7 +13,7 @@ requires: 3540, 7692
 
 ## Abstract
 
-Allow EOF contracts to discriminate between EOA (Externally Owned Accounts) and smart contract accounts by introducing an `IS_CONTRACT` instruction.
+Allow EOF contracts to discriminate between EOA (Externally Owned Accounts) and contracts (including smart contract accounts) by introducing an `IS_CONTRACT` instruction.
 
 ## Motivation
 
