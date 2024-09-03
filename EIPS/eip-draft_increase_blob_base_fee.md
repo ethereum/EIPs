@@ -1,5 +1,5 @@
 ---
-eip: <to be assigned>
+eip: 7762
 title: Increase Blob Base Fee
 description: Adjust the MIN_BASE_FEE_PER_BLOB_GAS to speed up price discovery on blob space
 author: <Max Resnick (@MaxResnick)>
