@@ -2,16 +2,14 @@
 eip: 
 title: Buyer-Seller Negotiable Pricing Mechanism
 description: Allows buyers and sellers to freely negotiate and determine transaction prices on the Ethereum network. The seller sets the initial price, and the buyer can propose a new price through negotiation with the seller, and eventually both parties can reach an agreement and complete the transaction.
-author: S7iter(@admi-n) <s7iter@gmail.com>
+author: S7iter (@admi-n)
 status: Draft
 type: Standards Track
 category: Core
 created: 2024-09-04
 ---
 
-
-
-## Introduction
+## Abstract
 
 This proposal introduces a new smart contract mechanism that allows buyers and sellers to freely negotiate and determine transaction prices on the Ethereum network. A new trading mode is added, where goods can be negotiated rather than only priced. This mechanism allows the seller to set an initial price, and the buyer can propose a new price through negotiation with the seller. Ultimately, both parties can reach an agreement and complete the transaction.
 
@@ -60,7 +58,7 @@ This proposal adopts a simple and flexible structure that enables buyers and sel
 
 This EIP introduces new functionality without affecting existing smart contract standards. It can be seamlessly integrated as an extension to existing markets and DApps.
 
-## Implementation
+## Reference Implementation
 
 Below is a sample Solidity smart contract that implements the core functionality of this proposal:
 
@@ -127,3 +125,11 @@ contract NegotiablePricing {
 }
 ```
 
+## Security Considerations
+
+- Reentrancy attack: In contract functions, especially those involving fund transfer, the nonReentrant modifier or similar protection measures should be used to prevent reentrancy attacks.
+- Malicious behavior: Ensure that the interests of both parties are protected during the price negotiation process, such as limiting the number of price negotiations or setting a timeout mechanism.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
