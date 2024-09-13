@@ -1,7 +1,7 @@
 ---
-title: <The EIP title is a few words, not a complete sentence>
-description: <Description is one full (short) sentence>
-author: <a comma separated list of the author's or authors' name + GitHub username (in parenthesis), or name and email (in angle brackets).  Example, FirstName LastName (@GitHubUsername), FirstName LastName <foo@bar.com>, FirstName (@GitHubUsername) and GitHubUsername (@GitHubUsername)>
+title: <ERC-6809 Custom SafeFallback Extension>
+description: <An interface for transferring and retrieving specific NFKBT assets.>
+author: <Mihai Onila (@MihaiORO), Nick Zeman (@NickZCZ), Narcis Cotaie (@NarcisCRO)>
 discussions-to: <URL>
 status: Draft
 type: <Standards Track, Meta, or Informational>
@@ -9,7 +9,7 @@ category: <Core, Networking, Interface, or ERC> # Only required for Standards Tr
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
-extension trial run
+
 <!--
   READ EIP-1 (https://eips.ethereum.org/EIPS/eip-1) BEFORE USING THIS TEMPLATE!
 
@@ -24,23 +24,13 @@ extension trial run
 
 ## Abstract
 
-<!--
-  The Abstract is a multi-sentence (short paragraph) technical summary. This should be a very terse and human-readable version of the specification section. Someone should be able to read only the abstract to get the gist of what this specification does.
-
-  TODO: Remove this comment before submitting
--->
+The standard is an extension of ERC-6809, Non-Fungible Key Bound Tokens (**NFKBT/s**). It proposes the additional function ‘customSafeFallback’, allowing asset owners to select and retrieve specific tokens from a smart contract that has NFKBT security activated. 
 
 ## Motivation
 
-<!--
-  This section is optional.
+NFKBTs contain an optional on-chain 2FA security system built directly into the token standard. When activated within they smart contract, all assets within that smart contract are secured, and retrievable. This is achieved via the ‘safeFallback’ function, which curates the transfer of NFKBTs from the holding wallet to the opposite Key wallet that called the function. However, currently the way ‘safeFallback’ works is that it transfers all the NFKBT assets within the given smart contract. There is no option for someone to specify which asset or assets they would like to transfer out of the holding wallet. 
 
-  The motivation section should include a description of any nontrivial problems the EIP solves. It should not describe how the EIP solves those problems, unless it is not immediately obvious. It should not describe why the EIP should be made into a standard, unless it is not immediately obvious.
-
-  With a few exceptions, external links are not allowed. If you feel that a particular resource would demonstrate a compelling case for your EIP, then save it as a printer-friendly PDF, put it in the assets folder, and link to that copy.
-
-  TODO: Remove this comment before submitting
--->
+ In the situation where someone owns multiple assets within the same NFKBT collection, the gas fee to call the safeFallback function increases based on how many assets they own as each asset accounts for one transfer. The ‘customSafeFallback’ function provides the option to select which NFKBT assets they would like individually, or in batches, transfer out of the holding wallet. Presumably, the most desired assets that hold the most value to the owner could be selectively transferred out, rather than moving all of assets at once and incurring undesired fees from undesired assets. 
 
 ## Specification
 
@@ -56,30 +46,15 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Rationale
 
-<!--
-  The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages.
+By standardizing the ‘customSafeFallback’ as an extension, an even more tailored experience is achieved when utilizing NFKBTs built in security. Adding this it doesn’t result in any negative impact or reduce functionality of ERC-6809 smart contracts. The likelihood of someone retrieving assets from a comprised holding wallet would however theoretically increase.
 
-  The current placeholder is acceptable for a draft.
+Take this example, someone owns 100 NFKBTS all within the same collection and the security has been activated. While connecting to dApp via the holding wallet, the owner mistakenly connected to a malicious website and now those assets are in stasis as they cannot be unlocked or else they will be stolen. The ‘safeFallback’ function was created for this scenrio, however when attempting to use it the fees far exceed the amount available as its attempting to do 100 transfers. Even if there is only 1 desired asset, calling the function would still require the transfer of all 100 to get the 1.
 
-  TODO: Remove this comment before submitting
--->
-
-TBD
+With the ‘customSafeFallback’ function, a list of tokenIDs can be selected. Rather than transferring all 100, only the specified assets are transferred making the cost far more reasonable and affordable. Truth be told, maybe only a few assets actually have any value and are worth retrieving. 
 
 ## Backwards Compatibility
 
-<!--
-
-  This section is optional.
-
-  All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-No backward compatibility issues found.
+This standard is fully ERC-6809 compatible.
 
 ## Test Cases
 
