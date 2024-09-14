@@ -3,9 +3,9 @@ title: <ERC-6809 Custom SafeFallback Extension>
 description: <An interface for transferring and retrieving specific NFKBT assets.>
 author: <Mihai Onila (@MihaiORO), Nick Zeman (@NickZCZ), Narcis Cotaie (@NarcisCRO)>
 discussions-to: <URL>
-status: Draft
+status: Idea
 type: <Standards Track, Meta, or Informational>
-category: <Core, Networking, Interface, or ERC> # Only required for Standards Track. Otherwise, remove this field.
+category: <ERC> # Only required for Standards Track. Otherwise, remove this field.
 created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
 requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
