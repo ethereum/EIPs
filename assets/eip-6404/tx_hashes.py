@@ -3,7 +3,7 @@ from ssz_types import *
 
 def recover_legacy_rlp_transaction(
         tx: RlpLegacyTransaction) -> LegacyRlpTransaction:
-    y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
+    y_parity, r, s = secp256k1_unpack_signature(tx.from_.secp256k1_signature)
     if tx.payload.chain_id is not None:  # EIP-155
         v = uint64(1 if y_parity else 0) + 35 + tx.payload.chain_id * 2
     else:
@@ -23,7 +23,7 @@ def recover_legacy_rlp_transaction(
 
 def recover_access_list_rlp_transaction(
         tx: RlpAccessListTransaction) -> AccessListRlpTransaction:
-    y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
+    y_parity, r, s = secp256k1_unpack_signature(tx.from_.secp256k1_signature)
 
     return AccessListRlpTransaction(
         chain_id=tx.payload.chain_id,
@@ -44,7 +44,7 @@ def recover_access_list_rlp_transaction(
 
 def recover_fee_market_rlp_transaction(
         tx: RlpFeeMarketTransaction) -> FeeMarketRlpTransaction:
-    y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
+    y_parity, r, s = secp256k1_unpack_signature(tx.from_.secp256k1_signature)
 
     return FeeMarketRlpTransaction(
         chain_id=tx.payload.chain_id,
@@ -66,7 +66,7 @@ def recover_fee_market_rlp_transaction(
 
 def recover_blob_rlp_transaction(tx: RlpBlobTransaction) -> BlobRlpTransaction:
     assert tx.payload.max_priority_fees_per_gas.blob == FeePerGas(0)
-    y_parity, r, s = ecdsa_unpack_signature(tx.signature.ecdsa_signature)
+    y_parity, r, s = secp256k1_unpack_signature(tx.from_.secp256k1_signature)
 
     return BlobRlpTransaction(
         chain_id=tx.payload.chain_id,
