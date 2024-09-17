@@ -15,38 +15,39 @@ class ExecutionAddress(ByteVector[20]):
 class VersionedHash(Bytes32):
     pass
 
-ECDSA_SIGNATURE_SIZE = 32 + 32 + 1
+SECP256K1_SIGNATURE_SIZE = 32 + 32 + 1
 MAX_EXECUTION_SIGNATURE_FIELDS = uint64(2**4)
 
 class ExecutionSignature(StableContainer[MAX_EXECUTION_SIGNATURE_FIELDS]):
-    from_: Optional[ExecutionAddress]
-    ecdsa_signature: Optional[ByteVector[ECDSA_SIGNATURE_SIZE]]
+    address: Optional[ExecutionAddress]
+    secp256k1_signature: Optional[ByteVector[SECP256K1_SIGNATURE_SIZE]]
 
-class EcdsaExecutionSignature(Profile[ExecutionSignature]):
-    from_: ExecutionAddress
-    ecdsa_signature: ByteVector[ECDSA_SIGNATURE_SIZE]
+class Secp256k1ExecutionSignature(Profile[ExecutionSignature]):
+    address: ExecutionAddress
+    secp256k1_signature: ByteVector[SECP256K1_SIGNATURE_SIZE]
 
-def ecdsa_pack_signature(y_parity: bool,
-                         r: uint256,
-                         s: uint256) -> ByteVector[ECDSA_SIGNATURE_SIZE]:
+def secp256k1_pack_signature(y_parity: bool,
+                             r: uint256,
+                             s: uint256) -> ByteVector[SECP256K1_SIGNATURE_SIZE]:
     return r.to_bytes(32, 'big') + s.to_bytes(32, 'big') + bytes([0x01 if y_parity else 0x00])
 
-def ecdsa_unpack_signature(signature: ByteVector[ECDSA_SIGNATURE_SIZE]) -> tuple[bool, uint256, uint256]:
+def secp256k1_unpack_signature(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]
+                               ) -> tuple[bool, uint256, uint256]:
     y_parity = signature[64] != 0
     r = uint256.from_bytes(signature[0:32], 'big')
     s = uint256.from_bytes(signature[32:64], 'big')
     return (y_parity, r, s)
 
-def ecdsa_validate_signature(signature: ByteVector[ECDSA_SIGNATURE_SIZE]):
+def secp256k1_validate_signature(signature: ByteVector[SECP256K1_SIGNATURE_SIZE]):
     SECP256K1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
     assert len(signature) == 65
     assert signature[64] in (0, 1)
-    _, r, s = ecdsa_unpack_signature(signature)
+    _, r, s = secp256k1_unpack_signature(signature)
     assert 0 < r < SECP256K1N
     assert 0 < s <= SECP256K1N // 2
 
-def ecdsa_recover_from_address(signature: ByteVector[ECDSA_SIGNATURE_SIZE],
-                               sig_hash: Hash32) -> ExecutionAddress:
+def secp256k1_recover_from_address(signature: ByteVector[SECP256K1_SIGNATURE_SIZE],
+                                   sig_hash: Hash32) -> ExecutionAddress:
     ecdsa = ECDSA()
     recover_sig = ecdsa.ecdsa_recoverable_deserialize(signature[0:64], signature[64])
     public_key = PublicKey(ecdsa.ecdsa_recover(sig_hash, recover_sig, raw=True))
@@ -113,37 +114,6 @@ class BlobFeesPerGas(Profile[FeesPerGas]):
     regular: FeePerGas
     blob: FeePerGas
 
-class BasicTransactionPayload(Profile[TransactionPayload]):
-    chain_id: ChainId
-    nonce: uint64
-    max_fees_per_gas: BasicFeesPerGas
-    gas: uint64
-    to: Optional[ExecutionAddress]
-    value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fees_per_gas: BasicFeesPerGas
-
-class BasicTransaction(Container):
-    payload: BasicTransactionPayload
-    signature: EcdsaExecutionSignature
-
-class BlobTransactionPayload(Profile[TransactionPayload]):
-    chain_id: ChainId
-    nonce: uint64
-    max_fees_per_gas: BlobFeesPerGas
-    gas: uint64
-    to: ExecutionAddress
-    value: uint256
-    input_: ByteList[MAX_CALLDATA_SIZE]
-    access_list: List[AccessTuple, MAX_ACCESS_LIST_SIZE]
-    max_priority_fees_per_gas: BlobFeesPerGas
-    blob_versioned_hashes: List[VersionedHash, MAX_BLOB_COMMITMENTS_PER_BLOCK]
-
-class BlobTransaction(Container):
-    payload: BlobTransactionPayload
-    signature: EcdsaExecutionSignature
-
 class RlpLegacyTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
     chain_id: Optional[ChainId]
@@ -156,7 +126,7 @@ class RlpLegacyTransactionPayload(Profile[TransactionPayload]):
 
 class RlpLegacyTransaction(Container):
     payload: RlpLegacyTransactionPayload
-    signature: EcdsaExecutionSignature
+    from_: Secp256k1ExecutionSignature
 
 class RlpAccessListTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -171,7 +141,7 @@ class RlpAccessListTransactionPayload(Profile[TransactionPayload]):
 
 class RlpAccessListTransaction(Container):
     payload: RlpAccessListTransactionPayload
-    signature: EcdsaExecutionSignature
+    from_: Secp256k1ExecutionSignature
 
 class RlpFeeMarketTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -187,7 +157,7 @@ class RlpFeeMarketTransactionPayload(Profile[TransactionPayload]):
 
 class RlpFeeMarketTransaction(Container):
     payload: RlpFeeMarketTransactionPayload
-    signature: EcdsaExecutionSignature
+    from_: Secp256k1ExecutionSignature
 
 class RlpBlobTransactionPayload(Profile[TransactionPayload]):
     type_: TransactionType
@@ -204,7 +174,7 @@ class RlpBlobTransactionPayload(Profile[TransactionPayload]):
 
 class RlpBlobTransaction(Container):
     payload: RlpBlobTransactionPayload
-    signature: EcdsaExecutionSignature
+    from_: Secp256k1ExecutionSignature
 
 LEGACY_TX_TYPE = TransactionType(0x00)
 ACCESS_LIST_TX_TYPE = TransactionType(0x01)
@@ -229,8 +199,8 @@ def identify_transaction_profile(tx: Transaction) -> Type[Profile]:
 from tx_hashes import compute_sig_hash
 
 def validate_tx_from_address(tx):
-    ecdsa_validate_signature(tx.signature.ecdsa_signature)
-    assert tx.signature.from_ == ecdsa_recover_from_address(
-        tx.signature.ecdsa_signature,
+    secp256k1_validate_signature(tx.from_.secp256k1_signature)
+    assert tx.from_.address == secp256k1_recover_from_address(
+        tx.from_.secp256k1_signature,
         compute_sig_hash(tx),
     )
