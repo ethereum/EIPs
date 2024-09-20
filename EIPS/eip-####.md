@@ -1,11 +1,11 @@
 ---
-title: Partial Gas Sponsorship Standardised Interface
-description: Standardized interface dApps to sponsor a portion of the gas fees required for user operations
-author: Lyu Min (@rockmin216), Wu Jinzhou (wujinzhou), Elwin Chua (@jingkang0822), Lucas Lim (@limyeechern)
-discussions-to: <URL>
+title: Partial Gas Sponsorship Interface
+description: Defining an interface that dApps can use to sponsor a portion of the gas fees required for user operations
+author: Lyu Min (@rockmin216), Wu Jinzhou (@wujinzhou), Elwin Chua (@jingkang0822), Lucas Lim (@limyeechern)
+discussions-to: https://ethereum-magicians.org/t/igassponsor-partial-gas-sponsorship-interface/21145
 status: Draft
 type: Standards Track
-category: ERC 
+category: Interface
 created: 2024-09-19 
 requires: 4337
 ---
