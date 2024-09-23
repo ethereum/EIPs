@@ -6,8 +6,8 @@ discussions-to: <URL>
 status: Idea
 type: <Standards Track, Meta, or Informational>
 category: <ERC> # Only required for Standards Track. Otherwise, remove this field.
-created: <date created on, in ISO 8601 (yyyy-mm-dd) format>
-requires: <EIP number(s)> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
+created: <2024-09-23>
+requires: <ERC-6809> # Only required when you reference an EIP in the `Specification` section. Otherwise, remove this field.
 ---
 
 <!--
@@ -28,9 +28,9 @@ The standard is an extension of ERC-6809, Non-Fungible Key Bound Tokens (**NFKBT
 
 ## Motivation
 
-NFKBTs contain an optional on-chain 2FA security system built directly into the token standard. When activated within they smart contract, all assets within that smart contract are secured, and retrievable. This is achieved via the `safeFallback` function, which curates the transfer of NFKBTs from the holding wallet to the opposite Key wallet that called the function. However, currently the way `safeFallback` works is that it transfers all the NFKBT assets within the given smart contract. There is no option for someone to specify which asset or assets they would like to transfer out of the holding wallet. 
+NFKBTs contain an optional on-chain 2FA security system built directly into the token standard. When activated within they smart contract, all assets within that smart contract are secured, and retrievable. This is achieved via the `safeFallback` function uniquely found within ERC-6809, which curates the transfer of NFKBTs from the holding wallet to the opposite Key wallet that called the function. However, currently the way `safeFallback` works is that it transfers all the NFKBT assets within the given smart contract once the function is called. There is no option for someone to specify which NFKBT asset or assets they would like to transfer out of the holding wallet requiring all to be moved. 
 
- In the situation where someone owns multiple assets within the same NFKBT collection, the gas fee to call the `safeFallback` function increases based on how many assets they own as each asset accounts for one transfer. The `customSafeFallback` function provides the option to select which NFKBT assets they would like individually, or in batches, transfer out of the holding wallet. Presumably, the most desired assets that hold the most value to the owner could be selectively transferred out, rather than moving all of assets at once and incurring undesired fees from undesired assets. 
+ In the situation where someone owns multiple assets within the same NFKBT collection, the gas fee to call the `safeFallback` function increases based on how many assets they own as each asset accounts for one transfer. The `customSafeFallback` function provides the option to select which NFKBT assets they would like individually, or in batches, transfer out of the holding wallet. Presumably, the most desired assets that hold the most value to the owner could be selectively transferred out, rather than moving all of assets at once and incurring undesired fees from undesired assets. Additionally, the holder may not have access to funds to cover the gas fees for the assets and is counting on selling one on the open-market, in order to regain possesion of all the other NFKBTs that remain frozen until `safeFallback` or `customSafeFallback` can be called.
 
 ## Specification
 
@@ -46,9 +46,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## Rationale
 
-By standardizing the `customSafeFallback` as an extension, an even more tailored experience is achieved when utilizing NFKBTs built in security. Adding this it doesn’t result in any negative impact or reduce functionality of ERC-6809 smart contracts. The likelihood of someone retrieving assets from a comprised holding wallet would however theoretically increase.
+By standardizing the `customSafeFallback` as an extension, an even more tailored experience is achieved when utilizing NFKBTs built in security. As an extension, it doesn’t result in any negative impact or reduce functionality of ERC-6809 smart contracts or the on-chain 2FA security they provide. The likelihood of someone retrieving assets from a compromised holding wallet would however theoretically increase.
 
-Take this example, someone owns 100 NFKBTS all within the same collection and the security has been activated. While connecting to dApp via the holding wallet, the owner mistakenly connected to a malicious website and now those assets are in stasis as they cannot be unlocked or else they will be stolen. The `safeFallback` function was created for this scenrio, however when attempting to use it the fees far exceed the amount available as its attempting to do 100 transfers. Even if there is only 1 desired asset, calling the function would still require the transfer of all 100 to get the 1.
+Take this example, someone owns 100 NFKBTS all within the same collection and the security has been activated. While attempting to connect to dApp via the holding wallet, the wallet containing the NFKBTs, the owner mistakenly connected through a malicious website and now those assets are in stasis as they cannot be unlocked or else they will be stolen. Another common example is someone losing their seed phrase and losing access to the wallet containing their assets. The `safeFallback` function was created for these scenarios and many others, however when attempting to use the `safeFallback` function the fees far exceed the amount available as it attempts to do 100 transfers. Even if there is only 1 desired asset, calling the function would still require the transfer of all 100 to get the in order to get the 1.
 
 With the `customSafeFallback` function, a list of `tokenID` can be selected. Rather than transferring all 100, only the specified assets are transferred making the cost far more reasonable and affordable. Truth be told, maybe only a few assets actually have any value and are worth retrieving. 
 
@@ -80,15 +80,7 @@ This standard is fully ERC-6809 compatible.
 
 ## Security Considerations
 
-<!--
-  All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
-
-  The current placeholder is acceptable for a draft.
-
-  TODO: Remove this comment before submitting
--->
-
-Needs discussion.
+The extension doesn't hinder the security NFKBT security provides, but rather offers another option on how one can utilize and specify the `safeFallback` function via `customSafeFallback`.
 
 ## Copyright
 
