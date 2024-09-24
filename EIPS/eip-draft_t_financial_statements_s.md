@@ -1,0 +1,554 @@
+---
+eip:
+title: Transparent Financial Statements Standard
+description: Standard A.P.I. for Protocols to Ensure Open Transparent Financial Data for all Investors.
+author: Ignacio Ceaglio <ignacioceaglio@gmail.com>
+discussions-to: <To Be Defined>
+status: Draft
+type: Standards Track
+category: ERC
+created: 2024-09-20
+requires: 20
+---
+
+## Abstract
+
+This proposal defines a standard A.P.I. that enables E.V.M. Blockchain-based companies (or also called "Protocols") to publish their financial information, specifically Income Statements and Balance Sheets, on-chain in a transparent and accessible manner through Solidity Smart Contracts. This standard aims to emulate the reporting structure used by publicly traded companies in traditional stocks markets, like the [S.E.C. 10-Q filings](https://www.sec.gov/about/forms/form10-q.pdf). The financial statements include key information, namely as Revenue, Cost of Goods Sold, Operating Expenses, Operating Income, Earnings before Interest, Taxes, Depreciation, and Amortization (E.B.I.T.D.A.) and
+Earnings Per Token (E.P.Share-Token), allowing investors to assess the financial health of blockchain-based companies in a standardized, transparent, clear and reliable format.
+
+## Motivation
+
+The motivation of this E.I.P. is to Bring Seriousness to the CryptoCurrencies Investments Market. Currently, the situation is as follows:
+
+Most ERC-20 Tokens representing E.V.M. Blockchain-based companies (or also called "Protocols"), DO NOT work the same way as a Publicly Traded Stock that represents a Share of ownership of the equity of that such company (so the user who buys a Protocol's ERC-20, is also now a share-holder and co-owner of the business, its profits and/or its dividends), but rather function as "Commodities" such as oil; they are consumable items created by said E.V.M. Blockchain-based company (or "Protocol") to be spent in their platform. They are Publicly Traded and advertised to be representing the underlying Protocol like a Share, working in practice the same way as a Commodity and without any Public, Transparent and *Clear* Financial Information as publicly traded stocks have.
+
+Added to that, most token research analysis reports that can be currently found on the internet are informal Substack or Twitter posts, with lots of abstract explanations about the features of the said Protocol to invest in, that lack of transparent financial numbers and factual financial information, that are made by anonymous users without real exposed reputations to affect.
+
+This E.I.P. will improve that by giving users and investors transparent, clear and factual financial information to work with when analyzing as a potential investment the such
+E.V.M. Blockchain-based company that implements this E.I.P. in their Solidity Smart Contracts, and that will generate Trust, Transparency and Seriousness in the CryptoCurrencies Investments Market long term.
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+All Transparent Financial Statements Standard implementations MUST implement EIP-20 to represent shares, and the financial numbers displayed in a StableCoin's value.
+
+All Transparent Financial Statements MUST implement EIP-20's optional metadata extensions.
+The `name` and `symbol` functions SHOULD reflect the underlying token's `name` and `symbol` in some way.
+
+All methods MUST be of visibility `public`.
+
+All methods MUST return the `stablecoin`.
+
+*Timestamp Constraint*: For all methods, startTimestamp MUST be less than or equal to endTimestamp. If startTimestamp is equal to endTimestamp, the method returns a balance sheet snapshot. If startTimestamp is less than endTimestamp, the method returns an income statement for that period.
+
+*Output Structs*: Instead of a single `uint256` value, each method returns a `Struct` with one or _OPTIONAL_ more `uint256` entries to allow for detailed financial data, each one with their own customized entry `name`.
+
+### Definitions:
+
+- Currency: The individual StableCoin used to value the publicly displayed financial numbers.
+- Revenue: Total earnings from selling products or services before expenses.
+- Cost of Goods Sold (C.O.G.S.): Direct costs for producing goods/services, including labor and materials.
+- Operating Expenses: Expenses like Selling, General, and Administrative, Research and Development, and other operational costs.
+- Operating Income: Revenue minus operating expenses.
+- E.B.I.T.D.A.: Earnings Before Interest, Taxes, Depreciation, and Amortization.
+- Other Income and Expenses: Non-operating income, such as interest, investment gains or losses.
+- Net Income: Profit after all expenses, taxes, and deductions.
+- E.P.S.: Earnings per Share Token (ERC-20), showing profit allocated per share.
+
+### Methods
+
+#### currency
+
+Returns the `address` of the individual StableCoin used to value the publicly displayed financial numbers.
+
+```yaml
+- name: address
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    /*none*/
+  outputs:
+    - name: currencyAddress
+      type: address
+
+```
+
+#### revenue
+
+Returns total revenue generated by the protocol within a time period.
+
+```yaml
+- name: revenue
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: RevenueStruct
+      type: struct
+      fields:
+        - name: grossRevenue
+          type: uint256
+        - name: optionalAdditionalRevenueDetail1
+          type: uint256
+        - name: optionalAdditionalRevenueDetailN
+          type: uint256
+
+```
+
+#### cogs
+
+Returns the cost of goods sold within a specified period.
+
+```yaml
+- name: cogs
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: COGSStruct
+      type: struct
+      fields:
+        - name: totalCOGS
+          type: uint256
+        - name: optionalAdditionalCOGSDetail1
+          type: uint256
+        - name: optionalAdditionalCOGSDetailN
+          type: uint256
+
+```
+
+#### operatingExpenses
+
+Returns the total operating expenses within a specified period.
+
+```yaml
+- name: operatingExpenses
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: OperatingExpensesStruct
+      type: struct
+      fields:
+        - name: totalOperatingExpenses
+          type: uint256
+        - name: optionalAdditionalExpenseDetail1
+          type: uint256
+        - name: optionalAdditionalExpenseDetailN
+          type: uint256
+
+```
+
+#### operatingIncome
+
+Returns operating income for the specified period (Revenue - COGS - Operating Expenses).
+
+```yaml
+- name: operatingIncome
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: OperatingIncomeStruct
+      type: struct
+      fields:
+        - name: totalOperatingIncome
+          type: uint256
+        - name: optionalAdditionalIncomeDetail1
+          type: uint256
+        - name: optionalAdditionalIncomeDetailN
+          type: uint256
+
+```
+
+#### ebitda
+
+Returns EBITDA for the given period.
+
+```yaml
+- name: ebitda
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: EBITDAstruct
+      type: struct
+      fields:
+        - name: totalEBITDA
+          type: uint256
+        - name: optionalAdditionalEBITDADetail1
+          type: uint256
+        - name: optionalAdditionalEBITDADetailN
+          type: uint256
+
+```
+
+#### otherIncomeExpenses
+
+Returns non-operating income and expenses, such as interest and investment gains or losses, for the specified period.
+
+```yaml
+- name: otherIncomeExpenses
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: OtherIncomeExpensesStruct
+      type: struct
+      fields:
+        - name: totalOtherIncome
+          type: uint256
+        - name: totalOtherExpenses
+          type: uint256
+        - name: totalOtherIncomeDetail1
+          type: uint256
+        - name: totalOtherExpensesDetail1
+          type: uint256
+        - name: totalOtherIncomeDetailN
+          type: uint256
+        - name: totalOtherExpensesDetailN
+          type: uint256
+
+```
+
+#### netIncome
+
+Returns net income for the period (Operating Income + Other Income/Expenses - Taxes - Depreciation).
+
+```yaml
+- name: netIncome
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: NetIncomeStruct
+      type: struct
+      fields:
+        - name: totalNetIncome
+          type: uint256
+        - name: optionalAdditionalNetIncomeDetail1
+          type: uint256
+        - name: optionalAdditionalNetIncomeDetailN
+          type: uint256
+
+```
+
+#### earningsPerShare
+
+Returns Earnings Per Share Token (EPS) for the period.
+
+```yaml
+- name: earningsPerShare
+  type: function
+  visibility: public
+  stateMutability: view
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: EPSstruct
+      type: struct
+      fields:
+        - name: basicEPS
+          type: uint256
+        - name: dilutedEPS
+          type: uint256
+        - name: EPSDetail1
+          type: uint256
+        - name: EPSDetailN
+          type: uint256
+
+```
+
+#### fullFinancialReport
+
+Returns a comprehensive struct that includes all the prior financial details of the Protocol combined: Revenue, COGS, Operating Expenses, Operating Income, EBITDA, Other Incomes and Expenses, Net income, and EPS into a unified `Struct`.
+
+```yaml
+- name: fullFinancialReport
+  type: function
+  stateMutability: view
+  visibility: public
+  inputs:
+    - name: startTimestamp
+      type: uint256
+    - name: endTimestamp
+      type: uint256
+  outputs:
+    - name: FullFinancialsStruct
+      type: struct
+      fields:
+        - name: RevenueStruct
+          type: struct
+        - name: COGSStruct
+          type: struct
+        - name: OperatingExpensesStruct
+          type: struct
+        - name: OperatingIncomeStruct
+          type: struct
+        - name: EBITDAstruct
+          type: struct
+        - name: OtherIncomeExpensesStruct
+          type: struct
+        - name: NetIncomeStruct
+          type: struct
+        - name: EPSstruct
+          type: struct
+
+```
+
+## Rationale
+
+The current state of token investment analysis is opaque, with most information presented in an abstract and non-quantitative form. This standard A.P.I. ensures a consistent and reliable way for investors to evaluate blockchain projects based on real financial data published directly on-chain, not just speculative promises. This will establish greater
+trust in the cryptocurrency markets and align token analysis with the standards of traditional equity markets.
+
+EIP-20 is enforced because implementation details like Earnings Per Token calculation directly carry over to the accounting. This standardization makes the Transparent Financial Statements compatible with all EIP-20 use cases.
+
+This implementation enables the Protocol to share their financial information both as their latest updated Balance Sheet (if the user chooses to just see a current snapshot of
+the financial state of the company) and as an Income Statement (if the user chooses to see the evolution of the financial state of the company between two different block
+timestamps) and also is thought to interact with other separated Smart Contracts of the same Protocol from which the financial information will be sent.
+
+## Backwards Compatibility
+
+Transparent Financial Statements Standard is fully backward compatible with the EIP-20 standard and has no known compatibility issues with other standards.
+
+## Reference Implementation
+
+
+*NOTE: This Reference Implementation is a placeholder. It will be improved in the future from the feedback received.*
+
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.27;
+
+interface IERC20 {
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+}
+
+contract TransparentFinancialStatements {
+
+    address public stablecoin;
+
+    struct RevenueStruct {
+        uint256 grossRevenue;
+        uint256 optionalAdditionalRevenueDetail1;
+        uint256 optionalAdditionalRevenueDetailN;
+    }
+
+    struct COGSStruct {
+        uint256 totalCOGS;
+        uint256 optionalAdditionalCOGSDetail1;
+        uint256 optionalAdditionalCOGSDetailN;
+    }
+
+    struct OperatingExpensesStruct {
+        uint256 totalOperatingExpenses;
+        uint256 optionalAdditionalExpenseDetail1;
+        uint256 optionalAdditionalExpenseDetailN;
+    }
+
+    struct OperatingIncomeStruct {
+        uint256 totalOperatingIncome;
+        uint256 optionalAdditionalIncomeDetail1;
+        uint256 optionalAdditionalIncomeDetailN;
+    }
+
+    struct EBITDAstruct {
+        uint256 totalEBITDA;
+        uint256 optionalAdditionalEBITDADetail1;
+        uint256 optionalAdditionalEBITDADetailN;
+    }
+
+    struct OtherIncomeExpensesStruct {
+        uint256 totalOtherIncome;
+        uint256 totalOtherExpenses;
+        uint256 totalOtherIncomeDetail1;
+        uint256 totalOtherExpensesDetail1;
+        uint256 totalOtherIncomeDetailN;
+        uint256 totalOtherExpensesDetailN;
+    }
+
+    struct NetIncomeStruct {
+        uint256 totalNetIncome;
+        uint256 optionalAdditionalNetIncomeDetail1;
+        uint256 optionalAdditionalNetIncomeDetailN;
+    }
+
+    struct EPSstruct {
+        uint256 basicEPS;
+        uint256 dilutedEPS;
+        uint256 EPSDetail1;
+        uint256 EPSDetailN;
+    }
+
+    struct FullFinancialsStruct {
+        RevenueStruct revenue;
+        COGSStruct cogs;
+        OperatingExpensesStruct operatingExpenses;
+        OperatingIncomeStruct operatingIncome;
+        EBITDAstruct ebitda;
+        OtherIncomeExpensesStruct otherIncomeExpenses;
+        NetIncomeStruct netIncome;
+        EPSstruct eps;
+    }
+
+    constructor(address _stablecoin) {
+        stablecoin = _stablecoin;
+    }
+
+    function currency() public view returns (address) {
+        return stablecoin;
+    }
+
+    function revenue(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (RevenueStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return revenue details
+        return RevenueStruct(1000, 500, 100); // Example values
+    }
+
+    function cogs(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (COGSStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return COGS details
+        return COGSStruct(400, 150, 50); // Example values
+    }
+
+    function operatingExpenses(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (OperatingExpensesStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return operating expenses details
+        return OperatingExpensesStruct(300, 100, 50); // Example values
+    }
+
+    function operatingIncome(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (OperatingIncomeStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return operating income details
+        return OperatingIncomeStruct(300, 100, 50); // Example values
+    }
+
+    function ebitda(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (EBITDAstruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return EBITDA details
+        return EBITDAstruct(700, 200, 100); // Example values
+    }
+
+    function otherIncomeExpenses(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (OtherIncomeExpensesStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return other income/expenses details
+        return OtherIncomeExpensesStruct(100, 50, 20, 10, 30, 20); // Example values
+    }
+
+    function netIncome(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (NetIncomeStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return net income details
+        return NetIncomeStruct(600, 200, 100); // Example values
+    }
+
+    function earningsPerShare(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (EPSstruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return EPS details
+        return EPSstruct(10, 8, 2, 1); // Example values
+    }
+
+    function fullFinancialReport(uint256 startTimestamp, uint256 endTimestamp) 
+        public 
+        view 
+        returns (FullFinancialsStruct memory) 
+    {
+        require(startTimestamp <= endTimestamp, "Invalid timestamps");
+        // Logic to calculate and return all financial details
+        return FullFinancialsStruct(
+            revenue(startTimestamp, endTimestamp),
+            cogs(startTimestamp, endTimestamp),
+            operatingExpenses(startTimestamp, endTimestamp),
+            operatingIncome(startTimestamp, endTimestamp),
+            ebitda(startTimestamp, endTimestamp),
+            otherIncomeExpenses(startTimestamp, endTimestamp),
+            netIncome(startTimestamp, endTimestamp),
+            earningsPerShare(startTimestamp, endTimestamp)
+        );
+    }
+}
+
+```
+
+## Security Considerations
+
+This E.I.P. involves displaying critical financial data on-chain, so special attention must be paid to ensure the accuracy and security of the data, particularly in preventing tampering or manipulation of key financial figures. Further discussion on validation mechanisms and audits for the smart contracts containing financial data is necessary.
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
