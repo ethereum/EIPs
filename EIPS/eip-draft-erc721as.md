@@ -1,7 +1,7 @@
 ---
 title: ERC721AS - Auto Staking
 description: ERC721AS is an zero-gas staking system for NFTs that does not require holders to ‘actively prove’ their holding status.
-author: Kiwoong Kim @helloing0119, Jeff Rhie @jeff-rhie, Jay B @DalecB
+author: Kiwoong Kim (@helloing0119), Jeff Rhie (@jeff-rhie), Jay B (@DalecB)
 discussions-to: https://ethereum-magicians.org/c/eips/5
 status: Draft
 type: Standards Track
