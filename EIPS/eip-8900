@@ -1,19 +1,19 @@
 ---
-eip: 8900
-title: Transparent Financial Statements Standard
-description: Standard A.P.I. for Protocols to Ensure Open Transparent Financial Data for all Investors.
-author: Ignacio Ceaglio <ignacioceaglio@gmail.com>
-discussions-to: <To Be Defined>
+eip:
+title: Transparent Financial Statements
+description: A.P.I. for Protocols to Ensure Open Transparent Financial Data for all Investors.
+author: Ignacio Ceaglio (@Nachoxt17) <ignacioceaglio@gmail.com>
+discussions-to: https://ethereum-magicians.org/t/ethereum-improvement-proposal-all-info/12326/53?u=nachoxt17
 status: Draft
 type: Standards Track
-category: ERC
+category: Interface
 created: 2024-09-20
 requires: 20
 ---
 
 ## Abstract
 
-This proposal defines a standard A.P.I. that enables E.V.M. Blockchain-based companies (or also called "Protocols") to publish their financial information, specifically Income Statements and Balance Sheets, on-chain in a transparent and accessible manner through Solidity Smart Contracts. This standard aims to emulate the reporting structure used by publicly traded companies in traditional stocks markets, like the [S.E.C. 10-Q filings](https://www.sec.gov/about/forms/form10-q.pdf). The financial statements include key information, namely as Revenue, Cost of Goods Sold, Operating Expenses, Operating Income, Earnings before Interest, Taxes, Depreciation, and Amortization (E.B.I.T.D.A.) and
+This proposal defines a standard A.P.I. that enables E.V.M. Blockchain-based companies (or also called "Protocols") to publish their financial information, specifically Income Statements and Balance Sheets, on-chain in a transparent and accessible manner through Solidity Smart Contracts. This standard aims to emulate the reporting structure used by publicly traded companies in traditional stocks markets, like the S.E.C. 10-Q filings. The financial statements include key information, namely as Revenue, Cost of Goods Sold, Operating Expenses, Operating Income, Earnings before Interest, Taxes, Depreciation, and Amortization (E.B.I.T.D.A.) and
 Earnings Per Token (E.P.Share-Token), allowing investors to assess the financial health of blockchain-based companies in a standardized, transparent, clear and reliable format.
 
 ## Motivation
@@ -31,9 +31,9 @@ E.V.M. Blockchain-based company that implements this E.I.P. in their Solidity Sm
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-All Transparent Financial Statements Standard implementations MUST implement EIP-20 to represent shares, and the financial numbers displayed in a StableCoin's value.
+All Transparent Financial Statements Standard implementations MUST implement ERC-20 to represent shares, and the financial numbers displayed in a StableCoin's value.
 
-All Transparent Financial Statements MUST implement EIP-20's optional metadata extensions.
+All Transparent Financial Statements MUST implement ERC-20's optional metadata extensions.
 The `name` and `symbol` functions SHOULD reflect the underlying token's `name` and `symbol` in some way.
 
 All methods MUST be of visibility `public`.
@@ -341,7 +341,7 @@ Returns a comprehensive struct that includes all the prior financial details of 
 The current state of token investment analysis is opaque, with most information presented in an abstract and non-quantitative form. This standard A.P.I. ensures a consistent and reliable way for investors to evaluate blockchain projects based on real financial data published directly on-chain, not just speculative promises. This will establish greater
 trust in the cryptocurrency markets and align token analysis with the standards of traditional equity markets.
 
-EIP-20 is enforced because implementation details like Earnings Per Token calculation directly carry over to the accounting. This standardization makes the Transparent Financial Statements compatible with all EIP-20 use cases.
+ERC-20 is enforced because implementation details like Earnings Per Token calculation directly carry over to the accounting. This standardization makes the Transparent Financial Statements compatible with all ERC-20 use cases.
 
 This implementation enables the Protocol to share their financial information both as their latest updated Balance Sheet (if the user chooses to just see a current snapshot of
 the financial state of the company) and as an Income Statement (if the user chooses to see the evolution of the financial state of the company between two different block
@@ -349,7 +349,7 @@ timestamps) and also is thought to interact with other separated Smart Contracts
 
 ## Backwards Compatibility
 
-Transparent Financial Statements Standard is fully backward compatible with the EIP-20 standard and has no known compatibility issues with other standards.
+Transparent Financial Statements Standard is fully backward compatible with the ERC-20 standard and has no known compatibility issues with other standards.
 
 ## Reference Implementation
 
