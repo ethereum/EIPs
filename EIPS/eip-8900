@@ -1,14 +1,14 @@
 ---
-eip:
+eip: 8900
 title: Transparent Financial Statements
 description: A.P.I. for Protocols to Ensure Open Transparent Financial Data for all Investors.
 author: Ignacio Ceaglio (@Nachoxt17) <ignacioceaglio@gmail.com>
-discussions-to: https://ethereum-magicians.org/t/ethereum-improvement-proposal-all-info/12326/53?u=nachoxt17
+discussions-to: https://ethereum-magicians.org/t/e-i-p-8900-transparent-financial-statements/21191?u=nachoxt17
 status: Draft
 type: Standards Track
 category: Interface
 created: 2024-09-20
-requires: 20
+requires: (20)[https://eips.ethereum.org/EIPS/eip-20]
 ---
 
 ## Abstract
