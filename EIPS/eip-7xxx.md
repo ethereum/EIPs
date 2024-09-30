@@ -1,0 +1,101 @@
+---
+eip: 7xxx
+title: New opcode BURN
+description: An opcode to burn native token at the given address
+author: Dev Bear (@itsdevbear)
+discussions-to: <URL>
+status: Draft
+type: Standards Track
+category: Core
+created: 2024-09-30
+---
+
+## Abstract
+
+This proposal introduces a new `BURN` opcode, designed to burn native tokens at the given address.
+
+## Motivation
+
+The motivation for this proposal is to provide a standardized and efficient way to burn native tokens directly within the EVM. Historically, contracts such as the BeaconDepositContract have "burned" ether by making it irrecoverable from the given address. This approach can lead to confusion and potential misuse. By introducing a dedicated `BURN` opcode, we can ensure a clear and consistent method for burning native tokens. This could become useful for Ethereum L2s when transferring ether back to the L1, as well as other EVM L1 chains that could leverage this for their cryptoeconomics. Additionally, it opens up an interesting design space for EIP-7685 use cases, providing a more robust and standardized mechanism for token management across different layers of the Ethereum ecosystem.
+
+## Specification
+
+The `BURN` opcode `(0xF8)` is introduced with the following behavior:
+
+1. Pops one 32-byte word from the top of the stack, treating this value as the `uint256` value of native token to be burned.
+2. Retrieves the current address from the EVM execution context.
+3. Checks the balance of the current address.
+4. If the value to be burned is greater than the balance of the current address, the opcode `MUST` revert.
+5. If the value to be burned is 0, the execution `MUST NOT` revert.
+6. Subtracts the value from the current address's native token balance.
+
+When `BURN` is used in the context of a DELEGATECALL or CALLCODE, the contract whose balance is to be manipulated is the contract that issued the DELEGATECALL or CALLCODE instruction.
+
+Example pseudocode for the `BURN` opcode:
+
+```python
+def op_burn(pc, interpreter, scope):
+    # Pop the value to be burned from the stack
+    value_to_burn = scope.stack.pop()
+    
+    # Retrieve the current address from the EVM execution context
+    current_address = scope.contract.address()
+    
+    # Check the balance of the current address
+    balance = interpreter.evm.state_db.get_balance(current_address)
+    
+    # If the value to be burned is greater than the balance, revert
+    if value_to_burn > balance:
+        return None, "ErrInsufficientBalance"
+    
+    # If the value to be burned is 0, do not revert
+    if value_to_burn == 0:
+        return None, None
+    
+    # Subtract the value from the current address's balance
+    interpreter.evm.state_db.sub_balance(current_address, value_to_burn)
+    return None, None
+```
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
+
+## Rationale
+
+The introduction of the `BURN` opcode helps clean up a piece of weird semantics in the Ethereum ecosystem. Historically, burning native tokens involved sending them to an address from which they could not be recovered, such as the zero address or a contract with no withdrawal functionality. This method is not only inefficient but also confusing for indexers and other tools that track token movements. By providing a dedicated `BURN` opcode, we eliminate this ambiguity and ensure that the act of burning tokens is explicit and standardized.
+
+
+Potential Pros:
+- Provides a clear and standardized method for burning native tokens within smart contracts.
+- Allows for better accounting practices of native token within smart contracts 
+- Reduces the possibility of a smart contract exploit caused by native token that was marked as "burned" being unintetionally recovered.
+
+
+Potential Cons:
+- Does not help remove unrecoverable ether sitting in existing contracts.
+- New code in the clients
+- New concept needed to be added to the yellow paper.
+
+
+## Backwards Compatibility
+
+No backwards compatibility issues.
+
+No backward compatibility issues found.
+
+## Test Cases
+
+- Coming soon
+
+## Reference Implementation
+
+- Coming Soon
+
+## Security Considerations
+
+- Potentially opens up misuse when using `DELEGATECALL`.
+
+Needs discussion.
+
+## Copyright
+
+Copyright and related rights waived via [CC0](../LICENSE.md).
