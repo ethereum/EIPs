@@ -1,47 +1,31 @@
-from typing import Optional, Type
+from typing import Optional
 from remerkleable.basic import uint8, uint16, uint32, uint64
 from remerkleable.bitfields import Bitvector
 from remerkleable.complex import Container, List
-from stable_container import OneOf, Profile, StableContainer
+from stable_container import Profile, StableContainer
 
-# Defines the common merkleization format and a portable serialization format
 class Shape(StableContainer[4]):
     side: Optional[uint16]
-    color: uint8
+    color: Optional[uint8]
     radius: Optional[uint16]
 
-# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Square(Profile[Shape]):
     side: uint16
     color: uint8
 
-# Inherits merkleization format from `Shape`, but is serialized more compactly
 class Circle(Profile[Shape]):
     color: uint8
     radius: uint16
 
-class AnyShape(OneOf[Shape]):
-    @classmethod
-    def select_from_base(cls, value: Shape, circle_allowed = False) -> Type[Shape]:
-        if value.radius is not None:
-            assert circle_allowed
-            return Circle
-        if value.side is not None:
-            return Square
-        assert False
-
-# Defines a container with immutable scheme that contains two `StableContainer`
 class ShapePair(Container):
     shape_1: Shape
     shape_2: Shape
 
-# Inherits merkleization format from `ShapePair`, and serializes more compactly
-class SquarePair(Profile[ShapePair]):
+class SquarePair(Container):
     shape_1: Square
     shape_2: Square
 
-# Inherits merkleization format from `ShapePair`, and serializes more compactly
-class CirclePair(Profile[ShapePair]):
+class CirclePair(Container):
     shape_1: Circle
     shape_2: Circle
 
@@ -50,6 +34,7 @@ class ShapePayload(Container):
     side: uint16
     color: uint8
     radius: uint16
+
 class ShapeRepr(Container):
     value: ShapePayload
     active_fields: Bitvector[4]
@@ -57,18 +42,6 @@ class ShapeRepr(Container):
 class ShapePairRepr(Container):
     shape_1: ShapeRepr
     shape_2: ShapeRepr
-
-class AnyShapePair(OneOf[ShapePair]):
-    @classmethod
-    def select_from_base(cls, value: ShapePair, circle_allowed = False) -> Type[ShapePair]:
-        typ_1 = AnyShape.select_from_base(value.shape_1, circle_allowed)
-        typ_2 = AnyShape.select_from_base(value.shape_2, circle_allowed)
-        assert typ_1 == typ_2
-        if typ_1 is Circle:
-            return CirclePair
-        if typ_1 is Square:
-            return SquarePair
-        assert False
 
 # Square tests
 square_bytes_stable = bytes.fromhex("03420001")
@@ -89,9 +62,7 @@ assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
 assert all(square.encode_bytes() == square_bytes_profile for square in squares)
 assert (
     Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
-    Square.decode_bytes(square_bytes_profile) ==
-    AnyShape.decode_bytes(square_bytes_stable) ==
-    AnyShape.decode_bytes(square_bytes_stable, circle_allowed = True)
+    Square.decode_bytes(square_bytes_profile)
 )
 assert all(shape.hash_tree_root() == square_root for shape in shapes)
 assert all(square.hash_tree_root() == square_root for square in squares)
@@ -128,9 +99,7 @@ assert all(shape.encode_bytes() == square_bytes_stable for shape in shapes)
 assert all(square.encode_bytes() == square_bytes_profile for square in squares)
 assert (
     Square(backing=Shape.decode_bytes(square_bytes_stable).get_backing()) ==
-    Square.decode_bytes(square_bytes_profile) ==
-    AnyShape.decode_bytes(square_bytes_stable) ==
-    AnyShape.decode_bytes(square_bytes_stable, circle_allowed = True)
+    Square.decode_bytes(square_bytes_profile)
 )
 assert all(shape.hash_tree_root() == square_root for shape in shapes)
 assert all(square.hash_tree_root() == square_root for square in squares)
@@ -169,8 +138,7 @@ assert all(shape.encode_bytes() == circle_bytes_stable for shape in shapes)
 assert all(circle.encode_bytes() == circle_bytes_profile for circle in circles)
 assert (
     Circle(backing=Shape.decode_bytes(circle_bytes_stable).get_backing()) ==
-    Circle.decode_bytes(circle_bytes_profile) ==
-    AnyShape.decode_bytes(circle_bytes_stable, circle_allowed = True)
+    Circle.decode_bytes(circle_bytes_profile)
 )
 assert all(shape.hash_tree_root() == circle_root for shape in shapes)
 assert all(circle.hash_tree_root() == circle_root for circle in circles)
@@ -191,11 +159,6 @@ for circle in circles:
         assert False
     except:
         pass
-try:
-    circle = AnyShape.decode_bytes(circle_bytes_stable, circle_allowed = False)
-    assert False
-except:
-    pass
 
 # SquarePair tests
 square_pair_bytes_stable = bytes.fromhex("080000000c0000000342000103690001")
@@ -228,9 +191,7 @@ assert all(pair.encode_bytes() == square_pair_bytes_stable for pair in shape_pai
 assert all(pair.encode_bytes() == square_pair_bytes_profile for pair in square_pairs)
 assert (
     SquarePair(backing=ShapePair.decode_bytes(square_pair_bytes_stable).get_backing()) ==
-    SquarePair.decode_bytes(square_pair_bytes_profile) ==
-    AnyShapePair.decode_bytes(square_pair_bytes_stable) ==
-    AnyShapePair.decode_bytes(square_pair_bytes_stable, circle_allowed = True)
+    SquarePair.decode_bytes(square_pair_bytes_profile)
 )
 assert all(pair.hash_tree_root() == square_pair_root for pair in shape_pairs)
 assert all(pair.hash_tree_root() == square_pair_root for pair in square_pairs)
@@ -266,8 +227,7 @@ assert all(pair.encode_bytes() == circle_pair_bytes_stable for pair in shape_pai
 assert all(pair.encode_bytes() == circle_pair_bytes_profile for pair in circle_pairs)
 assert (
     CirclePair(backing=ShapePair.decode_bytes(circle_pair_bytes_stable).get_backing()) ==
-    CirclePair.decode_bytes(circle_pair_bytes_profile) ==
-    AnyShapePair.decode_bytes(circle_pair_bytes_stable, circle_allowed = True)
+    CirclePair.decode_bytes(circle_pair_bytes_profile)
 )
 assert all(pair.hash_tree_root() == circle_pair_root for pair in shape_pairs)
 assert all(pair.hash_tree_root() == circle_pair_root for pair in circle_pairs)
@@ -287,11 +247,6 @@ try:
     assert False
 except:
     pass
-try:
-    shape = AnyShape.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
 shape = Shape(side=0x42, color=1, radius=0x42)
 shape_bytes = bytes.fromhex("074200014200")
 assert shape.encode_bytes() == shape_bytes
@@ -303,16 +258,6 @@ except:
     pass
 try:
     shape = Circle.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
-try:
-    shape = AnyShape.decode_bytes(shape_bytes)
-    assert False
-except:
-    pass
-try:
-    shape = AnyShape.decode_bytes("00")
     assert False
 except:
     pass
@@ -369,13 +314,13 @@ assert container.hash_tree_root() == ShapeContainerRepr(
 # basic container
 class Shape1(StableContainer[4]):
     side: Optional[uint16]
-    color: uint8
+    color: Optional[uint8]
     radius: Optional[uint16]
 
 # basic container with different depth
 class Shape2(StableContainer[8]):
     side: Optional[uint16]
-    color: uint8
+    color: Optional[uint8]
     radius: Optional[uint16]
 
 # basic container with variable fields

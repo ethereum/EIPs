@@ -9,8 +9,8 @@ class Hash32(Bytes32):
 class LegacyRlpTransactionPayload(Serializable):
     fields = (
         ('nonce', big_endian_int),
-        ('gasprice', big_endian_int),
-        ('startgas', big_endian_int),
+        ('gas_price', big_endian_int),
+        ('gas', big_endian_int),
         ('to', Binary(20, 20, allow_empty=True)),
         ('value', big_endian_int),
         ('data', binary),
@@ -19,8 +19,8 @@ class LegacyRlpTransactionPayload(Serializable):
 class LegacyRlpTransaction(Serializable):
     fields = (
         ('nonce', big_endian_int),
-        ('gasprice', big_endian_int),
-        ('startgas', big_endian_int),
+        ('gas_price', big_endian_int),
+        ('gas', big_endian_int),
         ('to', Binary(20, 20, allow_empty=True)),
         ('value', big_endian_int),
         ('data', binary),
@@ -33,8 +33,8 @@ def compute_legacy_sig_hash(tx: LegacyRlpTransaction) -> Hash32:
     if tx.v not in (27, 28):  # EIP-155
         return Hash32(keccak(encode(LegacyRlpTransaction(
             nonce=tx.nonce,
-            gasprice=tx.gasprice,
-            startgas=tx.startgas,
+            gas_price=tx.gas_price,
+            gas=tx.gas,
             to=tx.to,
             value=tx.value,
             data=tx.data,
@@ -45,8 +45,8 @@ def compute_legacy_sig_hash(tx: LegacyRlpTransaction) -> Hash32:
     else:
         return Hash32(keccak(encode(LegacyRlpTransactionPayload(
             nonce=tx.nonce,
-            gasprice=tx.gasprice,
-            startgas=tx.startgas,
+            gas_price=tx.gas_price,
+            gas=tx.gas,
             to=tx.to,
             value=tx.value,
             data=tx.data,
@@ -55,63 +55,14 @@ def compute_legacy_sig_hash(tx: LegacyRlpTransaction) -> Hash32:
 def compute_legacy_tx_hash(tx: LegacyRlpTransaction) -> Hash32:
     return Hash32(keccak(encode(tx)))
 
-class Eip2930RlpTransactionPayload(Serializable):
-    fields = (
-        ('chainId', big_endian_int),
-        ('nonce', big_endian_int),
-        ('gasPrice', big_endian_int),
-        ('gasLimit', big_endian_int),
-        ('to', Binary(20, 20, allow_empty=True)),
-        ('value', big_endian_int),
-        ('data', binary),
-        ('accessList', CountableList(RLPList([
-            Binary(20, 20),
-            CountableList(Binary(32, 32)),
-        ]))),
-    )
-
-class Eip2930RlpTransaction(Serializable):
-    fields = (
-        ('chainId', big_endian_int),
-        ('nonce', big_endian_int),
-        ('gasPrice', big_endian_int),
-        ('gasLimit', big_endian_int),
-        ('to', Binary(20, 20, allow_empty=True)),
-        ('value', big_endian_int),
-        ('data', binary),
-        ('accessList', CountableList(RLPList([
-            Binary(20, 20),
-            CountableList(Binary(32, 32)),
-        ]))),
-        ('signatureYParity', big_endian_int),
-        ('signatureR', big_endian_int),
-        ('signatureS', big_endian_int),
-    )
-
-def compute_eip2930_sig_hash(tx: Eip2930RlpTransaction) -> Hash32:
-    return Hash32(keccak(bytes([0x01]) + encode(Eip2930RlpTransactionPayload(
-        chainId=tx.chainId,
-        nonce=tx.nonce,
-        gasPrice=tx.gasPrice,
-        gasLimit=tx.gasLimit,
-        to=tx.to,
-        value=tx.value,
-        data=tx.data,
-        accessList=tx.accessList,
-    ))))
-
-def compute_eip2930_tx_hash(tx: Eip2930RlpTransaction) -> Hash32:
-    return Hash32(keccak(bytes([0x01]) + encode(tx)))
-
-class Eip1559RlpTransactionPayload(Serializable):
+class AccessListRlpTransactionPayload(Serializable):
     fields = (
         ('chain_id', big_endian_int),
         ('nonce', big_endian_int),
-        ('max_priority_fee_per_gas', big_endian_int),
-        ('max_fee_per_gas', big_endian_int),
-        ('gas_limit', big_endian_int),
-        ('destination', Binary(20, 20, allow_empty=True)),
-        ('amount', big_endian_int),
+        ('gas_price', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20, allow_empty=True)),
+        ('value', big_endian_int),
         ('data', binary),
         ('access_list', CountableList(RLPList([
             Binary(20, 20),
@@ -119,87 +70,136 @@ class Eip1559RlpTransactionPayload(Serializable):
         ]))),
     )
 
-class Eip1559RlpTransaction(Serializable):
+class AccessListRlpTransaction(Serializable):
     fields = (
         ('chain_id', big_endian_int),
         ('nonce', big_endian_int),
-        ('max_priority_fee_per_gas', big_endian_int),
-        ('max_fee_per_gas', big_endian_int),
-        ('gas_limit', big_endian_int),
-        ('destination', Binary(20, 20, allow_empty=True)),
-        ('amount', big_endian_int),
+        ('gas_price', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20, allow_empty=True)),
+        ('value', big_endian_int),
         ('data', binary),
         ('access_list', CountableList(RLPList([
             Binary(20, 20),
             CountableList(Binary(32, 32)),
         ]))),
-        ('signature_y_parity', big_endian_int),
-        ('signature_r', big_endian_int),
-        ('signature_s', big_endian_int),
+        ('y_parity', big_endian_int),
+        ('r', big_endian_int),
+        ('s', big_endian_int),
     )
 
-def compute_eip1559_sig_hash(tx: Eip1559RlpTransaction) -> Hash32:
-    return Hash32(keccak(bytes([0x02]) + encode(Eip1559RlpTransactionPayload(
+def compute_access_list_sig_hash(tx: AccessListRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x01]) + encode(AccessListRlpTransactionPayload(
         chain_id=tx.chain_id,
         nonce=tx.nonce,
-        max_priority_fee_per_gas=tx.max_priority_fee_per_gas,
-        max_fee_per_gas=tx.max_fee_per_gas,
-        gas_limit=tx.gas_limit,
-        destination=tx.destination,
-        amount=tx.amount,
+        gas_price=tx.gas_price,
+        gas=tx.gas,
+        to=tx.to,
+        value=tx.value,
         data=tx.data,
         access_list=tx.access_list,
     ))))
 
-def compute_eip1559_tx_hash(tx: Eip1559RlpTransaction) -> Hash32:
-    return Hash32(keccak(bytes([0x02]) + encode(tx)))
+def compute_access_list_tx_hash(tx: AccessListRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x01]) + encode(tx)))
 
-class Eip4844RlpTransactionPayload(Serializable):
+class FeeMarketRlpTransactionPayload(Serializable):
     fields = (
         ('chain_id', big_endian_int),
         ('nonce', big_endian_int),
         ('max_priority_fee_per_gas', big_endian_int),
         ('max_fee_per_gas', big_endian_int),
-        ('gas_limit', big_endian_int),
-        ('to', Binary(20, 20)),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20, allow_empty=True)),
         ('value', big_endian_int),
         ('data', binary),
         ('access_list', CountableList(RLPList([
             Binary(20, 20),
             CountableList(Binary(32, 32)),
         ]))),
-        ('max_fee_per_blob_gas', big_endian_int),
-        ('blob_versioned_hashes', CountableList(Binary(32, 32))),
     )
 
-class Eip4844RlpTransaction(Serializable):
+class FeeMarketRlpTransaction(Serializable):
     fields = (
         ('chain_id', big_endian_int),
         ('nonce', big_endian_int),
         ('max_priority_fee_per_gas', big_endian_int),
         ('max_fee_per_gas', big_endian_int),
-        ('gas_limit', big_endian_int),
-        ('to', Binary(20, 20)),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20, allow_empty=True)),
         ('value', big_endian_int),
         ('data', binary),
         ('access_list', CountableList(RLPList([
             Binary(20, 20),
             CountableList(Binary(32, 32)),
         ]))),
-        ('max_fee_per_blob_gas', big_endian_int),
-        ('blob_versioned_hashes', CountableList(Binary(32, 32))),
-        ('signature_y_parity', big_endian_int),
-        ('signature_r', big_endian_int),
-        ('signature_s', big_endian_int),
+        ('y_parity', big_endian_int),
+        ('r', big_endian_int),
+        ('s', big_endian_int),
     )
 
-def compute_eip4844_sig_hash(tx: Eip4844RlpTransaction) -> Hash32:
-    return Hash32(keccak(bytes([0x03]) + encode(Eip4844RlpTransactionPayload(
+def compute_fee_market_sig_hash(tx: FeeMarketRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x02]) + encode(FeeMarketRlpTransactionPayload(
         chain_id=tx.chain_id,
         nonce=tx.nonce,
         max_priority_fee_per_gas=tx.max_priority_fee_per_gas,
         max_fee_per_gas=tx.max_fee_per_gas,
-        gas_limit=tx.gas_limit,
+        gas=tx.gas,
+        to=tx.to,
+        value=tx.value,
+        data=tx.data,
+        access_list=tx.access_list,
+    ))))
+
+def compute_fee_market_tx_hash(tx: FeeMarketRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x02]) + encode(tx)))
+
+class BlobRlpTransactionPayload(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('nonce', big_endian_int),
+        ('max_priority_fee_per_gas', big_endian_int),
+        ('max_fee_per_gas', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20)),
+        ('value', big_endian_int),
+        ('data', binary),
+        ('access_list', CountableList(RLPList([
+            Binary(20, 20),
+            CountableList(Binary(32, 32)),
+        ]))),
+        ('max_fee_per_blob_gas', big_endian_int),
+        ('blob_versioned_hashes', CountableList(Binary(32, 32))),
+    )
+
+class BlobRlpTransaction(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('nonce', big_endian_int),
+        ('max_priority_fee_per_gas', big_endian_int),
+        ('max_fee_per_gas', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20)),
+        ('value', big_endian_int),
+        ('data', binary),
+        ('access_list', CountableList(RLPList([
+            Binary(20, 20),
+            CountableList(Binary(32, 32)),
+        ]))),
+        ('max_fee_per_blob_gas', big_endian_int),
+        ('blob_versioned_hashes', CountableList(Binary(32, 32))),
+        ('y_parity', big_endian_int),
+        ('r', big_endian_int),
+        ('s', big_endian_int),
+    )
+
+def compute_blob_sig_hash(tx: BlobRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x03]) + encode(BlobRlpTransactionPayload(
+        chain_id=tx.chain_id,
+        nonce=tx.nonce,
+        max_priority_fee_per_gas=tx.max_priority_fee_per_gas,
+        max_fee_per_gas=tx.max_fee_per_gas,
+        gas=tx.gas,
         to=tx.to,
         value=tx.value,
         data=tx.data,
@@ -208,17 +208,5 @@ def compute_eip4844_sig_hash(tx: Eip4844RlpTransaction) -> Hash32:
         blob_versioned_hashes=tx.blob_versioned_hashes,
     ))))
 
-def compute_eip4844_tx_hash(tx: Eip4844RlpTransaction) -> Hash32:
+def compute_blob_tx_hash(tx: BlobRlpTransaction) -> Hash32:
     return Hash32(keccak(bytes([0x03]) + encode(tx)))
-
-class RlpReceipt(Serializable):
-    fields = (
-        ('post_state_or_status', Binary(0, 32)),
-        ('cumulative_gas_used', big_endian_int),
-        ('logs_bloom', Binary(256, 256)),
-        ('logs', CountableList(RLPList([
-            Binary(20, 20),
-            CountableList(Binary(32, 32), 4),
-            binary,
-        ]))),
-    )
