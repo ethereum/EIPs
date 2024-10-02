@@ -210,3 +210,81 @@ def compute_blob_sig_hash(tx: BlobRlpTransaction) -> Hash32:
 
 def compute_blob_tx_hash(tx: BlobRlpTransaction) -> Hash32:
     return Hash32(keccak(bytes([0x03]) + encode(tx)))
+
+class SetCodeRlpAuthorizationPayload(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('address', Binary(20, 20)),
+        ('nonce', big_endian_int),
+    )
+
+class SetCodeRlpAuthorization(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('address', Binary(20, 20)),
+        ('nonce', big_endian_int),
+        ('y_parity', big_endian_int),
+        ('r', big_endian_int),
+        ('s', big_endian_int),
+    )
+
+def compute_set_code_auth_hash(auth: SetCodeRlpAuthorization) -> Hash32:
+    return Hash32(keccak(bytes([0x05]) + encode(SetCodeRlpAuthorizationPayload(
+        chain_id=auth.chain_id,
+        address=auth.address,
+        nonce=auth.nonce,
+    ))))
+
+class SetCodeRlpTransactionPayload(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('nonce', big_endian_int),
+        ('max_priority_fee_per_gas', big_endian_int),
+        ('max_fee_per_gas', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20)),
+        ('value', big_endian_int),
+        ('data', binary),
+        ('access_list', CountableList(RLPList([
+            Binary(20, 20),
+            CountableList(Binary(32, 32)),
+        ]))),
+        ('authorization_list', CountableList(SetCodeRlpAuthorization)),
+    )
+
+class SetCodeRlpTransaction(Serializable):
+    fields = (
+        ('chain_id', big_endian_int),
+        ('nonce', big_endian_int),
+        ('max_priority_fee_per_gas', big_endian_int),
+        ('max_fee_per_gas', big_endian_int),
+        ('gas', big_endian_int),
+        ('to', Binary(20, 20)),
+        ('value', big_endian_int),
+        ('data', binary),
+        ('access_list', CountableList(RLPList([
+            Binary(20, 20),
+            CountableList(Binary(32, 32)),
+        ]))),
+        ('authorization_list', CountableList(SetCodeRlpAuthorization)),
+        ('y_parity', big_endian_int),
+        ('r', big_endian_int),
+        ('s', big_endian_int),
+    )
+
+def compute_set_code_sig_hash(tx: SetCodeRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x04]) + encode(SetCodeRlpTransactionPayload(
+        chain_id=tx.chain_id,
+        nonce=tx.nonce,
+        max_priority_fee_per_gas=tx.max_priority_fee_per_gas,
+        max_fee_per_gas=tx.max_fee_per_gas,
+        gas=tx.gas,
+        to=tx.to,
+        value=tx.value,
+        data=tx.data,
+        access_list=tx.access_list,
+        authorization_list=tx.authorization_list,
+    ))))
+
+def compute_set_code_tx_hash(tx: SetCodeRlpTransaction) -> Hash32:
+    return Hash32(keccak(bytes([0x04]) + encode(tx)))
