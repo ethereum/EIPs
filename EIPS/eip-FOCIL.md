@@ -12,12 +12,14 @@ created: 2024-07-??
 
 ## Abstract
 
-Implement a robust mechanism to preserve Ethereum’s censorship resistance and chain neutrality properties by guaranteeing timely transaction inclusion. 
+Implement a robust mechanism to preserve Ethereum’s censorship resistance and chain neutrality properties by guaranteeing timely transaction inclusion.
 
-FOCIL is built in three simple steps:
+FOCIL is built in a few simple steps:
+
 - In each slot, a set of validators is selected to become IL committee members. Each member gossips one local inclusion list according to their subjective view of the mempool.
-- The block proposer and all attesters of the next slot listen to and collect available local inclusion lists. The block proposer makes sure it doesn't miss any local inclusion list by explicitly requesting for any missing ones when necessary.
-- The attesters vote for a block only if it contains as many transactions from the set of local inclusion lists as possible.
+- The proposer and all attesters of the next slot monitor, forward and collect available local inclusion lists.
+- The proposer includes transactions from all collected local ILs in its block before broadcasting it to the rest of the network.
+- Attesters only vote for the proposer's block if it includes transactions from local inclusion lists they collected.
 
 ## Motivation
 
@@ -35,9 +37,9 @@ TBD
 
 #### Timeline
 
-A set of validators is selected from the beacon committee to become IL committee for `slot N`. Their local inclusion lists constraint the block proposer for `slot N+1`.
+A set of validators is selected from the beacon committee to become IL committee for `slot N`.
 
-- **`Slot N`, `t=0 to 9s`**: After processing the block for `slot N` and confirming it as the head, each IL committee member of `slot N` constructs a local inclusion list based on the head and their view of the public mempool, then broadcasts it over the P2P network. If no block arrives by `t=8s`, each IL committee member should run `get_head` to retrieve their canonical head and use it to build their local inclusion list.
+- **`Slot N`, `t=0 to 8s`**: After processing the block for `slot N` and confirming it as the head, each IL committee member of `slot N` constructs a local inclusion list based on the head and their view of the public mempool, then broadcasts it over the P2P network.
 - **`Slot N`, `t=9s`**: IL committee members freeze their view of a set of local inclusion lists and no longer produce new ones.
 - **`Slot N`, `t=9 to 11s`**: IL committee members continue forwarding the local inclusion lists they are aware of but ignore any new ones. The block proposer and attesters of `slot N+1` continue listening to gossiped local inclusion lists. To ensure none are omitted, the block proposer can request for any missing local inclusion lists from a specific IL committee member via an RPC endpoint, for example, at `t=10s`.
 - **`Slot N`, `t=11s`**: The block proposer freezes its local inclusion lists view and IL committee members stop gossiping.
@@ -73,10 +75,6 @@ It is important to ensure there is enough time between the local inclusion list 
 Since the local inclusion lists from the IL committee are all different and FOCIL does not introduce any single actor with sole responsibility, it seems infeasible to aggregate local inclusion lists while satisfying the aforementioned core properties. A malicious IL committee member may equivocate their local inclusion list.
 
 To mitigate local inclusion list equivocation, FOCIL introduces a new P2P network rule that allows forwarding up to two local inclusion lists per IL committee member. If the block proposer or attesters detect two different local inclusion lists sent by the same IL committee member, they should ignore all local inclusion lists from that member. In the worst case, the bandwidth of the local inclusion list gossip subnet can at most double.
-
-### IL Stuffing
-
-A builder may flood the public mempool with transactions with the intention of invalidating them later—such as by draining the account's ETH to prevent base fee payment or by causing the transactions to revert. However, this attack is risky because the builder must submit these transactions to the public mempool before the target block, without knowing if they will secure the right to build it. This means another builder could win the block, include and execute the transactions intended to be invalidated, making the attack costly and impractical.
 
 <!--
   All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. For example, include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers.
